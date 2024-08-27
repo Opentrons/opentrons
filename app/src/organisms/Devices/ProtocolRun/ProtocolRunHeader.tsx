@@ -698,7 +698,6 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     reset,
     isPlayRunActionLoading,
     isPauseRunActionLoading,
-    isResetRunLoading,
   } = useRunControls(runId, (createRunResponse: Run): void =>
     // redirect to new run after successful reset
     {
@@ -707,7 +706,10 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       )
     }
   )
-  isResetRunLoadingRef.current = isResetRunLoading
+  const isResetRunLoading = isResetRunLoadingRef.current
+  if (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_RUNNING) {
+    isResetRunLoadingRef.current = false
+  }
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
   const { complete: isCalibrationComplete } = useRunCalibrationStatus(
     robotName,
@@ -790,8 +792,6 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     .some(module => module?.data != null && module.data.speedStatus !== 'idle')
   const isValidRunAgain =
     runStatus != null && RUN_AGAIN_STATUSES.includes(runStatus)
-  const validRunAgainButRequiresSetup = isValidRunAgain && !isSetupComplete
-  const runAgainWithSpinner = validRunAgainButRequiresSetup && isResetRunLoading
 
   let buttonText: string = ''
   let handleButtonClick = (): void => {}
@@ -804,7 +804,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     !isValidRunAgain
   ) {
     disableReason = t('setup_incomplete')
-  } else if (isOtherRunCurrent) {
+  } else if (isOtherRunCurrent && !isResetRunLoading) {
     disableReason = t('shared:robot_is_busy')
   } else if (isRobotOnWrongVersionOfSoftware) {
     disableReason = t('shared:a_software_update_is_available')
@@ -866,10 +866,11 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         })
       }
     }
-  } else if (runStatus != null && RUN_AGAIN_STATUSES.includes(runStatus)) {
-    buttonIconName = runAgainWithSpinner ? 'ot-spinner' : 'play'
+  } else if (isValidRunAgain) {
+    buttonIconName = isResetRunLoading ? 'ot-spinner' : 'play'
     buttonText = t('run_again')
     handleButtonClick = () => {
+      isResetRunLoadingRef.current = true
       reset()
       trackEvent({
         name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -889,7 +890,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         boxShadow="none"
         display={DISPLAY_FLEX}
         padding={`${SPACING.spacing12} ${SPACING.spacing16}`}
-        disabled={isRunControlButtonDisabled && !validRunAgainButRequiresSetup}
+        disabled={isRunControlButtonDisabled}
         onClick={handleButtonClick}
         id="ProtocolRunHeader_runControlButton"
         {...targetProps}
@@ -902,7 +903,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
             spin={
               isProtocolAnalyzing ||
               runStatus === RUN_STATUS_STOP_REQUESTED ||
-              runAgainWithSpinner
+              isResetRunLoading
             }
           />
         ) : null}
