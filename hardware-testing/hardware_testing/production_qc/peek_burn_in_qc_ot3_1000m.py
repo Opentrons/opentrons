@@ -438,17 +438,17 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
             helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
 
             for cycle in range(0, cycles+TRIALS_PER_CYCLE, TRIALS_PER_CYCLE):
-                await _test_plunger(
+                failed_cycles = await _test_plunger(
                     api, mount, report,
                     cycle=cycle, trials=trials,
                     continue_after_stall=continue_after_stall
                 )
 
-                failed_cycles = await _cycle_plunger(
-                    api, mount,
-                    cycle=cycle, trials=TRIALS_PER_CYCLE,
-                    continue_after_stall=continue_after_stall
-                )
+                # failed_cycles = await _cycle_plunger(
+                #     api, mount,
+                #     cycle=cycle, trials=TRIALS_PER_CYCLE,
+                #     continue_after_stall=continue_after_stall
+                # )
                 data = [failed_cycles, CSVResult.from_bool(True)]
                 report(
                     _get_cycling_section_tag(),
