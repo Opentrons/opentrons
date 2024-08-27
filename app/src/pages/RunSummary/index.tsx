@@ -251,15 +251,10 @@ export function RunSummary(): JSX.Element {
   }, [isRunCurrent, enteredER])
 
   const returnToQuickTransfer = (): void => {
-    if (!isRunCurrent) {
+    closeCurrentRunIfValid(() => {
       deleteRun(runId)
       navigate('/quick-transfer')
-    } else {
-      closeCurrentRunIfValid(() => {
-        deleteRun(runId)
-        navigate('/quick-transfer')
-      })
-    }
+    })
   }
 
   // TODO(jh, 05-30-24): EXEC-487. Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
