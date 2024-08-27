@@ -20,6 +20,7 @@ import {
   JUSTIFY_FLEX_START,
   LegacyStyledText,
   Link as LinkComponent,
+  NO_WRAP,
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   ProtocolDeck,
@@ -590,7 +591,7 @@ export function ChooseProtocolSlideoutComponent(
       <Flex
         gridGap={SPACING.spacing8}
         flexDirection={DIRECTION_ROW}
-        whiteSpace="nowrap"
+        whiteSpace={NO_WRAP}
       >
         <SecondaryButton
           onClick={() => {
