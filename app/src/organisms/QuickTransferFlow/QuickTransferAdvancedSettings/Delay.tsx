@@ -10,7 +10,7 @@ import {
   ALIGN_CENTER,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../App/portal'
-import { LargeButton } from '../../../atoms/buttons'
+import { RadioButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
 import { InputField } from '../../../atoms/InputField'
 import { ACTIONS } from '../constants'
@@ -178,13 +178,13 @@ export function Delay(props: DelayProps): JSX.Element {
           width="100%"
         >
           {delayEnabledDisplayItems.map(displayItem => (
-            <LargeButton
+            <RadioButton
               key={displayItem.description}
-              buttonType={
-                delayIsEnabled === displayItem.option ? 'primary' : 'secondary'
-              }
-              onClick={displayItem.onClick}
-              buttonText={displayItem.description}
+              isSelected={delayIsEnabled === displayItem.option}
+              onChange={displayItem.onClick}
+              buttonValue={displayItem.description}
+              buttonLabel={displayItem.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>

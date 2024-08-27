@@ -74,6 +74,7 @@ export function ProtocolSetupLiquids({
               setIsConfirmed(true)
               setSetupScreen('prepare to run')
             }}
+            buttonCategory="rounded"
           />
         )}
       </Flex>

@@ -183,11 +183,14 @@ export function RunSummary(): JSX.Element {
         isRunCurrent,
     }
   )
+
   // TODO(jh, 08-14-24): The backend never returns the "user cancelled a run" error and cancelledWithoutRecovery becomes unnecessary.
+  const cancelledWithoutRecovery =
+    !enteredER && runStatus === RUN_STATUS_STOPPED
   const hasCommandErrors =
     commandErrorList != null && commandErrorList.data.length > 0
   const disableErrorDetailsBtn = !(
-    hasCommandErrors ||
+    (hasCommandErrors && !cancelledWithoutRecovery) ||
     (runRecord?.data.errors != null && runRecord?.data.errors.length > 0)
   )
 

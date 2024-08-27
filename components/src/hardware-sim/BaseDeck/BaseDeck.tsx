@@ -57,6 +57,7 @@ export interface LabwareOnDeck {
   labwareChildren?: React.ReactNode
   onLabwareClick?: () => void
   highlight?: boolean
+  highlightShadow?: boolean
   stacked?: boolean
 }
 
@@ -70,6 +71,7 @@ export interface ModuleOnDeck {
   moduleChildren?: React.ReactNode
   onLabwareClick?: () => void
   highlightLabware?: boolean
+  highlightShadowLabware?: boolean
   stacked?: boolean
 }
 interface BaseDeckProps {
@@ -250,6 +252,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             moduleChildren,
             onLabwareClick,
             highlightLabware,
+            highlightShadowLabware,
           }) => {
             const slotPosition = getPositionFromSlotId(
               moduleLocation.slotName,
@@ -277,6 +280,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                         'left' && moduleModel === HEATERSHAKER_MODULE_V1
                     }
                     highlight={highlightLabware}
+                    highlightShadow={highlightShadowLabware}
                   />
                 ) : null}
                 {moduleChildren}
@@ -294,6 +298,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             missingTips,
             onLabwareClick,
             highlight,
+            highlightShadow,
           }) => {
             if (
               labwareLocation === 'offDeck' ||
@@ -322,6 +327,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   wellFill={wellFill ?? undefined}
                   missingTips={missingTips}
                   highlight={highlight}
+                  highlightShadow={highlightShadow}
                 />
                 {labwareChildren}
               </g>

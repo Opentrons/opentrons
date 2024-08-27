@@ -16,17 +16,23 @@ type TipSelectionModalProps = TipSelectionProps & {
 export function TipSelectionModal(
   props: TipSelectionModalProps
 ): JSX.Element | null {
-  const { toggleModal } = props
+  const { isOnDevice, toggleModal, failedLabwareUtils } = props
+  const { areTipsSelected } = failedLabwareUtils
   const { t } = useTranslation('error_recovery')
 
+  // If users end up in a state in which they deselect all wells, don't let them escape this modal.
   const modalHeader: ModalHeaderBaseProps = {
     title: t('change_tip_pickup_location'),
-    hasExitIcon: true,
+    hasExitIcon: areTipsSelected,
   }
 
-  if (props.isOnDevice) {
+  if (isOnDevice) {
     return createPortal(
-      <Modal header={modalHeader} onOutsideClick={toggleModal} zIndex={15}>
+      <Modal
+        header={modalHeader}
+        onOutsideClick={areTipsSelected ? toggleModal : undefined}
+        zIndex={15}
+      >
         <TipSelection {...props} />
       </Modal>,
       getTopPortalEl()
