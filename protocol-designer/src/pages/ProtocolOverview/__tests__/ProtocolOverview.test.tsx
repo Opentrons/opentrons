@@ -2,16 +2,19 @@ import * as React from 'react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 import { getFileMetadata, getRobotType } from '../../../file-data/selectors'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
+import { useBlockingHint } from '../../../components/Hints/useBlockingHint'
 import { ProtocolOverview } from '../index'
 
 import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('../../../step-forms/selectors')
 vi.mock('../../../file-data/selectors')
+vi.mock('../../../components/Hints/useBlockingHint')
 
 const mockNavigate = vi.fn()
 
@@ -43,9 +46,14 @@ describe('ProtocolOverview', () => {
       author: 'mockAuthor',
       description: 'mockDescription',
     })
+    vi.mocked(useBlockingHint).mockReturnValue(null)
   })
   it('renders each section with text', () => {
     render()
+    // buttons
+    screen.getByRole('button', { name: 'Edit protocol' })
+    screen.getByRole('button', { name: 'Export protocol' })
+
     //  metadata
     screen.getByText('mockName')
     screen.getByText('Protocol metadata')
@@ -69,9 +77,32 @@ describe('ProtocolOverview', () => {
     screen.getByText('Protocol steps')
   })
 
-  it('navigates to deck setup deck setup', () => {
+  it('should render text N/A if there is no data', () => {
+    vi.mocked(getFileMetadata).mockReturnValue({
+      protocolName: undefined,
+      author: undefined,
+      description: undefined,
+    })
     render()
-    fireEvent.click(screen.getByTestId('toDeckSetup'))
-    expect(mockNavigate).toHaveBeenCalled()
+    expect(screen.getAllByText('N/A').length).toBe(7)
   })
+
+  it.todo('should render mock materials list modal')
+
+  it('navigates to starting deck state', () => {
+    render()
+    const button = screen.getByRole('button', { name: 'Edit protocol' })
+    fireEvent.click(button)
+    expect(mockNavigate).toHaveBeenCalledWith('/designer')
+  })
+
+  it('renders the file sidebar and exports with blocking hint for exporting', () => {
+    vi.mocked(useBlockingHint).mockReturnValue(<div>mock blocking hint</div>)
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Export protocol' }))
+    expect(vi.mocked(useBlockingHint)).toHaveBeenCalled()
+    screen.getByText('mock blocking hint')
+  })
+
+  it.todo('warning modal tests')
 })

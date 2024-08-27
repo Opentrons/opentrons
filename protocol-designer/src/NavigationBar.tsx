@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -13,32 +14,19 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { actions as loadFileActions } from './load-file'
-import type { ThunkDispatch, RouteProps } from './types'
+import type { ThunkDispatch } from './types'
 
-export function NavigationBar({
-  routes,
-}: {
-  routes: RouteProps[]
-}): JSX.Element {
+export function NavigationBar(): JSX.Element | null {
   const { t } = useTranslation('shared')
-  const navRoutes = routes.filter(
-    (route: RouteProps) => route.navLinkTo !== '/createNew'
-  )
   const location = useLocation()
   const dispatch: ThunkDispatch<any> = useDispatch()
-  const navigate = useNavigate()
   const loadFile = (
     fileChangeEvent: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    if (window.confirm(t('confirm_import') as string)) {
-      dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
-      navigate('/overview')
-    }
+    dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
   }
-  const isFilteredNavPaths =
-    location.pathname === '/createNew' || location.pathname === '/'
 
-  return (
+  return location.pathname === '/designer' ? null : (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -71,21 +59,6 @@ export function NavigationBar({
           </StyledLabel>
         </Flex>
       </Flex>
-      {/* TODO(ja, 8/12/24: delete later. Leaving access to other
-      routes at all times until we make breadcrumbs and protocol overview pg */}
-      {isFilteredNavPaths ? null : (
-        <Flex
-          backgroundColor={COLORS.blue20}
-          padding={`${SPACING.spacing12} ${SPACING.spacing40}`}
-          gridGap={SPACING.spacing40}
-        >
-          {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
-            <NavbarLink key={name} to={navLinkTo}>
-              <StyledText desktopStyle="bodyDefaultRegular">{name}</StyledText>
-            </NavbarLink>
-          ))}
-        </Flex>
-      )}
     </Flex>
   )
 }

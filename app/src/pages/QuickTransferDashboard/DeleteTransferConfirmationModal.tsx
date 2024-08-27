@@ -1,21 +1,17 @@
 import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from 'react-query'
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import { Trans, useTranslation } from 'react-i18next'
 
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
-  Box,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  OVERFLOW_HIDDEN,
-  OVERFLOW_WRAP_ANYWHERE,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 
@@ -97,10 +93,17 @@ export function DeleteTransferConfirmationModal({
         gridGap={SPACING.spacing32}
         width="100%"
       >
-        <Box width="100%">
-          <TransferNameText>{transferName}</TransferNameText>
-          <AdditionalText>{t('will_be_deleted')}</AdditionalText>
-        </Box>
+        <Flex width="100%">
+          <StyledText oddStyle="bodyTextRegular">
+            <Trans
+              t={t}
+              i18nKey="will_be_deleted"
+              values={{
+                transferName,
+              }}
+            />
+          </StyledText>
+        </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}
           gridGap={SPACING.spacing8}
@@ -124,21 +127,3 @@ export function DeleteTransferConfirmationModal({
     </OddModal>
   )
 }
-
-const TransferNameText = styled.span`
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  overflow: ${OVERFLOW_HIDDEN};
-  overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
-  font-weight: ${TYPOGRAPHY.fontWeightBold};
-  font-size: ${TYPOGRAPHY.fontSize22};
-  line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${COLORS.grey60};
-`
-const AdditionalText = styled.span`
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  font-size: ${TYPOGRAPHY.fontSize22};
-  line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${COLORS.grey60};
-`

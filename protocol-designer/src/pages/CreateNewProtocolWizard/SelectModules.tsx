@@ -126,9 +126,10 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
           </StyledText>
           <Flex gridGap={SPACING.spacing4} flexWrap={WRAP}>
             {filteredSupportedModules
-              .filter(
-                module =>
-                  module !== ABSORBANCE_READER_V1 && enableAbsorbanceReader
+              .filter(module =>
+                enableAbsorbanceReader
+                  ? module
+                  : module !== ABSORBANCE_READER_V1
               )
               .map(moduleModel => (
                 <EmptySelectorButton

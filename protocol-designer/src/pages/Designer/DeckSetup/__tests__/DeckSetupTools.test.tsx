@@ -22,10 +22,10 @@ import { LabwareTools } from '../LabwareTools'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
+vi.mock('../LabwareTools')
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../top-selectors/labware-locations')
-vi.mock('../LabwareTools')
 vi.mock('../../../../labware-ingred/actions')
 vi.mock('../../../../step-forms/actions')
 vi.mock('../../../../step-forms/actions/additionalItems')
@@ -69,8 +69,8 @@ describe('DeckSetupTools', () => {
     screen.getByText('Temperature Module GEN2')
     screen.getByText('Staging area')
     screen.getByText('Waste chute')
-    screen.getByText('Trash bin')
-    screen.getByText('Waste chute and staging area')
+    screen.getByText('Trash Bin')
+    screen.getByText('Waste chute and staging area slot')
   })
   it('should render the labware tab', () => {
     render(props)
@@ -124,7 +124,7 @@ describe('DeckSetupTools', () => {
   })
   it('should close and add waste chute and staging area when done is called', () => {
     render(props)
-    fireEvent.click(screen.getByText('Waste chute and staging area'))
+    fireEvent.click(screen.getByText('Waste chute and staging area slot'))
     fireEvent.click(screen.getByText('Done'))
     expect(props.onCloseClick).toHaveBeenCalled()
     expect(vi.mocked(createDeckFixture)).toHaveBeenCalledTimes(2)

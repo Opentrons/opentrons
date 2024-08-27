@@ -218,8 +218,12 @@ const StyledTableRowComponent = (
         ) : null}
       </StyledTableCell>
       <StyledTableCell>
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
-          <LegacyStyledText as="p">
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          gridGap={SPACING.spacing16}
+          alignItems={ALIGN_CENTER}
+        >
+          <LegacyStyledText as="p" css={PARAMETER_VALUE_TEXT_STYLE}>
             {parameter.type === 'csv_file'
               ? parameter.file?.name ?? ''
               : formatRunTimeParameterValue(parameter, t)}
@@ -278,4 +282,13 @@ const StyledTableCell = styled.td<StyledTableCellProps>`
   padding: ${SPACING.spacing8} 0;
   padding-right: ${props =>
     props.paddingRight != null ? props.paddingRight : SPACING.spacing16};
+`
+
+const PARAMETER_VALUE_TEXT_STYLE = css`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 `

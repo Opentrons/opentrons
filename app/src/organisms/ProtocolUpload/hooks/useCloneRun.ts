@@ -36,10 +36,13 @@ export function useCloneRun(
         'protocols',
         protocolKey,
       ])
-      Promise.all([invalidateRuns, invalidateProtocols]).catch((e: Error) => {
-        console.error(`error invalidating runs query: ${e.message}`)
-      })
-      if (onSuccessCallback != null) onSuccessCallback(response)
+      Promise.all([invalidateRuns, invalidateProtocols])
+        .then(() => {
+          onSuccessCallback?.(response)
+        })
+        .catch((e: Error) => {
+          console.error(`error invalidating runs query: ${e.message}`)
+        })
     },
   })
   const { createProtocolAnalysis } = useCreateProtocolAnalysisMutation(

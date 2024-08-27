@@ -283,7 +283,7 @@ class ProtocolContext(CommandPublisher):
                 api_element="ProtocolContext.max_speeds",
                 since_version=f"{ENGINE_CORE_API_VERSION}",
                 current_version=f"{self._api_version}",
-                message=" Set speeds using InstrumentContext.default_speed or the per-method 'speed' argument.",
+                extra_message="Set speeds using InstrumentContext.default_speed or the per-method 'speed' argument.",
             )
 
         return self._core.get_max_speeds()
@@ -1065,7 +1065,7 @@ class ProtocolContext(CommandPublisher):
                 api_element="A Python Protocol safely resuming itself after a pause",
                 since_version=f"{ENGINE_CORE_API_VERSION}",
                 current_version=f"{self._api_version}",
-                message=" To wait automatically for a period of time, use ProtocolContext.delay().",
+                extra_message="To wait automatically for a period of time, use ProtocolContext.delay().",
             )
 
         # TODO(mc, 2023-02-13): this assert should be enough for mypy
@@ -1186,7 +1186,7 @@ class ProtocolContext(CommandPublisher):
                     api_element="Fixed Trash",
                     since_version="2.16",
                     current_version=f"{self._api_version}",
-                    message=" Fixed trash is no longer supported on Flex protocols.",
+                    extra_message="Fixed trash is no longer supported on Flex protocols.",
                 )
             disposal_locations = self._core.get_disposal_locations()
             if len(disposal_locations) == 0:
@@ -1259,7 +1259,7 @@ class ProtocolContext(CommandPublisher):
                     api_element="Calling `define_liquid()` without a `description`",
                     current_version=str(self._api_version),
                     until_version=str(desc_and_display_color_omittable_since),
-                    message="Use a newer API version or explicitly supply `description=None`.",
+                    extra_message="Use a newer API version or explicitly supply `description=None`.",
                 )
             else:
                 description = None
@@ -1269,7 +1269,7 @@ class ProtocolContext(CommandPublisher):
                     api_element="Calling `define_liquid()` without a `display_color`",
                     current_version=str(self._api_version),
                     until_version=str(desc_and_display_color_omittable_since),
-                    message="Use a newer API version or explicitly supply `display_color=None`.",
+                    extra_message="Use a newer API version or explicitly supply `display_color=None`.",
                 )
             else:
                 display_color = None

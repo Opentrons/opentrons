@@ -3308,7 +3308,7 @@
   version "0.0.0-dev"
   dependencies:
     "@types/lodash" "^4.14.191"
-    "@types/node-fetch" "^2.5.8"
+    "@types/node-fetch" "2.6.11"
     "@types/yargs" "17.0.32"
     escape-string-regexp "1.0.5"
     is-ip "3.1.0"
@@ -5469,7 +5469,7 @@
   resolved "https://registry.yarnpkg.com/@types/netmask/-/netmask-1.0.30.tgz#b68005e3e3c19f517ced4610bb69dce2e0c5babb"
   integrity sha512-Kl1xAICLv1Y7/WsNXkPKldRMz3QmXUYMIzr3rMXnIBDy9c4/sYG7V6P6u7Ja3w+uNtNQrRudJduqVoYX/DxfZg==
 
-"@types/node-fetch@2.6.11", "@types/node-fetch@^2.5.8", "@types/node-fetch@^2.6.4":
+"@types/node-fetch@2.6.11", "@types/node-fetch@^2.6.4":
   version "2.6.11"
   resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.6.11.tgz#9b39b78665dae0e82a08f02f4967d62c66f95d24"
   integrity sha512-24xFj9R5+rfQJLRyM56qh+wnVSYhyXC2tkoBndtY0U+vubqNsYXGjufB2nn8Q6gt0LrARwL6UBtMCSVCwl4B1g==

@@ -9,6 +9,7 @@ import {
   SPACING,
   LegacyStyledText,
 } from '@opentrons/components'
+import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../atoms/buttons'
 import { OddModal } from '../../molecules/OddModal'
@@ -18,12 +19,14 @@ import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 interface AnalysisFailedModalProps {
   errors: string[]
   protocolId: string | null
+  runId: string
   setShowAnalysisFailedModal: (showAnalysisFailedModal: boolean) => void
 }
 
 export function AnalysisFailedModal({
   errors,
   protocolId,
+  runId,
   setShowAnalysisFailedModal,
 }: AnalysisFailedModalProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
@@ -35,8 +38,15 @@ export function AnalysisFailedModal({
     hasExitIcon: true,
   }
 
+  const {
+    isLoading: isDismissing,
+    mutateAsync: dismissCurrentRunAsync,
+  } = useDismissCurrentRunMutation()
+
   const handleRestartSetup = (): void => {
-    navigate(protocolId != null ? `/protocols/${protocolId}` : '/protocols')
+    dismissCurrentRunAsync(runId).then(() => {
+      navigate(protocolId != null ? `/protocols/${protocolId}` : '/protocols')
+    })
   }
 
   return (
@@ -76,6 +86,9 @@ export function AnalysisFailedModal({
           onClick={handleRestartSetup}
           buttonText={t('restart_setup')}
           buttonType="alert"
+          iconName={isDismissing ? 'ot-spinner' : null}
+          iconPlacement="startIcon"
+          disabled={isDismissing}
         />
       </Flex>
     </OddModal>

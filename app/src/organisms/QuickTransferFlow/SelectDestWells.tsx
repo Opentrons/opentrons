@@ -150,10 +150,11 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
       <Flex
         justifyContent={JUSTIFY_CENTER}
         marginTop={SPACING.spacing120}
-        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
+        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing8} ${SPACING.spacing32}`}
         position={POSITION_FIXED}
         top="0"
         left="0"
+        height="80%"
         width="100%"
       >
         {labwareDefinition != null ? (

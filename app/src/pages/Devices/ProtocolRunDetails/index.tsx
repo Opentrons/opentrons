@@ -26,6 +26,7 @@ import {
   useModuleRenderInfoForProtocolById,
   useRobot,
   useRobotType,
+  useRunHasStarted,
   useRunStatuses,
   useSyncRobotClock,
 } from '../../../organisms/Devices/hooks'
@@ -315,16 +316,18 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
   const navigate = useNavigate()
-
+  const runHasStarted = useRunHasStarted(currentRunId)
   const disabled = currentRunId !== runId
   const tabDisabledReason = `${t('setup')} ${t(
     'not_available_for_a_completed_run'
   )}`
 
+  // On the initial render only, navigate to "run preview" if the run has started.
   React.useEffect(() => {
-    if (disabled && protocolRunDetailsTab === 'setup')
+    if (runHasStarted && protocolRunDetailsTab === 'setup') {
       navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
-  }, [disabled, navigate, robotName, runId])
+    }
+  }, [])
 
   return (
     <RoundTab
@@ -355,7 +358,7 @@ const ParametersTab = (props: ParametersTabProps): JSX.Element | null => {
         replace: true,
       })
     }
-  }, [disabled, navigate, robotName, runId])
+  }, [disabled, navigate, protocolRunDetailsTab, robotName, runId])
 
   return (
     <RoundTab
@@ -394,7 +397,7 @@ const ModuleControlsTab = (
   React.useEffect(() => {
     if (disabled && protocolRunDetailsTab === 'module-controls')
       navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
-  }, [disabled, navigate, robotName, runId])
+  }, [disabled, navigate, protocolRunDetailsTab, robotName, runId])
 
   return isEmpty(moduleRenderInfoForProtocolById) ? null : (
     <RoundTab

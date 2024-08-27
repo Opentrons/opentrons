@@ -6,9 +6,11 @@ import { screen } from '@testing-library/react'
 import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { loadProtocolFile } from '../../../load-file/actions'
+import { getFileMetadata } from '../../../file-data/selectors'
 import { Landing } from '../index'
 
 vi.mock('../../../load-file/actions')
+vi.mock('../../../file-data/selectors')
 
 const render = () => {
   return renderWithProviders(
@@ -23,6 +25,7 @@ const render = () => {
 
 describe('Landing', () => {
   beforeEach(() => {
+    vi.mocked(getFileMetadata).mockReturnValue({ created: 123 })
     vi.mocked(loadProtocolFile).mockReturnValue(vi.fn())
   })
   it('renders the landing page image and text', () => {
@@ -30,10 +33,10 @@ describe('Landing', () => {
     screen.getByLabelText('welcome image')
     screen.getByText('Welcome to Protocol Designer')
     screen.getByText(
-      'A no-code solution to create protocols that x, y and z meaning for your lab and workflow.'
+      'The easiest way to automate liquid handling on your Opentrons robot. No code required.'
     )
     screen.getByRole('button', { name: 'Create a protocol' })
-    screen.getByText('Import existing protocol')
+    screen.getByText('Edit existing protocol')
     screen.getByRole('img', { name: 'welcome image' })
   })
 })

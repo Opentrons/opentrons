@@ -122,13 +122,18 @@ export function AirGap(props: AirGapProps): JSX.Element {
   }
 
   const volumeRange = { min: 1, max: Math.floor(maxAvailableCapacity) }
-  const volumeError =
-    volume !== null && (volume < volumeRange.min || volume > volumeRange.max)
-      ? t(`value_out_of_range`, {
-          min: volumeRange.min,
-          max: volumeRange.max,
-        })
-      : null
+  let volumeError = null
+  if (volumeRange.min > volumeRange.max) {
+    volumeError = t('air_gap_capacity_error')
+  } else if (
+    volume !== null &&
+    (volume < volumeRange.min || volume > volumeRange.max)
+  ) {
+    volumeError = t(`value_out_of_range`, {
+      min: volumeRange.min,
+      max: volumeRange.max,
+    })
+  }
 
   let buttonIsDisabled = false
   if (currentStep === 2) {

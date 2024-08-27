@@ -7,7 +7,11 @@ import { Liquids } from './pages/Liquids'
 import { Designer } from './pages/Designer'
 import { CreateNewProtocolWizard } from './pages/CreateNewProtocolWizard'
 import { NavigationBar } from './NavigationBar'
-import { Kitchen } from './organisms'
+import {
+  Kitchen,
+  FileUploadMessagesModal,
+  LabwareUploadModal,
+} from './organisms'
 
 import type { RouteProps } from './types'
 
@@ -50,9 +54,11 @@ export function ProtocolRoutes(): JSX.Element {
 
   return (
     <>
-      <NavigationBar routes={pdRoutes} />
+      <NavigationBar />
       <Kitchen>
         <Box width="100%">
+          <LabwareUploadModal />
+          <FileUploadMessagesModal />
           <Routes>
             {allRoutes.map(({ Component, path }: RouteProps) => {
               return <Route key={path} path={path} element={<Component />} />

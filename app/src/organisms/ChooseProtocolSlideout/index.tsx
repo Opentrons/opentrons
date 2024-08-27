@@ -603,7 +603,15 @@ export function ChooseProtocolSlideoutComponent(
           {...targetPropsHover}
         >
           {isCreatingRun ? (
-            <Icon name="ot-spinner" spin size="1rem" />
+            <Flex
+              gridGap={SPACING.spacing4}
+              alignItems={ALIGN_CENTER}
+              whiteSpace="nowrap"
+              marginLeft={`-${SPACING.spacing4}`}
+            >
+              <Icon name="ot-spinner" spin size="1rem" />
+              {t('shared:confirm_values')}
+            </Flex>
           ) : (
             t('shared:confirm_values')
           )}
