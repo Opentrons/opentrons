@@ -17,9 +17,9 @@ interface SlotDetailContainerProps {
   slot: DeckSlotId | null
 }
 
-export const SlotDetailsContainer = (
+export function SlotDetailsContainer(
   props: SlotDetailContainerProps
-): JSX.Element | null => {
+): JSX.Element | null {
   const { robotType, slot } = props
   const { t } = useTranslation('shared')
   const location = useLocation()
@@ -34,18 +34,18 @@ export const SlotDetailsContainer = (
   }
   const {
     modules: deckSetupModules,
-    labware: deckSetupLabware,
+    labware: deckSetupLabwares,
     additionalEquipmentOnDeck,
   } = deckSetup
 
   const moduleOnSlot = Object.values(deckSetupModules).find(
     module => module.slot === slot
   )
-  const labwareOnSlot = Object.values(deckSetupLabware).find(
+  const labwareOnSlot = Object.values(deckSetupLabwares).find(
     lw => lw.slot === slot || lw.slot === moduleOnSlot?.id
   )
-  const nestedLabwareOnSlot = Object.values(deckSetupLabware).find(lw =>
-    Object.keys(deckSetupLabware).includes(lw.slot)
+  const nestedLabwareOnSlot = Object.values(deckSetupLabwares).find(lw =>
+    Object.keys(deckSetupLabwares).includes(lw.slot)
   )
   const labwareOnSlotDisplayName = labwareOnSlot?.def.metadata.displayName
   const nestedLabwareOnSlotDisplayName =
@@ -93,7 +93,7 @@ export const SlotDetailsContainer = (
 
   return location.pathname === '/designer' ? (
     <RobotCoordsForeignObject
-      width="253px"
+      width="15.8125rem"
       height="26.75rem"
       x={robotType === FLEX_ROBOT_TYPE ? '-400' : '-300'}
       y={getYPosition({ robotType, slot })}

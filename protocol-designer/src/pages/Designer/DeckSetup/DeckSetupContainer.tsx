@@ -28,6 +28,7 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
 import { getRobotType } from '../../../file-data/selectors'
 import { getHasGen1MultiChannelPipette } from '../../../step-forms'
+import { SlotDetailsContainer } from '../../../organisms'
 import { DeckSetupDetails } from './DeckSetupDetails'
 import { getCutoutIdForAddressableArea } from './utils'
 import { DeckSetupTools } from './DeckSetupTools'
@@ -39,7 +40,6 @@ import type {
   DeckSlot,
 } from '@opentrons/step-generation'
 import type { OpenSlot } from '../index'
-import { SlotDetailsContainer } from '../../../organisms'
 
 const WASTE_CHUTE_SPACE = 30
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [

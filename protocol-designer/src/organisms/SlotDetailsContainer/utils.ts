@@ -13,31 +13,42 @@ interface YPositionProps {
   robotType: RobotType
   slot: DeckSlotId
 }
-export const getYPosition = (props: YPositionProps): string => {
-  const { robotType, slot } = props
 
-  let yPosition: string = ''
+const Y_POSITIONS = {
+  FLEX: {
+    TOP: '-10',
+    TOP_MIDDLE: '-110',
+    BOTTOM_MIDDLE: '-230',
+    BOTTOM: '-330',
+  },
+  OT2: {
+    TOP: '-60',
+    TOP_MIDDLE: '-160',
+    BOTTOM_MIDDLE: '-250',
+    BOTTOM: '-340',
+  },
+}
+
+export const getYPosition = ({ robotType, slot }: YPositionProps): string => {
   if (robotType === FLEX_ROBOT_TYPE) {
     if (FLEX_TOP_ROW_SLOTS.includes(slot)) {
-      yPosition = '-10'
+      return Y_POSITIONS.FLEX.TOP
     } else if (FLEX_TOP_MIDDLE_ROW_SLOTS.includes(slot)) {
-      yPosition = '-110'
+      return Y_POSITIONS.FLEX.TOP_MIDDLE
     } else if (FLEX_BOTTOM_MIDDLE_ROW_SLOTS.includes(slot)) {
-      yPosition = '-230'
+      return Y_POSITIONS.FLEX.BOTTOM_MIDDLE
     } else {
-      yPosition = '-330'
+      return Y_POSITIONS.FLEX.BOTTOM
     }
   } else {
     if (OT2_TOP_ROW_SLOTS.includes(slot)) {
-      yPosition = '-60'
+      return Y_POSITIONS.OT2.TOP
     } else if (OT2_TOP_MIDDLE_ROW_SLOTS.includes(slot)) {
-      yPosition = '-160'
+      return Y_POSITIONS.OT2.TOP_MIDDLE
     } else if (OT2_BOTTOM_MIDDLE_ROW_SLOTS.includes(slot)) {
-      yPosition = '-250'
+      return Y_POSITIONS.OT2.BOTTOM_MIDDLE
     } else {
-      yPosition = '-340'
+      return Y_POSITIONS.OT2.BOTTOM
     }
   }
-
-  return yPosition
 }
