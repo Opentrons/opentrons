@@ -179,7 +179,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
                     addEquipment={addEquipment}
                     slotBoundingBox={controlSelectDimensions}
                     slotPosition={[0, 0, 0]}
-                    slotId={slotId}
+                    itemId={slotId}
                     selectedTerminalItemId={props.selectedTerminalItemId}
                   />
                 </>
@@ -192,7 +192,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
                   addEquipment={addEquipment}
                   slotBoundingBox={labwareInterfaceBoundingBox}
                   slotPosition={[0, 0, 0]}
-                  slotId={slotId}
+                  itemId={slotId}
                   selectedTerminalItemId={props.selectedTerminalItemId}
                 />
               ) : null}
@@ -247,13 +247,12 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
                   addressableArea.id,
                   deckDef
                 )}
-                slotId={addressableArea.id}
+                itemId={addressableArea.id}
                 selectedTerminalItemId={props.selectedTerminalItemId}
               />
             </React.Fragment>
           )
         })}
-
       {/* all labware on deck NOT those in modules */}
       {allLabware.map(labware => {
         if (
@@ -285,7 +284,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
               addEquipment={addEquipment}
               slotBoundingBox={slotBoundingBox}
               slotPosition={slotPosition}
-              slotId={labware.slot}
+              itemId={labware.slot}
               selectedTerminalItemId={props.selectedTerminalItemId}
             />
           </React.Fragment>
@@ -342,7 +341,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
               addEquipment={addEquipment}
               slotBoundingBox={slotBoundingBox}
               slotPosition={slotPosition}
-              slotId={slotOnDeck ?? ''}
+              itemId={slotOnDeck ?? ''}
               selectedTerminalItemId={props.selectedTerminalItemId}
             />
           </React.Fragment>

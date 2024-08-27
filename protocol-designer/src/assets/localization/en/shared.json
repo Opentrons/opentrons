@@ -26,6 +26,7 @@
   "heatershakermoduletype": "Heater-shaker Module",
   "labware_name_conflict": "Duplicate labware name",
   "labware": "Labware",
+  "labware_detail": "Labware detail",
   "left_right": "Left+Right",
   "left": "Left",
   "liquid": "Liquid",

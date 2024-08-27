@@ -32,6 +32,7 @@ export const SlotInformation: React.FC<SlotInformationProps> = ({
   fixtures = [],
 }) => {
   const { t } = useTranslation('shared')
+  const isOffDeck = location === 'offDeck'
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -39,9 +40,9 @@ export const SlotInformation: React.FC<SlotInformationProps> = ({
       width="100%"
     >
       <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-        <DeckInfoLabel deckLabel={location} />
+        {isOffDeck ? null : <DeckInfoLabel deckLabel={location} />}
         <StyledText desktopStyle="headingSmallBold">
-          {t('slot_detail')}
+          {t(isOffDeck ? 'labware_detail' : 'slot_detail')}
         </StyledText>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
@@ -57,8 +58,10 @@ export const SlotInformation: React.FC<SlotInformationProps> = ({
           <StackInfoList title={t('liquid')} items={liquids} />
         )}
         <StackInfoList title={t('labware')} items={labwares} />
-        <StackInfoList title={t('module')} items={modules} />
-        {robotType === FLEX_ROBOT_TYPE ? (
+        {isOffDeck ? null : (
+          <StackInfoList title={t('module')} items={modules} />
+        )}
+        {robotType === FLEX_ROBOT_TYPE && !isOffDeck ? (
           <StackInfoList title={t('fixtures')} items={fixtures} />
         ) : null}
       </Flex>

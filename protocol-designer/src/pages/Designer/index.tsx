@@ -24,10 +24,10 @@ import { useKitchen } from '../../organisms/Kitchen/hooks'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { getFileMetadata } from '../../file-data/selectors'
 import { DeckSetupContainer } from './DeckSetup'
+import { OffDeck } from './Offdeck'
 
 import type { CutoutId } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
-import { OffDeck } from './Offdeck'
 
 export interface OpenSlot {
   cutoutId: CutoutId

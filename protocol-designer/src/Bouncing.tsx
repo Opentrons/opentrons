@@ -13,7 +13,7 @@ export const Bouncing = (): JSX.Element => {
   const [position, setPosition] = React.useState<Location>({ x: 100, y: 100 })
   const [velocity, setVelocity] = React.useState<Location>({ x: 2, y: 2 })
   const [isPaused, setIsPaused] = React.useState<boolean>(false)
-  const [isStopped, setIsStopped] = React.useState<boolean>(false)
+  const [isStopped, setIsStopped] = React.useState<boolean>(true)
   const [showFeatureFlags, setShowFeatureFlags] = React.useState<boolean>(false)
 
   const divSize = 50

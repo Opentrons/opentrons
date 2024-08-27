@@ -11,16 +11,18 @@ import { SlotInformation } from '../../organisms/SlotInformation'
 import { getYPosition } from './utils'
 
 import type { DeckSlotId, RobotType } from '@opentrons/shared-data'
+import type { ContentsByWell } from '../../labware-ingred/types'
 
 interface SlotDetailContainerProps {
   robotType: RobotType
   slot: DeckSlotId | null
+  offDeckLabwareId?: string
 }
 
 export function SlotDetailsContainer(
   props: SlotDetailContainerProps
 ): JSX.Element | null {
-  const { robotType, slot } = props
+  const { robotType, slot, offDeckLabwareId } = props
   const { t } = useTranslation('shared')
   const location = useLocation()
   const deckSetup = useSelector(getDeckSetupForActiveItem)
@@ -29,14 +31,20 @@ export function SlotDetailsContainer(
   )
   const allIngredNamesIds = useSelector(selectors.allIngredientNamesIds)
 
-  if (slot == null) {
+  if (slot == null || (slot === 'offDeck' && offDeckLabwareId == null)) {
     return null
   }
+
   const {
     modules: deckSetupModules,
     labware: deckSetupLabwares,
     additionalEquipmentOnDeck,
   } = deckSetup
+
+  const offDeckLabwareDisplayName =
+    offDeckLabwareId != null
+      ? deckSetupLabwares[offDeckLabwareId].def.metadata.displayName
+      : null
 
   const moduleOnSlot = Object.values(deckSetupModules).find(
     module => module.slot === slot
@@ -62,10 +70,13 @@ export function SlotDetailsContainer(
 
   const liquidsLabware =
     nestedLabwareOnSlot != null ? nestedLabwareOnSlot : labwareOnSlot
-  const wellContents =
-    allWellContentsForActiveItem && liquidsLabware != null
-      ? allWellContentsForActiveItem[liquidsLabware.id]
-      : null
+
+  let wellContents: ContentsByWell | null = null
+  if (offDeckLabwareId != null && allWellContentsForActiveItem != null) {
+    wellContents = allWellContentsForActiveItem[offDeckLabwareId]
+  } else if (allWellContentsForActiveItem != null && liquidsLabware != null) {
+    wellContents = allWellContentsForActiveItem[liquidsLabware.id]
+  }
 
   const liquids =
     wellContents != null
@@ -84,14 +95,18 @@ export function SlotDetailsContainer(
     .filter(Boolean)
 
   const labwares: string[] = []
-  if (labwareOnSlotDisplayName != null) {
-    labwares.push(labwareOnSlotDisplayName)
-  }
-  if (nestedLabwareOnSlotDisplayName != null) {
-    labwares.push(nestedLabwareOnSlotDisplayName)
+  if (offDeckLabwareDisplayName != null) {
+    labwares.push(offDeckLabwareDisplayName)
+  } else {
+    if (labwareOnSlotDisplayName != null) {
+      labwares.push(labwareOnSlotDisplayName)
+    }
+    if (nestedLabwareOnSlotDisplayName != null) {
+      labwares.push(nestedLabwareOnSlotDisplayName)
+    }
   }
 
-  return location.pathname === '/designer' ? (
+  return location.pathname === '/designer' && slot !== 'offDeck' ? (
     <RobotCoordsForeignObject
       width="15.8125rem"
       height="26.75rem"
