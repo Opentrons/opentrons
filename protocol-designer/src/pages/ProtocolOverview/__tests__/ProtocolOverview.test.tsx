@@ -87,11 +87,7 @@ describe('ProtocolOverview', () => {
     expect(screen.getAllByText('N/A').length).toBe(7)
   })
 
-  it('navigates to deck setup deck setup', () => {
-    render()
-    fireEvent.click(screen.getByTestId('toDeckSetup'))
-    expect(mockNavigate).toHaveBeenCalled()
-  })
+  it.todo('should render mock materials list modal')
 
   it('navigates to starting deck state', () => {
     render()

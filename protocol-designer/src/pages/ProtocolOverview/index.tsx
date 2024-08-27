@@ -54,7 +54,7 @@ interface Fixture {
 }
 
 export function ProtocolOverview(): JSX.Element {
-  const { t } = useTranslation(['protocol_overview', 'shared'])
+  const { t } = useTranslation(['protocol_overview', 'alert', 'shared'])
   const navigate = useNavigate()
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
@@ -146,7 +146,7 @@ export function ProtocolOverview(): JSX.Element {
     content: React.ReactNode
   } => {
     return {
-      hintKey: 'export_v8_1_protocol_7_3',
+      hintKey: t('alert:export_v8_1_protocol_7_3'),
       content: v8WarningContent(t),
     }
   }
@@ -200,6 +200,7 @@ export function ProtocolOverview(): JSX.Element {
                 navigate('/designer')
               }}
               whiteSpace="nowrap"
+              height="3.5rem"
             />
             <LargeButton
               buttonText={t('export_protocol')}
@@ -367,7 +368,7 @@ export function ProtocolOverview(): JSX.Element {
                 {t('starting_deck')}
               </StyledText>
               <Btn
-                data-testid="toDeckSetup"
+                data-testid="Materials_list"
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 onClick={() => {
                   // ToDo (kk:08/27/2024) wire up material list modal
