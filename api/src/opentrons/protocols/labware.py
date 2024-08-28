@@ -260,11 +260,11 @@ def _get_path_to_labware(
             )
         else:
             res = (
-                    get_shared_data_root()
-                    / STANDARD_DEFS_PATH
-                    / "2"
-                    / load_name
-                    / f"{version}.json"
+                get_shared_data_root()
+                / STANDARD_DEFS_PATH
+                / "2"
+                / load_name
+                / f"{version}.json"
             )
             return (
                 get_shared_data_root()
