@@ -7,6 +7,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  NO_WRAP,
   SPACING,
   StyledText,
   useOnClickOutside,
@@ -86,7 +87,7 @@ export function SlotOverflowMenu(
 
   return (
     <Flex
-      whiteSpace="nowrap"
+      whiteSpace={NO_WRAP}
       ref={overflowWrapperRef}
       borderRadius={BORDERS.borderRadius8}
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"

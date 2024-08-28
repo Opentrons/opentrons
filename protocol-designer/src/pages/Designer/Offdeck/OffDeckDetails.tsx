@@ -9,10 +9,10 @@ import {
   Flex,
   JUSTIFY_CENTER,
   LabwareRender,
+  OVERFLOW_SCROLL,
   RobotWorkSpace,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
@@ -34,7 +34,7 @@ interface OffDeckDetailsProps {
 }
 export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
   const { onClick, addLabware, hover, setHover } = props
-  const { t } = useTranslation('starting_deck_state')
+  const { t, i18n } = useTranslation('starting_deck_state')
   const [menuListId, setShowMenuListForId] = React.useState<DeckSlotId | null>(
     null
   )
@@ -75,18 +75,17 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
         padding={`${SPACING.spacing16} ${SPACING.spacing40}`}
         backgroundColor={COLORS.grey20}
         height="100%"
-        overflowY="scroll"
+        overflowY={OVERFLOW_SCROLL}
         flexDirection={DIRECTION_COLUMN}
       >
         <Flex
           justifyContent={JUSTIFY_CENTER}
           width="100%"
           color={COLORS.grey60}
-          textTransform={TYPOGRAPHY.textTransformUppercase}
           marginBottom={SPACING.spacing40}
         >
           <StyledText desktopStyle="bodyDefaultSemiBold">
-            {t('off_deck_labware')}
+            {i18n.format(t('off_deck_labware'), 'uppercase')}
           </StyledText>
         </Flex>
 
@@ -104,37 +103,35 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
             }
             return (
               <Flex flexDirection={DIRECTION_COLUMN} key={lw.id}>
-                <Flex width="9.5625rem" height="6.375rem">
-                  <RobotWorkSpace
-                    key={lw.id}
-                    viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${dimensions.xDimension} ${dimensions.yDimension}`}
-                    width="100%"
-                    height="100%"
-                  >
-                    {() => (
-                      <>
-                        <LabwareRender
-                          definition={definition}
-                          wellFill={wellFillFromWellContents(
-                            wellContents,
-                            liquidDisplayColors
-                          )}
-                        />
-                        <DeckItemHover
-                          hover={hover}
-                          setShowMenuListForId={setShowMenuListForId}
-                          menuListId={menuListId}
-                          setHover={setHover}
-                          slotBoundingBox={xyzDimensions}
-                          slotPosition={[0, 0, 0]}
-                          itemId={lw.id}
-                          selectedTerminalItemId={START_TERMINAL_ITEM_ID}
-                        />
-                      </>
-                    )}
-                  </RobotWorkSpace>
-                </Flex>
-                {menuListId != null ? (
+                <RobotWorkSpace
+                  key={lw.id}
+                  viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${dimensions.xDimension} ${dimensions.yDimension}`}
+                  width="9.5625rem"
+                  height="6.375rem"
+                >
+                  {() => (
+                    <>
+                      <LabwareRender
+                        definition={definition}
+                        wellFill={wellFillFromWellContents(
+                          wellContents,
+                          liquidDisplayColors
+                        )}
+                      />
+                      <DeckItemHover
+                        hover={hover}
+                        setShowMenuListForId={setShowMenuListForId}
+                        menuListId={menuListId}
+                        setHover={setHover}
+                        slotBoundingBox={xyzDimensions}
+                        slotPosition={[0, 0, 0]}
+                        itemId={lw.id}
+                        selectedTerminalItemId={START_TERMINAL_ITEM_ID}
+                      />
+                    </>
+                  )}
+                </RobotWorkSpace>
+                {menuListId === lw.id ? (
                   // TODO fix this rendering position
                   <Flex marginTop="-2rem" marginLeft="4rem" zIndex={3}>
                     <SlotOverflowMenu
