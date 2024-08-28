@@ -6,6 +6,7 @@ import { FLEX_ROBOT_TYPE, getModuleDisplayName } from '@opentrons/shared-data'
 import { RobotCoordsForeignObject } from '@opentrons/components'
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import { selectors } from '../../labware-ingred/selectors'
+import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { SlotInformation } from '../../organisms/SlotInformation'
 import { getYPosition } from './utils'
@@ -29,6 +30,7 @@ export function SlotDetailsContainer(
   const allWellContentsForActiveItem = useSelector(
     wellContentsSelectors.getAllWellContentsForActiveItem
   )
+  const nickNames = useSelector(uiLabwareSelectors.getLabwareNicknamesById)
   const allIngredNamesIds = useSelector(selectors.allIngredientNamesIds)
 
   if (slot == null || (slot === 'offDeck' && offDeckLabwareId == null)) {
@@ -55,10 +57,6 @@ export function SlotDetailsContainer(
   const nestedLabwareOnSlot = Object.values(deckSetupLabwares).find(lw =>
     Object.keys(deckSetupLabwares).includes(lw.slot)
   )
-  const labwareOnSlotDisplayName = labwareOnSlot?.def.metadata.displayName
-  const nestedLabwareOnSlotDisplayName =
-    nestedLabwareOnSlot?.def.metadata.displayName
-
   const fixturesOnSlot = Object.values(additionalEquipmentOnDeck).filter(
     ae => ae.location?.split('cutout')[1] === slot
   )
@@ -98,11 +96,11 @@ export function SlotDetailsContainer(
   if (offDeckLabwareDisplayName != null) {
     labwares.push(offDeckLabwareDisplayName)
   } else {
-    if (labwareOnSlotDisplayName != null) {
-      labwares.push(labwareOnSlotDisplayName)
+    if (labwareOnSlot != null) {
+      labwares.push(nickNames[labwareOnSlot.id])
     }
-    if (nestedLabwareOnSlotDisplayName != null) {
-      labwares.push(nestedLabwareOnSlotDisplayName)
+    if (nestedLabwareOnSlot != null) {
+      labwares.push(nickNames[nestedLabwareOnSlot.id])
     }
   }
 

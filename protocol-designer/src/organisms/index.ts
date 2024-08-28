@@ -1,3 +1,4 @@
+export * from './EditNickNameModal'
 export * from './FeatureFlagsModal'
 export * from './FileUploadMessagesModal/'
 export * from './IncompatibleTipsModal'
