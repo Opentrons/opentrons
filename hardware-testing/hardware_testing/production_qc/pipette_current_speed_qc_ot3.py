@@ -20,7 +20,7 @@ from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.data import ui
 
-DEFAULT_TRIALS = 5
+DEFAULT_TRIALS = 200
 STALL_THRESHOLD_MM = 0.1
 TEST_ACCELERATION = 1500  # used during gravimetric tests
 
@@ -32,12 +32,8 @@ MUST_PASS_CURRENT = round(DEFAULT_CURRENT * 0.75, 2)  # the target spec (must pa
 assert (
     MUST_PASS_CURRENT < DEFAULT_CURRENT
 ), "must-pass current must be less than default current"
-TEST_SPEEDS = [
-    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] - 20,
-    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P],
-    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 10,
-    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 20,
-]
+TEST_SPEEDS = [0.5, 1.0, 2.0, 3.0, 4.0, 5.0]
+TEST_DISTANCES = [0.4, 0.6, 0.8]
 PLUNGER_CURRENTS_SPEED = {
     MUST_PASS_CURRENT - 0.45: TEST_SPEEDS,
     MUST_PASS_CURRENT - 0.35: TEST_SPEEDS,
@@ -175,6 +171,7 @@ async def _test_direction(
     speed: float,
     acceleration: float,
     direction: str,
+    distance: float,
 ) -> bool:
     plunger_poses = helpers_ot3.get_plunger_positions_ot3(api, mount)
     top, _, bottom, _ = plunger_poses
@@ -186,7 +183,7 @@ async def _test_direction(
         print("ERROR: unable to align at the start")
         return False
     # move the plunger
-    _plunger_target = {"down": bottom, "up": top + 1.0}[direction]
+    _plunger_target = {"down": distance, "up": distance}[direction]
     try:
         await _move_plunger(api, mount, _plunger_target, speed, current, acceleration)
         # check that encoder/motor still align
@@ -215,33 +212,36 @@ async def _test_plunger(
         # start at LOWEST (easiest) speed
         speeds = sorted(PLUNGER_CURRENTS_SPEED[current], reverse=False)
         for speed in speeds:
-            for trial in range(trials):
-                ui.print_header(
-                    f"CURRENT = {current}: "
-                    f"SPEED = {speed}: "
-                    f"TRIAL = {trial + 1}/{trials}"
-                )
-                await _home_plunger(api, mount)
-                for direction in ["down", "up"]:
-                    _pass = await _test_direction(
-                        api,
-                        mount,
-                        report,
-                        trial,
-                        current,
-                        speed,
-                        TEST_ACCELERATION,
-                        direction,
+            for distance in TEST_DISTANCES:
+                for trial in range(trials):
+                    ui.print_header(
+                        f"CURRENT = {current}: "
+                        f"SPEED = {speed}: "
+                        f"TRIAL = {trial + 1}/{trials}"
                     )
-                    if not _pass:
-                        ui.print_error(
-                            f"failed moving {direction} at {current} amps and {speed} mm/sec"
+                    await _home_plunger(api, mount)
+                    await api.home_plunger(mount)
+                    for direction in ["up", "down"]:
+                        _pass = await _test_direction(
+                            api,
+                            mount,
+                            report,
+                            trial,
+                            current,
+                            speed,
+                            TEST_ACCELERATION,
+                            direction,
+                            distance,
                         )
-                        max_failed_current = max(max_failed_current, current)
-                        if continue_after_stall:
-                            break
-                        else:
-                            return max_failed_current
+                        if not _pass:
+                            ui.print_error(
+                                f"failed moving {direction} at {current} amps and {speed} mm/sec"
+                            )
+                            max_failed_current = max(max_failed_current, current)
+                            if continue_after_stall:
+                                break
+                            else:
+                                return max_failed_current
     return max_failed_current
 
 
@@ -297,7 +297,11 @@ async def _main(is_simulating: bool, trials: int, continue_after_stall: bool) ->
         helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
 
         await _test_plunger(
-            api, mount, report, trials=trials, continue_after_stall=continue_after_stall
+            api,
+            mount,
+            report,
+            trials=trials,
+            continue_after_stall=continue_after_stall,
         )
         ui.print_title("DONE")
         report.save_to_disk()
