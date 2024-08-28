@@ -7,10 +7,7 @@ export type AdditionalEquipment =
   | 'gripper'
   | 'wasteChute'
   | 'trashBin'
-  | 'stagingArea_cutoutA3'
-  | 'stagingArea_cutoutB3'
-  | 'stagingArea_cutoutC3'
-  | 'stagingArea_cutoutD3'
+  | 'stagingArea'
 
 export interface WizardFormState {
   fields: NewProtocolFields
