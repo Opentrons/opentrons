@@ -37,15 +37,14 @@ import { ExitConfirmation } from './ExitConfirmation'
 import type { UseMutateFunction } from 'react-query'
 import type { GripperWizardFlowType } from './types'
 import type { AxiosError } from 'axios'
-import {
-  type CreateMaintenanceRunData,
-  type InstrumentData,
-  type MaintenanceRun,
-  type CommandData,
-  RUN_STATUS_FAILED,
+import type {
+  CreateMaintenanceRunData,
+  InstrumentData,
+  MaintenanceRun,
+  CommandData,
   RunStatus,
-  RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import type { Coordinates, CreateCommand } from '@opentrons/shared-data'
 
 const RUN_REFETCH_INTERVAL = 5000
@@ -300,7 +299,10 @@ export const GripperWizard = (
         isRobotMoving={isRobotMoving}
       />
     )
-  } else if (isExiting && errorMessage != null || maintenanceRunStatus === RUN_STATUS_FAILED) {
+  } else if (
+    (isExiting && errorMessage != null) ||
+    maintenanceRunStatus === RUN_STATUS_FAILED
+  ) {
     onExit = handleClose
     modalContent = (
       <SimpleWizardBody
