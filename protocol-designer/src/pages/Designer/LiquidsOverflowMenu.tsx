@@ -15,7 +15,6 @@ import {
   POSITION_ABSOLUTE,
   SPACING,
   StyledText,
-  useOnClickOutside,
 } from '@opentrons/components'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import * as labwareIngredActions from '../../labware-ingred/actions'
@@ -25,29 +24,22 @@ const NAV_HEIGHT = '64px'
 
 interface LiquidsOverflowMenuProps {
   onClose: () => void
+  showLiquidsModal: () => void
+  overflowWrapperRef: React.RefObject<HTMLDivElement>
 }
 
 export function LiquidsOverflowMenu(
   props: LiquidsOverflowMenuProps
 ): JSX.Element {
-  const { onClose } = props
+  const { onClose, showLiquidsModal, overflowWrapperRef } = props
   const { t } = useTranslation(['starting_deck_state'])
   const liquids = useSelector(labwareIngredSelectors.allIngredientNamesIds)
   const dispatch: ThunkDispatch<any> = useDispatch()
-  const [showDefineLiquidModal, setDefineLiquidModal] = React.useState<boolean>(
-    false
-  )
-  const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => {
-      if (!showDefineLiquidModal) {
-        onClose()
-      }
-    },
-  })
 
   return (
     <Flex
       position={POSITION_ABSOLUTE}
+      zIndex={5}
       right="50px"
       top={`calc(${NAV_HEIGHT} - 6px)`}
       whiteSpace={NO_WRAP}
@@ -66,8 +58,8 @@ export function LiquidsOverflowMenu(
           <MenuButton
             data-testid={`${name}_${ingredientId}`}
             onClick={() => {
-              setDefineLiquidModal(true)
               onClose()
+              showLiquidsModal()
               dispatch(labwareIngredActions.selectLiquidGroup(ingredientId))
             }}
             key={ingredientId}
@@ -83,8 +75,8 @@ export function LiquidsOverflowMenu(
       <MenuButton
         data-testid="defineLiquid"
         onClick={() => {
-          setDefineLiquidModal(true)
           onClose()
+          showLiquidsModal()
           dispatch(labwareIngredActions.createNewLiquidGroup())
         }}
         key="defineLiquid"

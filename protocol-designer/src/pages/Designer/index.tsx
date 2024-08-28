@@ -18,6 +18,7 @@ import {
   StyledText,
   Tabs,
   ToggleGroup,
+  useOnClickOutside,
 } from '@opentrons/components'
 import { useKitchen } from '../../organisms/Kitchen/hooks'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
@@ -93,6 +94,14 @@ export function Designer(): JSX.Element {
     }
   }, [])
 
+  const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
+    onClickOutside: () => {
+      if (!showDefineLiquidModal) {
+        showLiquidOverflowMenu(false)
+      }
+    },
+  })
+
   return (
     <>
       {showDefineLiquidModal ? (
@@ -104,7 +113,11 @@ export function Designer(): JSX.Element {
       ) : null}
       {liquidOverflowMenu ? (
         <LiquidsOverflowMenu
+          overflowWrapperRef={overflowWrapperRef}
           onClose={() => {
+            showLiquidOverflowMenu(false)
+          }}
+          showLiquidsModal={() => {
             showLiquidOverflowMenu(false)
             setDefineLiquidModal(true)
           }}

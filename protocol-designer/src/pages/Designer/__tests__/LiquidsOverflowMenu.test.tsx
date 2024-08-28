@@ -22,6 +22,8 @@ describe('SlotOverflowMenu', () => {
   beforeEach(() => {
     props = {
       onClose: vi.fn(),
+      showLiquidsModal: vi.fn(),
+      overflowWrapperRef: React.createRef(),
     }
     vi.mocked(labwareIngredSelectors.allIngredientNamesIds).mockReturnValue([
       {
@@ -36,6 +38,7 @@ describe('SlotOverflowMenu', () => {
     screen.getByText('mockname')
     fireEvent.click(screen.getByTestId('mockname_0'))
     expect(props.onClose).toHaveBeenCalled()
+    expect(props.showLiquidsModal).toHaveBeenCalled()
     expect(vi.mocked(labwareIngredActions.selectLiquidGroup)).toHaveBeenCalled()
     screen.getByText('Define a liquid')
     fireEvent.click(screen.getByTestId('defineLiquid'))
@@ -43,5 +46,6 @@ describe('SlotOverflowMenu', () => {
     expect(
       vi.mocked(labwareIngredActions.createNewLiquidGroup)
     ).toHaveBeenCalled()
+    expect(props.showLiquidsModal).toHaveBeenCalled()
   })
 })
