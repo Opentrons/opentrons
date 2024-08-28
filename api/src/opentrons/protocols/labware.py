@@ -5,11 +5,10 @@ import json
 import os
 
 from pathlib import Path
-from typing import Any, AnyStr, List, Dict, Optional, Union
+from typing import Any, AnyStr, Dict, Optional, Union
 
 import jsonschema  # type: ignore
 
-from opentrons.protocols.api_support.util import ModifiedList
 from opentrons_shared_data import load_shared_data, get_shared_data_root
 from opentrons.protocols.api_support.constants import (
     OPENTRONS_NAMESPACE,
@@ -61,29 +60,6 @@ def get_labware_definition(
         pass
 
     return _get_standard_labware_definition(load_name, namespace, version)
-
-
-def get_all_labware_definitions() -> List[str]:
-    """
-    Return a list of standard and custom labware definitions with load_name +
-        name_space + version existing on the robot
-    """
-    labware_list = ModifiedList()
-
-    def _check_for_subdirectories(path: Union[str, Path, os.DirEntry[str]]) -> None:
-        with os.scandir(path) as top_path:
-            for sub_dir in top_path:
-                if sub_dir.is_dir():
-                    labware_list.append(sub_dir.name)
-
-    # check for standard labware
-    _check_for_subdirectories(get_shared_data_root() / (STANDARD_DEFS_PATH / "2"))
-
-    # check for custom labware
-    for namespace in os.scandir(USER_DEFS_PATH):
-        _check_for_subdirectories(namespace)
-
-    return labware_list
 
 
 def save_definition(
@@ -250,29 +226,29 @@ def _get_path_to_labware(
 ) -> Path:
     if namespace == OPENTRONS_NAMESPACE:
         # all labware in OPENTRONS_NAMESPACE is stored in shared data
-        if load_name in os.listdir(get_shared_data_root() / STANDARD_DEFS_PATH / "3"):
-            return (
-                get_shared_data_root()
-                / STANDARD_DEFS_PATH
-                / "3"
-                / load_name
-                / f"{version}.json"
+
+        schema_3_load_name_present = load_name in os.listdir(
+            get_shared_data_root() / STANDARD_DEFS_PATH / "3"
+        )
+        if schema_3_load_name_present:
+            schema_3_version_present = f"{version}.json" in os.listdir(
+                get_shared_data_root() / STANDARD_DEFS_PATH / "3" / load_name
             )
-        else:
-            res = (
-                get_shared_data_root()
-                / STANDARD_DEFS_PATH
-                / "2"
-                / load_name
-                / f"{version}.json"
-            )
-            return (
-                get_shared_data_root()
-                / STANDARD_DEFS_PATH
-                / "2"
-                / load_name
-                / f"{version}.json"
-            )
+            if schema_3_version_present:
+                return (
+                    get_shared_data_root()
+                    / STANDARD_DEFS_PATH
+                    / "3"
+                    / load_name
+                    / f"{version}.json"
+                )
+        return (
+            get_shared_data_root()
+            / STANDARD_DEFS_PATH
+            / "2"
+            / load_name
+            / f"{version}.json"
+        )
     if not base_path:
         base_path = USER_DEFS_PATH
     def_path = base_path / namespace / load_name / f"{version}.json"
