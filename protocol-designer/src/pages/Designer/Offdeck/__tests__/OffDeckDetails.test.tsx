@@ -36,10 +36,7 @@ describe('OffDeckDetails', () => {
 
   beforeEach(() => {
     props = {
-      onClick: vi.fn(),
       addLabware: vi.fn(),
-      hover: null,
-      setHover: vi.fn(),
     }
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({

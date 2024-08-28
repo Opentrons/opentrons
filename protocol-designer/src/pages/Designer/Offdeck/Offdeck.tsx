@@ -24,9 +24,6 @@ export function OffDeck(): JSX.Element {
           addLabware={() => {
             setToolbox(true)
           }}
-          onClick={() => {
-            setToolbox(true)
-          }}
         />
       )}
     </>

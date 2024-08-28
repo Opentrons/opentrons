@@ -27,14 +27,12 @@ import { SlotOverflowMenu } from '../DeckSetup/SlotOverflowMenu'
 import type { DeckSlotId } from '@opentrons/shared-data'
 
 interface OffDeckDetailsProps {
-  onClick: () => void
   addLabware: () => void
-  hover: string | null
-  setHover: React.Dispatch<React.SetStateAction<string | null>>
 }
 export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
-  const { onClick, addLabware, hover, setHover } = props
+  const { addLabware } = props
   const { t, i18n } = useTranslation('starting_deck_state')
+  const [hoverSlot, setHoverSlot] = React.useState<DeckSlotId | null>(null)
   const [menuListId, setShowMenuListForId] = React.useState<DeckSlotId | null>(
     null
   )
@@ -58,18 +56,18 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
       justifyContent={JUSTIFY_CENTER}
       gridGap={SPACING.spacing24}
     >
-      {hover != null ? (
+      {hoverSlot != null ? (
         <Flex width="17.625rem" height="6.25rem" marginTop="4.75rem">
           <SlotDetailsContainer
             robotType={robotType}
             slot="offDeck"
-            offDeckLabwareId={hover}
+            offDeckLabwareId={hoverSlot}
           />
         </Flex>
       ) : null}
       <Flex
         marginRight="17.375rem"
-        marginLeft={hover ? '0' : '17.375rem'}
+        marginLeft={hoverSlot ? '0' : '17.375rem'}
         width="100%"
         borderRadius={SPACING.spacing12}
         padding={`${SPACING.spacing16} ${SPACING.spacing40}`}
@@ -119,10 +117,10 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                         )}
                       />
                       <DeckItemHover
-                        hover={hover}
+                        hover={hoverSlot}
                         setShowMenuListForId={setShowMenuListForId}
                         menuListId={menuListId}
-                        setHover={setHover}
+                        setHover={setHoverSlot}
                         slotBoundingBox={xyzDimensions}
                         slotPosition={[0, 0, 0]}
                         itemId={lw.id}
@@ -152,7 +150,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
           })}
           <Flex width="9.5625rem" height="6.375rem">
             <EmptySelectorButton
-              onClick={onClick}
+              onClick={addLabware}
               text={t('add_labware')}
               textAlignment="middle"
               size="large"

@@ -474,13 +474,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       </Box>
       {showOverflowMenu && (
         <>
-          {/* <Box
+          <Box
             ref={moduleOverflowWrapperRef}
             data-testid={`ModuleCard_overflow_menu_${module.serialNumber}`}
             onClick={() => {
               setShowOverflowMenu(false)
             }}
-          > */}
+          >
             <ModuleOverflowMenu
               handleAboutClick={handleAboutClick}
               module={module}
@@ -494,8 +494,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               handleInstructionsClick={handleInstructionsClick}
               handleCalibrateClick={handleCalibrateClick}
             />
-          {/* </Box>
-          {menuOverlay} */}
+          </Box>
+          {menuOverlay}
         </>
       )}
     </Flex>
