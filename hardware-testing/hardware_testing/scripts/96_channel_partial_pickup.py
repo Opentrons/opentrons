@@ -26,7 +26,7 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     get_plunger_positions_ot3,
     update_pick_up_current,
     update_pick_up_speed,
-    update_pick_up_distance,
+    # update_pick_up_distance,
     update_drop_tip_current,
     update_drop_tip_speed,
     _get_pipette_from_mount,
@@ -212,7 +212,54 @@ async def update_pickup_tip_speed(api, mount, speed) -> None:
     config_model = pipette.pick_up_configurations
     config_model.speed = speed
     pipette.pick_up_configurations = config_model
-    print(pipette.pick_up_configurations)
+    # print(pipette.pick_up_configurations)
+
+def update_pickup_tip_distance(api, mount, distance) -> None:
+    """Update drop-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    config_model = pipette.pick_up_configurations
+    config_model.press_fit.configuration_by_nozzle_map['SingleA1']['default'].distance = distance
+    config_model.press_fit.configuration_by_nozzle_map['SingleA12']['default'].distance = distance
+    config_model.press_fit.configuration_by_nozzle_map['SingleH1']['default'].distance = distance
+    config_model.press_fit.configuration_by_nozzle_map['SingleH12']['default'].distance = distance
+    config_model.press_fit.configuration_by_nozzle_map['SingleA1']['t1000'].distance = distance
+    config_model.press_fit.configuration_by_nozzle_map['SingleA12']['t1000'].distance = distance
+    config_model.press_fit.configuration_by_nozzle_map['SingleH1']['t1000'].distance = distance
+    config_model.press_fit.configuration_by_nozzle_map['SingleH12']['t1000'].distance = distance
+    config_model.press_fit.configuration_by_nozzle_map['SingleA1']['t200'].distance = distance
+    config_model.press_fit.configuration_by_nozzle_map['SingleA12']['t200'].distance = distance
+    config_model.press_fit.configuration_by_nozzle_map['SingleH1']['t200'].distance = distance
+    config_model.press_fit.configuration_by_nozzle_map['SingleH12']['t200'].distance = distance
+    config_model.press_fit.configuration_by_nozzle_map['SingleA1']['t50'].distance = distance
+    config_model.press_fit.configuration_by_nozzle_map['SingleA12']['t50'].distance = distance
+    config_model.press_fit.configuration_by_nozzle_map['SingleH1']['t50'].distance = distance
+    config_model.press_fit.configuration_by_nozzle_map['SingleH12']['t50'].distance = distance
+    pipette.pick_up_configurations = config_model
+    # print(pipette.pick_up_configurations)
+
+
+def update_pickup_tip_current(api, mount, current) -> None:
+    """Update drop-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    config_model = pipette.pick_up_configurations
+    config_model.press_fit.configuration_by_nozzle_map['SingleA1']['default'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['SingleA12']['default'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['SingleH1']['default'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['SingleH12']['default'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['SingleA1']['t1000'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['SingleA12']['t1000'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['SingleH1']['t1000'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['SingleH12']['t1000'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['SingleA1']['t200'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['SingleA12']['t200'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['SingleH1']['t200'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['SingleH12']['t200'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['SingleA1']['t50'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['SingleA12']['t50'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['SingleH1']['t50'].current = current
+    config_model.press_fit.configuration_by_nozzle_map['SingleH12']['t50'].current = current
+    pipette.pick_up_configurations = config_model
+    # print(pipette.pick_up_configurations)
 
 async def move_to_point(api, mount, point, cp):
     home_pos = api.get_instrument_max_height(mount, cp)
@@ -273,9 +320,12 @@ async def calibrate_tiprack(api, home_position, mount):
     tiprack_loc = Point(tiprack_loc[Axis.X],
                         tiprack_loc[Axis.Y],
                         tiprack_loc[Axis.by_mount(mount)])
+    enc_position = await api.encoder_current_position_ot3(mount, cp)
+    print(enc_position[Axis.by_mount(mount)])
     await api.pick_up_tip(
         mount, tip_length=tip_length[args.tip_size],
         presses = 1)
+    await api.get_tip_presence_status(mount)
     await api.home([Axis.Z_L])
     cp = CriticalPoint.TIP
     await asyncio.sleep(1)
@@ -285,10 +335,11 @@ async def calibrate_tiprack(api, home_position, mount):
     # drop_tip_loc = Point(drop_tip_loc[Axis.X],
     #                     drop_tip_loc[Axis.Y],
     #                     drop_tip_loc[Axis.by_mount(mount)])
-    drop_tip_loc = Point(150.90955236310438,
+    drop_tip_loc = Point(50.90955236310438,
                         74.3584,
                         99.417)
     return tiprack_loc, drop_tip_loc
+
 
 async def _main() -> None:
     today = datetime.date.today()
@@ -299,7 +350,7 @@ async def _main() -> None:
     await hw_api.cache_instruments()
     pipette_model = hw_api.get_all_attached_instr()[OT3Mount.LEFT]["pipette_id"]
     if args.nozzles == 1:
-        await hw_api.update_nozzle_configuration_for_mount(OT3Mount.LEFT, 'A1', 'A1')
+        await hw_api.update_nozzle_configuration_for_mount(OT3Mount.LEFT, 'H12', 'H12')
     elif args.nozzles == 8:
         await hw_api.update_nozzle_configuration_for_mount(OT3Mount.LEFT, 'A1', 'H1')
     instrument = hw_api._pipette_handler.get_pipette(OT3Mount.LEFT)
@@ -320,20 +371,20 @@ async def _main() -> None:
                                                 args.plunger_speed,
                                                 args.mount_speed,
                                                 today.strftime("%b-%d-%Y"))
-    liquid_probe_settings = LiquidProbeSettings(
-                                                # starting_mount_height = 100,
-                                                max_z_distance = args.max_z_distance,
-                                                min_z_distance = args.min_z_distance,
-                                                mount_speed = args.mount_speed,
-                                                plunger_speed = args.plunger_speed,
-                                                sensor_threshold_pascals = args.sensor_threshold,
-                                                expected_liquid_height = args.expected_liquid_height,
-                                                log_pressure = args.log_pressure,
-                                                aspirate_while_sensing = False,
-                                                auto_zero_sensor = False,
-                                                num_baseline_reads = 10,
-                                                data_file = lp_file_name,
-                                                )
+    # liquid_probe_settings = LiquidProbeSettings(
+    #                                             # starting_mount_height = 100,
+    #                                             max_z_distance = args.max_z_distance,
+    #                                             min_z_distance = args.min_z_distance,
+    #                                             mount_speed = args.mount_speed,
+    #                                             plunger_speed = args.plunger_speed,
+    #                                             sensor_threshold_pascals = args.sensor_threshold,
+    #                                             expected_liquid_height = args.expected_liquid_height,
+    #                                             log_pressure = args.log_pressure,
+    #                                             aspirate_while_sensing = False,
+    #                                             auto_zero_sensor = False,
+    #                                             num_baseline_reads = 10,
+    #                                             data_file = lp_file_name,
+    #                                             )
     try:
         await hw_api.home()
         await asyncio.sleep(1)
@@ -345,16 +396,17 @@ async def _main() -> None:
         start_time = time.perf_counter()
         m_current = float(input("motor_current in amps: "))
         if args.nozzles == 1:
-            instrument.nozzle_manager._pick_up_current_map[1] = m_current
-            await update_pick_up_current(hw_api, mount, m_current)
+            # print(instrument)
+            # instrument.nozzle_manager._pick_up_current_map[1] = m_current
+            update_pickup_tip_current(hw_api, mount, m_current)
         if args.nozzles == 8:
             instrument.nozzle_manager._pick_up_current_map[8] = m_current
-        pick_up_speed = float(input("pick up tip speed in mm/s: "))
+        # pick_up_speed = float(input("pick up tip speed in mm/s: "))
         #hw_api.clamp_tip_speed = float(input("clamp pick up Speed: "))
         pick_up_distance = float(input("pick up distance in mm: "))
-
-        await update_pick_up_speed(hw_api, mount, pick_up_speed)
-        await update_pick_up_distance(hw_api, mount, pick_up_distance)
+        update_pickup_tip_distance(hw_api, mount, pick_up_distance)
+        # # await update_pick_up_speed(hw_api, mount, pick_up_speed)
+        # await update_pick_up_distance(hw_api, mount, pick_up_distance)
         # Calibrate to tiprack
         if (args.calibrate):
             pickup_loc, droptip_loc = await calibrate_tiprack(hw_api, home_position, mount)
@@ -429,7 +481,7 @@ async def _main() -> None:
                     await move_to_point(hw_api, mount, tip_position, cp)
                     await asyncio.sleep(1)
                     tip_measurement = gauge.read()
-                    print(f"{tip_measurement}")
+                    print(f"tip measurement(mm): {tip_measurement}")
                     # print("\r", end="")
                     measurements.append(tip_measurement)
                     if tip_count % num_of_columns == 0:
@@ -455,41 +507,41 @@ async def _main() -> None:
                         if tip_count % num_of_columns == 0:
                             x_offset = 0
 
-            if args.trough:
-                cp = CriticalPoint.TIP
-                probe_prepare_loc = Point(trough_loc[0],
-                                    trough_loc[1],
-                                    trough_loc[2]+10)
-                await move_to_point(hw_api, mount, probe_prepare_loc, cp)
-                trig_val, enc_trig_val = await hw_api.liquid_probe(mount = mount,
-                                                                probe_settings = liquid_probe_settings,
-                                                                probe = InstrumentProbeType.SECONDARY)
-                print(f"LS Position:  {trig_val} ,LS ENC Position: {enc_trig_val}")
-                ls_trig = await hw_api.current_position_ot3(mount = mount, critical_point = cp, refresh = True)
-                await move_plunger_absolute_ot3(hw_api, mount, ls_trig[Axis.P_L] + 0.2)
-                retract_probe_loc = Point(trough_loc[0],
-                                    trough_loc[1],
-                                    trough_loc[2]+5)
-                await hw_api.move_to(mount = mount,
-                                    abs_position = retract_probe_loc,
-                                    speed = None,
-                                    critical_point = cp)
-                # await move_to_point(hw_api, mount, retract_probe_loc, cp)
-                await hw_api.prepare_for_aspirate(mount)
-                aspirate_depth = Point(trough_loc[0],
-                                    trough_loc[1],
-                                    ls_trig[Axis.by_mount(mount)]-5)
-                await hw_api.move_to(mount = mount,
-                                    abs_position = aspirate_depth,
-                                    speed = None,
-                                    critical_point = cp)
-                # await move_to_point(hw_api, mount, aspirate_depth, cp)
-                await hw_api.aspirate(mount, test_volume)
-                await hw_api.home_z(mount)
-                await countdown(leak_test_time)
-                await move_to_point(hw_api, mount, trough_loc, cp)
-                await hw_api.dispense(mount)
-                # await hw_api.home_z(mount)
+            # if args.trough:
+            #     cp = CriticalPoint.TIP
+            #     probe_prepare_loc = Point(trough_loc[0],
+            #                         trough_loc[1],
+            #                         trough_loc[2]+10)
+            #     await move_to_point(hw_api, mount, probe_prepare_loc, cp)
+            #     trig_val, enc_trig_val = await hw_api.liquid_probe(mount = mount,
+            #                                                     probe_settings = liquid_probe_settings,
+            #                                                     probe = InstrumentProbeType.SECONDARY)
+            #     print(f"LS Position:  {trig_val} ,LS ENC Position: {enc_trig_val}")
+            #     ls_trig = await hw_api.current_position_ot3(mount = mount, critical_point = cp, refresh = True)
+            #     await move_plunger_absolute_ot3(hw_api, mount, ls_trig[Axis.P_L] + 0.2)
+            #     retract_probe_loc = Point(trough_loc[0],
+            #                         trough_loc[1],
+            #                         trough_loc[2]+5)
+            #     await hw_api.move_to(mount = mount,
+            #                         abs_position = retract_probe_loc,
+            #                         speed = None,
+            #                         critical_point = cp)
+            #     # await move_to_point(hw_api, mount, retract_probe_loc, cp)
+            #     await hw_api.prepare_for_aspirate(mount)
+            #     aspirate_depth = Point(trough_loc[0],
+            #                         trough_loc[1],
+            #                         ls_trig[Axis.by_mount(mount)]-5)
+            #     await hw_api.move_to(mount = mount,
+            #                         abs_position = aspirate_depth,
+            #                         speed = None,
+            #                         critical_point = cp)
+            #     # await move_to_point(hw_api, mount, aspirate_depth, cp)
+            #     await hw_api.aspirate(mount, test_volume)
+            #     await hw_api.home_z(mount)
+            #     await countdown(leak_test_time)
+            #     await move_to_point(hw_api, mount, trough_loc, cp)
+            #     await hw_api.dispense(mount)
+            #     # await hw_api.home_z(mount)
             cp = CriticalPoint.TIP
             await move_to_point(hw_api, mount, droptip_loc, cp)
             input("Feel the Tip!")
@@ -497,8 +549,8 @@ async def _main() -> None:
             await hw_api.home_z(mount)
 
             # m_current = float(input("motor_current in amps: "))
-            instrument.nozzle_manager._pick_up_current_map[8] = m_current
-            print(instrument.nozzle_manager._pick_up_current_map)
+            # instrument.nozzle_manager._pick_up_current_map[8] = m_current
+            # print(instrument.nozzle_manager._pick_up_current_map)
             # pick_up_speed = float(input("pick up tip speed in mm/s: "))
             # Pick up distance default is 13mm
             # pick_up_distance = float(input("pick up distance in mm: "))
@@ -513,8 +565,10 @@ async def _main() -> None:
                 tips_to_use = (num_of_rows * num_of_columns)
             # tips_to_use = (num_of_rows * num_of_columns)
             # tips_to_use = num_of_columns * 8
-            await update_pick_up_speed(hw_api, mount, pick_up_speed)
-            await update_pick_up_distance(hw_api, mount, pick_up_distance)
+            # await update_pick_up_speed(hw_api, mount, pick_up_speed)
+            # await update_pick_up_distance(hw_api, mount, pick_up_distance)
+            pick_up_distance = float(input("pick up distance in mm: "))
+            update_pickup_tip_distance(hw_api, mount, pick_up_distance)
             cp = CriticalPoint.NOZZLE
             if args.nozzles == 1:
                 tip_num += 1
@@ -539,9 +593,12 @@ async def _main() -> None:
                                     pickup_loc[1] + row,
                                     pickup_loc[2])
             await move_to_point(hw_api, mount, pickup_location, cp)
+            enc_position = await api.encoder_current_position_ot3(mount, cp)
+            print(enc_position[Axis.by_mount(mount)])
             await hw_api.pick_up_tip(mount,
                                     tip_length=tip_length[args.tip_size],
                                     presses = 1)
+            await hw_api.get_tip_presence_status(mount)
             await hw_api.home_z(mount.LEFT)
             cp = CriticalPoint.TIP
             current_position = await hw_api.current_position_ot3(mount, cp)
