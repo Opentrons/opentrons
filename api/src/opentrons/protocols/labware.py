@@ -77,7 +77,7 @@ def get_all_labware_definitions() -> List[str]:
                     labware_list.append(sub_dir.name)
 
     # check for standard labware
-    _check_for_subdirectories(get_shared_data_root() / STANDARD_DEFS_PATH)
+    _check_for_subdirectories(get_shared_data_root() / (STANDARD_DEFS_PATH + "/2"))
 
     # check for custom labware
     for namespace in os.scandir(USER_DEFS_PATH):
@@ -252,9 +252,16 @@ def _get_path_to_labware(
 ) -> Path:
     if namespace == OPENTRONS_NAMESPACE:
         # all labware in OPENTRONS_NAMESPACE is stored in shared data
-        return (
-            get_shared_data_root() / STANDARD_DEFS_PATH / load_name / f"{version}.json"
-        )
+        if load_name in os.listdir(
+            get_shared_data_root() / STANDARD_DEFS_PATH / "3"
+        ):
+            return (
+                get_shared_data_root() / STANDARD_DEFS_PATH / "3" / load_name / f"{version}.json"
+            )
+        else:
+            return (
+                    get_shared_data_root() / STANDARD_DEFS_PATH / "2" / load_name / f"{version}.json"
+            )
     if not base_path:
         base_path = USER_DEFS_PATH
     def_path = base_path / namespace / load_name / f"{version}.json"
