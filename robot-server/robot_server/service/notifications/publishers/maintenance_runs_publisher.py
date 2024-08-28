@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-import logging
 from typing import Callable, Optional
 from fastapi import Depends
 

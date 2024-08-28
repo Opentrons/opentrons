@@ -14,6 +14,7 @@ from opentrons.util.change_notifier import ChangeNotifier, ChangeNotifier_ts
 
 LOG = getLogger(__name__)
 
+
 class PublisherNotifier:
     """An interface that invokes notification callbacks whenever a generic notify event occurs."""
 
@@ -52,6 +53,7 @@ class PublisherNotifier:
                         )
         except BaseException:
             LOG.exception("PublisherNotifer notify task failed")
+
 
 _pe_publisher_notifier_accessor: AppStateAccessor[PublisherNotifier] = AppStateAccessor[
     PublisherNotifier
