@@ -117,7 +117,11 @@ export function useDropTipCommands({
         )
         return chainRunCommands(
           isFlex
-            ? [UPDATE_ESTIMATORS_EXCEPT_PLUNGERS, moveToAACommand]
+            ? [
+                HOME_EXCEPT_PLUNGERS,
+                UPDATE_ESTIMATORS_EXCEPT_PLUNGERS,
+                moveToAACommand,
+              ]
             : [moveToAACommand],
           true
         )
