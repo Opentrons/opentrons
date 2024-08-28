@@ -77,7 +77,7 @@ def get_all_labware_definitions() -> List[str]:
                     labware_list.append(sub_dir.name)
 
     # check for standard labware
-    _check_for_subdirectories(get_shared_data_root() / (STANDARD_DEFS_PATH + "/2"))
+    _check_for_subdirectories(get_shared_data_root() / (STANDARD_DEFS_PATH / "2"))
 
     # check for custom labware
     for namespace in os.scandir(USER_DEFS_PATH):
@@ -114,7 +114,6 @@ def save_definition(
             f'Saving definitions to the "{OPENTRONS_NAMESPACE}" namespace '
             + "is not permitted"
         )
-
     def_path = _get_path_to_labware(load_name, namespace, version, location)
 
     if not force and def_path.is_file():
@@ -219,7 +218,6 @@ def _get_standard_labware_definition(
         Definitions Folder from the Opentrons App before
         uploading your protocol.
         """
-
     if namespace is None:
         for fallback_namespace in [OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE]:
             try:
@@ -252,15 +250,28 @@ def _get_path_to_labware(
 ) -> Path:
     if namespace == OPENTRONS_NAMESPACE:
         # all labware in OPENTRONS_NAMESPACE is stored in shared data
-        if load_name in os.listdir(
-            get_shared_data_root() / STANDARD_DEFS_PATH / "3"
-        ):
+        if load_name in os.listdir(get_shared_data_root() / STANDARD_DEFS_PATH / "3"):
             return (
-                get_shared_data_root() / STANDARD_DEFS_PATH / "3" / load_name / f"{version}.json"
+                get_shared_data_root()
+                / STANDARD_DEFS_PATH
+                / "3"
+                / load_name
+                / f"{version}.json"
             )
         else:
+            res = (
+                    get_shared_data_root()
+                    / STANDARD_DEFS_PATH
+                    / "2"
+                    / load_name
+                    / f"{version}.json"
+            )
             return (
-                    get_shared_data_root() / STANDARD_DEFS_PATH / "2" / load_name / f"{version}.json"
+                get_shared_data_root()
+                / STANDARD_DEFS_PATH
+                / "2"
+                / load_name
+                / f"{version}.json"
             )
     if not base_path:
         base_path = USER_DEFS_PATH
