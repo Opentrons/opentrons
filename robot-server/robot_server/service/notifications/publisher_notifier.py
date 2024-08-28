@@ -30,7 +30,9 @@ class PublisherNotifier:
 
     async def _initialize(self) -> None:
         """Initializes an instance of PublisherNotifier. This method should only be called once."""
-        self._notifier = asyncio.create_task(self._wait_for_event(), name='Run publisher notifier')
+        self._notifier = asyncio.create_task(
+            self._wait_for_event(), name="Run publisher notifier"
+        )
 
     def _notify_publishers(self) -> None:
         """A generic notifier, alerting all `waiters` of a change."""
@@ -45,9 +47,11 @@ class PublisherNotifier:
                     try:
                         await callback()
                     except BaseException:
-                        LOG.exception(f'PublisherNotifier: exception in callback {getattr(callback, "__name__", "<unknown>")}')
+                        LOG.exception(
+                            f'PublisherNotifier: exception in callback {getattr(callback, "__name__", "<unknown>")}'
+                        )
         except BaseException:
-            LOG.exception(f'PublisherNotifer notify task failed')
+            LOG.exception("PublisherNotifer notify task failed")
 
 _pe_publisher_notifier_accessor: AppStateAccessor[PublisherNotifier] = AppStateAccessor[
     PublisherNotifier
