@@ -141,6 +141,7 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
         >
           <NumericalKeyboard
             keyboardRef={keyboardRef}
+            initialValue={String(flowRate)}
             onChange={e => {
               setFlowRate(Number(e))
             }}
