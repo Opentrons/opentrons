@@ -94,8 +94,6 @@ export function GripperWizardFlows(
     enabled: createdMaintenanceRunId != null,
   })
 
-  console.log("maintenanceRunData: ", maintenanceRunData)
-
   // this will close the modal in case the run was deleted by the terminate
   // activity modal on the ODD
   React.useEffect(() => {
@@ -293,11 +291,6 @@ export const GripperWizard = (
   let onExit
   if (currentStep == null) return null
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
-  console.log("maintenanceRunStatus: ", maintenanceRunStatus)
-  if (maintenanceRunStatus != null && maintenanceRunStatus in [RUN_STATUS_FAILED, RUN_STATUS_STOPPED] ) {
-    console.log("in close session")
-    onExit = handleCleanUpAndClose
-  }
   if (showConfirmExit && maintenanceRunId !== null) {
     modalContent = (
       <ExitConfirmation

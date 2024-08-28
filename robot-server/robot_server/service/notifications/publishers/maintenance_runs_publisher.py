@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import logging
 from typing import Callable, Optional
 from fastapi import Depends
 
@@ -16,7 +17,7 @@ from .. import topics
 
 @dataclass
 class _RunHooks:
-    """Generated during a protocol run. Utilized by RunsPublisher."""
+    """Generated during a protocol run. Utilized by MaintenanceRunsPublisher."""
 
     run_id: str
     get_state_summary: Callable[[str], Optional[StateSummary]]
@@ -24,7 +25,7 @@ class _RunHooks:
 
 @dataclass
 class _EngineStateSlice:
-    """Protocol Engine state relevant to RunsPublisher."""
+    """Protocol Engine state relevant to MaintenanceRunsPublisher."""
 
     state_summary_status: Optional[EngineStatus] = None
 
