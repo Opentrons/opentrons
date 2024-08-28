@@ -14,6 +14,7 @@ import {
 } from '@opentrons/components'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { deleteModule } from '../../../step-forms/actions'
+import { EditNickNameModal } from '../../../organisms'
 import { deleteDeckFixture } from '../../../step-forms/actions/additionalItems'
 import {
   deleteContainer,
@@ -33,9 +34,14 @@ export function SlotOverflowMenu(
   const { slot, setShowMenuList, addEquipment } = props
   const { t } = useTranslation('starting_deck_state')
   const dispatch = useDispatch<ThunkDispatch<any>>()
+  const [showNickNameModal, setShowNickNameModal] = React.useState<boolean>(
+    false
+  )
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
-      setShowMenuList(false)
+      if (!showNickNameModal) {
+        setShowMenuList(false)
+      }
     },
   })
   const deckSetup = useSelector(getDeckSetupForActiveItem)
@@ -86,79 +92,94 @@ export function SlotOverflowMenu(
   }
 
   return (
-    <Flex
-      whiteSpace={NO_WRAP}
-      ref={overflowWrapperRef}
-      borderRadius={BORDERS.borderRadius8}
-      boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
-      backgroundColor={COLORS.white}
-      flexDirection={DIRECTION_COLUMN}
-      onClick={(e: React.MouseEvent) => {
-        e.preventDefault()
-        e.stopPropagation()
-      }}
-    >
-      <MenuButton
-        onClick={() => {
-          addEquipment(slot)
-          setShowMenuList(false)
-        }}
-      >
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {t('add_hw_lw')}
-        </StyledText>
-      </MenuButton>
-      <MenuButton
-        disabled={labwareOnSlot == null || isLabwareAnAdapter}
-        onClick={() => {
-          //  todo(ja, 8/22/24): wire this up
-          console.log('open nick name modal')
-          setShowMenuList(false)
-        }}
-      >
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {t('rename_lab')}
-        </StyledText>
-      </MenuButton>
-      <MenuButton
-        disabled={labwareOnSlot == null || isLabwareTiprack}
-        onClick={() => {
-          //  todo(ja, 8/22/24): wire this up
-          console.log('open liquids')
-          setShowMenuList(false)
-        }}
-      >
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {t('add_liquid')}
-        </StyledText>
-      </MenuButton>
-      <MenuButton
-        disabled={labwareOnSlot == null && !isLabwareAnAdapter}
-        onClick={() => {
-          if (labwareOnSlot != null && !isLabwareAnAdapter) {
-            dispatch(duplicateLabware(labwareOnSlot.id))
-          } else if (nestedLabwareOnSlot != null) {
-            dispatch(duplicateLabware(nestedLabwareOnSlot.id))
+    <>
+      {showNickNameModal && labwareOnSlot != null ? (
+        <EditNickNameModal
+          labwareId={
+            nestedLabwareOnSlot != null
+              ? nestedLabwareOnSlot.id
+              : labwareOnSlot.id
           }
-          setShowMenuList(false)
+          onClose={() => {
+            setShowNickNameModal(false)
+            setShowMenuList(false)
+          }}
+        />
+      ) : null}
+      <Flex
+        whiteSpace={NO_WRAP}
+        ref={overflowWrapperRef}
+        borderRadius={BORDERS.borderRadius8}
+        boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
+        backgroundColor={COLORS.white}
+        flexDirection={DIRECTION_COLUMN}
+        onClick={(e: React.MouseEvent) => {
+          e.preventDefault()
+          e.stopPropagation()
         }}
       >
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {t('duplicate')}
-        </StyledText>
-      </MenuButton>
-      <MenuButton
-        disabled={hasNoItems || hasTrashOnSlot}
-        onClick={() => {
-          handleClear()
-          setShowMenuList(false)
-        }}
-      >
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {t('clear_slot')}
-        </StyledText>
-      </MenuButton>
-    </Flex>
+        <MenuButton
+          onClick={() => {
+            addEquipment(slot)
+            setShowMenuList(false)
+          }}
+        >
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('add_hw_lw')}
+          </StyledText>
+        </MenuButton>
+        <MenuButton
+          disabled={labwareOnSlot == null || isLabwareAnAdapter}
+          onClick={(e: React.MouseEvent) => {
+            setShowNickNameModal(true)
+            e.preventDefault()
+            e.stopPropagation()
+          }}
+        >
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('rename_lab')}
+          </StyledText>
+        </MenuButton>
+        <MenuButton
+          disabled={labwareOnSlot == null || isLabwareTiprack}
+          onClick={() => {
+            //  todo(ja, 8/22/24): wire this up
+            console.log('open liquids')
+            setShowMenuList(false)
+          }}
+        >
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('add_liquid')}
+          </StyledText>
+        </MenuButton>
+        <MenuButton
+          disabled={labwareOnSlot == null && !isLabwareAnAdapter}
+          onClick={() => {
+            if (labwareOnSlot != null && !isLabwareAnAdapter) {
+              dispatch(duplicateLabware(labwareOnSlot.id))
+            } else if (nestedLabwareOnSlot != null) {
+              dispatch(duplicateLabware(nestedLabwareOnSlot.id))
+            }
+            setShowMenuList(false)
+          }}
+        >
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('duplicate')}
+          </StyledText>
+        </MenuButton>
+        <MenuButton
+          disabled={hasNoItems || hasTrashOnSlot}
+          onClick={() => {
+            handleClear()
+            setShowMenuList(false)
+          }}
+        >
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('clear_slot')}
+          </StyledText>
+        </MenuButton>
+      </Flex>
+    </>
   )
 }
 
