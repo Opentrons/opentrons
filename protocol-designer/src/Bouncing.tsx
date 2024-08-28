@@ -8,12 +8,22 @@ interface Location {
   y: number
 }
 
+const initialPosition = {
+  x: 100,
+  y: 100,
+}
+
+const initialVelocity = {
+  x: 2,
+  y: 2,
+}
+
 export const Bouncing = (): JSX.Element => {
   const [isDragging, setIsDragging] = React.useState<boolean>(false)
-  const [position, setPosition] = React.useState<Location>({ x: 100, y: 100 })
-  const [velocity, setVelocity] = React.useState<Location>({ x: 2, y: 2 })
+  const [position, setPosition] = React.useState<Location>(initialPosition)
+  const [velocity, setVelocity] = React.useState<Location>(initialVelocity)
   const [isPaused, setIsPaused] = React.useState<boolean>(false)
-  const [isStopped, setIsStopped] = React.useState<boolean>(false)
+  const [isStopped, setIsStopped] = React.useState<boolean>(true)
   const [showFeatureFlags, setShowFeatureFlags] = React.useState<boolean>(false)
 
   const divSize = 50

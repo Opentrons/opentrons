@@ -192,18 +192,18 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
 
   const populatedCategories: { [category: string]: boolean } = React.useMemo(
     () =>
-      ORDERED_CATEGORIES.reduce(
-        (acc, category) =>
-          labwareByCategory[category]
-            ? {
-                ...acc,
-                [category]: labwareByCategory[category].some(
-                  def => !getIsLabwareFiltered(def)
-                ),
-              }
-            : acc,
-        {}
-      ),
+      ORDERED_CATEGORIES.reduce((acc, category) => {
+        const isDeckLocationCategory =
+          slot === 'offDeck' ? category !== 'adapter' : true
+        return category in labwareByCategory && isDeckLocationCategory
+          ? {
+              ...acc,
+              [category]: labwareByCategory[category].some(
+                def => !getIsLabwareFiltered(def)
+              ),
+            }
+          : acc
+      }, {}),
     [labwareByCategory, getIsLabwareFiltered]
   )
 

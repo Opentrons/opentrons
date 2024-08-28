@@ -47,9 +47,9 @@ import type { ThunkDispatch } from '../../../types'
 import type { Fixture } from './constants'
 
 interface DeckSetupToolsProps {
-  cutoutId: CutoutId
   slot: DeckSlotId
   onCloseClick: () => void
+  cutoutId?: CutoutId
 }
 
 export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
@@ -107,7 +107,9 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
   )
 
   const [tab, setTab] = React.useState<'hardware' | 'labware'>(
-    moduleModels.length === 0 || createdModuleForSlot != null
+    moduleModels.length === 0 ||
+      createdModuleForSlot != null ||
+      slot === 'offDeck'
       ? 'labware'
       : 'hardware'
   )
@@ -142,23 +144,25 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
   }
 
   const handleClear = (): void => {
-    //  clear module from slot
-    if (createdModuleForSlot != null) {
-      dispatch(deleteModule(createdModuleForSlot.id))
-    }
-    //  clear fixture(s) from slot
-    if (createFixtureForSlots.length > 0) {
-      createFixtureForSlots.forEach(fixture =>
-        dispatch(deleteDeckFixture(fixture.id))
-      )
-    }
-    //  clear labware from slot
-    if (createdLabwareForSlot != null) {
-      dispatch(deleteContainer({ labwareId: createdLabwareForSlot.id }))
-    }
-    //  clear nested labware from slot
-    if (createdNestedLabwareForSlot != null) {
-      dispatch(deleteContainer({ labwareId: createdNestedLabwareForSlot.id }))
+    if (slot !== 'offDeck') {
+      //  clear module from slot
+      if (createdModuleForSlot != null) {
+        dispatch(deleteModule(createdModuleForSlot.id))
+      }
+      //  clear fixture(s) from slot
+      if (createFixtureForSlots.length > 0) {
+        createFixtureForSlots.forEach(fixture =>
+          dispatch(deleteDeckFixture(fixture.id))
+        )
+      }
+      //  clear labware from slot
+      if (createdLabwareForSlot != null) {
+        dispatch(deleteContainer({ labwareId: createdLabwareForSlot.id }))
+      }
+      //  clear nested labware from slot
+      if (createdNestedLabwareForSlot != null) {
+        dispatch(deleteContainer({ labwareId: createdNestedLabwareForSlot.id }))
+      }
     }
   }
 
@@ -172,7 +176,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
       ? (selectedHardware as ModuleModel)
       : undefined
 
-    if (fixture != null) {
+    if (fixture != null && cutoutId != null) {
       //  create fixture(s)
       if (fixture === 'wasteChuteAndStagingArea') {
         dispatch(createDeckFixture('wasteChute', cutoutId))
@@ -242,7 +246,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
       confirmButtonText={t('done')}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <Tabs tabs={[hardwareTab, labwareTab]} />
+        {slot !== 'offDeck' ? <Tabs tabs={[hardwareTab, labwareTab]} /> : null}
         {tab === 'hardware' ? (
           <>
             <Flex

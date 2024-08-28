@@ -2,7 +2,11 @@ import * as React from 'react'
 import compact from 'lodash/compact'
 import values from 'lodash/values'
 
-import { Module } from '@opentrons/components'
+import {
+  Module,
+  POSITION_ABSOLUTE,
+  RobotCoordsForeignDiv,
+} from '@opentrons/components'
 import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 import {
   getAddressableAreaFromSlotId,
@@ -29,6 +33,7 @@ import type {
   AddressableAreaName,
   CutoutId,
   DeckDefinition,
+  DeckSlotId,
   Dimensions,
 } from '@opentrons/shared-data'
 import type {
@@ -37,6 +42,7 @@ import type {
   ModuleOnDeck,
 } from '../../../step-forms'
 import type { TerminalItemId } from '../../../steplist'
+import { SlotOverflowMenu } from './SlotOverflowMenu'
 
 interface DeckSetupDetailsProps {
   activeDeckSetup: InitialDeckSetup
@@ -63,6 +69,9 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
     setHover,
   } = props
   const slotIdsBlockedBySpanning = getSlotIdsBlockedBySpanning(activeDeckSetup)
+  const [menuListId, setShowMenuListForId] = React.useState<DeckSlotId | null>(
+    null
+  )
 
   const allLabware: LabwareOnDeckType[] = Object.keys(
     activeDeckSetup.labware
@@ -74,6 +83,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
   }, [])
 
   const allModules: ModuleOnDeck[] = values(activeDeckSetup.modules)
+  const menuListSlotPosition = getPositionFromSlotId(menuListId ?? '', deckDef)
 
   // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
   const multichannelWarningSlotIds: AddressableAreaName[] = showGen1MultichannelCollisionWarnings
@@ -176,10 +186,11 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
                   <DeckItemHover
                     hover={hover}
                     setHover={setHover}
-                    addEquipment={addEquipment}
+                    setShowMenuListForId={setShowMenuListForId}
+                    menuListId={menuListId}
                     slotBoundingBox={controlSelectDimensions}
                     slotPosition={[0, 0, 0]}
-                    slotId={slotId}
+                    itemId={slotId}
                     selectedTerminalItemId={props.selectedTerminalItemId}
                   />
                 </>
@@ -189,10 +200,11 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
                 <DeckItemHover
                   hover={hover}
                   setHover={setHover}
-                  addEquipment={addEquipment}
+                  setShowMenuListForId={setShowMenuListForId}
+                  menuListId={menuListId}
                   slotBoundingBox={labwareInterfaceBoundingBox}
                   slotPosition={[0, 0, 0]}
-                  slotId={slotId}
+                  itemId={slotId}
                   selectedTerminalItemId={props.selectedTerminalItemId}
                 />
               ) : null}
@@ -241,19 +253,19 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
               <DeckItemHover
                 hover={hover}
                 setHover={setHover}
-                addEquipment={addEquipment}
+                setShowMenuListForId={setShowMenuListForId}
+                menuListId={menuListId}
                 slotBoundingBox={addressableArea.boundingBox}
                 slotPosition={getPositionFromSlotId(
                   addressableArea.id,
                   deckDef
                 )}
-                slotId={addressableArea.id}
+                itemId={addressableArea.id}
                 selectedTerminalItemId={props.selectedTerminalItemId}
               />
             </React.Fragment>
           )
         })}
-
       {/* all labware on deck NOT those in modules */}
       {allLabware.map(labware => {
         if (
@@ -282,10 +294,11 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
             <DeckItemHover
               hover={hover}
               setHover={setHover}
-              addEquipment={addEquipment}
+              setShowMenuListForId={setShowMenuListForId}
+              menuListId={menuListId}
               slotBoundingBox={slotBoundingBox}
               slotPosition={slotPosition}
-              slotId={labware.slot}
+              itemId={labware.slot}
               selectedTerminalItemId={props.selectedTerminalItemId}
             />
           </React.Fragment>
@@ -338,16 +351,41 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
             />
             <DeckItemHover
               hover={hover}
+              setShowMenuListForId={setShowMenuListForId}
+              menuListId={menuListId}
               setHover={setHover}
-              addEquipment={addEquipment}
               slotBoundingBox={slotBoundingBox}
               slotPosition={slotPosition}
-              slotId={slotOnDeck ?? ''}
+              itemId={slotOnDeck ?? ''}
               selectedTerminalItemId={props.selectedTerminalItemId}
             />
           </React.Fragment>
         )
       })}
+
+      {menuListSlotPosition != null && menuListId != null ? (
+        <RobotCoordsForeignDiv
+          x={menuListSlotPosition[0] + 50}
+          y={menuListSlotPosition[1] - 160}
+          width="172px"
+          height="180px"
+          innerDivProps={{
+            style: {
+              position: POSITION_ABSOLUTE,
+              transform: 'rotate(180deg) scaleX(-1)',
+              zIndex: 5,
+            },
+          }}
+        >
+          <SlotOverflowMenu
+            slot={menuListId}
+            addEquipment={addEquipment}
+            setShowMenuList={() => {
+              setShowMenuListForId(null)
+            }}
+          />
+        </RobotCoordsForeignDiv>
+      ) : null}
     </>
   )
 }

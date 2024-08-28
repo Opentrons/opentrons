@@ -33,8 +33,6 @@ describe('SlotOverflowMenu', () => {
   beforeEach(() => {
     props = {
       slot: 'D3',
-      xSlotPosition: 1,
-      ySlotPosition: 1,
       setShowMenuList: vi.fn(),
       addEquipment: vi.fn(),
     }
@@ -89,11 +87,6 @@ describe('SlotOverflowMenu', () => {
     expect(vi.mocked(deleteContainer)).toHaveBeenCalledTimes(2)
     expect(vi.mocked(deleteModule)).toHaveBeenCalled()
     expect(vi.mocked(deleteDeckFixture)).toHaveBeenCalled()
-    expect(props.setShowMenuList).toHaveBeenCalled()
-  })
-  it('should close menu list when overlay is clicked', () => {
-    render(props)
-    fireEvent.click(screen.getByTestId('SlotOverflowMenu_Overlay'))
     expect(props.setShowMenuList).toHaveBeenCalled()
   })
 })
