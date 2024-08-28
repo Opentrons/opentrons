@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import json
-import os
 
 from pathlib import Path
 from typing import Any, AnyStr, Dict, Optional, Union
@@ -226,29 +225,21 @@ def _get_path_to_labware(
 ) -> Path:
     if namespace == OPENTRONS_NAMESPACE:
         # all labware in OPENTRONS_NAMESPACE is stored in shared data
-
-        schema_3_load_name_present = load_name in os.listdir(
-            get_shared_data_root() / STANDARD_DEFS_PATH / "3"
+        schema_3_path = (
+            get_shared_data_root()
+            / STANDARD_DEFS_PATH
+            / "3"
+            / load_name
+            / f"{version}.json"
         )
-        if schema_3_load_name_present:
-            schema_3_version_present = f"{version}.json" in os.listdir(
-                get_shared_data_root() / STANDARD_DEFS_PATH / "3" / load_name
-            )
-            if schema_3_version_present:
-                return (
-                    get_shared_data_root()
-                    / STANDARD_DEFS_PATH
-                    / "3"
-                    / load_name
-                    / f"{version}.json"
-                )
-        return (
+        schema_2_path = (
             get_shared_data_root()
             / STANDARD_DEFS_PATH
             / "2"
             / load_name
             / f"{version}.json"
         )
+        return schema_3_path if schema_3_path.exists() else schema_2_path
     if not base_path:
         base_path = USER_DEFS_PATH
     def_path = base_path / namespace / load_name / f"{version}.json"
