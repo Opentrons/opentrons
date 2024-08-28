@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Public+Sans:300,400,400i,600,700');
 @import url('https://fonts.googleapis.com/css2?family=Reddit+Mono:wght@200..900&display=swap');
 
-/* OT NAV */
+/* OT TOP NAV */
 
 body {
     padding: 0;
@@ -22,6 +22,38 @@ body {
 /* use Akko from docs site instead of from main site */
 header a.button-sm {
     font-family: "AkkoPro-Regular", "Akko Pro", "Open Sans", sans-serif !important;
+}
+
+/* OT FOOTER */
+
+footer {
+    padding: 0;
+}
+
+.footer-app-button:hover {
+    color: #E8E9EA;
+}
+
+/* restate newsletter form styling */
+
+footer input.hs-input {
+  margin: 0;
+  max-width: 100%;
+  width: 100%;
+  height: 42px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  font-size: 1rem;
+  --tw-text-opacity: 1;
+  color: rgb(112 112 117 / var(--tw-text-opacity));
+}
+
+footer .hs_submit input {
+    height: 40px;
+    min-width: 100% !important;
+    width: 100% !important;
 }
 
 /* DOCS */
@@ -141,8 +173,19 @@ div.document h2,
 div.document h3,
 div.document h4,
 div.document h5 {
-    font-family: "Public Sans", "sans-serif";
+    font-family: "Public Sans", "sans-serif" !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
 }
+
+/* hide the word "Navigation" because people know what links are */
+div.sphinxsidebarwrapper > h3 {
+    display: none;
+}
+
+/* restate header sizes to avoid conflict from inline style in footer */
+div.document h3 { font-size: 150% !important; }
+div.document h4 { font-size: 130% !important; }
 
 /* Links need an extra two pixels of padding to compensate between body font height 
 being 1em and code font height being 0.9em */
