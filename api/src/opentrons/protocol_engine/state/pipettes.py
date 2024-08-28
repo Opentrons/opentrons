@@ -41,7 +41,7 @@ from ..actions import (
     SetPipetteMovementSpeedAction,
     SucceedCommandAction,
 )
-from .abstract_store import HasState, HandlesActions
+from ._abstract_store import HasState, HandlesActions
 
 
 @dataclass(frozen=True)

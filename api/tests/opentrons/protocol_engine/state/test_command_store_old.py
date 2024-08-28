@@ -17,7 +17,7 @@ from opentrons.protocol_engine.actions.actions import RunCommandAction
 
 from opentrons.protocol_engine import commands, errors
 from opentrons.protocol_engine.types import DeckType
-from opentrons.protocol_engine.state import Config
+from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.commands import (
     CommandState,
     CommandStore,

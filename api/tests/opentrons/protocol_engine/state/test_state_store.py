@@ -9,7 +9,8 @@ from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons.util.change_notifier import ChangeNotifier
 
 from opentrons.protocol_engine.actions import PlayAction
-from opentrons.protocol_engine.state import State, StateStore, Config
+from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine.state.state import State, StateStore
 from opentrons.protocol_engine.types import DeckType
 
 
