@@ -134,7 +134,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   }
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
-  const { reset } = useRunControls(runId, onResetSuccess)
+  const { reset, isRunControlLoading } = useRunControls(runId, onResetSuccess)
   const { deleteRun } = useDeleteRunMutation()
   const robot = useRobot(robotName)
   const robotSerialNumber =
@@ -184,7 +184,9 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       <MenuItem
         {...targetProps}
         onClick={handleResetClick}
-        disabled={robotIsBusy || isRobotOnWrongVersionOfSoftware}
+        disabled={
+          robotIsBusy || isRobotOnWrongVersionOfSoftware || isRunControlLoading
+        }
         data-testid="RecentProtocolRun_OverflowMenu_rerunNow"
       >
         {t('rerun_now')}
@@ -193,6 +195,9 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
         <Tooltip tooltipProps={tooltipProps}>
           {t('shared:a_software_update_is_available')}
         </Tooltip>
+      )}
+      {isRunControlLoading && (
+        <Tooltip tooltipProps={tooltipProps}>{t('rerun_loading')}</Tooltip>
       )}
       <MenuItem
         data-testid="RecentProtocolRun_OverflowMenu_downloadRunLog"
