@@ -14,6 +14,7 @@
   "custom": "Custom labware definitions",
   "customize_slot": "Customize slot {{slotName}}",
   "deck_hardware": "Deck hardware",
+  "define_liquid": "Define a liquid",
   "done": "Done",
   "duplicate": "Duplicate",
   "edit_labware": "Edit labware",

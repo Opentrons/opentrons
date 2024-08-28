@@ -19,12 +19,13 @@ import {
   Tabs,
   ToggleGroup,
 } from '@opentrons/components'
-
 import { useKitchen } from '../../organisms/Kitchen/hooks'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { getFileMetadata } from '../../file-data/selectors'
+import { DefineLiquidsModal } from '../../organisms'
 import { DeckSetupContainer } from './DeckSetup'
 import { OffDeck } from './Offdeck'
+import { LiquidsOverflowMenu } from './LiquidsOverflowMenu'
 
 import type { CutoutId } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
@@ -44,6 +45,12 @@ export function Designer(): JSX.Element {
   const navigate = useNavigate()
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const metadata = useSelector(getFileMetadata)
+  const [liquidOverflowMenu, showLiquidOverflowMenu] = React.useState<boolean>(
+    false
+  )
+  const [showDefineLiquidModal, setDefineLiquidModal] = React.useState<boolean>(
+    false
+  )
   const [zoomInOnSlot, setZoomInOnSlot] = React.useState<OpenSlot | null>(null)
   const [tab, setTab] = React.useState<'startingDeck' | 'protocolSteps'>(
     'startingDeck'
@@ -87,80 +94,100 @@ export function Designer(): JSX.Element {
   }, [])
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING.spacing12}>
-        {zoomInOnSlot != null ? null : (
-          <Tabs tabs={[startingDeckTab, protocolStepTab]} />
-        )}
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText desktopStyle="bodyDefaultSemiBold">
-            {metadata?.protocolName != null && metadata?.protocolName !== ''
-              ? metadata?.protocolName
-              : t('untitled_protocol')}
-          </StyledText>
-          <Flex color={COLORS.grey60} justifyContent={JUSTIFY_CENTER}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('edit_protocol')}
+    <>
+      {showDefineLiquidModal ? (
+        <DefineLiquidsModal
+          onClose={() => {
+            setDefineLiquidModal(false)
+          }}
+        />
+      ) : null}
+      {liquidOverflowMenu ? (
+        <LiquidsOverflowMenu
+          onClose={() => {
+            showLiquidOverflowMenu(false)
+            setDefineLiquidModal(true)
+          }}
+        />
+      ) : null}
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          padding={SPACING.spacing12}
+        >
+          {zoomInOnSlot != null ? null : (
+            <Tabs tabs={[startingDeckTab, protocolStepTab]} />
+          )}
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <StyledText desktopStyle="bodyDefaultSemiBold">
+              {metadata?.protocolName != null && metadata?.protocolName !== ''
+                ? metadata?.protocolName
+                : t('untitled_protocol')}
             </StyledText>
-          </Flex>
-        </Flex>
-        <Flex gridGap={SPACING.spacing8}>
-          <PrimaryButton
-            onClick={() => {
-              //  TODO: wire up liquids overflow menu
-              console.log('wire up liquids')
-            }}
-          >
-            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-              <Icon size="1rem" name="liquid" />
+            <Flex color={COLORS.grey60} justifyContent={JUSTIFY_CENTER}>
               <StyledText desktopStyle="bodyDefaultRegular">
-                {t('liquids')}
+                {t('edit_protocol')}
               </StyledText>
             </Flex>
-          </PrimaryButton>
-          <SecondaryButton
-            onClick={() => {
-              navigate('/overview')
-            }}
-          >
-            {t('shared:done')}
-          </SecondaryButton>
+          </Flex>
+          <Flex gridGap={SPACING.spacing8}>
+            <PrimaryButton
+              onClick={() => {
+                showLiquidOverflowMenu(true)
+              }}
+            >
+              <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+                <Icon size="1rem" name="liquid" />
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {t('liquids')}
+                </StyledText>
+              </Flex>
+            </PrimaryButton>
+
+            <SecondaryButton
+              onClick={() => {
+                navigate('/overview')
+              }}
+            >
+              {t('shared:done')}
+            </SecondaryButton>
+          </Flex>
+        </Flex>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          backgroundColor={COLORS.grey10}
+          padding={SPACING.spacing80}
+          height="calc(100vh - 64px)"
+        >
+          {tab === 'startingDeck' ? (
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
+              <Flex alignSelf={ALIGN_END}>
+                <ToggleGroup
+                  selectedValue={deckView}
+                  leftText={leftString}
+                  rightText={rightString}
+                  leftClick={() => {
+                    setDeckView(leftString)
+                  }}
+                  rightClick={() => {
+                    setDeckView(rightString)
+                  }}
+                />
+              </Flex>
+              {deckView === leftString ? (
+                <DeckSetupContainer
+                  setZoomInOnSlot={setZoomInOnSlot}
+                  zoomIn={zoomInOnSlot}
+                />
+              ) : (
+                <OffDeck />
+              )}
+            </Flex>
+          ) : (
+            <div>TODO wire this up</div>
+          )}
         </Flex>
       </Flex>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        backgroundColor={COLORS.grey10}
-        padding={SPACING.spacing80}
-        height="calc(100vh - 64px)"
-      >
-        {tab === 'startingDeck' ? (
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-            <Flex alignSelf={ALIGN_END}>
-              <ToggleGroup
-                selectedValue={deckView}
-                leftText={leftString}
-                rightText={rightString}
-                leftClick={() => {
-                  setDeckView(leftString)
-                }}
-                rightClick={() => {
-                  setDeckView(rightString)
-                }}
-              />
-            </Flex>
-            {deckView === leftString ? (
-              <DeckSetupContainer
-                setZoomInOnSlot={setZoomInOnSlot}
-                zoomIn={zoomInOnSlot}
-              />
-            ) : (
-              <OffDeck />
-            )}
-          </Flex>
-        ) : (
-          <div>TODO wire this up</div>
-        )}
-      </Flex>
-    </Flex>
+    </>
   )
 }
