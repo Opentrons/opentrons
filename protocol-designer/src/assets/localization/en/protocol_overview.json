@@ -3,7 +3,9 @@
   "created": "Date created",
   "deck_hardware": "Deck hardware",
   "description": "Description",
+  "edit_protocol": "Edit protocol",
   "edit": "Edit",
+  "export_protocol": "Export protocol",
   "extension": "Extension mount",
   "gripper": "Opentrons Flex Gripper",
   "individual_well_volume": "Individual Well Volume",
@@ -14,10 +16,11 @@
   "materials_list": "Materials list",
   "modified": "Last exported",
   "name": "Name",
+  "na": "N/A",
   "protocol_metadata": "Protocol metadata",
   "right_pip": "Right pipette",
   "robotType": "Robot type",
-  "starting_deck": "Protocol starting deck",
+  "starting_deck": "Protocol Starting Deck",
   "step": "Protocol steps",
   "untitled_protocol": "Untitled protocol"
 }
