@@ -133,7 +133,11 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                 </RobotWorkSpace>
                 {menuListId === lw.id ? (
                   // TODO fix this rendering position
-                  <Flex marginTop="-2rem" marginLeft="4rem" zIndex={3}>
+                  <Flex
+                    marginTop={`-${SPACING.spacing32}`}
+                    marginLeft="4rem"
+                    zIndex={3}
+                  >
                     <SlotOverflowMenu
                       slot={menuListId}
                       addEquipment={addLabware}
