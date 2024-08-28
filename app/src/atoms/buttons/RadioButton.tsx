@@ -82,6 +82,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
         display: ${maxLines != null ? '-webkit-box' : undefined};
         -webkit-line-clamp: ${maxLines ?? undefined};
         -webkit-box-orient: ${maxLines != null ? 'vertical' : undefined};
+        word-wrap: break-word;
       }
     }
   `
