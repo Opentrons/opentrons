@@ -12,6 +12,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  Modal,
   JUSTIFY_FLEX_END,
   PrimaryButton,
   SPACING,
@@ -20,7 +21,6 @@ import {
 } from '@opentrons/components'
 import { Banner } from '../../atoms/Banner'
 import { getTopPortalEl } from '../../App/portal'
-import { LegacyModal } from '../../molecules/LegacyModal'
 
 import type { AttachedModule } from '../../redux/modules/types'
 
@@ -82,7 +82,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
       </Flex>
       {showErrorDetails
         ? createPortal(
-            <LegacyModal
+            <Modal
               type="error"
               title={t('module_name_error', {
                 moduleName: getModuleDisplayName(attachedModule.moduleModel),
@@ -110,7 +110,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
                   {t('shared:close')}
                 </PrimaryButton>
               </Flex>
-            </LegacyModal>,
+            </Modal>,
             getTopPortalEl()
           )
         : null}

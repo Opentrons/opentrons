@@ -12,7 +12,7 @@ from anyio import Path as AsyncPath, to_thread
 
 from ._folder_migrator import MigrationOrchestrator
 from ._migrations import up_to_3, v3_to_v4, v4_to_v5, v5_to_v6
-from . import LATEST_VERSION_DIRECTORY
+from .file_and_directory_names import LATEST_VERSION_DIRECTORY
 
 _TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-robot-server-"
 _RESET_MARKER_FILE_NAME: Final = "_TO_BE_DELETED_ON_REBOOT"

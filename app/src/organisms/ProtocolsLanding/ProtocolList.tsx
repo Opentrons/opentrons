@@ -13,11 +13,12 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  MenuItem,
   Overlay,
   POSITION_ABSOLUTE,
   SecondaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -32,7 +33,6 @@ import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { ProtocolUploadInput } from './ProtocolUploadInput'
 import { ProtocolCard } from './ProtocolCard'
 import { EmptyStateLinks } from './EmptyStateLinks'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
 
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { ProtocolSort } from './hooks'

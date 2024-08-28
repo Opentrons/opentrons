@@ -12,27 +12,28 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  DropdownMenu,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
+  MenuItem,
   POSITION_ABSOLUTE,
   PrimaryButton,
   SecondaryButton,
+  ERROR_TOAST,
+  SUCCESS_TOAST,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
 import { LabwareCreator } from '@opentrons/labware-library'
-import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import {
   useTrackEvent,
   ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
 } from '../../redux/analytics'
 import { addCustomLabwareFileFromCreator } from '../../redux/custom-labware'
-import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 import { LabwareCard } from '../../organisms/LabwareCard'
 import { AddCustomLabwareSlideout } from '../../organisms/AddCustomLabwareSlideout'
 import { LabwareDetails } from '../../organisms/LabwareDetails'
@@ -40,7 +41,7 @@ import { useToaster } from '../../organisms/ToasterOven'
 import { useFeatureFlag } from '../../redux/config'
 import { useAllLabware, useLabwareFailure, useNewLabwareName } from './hooks'
 
-import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
+import type { DropdownOption } from '@opentrons/components'
 import type { LabwareFilter, LabwareSort } from './types'
 import type { LabwareDefAndDate } from './hooks'
 

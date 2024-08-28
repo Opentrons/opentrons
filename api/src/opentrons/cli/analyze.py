@@ -248,7 +248,7 @@ async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
             protocol_source=protocol_source,
             parse_mode=ParseMode.NORMAL,
             run_time_param_values=None,
-            run_time_param_files=None,
+            run_time_param_paths=None,
         )
     except Exception as error:
         err_id = "analysis-setup-error"

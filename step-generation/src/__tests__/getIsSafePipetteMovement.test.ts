@@ -1,4 +1,4 @@
-import { expect, describe, it } from 'vitest'
+import { expect, describe, it, beforeEach } from 'vitest'
 import { getIsSafePipetteMovement } from '../utils'
 import {
   TEMPERATURE_MODULE_TYPE,
@@ -18,53 +18,62 @@ const mockTipUri = 'mockTipUri'
 const mockModule = 'moduleId'
 const mockLabware2 = 'labwareId2'
 const mockAdapter = 'adapterId'
-const mockInvariantProperties: InvariantContext = {
-  pipetteEntities: {
-    pip: {
-      name: 'p1000_96',
-      id: 'pip',
-      tiprackDefURI: ['mockDefUri'],
-      tiprackLabwareDef: [fixtureTiprack1000ul as LabwareDefinition2],
-      spec: fixtureP100096V2Specs,
-    },
-  },
-  labwareEntities: {
-    [mockLabwareId]: {
-      id: mockLabwareId,
-      labwareDefURI: 'mockDefUri',
-      def: fixture96Plate as LabwareDefinition2,
-    },
-    [mockTiprackId]: {
-      id: mockTiprackId,
-      labwareDefURI: mockTipUri,
-      def: fixtureTiprack1000ul as LabwareDefinition2,
-    },
-    [mockAdapter]: {
-      id: mockAdapter,
-      labwareDefURI: 'mockAdapterUri',
-      def: fixtureTiprackAdapter as LabwareDefinition2,
-    },
-    [mockLabware2]: {
-      id: mockLabware2,
-      labwareDefURI: 'mockDefUri',
-      def: fixture96Plate as LabwareDefinition2,
-    },
-  },
-  moduleEntities: {},
-  additionalEquipmentEntities: {},
-  config: {
-    OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
-  },
-}
+const mockWellName = 'A1'
 
-const mockRobotState: RobotState = {
-  pipettes: { pip: { mount: 'left' } },
-  labware: { [mockLabwareId]: { slot: 'D2' }, [mockTiprackId]: { slot: 'A2' } },
-  modules: {},
-  tipState: { tipracks: {}, pipettes: {} },
-  liquidState: { pipettes: {}, labware: {}, additionalEquipment: {} },
-}
 describe('getIsSafePipetteMovement', () => {
+  let mockInvariantProperties: InvariantContext
+  let mockRobotState: RobotState
+  beforeEach(() => {
+    mockInvariantProperties = {
+      pipetteEntities: {
+        pip: {
+          name: 'p1000_96',
+          id: 'pip',
+          tiprackDefURI: ['mockDefUri'],
+          tiprackLabwareDef: [fixtureTiprack1000ul as LabwareDefinition2],
+          spec: fixtureP100096V2Specs,
+        },
+      },
+      labwareEntities: {
+        [mockLabwareId]: {
+          id: mockLabwareId,
+          labwareDefURI: 'mockDefUri',
+          def: fixture96Plate as LabwareDefinition2,
+        },
+        [mockTiprackId]: {
+          id: mockTiprackId,
+          labwareDefURI: mockTipUri,
+          def: fixtureTiprack1000ul as LabwareDefinition2,
+        },
+        [mockAdapter]: {
+          id: mockAdapter,
+          labwareDefURI: 'mockAdapterUri',
+          def: fixtureTiprackAdapter as LabwareDefinition2,
+        },
+        [mockLabware2]: {
+          id: mockLabware2,
+          labwareDefURI: 'mockDefUri',
+          def: fixture96Plate as LabwareDefinition2,
+        },
+      },
+      moduleEntities: {},
+      additionalEquipmentEntities: {},
+      config: {
+        OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
+      },
+    }
+    mockRobotState = {
+      pipettes: { pip: { mount: 'left' } },
+      labware: {
+        [mockLabwareId]: { slot: 'D2' },
+        [mockTiprackId]: { slot: 'A2' },
+      },
+      modules: {},
+      tipState: { tipracks: {}, pipettes: {} },
+      liquidState: { pipettes: {}, labware: {}, additionalEquipment: {} },
+    }
+  })
+
   it('returns true when the labware id is a trash bin', () => {
     const result = getIsSafePipetteMovement(
       {
@@ -97,7 +106,8 @@ describe('getIsSafePipetteMovement', () => {
       mockPipId,
       mockLabwareId,
       mockTipUri,
-      { x: -12, y: -100, z: 20 }
+      { x: -12, y: -100, z: 20 },
+      mockWellName
     )
     expect(result).toEqual(false)
   })
@@ -118,25 +128,31 @@ describe('getIsSafePipetteMovement', () => {
       mockPipId,
       mockLabwareId,
       mockTipUri,
-      { x: -1, y: 5, z: 20 }
+      { x: -1, y: 5, z: 20 },
+      mockWellName
     )
     expect(result).toEqual(true)
   })
   it('returns false when there is a tip that collides', () => {
     mockRobotState.tipState.tipracks = { mockTiprackId: { A1: true } }
+    mockRobotState.labware = {
+      ...mockRobotState.labware,
+      [mockAdapter]: { slot: 'D1' },
+    }
     const result = getIsSafePipetteMovement(
       mockRobotState,
       mockInvariantProperties,
       mockPipId,
       mockLabwareId,
       mockTipUri,
-      { x: -1, y: 5, z: 0 }
+      { x: -1, y: 5, z: 0 },
+      mockWellName
     )
     expect(result).toEqual(false)
   })
   it('returns false when there is a tall module nearby in a diagonal slot with adapter and labware', () => {
     mockRobotState.modules = {
-      [mockModule]: { slot: 'C1', moduleState: {} as any },
+      [mockModule]: { slot: 'D1', moduleState: {} as any },
     }
     mockRobotState.labware = {
       [mockLabwareId]: { slot: 'D2' },
@@ -160,7 +176,8 @@ describe('getIsSafePipetteMovement', () => {
       mockPipId,
       mockLabwareId,
       mockTipUri,
-      { x: 0, y: 0, z: 0 }
+      { x: 0, y: 0, z: 0 },
+      mockWellName
     )
     expect(result).toEqual(false)
   })

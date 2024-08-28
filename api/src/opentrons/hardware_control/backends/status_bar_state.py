@@ -48,6 +48,11 @@ class StatusBarStateController:
         if self._enabled:
             await self._controller.static_color(status_bar.YELLOW)
 
+    async def _status_bar_error_recovery(self) -> None:
+        self._status_bar_state = StatusBarState.ERROR_RECOVERY
+        if self._enabled:
+            await self._controller.pulse_color(status_bar.YELLOW)
+
     async def _status_bar_confirm(self) -> None:
         # Confirm should revert to IDLE
         self._status_bar_state = StatusBarState.IDLE
@@ -163,6 +168,7 @@ class StatusBarStateController:
             StatusBarState.PAUSED: self._status_bar_paused,
             StatusBarState.HARDWARE_ERROR: self._status_bar_hardware_error,
             StatusBarState.SOFTWARE_ERROR: self._status_bar_software_error,
+            StatusBarState.ERROR_RECOVERY: self._status_bar_error_recovery,
             StatusBarState.CONFIRMATION: self._status_bar_confirm,
             StatusBarState.RUN_COMPLETED: self._status_bar_run_complete,
             StatusBarState.UPDATING: self._status_bar_updating,

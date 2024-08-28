@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { SmallButton } from '../../atoms/buttons'
 
 interface PipetteNotAttachedErrorModalProps {
@@ -22,7 +22,7 @@ export const PipetteNotAttachedErrorModal = (
   const { i18n, t } = useTranslation(['quick_transfer', 'shared', 'branded'])
 
   return (
-    <Modal
+    <OddModal
       header={{
         title: t('branded:attach_a_pipette'),
         iconName: 'alert-circle',
@@ -51,6 +51,6 @@ export const PipetteNotAttachedErrorModal = (
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

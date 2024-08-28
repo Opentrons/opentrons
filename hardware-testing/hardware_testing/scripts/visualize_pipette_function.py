@@ -92,8 +92,8 @@ def _plot_table(model: str, table: List[List[float]]) -> None:
     plt.suptitle(model)
     plt.plot(*table)
     ax = plt.gca()
-    ax.set_xlim([min(table[0]), max(table[0])])
-    ax.set_ylim([min(table[1]), max(table[1])])
+    ax.set_xlim([min(table[0]), max(table[0])])  # type: ignore[arg-type]
+    ax.set_ylim([min(table[1]), max(table[1])])  # type: ignore[arg-type]
     plt.show()
 
 

@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { SmallButton } from '../../atoms/buttons'
 import { NameQuickTransfer } from './NameQuickTransfer'
 
@@ -24,7 +24,7 @@ export const SaveOrRunModal = (props: SaveOrRunModalProps): JSX.Element => {
   return showNameTransfer ? (
     <NameQuickTransfer onSave={props.onSave} />
   ) : (
-    <Modal
+    <OddModal
       header={{
         title: t('run_quick_transfer_now'),
         iconName: 'alert-circle',
@@ -33,13 +33,10 @@ export const SaveOrRunModal = (props: SaveOrRunModalProps): JSX.Element => {
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing10}
+        gridGap={SPACING.spacing32}
         width="100%"
       >
-        <LegacyStyledText
-          css={TYPOGRAPHY.bodyTextRegular}
-          paddingBottom={SPACING.spacing24}
-        >
+        <LegacyStyledText css={TYPOGRAPHY.bodyTextRegular}>
           {t('save_to_run_later')}
         </LegacyStyledText>
         <Flex gridGap={SPACING.spacing8}>
@@ -58,6 +55,6 @@ export const SaveOrRunModal = (props: SaveOrRunModalProps): JSX.Element => {
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

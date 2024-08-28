@@ -4,7 +4,7 @@ import { screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { fixture96Plate, fixtureTiprack1000ul } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../__testing-utils__'
-import { i18n } from '../../localization'
+import { i18n } from '../../assets/localization'
 import {
   getAdditionalEquipmentEntities,
   getArgsAndErrorsByStepId,

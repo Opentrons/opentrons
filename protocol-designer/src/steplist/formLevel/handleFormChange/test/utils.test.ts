@@ -7,10 +7,7 @@ import {
 } from '../utils'
 import { fixture_tiprack_300_ul } from '@opentrons/shared-data/labware/fixtures/2'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type {
-  PipetteEntities,
-  LabwareEntities,
-} from '@opentrons/step-generation'
+import type { PipetteEntities } from '@opentrons/step-generation'
 import type { FormData } from '../../../../form-types'
 
 const fixtureTiprack300ul = fixture_tiprack_300_ul as LabwareDefinition2
@@ -19,7 +16,6 @@ describe('utils', () => {
   describe('volumeInCapacityForMulti', () => {
     let sharedForm: FormData
     let pipetteEntities: PipetteEntities
-    let labwareEntities: LabwareEntities
     beforeEach(() => {
       sharedForm = {
         pipette: 'p300_single',
@@ -30,7 +26,6 @@ describe('utils', () => {
           tiprackLabwareDef: [fixtureTiprack300ul],
         },
       } as any
-      labwareEntities = {}
     })
     describe('multi dispense path', () => {
       const testCases = [
@@ -92,8 +87,7 @@ describe('utils', () => {
             expect(
               volumeInCapacityForMulti(
                 { ...sharedForm, ...form },
-                pipetteEntities,
-                labwareEntities
+                pipetteEntities
               )
             ).toBe(expected)
           })
@@ -150,8 +144,7 @@ describe('utils', () => {
             expect(
               volumeInCapacityForMulti(
                 { ...sharedForm, ...form },
-                pipetteEntities,
-                labwareEntities
+                pipetteEntities
               )
             ).toBe(expected)
           })

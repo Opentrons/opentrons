@@ -17,12 +17,12 @@ import {
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { UpdateInProgressModal } from './UpdateInProgressModal'
 import { UpdateResultsModal } from './UpdateResultsModal'
 import type { Subsystem } from '@opentrons/api-client'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface UpdateNeededModalProps {
   onClose: () => void
@@ -70,14 +70,14 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
   if (subsystem === 'pipette_left') mount = LEFT
   else if (subsystem === 'pipette_right') mount = RIGHT
 
-  const updateNeededHeader: ModalHeaderBaseProps = {
+  const updateNeededHeader: OddModalHeaderBaseProps = {
     title: t('update_needed'),
     iconName: 'ot-alert',
     iconColor: COLORS.yellow50,
   }
 
   let modalContent = (
-    <Modal header={updateNeededHeader}>
+    <OddModal header={updateNeededHeader}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <LegacyStyledText as="p" marginBottom={SPACING.spacing60}>
           <Trans
@@ -101,7 +101,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
           width="100%"
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
   if (
     (status === 'updating' || status === 'queued') &&

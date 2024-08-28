@@ -1,19 +1,19 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  StyledText,
-  SPACING,
-  TYPOGRAPHY,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  COLORS,
-  TEXT_ALIGN_RIGHT,
-  Icon,
-  SIZE_2,
   ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  ListItem,
+  SIZE_2,
+  SPACING,
+  StyledText,
+  TEXT_ALIGN_RIGHT,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { ListItem } from '../../../atoms/ListItem'
 import { FlowRateEntry } from './FlowRate'
 import { PipettePath } from './PipettePath'
 

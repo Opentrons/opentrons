@@ -19,7 +19,6 @@ import {
 import { HistoricalProtocolRun } from './HistoricalProtocolRun'
 import { useIsRobotViewable, useRunStatuses } from './hooks'
 import { useNotifyAllRunsQuery, useCurrentRunId } from '../../resources/runs'
-import { useFeatureFlag } from '../../redux/config'
 
 interface RecentProtocolRunsProps {
   robotName: string
@@ -36,7 +35,6 @@ export function RecentProtocolRuns({
   const currentRunId = useCurrentRunId()
   const { isRunTerminal } = useRunStatuses()
   const robotIsBusy = currentRunId != null ? !isRunTerminal : false
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   return (
     <Flex
@@ -90,15 +88,13 @@ export function RecentProtocolRuns({
               >
                 {t('protocol')}
               </LegacyStyledText>
-              {enableCsvFile ? (
-                <LegacyStyledText
-                  as="p"
-                  width="5%"
-                  data-testid="RecentProtocolRuns_FilesTitle"
-                >
-                  {t('files')}
-                </LegacyStyledText>
-              ) : null}
+              <LegacyStyledText
+                as="p"
+                width="5%"
+                data-testid="RecentProtocolRuns_FilesTitle"
+              >
+                {t('files')}
+              </LegacyStyledText>
               <LegacyStyledText
                 as="p"
                 width="14%"

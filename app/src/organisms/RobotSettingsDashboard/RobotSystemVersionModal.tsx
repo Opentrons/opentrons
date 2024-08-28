@@ -13,9 +13,9 @@ import {
 import { SmallButton } from '../../atoms/buttons'
 import { InlineNotification } from '../../atoms/InlineNotification'
 import { ReleaseNotes } from '../../molecules/ReleaseNotes'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface RobotSystemVersionModalProps {
   version: string
@@ -31,14 +31,14 @@ export function RobotSystemVersionModal({
   const { t } = useTranslation(['device_settings', 'shared'])
   const navigate = useNavigate()
 
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('robot_system_version_available', {
       releaseVersion: version,
     }),
   }
 
   return (
-    <Modal header={modalHeader} modalSize="large">
+    <OddModal header={modalHeader} modalSize="large">
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
@@ -74,6 +74,6 @@ export function RobotSystemVersionModal({
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

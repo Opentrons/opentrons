@@ -18,6 +18,7 @@ import {
   SecondaryButton,
   SPACING,
   LegacyStyledText,
+  ModalShell,
   TYPOGRAPHY,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
@@ -34,7 +35,6 @@ import levelProbeWithTip from '../../assets/images/lpc_level_probe_with_tip.svg'
 import levelProbeWithLabware from '../../assets/images/lpc_level_probe_with_labware.svg'
 import { getIsOnDevice } from '../../redux/config'
 import { getTopPortalEl } from '../../App/portal'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { SmallButton } from '../../atoms/buttons'
 import { NeedHelpLink } from '../CalibrationPanels'
 import { JogControls } from '../../molecules/JogControls'
@@ -193,7 +193,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
           </Flex>
           {showFullJogControls
             ? createPortal(
-                <LegacyModalShell
+                <ModalShell
                   width="60rem"
                   height="33.5rem"
                   padding={SPACING.spacing32}
@@ -229,7 +229,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                     }
                     isOnDevice={true}
                   />
-                </LegacyModalShell>,
+                </ModalShell>,
                 getTopPortalEl()
               )
             : null}

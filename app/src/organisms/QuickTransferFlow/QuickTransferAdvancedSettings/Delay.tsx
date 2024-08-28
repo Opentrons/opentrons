@@ -1,18 +1,20 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+
 import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
-  POSITION_FIXED,
-  COLORS,
   ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  InputField,
+  LargeButton,
+  POSITION_FIXED,
+  SPACING,
 } from '@opentrons/components'
+
 import { getTopPortalEl } from '../../../App/portal'
-import { LargeButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
-import { InputField } from '../../../atoms/InputField'
 import { ACTIONS } from '../constants'
 
 import type {
@@ -138,9 +140,19 @@ export function Delay(props: DelayProps): JSX.Element {
         })
       : null
 
+  // allow a maximum of 10 digits for delay duration
+  const durationRange = { min: 1, max: 9999999999 }
+  const durationError =
+    delayDuration != null &&
+    (delayDuration < durationRange.min || delayDuration > durationRange.max)
+      ? t(`value_out_of_range`, {
+          min: durationRange.min,
+          max: durationRange.max,
+        })
+      : null
   let buttonIsDisabled = false
   if (currentStep === 2) {
-    buttonIsDisabled = delayDuration == null
+    buttonIsDisabled = delayDuration == null || durationError != null
   } else if (currentStep === 3) {
     buttonIsDisabled = positionError != null || position == null
   }
@@ -199,6 +211,7 @@ export function Delay(props: DelayProps): JSX.Element {
             <InputField
               type="number"
               value={delayDuration}
+              error={durationError}
               title={t('delay_duration_s')}
               readOnly
             />

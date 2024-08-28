@@ -19,11 +19,13 @@ import {
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
 } from '@opentrons/shared-data'
 
+import { DeckInfoLabel } from '../../molecules/DeckInfoLabel'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { Module } from '../Module'
 import { LabwareRender } from '../Labware'
 import { FlexTrash } from '../Deck/FlexTrash'
 import { DeckFromLayers } from '../Deck/DeckFromLayers'
+import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import { SlotLabels } from '../Deck'
 import { COLORS } from '../../helix-design-system'
 
@@ -55,6 +57,7 @@ export interface LabwareOnDeck {
   labwareChildren?: React.ReactNode
   onLabwareClick?: () => void
   highlight?: boolean
+  stacked?: boolean
 }
 
 export interface ModuleOnDeck {
@@ -67,6 +70,7 @@ export interface ModuleOnDeck {
   moduleChildren?: React.ReactNode
   onLabwareClick?: () => void
   highlightLabware?: boolean
+  stacked?: boolean
 }
 interface BaseDeckProps {
   deckConfig: DeckConfiguration
@@ -243,6 +247,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             moduleChildren,
             onLabwareClick,
             highlightLabware,
+            stacked = false,
           }) => {
             const slotPosition = getPositionFromSlotId(
               moduleLocation.slotName,
@@ -273,6 +278,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   />
                 ) : null}
                 {moduleChildren}
+                {stacked ? <StackedBadge /> : null}
               </Module>
             ) : null
           }
@@ -286,6 +292,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             missingTips,
             onLabwareClick,
             highlight,
+            stacked = false,
           }) => {
             if (
               labwareLocation === 'offDeck' ||
@@ -316,6 +323,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   highlight={highlight}
                 />
                 {labwareChildren}
+                {stacked ? <StackedBadge /> : null}
               </g>
             ) : null
           }
@@ -323,5 +331,18 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       </>
       {children}
     </RobotCoordinateSpace>
+  )
+}
+
+function StackedBadge(): JSX.Element {
+  return (
+    <RobotCoordsForeignObject height="2.5rem" width="2.5rem" x={113} y={53}>
+      <DeckInfoLabel
+        height="1.25rem"
+        svgSize="0.875rem"
+        highlight
+        iconName="stacked"
+      />
+    </RobotCoordsForeignObject>
   )
 }

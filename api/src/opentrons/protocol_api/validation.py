@@ -208,7 +208,7 @@ def ensure_and_convert_deck_slot(
                 api_element=f"Specifying a deck slot like '{deck_slot}'",
                 until_version=f"{_COORDINATE_DECK_LABEL_VERSION_GATE}",
                 current_version=f"{api_version}",
-                message=f" Increase your protocol's apiLevel, or use slot '{alternative}' instead.",
+                extra_message=f"Increase your protocol's apiLevel, or use slot '{alternative}' instead.",
             )
 
         return parsed_slot.to_equivalent_for_robot_type(robot_type)

@@ -17,33 +17,52 @@ import {
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../../atoms/buttons'
-import { Modal } from '../../../molecules/Modal'
+import { OddModal } from '../../../molecules/OddModal'
+import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 
-import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
-import type { RunError } from '@opentrons/api-client'
+import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
+import type {
+  RunCommandErrors,
+  RunError,
+  RunStatus,
+} from '@opentrons/api-client'
+import type { RunCommandError } from '@opentrons/shared-data'
 
 interface RunFailedModalProps {
   runId: string
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
   errors?: RunError[]
+  commandErrorList?: RunCommandErrors
+  runStatus: RunStatus | null
 }
 
 export function RunFailedModal({
   runId,
   setShowRunFailedModal,
   errors,
+  commandErrorList,
+  runStatus,
 }: RunFailedModalProps): JSX.Element | null {
   const { t, i18n } = useTranslation(['run_details', 'shared', 'branded'])
   const navigate = useNavigate()
   const { stopRun } = useStopRunMutation()
   const [isCanceling, setIsCanceling] = React.useState(false)
 
-  if (errors == null || errors.length === 0) return null
-  const modalHeader: ModalHeaderBaseProps = {
-    title: t('run_failed_modal_title'),
+  if (
+    (errors == null || errors.length === 0) &&
+    (commandErrorList == null || commandErrorList.data.length === 0)
+  )
+    return null
+  const modalHeader: OddModalHeaderBaseProps = {
+    title:
+      commandErrorList == null || commandErrorList?.data.length === 0
+        ? t('run_failed_modal_title')
+        : runStatus === RUN_STATUS_SUCCEEDED
+        ? t('warning_details')
+        : t('error_details'),
   }
 
-  const highestPriorityError = getHighestPriorityError(errors)
+  const highestPriorityError = getHighestPriorityError(errors ?? [])
 
   const handleClose = (): void => {
     setIsCanceling(true)
@@ -60,8 +79,62 @@ export function RunFailedModal({
       },
     })
   }
+
+  interface ErrorContentProps {
+    errors: RunCommandError[]
+    isSingleError: boolean
+  }
+  const ErrorContent = ({
+    errors,
+    isSingleError,
+  }: ErrorContentProps): JSX.Element => {
+    return (
+      <>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
+          {isSingleError
+            ? t('error_info', {
+                errorType: errors[0].errorType,
+                errorCode: errors[0].errorCode,
+              })
+            : runStatus === RUN_STATUS_SUCCEEDED
+            ? t(errors.length > 1 ? 'no_of_warnings' : 'no_of_warning', {
+                count: errors.length,
+              })
+            : t(errors.length > 1 ? 'no_of_errors' : 'no_of_error', {
+                count: errors.length,
+              })}
+        </LegacyStyledText>
+        <Flex
+          width="100%"
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing8}
+          maxHeight="11rem"
+          backgroundColor={COLORS.grey35}
+          borderRadius={BORDERS.borderRadius8}
+          padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
+        >
+          <Flex flexDirection={DIRECTION_COLUMN} css={SCROLL_BAR_STYLE}>
+            {' '}
+            {errors.map((error, index) => (
+              <LegacyStyledText
+                as="p"
+                textAlign={TYPOGRAPHY.textAlignLeft}
+                key={index}
+              >
+                {' '}
+                {isSingleError
+                  ? error.detail
+                  : `${error.errorCode}: ${error.detail}`}
+              </LegacyStyledText>
+            ))}
+          </Flex>
+        </Flex>
+      </>
+    )
+  }
+
   return (
-    <Modal
+    <OddModal
       header={modalHeader}
       onOutsideClick={() => {
         setShowRunFailedModal(false)
@@ -80,37 +153,26 @@ export function RunFailedModal({
           gridGap={SPACING.spacing16}
           alignItems={ALIGN_FLEX_START}
         >
-          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
-            {t('error_info', {
-              errorType: highestPriorityError.errorType,
-              errorCode: highestPriorityError.errorCode,
-            })}
-          </LegacyStyledText>
-          <Flex
-            width="100%"
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing8}
-            maxHeight="11rem"
-            backgroundColor={COLORS.grey35}
-            borderRadius={BORDERS.borderRadius8}
-            padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
-          >
-            <Flex flexDirection={DIRECTION_COLUMN} css={SCROLL_BAR_STYLE}>
-              <LegacyStyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
-                {highestPriorityError.detail}
-              </LegacyStyledText>
-            </Flex>
-          </Flex>
-          <LegacyStyledText
-            as="p"
-            textAlign={TYPOGRAPHY.textAlignLeft}
-            css={css`
-              word-break: break-word;
-            `}
-          >
-            {t('branded:contact_information')}
-          </LegacyStyledText>
+          <ErrorContent
+            errors={
+              highestPriorityError
+                ? [highestPriorityError]
+                : commandErrorList?.data && commandErrorList?.data.length > 0
+                ? commandErrorList?.data
+                : []
+            }
+            isSingleError={!!highestPriorityError}
+          />
         </Flex>
+        <LegacyStyledText
+          as="p"
+          textAlign={TYPOGRAPHY.textAlignLeft}
+          css={css`
+            word-break: break-word;
+          `}
+        >
+          {t('branded:contact_information')}
+        </LegacyStyledText>
         <SmallButton
           width="100%"
           buttonType="alert"
@@ -119,7 +181,7 @@ export function RunFailedModal({
           disabled={isCanceling}
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }
 

@@ -3,6 +3,7 @@ import contextlib
 import logging
 from abc import ABC, abstractmethod
 from typing import AsyncGenerator, List, Optional
+from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnectedError
 from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
 
 
@@ -36,21 +37,20 @@ class Poller:
         self._poll_forever_task: Optional["asyncio.Task[None]"] = None
 
     async def start(self) -> None:
-        assert self._poll_forever_task is None, "Poller already started"
-        self._poll_forever_task = asyncio.create_task(self._poll_forever())
-        await self.wait_next_poll()
+        if self._poll_forever_task is None:
+            self._poll_forever_task = asyncio.create_task(self._poll_forever())
+            await self.wait_next_poll()
 
     async def stop(self) -> None:
         """Stop polling."""
         task = self._poll_forever_task
-
-        assert task is not None, "Poller never started"
-
-        async with self._use_read_lock():
-            task.cancel()
-            await asyncio.gather(task, return_exceptions=True)
-        for waiter in self._poll_waiters:
-            waiter.cancel(msg="Module was removed")
+        if task is not None:
+            async with self._use_read_lock():
+                task.cancel()
+                await asyncio.gather(task, return_exceptions=True)
+            for waiter in self._poll_waiters:
+                waiter.cancel(msg="Module was removed")
+            self._poll_forever_task = None
 
     async def wait_next_poll(self) -> None:
         """Wait for the next poll to complete.
@@ -98,6 +98,10 @@ class Poller:
                 await self._reader.read()
         except asyncio.CancelledError:
             raise
+        except AbsorbanceReaderDisconnectedError as e:
+            for waiter in previous_waiters:
+                Poller._set_waiter_complete(waiter, None)
+            self._reader.on_error(e)
         except Exception as e:
             log.exception("Polling exception")
             self._reader.on_error(e)

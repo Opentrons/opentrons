@@ -6,7 +6,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { getLocationInfoNames } from '../../Devices/ProtocolRun/utils/getLocationInfoNames'
-import { getTotalVolumePerLiquidId } from '../../Devices/ProtocolRun/SetupLiquids/utils'
+import { getVolumePerWell } from '../../Devices/ProtocolRun/SetupLiquids/utils'
 import { LiquidDetails } from '../LiquidDetails'
 import { LiquidsLabwareDetailsModal } from '../../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal'
 import {
@@ -39,7 +39,7 @@ describe('LiquidDetails', () => {
         displayColor: '#ff4888',
       },
     }
-    vi.mocked(getTotalVolumePerLiquidId).mockReturnValue(50)
+    vi.mocked(getVolumePerWell).mockReturnValue(50)
     vi.mocked(getLocationInfoNames).mockReturnValue({
       slotName: '4',
       labwareName: 'mock labware name',
@@ -53,9 +53,14 @@ describe('LiquidDetails', () => {
     screen.getByText('mock labware name')
     screen.getByText('Location')
     screen.getByText('Labware name')
-    screen.getByText('Volume')
+    screen.getByText('Individual well volume')
     screen.getByText('50 µL')
     fireEvent.click(screen.getByLabelText('LiquidDetails_0'))
     screen.getByText('mock modal')
+  })
+  it('renders variable well amount if no specific volume per well', () => {
+    vi.mocked(getVolumePerWell).mockReturnValue(null)
+    render(props)
+    screen.getByText('Variable well amount')
   })
 })

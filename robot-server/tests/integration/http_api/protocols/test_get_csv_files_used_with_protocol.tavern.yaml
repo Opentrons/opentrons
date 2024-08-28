@@ -1,0 +1,237 @@
+test_name: Test the /protocols/{protocolID}/dataFiles endpoint
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+
+stages:
+  - name: Upload data file 1
+    request:
+      url: '{ot2_server_base_url}/dataFiles'
+      method: POST
+      files:
+        file: 'tests/integration/data_files/test.csv'
+    response:
+      save:
+        json:
+          data_file_1_id: data.id
+          data_file_1_name: data.name
+      status_code:
+        - 201
+
+  - name: Upload data file 2
+    request:
+      url: '{ot2_server_base_url}/dataFiles'
+      method: POST
+      files:
+        file: 'tests/integration/data_files/sample_record.csv'
+    response:
+      save:
+        json:
+          data_file_2_id: data.id
+          data_file_2_name: data.name
+      status_code:
+        - 201
+
+  - name: Upload data file 3
+    request:
+      url: '{ot2_server_base_url}/dataFiles'
+      method: POST
+      files:
+        file: 'tests/integration/data_files/sample_plates.csv'
+    response:
+      save:
+        json:
+          data_file_3_id: data.id
+          data_file_3_name: data.name
+      status_code:
+        - 201
+
+  - name: Upload protocol with CSV file ID
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: POST
+      data:
+        runTimeParameterFiles: '{{"liq_handling_csv_file": "{data_file_1_id}"}}'
+      files:
+        files: 'tests/integration/protocols/basic_transfer_with_run_time_parameters.py'
+    response:
+      save:
+        json:
+          protocol_id: data.id
+          analysis_id: data.analysisSummaries[0].id
+          run_time_parameters_data1: data.analysisSummaries[0].runTimeParameters
+      strict:
+        json:off
+      status_code: 201
+      json:
+        data:
+          analysisSummaries:
+            - id: !anystr
+              status: pending
+              runTimeParameters:
+                - displayName: Liquid handling CSV file
+                  variableName: liq_handling_csv_file
+                  description: A CSV file that contains wells to use for pipetting
+                  type: csv_file
+                  file:
+                    id: '{data_file_1_id}'
+                    name: 'test.csv'
+
+  - name: Wait until analysis is completed
+    max_retries: 5
+    delay_after: 1
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}'
+    response:
+      status_code: 200
+      json:
+        data:
+          analyses: []
+          analysisSummaries:
+            - id: '{analysis_id}'
+              status: completed
+          id: !anything
+          protocolType: !anything
+          files: !anything
+          createdAt: !anything
+          robotType: !anything
+          protocolKind: !anything
+          metadata: !anything
+        links: !anything
+
+  - name: Start a new analysis with a different CSV file
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      method: POST
+      json:
+        data:
+          forceReAnalyze: true
+          runTimeParameterFiles:
+            liq_handling_csv_file: '{data_file_3_id}'
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          - id: '{analysis_id}'
+            status: completed
+          - id: !anystr
+            status: pending
+            runTimeParameters:
+              - displayName: Liquid handling CSV file
+                variableName: liq_handling_csv_file
+                description: A CSV file that contains wells to use for pipetting
+                type: csv_file
+                file:
+                  id: '{data_file_3_id}'
+                  name: 'sample_plates.csv'
+
+  - name: Wait until analysis is completed
+    max_retries: 5
+    delay_after: 1
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}'
+    response:
+      status_code: 200
+      json:
+        data:
+          analyses: []
+          analysisSummaries:
+            - id: '{analysis_id}'
+              status: completed
+            - id: !anystr
+              status: completed
+          id: !anything
+          protocolType: !anything
+          files: !anything
+          createdAt: !anything
+          robotType: !anything
+          protocolKind: !anything
+          metadata: !anything
+        links: !anything
+
+  - name: Create a run from the protocol and a CSV file
+    request:
+      url: '{ot2_server_base_url}/runs'
+      method: POST
+      json:
+        data:
+          protocolId: '{protocol_id}'
+          runTimeParameterFiles:
+            liq_handling_csv_file: '{data_file_1_id}'
+    response:
+      status_code: 201
+      save:
+        json:
+          run_id1: data.id
+          run_time_parameters_data2: data.runTimeParameters
+      strict:
+        json:off
+      json:
+        data:
+          id: !anystr
+          ok: True
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+          status: idle
+          runTimeParameters:
+            - displayName: Liquid handling CSV file
+              variableName: liq_handling_csv_file
+              description: A CSV file that contains wells to use for pipetting
+              type: csv_file
+              file:
+                id: '{data_file_1_id}'
+                name: 'test.csv'
+
+  - name: Create another run from the protocol and a different CSV file
+    request:
+      url: '{ot2_server_base_url}/runs'
+      method: POST
+      json:
+        data:
+          protocolId: '{protocol_id}'
+          runTimeParameterFiles:
+            liq_handling_csv_file: '{data_file_2_id}'
+    response:
+      status_code: 201
+      save:
+        json:
+          run_id2: data.id
+          run_time_parameters_data3: data.runTimeParameters
+      strict:
+        json:off
+      json:
+        data:
+          id: !anystr
+          ok: True
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+          status: idle
+          runTimeParameters:
+            - displayName: Liquid handling CSV file
+              variableName: liq_handling_csv_file
+              description: A CSV file that contains wells to use for pipetting
+              type: csv_file
+              file:
+                id: '{data_file_2_id}'
+                name: 'sample_record.csv'
+
+  - name: Fetch data files used with the protocol so far
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/dataFiles'
+    response:
+      status_code: 200
+      json:
+        meta:
+          cursor: 0
+          totalLength: 3
+        data:
+          - id: '{data_file_1_id}'
+            name: "test.csv"
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+          - id: '{data_file_2_id}'
+            name: "sample_record.csv"
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+          - id: '{data_file_3_id}'
+            name: "sample_plates.csv"
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"

@@ -1,13 +1,17 @@
 import * as React from 'react'
-import { Route, Navigate, Routes, useLocation } from 'react-router-dom'
+import { Route, Navigate, Routes } from 'react-router-dom'
 import { Box } from '@opentrons/components'
 import { Landing } from './pages/Landing'
 import { ProtocolOverview } from './pages/ProtocolOverview'
 import { Liquids } from './pages/Liquids'
-import { StartingDeckState } from './pages/StartingDeckState'
-import { ProtocolSteps } from './pages/ProtocolSteps'
-import { CreateNewProtocol } from './pages/CreateNewProtocol'
-import { Navbar } from './Navbar'
+import { Designer } from './pages/Designer'
+import { CreateNewProtocolWizard } from './pages/CreateNewProtocolWizard'
+import { NavigationBar } from './NavigationBar'
+import {
+  Kitchen,
+  FileUploadMessagesModal,
+  LabwareUploadModal,
+} from './organisms'
 
 import type { RouteProps } from './types'
 
@@ -26,19 +30,13 @@ const pdRoutes: RouteProps[] = [
     path: '/liquids',
   },
   {
-    Component: StartingDeckState,
-    name: 'Starting deck state',
-    navLinkTo: '/startingDeckState',
-    path: '/startingDeckState',
+    Component: Designer,
+    name: 'Edit protocol',
+    navLinkTo: '/designer',
+    path: '/designer',
   },
   {
-    Component: ProtocolSteps,
-    name: 'Protocol steps',
-    navLinkTo: '/steps',
-    path: '/steps',
-  },
-  {
-    Component: CreateNewProtocol,
+    Component: CreateNewProtocolWizard,
     name: 'Create new protocol',
     navLinkTo: '/createNew',
     path: '/createNew',
@@ -46,8 +44,6 @@ const pdRoutes: RouteProps[] = [
 ]
 
 export function ProtocolRoutes(): JSX.Element {
-  const location = useLocation()
-  const currentPath = location.pathname
   const landingPage: RouteProps = {
     Component: Landing,
     name: 'Landing',
@@ -58,15 +54,19 @@ export function ProtocolRoutes(): JSX.Element {
 
   return (
     <>
-      {currentPath === LANDING_ROUTE ? null : <Navbar routes={pdRoutes} />}
-      <Box width="100%">
-        <Routes>
-          {allRoutes.map(({ Component, path }: RouteProps) => {
-            return <Route key={path} path={path} element={<Component />} />
-          })}
-          <Route path="*" element={<Navigate to={LANDING_ROUTE} />} />
-        </Routes>
-      </Box>
+      <NavigationBar />
+      <Kitchen>
+        <Box width="100%">
+          <LabwareUploadModal />
+          <FileUploadMessagesModal />
+          <Routes>
+            {allRoutes.map(({ Component, path }: RouteProps) => {
+              return <Route key={path} path={path} element={<Component />} />
+            })}
+            <Route path="*" element={<Navigate to={LANDING_ROUTE} />} />
+          </Routes>
+        </Box>
+      </Kitchen>
     </>
   )
 }

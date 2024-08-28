@@ -182,6 +182,10 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         sensor_threshold_pascals=15,
         output_option=OutputOptions.can_bus_only,
         aspirate_while_sensing=False,
+        z_overlap_between_passes_mm=0.1,
+        plunger_reset_offset=2.0,
+        samples_for_baselining=20,
+        sample_time_sec=0.004,
         data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
     )
 
@@ -720,6 +724,7 @@ async def test_liquid_probe(
             plunger_speed=fake_liquid_settings.plunger_speed,
             threshold_pascals=fake_liquid_settings.sensor_threshold_pascals,
             plunger_impulse_time=fake_liquid_settings.plunger_impulse_time,
+            num_baseline_reads=fake_liquid_settings.samples_for_baselining,
             output_option=fake_liquid_settings.output_option,
         )
     except PipetteLiquidNotFoundError:

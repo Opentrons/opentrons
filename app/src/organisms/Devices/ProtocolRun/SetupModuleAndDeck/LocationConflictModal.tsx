@@ -17,6 +17,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  Modal,
 } from '@opentrons/components'
 import {
   getCutoutDisplayName,
@@ -29,8 +30,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../../../App/portal'
-import { LegacyModal } from '../../../../molecules/LegacyModal'
-import { Modal } from '../../../../molecules/Modal'
+import { OddModal } from '../../../../molecules/OddModal'
 import { SmallButton } from '../../../../atoms/buttons/SmallButton'
 import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
 
@@ -175,7 +175,7 @@ export const LocationConflictModal = (
 
   return createPortal(
     isOnDevice ? (
-      <Modal
+      <OddModal
         onOutsideClick={onCloseClick}
         header={{
           title: t('deck_conflict'),
@@ -273,9 +273,9 @@ export const LocationConflictModal = (
             />
           </Flex>
         </Flex>
-      </Modal>
+      </OddModal>
     ) : (
-      <LegacyModal
+      <Modal
         title={
           <Flex
             flexDirection={DIRECTION_ROW}
@@ -371,7 +371,7 @@ export const LocationConflictModal = (
             </PrimaryButton>
           </Flex>
         </Flex>
-      </LegacyModal>
+      </Modal>
     ),
     getTopPortalEl()
   )

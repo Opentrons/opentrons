@@ -29,12 +29,12 @@ import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 
 import { useNetworkConnection } from '../../resources/networking/hooks/useNetworkConnection'
 import { getLocalRobot } from '../../redux/discovery'
-import { useFeatureFlag } from '../../redux/config'
 import { NavigationMenu } from './NavigationMenu'
 import type { ON_DEVICE_DISPLAY_PATHS } from '../../App/OnDeviceDisplayApp'
 
-let NAV_LINKS: Array<typeof ON_DEVICE_DISPLAY_PATHS[number]> = [
+const NAV_LINKS: Array<typeof ON_DEVICE_DISPLAY_PATHS[number]> = [
   '/protocols',
+  '/quick-transfer',
   '/instruments',
   '/robot-settings',
 ]
@@ -68,15 +68,6 @@ export function Navigation(props: NavigationProps): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const [showNavMenu, setShowNavMenu] = React.useState<boolean>(false)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const enableQuickTransferFF = useFeatureFlag('enableQuickTransfer')
-  if (enableQuickTransferFF) {
-    NAV_LINKS = [
-      '/protocols',
-      '/quick-transfer',
-      '/instruments',
-      '/robot-settings',
-    ]
-  }
 
   // We need to display an icon for what type of network connection (if any)
   // is active next to the robot's name. The designs call for it to change color

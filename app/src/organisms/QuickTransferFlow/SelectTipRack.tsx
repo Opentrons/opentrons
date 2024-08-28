@@ -1,8 +1,12 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Flex, SPACING, DIRECTION_COLUMN } from '@opentrons/components'
+import {
+  Flex,
+  SPACING,
+  DIRECTION_COLUMN,
+  RadioButton,
+} from '@opentrons/components'
 import { getAllDefinitions } from '@opentrons/shared-data'
-import { RadioButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

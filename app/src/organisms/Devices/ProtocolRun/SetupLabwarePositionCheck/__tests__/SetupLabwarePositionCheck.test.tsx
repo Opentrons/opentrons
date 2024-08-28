@@ -42,10 +42,15 @@ const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 
 const render = () => {
+  let areOffsetsConfirmed = false
+  const confirmOffsets = vi.fn((offsetsConfirmed: boolean) => {
+    areOffsetsConfirmed = offsetsConfirmed
+  })
   return renderWithProviders(
     <MemoryRouter>
       <SetupLabwarePositionCheck
-        expandLabwareStep={vi.fn()}
+        offsetsConfirmed={areOffsetsConfirmed}
+        setOffsetsConfirmed={confirmOffsets}
         robotName={ROBOT_NAME}
         runId={RUN_ID}
       />

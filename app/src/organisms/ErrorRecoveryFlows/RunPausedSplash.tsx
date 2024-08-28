@@ -9,7 +9,6 @@ import {
   ALIGN_CENTER,
   SPACING,
   COLORS,
-  BORDERS,
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
   TYPOGRAPHY,
@@ -18,20 +17,20 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TEXT_ALIGN_CENTER,
   StyledText,
-  JUSTIFY_END,
   PrimaryButton,
   SecondaryButton,
+  LargeButton,
 } from '@opentrons/components'
 
 import { useErrorName } from './hooks'
 import { getErrorKind } from './utils'
-import { LargeButton } from '../../atoms/buttons'
-import { RECOVERY_MAP } from './constants'
+
 import {
-  RecoveryInterventionModal,
-  RecoverySingleColumnContentWrapper,
-  StepInfo,
-} from './shared'
+  BANNER_TEXT_CONTAINER_STYLE,
+  BANNER_TEXT_CONTENT_STYLE,
+  RECOVERY_MAP,
+} from './constants'
+import { RecoveryInterventionModal, StepInfo } from './shared'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '.'
@@ -39,6 +38,7 @@ import type {
   ERUtilsResults,
   UseRecoveryAnalyticsResult,
   UseRecoveryTakeoverResult,
+  useRetainedFailedCommandBySource,
 } from './hooks'
 
 export function useRunPausedSplash(
@@ -56,7 +56,7 @@ export function useRunPausedSplash(
 
 type RunPausedSplashProps = ERUtilsResults & {
   isOnDevice: boolean
-  failedCommand: ErrorRecoveryFlowsProps['failedCommand']
+  failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
   robotType: RobotType
   robotName: string
@@ -75,11 +75,11 @@ export function RunPausedSplash(
     robotName,
   } = props
   const { t } = useTranslation('error_recovery')
-  const errorKind = getErrorKind(failedCommand)
+  const errorKind = getErrorKind(failedCommand?.byRunRecord ?? null)
   const title = useErrorName(errorKind)
 
   const { proceedToRouteAndStep } = routeUpdateActions
-  const { reportInitialActionEvent } = analytics
+  const { reportErrorEvent } = analytics
 
   const buildTitleHeadingDesktop = (): JSX.Element => {
     return (
@@ -92,14 +92,14 @@ export function RunPausedSplash(
   // Do not launch error recovery, but do utilize the wizard's cancel route.
   const onCancelClick = (): Promise<void> => {
     return toggleERWizAsActiveUser(true, false).then(() => {
-      reportInitialActionEvent('cancel-run')
+      reportErrorEvent(failedCommand?.byRunRecord ?? null, 'cancel-run')
       void proceedToRouteAndStep(RECOVERY_MAP.CANCEL_RUN.ROUTE)
     })
   }
 
   const onLaunchERClick = (): Promise<void> => {
     return toggleERWizAsActiveUser(true, true).then(() => {
-      reportInitialActionEvent('launch-recovery')
+      reportErrorEvent(failedCommand?.byRunRecord ?? null, 'launch-recovery')
     })
   }
 
@@ -123,7 +123,7 @@ export function RunPausedSplash(
         position={POSITION_ABSOLUTE}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing60}
-        paddingY={SPACING.spacing40}
+        padding={SPACING.spacing40}
         backgroundColor={COLORS.red50}
         zIndex={5}
       >
@@ -132,7 +132,7 @@ export function RunPausedSplash(
             <Icon name="ot-alert" size="4.5rem" color={COLORS.white} />
             <SplashHeader>{title}</SplashHeader>
           </Flex>
-          <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
+          <Flex width="100%" justifyContent={JUSTIFY_CENTER}>
             <StepInfo
               {...props}
               oddStyle="level3HeaderBold"
@@ -169,49 +169,32 @@ export function RunPausedSplash(
       <RecoveryInterventionModal
         desktopType="desktop-small"
         titleHeading={buildTitleHeadingDesktop()}
-        isOnDevice={isOnDevice}
+        isOnDevice={false}
       >
-        <RecoverySingleColumnContentWrapper>
-          <Flex
-            gridGap={SPACING.spacing24}
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-          >
+        <Flex css={BANNER_TEXT_CONTAINER_STYLE}>
+          <Flex css={BANNER_TEXT_CONTENT_STYLE}>
+            <Icon
+              name="ot-alert"
+              size={SPACING.spacing40}
+              color={COLORS.red50}
+            />
             <Flex
-              borderRadius={BORDERS.borderRadius8}
-              padding={`${SPACING.spacing40} ${SPACING.spacing16}`}
-              gridGap={SPACING.spacing16}
-              height="100%"
+              gridGap={SPACING.spacing8}
               flexDirection={DIRECTION_COLUMN}
-              justifyContent={JUSTIFY_CENTER}
               alignItems={ALIGN_CENTER}
+              width="100%"
             >
-              <Icon
-                name="ot-alert"
-                size={SPACING.spacing40}
-                color={COLORS.red50}
+              <StyledText desktopStyle="headingSmallBold">{title}</StyledText>
+              <StepInfo
+                {...props}
+                desktopStyle="bodyDefaultRegular"
+                overflow="hidden"
+                overflowWrap={OVERFLOW_WRAP_BREAK_WORD}
+                textAlign={TEXT_ALIGN_CENTER}
               />
-              <Flex
-                gridGap={SPACING.spacing8}
-                flexDirection={DIRECTION_COLUMN}
-                alignItems={ALIGN_CENTER}
-              >
-                <StyledText desktopStyle="headingSmallBold">{title}</StyledText>
-                <StepInfo
-                  {...props}
-                  desktopStyle="bodyDefaultRegular"
-                  overflow="hidden"
-                  overflowWrap={OVERFLOW_WRAP_BREAK_WORD}
-                  textAlign={TEXT_ALIGN_CENTER}
-                />
-              </Flex>
             </Flex>
           </Flex>
-          <Flex
-            gridGap={SPACING.spacing8}
-            justifyContent={JUSTIFY_END}
-            alignItems={ALIGN_CENTER}
-          >
+          <Flex gridGap={SPACING.spacing8} marginLeft="auto">
             <SecondaryButton isDangerous onClick={onCancelClick}>
               {t('cancel_run')}
             </SecondaryButton>
@@ -224,7 +207,7 @@ export function RunPausedSplash(
               </StyledText>
             </PrimaryButton>
           </Flex>
-        </RecoverySingleColumnContentWrapper>
+        </Flex>
       </RecoveryInterventionModal>
     )
   }
@@ -245,7 +228,6 @@ const SplashFrame = styled(Flex)`
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
   grid-gap: ${SPACING.spacing40};
-  padding: ${SPACING.spacing24};
   padding-bottom: 0px;
 `
 

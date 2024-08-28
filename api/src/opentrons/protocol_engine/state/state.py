@@ -14,7 +14,7 @@ from opentrons.util.change_notifier import ChangeNotifier
 
 from ..resources import DeckFixedLabware
 from ..actions import Action, ActionHandler
-from .abstract_store import HasState, HandlesActions
+from ._abstract_store import HasState, HandlesActions
 from .commands import CommandState, CommandStore, CommandView
 from .addressable_areas import (
     AddressableAreaState,
@@ -191,6 +191,7 @@ class StateStore(StateView, ActionHandler):
         )
         self._module_store = ModuleStore(
             config=config,
+            deck_fixed_labware=deck_fixed_labware,
             module_calibration_offsets=module_calibration_offsets,
         )
         self._liquid_store = LiquidStore()

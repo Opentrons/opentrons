@@ -1,7 +1,7 @@
 from opentrons.protocol_api import ProtocolContext, ParameterContext
 
 metadata = {
-    "apiLevel": "2.18",
+    "apiLevel": "2.20",
     "author": "engineer@opentrons.com",
     "protocolName": "basic_transfer_standalone",
 }

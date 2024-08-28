@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Dict, List
 from opentrons.protocol_engine.types import Liquid
 
-from .abstract_store import HasState, HandlesActions
+from ._abstract_store import HasState, HandlesActions
 from ..actions import Action, AddLiquidAction
 from ..errors import LiquidDoesNotExistError
 

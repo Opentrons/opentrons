@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { SmallButton } from '../../atoms/buttons'
 
 interface StorageLimitReachedErrorModalProps {
@@ -21,7 +21,7 @@ export const StorageLimitReachedErrorModal = (
   const { i18n, t } = useTranslation(['quick_transfer', 'shared', 'branded'])
 
   return (
-    <Modal
+    <OddModal
       header={{
         title: t('storage_limit_reached'),
         iconName: 'alert-circle',
@@ -44,6 +44,6 @@ export const StorageLimitReachedErrorModal = (
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

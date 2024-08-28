@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
-import { useHoverTooltip } from '@opentrons/components'
+import { MenuItem, Tooltip, useHoverTooltip } from '@opentrons/components'
 import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -9,8 +9,6 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../../resources/runs'
 
 import type {

@@ -44,6 +44,10 @@ import {
   useErrorRecoveryFlows,
 } from '../../../organisms/ErrorRecoveryFlows'
 import { useLastRunCommand } from '../../../organisms/Devices/hooks/useLastRunCommand'
+import {
+  useInterventionModal,
+  InterventionModal,
+} from '../../../organisms/InterventionModal'
 
 import type { UseQueryResult } from 'react-query'
 import type { ProtocolAnalyses, RunCommandSummary } from '@opentrons/api-client'
@@ -64,6 +68,7 @@ vi.mock('../../../resources/runs')
 vi.mock('../../../redux/config')
 vi.mock('../../../organisms/ErrorRecoveryFlows')
 vi.mock('../../../organisms/Devices/hooks/useLastRunCommand')
+vi.mock('../../../organisms/InterventionModal')
 
 const RUN_ID = 'run_id'
 const ROBOT_NAME = 'otie'
@@ -159,6 +164,13 @@ describe('RunningProtocol', () => {
       isERActive: false,
       failedCommand: {} as any,
     })
+    vi.mocked(useInterventionModal).mockReturnValue({
+      showModal: false,
+      modalProps: {} as any,
+    })
+    vi.mocked(InterventionModal).mockReturnValue(
+      <div>MOCK_INTERVENTION_MODAL</div>
+    )
   })
 
   afterEach(() => {
@@ -217,6 +229,16 @@ describe('RunningProtocol', () => {
     })
     render(`/runs/${RUN_ID}/run`)
     screen.getByText('MOCK ERROR RECOVERY')
+  })
+
+  it('should render an InterventionModal appropriately', () => {
+    vi.mocked(useInterventionModal).mockReturnValue({
+      showModal: true,
+      modalProps: {} as any,
+    })
+    render(`/runs/${RUN_ID}/run`)
+
+    screen.getByText('MOCK_INTERVENTION_MODAL')
   })
 
   // ToDo (kj:04/04/2023) need to figure out the way to simulate swipe

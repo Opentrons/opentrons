@@ -1,12 +1,14 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
+  InputField,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -15,9 +17,10 @@ import {
   TEMP_MAX,
   TEMP_MIN,
 } from '@opentrons/shared-data'
+
 import { Slideout } from '../../atoms/Slideout'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
-import { InputField } from '../../atoms/InputField'
+
 import type { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
 import type { TemperatureModule } from '../../redux/modules/types'
 

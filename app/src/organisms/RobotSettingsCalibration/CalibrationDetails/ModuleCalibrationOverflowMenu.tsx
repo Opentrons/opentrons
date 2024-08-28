@@ -3,21 +3,21 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  COLORS,
-  POSITION_ABSOLUTE,
-  DIRECTION_COLUMN,
-  POSITION_RELATIVE,
   ALIGN_FLEX_END,
-  useOnClickOutside,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  MenuItem,
+  OverflowBtn,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
+  Tooltip,
   useHoverTooltip,
+  useMenuHandleClickOutside,
+  useOnClickOutside,
 } from '@opentrons/components'
 
-import { Tooltip } from '../../../atoms/Tooltip'
-import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
-import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { useChainLiveCommands } from '../../../resources/runs'
-import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
 import { useRunStatuses } from '../../Devices/hooks'
 import { getModulePrepCommands } from '../../Devices/getModulePrepCommands'
 import { ModuleWizardFlows } from '../../ModuleWizardFlows'

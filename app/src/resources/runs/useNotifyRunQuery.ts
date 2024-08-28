@@ -7,28 +7,32 @@ import type { Run, HostConfig } from '@opentrons/api-client'
 import type { QueryOptionsWithPolling } from '../useNotifyDataReady'
 import type { NotifyTopic } from '../../redux/shell/types'
 
+// TODO(jh, 08-21-24): Abstract harder.
 export function useNotifyRunQuery<TError = Error>(
   runId: string | null,
   options: QueryOptionsWithPolling<Run, TError> = {},
   hostOverride?: HostConfig | null
 ): UseQueryResult<Run, TError> {
-  const isEnabled = options.enabled !== false && runId != null
-
-  const { notifyOnSettled, shouldRefetch } = useNotifyDataReady({
+  const {
+    notifyOnSettled,
+    shouldRefetch,
+    isNotifyEnabled,
+  } = useNotifyDataReady({
     topic: `robot-server/runs/${runId}` as NotifyTopic,
-    options: { ...options, enabled: options.enabled != null && runId != null },
+    options,
     hostOverride,
   })
 
-  const httpResponse = useRunQuery(
-    runId,
-    {
-      ...options,
-      enabled: isEnabled && shouldRefetch,
-      onSettled: notifyOnSettled,
-    },
-    hostOverride
-  )
+  const queryOptions = {
+    ...options,
+    onSettled: isNotifyEnabled ? notifyOnSettled : options.onSettled,
+    refetchInterval: isNotifyEnabled ? false : options.refetchInterval,
+  }
+  const httpResponse = useRunQuery(runId, queryOptions, hostOverride)
+
+  if (isNotifyEnabled && shouldRefetch) {
+    httpResponse.refetch()
+  }
 
   return httpResponse
 }

@@ -4,6 +4,9 @@ import { Opentrons96FlatBottomAdapter } from './Opentrons96FlatBottomAdapter'
 import { OpentronsUniversalFlatAdapter } from './OpentronsUniversalFlatAdapter'
 import { OpentronsAluminumFlatBottomPlate } from './OpentronsAluminumFlatBottomPlate'
 import { OpentronsFlex96TiprackAdapter } from './OpentronsFlex96TiprackAdapter'
+import { COLORS } from '../../../helix-design-system'
+import { LabwareOutline } from '../labwareInternals'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const LABWARE_ADAPTER_LOADNAME_PATHS = {
   opentrons_96_deep_well_adapter: Opentrons96DeepWellAdapter,
@@ -20,13 +23,28 @@ export const labwareAdapterLoadNames = Object.keys(
 
 export interface LabwareAdapterProps {
   labwareLoadName: LabwareAdapterLoadName
+  definition?: LabwareDefinition2
+  highlight?: boolean
 }
 
 export const LabwareAdapter = (
   props: LabwareAdapterProps
 ): JSX.Element | null => {
-  const { labwareLoadName } = props
+  const { labwareLoadName, definition, highlight = false } = props
+  const highlightOutline =
+    highlight && definition != null ? (
+      <LabwareOutline
+        definition={definition}
+        highlight={highlight}
+        fill={COLORS.transparent}
+      />
+    ) : null
   const SVGElement = LABWARE_ADAPTER_LOADNAME_PATHS[labwareLoadName]
 
-  return <SVGElement />
+  return (
+    <g>
+      <SVGElement />
+      {highlightOutline}
+    </g>
+  )
 }

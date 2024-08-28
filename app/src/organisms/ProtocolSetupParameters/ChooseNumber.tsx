@@ -1,14 +1,16 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
+  InputField,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { InputField } from '../../atoms/InputField'
+
 import { useToaster } from '../ToasterOven'
 import { ChildNavigation } from '../ChildNavigation'
 import { NumericalKeyboard } from '../../atoms/SoftwareKeyboard'

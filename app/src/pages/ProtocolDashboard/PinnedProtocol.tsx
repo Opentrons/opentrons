@@ -22,7 +22,6 @@ import {
 
 import { LongPressModal } from './LongPressModal'
 import { formatTimeWithUtcLabel } from '../../resources/runs'
-import { useFeatureFlag } from '../../redux/config'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -89,8 +88,6 @@ export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
   const { t } = useTranslation('protocol_info')
 
   // ToDo (kk:06/18/2024) this will be removed later
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
-
   const handleProtocolClick = (
     longpress: UseLongPressResult,
     protocolId: string
@@ -105,8 +102,7 @@ export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
     }
   }, [longpress.isLongPressed, longPress])
 
-  const pushedBackgroundColor =
-    enableCsvFile && isRequiredCSV ? COLORS.yellow40 : COLORS.grey50
+  const pushedBackgroundColor = isRequiredCSV ? COLORS.yellow40 : COLORS.grey50
   const PUSHED_STATE_STYLE = css`
     &:active {
       background-color: ${longpress.isLongPressed ? '' : pushedBackgroundColor};
@@ -116,9 +112,7 @@ export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={
-        enableCsvFile && isRequiredCSV ? COLORS.yellow35 : COLORS.grey35
-      }
+      backgroundColor={isRequiredCSV ? COLORS.yellow35 : COLORS.grey35}
       borderRadius={BORDERS.borderRadius16}
       css={PUSHED_STATE_STYLE}
       flexDirection={DIRECTION_COLUMN}
@@ -136,7 +130,7 @@ export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
       data-testid={`${cardSize}_pinned_protocol_card`}
     >
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-        {enableCsvFile && isRequiredCSV ? (
+        {isRequiredCSV ? (
           <Chip
             type="warning"
             iconName="ot-alert"

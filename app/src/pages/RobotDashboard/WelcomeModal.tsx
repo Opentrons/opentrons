@@ -13,7 +13,7 @@ import {
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 
 import welcomeModalImage from '../../assets/images/on-device-display/welcome_dashboard_modal.png'
 
@@ -50,7 +50,7 @@ export function WelcomeModal({
   React.useEffect(startDiscoAnimation, [])
 
   return (
-    <Modal modalSize="small" onOutsideClick={handleCloseModal}>
+    <OddModal modalSize="small" onOutsideClick={handleCloseModal}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_CENTER}
@@ -82,6 +82,6 @@ export function WelcomeModal({
         </Flex>
         <SmallButton buttonText={t('shared:next')} onClick={handleCloseModal} />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

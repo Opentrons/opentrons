@@ -2,13 +2,18 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Flex, Icon, SPACING, LegacyStyledText } from '@opentrons/components'
+import {
+  Flex,
+  Icon,
+  LegacyStyledText,
+  MenuItem,
+  MenuList,
+  SPACING,
+} from '@opentrons/components'
 import { useCreateRunMutation } from '@opentrons/react-api-client'
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../App/constants'
-import { MenuList } from '../../atoms/MenuList'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { SmallModalChildren } from '../../molecules/Modal'
+import { SmallModalChildren } from '../../molecules/OddModal'
 import { useToaster } from '../../organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '../../redux/config'
 

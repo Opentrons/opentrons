@@ -6,6 +6,7 @@ import {
   SPACING,
   DIRECTION_COLUMN,
   POSITION_FIXED,
+  LargeButton,
   COLORS,
 } from '@opentrons/components'
 import {
@@ -14,7 +15,6 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../App/portal'
-import { LargeButton } from '../../../atoms/buttons'
 import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 import { ChildNavigation } from '../../ChildNavigation'
 import { ACTIONS } from '../constants'
@@ -61,14 +61,14 @@ export const useBlowOutLocationOptions = (
   }> = []
   if (transferType !== 'distribute') {
     blowOutLocationItems.push({
-      location: 'source_well',
-      description: t('blow_out_source_well'),
+      location: 'dest_well',
+      description: t('blow_out_destination_well'),
     })
   }
   if (transferType !== 'consolidate') {
     blowOutLocationItems.push({
-      location: 'dest_well',
-      description: t('blow_out_destination_well'),
+      location: 'source_well',
+      description: t('blow_out_source_well'),
     })
   }
   trashLocations.forEach(location => {

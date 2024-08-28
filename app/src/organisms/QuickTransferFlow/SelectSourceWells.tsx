@@ -7,6 +7,7 @@ import {
   POSITION_FIXED,
   SPACING,
 } from '@opentrons/components'
+import { getAllDefinitions } from '@opentrons/shared-data'
 
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { WellSelection } from '../../organisms/WellSelection'
@@ -23,6 +24,11 @@ interface SelectSourceWellsProps {
   state: QuickTransferWizardState
   dispatch: React.Dispatch<QuickTransferWizardAction>
 }
+
+export const CIRCULAR_WELL_96_PLATE_DEFINITION_URI =
+  'opentrons/thermoscientificnunc_96_wellplate_2000ul/1'
+export const RECTANGULAR_WELL_96_PLATE_DEFINITION_URI =
+  'opentrons/usascientific_96_wellplate_2.4ml_deep/1'
 
 export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
   const { onNext, onBack, state, dispatch } = props
@@ -50,6 +56,17 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
       setSelectedWells({})
     },
   }
+  let displayLabwareDefinition = state.source
+  if (state.source?.parameters.format === '96Standard') {
+    const allDefinitions = getAllDefinitions()
+    if (Object.values(state.source.wells)[0].shape === 'circular') {
+      displayLabwareDefinition =
+        allDefinitions[CIRCULAR_WELL_96_PLATE_DEFINITION_URI]
+    } else {
+      displayLabwareDefinition =
+        allDefinitions[RECTANGULAR_WELL_96_PLATE_DEFINITION_URI]
+    }
+  }
 
   return (
     <>
@@ -65,20 +82,21 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
       <Flex
         justifyContent={JUSTIFY_CENTER}
         marginTop={SPACING.spacing120}
-        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
+        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing8} ${SPACING.spacing32}`}
         position={POSITION_FIXED}
         top="0"
         left="0"
+        height="80%"
         width="100%"
       >
-        {state.source != null ? (
+        {state.source != null && displayLabwareDefinition != null ? (
           <Flex
             width={
               state.source.parameters.format === '384Standard' ? '100%' : '75%'
             }
           >
             <WellSelection
-              definition={state.source}
+              definition={displayLabwareDefinition}
               deselectWells={(wells: string[]) => {
                 setSelectedWells(prevWells =>
                   without(Object.keys(prevWells), ...wells).reduce(

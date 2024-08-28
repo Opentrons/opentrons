@@ -572,17 +572,23 @@ class PauseType(enum.Enum):
 
 
 class StatusBarState(enum.Enum):
-    IDLE = 0
-    RUNNING = 1
-    PAUSED = 2
-    HARDWARE_ERROR = 3
-    SOFTWARE_ERROR = 4
-    CONFIRMATION = 5
-    RUN_COMPLETED = 6
-    UPDATING = 7
-    ACTIVATION = 8
-    DISCO = 9
-    OFF = 10
+    """Semantic status bar states.
+
+    These mostly correspond to cases listed out in the Flex manual.
+    """
+
+    IDLE = enum.auto()
+    RUNNING = enum.auto()
+    PAUSED = enum.auto()
+    HARDWARE_ERROR = enum.auto()
+    SOFTWARE_ERROR = enum.auto()
+    ERROR_RECOVERY = enum.auto()
+    CONFIRMATION = enum.auto()
+    RUN_COMPLETED = enum.auto()
+    UPDATING = enum.auto()
+    ACTIVATION = enum.auto()
+    DISCO = enum.auto()
+    OFF = enum.auto()
 
     def transient(self) -> bool:
         return self.value in {

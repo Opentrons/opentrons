@@ -24,14 +24,15 @@ import {
 import {
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  RUN_STATUS_FINISHING,
 } from '@opentrons/api-client'
 
 import { StepMeter } from '../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useNotifyRunQuery } from '../../resources/runs'
-import { InterventionModal } from '../../organisms/InterventionModal'
-import { isInterventionCommand } from '../../organisms/InterventionModal/utils'
+import {
+  InterventionModal,
+  useInterventionModal,
+} from '../../organisms/InterventionModal'
 import {
   useRunStatus,
   useRunTimestamps,
@@ -89,10 +90,6 @@ export function RunningProtocol(): JSX.Element {
     showConfirmCancelRunModal,
     setShowConfirmCancelRunModal,
   ] = React.useState<boolean>(false)
-  const [
-    interventionModalCommandKey,
-    setInterventionModalCommandKey,
-  ] = React.useState<string | null>(null)
   const lastAnimatedCommand = React.useRef<string | null>(null)
   const { ref, style, swipeType, setSwipeType } = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -124,6 +121,16 @@ export function RunningProtocol(): JSX.Element {
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const robotType = useRobotType(robotName)
   const { isERActive, failedCommand } = useErrorRecoveryFlows(runId, runStatus)
+  const {
+    showModal: showIntervention,
+    modalProps: interventionProps,
+  } = useInterventionModal({
+    runStatus,
+    lastRunCommand,
+    runData: runRecord?.data ?? null,
+    robotName,
+    analysis: robotSideAnalysis,
+  })
 
   React.useEffect(() => {
     if (
@@ -143,30 +150,13 @@ export function RunningProtocol(): JSX.Element {
     }
   }, [currentOption, swipeType, setSwipeType])
 
-  React.useEffect(() => {
-    if (
-      lastRunCommand != null &&
-      interventionModalCommandKey != null &&
-      lastRunCommand.key !== interventionModalCommandKey
-    ) {
-      // set intervention modal command key to null if different from current command key
-      setInterventionModalCommandKey(null)
-    } else if (
-      lastRunCommand?.key != null &&
-      isInterventionCommand(lastRunCommand) &&
-      interventionModalCommandKey === null
-    ) {
-      setInterventionModalCommandKey(lastRunCommand.key)
-    }
-  }, [lastRunCommand, interventionModalCommandKey])
-
   return (
     <>
       {isERActive ? (
         <ErrorRecoveryFlows
           runStatus={runStatus}
           runId={runId}
-          failedCommand={failedCommand}
+          failedCommandByRunRecord={failedCommand}
           protocolAnalysis={robotSideAnalysis}
         />
       ) : null}
@@ -202,18 +192,8 @@ export function RunningProtocol(): JSX.Element {
             isActiveRun={true}
           />
         ) : null}
-        {interventionModalCommandKey != null &&
-        runRecord?.data != null &&
-        lastRunCommand != null &&
-        isInterventionCommand(lastRunCommand) &&
-        runStatus !== RUN_STATUS_FINISHING ? (
-          <InterventionModal
-            robotName={robotName}
-            command={lastRunCommand}
-            onResume={playRun}
-            run={runRecord.data}
-            analysis={robotSideAnalysis}
-          />
+        {showIntervention ? (
+          <InterventionModal {...interventionProps} onResume={playRun} />
         ) : null}
         <Flex
           ref={ref}

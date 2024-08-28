@@ -1,9 +1,11 @@
 """Tests for robot_server.runs.run_store."""
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import List, Optional, Type
 
 import pytest
 from decoy import Decoy
+from robot_server.data_files.data_files_store import DataFileInfo, DataFilesStore
 from sqlalchemy.engine import Engine
 from unittest import mock
 
@@ -12,6 +14,7 @@ from opentrons_shared_data.errors.codes import ErrorCodes
 
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
 from robot_server.runs.run_store import (
+    CSVParameterRunResource,
     RunStore,
     RunResource,
     CommandNotFoundError,
@@ -157,6 +160,7 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
             displayName="Display Name 4",
             variableName="variable_name_4",
             description="a csv parameter without file id",
+            file=pe_types.FileInfo(id="file-id", name="csvFile"),
         ),
     ]
 
@@ -202,7 +206,20 @@ def invalid_state_summary() -> StateSummary:
     )
 
 
-def test_update_run_state(
+@pytest.fixture
+def data_files_store(sql_engine: Engine, tmp_path: Path) -> DataFilesStore:
+    """Return a `DataFilesStore` linked to the same database as the subject under test.
+
+    `DataFilesStore` is tested elsewhere.
+    We only need it here to prepare the database for the analysis store tests.
+    The CSV parameters table always needs a data file to link to.
+    """
+    data_files_dir = tmp_path / "data_files"
+    data_files_dir.mkdir()
+    return DataFilesStore(sql_engine=sql_engine, data_files_directory=data_files_dir)
+
+
+async def test_update_run_state(
     subject: RunStore,
     state_summary: StateSummary,
     protocol_commands: List[pe_commands.Command],
@@ -250,6 +267,39 @@ def test_update_run_state(
     mock_runs_publisher.publish_runs_advise_refetch.assert_called_once_with(
         run_id="run-id"
     )
+
+
+async def test_insert_and_get_csv_rtp(
+    subject: RunStore,
+    data_files_store: DataFilesStore,
+    run_time_parameters: List[pe_types.RunTimeParameter],
+) -> None:
+    """It should be able to insert and get csv rtp from the db."""
+    await data_files_store.insert(
+        DataFileInfo(
+            id="file-id",
+            name="my_csv_file.csv",
+            file_hash="file-hash",
+            created_at=datetime(year=2024, month=1, day=1, tzinfo=timezone.utc),
+        )
+    )
+
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+
+    subject.insert_csv_rtp(run_id="run-id", run_time_parameters=run_time_parameters)
+    csv_rtp_result = subject.get_all_csv_rtp()
+
+    assert csv_rtp_result == [
+        CSVParameterRunResource(
+            run_id="run-id",
+            parameter_variable_name="variable_name_4",
+            file_id="file-id",
+        )
+    ]
 
 
 def test_update_state_run_not_found(
@@ -434,7 +484,12 @@ def test_get_all_runs(
     assert result == expected_result
 
 
-def test_remove_run(subject: RunStore, mock_runs_publisher: mock.Mock) -> None:
+async def test_remove_run(
+    subject: RunStore,
+    mock_runs_publisher: mock.Mock,
+    data_files_store: DataFilesStore,
+    run_time_parameters: List[pe_types.RunTimeParameter],
+) -> None:
     """It can remove a previously stored run entry."""
     action = RunAction(
         actionType=RunActionType.PLAY,
@@ -448,6 +503,15 @@ def test_remove_run(subject: RunStore, mock_runs_publisher: mock.Mock) -> None:
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
     subject.insert_action(run_id="run-id", action=action)
+    await data_files_store.insert(
+        DataFileInfo(
+            id="file-id",
+            name="my_csv_file.csv",
+            file_hash="file-hash",
+            created_at=datetime(year=2024, month=1, day=1, tzinfo=timezone.utc),
+        )
+    )
+    subject.insert_csv_rtp(run_id="run-id", run_time_parameters=run_time_parameters)
     subject.remove(run_id="run-id")
 
     assert subject.get_all(length=20) == []

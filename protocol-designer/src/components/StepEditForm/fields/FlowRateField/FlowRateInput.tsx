@@ -6,10 +6,10 @@ import {
   AlertModal,
   FormGroup,
   RadioGroup,
-  InputField,
+  LegacyInputField,
   Flex,
   useHoverTooltip,
-  Tooltip,
+  LegacyTooltip,
 } from '@opentrons/components'
 import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
 import type { FieldProps } from '../../types'
@@ -147,7 +147,7 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
   }
 
   const FlowRateInputField = (
-    <InputField
+    <LegacyInputField
       disabled={disabled}
       caption={rangeDescription}
       error={errorMessage}
@@ -215,7 +215,7 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
     <>
       {flowRateType === 'blowout' ? (
         <Flex {...targetProps}>
-          <InputField
+          <LegacyInputField
             className={className || stepFormStyles.small_field}
             disabled={disabled}
             isIndeterminate={isIndeterminate}
@@ -225,11 +225,11 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
             units={t('application:units.microliterPerSec')}
             value={props.value ? String(props.value) : 'default'}
           />
-          <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
+          <LegacyTooltip {...tooltipProps}>{tooltipContent}</LegacyTooltip>
         </Flex>
       ) : (
         <FormGroup label={label || DEFAULT_LABEL} disabled={disabled}>
-          <InputField
+          <LegacyInputField
             className={className || stepFormStyles.small_field}
             disabled={disabled}
             isIndeterminate={isIndeterminate}

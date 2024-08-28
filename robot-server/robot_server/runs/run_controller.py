@@ -13,7 +13,7 @@ from .action_models import RunAction, RunActionType
 
 from opentrons.protocol_engine.types import DeckConfigurationType
 
-from robot_server.service.notifications import RunsPublisher
+from robot_server.service.notifications import RunsPublisher, MaintenanceRunsPublisher
 
 log = logging.getLogger(__name__)
 
@@ -32,12 +32,14 @@ class RunController:
         run_orchestrator_store: RunOrchestratorStore,
         run_store: RunStore,
         runs_publisher: RunsPublisher,
+        maintenance_runs_publisher: MaintenanceRunsPublisher,
     ) -> None:
         self._run_id = run_id
         self._task_runner = task_runner
         self._run_orchestrator_store = run_orchestrator_store
         self._run_store = run_store
         self._runs_publisher = runs_publisher
+        self._maintenance_runs_publisher = maintenance_runs_publisher
 
     def create_action(
         self,
@@ -80,6 +82,8 @@ class RunController:
                         func=self._run_protocol_and_insert_result,
                         deck_configuration=action_payload,
                     )
+                    # Playing a protocol run terminates an existing maintenance run.
+                    self._maintenance_runs_publisher.publish_current_maintenance_run()
 
             elif action_type == RunActionType.PAUSE:
                 log.info(f'Pausing run "{self._run_id}".')
@@ -112,6 +116,4 @@ class RunController:
             commands=result.commands,
             run_time_parameters=result.parameters,
         )
-        await self._runs_publisher.publish_pre_serialized_commands_notification(
-            self._run_id
-        )
+        self._runs_publisher.publish_pre_serialized_commands_notification(self._run_id)

@@ -21,7 +21,7 @@ Multi-Channel Movement
 
 All :ref:`building block <v2-atomic-commands>` and :ref:`complex commands <v2-complex-commands>` work with single- and multi-channel pipettes.
 
-To keep the protocol API consistent when using single- and multi-channel pipettes, commands treat the back left channel of a multi-channel pipette as its *primary channel*. Location arguments of pipetting commands use the primary channel. The :py:meth:`.InstrumentContext.configure_nozzle_layout` method can change the pipette's primary channel, using its ``start`` parameter. See :ref:`partial-tip-pickup` for more information.
+To keep the protocol API consistent when using single- and multi-channel pipettes, location arguments of pipetting commands use the pipette's *primary channel*. For multi-channel pipettes picking up tips with all of their channels, the back-left channel is considered primary. When using fewer channels, the ``start`` parameter of the :py:meth:`.InstrumentContext.configure_nozzle_layout` method can change the pipette's primary channel. See :ref:`partial-tip-pickup` for more information.
 
 With a pipette's default settings, you can generally access the wells indicated in the table below. Moving to any other well may cause the pipette to crash.
 

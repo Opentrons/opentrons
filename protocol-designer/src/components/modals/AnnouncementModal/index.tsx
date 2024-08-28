@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { useTranslation } from 'react-i18next'
-import { Modal, OutlineButton } from '@opentrons/components'
+import { LegacyModal, OutlineButton } from '@opentrons/components'
 import {
   setLocalStorageItem,
   getLocalStorageItem,
@@ -35,7 +35,7 @@ export const AnnouncementModal = (): JSX.Element => {
   return (
     <>
       {showAnnouncementModal && (
-        <Modal
+        <LegacyModal
           className={cx(modalStyles.modal, styles.announcement_modal)}
           contentsClassName={styles.modal_contents}
           onCloseClick={handleClick}
@@ -57,7 +57,7 @@ export const AnnouncementModal = (): JSX.Element => {
               </OutlineButton>
             </div>
           </div>
-        </Modal>
+        </LegacyModal>
       )}
     </>
   )

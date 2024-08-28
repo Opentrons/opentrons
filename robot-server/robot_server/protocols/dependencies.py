@@ -3,8 +3,7 @@
 
 from asyncio import Lock as AsyncLock
 from pathlib import Path
-from typing_extensions import Final
-import logging
+from typing_extensions import Annotated
 
 from anyio import Path as AsyncPath
 from fastapi import Depends
@@ -24,6 +23,7 @@ from robot_server.persistence.fastapi_dependencies import (
     get_sql_engine,
     get_active_persistence_directory,
 )
+from robot_server.persistence.file_and_directory_names import PROTOCOLS_DIRECTORY
 from robot_server.settings import get_settings
 from .analyses_manager import AnalysesManager
 
@@ -33,10 +33,6 @@ from .protocol_store import (
 )
 from .analysis_store import AnalysisStore
 
-
-_PROTOCOL_FILES_SUBDIRECTORY: Final = "protocols"
-
-_log = logging.getLogger(__name__)
 
 _protocol_store_init_lock = AsyncLock()
 _protocol_store_accessor = AppStateAccessor[ProtocolStore]("protocol_store")
@@ -64,14 +60,14 @@ def get_file_hasher() -> FileHasher:
 
 
 async def get_protocol_directory(
-    app_state: AppState = Depends(get_app_state),
-    persistence_directory: Path = Depends(get_active_persistence_directory),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    persistence_directory: Annotated[Path, Depends(get_active_persistence_directory)],
 ) -> Path:
     """Get the directory to save protocol files, creating it if needed."""
     async with _protocol_directory_init_lock:
         protocol_directory = _protocol_directory_accessor.get_from(app_state)
         if protocol_directory is None:
-            protocol_directory = persistence_directory / _PROTOCOL_FILES_SUBDIRECTORY
+            protocol_directory = persistence_directory / PROTOCOLS_DIRECTORY
             await AsyncPath(protocol_directory).mkdir(exist_ok=True)
             _protocol_directory_accessor.set_on(app_state, protocol_directory)
 
@@ -79,10 +75,10 @@ async def get_protocol_directory(
 
 
 async def get_protocol_store(
-    app_state: AppState = Depends(get_app_state),
-    sql_engine: SQLEngine = Depends(get_sql_engine),
-    protocol_directory: Path = Depends(get_protocol_directory),
-    protocol_reader: ProtocolReader = Depends(get_protocol_reader),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    sql_engine: Annotated[SQLEngine, Depends(get_sql_engine)],
+    protocol_directory: Annotated[Path, Depends(get_protocol_directory)],
+    protocol_reader: Annotated[ProtocolReader, Depends(get_protocol_reader)],
 ) -> ProtocolStore:
     """Get a singleton ProtocolStore to keep track of created protocols."""
     async with _protocol_store_init_lock:
@@ -99,8 +95,8 @@ async def get_protocol_store(
 
 
 async def get_analysis_store(
-    app_state: AppState = Depends(get_app_state),
-    sql_engine: SQLEngine = Depends(get_sql_engine),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    sql_engine: Annotated[SQLEngine, Depends(get_sql_engine)],
 ) -> AnalysisStore:
     """Get a singleton AnalysisStore to keep track of created analyses."""
     analysis_store = _analysis_store_accessor.get_from(app_state)
@@ -113,9 +109,9 @@ async def get_analysis_store(
 
 
 async def get_analyses_manager(
-    app_state: AppState = Depends(get_app_state),
-    analysis_store: AnalysisStore = Depends(get_analysis_store),
-    task_runner: TaskRunner = Depends(get_task_runner),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
+    task_runner: Annotated[TaskRunner, Depends(get_task_runner)],
 ) -> AnalysesManager:
     """Get a singleton AnalysesManager to keep track of analyzers."""
     analyses_manager = _analyses_manager_accessor.get_from(app_state)
@@ -130,7 +126,7 @@ async def get_analyses_manager(
 
 
 async def get_protocol_auto_deleter(
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
 ) -> ProtocolAutoDeleter:
     """Get a `ProtocolAutoDeleter` to delete old protocols."""
     return ProtocolAutoDeleter(
@@ -143,7 +139,7 @@ async def get_protocol_auto_deleter(
 
 
 async def get_quick_transfer_protocol_auto_deleter(
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
 ) -> ProtocolAutoDeleter:
     """Get a `ProtocolAutoDeleter` to delete old quick transfer protocols."""
     return ProtocolAutoDeleter(

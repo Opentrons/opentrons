@@ -138,7 +138,7 @@ describe('ErrorRecoveryFlows', () => {
   beforeEach(() => {
     props = {
       runStatus: RUN_STATUS_AWAITING_RECOVERY,
-      failedCommand: mockFailedCommand,
+      failedCommandByRunRecord: mockFailedCommand,
       runId: 'MOCK_RUN_ID',
       protocolAnalysis: {} as any,
     }
@@ -205,22 +205,5 @@ describe('ErrorRecoveryFlows', () => {
     vi.mocked(useRunPausedSplash).mockReturnValue(false)
     render(props)
     expect(screen.queryByText('MOCK RUN PAUSED SPLASH')).not.toBeInTheDocument()
-  })
-
-  it('calls reportErrorEvent with failedCommand on mount and when failedCommand changes', () => {
-    const mockReportErrorEvent = vi.fn()
-    vi.mocked(useRecoveryAnalytics).mockReturnValue({
-      reportErrorEvent: mockReportErrorEvent,
-    } as any)
-
-    const { rerender } = render(props)
-    expect(mockReportErrorEvent).toHaveBeenCalledWith(mockFailedCommand)
-
-    const newProps = {
-      ...props,
-      failedCommand: null,
-    }
-    rerender(<ErrorRecoveryFlows {...newProps} />)
-    expect(mockReportErrorEvent).toHaveBeenCalledWith(newProps.failedCommand)
   })
 })

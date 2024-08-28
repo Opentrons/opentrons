@@ -18,12 +18,13 @@ export function FailedStepNextStep({
   | 'robotType'
 >): JSX.Element {
   const { t } = useTranslation('error_recovery')
+  const failedCommandByAnalysis = failedCommand?.byAnalysis ?? null
 
   const nthStepAfter = (n: number): number | undefined =>
     stepCounts.currentStepNumber == null
       ? undefined
       : stepCounts.currentStepNumber + n
-  const nthCommand = (n: number): typeof failedCommand =>
+  const nthCommand = (n: number): typeof failedCommandByAnalysis =>
     commandsAfterFailedCommand != null
       ? n < commandsAfterFailedCommand.length
         ? commandsAfterFailedCommand[n]
@@ -40,6 +41,7 @@ export function FailedStepNextStep({
       ? { command: commandsAfter[1], index: nthStepAfter(2) }
       : null,
   ] as const
+
   return (
     <CategorizedStepContent
       commandTextData={protocolAnalysis}
@@ -47,10 +49,10 @@ export function FailedStepNextStep({
       topCategoryHeadline={t('failed_step')}
       topCategory="failed"
       topCategoryCommand={
-        failedCommand == null
+        failedCommandByAnalysis == null
           ? null
           : {
-              command: failedCommand,
+              command: failedCommandByAnalysis,
               index: stepCounts.currentStepNumber ?? undefined,
             }
       }

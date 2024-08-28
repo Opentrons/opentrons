@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import Depends
 
 from server_utils.fastapi_utils.app_state import (
@@ -16,13 +18,11 @@ class MaintenanceRunsPublisher:
         """Returns a configured Maintenance Runs Publisher."""
         self._client = client
 
-    async def publish_current_maintenance_run(
+    def publish_current_maintenance_run(
         self,
     ) -> None:
         """Publishes the equivalent of GET /maintenance_run/current_run"""
-        await self._client.publish_advise_refetch_async(
-            topic=topics.MAINTENANCE_RUNS_CURRENT_RUN
-        )
+        self._client.publish_advise_refetch(topic=topics.MAINTENANCE_RUNS_CURRENT_RUN)
 
 
 _maintenance_runs_publisher_accessor: AppStateAccessor[
@@ -31,8 +31,10 @@ _maintenance_runs_publisher_accessor: AppStateAccessor[
 
 
 async def get_maintenance_runs_publisher(
-    app_state: AppState = Depends(get_app_state),
-    notification_client: NotificationClient = Depends(get_notification_client),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    notification_client: Annotated[
+        NotificationClient, Depends(get_notification_client)
+    ],
 ) -> MaintenanceRunsPublisher:
     """Get a singleton MaintenanceRunsPublisher to publish maintenance run topics."""
     maintenance_runs_publisher = _maintenance_runs_publisher_accessor.get_from(

@@ -108,10 +108,12 @@ async def test_create_run_command(
     ).then_return(command_once_added)
 
     result = await create_run_command(
+        run_id="run-id",
         request_body=RequestModelWithCommandCreate(data=command_request),
         waitUntilComplete=False,
         run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         timeout=None,
+        check_estop=True,
     )
 
     assert result.content.data == command_once_added
@@ -148,10 +150,12 @@ async def test_create_run_command_blocking_completion(
     ).then_return(command_once_completed)
 
     result = await create_run_command(
+        run_id="run-id",
         request_body=RequestModelWithCommandCreate(data=command_request),
         waitUntilComplete=True,
         timeout=999,
         run_orchestrator_store=mock_maintenance_run_orchestrator_store,
+        check_estop=True,
     )
 
     assert result.content.data == command_once_completed

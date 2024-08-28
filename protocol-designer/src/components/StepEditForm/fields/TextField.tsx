@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { InputField } from '@opentrons/components'
+import { LegacyInputField } from '@opentrons/components'
 import type { FieldProps } from '../types'
 
 type TextFieldProps = FieldProps & {
@@ -20,7 +20,7 @@ export const TextField = (props: TextFieldProps): JSX.Element => {
   } = props
 
   return (
-    <InputField
+    <LegacyInputField
       {...otherProps}
       error={errorToShow}
       onBlur={onFieldBlur}

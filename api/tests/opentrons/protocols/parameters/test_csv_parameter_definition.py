@@ -1,12 +1,12 @@
 """Tests for the CSV Parameter Definitions."""
 import inspect
-import tempfile
-from io import TextIOWrapper
 
 import pytest
 from decoy import Decoy
 
 from opentrons.protocol_engine.types import CSVParameter, FileInfo
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.parameters import validation as mock_validation
 from opentrons.protocols.parameters.csv_parameter_definition import (
     create_csv_parameter,
@@ -19,6 +19,12 @@ from opentrons.protocols.parameters.exceptions import RuntimeParameterRequired
 def _patch_parameter_validation(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
     for name, func in inspect.getmembers(mock_validation, inspect.isfunction):
         monkeypatch.setattr(mock_validation, name, decoy.mock(func=func))
+
+
+@pytest.fixture
+def api_version() -> APIVersion:
+    """The API version under test."""
+    return MAX_SUPPORTED_VERSION
 
 
 @pytest.fixture
@@ -55,12 +61,9 @@ def test_create_csv_parameter(decoy: Decoy) -> None:
 def test_set_csv_value(
     decoy: Decoy, csv_parameter_subject: CSVParameterDefinition
 ) -> None:
-    """It should set the CSV parameter value to a file."""
-    mock_file = decoy.mock(cls=TextIOWrapper)
-    decoy.when(mock_file.name).then_return("mock.csv")
-
-    csv_parameter_subject.value = mock_file
-    assert csv_parameter_subject.value is mock_file
+    """It should set the CSV parameter value to a byte string."""
+    csv_parameter_subject.value = b"123"
+    assert csv_parameter_subject.value == b"123"
 
 
 def test_csv_parameter_as_protocol_engine_type(
@@ -75,25 +78,25 @@ def test_csv_parameter_as_protocol_engine_type(
         file=None,
     )
 
-    csv_parameter_subject.file_info = FileInfo(id="123abc", name="")
+    csv_parameter_subject.file_info = FileInfo(id="123", name="abc")
     result = csv_parameter_subject.as_protocol_engine_type()
     assert result == CSVParameter(
         displayName="My cool CSV",
         variableName="my_cool_csv",
         description="Comma Separated Value",
-        file=FileInfo(id="123abc", name=""),
+        file=FileInfo(id="123", name="abc"),
     )
 
 
 def test_csv_parameter_as_csv_parameter_interface(
+    api_version: APIVersion,
     csv_parameter_subject: CSVParameterDefinition,
 ) -> None:
     """It should return the CSV parameter interface for use in a protocol run context."""
-    result = csv_parameter_subject.as_csv_parameter_interface()
+    result = csv_parameter_subject.as_csv_parameter_interface(api_version)
     with pytest.raises(RuntimeParameterRequired):
         result.file
 
-    mock_file = tempfile.NamedTemporaryFile(mode="r", suffix=".csv")
-    csv_parameter_subject.value = mock_file  # type: ignore[assignment]
-    result = csv_parameter_subject.as_csv_parameter_interface()
-    assert result.file is mock_file  # type: ignore[comparison-overlap]
+    csv_parameter_subject.value = b"abc"
+    result = csv_parameter_subject.as_csv_parameter_interface(api_version)
+    assert result.contents == "abc"

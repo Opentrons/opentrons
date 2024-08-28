@@ -10,6 +10,8 @@ from opentrons.types import DeckSlotName, MountType, Point
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.commands.command import DefinedErrorData
 from opentrons.protocol_engine.commands.pipetting_common import (
+    LiquidNotFoundError,
+    LiquidNotFoundErrorInternalData,
     OverpressureError,
     OverpressureErrorInternalData,
 )
@@ -500,6 +502,95 @@ def test_blow_out_clears_volume(
                 pipette_id="pipette-id",
                 labware_id="dispense-labware-id",
                 well_name="dispense-well-name",
+            ),
+        ),
+        # liquidProbe and tryLiquidProbe succeeding and with overpressure error
+        (
+            SucceedCommandAction(
+                command=cmd.LiquidProbe(
+                    id="command-id",
+                    createdAt=datetime.now(),
+                    startedAt=datetime.now(),
+                    completedAt=datetime.now(),
+                    key="command-key",
+                    status=cmd.CommandStatus.SUCCEEDED,
+                    params=cmd.LiquidProbeParams(
+                        labwareId="liquid-probe-labware-id",
+                        wellName="liquid-probe-well-name",
+                        pipetteId="pipette-id",
+                    ),
+                    result=cmd.LiquidProbeResult(
+                        position=DeckPoint(x=0, y=0, z=0), z_position=0
+                    ),
+                ),
+                private_result=None,
+            ),
+            CurrentWell(
+                pipette_id="pipette-id",
+                labware_id="liquid-probe-labware-id",
+                well_name="liquid-probe-well-name",
+            ),
+        ),
+        (
+            FailCommandAction(
+                running_command=cmd.LiquidProbe(
+                    id="command-id",
+                    createdAt=datetime.now(),
+                    startedAt=datetime.now(),
+                    key="command-key",
+                    status=cmd.CommandStatus.RUNNING,
+                    params=cmd.LiquidProbeParams(
+                        labwareId="liquid-probe-labware-id",
+                        wellName="liquid-probe-well-name",
+                        pipetteId="pipette-id",
+                    ),
+                ),
+                error=DefinedErrorData(
+                    public=LiquidNotFoundError(
+                        id="error-id",
+                        createdAt=datetime.now(),
+                    ),
+                    private=LiquidNotFoundErrorInternalData(
+                        position=DeckPoint(x=0, y=0, z=0)
+                    ),
+                ),
+                command_id="command-id",
+                error_id="error-id",
+                failed_at=datetime.now(),
+                notes=[],
+                type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+            ),
+            CurrentWell(
+                pipette_id="pipette-id",
+                labware_id="liquid-probe-labware-id",
+                well_name="liquid-probe-well-name",
+            ),
+        ),
+        (
+            SucceedCommandAction(
+                command=cmd.TryLiquidProbe(
+                    id="command-id",
+                    createdAt=datetime.now(),
+                    startedAt=datetime.now(),
+                    completedAt=datetime.now(),
+                    key="command-key",
+                    status=cmd.CommandStatus.SUCCEEDED,
+                    params=cmd.TryLiquidProbeParams(
+                        labwareId="try-liquid-probe-labware-id",
+                        wellName="try-liquid-probe-well-name",
+                        pipetteId="pipette-id",
+                    ),
+                    result=cmd.TryLiquidProbeResult(
+                        position=DeckPoint(x=0, y=0, z=0),
+                        z_position=0,
+                    ),
+                ),
+                private_result=None,
+            ),
+            CurrentWell(
+                pipette_id="pipette-id",
+                labware_id="try-liquid-probe-labware-id",
+                well_name="try-liquid-probe-well-name",
             ),
         ),
     ),

@@ -16,14 +16,15 @@ import {
   SPACING_AUTO,
   SPACING,
   LegacyStyledText,
+  ERROR_TOAST,
+  SUCCESS_TOAST,
   TYPOGRAPHY,
   useConditionalConfirm,
+  Modal,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
-import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import { useToaster } from '../../organisms/ToasterOven'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 import {
   clearDiscoveryCache,
@@ -68,7 +69,7 @@ export function ClearUnavailableRobots(): JSX.Element {
     <>
       {showConfirmDeleteUnavailRobots
         ? createPortal(
-            <LegacyModal
+            <Modal
               type="warning"
               title={t('clear_unavailable_robots')}
               onClose={cancelExit}
@@ -101,7 +102,7 @@ export function ClearUnavailableRobots(): JSX.Element {
                   </AlertPrimaryButton>
                 </Flex>
               </Flex>
-            </LegacyModal>,
+            </Modal>,
             getTopPortalEl()
           )
         : null}

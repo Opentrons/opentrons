@@ -52,11 +52,17 @@ const mockRefetch = vi.fn()
 const mockCreateLiveCommand = vi.fn()
 
 const render = () => {
+  let confirmed = false
+  const setIsConfirmed = vi.fn((ready: boolean) => {
+    confirmed = ready
+  })
   return renderWithProviders(
     <MemoryRouter>
       <ProtocolSetupLabware
         runId={RUN_ID}
         setSetupScreen={mockSetSetupScreen}
+        isConfirmed={confirmed}
+        setIsConfirmed={setIsConfirmed}
       />
     </MemoryRouter>,
     {
@@ -110,11 +116,15 @@ describe('ProtocolSetupLabware', () => {
     expect(mockSetSetupScreen).toHaveBeenCalledWith('prepare to run')
   })
 
-  it('should launch and close the deck map', () => {
+  it('should toggle between map view and list view', () => {
     render()
+    expect(screen.queryByText('List View')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Map View' }))
-    fireEvent.click(screen.getByLabelText('closeIcon'))
+    expect(screen.queryByText('Map View')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'List View' }))
     screen.getByText('Labware')
+    screen.getByText('Labware name')
+    screen.getByText('Location')
   })
 
   it('sends a latch-close command when the labware latch is open and the button is clicked', () => {

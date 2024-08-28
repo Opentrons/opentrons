@@ -8,8 +8,9 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
+  Tooltip,
   TOOLTIP_LEFT,
   TYPOGRAPHY,
   useHoverTooltip,
@@ -17,7 +18,6 @@ import {
 
 import { getTopPortalEl } from '../../App/portal'
 import { TertiaryButton } from '../../atoms/buttons'
-import { Tooltip } from '../../atoms/Tooltip'
 import { AskForCalibrationBlockModal } from '../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import {
   useTrackEvent,

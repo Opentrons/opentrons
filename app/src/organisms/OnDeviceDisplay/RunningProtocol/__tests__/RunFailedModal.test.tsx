@@ -10,6 +10,7 @@ import { i18n } from '../../../../i18n'
 import { RunFailedModal } from '../RunFailedModal'
 
 import type { NavigateFunction } from 'react-router-dom'
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 
@@ -100,6 +101,7 @@ describe('RunFailedModal', () => {
       runId: RUN_ID,
       setShowRunFailedModal: mockFn,
       errors: mockErrors,
+      runStatus: RUN_STATUS_FAILED,
     }
 
     vi.mocked(useStopRunMutation).mockReturnValue({

@@ -4,7 +4,7 @@ import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fixtureTiprack1000ul } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../localization'
+import { i18n } from '../../../../../assets/localization'
 import { getAllTiprackOptions } from '../../../../../ui/labware/selectors'
 import { getEnableReturnTip } from '../../../../../feature-flags/selectors'
 import {

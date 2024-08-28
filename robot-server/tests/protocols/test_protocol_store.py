@@ -1,4 +1,5 @@
 """Tests for the ProtocolStore interface."""
+from opentrons.protocol_engine.types import CSVParameter, FileInfo
 import pytest
 from decoy import Decoy
 from datetime import datetime, timezone
@@ -68,9 +69,11 @@ def run_store(sql_engine: SQLEngine, mock_runs_publisher: RunsPublisher) -> RunS
 
 
 @pytest.fixture
-def data_files_store(sql_engine: SQLEngine) -> DataFilesStore:
+def data_files_store(sql_engine: SQLEngine, tmp_path: Path) -> DataFilesStore:
     """Get a mocked out DataFilesStore."""
-    return DataFilesStore(sql_engine=sql_engine)
+    data_files_dir = tmp_path / "data_files"
+    data_files_dir.mkdir()
+    return DataFilesStore(sql_engine=sql_engine, data_files_directory=data_files_dir)
 
 
 @pytest.fixture
@@ -528,6 +531,7 @@ async def test_get_referenced_data_files(
     subject: ProtocolStore,
     data_files_store: DataFilesStore,
     completed_analysis_store: CompletedAnalysisStore,
+    run_store: RunStore,
 ) -> None:
     """It should fetch a list of data files referenced in protocol's analyses and runs."""
     protocol_resource_1 = ProtocolResource(
@@ -577,10 +581,11 @@ async def test_get_referenced_data_files(
             liquids=[],
         ),
     )
+
     subject.insert(protocol_resource_1)
     await data_files_store.insert(
         DataFileInfo(
-            id="data-file-id",
+            id="data-file-id-1",
             name="file-name",
             file_hash="abc123",
             created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
@@ -594,6 +599,32 @@ async def test_get_referenced_data_files(
             created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         )
     )
+    await data_files_store.insert(
+        DataFileInfo(
+            id="data-file-id-3",
+            name="file-name",
+            file_hash="abc123",
+            created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        )
+    )
+
+    run_store.insert(
+        run_id="run-id-1",
+        protocol_id="protocol-id",
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+
+    run_store.insert_csv_rtp(
+        run_id="run-id-1",
+        run_time_parameters=[
+            CSVParameter(
+                variableName="csvFile",
+                displayName="csv param",
+                file=FileInfo(id="data-file-id-3", name="file-name"),
+            )
+        ],
+    )
+
     await completed_analysis_store.make_room_and_add(
         completed_analysis_resource=analysis_resource1,
         primitive_rtp_resources=[],
@@ -601,7 +632,7 @@ async def test_get_referenced_data_files(
             CSVParameterResource(
                 analysis_id="analysis-id-1",
                 parameter_variable_name="csv-var",
-                file_id="data-file-id",
+                file_id="data-file-id-1",
             ),
             CSVParameterResource(
                 analysis_id="analysis-id-1",
@@ -616,14 +647,20 @@ async def test_get_referenced_data_files(
         csv_rtp_resources=[],
     )
     result = await subject.get_referenced_data_files("protocol-id")
+
     assert result == [
         DataFile(
-            id="data-file-id",
+            id="data-file-id-1",
             name="file-name",
             createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         ),
         DataFile(
             id="data-file-id-2",
+            name="file-name",
+            createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        ),
+        DataFile(
+            id="data-file-id-3",
             name="file-name",
             createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         ),

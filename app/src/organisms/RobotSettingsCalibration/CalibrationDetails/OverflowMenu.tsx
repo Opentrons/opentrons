@@ -4,13 +4,16 @@ import { saveAs } from 'file-saver'
 import { css } from 'styled-components'
 
 import {
-  Flex,
+  ALIGN_FLEX_END,
   BORDERS,
   COLORS,
-  POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
+  Flex,
+  MenuItem,
+  OverflowBtn,
+  POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  ALIGN_FLEX_END,
+  useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
 import { isFlexPipette, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
@@ -21,9 +24,6 @@ import {
 } from '@opentrons/react-api-client'
 
 import { Divider } from '../../../atoms/structure'
-import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
-import { MenuItem } from '../../../atoms/MenuList/MenuItem'
-import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
 import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
@@ -214,6 +214,8 @@ export function OverflowMenu({
               css={css`
                 border-radius: ${BORDERS.borderRadius8};
               `}
+              disabled={isRunning}
+              aria-label={`CalibrationOverflowMenu_button_calibrate`}
             >
               {t(
                 ot3PipCal == null

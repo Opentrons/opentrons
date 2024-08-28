@@ -1,11 +1,7 @@
 import * as React from 'react'
 import map from 'lodash/map'
 import isEmpty from 'lodash/isEmpty'
-import {
-  parseInitialLoadedLabwareByAdapter,
-  parseLabwareInfoByLiquidId,
-  parseLiquidsInLoadOrder,
-} from '@opentrons/api-client'
+
 import {
   ALIGN_CENTER,
   BaseDeck,
@@ -18,6 +14,9 @@ import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getSimplestDeckConfigForProtocol,
+  parseInitialLoadedLabwareByAdapter,
+  parseLabwareInfoByLiquidId,
+  parseLiquidsInLoadOrder,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
@@ -108,7 +107,9 @@ export function SetupLiquidsMap(
               setHoverLabwareId('')
             }}
             onClick={() => {
-              if (labwareHasLiquid) setLiquidDetailsLabwareId(topLabwareId)
+              if (labwareHasLiquid) {
+                setLiquidDetailsLabwareId(topLabwareId)
+              }
             }}
             cursor={labwareHasLiquid ? 'pointer' : ''}
           >
@@ -169,8 +170,9 @@ export function SetupLiquidsMap(
                     setHoverLabwareId('')
                   }}
                   onClick={() => {
-                    if (labwareHasLiquid)
+                    if (labwareHasLiquid) {
                       setLiquidDetailsLabwareId(topLabwareId)
+                    }
                   }}
                   cursor={labwareHasLiquid ? 'pointer' : ''}
                 >

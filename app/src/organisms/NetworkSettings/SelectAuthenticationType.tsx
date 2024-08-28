@@ -13,9 +13,9 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  RadioButton,
 } from '@opentrons/components'
 
-import { RadioButton } from '../../atoms/buttons'
 import { getLocalRobot } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'

@@ -4,7 +4,7 @@ import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen, cleanup } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../localization'
+import { i18n } from '../../../../assets/localization'
 import { MetadataTile } from '../MetadataTile'
 import type { FormState, WizardTileProps } from '../types'
 

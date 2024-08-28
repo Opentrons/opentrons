@@ -2,7 +2,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { Modal } from '@opentrons/components'
+import { LegacyModal } from '@opentrons/components'
 
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import { selectors } from '../../labware-ingred/selectors'
@@ -34,7 +34,7 @@ export const BrowseLabwareModal = (): JSX.Element | null => {
   }
 
   return (
-    <Modal
+    <LegacyModal
       className={modalStyles.modal}
       contentsClassName={cx(
         modalStyles.modal_contents,
@@ -50,6 +50,6 @@ export const BrowseLabwareModal = (): JSX.Element | null => {
       <div className={styles.modal_instructions}>
         {t('browse_labware.instructions')}
       </div>
-    </Modal>
+    </LegacyModal>
   )
 }

@@ -8,7 +8,7 @@ import {
   MAGNETIC_BLOCK_TYPE,
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../../localization'
+import { i18n } from '../../../../assets/localization'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { EquipmentOption } from '../EquipmentOption'
 

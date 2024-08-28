@@ -87,12 +87,12 @@ describe('useDropTipRouting', () => {
   })
 })
 
-describe('useExternalMapUpdates', () => {
-  it('should call trackCurrentMap when the drop tip flow map updates', async () => {
-    const mockTrackCurrentMap = vi.fn()
+describe('useReportMap', () => {
+  it('should call reportMap when the drop tip flow map updates', async () => {
+    const mockReportMap = vi.fn()
 
     const mockFixitUtils = {
-      trackCurrentMap: mockTrackCurrentMap,
+      reportMap: mockReportMap,
     } as any
 
     const { result } = renderHook(() => useDropTipRouting(mockFixitUtils))
@@ -101,18 +101,18 @@ describe('useExternalMapUpdates', () => {
       await result.current.proceedToRoute(DT_ROUTES.BLOWOUT)
     })
 
-    expect(mockTrackCurrentMap).toHaveBeenCalledWith({
-      currentRoute: DT_ROUTES.BLOWOUT,
-      currentStep: expect.any(String),
+    expect(mockReportMap).toHaveBeenCalledWith({
+      route: DT_ROUTES.BLOWOUT,
+      step: expect.any(String),
     })
 
     await act(async () => {
       await result.current.proceed()
     })
 
-    expect(mockTrackCurrentMap).toHaveBeenCalledWith({
-      currentRoute: DT_ROUTES.BLOWOUT,
-      currentStep: expect.any(String),
+    expect(mockReportMap).toHaveBeenCalledWith({
+      route: DT_ROUTES.BLOWOUT,
+      step: expect.any(String),
     })
   })
 })
@@ -126,9 +126,7 @@ describe('getInitialRouteAndStep', () => {
   })
 
   it('should return the default initial route and step when fixitUtils.routeOverride is not provided', () => {
-    const fixitUtils = {
-      routeOverride: undefined,
-    } as any
+    const fixitUtils = undefined
 
     const [initialRoute, initialStep] = getInitialRouteAndStep(fixitUtils)
 
@@ -138,12 +136,12 @@ describe('getInitialRouteAndStep', () => {
 
   it('should return the overridden route and step when fixitUtils.routeOverride is provided', () => {
     const fixitUtils = {
-      routeOverride: DT_ROUTES.DROP_TIP,
+      routeOverride: { route: DT_ROUTES.DROP_TIP, step: DT_ROUTES.DROP_TIP[2] },
     } as any
 
     const [initialRoute, initialStep] = getInitialRouteAndStep(fixitUtils)
 
     expect(initialRoute).toBe(DT_ROUTES.DROP_TIP)
-    expect(initialStep).toBe(DT_ROUTES.DROP_TIP[0])
+    expect(initialStep).toBe(DT_ROUTES.DROP_TIP[2])
   })
 })

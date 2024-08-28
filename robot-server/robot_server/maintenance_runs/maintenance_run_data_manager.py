@@ -115,7 +115,7 @@ class MaintenanceRunDataManager:
             state_summary=state_summary,
         )
 
-        await self._maintenance_runs_publisher.publish_current_maintenance_run()
+        self._maintenance_runs_publisher.publish_current_maintenance_run()
 
         return maintenance_run_data
 
@@ -157,7 +157,7 @@ class MaintenanceRunDataManager:
         if run_id == self._run_orchestrator_store.current_run_id:
             await self._run_orchestrator_store.clear()
 
-            await self._maintenance_runs_publisher.publish_current_maintenance_run()
+            self._maintenance_runs_publisher.publish_current_maintenance_run()
 
         else:
             raise MaintenanceRunNotFoundError(run_id=run_id)

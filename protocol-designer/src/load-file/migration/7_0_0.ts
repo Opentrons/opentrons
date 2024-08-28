@@ -6,6 +6,7 @@ import { getAdapterAndLabwareSplitInfo } from './utils/getAdapterAndLabwareSplit
 import type {
   LabwareDefinition2,
   LabwareDefinitionsByUri,
+  LoadLiquidCreateCommand,
   ProtocolFileV6,
 } from '@opentrons/shared-data'
 import type {
@@ -19,6 +20,7 @@ import type {
   LoadPipetteCreateCommand as LoadPipetteCommandV6,
   LoadModuleCreateCommand as LoadModuleCommandV6,
   LoadLabwareCreateCommand as LoadLabwareCommandV6,
+  LoadLiquidCreateCommand as LoadLiquidCommandV6,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
@@ -242,6 +244,26 @@ export const migrateFile = (
         },
       }
     })
+
+  const loadLiquidCommands: LoadLiquidCreateCommand[] = commands
+    .filter(
+      (command): command is LoadLiquidCommandV6 =>
+        command.commandType === 'loadLiquid'
+    )
+    .map(command => {
+      const labwareId = command.params.labwareId
+      const definitionId = labware[labwareId].definitionId
+      return {
+        ...command,
+        params: {
+          ...command.params,
+          labwareId: labwareId.includes(definitionId)
+            ? labwareId
+            : `${labwareId}:${definitionId}`,
+        },
+      }
+    })
+
   const newLabwareLocationUpdate: LabwareLocationUpdate = Object.keys(
     labwareLocationUpdate
   ).reduce((acc: LabwareLocationUpdate, labwareId: string) => {
@@ -293,7 +315,11 @@ export const migrateFile = (
         const newLabwareId = mappedLabwareIds[labwareId].newLabwareId
         updatedIngredLocations[newLabwareId] = wellData
       } else {
-        updatedIngredLocations[labwareId] = wellData
+        const definitionId = labware[labwareId].definitionId
+        const newLabwareId = labwareId.includes(definitionId)
+          ? labwareId
+          : `${labwareId}:${definitionId}`
+        updatedIngredLocations[newLabwareId] = wellData
       }
     }
     return updatedIngredLocations
@@ -471,6 +497,7 @@ export const migrateFile = (
       ...loadModuleCommands,
       ...loadAdapterAndLabwareCommands,
       ...loadLabwareCommands,
+      ...loadLiquidCommands,
     ],
   }
 }

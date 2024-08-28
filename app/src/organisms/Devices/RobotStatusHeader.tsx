@@ -14,9 +14,10 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
-  LegacyStyledText,
+  Tooltip,
   truncateString,
   TYPOGRAPHY,
   useHoverTooltip,
@@ -24,7 +25,6 @@ import {
 } from '@opentrons/components'
 
 import { QuaternaryButton } from '../../atoms/buttons'
-import { Tooltip } from '../../atoms/Tooltip'
 import { useIsFlex } from '../../organisms/Devices/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
 import {

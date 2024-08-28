@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
-  Tooltip,
+  LegacyTooltip,
   DeprecatedPrimaryButton,
   useHoverTooltip,
   TOOLTIP_RIGHT,
@@ -60,7 +60,9 @@ export const StepCreationButtonComponent = (
       {...targetProps}
     >
       {disabled && (
-        <Tooltip {...tooltipProps}>{t(`disabled_step_creation`)}</Tooltip>
+        <LegacyTooltip {...tooltipProps}>
+          {t(`disabled_step_creation`)}
+        </LegacyTooltip>
       )}
       <DeprecatedPrimaryButton
         id="StepCreationButton"
@@ -100,7 +102,7 @@ export function StepButtonItem(props: StepButtonItemProps): JSX.Element {
           {t(`application:stepType.${stepType}`, stepType)}
         </DeprecatedPrimaryButton>
       </div>
-      <Tooltip {...tooltipProps}>{tooltipMessage}</Tooltip>
+      <LegacyTooltip {...tooltipProps}>{tooltipMessage}</LegacyTooltip>
     </>
   )
 }

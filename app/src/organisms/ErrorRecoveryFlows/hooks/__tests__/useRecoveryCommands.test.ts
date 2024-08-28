@@ -46,7 +46,7 @@ describe('useRecoveryCommands', () => {
 
   const props = {
     runId: mockRunId,
-    failedCommand: mockFailedCommand,
+    failedCommandByRunRecord: mockFailedCommand,
     failedLabwareUtils: mockFailedLabwareUtils,
     routeUpdateActions: mockRouteUpdateActions,
     recoveryToastUtils: { makeSuccessToast: mockMakeSuccessToast } as any,
@@ -132,7 +132,7 @@ describe('useRecoveryCommands', () => {
       const { result } = renderHook(() =>
         useRecoveryCommands({
           runId: mockRunId,
-          failedCommand: {
+          failedCommandByRunRecord: {
             ...mockFailedCommand,
             commandType: inPlaceCommandType,
             params: {
@@ -230,7 +230,7 @@ describe('useRecoveryCommands', () => {
 
     const testProps = {
       ...props,
-      failedCommand: mockFailedCmdWithPipetteId,
+      failedCommandByRunRecord: mockFailedCmdWithPipetteId,
       failedLabwareUtils: {
         ...mockFailedLabwareUtils,
         failedLabware: mockFailedLabware,
@@ -271,7 +271,7 @@ describe('useRecoveryCommands', () => {
 
     const testProps = {
       ...props,
-      failedCommand: mockFailedCommandWithError,
+      failedCommandByRunRecord: mockFailedCommandWithError,
     }
 
     const { result } = renderHook(() => useRecoveryCommands(testProps))

@@ -13,6 +13,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   SPACING,
+  Modal,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -49,8 +50,7 @@ import {
 
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 import { TertiaryButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
-import { LegacyModal } from '../../molecules/LegacyModal'
+import { OddModal } from '../../molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration/'
 
 import type {
@@ -58,8 +58,8 @@ import type {
   CutoutId,
   CutoutFixtureId,
 } from '@opentrons/shared-data'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
-import type { LegacyModalProps } from '../../molecules/LegacyModal'
+import type { ModalProps } from '@opentrons/components'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
@@ -104,7 +104,7 @@ export function AddFixtureModal({
     initialStage
   )
 
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('add_to_slot', {
       slotName: getCutoutDisplayName(cutoutId),
     }),
@@ -112,7 +112,7 @@ export function AddFixtureModal({
     onClick: closeModal,
   }
 
-  const modalProps: LegacyModalProps = {
+  const modalProps: ModalProps = {
     title: t('add_to_slot', {
       slotName: getCutoutDisplayName(cutoutId),
     }),
@@ -335,7 +335,7 @@ export function AddFixtureModal({
   return (
     <>
       {isOnDevice ? (
-        <Modal
+        <OddModal
           header={modalHeader}
           onOutsideClick={() => {
             if (providedFixtureOptions == null) closeModal()
@@ -350,9 +350,9 @@ export function AddFixtureModal({
               {nextStageOptions}
             </Flex>
           </Flex>
-        </Modal>
+        </OddModal>
       ) : (
-        <LegacyModal {...modalProps}>
+        <Modal {...modalProps}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
             <LegacyStyledText as="p">
               {t('add_fixture_description')}
@@ -377,7 +377,7 @@ export function AddFixtureModal({
               </LegacyStyledText>
             </Btn>
           ) : null}
-        </LegacyModal>
+        </Modal>
       )}
     </>
   )

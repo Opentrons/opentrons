@@ -58,6 +58,11 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
     switch (action.type) {
       case UI_INITIALIZED:
       case 'shell:CHECK_UPDATE':
+        // short circuit early if we're already downloading the latest system files
+        if (isGettingLatestSystemFiles) {
+          log.info(`system update download already in progress`)
+          return
+        }
         updateLatestVersion()
           .then(() => {
             if (isUpdateAvailable() && !isGettingLatestSystemFiles) {

@@ -4,7 +4,7 @@ types in this file by and large require the use of typing_extensions.
 this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 """
 from typing import Dict, List, NewType, Union
-from typing_extensions import Literal, TypedDict
+from typing_extensions import Literal, TypedDict, NotRequired
 
 
 LabwareUri = NewType("LabwareUri", str)
@@ -37,6 +37,7 @@ LabwareRoles = Union[
 
 Circular = Literal["circular"]
 Rectangular = Literal["rectangular"]
+Spherical = Literal["spherical"]
 WellShape = Union[Circular, Rectangular]
 
 
@@ -89,6 +90,7 @@ class CircularWellDefinition(TypedDict):
     y: float
     z: float
     diameter: float
+    geometryDefinitionId: NotRequired[str]
 
 
 class RectangularWellDefinition(TypedDict):
@@ -100,6 +102,7 @@ class RectangularWellDefinition(TypedDict):
     z: float
     xDimension: float
     yDimension: float
+    geometryDefinitionId: NotRequired[str]
 
 
 WellDefinition = Union[CircularWellDefinition, RectangularWellDefinition]
@@ -117,7 +120,38 @@ class WellGroup(TypedDict, total=False):
     brand: LabwareBrandData
 
 
-class _RequiredLabwareDefinition(TypedDict):
+class CircularCrossSection(TypedDict):
+    shape: Circular
+    diameter: float
+
+
+class RectangularCrossSection(TypedDict):
+    shape: Rectangular
+    xDimension: float
+    yDimension: float
+
+
+class SphericalSegment(TypedDict):
+    shape: Spherical
+    radiusOfCurvature: float
+    depth: float
+
+
+TopCrossSection = Union[CircularCrossSection, RectangularCrossSection]
+BottomShape = Union[CircularCrossSection, RectangularCrossSection, SphericalSegment]
+
+
+class BoundedSection(TypedDict):
+    geometry: TopCrossSection
+    topHeight: float
+
+
+class InnerWellGeometry(TypedDict):
+    frusta: List[BoundedSection]
+    bottomShape: BottomShape
+
+
+class LabwareDefinition(TypedDict):
     schemaVersion: Literal[2]
     version: int
     namespace: str
@@ -129,12 +163,10 @@ class _RequiredLabwareDefinition(TypedDict):
     dimensions: LabwareDimensions
     wells: Dict[str, WellDefinition]
     groups: List[WellGroup]
-
-
-class LabwareDefinition(_RequiredLabwareDefinition, total=False):
-    stackingOffsetWithLabware: Dict[str, NamedOffset]
-    stackingOffsetWithModule: Dict[str, NamedOffset]
-    allowedRoles: List[LabwareRoles]
-    gripperOffsets: Dict[str, GripperOffsets]
-    gripForce: float
-    gripHeightFromLabwareBottom: float
+    stackingOffsetWithLabware: NotRequired[Dict[str, NamedOffset]]
+    stackingOffsetWithModule: NotRequired[Dict[str, NamedOffset]]
+    allowedRoles: NotRequired[List[LabwareRoles]]
+    gripperOffsets: NotRequired[Dict[str, GripperOffsets]]
+    gripForce: NotRequired[float]
+    gripHeightFromLabwareBottom: NotRequired[float]
+    innerLabwareGeometry: NotRequired[Dict[str, InnerWellGeometry]]

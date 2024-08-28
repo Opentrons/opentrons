@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import head from 'lodash/head'
 
 import {
   DIRECTION_COLUMN,
@@ -33,6 +32,8 @@ import type { FixitCommandTypeUtils } from '../../DropTipWizardFlows/types'
 export function ManageTips(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props
 
+  routeAlternativelyIfNoPipette(props)
+
   const buildContent = (): JSX.Element => {
     const { DROP_TIP_FLOWS } = RECOVERY_MAP
     const { step, route } = recoveryMap
@@ -60,7 +61,7 @@ export function BeginRemoval({
   currentRecoveryOptionUtils,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
-  const { pipettesWithTip } = tipStatusUtils
+  const { aPipetteWithTip } = tipStatusUtils
   const {
     proceedNextStep,
     setRobotInMotion,
@@ -69,7 +70,7 @@ export function BeginRemoval({
   const { cancelRun } = recoveryCommands
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
-  const mount = head(pipettesWithTip)?.mount
+  const mount = aPipetteWithTip?.mount
 
   const primaryOnClick = (): void => {
     void proceedNextStep()
@@ -132,7 +133,7 @@ export function BeginRemoval({
         primaryBtnOnClick={primaryOnClick}
         primaryBtnTextOverride={t('begin_removal')}
         secondaryBtnOnClick={secondaryOnClick}
-        secondaryBtnTextOverride={t('skip')}
+        secondaryBtnTextOverride={t('skip_and_home_pipette')}
         secondaryAsTertiary={true}
       />
     </RecoverySingleColumnContentWrapper>
@@ -155,9 +156,7 @@ function DropTipFlowsContainer(
   const { setTipStatusResolved } = tipStatusUtils
   const { cancelRun } = recoveryCommands
 
-  const { mount, specs } = head(
-    tipStatusUtils.pipettesWithTip
-  ) as PipetteWithTip // Safe as we have to have tips to get to this point in the flow.
+  const { mount, specs } = tipStatusUtils.aPipetteWithTip as PipetteWithTip // Safe as we have to have tips to get to this point in the flow.
 
   const onCloseFlow = (): void => {
     if (selectedRecoveryOption === RETRY_NEW_TIPS.ROUTE) {
@@ -200,9 +199,10 @@ export function useDropTipFlowUtils({
   tipStatusUtils,
   failedCommand,
   currentRecoveryOptionUtils,
-  trackExternalMap,
+  subMapUtils,
   routeUpdateActions,
   recoveryMap,
+  failedPipetteInfo,
 }: RecoveryContentProps): FixitCommandTypeUtils {
   const { t } = useTranslation('error_recovery')
   const {
@@ -215,7 +215,8 @@ export function useDropTipFlowUtils({
   const { step } = recoveryMap
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { proceedToRouteAndStep } = routeUpdateActions
-  const failedCommandId = failedCommand?.id ?? '' // We should have a failed command here unless the run is not in AWAITING_RECOVERY.
+  const { updateSubMap, subMap } = subMapUtils
+  const failedCommandId = failedCommand?.byRunRecord.id ?? '' // We should have a failed command here unless the run is not in AWAITING_RECOVERY.
 
   const buildTipDropCompleteBtn = (): string => {
     switch (selectedRecoveryOption) {
@@ -288,22 +289,74 @@ export function useDropTipFlowUtils({
   }
 
   // If a specific step within the DROP_TIP_FLOWS route is selected, begin the Drop Tip Flows at its related route.
+  //
+  // NOTE: The substep is cleared by drop tip wizard after the completion of the wizard flow.
   const buildRouteOverride = (): FixitCommandTypeUtils['routeOverride'] => {
+    if (subMap?.route != null) {
+      return { route: subMap.route, step: subMap.step }
+    }
+
     switch (step) {
       case DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP:
-        return DT_ROUTES.DROP_TIP
+        return { route: DT_ROUTES.DROP_TIP, step: subMap?.step ?? null }
       case DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT:
-        return DT_ROUTES.BLOWOUT
+        return { route: DT_ROUTES.BLOWOUT, step: subMap?.step ?? null }
     }
   }
+
+  const pipetteId =
+    failedCommand != null &&
+    'params' in failedCommand.byRunRecord &&
+    'pipetteId' in failedCommand.byRunRecord.params
+      ? failedCommand.byRunRecord.params.pipetteId
+      : null
 
   return {
     runId,
     failedCommandId,
+    pipetteId,
     copyOverrides: buildCopyOverrides(),
-    trackCurrentMap: trackExternalMap,
     errorOverrides: buildErrorOverrides(),
     buttonOverrides: buildButtonOverrides(),
     routeOverride: buildRouteOverride(),
+    reportMap: updateSubMap,
   }
+}
+
+// Handle cases in which there is no pipette that could be used for drop tip wizard by routing
+// to the next step or to option selection, if no special routing is provided.
+function routeAlternativelyIfNoPipette(props: RecoveryContentProps): void {
+  const {
+    routeUpdateActions,
+    currentRecoveryOptionUtils,
+    tipStatusUtils,
+  } = props
+  const { proceedToRouteAndStep } = routeUpdateActions
+  const { selectedRecoveryOption } = currentRecoveryOptionUtils
+  const {
+    RETRY_NEW_TIPS,
+    SKIP_STEP_WITH_NEW_TIPS,
+    OPTION_SELECTION,
+  } = RECOVERY_MAP
+
+  if (tipStatusUtils.aPipetteWithTip == null)
+    switch (selectedRecoveryOption) {
+      case RETRY_NEW_TIPS.ROUTE: {
+        proceedToRouteAndStep(
+          selectedRecoveryOption,
+          RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+        )
+        break
+      }
+      case SKIP_STEP_WITH_NEW_TIPS.ROUTE: {
+        proceedToRouteAndStep(
+          selectedRecoveryOption,
+          SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS
+        )
+        break
+      }
+      default: {
+        proceedToRouteAndStep(OPTION_SELECTION.ROUTE)
+      }
+    }
 }

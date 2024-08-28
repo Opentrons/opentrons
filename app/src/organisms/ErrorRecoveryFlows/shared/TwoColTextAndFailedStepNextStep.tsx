@@ -46,9 +46,9 @@ export function TwoColTextAndFailedStepNextStep(
         <Flex
           flexDirection={DIRECTION_COLUMN}
           css={css`
-            gap: ${SPACING.spacing16};
+            gap: ${SPACING.spacing8};
             @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-              gap: ${SPACING.spacing8};
+              gap: ${SPACING.spacing12};
             }
           `}
         >
@@ -58,12 +58,16 @@ export function TwoColTextAndFailedStepNextStep(
           >
             {leftColTitle}
           </StyledText>
-          <StyledText
-            oddStyle="bodyTextRegular"
-            desktopStyle="bodyDefaultRegular"
-          >
-            {leftColBodyText}
-          </StyledText>
+          {typeof leftColBodyText === 'string' ? (
+            <StyledText
+              oddStyle="bodyTextRegular"
+              desktopStyle="bodyDefaultRegular"
+            >
+              {leftColBodyText}
+            </StyledText>
+          ) : (
+            leftColBodyText
+          )}
         </Flex>
         <FailedStepNextStep {...props} />
       </TwoColumn>

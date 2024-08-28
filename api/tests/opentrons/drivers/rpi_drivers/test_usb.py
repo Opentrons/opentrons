@@ -1,3 +1,4 @@
+from _pytest.fixtures import SubRequest
 import pytest
 from mock import patch, MagicMock
 from typing import Iterator, cast
@@ -58,14 +59,14 @@ fake_bus_flex = [
 
 
 @pytest.fixture(params=[BoardRevision.OG, BoardRevision.A, BoardRevision.FLEX_B2])
-def revision(request) -> BoardRevision:
+def revision(request: SubRequest) -> BoardRevision:
     return cast(BoardRevision, request.param)
 
 
 @pytest.fixture()
 def usb_bus(revision: BoardRevision) -> Iterator[USBBus]:
     @staticmethod  # type: ignore[misc]
-    def fake_read_bus():
+    def fake_read_bus() -> list[str]:
         if revision == BoardRevision.OG:
             return fake_bus_og
         elif revision == BoardRevision.A:
@@ -80,7 +81,7 @@ def usb_bus(revision: BoardRevision) -> Iterator[USBBus]:
         yield USBBus(revision)
 
 
-def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
+def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus) -> None:
     # TODO(mc, 2022-03-01): partial patching the class under test creates
     # a contaminated test subject that reduces the value of these tests
     # https://github.com/testdouble/contributing-tests/wiki/Partial-Mock

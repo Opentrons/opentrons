@@ -2,7 +2,7 @@ import * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
-import { i18n } from '../../../localization'
+import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { MultipleModulesRow } from '../MultipleModulesRow'
 import {

@@ -19,14 +19,14 @@ import {
 } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../../atoms/buttons'
-import { Modal } from '../../../molecules/Modal'
+import { OddModal } from '../../../molecules/OddModal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../redux/analytics'
 import { getLocalRobot } from '../../../redux/discovery'
 import { CancelingRunModal } from './CancelingRunModal'
 
-import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
 
 interface ConfirmCancelRunModalProps {
   runId: string
@@ -68,7 +68,7 @@ export function ConfirmCancelRunModal({
   const navigate = useNavigate()
   const [isCanceling, setIsCanceling] = React.useState(false)
 
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('cancel_run_modal_heading'),
     hasExitIcon: false,
     iconName: 'ot-alert',
@@ -105,7 +105,7 @@ export function ConfirmCancelRunModal({
   return isCanceling || isDismissing ? (
     <CancelingRunModal />
   ) : (
-    <Modal
+    <OddModal
       modalSize="medium"
       header={modalHeader}
       onOutsideClick={() => {
@@ -146,6 +146,6 @@ export function ConfirmCancelRunModal({
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

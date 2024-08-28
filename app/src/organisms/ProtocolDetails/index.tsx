@@ -31,27 +31,25 @@ import {
   Tabs,
   SIZE_1,
   SIZE_5,
+  Modal,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  parseInitialPipetteNamesByMount,
-  parseInitialLoadedModulesBySlot,
-  parseInitialLoadedLabwareBySlot,
-  parseInitialLoadedLabwareByModuleId,
-  parseInitialLoadedLabwareByAdapter,
-} from '@opentrons/api-client'
-import {
   MAGNETIC_BLOCK_TYPE,
   getGripperDisplayName,
   getModuleType,
   getSimplestDeckConfigForProtocol,
+  parseInitialLoadedLabwareByAdapter,
+  parseInitialLoadedLabwareByModuleId,
+  parseInitialLoadedLabwareBySlot,
+  parseInitialLoadedModulesBySlot,
+  parseInitialPipetteNamesByMount,
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -389,14 +387,14 @@ export function ProtocolDetails(
     <>
       {showDeckViewModal
         ? createPortal(
-            <LegacyModal
+            <Modal
               title={t('deck_view')}
               onClose={() => {
                 setShowDeckViewModal(false)
               }}
             >
               {deckMap}
-            </LegacyModal>,
+            </Modal>,
             getTopPortalEl()
           )
         : null}

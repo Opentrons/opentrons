@@ -3,6 +3,7 @@ import inspect
 import logging
 import traceback
 import sys
+from types import TracebackType
 from typing import Any, Dict, Optional
 
 from opentrons.drivers.smoothie_drivers.errors import SmoothieAlarm
@@ -12,7 +13,7 @@ from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.protocols.types import PythonProtocol, MalformedPythonProtocolError
 from opentrons.protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
-    CSVRunTimeParamFilesType,
+    CSVRuntimeParamPaths,
 )
 
 
@@ -21,7 +22,7 @@ from opentrons_shared_data.errors.exceptions import ExecutionCancelledError
 MODULE_LOG = logging.getLogger(__name__)
 
 
-def _runfunc_ok(run_func: Any):
+def _runfunc_ok(run_func: Any) -> None:
     if not callable(run_func):
         raise SyntaxError("No function 'run(ctx)' defined")
     sig = inspect.Signature.from_callable(run_func)
@@ -44,10 +45,14 @@ def _add_parameters_func_ok(add_parameters_func: Any) -> None:
         raise SyntaxError("Function 'add_parameters' must take exactly one argument.")
 
 
-def _find_protocol_error(tb, proto_name):
+def _find_protocol_error(
+    tb: TracebackType | None, proto_name: str
+) -> traceback.FrameSummary:
     """Return the FrameInfo for the lowest frame in the traceback from the
     protocol.
     """
+    if tb is None:
+        raise KeyError
     tb_info = traceback.extract_tb(tb)
     for frame in reversed(tb_info):
         if frame.filename == proto_name:
@@ -57,7 +62,7 @@ def _find_protocol_error(tb, proto_name):
 
 
 def _raise_pretty_protocol_error(exception: Exception, filename: str) -> None:
-    exc_type, exc_value, tb = sys.exc_info()
+    _, _, tb = sys.exc_info()
     try:
         frame = _find_protocol_error(tb, filename)
     except KeyError:
@@ -71,7 +76,7 @@ def _raise_pretty_protocol_error(exception: Exception, filename: str) -> None:
 def _parse_and_set_parameters(
     parameter_context: ParameterContext,
     run_time_param_overrides: Optional[PrimitiveRunTimeParamValuesType],
-    run_time_param_file_overrides: Optional[CSVRunTimeParamFilesType],
+    run_time_param_file_overrides: Optional[CSVRuntimeParamPaths],
     new_globs: Dict[Any, Any],
     filename: str,
 ) -> Parameters:
@@ -111,7 +116,7 @@ def exec_add_parameters(
     protocol: PythonProtocol,
     parameter_context: ParameterContext,
     run_time_param_overrides: Optional[PrimitiveRunTimeParamValuesType],
-    run_time_param_file_overrides: Optional[CSVRunTimeParamFilesType],
+    run_time_param_file_overrides: Optional[CSVRuntimeParamPaths],
 ) -> Optional[Parameters]:
     """Exec the add_parameters function and get the final run time parameters with overrides."""
     new_globs: Dict[Any, Any] = {}

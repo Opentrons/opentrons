@@ -13,10 +13,11 @@ import {
   DISPLAY_NONE,
   Flex,
   InfoScreen,
+  LegacyStyledText,
+  OVERFLOW_SCROLL,
   POSITION_FIXED,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -34,7 +35,6 @@ import { useLastRunCommand } from '../Devices/hooks/useLastRunCommand'
 import type { RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
 import type { ViewportListRef } from 'react-viewport-list'
-
 const COLOR_FADE_MS = 500
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
 // arbitrary large number of commands
@@ -80,10 +80,22 @@ export const RunPreviewComponent = (
     isCurrentCommandVisible,
     setIsCurrentCommandVisible,
   ] = React.useState<boolean>(true)
-  if (robotSideAnalysis == null) return null
+  const filteredCommandsFromQuery = React.useMemo(
+    () =>
+      commandsFromQuery?.filter(
+        command => !('intent' in command) || command.intent !== 'fixit'
+      ),
+    [commandsFromQuery == null]
+  )
+
+  if (robotSideAnalysis == null) {
+    return null
+  }
+
   const commands = isRunTerminal
-    ? commandsFromQuery
+    ? filteredCommandsFromQuery
     : robotSideAnalysis.commands
+
   // pass relevant data from run rather than analysis so that CommandText utilities can properly hash the entities' IDs
   // TODO (nd:05/02/2024, AUTH-380): update name and types for CommandText (and children/utilities) use of analysis.
   // We should ideally pass only subset of analysis/run data required by these children and utilities
@@ -102,7 +114,6 @@ export const RunPreviewComponent = (
     commands != null
       ? commands.findIndex(c => c.key === currentRunCommandKey)
       : 0
-
   if (isRunCommandDataLoading || commands == null) {
     return (
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
@@ -120,9 +131,9 @@ export const RunPreviewComponent = (
     <Flex
       ref={viewPortRef}
       flexDirection={DIRECTION_COLUMN}
-      height="28rem"
+      height="65vh"
       width="100%"
-      overflowY="scroll"
+      overflowY={OVERFLOW_SCROLL}
       gridGap={SPACING.spacing8}
       padding={SPACING.spacing16}
     >

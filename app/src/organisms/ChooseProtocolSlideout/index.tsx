@@ -13,21 +13,24 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_BLOCK,
+  DropdownMenu,
   Flex,
   Icon,
-  Link as LinkComponent,
+  InputField,
   JUSTIFY_CENTER,
   JUSTIFY_END,
   JUSTIFY_FLEX_START,
+  LegacyStyledText,
+  Link as LinkComponent,
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   ProtocolDeck,
-  SPACING,
   SecondaryButton,
-  LegacyStyledText,
+  SPACING,
+  Tooltip,
   TYPOGRAPHY,
-  useTooltip,
   useHoverTooltip,
+  useTooltip,
 } from '@opentrons/components'
 import {
   ApiHostProvider,
@@ -36,15 +39,11 @@ import {
 import { sortRuntimeParameters } from '@opentrons/shared-data'
 
 import { useLogger } from '../../logger'
-import { useFeatureFlag } from '../../redux/config'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { appShellRequestor } from '../../redux/shell/remote'
 import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
-import { Tooltip } from '../../atoms/Tooltip'
 import { ToggleButton } from '../../atoms/buttons'
-import { InputField } from '../../atoms/InputField'
-import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 import { MiniCard } from '../../molecules/MiniCard'
 import { UploadInput } from '../../molecules/UploadInput'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
@@ -117,7 +116,6 @@ export function ChooseProtocolSlideoutComponent(
     ) ?? false
   )
   const [isInputFocused, setIsInputFocused] = React.useState<boolean>(false)
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   React.useEffect(() => {
     setRunTimeParametersOverrides(
@@ -239,20 +237,12 @@ export function ChooseProtocolSlideoutComponent(
           runTimeParametersOverrides,
           mappedResolvedCsvVariableToFileId
         )
-        if (enableCsvFile) {
-          createRunFromProtocolSource({
-            files: srcFileObjects,
-            protocolKey: selectedProtocol.protocolKey,
-            runTimeParameterValues,
-            runTimeParameterFiles,
-          })
-        } else {
-          createRunFromProtocolSource({
-            files: srcFileObjects,
-            protocolKey: selectedProtocol.protocolKey,
-            runTimeParameterValues,
-          })
-        }
+        createRunFromProtocolSource({
+          files: srcFileObjects,
+          protocolKey: selectedProtocol.protocolKey,
+          runTimeParameterValues,
+          runTimeParameterFiles,
+        })
       })
     } else {
       logger.warn('failed to create protocol, no protocol selected')
@@ -441,7 +431,7 @@ export function ChooseProtocolSlideoutComponent(
               if (error != null) {
                 errors.push(error as string)
               }
-              return !enableCsvFile ? null : (
+              return (
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   alignItems={ALIGN_CENTER}
@@ -613,7 +603,15 @@ export function ChooseProtocolSlideoutComponent(
           {...targetPropsHover}
         >
           {isCreatingRun ? (
-            <Icon name="ot-spinner" spin size="1rem" />
+            <Flex
+              gridGap={SPACING.spacing4}
+              alignItems={ALIGN_CENTER}
+              whiteSpace="nowrap"
+              marginLeft={`-${SPACING.spacing4}`}
+            >
+              <Icon name="ot-spinner" spin size="1rem" />
+              {t('shared:confirm_values')}
+            </Flex>
           ) : (
             t('shared:confirm_values')
           )}

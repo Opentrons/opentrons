@@ -1,5 +1,4 @@
-from typing import Type, Union
-
+from typing import Type, Union, AsyncGenerator
 import pytest
 from _pytest.fixtures import SubRequest
 from mock import AsyncMock, call
@@ -83,7 +82,9 @@ async def async_subject(
 
 
 @pytest.fixture
-async def subject_raise_on_error_patched(async_subject):
+async def subject_raise_on_error_patched(
+    async_subject: AsyncResponseSerialConnection,
+) -> AsyncGenerator[AsyncResponseSerialConnection, None]:
     raise_on_error_mock = mock.MagicMock()
     with mock.patch.object(async_subject, "raise_on_error", raise_on_error_mock):
         yield async_subject

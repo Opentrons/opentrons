@@ -1,16 +1,17 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  LegacyStyledText,
-  SPACING,
-  TYPOGRAPHY,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  ListItem,
+  SPACING,
   TEXT_ALIGN_RIGHT,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { ListItem } from '../../atoms/ListItem'
+import { useToaster } from '../ToasterOven'
 import { CONSOLIDATE, DISTRIBUTE } from './constants'
 
 import type { QuickTransferSummaryState } from './types'
@@ -22,12 +23,16 @@ interface OverviewProps {
 export function Overview(props: OverviewProps): JSX.Element | null {
   const { state } = props
   const { t } = useTranslation(['quick_transfer', 'shared'])
+  const { makeSnackbar } = useToaster()
 
   let transferCopy = t('volume_per_well')
   if (state.transferType === CONSOLIDATE) {
     transferCopy = t('aspirate_volume')
   } else if (state.transferType === DISTRIBUTE) {
     transferCopy = t('dispense_volume')
+  }
+  const onClick = (): void => {
+    makeSnackbar(t('create_new_to_edit') as string)
   }
 
   const displayItems = [
@@ -63,7 +68,7 @@ export function Overview(props: OverviewProps): JSX.Element | null {
       marginTop="192px"
     >
       {displayItems.map(displayItem => (
-        <ListItem type="noActive" key={displayItem.option}>
+        <ListItem type="noActive" key={displayItem.option} onClick={onClick}>
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
             <LegacyStyledText
               css={TYPOGRAPHY.level4HeaderSemiBold}

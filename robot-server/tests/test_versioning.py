@@ -6,7 +6,7 @@ and response tests are in `tests/integration/test_version_headers.tavern.yaml`.
 import pytest
 from fastapi import FastAPI, APIRouter, Request, Depends
 from fastapi.testclient import TestClient
-from typing import Dict
+from typing import Annotated, Dict
 
 from robot_server.errors.exception_handlers import exception_handlers
 from robot_server.versioning import API_VERSION, check_version_header
@@ -30,7 +30,7 @@ def test_check_version_header(app: FastAPI, client: TestClient) -> None:
     @app.get("/foobar")
     def _get_foobar(
         request: Request,
-        _: None = Depends(check_version_header),
+        _: Annotated[None, Depends(check_version_header)],
     ) -> Dict[str, str]:
         assert request.state.api_version == 2
         return {"hello": "world"}
@@ -64,7 +64,7 @@ def test_check_version_header_fallback(app: FastAPI, client: TestClient) -> None
     @app.get("/foobar")
     def _get_foobar(
         request: Request,
-        _: None = Depends(check_version_header),
+        _: Annotated[None, Depends(check_version_header)],
     ) -> Dict[str, str]:
         assert request.state.api_version == API_VERSION
         return {"hello": "world"}

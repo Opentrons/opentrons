@@ -4,7 +4,7 @@ import subprocess
 
 from starlette import status
 from starlette.responses import JSONResponse
-from typing import Optional
+from typing import Annotated, Optional
 from fastapi import APIRouter, HTTPException, File, Path, UploadFile, Query
 
 from opentrons_shared_data.errors import ErrorCodes
@@ -66,17 +66,19 @@ async def get_networking_status() -> NetworkingStatus:
     response_model=WifiNetworks,
 )
 async def get_wifi_networks(
-    rescan: Optional[bool] = Query(
-        default=False,
-        description=(
-            "If `true`, forces a rescan for beaconing Wi-Fi networks. "
-            "This is an expensive operation that can take ~10 seconds, "
-            'so only do it based on user needs like clicking a "scan network" '
-            "button, not just to poll. "
-            "If `false`, returns the cached Wi-Fi networks, "
-            "letting the system decide when to do a rescan."
+    rescan: Annotated[
+        Optional[bool],
+        Query(
+            description=(
+                "If `true`, forces a rescan for beaconing Wi-Fi networks. "
+                "This is an expensive operation that can take ~10 seconds, "
+                'so only do it based on user needs like clicking a "scan network" '
+                "button, not just to poll. "
+                "If `false`, returns the cached Wi-Fi networks, "
+                "letting the system decide when to do a rescan."
+            ),
         ),
-    )
+    ] = False
 ) -> WifiNetworks:
     networks = await nmcli.available_ssids(rescan)
     return WifiNetworks(list=[WifiNetworkFull(**n) for n in networks])
@@ -189,11 +191,14 @@ async def post_wifi_key(key: UploadFile = File(...)):
     },
 )
 async def delete_wifi_key(
-    key_uuid: str = Path(
-        ...,
-        description="The ID of key to delete, as determined by a previous"
-        " call to GET /wifi/keys",
-    )
+    key_uuid: Annotated[
+        str,
+        Path(
+            ...,
+            description="The ID of key to delete, as determined by a previous"
+            " call to GET /wifi/keys",
+        ),
+    ]
 ) -> V1BasicResponse:
     """Delete wifi key handler"""
     deleted_file = wifi.remove_key(key_uuid)

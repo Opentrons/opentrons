@@ -100,5 +100,6 @@ class DevServer:
 
     def stop(self) -> None:
         """Stop the robot server."""
+        # todo(mm, 2024-08-15): self.proc does not necessarily exist if startup fails.
         self.proc.send_signal(signal.SIGTERM)
         self.proc.wait()

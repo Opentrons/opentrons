@@ -13,19 +13,20 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
+  InputField,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { Slideout } from '../../atoms/Slideout'
-import { InputField } from '../../atoms/InputField'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
 
-import type { ThermocyclerModule } from '../../redux/modules/types'
 import type {
   TCSetTargetBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
 } from '@opentrons/shared-data'
+import type { ThermocyclerModule } from '../../redux/modules/types'
 
 interface ThermocyclerModuleSlideoutProps {
   module: ThermocyclerModule

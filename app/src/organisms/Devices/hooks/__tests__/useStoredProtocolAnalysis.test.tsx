@@ -6,13 +6,13 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
 
+import { useProtocolQuery } from '@opentrons/react-api-client'
 import {
-  parseRequiredModulesEntity,
+  OT2_ROBOT_TYPE,
   parseInitialLoadedLabwareEntity,
   parsePipetteEntity,
-} from '@opentrons/api-client'
-import { useProtocolQuery } from '@opentrons/react-api-client'
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+  parseRequiredModulesEntity,
+} from '@opentrons/shared-data'
 
 import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
 import { getStoredProtocol } from '../../../../redux/protocol-storage'
@@ -28,9 +28,18 @@ import { useNotifyRunQuery } from '../../../../resources/runs'
 import type { Store } from 'redux'
 import type { UseQueryResult } from 'react-query'
 import type { Protocol, Run } from '@opentrons/api-client'
+import type * as SharedData from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../../../redux/protocol-storage'
 
-vi.mock('@opentrons/api-client')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actualSharedData = await importOriginal<typeof SharedData>()
+  return {
+    ...actualSharedData,
+    parseInitialLoadedLabwareEntity: vi.fn(),
+    parsePipetteEntity: vi.fn(),
+    parseRequiredModulesEntity: vi.fn(),
+  }
+})
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../redux/protocol-storage/selectors')
 vi.mock('../../../../resources/runs')

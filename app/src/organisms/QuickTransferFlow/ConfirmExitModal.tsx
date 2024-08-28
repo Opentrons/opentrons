@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { SmallButton } from '../../atoms/buttons'
 
 interface ConfirmExitModalProps {
@@ -20,7 +20,7 @@ export const ConfirmExitModal = (props: ConfirmExitModalProps): JSX.Element => {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
 
   return (
-    <Modal
+    <OddModal
       header={{
         title: t('exit_quick_transfer'),
         iconName: 'alert-circle',
@@ -29,7 +29,7 @@ export const ConfirmExitModal = (props: ConfirmExitModalProps): JSX.Element => {
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing10}
+        gridGap={SPACING.spacing32}
         width="100%"
       >
         <LegacyStyledText css={TYPOGRAPHY.bodyTextRegular}>
@@ -49,6 +49,6 @@ export const ConfirmExitModal = (props: ConfirmExitModalProps): JSX.Element => {
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

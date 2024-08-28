@@ -29,6 +29,7 @@ from .. import errors
 from ..resources import DeckFixedLabware, labware_validation, fixture_validation
 from ..commands import (
     Command,
+    absorbance_reader,
     LoadLabwareResult,
     MoveLabwareResult,
     ReloadLabwareResult,
@@ -57,8 +58,8 @@ from ..actions import (
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
 )
-from .abstract_store import HasState, HandlesActions
-from .move_types import EdgePathType
+from ._abstract_store import HasState, HandlesActions
+from ._move_types import EdgePathType
 
 
 # URIs of labware whose definitions accidentally specify an engage height
@@ -224,6 +225,14 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 new_location = OFF_DECK_LOCATION
             self._state.labware_by_id[labware_id].location = new_location
 
+        elif isinstance(command.result, absorbance_reader.MoveLidResult):
+            lid_id = command.result.lidId
+            new_location = command.result.newLocation
+            new_offset_id = command.result.offsetId
+
+            self._state.labware_by_id[lid_id].offsetId = new_offset_id
+            self._state.labware_by_id[lid_id].location = new_location
+
     def _add_labware_offset(self, labware_offset: LabwareOffset) -> None:
         """Add a new labware offset to state.
 
@@ -308,6 +317,22 @@ class LabwareView(HasState[LabwareState]):
             ) or (
                 isinstance(labware.location, AddressableAreaLocation)
                 and labware.location.addressableAreaName == slot_name.id
+            ):
+                return labware
+
+        return None
+
+    def get_by_addressable_area(
+        self,
+        addressable_area: str,
+    ) -> Optional[LoadedLabware]:
+        """Get the labware located in a given addressable area, if any."""
+        loaded_labware = list(self._state.labware_by_id.values())
+
+        for labware in loaded_labware:
+            if (
+                isinstance(labware.location, AddressableAreaLocation)
+                and labware.location.addressableAreaName == addressable_area
             ):
                 return labware
 
@@ -703,6 +728,12 @@ class LabwareView(HasState[LabwareState]):
     def is_fixed_trash(self, labware_id: str) -> bool:
         """Check if labware is fixed trash."""
         return self.get_has_quirk(labware_id, "fixedTrash")
+
+    def is_absorbance_reader_lid(self, labware_id: str) -> bool:
+        """Check if labware is an absorbance reader lid."""
+        return labware_validation.is_absorbance_reader_lid(
+            self.get(labware_id).loadName
+        )
 
     def raise_if_labware_inaccessible_by_pipette(self, labware_id: str) -> None:
         """Raise an error if the specified location cannot be reached via a pipette."""
