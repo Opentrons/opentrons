@@ -17,6 +17,7 @@ import {
   SPACING,
   SIZE_1,
   ALIGN_CENTER,
+  FLEX_MAX_CONTENT,
 } from '@opentrons/components'
 import { useDeleteRunMutation } from '@opentrons/react-api-client'
 
@@ -165,7 +166,6 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
 
   return (
     <Flex
-      whiteSpace="nowrap"
       zIndex={10}
       borderRadius="4px 4px 0px 0px"
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
@@ -174,6 +174,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       top="2.3rem"
       right={0}
       flexDirection={DIRECTION_COLUMN}
+      width={FLEX_MAX_CONTENT}
     >
       <NavLink to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}>
         <MenuItem data-testid="RecentProtocolRun_OverflowMenu_viewRunRecord">
