@@ -206,7 +206,7 @@
           },
           "t50": {
             "speed": 10.0,
-            "distance": 11,
+            "distance": 10.85,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {
@@ -284,7 +284,7 @@
           },
           "t50": {
             "speed": 10.0,
-            "distance": 11,
+            "distance": 10.85,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {
@@ -362,7 +362,7 @@
           },
           "t50": {
             "speed": 10.0,
-            "distance": 11,
+            "distance": 10.85,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {
@@ -440,7 +440,7 @@
           },
           "t50": {
             "speed": 10.0,
-            "distance": 11,
+            "distance": 10.85,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {
