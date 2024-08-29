@@ -38,7 +38,7 @@ import { DetachProbe } from './DetachProbe'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 
-import type { AttachedModule, CommandData } from '@opentrons/api-client'
+import { RUN_STATUS_FAILED, type AttachedModule, type CommandData } from '@opentrons/api-client'
 import type {
   CreateCommand,
   CutoutConfig,
@@ -271,7 +271,7 @@ export const ModuleWizardFlows = (
         })}
       />
     )
-  } else if (prepCommandErrorMessage != null || errorMessage != null) {
+  } else if (prepCommandErrorMessage != null || errorMessage != null || maintenanceRunData?.data.status === RUN_STATUS_FAILED) {
     modalContent = (
       <SimpleWizardBody
         isSuccess={false}
