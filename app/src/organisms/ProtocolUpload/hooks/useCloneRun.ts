@@ -28,7 +28,7 @@ export function useCloneRun(
   const queryClient = useQueryClient()
   const { data: runRecord, isStale: isLoadingRun } = useNotifyRunQuery(runId)
   const protocolKey = runRecord?.data.protocolId ?? null
-
+  console.log(`UCR: run data for ${runId}: stale: ${isLoadingRun}`)
   const { createRun, isLoading: isCloning } = useCreateRunMutation({
     onSuccess: response => {
       const invalidateRuns = queryClient.invalidateQueries([host, 'runs'])
