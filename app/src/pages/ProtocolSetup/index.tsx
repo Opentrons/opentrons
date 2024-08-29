@@ -115,6 +115,8 @@ interface ProtocolSetupStepProps {
   title: string
   // first line of detail text
   detail?: string | null
+  // clip detail text overflow with ellipsis
+  clipDetail?: boolean
   // second line of detail text
   subDetail?: string | null
   // disallow click handler, disabled styling
@@ -140,6 +142,7 @@ export function ProtocolSetupStep({
   detail,
   subDetail,
   disabled = false,
+  clipDetail = false,
   interactionDisabled = false,
   disabledReason,
   description,
@@ -250,6 +253,7 @@ export function ProtocolSetupStep({
             textAlign={TEXT_ALIGN_RIGHT}
             color={interactionDisabled ? COLORS.grey50 : COLORS.black90}
             maxWidth="20rem"
+            css={clipDetail ? CLIPPED_TEXT_STYLE : undefined}
           >
             {detail}
             {subDetail != null && detail != null ? <br /> : null}
@@ -1075,3 +1079,9 @@ export function ProtocolSetup(): JSX.Element {
     </>
   )
 }
+
+const CLIPPED_TEXT_STYLE = css`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`
