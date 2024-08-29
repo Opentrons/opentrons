@@ -25,8 +25,8 @@ export const STYLE_BY_WELL_CONTENTS: {
   }
 } = {
   highlightedWell: {
-    stroke: COLORS.blue50,
-    fill: `${COLORS.blue50}33`, // 20% opacity
+    stroke: 'transparent',
+    fill: COLORS.blue50, // 20% opacity
     strokeWidth: 1,
   },
   disabledWell: {
@@ -37,7 +37,7 @@ export const STYLE_BY_WELL_CONTENTS: {
   selectedWell: {
     stroke: COLORS.blue50,
     fill: COLORS.transparent,
-    strokeWidth: 1,
+    strokeWidth: 0,
   },
   tipMissing: {
     stroke: '#A4A4A4', // LEGACY --c-near-black
@@ -51,7 +51,7 @@ export const STYLE_BY_WELL_CONTENTS: {
   },
   defaultWell: {
     fill: COLORS.white,
-    stroke: COLORS.black90,
+    stroke: 'transparent',
     strokeWidth: 0.6,
   },
 }

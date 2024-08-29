@@ -8,10 +8,11 @@ import type { CSSProperties } from 'styled-components'
 export interface FilledWellsProps {
   definition: LabwareDefinition2
   fillByWell: Record<string, CSSProperties['fill']>
+  strokeColor?: string
 }
 
 function FilledWellsComponent(props: FilledWellsProps): JSX.Element {
-  const { definition, fillByWell } = props
+  const { definition, fillByWell, strokeColor = COLORS.black90 } = props
   return (
     <>
       {map<Record<string, CSSProperties['fill']>, React.ReactNode>(
@@ -23,7 +24,7 @@ function FilledWellsComponent(props: FilledWellsProps): JSX.Element {
               wellName={wellName}
               well={definition.wells[wellName]}
               fill={color}
-              stroke={COLORS.black90}
+              stroke={strokeColor}
               strokeWidth="0.6"
             />
           )

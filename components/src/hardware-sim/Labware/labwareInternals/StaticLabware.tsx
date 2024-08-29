@@ -9,7 +9,7 @@ import { STYLE_BY_WELL_CONTENTS } from './StyledWells'
 import { COLORS } from '../../../helix-design-system'
 
 import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
-import type { WellMouseEvent } from './types'
+import type { WellMouseEvent, WellStroke } from './types'
 import type { CSSProperties } from 'styled-components'
 
 export interface StaticLabwareProps {
@@ -27,6 +27,7 @@ export interface StaticLabwareProps {
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
   fill?: CSSProperties['fill']
   showRadius?: boolean
+  wellStroke?: WellStroke
 }
 
 const TipDecoration = React.memo(function TipDecoration(props: {
@@ -63,6 +64,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
     onMouseLeaveWell,
     fill,
     showRadius = true,
+    wellStroke = {},
   } = props
 
   const { isTiprack } = definition.parameters
@@ -93,6 +95,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
                       ? STYLE_BY_WELL_CONTENTS.tipPresent
                       : STYLE_BY_WELL_CONTENTS.defaultWell)}
                     fill={fill}
+                    stroke={wellStroke[wellName] ?? undefined}
                   />
 
                   {isTiprack ? (
