@@ -19,6 +19,7 @@ import { useOnClickOutside } from '../../interaction-enhancers'
 import { LegacyStyledText } from '../../atoms/StyledText/LegacyStyledText'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
+import { LiquidIcon } from '../LiquidIcon'
 
 /** this is the max height to display 10 items */
 const MAX_HEIGHT = 316
@@ -29,6 +30,8 @@ const HEIGHT_ADJUSTMENT = 100
 export interface DropdownOption {
   name: string
   value: string
+  /** optional dropdown option for adding the liquid color icon */
+  liquidColor?: string
 }
 
 export type DropdownBorder = 'rounded' | 'neutral'
@@ -74,7 +77,6 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   const [dropdownPosition, setDropdownPosition] = React.useState<
     'top' | 'bottom'
   >('bottom')
-
   const dropDownMenuWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
       setShowDropdownMenu(false)
@@ -164,7 +166,6 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
       color: ${COLORS.grey40};
     }
   `
-
   return (
     <Flex flexDirection={DIRECTION_COLUMN} ref={dropDownMenuWrapperRef}>
       {title !== null ? (
@@ -200,18 +201,23 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           css={DROPDOWN_STYLE}
           tabIndex={tabIndex}
         >
-          <LegacyStyledText
-            css={css`
-              ${dropdownType === 'rounded'
-                ? TYPOGRAPHY.pSemiBold
-                : TYPOGRAPHY.pRegular}
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-            `}
-          >
-            {currentOption.name}
-          </LegacyStyledText>
+          <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+            {currentOption.liquidColor != null ? (
+              <LiquidIcon color={currentOption.liquidColor} />
+            ) : null}
+            <LegacyStyledText
+              css={css`
+                ${dropdownType === 'rounded'
+                  ? TYPOGRAPHY.pSemiBold
+                  : TYPOGRAPHY.pRegular}
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              `}
+            >
+              {currentOption.name}
+            </LegacyStyledText>
+          </Flex>
           {showDropdownMenu ? (
             <Icon size="0.75rem" name="menu-down" transform="rotate(180deg)" />
           ) : (
@@ -241,7 +247,12 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                   setShowDropdownMenu(false)
                 }}
               >
-                {option.name}
+                <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+                  {option.liquidColor != null ? (
+                    <LiquidIcon color={option.liquidColor} />
+                  ) : null}
+                  {option.name}
+                </Flex>
               </MenuItem>
             ))}
           </Flex>

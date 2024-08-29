@@ -1,4 +1,9 @@
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Controller, useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import {
+  ALIGN_CENTER,
   Btn,
   DIRECTION_COLUMN,
   DropdownMenu,
@@ -6,26 +11,25 @@ import {
   InputField,
   JUSTIFY_SPACE_BETWEEN,
   LargeButton,
+  LiquidIcon,
   ListItem,
   SPACING,
   StyledText,
   TYPOGRAPHY,
   Toolbox,
 } from '@opentrons/components'
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import * as fieldProcessors from '../../steplist/fieldLevel/processing'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { getLabwareEntities } from '../../step-forms/selectors'
-import { useTranslation } from 'react-i18next'
 import { getSelectedWells } from '../../well-selection/selectors'
+import { getLabwareNicknamesById } from '../../ui/labware/selectors'
 import {
   removeWellsContents,
   setWellContents,
 } from '../../labware-ingred/actions'
-import { Controller, useForm } from 'react-hook-form'
 import { deselectAllWells } from '../../well-selection/actions'
+import type { DropdownOption } from '@opentrons/components'
+import type { ContentsByWell } from '../../labware-ingred/types'
 
 interface ValidFormValues {
   selectedLiquidId: string
@@ -42,13 +46,13 @@ interface LiquidToolboxProps {
 export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
   const { onClose } = props
   const { t } = useTranslation(['liquids', 'shared'])
-  const labwareEntities = useSelector(getLabwareEntities)
   const dispatch = useDispatch()
+  const liquids = useSelector(labwareIngredSelectors.allIngredientNamesIds)
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const selectedWellGroups = useSelector(getSelectedWells)
+  const nickNames = useSelector(getLabwareNicknamesById)
   const selectedWells = Object.keys(selectedWellGroups)
-  const labwareDisplayName =
-    labwareId != null ? labwareEntities[labwareId].def.metadata.displayName : ''
+  const labwareDisplayName = labwareId != null ? nickNames[labwareId] : ''
   const liquidLocations = useSelector(
     labwareIngredSelectors.getLiquidsByLabwareId
   )
@@ -63,6 +67,9 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
   )
   const liquidSelectionOptions = useSelector(
     labwareIngredSelectors.getLiquidSelectionOptions
+  )
+  const allWellContentsForActiveItem = useSelector(
+    wellContentsSelectors.getAllWellContentsForActiveItem
   )
 
   const selectionHasLiquids = Boolean(
@@ -86,7 +93,8 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
     watch,
     control,
     setValue,
-    formState: { errors, touchedFields },
+    reset,
+    formState: { touchedFields },
   } = useForm<ToolboxFormValues>({
     defaultValues: getInitialValues(),
   })
@@ -161,6 +169,7 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
 
   const handleSaveSubmit: (values: ToolboxFormValues) => void = values => {
     handleSaveForm(values)
+    reset()
   }
 
   let volumeErrors: string | null = null
@@ -174,13 +183,38 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
     }
   }
 
+  let wellContents: ContentsByWell | null = null
+  if (allWellContentsForActiveItem != null && labwareId != null) {
+    wellContents = allWellContentsForActiveItem[labwareId]
+  }
+
+  const liquidsInLabware =
+    wellContents != null
+      ? Object.values(wellContents).flatMap(content => content.groupIds)
+      : null
+
+  const uniqueLiquids = Array.from(new Set(liquidsInLabware))
+
+  const liquidInfo = uniqueLiquids
+    .map(liquid => {
+      const foundLiquid = Object.values(liquids).find(
+        id => id.ingredientId === liquid
+      )
+      return { name: foundLiquid?.name, color: foundLiquid?.displayColor }
+    })
+    .filter(Boolean)
+
   return (
     <Toolbox
       title={labwareDisplayName}
       confirmButtonText={t('shared:done')}
       onConfirmClick={onClose}
       onCloseClick={handleClearWells}
-      closeButtonText="Clear wells"
+      height="calc(100vh - 64px)"
+      closeButtonText={t('clear_wells')}
+      disableCloseButton={
+        !(labwareId != null && selectedWells != null && selectionHasLiquids)
+      }
     >
       <form onSubmit={handleSubmit(handleSaveSubmit)}>
         <ListItem type="noActive">
@@ -190,10 +224,12 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
           >
             <StyledText desktopStyle="bodyDefaultSemiBold">
-              Add liquid
+              {t('add_liquid')}
             </StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              <StyledText desktopStyle="bodyDefaultRegular">Liquid</StyledText>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('liquid')}
+              </StyledText>
               <Controller
                 name="selectedLiquidId"
                 control={control}
@@ -201,21 +237,34 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
                   required: true,
                 }}
                 render={({ field }) => {
-                  const selectLiquidIdName = liquidSelectionOptions.find(
+                  const fullOptions: DropdownOption[] = liquidSelectionOptions.map(
+                    option => {
+                      const liquid = liquids.find(
+                        liquid => liquid.ingredientId === option.value
+                      )
+
+                      return {
+                        name: option.name,
+                        value: option.value,
+                        liquidColor: liquid?.displayColor ?? '',
+                      }
+                    }
+                  )
+                  const selectedLiquid = fullOptions.find(
                     option => option.value === selectedLiquidId
-                  )?.name
+                  )
+                  const selectLiquidIdName = selectedLiquid?.name
+                  const selectLiquidColor = selectedLiquid?.liquidColor
 
                   return (
                     <DropdownMenu
-                      filterOptions={liquidSelectionOptions}
-                      //   error={
-                      //     Boolean(touchedFields.selectedLiquidId)
-                      //       ? errors.selectedLiquidId?.message
-                      //       : null
-                      //   }
+                      width="254px"
+                      dropdownType="neutral"
+                      filterOptions={fullOptions}
                       currentOption={{
                         value: selectedLiquidId ?? '',
                         name: selectLiquidIdName ?? '',
+                        liquidColor: selectLiquidColor,
                       }}
                       onClick={field.onChange}
                     />
@@ -223,9 +272,10 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
                 }}
               />
             </Flex>
+
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               <StyledText desktopStyle="bodyDefaultRegular">
-                Liquid volume by well
+                {t('liquid_volume')}
               </StyledText>
               <Controller
                 name="volume"
@@ -251,13 +301,49 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
                 onClick={handleCancelForm}
               >
                 <StyledText desktopStyle="bodyDefaultRegular">
-                  Cancel
+                  {t('shared:cancel')}
                 </StyledText>
               </Btn>
-              <LargeButton type="submit" buttonText={'Add'} />
+              <LargeButton
+                type="submit"
+                buttonText={t('add')}
+                disabled={
+                  volumeErrors != null ||
+                  volume == null ||
+                  volume === '' ||
+                  selectedLiquidId == null ||
+                  selectedLiquidId === ''
+                }
+              />
             </Flex>
           </Flex>
         </ListItem>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing8}
+          marginTop={SPACING.spacing24}
+        >
+          {liquidInfo.length > 0 ? (
+            <StyledText desktopStyle="bodyDefaultSemiBold">
+              {t('liquids_added')}
+            </StyledText>
+          ) : null}
+          {liquidInfo.map(info => (
+            <>
+              <ListItem type="noActive">
+                <Flex
+                  padding={SPACING.spacing12}
+                  alignItems={ALIGN_CENTER}
+                  gridGap={SPACING.spacing16}
+                >
+                  <LiquidIcon color={info.color ?? ''} size="medium" />
+                  {info.name}
+                </Flex>
+              </ListItem>
+              TODO: add the list of all liquid wells, similar to IngredientsList
+            </>
+          ))}
+        </Flex>
       </form>
     </Toolbox>
   )

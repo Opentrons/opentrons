@@ -20,7 +20,9 @@ export interface ToolboxProps {
   onConfirmClick: () => void
   onCloseClick: () => void
   closeButtonText: string
+  disableCloseButton?: boolean
   width?: string
+  height?: string
   titleIconName?: IconName
 }
 
@@ -33,6 +35,8 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
     onConfirmClick,
     titleIconName,
     closeButtonText,
+    height = '100%',
+    disableCloseButton = false,
     width = '19.5rem',
   } = props
 
@@ -59,10 +63,10 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
       cursor="auto"
       position={POSITION_FIXED}
       right="0"
-      top="0"
+      bottom="0"
       backgroundColor={COLORS.white}
       boxShadow="0px 3px 6px rgba(0, 0, 0, 0.23)"
-      height="100%"
+      height={height}
       borderRadius={BORDERS.borderRadius8}
     >
       <Flex
@@ -76,6 +80,7 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
           alignItems={ALIGN_CENTER}
           padding={`${SPACING.spacing20} ${SPACING.spacing16}`}
           borderBottom={`1px solid ${COLORS.grey30}`}
+          gridGap={SPACING.spacing12}
         >
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
             {titleIconName != null ? (
@@ -87,6 +92,8 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
             onClick={onCloseClick}
             textDecoration={textDecorationUnderline}
             data-testid={`Toolbox_${closeButtonText}`}
+            whiteSpace="nowrap"
+            disable={disableCloseButton}
           >
             <StyledText desktopStyle="bodyDefaultRegular">
               {closeButtonText}

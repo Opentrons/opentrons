@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import {
   BORDERS,
   COLORS,
@@ -14,7 +15,7 @@ import {
 } from '@opentrons/components'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { deleteModule } from '../../../step-forms/actions'
-import { EditNickNameModal, AssignLiquidsModal } from '../../../organisms'
+import { EditNickNameModal } from '../../../organisms'
 import { deleteDeckFixture } from '../../../step-forms/actions/additionalItems'
 import {
   deleteContainer,
@@ -34,21 +35,18 @@ export function SlotOverflowMenu(
 ): JSX.Element | null {
   const { slot, setShowMenuList, addEquipment } = props
   const { t } = useTranslation('starting_deck_state')
+  const navigate = useNavigate()
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const [showNickNameModal, setShowNickNameModal] = React.useState<boolean>(
     false
   )
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
-      if (!openAssignLiquidsModal && !showNickNameModal) {
+      if (!showNickNameModal) {
         setShowMenuList(false)
       }
     },
   })
-  const [
-    openAssignLiquidsModal,
-    setOpenAssignLiquidsModal,
-  ] = React.useState<boolean>(false)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const {
     labware: deckSetupLabware,
@@ -96,13 +94,7 @@ export function SlotOverflowMenu(
     }
   }
 
-  return openAssignLiquidsModal ? (
-    <AssignLiquidsModal
-      onClose={() => {
-        setOpenAssignLiquidsModal(false)
-      }}
-    />
-  ) : (
+  return (
     <>
       {showNickNameModal && labwareOnSlot != null ? (
         <EditNickNameModal
@@ -157,10 +149,10 @@ export function SlotOverflowMenu(
             isLabwareTiprack
           }
           onClick={() => {
-            setOpenAssignLiquidsModal(true)
             if (labwareOnSlot != null) {
               dispatch(openIngredientSelector(labwareOnSlot.id))
             }
+            navigate('/liquids')
           }}
         >
           <StyledText desktopStyle="bodyDefaultRegular">
