@@ -73,7 +73,8 @@ describe('useNotifyDataReady', () => {
         options: { ...MOCK_OPTIONS, forceHttpPolling: true },
       } as any)
     )
-    expect(result.current.shouldRefetch).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(false)
+    expect(result.current.isNotifyEnabled).toEqual(false)
     expect(appShellListener).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
@@ -85,7 +86,8 @@ describe('useNotifyDataReady', () => {
         options: { ...MOCK_OPTIONS, enabled: false },
       } as any)
     )
-    expect(result.current.shouldRefetch).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(false)
+    expect(result.current.isNotifyEnabled).toEqual(false)
     expect(appShellListener).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
@@ -97,12 +99,13 @@ describe('useNotifyDataReady', () => {
         options: { ...MOCK_OPTIONS, staleTime: Infinity },
       } as any)
     )
-    expect(result.current.shouldRefetch).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(false)
+    expect(result.current.isNotifyEnabled).toEqual(false)
     expect(appShellListener).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
-  it('should set HTTP refetch to always if there is an error', () => {
+  it('should set isNotifyEnabled to false if there is an error', () => {
     vi.mocked(useHost).mockReturnValue({ hostname: null } as any)
     const errorSpy = vi.spyOn(console, 'error')
     errorSpy.mockImplementation(() => {})
@@ -115,10 +118,11 @@ describe('useNotifyDataReady', () => {
       } as any)
     )
 
-    expect(result.current.shouldRefetch).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(false)
+    expect(result.current.isNotifyEnabled).toEqual(false)
   })
 
-  it('should return set HTTP refetch to always and fire an analytics reporting event if the connection was refused', () => {
+  it('should return set isNotifyEnabled to false and fire an analytics reporting event if the connection was refused', () => {
     vi.mocked(appShellListener).mockImplementation(function ({
       callback,
     }): any {
@@ -134,7 +138,7 @@ describe('useNotifyDataReady', () => {
     )
     expect(mockTrackEvent).toHaveBeenCalled()
     rerender()
-    expect(result.current.shouldRefetch).toEqual(true)
+    expect(result.current.isNotifyEnabled).toEqual(false)
   })
 
   it('should trigger a single HTTP refetch if the refetch flag was returned', () => {
@@ -153,6 +157,7 @@ describe('useNotifyDataReady', () => {
     )
     rerender()
     expect(result.current.shouldRefetch).toEqual(true)
+    expect(result.current.isNotifyEnabled).toEqual(true)
   })
 
   it('should trigger a single HTTP refetch if the unsubscribe flag was returned', () => {
@@ -170,6 +175,7 @@ describe('useNotifyDataReady', () => {
     )
     rerender()
     expect(result.current.shouldRefetch).toEqual(true)
+    expect(result.current.isNotifyEnabled).toEqual(true)
   })
 
   it('should clean up the listener on dismount', () => {
@@ -210,7 +216,8 @@ describe('useNotifyDataReady', () => {
       } as any)
     )
 
-    expect(result.current.shouldRefetch).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(false)
+    expect(result.current.isNotifyEnabled).toEqual(false)
     expect(appShellListener).not.toHaveBeenCalled()
   })
 })
