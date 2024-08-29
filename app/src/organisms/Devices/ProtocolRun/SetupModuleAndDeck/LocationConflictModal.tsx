@@ -27,6 +27,8 @@ import {
   getCutoutFixturesForModuleModel,
   getFixtureIdByCutoutIdFromModuleSlotName,
   SINGLE_LEFT_SLOT_FIXTURE,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
+  THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../../../App/portal'
@@ -83,8 +85,8 @@ export const LocationConflictModal = (
 
   // check if current fixture in cutoutId is thermocycler
   const isThermocyclerCurrentFixture =
-    deckConfigurationAtLocationFixtureId === 'thermocyclerModuleV2Rear' ||
-    deckConfigurationAtLocationFixtureId === 'thermocyclerModuleV2Front'
+    deckConfigurationAtLocationFixtureId === THERMOCYCLER_V2_REAR_FIXTURE ||
+    deckConfigurationAtLocationFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE
 
   const currentFixtureDisplayName =
     deckConfigurationAtLocationFixtureId != null
@@ -126,6 +128,7 @@ export const LocationConflictModal = (
           /**
            * special-case for removing current thermocycler:
            * set paired cutout (B1 for A1, A1 for B1) to single slot left fixture
+           * TODO(bh, 2024-08-29): generalize to remove all entities from FixtureGroup
            */
           return {
             ...existingCutoutConfig,
@@ -160,6 +163,7 @@ export const LocationConflictModal = (
           /**
            * special-case for removing current thermocycler:
            * set paired cutout (B1 for A1, A1 for B1) to single slot left fixture
+           * TODO(bh, 2024-08-29): generalize to remove all entities from FixtureGroup
            */
           return {
             ...fixture,
