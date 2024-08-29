@@ -20,12 +20,11 @@ LIQUID_MOUNT = "right"
 LIQUID_TIP_SIZE = 200
 LIQUID_PIPETTE_SIZE = 1000
 
-PROBING_MOUNT = "right"
+PROBING_MOUNT = "left"
 PROBING_TIP_SIZE = 50
-PROBING_PIPETTE_SIZE = 1000
+PROBING_PIPETTE_SIZE = 50
 
-SRC_LIQ_HEIGHT = 10  # depth in source reservoir to aspirate
-
+ASPIRATE_MM_FROM_BOTTOM = 10  # depth in source reservoir to aspirate
 RESERVOIR = "nest_1_well_reservoir_195mL"
 LABWARE = "armadillo_96_wellplate_200ul_pcr_full_skirt"
 
@@ -218,7 +217,7 @@ def _test_for_finding_liquid_height(
         tip_z_error = _get_tip_z_error(ctx, probing_pipette, dial)
         # pickup liquid tip, then immediately transfer liquid
         liquid_pipette.pick_up_tip(liq_tip)
-        liquid_pipette.aspirate(TEST_VOLUME, src_well.bottom(SRC_LIQ_HEIGHT))
+        liquid_pipette.aspirate(TEST_VOLUME, src_well.bottom(ASPIRATE_MM_FROM_BOTTOM))
         liquid_pipette.dispense(TEST_VOLUME, well)
         liquid_pipette.prepare_to_aspirate()
         # get height of liquid
