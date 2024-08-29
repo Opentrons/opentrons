@@ -200,10 +200,17 @@ stages:
           runTimeParameterValues:
             sample_count: 2.0
     response:
+      save:
+        json:
+          analysis_id3: data[2].id
+          run_time_parameters_data3: data[2].runTimeParameters
       strict:
         - json:off
       status_code: 201
       json:
+        meta:
+          cursor: 0
+          totalLength: 3
         data:
           - id: '{analysis_id}'
             status: completed
@@ -253,3 +260,40 @@ stages:
               - displayName: Liquid handling CSV file
                 variableName: liq_handling_csv_file
                 description: A CSV file that contains wells to use for pipetting
+
+  - name: Retry until analysis is completed
+    max_retries: 5
+    delay_after: 1
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id3}'
+    response:
+      strict:
+        - json:off
+      json:
+        data:
+          id: '{analysis_id3}'
+          status: completed
+
+  - name: Check that a new analysis is NOT started for the protocol when RTP values are same
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      method: POST
+      json:
+        data:
+          runTimeParameterValues:
+            sample_count: 2.0
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        meta:
+          cursor: 0
+          totalLength: 3
+        data:
+          - id: '{analysis_id}'
+            status: completed
+          - id: '{analysis_id2}'
+            status: completed
+          - id: '{analysis_id3}'
+            status: completed
