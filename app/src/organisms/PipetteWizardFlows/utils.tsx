@@ -24,8 +24,27 @@ import zAxisDetach96 from '../../assets/videos/pipette-wizard-flows/Pipette_Zaxi
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import detachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 
-import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
+import type {
+  AttachedPipettesFromInstrumentsQuery,
+  PipetteInformation,
+} from '../Devices/hooks'
 import type { PipetteWizardFlow, PipetteWizardStep } from './types'
+import type { Mount } from '../../redux/pipettes/types'
+
+export function pipetteIs96Channel(
+  pipette: PipetteInformation | null
+): boolean {
+  return pipette?.data?.channels === 96
+}
+
+export function getPipetteCoveringMount(
+  attachedPipettes: AttachedPipettesFromInstrumentsQuery,
+  mount: Mount
+): PipetteInformation | null {
+  return pipetteIs96Channel(attachedPipettes[LEFT])
+    ? attachedPipettes[LEFT]
+    : attachedPipettes[mount]
+}
 
 export function getIsGantryEmpty(
   attachedPipette: AttachedPipettesFromInstrumentsQuery

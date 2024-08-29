@@ -31,7 +31,7 @@ import {
   NINETY_SIX_CHANNEL_MOUNTING_PLATE,
   BODY_STYLE,
 } from './constants'
-import { getIsGantryEmpty } from './utils'
+import { getIsGantryEmpty, getPipetteCoveringMount } from './utils'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type { UseMutateFunction } from 'react-query'
@@ -84,7 +84,8 @@ export const BeforeBeginning = (
       createMaintenanceRun({})
     }
   }, [])
-  const pipetteId = attachedPipettes[mount]?.serialNumber
+  const pipetteCoveringMount = getPipetteCoveringMount(attachedPipettes, mount)
+  const pipetteId = pipetteCoveringMount?.serialNumber
   const isGantryEmpty = getIsGantryEmpty(attachedPipettes)
   const isGantryEmptyFor96ChannelAttachment =
     isGantryEmpty &&
@@ -174,7 +175,7 @@ export const BeforeBeginning = (
       {
         commandType: 'loadPipette' as const,
         params: {
-          pipetteName: attachedPipettes[mount]?.instrumentName ?? '',
+          pipetteName: pipetteCoveringMount?.instrumentName ?? '',
           pipetteId: pipetteId ?? '',
           mount,
         },
