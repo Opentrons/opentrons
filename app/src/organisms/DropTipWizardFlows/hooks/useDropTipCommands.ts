@@ -118,6 +118,7 @@ export function useDropTipCommands({
         return chainRunCommands(
           isFlex
             ? [
+                ENGAGE_AXES,
                 HOME_EXCEPT_PLUNGERS,
                 UPDATE_ESTIMATORS_EXCEPT_PLUNGERS,
                 moveToAACommand,
@@ -290,6 +291,11 @@ export function useDropTipCommands({
 const HOME: CreateCommand = {
   commandType: 'home' as const,
   params: {},
+}
+
+const ENGAGE_AXES: CreateCommand = {
+  commandType: 'unsafe/engageAxes' as const,
+  params: { axes: ['leftZ', 'rightZ', 'x', 'y'] },
 }
 
 const HOME_EXCEPT_PLUNGERS: CreateCommand = {
