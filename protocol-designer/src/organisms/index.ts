@@ -1,3 +1,4 @@
+export * from './DefineLiquidsModal'
 export * from './EditNickNameModal'
 export * from './FeatureFlagsModal'
 export * from './FileUploadMessagesModal/'
