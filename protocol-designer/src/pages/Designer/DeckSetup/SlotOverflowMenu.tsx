@@ -14,11 +14,12 @@ import {
 } from '@opentrons/components'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { deleteModule } from '../../../step-forms/actions'
-import { EditNickNameModal } from '../../../organisms'
+import { EditNickNameModal, AssignLiquidsModal } from '../../../organisms'
 import { deleteDeckFixture } from '../../../step-forms/actions/additionalItems'
 import {
   deleteContainer,
   duplicateLabware,
+  openIngredientSelector,
 } from '../../../labware-ingred/actions'
 import type { DeckSlotId } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../../types'
@@ -39,11 +40,15 @@ export function SlotOverflowMenu(
   )
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
-      if (!showNickNameModal) {
+      if (!openAssignLiquidsModal && !showNickNameModal) {
         setShowMenuList(false)
       }
     },
   })
+  const [
+    openAssignLiquidsModal,
+    setOpenAssignLiquidsModal,
+  ] = React.useState<boolean>(false)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const {
     labware: deckSetupLabware,
@@ -91,19 +96,24 @@ export function SlotOverflowMenu(
     }
   }
 
-  return (
+  return openAssignLiquidsModal ? (
+    <AssignLiquidsModal
+      onClose={() => {
+        setOpenAssignLiquidsModal(false)
+      }}
+    />
+  ) : (
     <>
       {showNickNameModal && labwareOnSlot != null ? (
         <EditNickNameModal
+          onClose={() => {
+            setShowNickNameModal(false)
+          }}
           labwareId={
             nestedLabwareOnSlot != null
               ? nestedLabwareOnSlot.id
               : labwareOnSlot.id
           }
-          onClose={() => {
-            setShowNickNameModal(false)
-            setShowMenuList(false)
-          }}
         />
       ) : null}
       <Flex
@@ -141,11 +151,16 @@ export function SlotOverflowMenu(
           </StyledText>
         </MenuButton>
         <MenuButton
-          disabled={labwareOnSlot == null || isLabwareTiprack}
+          disabled={
+            labwareOnSlot == null ||
+            (labwareOnSlot != null && isLabwareAnAdapter) ||
+            isLabwareTiprack
+          }
           onClick={() => {
-            //  todo(ja, 8/22/24): wire this up
-            console.log('open liquids')
-            setShowMenuList(false)
+            setOpenAssignLiquidsModal(true)
+            if (labwareOnSlot != null) {
+              dispatch(openIngredientSelector(labwareOnSlot.id))
+            }
           }}
         >
           <StyledText desktopStyle="bodyDefaultRegular">
@@ -160,6 +175,7 @@ export function SlotOverflowMenu(
             } else if (nestedLabwareOnSlot != null) {
               dispatch(duplicateLabware(nestedLabwareOnSlot.id))
             }
+
             setShowMenuList(false)
           }}
         >
