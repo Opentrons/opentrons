@@ -205,9 +205,6 @@ async def _main(length: int, plot: bool = False) -> None:
         for model in models:
             tables_per_tip, errors = _gather_tables_per_tip(model, length)
             all_errors += errors
-            # TODO: I want to find the %D spread between all minor revisions
-            #       so I should gather them up and combine them
-            #       then export a CSV
             for rev in MAJOR_REVS:
                 if rev in model:
                     tables_per_tip_per_rev[rev].append(tables_per_tip)
@@ -218,11 +215,6 @@ async def _main(length: int, plot: bool = False) -> None:
             if len(minor_rev_tables_per_tip) == 1:
                 print(f"major-rev {rev} only have 1x minor-rev")
                 del tables_per_tip_per_rev_only_multiple[rev]
-        # TODO: ok so now I have 2-3 tables per major rev
-        #       so we can loop through each and find the %D spread
-        # from pprint import pprint
-        # pprint(tables_per_tip_per_rev_only_multiple)
-        # exit()
         target_results: Dict[str, Dict[int, List[float]]] = {}
         percent_d_results: Dict[str, Dict[int, List[float]]] = {}
         for rev, list_of_tables_per_tip in tables_per_tip_per_rev_only_multiple.items():
