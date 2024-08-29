@@ -98,14 +98,15 @@ export function SlotOverflowMenu(
     <>
       {showNickNameModal && labwareOnSlot != null ? (
         <EditNickNameModal
-          onClose={() => {
-            setShowNickNameModal(false)
-          }}
           labwareId={
             nestedLabwareOnSlot != null
               ? nestedLabwareOnSlot.id
               : labwareOnSlot.id
           }
+          onClose={() => {
+            setShowNickNameModal(false)
+            setShowMenuList(false)
+          }}
         />
       ) : null}
       <Flex
