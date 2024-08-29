@@ -106,3 +106,22 @@ stages:
           - id: !anystr
             status: pending
             runTimeParameters: []
+
+
+  - name: Check that a new analysis is NOT started for the same protocol
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      method: POST
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        meta:
+          cursor: 0
+          totalLength: 2
+        data:
+          - id: '{analysis_id}'
+            status: completed
+          - id: !anystr
+            status: completed
