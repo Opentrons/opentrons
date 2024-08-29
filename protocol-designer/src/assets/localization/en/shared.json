@@ -88,6 +88,7 @@
   "re_export": "To use this definition, use Labware Creator to give it a unique load name and display name.",
   "remove": "remove",
   "right": "Right",
+  "save": "Save",
   "shared_display_name": "Shared display name: ",
   "shared_load_name": "Shared load name: ",
   "shares_name": "This labware has the same load name or display name as {{customOrStandard}}, which is already in this protocol.",
