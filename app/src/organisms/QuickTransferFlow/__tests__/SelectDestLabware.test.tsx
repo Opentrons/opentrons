@@ -96,7 +96,7 @@ describe('SelectDestLabware', () => {
       },
     })
     render(props)
-    screen.getByText('Source labware in D2')
+    screen.getByText('Source labware in C2')
     screen.getByText('source labware name')
   })
   it('enables continue button if you select a labware', () => {
@@ -109,7 +109,7 @@ describe('SelectDestLabware', () => {
     })
     const continueBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(continueBtn).toBeDisabled()
-    const sourceLabware = screen.getByText('Source labware in D2')
+    const sourceLabware = screen.getByText('Source labware in C2')
     fireEvent.click(sourceLabware)
     expect(continueBtn).toBeEnabled()
   })

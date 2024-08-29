@@ -117,8 +117,8 @@ export function SelectDestLabware(
               onChange={() => {
                 setSelectedLabware('source')
               }}
-              buttonLabel={t('source_labware_d2')}
-              buttonValue="source-labware-d2"
+              buttonLabel={t('source_labware_c2')}
+              buttonValue="source-labware-c2"
               subButtonLabel={state.source.metadata.displayName}
             />
           ) : null}

@@ -932,6 +932,7 @@ class ProtocolContext(CommandPublisher):
                              from the Opentrons App or touchscreen.
         :param bool liquid_presence_detection: If ``True``, enable automatic
             :ref:`liquid presence detection <lpd>` for Flex 1-, 8-, or 96-channel pipettes.
+
             .. versionadded:: 2.20
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
