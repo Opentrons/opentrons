@@ -290,7 +290,7 @@ export const PipetteWizardFlows = (
         isSuccess={false}
         iconColor={COLORS.red50}
         header={t('shared:error_encountered')}
-        subHeader={errorMessage}
+        subHeader={errorMessage ?? undefined}
       />
     )
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
