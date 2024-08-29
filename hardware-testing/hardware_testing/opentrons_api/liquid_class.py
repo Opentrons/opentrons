@@ -293,45 +293,123 @@ class LiquidClassPipette(InstrumentContext):
         return self
 
 
-GLYCEROL_50_PERCENT: Dict[str, Dict[str, Liquid]] = {
+GLYCEROL_50_PERCENT: Dict[str, Dict[str, Dict[float, Liquid]]] = {
     "flex_1channel_1000": {
-        "opentrons_flex_96_filtertiprack_50ul": Liquid(
-            submerge=Submerge(  # required
-                approach_height=Height(1.0, HeightRef.WELL_TOP),
-                liquid_level_detection=True,
-                speed=60,
-                height=Height(1, HeightRef.WELL_BOTTOM),
-                delay=None,
+        "opentrons_flex_96_filtertiprack_50ul": {
+            5.0: Liquid(
+                submerge=Submerge(  # required
+                    approach_height=Height(1.0, HeightRef.WELL_TOP),
+                    liquid_level_detection=True,
+                    speed=60,
+                    height=Height(1, HeightRef.WELL_BOTTOM),
+                    delay=None,
+                ),
+                aspirate=Aspirate(  # required
+                    flow_rate=50.0,
+                    height=Height(1, HeightRef.WELL_BOTTOM),
+                    liquid_z_tracking=False,
+                    delay=0.5,
+                ),
+                dispense=Dispense(  # required
+                    flow_rate=50.0,
+                    height=Height(1, HeightRef.WELL_BOTTOM),
+                    liquid_z_tracking=False,
+                    delay=0.5,
+                    push_out=7.0,
+                ),
+                retract=Retract(  # required
+                    speed=60,
+                    height=Height(1.0, HeightRef.WELL_TOP),
+                    delay=0,
+                    air_gap=5.0,
+                    blow_out=True,
+                ),
+                touch=Touch(  # nice-to-have (could be through a separate command)
+                    speed=30.0,
+                    height=Height(-1, HeightRef.WELL_TOP),
+                    delay=None,
+                    strategy=TouchStrategy.FOUR_SIDES,
+                ),
+                volume=Volume(  # nice-to-have (requires HW testing)
+                    min=3.0, max=35.0, adjustment=[(4.1, 3.04), (39.0, 35.78)]
+                ),
             ),
-            aspirate=Aspirate(  # required
-                flow_rate=50.0,
-                height=Height(1, HeightRef.WELL_BOTTOM),
-                liquid_z_tracking=False,
-                delay=0.5,
+            10.0: Liquid(
+                submerge=Submerge(  # required
+                    approach_height=Height(1.0, HeightRef.WELL_TOP),
+                    liquid_level_detection=True,
+                    speed=60,
+                    height=Height(1, HeightRef.WELL_BOTTOM),
+                    delay=None,
+                ),
+                aspirate=Aspirate(  # required
+                    flow_rate=50.0,
+                    height=Height(1, HeightRef.WELL_BOTTOM),
+                    liquid_z_tracking=False,
+                    delay=0.5,
+                ),
+                dispense=Dispense(  # required
+                    flow_rate=50.0,
+                    height=Height(1, HeightRef.WELL_BOTTOM),
+                    liquid_z_tracking=False,
+                    delay=0.5,
+                    push_out=7.0,
+                ),
+                retract=Retract(  # required
+                    speed=60,
+                    height=Height(1.0, HeightRef.WELL_TOP),
+                    delay=0,
+                    air_gap=5.0,
+                    blow_out=True,
+                ),
+                touch=Touch(  # nice-to-have (could be through a separate command)
+                    speed=30.0,
+                    height=Height(-1, HeightRef.WELL_TOP),
+                    delay=None,
+                    strategy=TouchStrategy.FOUR_SIDES,
+                ),
+                volume=Volume(  # nice-to-have (requires HW testing)
+                    min=3.0, max=35.0, adjustment=[(4.1, 3.04), (39.0, 35.78)]
+                ),
             ),
-            dispense=Dispense(  # required
-                flow_rate=50.0,
-                height=Height(1, HeightRef.WELL_BOTTOM),
-                liquid_z_tracking=False,
-                delay=0.5,
-                push_out=7.0,
+            50.0: Liquid(
+                submerge=Submerge(  # required
+                    approach_height=Height(1.0, HeightRef.WELL_TOP),
+                    liquid_level_detection=True,
+                    speed=60,
+                    height=Height(1, HeightRef.WELL_BOTTOM),
+                    delay=None,
+                ),
+                aspirate=Aspirate(  # required
+                    flow_rate=50.0,
+                    height=Height(1, HeightRef.WELL_BOTTOM),
+                    liquid_z_tracking=False,
+                    delay=0.5,
+                ),
+                dispense=Dispense(  # required
+                    flow_rate=50.0,
+                    height=Height(1, HeightRef.WELL_BOTTOM),
+                    liquid_z_tracking=False,
+                    delay=0.5,
+                    push_out=7.0,
+                ),
+                retract=Retract(  # required
+                    speed=60,
+                    height=Height(1.0, HeightRef.WELL_TOP),
+                    delay=0,
+                    air_gap=5.0,
+                    blow_out=True,
+                ),
+                touch=Touch(  # nice-to-have (could be through a separate command)
+                    speed=30.0,
+                    height=Height(-1, HeightRef.WELL_TOP),
+                    delay=None,
+                    strategy=TouchStrategy.FOUR_SIDES,
+                ),
+                volume=Volume(  # nice-to-have (requires HW testing)
+                    min=3.0, max=35.0, adjustment=[(4.1, 3.04), (39.0, 35.78)]
+                ),
             ),
-            retract=Retract(  # required
-                speed=60,
-                height=Height(1.0, HeightRef.WELL_TOP),
-                delay=0,
-                air_gap=5.0,
-                blow_out=True,
-            ),
-            touch=Touch(  # nice-to-have (could be through a separate command)
-                speed=30.0,
-                height=Height(-1, HeightRef.WELL_TOP),
-                delay=None,
-                strategy=TouchStrategy.FOUR_SIDES,
-            ),
-            volume=Volume(  # nice-to-have (requires HW testing)
-                min=3.0, max=35.0, adjustment=[(4.1, 3.04), (39.0, 35.78)]
-            ),
-        )
+        }
     }
 }
