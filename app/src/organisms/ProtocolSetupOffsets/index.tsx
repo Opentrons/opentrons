@@ -106,7 +106,7 @@ export function ProtocolSetupOffsets({
             )}
           </Flex>
           <Flex marginTop={SPACING.spacing32} flexDirection={DIRECTION_COLUMN}>
-            {nonIdentityOffsets.length >= 0 ? (
+            {nonIdentityOffsets.length > 0 ? (
               <>
                 <StyledText
                   oddStyle="level4HeaderSemiBold"
