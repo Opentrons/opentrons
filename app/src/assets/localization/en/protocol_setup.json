@@ -205,6 +205,7 @@
   "offset_data": "Offset Data",
   "offsets_applied_plural": "{{count}} offsets applied",
   "offsets_applied": "{{count}} offset applied",
+  "offsets_confirmed": "Offsets confirmed",
   "offsets_ready": "Offsets ready",
   "on_adapter_in_mod": "on {{adapterName}} in {{moduleName}}",
   "on_adapter": "on {{adapterName}}",

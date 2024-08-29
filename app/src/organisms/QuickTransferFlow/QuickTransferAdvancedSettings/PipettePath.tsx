@@ -1,4 +1,5 @@
 import * as React from 'react'
+import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 import {
@@ -218,7 +219,10 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
           {blowOutLocationItems.map(option => (
             <RadioButton
               key={option.description}
-              isSelected={blowOutLocation === option.location}
+              isSelected={
+                isEqual(blowOutLocation, option.location) ||
+                blowOutLocation === option.location
+              }
               onChange={() => {
                 setBlowOutLocation(option.location)
               }}

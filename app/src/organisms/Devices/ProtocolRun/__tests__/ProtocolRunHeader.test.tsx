@@ -332,6 +332,7 @@ describe('ProtocolRunHeader', () => {
         isStopRunActionLoading: false,
         isResetRunLoading: false,
         isResumeRunFromRecoveryActionLoading: false,
+        isRunControlLoading: false,
       })
     when(vi.mocked(useRunStatus)).calledWith(RUN_ID).thenReturn(RUN_STATUS_IDLE)
     when(vi.mocked(useRunTimestamps)).calledWith(RUN_ID).thenReturn({
@@ -848,6 +849,7 @@ describe('ProtocolRunHeader', () => {
         isStopRunActionLoading: false,
         isResetRunLoading: true,
         isResumeRunFromRecoveryActionLoading: false,
+        isRunControlLoading: false,
       })
     render()
 
