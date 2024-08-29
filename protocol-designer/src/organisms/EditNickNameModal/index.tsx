@@ -39,7 +39,6 @@ export function EditNickNameModal(props: EditNickNameModalProps): JSX.Element {
     <Modal
       title={t('rename_labware')}
       type="info"
-      closeOnOutsideClick
       onClose={onClose}
       footer={
         <Flex
@@ -67,15 +66,14 @@ export function EditNickNameModal(props: EditNickNameModalProps): JSX.Element {
           </StyledText>
         </Flex>
         <InputField
+          data-testid="renameLabware_inputField"
           name="renameLabware"
           onChange={e => {
             setNickName(e.target.value)
           }}
           value={nickName}
           type="text"
-          onBlur={e => {
-            e.target.focus()
-          }}
+          autoFocus
         />
       </Flex>
     </Modal>,
