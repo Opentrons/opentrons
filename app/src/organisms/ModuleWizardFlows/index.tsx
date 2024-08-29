@@ -50,6 +50,7 @@ interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
   closeFlow: () => void
   isPrepCommandLoading: boolean
+  isLoadedInRun?: boolean
   onComplete?: () => void
   prepCommandErrorMessage?: string
 }
@@ -61,6 +62,7 @@ export const ModuleWizardFlows = (
 ): JSX.Element | null => {
   const {
     attachedModule,
+    isLoadedInRun = false,
     isPrepCommandLoading,
     closeFlow,
     onComplete,
@@ -317,6 +319,7 @@ export const ModuleWizardFlows = (
         {...calibrateBaseProps}
         availableSlotNames={availableSlotNames}
         deckConfig={deckConfig}
+        isLoadedInRun={isLoadedInRun}
         occupiedCutouts={occupiedCutouts}
         configuredFixtureIdByCutoutId={fixtureIdByCutoutId}
       />
