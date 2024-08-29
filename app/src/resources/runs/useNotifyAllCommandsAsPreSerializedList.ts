@@ -12,14 +12,18 @@ export function useNotifyAllCommandsAsPreSerializedList(
   params?: GetCommandsParams | null,
   options: QueryOptionsWithPolling<CommandsData, AxiosError> = {}
 ): UseQueryResult<CommandsData, AxiosError> {
-  const { notifyOnSettled, shouldRefetch } = useNotifyDataReady({
+  const {
+    notifyOnSettled,
+    shouldRefetch,
+    isNotifyEnabled,
+  } = useNotifyDataReady({
     topic: `robot-server/runs/pre_serialized_commands/${runId}`,
     options,
   })
 
   const httpResponse = useAllCommandsAsPreSerializedList(runId, params, {
     ...options,
-    enabled: options?.enabled !== false && shouldRefetch,
+    enabled: options?.enabled !== false && (shouldRefetch || !isNotifyEnabled),
     onSettled: notifyOnSettled,
   })
 
