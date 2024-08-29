@@ -26,7 +26,8 @@ export function NavigationBar(): JSX.Element | null {
     dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
   }
 
-  return location.pathname === '/designer' || location.pathname === '/liquids' ? null : (
+  return location.pathname === '/designer' ||
+    location.pathname === '/liquids' ? null : (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
