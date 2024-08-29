@@ -95,11 +95,10 @@ class Liquid:
 
 
 class LiquidClassPipette(InstrumentContext):
-    
     def __init__(self, *args, **kwargs) -> None:
         self._submerged = False
         super(LiquidClassPipette, self).__init__(*args, **kwargs)
-    
+
     @property
     def _last_well(self) -> Optional[Well]:
         prev_loc = self._get_last_location_by_api_version()
@@ -107,7 +106,9 @@ class LiquidClassPipette(InstrumentContext):
             return prev_loc.labware.as_well()
         return None
 
-    def _need_to_retract(self, location: Optional[Union[Location, Well]], liquid: Liquid) -> bool:
+    def _need_to_retract(
+        self, location: Optional[Union[Location, Well]], liquid: Liquid
+    ) -> bool:
         # a) if target well is different
         # b) same well, but new height is outside well/liquid
         if not location or not self._last_well:
@@ -116,10 +117,14 @@ class LiquidClassPipette(InstrumentContext):
         assert new_well
         if self._last_well != new_well:  # totally different well?
             return True
-        elif not self._loc_in_well(new_well, liquid.submerge.height)[1]:  # same well, but now not submerged
+        elif not self._loc_in_well(new_well, liquid.submerge.height)[
+            1
+        ]:  # same well, but now not submerged
             return self._submerged  # no need to submerge if not already submerged
 
-    def _need_to_submerge(self, location: Union[Location, Well], liquid: Liquid) -> bool:
+    def _need_to_submerge(
+        self, location: Union[Location, Well], liquid: Liquid
+    ) -> bool:
         # TODO: make this work the same as retract logic, checking submerged flag and what-not
         if not location:
             return False
@@ -142,7 +147,12 @@ class LiquidClassPipette(InstrumentContext):
             )
         return loc, submerged
 
-    def _move_in_well(self, location: Union[Location, Well], height: Height, speed: Optional[float] = None) -> None:
+    def _move_in_well(
+        self,
+        location: Union[Location, Well],
+        height: Height,
+        speed: Optional[float] = None,
+    ) -> None:
         if isinstance(location, Location):
             self.move_to(location, speed=speed)
         else:
@@ -320,9 +330,7 @@ GLYCEROL_50_PERCENT: Dict[str, Dict[str, Liquid]] = {
                 strategy=TouchStrategy.FOUR_SIDES,
             ),
             volume=Volume(  # nice-to-have (requires HW testing)
-                min=3.0,
-                max=35.0,
-                adjustment=[(4.1, 3.04), (39.0, 35.78)]
+                min=3.0, max=35.0, adjustment=[(4.1, 3.04), (39.0, 35.78)]
             ),
         )
     }
