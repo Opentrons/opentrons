@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Any, Optional, Union
 from opentrons.protocol_api import SINGLE, COLUMN, PARTIAL_COLUMN, ROW
 
 metadata = {
@@ -13,6 +13,11 @@ requirements = {
 }
 
 ####### RTP DEFINITIONS #######
+# NozzleConfigurationType is from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
+# do not want to import that as that interface or location might change
+# type is not in shared-data
+# cannot do the below
+# ApiTipConfigType = Union[SINGLE, COLUMN, PARTIAL_COLUMN, ROW]
 
 
 @dataclass
@@ -23,7 +28,7 @@ class PartialTipConfig:
     description: str
     starting_tip: str
     starting_nozzle: str
-    api_tip_config: str
+    api_tip_config: Any
     api_start: str
     api_end: Optional[str]
 
