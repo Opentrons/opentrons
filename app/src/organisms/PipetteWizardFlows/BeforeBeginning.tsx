@@ -13,6 +13,7 @@ import {
   SINGLE_MOUNT_PIPETTES,
   WEIGHT_OF_96_CHANNEL,
   WASTE_CHUTE_CUTOUT,
+  LEFT,
 } from '@opentrons/shared-data'
 import { Banner } from '../../atoms/Banner'
 import {
@@ -31,7 +32,11 @@ import {
   NINETY_SIX_CHANNEL_MOUNTING_PLATE,
   BODY_STYLE,
 } from './constants'
-import { getIsGantryEmpty, getPipetteCoveringMount } from './utils'
+import {
+  getIsGantryEmpty,
+  getPipetteCoveringMount,
+  pipetteIs96Channel,
+} from './utils'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type { UseMutateFunction } from 'react-query'
@@ -86,6 +91,8 @@ export const BeforeBeginning = (
   }, [])
   const pipetteCoveringMount = getPipetteCoveringMount(attachedPipettes, mount)
   const pipetteId = pipetteCoveringMount?.serialNumber
+  const is96 = pipetteIs96Channel(pipetteCoveringMount)
+  const mountForDetach = is96 ? LEFT : mount
   const isGantryEmpty = getIsGantryEmpty(attachedPipettes)
   const isGantryEmptyFor96ChannelAttachment =
     isGantryEmpty &&
@@ -177,14 +184,14 @@ export const BeforeBeginning = (
         params: {
           pipetteName: pipetteCoveringMount?.instrumentName ?? '',
           pipetteId: pipetteId ?? '',
-          mount,
+          mount: mountForDetach,
         },
       },
       { commandType: 'home' as const, params: {} },
       {
         commandType: 'calibration/moveToMaintenancePosition' as const,
         params: {
-          mount,
+          mount: mountForDetach,
         },
       },
     ]
@@ -203,7 +210,7 @@ export const BeforeBeginning = (
     {
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
-        mount,
+        mount: mountForDetach,
       },
     },
   ]
