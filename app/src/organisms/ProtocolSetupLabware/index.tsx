@@ -183,9 +183,8 @@ export function ProtocolSetupLabware({
           <Chip
             background
             iconName="ot-check"
-            text={t('placements_ready')}
+            text={t('placements_confirmed')}
             type="success"
-            chipSize="small"
           />
         ) : (
           <SmallButton

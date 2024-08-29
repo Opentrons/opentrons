@@ -90,9 +90,8 @@ export function ProtocolSetupOffsets({
               <Chip
                 background
                 iconName="ot-check"
-                text={t('placements_ready')}
+                text={t('offsets_confirmed')}
                 type="success"
-                chipSize="small"
               />
             ) : (
               <SmallButton
@@ -107,7 +106,7 @@ export function ProtocolSetupOffsets({
             )}
           </Flex>
           <Flex marginTop={SPACING.spacing32} flexDirection={DIRECTION_COLUMN}>
-            {nonIdentityOffsets.length > 0 ? (
+            {nonIdentityOffsets.length >= 0 ? (
               <>
                 <StyledText
                   oddStyle="level4HeaderSemiBold"
