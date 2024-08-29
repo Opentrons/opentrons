@@ -28,7 +28,7 @@ class PartialTipConfig:
 
 ninety_six_single_top_left = PartialTipConfig(
     key="ninety_six_single_top_left",
-    description="96 single top left",
+    description="96 single picking up top left of tiprack",
     startingTip="A1",
     startingNozzle="H12",
     apiTipConfig=SINGLE,
@@ -38,7 +38,7 @@ ninety_six_single_top_left = PartialTipConfig(
 
 ninety_six_single_top_right = PartialTipConfig(
     key="ninety_six_single_top_right",
-    description="96 single top right",
+    description="96 single picking up top right of tiprack",
     startingTip="A12",
     startingNozzle="H1",
     apiTipConfig=SINGLE,
@@ -48,7 +48,7 @@ ninety_six_single_top_right = PartialTipConfig(
 
 ninety_six_single_bottom_left = PartialTipConfig(
     key="ninety_six_single_bottom_left",
-    description="96 single bottom left",
+    description="96 single picking up bottom left of tiprack",
     startingTip="H1",
     startingNozzle="A12",
     apiTipConfig=SINGLE,
@@ -58,7 +58,7 @@ ninety_six_single_bottom_left = PartialTipConfig(
 
 ninety_six_single_bottom_right = PartialTipConfig(
     key="ninety_six_single_bottom_right",
-    description="96 single bottom right",
+    description="96 single picking up bottom right of tiprack",
     startingTip="H12",
     startingNozzle="A1",
     apiTipConfig=SINGLE,
@@ -70,7 +70,7 @@ ninety_six_single_bottom_right = PartialTipConfig(
 
 ninety_six_column_left = PartialTipConfig(
     key="ninety_six_column_left",
-    description="96 column left",
+    description="96 column picking up left column of tiprack",
     startingTip="Column 1",
     startingNozzle="Column 12",
     apiTipConfig=COLUMN,
@@ -81,7 +81,7 @@ ninety_six_column_left = PartialTipConfig(
 
 ninety_six_column_right = PartialTipConfig(
     key="ninety_six_column_right",
-    description="96 column right",
+    description="96 column picking up right column of tiprack",
     startingTip="Row 12",
     startingNozzle="Row 1",
     apiTipConfig=COLUMN,
@@ -93,7 +93,7 @@ ninety_six_column_right = PartialTipConfig(
 
 ninety_six_row_top = PartialTipConfig(
     key="ninety_six_row_top",
-    description="96 row top",
+    description="96 row picking up top row of tiprack",
     startingTip="Row A",
     startingNozzle="Row H",
     apiTipConfig=ROW,
@@ -103,7 +103,7 @@ ninety_six_row_top = PartialTipConfig(
 
 ninety_six_row_bottom = PartialTipConfig(
     key="ninety_six_row_bottom",
-    description="96 row bottom",
+    description="96 row picking up bottom row of tiprack",
     startingTip="Row H",
     startingNozzle="Row A",
     apiTipConfig=ROW,
@@ -112,10 +112,10 @@ ninety_six_row_bottom = PartialTipConfig(
 )
 
 # pipette = protocol.load_instrument(instrument_name="flex_8channel_50", mount="right")
-
+# works for all 8 channel pipettes
 eight_single_top = PartialTipConfig(
     key="eight_single_top",
-    description="8 single top",
+    description="8 channel single picking up from the top of the tiprack",
     startingTip="A1",
     startingNozzle="H1",
     apiTipConfig=SINGLE,
@@ -125,7 +125,7 @@ eight_single_top = PartialTipConfig(
 
 eight_single_bottom = PartialTipConfig(
     key="eight_single_bottom",
-    description="8 single bottom",
+    description="8 channel single picking up from the bottom of the tiprack",
     startingTip="H1",
     startingNozzle="A1",
     apiTipConfig=SINGLE,
