@@ -39,8 +39,7 @@ export function RecentProtocolRuns({
     const protocol = protocols?.data?.data.find(
       protocol => protocol.id === run.protocolId
     )
-    const isQuickTransfer = protocol?.protocolKind === 'quick-transfer'
-    return !isQuickTransfer
+    return protocol?.protocolKind !== 'quick-transfer'
   })
 
   return (
