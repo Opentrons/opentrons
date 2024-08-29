@@ -26,8 +26,7 @@ export function useCloneRun(
 ): UseCloneRunResult {
   const host = useHost()
   const queryClient = useQueryClient()
-  const { data: runRecord, isFetching, isRefetching } = useNotifyRunQuery(runId)
-  const isLoadingRun = isFetching || isRefetching
+  const { data: runRecord, isLoading: isLoadingRun } = useNotifyRunQuery(runId)
   const protocolKey = runRecord?.data.protocolId ?? null
   const { createRun, isLoading: isCloning } = useCreateRunMutation({
     onSuccess: response => {

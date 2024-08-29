@@ -197,7 +197,9 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
         </Tooltip>
       )}
       {isRunControlLoading && (
-        <Tooltip tooltipProps={tooltipProps}>{t('rerun_loading')}</Tooltip>
+        <Tooltip whiteSpace="normal" tooltipProps={tooltipProps}>
+          {t('rerun_loading')}
+        </Tooltip>
       )}
       <MenuItem
         data-testid="RecentProtocolRun_OverflowMenu_downloadRunLog"
