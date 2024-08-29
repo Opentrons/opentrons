@@ -87,6 +87,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
         isStopRunActionLoading: false,
         isResetRunLoading: false,
         isResumeRunFromRecoveryActionLoading: false,
+        isRunControlLoading: false,
       })
     when(useNotifyAllCommandsQuery)
       .calledWith(
@@ -144,6 +145,32 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
+    render(props)
+    const btn = screen.getByRole('button')
+    fireEvent.click(btn)
+    screen.getByRole('button', {
+      name: 'View protocol run record',
+    })
+    const rerunBtn = screen.getByRole('button', { name: 'Rerun protocol now' })
+    expect(rerunBtn).toBeDisabled()
+  })
+
+  it('disables the rerun protocol menu item if run data is loading', () => {
+    when(useRunControls)
+      .calledWith(RUN_ID, expect.anything())
+      .thenReturn({
+        play: () => {},
+        pause: () => {},
+        stop: () => {},
+        reset: () => {},
+        resumeFromRecovery: () => {},
+        isPlayRunActionLoading: false,
+        isPauseRunActionLoading: false,
+        isStopRunActionLoading: false,
+        isResetRunLoading: false,
+        isResumeRunFromRecoveryActionLoading: false,
+        isRunControlLoading: true,
+      })
     render(props)
     const btn = screen.getByRole('button')
     fireEvent.click(btn)
