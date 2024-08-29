@@ -17,6 +17,7 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
     routeUpdateActions,
     recoveryCommands,
     isOnDevice,
+    failedLabwareUtils,
   } = props
   const { ROBOT_PICKING_UP_TIPS } = RECOVERY_MAP
   const { pickUpTips } = recoveryCommands
@@ -75,6 +76,7 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
         </TwoColumn>
         <RecoveryFooterButtons
           primaryBtnOnClick={primaryBtnOnClick}
+          primaryBtnDisabled={!failedLabwareUtils.areTipsSelected}
           secondaryBtnOnClick={goBackPrevStep}
           primaryBtnTextOverride={t('pick_up_tips')}
           {...buildTertiaryBtnProps()}

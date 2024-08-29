@@ -184,10 +184,12 @@ export function RunSummary(): JSX.Element {
     }
   )
   // TODO(jh, 08-14-24): The backend never returns the "user cancelled a run" error and cancelledWithoutRecovery becomes unnecessary.
+  const cancelledWithoutRecovery =
+    !enteredER && runStatus === RUN_STATUS_STOPPED
   const hasCommandErrors =
     commandErrorList != null && commandErrorList.data.length > 0
   const disableErrorDetailsBtn = !(
-    hasCommandErrors ||
+    (hasCommandErrors && !cancelledWithoutRecovery) ||
     (runRecord?.data.errors != null && runRecord?.data.errors.length > 0)
   )
 
@@ -248,15 +250,10 @@ export function RunSummary(): JSX.Element {
   }, [isRunCurrent, enteredER])
 
   const returnToQuickTransfer = (): void => {
-    if (!isRunCurrent) {
+    closeCurrentRunIfValid(() => {
       deleteRun(runId)
       navigate('/quick-transfer')
-    } else {
-      closeCurrentRunIfValid(() => {
-        deleteRun(runId)
-        navigate('/quick-transfer')
-      })
-    }
+    })
   }
 
   // TODO(jh, 05-30-24): EXEC-487. Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
