@@ -28,6 +28,8 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
 import { getRobotType } from '../../../file-data/selectors'
 import { getHasGen1MultiChannelPipette } from '../../../step-forms'
+import { getOnlyLatestDefs } from '../../../labware-defs'
+import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { SlotDetailsContainer } from '../../../organisms'
 import { DeckSetupDetails } from './DeckSetupDetails'
 import { getCutoutIdForAddressableArea } from './utils'
@@ -74,6 +76,27 @@ export function DeckSetupContainer(
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
   )
+  const [hoveredLabware, setHoveredLabware] = React.useState<string | null>(
+    null
+  )
+  const deckSetup = useSelector(getDeckSetupForActiveItem)
+  const {
+    labware: deckSetupLabware,
+    modules: deckSetupModules,
+    additionalEquipmentOnDeck,
+  } = deckSetup
+  const createdLabwareForSlot = Object.values(deckSetupLabware).find(
+    lw => lw.slot === zoomIn?.slot
+  )
+  const [selecteLabwareDefURI, setSelectedLabwareDefURI] = React.useState<
+    string | null
+  >(createdLabwareForSlot?.labwareDefURI ?? null)
+
+  const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
+  const defs = getOnlyLatestDefs()
+
+  const hoveredLabwareDef =
+    hoveredLabware != null ? defs[hoveredLabware] ?? null : null
 
   const addEquipment = (slotId: string): void => {
     const cutoutId =
@@ -135,11 +158,14 @@ export function DeckSetupContainer(
       {zoomIn != null ? (
         //  TODO(ja, 8/6/24): still need to develop the zoomed in slot
         <DeckSetupTools
+          selecteLabwareDefURI={selecteLabwareDefURI}
+          setSelectedLabwareDefURI={setSelectedLabwareDefURI}
           onCloseClick={() => {
             setZoomInOnSlot(null)
           }}
           cutoutId={zoomIn.cutoutId}
           slot={zoomIn.slot}
+          setHoveredLabware={setHoveredLabware}
         />
       ) : (
         <Flex

@@ -12,12 +12,21 @@ import type { DeckLabelProps } from '../../molecules/DeckLabel'
 interface DeckLabelSetProps {
   children: React.ReactNode
   deckLabels: DeckLabelProps[]
+  isLabwareType?: boolean
 }
 
 export function DeckLabelSet({
   children,
   deckLabels,
+  isLabwareType = true,
 }: DeckLabelSetProps): JSX.Element {
+  const StyledFlex = styled(Flex)`
+    width: 100%;
+    height: ${FLEX_MAX_CONTENT};
+    border-radius: ${isLabwareType ? '25.15px' : BORDERS.borderRadius8};
+    border: 3px solid ${COLORS.blue50};
+  `
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <StyledFlex data-testid="DeckLabeSet">{children}</StyledFlex>
@@ -35,13 +44,6 @@ export function DeckLabelSet({
     </Flex>
   )
 }
-
-const StyledFlex = styled(Flex)`
-  width: 100%;
-  height: ${FLEX_MAX_CONTENT};
-  border-radius: ${BORDERS.borderRadius8};
-  border: 3px solid ${COLORS.blue50};
-`
 
 const LabelContainer = styled(Flex)`
   flex-direction: ${DIRECTION_COLUMN};

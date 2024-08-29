@@ -68,6 +68,7 @@ interface LabwareToolsProps {
     React.SetStateAction<string | null>
   >
   selectedNestedSelectedLabwareDefURI: string | null
+  setHoveredLabware: (defUri: string | null) => void
 }
 
 export function LabwareTools(props: LabwareToolsProps): JSX.Element {
@@ -78,6 +79,7 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
     selecteLabwareDefURI,
     setNestedSelectedLabwareDefURI,
     selectedNestedSelectedLabwareDefURI,
+    setHoveredLabware,
   } = props
   const { t } = useTranslation(['starting_deck_state', 'shared'])
   const robotType = useSelector(getRobotType)

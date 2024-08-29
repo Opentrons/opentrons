@@ -50,11 +50,12 @@ import type { Fixture } from './constants'
 interface DeckSetupToolsProps {
   slot: DeckSlotId
   onCloseClick: () => void
+  setHoveredLabware: (defUri: string | null) => void
   cutoutId?: CutoutId
 }
 
 export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
-  const { slot, onCloseClick, cutoutId } = props
+  const { slot, onCloseClick, cutoutId, setHoveredLabware } = props
   const { i18n, t } = useTranslation(['starting_deck_state', 'shared'])
   const { makeSnackbar } = useKitchen()
   const robotType = useSelector(getRobotType)
@@ -92,9 +93,6 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
     ModuleModel | Fixture | null
   >(createdModuleForSlot?.model ?? preSelectedFixture ?? null)
 
-  const [selecteLabwareDefURI, setSelectedLabwareDefURI] = React.useState<
-    string | null
-  >(createdLabwareForSlot?.labwareDefURI ?? null)
   const [
     nestedSelectedLabwareDefURI,
     setNestedSelectedLabwareDefURI,
@@ -234,7 +232,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
 
   return (
     <Toolbox
-      width="25rem"
+      width="374px"
       title={
         <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
           <DeckInfoLabel
@@ -389,6 +387,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
           </>
         ) : (
           <LabwareTools
+            setHoveredLabware={setHoveredLabware}
             selecteLabwareDefURI={selecteLabwareDefURI}
             setSelectedLabwareDefURI={setSelectedLabwareDefURI}
             setNestedSelectedLabwareDefURI={setNestedSelectedLabwareDefURI}

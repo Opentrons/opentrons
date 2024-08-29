@@ -156,7 +156,11 @@ export function Designer(): JSX.Element {
         </Flex>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          backgroundColor={COLORS.grey10}
+          backgroundColor={
+            tab === 'startingDeck' && deckView === rightString
+              ? COLORS.white
+              : COLORS.grey10
+          }
           padding={SPACING.spacing80}
           height="calc(100vh - 64px)"
         >
