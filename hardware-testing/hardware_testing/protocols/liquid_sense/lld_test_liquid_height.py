@@ -13,7 +13,7 @@ from opentrons.types import Point
 ###########################################
 # TODO: use runtime-variables instead of constants
 NUM_TRIALS = 10
-TEST_VOLUME = 100
+TEST_VOLUME = 40
 CSV_HEADER = "trial,volume,height,tip-z-error"
 
 LIQUID_MOUNT = "right"
@@ -24,8 +24,8 @@ PROBING_MOUNT = "left"
 PROBING_TIP_SIZE = 50
 PROBING_PIPETTE_SIZE = 50
 
-ASPIRATE_MM_FROM_BOTTOM = 10  # depth in source reservoir to aspirate
-RESERVOIR = "nest_1_well_reservoir_195mL"
+ASPIRATE_MM_FROM_BOTTOM = 5  # depth in source reservoir to aspirate
+RESERVOIR = "nest_1_reservoir_195ml"
 LABWARE = "armadillo_96_wellplate_200ul_pcr_full_skirt"
 
 SLOT_LIQUID_TIPRACK = "C3"
@@ -204,8 +204,7 @@ def _test_for_finding_liquid_height(
     src_well: Well,
     wells: List[Well],
 ) -> None:
-    assert len(liquid_tips) == len(probing_tips)
-    assert len(liquid_tips) == len(wells)
+    assert len(liquid_tips) == len(probing_tips), f"{len(liquid_tips)},{len(probing_tips)}"
     trial_counter = 0
     _store_dial_baseline(ctx, probing_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
