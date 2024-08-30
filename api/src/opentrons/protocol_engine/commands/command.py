@@ -147,8 +147,6 @@ class DefinedErrorData(Generic[_ErrorT_co, _PrivateResultT_co]):
         Use `state_update` instead.
     """
 
-    # todo(mm, 2024-08-22): Remove the default once all command implementations
-    # use this, to make it harder to forget in new command implementations.
     state_update: StateUpdate = dataclasses.field(
         # todo(mm, 2024-08-22): Remove the default once all command implementations
         # use this, to make it harder to forget in new command implementations.
