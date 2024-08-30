@@ -345,7 +345,7 @@ const fromEmptyGantryAttachNinetySix = (): PipetteWizardStep[] => [
   },
 ]
 
-const fromEmptyGantryAttachSingleMountOn = (
+const fromEmptyMountAttachSingleMountOn = (
   mount: Mount
 ): PipetteWizardStep[] => [
   {
@@ -380,6 +380,31 @@ const fromEmptyGantryAttachSingleMountOn = (
     flowType: FLOWS.CALIBRATE,
   },
 ]
+/**
++-------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+
+|             |96                                             |left                                          |right                                          |
+|             |                                               |                                              |                                               |
+|             |                                               |                                              |                                               |
++-------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+
+| 96          | calibrateAlreadyAttachedPipetteOn(left)       | detachNinetySixAndAttachSingleMountOn(left)  |                  X1                           |
++-------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+
+|             |                                               | calibrateAlreadyAttachedPipetteOn(left) or   | fromEmptyMountAttachSingleMountOn(right)      |
+| left only   | detachSingleMountOnLeftAndAttachNinetySix()   | detachSingleMountAndAttachSingleMountOn(left)|                                               |
+|             |                                               |                                              |                                               |
++-------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+
+|             |                                               |                                              | calibrateAlreadyAttachedPipetteOn(right) or   |
+| right only  | detachSingleMountOnRightAndAttachNinetySix()  |fromEmptyMountAttachSingleMountOn(left)       | detachSingleMountAndAttachSingleMountOn(right)|
+|             |                                               |                                              |                                               |
++-------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+
+| left and    |                                               | calibrateAlreadyAttachedPipetteOn(left) or   | calibrateAlreadyAttachedPipetteOn(right) or   |
+| right       | detachTwoSingleMountsAndAttachNinetySix()     | detachSingleMountAndAttachSingleMountOn(left)| detachSingleMountAndAttachSingleMountOn(right)|
+|             |                                               |                                              |                                               |
++-------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+
+|             |                                               |                                              |                                               |
+| nothing     | fromEmptyGantryAttachNinetySix()              | fromEmptyMountAttachSingleMountOn(left)      | fromEmptyMountAttachSingleMountOn(right)      |
+|             |                                               |                                              |                                               |
++-------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+
+ **/
 
 export const getPipetteWizardStepsForProtocol = (
   attachedPipettes: AttachedPipettesFromInstrumentsQuery,
@@ -401,8 +426,9 @@ export const getPipetteWizardStepsForProtocol = (
     requiredPipette.pipetteName !== 'p1000_96' &&
     attachedPipettes[mount] != null
   ) {
-    //    96-channel pipette attached and need to attach single mount pipette
-
+    // 96-channel pipette attached and need to attach single mount pipette
+    // X1: this check can only be reached if mount is LEFT, because if mount is RIGHT
+    // then the 96 won't show up in attached pipettes
     if (nintySixChannelAttached) {
       return detachNinetySixAndAttachSingleMountOn(mount)
       //    Single mount pipette attached and need to attach new single mount pipette
@@ -437,7 +463,7 @@ export const getPipetteWizardStepsForProtocol = (
       return fromEmptyGantryAttachNinetySix()
       //    Gantry empty and need to attach single mount pipette
     } else {
-      return fromEmptyGantryAttachSingleMountOn(mount)
+      return fromEmptyMountAttachSingleMountOn(mount)
     }
   }
 }
