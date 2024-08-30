@@ -82,19 +82,15 @@ def stringify_pickup_location_range(  # noqa: C901
             loc_str_list = [location.well_name + "-" + _stringify_new_loc(last_well)]
 
         elif nozzle_map.starting_nozzle == "H1":
-            datastr = ""
             first_well_col = len(labware_columns) - 1
             first_well_row = 0
             if critical_column + len(nozzle_map.columns) < len(labware_columns):
                 first_well_col = critical_column + (len(nozzle_map.columns) - 1)
             if critical_row - len(nozzle_map.rows) >= 0:
-                datastr = "This should be true"
                 first_well_row = critical_row - (len(nozzle_map.rows) - 1)
 
             first_well = labware_columns[first_well_col][first_well_row]
-            loc_str_list = [
-                first_well.well_name + "-" + _stringify_new_loc(location) + datastr
-            ]
+            loc_str_list = [first_well.well_name + "-" + _stringify_new_loc(location)]
 
         elif nozzle_map.starting_nozzle == "H12":
             first_well_col = 0
