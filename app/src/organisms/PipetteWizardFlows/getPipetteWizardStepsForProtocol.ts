@@ -382,11 +382,11 @@ const fromEmptyMountAttachSingleMountOn = (
 ]
 /**
 +-------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+
-|             |96                                             |left                                          |right                                          |
+| requested > |96                                             |left                                          |right                                          |
 |             |                                               |                                              |                                               |
-|             |                                               |                                              |                                               |
+| v attached  |                                               |                                              |                                               |
 +-------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+
-| 96          | calibrateAlreadyAttachedPipetteOn(left)       | detachNinetySixAndAttachSingleMountOn(left)  |                  X1                           |
+| 96          | calibrateAlreadyAttachedPipetteOn(left)       | detachNinetySixAndAttachSingleMountOn(left)  | detachNinetySixAndAttachSingleMountOn(right)  |
 +-------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+
 |             |                                               | calibrateAlreadyAttachedPipetteOn(left) or   | fromEmptyMountAttachSingleMountOn(right)      |
 | left only   | detachSingleMountOnLeftAndAttachNinetySix()   | detachSingleMountAndAttachSingleMountOn(left)|                                               |
@@ -412,57 +412,53 @@ export const getPipetteWizardStepsForProtocol = (
   mount: Mount
 ): PipetteWizardStep[] | null => {
   const requiredPipette = pipetteInfo.find(pipette => pipette.mount === mount)
-  const nintySixChannelAttached =
+  const ninetySixChannelAttached =
     attachedPipettes[LEFT]?.instrumentName === 'p1000_96'
-  //  return empty array if no pipette is required in the protocol
+  const ninetySixChannelRequested = requiredPipette?.pipetteName === 'p1000_96'
+
   if (requiredPipette == null) {
+    //  return empty array if no pipette is required in the protocol
     return null
-    // return calibration flow if correct pipette is attached
   } else if (
     requiredPipette?.pipetteName === attachedPipettes[mount]?.instrumentName
   ) {
+    // return calibration flow if correct pipette is attached
     return calibrateAlreadyAttachedPipetteOn(mount)
-  } else if (
-    requiredPipette.pipetteName !== 'p1000_96' &&
-    attachedPipettes[mount] != null
-  ) {
+  } else if (!ninetySixChannelRequested && ninetySixChannelAttached) {
     // 96-channel pipette attached and need to attach single mount pipette
-    // X1: this check can only be reached if mount is LEFT, because if mount is RIGHT
-    // then the 96 won't show up in attached pipettes
-    if (nintySixChannelAttached) {
-      return detachNinetySixAndAttachSingleMountOn(mount)
-      //    Single mount pipette attached and need to attach new single mount pipette
-    } else {
-      return detachSingleMountAndAttachSingleMountOn(mount)
-    }
-    //  Single mount pipette attached to both mounts and need to attach 96-channel pipette
+    return detachNinetySixAndAttachSingleMountOn(mount)
+  } else if (!ninetySixChannelRequested && attachedPipettes[mount] != null) {
+    // Single mount pipette attached and need to attach new single mount pipette
+    return detachSingleMountAndAttachSingleMountOn(mount)
   } else if (
-    requiredPipette.pipetteName === 'p1000_96' &&
+    ninetySixChannelRequested &&
     attachedPipettes[LEFT] != null &&
     attachedPipettes[RIGHT] != null
   ) {
+    // Single mount pipette attached to both mounts and need to attach 96-channel pipette
     return detachTwoSingleMountsAndAttachNinetySix()
-    //  Single mount pipette attached to left mount and need to attach 96-channel pipette
   } else if (
-    requiredPipette.pipetteName === 'p1000_96' &&
+    ninetySixChannelRequested &&
     attachedPipettes[LEFT] != null &&
     attachedPipettes[RIGHT] == null
   ) {
+    // Single mount pipette attached to left mount and need to attach 96-channel pipette
     return detachSingleMountOnLeftAndAttachNinetySix()
-    //  Single mount pipette attached to right mount and need to attach 96-channel pipette
   } else if (
-    requiredPipette.pipetteName === 'p1000_96' &&
+    ninetySixChannelRequested &&
     attachedPipettes[LEFT] == null &&
     attachedPipettes[RIGHT] != null
   ) {
+    // Single mount pipette attached to right mount and need to attach 96-channel pipette
     return detachSingleMountOnRightAndAttachNinetySix()
-    //  if no pipette is attached to gantry
   } else {
-    //  Gantry empty and need to attach 96-channel pipette
-    if (requiredPipette.pipetteName === 'p1000_96') {
+    // if no pipette is attached to gantry
+
+    if (ninetySixChannelRequested) {
+      // Gantry empty and need to attach 96-channel pipette
       return fromEmptyGantryAttachNinetySix()
-      //    Gantry empty and need to attach single mount pipette
     } else {
+      // Gantry empty and need to attach single mount pipette
       return fromEmptyMountAttachSingleMountOn(mount)
     }
   }
