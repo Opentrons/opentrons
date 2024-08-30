@@ -117,12 +117,7 @@ export function useDropTipCommands({
         )
         return chainRunCommands(
           isFlex
-            ? [
-                ENGAGE_AXES,
-                HOME_EXCEPT_PLUNGERS,
-                UPDATE_ESTIMATORS_EXCEPT_PLUNGERS,
-                moveToAACommand,
-              ]
+            ? [ENGAGE_AXES, UPDATE_ESTIMATORS_EXCEPT_PLUNGERS, moveToAACommand]
             : [moveToAACommand],
           true
         )
@@ -295,7 +290,9 @@ const HOME: CreateCommand = {
 
 const ENGAGE_AXES: CreateCommand = {
   commandType: 'unsafe/engageAxes' as const,
-  params: { axes: ['leftZ', 'rightZ', 'x', 'y'] },
+  params: {
+    axes: ['leftZ', 'rightZ', 'x', 'y', 'leftPlunger', 'rightPlunger'],
+  },
 }
 
 const HOME_EXCEPT_PLUNGERS: CreateCommand = {
@@ -306,6 +303,11 @@ const HOME_EXCEPT_PLUNGERS: CreateCommand = {
 const UPDATE_ESTIMATORS_EXCEPT_PLUNGERS: CreateCommand = {
   commandType: 'unsafe/updatePositionEstimators' as const,
   params: { axes: ['leftZ', 'rightZ', 'x', 'y'] },
+}
+
+const UPDATE_PLUNGER_ESTIMATORS: CreateCommand = {
+  commandType: 'unsafe/updatePositionEstimators' as const,
+  params: { axes: ['leftPlunger', 'rightPlunger'] },
 }
 
 const buildDropTipInPlaceCommand = (
@@ -333,6 +335,8 @@ const buildBlowoutCommands = (
 ): CreateCommand[] =>
   isFlex
     ? [
+        ENGAGE_AXES,
+        UPDATE_PLUNGER_ESTIMATORS,
         {
           commandType: 'unsafe/blowOutInPlace',
           params: {
@@ -352,6 +356,8 @@ const buildBlowoutCommands = (
         },
       ]
     : [
+        ENGAGE_AXES,
+        UPDATE_PLUNGER_ESTIMATORS,
         {
           commandType: 'blowOutInPlace',
           params: {
