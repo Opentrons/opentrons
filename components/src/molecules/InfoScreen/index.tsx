@@ -14,7 +14,6 @@ interface InfoScreenProps {
 
 export function InfoScreen({
   content,
-  // t,
   backgroundColor = COLORS.grey30,
 }: InfoScreenProps): JSX.Element {
   return (

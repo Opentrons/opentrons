@@ -4,7 +4,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 
 import { renderWithProviders } from '../../../testing/utils'
 import { BORDERS, COLORS } from '../../../helix-design-system'
-import { InfoScreen } from '../InfoScreen'
+import { InfoScreen } from '../../InfoScreen'
 
 const render = (props: React.ComponentProps<typeof InfoScreen>) => {
   return renderWithProviders(<InfoScreen {...props} />)
