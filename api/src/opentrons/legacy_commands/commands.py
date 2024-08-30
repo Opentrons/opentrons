@@ -2,7 +2,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List, Union, overload
 
 
-from .helpers import stringify_location, stringify_disposal_location, listify
+from .helpers import (
+    stringify_location,
+    stringify_disposal_location,
+    listify,
+    stringify_pickup_location_range,
+)
 from . import types as command_types
 
 from opentrons.types import Location
@@ -247,7 +252,12 @@ def return_tip() -> command_types.ReturnTipCommand:
 def pick_up_tip(
     instrument: InstrumentContext, location: Well
 ) -> command_types.PickUpTipCommand:
-    location_text = stringify_location(location)
+    if instrument._core.get_active_channels() < instrument.channels:
+        location_text = stringify_pickup_location_range(
+            instrument._core.get_nozzle_map(), location
+        )
+    else:
+        location_text = stringify_location(location)
     text = f"Picking up tip from {location_text}"
     return {
         "name": command_types.PICK_UP_TIP,
