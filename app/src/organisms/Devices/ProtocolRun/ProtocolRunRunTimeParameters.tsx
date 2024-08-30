@@ -130,10 +130,11 @@ export function ProtocolRunRuntimeParameters({
       {!hasRunTimeParameters ? (
         <Flex padding={SPACING.spacing16}>
           <InfoScreen
-            contentType={
-              isRunCancelledWithoutStarting ? 'runNotStarted' : 'parameters'
+            content={
+              isRunCancelledWithoutStarting
+                ? t('run_never_started')
+                : t('no_parameters_specified_in_protocol')
             }
-            t={t}
           />
         </Flex>
       ) : (

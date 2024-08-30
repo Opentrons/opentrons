@@ -4,8 +4,9 @@ import { i18n } from '../../assets/localization'
 import { MaterialsListModal as MaterialsListModalComponent } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
+import type { ModuleOnDeck } from '@opentrons/components'
 
-const mockHardware = [] as any[]
+const mockHardware = [] as ModuleOnDeck[]
 const mockLabware = [] as any[]
 const mockLiquids = [] as any[]
 

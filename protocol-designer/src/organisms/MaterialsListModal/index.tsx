@@ -10,10 +10,13 @@ import {
   DIRECTION_ROW,
   ListItem,
   ListItemDescriptor,
+  InfoScreen,
 } from '@opentrons/components'
 
+import type { ModuleOnDeck } from '@opentrons/components'
+
 interface MaterialsListModalProps {
-  hardware: any[]
+  hardware: ModuleOnDeck[]
   labware: any[]
   liquids: any[]
   closeModal: () => void
@@ -34,17 +37,19 @@ export function MaterialsListModal({
             {t('deck_hardware')}
           </StyledText>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-            {hardware.length > 0
-              ? hardware.map((hw, id) => (
-                  <ListItem type="noActive" key={`hardware${id}`}>
-                    <ListItemDescriptor
-                      type="default"
-                      description={hw}
-                      content={hw}
-                    />
-                  </ListItem>
-                ))
-              : null}
+            {hardware.length > 0 ? (
+              hardware.map((hw, id) => (
+                <ListItem type="noActive" key={`hardware${id}`}>
+                  <ListItemDescriptor
+                    type="default"
+                    description={hw}
+                    content={hw}
+                  />
+                </ListItem>
+              ))
+            ) : (
+              <InfoScreen content={t('no_deck_hardware')} />
+            )}
           </Flex>
         </Flex>
 
@@ -53,17 +58,19 @@ export function MaterialsListModal({
             {t('labware')}
           </StyledText>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-            {labware.length > 0
-              ? labware.map((lw, id) => (
-                  <ListItem type="noActive" key={`labware_${id}`}>
-                    <ListItemDescriptor
-                      type="default"
-                      description={lw}
-                      content={lw}
-                    />
-                  </ListItem>
-                ))
-              : null}
+            {labware.length > 0 ? (
+              labware.map((lw, id) => (
+                <ListItem type="noActive" key={`labware_${id}`}>
+                  <ListItemDescriptor
+                    type="default"
+                    description={lw}
+                    content={lw}
+                  />
+                </ListItem>
+              ))
+            ) : (
+              <InfoScreen content={t('no_labware')} />
+            )}
           </Flex>
         </Flex>
 
@@ -78,17 +85,19 @@ export function MaterialsListModal({
               paddingY={SPACING.spacing12}
             ></Flex>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-              {liquids.length > 0
-                ? liquids.map((liquid, id) => (
-                    <ListItem type="noActive" key={`liquid_${id}`}>
-                      <ListItemDescriptor
-                        type="default"
-                        description={liquid}
-                        content={liquid}
-                      />
-                    </ListItem>
-                  ))
-                : null}
+              {liquids.length > 0 ? (
+                liquids.map((liquid, id) => (
+                  <ListItem type="noActive" key={`liquid_${id}`}>
+                    <ListItemDescriptor
+                      type="default"
+                      description={liquid}
+                      content={liquid}
+                    />
+                  </ListItem>
+                ))
+              ) : (
+                <InfoScreen content={t('no_liquids')} />
+              )}
             </Flex>
           </Flex>
         </Flex>

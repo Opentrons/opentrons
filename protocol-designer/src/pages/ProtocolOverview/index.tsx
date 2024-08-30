@@ -66,6 +66,10 @@ export function ProtocolOverview(): JSX.Element {
   const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
   const modulesOnDeck = initialDeckSetup.modules
+  const labwaresOnDeck = initialDeckSetup.labware
+
+  console.log('modulesOnDeck', modulesOnDeck)
+  console.log('labwaresOnDeck', labwaresOnDeck)
 
   const nonLoadCommands =
     fileData?.commands.filter(
