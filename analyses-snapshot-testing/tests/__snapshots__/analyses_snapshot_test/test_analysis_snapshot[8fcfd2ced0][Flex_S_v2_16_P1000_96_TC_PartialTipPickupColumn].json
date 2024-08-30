@@ -3606,6 +3606,82 @@
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ddccee6754fe0092b9c66898d66b79a7",
+      "notes": [],
+      "params": {
+        "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 20.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -9.8
+          },
+          "origin": "top"
+        },
+        "wellName": "A2"
+      },
+      "result": {
+        "position": {
+          "x": 23.28,
+          "y": 181.18,
+          "z": 4.5
+        },
+        "volume": 20.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "5287b77e909d217f4b05e5006cf9ff25",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": true,
+        "forceDirect": false,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b81364c35c04784c34f571446e64484c",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
     }
   ],
   "config": {
@@ -3616,29 +3692,7 @@
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",
-  "errors": [
-    {
-      "createdAt": "TIMESTAMP",
-      "detail": "PartialTipMovementNotAllowedError [line 20]: Error 2004 MOTION_PLANNING_FAILURE (PartialTipMovementNotAllowedError): Requested motion with the A12 nozzle partial configuration is outside of robot bounds for the pipette.",
-      "errorCode": "4000",
-      "errorInfo": {},
-      "errorType": "ExceptionInProtocolError",
-      "id": "UUID",
-      "isDefined": false,
-      "wrappedErrors": [
-        {
-          "createdAt": "TIMESTAMP",
-          "detail": "Requested motion with the A12 nozzle partial configuration is outside of robot bounds for the pipette.",
-          "errorCode": "2004",
-          "errorInfo": {},
-          "errorType": "PartialTipMovementNotAllowedError",
-          "id": "UUID",
-          "isDefined": false,
-          "wrappedErrors": []
-        }
-      ]
-    }
-  ],
+  "errors": [],
   "files": [
     {
       "name": "Flex_S_v2_16_P1000_96_TC_PartialTipPickupColumn.py",
@@ -3681,7 +3735,7 @@
       "pipetteName": "p1000_96"
     }
   ],
-  "result": "not-ok",
+  "result": "ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }
