@@ -1,9 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { createPortal } from 'react-dom'
 
 import {
   ALIGN_CENTER,
   COLORS,
+  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -17,6 +19,8 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
+
+import { getTopPortalEl } from '../../components/portals/TopPortal'
 
 import type { ModuleOnDeck } from '@opentrons/components'
 import type { OrderedLiquids } from '../../labware-ingred/types'
@@ -35,7 +39,7 @@ export function MaterialsListModal({
   closeModal,
 }: MaterialsListModalProps): JSX.Element {
   const { t } = useTranslation('protocol_overview')
-  return (
+  return createPortal(
     <Modal onClose={closeModal} closeOnOutsideClick title={t('materials_list')}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
@@ -48,7 +52,7 @@ export function MaterialsListModal({
                 <ListItem type="noActive" key={`hardware${id}`}>
                   <ListItemDescriptor
                     type="default"
-                    description={hw}
+                    description={<DeckInfoLabel deckLabel={''} />}
                     content={hw}
                   />
                 </ListItem>
@@ -69,7 +73,9 @@ export function MaterialsListModal({
                 <ListItem type="noActive" key={`labware_${id}`}>
                   <ListItemDescriptor
                     type="default"
-                    description={lw}
+                    description={
+                      <DeckInfoLabel deckLabel={lw.labwareLocation} />
+                    }
                     content={lw}
                   />
                 </ListItem>
@@ -124,7 +130,8 @@ export function MaterialsListModal({
                       </Flex>
 
                       <Flex flex="1.27">
-                        <Tag text={liquid.name ?? ''} type="default" />
+                        {/* ToDo (kk:08/30/2024) get the well volume */}
+                        <Tag text={''} type="default" />
                       </Flex>
                     </Flex>
                   </ListItem>
@@ -136,6 +143,7 @@ export function MaterialsListModal({
           </Flex>
         </Flex>
       </Flex>
-    </Modal>
+    </Modal>,
+    getTopPortalEl()
   )
 }
