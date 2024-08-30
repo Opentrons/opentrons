@@ -20,10 +20,14 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
-import { getInitialDeckSetup } from '../../step-forms/selectors'
+import {
+  getAdditionalEquipmentEntities,
+  getInitialDeckSetup,
+} from '../../step-forms/selectors'
 import { selectors as fileSelectors } from '../../file-data'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { actions as loadFileActions } from '../../load-file'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import {
   getUnusedEntities,
   getUnusedStagingAreas,
@@ -60,16 +64,27 @@ export function ProtocolOverview(): JSX.Element {
   const robotType = useSelector(fileSelectors.getRobotType)
   const deckSetup = useSelector(getInitialDeckSetup)
 
+  console.log('deckSetup', deckSetup)
+
   const dispatch: ThunkDispatch<any> = useDispatch()
   const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
   const fileData = useSelector(fileSelectors.createFile)
   const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
+  const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const modulesOnDeck = initialDeckSetup.modules
   const labwaresOnDeck = initialDeckSetup.labware
 
+  const liquids = useSelector(labwareIngredSelectors.allIngredientNamesIds)
+
+  console.log('liquids', liquids)
+
+  console.log('additionalEquipment', additionalEquipment)
+
   console.log('modulesOnDeck', modulesOnDeck)
-  console.log('labwaresOnDeck', labwaresOnDeck)
+  // console.log('labwaresOnDeck', labwaresOnDeck)
+
+  const hardWareForMaterials = []
 
   const nonLoadCommands =
     fileData?.commands.filter(
@@ -119,6 +134,7 @@ export function ProtocolOverview(): JSX.Element {
   const leftPip = pipettesOnDeck.find(pip => pip.mount === 'left')
   const rightPip = pipettesOnDeck.find(pip => pip.mount === 'right')
   const gripper = additionalEquipmentOnDeck.find(ae => ae.name === 'gripper')
+  console.log('additionalEquipmentOnDeck', additionalEquipmentOnDeck)
   const {
     protocolName,
     description,

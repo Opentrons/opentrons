@@ -2,23 +2,29 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  StyledText,
-  Modal,
+  ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  InfoScreen,
+  JUSTIFY_SPACE_BETWEEN,
+  LiquidIcon,
   ListItem,
   ListItemDescriptor,
-  InfoScreen,
+  Modal,
+  SPACING,
+  StyledText,
+  Tag,
 } from '@opentrons/components'
 
 import type { ModuleOnDeck } from '@opentrons/components'
+import type { OrderedLiquids } from '../../labware-ingred/types'
 
 interface MaterialsListModalProps {
   hardware: ModuleOnDeck[]
   labware: any[]
-  liquids: any[]
+  liquids: OrderedLiquids
   closeModal: () => void
 }
 
@@ -79,20 +85,48 @@ export function MaterialsListModal({
             {t('liquids')}
           </StyledText>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-            <Flex
-              flexDirection={DIRECTION_ROW}
-              gridGap={SPACING.spacing8}
-              paddingY={SPACING.spacing12}
-            ></Flex>
+            {liquids.length > 0 ? (
+              <Flex
+                flexDirection={DIRECTION_ROW}
+                gridGap={SPACING.spacing8}
+                paddingX={SPACING.spacing12}
+              >
+                <StyledText
+                  flex="1"
+                  desktopStyle="bodyDefaultRegular"
+                  color={COLORS.grey60}
+                >
+                  {t('name')}
+                </StyledText>
+                <StyledText
+                  flex="1.27"
+                  desktopStyle="bodyDefaultRegular"
+                  color={COLORS.grey60}
+                >
+                  {t('individual_well_volume')}
+                </StyledText>
+              </Flex>
+            ) : null}
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
               {liquids.length > 0 ? (
                 liquids.map((liquid, id) => (
                   <ListItem type="noActive" key={`liquid_${id}`}>
-                    <ListItemDescriptor
-                      type="default"
-                      description={liquid}
-                      content={liquid}
-                    />
+                    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+                      <Flex
+                        alignItems={ALIGN_CENTER}
+                        gridGap={SPACING.spacing8}
+                        flex="1"
+                      >
+                        <LiquidIcon color={liquid.displayColor ?? ''} />
+                        <StyledText desktopStyle="bodyDefaultRegular">
+                          {liquid.name ?? t('n/a')}
+                        </StyledText>
+                      </Flex>
+
+                      <Flex flex="1.27">
+                        <Tag text={liquid.name ?? ''} type="default" />
+                      </Flex>
+                    </Flex>
                   </ListItem>
                 ))
               ) : (

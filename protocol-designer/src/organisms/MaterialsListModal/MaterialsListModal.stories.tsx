@@ -5,10 +5,11 @@ import { MaterialsListModal as MaterialsListModalComponent } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type { ModuleOnDeck } from '@opentrons/components'
+import type { OrderedLiquids } from '../../labware-ingred/types'
 
 const mockHardware = [] as ModuleOnDeck[]
 const mockLabware = [] as any[]
-const mockLiquids = [] as any[]
+const mockLiquids = [] as OrderedLiquids
 
 const meta: Meta<typeof MaterialsListModalComponent> = {
   title: 'Protocol-Designer/Organisms/MaterialsListModal',
