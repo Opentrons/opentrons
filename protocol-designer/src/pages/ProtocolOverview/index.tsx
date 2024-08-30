@@ -82,7 +82,6 @@ export function ProtocolOverview(): JSX.Element {
   console.log('additionalEquipment', additionalEquipment)
 
   console.log('modulesOnDeck', modulesOnDeck)
-  // console.log('labwaresOnDeck', labwaresOnDeck)
 
   const hardWareForMaterials = []
 
