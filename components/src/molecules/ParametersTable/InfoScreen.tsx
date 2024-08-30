@@ -8,16 +8,7 @@ import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
 
 interface InfoScreenProps {
-  // contentType:
   content: string
-
-  // | 'parameters'
-  // | 'moduleControls'
-  // | 'runNotStarted'
-  // | 'labware'
-  // | 'noFiles'
-  // | 'noLabwareOffsetData'
-  // t?: any
   backgroundColor?: string
 }
 
@@ -26,40 +17,6 @@ export function InfoScreen({
   // t,
   backgroundColor = COLORS.grey30,
 }: InfoScreenProps): JSX.Element {
-  // let bodyText: string = ''
-  // switch (contentType) {
-  //   case 'parameters':
-  //     bodyText =
-  //       t != null
-  //         ? t('no_parameters_specified_in_protocol')
-  //         : 'No parameters specified in this protocol'
-  //     break
-  //   case 'moduleControls':
-  //     bodyText =
-  //       t != null
-  //         ? t('connect_modules_for_controls')
-  //         : 'Connect modules to see controls'
-  //     break
-  //   case 'runNotStarted':
-  //     bodyText = t != null ? t('run_never_started') : 'Run was never started'
-  //     break
-  //   case 'labware':
-  //     bodyText = 'No labware specified in this protocol'
-  //     break
-  //   case 'noFiles':
-  //     bodyText =
-  //       t != null ? t('no_files_included') : 'No protocol files included'
-  //     break
-  //   case 'noLabwareOffsetData':
-  //     bodyText =
-  //       t != null
-  //         ? t('no_offsets_available')
-  //         : 'No Labware Offset data available'
-  //     break
-  //   default:
-  //     bodyText = contentType
-  // }
-
   return (
     <Flex
       alignItems={ALIGN_CENTER}
