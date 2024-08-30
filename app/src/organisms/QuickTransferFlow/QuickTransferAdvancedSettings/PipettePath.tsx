@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InputField,
-  LargeButton,
+  RadioButton,
   POSITION_FIXED,
   SPACING,
 } from '@opentrons/components'
@@ -156,15 +156,15 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
           width="100%"
         >
           {allowedPipettePathOptions.map(option => (
-            <LargeButton
-              key={option.pathOption}
-              buttonType={
-                selectedPath === option.pathOption ? 'primary' : 'secondary'
-              }
-              onClick={() => {
+            <RadioButton
+              key={option.description}
+              isSelected={selectedPath === option.pathOption}
+              onChange={() => {
                 setSelectedPath(option.pathOption)
               }}
-              buttonText={option.description}
+              buttonValue={option.description}
+              buttonLabel={option.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>
@@ -202,6 +202,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              initialValue={String(disposalVolume)}
               onChange={e => {
                 setDisposalVolume(Number(e))
               }}
@@ -218,15 +219,15 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
           width="100%"
         >
           {blowOutLocationItems.map(option => (
-            <LargeButton
+            <RadioButton
               key={option.description}
-              buttonType={
-                blowOutLocation === option.location ? 'primary' : 'secondary'
-              }
-              onClick={() => {
+              isSelected={blowOutLocation === option.location}
+              onChange={() => {
                 setBlowOutLocation(option.location)
               }}
-              buttonText={option.description}
+              buttonValue={option.description}
+              buttonLabel={option.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>

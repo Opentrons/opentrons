@@ -108,23 +108,7 @@ export function ProtocolRunRuntimeParameters({
           ) : null}
         </Flex>
         {hasRunTimeParameters ? (
-          <Banner
-            type="informing"
-            width="100%"
-            iconMarginLeft={SPACING.spacing4}
-          >
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText
-                as="p"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              >
-                {t('values_are_view_only')}
-              </LegacyStyledText>
-              <LegacyStyledText as="p">
-                {t('cancel_and_restart_to_edit')}
-              </LegacyStyledText>
-            </Flex>
-          </Banner>
+          <RunTimeParametersBanner isRunTerminal={isRunTerminal} />
         ) : null}
       </Flex>
       {!hasRunTimeParameters ? (
@@ -168,6 +152,31 @@ export function ProtocolRunRuntimeParameters({
         </>
       )}
     </>
+  )
+}
+
+interface RunTimeParametersBannerProps {
+  isRunTerminal: boolean
+}
+
+function RunTimeParametersBanner({
+  isRunTerminal,
+}: RunTimeParametersBannerProps): JSX.Element {
+  const { t } = useTranslation('protocol_setup')
+
+  return (
+    <Banner type="informing" width="100%" iconMarginLeft={SPACING.spacing4}>
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {isRunTerminal ? t('download_files') : t('values_are_view_only')}
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
+          {isRunTerminal
+            ? t('all_files_associated')
+            : t('cancel_and_restart_to_edit')}
+        </LegacyStyledText>
+      </Flex>
+    </Banner>
   )
 }
 

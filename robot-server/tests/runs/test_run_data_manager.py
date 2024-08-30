@@ -668,6 +668,10 @@ async def test_update_current(
         mock_runs_publisher.publish_runs_advise_refetch(run_id),
         times=1,
     )
+    decoy.verify(
+        mock_runs_publisher.publish_runs_advise_refetch(run_id),
+        times=1,
+    )
     assert result == Run(
         current=False,
         id=run_resource.run_id,

@@ -123,6 +123,7 @@ The entire start of the ``run()`` function, including a pipette and fixed labwar
             instrument_name="flex_1channel_1000",
             mount="left",
             tip_racks=[tiprack]
+        )
         # load trash bin
         trash = protocol.load_trash_bin("A3")
         )
