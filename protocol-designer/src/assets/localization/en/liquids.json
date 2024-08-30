@@ -1,3 +1,8 @@
 {
-  "liquids": "Liquids"
+  "define_liquid": "Define a liquid",
+  "delete_liquid": "Delete liquid",
+  "description": "Description",
+  "display_color": "Color",
+  "liquids": "Liquids",
+  "name": "Name"
 }

@@ -16,6 +16,7 @@ import {
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { TertiaryButton } from '../../../atoms/buttons'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useStoredProtocolAnalysis } from '../hooks'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
@@ -40,11 +41,13 @@ export function SetupFlexPipetteCalibrationItem({
   )
   const { data: attachedInstruments } = useInstrumentsQuery()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const loadPipetteCommand = mostRecentAnalysis?.commands.find(
+  const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
+  const completedAnalysis = mostRecentAnalysis ?? storedProtocolAnalysis
+  const loadPipetteCommand = completedAnalysis?.commands.find(
     (command): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette' && command.params.mount === mount
   )
-  const requestedPipette = mostRecentAnalysis?.pipettes?.find(
+  const requestedPipette = completedAnalysis?.pipettes?.find(
     pipette => pipette.id === loadPipetteCommand?.result?.pipetteId
   )
 
@@ -120,7 +123,7 @@ export function SetupFlexPipetteCalibrationItem({
               ? NINETY_SIX_CHANNEL
               : SINGLE_MOUNT_PIPETTES
           }
-          pipetteInfo={mostRecentAnalysis?.pipettes}
+          pipetteInfo={completedAnalysis?.pipettes}
           onComplete={instrumentsRefetch}
         />
       )}

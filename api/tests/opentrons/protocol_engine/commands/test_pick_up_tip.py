@@ -9,7 +9,7 @@ from opentrons.protocol_engine import WellLocation, WellOffset, DeckPoint
 from opentrons.protocol_engine.errors import TipNotAttachedError
 from opentrons.protocol_engine.execution import MovementHandler, TipHandler
 from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import TipGeometry
 
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData

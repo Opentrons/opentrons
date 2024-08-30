@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { createPortal } from 'react-dom'
 import styled from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -8,41 +7,43 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  POSITION_ABSOLUTE,
+  NO_WRAP,
   SPACING,
   StyledText,
+  useOnClickOutside,
 } from '@opentrons/components'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { deleteModule } from '../../../step-forms/actions'
+import { EditNickNameModal } from '../../../organisms'
 import { deleteDeckFixture } from '../../../step-forms/actions/additionalItems'
 import {
   deleteContainer,
   duplicateLabware,
 } from '../../../labware-ingred/actions'
-import { getTopPortalEl } from '../../../components/portals/TopPortal'
-
 import type { DeckSlotId } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../../types'
 
 interface SlotOverflowMenuProps {
   slot: DeckSlotId
-  xSlotPosition: number
-  ySlotPosition: number
   setShowMenuList: (value: React.SetStateAction<boolean>) => void
   addEquipment: (slotId: string) => void
 }
 export function SlotOverflowMenu(
   props: SlotOverflowMenuProps
 ): JSX.Element | null {
-  const {
-    slot,
-    xSlotPosition,
-    ySlotPosition,
-    setShowMenuList,
-    addEquipment,
-  } = props
+  const { slot, setShowMenuList, addEquipment } = props
   const { t } = useTranslation('starting_deck_state')
   const dispatch = useDispatch<ThunkDispatch<any>>()
+  const [showNickNameModal, setShowNickNameModal] = React.useState<boolean>(
+    false
+  )
+  const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
+    onClickOutside: () => {
+      if (!showNickNameModal) {
+        setShowMenuList(false)
+      }
+    },
+  })
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const {
     labware: deckSetupLabware,
@@ -90,24 +91,27 @@ export function SlotOverflowMenu(
     }
   }
 
-  return createPortal(
-    <Overlay
-      data-testid="SlotOverflowMenu_Overlay"
-      onClick={(e: React.MouseEvent) => {
-        e.stopPropagation()
-        setShowMenuList(false)
-      }}
-    >
+  return (
+    <>
+      {showNickNameModal && labwareOnSlot != null ? (
+        <EditNickNameModal
+          labwareId={
+            nestedLabwareOnSlot != null
+              ? nestedLabwareOnSlot.id
+              : labwareOnSlot.id
+          }
+          onClose={() => {
+            setShowNickNameModal(false)
+            setShowMenuList(false)
+          }}
+        />
+      ) : null}
       <Flex
-        whiteSpace="nowrap"
-        zIndex={10}
+        whiteSpace={NO_WRAP}
+        ref={overflowWrapperRef}
         borderRadius={BORDERS.borderRadius8}
         boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
-        position={POSITION_ABSOLUTE}
         backgroundColor={COLORS.white}
-        //  todo(ja, 8/22/24): lol we need to fix these positions based off othe deck map & slot
-        right={ySlotPosition}
-        top={200 + xSlotPosition}
         flexDirection={DIRECTION_COLUMN}
         onClick={(e: React.MouseEvent) => {
           e.preventDefault()
@@ -126,10 +130,10 @@ export function SlotOverflowMenu(
         </MenuButton>
         <MenuButton
           disabled={labwareOnSlot == null || isLabwareAnAdapter}
-          onClick={() => {
-            //  todo(ja, 8/22/24): wire this up
-            console.log('open nick name modal')
-            setShowMenuList(false)
+          onClick={(e: React.MouseEvent) => {
+            setShowNickNameModal(true)
+            e.preventDefault()
+            e.stopPropagation()
           }}
         >
           <StyledText desktopStyle="bodyDefaultRegular">
@@ -175,8 +179,7 @@ export function SlotOverflowMenu(
           </StyledText>
         </MenuButton>
       </Flex>
-    </Overlay>,
-    getTopPortalEl()
+    </>
   )
 }
 
@@ -193,14 +196,4 @@ const MenuButton = styled.button`
     color: ${COLORS.grey40};
     cursor: auto;
   }
-`
-const Overlay = styled.div`
-  position: ${POSITION_ABSOLUTE};
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 1;
-  background-color: ${COLORS.transparent};
-  cursor: default;
 `

@@ -521,7 +521,7 @@ export function ProtocolDetails(): JSX.Element | null {
           isScrolled={isScrolled}
           isProtocolFetching={isProtocolFetching}
         />
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} paddingTop={SPACING.spacing6}>
           <ProtocolSectionTabs
             currentOption={currentOption}
             setCurrentOption={setCurrentOption}

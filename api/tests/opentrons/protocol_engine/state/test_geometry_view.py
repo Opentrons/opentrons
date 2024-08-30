@@ -61,7 +61,7 @@ from opentrons.protocol_engine.commands import (
     LoadModuleParams,
 )
 from opentrons.protocol_engine.actions import SucceedCommandAction
-from opentrons.protocol_engine.state import move_types
+from opentrons.protocol_engine.state import _move_types
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView, LabwareStore
 from opentrons.protocol_engine.state.modules import ModuleView, ModuleStore
@@ -105,10 +105,10 @@ def mock_addressable_area_view(decoy: Decoy) -> AddressableAreaView:
 
 
 @pytest.fixture(autouse=True)
-def patch_mock_move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Mock out move_types.py functions."""
-    for name, func in inspect.getmembers(move_types, inspect.isfunction):
-        monkeypatch.setattr(move_types, name, decoy.mock(func=func))
+def patch_mock__move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Mock out _move_types.py functions."""
+    for name, func in inspect.getmembers(_move_types, inspect.isfunction):
+        monkeypatch.setattr(_move_types, name, decoy.mock(func=func))
 
 
 @pytest.fixture
@@ -184,6 +184,12 @@ def addressable_area_store(
             "robotType": "OT-3 Standard",
             "models": ["OT-3 Standard"],
             "extents": [477.2, 493.8, 0.0],
+            "paddingOffsets": {
+                "rear": -177.42,
+                "front": 51.8,
+                "leftSide": 31.88,
+                "rightSide": -80.32,
+            },
             "mountOffsets": {
                 "left": [-13.5, -60.5, 255.675],
                 "right": [40.5, -60.5, 255.675],

@@ -66,8 +66,6 @@ export const RunPreviewComponent = (
     runId,
     { cursor: 0, pageLength: MAX_COMMANDS },
     {
-      staleTime: Infinity,
-      cacheTime: Infinity,
       enabled: isRunTerminal,
     }
   )

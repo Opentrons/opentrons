@@ -10,7 +10,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from ..protocol_engine import ProtocolEngine
 from ..errors import ProtocolCommandFailedError
 from ..error_recovery_policy import ErrorRecoveryType
-from ..state import StateView
+from ..state.state import StateView
 from ..commands import Command, CommandCreate, CommandResult, CommandStatus
 
 

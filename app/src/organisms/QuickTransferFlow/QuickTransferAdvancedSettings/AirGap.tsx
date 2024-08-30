@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InputField,
-  LargeButton,
+  RadioButton,
   POSITION_FIXED,
   SPACING,
 } from '@opentrons/components'
@@ -163,13 +163,13 @@ export function AirGap(props: AirGapProps): JSX.Element {
           width="100%"
         >
           {enableAirGapDisplayItems.map(displayItem => (
-            <LargeButton
+            <RadioButton
               key={displayItem.description}
-              buttonType={
-                airGapEnabled === displayItem.option ? 'primary' : 'secondary'
-              }
-              onClick={displayItem.onClick}
-              buttonText={displayItem.description}
+              isSelected={airGapEnabled === displayItem.option}
+              onChange={displayItem.onClick}
+              buttonValue={displayItem.description}
+              buttonLabel={displayItem.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>
@@ -207,6 +207,7 @@ export function AirGap(props: AirGapProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              initialValue={String(volume)}
               onChange={e => {
                 setVolume(Number(e))
               }}

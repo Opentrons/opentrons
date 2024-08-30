@@ -9,6 +9,7 @@ import {
   deleteContainer,
   duplicateLabware,
 } from '../../../../labware-ingred/actions'
+import { EditNickNameModal } from '../../../../organisms'
 import { deleteModule } from '../../../../step-forms/actions'
 import { deleteDeckFixture } from '../../../../step-forms/actions/additionalItems'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
@@ -20,6 +21,7 @@ vi.mock('../../../../top-selectors/labware-locations')
 vi.mock('../../../../step-forms/actions')
 vi.mock('../../../../labware-ingred/actions')
 vi.mock('../../../../step-forms/actions/additionalItems')
+vi.mock('../../../../organisms')
 
 const render = (props: React.ComponentProps<typeof SlotOverflowMenu>) => {
   return renderWithProviders(<SlotOverflowMenu {...props} />, {
@@ -33,8 +35,6 @@ describe('SlotOverflowMenu', () => {
   beforeEach(() => {
     props = {
       slot: 'D3',
-      xSlotPosition: 1,
-      ySlotPosition: 1,
       setShowMenuList: vi.fn(),
       addEquipment: vi.fn(),
     }
@@ -68,6 +68,9 @@ describe('SlotOverflowMenu', () => {
         fixture: { name: 'stagingArea', id: 'mockId', location: 'cutoutD3' },
       },
     })
+    vi.mocked(EditNickNameModal).mockReturnValue(
+      <div>mockEditNickNameModal</div>
+    )
   })
   it('should renders all buttons as enabled and clicking on them calls ctas', () => {
     render(props)
@@ -77,9 +80,7 @@ describe('SlotOverflowMenu', () => {
     expect(props.addEquipment).toHaveBeenCalled()
     expect(props.setShowMenuList).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Rename labware' }))
-    // TODO(ja, 8/22/24): wire up cta for rename labware modal
-    expect(props.setShowMenuList).toHaveBeenCalled()
-    // TODO(ja, 8/22/24): wire up cta for liquids
+    screen.getByText('mockEditNickNameModal')
     fireEvent.click(screen.getByRole('button', { name: 'Add liquid' }))
     expect(props.setShowMenuList).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Duplicate' }))
@@ -89,11 +90,6 @@ describe('SlotOverflowMenu', () => {
     expect(vi.mocked(deleteContainer)).toHaveBeenCalledTimes(2)
     expect(vi.mocked(deleteModule)).toHaveBeenCalled()
     expect(vi.mocked(deleteDeckFixture)).toHaveBeenCalled()
-    expect(props.setShowMenuList).toHaveBeenCalled()
-  })
-  it('should close menu list when overlay is clicked', () => {
-    render(props)
-    fireEvent.click(screen.getByTestId('SlotOverflowMenu_Overlay'))
     expect(props.setShowMenuList).toHaveBeenCalled()
   })
 })
