@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import {
+  ALIGN_CENTER,
   BORDERS,
   Box,
   COLORS,
@@ -16,33 +17,30 @@ import {
 } from '@opentrons/components'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { getOnlyLatestDefs } from '../../../labware-defs'
+import { selectors } from '../../../labware-ingred/selectors'
+import { selectZoomedInSlot } from '../../../labware-ingred/actions'
 import { DeckSetupTools } from '../DeckSetup/DeckSetupTools'
 import { OffDeckDetails } from './OffDeckDetails'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 
 export function OffDeck(): JSX.Element {
-  const [toolbox, setToolbox] = React.useState<boolean>(false)
   const { t, i18n } = useTranslation('starting_deck_state')
   const [hoveredLabware, setHoveredLabware] = React.useState<string | null>(
     null
   )
-  const deckSetup = useSelector(getDeckSetupForActiveItem)
-  const {
-    labware: deckSetupLabware,
-  } = deckSetup
-  const createdLabwareForSlot = Object.values(deckSetupLabware).find(
-    lw => lw.slot === 'offDeck'
-  )
-  const [selecteLabwareDefURI, setSelectedLabwareDefURI] = React.useState<
-    string | null
-  >(createdLabwareForSlot?.labwareDefURI ?? null)
+  const dispatch = useDispatch()
+
+  const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
+  const { selectedLabwareDefUri, zoomedInSlot } = zoomedInSlotInfo
+
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const defs = getOnlyLatestDefs()
 
   const hoveredLabwareDef =
-    hoveredLabware != null ? defs[hoveredLabware] ?? null : null
+    hoveredLabware != null
+      ? defs[hoveredLabware] ?? customLabwareDefs[hoveredLabware] ?? null
+      : null
   const offDeckLabware =
-    selecteLabwareDefURI != null ? defs[selecteLabwareDefURI] ?? null : null
+    selectedLabwareDefUri != null ? defs[selectedLabwareDefUri] ?? null : null
 
   let labware = (
     <Box
@@ -105,14 +103,14 @@ export function OffDeck(): JSX.Element {
 
   return (
     <>
-      {toolbox ? (
+      {zoomedInSlot.slot === 'offDeck' ? (
         <>
-          <Flex justifyContent="center" width="calc(100% - 25rem)">
+          <Flex justifyContent={JUSTIFY_CENTER} width="calc(100% - 25rem)">
             <Flex
               width="630.84px"
               height="514px"
-              justifyContent="center"
-              alignItems="center"
+              justifyContent={JUSTIFY_CENTER}
+              alignItems={ALIGN_CENTER}
               borderRadius={BORDERS.borderRadius8}
               backgroundColor={COLORS.grey20}
             >
@@ -129,7 +127,7 @@ export function OffDeck(): JSX.Element {
                   marginBottom={SPACING.spacing40}
                 >
                   <StyledText desktopStyle="bodyDefaultSemiBold">
-                    {i18n.format(t('off_deck_labware'), 'uppercase')}
+                    {i18n.format(t('off_deck_labware'), 'upperCase')}
                   </StyledText>
                 </Flex>
                 {labware}
@@ -137,19 +135,17 @@ export function OffDeck(): JSX.Element {
             </Flex>
           </Flex>
           <DeckSetupTools
-            selecteLabwareDefURI={selecteLabwareDefURI}
-            setSelectedLabwareDefURI={setSelectedLabwareDefURI}
+            onDeckProps={null}
             setHoveredLabware={setHoveredLabware}
             onCloseClick={() => {
-              setToolbox(false)
+              dispatch(selectZoomedInSlot({ slot: null, cutout: null }))
             }}
-            slot="offDeck"
           />
         </>
       ) : (
         <OffDeckDetails
           addLabware={() => {
-            setToolbox(true)
+            dispatch(selectZoomedInSlot({ slot: 'offDeck', cutout: null }))
           }}
         />
       )}

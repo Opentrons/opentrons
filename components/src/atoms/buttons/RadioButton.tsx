@@ -27,6 +27,9 @@ interface RadioButtonProps extends StyleProps {
   subButtonLabel?: string
   id?: string
   maxLines?: number | null
+  //  used for mouseEnter and mouseLeave
+  setNoHover?: () => void
+  setHovered?: () => void
 }
 
 //  used for ODD and helix
@@ -45,6 +48,8 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     largeDesktopBorderRadius = false,
     iconName,
     maxLines = null,
+    setHovered,
+    setNoHover,
   } = props
 
   const isLarge = radioButtonType === 'large'
@@ -120,7 +125,12 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
         type="radio"
         value={buttonValue}
       />
-      <SettingButtonLabel role="label" htmlFor={id}>
+      <SettingButtonLabel
+        role="label"
+        htmlFor={id}
+        onMouseEnter={setHovered}
+        onMouseLeave={setNoHover}
+      >
         <Flex
           flexDirection={DIRECTION_ROW}
           gridGap={SPACING.spacing2}

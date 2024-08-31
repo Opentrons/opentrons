@@ -1,7 +1,8 @@
 import { createAction } from 'redux-actions'
 import { selectors } from '../selectors'
 import type { DeckSlot, ThunkAction } from '../../types'
-import type { IngredInputs } from '../types'
+import type { Fixture, IngredInputs } from '../types'
+import type { CutoutId, ModuleModel } from '@opentrons/shared-data'
 // ===== Labware selector actions =====
 export interface OpenAddLabwareModalAction {
   type: 'OPEN_ADD_LABWARE_MODAL'
@@ -106,6 +107,7 @@ export interface DuplicateLabwareAction {
     slot: DeckSlot
   }
 }
+
 export interface RemoveWellsContentsAction {
   type: 'REMOVE_WELLS_CONTENTS'
   payload: {
@@ -214,3 +216,69 @@ export const editLiquidGroup: (
     },
   })
 }
+
+//  NOTE: the following actions are for selecting labware/hardware for the zoomed in slot
+export interface SelectLabwareDefUriAction {
+  type: 'SELECT_LABWARE_DEF_URI'
+  payload: {
+    labwareDefUri: string | null
+  }
+}
+export const selectLabwareDefUri: (
+  payload: SelectLabwareDefUriAction['payload']
+) => SelectLabwareDefUriAction = payload => ({
+  type: 'SELECT_LABWARE_DEF_URI',
+  payload,
+})
+export interface SelectNestedLabwareDefUriAction {
+  type: 'SELECT_NESTED_LABWARE_DEF_URI'
+  payload: {
+    nestedLabwareDefUri: string | null
+  }
+}
+export const selectNestedLabwareDefUri: (
+  payload: SelectNestedLabwareDefUriAction['payload']
+) => SelectNestedLabwareDefUriAction = payload => ({
+  type: 'SELECT_NESTED_LABWARE_DEF_URI',
+  payload,
+})
+
+export interface SelectModuleAction {
+  type: 'SELECT_MODULE'
+  payload: {
+    moduleModel: ModuleModel | null
+  }
+}
+export const selectModule: (
+  payload: SelectModuleAction['payload']
+) => SelectModuleAction = payload => ({
+  type: 'SELECT_MODULE',
+  payload,
+})
+
+export interface SelectFixtureAction {
+  type: 'SELECT_FIXTURE'
+  payload: {
+    fixture: Fixture | null
+  }
+}
+export const selectFixture: (
+  payload: SelectFixtureAction['payload']
+) => SelectFixtureAction = payload => ({
+  type: 'SELECT_FIXTURE',
+  payload,
+})
+
+export interface ZoomedInAction {
+  type: 'ZOOMED_IN_SLOT'
+  payload: {
+    slot: DeckSlot | null
+    cutout: CutoutId | null
+  }
+}
+export const selectZoomedInSlot: (
+  payload: ZoomedInAction['payload']
+) => ZoomedInAction = payload => ({
+  type: 'ZOOMED_IN_SLOT',
+  payload,
+})

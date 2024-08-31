@@ -156,6 +156,7 @@ export function denormalizePipetteEntities(
     {}
   )
 }
+/** deprecated */
 export const getSlotIdsBlockedBySpanning = (
   initialDeckSetup: InitialDeckSetup
 ): DeckSlot[] => {
@@ -170,7 +171,6 @@ export const getSlotIdsBlockedBySpanning = (
 
   return []
 }
-
 export const getSlotIdsBlockedBySpanningForThermocycler = (
   initialDeckSetup: InitialDeckSetup,
   robotType: RobotType

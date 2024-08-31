@@ -1,16 +1,32 @@
-import { getIsTiprack } from '@opentrons/shared-data'
+import { CutoutId, getIsTiprack } from '@opentrons/shared-data'
 import { uuid } from '../../utils'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
-import { selectors as stepFormSelectors } from '../../step-forms'
+import {
+  LabwareOnDeck,
+  ModuleOnDeck,
+  selectors as stepFormSelectors,
+} from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
 import { getRobotType } from '../../file-data/selectors'
+import {
+  SelectNestedLabwareDefUriAction,
+  SelectLabwareDefUriAction,
+  SelectModuleAction,
+  selectNestedLabwareDefUri,
+  selectLabwareDefUri,
+  selectModule,
+  selectFixture,
+  SelectFixtureAction,
+} from './actions'
 import type {
   CreateContainerArgs,
   CreateContainerAction,
   DuplicateLabwareAction,
 } from './actions'
 import type { ThunkAction } from '../../types'
+import type { Fixture } from '../types'
+
 export interface RenameLabwareAction {
   type: 'RENAME_LABWARE'
   payload: {
@@ -166,4 +182,40 @@ export const duplicateLabware: (
       },
     })
   }
+}
+
+interface PreselectedSlotInfo {
+  createdModuleForSlot?: ModuleOnDeck | null
+  createdLabwareForSlot?: LabwareOnDeck | null
+  createdNestedLabwareForSlot?: LabwareOnDeck | null
+  preSelectedFixture?: Fixture | null
+}
+
+export const selectPreselectedSlotInfo: (
+  args: PreselectedSlotInfo
+) => ThunkAction<
+  | SelectNestedLabwareDefUriAction
+  | SelectLabwareDefUriAction
+  | SelectModuleAction
+  | SelectFixtureAction
+> = args => dispatch => {
+  const {
+    createdModuleForSlot,
+    createdLabwareForSlot,
+    createdNestedLabwareForSlot,
+    preSelectedFixture,
+  } = args
+
+  dispatch(
+    selectNestedLabwareDefUri({
+      nestedLabwareDefUri: createdNestedLabwareForSlot?.labwareDefURI ?? null,
+    })
+  )
+  dispatch(
+    selectLabwareDefUri({
+      labwareDefUri: createdLabwareForSlot?.labwareDefURI ?? null,
+    })
+  )
+  dispatch(selectModule({ moduleModel: createdModuleForSlot?.model ?? null }))
+  dispatch(selectFixture({ fixture: preSelectedFixture ?? null }))
 }

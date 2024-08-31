@@ -22,6 +22,7 @@ import type {
   AddressableAreaName,
   CutoutFixture,
   CutoutId,
+  DeckDefinition,
   DeckSlotId,
   LabwareDefinition2,
   ModuleModel,
@@ -177,4 +178,59 @@ export const getOt2HeaterShakerDeckErrors = (
   }
 
   return error
+}
+
+interface ZoomInOnCoordinateProps {
+  x: number
+  y: number
+  deckDef: DeckDefinition
+}
+export function zoomInOnCoordinate(props: ZoomInOnCoordinateProps): string {
+  const { x, y, deckDef } = props
+  const [width, height] = [deckDef.dimensions[0], deckDef.dimensions[1]]
+
+  const zoomFactor = 0.6
+  const newWidth = width * zoomFactor
+  const newHeight = height * zoomFactor
+
+  //  +125 and +50 to get the approximate center of the screen point
+  const newMinX = x - newWidth / 2 + 125
+  const newMinY = y - newHeight / 2 + 50
+
+  return `${newMinX} ${newMinY} ${newWidth} ${newHeight}`
+}
+
+interface AnimateZoomProps {
+  targetViewBox: string
+  viewBox: string
+  setViewBox: React.Dispatch<React.SetStateAction<string>>
+}
+
+type ViewBox = [number, number, number, number]
+
+export function animateZoom(props: AnimateZoomProps): void {
+  const { targetViewBox, viewBox, setViewBox } = props
+
+  if (targetViewBox === viewBox) return
+
+  const duration = 500 // Animation duration in ms
+  const start = performance.now()
+  const initialViewBoxValues = viewBox.split(' ').map(Number) as ViewBox
+  const targetViewBoxValues = targetViewBox.split(' ').map(Number) as ViewBox
+
+  const animate = (time: number): void => {
+    const elapsed = time - start
+    const progress = Math.min(elapsed / duration, 1)
+
+    const interpolatedViewBox = initialViewBoxValues.map(
+      (start, index) => start + progress * (targetViewBoxValues[index] - start)
+    )
+
+    setViewBox(interpolatedViewBox.join(' '))
+
+    if (progress < 1) {
+      requestAnimationFrame(animate)
+    }
+  }
+  requestAnimationFrame(animate)
 }

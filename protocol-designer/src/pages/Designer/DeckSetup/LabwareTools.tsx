@@ -20,7 +20,6 @@ import {
 import {
   HEATERSHAKER_MODULE_TYPE,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
-  MODULE_MODELS,
   OT2_ROBOT_TYPE,
   getAreSlotsHorizontallyAdjacent,
   getIsLabwareAboveHeight,
@@ -40,47 +39,29 @@ import { createCustomLabwareDef } from '../../../labware-defs/actions'
 import { getRobotType } from '../../../file-data/selectors'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { getPipetteEntities } from '../../../step-forms/selectors'
+import { selectors } from '../../../labware-ingred/selectors'
+import { selectLabwareDefUri } from '../../../labware-ingred/actions'
 import { ORDERED_CATEGORIES } from './constants'
 import {
   getLabwareIsRecommended,
   getLabwareCompatibleWithAdapter,
 } from './utils'
 
-import type {
-  DeckSlotId,
-  LabwareDefinition2,
-  ModuleModel,
-} from '@opentrons/shared-data'
+import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ModuleOnDeck } from '../../../step-forms'
 import type { ThunkDispatch } from '../../../types'
 import type { LabwareDefByDefURI } from '../../../labware-defs'
-import type { Fixture } from './constants'
 
 const CUSTOM_CATEGORY = 'custom'
 const STANDARD_X_DIMENSION = 127.75
 const STANDARD_Y_DIMENSION = 85.48
 interface LabwareToolsProps {
   slot: DeckSlotId
-  selectedHardware: ModuleModel | Fixture | null
-  setSelectedLabwareDefURI: React.Dispatch<React.SetStateAction<string | null>>
-  selecteLabwareDefURI: string | null
-  setNestedSelectedLabwareDefURI: React.Dispatch<
-    React.SetStateAction<string | null>
-  >
-  selectedNestedSelectedLabwareDefURI: string | null
   setHoveredLabware: (defUri: string | null) => void
 }
 
 export function LabwareTools(props: LabwareToolsProps): JSX.Element {
-  const {
-    slot,
-    selectedHardware,
-    setSelectedLabwareDefURI,
-    selecteLabwareDefURI,
-    setNestedSelectedLabwareDefURI,
-    selectedNestedSelectedLabwareDefURI,
-    setHoveredLabware,
-  } = props
+  const { slot, setHoveredLabware } = props
   const { t } = useTranslation(['starting_deck_state', 'shared'])
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch<ThunkDispatch<any>>()
@@ -88,8 +69,14 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
   const pipetteEntities = useSelector(getPipetteEntities)
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
-  //    TODO(ja, 8/16/24): We are always filtering recommended labware, check with designs
-  //    where to add the filter checkbox/button
+  const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
+  const {
+    selectedLabwareDefUri,
+    selectedModuleModel,
+    selectedNestedLabwareDefUri,
+  } = zoomedInSlotInfo
+  // TODO(ja, 8/16/24): We are always filtering recommended labware, check with designs
+  // where to add the filter checkbox/button
   const [filterRecommended, setFilterRecommended] = React.useState<boolean>(
     true
   )
@@ -105,11 +92,9 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
   const has96Channel = getHas96Channel(pipetteEntities)
   const defs = getOnlyLatestDefs()
   const modulesById = deckSetup.modules
-  const moduleModel = MODULE_MODELS.includes(selectedHardware as ModuleModel)
-    ? (selectedHardware as ModuleModel)
-    : null
 
-  const moduleType = moduleModel != null ? getModuleType(moduleModel) : null
+  const moduleType =
+    selectedModuleModel != null ? getModuleType(selectedModuleModel) : null
   const initialModules: ModuleOnDeck[] = Object.keys(modulesById).map(
     moduleId => modulesById[moduleId]
   )
@@ -152,7 +137,7 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
 
       return (
         (filterRecommended &&
-          !getLabwareIsRecommended(labwareDef, moduleModel)) ||
+          !getLabwareIsRecommended(labwareDef, selectedModuleModel)) ||
         (filterHeight &&
           getIsLabwareAboveHeight(
             labwareDef,
@@ -266,12 +251,20 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
                     buttonText={
                       customLabwareDefs[labwareURI].metadata.displayName
                     }
+                    setNoHover={() => {
+                      setHoveredLabware(null)
+                    }}
+                    setHovered={() => {
+                      setHoveredLabware(labwareURI)
+                    }}
                     buttonValue={labwareURI}
                     onChange={e => {
                       e.stopPropagation()
-                      setSelectedLabwareDefURI(labwareURI)
+                      dispatch(
+                        selectLabwareDefUri({ labwareDefUri: labwareURI })
+                      )
                     }}
-                    isSelected={labwareURI === selecteLabwareDefURI}
+                    isSelected={labwareURI === selectedLabwareDefUri}
                   />
                 ))}
               </ListButtonAccordion>
@@ -307,21 +300,36 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
                             key={`${index}_${category}_${loadName}`}
                           >
                             <ListButtonRadioButton
+                              setNoHover={() => {
+                                setHoveredLabware(null)
+                              }}
+                              setHovered={() => {
+                                setHoveredLabware(labwareURI)
+                              }}
                               id={`${index}_${category}_${loadName}`}
                               buttonText={labwareDef.metadata.displayName}
                               buttonValue={labwareURI}
                               onChange={e => {
                                 e.stopPropagation()
-                                setSelectedLabwareDefURI(
-                                  labwareURI === selecteLabwareDefURI
-                                    ? null
-                                    : labwareURI
+                                dispatch(
+                                  selectLabware({
+                                    labwareDefUri:
+                                      labwareURI === selectedLabwareDefUri
+                                        ? null
+                                        : labwareURI,
+                                  })
+                                )
+                                // reset the nested labware def uri in case it is not compatible
+                                dispatch(
+                                  selectNestedLabware({
+                                    nestedLabwareDefUri: null,
+                                  })
                                 )
                               }}
-                              isSelected={labwareURI === selecteLabwareDefURI}
+                              isSelected={labwareURI === selectedLabwareDefUri}
                             />
 
-                            {labwareURI === selecteLabwareDefURI &&
+                            {labwareURI === selectedLabwareDefUri &&
                               getLabwareCompatibleWithAdapter(loadName)
                                 ?.length > 0 && (
                                 <ListButtonAccordionContainer
@@ -332,7 +340,7 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
                                     isNested
                                     mainHeadline={t('adapter_compatible_lab')}
                                     isExpanded={
-                                      labwareURI === selecteLabwareDefURI
+                                      labwareURI === selectedLabwareDefUri
                                     }
                                   >
                                     {has96Channel &&
@@ -343,6 +351,14 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
                                               defs[tiprackDefUri]
                                             return (
                                               <ListButtonRadioButton
+                                                setNoHover={() => {
+                                                  setHoveredLabware(null)
+                                                }}
+                                                setHovered={() => {
+                                                  setHoveredLabware(
+                                                    tiprackDefUri
+                                                  )
+                                                }}
                                                 key={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                                                 id={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                                                 buttonText={
@@ -352,13 +368,15 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
                                                 buttonValue={tiprackDefUri}
                                                 onChange={e => {
                                                   e.stopPropagation()
-                                                  setNestedSelectedLabwareDefURI(
-                                                    tiprackDefUri
+                                                  dispatch(
+                                                    selectNestedLabware({
+                                                      nestedLabwareDefUri: tiprackDefUri,
+                                                    })
                                                   )
                                                 }}
                                                 isSelected={
                                                   tiprackDefUri ===
-                                                  selectedNestedSelectedLabwareDefURI
+                                                  selectedNestedLabwareDefUri
                                                 }
                                               />
                                             )
@@ -380,13 +398,15 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
                                               buttonValue={nestedDefUri}
                                               onChange={e => {
                                                 e.stopPropagation()
-                                                setNestedSelectedLabwareDefURI(
-                                                  nestedDefUri
+                                                dispatch(
+                                                  selectNestedLabware({
+                                                    nestedLabwareDefUri: nestedDefUri,
+                                                  })
                                                 )
                                               }}
                                               isSelected={
                                                 nestedDefUri ===
-                                                selectedNestedSelectedLabwareDefURI
+                                                selectedNestedLabwareDefUri
                                               }
                                             />
                                           )

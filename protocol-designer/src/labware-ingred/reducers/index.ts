@@ -10,8 +10,13 @@ import type {
   LocationLiquidState,
   LabwareLiquidState,
 } from '@opentrons/step-generation'
+import type { LoadLabwareCreateCommand } from '@opentrons/shared-data'
 import type { Action, DeckSlot } from '../../types'
-import type { LiquidGroupsById, DisplayLabware } from '../types'
+import type {
+  LiquidGroupsById,
+  DisplayLabware,
+  ZoomedInSlotInfoState,
+} from '../types'
 import type { LoadFileAction } from '../../load-file'
 import type {
   RemoveWellsContentsAction,
@@ -28,8 +33,12 @@ import type {
   CloseIngredientSelectorAction,
   DrillDownOnLabwareAction,
   DrillUpFromLabwareAction,
+  SelectLabwareDefUriAction,
+  SelectNestedLabwareDefUriAction,
+  SelectModuleAction,
+  SelectFixtureAction,
+  ZoomedInAction,
 } from '../actions'
-import type { LoadLabwareCreateCommand } from '@opentrons/shared-data'
 // REDUCERS
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
 // (this state just toggles a modal)
@@ -344,7 +353,69 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
   },
   {}
 )
+
+const initialState: ZoomedInSlotInfoState = {
+  selectedLabwareDefUri: null,
+  selectedNestedLabwareDefUri: null,
+  selectedModuleModel: null,
+  selectedFixture: null,
+  zoomedInSlot: { slot: null, cutout: null },
+}
+
+export const zoomedInSlotInfo = handleActions<ZoomedInSlotInfoState, any>(
+  {
+    //@ts-expect-error
+    SELECT_LABWARE_DEF_URI: (
+      state: ZoomedInSlotInfoState,
+      action: SelectLabwareDefUriAction
+    ): ZoomedInSlotInfoState => {
+      const { labwareDefUri } = action.payload
+      return { ...state, selectedLabwareDefUri: labwareDefUri }
+    },
+    //@ts-expect-error
+    SELECT_NESTED_LABWARE_DEF_URI: (
+      state: ZoomedInSlotInfoState,
+      action: SelectNestedLabwareDefUriAction
+    ): ZoomedInSlotInfoState => {
+      const { nestedLabwareDefUri } = action.payload
+      return { ...state, selectedNestedLabwareDefUri: nestedLabwareDefUri }
+    },
+    //@ts-expect-error
+    SELECT_MODULE: (
+      state: ZoomedInSlotInfoState,
+      action: SelectModuleAction
+    ): ZoomedInSlotInfoState => {
+      const { moduleModel } = action.payload
+      return { ...state, selectedModuleModel: moduleModel }
+    },
+    //@ts-expect-error
+    SELECT_FIXTURE: (
+      state: ZoomedInSlotInfoState,
+      action: SelectFixtureAction
+    ): ZoomedInSlotInfoState => {
+      const { fixture } = action.payload
+      return { ...state, selectedFixture: fixture }
+    },
+    //@ts-expect-error
+    ZOOMED_IN_SLOT: (
+      state: ZoomedInSlotInfoState,
+      action: ZoomedInAction
+    ): ZoomedInSlotInfoState => {
+      const { slot, cutout } = action.payload
+      return {
+        ...state,
+        zoomedInSlot: {
+          slot,
+          cutout,
+        },
+      }
+    },
+  },
+  initialState
+)
+
 export interface RootState {
+  zoomedInSlotInfo: ZoomedInSlotInfoState
   modeLabwareSelection: DeckSlot | false
   selectedContainerId: SelectedContainerId
   drillDownLabwareId: DrillDownLabwareId
@@ -356,6 +427,7 @@ export interface RootState {
 }
 // TODO Ian 2018-01-15 factor into separate files
 export const rootReducer: Reducer<RootState, Action> = combineReducers({
+  zoomedInSlotInfo,
   modeLabwareSelection,
   selectedContainerId,
   selectedLiquidGroup,

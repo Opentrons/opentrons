@@ -19,8 +19,10 @@ import type {
   IngredInputs,
   LiquidGroup,
   OrderedLiquids,
+  ZoomedInSlotInfoState,
 } from './types'
 import type { BaseState, DeckSlot } from './../types'
+import { CutoutId } from '@opentrons/shared-data'
 // TODO: Ian 2019-02-15 no RootSlice, use BaseState
 interface RootSlice {
   labwareIngred: RootState
@@ -157,6 +159,20 @@ const getLiquidDisplayColors: Selector<RootSlice, string[]> = createSelector(
       return acc
     }, [])
 )
+
+const getZoomedInSlotInfo: Selector<
+  RootSlice,
+  ZoomedInSlotInfoState
+> = createSelector(rootSelector, rootState => rootState.zoomedInSlotInfo)
+
+const getZoomedInSlot: Selector<
+  RootSlice,
+  { slot: DeckSlot | null; cutout: CutoutId | null }
+> = createSelector(
+  rootSelector,
+  rootState => rootState.zoomedInSlotInfo.zoomedInSlot
+)
+
 // TODO: prune selectors
 export const selectors = {
   rootSelector,
@@ -177,4 +193,6 @@ export const selectors = {
   selectedAddLabwareSlot,
   getDeckHasLiquid,
   getLiquidDisplayColors,
+  getZoomedInSlotInfo,
+  getZoomedInSlot,
 }

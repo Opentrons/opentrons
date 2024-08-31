@@ -24,6 +24,7 @@ import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations
 import { getFileMetadata } from '../../file-data/selectors'
 import { DefineLiquidsModal, ProtocolMetadataNav } from '../../organisms'
 import { DeckSetupContainer } from './DeckSetup'
+import { selectors } from '../../labware-ingred/selectors'
 import { OffDeck } from './Offdeck'
 import { LiquidsOverflowMenu } from './LiquidsOverflowMenu'
 
@@ -43,6 +44,7 @@ export function Designer(): JSX.Element {
   ])
   const { bakeToast } = useKitchen()
   const navigate = useNavigate()
+  const zoomIn = useSelector(selectors.getZoomedInSlot)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const metadata = useSelector(getFileMetadata)
   const [liquidOverflowMenu, showLiquidOverflowMenu] = React.useState<boolean>(
@@ -51,7 +53,6 @@ export function Designer(): JSX.Element {
   const [showDefineLiquidModal, setDefineLiquidModal] = React.useState<boolean>(
     false
   )
-  const [zoomInOnSlot, setZoomInOnSlot] = React.useState<OpenSlot | null>(null)
   const [tab, setTab] = React.useState<'startingDeck' | 'protocolSteps'>(
     'startingDeck'
   )
@@ -93,6 +94,13 @@ export function Designer(): JSX.Element {
     }
   }, [])
 
+  //  navigate to landing if suddenly you have no created protocol
+  React.useEffect(() => {
+    if (metadata?.created == null) {
+      navigate('/')
+    }
+  }, [additionalEquipmentOnDeck, navigate])
+
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
       if (!showDefineLiquidModal) {
@@ -100,6 +108,9 @@ export function Designer(): JSX.Element {
       }
     },
   })
+
+  const deckViewItems =
+    deckView === leftString ? <DeckSetupContainer /> : <OffDeck />
 
   return (
     <>
@@ -127,7 +138,7 @@ export function Designer(): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           padding={SPACING.spacing12}
         >
-          {zoomInOnSlot != null ? null : (
+          {zoomIn.slot != null ? null : (
             <Tabs tabs={[startingDeckTab, protocolStepTab]} />
           )}
           <ProtocolMetadataNav />
@@ -166,27 +177,22 @@ export function Designer(): JSX.Element {
         >
           {tab === 'startingDeck' ? (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-              <Flex alignSelf={ALIGN_END}>
-                <ToggleGroup
-                  selectedValue={deckView}
-                  leftText={leftString}
-                  rightText={rightString}
-                  leftClick={() => {
-                    setDeckView(leftString)
-                  }}
-                  rightClick={() => {
-                    setDeckView(rightString)
-                  }}
-                />
-              </Flex>
-              {deckView === leftString ? (
-                <DeckSetupContainer
-                  setZoomInOnSlot={setZoomInOnSlot}
-                  zoomIn={zoomInOnSlot}
-                />
-              ) : (
-                <OffDeck />
-              )}
+              {zoomIn.slot == null ? (
+                <Flex alignSelf={ALIGN_END}>
+                  <ToggleGroup
+                    selectedValue={deckView}
+                    leftText={leftString}
+                    rightText={rightString}
+                    leftClick={() => {
+                      setDeckView(leftString)
+                    }}
+                    rightClick={() => {
+                      setDeckView(rightString)
+                    }}
+                  />
+                </Flex>
+              ) : null}
+              {deckViewItems}
             </Flex>
           ) : (
             <div>TODO wire this up</div>
