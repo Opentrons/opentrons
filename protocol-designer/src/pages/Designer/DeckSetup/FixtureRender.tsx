@@ -1,20 +1,19 @@
 import * as React from 'react'
-import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import {
   COLORS,
   FlexTrash,
   SingleSlotFixture,
   StagingAreaFixture,
-  StagingAreaLocation,
   WasteChuteFixture,
   WasteChuteStagingAreaFixture,
 } from '@opentrons/components'
 import { darkFill, lightFill } from './DeckSetupContainer'
-import type { TrashCutoutId } from '@opentrons/components'
+import type { TrashCutoutId, StagingAreaLocation } from '@opentrons/components'
 import type {
   CutoutId,
   DeckDefinition,
   RobotType,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import type { Fixture } from './constants'
 

@@ -364,7 +364,7 @@ const initialState: ZoomedInSlotInfoState = {
 
 export const zoomedInSlotInfo = handleActions<ZoomedInSlotInfoState, any>(
   {
-    //@ts-expect-error
+    //  @ts-expect-error
     SELECT_LABWARE_DEF_URI: (
       state: ZoomedInSlotInfoState,
       action: SelectLabwareDefUriAction
@@ -372,7 +372,7 @@ export const zoomedInSlotInfo = handleActions<ZoomedInSlotInfoState, any>(
       const { labwareDefUri } = action.payload
       return { ...state, selectedLabwareDefUri: labwareDefUri }
     },
-    //@ts-expect-error
+    //  @ts-expect-error
     SELECT_NESTED_LABWARE_DEF_URI: (
       state: ZoomedInSlotInfoState,
       action: SelectNestedLabwareDefUriAction
@@ -380,7 +380,7 @@ export const zoomedInSlotInfo = handleActions<ZoomedInSlotInfoState, any>(
       const { nestedLabwareDefUri } = action.payload
       return { ...state, selectedNestedLabwareDefUri: nestedLabwareDefUri }
     },
-    //@ts-expect-error
+    //  @ts-expect-error
     SELECT_MODULE: (
       state: ZoomedInSlotInfoState,
       action: SelectModuleAction
@@ -388,7 +388,7 @@ export const zoomedInSlotInfo = handleActions<ZoomedInSlotInfoState, any>(
       const { moduleModel } = action.payload
       return { ...state, selectedModuleModel: moduleModel }
     },
-    //@ts-expect-error
+    //  @ts-expect-error
     SELECT_FIXTURE: (
       state: ZoomedInSlotInfoState,
       action: SelectFixtureAction
@@ -396,7 +396,7 @@ export const zoomedInSlotInfo = handleActions<ZoomedInSlotInfoState, any>(
       const { fixture } = action.payload
       return { ...state, selectedFixture: fixture }
     },
-    //@ts-expect-error
+    //  @ts-expect-error
     ZOOMED_IN_SLOT: (
       state: ZoomedInSlotInfoState,
       action: ZoomedInAction

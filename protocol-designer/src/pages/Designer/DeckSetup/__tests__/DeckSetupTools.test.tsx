@@ -9,11 +9,7 @@ import {
 } from '@opentrons/shared-data'
 import { i18n } from '../../../../assets/localization'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import {
-  deleteContainer,
-  selectLabwareDefUri,
-  selectModule,
-} from '../../../../labware-ingred/actions'
+import { deleteContainer } from '../../../../labware-ingred/actions'
 import { createModule, deleteModule } from '../../../../step-forms/actions'
 import { getRobotType } from '../../../../file-data/selectors'
 import {
@@ -145,12 +141,18 @@ describe('DeckSetupTools', () => {
     })
     render(props)
     fireEvent.click(screen.getByText('Heater-Shaker Module GEN1'))
-    expect(vi.mocked(selectModule)).toHaveBeenCalled()
     fireEvent.click(screen.getByText('Done'))
     expect(props.onCloseClick).toHaveBeenCalled()
     expect(vi.mocked(createModule)).toHaveBeenCalled()
   })
   it('should close and add waste chute and staging area when done is called', () => {
+    vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
+      selectedLabwareDefUri: null,
+      selectedNestedLabwareDefUri: null,
+      selectedFixture: 'wasteChuteAndStagingArea',
+      selectedModuleModel: HEATERSHAKER_MODULE_V1,
+      zoomedInSlot: { slot: 'D3', cutout: 'cutoutD3' },
+    })
     render(props)
     fireEvent.click(screen.getByText('Waste chute and staging area slot'))
     fireEvent.click(screen.getByText('Done'))

@@ -83,6 +83,14 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
   const [selectedHardware, setHardware] = React.useState<
     ModuleModel | Fixture | null
   >(null)
+  const moduleModels = getModuleModelsBySlot(
+    enableAbsorbanceReader,
+    robotType,
+    slot ?? ''
+  )
+  const [tab, setTab] = React.useState<'hardware' | 'labware'>(
+    moduleModels.length === 0 || slot === 'offDeck' ? 'labware' : 'hardware'
+  )
 
   //  initialize the previously selected hardware
   React.useEffect(() => {
@@ -110,16 +118,6 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
     createFixtureForSlots,
   } = getSlotInformation({ deckSetup, slot })
 
-  const moduleModels = getModuleModelsBySlot(
-    enableAbsorbanceReader,
-    robotType,
-    slot
-  )
-
-  const [tab, setTab] = React.useState<'hardware' | 'labware'>(
-    moduleModels.length === 0 || slot === 'offDeck' ? 'labware' : 'hardware'
-  )
-
   let fixtures: Fixture[] = []
   if (slot === 'D3') {
     fixtures = FIXTURES
@@ -141,7 +139,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
     text: t('labware'),
     disabled:
       selectedFixture === 'wasteChute' ||
-      selectedFixture == 'wasteChuteAndStagingArea' ||
+      selectedFixture === 'wasteChuteAndStagingArea' ||
       selectedFixture === 'trashBin',
     isActive: tab === 'labware',
     onClick: () => {

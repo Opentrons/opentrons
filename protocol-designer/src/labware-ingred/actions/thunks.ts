@@ -1,28 +1,25 @@
 import { getIsTiprack } from '@opentrons/shared-data'
 import { uuid } from '../../utils'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
-import {
-  LabwareOnDeck,
-  ModuleOnDeck,
-  selectors as stepFormSelectors,
-} from '../../step-forms'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
 import { getRobotType } from '../../file-data/selectors'
 import {
-  SelectNestedLabwareDefUriAction,
-  SelectLabwareDefUriAction,
-  SelectModuleAction,
   selectNestedLabwareDefUri,
   selectLabwareDefUri,
   selectModule,
   selectFixture,
-  SelectFixtureAction,
 } from './actions'
+import type { LabwareOnDeck, ModuleOnDeck } from '../../step-forms'
 import type {
   CreateContainerArgs,
   CreateContainerAction,
   DuplicateLabwareAction,
+  SelectNestedLabwareDefUriAction,
+  SelectLabwareDefUriAction,
+  SelectModuleAction,
+  SelectFixtureAction,
 } from './actions'
 import type { ThunkAction } from '../../types'
 import type { Fixture } from '../types'

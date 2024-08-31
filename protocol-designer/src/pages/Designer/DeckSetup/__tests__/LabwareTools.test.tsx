@@ -15,9 +15,14 @@ import {
   getPipetteEntities,
 } from '../../../../step-forms/selectors'
 import { getHas96Channel } from '../../../../utils'
+import { selectors } from '../../../../labware-ingred/selectors'
 import { createCustomLabwareDef } from '../../../../labware-defs/actions'
 import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import { getRobotType } from '../../../../file-data/selectors'
+import {
+  selectLabwareDefUri,
+  selectNestedLabwareDefUri,
+} from '../../../../labware-ingred/actions'
 import { LabwareTools } from '../LabwareTools'
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
 
@@ -26,6 +31,8 @@ vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../labware-defs/selectors')
 vi.mock('../../../../labware-defs/actions')
+vi.mock('../../../../labware-ingred/selectors')
+vi.mock('../../../../labware-ingred/actions')
 
 const render = (props: React.ComponentProps<typeof LabwareTools>) => {
   return renderWithProviders(<LabwareTools {...props} />, {
@@ -39,11 +46,7 @@ describe('LabwareTools', () => {
   beforeEach(() => {
     props = {
       slot: 'D3',
-      selectedHardware: null,
-      setSelectedLabwareDefURI: vi.fn(),
-      selecteLabwareDefURI: null,
-      setNestedSelectedLabwareDefURI: vi.fn(),
-      selectedNestedSelectedLabwareDefURI: null,
+      setHoveredLabware: vi.fn(),
     }
     vi.mocked(getCustomLabwareDefsByURI).mockReturnValue({})
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
@@ -56,6 +59,13 @@ describe('LabwareTools', () => {
         id: 'mockPipId',
         tiprackLabwareDef: [fixtureTiprack1000ul as LabwareDefinition2],
       },
+    })
+    vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
+      selectedLabwareDefUri: null,
+      selectedNestedLabwareDefUri: null,
+      selectedFixture: null,
+      selectedModuleModel: null,
+      zoomedInSlot: { slot: 'D3', cutout: 'cutoutD3' },
     })
     vi.mocked(getHas96Channel).mockReturnValue(false)
     vi.mocked(getInitialDeckSetup).mockReturnValue({
@@ -80,11 +90,16 @@ describe('LabwareTools', () => {
       screen.getByRole('label', { name: 'Corning 384 Well Plate' })
     )
     //  set labware
-    expect(props.setSelectedLabwareDefURI).toHaveBeenCalled()
+    expect(vi.mocked(selectLabwareDefUri)).toHaveBeenCalled()
   })
   it('renders deck slot and selects an adapter and labware', () => {
-    props.selecteLabwareDefURI =
-      'fixture/fixture_universal_flat_bottom_adapter/1'
+    vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
+      selectedLabwareDefUri: 'fixture/fixture_universal_flat_bottom_adapter/1',
+      selectedNestedLabwareDefUri: null,
+      selectedFixture: null,
+      selectedModuleModel: null,
+      zoomedInSlot: { slot: 'D3', cutout: 'cutoutD3' },
+    })
     render(props)
     screen.getByText('Adapter')
     fireEvent.click(screen.getAllByTestId('ListButton_noActive')[4])
@@ -102,7 +117,7 @@ describe('LabwareTools', () => {
         name: 'Fixture Corning 96 Well Plate 360 µL Flat',
       })
     )
-    expect(props.setNestedSelectedLabwareDefURI).toHaveBeenCalled()
+    expect(vi.mocked(selectNestedLabwareDefUri)).toHaveBeenCalled()
   })
 
   it('renders the custom labware flow', () => {

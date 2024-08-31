@@ -31,7 +31,6 @@ import { selectPreselectedSlotInfo } from '../../../labware-ingred/actions'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getRobotType } from '../../../file-data/selectors'
 import { getSlotInformation } from '../utils'
-import { Fixture } from './constants'
 import { FixtureRender } from './FixtureRender'
 import { DeckItemHover } from './DeckItemHover'
 import { SlotOverflowMenu } from './SlotOverflowMenu'
@@ -51,6 +50,7 @@ import type {
   ModuleOnDeck,
 } from '../../../step-forms'
 import type { TerminalItemId } from '../../../steplist'
+import type { Fixture } from './constants'
 
 interface DeckSetupDetailsProps {
   activeDeckSetup: InitialDeckSetup

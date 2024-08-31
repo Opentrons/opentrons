@@ -11,16 +11,18 @@ import type {
 } from '../../step-forms'
 import type { Fixture } from './DeckSetup/constants'
 
+interface AdditionalEquipment {
+  name: AdditionalEquipmentName
+  id: string
+  location?: string
+}
+
 interface SlotInformation {
   slotPosition: CoordinateTuple | null
   createdModuleForSlot?: ModuleOnDeck
   createdLabwareForSlot?: LabwareOnDeck
   createdNestedLabwareForSlot?: LabwareOnDeck
-  createFixtureForSlots?: {
-    name: AdditionalEquipmentName
-    id: string
-    location?: string | undefined
-  }[]
+  createFixtureForSlots?: AdditionalEquipment[]
   preSelectedFixture?: Fixture
 }
 

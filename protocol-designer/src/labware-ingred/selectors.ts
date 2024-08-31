@@ -6,6 +6,7 @@ import reduce from 'lodash/reduce'
 import type { Selector } from 'reselect'
 import type { Options } from '@opentrons/components'
 import type { LabwareLiquidState } from '@opentrons/step-generation'
+import type { CutoutId } from '@opentrons/shared-data'
 import type {
   RootState,
   ContainersState,
@@ -22,7 +23,6 @@ import type {
   ZoomedInSlotInfoState,
 } from './types'
 import type { BaseState, DeckSlot } from './../types'
-import { CutoutId } from '@opentrons/shared-data'
 // TODO: Ian 2019-02-15 no RootSlice, use BaseState
 interface RootSlice {
   labwareIngred: RootState
