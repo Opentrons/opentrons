@@ -35,6 +35,8 @@
   "rename_lab": "Rename labware",
   "reservoir": "Reservoir",
   "starting_deck_state": "Starting deck state",
+  "tc_slots_occupied_flex": "The Thermocycler needs slots A1 and B1. Slot A1 is occupied",
+  "tc_slots_occupied_ot2": "The Thermocycler needs slots 7, 8, 10, and 11. One or more of those slots is occupied",
   "tipRack": "Tip rack",
   "tubeRack": "Tube rack",
   "untitled_protocol": "Untitled protocol",

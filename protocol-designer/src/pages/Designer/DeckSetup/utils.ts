@@ -30,6 +30,9 @@ import type {
 } from '@opentrons/shared-data'
 import type { InitialDeckSetup } from '../../../step-forms'
 
+const OT2_TC_SLOTS = ['7', '8', '10', '11']
+const FLEX_TC_SLOTS = ['A1', 'B1']
+
 export function getCutoutIdForAddressableArea(
   addressableArea: AddressableAreaName,
   cutoutFixtures: CutoutFixture[]
@@ -137,43 +140,61 @@ export const getLabwareCompatibleWithAdapter = (
     .map(([labwareDefUri]) => labwareDefUri)
 }
 
-interface Ot2HeaterShakerDeckErrorsProps {
+interface DeckErrorsProps {
   modules: InitialDeckSetup['modules']
   selectedSlot: string
   selectedModel: ModuleModel
+  labware: InitialDeckSetup['labware']
+  robotType: RobotType
 }
 
-export const getOt2HeaterShakerDeckErrors = (
-  props: Ot2HeaterShakerDeckErrorsProps
-): string | null => {
-  const { selectedSlot, selectedModel, modules } = props
+export const getDeckErrors = (props: DeckErrorsProps): string | null => {
+  const { selectedSlot, selectedModel, modules, labware, robotType } = props
 
   let error = null
 
-  const isModuleAdjacentToHeaterShaker =
-    // if the module is a heater shaker, it can't be adjacent to another heater shaker
-    // because PD does not support MoaM for OT-2
-    getModuleType(selectedModel) !== HEATERSHAKER_MODULE_TYPE &&
-    some(
-      modules,
-      hwModule =>
-        hwModule.type === HEATERSHAKER_MODULE_TYPE &&
-        getAreSlotsAdjacent(hwModule.slot, selectedSlot)
-    )
+  if (robotType === OT2_ROBOT_TYPE) {
+    const isModuleAdjacentToHeaterShaker =
+      // if the module is a heater shaker, it can't be adjacent to another heater shaker
+      // because PD does not support MoaM for OT-2
+      getModuleType(selectedModel) !== HEATERSHAKER_MODULE_TYPE &&
+      some(
+        modules,
+        hwModule =>
+          hwModule.type === HEATERSHAKER_MODULE_TYPE &&
+          getAreSlotsAdjacent(hwModule.slot, selectedSlot)
+      )
 
-  if (isModuleAdjacentToHeaterShaker) {
-    error = 'heater_shaker_adjacent'
-  } else if (getModuleType(selectedModel) === HEATERSHAKER_MODULE_TYPE) {
-    const isHeaterShakerAdjacentToAnotherModule = some(
-      modules,
-      hwModule =>
-        getAreSlotsAdjacent(hwModule.slot, selectedSlot) &&
-        // if the other module is a heater shaker it's the same heater shaker (reflecting current state)
-        // since the form has not been saved yet and PD does not support MoaM for OT-2
-        hwModule.type !== HEATERSHAKER_MODULE_TYPE
-    )
-    if (isHeaterShakerAdjacentToAnotherModule) {
-      error = 'heater_shaker_adjacent_to'
+    if (isModuleAdjacentToHeaterShaker) {
+      error = 'heater_shaker_adjacent'
+    } else if (getModuleType(selectedModel) === HEATERSHAKER_MODULE_TYPE) {
+      const isHeaterShakerAdjacentToAnotherModule = some(
+        modules,
+        hwModule =>
+          getAreSlotsAdjacent(hwModule.slot, selectedSlot) &&
+          // if the other module is a heater shaker it's the same heater shaker (reflecting current state)
+          // since the form has not been saved yet and PD does not support MoaM for OT-2
+          hwModule.type !== HEATERSHAKER_MODULE_TYPE
+      )
+      if (isHeaterShakerAdjacentToAnotherModule) {
+        error = 'heater_shaker_adjacent_to'
+      }
+    } else if (getModuleType(selectedModel) === THERMOCYCLER_MODULE_TYPE) {
+      const isLabwareInTCSlots = Object.values(labware).some(lw =>
+        OT2_TC_SLOTS.includes(lw.slot)
+      )
+      if (isLabwareInTCSlots) {
+        error = 'tc_slots_occupied_ot2'
+      }
+    }
+  } else {
+    if (getModuleType(selectedModel) === THERMOCYCLER_MODULE_TYPE) {
+      const isLabwareInTCSlots = Object.values(labware).some(lw =>
+        FLEX_TC_SLOTS.includes(lw.slot)
+      )
+      if (isLabwareInTCSlots) {
+        error = 'tc_slots_occupied_flex'
+      }
     }
   }
 

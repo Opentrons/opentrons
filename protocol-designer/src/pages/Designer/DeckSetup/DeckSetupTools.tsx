@@ -33,7 +33,6 @@ import {
   selectFixture,
   selectLabwareDefUri,
   selectModule,
-  selectNestedLabwareDefUri,
   selectPreselectedSlotInfo,
   selectZoomedInSlot,
 } from '../../../labware-ingred/actions'
@@ -41,13 +40,13 @@ import {
   getEnableAbsorbanceReader,
   getEnableMoam,
 } from '../../../feature-flags/selectors'
+import { selectors } from '../../../labware-ingred/selectors'
 import { useKitchen } from '../../../organisms/Kitchen/hooks'
 import { createContainerAboveModule } from '../../../step-forms/actions/thunks'
 import { FIXTURES, MOAM_MODELS, MOAM_MODELS_WITH_FF } from './constants'
 import { getSlotInformation } from '../utils'
-import { getModuleModelsBySlot, getOt2HeaterShakerDeckErrors } from './utils'
+import { getModuleModelsBySlot, getDeckErrors } from './utils'
 import { LabwareTools } from './LabwareTools'
-import { selectors } from '../../../labware-ingred/selectors'
 
 import type { ModuleModel } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../../types'
@@ -96,7 +95,11 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
     return null
   }
 
-  const { modules: deckSetupModules, additionalEquipmentOnDeck } = deckSetup
+  const {
+    modules: deckSetupModules,
+    additionalEquipmentOnDeck,
+    labware: deckSetupLabware,
+  } = deckSetup
   const hasTrash = Object.values(additionalEquipmentOnDeck).some(
     ae => ae.name === 'trashBin'
   )
@@ -291,10 +294,12 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
                   ? MOAM_MODELS
                   : MOAM_MODELS_WITH_FF
 
-                const ot2CollisionError = getOt2HeaterShakerDeckErrors({
+                const collisionError = getDeckErrors({
                   modules: deckSetupModules,
                   selectedSlot: slot,
                   selectedModel: model,
+                  labware: deckSetupLabware,
+                  robotType: robotType,
                 })
 
                 return (
@@ -348,11 +353,8 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
                             ),
                           }) as string
                         )
-                      } else if (
-                        robotType === OT2_ROBOT_TYPE &&
-                        ot2CollisionError != null
-                      ) {
-                        makeSnackbar(t(`${ot2CollisionError}`) as string)
+                      } else if (collisionError != null) {
+                        makeSnackbar(t(`${collisionError}`) as string)
                       } else {
                         setHardware(model)
                         dispatch(selectModule({ moduleModel: model }))

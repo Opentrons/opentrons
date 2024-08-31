@@ -101,8 +101,6 @@ export function DeckSetupContainer(): JSX.Element {
     dispatch(selectZoomedInSlot({ slot: slotId, cutout: cutoutId }))
   }
 
-  const trashSlot = trash?.location
-
   const _hasGen1MultichannelPipette = React.useMemo(
     () => getHasGen1MultiChannelPipette(activeDeckSetup.pipettes),
     [activeDeckSetup.pipettes]
@@ -158,32 +156,32 @@ export function DeckSetupContainer(): JSX.Element {
 
   // TODO(ja): the animation is causing deckSetupTools to rerender 62 times
   // should optimize this
-  // const hoveredSlotPosition = React.useMemo(
-  //   () => getPositionFromSlotId(zoomIn?.slot ?? '', deckDef),
-  //   [deckDef, zoomIn]
-  // )
+  const hoveredSlotPosition = React.useMemo(
+    () => getPositionFromSlotId(zoomIn?.slot ?? '', deckDef),
+    [deckDef, zoomIn]
+  )
 
-  // React.useEffect(() => {
-  //   if (zoomIn != null && hoveredSlotPosition != null) {
-  //     const zoomedInViewBox = zoomInOnCoordinate({
-  //       x: hoveredSlotPosition[0],
-  //       y: hoveredSlotPosition[1],
-  //       deckDef,
-  //     })
+  React.useEffect(() => {
+    if (zoomIn != null && hoveredSlotPosition != null) {
+      const zoomedInViewBox = zoomInOnCoordinate({
+        x: hoveredSlotPosition[0],
+        y: hoveredSlotPosition[1],
+        deckDef,
+      })
 
-  //     animateZoom({
-  //       targetViewBox: zoomedInViewBox,
-  //       viewBox,
-  //       setViewBox,
-  //     })
-  //   } else {
-  //     animateZoom({
-  //       targetViewBox: initialViewBox,
-  //       viewBox,
-  //       setViewBox,
-  //     })
-  //   }
-  // }, [zoomIn, animateZoom])
+      animateZoom({
+        targetViewBox: zoomedInViewBox,
+        viewBox,
+        setViewBox,
+      })
+    } else {
+      animateZoom({
+        targetViewBox: initialViewBox,
+        viewBox,
+        setViewBox,
+      })
+    }
+  }, [zoomIn, animateZoom])
 
   return (
     <>
@@ -229,18 +227,27 @@ export function DeckSetupContainer(): JSX.Element {
                         />
                       ) : null
                     })}
-                    {stagingAreaFixtures.map(fixture => (
-                      <StagingAreaFixture
-                        key={fixture.id}
-                        cutoutId={fixture.location as StagingAreaLocation}
-                        deckDefinition={deckDef}
-                        slotClipColor={darkFill}
-                        fixtureBaseColor={lightFill}
-                      />
-                    ))}
+                    {stagingAreaFixtures.map(fixture => {
+                      if (
+                        zoomIn.cutout == null ||
+                        zoomIn.cutout !== fixture.location
+                      ) {
+                        return (
+                          <StagingAreaFixture
+                            key={fixture.id}
+                            cutoutId={fixture.location as StagingAreaLocation}
+                            deckDefinition={deckDef}
+                            slotClipColor={darkFill}
+                            fixtureBaseColor={lightFill}
+                          />
+                        )
+                      }
+                    })}
                     {trash != null
                       ? trashBinFixtures.map(({ cutoutId }) =>
-                          cutoutId != null ? (
+                          cutoutId != null &&
+                          (zoomIn.cutout == null ||
+                            zoomIn.cutout !== cutoutId) ? (
                             <React.Fragment key={cutoutId}>
                               <SingleSlotFixture
                                 cutoutId={cutoutId}
@@ -258,23 +265,41 @@ export function DeckSetupContainer(): JSX.Element {
                           ) : null
                         )
                       : null}
-                    {wasteChuteFixtures.map(fixture => (
-                      <WasteChuteFixture
-                        key={fixture.id}
-                        cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
-                        deckDefinition={deckDef}
-                        fixtureBaseColor={lightFill}
-                      />
-                    ))}
-                    {wasteChuteStagingAreaFixtures.map(fixture => (
-                      <WasteChuteStagingAreaFixture
-                        key={fixture.id}
-                        cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
-                        deckDefinition={deckDef}
-                        slotClipColor={darkFill}
-                        fixtureBaseColor={lightFill}
-                      />
-                    ))}
+                    {wasteChuteFixtures.map(fixture => {
+                      if (
+                        zoomIn.cutout == null ||
+                        zoomIn.cutout !== fixture.location
+                      ) {
+                        return (
+                          <WasteChuteFixture
+                            key={fixture.id}
+                            cutoutId={
+                              fixture.location as typeof WASTE_CHUTE_CUTOUT
+                            }
+                            deckDefinition={deckDef}
+                            fixtureBaseColor={lightFill}
+                          />
+                        )
+                      }
+                    })}
+                    {wasteChuteStagingAreaFixtures.map(fixture => {
+                      if (
+                        zoomIn.cutout == null ||
+                        zoomIn.cutout !== fixture.location
+                      ) {
+                        return (
+                          <WasteChuteStagingAreaFixture
+                            key={fixture.id}
+                            cutoutId={
+                              fixture.location as typeof WASTE_CHUTE_CUTOUT
+                            }
+                            deckDefinition={deckDef}
+                            slotClipColor={darkFill}
+                            fixtureBaseColor={lightFill}
+                          />
+                        )
+                      }
+                    })}
                   </>
                 )}
                 <DeckSetupDetails
@@ -285,7 +310,6 @@ export function DeckSetupContainer(): JSX.Element {
                   hover={hoverSlot}
                   setHover={setHoverSlot}
                   addEquipment={addEquipment}
-                  trashSlot={trashSlot ?? null}
                   activeDeckSetup={activeDeckSetup}
                   selectedTerminalItemId={selectedTerminalItemId}
                   stagingAreaCutoutIds={stagingAreaFixtures.map(

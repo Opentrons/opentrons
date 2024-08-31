@@ -57,7 +57,6 @@ interface DeckSetupDetailsProps {
   showGen1MultichannelCollisionWarnings: boolean
   deckDef: DeckDefinition
   stagingAreaCutoutIds: CutoutId[]
-  trashSlot: string | null
   addEquipment: (slotId: string) => void
   hover: string | null
   setHover: React.Dispatch<React.SetStateAction<string | null>>
@@ -73,7 +72,6 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
     activeDeckSetup,
     showGen1MultichannelCollisionWarnings,
     deckDef,
-    trashSlot,
     addEquipment,
     stagingAreaCutoutIds,
     selectedTerminalItemId,
@@ -224,8 +222,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
           yDimension: labwareLoadedOnModule?.def.dimensions.yDimension ?? 0,
           zDimension: labwareLoadedOnModule?.def.dimensions.zDimension ?? 0,
         }
-        return hoveredModule == null &&
-          zoomedInSlotInfo.selectedModuleModel == null ? (
+        return moduleOnDeck.slot !== zoomedInSlotInfo.zoomedInSlot.slot ? (
           <React.Fragment key={moduleOnDeck.id}>
             <Module
               key={moduleOnDeck.id}
@@ -348,7 +345,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
           console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
           return null
         }
-        return (
+        return labware.slot !== zoomedInSlotInfo.zoomedInSlot.slot ? (
           <React.Fragment key={labware.id}>
             <LabwareOnDeck
               x={slotPosition[0]}
@@ -367,7 +364,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
               selectedTerminalItemId={props.selectedTerminalItemId}
             />
           </React.Fragment>
-        )
+        ) : null
       })}
 
       {/* all nested labwares on deck  */}
@@ -431,7 +428,9 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
 
       {/* selected hardware + labware */}
       {zoomedInSlotInfo.selectedFixture != null &&
-      zoomedInSlotInfo.zoomedInSlot.cutout != null ? (
+      zoomedInSlotInfo.zoomedInSlot.cutout != null &&
+      hoveredFixture == null &&
+      hoveredModule == null ? (
         <FixtureRender
           fixture={zoomedInSlotInfo.selectedFixture}
           cutout={zoomedInSlotInfo.zoomedInSlot.cutout}
@@ -442,7 +441,8 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
 
       {zoomedInSlotInfo.selectedModuleModel != null &&
       slotPosition != null &&
-      hoveredModule == null ? (
+      hoveredModule == null &&
+      hoveredFixture == null ? (
         <Module
           key={`${zoomedInSlotInfo.selectedModuleModel}_${zoomedInSlot}_selected`}
           x={slotPosition[0]}
@@ -452,7 +452,8 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
         >
           <>
             {zoomedInSlotInfo.selectedLabwareDefUri != null &&
-            zoomedInSlotInfo.selectedModuleModel != null ? (
+            zoomedInSlotInfo.selectedModuleModel != null &&
+            hoveredLabware == null ? (
               <g transform={`translate(0, 0)`}>
                 <LabwareRender
                   definition={defs[zoomedInSlotInfo.selectedLabwareDefUri]}
@@ -471,7 +472,8 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
 
       {zoomedInSlotInfo.selectedLabwareDefUri != null &&
       slotPosition != null &&
-      zoomedInSlotInfo.selectedModuleModel == null ? (
+      zoomedInSlotInfo.selectedModuleModel == null &&
+      hoveredLabware == null ? (
         <g transform={`translate(${slotPosition[0]}, ${slotPosition[1]})`}>
           <LabwareRender
             definition={defs[zoomedInSlotInfo.selectedLabwareDefUri]}
