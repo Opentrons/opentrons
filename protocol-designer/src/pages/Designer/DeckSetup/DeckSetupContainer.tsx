@@ -81,6 +81,32 @@ export function DeckSetupContainer(): JSX.Element {
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
   )
+  const wasteChuteFixtures = Object.values(
+    activeDeckSetup.additionalEquipmentOnDeck
+  ).filter(
+    aE =>
+      WASTE_CHUTE_CUTOUT.includes(aE.location as CutoutId) &&
+      aE.name === 'wasteChute'
+  )
+  const wasteChuteStagingAreaFixtures = Object.values(
+    activeDeckSetup.additionalEquipmentOnDeck
+  ).filter(
+    aE =>
+      STAGING_AREA_CUTOUTS.includes(aE.location as CutoutId) &&
+      aE.name === 'stagingArea' &&
+      aE.location === WASTE_CHUTE_CUTOUT &&
+      wasteChuteFixtures.length > 0
+  )
+  const hasWasteChute =
+    wasteChuteFixtures.length > 0 || wasteChuteStagingAreaFixtures.length > 0
+
+  const initialViewBox = `${deckDef.cornerOffsetFromOrigin[0]} ${
+    hasWasteChute
+      ? deckDef.cornerOffsetFromOrigin[1] - WASTE_CHUTE_SPACE
+      : deckDef.cornerOffsetFromOrigin[1]
+  } ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`
+
+  const [viewBox, setViewBox] = React.useState<string>(initialViewBox)
   const [hoveredLabware, setHoveredLabware] = React.useState<string | null>(
     null
   )
@@ -97,8 +123,21 @@ export function DeckSetupContainer(): JSX.Element {
         slotId as AddressableAreaName,
         deckDef.cutoutFixtures
       ) ?? 'cutoutD1'
-
     dispatch(selectZoomedInSlot({ slot: slotId, cutout: cutoutId }))
+
+    const zoomInSlotPosition = getPositionFromSlotId(slotId ?? '', deckDef)
+    if (zoomInSlotPosition != null) {
+      const zoomedInViewBox = zoomInOnCoordinate({
+        x: zoomInSlotPosition[0],
+        y: zoomInSlotPosition[1],
+        deckDef,
+      })
+      animateZoom({
+        targetViewBox: zoomedInViewBox,
+        viewBox,
+        setViewBox,
+      })
+    }
   }
 
   const _hasGen1MultichannelPipette = React.useMemo(
@@ -114,13 +153,6 @@ export function DeckSetupContainer(): JSX.Element {
       cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
     },
   ]
-  const wasteChuteFixtures = Object.values(
-    activeDeckSetup.additionalEquipmentOnDeck
-  ).filter(
-    aE =>
-      WASTE_CHUTE_CUTOUT.includes(aE.location as CutoutId) &&
-      aE.name === 'wasteChute'
-  )
   const stagingAreaFixtures: AdditionalEquipmentEntity[] = Object.values(
     activeDeckSetup.additionalEquipmentOnDeck
   ).filter(
@@ -129,59 +161,9 @@ export function DeckSetupContainer(): JSX.Element {
       aE.name === 'stagingArea'
   )
 
-  const wasteChuteStagingAreaFixtures = Object.values(
-    activeDeckSetup.additionalEquipmentOnDeck
-  ).filter(
-    aE =>
-      STAGING_AREA_CUTOUTS.includes(aE.location as CutoutId) &&
-      aE.name === 'stagingArea' &&
-      aE.location === WASTE_CHUTE_CUTOUT &&
-      wasteChuteFixtures.length > 0
-  )
-
-  const hasWasteChute =
-    wasteChuteFixtures.length > 0 || wasteChuteStagingAreaFixtures.length > 0
-
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
   )
-
-  const initialViewBox = `${deckDef.cornerOffsetFromOrigin[0]} ${
-    hasWasteChute
-      ? deckDef.cornerOffsetFromOrigin[1] - WASTE_CHUTE_SPACE
-      : deckDef.cornerOffsetFromOrigin[1]
-  } ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`
-
-  const [viewBox, setViewBox] = React.useState<string>(initialViewBox)
-
-  // TODO(ja): the animation is causing deckSetupTools to rerender 62 times
-  // should optimize this
-  const hoveredSlotPosition = React.useMemo(
-    () => getPositionFromSlotId(zoomIn?.slot ?? '', deckDef),
-    [deckDef, zoomIn]
-  )
-
-  React.useEffect(() => {
-    if (zoomIn != null && hoveredSlotPosition != null) {
-      const zoomedInViewBox = zoomInOnCoordinate({
-        x: hoveredSlotPosition[0],
-        y: hoveredSlotPosition[1],
-        deckDef,
-      })
-
-      animateZoom({
-        targetViewBox: zoomedInViewBox,
-        viewBox,
-        setViewBox,
-      })
-    } else {
-      animateZoom({
-        targetViewBox: initialViewBox,
-        viewBox,
-        setViewBox,
-      })
-    }
-  }, [zoomIn, animateZoom])
 
   return (
     <>
@@ -343,6 +325,11 @@ export function DeckSetupContainer(): JSX.Element {
           }}
           onCloseClick={() => {
             dispatch(selectZoomedInSlot({ slot: null, cutout: null }))
+            animateZoom({
+              targetViewBox: initialViewBox,
+              viewBox,
+              setViewBox,
+            })
           }}
           setHoveredLabware={setHoveredLabware}
         />

@@ -221,7 +221,7 @@ export function zoomInOnCoordinate(props: ZoomInOnCoordinateProps): string {
   return `${newMinX} ${newMinY} ${newWidth} ${newHeight}`
 }
 
-interface AnimateZoomProps {
+export interface AnimateZoomProps {
   targetViewBox: string
   viewBox: string
   setViewBox: React.Dispatch<React.SetStateAction<string>>

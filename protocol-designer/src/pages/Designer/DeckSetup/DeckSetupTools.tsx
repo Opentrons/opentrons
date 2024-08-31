@@ -79,7 +79,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
     selectedNestedLabwareDefUri,
   } = zoomedInSlotInfo
   const { slot, cutout } = zoomedInSlot
-
+  console.log('hello')
   const [selectedHardware, setHardware] = React.useState<
     ModuleModel | Fixture | null
   >(null)

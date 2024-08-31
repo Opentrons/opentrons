@@ -107,7 +107,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
     deckDef,
   })
 
-  //  conditionally render the slot's info
+  //  initiate the slot's info
   React.useEffect(() => {
     dispatch(
       selectPreselectedSlotInfo({
