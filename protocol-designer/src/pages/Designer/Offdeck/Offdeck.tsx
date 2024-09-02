@@ -7,7 +7,6 @@ import {
   Box,
   COLORS,
   DIRECTION_COLUMN,
-  DeckLabelSet,
   Flex,
   JUSTIFY_CENTER,
   LabwareRender,
@@ -52,52 +51,52 @@ export function OffDeck(): JSX.Element {
   )
   if (hoveredLabwareDef != null && hoveredLabwareDef !== offDeckLabware) {
     labware = (
-      <DeckLabelSet
-        deckLabels={[
-          {
-            text: hoveredLabwareDef.metadata.displayName,
-            isSelected: false,
-          },
-        ]}
+      //  TODO(ja): adding deck labware sets in a followup
+      // <DeckLabelSet
+      //   deckLabels={[
+      //     {
+      //       text: hoveredLabwareDef.metadata.displayName,
+      //       isSelected: false,
+      //     },
+      //   ]}
+      // >
+      <RobotWorkSpace
+        key={hoveredLabwareDef.parameters.loadName}
+        viewBox={`${hoveredLabwareDef.cornerOffsetFromSlot.x} ${hoveredLabwareDef.cornerOffsetFromSlot.y} ${hoveredLabwareDef.dimensions.xDimension} ${hoveredLabwareDef.dimensions.yDimension}`}
+        width="510.84px"
+        height="342px"
       >
-        <RobotWorkSpace
-          key={hoveredLabwareDef.parameters.loadName}
-          viewBox={`${hoveredLabwareDef.cornerOffsetFromSlot.x} ${hoveredLabwareDef.cornerOffsetFromSlot.y} ${hoveredLabwareDef.dimensions.xDimension} ${hoveredLabwareDef.dimensions.yDimension}`}
-          width="510.84px"
-          height="342px"
-        >
-          {() => (
-            <>
-              <LabwareRender definition={hoveredLabwareDef} />
-            </>
-          )}
-        </RobotWorkSpace>
-      </DeckLabelSet>
+        {() => (
+          <>
+            <LabwareRender definition={hoveredLabwareDef} />
+          </>
+        )}
+      </RobotWorkSpace>
     )
   } else if (offDeckLabware != null) {
     const def = offDeckLabware
     labware = (
-      <DeckLabelSet
-        deckLabels={[
-          {
-            text: def.metadata.displayName,
-            isSelected: true,
-          },
-        ]}
+      // <DeckLabelSet
+      //   deckLabels={[
+      //     {
+      //       text: def.metadata.displayName,
+      //       isSelected: true,
+      //     },
+      //   ]}
+      // >
+      <RobotWorkSpace
+        key={def.parameters.loadName}
+        viewBox={`${def.cornerOffsetFromSlot.x} ${def.cornerOffsetFromSlot.y} ${def.dimensions.xDimension} ${def.dimensions.yDimension}`}
+        width="510.84px"
+        height="342px"
       >
-        <RobotWorkSpace
-          key={def.parameters.loadName}
-          viewBox={`${def.cornerOffsetFromSlot.x} ${def.cornerOffsetFromSlot.y} ${def.dimensions.xDimension} ${def.dimensions.yDimension}`}
-          width="510.84px"
-          height="342px"
-        >
-          {() => (
-            <>
-              <LabwareRender definition={def} />
-            </>
-          )}
-        </RobotWorkSpace>
-      </DeckLabelSet>
+        {() => (
+          <>
+            <LabwareRender definition={def} />
+          </>
+        )}
+      </RobotWorkSpace>
+      // </DeckLabelSet>
     )
   }
 
@@ -107,15 +106,15 @@ export function OffDeck(): JSX.Element {
         <>
           <Flex justifyContent={JUSTIFY_CENTER} width="calc(100% - 25rem)">
             <Flex
-              width="630.84px"
-              height="514px"
+              width="39.4275rem"
+              height="32.125rem"
               justifyContent={JUSTIFY_CENTER}
               alignItems={ALIGN_CENTER}
               borderRadius={BORDERS.borderRadius8}
               backgroundColor={COLORS.grey20}
             >
               <Flex
-                padding="60px"
+                padding={SPACING.spacing60}
                 width="100%"
                 height="100%"
                 flexDirection={DIRECTION_COLUMN}

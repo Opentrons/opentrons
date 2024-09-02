@@ -7,7 +7,7 @@ import {
   WasteChuteFixture,
   WasteChuteStagingAreaFixture,
 } from '@opentrons/components'
-import { darkFill, lightFill } from './DeckSetupContainer'
+import { lightFill } from './DeckSetupContainer'
 import type { TrashCutoutId, StagingAreaLocation } from '@opentrons/components'
 import type {
   CutoutId,
@@ -33,7 +33,6 @@ export const FixtureRender = (props: FixtureRenderProps): JSX.Element => {
           key={`fixtureRender_${fixture}`}
           cutoutId={cutout as StagingAreaLocation}
           deckDefinition={deckDef}
-          slotClipColor={darkFill}
           fixtureBaseColor={lightFill}
         />
       )
@@ -72,7 +71,6 @@ export const FixtureRender = (props: FixtureRenderProps): JSX.Element => {
           key={`fixtureRender_${fixture}`}
           cutoutId={cutout as typeof WASTE_CHUTE_CUTOUT}
           deckDefinition={deckDef}
-          slotClipColor={darkFill}
           fixtureBaseColor={lightFill}
         />
       )

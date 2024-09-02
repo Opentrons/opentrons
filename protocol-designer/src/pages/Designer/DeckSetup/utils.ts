@@ -1,3 +1,4 @@
+import some from 'lodash/some'
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
@@ -9,7 +10,6 @@ import {
   getAreSlotsAdjacent,
   getModuleType,
 } from '@opentrons/shared-data'
-import some from 'lodash/some'
 
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import {
@@ -234,7 +234,7 @@ export function animateZoom(props: AnimateZoomProps): void {
 
   if (targetViewBox === viewBox) return
 
-  const duration = 500 // Animation duration in ms
+  const duration = 500
   const start = performance.now()
   const initialViewBoxValues = viewBox.split(' ').map(Number) as ViewBox
   const targetViewBoxValues = targetViewBox.split(' ').map(Number) as ViewBox

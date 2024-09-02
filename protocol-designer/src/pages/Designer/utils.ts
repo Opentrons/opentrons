@@ -31,6 +31,10 @@ interface SlotInformationProps {
   slot: DeckSlot
   deckDef?: DeckDefinition
 }
+
+const FOURTH_COLUMN_SLOTS = ['A4', 'B4', 'C4', 'D4']
+const FOURTH_COLUMN_CONVERSION = { A4: 'A3', B4: 'B3', C4: 'C3', D4: 'D3' }
+
 export const getSlotInformation = (
   props: SlotInformationProps
 ): SlotInformation => {
@@ -48,11 +52,18 @@ export const getSlotInformation = (
   const createdLabwareForSlot = Object.values(deckSetupLabware).find(
     lw => lw.slot === slot || lw.slot === createdModuleForSlot?.id
   )
-  const createdNestedLabwareForSlot = Object.values(deckSetupLabware).find(lw =>
-    Object.keys(deckSetupLabware).includes(lw.slot)
+  const createdNestedLabwareForSlot = Object.values(deckSetupLabware).find(
+    lw => lw.slot === createdLabwareForSlot?.id
   )
   const createFixtureForSlots = Object.values(additionalEquipmentOnDeck).filter(
-    ae => ae.location?.split('cutout')[1] === slot
+    ae => {
+      const slotKey = FOURTH_COLUMN_SLOTS.includes(slot)
+        ? FOURTH_COLUMN_CONVERSION[
+            slot as keyof typeof FOURTH_COLUMN_CONVERSION
+          ]
+        : slot
+      return ae.location?.split('cutout')[1] === slotKey
+    }
   )
 
   const preSelectedFixture =

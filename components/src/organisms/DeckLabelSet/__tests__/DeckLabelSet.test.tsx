@@ -4,7 +4,6 @@ import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../testing/utils'
 import { BORDERS, COLORS } from '../../../helix-design-system'
-import { Box } from '../../../primitives'
 import { DeckLabel } from '../../../molecules/DeckLabel'
 import { DeckLabelSet } from '..'
 
@@ -31,11 +30,10 @@ describe('DeckLabelSet', () => {
 
   beforeEach(() => {
     props = {
-      children: (
-        <Box width="31.9375rem" height="5.75rem">
-          test
-        </Box>
-      ),
+      width: 10,
+      height: 10,
+      x: 10,
+      y: 10,
       deckLabels: mockDeckLabels,
     }
     vi.mocked(DeckLabel).mockReturnValue(<div>mock DeckLabels</div>)

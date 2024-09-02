@@ -93,7 +93,7 @@ export function SlotOverflowMenu(
       dispatch(deleteContainer({ labwareId: nestedLabwareOnSlot.id }))
     }
   }
-
+  console.log('slot from slow overflow menu', slot)
   return (
     <>
       {showNickNameModal && labwareOnSlot != null ? (

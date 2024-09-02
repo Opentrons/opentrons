@@ -31,8 +31,8 @@ import { getRobotType } from '../../../file-data/selectors'
 import { getHasGen1MultiChannelPipette } from '../../../step-forms'
 import { SlotDetailsContainer } from '../../../organisms'
 import { selectZoomedInSlot } from '../../../labware-ingred/actions'
-import { DeckSetupDetails } from './DeckSetupDetails'
 import { selectors } from '../../../labware-ingred/selectors'
+import { DeckSetupDetails } from './DeckSetupDetails'
 import {
   animateZoom,
   getCutoutIdForAddressableArea,
@@ -63,9 +63,7 @@ const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'screwHoles',
   'fixedTrash',
 ]
-
 export const lightFill = COLORS.grey35
-export const darkFill = COLORS.grey60
 
 export function DeckSetupContainer(): JSX.Element {
   const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)
@@ -122,7 +120,10 @@ export function DeckSetupContainer(): JSX.Element {
       getCutoutIdForAddressableArea(
         slotId as AddressableAreaName,
         deckDef.cutoutFixtures
-      ) ?? 'cutoutD1'
+      ) ?? null
+    if (cutoutId == null) {
+      console.error('expected to find a cutoutId but could not')
+    }
     dispatch(selectZoomedInSlot({ slot: slotId, cutout: cutoutId }))
 
     const zoomInSlotPosition = getPositionFromSlotId(slotId ?? '', deckDef)
@@ -219,7 +220,6 @@ export function DeckSetupContainer(): JSX.Element {
                             key={fixture.id}
                             cutoutId={fixture.location as StagingAreaLocation}
                             deckDefinition={deckDef}
-                            slotClipColor={darkFill}
                             fixtureBaseColor={lightFill}
                           />
                         )
@@ -276,7 +276,6 @@ export function DeckSetupContainer(): JSX.Element {
                               fixture.location as typeof WASTE_CHUTE_CUTOUT
                             }
                             deckDefinition={deckDef}
-                            slotClipColor={darkFill}
                             fixtureBaseColor={lightFill}
                           />
                         )
@@ -285,7 +284,7 @@ export function DeckSetupContainer(): JSX.Element {
                   </>
                 )}
                 <DeckSetupDetails
-                  zoomedInSlot={zoomIn.slot ?? undefined}
+                  selectedZoomInSlot={zoomIn.slot ?? undefined}
                   hoveredLabware={hoveredLabware}
                   hoveredModule={hoveredModule}
                   hoveredFixture={hoveredFixture}

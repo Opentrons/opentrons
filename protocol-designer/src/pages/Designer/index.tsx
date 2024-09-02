@@ -172,7 +172,7 @@ export function Designer(): JSX.Element {
               ? COLORS.white
               : COLORS.grey10
           }
-          padding={SPACING.spacing80}
+          padding={zoomIn.slot != null ? '0' : SPACING.spacing80}
           height="calc(100vh - 64px)"
         >
           {tab === 'startingDeck' ? (

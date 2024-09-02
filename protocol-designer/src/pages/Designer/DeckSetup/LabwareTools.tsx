@@ -75,10 +75,10 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
     selectedModuleModel,
     selectedNestedLabwareDefUri,
   } = zoomedInSlotInfo
-  // TODO(ja, 8/16/24): We are always filtering recommended labware, check with designs
+  // TODO(ja, 8/16/24): We are never filtering recommended labware, check with designs
   // where to add the filter checkbox/button
   const [filterRecommended, setFilterRecommended] = React.useState<boolean>(
-    true
+    false
   )
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
     null
@@ -106,8 +106,8 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
   )
   // if you're adding labware to a module, check the recommended filter by default
   React.useEffect(() => {
-    setFilterRecommended(moduleType != null)
     if (robotType === OT2_ROBOT_TYPE) {
+      setFilterRecommended(moduleType != null)
       setFilterHeight(isNextToHeaterShaker)
     }
   }, [moduleType, isNextToHeaterShaker, robotType])

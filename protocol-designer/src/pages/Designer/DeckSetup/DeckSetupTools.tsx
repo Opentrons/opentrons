@@ -61,6 +61,12 @@ interface DeckSetupToolsProps {
   } | null
 }
 
+const TRASH_TYPES: Fixture[] = [
+  'wasteChute',
+  'trashBin',
+  'wasteChuteAndStagingArea',
+]
+
 export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
   const { onCloseClick, setHoveredLabware, onDeckProps } = props
   const { t, i18n } = useTranslation(['starting_deck_state', 'shared'])
@@ -79,7 +85,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
     selectedNestedLabwareDefUri,
   } = zoomedInSlotInfo
   const { slot, cutout } = zoomedInSlot
-  console.log('hello')
+  console.log('DeckSetupTools was rendered')
   const [selectedHardware, setHardware] = React.useState<
     ModuleModel | Fixture | null
   >(null)
@@ -111,6 +117,10 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
   const hasTrash = Object.values(additionalEquipmentOnDeck).some(
     ae => ae.name === 'trashBin'
   )
+  const trashyEntities = Object.values(additionalEquipmentOnDeck).filter(
+    ae => ae.name === 'trashBin' || ae.name === 'wasteChute'
+  )
+
   const {
     createdNestedLabwareForSlot,
     createdModuleForSlot,
@@ -179,6 +189,8 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
         dispatch(deleteContainer({ labwareId: createdNestedLabwareForSlot.id }))
       }
     }
+    handleResetToolbox()
+    setHardware(null)
   }
 
   const handleConfirm = (): void => {
@@ -254,8 +266,15 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
       }
       closeButtonText={t('clear')}
       onCloseClick={() => {
-        handleClear()
-        handleResetToolbox()
+        if (
+          trashyEntities.length === 1 &&
+          TRASH_TYPES.includes(selectedFixture as Fixture)
+        ) {
+          makeSnackbar(t('trash_required') as string)
+        } else {
+          handleClear()
+          handleResetToolbox()
+        }
       }}
       onConfirmClick={() => {
         handleConfirm()
@@ -353,6 +372,11 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
                         )
                       } else if (collisionError != null) {
                         makeSnackbar(t(`${collisionError}`) as string)
+                      } else if (
+                        trashyEntities.length === 1 &&
+                        TRASH_TYPES.includes(selectedFixture as Fixture)
+                      ) {
+                        makeSnackbar(t('trash_required') as string)
                       } else {
                         setHardware(model)
                         dispatch(selectModule({ moduleModel: model }))
@@ -399,6 +423,11 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
                             hardware: t('shared:trashBin'),
                           }) as string
                         )
+                      } else if (
+                        trashyEntities.length === 1 &&
+                        TRASH_TYPES.includes(selectedFixture as Fixture)
+                      ) {
+                        makeSnackbar(t('trash_required') as string)
                       } else {
                         setHardware(fixture)
                         dispatch(selectFixture({ fixture: fixture }))
