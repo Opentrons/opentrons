@@ -218,7 +218,7 @@ class FlexBackend(Protocol):
         ...
 
     async def tip_action(
-        self, origin: Dict[Axis, float], targets: List[Tuple[Dict[Axis, float], float]]
+        self, origin: float, targets: List[Tuple[float, float]]
     ) -> None:
         ...
 

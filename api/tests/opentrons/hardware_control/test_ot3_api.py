@@ -2038,12 +2038,10 @@ async def test_drop_tip_full_tiprack(
         assert len(tip_action.call_args_list) == 2
         # first call should be "clamp", moving down
         first_target = tip_action.call_args_list[0][-1]["targets"][0][0]
-        assert list(first_target.keys()) == [Axis.Q]
-        assert first_target[Axis.Q] == 10
+        assert first_target == 10
         # next call should be "clamp", moving back up
         second_target = tip_action.call_args_list[1][-1]["targets"][0][0]
-        assert list(second_target.keys()) == [Axis.Q]
-        assert second_target[Axis.Q] < 10
+        assert second_target < 10
         # home should be called after tip_action is done
         assert len(mock_home_gear_motors.call_args_list) == 1
 
