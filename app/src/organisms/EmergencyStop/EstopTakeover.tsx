@@ -40,7 +40,6 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
       setIsWaitingForLogicalDisengage(false)
     },
   })
-  console.log(`estop status: ${estopStatus?.data.status}`)
 
   const {
     isEmergencyStopModalDismissed,

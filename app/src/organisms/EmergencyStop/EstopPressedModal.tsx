@@ -186,7 +186,7 @@ function DesktopModal({
         },
         onError: (error: any) => {
           setIsResuming(false)
-          console.log(error)
+          console.error(error)
         },
       }
     )
