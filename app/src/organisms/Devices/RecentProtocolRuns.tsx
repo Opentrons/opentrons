@@ -120,14 +120,15 @@ export function RecentProtocolRuns({
                 const protocol = protocols?.data?.data.find(
                   protocol => protocol.id === run.protocolId
                 )
-
+                const isQuickTransfer =
+                  protocol?.protocolKind === 'quick-transfer'
                 const protocolName =
                   protocol?.metadata.protocolName ??
                   protocol?.files[0].name ??
                   t('shared:loading') ??
                   ''
 
-                return (
+                return !isQuickTransfer ? (
                   <HistoricalProtocolRun
                     run={run}
                     protocolName={protocolName}
@@ -136,7 +137,7 @@ export function RecentProtocolRuns({
                     robotIsBusy={robotIsBusy}
                     key={index}
                   />
-                )
+                ) : null
               })}
           </>
         )}

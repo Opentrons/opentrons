@@ -24,11 +24,15 @@ type LargeButtonTypes =
   | 'alertStroke'
   | 'alertAlt'
 interface LargeButtonProps extends StyleProps {
+  /** used for form submission */
+  type?: 'submit'
   onClick?: () => void
   buttonType?: LargeButtonTypes
   buttonText: React.ReactNode
   iconName?: IconName
   disabled?: boolean
+  /** aria-disabled for displaying snack bar. */
+  ariaDisabled?: boolean
 }
 
 export function LargeButton(props: LargeButtonProps): JSX.Element {
@@ -36,7 +40,9 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     buttonType = 'primary',
     buttonText,
     iconName,
+    ariaDisabled = false,
     disabled = false,
+    type,
     ...buttonProps
   } = props
 
@@ -157,6 +163,13 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       };
     }
 
+    &[aria-disabled='true'] {
+      color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
+      background-color: ${
+        LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
+      };
+    }
+
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       cursor: default;
       align-items: ${ALIGN_FLEX_START};
@@ -229,10 +242,12 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
   `
   return (
     <Btn
+      type={type}
       display={DISPLAY_FLEX}
       css={LARGE_BUTTON_STYLE}
+      disabled={ariaDisabled ? false : disabled}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      disabled={disabled}
+      aria-disabled={ariaDisabled}
       {...buttonProps}
     >
       <LegacyStyledText

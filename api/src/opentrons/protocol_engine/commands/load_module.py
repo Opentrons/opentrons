@@ -19,7 +19,7 @@ from opentrons.protocol_engine.resources import deck_configuration_provider
 from opentrons.drivers.types import AbsorbanceReaderLidStatus
 
 if TYPE_CHECKING:
-    from ..state import StateView
+    from ..state.state import StateView
     from ..execution import EquipmentHandler
 
 

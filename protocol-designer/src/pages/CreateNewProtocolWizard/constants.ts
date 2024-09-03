@@ -103,11 +103,6 @@ export const PIPETTE_VOLUMES: PipetteVolumes = {
   ],
 }
 
-export const MAX_MOAM_MODULES = 7
-//  limiting 10 instead of 11 to make space for a single default tiprack
-//  to be auto-generated
-export const MAX_MAGNETIC_BLOCKS = 10
-
 export const FLEX_SUPPORTED_MODULE_MODELS: ModuleModel[] = [
   THERMOCYCLER_MODULE_V2,
   HEATERSHAKER_MODULE_V1,

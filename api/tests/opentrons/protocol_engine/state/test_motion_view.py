@@ -20,13 +20,13 @@ from opentrons.protocol_engine.types import (
     MotorAxis,
     AddressableOffsetVector,
 )
-from opentrons.protocol_engine.state import PipetteLocationData, move_types
+from opentrons.protocol_engine.state import _move_types
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.pipettes import PipetteView
 from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
 from opentrons.protocol_engine.state.geometry import GeometryView
-from opentrons.protocol_engine.state.motion import MotionView
+from opentrons.protocol_engine.state.motion import MotionView, PipetteLocationData
 from opentrons.protocol_engine.state.modules import ModuleView
 from opentrons.protocol_engine.state.module_substates import HeaterShakerModuleId
 from opentrons_shared_data.robot.types import RobotType
@@ -46,10 +46,10 @@ def patch_mock_get_waypoints(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> N
 
 
 @pytest.fixture(autouse=True)
-def patch_mock_move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Mock out move_types.py functions."""
-    for name, func in inspect.getmembers(move_types, inspect.isfunction):
-        monkeypatch.setattr(move_types, name, decoy.mock(func=func))
+def patch_mock__move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Mock out _move_types.py functions."""
+    for name, func in inspect.getmembers(_move_types, inspect.isfunction):
+        monkeypatch.setattr(_move_types, name, decoy.mock(func=func))
 
 
 @pytest.fixture
@@ -313,7 +313,7 @@ def test_get_movement_waypoints_to_well_for_y_center(
     ).then_return(Point(x=4, y=5, z=6))
 
     decoy.when(
-        move_types.get_move_type_to_well(
+        _move_types.get_move_type_to_well(
             "pipette-id", "labware-id", "well-name", location, True
         )
     ).then_return(motion_planning.MoveType.GENERAL_ARC)
@@ -395,7 +395,7 @@ def test_get_movement_waypoints_to_well_for_xy_center(
     ).then_return(Point(x=4, y=5, z=6))
 
     decoy.when(
-        move_types.get_move_type_to_well(
+        _move_types.get_move_type_to_well(
             "pipette-id", "labware-id", "well-name", location, True
         )
     ).then_return(motion_planning.MoveType.GENERAL_ARC)
@@ -910,18 +910,18 @@ def test_get_touch_tip_waypoints(
         labware_view.get_edge_path_type(
             "labware-id", "B2", MountType.LEFT, DeckSlotName.SLOT_4, True
         )
-    ).then_return(move_types.EdgePathType.RIGHT)
+    ).then_return(_move_types.EdgePathType.RIGHT)
 
     decoy.when(
         labware_view.get_well_radial_offsets("labware-id", "B2", 0.123)
     ).then_return((1.2, 3.4))
 
     decoy.when(
-        move_types.get_edge_point_list(
+        _move_types.get_edge_point_list(
             center=center_point,
             x_radius=1.2,
             y_radius=3.4,
-            edge_path_type=move_types.EdgePathType.RIGHT,
+            edge_path_type=_move_types.EdgePathType.RIGHT,
         )
     ).then_return([Point(x=11, y=22, z=33), Point(x=44, y=55, z=66)])
 

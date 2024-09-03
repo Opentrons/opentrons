@@ -6,6 +6,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 
 import { SlotInformation } from '..'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 const mockLiquids = ['Mastermix', 'Ethanol', 'Water']
 const mockLabwares = ['96 Well Plate', 'Adapter']
@@ -22,17 +23,19 @@ describe('SlotInformation', () => {
 
   beforeEach(() => {
     props = {
+      robotType: FLEX_ROBOT_TYPE,
       location: 'A1',
       liquids: [],
       labwares: [],
       modules: [],
+      fixtures: [],
     }
   })
 
   it('should render DeckInfoLabel and title', () => {
     render(props)
     screen.getByText('A1')
-    screen.getByText('Slot Stack Information')
+    screen.getByText('Slot Detail')
   })
 
   it('should render liquid, labware, and module', () => {
@@ -40,7 +43,8 @@ describe('SlotInformation', () => {
     screen.getByText('Liquid')
     screen.getByText('Labware')
     screen.getByText('Module')
-    expect(screen.getAllByText('None').length).toBe(3)
+    screen.getByText('Fixtures')
+    expect(screen.getAllByText('None').length).toBe(4)
   })
 
   it('should render info of liquid, labware, and module', () => {
@@ -51,12 +55,10 @@ describe('SlotInformation', () => {
       modules: mockModules,
     }
     render(props)
-    expect(screen.getAllByText('Liquid').length).toBe(mockLiquids.length)
+    expect(screen.getAllByText('Liquid').length).toBe(1)
     expect(screen.getAllByText('Labware').length).toBe(mockLabwares.length)
     expect(screen.getAllByText('Module').length).toBe(mockModules.length)
-    screen.getByText('Mastermix')
-    screen.getByText('Ethanol')
-    screen.getByText('Water')
+    screen.getByText('Mastermix, Ethanol, Water')
     screen.getByText('96 Well Plate')
     screen.getByText('Adapter')
     screen.getByText('Thermocycler Module Gen2')

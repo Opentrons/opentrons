@@ -6,7 +6,8 @@ from decoy import Decoy, matchers
 
 from opentrons.protocol_engine.actions import ActionDispatcher, PauseAction, PauseSource
 from opentrons.protocol_engine.execution.run_control import RunControlHandler
-from opentrons.protocol_engine.state import Config, StateStore
+from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.types import DeckType
 
 

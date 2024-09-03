@@ -49,6 +49,10 @@ describe('SelectTips', () => {
           channels: 8,
         },
       } as any,
+      failedLabwareUtils: {
+        selectedTipLocations: { A1: null },
+        areTipsSelected: true,
+      } as any,
     }
 
     vi.mocked(TipSelectionModal).mockReturnValue(
@@ -137,5 +141,23 @@ describe('SelectTips', () => {
       name: 'Change location',
     })
     expect(tertiaryBtn[0]).toBeDisabled()
+  })
+
+  it('disables the primary button if tips are not selected', () => {
+    props = {
+      ...props,
+      failedLabwareUtils: {
+        selectedTipLocations: null,
+        areTipsSelected: false,
+      } as any,
+    }
+
+    render(props)
+
+    const primaryBtn = screen.getAllByRole('button', {
+      name: 'Pick up tips',
+    })
+
+    expect(primaryBtn[0]).toBeDisabled()
   })
 })

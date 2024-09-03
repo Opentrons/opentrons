@@ -16,7 +16,7 @@ from .pipetting_common import (
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler, GantryMover
-    from ..state import StateView
+    from ..state.state import StateView
 
 
 TouchTipCommandType = Literal["touchTip"]
