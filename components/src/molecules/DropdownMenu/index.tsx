@@ -7,7 +7,9 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
+  NO_WRAP,
   OVERFLOW_AUTO,
+  OVERFLOW_HIDDEN,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
 } from '../../styles'
@@ -210,8 +212,8 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                 ${dropdownType === 'rounded'
                   ? TYPOGRAPHY.pSemiBold
                   : TYPOGRAPHY.pRegular}
-                white-space: nowrap;
-                overflow: hidden;
+                white-space: ${NO_WRAP};
+                overflow: $ ${OVERFLOW_HIDDEN};
                 text-overflow: ellipsis;
               `}
             >

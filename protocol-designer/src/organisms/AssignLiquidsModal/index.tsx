@@ -2,9 +2,6 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { selectors } from '../../labware-ingred/selectors'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -17,6 +14,9 @@ import {
   StyledText,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
+import { selectors } from '../../labware-ingred/selectors'
+import { selectors as stepFormSelectors } from '../../step-forms'
+import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import { getSelectedWells } from '../../well-selection/selectors'
 import {
   SelectableLabware,

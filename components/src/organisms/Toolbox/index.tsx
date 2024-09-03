@@ -5,6 +5,7 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
+  NO_WRAP,
   POSITION_FIXED,
 } from '../../styles'
 import { BORDERS, COLORS } from '../../helix-design-system'
@@ -92,7 +93,7 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
             onClick={onCloseClick}
             textDecoration={textDecorationUnderline}
             data-testid={`Toolbox_${closeButtonText}`}
-            whiteSpace="nowrap"
+            whiteSpace={NO_WRAP}
             disable={disableCloseButton}
           >
             <StyledText desktopStyle="bodyDefaultRegular">
