@@ -20,32 +20,41 @@ import {
   Tag,
 } from '@opentrons/components'
 import {
-  getLabwareDisplayName,
+  // getLabwareDisplayName,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../components/portals/TopPortal'
 
-import type { LabwareOnDeck, ModuleOnDeck } from '@opentrons/components'
-import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
+// import type { LabwareOnDeck, ModuleOnDeck } from '@opentrons/components'
+// import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
 import type { OrderedLiquids } from '../../labware-ingred/types'
+// import type { ModuleTemporalProperties } from '../../step-forms'
 
 interface MaterialsListModalProps {
-  hardware: ModuleOnDeck[]
-  labware: LabwareOnDeck[]
+  hardware: any[]
+  labware: any[]
   liquids: OrderedLiquids
-  closeModal: () => void
+  setShowMaterialsListModal: (showMaterialsListModal: boolean) => void
 }
 
 export function MaterialsListModal({
   hardware,
   labware,
   liquids,
-  closeModal,
+  setShowMaterialsListModal,
 }: MaterialsListModalProps): JSX.Element {
+  console.log('hardware', hardware[0])
+  console.log('labware', labware)
   const { t } = useTranslation('protocol_overview')
   return createPortal(
-    <Modal onClose={closeModal} closeOnOutsideClick title={t('materials_list')}>
+    <Modal
+      onClose={() => {
+        setShowMaterialsListModal(false)
+      }}
+      closeOnOutsideClick
+      title={t('materials_list')}
+    >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <StyledText desktopStyle="bodyDefaultSemiBold">
@@ -53,16 +62,12 @@ export function MaterialsListModal({
           </StyledText>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             {hardware.length > 0 ? (
-              hardware.map((hw: ModuleOnDeck, id: number) => (
+              hardware.map((hw, id) => (
                 <ListItem type="noActive" key={`hardware${id}`}>
                   <ListItemDescriptor
                     type="default"
-                    description={
-                      <DeckInfoLabel deckLabel={hw.moduleLocation.slotName} />
-                    }
-                    content={getModuleDisplayName(
-                      hw.moduleModel as ModuleModel
-                    )}
+                    description={<DeckInfoLabel deckLabel={hw.slot} />}
+                    content={getModuleDisplayName(hw.model)}
                   />
                 </ListItem>
               ))
@@ -78,22 +83,13 @@ export function MaterialsListModal({
           </StyledText>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             {labware.length > 0 ? (
-              labware.map((lw: LabwareOnDeck, id: number) => {
-                const { definition, labwareLocation } = lw
-                const slotName =
-                  typeof labwareLocation === 'object' &&
-                  'slotName' in labwareLocation
-                    ? labwareLocation.slotName
-                    : ''
-
+              labware.map((lw, id) => {
                 return (
                   <ListItem type="noActive" key={`labware_${id}`}>
                     <ListItemDescriptor
                       type="default"
-                      description={<DeckInfoLabel deckLabel={slotName} />}
-                      content={getLabwareDisplayName(
-                        definition as LabwareDefinition2
-                      )}
+                      description={<DeckInfoLabel deckLabel={lw.slot} />}
+                      content={lw.def.metadata.displayName}
                     />
                   </ListItem>
                 )

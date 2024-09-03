@@ -21,7 +21,7 @@ import {
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
 import {
-  getAdditionalEquipmentEntities,
+  // getAdditionalEquipmentEntities,
   getInitialDeckSetup,
 } from '../../step-forms/selectors'
 import { selectors as fileSelectors } from '../../file-data'
@@ -39,6 +39,7 @@ import { v8WarningContent } from '../../components/FileSidebar/FileSidebar'
 import { MaterialsListModal } from '../../organisms/MaterialsListModal'
 
 import type { CreateCommand, PipetteName } from '@opentrons/shared-data'
+import type { LabwareOnDeck, ModuleOnDeck } from '@opentrons/components'
 import type { ThunkDispatch } from '../../types'
 import type { HintKey } from '../../tutorial'
 
@@ -65,7 +66,7 @@ export function ProtocolOverview(): JSX.Element {
   const robotType = useSelector(fileSelectors.getRobotType)
   const deckSetup = useSelector(getInitialDeckSetup)
 
-  console.log('deckSetup', deckSetup)
+  // console.log('deckSetup', deckSetup)
 
   const dispatch: ThunkDispatch<any> = useDispatch()
   const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
@@ -76,7 +77,7 @@ export function ProtocolOverview(): JSX.Element {
   const fileData = useSelector(fileSelectors.createFile)
   const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
-  const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
+  // const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const modulesOnDeck = initialDeckSetup.modules
   const labwaresOnDeck = initialDeckSetup.labware
 
@@ -84,11 +85,11 @@ export function ProtocolOverview(): JSX.Element {
     labwareIngredSelectors.allIngredientNamesIds
   )
 
-  console.log('additionalEquipment', additionalEquipment)
+  // console.log('additionalEquipment', additionalEquipment)
 
-  console.log('modulesOnDeck', modulesOnDeck)
+  // console.log('modulesOnDeck', Object.values(modulesOnDeck))
 
-  const hardWareForMaterials = []
+  // const hardWareForMaterials = []
 
   const nonLoadCommands =
     fileData?.commands.filter(
@@ -138,7 +139,7 @@ export function ProtocolOverview(): JSX.Element {
   const leftPip = pipettesOnDeck.find(pip => pip.mount === 'left')
   const rightPip = pipettesOnDeck.find(pip => pip.mount === 'right')
   const gripper = additionalEquipmentOnDeck.find(ae => ae.name === 'gripper')
-  console.log('additionalEquipmentOnDeck', additionalEquipmentOnDeck)
+  // console.log('additionalEquipmentOnDeck', additionalEquipmentOnDeck)
   const {
     protocolName,
     description,
@@ -193,7 +194,14 @@ export function ProtocolOverview(): JSX.Element {
   return (
     <>
       {blockingExportHint}
-      {/* {showMaterialsListModal ? (<MaterialsListModal hardware={{Object.values(modulesOnDeck)}} labware={Object.values(labwaresOnDeck)} liquids={liquidsOnDeck}   />) : null} */}
+      {showMaterialsListModal ? (
+        <MaterialsListModal
+          hardware={Object.values(modulesOnDeck)}
+          labware={Object.values(labwaresOnDeck)}
+          liquids={liquidsOnDeck}
+          setShowMaterialsListModal={setShowMaterialsListModal}
+        />
+      ) : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         padding={`${SPACING.spacing60} ${SPACING.spacing80}`}
@@ -398,8 +406,8 @@ export function ProtocolOverview(): JSX.Element {
                 data-testid="Materials_list"
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 onClick={() => {
-                  // ToDo (kk:08/27/2024) wire up material list modal
-                  console.log('open material list modal')
+                  console.log('show materials list modal')
+                  setShowMaterialsListModal(true)
                 }}
               >
                 <StyledText desktopStyle="bodyDefaultRegular">

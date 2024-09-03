@@ -15,7 +15,7 @@ vi.mock('@opentrons/components', async importOriginal => {
   }
 })
 
-const mockCloseModal = vi.fn()
+const mockSetShowMaterialsListModal = vi.fn()
 
 const render = (props: React.ComponentProps<typeof MaterialsListModal>) => {
   return renderWithProviders(<MaterialsListModal {...props} />, {
@@ -31,7 +31,7 @@ describe('MaterialsListModal', () => {
       hardware: [],
       labware: [],
       liquids: [],
-      closeModal: mockCloseModal,
+      setShowMaterialsListModal: mockSetShowMaterialsListModal,
     }
   })
 
