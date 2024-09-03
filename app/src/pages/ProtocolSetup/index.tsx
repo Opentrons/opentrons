@@ -17,10 +17,11 @@ import {
   Icon,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  NO_WRAP,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
-  LegacyStyledText,
   TEXT_ALIGN_RIGHT,
   truncateString,
   TYPOGRAPHY,
@@ -1081,7 +1082,7 @@ export function ProtocolSetup(): JSX.Element {
 }
 
 const CLIPPED_TEXT_STYLE = css`
-  white-space: nowrap;
+  white-space: ${NO_WRAP};
   overflow: hidden;
   text-overflow: ellipsis;
 `
