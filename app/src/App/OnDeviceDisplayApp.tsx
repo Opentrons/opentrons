@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import { css } from 'styled-components'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import {
   Box,
-  POSITION_RELATIVE,
   COLORS,
   OVERFLOW_AUTO,
+  POSITION_RELATIVE,
   useIdle,
   useScrolling,
 } from '@opentrons/components'
@@ -49,11 +49,8 @@ import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
 import { updateBrightness } from '../redux/shell'
 import { SLEEP_NEVER_MS } from './constants'
-import {
-  useCurrentRunRoute,
-  useProtocolReceiptToast,
-  useSoftwareUpdatePoll,
-} from './hooks'
+import { useProtocolReceiptToast, useSoftwareUpdatePoll } from './hooks'
+import { TopLevelRedirects } from './TopLevelRedirects'
 
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
 
@@ -270,15 +267,6 @@ export function OnDeviceDisplayAppRoutes(): JSX.Element {
       )}
     </Routes>
   )
-}
-
-function TopLevelRedirects(): JSX.Element | null {
-  const currentRunRoute = useCurrentRunRoute()
-  return currentRunRoute != null ? (
-    <Routes>
-      <Route path="*" element={<Navigate to={currentRunRoute} />} />
-    </Routes>
-  ) : null
 }
 
 function ProtocolReceiptToasts(): null {
