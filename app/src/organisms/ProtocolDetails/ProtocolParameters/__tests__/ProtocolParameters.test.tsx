@@ -13,9 +13,7 @@ vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Components>()
   return {
     ...actual,
-    NoParameters: vi.fn(() => (
-      <div>No parameters specified in this protocol</div>
-    )),
+    InfoScreen: vi.fn(() => <div>mock InfoScreen</div>),
   }
 })
 
@@ -133,11 +131,11 @@ describe('ProtocolParameters', () => {
     screen.getByText('Left, Right')
   })
 
-  it('should render empty display when protocol does not have any parameter', () => {
+  it('should render InfoScreen component when protocol does not have any parameter', () => {
     props = {
       runTimeParameters: [],
     }
     render(props)
-    screen.getByText('No parameters specified in this protocol')
+    screen.getByText('mock InfoScreen')
   })
 })
