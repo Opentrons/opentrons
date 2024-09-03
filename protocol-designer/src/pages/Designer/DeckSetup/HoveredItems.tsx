@@ -10,7 +10,6 @@ import {
 import { selectors } from '../../../labware-ingred/selectors'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { ModuleLabel } from './ModuleLabel'
 import type {
   DeckDefinition,
   ModuleModel,
@@ -67,24 +66,13 @@ export const HoveredItems = (props: HoveredLabwareProps): JSX.Element => {
       {hoveredModuleDef != null &&
       hoveredSlotPosition != null &&
       orientation != null ? (
-        <>
-          <Module
-            key={`${hoveredModuleDef.model}_${zoomedInSlot.slot}_hover`}
-            x={hoveredSlotPosition[0]}
-            y={hoveredSlotPosition[1]}
-            def={hoveredModuleDef}
-            orientation={orientation}
-          />
-          {hoveredModule != null ? (
-            <ModuleLabel
-              moduleModel={hoveredModule}
-              position={hoveredSlotPosition}
-              orientation={orientation}
-              isSelected={false}
-              isLast={true}
-            />
-          ) : null}
-        </>
+        <Module
+          key={`${hoveredModuleDef.model}_${zoomedInSlot.slot}_hover`}
+          x={hoveredSlotPosition[0]}
+          y={hoveredSlotPosition[1]}
+          def={hoveredModuleDef}
+          orientation={orientation}
+        />
       ) : null}
 
       {/* TODO(ja): add labware labels with no module in a follow up */}

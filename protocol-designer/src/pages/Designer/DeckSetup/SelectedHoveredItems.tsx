@@ -9,7 +9,6 @@ import {
 import { selectors } from '../../../labware-ingred/selectors'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { ModuleLabel } from './ModuleLabel'
 import type {
   CoordinateTuple,
   DeckDefinition,
@@ -114,49 +113,35 @@ export const SelectedHoveredItems = (
       hoveredModule == null &&
       hoveredFixture == null &&
       orientation != null ? (
-        <>
-          <Module
-            key={`${selectedModuleModel}_${zoomedInSlot.slot}_selected`}
-            x={slotPosition[0]}
-            y={slotPosition[1]}
-            def={getModuleDef2(selectedModuleModel)}
-            orientation={orientation}
-          >
-            <>
-              {selectedLabwareDefUri != null &&
-              selectedModuleModel != null &&
-              hoveredLabware == null ? (
-                <g transform={`translate(0, 0)`}>
-                  <LabwareRender definition={defs[selectedLabwareDefUri]} />
-                </g>
-              ) : null}
-              {selectedNestedLabwareDefUri != null &&
-              selectedModuleModel != null &&
-              hoveredLabware == null ? (
-                <g transform={`translate(0, 0)`}>
-                  <LabwareRender
-                    definition={defs[selectedNestedLabwareDefUri]}
-                  />
-                </g>
-              ) : null}
-              {hoveredLabwareDef != null && selectedModuleModel != null ? (
-                <g transform={`translate(0, 0)`}>
-                  <LabwareRender definition={hoveredLabwareDef} />
-                </g>
-              ) : null}
-            </>
-          </Module>
-          {selectedModuleModel != null ? (
-            <ModuleLabel
-              isLast={hoveredLabware == null && selectedLabwareDefUri == null}
-              moduleModel={selectedModuleModel}
-              position={slotPosition}
-              orientation={orientation}
-              isSelected={true}
-              labwareInfos={labwareInfos}
-            />
-          ) : null}
-        </>
+        <Module
+          key={`${selectedModuleModel}_${zoomedInSlot.slot}_selected`}
+          x={slotPosition[0]}
+          y={slotPosition[1]}
+          def={getModuleDef2(selectedModuleModel)}
+          orientation={orientation}
+        >
+          <>
+            {selectedLabwareDefUri != null &&
+            selectedModuleModel != null &&
+            hoveredLabware == null ? (
+              <g transform={`translate(0, 0)`}>
+                <LabwareRender definition={defs[selectedLabwareDefUri]} />
+              </g>
+            ) : null}
+            {selectedNestedLabwareDefUri != null &&
+            selectedModuleModel != null &&
+            hoveredLabware == null ? (
+              <g transform={`translate(0, 0)`}>
+                <LabwareRender definition={defs[selectedNestedLabwareDefUri]} />
+              </g>
+            ) : null}
+            {hoveredLabwareDef != null && selectedModuleModel != null ? (
+              <g transform={`translate(0, 0)`}>
+                <LabwareRender definition={hoveredLabwareDef} />
+              </g>
+            ) : null}
+          </>
+        </Module>
       ) : null}
 
       {/* TODO(ja): add labware labels with no module in a follow up */}
