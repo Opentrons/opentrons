@@ -68,7 +68,7 @@ vi.mock('../../redux/shell')
 vi.mock('../../redux/discovery')
 vi.mock('../../resources/maintenance_runs')
 vi.mock('../hooks')
-vi.mock('../TopLevelRedirects')
+vi.mock('../ODDTopLevelRedirects')
 
 const mockSettings = {
   sleepMs: 60 * 1000 * 60 * 24 * 7,
