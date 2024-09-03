@@ -25,6 +25,8 @@ describe('EstopPressedModal - Touchscreen', () => {
     props = {
       isEngaged: true,
       closeModal: vi.fn(),
+      isWaitingForLogicalDisengage: false,
+      setShouldSeeLogicalDisengage: vi.fn(),
     }
     vi.mocked(getIsOnDevice).mockReturnValue(true)
     vi.mocked(useAcknowledgeEstopDisengageMutation).mockReturnValue({
@@ -69,6 +71,8 @@ describe('EstopPressedModal - Desktop', () => {
       closeModal: vi.fn(),
       isDismissedModal: false,
       setIsDismissedModal: vi.fn(),
+      isWaitingForLogicalDisengage: false,
+      setShouldSeeLogicalDisengage: vi.fn(),
     }
     vi.mocked(getIsOnDevice).mockReturnValue(false)
     vi.mocked(useAcknowledgeEstopDisengageMutation).mockReturnValue({
