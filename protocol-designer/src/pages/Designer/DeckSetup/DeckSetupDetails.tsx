@@ -3,11 +3,7 @@ import compact from 'lodash/compact'
 import values from 'lodash/values'
 import { useDispatch, useSelector } from 'react-redux'
 
-import {
-  Module,
-  POSITION_ABSOLUTE,
-  RobotCoordsForeignDiv,
-} from '@opentrons/components'
+import { Module } from '@opentrons/components'
 import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 import {
   getAddressableAreaFromSlotId,
@@ -49,23 +45,6 @@ import type {
 } from '../../../step-forms'
 import type { TerminalItemId } from '../../../steplist'
 import type { Fixture } from './constants'
-
-const ROBOT_BOTTOM_HALF_SLOTS = [
-  'D1',
-  'D2',
-  'D3',
-  'D4',
-  'C1',
-  'C2',
-  'C3',
-  'C4',
-  '1',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-]
 
 interface DeckSetupDetailsProps {
   activeDeckSetup: InitialDeckSetup
@@ -451,30 +430,14 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
 
       {/* slot overflow menu */}
       {menuListSlotPosition != null && menuListId != null ? (
-        <RobotCoordsForeignDiv
-          x={menuListSlotPosition[0] + 50}
-          y={
-            menuListSlotPosition[1] -
-            (ROBOT_BOTTOM_HALF_SLOTS.includes(menuListId) ? -70 : 160)
-          }
-          width="172px"
-          height="180px"
-          innerDivProps={{
-            style: {
-              position: POSITION_ABSOLUTE,
-              transform: 'rotate(180deg) scaleX(-1)',
-              zIndex: 5,
-            },
+        <SlotOverflowMenu
+          menuListSlotPosition={menuListSlotPosition}
+          slot={menuListId}
+          addEquipment={addEquipment}
+          setShowMenuList={() => {
+            setShowMenuListForId(null)
           }}
-        >
-          <SlotOverflowMenu
-            slot={menuListId}
-            addEquipment={addEquipment}
-            setShowMenuList={() => {
-              setShowMenuListForId(null)
-            }}
-          />
-        </RobotCoordsForeignDiv>
+        />
       ) : null}
     </>
   )

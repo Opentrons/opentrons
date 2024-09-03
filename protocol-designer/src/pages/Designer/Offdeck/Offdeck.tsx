@@ -66,11 +66,7 @@ export function OffDeck(): JSX.Element {
         width="510.84px"
         height="342px"
       >
-        {() => (
-          <>
-            <LabwareRender definition={hoveredLabwareDef} />
-          </>
-        )}
+        {() => <LabwareRender definition={hoveredLabwareDef} />}
       </RobotWorkSpace>
     )
   } else if (offDeckLabware != null) {
@@ -90,11 +86,7 @@ export function OffDeck(): JSX.Element {
         width="510.84px"
         height="342px"
       >
-        {() => (
-          <>
-            <LabwareRender definition={def} />
-          </>
-        )}
+        {() => <LabwareRender definition={def} />}
       </RobotWorkSpace>
       // </DeckLabelSet>
     )
