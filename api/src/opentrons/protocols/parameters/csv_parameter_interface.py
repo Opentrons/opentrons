@@ -84,4 +84,7 @@ class CSVParameter:
                 rows.append(row)
         except (UnicodeDecodeError, csv.Error):
             raise ParameterValueError("Cannot parse provided CSV contents.")
+        # Remove any trailing empty rows at the end of the parsed rows
+        while rows and rows[-1] == []:
+            rows.pop()
         return rows
