@@ -47,12 +47,17 @@ class PublisherNotifier:
                 for callback in self._callbacks:
                     try:
                         await callback()
-                    except BaseException:
+                    except BaseException as e:
                         LOG.exception(
-                            f'PublisherNotifier: exception in callback {getattr(callback, "__name__", "<unknown>")}'
+                            f"PublisherNotifier: exception in callback {getattr(callback, '__name__', '<unknown>')} - {e}"
                         )
-        except BaseException:
-            LOG.exception("PublisherNotifer notify task failed")
+        except asyncio.CancelledError:
+            LOG.info("PublisherNotifier: Task was cancelled gracefully.")
+            raise  # Re-raise to ensure proper task cancellation
+        except BaseException as e:
+            LOG.exception(f"PublisherNotifier: notify task failed - {e}")
+        finally:
+            LOG.info("PublisherNotifier: _wait_for_event has stopped.")
 
 
 _pe_publisher_notifier_accessor: AppStateAccessor[PublisherNotifier] = AppStateAccessor[

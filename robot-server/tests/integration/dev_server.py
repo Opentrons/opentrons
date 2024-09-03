@@ -100,6 +100,26 @@ class DevServer:
 
     def stop(self) -> None:
         """Stop the robot server."""
-        # todo(mm, 2024-08-15): self.proc does not necessarily exist if startup fails.
-        self.proc.send_signal(signal.SIGTERM)
-        self.proc.wait()
+        if hasattr(self, 'proc') and self.proc is not None:
+            try:
+                print(f"Attempting to stop process with PID: {self.proc.pid}")
+                self.proc.send_signal(signal.SIGTERM)
+
+                # Wait for the process to terminate
+                timeout_sec = 10
+                self.proc.wait(timeout=timeout_sec)
+                print(f"Process {self.proc.pid} terminated successfully with SIGTERM.")
+
+            except subprocess.TimeoutExpired:
+                print(f"Process {self.proc.pid} did not terminate in {timeout_sec} seconds, attempting to kill.")
+                self.proc.kill()
+
+                # Wait for the process to be forcefully killed
+                self.proc.wait()
+                print(f"Process {self.proc.pid} killed successfully.")
+
+            except Exception as e:
+                print(f"An error occurred while stopping the process: {e}")
+
+        else:
+            print("No process found or process already stopped.")

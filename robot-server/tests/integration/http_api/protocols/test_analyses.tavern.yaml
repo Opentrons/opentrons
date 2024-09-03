@@ -107,11 +107,37 @@ stages:
             status: pending
             runTimeParameters: []
 
+  - name: Check that the second analysis summary is present in /protocols/:id; retry until it says it's completed
+    max_retries: 5
+    delay_after: 1
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}'
+    response:
+      save:
+        json:
+          analysis_id_1: data.analysisSummaries[1].id
+      status_code: 200
+      json:
+        data:
+          analyses: []
+          analysisSummaries:
+            - id: '{analysis_id}'
+              status: completed
+            - id: !anything
+              status: completed
+          id: !anything
+          protocolType: !anything
+          files: !anything
+          createdAt: !anything
+          robotType: !anything
+          protocolKind: !anything
+          metadata: !anything
+        links: !anything
 
   - name: Check that a new analysis is NOT started for the same protocol
     request:
       url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
-      method: GET
+      method: POST
     response:
       strict:
         - json:off
@@ -123,5 +149,30 @@ stages:
         data:
           - id: '{analysis_id}'
             status: completed
-          - id: !anystr
+          - id: '{analysis_id_1}'
             status: completed
+
+  - name: Check that a third analysis summary is NOT present in /protocols/:id
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}'
+    response:
+      save:
+        json:
+          analysis_id_1: data.analysisSummaries[1].id
+      status_code: 200
+      json:
+        data:
+          analyses: []
+          analysisSummaries:
+            - id: '{analysis_id}'
+              status: completed
+            - id: '{analysis_id_1}'
+              status: completed
+          id: !anything
+          protocolType: !anything
+          files: !anything
+          createdAt: !anything
+          robotType: !anything
+          protocolKind: !anything
+          metadata: !anything
+        links: !anything
