@@ -13,10 +13,7 @@ import {
 } from '@opentrons/shared-data'
 import { LabwareOnDeck } from '../../components/DeckSetup/LabwareOnDeck'
 import { getStagingAreaAddressableAreas } from '../../utils'
-import {
-  getSlotIdsBlockedBySpanningForThermocycler,
-  getSlotIsEmpty,
-} from '../../step-forms'
+import { getSlotIdsBlockedBySpanningForThermocycler } from '../../step-forms'
 import { SlotHover } from './SlotHover'
 import type {
   CutoutId,
@@ -224,8 +221,7 @@ export const DeckThumbnailDetails = (
             stagingAreaAddressableAreas.includes(addressableArea.id)
           return (
             addressableAreas &&
-            !slotIdsBlockedBySpanning.includes(addressableArea.id) &&
-            getSlotIsEmpty(initialDeckSetup, addressableArea.id)
+            !slotIdsBlockedBySpanning.includes(addressableArea.id)
           )
         })
         .map(addressableArea => {
