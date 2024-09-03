@@ -5,7 +5,7 @@ import { useCurrentRunId } from '../../resources/runs'
 import { CURRENT_RUN_POLL } from './constants'
 import { useCurrentRunRoute } from './hooks'
 
-export function TopLevelRedirects(): JSX.Element | null {
+export function ODDTopLevelRedirects(): JSX.Element | null {
   const currentRunId = useCurrentRunId({ refetchInterval: CURRENT_RUN_POLL })
 
   return currentRunId != null ? (

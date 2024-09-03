@@ -29,7 +29,7 @@ import { getLocalRobot } from '../../redux/discovery'
 import { mockConnectedRobot } from '../../redux/discovery/__fixtures__'
 import { useProtocolReceiptToast } from '../hooks'
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
-import { TopLevelRedirects } from '../TopLevelRedirects'
+import { ODDTopLevelRedirects } from '../ODDTopLevelRedirects'
 
 import type { UseQueryResult } from 'react-query'
 import type { RobotSettingsResponse } from '@opentrons/api-client'
@@ -90,7 +90,7 @@ describe('OnDeviceDisplayApp', () => {
   beforeEach(() => {
     vi.mocked(getOnDeviceDisplaySettings).mockReturnValue(mockSettings as any)
     vi.mocked(getIsShellReady).mockReturnValue(true)
-    vi.mocked(TopLevelRedirects).mockReturnValue(null)
+    vi.mocked(ODDTopLevelRedirects).mockReturnValue(null)
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
     vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
       data: {
@@ -190,7 +190,7 @@ describe('OnDeviceDisplayApp', () => {
     expect(vi.mocked(useProtocolReceiptToast)).toHaveBeenCalled()
   })
   it('renders TopLevelRedirects when it should conditionally render', () => {
-    vi.mocked(TopLevelRedirects).mockReturnValue(<div>MOCK_REDIRECTS</div>)
+    vi.mocked(ODDTopLevelRedirects).mockReturnValue(<div>MOCK_REDIRECTS</div>)
     render('/')
     screen.getByText('MOCK_REDIRECTS')
   })

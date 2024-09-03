@@ -50,7 +50,7 @@ import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
 import { updateBrightness } from '../redux/shell'
 import { SLEEP_NEVER_MS } from './constants'
 import { useProtocolReceiptToast, useSoftwareUpdatePoll } from './hooks'
-import { TopLevelRedirects } from './TopLevelRedirects'
+import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
 
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
 
@@ -198,7 +198,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                 </>
               )}
             </Box>
-            <TopLevelRedirects />
+            <ODDTopLevelRedirects />
           </ErrorBoundary>
         </OnDeviceLocalizationProvider>
       </InitialLoadingScreen>

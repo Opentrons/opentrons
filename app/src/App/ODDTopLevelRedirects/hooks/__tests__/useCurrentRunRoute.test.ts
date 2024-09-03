@@ -3,7 +3,6 @@ import { describe, it, expect, vi } from 'vitest'
 import { useCurrentRunRoute } from '../useCurrentRunRoute'
 import { useNotifyRunQuery } from '../../../../resources/runs'
 import {
-  RUN_ACTION_TYPE_PLAY,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_FAILED,
   RUN_STATUS_IDLE,
@@ -29,7 +28,7 @@ describe('useCurrentRunRoute', () => {
 
   it('returns null when isFetching is true', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue({
-      data: { data: {} },
+      data: { data: { startedAt: '123' } },
       isFetching: true,
     } as any)
 
@@ -41,7 +40,11 @@ describe('useCurrentRunRoute', () => {
   it('returns the summary route for a run with succeeded status', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: {
-        data: { id: MOCK_RUN_ID, status: RUN_STATUS_SUCCEEDED, actions: [] },
+        data: {
+          id: MOCK_RUN_ID,
+          status: RUN_STATUS_SUCCEEDED,
+          startedAt: '123',
+        },
       },
       isFetching: false,
     } as any)
@@ -57,7 +60,7 @@ describe('useCurrentRunRoute', () => {
         data: {
           id: MOCK_RUN_ID,
           status: RUN_STATUS_STOPPED,
-          actions: [{ actionType: RUN_ACTION_TYPE_PLAY }],
+          startedAt: '123',
         },
       },
       isFetching: false,
@@ -71,7 +74,7 @@ describe('useCurrentRunRoute', () => {
   it('returns summary route for a run with failed status', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: {
-        data: { id: MOCK_RUN_ID, status: RUN_STATUS_FAILED, actions: [] },
+        data: { id: MOCK_RUN_ID, status: RUN_STATUS_FAILED, startedAt: '123' },
       },
       isFetching: false,
     } as any)
@@ -83,7 +86,9 @@ describe('useCurrentRunRoute', () => {
 
   it('returns the setup route for a run with an idle status', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue({
-      data: { data: { id: MOCK_RUN_ID, status: RUN_STATUS_IDLE, actions: [] } },
+      data: {
+        data: { id: MOCK_RUN_ID, status: RUN_STATUS_IDLE, startedAt: null },
+      },
       isFetching: false,
     } as any)
 
@@ -98,7 +103,7 @@ describe('useCurrentRunRoute', () => {
         data: {
           id: MOCK_RUN_ID,
           status: RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-          actions: [],
+          startedAt: null,
         },
       },
       isFetching: false,
@@ -115,7 +120,7 @@ describe('useCurrentRunRoute', () => {
         data: {
           id: MOCK_RUN_ID,
           status: RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-          actions: [{ actionType: RUN_ACTION_TYPE_PLAY }],
+          startedAt: '123',
         },
       },
       isFetching: false,
@@ -129,7 +134,7 @@ describe('useCurrentRunRoute', () => {
   it('returns null for cancelled run before starting', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: {
-        data: { id: MOCK_RUN_ID, status: RUN_STATUS_STOPPED, actions: [] },
+        data: { id: MOCK_RUN_ID, status: RUN_STATUS_STOPPED, startedAt: null },
       },
       isFetching: false,
     } as any)
