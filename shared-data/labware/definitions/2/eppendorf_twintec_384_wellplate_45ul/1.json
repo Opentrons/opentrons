@@ -434,8 +434,11 @@
     ]
   ],
   "brand": {
-    "brand": "Eppendorf twin.tec",
-    "brandId": ["30129547"]
+    "brand": "Eppendorf",
+    "brandId": ["30129547"],
+    "links": [
+      "https://www.eppendorf.com/us-en/Products/Laboratory-Consumables/Plates/Eppendorf-twintec-PCR-Plates-LoBind-p-0030129547"
+    ]
   },
   "metadata": {
     "displayName": "Eppendorf Twin.tec 384 Well Plate 45 µL",
@@ -4304,7 +4307,7 @@
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "eppendorftwin.tec_384_wellplate_45ul"
+    "loadName": "eppendorf_twintec_384_wellplate_45ul"
   },
   "namespace": "opentrons",
   "version": 1,

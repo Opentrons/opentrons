@@ -26,6 +26,9 @@
       "951033588",
       "951033600",
       "951033707"
+    ],
+    "links": [
+      "https://www.eppendorf.com/us-en/Products/Laboratory-Consumables/Plates/Eppendorf-Deepwell-Plates-p-951033405"
     ]
   },
   "metadata": {
@@ -1110,7 +1113,7 @@
     "format": "96Standard",
     "quirks": [],
     "isTiprack": false,
-    "isMagneticModuleCompatible": true,
+    "isMagneticModuleCompatible": false,
     "loadName": "eppendorf_96_wellplate_2000ul"
   },
   "namespace": "opentrons",
@@ -1120,5 +1123,12 @@
     "x": 0,
     "y": 0,
     "z": 0
+  },
+  "stackingOffsetWithModule": {
+    "magneticBlockV1": {
+      "x": 0,
+      "y": 0,
+      "z": 1.86
+    }
   }
 }
