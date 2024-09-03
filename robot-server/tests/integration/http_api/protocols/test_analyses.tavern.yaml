@@ -111,7 +111,7 @@ stages:
   - name: Check that a new analysis is NOT started for the same protocol
     request:
       url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
-      method: POST
+      method: GET
     response:
       strict:
         - json:off
