@@ -19,15 +19,20 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
+import {
+  getLabwareDisplayName,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../components/portals/TopPortal'
 
-import type { ModuleOnDeck } from '@opentrons/components'
+import type { LabwareOnDeck, ModuleOnDeck } from '@opentrons/components'
+import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
 import type { OrderedLiquids } from '../../labware-ingred/types'
 
 interface MaterialsListModalProps {
   hardware: ModuleOnDeck[]
-  labware: any[]
+  labware: LabwareOnDeck[]
   liquids: OrderedLiquids
   closeModal: () => void
 }
@@ -48,12 +53,16 @@ export function MaterialsListModal({
           </StyledText>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             {hardware.length > 0 ? (
-              hardware.map((hw, id) => (
+              hardware.map((hw: ModuleOnDeck, id: number) => (
                 <ListItem type="noActive" key={`hardware${id}`}>
                   <ListItemDescriptor
                     type="default"
-                    description={<DeckInfoLabel deckLabel={''} />}
-                    content={hw}
+                    description={
+                      <DeckInfoLabel deckLabel={hw.moduleLocation.slotName} />
+                    }
+                    content={getModuleDisplayName(
+                      hw.moduleModel as ModuleModel
+                    )}
                   />
                 </ListItem>
               ))
@@ -69,17 +78,26 @@ export function MaterialsListModal({
           </StyledText>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             {labware.length > 0 ? (
-              labware.map((lw, id) => (
-                <ListItem type="noActive" key={`labware_${id}`}>
-                  <ListItemDescriptor
-                    type="default"
-                    description={
-                      <DeckInfoLabel deckLabel={lw.labwareLocation} />
-                    }
-                    content={lw}
-                  />
-                </ListItem>
-              ))
+              labware.map((lw: LabwareOnDeck, id: number) => {
+                const { definition, labwareLocation } = lw
+                const slotName =
+                  typeof labwareLocation === 'object' &&
+                  'slotName' in labwareLocation
+                    ? labwareLocation.slotName
+                    : ''
+
+                return (
+                  <ListItem type="noActive" key={`labware_${id}`}>
+                    <ListItemDescriptor
+                      type="default"
+                      description={<DeckInfoLabel deckLabel={slotName} />}
+                      content={getLabwareDisplayName(
+                        definition as LabwareDefinition2
+                      )}
+                    />
+                  </ListItem>
+                )
+              })
             ) : (
               <InfoScreen content={t('no_labware')} />
             )}

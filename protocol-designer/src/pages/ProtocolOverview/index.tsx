@@ -36,6 +36,7 @@ import {
 import { resetScrollElements } from '../../ui/steps/utils'
 import { useBlockingHint } from '../../components/Hints/useBlockingHint'
 import { v8WarningContent } from '../../components/FileSidebar/FileSidebar'
+import { MaterialsListModal } from '../../organisms/MaterialsListModal'
 
 import type { CreateCommand, PipetteName } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../types'
@@ -68,6 +69,10 @@ export function ProtocolOverview(): JSX.Element {
 
   const dispatch: ThunkDispatch<any> = useDispatch()
   const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
+  const [
+    showMaterialsListModal,
+    setShowMaterialsListModal,
+  ] = React.useState<boolean>(false)
   const fileData = useSelector(fileSelectors.createFile)
   const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
@@ -75,9 +80,9 @@ export function ProtocolOverview(): JSX.Element {
   const modulesOnDeck = initialDeckSetup.modules
   const labwaresOnDeck = initialDeckSetup.labware
 
-  const liquids = useSelector(labwareIngredSelectors.allIngredientNamesIds)
-
-  console.log('liquids', liquids)
+  const liquidsOnDeck = useSelector(
+    labwareIngredSelectors.allIngredientNamesIds
+  )
 
   console.log('additionalEquipment', additionalEquipment)
 
@@ -188,6 +193,7 @@ export function ProtocolOverview(): JSX.Element {
   return (
     <>
       {blockingExportHint}
+      {/* {showMaterialsListModal ? (<MaterialsListModal hardware={{Object.values(modulesOnDeck)}} labware={Object.values(labwaresOnDeck)} liquids={liquidsOnDeck}   />) : null} */}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         padding={`${SPACING.spacing60} ${SPACING.spacing80}`}
@@ -203,7 +209,9 @@ export function ProtocolOverview(): JSX.Element {
               desktopStyle="displayBold"
               css={PROTOCOL_NAME_TEXT_STYLE}
             >
-              {protocolName ?? t('untitled_protocol')}
+              {protocolName != null && protocolName !== ''
+                ? protocolName
+                : t('untitled_protocol')}
             </StyledText>
           </Flex>
 

@@ -96,19 +96,19 @@ export const LabwareStackModal = (
   const isModuleThermocycler =
     moduleModel == null
       ? false
-      : getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE
+      : getModuleType) === THERMOCYCLER_MODULE_TYPE
   const thermocyclerLocation =
     robotType === FLEX_ROBOT_TYPE
       ? TC_MODULE_LOCATION_OT3
       : TC_MODULE_LOCATION_OT2
   const moduleDisplayName =
-    moduleModel != null ? getModuleDisplayName(moduleModel) : null ?? ''
+    moduleModel != null ? getModuleDisplayName) : null ?? ''
   const isAdapterForTiprack =
     adapterDef?.parameters.loadName === 'opentrons_flex_96_tiprack_adapter'
   const tiprackAdapterImg = <img src={tiprackAdapter} css={IMAGE_STYLE} />
   const moduleImg =
     moduleModel != null ? (
-      <img src={getModuleImage(moduleModel, true)} css={IMAGE_STYLE} />
+      <img src={getModuleImage, true)} css={IMAGE_STYLE} />
     ) : null
 
   return isOnDevice ? (
