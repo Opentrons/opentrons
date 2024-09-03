@@ -1,3 +1,4 @@
+from typing import List, Tuple
 import pytest
 import platform
 from decoy import Decoy
@@ -45,27 +46,39 @@ def csv_file_different_delimiter() -> bytes:
 
 
 @pytest.fixture
-def csv_file_basic_trailing_empty() -> bytes:
-    """A basic CSV file with quotes around strings."""
-    return b'"x","y","z"\n"a",1,2\n"b",3,4\n"c",5,6\n'
+def csv_file_basic_trailing_empty() -> Tuple[bytes, List[List[str]]]:
+    """A basic CSV file with quotes around strings and a trailing newline."""
+    return (
+        b'"x","y","z"\n"a",1,2\n"b",3,4\n"c",5,6\n',
+        [["x", "y", "z"], ["a", "1", "2"], ["b", "3", "4"], ["c", "5", "6"]],
+    )
 
 
 @pytest.fixture
-def csv_file_basic_three_trailing_empty() -> bytes:
-    """A basic CSV file with quotes around strings."""
-    return b'"x","y","z"\n"a",1,2\n"b",3,4\n"c",5,6\n\n\n'
+def csv_file_basic_three_trailing_empty() -> Tuple[bytes, List[List[str]]]:
+    """A basic CSV file with quotes around strings and three trailing newlines."""
+    return (
+        b'"x","y","z"\n"a",1,2\n"b",3,4\n"c",5,6\n\n\n',
+        [["x", "y", "z"], ["a", "1", "2"], ["b", "3", "4"], ["c", "5", "6"]],
+    )
 
 
 @pytest.fixture
-def csv_file_empty_row_and_trailing_empty() -> bytes:
-    """A basic CSV file with quotes around strings."""
-    return b'"x","y","z"\n\n"b",3,4\n"c",5,6\n'
+def csv_file_empty_row_and_trailing_empty() -> Tuple[bytes, List[List[str]]]:
+    """A basic CSV file with quotes around strings, an empty row, and a trailing newline."""
+    return (
+        b'"x","y","z"\n\n"b",3,4\n"c",5,6\n',
+        [["x", "y", "z"], [], ["b", "3", "4"], ["c", "5", "6"]],
+    )
 
 
 @pytest.fixture
-def csv_file_windows_empty_row_trailing_empty() -> bytes:
-    """A basic CSV file with quotes around strings."""
-    return b'"x","y","z"\r\n\r\n"b",3,4\r\n"c",5,6\r\n'
+def csv_file_windows_empty_row_trailing_empty() -> Tuple[bytes, List[List[str]]]:
+    """A basic CSV file with quotes around strings, Windows-style newlines, an empty row, and a trailing newline."""
+    return (
+        b'"x","y","z"\r\n\r\n"b",3,4\r\n"c",5,6\r\n',
+        [["x", "y", "z"], [], ["b", "3", "4"], ["c", "5", "6"]],
+    )
 
 
 def test_csv_parameter(
@@ -152,19 +165,30 @@ def test_csv_parameter_dont_detect_dialect(
 
 
 @pytest.mark.parametrize(
-    "csv_file",
+    "csv_file_fixture",
     [
-        lazy_fixture("csv_file_basic_trailing_empty"),
-        lazy_fixture("csv_file_basic_three_trailing_empty"),
-        lazy_fixture("csv_file_empty_row_and_trailing_empty"),
-        lazy_fixture("csv_file_windows_empty_row_trailing_empty"),
+        "csv_file_basic_trailing_empty",
+        "csv_file_basic_three_trailing_empty",
+        "csv_file_empty_row_and_trailing_empty",
+        "csv_file_windows_empty_row_trailing_empty",
     ],
 )
 def test_csv_parameter_trailing_empties(
     decoy: Decoy,
     api_version: APIVersion,
-    csv_file: bytes,
+    request: pytest.FixtureRequest,
+    csv_file_fixture: str,
 ) -> None:
     """It should load the rows as all strings even with no quotes or leading spaces."""
+    # Get the fixture value (tuple of bytes and expected output)
+    csv_file, expected_output = request.getfixturevalue(csv_file_fixture)
+
     subject = CSVParameter(csv_file, api_version)
-    assert len(subject.parse_as_csv()) == 4
+    parsed_csv = subject.parse_as_csv()
+
+    assert (
+        parsed_csv == expected_output
+    ), f"Expected {expected_output}, but got {parsed_csv}"
+    assert len(parsed_csv) == len(
+        expected_output
+    ), f"Expected {len(expected_output)} rows, but got {len(parsed_csv)}"
