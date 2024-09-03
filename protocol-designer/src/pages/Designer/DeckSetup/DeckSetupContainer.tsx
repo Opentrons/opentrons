@@ -30,7 +30,7 @@ import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
 import { getRobotType } from '../../../file-data/selectors'
 import { getHasGen1MultiChannelPipette } from '../../../step-forms'
 import { SlotDetailsContainer } from '../../../organisms'
-import { selectZoomedInSlot } from '../../../labware-ingred/actions'
+import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import { DeckSetupDetails } from './DeckSetupDetails'
 import {
@@ -124,13 +124,14 @@ export function DeckSetupContainer(): JSX.Element {
     if (cutoutId == null) {
       console.error('expected to find a cutoutId but could not')
     }
-    dispatch(selectZoomedInSlot({ slot: slotId, cutout: cutoutId }))
+    dispatch(selectZoomedIntoSlot({ slot: slotId, cutout: cutoutId }))
 
     const zoomInSlotPosition = getPositionFromSlotId(slotId ?? '', deckDef)
     if (zoomInSlotPosition != null) {
       const zoomedInViewBox = zoomInOnCoordinate({
         x: zoomInSlotPosition[0],
         y: zoomInSlotPosition[1],
+
         deckDef,
       })
       //  TODO(ja, 9/3/24): re-examine this usage. It is causing
@@ -326,7 +327,7 @@ export function DeckSetupContainer(): JSX.Element {
             setHoveredModule,
           }}
           onCloseClick={() => {
-            dispatch(selectZoomedInSlot({ slot: null, cutout: null }))
+            dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
             animateZoom({
               targetViewBox: initialViewBox,
               viewBox,

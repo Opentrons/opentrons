@@ -4,13 +4,13 @@ import { FixtureRender } from './FixtureRender'
 import { LabwareRender, Module } from '@opentrons/components'
 import {
   getModuleDef2,
-  getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import { selectors } from '../../../labware-ingred/selectors'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import type {
+  CoordinateTuple,
   DeckDefinition,
   ModuleModel,
   RobotType,
@@ -23,24 +23,28 @@ interface HoveredLabwareProps {
   hoveredLabware: string | null
   hoveredModule: ModuleModel | null
   hoveredFixture: Fixture | null
+  hoveredSlotPosition: CoordinateTuple | null
 }
-export const HoveredItems = (props: HoveredLabwareProps): JSX.Element => {
+export const HoveredItems = (
+  props: HoveredLabwareProps
+): JSX.Element | null => {
   const {
     deckDef,
     robotType,
     hoveredLabware,
     hoveredModule,
     hoveredFixture,
+    hoveredSlotPosition,
   } = props
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const { zoomedInSlot, selectedModuleModel } = zoomedInSlotInfo
 
-  const hoveredSlotPosition = React.useMemo(
-    () => getPositionFromSlotId(zoomedInSlot.slot ?? '', deckDef),
-    [zoomedInSlot, deckDef]
-  )
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const defs = getOnlyLatestDefs()
+
+  if (hoveredSlotPosition == null) {
+    return null
+  }
   const hoveredModuleDef =
     hoveredModule != null ? getModuleDef2(hoveredModule) : hoveredModule
   const hoveredLabwareDef =

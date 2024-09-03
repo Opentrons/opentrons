@@ -256,7 +256,7 @@ export function SlotOverflowMenu(
 
 const MenuButton = styled.button`
   background-color: ${COLORS.transparent};
-
+  border-radius: inherit;
   cursor: pointer;
   padding: ${SPACING.spacing8} ${SPACING.spacing12};
   border: none;

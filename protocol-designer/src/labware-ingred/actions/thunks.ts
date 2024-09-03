@@ -6,8 +6,8 @@ import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
 import { getRobotType } from '../../file-data/selectors'
 import {
-  selectNestedLabwareDefUri,
-  selectLabwareDefUri,
+  selectNestedLabware,
+  selectLabware,
   selectModule,
   selectFixture,
 } from './actions'
@@ -16,8 +16,8 @@ import type {
   CreateContainerArgs,
   CreateContainerAction,
   DuplicateLabwareAction,
-  SelectNestedLabwareDefUriAction,
-  SelectLabwareDefUriAction,
+  SelectNestedLabwareAction,
+  SelectLabwareAction,
   SelectModuleAction,
   SelectFixtureAction,
 } from './actions'
@@ -181,18 +181,18 @@ export const duplicateLabware: (
   }
 }
 
-interface PreselectedSlotInfo {
+interface EditSlotInfo {
   createdModuleForSlot?: ModuleOnDeck | null
   createdLabwareForSlot?: LabwareOnDeck | null
   createdNestedLabwareForSlot?: LabwareOnDeck | null
   preSelectedFixture?: Fixture | null
 }
 
-export const selectPreselectedSlotInfo: (
-  args: PreselectedSlotInfo
+export const editSlotInfo: (
+  args: EditSlotInfo
 ) => ThunkAction<
-  | SelectNestedLabwareDefUriAction
-  | SelectLabwareDefUriAction
+  | SelectNestedLabwareAction
+  | SelectLabwareAction
   | SelectModuleAction
   | SelectFixtureAction
 > = args => dispatch => {
@@ -204,12 +204,12 @@ export const selectPreselectedSlotInfo: (
   } = args
 
   dispatch(
-    selectNestedLabwareDefUri({
+    selectNestedLabware({
       nestedLabwareDefUri: createdNestedLabwareForSlot?.labwareDefURI ?? null,
     })
   )
   dispatch(
-    selectLabwareDefUri({
+    selectLabware({
       labwareDefUri: createdLabwareForSlot?.labwareDefURI ?? null,
     })
   )

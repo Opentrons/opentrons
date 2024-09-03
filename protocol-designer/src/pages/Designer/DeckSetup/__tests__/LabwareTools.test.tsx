@@ -20,8 +20,8 @@ import { createCustomLabwareDef } from '../../../../labware-defs/actions'
 import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import { getRobotType } from '../../../../file-data/selectors'
 import {
-  selectLabwareDefUri,
-  selectNestedLabwareDefUri,
+  selectLabware,
+  selectNestedLabware,
 } from '../../../../labware-ingred/actions'
 import { LabwareTools } from '../LabwareTools'
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
@@ -90,7 +90,7 @@ describe('LabwareTools', () => {
       screen.getByRole('label', { name: 'Corning 384 Well Plate' })
     )
     //  set labware
-    expect(vi.mocked(selectLabwareDefUri)).toHaveBeenCalled()
+    expect(vi.mocked(selectLabware)).toHaveBeenCalled()
   })
   it('renders deck slot and selects an adapter and labware', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
@@ -117,7 +117,7 @@ describe('LabwareTools', () => {
         name: 'Fixture Corning 96 Well Plate 360 µL Flat',
       })
     )
-    expect(vi.mocked(selectNestedLabwareDefUri)).toHaveBeenCalled()
+    expect(vi.mocked(selectNestedLabware)).toHaveBeenCalled()
   })
 
   it('renders the custom labware flow', () => {

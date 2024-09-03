@@ -21,7 +21,7 @@ import { LabwareOnDeck } from '../../../components/DeckSetup/LabwareOnDeck'
 import { selectors } from '../../../labware-ingred/selectors'
 import { SlotWarning } from '../../../components/DeckSetup/SlotWarning'
 import { getStagingAreaAddressableAreas } from '../../../utils'
-import { selectPreselectedSlotInfo } from '../../../labware-ingred/actions'
+import { editSlotInfo } from '../../../labware-ingred/actions'
 import { getRobotType } from '../../../file-data/selectors'
 import { getSlotInformation } from '../utils'
 import { DeckItemHover } from './DeckItemHover'
@@ -102,7 +102,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
   //  initiate the slot's info
   React.useEffect(() => {
     dispatch(
-      selectPreselectedSlotInfo({
+      editSlotInfo({
         createdNestedLabwareForSlot,
         createdLabwareForSlot,
         createdModuleForSlot,
@@ -421,6 +421,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
 
       {/* hovered hardware + labware */}
       <HoveredItems
+        hoveredSlotPosition={slotPosition}
         deckDef={deckDef}
         robotType={robotType}
         hoveredFixture={hoveredFixture}

@@ -31,10 +31,11 @@ import {
   createContainer,
   deleteContainer,
   selectFixture,
-  selectLabwareDefUri,
+  selectLabware,
   selectModule,
-  selectPreselectedSlotInfo,
-  selectZoomedInSlot,
+  editSlotInfo,
+  selectZoomedIntoSlot,
+  selectNestedLabware,
 } from '../../../labware-ingred/actions'
 import {
   getEnableAbsorbanceReader,
@@ -158,7 +159,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
 
   const handleResetToolbox = (): void => {
     dispatch(
-      selectPreselectedSlotInfo({
+      editSlotInfo({
         createdNestedLabwareForSlot: null,
         createdLabwareForSlot: null,
         createdModuleForSlot: null,
@@ -242,7 +243,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
       )
     }
     handleResetToolbox()
-    dispatch(selectZoomedInSlot({ slot: null, cutout: null }))
+    dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
     onCloseClick()
   }
 
@@ -379,7 +380,10 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
                       } else {
                         setHardware(model)
                         dispatch(selectModule({ moduleModel: model }))
-                        dispatch(selectLabwareDefUri({ labwareDefUri: null }))
+                        dispatch(selectLabware({ labwareDefUri: null }))
+                        dispatch(
+                          selectNestedLabware({ nestedLabwareDefUri: null })
+                        )
                       }
                     }}
                     isSelected={model === selectedHardware}
@@ -430,7 +434,10 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
                       } else {
                         setHardware(fixture)
                         dispatch(selectFixture({ fixture: fixture }))
-                        dispatch(selectLabwareDefUri({ labwareDefUri: null }))
+                        dispatch(selectLabware({ labwareDefUri: null }))
+                        dispatch(
+                          selectNestedLabware({ nestedLabwareDefUri: null })
+                        )
                       }
                     }}
                     isSelected={fixture === selectedHardware}

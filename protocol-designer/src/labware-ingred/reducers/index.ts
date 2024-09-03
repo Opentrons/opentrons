@@ -15,7 +15,7 @@ import type { Action, DeckSlot } from '../../types'
 import type {
   LiquidGroupsById,
   DisplayLabware,
-  ZoomedInSlotInfoState,
+  ZoomedIntoSlotInfoState,
 } from '../types'
 import type { LoadFileAction } from '../../load-file'
 import type {
@@ -33,11 +33,11 @@ import type {
   CloseIngredientSelectorAction,
   DrillDownOnLabwareAction,
   DrillUpFromLabwareAction,
-  SelectLabwareDefUriAction,
-  SelectNestedLabwareDefUriAction,
+  SelectLabwareAction,
+  SelectNestedLabwareAction,
   SelectModuleAction,
   SelectFixtureAction,
-  ZoomedInAction,
+  ZoomedIntoSlotAction,
 } from '../actions'
 // REDUCERS
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
@@ -354,7 +354,7 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
   {}
 )
 
-const initialState: ZoomedInSlotInfoState = {
+const selectedSlotInfoInitialState: ZoomedIntoSlotInfoState = {
   selectedLabwareDefUri: null,
   selectedNestedLabwareDefUri: null,
   selectedModuleModel: null,
@@ -362,45 +362,33 @@ const initialState: ZoomedInSlotInfoState = {
   zoomedInSlot: { slot: null, cutout: null },
 }
 
-export const zoomedInSlotInfo = handleActions<ZoomedInSlotInfoState, any>(
-  {
-    //  @ts-expect-error
-    SELECT_LABWARE_DEF_URI: (
-      state: ZoomedInSlotInfoState,
-      action: SelectLabwareDefUriAction
-    ): ZoomedInSlotInfoState => {
+export const zoomedInSlotInfo = (
+  state: ZoomedIntoSlotInfoState = selectedSlotInfoInitialState,
+  action:
+    | SelectLabwareAction
+    | SelectNestedLabwareAction
+    | SelectModuleAction
+    | SelectFixtureAction
+    | ZoomedIntoSlotAction
+): ZoomedIntoSlotInfoState => {
+  switch (action.type) {
+    case 'SELECT_LABWARE': {
       const { labwareDefUri } = action.payload
       return { ...state, selectedLabwareDefUri: labwareDefUri }
-    },
-    //  @ts-expect-error
-    SELECT_NESTED_LABWARE_DEF_URI: (
-      state: ZoomedInSlotInfoState,
-      action: SelectNestedLabwareDefUriAction
-    ): ZoomedInSlotInfoState => {
+    }
+    case 'SELECT_NESTED_LABWARE': {
       const { nestedLabwareDefUri } = action.payload
       return { ...state, selectedNestedLabwareDefUri: nestedLabwareDefUri }
-    },
-    //  @ts-expect-error
-    SELECT_MODULE: (
-      state: ZoomedInSlotInfoState,
-      action: SelectModuleAction
-    ): ZoomedInSlotInfoState => {
+    }
+    case 'SELECT_MODULE': {
       const { moduleModel } = action.payload
       return { ...state, selectedModuleModel: moduleModel }
-    },
-    //  @ts-expect-error
-    SELECT_FIXTURE: (
-      state: ZoomedInSlotInfoState,
-      action: SelectFixtureAction
-    ): ZoomedInSlotInfoState => {
+    }
+    case 'SELECT_FIXTURE': {
       const { fixture } = action.payload
       return { ...state, selectedFixture: fixture }
-    },
-    //  @ts-expect-error
-    ZOOMED_IN_SLOT: (
-      state: ZoomedInSlotInfoState,
-      action: ZoomedInAction
-    ): ZoomedInSlotInfoState => {
+    }
+    case 'ZOOMED_INTO_SLOT': {
       const { slot, cutout } = action.payload
       return {
         ...state,
@@ -409,13 +397,13 @@ export const zoomedInSlotInfo = handleActions<ZoomedInSlotInfoState, any>(
           cutout,
         },
       }
-    },
-  },
-  initialState
-)
-
+    }
+    default:
+      return state
+  }
+}
 export interface RootState {
-  zoomedInSlotInfo: ZoomedInSlotInfoState
+  zoomedInSlotInfo: ZoomedIntoSlotInfoState
   modeLabwareSelection: DeckSlot | false
   selectedContainerId: SelectedContainerId
   drillDownLabwareId: DrillDownLabwareId

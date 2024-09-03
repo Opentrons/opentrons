@@ -218,28 +218,28 @@ export const editLiquidGroup: (
 }
 
 //  NOTE: the following actions are for selecting labware/hardware for the zoomed in slot
-export interface SelectLabwareDefUriAction {
-  type: 'SELECT_LABWARE_DEF_URI'
+export interface SelectLabwareAction {
+  type: 'SELECT_LABWARE'
   payload: {
     labwareDefUri: string | null
   }
 }
-export const selectLabwareDefUri: (
-  payload: SelectLabwareDefUriAction['payload']
-) => SelectLabwareDefUriAction = payload => ({
-  type: 'SELECT_LABWARE_DEF_URI',
+export const selectLabware: (
+  payload: SelectLabwareAction['payload']
+) => SelectLabwareAction = payload => ({
+  type: 'SELECT_LABWARE',
   payload,
 })
-export interface SelectNestedLabwareDefUriAction {
-  type: 'SELECT_NESTED_LABWARE_DEF_URI'
+export interface SelectNestedLabwareAction {
+  type: 'SELECT_NESTED_LABWARE'
   payload: {
     nestedLabwareDefUri: string | null
   }
 }
-export const selectNestedLabwareDefUri: (
-  payload: SelectNestedLabwareDefUriAction['payload']
-) => SelectNestedLabwareDefUriAction = payload => ({
-  type: 'SELECT_NESTED_LABWARE_DEF_URI',
+export const selectNestedLabware: (
+  payload: SelectNestedLabwareAction['payload']
+) => SelectNestedLabwareAction = payload => ({
+  type: 'SELECT_NESTED_LABWARE',
   payload,
 })
 
@@ -269,16 +269,16 @@ export const selectFixture: (
   payload,
 })
 
-export interface ZoomedInAction {
-  type: 'ZOOMED_IN_SLOT'
+export interface ZoomedIntoSlotAction {
+  type: 'ZOOMED_INTO_SLOT'
   payload: {
     slot: DeckSlot | null
     cutout: CutoutId | null
   }
 }
-export const selectZoomedInSlot: (
-  payload: ZoomedInAction['payload']
-) => ZoomedInAction = payload => ({
-  type: 'ZOOMED_IN_SLOT',
+export const selectZoomedIntoSlot: (
+  payload: ZoomedIntoSlotAction['payload']
+) => ZoomedIntoSlotAction = payload => ({
+  type: 'ZOOMED_INTO_SLOT',
   payload,
 })

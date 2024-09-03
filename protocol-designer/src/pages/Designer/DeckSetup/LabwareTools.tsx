@@ -40,7 +40,10 @@ import { getRobotType } from '../../../file-data/selectors'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { getPipetteEntities } from '../../../step-forms/selectors'
 import { selectors } from '../../../labware-ingred/selectors'
-import { selectLabwareDefUri } from '../../../labware-ingred/actions'
+import {
+  selectLabware,
+  selectNestedLabware,
+} from '../../../labware-ingred/actions'
 import { ORDERED_CATEGORIES } from './constants'
 import {
   getLabwareIsRecommended,
@@ -260,9 +263,7 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
                     buttonValue={labwareURI}
                     onChange={e => {
                       e.stopPropagation()
-                      dispatch(
-                        selectLabwareDefUri({ labwareDefUri: labwareURI })
-                      )
+                      dispatch(selectLabware({ labwareDefUri: labwareURI }))
                     }}
                     isSelected={labwareURI === selectedLabwareDefUri}
                   />

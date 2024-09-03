@@ -20,7 +20,7 @@ import type {
   IngredInputs,
   LiquidGroup,
   OrderedLiquids,
-  ZoomedInSlotInfoState,
+  ZoomedIntoSlotInfoState,
 } from './types'
 import type { BaseState, DeckSlot } from './../types'
 // TODO: Ian 2019-02-15 no RootSlice, use BaseState
@@ -162,7 +162,7 @@ const getLiquidDisplayColors: Selector<RootSlice, string[]> = createSelector(
 
 const getZoomedInSlotInfo: Selector<
   RootSlice,
-  ZoomedInSlotInfoState
+  ZoomedIntoSlotInfoState
 > = createSelector(rootSelector, rootState => rootState.zoomedInSlotInfo)
 
 const getZoomedInSlot: Selector<

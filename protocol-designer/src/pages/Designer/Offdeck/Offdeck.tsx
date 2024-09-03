@@ -17,7 +17,7 @@ import {
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { selectors } from '../../../labware-ingred/selectors'
-import { selectZoomedInSlot } from '../../../labware-ingred/actions'
+import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { DeckSetupTools } from '../DeckSetup/DeckSetupTools'
 import { OffDeckDetails } from './OffDeckDetails'
 
@@ -129,14 +129,14 @@ export function OffDeck(): JSX.Element {
             onDeckProps={null}
             setHoveredLabware={setHoveredLabware}
             onCloseClick={() => {
-              dispatch(selectZoomedInSlot({ slot: null, cutout: null }))
+              dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
             }}
           />
         </>
       ) : (
         <OffDeckDetails
           addLabware={() => {
-            dispatch(selectZoomedInSlot({ slot: 'offDeck', cutout: null }))
+            dispatch(selectZoomedIntoSlot({ slot: 'offDeck', cutout: null }))
           }}
         />
       )}

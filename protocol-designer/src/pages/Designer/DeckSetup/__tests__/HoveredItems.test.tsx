@@ -36,6 +36,7 @@ describe('HoveredItems', () => {
 
   beforeEach(() => {
     props = {
+      hoveredSlotPosition: [0, 0, 0],
       deckDef: getDeckDefFromRobotType(FLEX_ROBOT_TYPE),
       robotType: FLEX_ROBOT_TYPE,
       hoveredLabware: null,
