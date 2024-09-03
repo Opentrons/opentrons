@@ -27,7 +27,7 @@ Welcome to the v8.0.0 release of the Opentrons App!
 
 ### Known Issues
 
-- Labware offsets can't be applied to protocols that require selecting a CSV file as a runtime parameter value. Write the protocol in such a way that it passes analysis with or without the CSV file, or run Labware Position Check after confirming parameter values.
+- Previously saved labware offsets can't be applied to protocols that require selecting a CSV file as a runtime parameter value. Run Labware Position Check freshly every time, unless you are rerunning something from the touch screen with already saved labware offsets and unchanged parameters.
 - Error recovery can't perform partial tip pickup, because it doesn't account for the pipette nozzle configuration of 8- and 96-channel pipettes. If a recovery step requires partial tip pickup, cancel the protocol instead.
 
 ---
