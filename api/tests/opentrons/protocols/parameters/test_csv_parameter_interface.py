@@ -179,7 +179,7 @@ def test_csv_parameter_trailing_empties(
     request: pytest.FixtureRequest,
     csv_file_fixture: str,
 ) -> None:
-    """It should load the rows as all strings.  Empty rows are allowed in the middle if the data but all trailing empty rows are removed."""
+    """It should load the rows as all strings.  Empty rows are allowed in the middle of the data but all trailing empty rows are removed."""
     # Get the fixture value (tuple of bytes and expected output)
     csv_file, expected_output = request.getfixturevalue(csv_file_fixture)
 
