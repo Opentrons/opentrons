@@ -51,12 +51,8 @@ export function SlotHover(props: SlotHoverProps): JSX.Element | null {
       deckDef.cutoutFixtures
     ) ?? 'cutoutD1'
 
-  //  return null for TC slots and 4th column slots
-  if (
-    slotPosition === null ||
-    FOURTH_COLUMN_SLOTS.includes(slotId) ||
-    (hasTCOnSlot && tcSlots.includes(slotId))
-  )
+  //  return null for TC slots
+  if (slotPosition === null || (hasTCOnSlot && tcSlots.includes(slotId)))
     return null
 
   const hoverOpacity = hover != null && hover === slotId ? '1' : '0'
@@ -78,7 +74,8 @@ export function SlotHover(props: SlotHoverProps): JSX.Element | null {
     const X_ADJUSTMENT_LEFT_SIDE = -101.5
     const X_ADJUSTMENT = -17
     const X_DIMENSION_MIDDLE_SLOTS = 160.3
-    const X_DIMENSION_OUTER_SLOTS = hasStagingArea ? 340.8 : 246.5
+    const X_DIMENSION_OUTER_SLOTS = hasStagingArea ? 160.0 : 246.5
+    const X_DIMENSION_4TH_COLUMN_SLOTS = 175.0
     const Y_DIMENSION = hasTCOnSlot ? 294.0 : 106.0
 
     const slotFromCutout = slotId
@@ -96,9 +93,12 @@ export function SlotHover(props: SlotHoverProps): JSX.Element | null {
     const isMiddleOfDeck =
       slotId === 'A2' || slotId === 'B2' || slotId === 'C2' || slotId === 'D2'
 
-    const xDimension = isMiddleOfDeck
-      ? X_DIMENSION_MIDDLE_SLOTS
-      : X_DIMENSION_OUTER_SLOTS
+    let xDimension = X_DIMENSION_OUTER_SLOTS
+    if (isMiddleOfDeck) {
+      xDimension = X_DIMENSION_MIDDLE_SLOTS
+    } else if (FOURTH_COLUMN_SLOTS.includes(slotId)) {
+      xDimension = X_DIMENSION_4TH_COLUMN_SLOTS
+    }
     const yDimension = Y_DIMENSION
 
     return (
