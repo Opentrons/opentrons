@@ -20,17 +20,10 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
-import {
-  // getLabwareDisplayName,
-  getModuleDisplayName,
-} from '@opentrons/shared-data'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../components/portals/TopPortal'
-
-// import type { LabwareOnDeck, ModuleOnDeck } from '@opentrons/components'
-// import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
 import type { OrderedLiquids } from '../../labware-ingred/types'
-// import type { ModuleTemporalProperties } from '../../step-forms'
 
 const MODAL_MIN_WIDTH = '36.1875rem'
 
@@ -47,8 +40,6 @@ export function MaterialsListModal({
   liquids,
   setShowMaterialsListModal,
 }: MaterialsListModalProps): JSX.Element {
-  console.log('hardware', hardware[0])
-  console.log('labware', labware)
   const { t } = useTranslation('protocol_overview')
   return createPortal(
     <Modal

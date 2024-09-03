@@ -20,10 +20,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
-import {
-  // getAdditionalEquipmentEntities,
-  getInitialDeckSetup,
-} from '../../step-forms/selectors'
+import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { selectors as fileSelectors } from '../../file-data'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { actions as loadFileActions } from '../../load-file'
@@ -64,9 +61,6 @@ export function ProtocolOverview(): JSX.Element {
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
   const deckSetup = useSelector(getInitialDeckSetup)
-
-  // console.log('deckSetup', deckSetup)
-
   const dispatch: ThunkDispatch<any> = useDispatch()
   const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
   const [
@@ -83,13 +77,6 @@ export function ProtocolOverview(): JSX.Element {
   const liquidsOnDeck = useSelector(
     labwareIngredSelectors.allIngredientNamesIds
   )
-
-  // console.log('additionalEquipment', additionalEquipment)
-
-  // console.log('modulesOnDeck', Object.values(modulesOnDeck))
-
-  // const hardWareForMaterials = []
-
   const nonLoadCommands =
     fileData?.commands.filter(
       command => !LOAD_COMMANDS.includes(command.commandType)
@@ -138,7 +125,6 @@ export function ProtocolOverview(): JSX.Element {
   const leftPip = pipettesOnDeck.find(pip => pip.mount === 'left')
   const rightPip = pipettesOnDeck.find(pip => pip.mount === 'right')
   const gripper = additionalEquipmentOnDeck.find(ae => ae.name === 'gripper')
-  // console.log('additionalEquipmentOnDeck', additionalEquipmentOnDeck)
   const {
     protocolName,
     description,
@@ -406,7 +392,6 @@ export function ProtocolOverview(): JSX.Element {
                 data-testid="Materials_list"
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 onClick={() => {
-                  console.log('show materials list modal')
                   setShowMaterialsListModal(true)
                 }}
               >
