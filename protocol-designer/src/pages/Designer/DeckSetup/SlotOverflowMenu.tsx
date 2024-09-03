@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import {
   BORDERS,
   COLORS,
@@ -19,6 +20,7 @@ import { deleteDeckFixture } from '../../../step-forms/actions/additionalItems'
 import {
   deleteContainer,
   duplicateLabware,
+  openIngredientSelector,
 } from '../../../labware-ingred/actions'
 import type { DeckSlotId } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../../types'
@@ -33,6 +35,7 @@ export function SlotOverflowMenu(
 ): JSX.Element | null {
   const { slot, setShowMenuList, addEquipment } = props
   const { t } = useTranslation('starting_deck_state')
+  const navigate = useNavigate()
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const [showNickNameModal, setShowNickNameModal] = React.useState<boolean>(
     false
@@ -141,11 +144,16 @@ export function SlotOverflowMenu(
           </StyledText>
         </MenuButton>
         <MenuButton
-          disabled={labwareOnSlot == null || isLabwareTiprack}
+          disabled={
+            labwareOnSlot == null ||
+            (labwareOnSlot != null && isLabwareAnAdapter) ||
+            isLabwareTiprack
+          }
           onClick={() => {
-            //  todo(ja, 8/22/24): wire this up
-            console.log('open liquids')
-            setShowMenuList(false)
+            if (labwareOnSlot != null) {
+              dispatch(openIngredientSelector(labwareOnSlot.id))
+            }
+            navigate('/liquids')
           }}
         >
           <StyledText desktopStyle="bodyDefaultRegular">
@@ -160,6 +168,7 @@ export function SlotOverflowMenu(
             } else if (nestedLabwareOnSlot != null) {
               dispatch(duplicateLabware(nestedLabwareOnSlot.id))
             }
+
             setShowMenuList(false)
           }}
         >
