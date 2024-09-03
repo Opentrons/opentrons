@@ -100,7 +100,7 @@ class DevServer:
 
     def stop(self) -> None:
         """Stop the robot server."""
-        if hasattr(self, 'proc') and self.proc is not None:
+        if hasattr(self, "proc") and self.proc is not None:
             try:
                 print(f"Attempting to stop process with PID: {self.proc.pid}")
                 self.proc.send_signal(signal.SIGTERM)
@@ -111,7 +111,9 @@ class DevServer:
                 print(f"Process {self.proc.pid} terminated successfully with SIGTERM.")
 
             except subprocess.TimeoutExpired:
-                print(f"Process {self.proc.pid} did not terminate in {timeout_sec} seconds, attempting to kill.")
+                print(
+                    f"Process {self.proc.pid} did not terminate in {timeout_sec} seconds, attempting to kill."
+                )
                 self.proc.kill()
 
                 # Wait for the process to be forcefully killed
