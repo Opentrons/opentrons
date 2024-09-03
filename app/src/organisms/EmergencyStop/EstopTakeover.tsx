@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { useEstopQuery, useHost } from '@opentrons/react-api-client'
+import { useEstopQuery } from '@opentrons/react-api-client'
 
 import { EstopPressedModal } from './EstopPressedModal'
 import { EstopMissingModal } from './EstopMissingModal'
@@ -41,7 +41,6 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
     },
   })
   console.log(`estop status: ${estopStatus?.data.status}`)
-  const host = useHost()
 
   const {
     isEmergencyStopModalDismissed,

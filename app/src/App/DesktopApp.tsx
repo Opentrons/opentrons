@@ -36,7 +36,7 @@ import { ProtocolTimeline } from '../pages/Protocols/ProtocolDetails/ProtocolTim
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { DesktopAppFallback } from './DesktopAppFallback'
 
-import type { RouteProps, DesktopRouteParams } from './types'
+import type { RouteProps } from './types'
 
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()

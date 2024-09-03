@@ -63,13 +63,12 @@ export interface UnsafeEngageAxesParams {
   axes: MotorAxes
 }
 
-export interface UnsafeEngageAxesCreateCommand
-  extends CommonCommandCreateInfo {
+export interface UnsafeEngageAxesCreateCommand extends CommonCommandCreateInfo {
   commandType: 'unsafe/engageAxes'
   params: UnsafeUpdatePositionEstimatorsParams
 }
 export interface UnsafeEngageAxesRunTimeCommand
   extends CommonCommandRunTimeInfo,
-  UnsafeEngageAxesCreateCommand {
+    UnsafeEngageAxesCreateCommand {
   result?: any
 }
