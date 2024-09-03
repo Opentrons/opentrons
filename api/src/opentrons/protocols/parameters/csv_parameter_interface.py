@@ -85,6 +85,11 @@ class CSVParameter:
         except (UnicodeDecodeError, csv.Error):
             raise ParameterValueError("Cannot parse provided CSV contents.")
         # Remove any trailing empty rows at the end of the parsed rows
+        return self._remove_trailing_empty_rows(rows)
+
+    @staticmethod
+    def _remove_trailing_empty_rows(rows: List[List[str]]) -> List[List[str]]:
+        """Removes any trailing empty rows."""
         while rows and rows[-1] == []:
             rows.pop()
         return rows
