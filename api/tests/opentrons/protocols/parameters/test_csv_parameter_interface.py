@@ -180,7 +180,9 @@ def test_csv_parameter_trailing_empties(
     csv_file_fixture: str,
 ) -> None:
     """It should load the rows as all strings.  Empty rows are allowed in the middle of the data but all trailing empty rows are removed."""
-    # Get the fixture value (tuple of bytes and expected output)
+    # Get the fixture value
+    csv_file: bytes
+    expected_output: List[List[str]]
     csv_file, expected_output = request.getfixturevalue(csv_file_fixture)
 
     subject = CSVParameter(csv_file, api_version)
