@@ -39,7 +39,6 @@ import { v8WarningContent } from '../../components/FileSidebar/FileSidebar'
 import { MaterialsListModal } from '../../organisms/MaterialsListModal'
 
 import type { CreateCommand, PipetteName } from '@opentrons/shared-data'
-import type { LabwareOnDeck, ModuleOnDeck } from '@opentrons/components'
 import type { ThunkDispatch } from '../../types'
 import type { HintKey } from '../../tutorial'
 
@@ -206,6 +205,7 @@ export function ProtocolOverview(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         padding={`${SPACING.spacing60} ${SPACING.spacing80}`}
         gridGap={SPACING.spacing60}
+        width="100%"
       >
         <Flex
           justifyContent={JUSTIFY_SPACE_BETWEEN}

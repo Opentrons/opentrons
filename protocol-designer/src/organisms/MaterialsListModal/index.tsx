@@ -15,6 +15,7 @@ import {
   ListItem,
   ListItemDescriptor,
   Modal,
+  ModuleIcon,
   SPACING,
   StyledText,
   Tag,
@@ -30,6 +31,8 @@ import { getTopPortalEl } from '../../components/portals/TopPortal'
 // import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
 import type { OrderedLiquids } from '../../labware-ingred/types'
 // import type { ModuleTemporalProperties } from '../../step-forms'
+
+const MODAL_MIN_WIDTH = '36.1875rem'
 
 interface MaterialsListModalProps {
   hardware: any[]
@@ -54,6 +57,8 @@ export function MaterialsListModal({
       }}
       closeOnOutsideClick
       title={t('materials_list')}
+      marginLeft="0rem"
+      minWidth={MODAL_MIN_WIDTH}
     >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
@@ -67,7 +72,17 @@ export function MaterialsListModal({
                   <ListItemDescriptor
                     type="default"
                     description={<DeckInfoLabel deckLabel={hw.slot} />}
-                    content={getModuleDisplayName(hw.model)}
+                    content={
+                      <Flex
+                        alignItems={ALIGN_CENTER}
+                        grigGap={SPACING.spacing4}
+                      >
+                        <ModuleIcon moduleType={hw.type} size="1rem" />
+                        <StyledText desktopStyle="bodyDefaultRegular">
+                          {getModuleDisplayName(hw.model)}
+                        </StyledText>
+                      </Flex>
+                    }
                   />
                 </ListItem>
               ))
