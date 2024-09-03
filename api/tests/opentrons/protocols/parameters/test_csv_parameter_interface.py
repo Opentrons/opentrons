@@ -62,6 +62,12 @@ def csv_file_empty_row_and_trailing_empty() -> bytes:
     return b'"x","y","z"\n\n"b",3,4\n"c",5,6\n'
 
 
+@pytest.fixture
+def csv_file_windows_empty_row_trailing_empty() -> bytes:
+    """A basic CSV file with quotes around strings."""
+    return b'"x","y","z"\r\n\r\n"b",3,4\r\n"c",5,6\r\n'
+
+
 def test_csv_parameter(
     decoy: Decoy, api_version: APIVersion, csv_file_basic: bytes
 ) -> None:
@@ -151,6 +157,7 @@ def test_csv_parameter_dont_detect_dialect(
         lazy_fixture("csv_file_basic_trailing_empty"),
         lazy_fixture("csv_file_basic_three_trailing_empty"),
         lazy_fixture("csv_file_empty_row_and_trailing_empty"),
+        lazy_fixture("csv_file_windows_empty_row_trailing_empty"),
     ],
 )
 def test_csv_parameter_trailing_empties(
@@ -160,5 +167,4 @@ def test_csv_parameter_trailing_empties(
 ) -> None:
     """It should load the rows as all strings even with no quotes or leading spaces."""
     subject = CSVParameter(csv_file, api_version)
-
     assert len(subject.parse_as_csv()) == 4
