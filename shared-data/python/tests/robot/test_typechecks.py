@@ -3,7 +3,7 @@ import typeguard
 
 
 from opentrons_shared_data.robot import load
-from opentrons_shared_data.robot.dev_types import RobotDefinition, RobotType
+from opentrons_shared_data.robot.types import RobotDefinition, RobotType
 
 
 @pytest.mark.parametrize("defname", ["OT-2 Standard", "OT-3 Standard"])

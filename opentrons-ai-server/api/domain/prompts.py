@@ -1,4 +1,5 @@
 import json
+import logging
 import uuid
 from typing import Any, Dict, Iterable
 
@@ -7,7 +8,8 @@ from openai.types.chat import ChatCompletionToolParam
 
 from api.settings import Settings
 
-settings = Settings.build()
+settings: Settings = Settings()
+logger = logging.getLogger(__name__)
 
 
 def generate_unique_name() -> str:
@@ -25,23 +27,23 @@ def send_post_request(payload: str) -> str:
     response = requests.post(url, json=data, headers=headers)
 
     if response.status_code != 200:
-        print("Error: " + response.text)
+        logger.error("Error: " + response.text)
         return "Error: " + response.text
 
     # Check the response before returning it
     # ToDo clean up code
     response_data: Dict[str, Any] = response.json()
     if "error_message" in response_data:
-        print("Error in response:", response_data["error_message"])
+        logger.error("Error in response:", response_data["error_message"])
         return str(response_data["error_message"])
     elif "protocol_name" in response_data:
-        # print("Protocol executed successfully. Run log:", response_data["run_log"])
+        logger.debug("Protocol executed successfully", extra={"response_data": response_data["run_log"]})
 
         return str(response_data["run_status"])
         # ToDo if run_log option is on
         # return response_data["run_log"]
     else:
-        print("Unexpected response:", response_data)
+        logger.info("Unexpected response:", extra={"response_data": response_data})
         return "Unexpected response"
 
 
@@ -97,7 +99,7 @@ using only this information.
 
 INSTRUCTIONS:
 
-1) All types of protocols are based on apiLevel 2.15,
+1) All types of protocols are based on apiLevel 2.19,
  thus prepend the following code block
 `metadata` and `requirements`:
 ```python
@@ -108,7 +110,7 @@ metadata = {
     'author': '[user name]',
     'description': "[what is the protocol about]"
 }
-requirements = {"robotType": "[Robot type]", "apiLevel": "2.15"}
+requirements = {"robotType": "[Robot type]", "apiLevel": "2.19"}
 ```
 
 2) See the transfer rules <<COMMON RULES for TRANSFER>> below.
@@ -124,6 +126,14 @@ Note that sometimes API names is very long eg.,
 
 
 5)  If the pipette is multi-channel eg., P20 Multi-Channel Gen2, please use `columns` method.
+
+6) <<< Load trash for Flex >>>
+For Flex protocols, NOT OT-2 protocols using API version 2.16 or later,
+load a trash bin in slot A3:
+```python
+trash = protocol.load_trash_bin("A3")
+```
+Note that you load trash before commands.
 \n\n
 """
 
@@ -311,7 +321,7 @@ metadata = {
     'author': 'chatGPT',
     'description': 'Transfer reagent',
 }
-requirements = {"robotType": "OT-2", "apiLevel": "2.15"}
+requirements = {"robotType": "OT-2", "apiLevel": "2.19"}
 
 def run(protocol):
     # labware

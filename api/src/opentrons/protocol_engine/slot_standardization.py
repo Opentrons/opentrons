@@ -17,7 +17,7 @@ deck slot.
 
 from typing import Any, Callable, Dict, Type
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from . import commands
 from .types import (

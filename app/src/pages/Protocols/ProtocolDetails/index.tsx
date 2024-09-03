@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useParams, Redirect } from 'react-router-dom'
+import { useParams, Navigate } from 'react-router-dom'
 
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -12,7 +12,9 @@ import type { Dispatch, State } from '../../../redux/types'
 import type { DesktopRouteParams } from '../../../App/types'
 
 export function ProtocolDetails(): JSX.Element {
-  const { protocolKey } = useParams<DesktopRouteParams>()
+  const { protocolKey } = useParams<
+    keyof DesktopRouteParams
+  >() as DesktopRouteParams
 
   const dispatch = useDispatch<Dispatch>()
   const storedProtocol = useSelector((state: State) =>
@@ -26,6 +28,6 @@ export function ProtocolDetails(): JSX.Element {
   return storedProtocol != null ? (
     <ProtocolDetailsContents {...storedProtocol} />
   ) : (
-    <Redirect to="/protocols" />
+    <Navigate to="/protocols" />
   )
 }

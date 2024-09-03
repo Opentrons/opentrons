@@ -12,6 +12,7 @@ import {
   HEATERSHAKER_MODULE_V1_FIXTURE,
   TEMPERATURE_MODULE_V2_FIXTURE,
   MAGNETIC_BLOCK_V1_FIXTURE,
+  ABSORBANCE_READER_V1_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
 } from '@opentrons/shared-data'
 
@@ -34,6 +35,7 @@ import { TemperatureModuleFixture } from './TemperatureModuleFixture'
 import { HeaterShakerFixture } from './HeaterShakerFixture'
 import { MagneticBlockFixture } from './MagneticBlockFixture'
 import { ThermocyclerFixture } from './ThermocyclerFixture'
+import { AbsorbanceReaderFixture } from './AbsorbanceReaderFixture'
 
 interface DeckConfiguratorProps {
   deckConfig: DeckConfiguration
@@ -104,6 +106,13 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       MAGNETIC_BLOCK_V1_FIXTURE,
       STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
     ] as CutoutFixtureId[]).includes(cutoutFixtureId)
+  )
+  const absorbanceReaderFixtures = deckConfig.filter(
+    ({ cutoutFixtureId }) => cutoutFixtureId === ABSORBANCE_READER_V1_FIXTURE
+  )
+  const magneticBlockStagingAreaFixtures = deckConfig.filter(
+    ({ cutoutFixtureId }) =>
+      cutoutFixtureId === STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
   )
 
   return (
@@ -231,6 +240,18 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           selected={cutoutId === selectedCutoutId}
         />
       ))}
+      {absorbanceReaderFixtures.map(({ cutoutId, cutoutFixtureId }) => (
+        <AbsorbanceReaderFixture
+          key={cutoutId}
+          deckDefinition={deckDef}
+          handleClickRemove={
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+          }
+          fixtureLocation={cutoutId}
+          cutoutFixtureId={cutoutFixtureId}
+          selected={cutoutId === selectedCutoutId}
+        />
+      ))}
       {additionalStaticFixtures?.map(staticFixture => (
         <StaticFixture
           key={staticFixture.location}
@@ -244,7 +265,8 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         color={darkFill}
         show4thColumn={
           stagingAreaFixtures.length > 0 ||
-          wasteChuteStagingAreaFixtures.length > 0
+          wasteChuteStagingAreaFixtures.length > 0 ||
+          magneticBlockStagingAreaFixtures.length > 0
         }
       />
       {children}

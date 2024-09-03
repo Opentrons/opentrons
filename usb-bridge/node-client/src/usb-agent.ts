@@ -48,7 +48,9 @@ export function buildUSBAgent(opts: { serialPort: string }): http.Agent {
   usbAgent.maxFreeSockets = 1
   usbAgent.maxSockets = 1
   usbAgent.maxTotalSockets = 1
-  usbAgent.destroy = () => port.close()
+  usbAgent.destroy = () => {
+    port.close()
+  }
   return usbAgent
 }
 
@@ -228,10 +230,9 @@ class SerialPortHttpAgent extends http.Agent {
             `Failed to open port: ${message} , retrying ${this.remainingRetries} more times`
           )
           this.remainingRetries--
-          setTimeout(
-            () => this.port.open(openRetryer),
-            SOCKET_OPEN_RETRY_TIME_MS
-          )
+          setTimeout(() => {
+            this.port.open(openRetryer)
+          }, SOCKET_OPEN_RETRY_TIME_MS)
         } else if (!this.destroyed) {
           const message = err?.message ?? err
           this.log(

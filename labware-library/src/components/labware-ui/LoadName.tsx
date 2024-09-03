@@ -29,10 +29,9 @@ export function LoadName(props: LoadNameProps): JSX.Element {
   const handleCopy = (): void => {
     setSuccess(true)
     cleanupSuccessTimeout()
-    successTimeout.current = setTimeout(
-      () => setSuccess(false),
-      SUCCESS_TIMEOUT_MS
-    )
+    successTimeout.current = setTimeout(() => {
+      setSuccess(false)
+    }, SUCCESS_TIMEOUT_MS)
   }
 
   const handleCopyButtonClick = (): void => {
@@ -51,7 +50,9 @@ export function LoadName(props: LoadNameProps): JSX.Element {
           className={styles.load_name_input}
           type="text"
           value={loadName}
-          onFocus={e => e.currentTarget.select()}
+          onFocus={e => {
+            e.currentTarget.select()
+          }}
           readOnly
         />
       </label>

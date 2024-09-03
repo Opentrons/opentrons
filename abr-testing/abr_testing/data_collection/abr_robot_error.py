@@ -1,5 +1,5 @@
 """Create ticket for robot with error."""
-from typing import List, Tuple
+from typing import List, Tuple, Any, Dict, Optional
 from abr_testing.data_collection import read_robot_logs, abr_google_drive, get_run_logs
 import requests
 import argparse
@@ -7,7 +7,234 @@ from abr_testing.automation import jira_tool, google_sheets_tool, google_drive_t
 import shutil
 import os
 import subprocess
+from datetime import datetime, timedelta
 import sys
+import json
+import re
+import pandas as pd
+from statistics import mean, StatisticsError
+
+
+def compare_current_trh_to_average(
+    robot: str,
+    start_time: Any,
+    end_time: Optional[Any],
+    protocol_name: str,
+    storage_directory: str,
+) -> str:
+    """Get average temp/rh for errored run and compare to average."""
+    # Connect to ABR ambient conditions sheet
+    credentials_path = os.path.join(storage_directory, "credentials.json")
+    temprh_data_sheet = google_sheets_tool.google_sheet(
+        credentials_path, "ABR Ambient Conditions", 0
+    )
+    headers = temprh_data_sheet.get_row(1)
+    all_trh_data = temprh_data_sheet.get_all_data(expected_headers=headers)
+    # Connect to ABR-run-data sheet
+    abr_data = google_sheets_tool.google_sheet(credentials_path, "ABR-run-data", 0)
+    headers = abr_data.get_row(1)
+    all_run_data = abr_data.get_all_data(expected_headers=headers)
+    # Find average conditions of errored time period
+    df_all_trh = pd.DataFrame(all_trh_data)
+    # Convert timestamps to datetime objects
+    df_all_trh["Timestamp"] = pd.to_datetime(
+        df_all_trh["Timestamp"], format="mixed", utc=True
+    ).dt.tz_localize(None)
+    # Ensure start_time is timezone-naive
+    start_time = start_time.replace(tzinfo=None)
+    relevant_temp_rhs = df_all_trh[
+        (df_all_trh["Robot"] == robot) & (df_all_trh["Timestamp"] >= start_time)
+    ]
+    try:
+        avg_temp = round(mean(relevant_temp_rhs["Temp (oC)"]), 2)
+        avg_rh = round(mean(relevant_temp_rhs["Relative Humidity (%)"]), 2)
+    except StatisticsError:
+        # If there is one value assign it as the average.
+        if len(relevant_temp_rhs["Temp (oC)"]) == 1:
+            avg_temp = relevant_temp_rhs["Temp (oC)"][0]
+            avg_rh = relevant_temp_rhs["Relative Humidity (%)"][0]
+        else:
+            avg_temp = None
+            avg_rh = None
+    # Get AVG t/rh of runs w/ same robot & protocol newer than 3 wks old with no errors
+    weeks_ago_3 = start_time - timedelta(weeks=3)
+    df_all_run_data = pd.DataFrame(all_run_data)
+    df_all_run_data["Start_Time"] = pd.to_datetime(
+        df_all_run_data["Start_Time"], format="mixed", utc=True
+    ).dt.tz_localize(None)
+    df_all_run_data["Errors"] = pd.to_numeric(df_all_run_data["Errors"])
+    df_all_run_data["Average Temp (oC)"] = pd.to_numeric(
+        df_all_run_data["Average Temp (oC)"]
+    )
+    common_filters = (
+        (df_all_run_data["Robot"] == robot)
+        & (df_all_run_data["Start_Time"] >= weeks_ago_3)
+        & (df_all_run_data["Start_Time"] <= start_time)
+        & (df_all_run_data["Errors"] < 1)
+        & (df_all_run_data["Average Temp (oC)"] > 1)
+    )
+
+    if protocol_name == "":
+        relevant_run_data = df_all_run_data[common_filters]
+    else:
+        relevant_run_data = df_all_run_data[
+            common_filters & (df_all_run_data["Protocol_Name"] == protocol_name)
+        ]
+    # Calculate means of historical data
+    try:
+        historical_avg_temp = round(
+            mean(relevant_run_data["Average Temp (oC)"].astype(float)), 2
+        )
+        historical_avg_rh = round(
+            mean(relevant_run_data["Average RH(%)"].astype(float)), 2
+        )
+    except StatisticsError:
+        historical_avg_temp = None
+        historical_avg_rh = None
+    # Formats TEMP/RH message for ticket.
+    temp_rh_message = (
+        f"{len(relevant_run_data)} runs with temp/rh data for {robot} running {protocol_name}."
+        f" AVG TEMP (deg C): {historical_avg_temp}. AVG RH (%): {historical_avg_rh}."
+        f" AVG TEMP of ERROR: {avg_temp}. AVG RH of ERROR: {avg_rh}."
+    )
+    # Print out comparison string.
+    print(temp_rh_message)
+    return temp_rh_message
+
+
+def compare_lpc_to_historical_data(
+    labware_dict: Dict[str, Any], robot: str, storage_directory: str
+) -> str:
+    """Compare LPC data of slot error occurred in to historical relevant data."""
+    # Connect to LPC Google Sheet and get data.
+    credentials_path = os.path.join(storage_directory, "credentials.json")
+    google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
+    headers = google_sheet_lpc.get_row(1)
+    all_lpc_data = google_sheet_lpc.get_all_data(expected_headers=headers)
+    df_lpc_data = pd.DataFrame(all_lpc_data)
+    labware = labware_dict["Labware Type"]
+    slot = labware_dict["Slot"]
+    # Filter data to match to appropriate labware and slot.
+    # Discludes any run with an error.
+    relevant_lpc = df_lpc_data[
+        (df_lpc_data["Slot"] == slot)
+        & (df_lpc_data["Labware Type"] == labware)
+        & (df_lpc_data["Robot"] == robot)
+        & (df_lpc_data["Module"] == labware_dict["Module"])
+        & (df_lpc_data["Adapter"] == labware_dict["Adapter"])
+        & (df_lpc_data["Errors"] < 1)
+    ]
+    # Converts coordinates to floats and finds averages.
+    x_float = [float(value) for value in relevant_lpc["X"]]
+    y_float = [float(value) for value in relevant_lpc["Y"]]
+    z_float = [float(value) for value in relevant_lpc["Z"]]
+    current_x = round(labware_dict["X"], 2)
+    current_y = round(labware_dict["Y"], 2)
+    current_z = round(labware_dict["Z"], 2)
+    try:
+        avg_x = round(mean(x_float), 2)
+        avg_y = round(mean(y_float), 2)
+        avg_z = round(mean(z_float), 2)
+    except StatisticsError:
+        # If there is one value assign it as the average.
+        if len(x_float) == 1:
+            avg_x = x_float[0]
+            avg_y = y_float[0]
+            avg_z = z_float[0]
+        else:
+            avg_x = None
+            avg_y = None
+            avg_z = None
+
+    # Formats LPC message for ticket.
+    lpc_message = (
+        f"There were {len(x_float)} LPC coords found for {labware} at {slot}. "
+        f"AVERAGE POSITION: ({avg_x}, {avg_y}, {avg_z}). "
+        f"CURRENT POSITION: ({current_x}, {current_y}, {current_z})"
+    )
+    return lpc_message
+
+
+def read_each_log(folder_path: str, issue_url: str) -> None:
+    """Read log and comment error portion on JIRA ticket."""
+    for file_name in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, file_name)
+        not_found_words = []
+        print(file_path)
+        if file_path.endswith(".log"):
+            with open(file_path) as file:
+                lines = file.readlines()
+            words = [
+                "error",
+                "traceback",
+                "error frame encountered",
+                "did not receive",
+                "collision_detected",
+                "fail",
+                "warning",
+                "failure",
+                "homingfail",
+                "timed out",
+                "exception",
+            ]
+            error_lines = ""
+            for word in words:
+                content_list = []
+                for line_index, line in enumerate(lines):
+                    if word in line.lower():
+                        lines_before = max(0, line_index - 10)
+                        lines_after = min(len(lines), line_index + 10)
+                        error_lines = "".join(lines[lines_before:lines_after])
+                        code_lines = {
+                            "type": "codeBlock",
+                            "content": [{"type": "text", "text": error_lines}],
+                        }
+                        content_list.append(code_lines)
+                num_times = len(content_list)
+                if num_times == 0:
+                    not_found_words.append(word)
+                else:
+                    message = f"Key word '{word.upper()}' found in {file_name} {num_times} TIMES."
+                    line_1 = {
+                        "type": "paragraph",
+                        "content": [{"type": "text", "text": message}],
+                    }
+                    content_list.insert(0, line_1)
+                    ticket.comment(content_list, issue_key)
+            no_word_found_message = (
+                f"Key words '{not_found_words} were not found in {file_name}."
+            )
+            no_word_found_dict = {
+                "type": "paragraph",
+                "content": [{"type": "text", "text": no_word_found_message}],
+            }
+            content_list.append(no_word_found_dict)
+            ticket.comment(content_list, issue_key)
+
+
+def match_error_to_component(
+    project_id: str, error_message: str, components: List[str]
+) -> List[str]:
+    """Match error to component based on error message."""
+    project_components = ticket.get_project_components(project_id)
+    component_names = [proj_comp["name"] for proj_comp in project_components]
+    for component in component_names:
+        pattern = re.compile(component, re.IGNORECASE)
+        matches = pattern.findall(error_message)
+        if matches:
+            components.append(component)
+    return components
+
+
+def get_user_id(user_file_path: str, assignee_name: str) -> str:
+    """Get assignee account id."""
+    users = json.load(open(user_file_path))
+    assignee_id = "-1"  # Code to leave issue unassigned.
+    for item in users:
+        user = users[item]
+        if user["displayName"] == assignee_name:
+            assignee_id = user["accountId"]
+    return assignee_id
 
 
 def get_error_runs_from_robot(ip: str) -> List[str]:
@@ -26,7 +253,72 @@ def get_error_runs_from_robot(ip: str) -> List[str]:
     return error_run_ids
 
 
-def get_error_info_from_robot(
+def get_robot_state(
+    ip: str, reported_string: str
+) -> Tuple[Any, Any, Any, List[str], str]:
+    """Get robot status in case of non run error."""
+    description = dict()
+    # Get instruments attached to robot
+    try:
+        response = requests.get(
+            f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
+        )
+        print(f"Connected to {ip}")
+    except Exception:
+        print(f"ERROR: Failed to read IP address: {ip}")
+        sys.exit()
+    response = requests.get(
+        f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
+    )
+    health_data = response.json()
+    parent = health_data.get("name", "")
+    # Create summary name
+    description["robot_name"] = parent
+    summary = parent + "_" + reported_string
+    affects_version = health_data.get("api_version", "")
+    description["affects_version"] = affects_version
+    # Instruments Attached
+    response = requests.get(
+        f"http://{ip}:31950/instruments", headers={"opentrons-version": "3"}
+    )
+
+    instrument_data = response.json()
+    for instrument in instrument_data["data"]:
+        description[instrument["mount"]] = instrument
+    # Get modules attached to robot
+    response = requests.get(
+        f"http://{ip}:31950/modules", headers={"opentrons-version": "3"}
+    )
+    module_data = response.json()
+    for module in module_data["data"]:
+        description[module["moduleType"]] = module
+    components = ["Flex-RABR"]
+    components = match_error_to_component("RABR", reported_string, components)
+    print(components)
+    end_time = datetime.now()
+    print(end_time)
+    start_time = end_time - timedelta(hours=2)
+    print(start_time)
+    # Get current temp/rh compared to historical data
+    temp_rh_string = compare_current_trh_to_average(
+        parent, start_time, end_time, "", storage_directory
+    )
+    description["Robot Temp and RH Comparison"] = temp_rh_string
+    whole_description_str = (
+        "{"
+        + "\n".join("{!r}: {!r},".format(k, v) for k, v in description.items())
+        + "}"
+    )
+    return (
+        summary,
+        parent,
+        affects_version,
+        components,
+        whole_description_str,
+    )
+
+
+def get_run_error_info_from_robot(
     ip: str, one_run: str, storage_directory: str
 ) -> Tuple[str, str, str, List[str], str, str]:
     """Get error information from robot to fill out ticket."""
@@ -49,6 +341,8 @@ def get_error_info_from_robot(
     failure_level = "Level " + str(error_level) + " Failure"
 
     components = [failure_level, "Flex-RABR"]
+    components = match_error_to_component("RABR", error_type, components)
+    print(components)
     affects_version = results["API_Version"]
     parent = results.get("robot_name", "")
     print(parent)
@@ -57,11 +351,70 @@ def get_error_info_from_robot(
     description["protocol_name"] = results["protocol"]["metadata"].get(
         "protocolName", ""
     )
+    # Get start and end time of run
+    start_time = datetime.strptime(
+        results.get("startedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+    )
+    adjusted_start_time = start_time - timedelta(hours=4)
+    complete_time = datetime.strptime(
+        results.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+    )
+    adjusted_complete_time = complete_time - timedelta(hours=4)
+    # Get average temp and rh of robot and protocol the error occurred on.
+    temp_rh_comparison = compare_current_trh_to_average(
+        parent,
+        adjusted_start_time,
+        adjusted_complete_time,
+        description["protocol_name"],
+        storage_directory,
+    )
+    # Get LPC coordinates of labware of failure
+    lpc_dict = results["labwareOffsets"]
+    labware_dict = results["labware"]
     description["error"] = " ".join([error_code, error_type, error_instrument])
-    description["protocol_step"] = list(results["commands"])[-1]
+    protocol_step = list(results["commands"])[-1]
+    errored_labware_id = protocol_step["params"].get("labwareId", "")
+    errored_labware_dict = {}
+    lpc_message = ""
+    # If there is labware included in the error message, its LPC coords will be extracted.
+    if len(errored_labware_id) > 0:
+        for labware in labware_dict:
+            if labware["id"] == errored_labware_id:
+                errored_labware_dict["Slot"] = labware["location"].get("slotName", "")
+                errored_labware_dict["Labware Type"] = labware.get("definitionUri", "")
+                offset_id = labware.get("offsetId", "")
+                labware_slot = errored_labware_dict["Slot"]
+                if str(labware_slot) == "":
+                    lpc_message = "No labware slot was associated with this error. \
+Please manually check LPC data."
+                elif offset_id == "":
+                    lpc_message = f"The current LPC coords found at {labware_slot} are (0, 0, 0). \
+Please confirm with the ABR-LPC sheet and re-LPC."
+                else:
+                    for lpc in lpc_dict:
+                        if lpc.get("id", "") == offset_id:
+                            errored_labware_dict["X"] = lpc["vector"].get("x", "")
+                            errored_labware_dict["Y"] = lpc["vector"].get("y", "")
+                            errored_labware_dict["Z"] = lpc["vector"].get("z", "")
+                            errored_labware_dict["Module"] = lpc["location"].get(
+                                "moduleModel", ""
+                            )
+                            errored_labware_dict["Adapter"] = lpc["location"].get(
+                                "definitionUri", ""
+                            )
+
+                            lpc_message = compare_lpc_to_historical_data(
+                                errored_labware_dict, parent, storage_directory
+                            )
+
+    description["protocol_step"] = protocol_step
     description["right_mount"] = results.get("right", "No attachment")
     description["left_mount"] = results.get("left", "No attachment")
     description["gripper"] = results.get("extension", "No attachment")
+    if len(lpc_message) < 1:
+        lpc_message = "No LPC coordinates found in relation to error."
+    description["LPC Comparison"] = lpc_message
+    description["Robot Temp and RH Comparison"] = temp_rh_comparison
     all_modules = abr_google_drive.get_modules(results)
     whole_description = {**description, **all_modules}
     whole_description_str = (
@@ -123,50 +476,76 @@ if __name__ == "__main__":
     args = parser.parse_args()
     storage_directory = args.storage_directory[0]
     ip = str(input("Enter Robot IP: "))
+    assignee = str(input("Enter Assignee Full Name:"))
+    run_or_other = str(
+        input(
+            "Press ENTER to report run error. If not a run error, type short summary of error: "
+        )
+    )
     url = "https://opentrons.atlassian.net"
     api_token = args.jira_api_token[0]
     email = args.email[0]
     board_id = args.board_id[0]
     reporter_id = args.reporter_id[0]
+    file_paths = read_robot_logs.get_logs(storage_directory, ip)
     ticket = jira_tool.JiraTicket(url, api_token, email)
-    ticket.issues_on_board(board_id)
+    users_file_path = ticket.get_jira_users(storage_directory)
+    assignee_id = get_user_id(users_file_path, assignee)
+    run_log_file_path = ""
     try:
         error_runs = get_error_runs_from_robot(ip)
     except requests.exceptions.InvalidURL:
         print("Invalid IP address.")
         sys.exit()
-    one_run = error_runs[-1]  # Most recent run with error.
-    (
-        summary,
-        robot,
-        affects_version,
-        components,
-        whole_description_str,
-        run_log_file_path,
-    ) = get_error_info_from_robot(ip, one_run, storage_directory)
-    affects_version = "internal release - any"
+    if len(run_or_other) < 1:
+        one_run = error_runs[-1]  # Most recent run with error.
+        (
+            summary,
+            robot,
+            affects_version,
+            components,
+            whole_description_str,
+            run_log_file_path,
+        ) = get_run_error_info_from_robot(ip, one_run, storage_directory)
+    else:
+        (
+            summary,
+            robot,
+            affects_version,
+            components,
+            whole_description_str,
+        ) = get_robot_state(ip, run_or_other)
     # Get Calibration Data
     saved_file_path_calibration, calibration = read_robot_logs.get_calibration_offsets(
         ip, storage_directory
     )
-    file_paths = read_robot_logs.get_logs(storage_directory, ip)
-    print(f"Making ticket for run: {one_run} on robot {robot}.")
+
+    print(f"Making ticket for {summary}.")
     # TODO: make argument or see if I can get rid of with using board_id.
     project_key = "RABR"
-    parent_key = project_key + "-" + robot[-1]
+    print(robot)
+    parent_key = project_key + "-" + robot.split("ABR")[1]
+
+    # Grab all previous issues
+    all_issues = ticket.issues_on_board(project_key)
+
     # TODO: read board to see if ticket for run id already exists.
     # CREATE TICKET
-    issue_key = ticket.create_ticket(
+    issue_key, raw_issue_url = ticket.create_ticket(
         summary,
         whole_description_str,
         project_key,
         reporter_id,
+        assignee_id,
         "Bug",
         "Medium",
         components,
         affects_version,
         parent_key,
     )
+    # Link Tickets
+    to_link = ticket.match_issues(all_issues, summary)
+    ticket.link_issues(to_link, issue_key)
     # OPEN TICKET
     issue_url = ticket.open_issue(issue_key)
     # MOVE FILES TO ERROR FOLDER.
@@ -174,41 +553,61 @@ if __name__ == "__main__":
     error_folder_path = os.path.join(storage_directory, issue_key)
     os.makedirs(error_folder_path, exist_ok=True)
     for source_file in error_files:
-        destination_file = os.path.join(
-            error_folder_path, os.path.basename(source_file)
-        )
-        shutil.move(source_file, destination_file)
-    # OPEN FOLDER DIRECTORY
-    subprocess.Popen(["explorer", error_folder_path])
-    # CONNECT TO GOOGLE DRIVE
-    credentials_path = os.path.join(storage_directory, "credentials.json")
-    google_sheet_name = "ABR-run-data"
-    google_drive = google_drive_tool.google_drive(
-        credentials_path,
-        "1Cvej0eadFOTZr9ILRXJ0Wg65ymOtxL4m",
-        "rhyann.clarke@opentrons.ocm",
-    )
-    # CONNECT TO GOOGLE SHEET
-    google_sheet = google_sheets_tool.google_sheet(
-        credentials_path, google_sheet_name, 0
-    )
+        try:
+            destination_file = os.path.join(
+                error_folder_path, os.path.basename(source_file)
+            )
+            shutil.move(source_file, destination_file)
+        except shutil.Error:
+            continue
+    # POST FILES TO TICKET
+    list_of_files = os.listdir(error_folder_path)
+    for file in list_of_files:
+        file_to_attach = os.path.join(error_folder_path, file)
+        ticket.post_attachment_to_ticket(issue_key, file_to_attach)
+    # ADD ERROR COMMENTS TO TICKET
+    read_each_log(error_folder_path, raw_issue_url)
     # WRITE ERRORED RUN TO GOOGLE SHEET
-    error_run_log = os.path.join(error_folder_path, os.path.basename(run_log_file_path))
-    google_drive.upload_file(error_run_log)
-    run_id = os.path.basename(error_run_log).split("_")[1].split(".")[0]
-    (
-        runs_and_robots,
-        headers,
-        runs_and_lpc,
-        headers_lpc,
-    ) = abr_google_drive.create_data_dictionary(
-        run_id, error_folder_path, issue_url, "", ""
-    )
+    if len(run_or_other) < 1:
+        # CONNECT TO GOOGLE DRIVE
+        credentials_path = os.path.join(storage_directory, "credentials.json")
+        google_sheet_name = "ABR-run-data"
+        google_drive = google_drive_tool.google_drive(
+            credentials_path,
+            "1Cvej0eadFOTZr9ILRXJ0Wg65ymOtxL4m",
+            "rhyann.clarke@opentrons.ocm",
+        )
+        # CONNECT TO GOOGLE SHEET
+        google_sheet = google_sheets_tool.google_sheet(
+            credentials_path, google_sheet_name, 0
+        )
+        error_run_log = os.path.join(
+            error_folder_path, os.path.basename(run_log_file_path)
+        )
+        try:
+            google_drive.upload_file(error_run_log, "1Cvej0eadFOTZr9ILRXJ0Wg65ymOtxL4m")
+        except FileNotFoundError:
+            print("Run file not uploaded.")
+        run_id = os.path.basename(error_run_log).split("_")[1].split(".")[0]
+        (
+            runs_and_robots,
+            headers,
+            runs_and_lpc,
+            headers_lpc,
+        ) = abr_google_drive.create_data_dictionary(
+            run_id, error_folder_path, issue_url, "", ""
+        )
 
-    start_row = google_sheet.get_index_row() + 1
-    google_sheet.batch_update_cells(runs_and_robots, "A", start_row, "0")
-    print("Wrote run to ABR-run-data")
-    # Add LPC to google sheet
-    google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
-    start_row_lpc = google_sheet_lpc.get_index_row() + 1
-    google_sheet_lpc.batch_update_cells(runs_and_lpc, "A", start_row_lpc, "0")
+        start_row = google_sheet.get_index_row() + 1
+        google_sheet.batch_update_cells(runs_and_robots, "A", start_row, "0")
+        print("Wrote run to ABR-run-data")
+        # Add LPC to google sheet
+        google_sheet_lpc = google_sheets_tool.google_sheet(
+            credentials_path, "ABR-LPC", 0
+        )
+        start_row_lpc = google_sheet_lpc.get_index_row() + 1
+        google_sheet_lpc.batch_update_cells(runs_and_lpc, "A", start_row_lpc, "0")
+    else:
+        print("Ticket created.")
+    # Open folder directory incase uploads to ticket were incomplete
+    subprocess.Popen(["explorer", error_folder_path])

@@ -73,7 +73,11 @@ export const useLongPress = (): UseLongPressResult => {
     isTapped,
     setIsLongPressed,
     setIsTapped,
-    enable: () => setIsEnabled(true),
-    disable: () => setIsEnabled(false),
+    enable: () => {
+      setIsEnabled(true)
+    },
+    disable: () => {
+      setIsEnabled(false)
+    },
   }
 }

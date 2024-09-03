@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
@@ -15,9 +15,11 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { Banner } from '../../atoms/Banner'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
 import { usePipetteNameSpecs } from '../../resources/instruments/hooks'
 import {
@@ -144,14 +146,14 @@ export const BeforeBeginning = (
 
         if (requiredPipette.pipetteName === 'p1000_96') {
           equipmentList = [
-            { ...NINETY_SIX_CHANNEL_PIPETTE, displayName: displayName },
+            { ...NINETY_SIX_CHANNEL_PIPETTE, displayName },
             CALIBRATION_PROBE,
             HEX_SCREWDRIVER,
             NINETY_SIX_CHANNEL_MOUNTING_PLATE,
           ]
         } else {
           equipmentList = [
-            { ...PIPETTE, displayName: displayName },
+            { ...PIPETTE, displayName },
             CALIBRATION_PROBE,
             HEX_SCREWDRIVER,
           ]
@@ -174,14 +176,14 @@ export const BeforeBeginning = (
         params: {
           pipetteName: attachedPipettes[mount]?.instrumentName ?? '',
           pipetteId: pipetteId ?? '',
-          mount: mount,
+          mount,
         },
       },
       { commandType: 'home' as const, params: {} },
       {
         commandType: 'calibration/moveToMaintenancePosition' as const,
         params: {
-          mount: mount,
+          mount,
         },
       },
     ]
@@ -191,7 +193,7 @@ export const BeforeBeginning = (
         proceed()
       })
       .catch(error => {
-        setShowErrorMessage(error.message)
+        setShowErrorMessage(error.message as string)
       })
   }
 
@@ -200,7 +202,7 @@ export const BeforeBeginning = (
     {
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
-        mount: mount,
+        mount,
       },
     },
   ]
@@ -227,11 +229,12 @@ export const BeforeBeginning = (
         proceed()
       })
       .catch(error => {
-        setShowErrorMessage(error.message)
+        setShowErrorMessage(error.message as string)
       })
   }
 
-  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
+  if (isRobotMoving)
+    return <SimpleWizardInProgressBody description={t('stand_back')} />
 
   return errorMessage != null ? (
     <SimpleWizardBody
@@ -251,33 +254,37 @@ export const BeforeBeginning = (
               t={t}
               i18nKey={bodyTranslationKey}
               components={{
-                block: <StyledText css={BODY_STYLE} />,
+                block: <LegacyStyledText css={BODY_STYLE} />,
               }}
             />
             {selectedPipette === NINETY_SIX_CHANNEL &&
               flowType === FLOWS.ATTACH &&
-              !isOnDevice && (
-                <StyledText css={BODY_STYLE}>
+              !Boolean(isOnDevice) && (
+                <LegacyStyledText css={BODY_STYLE}>
                   {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
-                </StyledText>
+                </LegacyStyledText>
               )}
           </Flex>
           {selectedPipette === NINETY_SIX_CHANNEL &&
             (flowType === FLOWS.CALIBRATE || flowType === FLOWS.ATTACH ? (
               <Banner
-                type={isWasteChuteOnDeck ? 'error' : 'warning'}
-                size={isOnDevice ? '1.5rem' : '1rem'}
-                marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
+                type={Boolean(isWasteChuteOnDeck) ? 'error' : 'warning'}
+                size={Boolean(isOnDevice) ? '1.5rem' : '1rem'}
+                marginTop={
+                  Boolean(isOnDevice) ? SPACING.spacing24 : SPACING.spacing16
+                }
               >
-                {isWasteChuteOnDeck
+                {Boolean(isWasteChuteOnDeck)
                   ? t('waste_chute_error')
                   : t('waste_chute_warning')}
               </Banner>
             ) : (
               <Banner
                 type="warning"
-                size={isOnDevice ? '1.5rem' : '1rem'}
-                marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
+                size={Boolean(isOnDevice) ? '1.5rem' : '1rem'}
+                marginTop={
+                  Boolean(isOnDevice) ? SPACING.spacing24 : SPACING.spacing16
+                }
               >
                 {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
               </Banner>

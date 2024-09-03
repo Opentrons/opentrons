@@ -14,7 +14,6 @@ import type {
   HostConfig,
   LabwareOffsetCreateData,
   Protocol,
-  RunTimeParameterCreateData,
 } from '@opentrons/api-client'
 import type { UseCreateRunMutationOptions } from '@opentrons/react-api-client/src/runs/useCreateRunMutation'
 import type { CreateProtocolVariables } from '@opentrons/react-api-client/src/protocols/useCreateProtocolMutation'
@@ -36,8 +35,7 @@ export interface UseCreateRun {
 export function useCreateRunFromProtocol(
   options: UseCreateRunMutationOptions,
   hostOverride?: HostConfig | null,
-  labwareOffsets?: LabwareOffsetCreateData[],
-  runTimeParameterValues?: RunTimeParameterCreateData
+  labwareOffsets?: LabwareOffsetCreateData[]
 ): UseCreateRun {
   const contextHost = useHost()
   const host =
@@ -58,11 +56,9 @@ export function useCreateRunFromProtocol(
     {
       ...options,
       onSuccess: (...args) => {
-        queryClient
-          .invalidateQueries([host, 'runs'])
-          .catch((e: Error) =>
-            console.error(`error invalidating runs query: ${e.message}`)
-          )
+        queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
+          console.error(`error invalidating runs query: ${e.message}`)
+        })
         options.onSuccess?.(...args)
       },
     },
@@ -75,16 +71,16 @@ export function useCreateRunFromProtocol(
     reset: resetProtocolMutation,
   } = useCreateProtocolMutation(
     {
-      onSuccess: data => {
+      onSuccess: (data, { runTimeParameterValues, runTimeParameterFiles }) => {
         createRun({
           protocolId: data.data.id,
           labwareOffsets,
           runTimeParameterValues,
+          runTimeParameterFiles,
         })
       },
     },
-    host,
-    runTimeParameterValues
+    host
   )
 
   let error =
@@ -103,7 +99,12 @@ export function useCreateRunFromProtocol(
 
   return {
     createRunFromProtocolSource: (
-      { files: srcFiles, protocolKey },
+      {
+        files: srcFiles,
+        protocolKey,
+        runTimeParameterValues,
+        runTimeParameterFiles,
+      },
       ...args
     ) => {
       resetRunMutation()
@@ -112,6 +113,7 @@ export function useCreateRunFromProtocol(
           files: [...srcFiles, ...customLabwareFiles],
           protocolKey,
           runTimeParameterValues,
+          runTimeParameterFiles,
         },
         ...args
       )

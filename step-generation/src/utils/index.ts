@@ -18,6 +18,7 @@ export {
 }
 export * from './commandCreatorArgsGetters'
 export * from './heaterShakerCollision'
+export * from './createTimelineFromRunCommands'
 export * from './misc'
 export * from './movableTrashCommandsUtil'
 export * from './safePipetteMovements'

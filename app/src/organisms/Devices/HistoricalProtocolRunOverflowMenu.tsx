@@ -1,30 +1,31 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { NavLink, useHistory } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  FLEX_MAX_CONTENT,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
+  MenuItem,
+  OverflowBtn,
   POSITION_ABSOLUTE,
-  ALIGN_FLEX_END,
-  DIRECTION_COLUMN,
   POSITION_RELATIVE,
-  COLORS,
-  useOnClickOutside,
-  useHoverTooltip,
-  Box,
-  SPACING,
   SIZE_1,
-  ALIGN_CENTER,
+  SPACING,
+  Tooltip,
+  useHoverTooltip,
+  useMenuHandleClickOutside,
+  useOnClickOutside,
 } from '@opentrons/components'
 import { useDeleteRunMutation } from '@opentrons/react-api-client'
 
 import { Divider } from '../../atoms/structure'
-import { Tooltip } from '../../atoms/Tooltip'
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useRunControls } from '../../organisms/RunTimeControl/hooks'
 import {
   useTrackEvent,
@@ -55,7 +56,9 @@ export function HistoricalProtocolRunOverflowMenu(
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const protocolRunOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => setShowOverflowMenu(false),
+    onClickOutside: () => {
+      setShowOverflowMenu(false)
+    },
   })
   const { downloadRunLog, isRunLogLoading } = useDownloadRunLog(
     robotName,
@@ -101,7 +104,7 @@ interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
 }
 function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { t } = useTranslation('device_details')
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const {
     runId,
@@ -118,10 +121,11 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     })?.autoUpdateAction
   )
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const onResetSuccess = (createRunResponse: Run): void =>
-    history.push(
+  const onResetSuccess = (createRunResponse: Run): void => {
+    navigate(
       `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
     )
+  }
   const onDownloadClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
@@ -162,7 +166,6 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
 
   return (
     <Flex
-      whiteSpace="nowrap"
       zIndex={10}
       borderRadius="4px 4px 0px 0px"
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
@@ -171,6 +174,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       top="2.3rem"
       right={0}
       flexDirection={DIRECTION_COLUMN}
+      width={FLEX_MAX_CONTENT}
     >
       <NavLink to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}>
         <MenuItem data-testid="RecentProtocolRun_OverflowMenu_viewRunRecord">

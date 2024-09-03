@@ -5,7 +5,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import DefaultDict, FrozenSet, List, Set, Tuple, Union, Optional
 
-from opentrons_shared_data.deck import dev_types as deck_types
+from opentrons_shared_data.deck import types as deck_types
 
 
 @dataclass(frozen=True)

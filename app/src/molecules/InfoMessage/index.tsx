@@ -10,7 +10,7 @@ import {
   Icon,
   SIZE_1,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -42,10 +42,12 @@ export function InfoMessage({ title, body }: InfoMessageProps): JSX.Element {
         gridGap={SPACING.spacing4}
         color={COLORS.black90}
       >
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {title}
-        </StyledText>
-        {body != null ? <StyledText as="p">{body}</StyledText> : null}
+        </LegacyStyledText>
+        {body != null ? (
+          <LegacyStyledText as="p">{body}</LegacyStyledText>
+        ) : null}
       </Flex>
     </Flex>
   )

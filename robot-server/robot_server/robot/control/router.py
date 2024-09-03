@@ -1,9 +1,9 @@
 """Router for /robot/control endpoints."""
 from fastapi import APIRouter, status, Depends
-from typing import TYPE_CHECKING
+from typing import Annotated, TYPE_CHECKING
 
-from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.robot.types import RobotTypeEnum
 from robot_server.hardware import get_robot_type
 
 from robot_server.errors.error_responses import ErrorBody
@@ -48,7 +48,7 @@ async def _get_estop_status_response(
     },
 )
 async def get_estop_status(
-    estop_handler: EstopHandler = Depends(get_estop_handler),
+    estop_handler: Annotated[EstopHandler, Depends(get_estop_handler)],
 ) -> PydanticResponse[SimpleBody[EstopStatusModel]]:
     """Return the current status of the estop."""
     return await _get_estop_status_response(estop_handler)
@@ -66,14 +66,16 @@ async def get_estop_status(
     },
 )
 async def put_acknowledge_estop_disengage(
-    estop_handler: EstopHandler = Depends(get_estop_handler),
+    estop_handler: Annotated[EstopHandler, Depends(get_estop_handler)],
 ) -> PydanticResponse[SimpleBody[EstopStatusModel]]:
     """Transition from the `logically_engaged` status if applicable."""
     estop_handler.acknowledge_and_clear()
     return await _get_estop_status_response(estop_handler)
 
 
-def get_door_switch_required(robot_type: RobotType = Depends(get_robot_type)) -> bool:
+def get_door_switch_required(
+    robot_type: Annotated[RobotType, Depends(get_robot_type)]
+) -> bool:
     return ff.enable_door_safety_switch(RobotTypeEnum.robot_literal_to_enum(robot_type))
 
 
@@ -85,8 +87,8 @@ def get_door_switch_required(robot_type: RobotType = Depends(get_robot_type)) ->
     responses={status.HTTP_200_OK: {"model": SimpleBody[DoorStatusModel]}},
 )
 async def get_door_status(
-    hardware: HardwareControlAPI = Depends(get_hardware),
-    door_required: bool = Depends(get_door_switch_required),
+    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    door_required: Annotated[bool, Depends(get_door_switch_required)],
 ) -> PydanticResponse[SimpleBody[DoorStatusModel]]:
     return await PydanticResponse.create(
         content=SimpleBody.model_construct(

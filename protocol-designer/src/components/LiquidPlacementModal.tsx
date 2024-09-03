@@ -67,9 +67,9 @@ export function LiquidPlacementModal(): JSX.Element | null {
             selectedPrimaryWells={selectedWells}
             selectWells={(wells: WellGroup) => dispatch(selectWells(wells))}
             deselectWells={(wells: WellGroup) => dispatch(deselectWells(wells))}
-            updateHighlightedWells={(wells: WellGroup) =>
+            updateHighlightedWells={(wells: WellGroup) => {
               setHighlightedWells(wells)
-            }
+            }}
             ingredNames={liquidNamesById}
             wellContents={wellContents}
             nozzleType={null}

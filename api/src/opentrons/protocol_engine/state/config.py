@@ -1,7 +1,7 @@
 """Top-level ProtocolEngine configuration options."""
 from dataclasses import dataclass
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.protocol_engine.types import DeckType
 

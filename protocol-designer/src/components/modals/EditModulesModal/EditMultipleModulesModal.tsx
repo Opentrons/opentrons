@@ -18,6 +18,16 @@ import {
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 import {
+  HEATERSHAKER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_V1,
+  HEATERSHAKER_MODULE_V1_FIXTURE,
+  HEATER_SHAKER_CUTOUTS,
+  MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_BLOCK_V1,
+  MAGNETIC_BLOCK_V1_FIXTURE,
+  SINGLE_CENTER_CUTOUTS,
+  SINGLE_LEFT_CUTOUTS,
+  SINGLE_RIGHT_CUTOUTS,
   SINGLE_RIGHT_SLOT_FIXTURE,
   TEMPERATURE_MODULE_CUTOUTS,
   TEMPERATURE_MODULE_TYPE,
@@ -33,6 +43,8 @@ import type {
   DeckConfiguration,
   CutoutId,
   ModuleType,
+  ModuleModel,
+  CutoutFixtureId,
 } from '@opentrons/shared-data'
 import type { Control, ControllerRenderProps } from 'react-hook-form'
 import type { ModuleOnDeck } from '../../../step-forms'
@@ -47,6 +59,37 @@ interface EditMultipleModulesModalComponentProps
   moduleLocations: string[] | null
 }
 
+type MoamTypes =
+  | typeof HEATERSHAKER_MODULE_TYPE
+  | typeof TEMPERATURE_MODULE_TYPE
+  | typeof MAGNETIC_BLOCK_TYPE
+interface MoamInfo {
+  fixture: CutoutFixtureId
+  cutouts: CutoutId[]
+  model: ModuleModel
+}
+const MOAM_INFO: Record<MoamTypes, MoamInfo> = {
+  [TEMPERATURE_MODULE_TYPE]: {
+    fixture: TEMPERATURE_MODULE_V2_FIXTURE,
+    cutouts: TEMPERATURE_MODULE_CUTOUTS,
+    model: TEMPERATURE_MODULE_V2,
+  },
+  [HEATERSHAKER_MODULE_TYPE]: {
+    fixture: HEATERSHAKER_MODULE_V1_FIXTURE,
+    cutouts: HEATER_SHAKER_CUTOUTS,
+    model: HEATERSHAKER_MODULE_V1,
+  },
+  [MAGNETIC_BLOCK_TYPE]: {
+    fixture: MAGNETIC_BLOCK_V1_FIXTURE,
+    cutouts: [
+      ...SINGLE_LEFT_CUTOUTS,
+      ...SINGLE_CENTER_CUTOUTS,
+      ...SINGLE_RIGHT_CUTOUTS,
+    ],
+    model: MAGNETIC_BLOCK_V1,
+  },
+}
+
 const EditMultipleModulesModalComponent = (
   props: EditMultipleModulesModalComponentProps
 ): JSX.Element => {
@@ -59,7 +102,6 @@ const EditMultipleModulesModalComponent = (
     moduleType,
   } = props
   const initialDeckSetup = useSelector(getInitialDeckSetup)
-
   const selectedSlots = useWatch({
     control,
     name: 'selectedAddressableAreas',
@@ -91,17 +133,17 @@ const EditMultipleModulesModalComponent = (
           return [
             {
               cutoutId: location as CutoutId,
-              cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
+              cutoutFixtureId: MOAM_INFO[moduleType as MoamTypes].fixture,
             },
           ]
         })
       : []
-  const STANDARD_EMPTY_SLOTS: DeckConfiguration = TEMPERATURE_MODULE_CUTOUTS.map(
-    cutoutId => ({
-      cutoutId,
-      cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
-    })
-  )
+  const STANDARD_EMPTY_SLOTS: DeckConfiguration = MOAM_INFO[
+    moduleType as MoamTypes
+  ].cutouts.map(cutoutId => ({
+    cutoutId,
+    cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
+  }))
 
   STANDARD_EMPTY_SLOTS.forEach(emptySlot => {
     if (
@@ -127,7 +169,7 @@ const EditMultipleModulesModalComponent = (
       if (slot.cutoutId === cutoutId) {
         return {
           ...slot,
-          cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
+          cutoutFixtureId: MOAM_INFO[moduleType as MoamTypes].fixture,
         }
       }
       return slot
@@ -192,8 +234,12 @@ const EditMultipleModulesModalComponent = (
           render={({ field }) => (
             <DeckConfigurator
               deckConfig={updatedSlots}
-              handleClickAdd={cutoutId => handleClickAdd(cutoutId, field)}
-              handleClickRemove={cutoutId => handleClickRemove(cutoutId, field)}
+              handleClickAdd={cutoutId => {
+                handleClickAdd(cutoutId, field)
+              }}
+              handleClickRemove={cutoutId => {
+                handleClickRemove(cutoutId, field)
+              }}
               showExpansion={false}
             />
           )}
@@ -242,15 +288,18 @@ export function EditMultipleModulesModal(
         dispatch(
           createModule({
             slot: aa.split('cutout')[1],
-            type: TEMPERATURE_MODULE_TYPE,
-            model: TEMPERATURE_MODULE_V2,
+            type: moduleType,
+            model: MOAM_INFO[moduleType as MoamTypes].model,
           })
         )
       }
     })
     Object.values(allModulesOnDeck).forEach(module => {
       const moduleCutout = `cutout${module.slot}`
-      if (!data.selectedAddressableAreas.includes(moduleCutout)) {
+      if (
+        !data.selectedAddressableAreas.includes(moduleCutout) &&
+        module.type === moduleType
+      ) {
         dispatch(deleteModule(module.id))
       }
     })
@@ -261,7 +310,7 @@ export function EditMultipleModulesModal(
       <ModalShell width="48rem">
         <Box marginTop={SPACING.spacing32} paddingX={SPACING.spacing32}>
           <Text as="h2">
-            {t('module_display_names.multipleTemperatureModuleTypes')}
+            {t(`module_display_names.multiple${moduleType}s`)}
           </Text>
         </Box>
         <EditMultipleModulesModalComponent

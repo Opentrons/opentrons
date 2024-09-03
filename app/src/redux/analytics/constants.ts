@@ -60,3 +60,15 @@ export const ANALYTICS_STATE_ROBOT_UPDATE = {
 } as const
 export const ANALYTICS_ROBOT_UPDATE_VIEW = 'robotUpdateView'
 export const ANALYTICS_ROBOT_UPDATE_CHANGE_LOG_VIEW = 'robotUpdateChangeLogView'
+
+/**
+ * Error Recovery Analytics
+ */
+
+export const ANALYTICS_RECOVERY_ERROR_EVENT = 'recoveryErrorEvent'
+export const ANALYTICS_RECOVERY_ACTION_SELECTED =
+  'recoverySelectedRecoveryAction'
+export const ANALYTICS_RECOVERY_VIEW_ERROR_DETAILS = 'recoveryViewErrorDetails'
+export const ANALYTICS_RECOVERY_ACTION_RESULT =
+  'recoverySelectedRecoveryActionResult'
+export const ANALYTICS_RECOVERY_RUN_RESULT = 'recoveryRunResultAfterError'

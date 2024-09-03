@@ -7,10 +7,6 @@ protocol state and side-effects like robot movements.
 The main interface is the `ProtocolEngine` class.
 """
 
-from .create_protocol_engine import (
-    create_protocol_engine,
-    create_protocol_engine_in_thread,
-)
 from .protocol_engine import ProtocolEngine
 from .errors import ProtocolEngineError, ErrorOccurrence
 from .notes import CommandNote
@@ -22,7 +18,10 @@ from .commands import (
     CommandType,
     CommandIntent,
 )
-from .state import State, StateView, StateSummary, CommandSlice, CommandPointer, Config
+from .state.state import State, StateView
+from .state.state_summary import StateSummary
+from .state.commands import CommandSlice, CommandErrorSlice, CommandPointer
+from .state.config import Config
 from .plugins import AbstractPlugin
 
 from .types import (
@@ -85,6 +84,7 @@ __all__ = [
     "State",
     "StateView",
     "CommandSlice",
+    "CommandErrorSlice",
     "CommandPointer",
     # public value interfaces and models
     "LabwareOffset",

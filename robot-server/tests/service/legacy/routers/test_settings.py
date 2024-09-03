@@ -15,7 +15,7 @@ from opentrons_shared_data.pipette import (
     pipette_definition as pip_def,
 )
 from opentrons.types import Mount
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
 
 from robot_server.app import app

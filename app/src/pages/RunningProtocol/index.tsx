@@ -29,8 +29,10 @@ import {
 import { StepMeter } from '../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useNotifyRunQuery } from '../../resources/runs'
-import { InterventionModal } from '../../organisms/InterventionModal'
-import { isInterventionCommand } from '../../organisms/InterventionModal/utils'
+import {
+  InterventionModal,
+  useInterventionModal,
+} from '../../organisms/InterventionModal'
 import {
   useRunStatus,
   useRunTimestamps,
@@ -78,7 +80,9 @@ export type ScreenOption =
   | 'RunningProtocolCommandList'
 
 export function RunningProtocol(): JSX.Element {
-  const { runId } = useParams<OnDeviceRouteParams>()
+  const { runId } = useParams<
+    keyof OnDeviceRouteParams
+  >() as OnDeviceRouteParams
   const [currentOption, setCurrentOption] = React.useState<ScreenOption>(
     'CurrentRunningProtocolCommand'
   )
@@ -86,12 +90,8 @@ export function RunningProtocol(): JSX.Element {
     showConfirmCancelRunModal,
     setShowConfirmCancelRunModal,
   ] = React.useState<boolean>(false)
-  const [
-    interventionModalCommandKey,
-    setInterventionModalCommandKey,
-  ] = React.useState<string | null>(null)
   const lastAnimatedCommand = React.useRef<string | null>(null)
-  const swipe = useSwipe()
+  const { ref, style, swipeType, setSwipeType } = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const lastRunCommand = useLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
@@ -113,6 +113,7 @@ export function RunningProtocol(): JSX.Element {
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
+  const isQuickTransfer = protocolRecord?.data.protocolKind === 'quick-transfer'
   const { playRun, pauseRun } = useRunActionMutations(runId)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot != null ? localRobot.name : 'no name'
@@ -120,55 +121,58 @@ export function RunningProtocol(): JSX.Element {
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const robotType = useRobotType(robotName)
   const { isERActive, failedCommand } = useErrorRecoveryFlows(runId, runStatus)
+  const {
+    showModal: showIntervention,
+    modalProps: interventionProps,
+  } = useInterventionModal({
+    runStatus,
+    lastRunCommand,
+    runData: runRecord?.data ?? null,
+    robotName,
+    analysis: robotSideAnalysis,
+  })
 
   React.useEffect(() => {
     if (
       currentOption === 'CurrentRunningProtocolCommand' &&
-      swipe.swipeType === 'swipe-left'
+      swipeType === 'swipe-left'
     ) {
       setCurrentOption('RunningProtocolCommandList')
-      swipe.setSwipeType('')
+      setSwipeType('')
     }
 
     if (
       currentOption === 'RunningProtocolCommandList' &&
-      swipe.swipeType === 'swipe-right'
+      swipeType === 'swipe-right'
     ) {
       setCurrentOption('CurrentRunningProtocolCommand')
-      swipe.setSwipeType('')
+      setSwipeType('')
     }
-  }, [currentOption, swipe, swipe.setSwipeType])
-
-  React.useEffect(() => {
-    if (
-      lastRunCommand != null &&
-      interventionModalCommandKey != null &&
-      lastRunCommand.key !== interventionModalCommandKey
-    ) {
-      // set intervention modal command key to null if different from current command key
-      setInterventionModalCommandKey(null)
-    } else if (
-      lastRunCommand?.key != null &&
-      isInterventionCommand(lastRunCommand) &&
-      interventionModalCommandKey === null
-    ) {
-      setInterventionModalCommandKey(lastRunCommand.key)
-    }
-  }, [lastRunCommand, interventionModalCommandKey])
+  }, [currentOption, swipeType, setSwipeType])
 
   return (
     <>
       {isERActive ? (
-        <ErrorRecoveryFlows runId={runId} failedCommand={failedCommand} />
+        <ErrorRecoveryFlows
+          runStatus={runStatus}
+          runId={runId}
+          failedCommandByRunRecord={failedCommand}
+          protocolAnalysis={robotSideAnalysis}
+        />
       ) : null}
       {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
         <OpenDoorAlertModal />
       ) : null}
       {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
+      {/* note: this zindex is here to establish a zindex context for the bullets
+          so they're relatively-above this flex but not anything else like error
+          recovery
+        */}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         position={POSITION_RELATIVE}
         overflow={OVERFLOW_HIDDEN}
+        zIndex="0"
       >
         {robotSideAnalysis != null ? (
           <StepMeter
@@ -183,30 +187,24 @@ export function RunningProtocol(): JSX.Element {
         {showConfirmCancelRunModal ? (
           <ConfirmCancelRunModal
             runId={runId}
+            isQuickTransfer={isQuickTransfer}
             setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
             isActiveRun={true}
           />
         ) : null}
-        {interventionModalCommandKey != null &&
-        runRecord?.data != null &&
-        lastRunCommand != null &&
-        isInterventionCommand(lastRunCommand) ? (
-          <InterventionModal
-            robotName={robotName}
-            command={lastRunCommand}
-            onResume={playRun}
-            run={runRecord.data}
-            analysis={robotSideAnalysis}
-          />
+        {showIntervention ? (
+          <InterventionModal {...interventionProps} onResume={playRun} />
         ) : null}
         <Flex
-          ref={swipe.ref}
+          ref={ref}
+          style={style}
           padding={`1.75rem ${SPACING.spacing40} ${SPACING.spacing40}`}
           flexDirection={DIRECTION_COLUMN}
         >
           {robotSideAnalysis != null ? (
             currentOption === 'CurrentRunningProtocolCommand' ? (
               <CurrentRunningProtocolCommand
+                runId={runId}
                 playRun={playRun}
                 pauseRun={pauseRun}
                 setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}

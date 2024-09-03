@@ -5,21 +5,19 @@ Add new tests to test_command_state.py, where they can be tested together.
 """
 
 
+from decoy import matchers
 import pytest
 from datetime import datetime
-from typing import NamedTuple, Type
+from typing import Any
 
 from opentrons_shared_data.errors import ErrorCodes
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.actions.actions import RunCommandAction
-from opentrons.types import MountType, DeckSlotName
-from opentrons.hardware_control.types import DoorState
 
 from opentrons.protocol_engine import commands, errors
-from opentrons.protocol_engine.types import DeckSlotLocation, DeckType, WellLocation
-from opentrons.protocol_engine.state import Config
+from opentrons.protocol_engine.types import DeckType
+from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.commands import (
     CommandState,
     CommandStore,
@@ -38,7 +36,6 @@ from opentrons.protocol_engine.actions import (
     FinishErrorDetails,
     StopAction,
     HardwareStoppedAction,
-    DoorChangeAction,
 )
 
 from opentrons.protocol_engine.state.command_history import CommandHistory
@@ -55,217 +52,13 @@ def _make_config(block_on_door_open: bool = False) -> Config:
     )
 
 
-@pytest.mark.parametrize(
-    ("is_door_open", "config", "expected_is_door_blocking"),
-    [
-        (False, _make_config(), False),
-        (True, _make_config(), False),
-        (False, _make_config(block_on_door_open=True), False),
-        (True, _make_config(block_on_door_open=True), True),
-    ],
-)
-def test_initial_state(
-    is_door_open: bool,
-    config: Config,
-    expected_is_door_blocking: bool,
-) -> None:
-    """It should set the initial state."""
-    subject = CommandStore(is_door_open=is_door_open, config=config)
+def _placeholder_error_recovery_policy(*args: object, **kwargs: object) -> Any:
+    """A placeholder `ErrorRecoveryPolicy` for tests that don't care about it.
 
-    assert subject.state == CommandState(
-        command_history=CommandHistory(),
-        queue_status=QueueStatus.SETUP,
-        run_completed_at=None,
-        run_started_at=None,
-        is_door_blocking=expected_is_door_blocking,
-        run_result=None,
-        run_error=None,
-        finish_error=None,
-        failed_command=None,
-        command_error_recovery_types={},
-        recovery_target_command_id=None,
-        latest_protocol_command_hash=None,
-        stopped_by_estop=False,
-    )
-
-
-class QueueCommandSpec(NamedTuple):
-    """Test data for the QueueCommandAction."""
-
-    command_request: commands.CommandCreate
-    expected_cls: Type[commands.Command]
-    created_at: datetime = datetime(year=2021, month=1, day=1)
-    command_id: str = "command-id"
-    command_key: str = "command-key"
-
-
-@pytest.mark.parametrize(
-    QueueCommandSpec._fields,
-    [
-        QueueCommandSpec(
-            command_request=commands.AspirateCreate(
-                params=commands.AspirateParams(
-                    pipetteId="pipette-id",
-                    labwareId="labware-id",
-                    wellName="well-name",
-                    volume=42,
-                    flowRate=1.23,
-                    wellLocation=WellLocation(),
-                ),
-                key="command-key",
-            ),
-            expected_cls=commands.Aspirate,
-        ),
-        QueueCommandSpec(
-            command_request=commands.DispenseCreate(
-                params=commands.DispenseParams(
-                    pipetteId="pipette-id",
-                    labwareId="labware-id",
-                    wellName="well-name",
-                    volume=42,
-                    flowRate=1.23,
-                    wellLocation=WellLocation(),
-                ),
-            ),
-            expected_cls=commands.Dispense,
-            # test when key prop is missing
-            command_key="command-id",
-        ),
-        QueueCommandSpec(
-            command_request=commands.DropTipCreate(
-                params=commands.DropTipParams(
-                    pipetteId="pipette-id",
-                    labwareId="labware-id",
-                    wellName="well-name",
-                ),
-                key="command-key",
-            ),
-            expected_cls=commands.DropTip,
-        ),
-        QueueCommandSpec(
-            command_request=commands.LoadLabwareCreate(
-                params=commands.LoadLabwareParams(
-                    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-                    loadName="load-name",
-                    namespace="namespace",
-                    version=42,
-                ),
-                key="command-key",
-            ),
-            expected_cls=commands.LoadLabware,
-        ),
-        QueueCommandSpec(
-            command_request=commands.LoadPipetteCreate(
-                params=commands.LoadPipetteParams(
-                    mount=MountType.LEFT,
-                    pipetteName=PipetteNameType.P300_SINGLE,
-                ),
-                key="command-key",
-            ),
-            expected_cls=commands.LoadPipette,
-        ),
-        QueueCommandSpec(
-            command_request=commands.PickUpTipCreate(
-                params=commands.PickUpTipParams(
-                    pipetteId="pipette-id",
-                    labwareId="labware-id",
-                    wellName="well-name",
-                ),
-                key="command-key",
-            ),
-            expected_cls=commands.PickUpTip,
-        ),
-        QueueCommandSpec(
-            command_request=commands.MoveToWellCreate(
-                params=commands.MoveToWellParams(
-                    pipetteId="pipette-id",
-                    labwareId="labware-id",
-                    wellName="well-name",
-                ),
-                key="command-key",
-            ),
-            expected_cls=commands.MoveToWell,
-        ),
-        QueueCommandSpec(
-            command_request=commands.WaitForResumeCreate(
-                params=commands.WaitForResumeParams(message="hello world"),
-                key="command-key",
-            ),
-            expected_cls=commands.WaitForResume,
-        ),
-        QueueCommandSpec(
-            # a WaitForResumeCreate with `pause` should be mapped to
-            # a WaitForResume with `commandType="waitForResume"`
-            command_request=commands.WaitForResumeCreate(
-                commandType="pause",
-                params=commands.WaitForResumeParams(message="hello world"),
-                key="command-key",
-            ),
-            expected_cls=commands.WaitForResume,
-        ),
-    ],
-)
-def test_command_store_queues_commands(
-    command_request: commands.CommandCreate,
-    expected_cls: Type[commands.Command],
-    created_at: datetime,
-    command_id: str,
-    command_key: str,
-) -> None:
-    """It should add a command to the store."""
-    action = QueueCommandAction(
-        request=command_request,
-        request_hash=None,
-        created_at=created_at,
-        command_id=command_id,
-    )
-    expected_command = expected_cls(
-        id=command_id,
-        key=command_key,
-        createdAt=created_at,
-        status=commands.CommandStatus.QUEUED,
-        params=command_request.params,  # type: ignore[arg-type]
-    )
-
-    subject = CommandStore(is_door_open=False, config=_make_config())
-    subject.handle_action(action)
-
-    assert subject.state.command_history.get("command-id") == CommandEntry(
-        index=0, command=expected_command
-    )
-    assert subject.state.command_history.get_all_ids() == ["command-id"]
-    assert subject.state.command_history.get_queue_ids() == OrderedSet(["command-id"])
-
-
-def test_command_queue_with_hash() -> None:
-    """It should queue a command with a command hash and no explicit key."""
-    create = commands.WaitForResumeCreate(
-        params=commands.WaitForResumeParams(message="hello world"),
-    )
-
-    subject = CommandStore(is_door_open=False, config=_make_config())
-    subject.handle_action(
-        QueueCommandAction(
-            request=create,
-            request_hash="abc123",
-            created_at=datetime(year=2021, month=1, day=1),
-            command_id="command-id-1",
-        )
-    )
-
-    assert subject.state.command_history.get("command-id-1").command.key == "abc123"
-    assert subject.state.latest_protocol_command_hash == "abc123"
-
-    subject.handle_action(
-        QueueCommandAction(
-            request=create,
-            request_hash="def456",
-            created_at=datetime(year=2021, month=1, day=1),
-            command_id="command-id-2",
-        )
-    )
-
-    assert subject.state.latest_protocol_command_hash == "def456"
+    That should be all the tests in this file, since error recovery was added
+    after this file was deprecated.
+    """
+    raise NotImplementedError()
 
 
 def test_command_queue_and_unqueue() -> None:
@@ -295,7 +88,11 @@ def test_command_queue_and_unqueue() -> None:
         command=create_succeeded_command(command_id="command-id-2"),
     )
 
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(queue_1)
     assert subject.state.command_history.get_queue_ids() == OrderedSet(["command-id-1"])
@@ -344,7 +141,11 @@ def test_setup_command_queue_and_unqueue() -> None:
         command=create_succeeded_command(command_id="command-id-2"),
     )
 
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(queue_1)
     assert subject.state.command_history.get_setup_queue_ids() == OrderedSet(
@@ -388,7 +189,11 @@ def test_setup_queue_action_updates_command_intent() -> None:
         intent=commands.CommandIntent.SETUP,
     )
 
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(queue_cmd)
     assert subject.state.command_history.get("command-id-1") == CommandEntry(
@@ -413,7 +218,11 @@ def test_running_command_id() -> None:
         command=create_succeeded_command(command_id="command-id-1"),
     )
 
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(queue)
     assert subject.state.command_history.get_running_command() is None
@@ -440,7 +249,11 @@ def test_command_store_keeps_commands_in_queue_order() -> None:
         params=commands.CommentParams(message="hello world"),
     )
 
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(
         QueueCommandAction(
@@ -503,7 +316,11 @@ def test_command_store_keeps_commands_in_queue_order() -> None:
 @pytest.mark.parametrize("pause_source", PauseSource)
 def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
     """It should clear the running flag on pause."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
     subject.handle_action(PauseAction(source=pause_source))
 
     assert subject.state == CommandState(
@@ -520,18 +337,21 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
         recovery_target_command_id=None,
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
+        failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
+        has_entered_error_recovery=False,
     )
 
 
 @pytest.mark.parametrize("pause_source", PauseSource)
 def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
     """It should set the running flag on play."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
     )
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
 
     assert subject.state == CommandState(
         command_history=CommandHistory(),
@@ -547,6 +367,9 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
+        failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
+        has_entered_error_recovery=False,
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -556,13 +379,13 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
 
 def test_command_store_handles_finish_action() -> None:
     """It should change to a succeeded state with FinishAction."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
-
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
     )
+
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction())
 
     assert subject.state == CommandState(
@@ -579,6 +402,9 @@ def test_command_store_handles_finish_action() -> None:
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
+        failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
+        has_entered_error_recovery=False,
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -588,13 +414,13 @@ def test_command_store_handles_finish_action() -> None:
 
 def test_command_store_handles_finish_action_with_stopped() -> None:
     """It should change to a stopped state if FinishAction has set_run_status=False."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
-
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
     )
+
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction(set_run_status=False))
 
     assert subject.state.run_result == RunResult.STOPPED
@@ -608,13 +434,13 @@ def test_command_store_handles_stop_action(
     from_estop: bool, expected_run_result: RunResult
 ) -> None:
     """It should mark the engine as non-gracefully stopped on StopAction."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
-
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
     )
+
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(StopAction(from_estop=from_estop))
 
     assert subject.state == CommandState(
@@ -631,6 +457,9 @@ def test_command_store_handles_stop_action(
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_protocol_command_hash=None,
         stopped_by_estop=from_estop,
+        failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
+        has_entered_error_recovery=False,
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -640,13 +469,13 @@ def test_command_store_handles_stop_action(
 
 def test_command_store_handles_stop_action_when_awaiting_recovery() -> None:
     """It should mark the engine as non-gracefully stopped on StopAction."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
-
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
     )
+
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
 
     subject.state.queue_status = QueueStatus.AWAITING_RECOVERY
 
@@ -666,6 +495,9 @@ def test_command_store_handles_stop_action_when_awaiting_recovery() -> None:
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
+        failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
+        has_entered_error_recovery=False,
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -675,13 +507,13 @@ def test_command_store_handles_stop_action_when_awaiting_recovery() -> None:
 
 def test_command_store_cannot_restart_after_should_stop() -> None:
     """It should reject a play action after finish."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
-    subject.handle_action(FinishAction())
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
     )
+    subject.handle_action(FinishAction())
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
 
     assert subject.state == CommandState(
         command_history=CommandHistory(),
@@ -697,6 +529,9 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
         run_started_at=None,
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
+        failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
+        has_entered_error_recovery=False,
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -706,11 +541,15 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
 
 def test_command_store_save_started_completed_run_timestamp() -> None:
     """It should save started and completed timestamps."""
-    subject = CommandStore(config=_make_config(), is_door_open=False)
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        is_door_open=False,
+    )
     start_time = datetime(year=2021, month=1, day=1)
     hardware_stopped_time = datetime(year=2022, month=2, day=2)
 
-    subject.handle_action(PlayAction(requested_at=start_time, deck_configuration=[]))
+    subject.handle_action(PlayAction(requested_at=start_time))
     subject.handle_action(
         HardwareStoppedAction(
             completed_at=hardware_stopped_time, finish_error_details=None
@@ -723,16 +562,20 @@ def test_command_store_save_started_completed_run_timestamp() -> None:
 
 def test_timestamps_are_latched() -> None:
     """It should not change startedAt or completedAt once set."""
-    subject = CommandStore(config=_make_config(), is_door_open=False)
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        is_door_open=False,
+    )
 
     play_time_1 = datetime(year=2021, month=1, day=1)
     play_time_2 = datetime(year=2022, month=2, day=2)
     stop_time_1 = datetime(year=2023, month=3, day=3)
     stop_time_2 = datetime(year=2024, month=4, day=4)
 
-    subject.handle_action(PlayAction(requested_at=play_time_1, deck_configuration=[]))
+    subject.handle_action(PlayAction(requested_at=play_time_1))
     subject.handle_action(PauseAction(source=PauseSource.CLIENT))
-    subject.handle_action(PlayAction(requested_at=play_time_2, deck_configuration=[]))
+    subject.handle_action(PlayAction(requested_at=play_time_2))
     subject.handle_action(
         HardwareStoppedAction(completed_at=stop_time_1, finish_error_details=None)
     )
@@ -754,7 +597,11 @@ def test_command_store_wraps_unknown_errors() -> None:
     The wrapping EnumeratedError should be an UnexpectedProtocolError for errors that happened
     in the main part of the protocol run, or a PythonException for errors that happened elsewhere.
     """
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(
         FinishAction(
@@ -829,6 +676,9 @@ def test_command_store_wraps_unknown_errors() -> None:
         recovery_target_command_id=None,
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
+        failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
+        has_entered_error_recovery=False,
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -843,7 +693,11 @@ def test_command_store_preserves_enumerated_errors() -> None:
         def __init__(self, message: str) -> None:
             super().__init__(ErrorCodes.PIPETTE_NOT_PRESENT, message)
 
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
 
     subject.handle_action(
         FinishAction(
@@ -892,6 +746,9 @@ def test_command_store_preserves_enumerated_errors() -> None:
         run_started_at=None,
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
+        failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
+        has_entered_error_recovery=False,
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -901,13 +758,13 @@ def test_command_store_preserves_enumerated_errors() -> None:
 
 def test_command_store_ignores_stop_after_graceful_finish() -> None:
     """It should no-op on stop if already gracefully finished."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
-
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
     )
+
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction())
     subject.handle_action(StopAction())
 
@@ -925,6 +782,9 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
+        failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
+        has_entered_error_recovery=False,
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -934,13 +794,13 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
 
 def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
     """It should no-op on finish if already ungracefully stopped."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
-
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
     )
+
+    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(StopAction())
     subject.handle_action(FinishAction())
 
@@ -958,6 +818,9 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
+        failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
+        has_entered_error_recovery=False,
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -967,7 +830,11 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
 
 def test_handles_hardware_stopped() -> None:
     """It should mark the hardware as stopped on HardwareStoppedAction."""
-    subject = CommandStore(is_door_open=False, config=_make_config())
+    subject = CommandStore(
+        is_door_open=False,
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
     completed_at = datetime(year=2021, day=1, month=1)
     subject.handle_action(
         HardwareStoppedAction(completed_at=completed_at, finish_error_details=None)
@@ -987,84 +854,11 @@ def test_handles_hardware_stopped() -> None:
         run_started_at=None,
         latest_protocol_command_hash=None,
         stopped_by_estop=False,
+        failed_command_errors=[],
+        error_recovery_policy=matchers.Anything(),
+        has_entered_error_recovery=False,
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
     assert subject.state.command_history.get_queue_ids() == OrderedSet()
     assert subject.state.command_history.get_setup_queue_ids() == OrderedSet()
-
-
-@pytest.mark.parametrize(
-    ("is_door_open", "config", "expected_queue_status"),
-    [
-        (False, _make_config(), QueueStatus.RUNNING),
-        (True, _make_config(), QueueStatus.RUNNING),
-        (False, _make_config(block_on_door_open=True), QueueStatus.RUNNING),
-        (True, _make_config(block_on_door_open=True), QueueStatus.PAUSED),
-    ],
-)
-def test_command_store_handles_play_according_to_initial_door_state(
-    is_door_open: bool,
-    config: Config,
-    expected_queue_status: QueueStatus,
-) -> None:
-    """It should set command queue state on play action according to door state."""
-    subject = CommandStore(is_door_open=is_door_open, config=config)
-    start_time = datetime(year=2021, month=1, day=1)
-    subject.handle_action(PlayAction(requested_at=start_time, deck_configuration=[]))
-
-    assert subject.state.queue_status == expected_queue_status
-    assert subject.state.run_started_at == start_time
-
-
-@pytest.mark.parametrize(
-    ("config", "expected_is_door_blocking"),
-    [
-        (_make_config(block_on_door_open=True), True),
-        (_make_config(block_on_door_open=False), False),
-    ],
-)
-def test_handles_door_open_and_close_event_before_play(
-    config: Config, expected_is_door_blocking: bool
-) -> None:
-    """It should update state but not pause on door open whenis setup."""
-    subject = CommandStore(is_door_open=False, config=config)
-
-    subject.handle_action(DoorChangeAction(door_state=DoorState.OPEN))
-
-    assert subject.state.queue_status == QueueStatus.SETUP
-    assert subject.state.is_door_blocking is expected_is_door_blocking
-
-    subject.handle_action(DoorChangeAction(door_state=DoorState.CLOSED))
-
-    assert subject.state.queue_status == QueueStatus.SETUP
-    assert subject.state.is_door_blocking is False
-
-
-@pytest.mark.parametrize(
-    ("config", "expected_queue_status", "expected_is_door_blocking"),
-    [
-        (_make_config(block_on_door_open=True), QueueStatus.PAUSED, True),
-        (_make_config(block_on_door_open=False), QueueStatus.RUNNING, False),
-    ],
-)
-def test_handles_door_open_and_close_event_after_play(
-    config: Config, expected_queue_status: QueueStatus, expected_is_door_blocking: bool
-) -> None:
-    """It should update state when door opened and closed after run is played."""
-    subject = CommandStore(is_door_open=False, config=config)
-
-    subject.handle_action(
-        PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        )
-    )
-    subject.handle_action(DoorChangeAction(door_state=DoorState.OPEN))
-
-    assert subject.state.queue_status == expected_queue_status
-    assert subject.state.is_door_blocking is expected_is_door_blocking
-
-    subject.handle_action(DoorChangeAction(door_state=DoorState.CLOSED))
-
-    assert subject.state.queue_status == expected_queue_status
-    assert subject.state.is_door_blocking is False

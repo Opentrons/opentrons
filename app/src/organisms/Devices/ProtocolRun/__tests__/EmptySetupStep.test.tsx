@@ -18,7 +18,6 @@ describe('EmptySetupStep', () => {
     props = {
       title: 'mockTitle',
       description: 'mockDescription',
-      label: 'mockLabel',
     }
   })
 
@@ -26,6 +25,5 @@ describe('EmptySetupStep', () => {
     render(props)
     screen.getByText('mockTitle')
     screen.getByText('mockDescription')
-    screen.getByText('mockLabel')
   })
 })

@@ -7,6 +7,7 @@ import {
   BORDERS,
   Btn,
   COLORS,
+  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
@@ -14,6 +15,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  MODULE_ICON_NAME_BY_TYPE,
   LabwareRender,
   SIZE_AUTO,
   SPACING,
@@ -35,6 +37,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { ToggleButton } from '../../../../atoms/buttons'
+import { Divider } from '../../../../atoms/structure'
 import { SecureLabwareModal } from './SecureLabwareModal'
 
 import type {
@@ -53,12 +56,13 @@ import type { NestedLabwareInfo } from './getNestedLabwareInfo'
 
 const LabwareRow = styled.div`
   display: grid;
-  grid-template-columns: 1fr 6fr 5.9fr;
+  grid-template-columns: 90px 12fr;
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
   border-color: ${COLORS.grey30};
   border-radius: ${BORDERS.borderRadius4};
-  padding: ${SPACING.spacing16};
+  padding: ${SPACING.spacing12} ${SPACING.spacing16} ${SPACING.spacing12}
+    ${SPACING.spacing24};
 `
 
 interface LabwareListItemProps extends LabwareSetupItem {
@@ -67,6 +71,7 @@ interface LabwareListItemProps extends LabwareSetupItem {
   isFlex: boolean
   commands: RunTimeCommand[]
   nestedLabwareInfo: NestedLabwareInfo | null
+  showLabwareSVG?: boolean
 }
 
 export function LabwareListItem(
@@ -83,8 +88,9 @@ export function LabwareListItem(
     isFlex,
     commands,
     nestedLabwareInfo,
+    showLabwareSVG,
   } = props
-  const { t } = useTranslation('protocol_setup')
+  const { i18n, t } = useTranslation('protocol_setup')
   const [
     secureLabwareModalType,
     setSecureLabwareModalType,
@@ -103,10 +109,14 @@ export function LabwareListItem(
     'addressableAreaName' in initialLocation
   ) {
     slotInfo = initialLocation.addressableAreaName
+  } else if (initialLocation === 'offDeck') {
+    slotInfo = i18n.format(t('off_deck'), 'upperCase')
   }
 
   let moduleDisplayName: string | null = null
+  let moduleType: ModuleType | null = null
   let extraAttentionText: JSX.Element | null = null
+  let secureLabwareInstructions: JSX.Element | null = null
   let isCorrectHeaterShakerAttached: boolean = false
   let isHeaterShakerInProtocol: boolean = false
   let latchCommand:
@@ -144,7 +154,7 @@ export function LabwareListItem(
     moduleModel != null
   ) {
     const moduleName = getModuleDisplayName(moduleModel)
-    const moduleType = getModuleType(moduleModel)
+    moduleType = getModuleType(moduleModel)
     const moduleTypeNeedsAttention = extraAttentionModules.find(
       extraAttentionModType => extraAttentionModType === moduleType
     )
@@ -158,7 +168,7 @@ export function LabwareListItem(
       case MAGNETIC_MODULE_TYPE:
       case THERMOCYCLER_MODULE_TYPE:
         if (moduleModel !== THERMOCYCLER_MODULE_V2) {
-          extraAttentionText = (
+          secureLabwareInstructions = (
             <Btn
               css={css`
                 color: ${COLORS.grey50};
@@ -167,18 +177,22 @@ export function LabwareListItem(
                   color: ${COLORS.black90};
                 }
               `}
-              onClick={() => setSecureLabwareModalType(moduleType)}
+              onClick={() => {
+                setSecureLabwareModalType(moduleType)
+              }}
             >
-              <Flex flexDirection={DIRECTION_ROW}>
+              <Flex flexDirection={DIRECTION_ROW} width="15rem">
                 <Icon
                   name="information"
                   size="0.75rem"
                   marginTop={SPACING.spacing4}
+                  color={COLORS.grey60}
                 />
                 <StyledText
                   marginLeft={SPACING.spacing4}
-                  as="p"
+                  desktopStyle="bodyDefaultRegular"
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                  color={COLORS.grey60}
                 >
                   {t('secure_labware_instructions')}
                 </StyledText>
@@ -190,7 +204,7 @@ export function LabwareListItem(
       case HEATERSHAKER_MODULE_TYPE:
         isHeaterShakerInProtocol = true
         extraAttentionText = (
-          <StyledText as="p" color={COLORS.grey50} maxWidth="15.25rem">
+          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
             {t('heater_shaker_labware_list_view')}
           </StyledText>
         )
@@ -254,99 +268,134 @@ export function LabwareListItem(
 
   return (
     <LabwareRow>
-      <Flex alignItems={ALIGN_CENTER}>
-        <StyledText as="p" data-testid={`slot_info_${slotInfo}`}>
-          {slotInfo}
-        </StyledText>
+      <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing2} width="5rem">
+        {slotInfo != null && isFlex ? (
+          <DeckInfoLabel deckLabel={slotInfo} />
+        ) : (
+          <StyledText
+            css={TYPOGRAPHY.pSemiBold}
+            data-testid={`slot_info_${slotInfo}`}
+          >
+            {slotInfo}
+          </StyledText>
+        )}
+        {nestedLabwareInfo != null || moduleDisplayName != null ? (
+          <DeckInfoLabel iconName="stacked" />
+        ) : null}
       </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+        {nestedLabwareInfo != null &&
+        nestedLabwareInfo?.sharedSlotId === slotInfo ? (
+          <>
+            <Flex>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                justifyContent={JUSTIFY_CENTER}
+                marginLeft={SPACING.spacing8}
+                marginRight={SPACING.spacing24}
+              >
+                <StyledText desktopStyle="bodyDefaultSemiBold">
+                  {nestedLabwareInfo.nestedLabwareDisplayName}
+                </StyledText>
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  color={COLORS.grey60}
+                >
+                  {nestedLabwareInfo.nestedLabwareNickName}
+                </StyledText>
+              </Flex>
+            </Flex>
+            <Divider marginY="0" />
+          </>
+        ) : null}
         <Flex>
-          <StandaloneLabware definition={definition} />
+          {showLabwareSVG ? (
+            <StandaloneLabware definition={definition} />
+          ) : null}
           <Flex
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_CENTER}
-            marginLeft={SPACING.spacing16}
+            marginLeft={SPACING.spacing8}
             marginRight={SPACING.spacing24}
           >
-            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <StyledText desktopStyle="bodyDefaultSemiBold">
               {labwareDisplayName}
             </StyledText>
-            <StyledText as="p" color={COLORS.grey50}>
+            <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
               {nickName}
             </StyledText>
           </Flex>
         </Flex>
-        {nestedLabwareInfo != null &&
-        nestedLabwareInfo?.sharedSlotId === slotInfo ? (
-          <Flex>
-            {nestedLabwareInfo.nestedLabwareDefinition != null ? (
-              <StandaloneLabware
-                definition={nestedLabwareInfo.nestedLabwareDefinition}
-              />
-            ) : null}
+        {moduleDisplayName != null ? (
+          <>
+            <Divider marginY="0" />
             <Flex
-              flexDirection={DIRECTION_COLUMN}
-              justifyContent={JUSTIFY_CENTER}
-              marginLeft={SPACING.spacing16}
-              marginRight={SPACING.spacing24}
-            >
-              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                {nestedLabwareInfo.nestedLabwareDisplayName}
-              </StyledText>
-              <StyledText as="p" color={COLORS.grey50}>
-                {nestedLabwareInfo.nestedLabwareNickName}
-              </StyledText>
-            </Flex>
-          </Flex>
-        ) : null}
-      </Flex>
-      <Flex
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing8}
-      >
-        <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
-          <StyledText as="p">
-            {moduleDisplayName != null
-              ? moduleDisplayName
-              : t(initialLocation === 'offDeck' ? 'off_deck' : 'on_deck')}
-          </StyledText>
-          {extraAttentionText != null ? extraAttentionText : null}
-        </Flex>
-
-        {isHeaterShakerInProtocol ? (
-          <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="h6" minWidth="6.2rem">
-              {t('labware_latch')}
-            </StyledText>
-            <Flex
-              flexDirection={DIRECTION_ROW}
-              alignItems={ALIGN_CENTER}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
-              marginTop="3px"
+              flexDirection={DIRECTION_ROW}
+              marginLeft={SPACING.spacing8}
+              paddingRight={SPACING.spacing24}
+              gridGap={SPACING.spacing8}
             >
-              <ToggleButton
-                label={`heater_shaker_${
-                  moduleLocation?.slotName ?? ''
-                }_latch_toggle`}
-                size={SIZE_AUTO}
-                disabled={!isCorrectHeaterShakerAttached || isLatchLoading}
-                toggledOn={isLatchClosed}
-                onClick={toggleLatch}
-                display={DISPLAY_FLEX}
-                alignItems={ALIGN_CENTER}
-              />
-              <StyledText as="p" width="4rem">
-                {hsLatchText}
-              </StyledText>
+              <Flex gridGap={SPACING.spacing12} alignItems={ALIGN_CENTER}>
+                {moduleType != null ? (
+                  <DeckInfoLabel
+                    iconName={MODULE_ICON_NAME_BY_TYPE[moduleType]}
+                  />
+                ) : null}
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  justifyContent={JUSTIFY_CENTER}
+                >
+                  <StyledText desktopStyle="bodyDefaultSemiBold">
+                    {moduleDisplayName}
+                  </StyledText>
+                  {extraAttentionText}
+                </Flex>
+              </Flex>
+              {secureLabwareInstructions}
+              {isHeaterShakerInProtocol ? (
+                <Flex flexDirection={DIRECTION_COLUMN} width="15rem">
+                  <StyledText
+                    desktopStyle="bodyDefaultRegular"
+                    color={COLORS.grey60}
+                    minWidth="6.2rem"
+                  >
+                    {t('labware_latch')}
+                  </StyledText>
+                  <Flex
+                    flexDirection={DIRECTION_ROW}
+                    gridGap={SPACING.spacing4}
+                    marginTop="3px"
+                  >
+                    <ToggleButton
+                      label={`heater_shaker_${
+                        moduleLocation?.slotName ?? ''
+                      }_latch_toggle`}
+                      size={SIZE_AUTO}
+                      disabled={
+                        !isCorrectHeaterShakerAttached || isLatchLoading
+                      }
+                      toggledOn={isLatchClosed}
+                      onClick={toggleLatch}
+                      display={DISPLAY_FLEX}
+                      alignItems={ALIGN_CENTER}
+                    />
+                    <StyledText desktopStyle="bodyDefaultRegular" width="4rem">
+                      {hsLatchText}
+                    </StyledText>
+                  </Flex>
+                </Flex>
+              ) : null}
             </Flex>
-          </Flex>
+          </>
         ) : null}
       </Flex>
       {secureLabwareModalType != null && (
         <SecureLabwareModal
           type={secureLabwareModalType as ModuleTypesThatRequireExtraAttention}
-          onCloseClick={() => setSecureLabwareModalType(null)}
+          onCloseClick={() => {
+            setSecureLabwareModalType(null)
+          }}
         />
       )}
     </LabwareRow>

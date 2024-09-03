@@ -6,7 +6,6 @@ context('Tubes and Block', () => {
   beforeEach(() => {
     cy.visit('/create')
     cy.viewport('macbook-15')
-    cy.contains('NO').click({ force: true })
 
     cy.get('label')
       .contains('What type of labware are you creating?')
@@ -33,7 +32,7 @@ context('Tubes and Block', () => {
       .contains(/^Tubes$/)
       .click()
 
-    cy.contains('start creating labware').click({ force: true })
+    cy.contains('Start creating labware').click({ force: true })
   })
   describe('96 Well', () => {
     describe('Tubes', () => {
@@ -311,7 +310,7 @@ context('Tubes and Block', () => {
           .trigger('mousedown')
         cy.get('*[class^="_option_label"]').contains('PCR Plate').click()
 
-        cy.contains('start creating labware').click({ force: true })
+        cy.contains('Start creating labware').click({ force: true })
       })
       it('does not have a preview image', () => {
         cy.contains('Add missing info to see labware preview').should('exist')
@@ -468,7 +467,7 @@ context('Tubes and Block', () => {
           .contains('What labware is on top of your aluminum block?')
           .should('not.exist')
 
-        cy.contains('start creating labware').click({ force: true })
+        cy.contains('Start creating labware').click({ force: true })
         cy.get("input[name='homogeneousWells'][value='false']").check({
           force: true,
         })

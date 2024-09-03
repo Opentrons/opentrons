@@ -11,9 +11,9 @@ import { AlternativeSecurityTypeModal } from '../AlternativeSecurityTypeModal'
 import { SelectAuthenticationType } from '../SelectAuthenticationType'
 import { SetWifiCred } from '../SetWifiCred'
 
-import type { useHistory } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 const mockSetSelectedAuthType = vi.fn()
 
 vi.mock('../SetWifiCred')
@@ -22,10 +22,10 @@ vi.mock('../../../redux/discovery/selectors')
 vi.mock('../AlternativeSecurityTypeModal')
 vi.mock('../../RobotSettingsDashboard/NetworkSettings/hooks')
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useHistory>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 

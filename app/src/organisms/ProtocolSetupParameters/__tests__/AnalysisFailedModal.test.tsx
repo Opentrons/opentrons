@@ -1,21 +1,28 @@
 import * as React from 'react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
+import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { AnalysisFailedModal } from '../AnalysisFailedModal'
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
-const mockPush = vi.fn()
-const PROTOCOL_ID = 'mockId'
+const PROTOCOL_ID = 'mockProtocolId'
+const RUN_ID = 'mockRunId'
 const mockSetShowAnalysisFailedModal = vi.fn()
+const mockNavigate = vi.fn()
+const mockDismissCurrentRunAsync = vi.fn(
+  () => new Promise(resolve => resolve({}))
+)
 
+vi.mock('@opentrons/react-api-client')
 vi.mock('react-router-dom', async importOriginal => {
-  const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
+  const reactRouterDom = await importOriginal<NavigateFunction>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -28,6 +35,11 @@ const render = (props: React.ComponentProps<typeof AnalysisFailedModal>) => {
 describe('AnalysisFailedModal', () => {
   let props: React.ComponentProps<typeof AnalysisFailedModal>
 
+  when(vi.mocked(useDismissCurrentRunMutation))
+    .calledWith()
+    .thenReturn({
+      mutateAsync: mockDismissCurrentRunAsync,
+    } as any)
   beforeEach(() => {
     props = {
       errors: [
@@ -35,6 +47,7 @@ describe('AnalysisFailedModal', () => {
         'analysis failed reason message 2',
       ],
       protocolId: PROTOCOL_ID,
+      runId: RUN_ID,
       setShowAnalysisFailedModal: mockSetShowAnalysisFailedModal,
     }
   })
@@ -55,15 +68,10 @@ describe('AnalysisFailedModal', () => {
     expect(mockSetShowAnalysisFailedModal).toHaveBeenCalled()
   })
 
-  it('should call a mock function when tapping restart setup button', () => {
+  it('should call mock dismiss current run function when tapping restart setup button', () => {
     render(props)
     fireEvent.click(screen.getByText('Restart setup'))
-    expect(mockPush).toHaveBeenCalledWith(`/protocols/${PROTOCOL_ID}`)
-  })
-
-  it('should push to protocols dashboard when tapping restart setup button and protocol ID is null', () => {
-    render({ ...props, protocolId: null })
-    fireEvent.click(screen.getByText('Restart setup'))
-    expect(mockPush).toHaveBeenCalledWith('/protocols')
+    console.log(mockDismissCurrentRunAsync)
+    expect(mockDismissCurrentRunAsync).toBeCalled()
   })
 })

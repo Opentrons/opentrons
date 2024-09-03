@@ -2,7 +2,7 @@ import logging
 from typing import Awaitable, Optional, cast
 from opentrons.types import Mount
 from opentrons.protocol_api import labware
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition
 from robot_server.robot.calibration.pipette_offset.user_flow import (
     PipetteOffsetCalibrationUserFlow,
 )

@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StatusLabel } from '../../atoms/StatusLabel'
@@ -62,12 +62,14 @@ export const TemperatureModuleData = (
         flexDirection={DIRECTION_COLUMN}
         data-testid="temp_module_data"
       >
-        <StyledText marginBottom={SPACING.spacing2}>
+        <LegacyStyledText marginBottom={SPACING.spacing2}>
           {t(targetTemp == null ? 'na_temp' : 'target_temp', {
             temp: targetTemp,
           })}
-        </StyledText>
-        <StyledText>{t('current_temp', { temp: currentTemp })}</StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText>
+          {t('current_temp', { temp: currentTemp })}
+        </LegacyStyledText>
       </Flex>
     </>
   )

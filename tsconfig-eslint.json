@@ -39,5 +39,14 @@
     "*.js",
     ".*.js",
     "**/*.json"
+  ],
+  "exclude": [
+    "analyses-snapshot-testing/**",
+    "**/node_modules/**",
+    "**/coverage/**",
+    "**/dist/**/*",
+    "**/lib/**/*",
+    "**/build/**",
+    "**/venv/**",
   ]
 }

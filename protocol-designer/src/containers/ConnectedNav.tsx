@@ -2,9 +2,11 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { KNOWLEDGEBASE_ROOT_URL } from '../components/KnowledgeBaseLink'
-import { NavTab, TabbedNavBar, OutsideLinkTab } from '@opentrons/components'
 import { selectors as fileSelectors } from '../file-data'
 import { actions, selectors } from '../navigation'
+import { TabbedNavBar } from './TabbedNavBar'
+import { NavTab } from './NavTab'
+import { OutsideLinkTab } from './OutsideLinkTab'
 import type { Page } from '../navigation'
 
 export function ConnectedNav(): JSX.Element {

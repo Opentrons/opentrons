@@ -7,14 +7,14 @@ from decoy import Decoy
 from typing import cast, List, Tuple, Optional, NamedTuple
 from datetime import datetime
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import Point, DeckSlotName, MountType
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.labware.models import (
     Dimensions as LabwareDimensions,
     Parameters as LabwareDefinitionParameters,
@@ -61,7 +61,7 @@ from opentrons.protocol_engine.commands import (
     LoadModuleParams,
 )
 from opentrons.protocol_engine.actions import SucceedCommandAction
-from opentrons.protocol_engine.state import move_types
+from opentrons.protocol_engine.state import _move_types
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView, LabwareStore
 from opentrons.protocol_engine.state.modules import ModuleView, ModuleStore
@@ -105,10 +105,10 @@ def mock_addressable_area_view(decoy: Decoy) -> AddressableAreaView:
 
 
 @pytest.fixture(autouse=True)
-def patch_mock_move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Mock out move_types.py functions."""
-    for name, func in inspect.getmembers(move_types, inspect.isfunction):
-        monkeypatch.setattr(move_types, name, decoy.mock(func=func))
+def patch_mock__move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Mock out _move_types.py functions."""
+    for name, func in inspect.getmembers(_move_types, inspect.isfunction):
+        monkeypatch.setattr(_move_types, name, decoy.mock(func=func))
 
 
 @pytest.fixture
@@ -147,7 +147,9 @@ def labware_view(labware_store: LabwareStore) -> LabwareView:
 @pytest.fixture
 def module_store(state_config: Config) -> ModuleStore:
     """Get a module store that can accept actions."""
-    return ModuleStore(config=state_config, module_calibration_offsets={})
+    return ModuleStore(
+        config=state_config, deck_fixed_labware=[], module_calibration_offsets={}
+    )
 
 
 @pytest.fixture
@@ -174,7 +176,26 @@ def addressable_area_store(
 ) -> AddressableAreaStore:
     """Get an addressable area store that can accept actions."""
     return AddressableAreaStore(
-        deck_configuration=[], config=state_config, deck_definition=deck_definition
+        deck_configuration=[],
+        config=state_config,
+        deck_definition=deck_definition,
+        robot_definition={
+            "displayName": "OT-3",
+            "robotType": "OT-3 Standard",
+            "models": ["OT-3 Standard"],
+            "extents": [477.2, 493.8, 0.0],
+            "paddingOffsets": {
+                "rear": -177.42,
+                "front": 51.8,
+                "leftSide": 31.88,
+                "rightSide": -80.32,
+            },
+            "mountOffsets": {
+                "left": [-13.5, -60.5, 255.675],
+                "right": [40.5, -60.5, 255.675],
+                "gripper": [84.55, -12.75, 93.85],
+            },
+        },
     )
 
 
@@ -2077,7 +2098,10 @@ def test_get_next_drop_tip_location(
             pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
                 back_left_corner=Point(x=10, y=20, z=30),
                 front_right_corner=Point(x=40, y=50, z=60),
+                front_left_corner=Point(x=10, y=50, z=60),
+                back_right_corner=Point(x=40, y=20, z=60),
             ),
+            lld_settings={},
         )
     )
     decoy.when(mock_pipette_view.get_mount("pip-123")).then_return(pipette_mount)

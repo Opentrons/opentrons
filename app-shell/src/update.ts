@@ -20,14 +20,19 @@ export function registerUpdate(
   return function handleAction(action: Action) {
     switch (action.type) {
       case UI_INITIALIZED:
-      case 'shell:CHECK_UPDATE':
-        return checkUpdate(dispatch)
+      case 'shell:CHECK_UPDATE': {
+        checkUpdate(dispatch)
+        return
+      }
 
-      case 'shell:DOWNLOAD_UPDATE':
-        return downloadUpdate(dispatch)
+      case 'shell:DOWNLOAD_UPDATE': {
+        downloadUpdate(dispatch)
+        return
+      }
 
-      case 'shell:APPLY_UPDATE':
-        return autoUpdater.quitAndInstall()
+      case 'shell:APPLY_UPDATE': {
+        autoUpdater.quitAndInstall()
+      }
     }
   }
 }
@@ -81,9 +86,12 @@ interface DownloadingPayload {
 }
 
 function downloadUpdate(dispatch: Dispatch): void {
-  const onDownloading = (payload: DownloadingPayload): void =>
+  const onDownloading = (payload: DownloadingPayload): void => {
     dispatch({ type: 'shell:DOWNLOAD_PERCENTAGE', payload })
-  const onDownloaded = (): void => done({})
+  }
+  const onDownloaded = (): void => {
+    done({})
+  }
   const onError = (error: Error): void => {
     done({ error: PlainObjectError(error) })
   }

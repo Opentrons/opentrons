@@ -1,7 +1,7 @@
 """HTTP routes and handlers for /health endpoints."""
 from dataclasses import dataclass
 from fastapi import APIRouter, Depends, status
-from typing import Dict, cast
+from typing import Annotated, Dict, cast
 import logging
 import json
 
@@ -16,17 +16,23 @@ from robot_server.persistence.fastapi_dependencies import (
 )
 from robot_server.service.legacy.models import V1BasicResponse
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from .models import Health, HealthLinks
 
 _log = logging.getLogger(__name__)
 
-OT2_LOG_PATHS = ["/logs/serial.log", "/logs/api.log", "/logs/server.log"]
+OT2_LOG_PATHS = [
+    "/logs/serial.log",
+    "/logs/api.log",
+    "/logs/server.log",
+    "/logs/update_server.log",
+]
 FLEX_LOG_PATHS = [
     "/logs/serial.log",
     "/logs/api.log",
     "/logs/server.log",
+    "/logs/update_server.log",
     "/logs/touchscreen.log",
 ]
 VERSION_PATH = "/etc/VERSION.json"
@@ -117,16 +123,16 @@ health_router = APIRouter()
     },
 )
 async def get_health(
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
     # This endpoint doesn't actually need sql_engine. We use it in order to artificially
     # fail requests until the database has finished initializing. This plays into the
     # Opentrons App's current error handling. With a non-healthy /health, the app will
     # block off most of its robot details UI. This prevents the user from trying things
     # like viewing runs and uploading protocols, which would hit "database not ready"
     # errors that would present in a confusing way.
-    sql_engine: object = Depends(ensure_sql_engine_is_ready),
-    versions: ComponentVersions = Depends(get_versions),
-    robot_type: RobotType = Depends(get_robot_type),
+    sql_engine: Annotated[object, Depends(ensure_sql_engine_is_ready)],
+    versions: Annotated[ComponentVersions, Depends(get_versions)],
+    robot_type: Annotated[RobotType, Depends(get_robot_type)],
 ) -> Health:
     """Get information about the health of the robot server.
 

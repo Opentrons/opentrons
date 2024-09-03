@@ -74,10 +74,10 @@ describe('ProtocolOverflowMenu', () => {
   })
 
   it('should call reanalyze when clicking reanalyze', () => {
-    const [{ getByTestId, getByText }, store] = render()
-    const button = getByTestId('ProtocolOverflowMenu_overflowBtn')
+    const store = render()[1]
+    const button = screen.getByTestId('ProtocolOverflowMenu_overflowBtn')
     fireEvent.click(button)
-    const reanalyzeButton = getByText('Reanalyze')
+    const reanalyzeButton = screen.getByText('Reanalyze')
     fireEvent.click(reanalyzeButton)
 
     expect(store.dispatch).toHaveBeenCalledWith(

@@ -7,11 +7,11 @@ import {
   BORDERS,
   COLORS,
   Chip,
+  DeckInfoLabel,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LocationIcon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -139,7 +139,7 @@ function ModuleTableItem({
   const handleCalibrate = (): void => {
     if (module.attachedModuleMatch != null) {
       if (getModuleTooHot(module.attachedModuleMatch)) {
-        makeSnackbar(t('module_wizard_flows:module_too_hot'))
+        makeSnackbar(t('module_wizard_flows:module_too_hot') as string)
       } else {
         chainLiveCommands(
           getModulePrepCommands(module.attachedModuleMatch),
@@ -150,7 +150,7 @@ function ModuleTableItem({
         setShowModuleWizard(true)
       }
     } else {
-      makeSnackbar(t('attach_module'))
+      makeSnackbar(t('attach_module') as string)
     }
   }
 
@@ -195,9 +195,9 @@ function ModuleTableItem({
     )
   } else if (isNonConnectingModule) {
     moduleStatus = (
-      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('n_a')}
-      </StyledText>
+      </LegacyStyledText>
     )
   } else if (
     isModuleReady &&
@@ -225,11 +225,11 @@ function ModuleTableItem({
     )
   } else if (!calibrationStatus?.complete) {
     moduleStatus = (
-      <StyledText as="p">
+      <LegacyStyledText as="p">
         {calibrationStatus?.reason === 'attach_pipette_failure_reason'
           ? t('calibration_required_attach_pipette_first')
           : t('calibration_required_calibrate_pipette_first')}
-      </StyledText>
+      </LegacyStyledText>
     )
   }
 
@@ -276,13 +276,13 @@ function ModuleTableItem({
         padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       >
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {getModuleDisplayName(module.moduleDef.model)}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
-          <LocationIcon
-            slotName={
+          <DeckInfoLabel
+            deckLabel={
               getModuleType(module.moduleDef.model) === THERMOCYCLER_MODULE_TYPE
                 ? TC_MODULE_LOCATION_OT3
                 : module.slotName

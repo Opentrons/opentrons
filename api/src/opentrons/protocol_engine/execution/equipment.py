@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import Optional, overload, Union
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
@@ -14,6 +14,7 @@ from opentrons.hardware_control.modules import (
     HeaterShaker,
     TempDeck,
     Thermocycler,
+    AbsorbanceReader,
 )
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine.state.module_substates import (
@@ -21,6 +22,7 @@ from opentrons.protocol_engine.state.module_substates import (
     HeaterShakerModuleId,
     TemperatureModuleId,
     ThermocyclerModuleId,
+    AbsorbanceReaderId,
 )
 from ..errors import (
     FailedToLoadPipetteError,
@@ -33,7 +35,8 @@ from ..resources import (
     ModelUtils,
     pipette_data_provider,
 )
-from ..state import StateStore, HardwareModule
+from ..state.state import StateStore
+from ..state.modules import HardwareModule
 from ..types import (
     LabwareLocation,
     DeckSlotLocation,
@@ -203,6 +206,7 @@ class EquipmentHandler:
         pipette_name: PipetteNameType,
         mount: MountType,
         pipette_id: Optional[str],
+        tip_overlap_version: Optional[str],
     ) -> LoadedPipetteData:
         """Ensure the requested pipette is attached.
 
@@ -211,6 +215,8 @@ class EquipmentHandler:
             mount: The mount on which pipette must be attached.
             pipette_id: An optional identifier to assign the pipette. If None, an
                 identifier will be generated.
+            tip_overlap_version: An optional specifier for the version of tip overlap data to use.
+                If None, defaults to v0. Does not need to be format checked - this function does it.
 
         Returns:
             A LoadedPipetteData object.
@@ -224,6 +230,11 @@ class EquipmentHandler:
             pipette_name.value
             if isinstance(pipette_name, PipetteNameType)
             else pipette_name
+        )
+        sanitized_overlap_version = (
+            pipette_data_provider.validate_and_default_tip_overlap_version(
+                tip_overlap_version
+            )
         )
 
         pipette_id = pipette_id or self._model_utils.generate_id()
@@ -257,14 +268,16 @@ class EquipmentHandler:
 
             serial_number = pipette_dict["pipette_id"]
             static_pipette_config = pipette_data_provider.get_pipette_static_config(
-                pipette_dict
+                pipette_dict=pipette_dict, tip_overlap_version=sanitized_overlap_version
             )
 
         else:
             serial_number = self._model_utils.generate_id(prefix="fake-serial-number-")
             static_pipette_config = (
                 self._virtual_pipette_data_provider.get_virtual_pipette_static_config(
-                    pipette_name_value, pipette_id
+                    pipette_name=pipette_name_value,
+                    pipette_id=pipette_id,
+                    tip_overlap_version=sanitized_overlap_version,
                 )
             )
         serial = serial_number or ""
@@ -367,9 +380,7 @@ class EquipmentHandler:
         )
 
     async def configure_for_volume(
-        self,
-        pipette_id: str,
-        volume: float,
+        self, pipette_id: str, volume: float, tip_overlap_version: Optional[str]
     ) -> LoadedConfigureForVolumeData:
         """Ensure the requested volume can be configured for the given pipette.
 
@@ -381,6 +392,11 @@ class EquipmentHandler:
             A LoadedConfiguredVolumeData object.
         """
         use_virtual_pipettes = self._state_store.config.use_virtual_pipettes
+        sanitized_overlap_version = (
+            pipette_data_provider.validate_and_default_tip_overlap_version(
+                tip_overlap_version
+            )
+        )
 
         if not use_virtual_pipettes:
             mount = self._state_store.pipettes.get_mount(pipette_id).to_hw_mount()
@@ -390,7 +406,7 @@ class EquipmentHandler:
 
             serial_number = pipette_dict["pipette_id"]
             static_pipette_config = pipette_data_provider.get_pipette_static_config(
-                pipette_dict
+                pipette_dict=pipette_dict, tip_overlap_version=sanitized_overlap_version
             )
 
         else:
@@ -401,7 +417,9 @@ class EquipmentHandler:
 
             serial_number = self._model_utils.generate_id(prefix="fake-serial-number-")
             static_pipette_config = self._virtual_pipette_data_provider.get_virtual_pipette_static_config_by_model_string(
-                model, pipette_id
+                pipette_model_string=model,
+                pipette_id=pipette_id,
+                tip_overlap_version=sanitized_overlap_version,
             )
 
         return LoadedConfigureForVolumeData(
@@ -486,6 +504,13 @@ class EquipmentHandler:
         self,
         module_id: ThermocyclerModuleId,
     ) -> Optional[Thermocycler]:
+        ...
+
+    @overload
+    def get_module_hardware_api(
+        self,
+        module_id: AbsorbanceReaderId,
+    ) -> Optional[AbsorbanceReader]:
         ...
 
     def get_module_hardware_api(self, module_id: str) -> Optional[AbstractModule]:

@@ -1,9 +1,12 @@
 """Aspirate command request, result, and implementation models."""
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type
+from typing import TYPE_CHECKING, Optional, Type, Union
+from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
 from typing_extensions import Literal
 
 from .pipetting_common import (
+    OverpressureError,
+    OverpressureErrorInternalData,
     PipetteIdMixin,
     AspirateVolumeMixin,
     FlowRateMixin,
@@ -11,7 +14,13 @@ from .pipetting_common import (
     BaseLiquidHandlingResult,
     DestinationPositionResult,
 )
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from .command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    DefinedErrorData,
+    SuccessData,
+)
 from ..errors.error_occurrence import ErrorOccurrence
 
 from opentrons.hardware_control import HardwareControlAPI
@@ -20,7 +29,8 @@ from ..types import WellLocation, WellOrigin, CurrentWell, DeckPoint
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler, PipettingHandler
-    from ..state import StateView
+    from ..resources import ModelUtils
+    from ..state.state import StateView
     from ..notes import CommandNoteAdder
 
 
@@ -41,9 +51,13 @@ class AspirateResult(BaseLiquidHandlingResult, DestinationPositionResult):
     pass
 
 
-class AspirateImplementation(
-    AbstractCommandImpl[AspirateParams, SuccessData[AspirateResult, None]]
-):
+_ExecuteReturn = Union[
+    SuccessData[AspirateResult, None],
+    DefinedErrorData[OverpressureError, OverpressureErrorInternalData],
+]
+
+
+class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]):
     """Aspirate command implementation."""
 
     def __init__(
@@ -53,6 +67,7 @@ class AspirateImplementation(
         hardware_api: HardwareControlAPI,
         movement: MovementHandler,
         command_note_adder: CommandNoteAdder,
+        model_utils: ModelUtils,
         **kwargs: object,
     ) -> None:
         self._pipetting = pipetting
@@ -60,10 +75,9 @@ class AspirateImplementation(
         self._hardware_api = hardware_api
         self._movement = movement
         self._command_note_adder = command_note_adder
+        self._model_utils = model_utils
 
-    async def execute(
-        self, params: AspirateParams
-    ) -> SuccessData[AspirateResult, None]:
+    async def execute(self, params: AspirateParams) -> _ExecuteReturn:
         """Move to and aspirate from the requested well.
 
         Raises:
@@ -105,20 +119,43 @@ class AspirateImplementation(
             current_well=current_well,
         )
 
-        volume = await self._pipetting.aspirate_in_place(
-            pipette_id=pipette_id,
-            volume=params.volume,
-            flow_rate=params.flowRate,
-            command_note_adder=self._command_note_adder,
-        )
-
-        return SuccessData(
-            public=AspirateResult(
-                volume=volume,
-                position=DeckPoint(x=position.x, y=position.y, z=position.z),
-            ),
-            private=None,
-        )
+        try:
+            volume_aspirated = await self._pipetting.aspirate_in_place(
+                pipette_id=pipette_id,
+                volume=params.volume,
+                flow_rate=params.flowRate,
+                command_note_adder=self._command_note_adder,
+            )
+        except PipetteOverpressureError as e:
+            return DefinedErrorData(
+                public=OverpressureError(
+                    id=self._model_utils.generate_id(),
+                    createdAt=self._model_utils.get_timestamp(),
+                    wrappedErrors=[
+                        ErrorOccurrence.from_failed(
+                            id=self._model_utils.generate_id(),
+                            createdAt=self._model_utils.get_timestamp(),
+                            error=e,
+                        )
+                    ],
+                    errorInfo={"retryLocation": (position.x, position.y, position.z)},
+                ),
+                private=OverpressureErrorInternalData(
+                    position=DeckPoint.construct(
+                        x=position.x, y=position.y, z=position.z
+                    )
+                ),
+            )
+        else:
+            return SuccessData(
+                public=AspirateResult(
+                    volume=volume_aspirated,
+                    position=DeckPoint.construct(
+                        x=position.x, y=position.y, z=position.z
+                    ),
+                ),
+                private=None,
+            )
 
 
 class Aspirate(BaseCommand[AspirateParams, AspirateResult, ErrorOccurrence]):

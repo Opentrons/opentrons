@@ -128,7 +128,7 @@ class TipNotAttachedError(ProtocolEngineError):
         details: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build a PIpetteNotAttachedError."""
+        """Build a PipetteNotAttachedError."""
         super().__init__(ErrorCodes.UNEXPECTED_TIP_REMOVAL, message, details, wrapping)
 
 
@@ -897,6 +897,19 @@ class LocationIsStagingSlotError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class LocationIsLidDockSlotError(ProtocolEngineError):
+    """Raised when referencing a labware on a lid dock slot when trying to get standard deck slot."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LocationIsLidDockSlotError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class FirmwareUpdateRequired(ProtocolEngineError):
     """Raised when the firmware needs to be updated."""
 
@@ -1017,3 +1030,16 @@ class NotSupportedOnRobotType(ProtocolEngineError):
         super().__init__(
             ErrorCodes.NOT_SUPPORTED_ON_ROBOT_TYPE, message, details, wrapping
         )
+
+
+class TipNotEmptyError(ProtocolEngineError):
+    """Raised when an operation requires an empty tip but is provided a tip with liquid."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a TipNotEmptyError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)

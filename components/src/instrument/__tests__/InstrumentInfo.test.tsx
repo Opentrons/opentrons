@@ -7,6 +7,7 @@ import { InstrumentInfo } from '../InstrumentInfo'
 import { InstrumentDiagram } from '../InstrumentDiagram'
 
 vi.mock('../InstrumentDiagram')
+
 const render = (props: React.ComponentProps<typeof InstrumentInfo>) => {
   return renderWithProviders(<InstrumentInfo {...props} />)[0]
 }

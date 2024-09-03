@@ -8,6 +8,7 @@ from opentrons.types import Location, Mount
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import FlowRates, find_value_for_api_version
+from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine import (
     DeckPoint,
     DropTipWellLocation,
@@ -29,12 +30,11 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.hardware_control.nozzle_manager import NozzleMap
-from . import deck_conflict
+from . import deck_conflict, overlap_versions
 
 from ..instrument import AbstractInstrument
 from .well import WellCore
@@ -83,6 +83,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._flow_rates = FlowRates(self)
 
         self.set_default_speed(speed=default_movement_speed)
+        self._liquid_presence_detection = bool(
+            self._engine_client.state.pipettes.get_liquid_presence_detection(pipette_id)
+        )
 
     @property
     def pipette_id(self) -> str:
@@ -121,18 +124,22 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         """
         if well_core is None:
             if not in_place:
-                self._engine_client.move_to_coordinates(
-                    pipette_id=self._pipette_id,
-                    coordinates=DeckPoint(
-                        x=location.point.x, y=location.point.y, z=location.point.z
-                    ),
-                    minimum_z_height=None,
-                    force_direct=False,
-                    speed=None,
+                self._engine_client.execute_command(
+                    cmd.MoveToCoordinatesParams(
+                        pipetteId=self._pipette_id,
+                        coordinates=DeckPoint(
+                            x=location.point.x, y=location.point.y, z=location.point.z
+                        ),
+                        minimumZHeight=None,
+                        forceDirect=False,
+                        speed=None,
+                    )
                 )
 
-            self._engine_client.aspirate_in_place(
-                pipette_id=self._pipette_id, volume=volume, flow_rate=flow_rate
+            self._engine_client.execute_command(
+                cmd.AspirateInPlaceParams(
+                    pipetteId=self._pipette_id, volume=volume, flowRate=flow_rate
+                )
             )
 
         else:
@@ -153,13 +160,15 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 well_name=well_name,
                 well_location=well_location,
             )
-            self._engine_client.aspirate(
-                pipette_id=self._pipette_id,
-                labware_id=labware_id,
-                well_name=well_name,
-                well_location=well_location,
-                volume=volume,
-                flow_rate=flow_rate,
+            self._engine_client.execute_command(
+                cmd.AspirateParams(
+                    pipetteId=self._pipette_id,
+                    labwareId=labware_id,
+                    wellName=well_name,
+                    wellLocation=well_location,
+                    volume=volume,
+                    flowRate=flow_rate,
+                )
             )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
@@ -200,21 +209,27 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                         disposal_location=location, force_direct=False, speed=None
                     )
                 else:
-                    self._engine_client.move_to_coordinates(
-                        pipette_id=self._pipette_id,
-                        coordinates=DeckPoint(
-                            x=location.point.x, y=location.point.y, z=location.point.z
-                        ),
-                        minimum_z_height=None,
-                        force_direct=False,
-                        speed=None,
+                    self._engine_client.execute_command(
+                        cmd.MoveToCoordinatesParams(
+                            pipetteId=self._pipette_id,
+                            coordinates=DeckPoint(
+                                x=location.point.x,
+                                y=location.point.y,
+                                z=location.point.z,
+                            ),
+                            minimumZHeight=None,
+                            forceDirect=False,
+                            speed=None,
+                        )
                     )
 
-            self._engine_client.dispense_in_place(
-                pipette_id=self._pipette_id,
-                volume=volume,
-                flow_rate=flow_rate,
-                push_out=push_out,
+            self._engine_client.execute_command(
+                cmd.DispenseInPlaceParams(
+                    pipetteId=self._pipette_id,
+                    volume=volume,
+                    flowRate=flow_rate,
+                    pushOut=push_out,
+                )
             )
         else:
             if isinstance(location, (TrashBin, WasteChute)):
@@ -236,14 +251,16 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 well_name=well_name,
                 well_location=well_location,
             )
-            self._engine_client.dispense(
-                pipette_id=self._pipette_id,
-                labware_id=labware_id,
-                well_name=well_name,
-                well_location=well_location,
-                volume=volume,
-                flow_rate=flow_rate,
-                push_out=push_out,
+            self._engine_client.execute_command(
+                cmd.DispenseParams(
+                    pipetteId=self._pipette_id,
+                    labwareId=labware_id,
+                    wellName=well_name,
+                    wellLocation=well_location,
+                    volume=volume,
+                    flowRate=flow_rate,
+                    pushOut=push_out,
+                )
             )
 
         if isinstance(location, (TrashBin, WasteChute)):
@@ -274,18 +291,22 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                         disposal_location=location, force_direct=False, speed=None
                     )
                 else:
-                    self._engine_client.move_to_coordinates(
-                        pipette_id=self._pipette_id,
-                        coordinates=DeckPoint(
-                            x=location.point.x, y=location.point.y, z=location.point.z
-                        ),
-                        force_direct=False,
-                        minimum_z_height=None,
-                        speed=None,
+                    self._engine_client.execute_command(
+                        cmd.MoveToCoordinatesParams(
+                            pipetteId=self._pipette_id,
+                            coordinates=DeckPoint(
+                                x=location.point.x,
+                                y=location.point.y,
+                                z=location.point.z,
+                            ),
+                            forceDirect=False,
+                            minimumZHeight=None,
+                            speed=None,
+                        )
                     )
 
-            self._engine_client.blow_out_in_place(
-                pipette_id=self._pipette_id, flow_rate=flow_rate
+            self._engine_client.execute_command(
+                cmd.BlowOutInPlaceParams(pipetteId=self._pipette_id, flowRate=flow_rate)
             )
         else:
             if isinstance(location, (TrashBin, WasteChute)):
@@ -307,14 +328,16 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 well_name=well_name,
                 well_location=well_location,
             )
-            self._engine_client.blow_out(
-                pipette_id=self._pipette_id,
-                labware_id=labware_id,
-                well_name=well_name,
-                well_location=well_location,
-                # TODO(jbl 2022-11-07) PAPIv2 does not have an argument for rate and
-                #   this also needs to be refactored along with other flow rate related issues
-                flow_rate=flow_rate,
+            self._engine_client.execute_command(
+                cmd.BlowOutParams(
+                    pipetteId=self._pipette_id,
+                    labwareId=labware_id,
+                    wellName=well_name,
+                    wellLocation=well_location,
+                    # TODO(jbl 2022-11-07) PAPIv2 does not have an argument for rate and
+                    #   this also needs to be refactored along with other flow rate related issues
+                    flowRate=flow_rate,
+                )
             )
 
         if isinstance(location, (TrashBin, WasteChute)):
@@ -355,13 +378,15 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_name=well_name,
             well_location=well_location,
         )
-        self._engine_client.touch_tip(
-            pipette_id=self._pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
-            well_location=well_location,
-            radius=radius,
-            speed=speed,
+        self._engine_client.execute_command(
+            cmd.TouchTipParams(
+                pipetteId=self._pipette_id,
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+                radius=radius,
+                speed=speed,
+            )
         )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
@@ -409,11 +434,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_location=well_location,
         )
 
-        self._engine_client.pick_up_tip_wait_for_recovery(
-            pipette_id=self._pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
-            well_location=well_location,
+        self._engine_client.execute_command(
+            cmd.PickUpTipParams(
+                pipetteId=self._pipette_id,
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+            )
         )
 
         # Set the "last location" unconditionally, even if the command failed
@@ -471,13 +498,15 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_name=well_name,
             well_location=well_location,
         )
-        self._engine_client.drop_tip(
-            pipette_id=self._pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
-            well_location=well_location,
-            home_after=home_after,
-            alternateDropLocation=alternate_drop_location,
+        self._engine_client.execute_command(
+            cmd.DropTipParams(
+                pipetteId=self._pipette_id,
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+                homeAfter=home_after,
+                alternateDropLocation=alternate_drop_location,
+            )
         )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
@@ -514,15 +543,17 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
         if isinstance(disposal_location, TrashBin):
             addressable_area_name = disposal_location.area_name
-            self._engine_client.move_to_addressable_area_for_drop_tip(
-                pipette_id=self._pipette_id,
-                addressable_area_name=addressable_area_name,
-                offset=offset,
-                force_direct=force_direct,
-                speed=speed,
-                minimum_z_height=None,
-                alternate_drop_location=alternate_tip_drop,
-                ignore_tip_configuration=True,
+            self._engine_client.execute_command(
+                cmd.MoveToAddressableAreaForDropTipParams(
+                    pipetteId=self._pipette_id,
+                    addressableAreaName=addressable_area_name,
+                    offset=offset,
+                    forceDirect=force_direct,
+                    speed=speed,
+                    minimumZHeight=None,
+                    alternateDropLocation=alternate_tip_drop,
+                    ignoreTipConfiguration=True,
+                )
             )
 
         if isinstance(disposal_location, WasteChute):
@@ -533,19 +564,23 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 96: "96ChannelWasteChute",
             }[num_channels]
 
-            self._engine_client.move_to_addressable_area(
-                pipette_id=self._pipette_id,
-                addressable_area_name=addressable_area_name,
-                offset=offset,
-                force_direct=force_direct,
-                speed=speed,
-                minimum_z_height=None,
+            self._engine_client.execute_command(
+                cmd.MoveToAddressableAreaParams(
+                    pipetteId=self._pipette_id,
+                    addressableAreaName=addressable_area_name,
+                    offset=offset,
+                    forceDirect=force_direct,
+                    speed=speed,
+                    minimumZHeight=None,
+                )
             )
 
     def _drop_tip_in_place(self, home_after: Optional[bool]) -> None:
-        self._engine_client.drop_tip_in_place(
-            pipette_id=self._pipette_id,
-            home_after=home_after,
+        self._engine_client.execute_command(
+            cmd.DropTipInPlaceParams(
+                pipetteId=self._pipette_id,
+                homeAfter=home_after,
+            )
         )
 
     def home(self) -> None:
@@ -553,13 +588,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         plunger_axis = self._engine_client.state.pipettes.get_plunger_axis(
             self._pipette_id
         )
-        self._engine_client.home([z_axis, plunger_axis])
+        self._engine_client.execute_command(cmd.HomeParams(axes=[z_axis, plunger_axis]))
 
     def home_plunger(self) -> None:
         plunger_axis = self._engine_client.state.pipettes.get_plunger_axis(
             self._pipette_id
         )
-        self._engine_client.home([plunger_axis])
+        self._engine_client.execute_command(cmd.HomeParams(axes=[plunger_axis]))
 
     def move_to(
         self,
@@ -582,14 +617,16 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 )
             )
 
-            self._engine_client.move_to_well(
-                pipette_id=self._pipette_id,
-                labware_id=labware_id,
-                well_name=well_name,
-                well_location=well_location,
-                minimum_z_height=minimum_z_height,
-                force_direct=force_direct,
-                speed=speed,
+            self._engine_client.execute_command(
+                cmd.MoveToWellParams(
+                    pipetteId=self._pipette_id,
+                    labwareId=labware_id,
+                    wellName=well_name,
+                    wellLocation=well_location,
+                    minimumZHeight=minimum_z_height,
+                    forceDirect=force_direct,
+                    speed=speed,
+                )
             )
         else:
             if isinstance(location, (TrashBin, WasteChute)):
@@ -597,14 +634,16 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                     disposal_location=location, force_direct=force_direct, speed=speed
                 )
             else:
-                self._engine_client.move_to_coordinates(
-                    pipette_id=self._pipette_id,
-                    coordinates=DeckPoint(
-                        x=location.point.x, y=location.point.y, z=location.point.z
-                    ),
-                    minimum_z_height=minimum_z_height,
-                    force_direct=force_direct,
-                    speed=speed,
+                self._engine_client.execute_command(
+                    cmd.MoveToCoordinatesParams(
+                        pipetteId=self._pipette_id,
+                        coordinates=DeckPoint(
+                            x=location.point.x, y=location.point.y, z=location.point.z
+                        ),
+                        minimumZHeight=minimum_z_height,
+                        forceDirect=force_direct,
+                        speed=speed,
+                    )
                 )
         if isinstance(location, (TrashBin, WasteChute)):
             self._protocol_core.set_last_location(location=None, mount=self.get_mount())
@@ -710,21 +749,17 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             self._pipette_id
         )
 
+    def get_liquid_presence_detection(self) -> bool:
+        return self._liquid_presence_detection
+
     def is_tip_tracking_available(self) -> bool:
-        primary_nozzle = self._engine_client.state.pipettes.get_primary_nozzle(
-            self._pipette_id
-        )
         if self.get_nozzle_configuration() == NozzleConfigurationType.FULL:
             return True
         else:
             if self.get_channels() == 96:
                 return True
             if self.get_channels() == 8:
-                # TODO: (cb, 03/06/24): Enable automatic tip tracking on the 8 channel pipettes once PAPI support exists
-                return (
-                    self.get_nozzle_configuration() == NozzleConfigurationType.SINGLE
-                    and primary_nozzle == "H1"
-                )
+                return True
         return False
 
     def set_flow_rate(
@@ -743,19 +778,31 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             assert blow_out > 0
             self._blow_out_flow_rate = blow_out
 
+    def set_liquid_presence_detection(self, enable: bool) -> None:
+        self._liquid_presence_detection = enable
+
     def configure_for_volume(self, volume: float) -> None:
-        self._engine_client.configure_for_volume(
-            pipette_id=self._pipette_id, volume=volume
+        self._engine_client.execute_command(
+            cmd.ConfigureForVolumeParams(
+                pipetteId=self._pipette_id,
+                volume=volume,
+                tipOverlapNotAfterVersion=overlap_versions.overlap_for_api_version(
+                    self._protocol_core.api_version
+                ),
+            )
         )
 
     def prepare_to_aspirate(self) -> None:
-        self._engine_client.prepare_to_aspirate(pipette_id=self._pipette_id)
+        self._engine_client.execute_command(
+            cmd.PrepareToAspirateParams(pipetteId=self._pipette_id)
+        )
 
     def configure_nozzle_layout(
         self,
         style: NozzleLayout,
         primary_nozzle: Optional[str],
         front_right_nozzle: Optional[str],
+        back_left_nozzle: Optional[str],
     ) -> None:
         if style == NozzleLayout.COLUMN:
             configuration_model: NozzleLayoutConfigurationType = (
@@ -767,11 +814,17 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             configuration_model = RowNozzleLayoutConfiguration(
                 primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
             )
-        elif style == NozzleLayout.QUADRANT:
-            assert front_right_nozzle is not None
+        elif style == NozzleLayout.QUADRANT or style == NozzleLayout.PARTIAL_COLUMN:
+            assert (
+                # We make sure to set these nozzles in the calling function
+                # if using QUADRANT or PARTIAL_COLUMN. Asserting only for type verification here.
+                front_right_nozzle is not None
+                and back_left_nozzle is not None
+            ), f"Both front right and back left nozzles are required for {style} configuration."
             configuration_model = QuadrantNozzleLayoutConfiguration(
                 primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle),
                 frontRightNozzle=front_right_nozzle,
+                backLeftNozzle=back_left_nozzle,
             )
         elif style == NozzleLayout.SINGLE:
             configuration_model = SingleNozzleLayoutConfiguration(
@@ -779,11 +832,89 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             )
         else:
             configuration_model = AllNozzleLayoutConfiguration()
-        self._engine_client.configure_nozzle_layout(
-            pipette_id=self._pipette_id, configuration_params=configuration_model
+        self._engine_client.execute_command(
+            cmd.ConfigureNozzleLayoutParams(
+                pipetteId=self._pipette_id, configurationParams=configuration_model
+            )
         )
 
     def retract(self) -> None:
         """Retract this instrument to the top of the gantry."""
         z_axis = self._engine_client.state.pipettes.get_z_axis(self._pipette_id)
-        self._engine_client.home([z_axis])
+        self._engine_client.execute_command(cmd.HomeParams(axes=[z_axis]))
+
+    def detect_liquid_presence(self, well_core: WellCore, loc: Location) -> bool:
+        labware_id = well_core.labware_id
+        well_name = well_core.get_name()
+        well_location = WellLocation(
+            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+        )
+
+        # The error handling here is a bit nuanced and also a bit broken:
+        #
+        # - If the hardware detects liquid, the `tryLiquidProbe` engine command will
+        #   succeed and return a height, which we'll convert to a `True` return.
+        #   Okay so far.
+        #
+        # - If the hardware detects no liquid, the `tryLiquidProbe` engine command will
+        #   succeed and return `None`, which we'll convert to a `False` return.
+        #   Still okay so far.
+        #
+        # - If there is any other error within the `tryLiquidProbe` command, things get
+        #   messy. It may kick the run into recovery mode. At that point, all bets are
+        #   off--we lose our guarantee of having a `tryLiquidProbe` command whose
+        #   `result` we can inspect. We don't know how to deal with that here, so we
+        #   currently propagate the exception up, which will quickly kill the protocol,
+        #   after a potential split second of recovery mode. It's unclear what would
+        #   be good user-facing behavior here, but it's unfortunate to kill the protocol
+        #   for an error that the engine thinks should be recoverable.
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.TryLiquidProbeParams(
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+                pipetteId=self.pipette_id,
+            )
+        )
+
+        self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
+
+        return result.z_position is not None
+
+    def liquid_probe_with_recovery(self, well_core: WellCore, loc: Location) -> None:
+        labware_id = well_core.labware_id
+        well_name = well_core.get_name()
+        well_location = WellLocation(
+            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
+        )
+        self._engine_client.execute_command(
+            cmd.LiquidProbeParams(
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+                pipetteId=self.pipette_id,
+            )
+        )
+
+        self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
+
+    def liquid_probe_without_recovery(
+        self, well_core: WellCore, loc: Location
+    ) -> float:
+        labware_id = well_core.labware_id
+        well_name = well_core.get_name()
+        well_location = WellLocation(
+            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
+        )
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.LiquidProbeParams(
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+                pipetteId=self.pipette_id,
+            )
+        )
+
+        self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
+
+        return result.z_position

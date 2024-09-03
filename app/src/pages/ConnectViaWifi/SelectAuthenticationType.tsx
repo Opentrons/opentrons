@@ -29,7 +29,9 @@ export function SelectAuthenticationType({
       <RobotSetupHeader
         buttonText={i18n.format(t('continue'), 'capitalize')}
         header={t('select_a_security_type')}
-        onClickBack={() => setCurrentOption('WifiList')}
+        onClickBack={() => {
+          setCurrentOption('WifiList')
+        }}
         onClickButton={() => {
           selectedAuthType !== 'none'
             ? setCurrentOption('SetWifiCred')

@@ -18,6 +18,7 @@ import {
   FLEX_ROBOT_TYPE,
   WASTE_CHUTE_CUTOUT,
   getAreSlotsAdjacent,
+  MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 import { actions as stepFormActions } from '../../../step-forms'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
@@ -165,7 +166,10 @@ export function CreateFileWizard(): JSX.Element | null {
     }
     const newProtocolFields = values.fields
 
-    if (!hasUnsavedChanges || window.confirm(t('alert:confirm_create_new'))) {
+    if (
+      !hasUnsavedChanges ||
+      window.confirm(t('alert:confirm_create_new') as string)
+    ) {
       dispatch(fileActions.createNewProtocol(newProtocolFields))
       const pipettesById: Record<string, PipetteOnDeck> = pipettes.reduce(
         (acc, pipette) => ({ ...acc, [uuid()]: pipette }),
@@ -253,6 +257,7 @@ export function CreateFileWizard(): JSX.Element | null {
               createModuleWithNoSlot({
                 model: moduleArgs.model,
                 type: moduleArgs.type,
+                isMagneticBlock: moduleArgs.type === MAGNETIC_BLOCK_TYPE,
               })
             )
       })
@@ -265,7 +270,10 @@ export function CreateFileWizard(): JSX.Element | null {
       const newTiprackModels: string[] = uniq(
         pipettes.flatMap(pipette => pipette.tiprackDefURI)
       )
-      const FLEX_MIDDLE_SLOTS = ['C2', 'B2', 'A2']
+      const hasMagneticBlock = modules.some(
+        module => module.type === MAGNETIC_BLOCK_TYPE
+      )
+      const FLEX_MIDDLE_SLOTS = hasMagneticBlock ? [] : ['C2', 'B2', 'A2']
       const hasOt2TC = modules.find(
         module => module.type === THERMOCYCLER_MODULE_TYPE
       )
@@ -412,6 +420,7 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
   } = props
   const { ...formProps } = useForm<FormState>({
     defaultValues: initialFormState,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     resolver: yupResolver(validationSchema),
   })
 
@@ -433,7 +442,9 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
                 {...formProps}
                 goBack={goBack}
                 proceed={() => {
-                  handleProceedRobotType(formProps.getValues().fields.robotType)
+                  handleProceedRobotType(
+                    formProps.getValues().fields.robotType ?? OT2_ROBOT_TYPE
+                  )
                   proceed()
                 }}
               />
@@ -464,7 +475,9 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
             return (
               <ModulesAndOtherTile
                 {...formProps}
-                proceed={() => createProtocolFile(formProps.getValues())}
+                proceed={() => {
+                  createProtocolFile(formProps.getValues())
+                }}
                 goBack={goBack}
               />
             )

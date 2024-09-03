@@ -20,7 +20,7 @@ from ..commands import (
     CommandDefinedErrorData,
     CommandPrivateResult,
 )
-from ..error_recovery_policy import ErrorRecoveryType
+from ..error_recovery_policy import ErrorRecoveryPolicy, ErrorRecoveryType
 from ..notes.notes import CommandNote
 from ..types import (
     LabwareOffsetCreate,
@@ -36,7 +36,6 @@ class PlayAction:
     """Start or resume processing commands in the engine."""
 
     requested_at: datetime
-    deck_configuration: Optional[DeckConfigurationType]
 
 
 class PauseSource(str, Enum):
@@ -221,12 +220,19 @@ class AddLiquidAction:
 
 
 @dataclass(frozen=True)
+class SetDeckConfigurationAction:
+    """See `ProtocolEngine.set_deck_configuration()`."""
+
+    deck_configuration: Optional[DeckConfigurationType]
+
+
+@dataclass(frozen=True)
 class AddAddressableAreaAction:
     """Add a single addressable area to state.
 
-    This differs from the deck configuration in PlayAction which sends over a mapping of cutout fixtures.
-    This action will only load one addressable area and that should be pre-validated before being sent via
-    the action.
+    This differs from the deck configuration in ProvideDeckConfigurationAction which
+    sends over a mapping of cutout fixtures. This action will only load one addressable
+    area and that should be pre-validated before being sent via the action.
     """
 
     addressable_area: AddressableAreaLocation
@@ -260,6 +266,24 @@ class SetPipetteMovementSpeedAction:
     speed: Optional[float]
 
 
+@dataclass(frozen=True)
+class AddAbsorbanceReaderLidAction:
+    """Add the absorbance reader lid id to the absorbance reader module substate.
+
+    This action is dispatched the absorbance reader module is first loaded.
+    """
+
+    module_id: str
+    lid_id: str
+
+
+@dataclass(frozen=True)
+class SetErrorRecoveryPolicyAction:
+    """See `ProtocolEngine.set_error_recovery_policy()`."""
+
+    error_recovery_policy: ErrorRecoveryPolicy
+
+
 Action = Union[
     PlayAction,
     PauseAction,
@@ -275,8 +299,11 @@ Action = Union[
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddModuleAction,
+    SetDeckConfigurationAction,
     AddAddressableAreaAction,
     AddLiquidAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
+    AddAbsorbanceReaderLidAction,
+    SetErrorRecoveryPolicyAction,
 ]

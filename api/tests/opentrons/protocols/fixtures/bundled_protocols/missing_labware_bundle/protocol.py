@@ -1,4 +1,7 @@
-def run(protocol_context):
+from opentrons.protocol_api.protocol_context import ProtocolContext
+
+
+def run(protocol_context: ProtocolContext) -> None:
     tip_rack = protocol_context.load_labware("opentrons_96_tiprack_10ul", "3")
     plate = protocol_context.load_labware("biorad_96_wellplate_200ul_pcr", "1")
 

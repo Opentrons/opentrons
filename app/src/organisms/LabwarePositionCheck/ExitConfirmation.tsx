@@ -14,7 +14,7 @@ import {
   SecondaryButton,
   SIZE_3,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -66,9 +66,9 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
                 ? t('remove_probe_before_exit')
                 : t('exit_screen_title')}
             </ConfirmationHeader>
-            <StyledText as="p" marginTop={SPACING.spacing8}>
+            <LegacyStyledText as="p" marginTop={SPACING.spacing8}>
               {t('exit_screen_subtitle')}
-            </StyledText>
+            </LegacyStyledText>
           </>
         )}
       </Flex>

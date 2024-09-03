@@ -45,7 +45,7 @@ def get_liquid_definition_for(
                         }
                     )
                 },
-                "defaultTipOverlapDictionary": {},
+                "versionedTipOverlapDictionary": {"v0": {}},
                 "maxVolume": 30,
                 "minVolume": 1,
                 "defaultTipracks": [],
@@ -78,7 +78,7 @@ def get_liquid_definition_for(
                         }
                     )
                 },
-                "defaultTipOverlapDictionary": {},
+                "versionedTipOverlapDictionary": {"v0": {}},
                 "maxVolume": 100,
                 "minVolume": 5,
                 "defaultTipracks": [],

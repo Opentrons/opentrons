@@ -8,18 +8,20 @@ import {
   JUSTIFY_END,
   ALIGN_FLEX_END,
   PrimaryButton,
+  Modal,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
-import { Skeleton } from '.'
+import { Skeleton as SkeletonComponent } from '.'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof SkeletonComponent> = {
   title: 'App/Atoms/Skeleton',
-  component: Skeleton,
-} as Meta
+  component: SkeletonComponent,
+}
 
-const Template: Story<React.ComponentProps<typeof Skeleton>> = args => {
+export default meta
+
+const DemoSkeleton = (args): JSX.Element => {
   return (
     <Modal width="47rem">
       <Flex flexDirection={DIRECTION_COLUMN} height="24.6rem">
@@ -35,13 +37,21 @@ const Template: Story<React.ComponentProps<typeof Skeleton>> = args => {
             flex="1"
             gridGap={SPACING.spacing16}
           >
-            <Skeleton height="1.5rem" width="100px" backgroundSize="47rem" />
-            <Skeleton {...args} />
-            <Skeleton {...args} />
-            <Skeleton {...args} />
+            <SkeletonComponent
+              height="1.5rem"
+              width="100px"
+              backgroundSize="47rem"
+            />
+            <SkeletonComponent {...args} />
+            <SkeletonComponent {...args} />
+            <SkeletonComponent {...args} />
           </Flex>
           <Flex flex="1" justifyContent={JUSTIFY_CENTER}>
-            <Skeleton height="12.5rem" width="100%" backgroundSize="47rem" />
+            <SkeletonComponent
+              height="12.5rem"
+              width="100%"
+              backgroundSize="47rem"
+            />
           </Flex>
         </Flex>
         <Flex
@@ -58,9 +68,10 @@ const Template: Story<React.ComponentProps<typeof Skeleton>> = args => {
   )
 }
 
-export const Primary = Template.bind({})
-Primary.args = {
-  width: '15.625rem',
-  height: '1.25rem',
-  backgroundSize: '47rem',
+type Story = StoryObj<typeof SkeletonComponent>
+
+export const Skeleton: Story = {
+  render: () => (
+    <DemoSkeleton width="15.625rem" height="1.25rem" backgroundSize="47rem" />
+  ),
 }

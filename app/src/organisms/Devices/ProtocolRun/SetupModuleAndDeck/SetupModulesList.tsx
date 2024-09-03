@@ -13,9 +13,10 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   SPACING,
-  StyledText,
   TOOLTIP_LEFT,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -35,7 +36,6 @@ import {
 
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
-import { Tooltip } from '../../../../atoms/Tooltip'
 import { useChainLiveCommands } from '../../../../resources/runs'
 import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
@@ -214,18 +214,26 @@ export function ModulesListItem({
           }
         `}
         marginTop={SPACING.spacing4}
-        onClick={() => setShowModuleSetupModal(true)}
+        onClick={() => {
+          setShowModuleSetupModal(true)
+        }}
       >
         <Flex flexDirection={DIRECTION_ROW}>
-          <StyledText as="p">{t('view_setup_instructions')}</StyledText>
+          <LegacyStyledText as="p">
+            {t('view_setup_instructions')}
+          </LegacyStyledText>
         </Flex>
       </Btn>
     )
   } else if (moduleModel === MAGNETIC_BLOCK_V1) {
     subText = (
-      <StyledText as="p" marginLeft={SPACING.spacing20} color={COLORS.grey50}>
+      <LegacyStyledText
+        as="p"
+        marginLeft={SPACING.spacing20}
+        color={COLORS.grey50}
+      >
         {t('no_usb_connection_required')}
-      </StyledText>
+      </LegacyStyledText>
     )
   }
 
@@ -288,7 +296,9 @@ export function ModulesListItem({
     <>
       {showLocationConflictModal && cutoutIdForSlotName != null ? (
         <LocationConflictModal
-          onCloseClick={() => setShowLocationConflictModal(false)}
+          onCloseClick={() => {
+            setShowLocationConflictModal(false)
+          }}
           cutoutId={cutoutIdForSlotName}
           requiredModule={moduleModel}
           deckDef={deckDef}
@@ -298,7 +308,9 @@ export function ModulesListItem({
       {showModuleWizard && attachedModuleMatch != null ? (
         <ModuleWizardFlows
           attachedModule={attachedModuleMatch}
-          closeFlow={() => setShowModuleWizard(false)}
+          closeFlow={() => {
+            setShowModuleWizard(false)
+          }}
           isPrepCommandLoading={isCommandMutationLoading}
           prepCommandErrorMessage={
             prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
@@ -315,7 +327,9 @@ export function ModulesListItem({
       >
         {showModuleSetupModal && heaterShakerModuleFromProtocol != null ? (
           <ModuleSetupModal
-            close={() => setShowModuleSetupModal(false)}
+            close={() => {
+              setShowModuleSetupModal(false)
+            }}
             moduleDisplayName={
               heaterShakerModuleFromProtocol.moduleDef.displayName
             }
@@ -329,12 +343,12 @@ export function ModulesListItem({
           <Flex alignItems={JUSTIFY_CENTER} width="45%">
             <img width="60px" height="54px" src={getModuleImage(moduleModel)} />
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText
+              <LegacyStyledText
                 css={TYPOGRAPHY.pSemiBold}
                 marginLeft={SPACING.spacing20}
               >
                 {displayName}
-              </StyledText>
+              </LegacyStyledText>
               {subText}
             </Flex>
           </Flex>
@@ -343,19 +357,19 @@ export function ModulesListItem({
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_CENTER}
           >
-            <StyledText as="p">
+            <LegacyStyledText as="p">
               {getModuleType(moduleModel) === 'thermocyclerModuleType'
                 ? isFlex
                   ? TC_MODULE_LOCATION_OT3
                   : TC_MODULE_LOCATION_OT2
                 : slotName}
-            </StyledText>
+            </LegacyStyledText>
             {attachedModuleMatch?.usbPort.port != null ? (
-              <StyledText as="p">
+              <LegacyStyledText as="p">
                 {t('usb_port_number', {
                   port: attachedModuleMatch.usbPort.port,
                 })}
-              </StyledText>
+              </LegacyStyledText>
             ) : null}
           </Flex>
           <Flex
@@ -376,11 +390,13 @@ export function ModulesListItem({
                 />
                 <TertiaryButton
                   width="max-content"
-                  onClick={() => setShowLocationConflictModal(true)}
+                  onClick={() => {
+                    setShowLocationConflictModal(true)
+                  }}
                 >
-                  <StyledText as="label" cursor="pointer">
+                  <LegacyStyledText as="label" cursor="pointer">
                     {t('resolve')}
-                  </StyledText>
+                  </LegacyStyledText>
                 </TertiaryButton>
               </Flex>
             ) : moduleModel === MAGNETIC_BLOCK_V1 ? (

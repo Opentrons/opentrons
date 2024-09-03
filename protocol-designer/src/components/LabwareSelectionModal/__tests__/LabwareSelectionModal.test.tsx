@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { fireEvent, screen, cleanup } from '@testing-library/react'
+import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
 import {
   renderWithProviders,
   nestedTextMatcher,
@@ -14,7 +14,7 @@ import {
   ADAPTER_96_CHANNEL,
   getLabwareCompatibleWithAdapter,
 } from '../../../utils/labwareModuleCompatibility'
-import { i18n } from '../../../localization'
+import { i18n } from '../../../assets/localization'
 import { LabwareSelectionModal } from '../LabwareSelectionModal'
 import {
   getInitialDeckSetup,
@@ -72,9 +72,6 @@ describe('LabwareSelectionModal', () => {
       },
     })
     vi.mocked(getCustomLabwareDefsByURI).mockReturnValue({})
-  })
-  afterEach(() => {
-    cleanup()
   })
   it('should NOT filter out labware above 57 mm when the slot is NOT next to a heater shaker', () => {
     render()

@@ -105,8 +105,8 @@ describe('CheckItem', () => {
         },
       ])
     )
-    const { getByRole } = render(props)
-    fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm placement' }))
     await new Promise((resolve, reject) => setTimeout(resolve))
     expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
@@ -160,8 +160,8 @@ describe('CheckItem', () => {
         },
       ])
     )
-    const { getByRole } = render(props)
-    fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm placement' }))
     await new Promise((resolve, reject) => setTimeout(resolve))
 
     expect(props.chainRunCommands).toHaveBeenNthCalledWith(
@@ -213,8 +213,8 @@ describe('CheckItem', () => {
         },
       ])
     )
-    const { getByRole } = render(props)
-    fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm placement' }))
     await new Promise((resolve, reject) => setTimeout(resolve))
 
     expect(props.chainRunCommands).toHaveBeenNthCalledWith(
@@ -258,9 +258,9 @@ describe('CheckItem', () => {
       labwareId: mockCompletedAnalysis.labware[1].id,
       adapterId: 'labwareId2',
     }
-    const { getByText } = render(props)
-    getByText('Prepare labware in Slot D1')
-    getByText(
+    render(props)
+    screen.getByText('Prepare labware in Slot D1')
+    screen.getByText(
       nestedTextMatcher(
         'Place a Mock Labware Definition followed by a Mock Labware Definition into Slot D1'
       )
@@ -283,8 +283,8 @@ describe('CheckItem', () => {
         },
       ])
     )
-    const { getByRole } = render(props)
-    fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm placement' }))
     await new Promise((resolve, reject) => setTimeout(resolve))
 
     expect(props.chainRunCommands).toHaveBeenNthCalledWith(
@@ -341,8 +341,8 @@ describe('CheckItem', () => {
         },
       ],
     }
-    const { getByRole } = render(props)
-    fireEvent.click(getByRole('button', { name: 'Go back' }))
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Go back' }))
     await new Promise((resolve, reject) => setTimeout(resolve))
 
     expect(props.chainRunCommands).toHaveBeenNthCalledWith(
@@ -391,8 +391,8 @@ describe('CheckItem', () => {
         },
       ],
     }
-    const { getByRole } = render(props)
-    fireEvent.click(getByRole('button', { name: 'Confirm position' }))
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm position' }))
     await new Promise((resolve, reject) => setTimeout(resolve))
 
     expect(props.chainRunCommands).toHaveBeenNthCalledWith(
@@ -459,7 +459,7 @@ describe('CheckItem', () => {
         ],
       },
     }
-    const { getByRole } = render(props)
+    render(props)
     await new Promise((resolve, reject) => setTimeout(resolve))
 
     expect(props.chainRunCommands).toHaveBeenNthCalledWith(
@@ -480,7 +480,7 @@ describe('CheckItem', () => {
       ],
       false
     )
-    fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm placement' }))
 
     expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       2,
@@ -562,8 +562,8 @@ describe('CheckItem', () => {
       ])
     )
 
-    const { getByRole } = render(props)
-    fireEvent.click(getByRole('button', { name: 'Confirm position' }))
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm position' }))
     await new Promise((resolve, reject) => setTimeout(resolve))
 
     expect(props.chainRunCommands).toHaveBeenNthCalledWith(
@@ -664,8 +664,8 @@ describe('CheckItem', () => {
         },
       ])
     )
-    const { getByRole } = render(props)
-    fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm placement' }))
     await new Promise((resolve, reject) => setTimeout(resolve))
 
     expect(props.chainRunCommands).toHaveBeenNthCalledWith(

@@ -15,7 +15,6 @@ export const fontSizeH4 = '0.813rem' //  13px
 export const fontSizeH6 = '0.563rem' // 9px
 export const fontSizeP = '0.8125rem' // 13px
 export const fontSizeLabel = '0.6875rem' // 11px
-// this is redundant but we need this for captions and it makes more sense to call it caption rather than re-using fsh6
 export const fontSizeCaption = '0.625rem' // 10px
 
 // Font Weights
@@ -35,6 +34,7 @@ export const lineHeight20 = '1.25rem' // 20px
 export const lineHeight18 = '1.125rem' // 18px
 export const lineHeight16 = '1rem' // 16px
 export const lineHeight12 = '0.75rem' // 12px
+export const lineHeightNormal = 'normal' // normal
 
 // font styles
 export const fontStyleNormal = 'normal'

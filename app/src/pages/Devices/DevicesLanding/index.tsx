@@ -16,7 +16,7 @@ import {
   POSITION_ABSOLUTE,
   SIZE_6,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
@@ -75,9 +75,9 @@ export function DevicesLanding(): JSX.Element {
         marginTop={SPACING.spacing8}
         height="2.25rem"
       >
-        <StyledText as="h1" id="DevicesLanding_title">
+        <LegacyStyledText as="h1" id="DevicesLanding_title">
           {t('devices')}
-        </StyledText>
+        </LegacyStyledText>
         <NewRobotSetupHelp />
       </Flex>
       {isScanning && noRobots ? <DevicesLoadingState /> : null}
@@ -146,7 +146,7 @@ function DevicesLoadingState(): JSX.Element {
       marginTop="10vh"
       marginBottom="10vh"
     >
-      <StyledText as="h1">{t('looking_for_robots')}</StyledText>
+      <LegacyStyledText as="h1">{t('looking_for_robots')}</LegacyStyledText>
       <Icon
         name="ot-spinner"
         aria-label="ot-spinner"

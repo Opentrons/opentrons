@@ -12,8 +12,8 @@ from opentrons.hardware_control.types import OT3Mount
 from opentrons_shared_data.labware.models import LabwareDefinition
 
 if typing.TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import LabwareUri
-    from opentrons_shared_data.labware.dev_types import (
+    from opentrons_shared_data.pipette.types import LabwareUri
+    from opentrons_shared_data.labware.types import (
         LabwareDefinition as TypeDictLabwareDef,
     )
 

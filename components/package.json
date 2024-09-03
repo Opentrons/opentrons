@@ -19,9 +19,7 @@
   "homepage": "https://github.com/Opentrons/opentrons#readme",
   "peerDependencies": {
     "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-router-dom": "5.3.4",
-    "@types/react-router-dom": "5.3.3"
+    "react-dom": "18.2.0"
   },
   "dependencies": {
     "@opentrons/shared-data": "link:../shared-data",
@@ -33,12 +31,11 @@
     "@types/styled-components": "^5.1.26",
     "@types/webpack-env": "^1.16.0",
     "classnames": "2.2.5",
-    "interactjs": "^1.10.17",
+    "interactjs": "^1.10.27",
     "lodash": "4.17.21",
-    "react-i18next": "13.5.0",
+    "react-i18next": "14.0.0",
     "react-popper": "1.0.0",
     "react-remove-scroll": "2.4.3",
-    "react-router-dom": "5.3.4",
     "react-select": "5.4.0",
     "redux": "4.0.5",
     "styled-components": "5.3.6"

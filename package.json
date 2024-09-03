@@ -33,6 +33,10 @@
     "@storybook/react-docgen-typescript-plugin": "1.0.6--canary.9.cd77847.0"
   },
   "devDependencies": {
+    "@aws-sdk/client-cloudfront": "^3.582.0",
+    "@aws-sdk/client-s3": "^3.582.0",
+    "@aws-sdk/client-dynamodb": "^3.582.0",
+    "@aws-sdk/credential-provider-ini": "^3.582.0",
     "@cypress/webpack-preprocessor": "^5.1.2",
     "@electron/rebuild": "3.2.10",
     "@octokit/rest": "^19.0.5",
@@ -59,7 +63,6 @@
     "@types/react-color": "^3.0.6",
     "@types/react-dom": "18.2.0",
     "@types/react-redux": "7.1.32",
-    "@types/react-router-dom": "5.3.3",
     "@types/redux-mock-store": "^1.0.2",
     "@types/semver": "^7.3.6",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
@@ -122,7 +125,7 @@
     "react": "18.2.0",
     "react-docgen-typescript": "^1.21.0",
     "react-dom": "18.2.0",
-    "react-i18next": "13.5.0",
+    "react-i18next": "14.0.0",
     "react-query": "3.35.0",
     "react-snap": "^1.23.0",
     "redux-mock-store": "^1.5.3",

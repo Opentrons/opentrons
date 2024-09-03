@@ -11,7 +11,7 @@ import {
   FormGroup,
   OutlineButton,
   DeprecatedPrimaryButton,
-  InputField,
+  LegacyInputField,
 } from '@opentrons/components'
 import styles from './LiquidPlacementForm.module.css'
 import formStyles from '../forms/forms.module.css'
@@ -58,8 +58,8 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
   )
 
   const selectionHasLiquids = Boolean(
-    labwareId &&
-      liquidLocations[labwareId] &&
+    labwareId != null &&
+      liquidLocations[labwareId] != null &&
       Object.keys(selectedWellGroups).some(
         well => liquidLocations[labwareId][well]
       )
@@ -67,7 +67,7 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
 
   const getInitialValues: () => ValidFormValues = () => {
     return {
-      selectedLiquidId: commonSelectedLiquidId || '',
+      selectedLiquidId: commonSelectedLiquidId ?? '',
       volume:
         commonSelectedVolume != null ? commonSelectedVolume.toString() : '',
     }
@@ -91,11 +91,11 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
   }
 
   const handleClearWells: () => void = () => {
-    if (labwareId && selectedWells && selectionHasLiquids) {
-      if (global.confirm(t('application:are_you_sure'))) {
+    if (labwareId != null && selectedWells != null && selectionHasLiquids) {
+      if (global.confirm(t('application:are_you_sure') as string)) {
         dispatch(
           removeWellsContents({
-            labwareId: labwareId,
+            labwareId,
             wells: selectedWells,
           })
         )
@@ -123,7 +123,7 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
       'when saving liquid placement form, expected a selected labware ID'
     )
     console.assert(
-      selectedWells && selectedWells.length > 0,
+      selectedWells != null && selectedWells.length > 0,
       `when saving liquid placement form, expected selected wells to be array with length > 0 but got ${String(
         selectedWells
       )}`
@@ -143,8 +143,8 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
       dispatch(
         setWellContents({
           liquidGroupId: selectedLiquidId,
-          labwareId: labwareId,
-          wells: selectedWells || [],
+          labwareId,
+          wells: selectedWells ?? [],
           volume: Number(values.volume),
         })
       )
@@ -160,7 +160,7 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
   if (!showForm) return null
 
   let volumeErrors: string | null = null
-  if (touchedFields.volume) {
+  if (Boolean(touchedFields.volume)) {
     if (volume == null || volume === '0') {
       volumeErrors = t('generic.error.more_than_zero')
     } else if (parseInt(volume) > selectedWellsMaxVolume) {
@@ -190,7 +190,7 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
                   className={stepEditFormStyles.large_field}
                   options={liquidSelectionOptions}
                   error={
-                    touchedFields.selectedLiquidId
+                    Boolean(touchedFields.selectedLiquidId)
                       ? errors.selectedLiquidId?.message
                       : null
                   }
@@ -212,7 +212,7 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
                 required: true,
               }}
               render={({ field }) => (
-                <InputField
+                <LegacyInputField
                   name="volume"
                   units={t('application:units.microliter')}
                   value={volume}
@@ -227,7 +227,13 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
 
         <div className={styles.button_row}>
           <OutlineButton
-            disabled={!(labwareId && selectedWells && selectionHasLiquids)}
+            disabled={
+              !(
+                labwareId != null &&
+                selectedWells != null &&
+                selectionHasLiquids
+              )
+            }
             onClick={handleClearWells}
           >
             {t('button:clear_wells')}

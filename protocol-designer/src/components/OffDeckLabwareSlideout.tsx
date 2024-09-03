@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
-  Tooltip,
+  LegacyTooltip,
   DeprecatedPrimaryButton,
   useHoverTooltip,
   Flex,
@@ -32,7 +32,7 @@ import { getRobotStateAtActiveItem } from '../top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../ui/labware/selectors'
 import { EditLabwareOffDeck } from './DeckSetup/LabwareOverlays/EditLabwareOffDeck'
 import { BrowseLabware } from './DeckSetup/LabwareOverlays/BrowseLabware'
-import { Slideout } from '../atoms/Slideout'
+import { Slideout } from './Slideout'
 import { wellFillFromWellContents } from './labware'
 
 interface OffDeckLabwareSlideoutProps {
@@ -83,9 +83,9 @@ export const OffDeckLabwareSlideout = (
             {t('button:add_off_deck')}
           </DeprecatedPrimaryButton>
           {disabled ? (
-            <Tooltip {...tooltipProps}>
+            <LegacyTooltip {...tooltipProps}>
               {t(`tooltip:disabled_off_deck`)}
-            </Tooltip>
+            </LegacyTooltip>
           ) : null}
         </div>
       }

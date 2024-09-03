@@ -165,7 +165,13 @@ export function RobotSettingsDashboard(): JSX.Element {
         />
       )
     case 'UpdateChannel':
-      return <UpdateChannel handleBackPress={() => setCurrentOption(null)} />
+      return (
+        <UpdateChannel
+          handleBackPress={() => {
+            setCurrentOption(null)
+          }}
+        />
+      )
 
     case 'RobotSettingsWifi':
       return (
@@ -214,7 +220,9 @@ export function RobotSettingsDashboard(): JSX.Element {
     case 'EthernetConnectionDetails':
       return (
         <EthernetConnectionDetails
-          handleGoBack={() => setCurrentOption('NetworkSettings')}
+          handleGoBack={() => {
+            setCurrentOption('NetworkSettings')
+          }}
         />
       )
 

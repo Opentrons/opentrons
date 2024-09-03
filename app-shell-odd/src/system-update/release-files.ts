@@ -121,7 +121,9 @@ export function readUserFileInfo(systemFile: string): Promise<UserFileInfo> {
         versionInfo,
       }))
 
-    result.finally(() => zip.close())
+    result.finally(() => {
+      zip.close()
+    })
 
     return result
   })

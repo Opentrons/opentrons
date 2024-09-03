@@ -14,6 +14,7 @@ import type {
 } from '../../robot-api/operators'
 
 import type { FetchPipettesAction } from '../types'
+import type { FetchPipettesResponseBody } from '@opentrons/api-client'
 
 const mapActionToRequest: ActionToRequestMapper<FetchPipettesAction> = action => ({
   method: GET,
@@ -29,8 +30,16 @@ const mapResponseToAction: ResponseToActionMapper<FetchPipettesAction> = (
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.fetchPipettesSuccess(host.name, body, meta)
-    : Actions.fetchPipettesFailure(host.name, body, meta)
+    ? Actions.fetchPipettesSuccess(
+        host.name,
+        body as FetchPipettesResponseBody,
+        meta
+      )
+    : Actions.fetchPipettesFailure(
+        host.name,
+        body as Record<string, unknown>,
+        meta
+      )
 }
 
 export const fetchPipettesEpic: Epic = (action$, state$) => {

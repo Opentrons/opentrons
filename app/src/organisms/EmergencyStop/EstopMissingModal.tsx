@@ -8,17 +8,17 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
+  Modal,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
-import { LegacyModal } from '../../molecules/LegacyModal'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { getIsOnDevice } from '../../redux/config'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
-import type { LegacyModalProps } from '../../molecules/LegacyModal'
+import type { ModalProps } from '@opentrons/components'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 // Note (07/13/2023) After the launch, we will unify the modal components into one component.
 // Then TouchScreenModal and DesktopModal will be TouchScreenContent and DesktopContent that only render each content.
@@ -66,7 +66,7 @@ function TouchscreenModal({
   robotName,
 }: EstopMissingTouchscreenModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('estop_missing'),
     iconName: 'ot-alert',
     iconColor: COLORS.red50,
@@ -76,16 +76,16 @@ function TouchscreenModal({
   }
 
   return (
-    <Modal {...modalProps}>
+    <OddModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('connect_the_estop_to_continue')}
-        </StyledText>
-        <StyledText as="p">
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
           {t('estop_missing_description', { robotName: robotName })}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }
 
@@ -106,7 +106,7 @@ function DesktopModal({
     closeModal()
   }
 
-  const modalProps: LegacyModalProps = {
+  const modalProps: ModalProps = {
     type: 'error',
     title: t('estop_missing'),
     onClose: handleCloseModal,
@@ -116,13 +116,15 @@ function DesktopModal({
   }
 
   return (
-    <LegacyModal {...modalProps}>
+    <Modal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-        <StyledText as="h1">{t('connect_the_estop_to_continue')}</StyledText>
-        <StyledText>
+        <LegacyStyledText as="h1">
+          {t('connect_the_estop_to_continue')}
+        </LegacyStyledText>
+        <LegacyStyledText>
           {t('estop_missing_description', { robotName: robotName })}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

@@ -2,11 +2,12 @@
 import random
 import logging
 import paho.mqtt.client as mqtt
-from anyio import to_thread
 from fastapi import Depends
-from typing import Any, Dict, Optional
+from typing import Annotated, Any, Dict, Optional
 from enum import Enum
 
+
+from .topics import TopicName
 from ..json_api import NotifyRefetchBody, NotifyUnsubscribeBody
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -75,30 +76,14 @@ class NotificationClient:
         )
         self._client.loop_start()
 
-    async def disconnect(self) -> None:
+    def disconnect(self) -> None:
         """Disconnect the client from the MQTT broker."""
         self._client.loop_stop()
-        await to_thread.run_sync(self._client.disconnect)
-
-    async def publish_advise_refetch_async(self, topic: str) -> None:
-        """Asynchronously publish a refetch message on a specific topic to the MQTT broker.
-
-        Args:
-            topic: The topic to publish the message on.
-        """
-        await to_thread.run_sync(self.publish_advise_refetch, topic)
-
-    async def publish_advise_unsubscribe_async(self, topic: str) -> None:
-        """Asynchronously publish an unsubscribe message on a specific topic to the MQTT broker.
-
-        Args:
-            topic: The topic to publish the message on.
-        """
-        await to_thread.run_sync(self.publish_advise_unsubscribe, topic)
+        self._client.disconnect()
 
     def publish_advise_refetch(
         self,
-        topic: str,
+        topic: TopicName,
     ) -> None:
         """Publish a refetch message on a specific topic to the MQTT broker.
 
@@ -116,7 +101,7 @@ class NotificationClient:
 
     def publish_advise_unsubscribe(
         self,
-        topic: str,
+        topic: TopicName,
     ) -> None:
         """Publish an unsubscribe message on a specific topic to the MQTT broker.
 
@@ -152,7 +137,7 @@ class NotificationClient:
         if rc == 0:
             log.info("Successfully connected to MQTT broker.")
         else:
-            log.info(f"Failed to connect to MQTT broker with reason code: {rc}")
+            log.error(f"Failed to connect to MQTT broker with reason code: {rc}")
 
     def _on_disconnect(
         self,
@@ -172,7 +157,7 @@ class NotificationClient:
         if rc == 0:
             log.info("Successfully disconnected from MQTT broker.")
         else:
-            log.info(f"Failed to disconnect from MQTT broker with reason code: {rc}")
+            log.error(f"Failed to disconnect from MQTT broker with reason code: {rc}")
 
 
 _notification_client_accessor: AppStateAccessor[NotificationClient] = AppStateAccessor[
@@ -190,10 +175,15 @@ def initialize_notification_client(app_state: AppState) -> None:
 
     try:
         notification_client.connect()
-    except Exception as error:
-        log.info(f"Could not successfully connect to notification server: {error}")
+    except Exception:
+        log.warning(
+            "Could not successfully connect to MQTT broker. Is this a dev server?",
+            exc_info=True,
+        )
 
 
+# todo(mm, 2024-08-20): When ASGI app teardown no longer uses asyncio.gather(),
+# this can be non-async.
 async def clean_up_notification_client(app_state: AppState) -> None:
     """Clean up the `NotificationClient` stored on `app_state`.
 
@@ -204,12 +194,15 @@ async def clean_up_notification_client(app_state: AppState) -> None:
     ] = _notification_client_accessor.get_from(app_state)
 
     if notification_client is not None:
-        await notification_client.disconnect()
+        notification_client.disconnect()
 
 
 def get_notification_client(
-    app_state: AppState = Depends(get_app_state),
-) -> Optional[NotificationClient]:
+    app_state: Annotated[AppState, Depends(get_app_state)],
+) -> NotificationClient:
     """Intended to be used by endpoint functions as a FastAPI dependency."""
     notification_client = _notification_client_accessor.get_from(app_state)
+    assert (
+        notification_client is not None
+    ), "Forgot to initialize notification client as part of server startup?"
     return notification_client

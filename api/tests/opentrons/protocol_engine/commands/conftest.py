@@ -13,9 +13,10 @@ from opentrons.protocol_engine.execution import (
     LabwareMovementHandler,
     StatusBarHandler,
     TipHandler,
+    GantryMover,
 )
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 
 
 @pytest.fixture
@@ -76,3 +77,9 @@ def model_utils(decoy: Decoy) -> ModelUtils:
 def status_bar(decoy: Decoy) -> StatusBarHandler:
     """Get a mocked out StatusBarHandler."""
     return decoy.mock(cls=StatusBarHandler)
+
+
+@pytest.fixture
+def gantry_mover(decoy: Decoy) -> GantryMover:
+    """Get a mocked out GantryMover."""
+    return decoy.mock(cls=GantryMover)

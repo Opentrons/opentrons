@@ -4,7 +4,7 @@ from typing import Dict, Iterable, Optional, cast
 
 from anyio import to_thread
 
-from opentrons_shared_data.labware.dev_types import (
+from opentrons_shared_data.labware.types import (
     LabwareDefinition as LabwareDefinitionTypedDict,
 )
 from opentrons_shared_data.labware.models import LabwareDefinition
@@ -13,7 +13,10 @@ from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_engine import ProtocolEngine
-from opentrons.protocol_engine.types import RunTimeParamValuesType
+from opentrons.protocol_engine.types import (
+    PrimitiveRunTimeParamValuesType,
+    CSVRuntimeParamPaths,
+)
 from opentrons.protocol_reader import ProtocolSource, ProtocolFileRole
 from opentrons.util.broker import Broker
 
@@ -154,18 +157,23 @@ class PythonProtocolExecutor:
     ) -> None:
         """Execute a PAPIv2 protocol with a given ProtocolContext in a child thread."""
         await to_thread.run_sync(
-            run_protocol, protocol, context, run_time_parameters_with_overrides
+            run_protocol,
+            protocol,
+            context,
+            run_time_parameters_with_overrides,
         )
 
     @staticmethod
     def extract_run_parameters(
         protocol: PythonProtocol,
         parameter_context: ParameterContext,
-        run_time_param_overrides: Optional[RunTimeParamValuesType],
+        run_time_param_overrides: Optional[PrimitiveRunTimeParamValuesType],
+        run_time_param_file_overrides: Optional[CSVRuntimeParamPaths],
     ) -> Optional[Parameters]:
         """Extract the parameters defined in the protocol, overridden with values for the run."""
         return exec_add_parameters(
             protocol=protocol,
             parameter_context=parameter_context,
             run_time_param_overrides=run_time_param_overrides,
+            run_time_param_file_overrides=run_time_param_file_overrides,
         )

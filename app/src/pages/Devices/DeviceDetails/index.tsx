@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { Redirect, useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
@@ -12,7 +12,9 @@ import { DeviceDetailsComponent } from './DeviceDetailsComponent'
 import type { DesktopRouteParams } from '../../../App/types'
 
 export function DeviceDetails(): JSX.Element | null {
-  const { robotName } = useParams<DesktopRouteParams>()
+  const { robotName } = useParams<
+    keyof DesktopRouteParams
+  >() as DesktopRouteParams
   const robot = useRobot(robotName)
   const isScanning = useSelector(getScanning)
 
@@ -30,6 +32,6 @@ export function DeviceDetails(): JSX.Element | null {
       <DeviceDetailsComponent robotName={robotName} />
     </ApiHostProvider>
   ) : (
-    <Redirect to="/devices" />
+    <Navigate to="/devices" />
   )
 }

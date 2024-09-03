@@ -12,10 +12,12 @@ import {
   DISPLAY_FLEX,
   DISPLAY_NONE,
   Flex,
+  InfoScreen,
+  LegacyStyledText,
+  OVERFLOW_SCROLL,
   POSITION_FIXED,
   PrimaryButton,
   SPACING,
-  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -24,18 +26,15 @@ import {
   useNotifyAllCommandsAsPreSerializedList,
   useNotifyRunQuery,
 } from '../../resources/runs'
-import { CommandText } from '../CommandText'
+import { CommandText, CommandIcon } from '../../molecules/Command'
 import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
-import { CommandIcon } from './CommandIcon'
 import { useRunStatus } from '../RunTimeControl/hooks'
-import { getCommandTextData } from '../CommandText/utils/getCommandTextData'
 import { useLastRunCommand } from '../Devices/hooks/useLastRunCommand'
 
-import type { ViewportListRef } from 'react-viewport-list'
 import type { RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
-
+import type { ViewportListRef } from 'react-viewport-list'
 const COLOR_FADE_MS = 500
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
 // arbitrary large number of commands
@@ -60,17 +59,17 @@ export const RunPreviewComponent = (
       ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
       : false
   // we only ever want one request done for terminal runs because this is a heavy request
-  const commandsFromQuery = useNotifyAllCommandsAsPreSerializedList(
+  const {
+    data: commandsFromQueryResponse,
+    isLoading: isRunCommandDataLoading,
+  } = useNotifyAllCommandsAsPreSerializedList(
     runId,
     { cursor: 0, pageLength: MAX_COMMANDS },
     {
-      staleTime: Infinity,
-      cacheTime: Infinity,
       enabled: isRunTerminal,
     }
-  ).data?.data
-  const nullCheckedCommandsFromQuery =
-    commandsFromQuery == null ? robotSideAnalysis?.commands : commandsFromQuery
+  )
+  const commandsFromQuery = commandsFromQueryResponse?.data
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
   const currentRunCommandKey = useLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
@@ -79,122 +78,158 @@ export const RunPreviewComponent = (
     isCurrentCommandVisible,
     setIsCurrentCommandVisible,
   ] = React.useState<boolean>(true)
-  if (robotSideAnalysis == null) return null
-  const commands =
-    (isRunTerminal
-      ? nullCheckedCommandsFromQuery
-      : robotSideAnalysis.commands) ?? []
-  const commandTextData =
-    isRunTerminal && runRecord?.data != null
-      ? getCommandTextData(runRecord.data, nullCheckedCommandsFromQuery)
-      : getCommandTextData(robotSideAnalysis)
-  const currentRunCommandIndex = commands.findIndex(
-    c => c.key === currentRunCommandKey
+  const filteredCommandsFromQuery = React.useMemo(
+    () =>
+      commandsFromQuery?.filter(
+        command => !('intent' in command) || command.intent !== 'fixit'
+      ),
+    [commandsFromQuery == null]
   )
 
-  return (
+  if (robotSideAnalysis == null) {
+    return null
+  }
+
+  const commands = isRunTerminal
+    ? filteredCommandsFromQuery
+    : robotSideAnalysis.commands
+
+  // pass relevant data from run rather than analysis so that CommandText utilities can properly hash the entities' IDs
+  // TODO (nd:05/02/2024, AUTH-380): update name and types for CommandText (and children/utilities) use of analysis.
+  // We should ideally pass only subset of analysis/run data required by these children and utilities
+  const protocolDataFromAnalysisOrRun =
+    isRunTerminal && runRecord?.data != null
+      ? {
+          ...robotSideAnalysis,
+          labware: runRecord.data.labware ?? [],
+          modules: runRecord.data.modules ?? [],
+          pipettes: runRecord.data.pipettes ?? [],
+          liquids: runRecord.data.liquids ?? [],
+          commands: commands ?? [],
+        }
+      : robotSideAnalysis
+  const currentRunCommandIndex =
+    commands != null
+      ? commands.findIndex(c => c.key === currentRunCommandKey)
+      : 0
+  if (isRunCommandDataLoading || commands == null) {
+    return (
+      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
+        <LegacyStyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
+          {t('protocol_setup:loading_data')}
+        </LegacyStyledText>
+      </Flex>
+    )
+  }
+  return commands.length === 0 ? (
+    <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
+      <InfoScreen contentType="runNotStarted" />
+    </Flex>
+  ) : (
     <Flex
       ref={viewPortRef}
       flexDirection={DIRECTION_COLUMN}
-      height="28rem"
+      height="65vh"
       width="100%"
-      overflowY="scroll"
+      overflowY={OVERFLOW_SCROLL}
       gridGap={SPACING.spacing8}
       padding={SPACING.spacing16}
     >
-      <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-        <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-          {t('run_preview')}
-        </StyledText>
-        <StyledText as="label" color={COLORS.grey50}>
-          {t('steps_total', { count: commands.length })}
-        </StyledText>
-      </Flex>
-      <StyledText as="p" marginBottom={SPACING.spacing8}>
-        {t('preview_of_protocol_steps')}
-      </StyledText>
-      <Divider marginX={`calc(-1 * ${SPACING.spacing16})`} />
-      <ViewportList
-        viewportRef={viewPortRef}
-        ref={ref}
-        items={commands}
-        onViewportIndexesChange={([
-          lowestVisibleIndex,
-          highestVisibleIndex,
-        ]) => {
-          if (currentRunCommandIndex >= 0) {
-            setIsCurrentCommandVisible(
-              currentRunCommandIndex >= lowestVisibleIndex &&
-                currentRunCommandIndex <= highestVisibleIndex
-            )
-          }
-        }}
-        initialIndex={currentRunCommandIndex}
-      >
-        {(command, index) => {
-          const isCurrent = index === currentRunCommandIndex
-          const backgroundColor = isCurrent ? COLORS.blue30 : COLORS.grey20
-          const iconColor = isCurrent ? COLORS.blue60 : COLORS.grey50
-          return (
-            <Flex
-              key={command.id}
-              alignItems={ALIGN_CENTER}
-              gridGap={SPACING.spacing8}
-            >
-              <StyledText
-                minWidth={SPACING.spacing16}
-                fontSize={TYPOGRAPHY.fontSizeCaption}
-              >
-                {index + 1}
-              </StyledText>
+      <>
+        <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+          <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {t('run_preview')}
+          </LegacyStyledText>
+          <LegacyStyledText as="label" color={COLORS.grey50}>
+            {t('steps_total', { count: commands.length })}
+          </LegacyStyledText>
+        </Flex>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing8}>
+          {t('preview_of_protocol_steps')}
+        </LegacyStyledText>
+        <Divider marginX={`calc(-1 * ${SPACING.spacing16})`} />
+        <ViewportList
+          viewportRef={viewPortRef}
+          ref={ref}
+          items={commands}
+          onViewportIndexesChange={([
+            lowestVisibleIndex,
+            highestVisibleIndex,
+          ]) => {
+            if (currentRunCommandIndex >= 0) {
+              setIsCurrentCommandVisible(
+                currentRunCommandIndex >= lowestVisibleIndex &&
+                  currentRunCommandIndex <= highestVisibleIndex
+              )
+            }
+          }}
+          initialIndex={currentRunCommandIndex}
+        >
+          {(command, index) => {
+            const isCurrent = index === currentRunCommandIndex
+            const backgroundColor = isCurrent ? COLORS.blue30 : COLORS.grey20
+            const iconColor = isCurrent ? COLORS.blue60 : COLORS.grey50
+            return (
               <Flex
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing4}
-                width="100%"
-                backgroundColor={
-                  index === jumpedIndex ? '#F5E3FF' : backgroundColor
-                }
-                color={COLORS.black90}
-                borderRadius={BORDERS.borderRadius4}
-                padding={SPACING.spacing8}
-                css={css`
-                  transition: background-color ${COLOR_FADE_MS}ms ease-out,
-                    border-color ${COLOR_FADE_MS}ms ease-out;
-                `}
+                key={command.id}
+                alignItems={ALIGN_CENTER}
+                gridGap={SPACING.spacing8}
               >
-                <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-                  <CommandIcon command={command} color={iconColor} />
-                  <CommandText
-                    command={command}
-                    commandTextData={commandTextData}
-                    robotType={robotType}
-                    color={COLORS.black90}
-                  />
+                <LegacyStyledText
+                  minWidth={SPACING.spacing16}
+                  fontSize={TYPOGRAPHY.fontSizeCaption}
+                >
+                  {index + 1}
+                </LegacyStyledText>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing4}
+                  width="100%"
+                  backgroundColor={
+                    index === jumpedIndex ? '#F5E3FF' : backgroundColor
+                  }
+                  color={COLORS.black90}
+                  borderRadius={BORDERS.borderRadius4}
+                  padding={SPACING.spacing8}
+                  css={css`
+                    transition: background-color ${COLOR_FADE_MS}ms ease-out,
+                      border-color ${COLOR_FADE_MS}ms ease-out;
+                  `}
+                >
+                  <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+                    <CommandIcon command={command} color={iconColor} />
+                    <CommandText
+                      command={command}
+                      commandTextData={protocolDataFromAnalysisOrRun}
+                      robotType={robotType}
+                      color={COLORS.black90}
+                    />
+                  </Flex>
                 </Flex>
               </Flex>
-            </Flex>
-          )
-        }}
-      </ViewportList>
-      {currentRunCommandIndex >= 0 ? (
-        <PrimaryButton
-          position={POSITION_FIXED}
-          bottom={SPACING.spacing40}
-          left={`calc(calc(100% + ${NAV_BAR_WIDTH})/2)`} // add width of half of nav bar to center within run tab
-          transform="translate(-50%)"
-          borderRadius={SPACING.spacing32}
-          display={isCurrentCommandVisible ? DISPLAY_NONE : DISPLAY_FLEX}
-          onClick={makeHandleScrollToStep(currentRunCommandIndex)}
-          id="RunLog_jumpToCurrentStep"
-        >
-          {t('view_current_step')}
-        </PrimaryButton>
-      ) : null}
-      {currentRunCommandIndex === commands.length - 1 ? (
-        <StyledText as="h6" color={COLORS.grey60}>
-          {t('end_of_protocol')}
-        </StyledText>
-      ) : null}
+            )
+          }}
+        </ViewportList>
+        {currentRunCommandIndex >= 0 ? (
+          <PrimaryButton
+            position={POSITION_FIXED}
+            bottom={SPACING.spacing40}
+            left={`calc(calc(100% + ${NAV_BAR_WIDTH})/2)`} // add width of half of nav bar to center within run tab
+            transform="translate(-50%)"
+            borderRadius={SPACING.spacing32}
+            display={isCurrentCommandVisible ? DISPLAY_NONE : DISPLAY_FLEX}
+            onClick={makeHandleScrollToStep(currentRunCommandIndex)}
+            id="RunLog_jumpToCurrentStep"
+          >
+            {t('view_current_step')}
+          </PrimaryButton>
+        ) : null}
+        {currentRunCommandIndex === commands.length - 1 ? (
+          <LegacyStyledText as="h6" color={COLORS.grey60}>
+            {t('end_of_protocol')}
+          </LegacyStyledText>
+        ) : null}
+      </>
     </Flex>
   )
 }

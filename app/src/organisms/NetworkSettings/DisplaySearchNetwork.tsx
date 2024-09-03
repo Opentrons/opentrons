@@ -9,7 +9,7 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -29,14 +29,14 @@ export function DisplaySearchNetwork(): JSX.Element {
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
       >
-        <StyledText
+        <LegacyStyledText
           as="h3"
           color={COLORS.grey60}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing40}
         >
           {t('searching_for_networks')}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
     </Flex>
   )

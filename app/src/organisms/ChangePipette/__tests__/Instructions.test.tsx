@@ -55,14 +55,14 @@ describe('Instructions', () => {
     )
   })
   it('renders 1st page of the detach pipette flow', () => {
-    const { getByText, getByRole, getByAltText } = render(props)
-    getByText('Loosen the screws')
-    getByText(
+    render(props)
+    screen.getByText('Loosen the screws')
+    screen.getByText(
       'Using a 2.5 mm screwdriver, loosen the three screws on the back of the pipette that is currently attached.'
     )
-    getByAltText('detach-left-single-GEN1-screws')
-    const goBack = getByRole('button', { name: 'Go back' })
-    const cont = getByRole('button', { name: 'Continue' })
+    screen.getByAltText('detach-left-single-GEN1-screws')
+    const goBack = screen.getByRole('button', { name: 'Go back' })
+    const cont = screen.getByRole('button', { name: 'Continue' })
     fireEvent.click(goBack)
     expect(props.back).toHaveBeenCalled()
     fireEvent.click(cont)
@@ -74,16 +74,16 @@ describe('Instructions', () => {
       ...props,
       currentStepCount: 2,
     }
-    const { getByText, getByRole, getByAltText } = render(props)
-    getByText('Remove the pipette')
-    getByText(
+    render(props)
+    screen.getByText('Remove the pipette')
+    screen.getByText(
       'Hold onto the pipette so it does not fall. Disconnect the pipette from the robot by pulling the white connector tab.'
     )
-    getByAltText('detach-left-single-GEN1-tab')
-    const goBack = getByRole('button', { name: 'Go back' })
+    screen.getByAltText('detach-left-single-GEN1-tab')
+    const goBack = screen.getByRole('button', { name: 'Go back' })
     fireEvent.click(goBack)
     expect(props.prevStep).toHaveBeenCalled()
-    getByText('mock check pipettes button')
+    screen.getByText('mock check pipettes button')
   })
 
   it('renders the attach flow when no pipette is selected', () => {
@@ -102,9 +102,9 @@ describe('Instructions', () => {
       currentStepCount: 0,
       attachedWrong: false,
     }
-    const { getByText, getByRole } = render(props)
-    getByText('Choose a pipette to attach')
-    const goBack = getByRole('button', { name: 'Go back' })
+    render(props)
+    screen.getByText('Choose a pipette to attach')
+    const goBack = screen.getByRole('button', { name: 'Go back' })
     fireEvent.click(goBack)
     expect(props.back).toHaveBeenCalled()
     expect(screen.queryByText('Continue')).not.toBeInTheDocument()
@@ -126,19 +126,19 @@ describe('Instructions', () => {
       currentStepCount: 1,
       attachedWrong: false,
     }
-    const { getByText, getByRole, getByAltText } = render(props)
-    getByText('Insert screws')
-    getByText(
+    render(props)
+    screen.getByText('Insert screws')
+    screen.getByText(
       'Using a 2.5 mm screwdriver, insert the the three screws on the back of the pipette.'
     )
-    getByText(
+    screen.getByText(
       'Starting with screw #1, tighten the screws with a clockwise motion.'
     )
-    getByAltText('attach-left-single-GEN1-screws')
-    const goBack = getByRole('button', { name: 'Go back' })
+    screen.getByAltText('attach-left-single-GEN1-screws')
+    const goBack = screen.getByRole('button', { name: 'Go back' })
     fireEvent.click(goBack)
     expect(props.setWantedName).toHaveBeenCalled()
-    const cont = getByRole('button', { name: 'Continue' })
+    const cont = screen.getByRole('button', { name: 'Continue' })
     fireEvent.click(cont)
     expect(props.nextStep).toHaveBeenCalled()
   })
@@ -159,16 +159,16 @@ describe('Instructions', () => {
       currentStepCount: 2,
       attachedWrong: false,
     }
-    const { getByText, getByRole, getByAltText } = render(props)
-    getByText('Attach the pipette')
-    getByText(
+    render(props)
+    screen.getByText('Attach the pipette')
+    screen.getByText(
       'Push in the white connector tab until you feel it plug into the pipette.'
     )
-    getByAltText('attach-left-single-GEN1-tab')
-    const goBack = getByRole('button', { name: 'Go back' })
+    screen.getByAltText('attach-left-single-GEN1-tab')
+    const goBack = screen.getByRole('button', { name: 'Go back' })
     fireEvent.click(goBack)
     expect(props.prevStep).toHaveBeenCalled()
-    getByText('mock check pipettes button')
+    screen.getByText('mock check pipettes button')
   })
 
   it('renders the attach flow 1st page when a p10 8 channel is selected', () => {
@@ -187,18 +187,18 @@ describe('Instructions', () => {
       currentStepCount: 1,
       attachedWrong: false,
     }
-    const { getByText, getByRole, getByAltText } = render(props)
-    getByText('Insert screws')
-    getByText(
+    render(props)
+    screen.getByText('Insert screws')
+    screen.getByText(
       'Using a 2.5 mm screwdriver, insert the the three screws on the back of the pipette.'
     )
-    getByText(
+    screen.getByText(
       nestedTextMatcher(
         'Starting with screw #1, loosely tighten the screws with a clockwise motion. You will tighten them fully in a later step.'
       )
     )
-    getByAltText('attach-left-multi-GEN1-screws')
-    const cont = getByRole('button', { name: 'Continue' })
+    screen.getByAltText('attach-left-multi-GEN1-screws')
+    const cont = screen.getByRole('button', { name: 'Continue' })
     fireEvent.click(cont)
     expect(props.nextStep).toHaveBeenCalled()
   })
@@ -219,16 +219,16 @@ describe('Instructions', () => {
       currentStepCount: 2,
       attachedWrong: false,
     }
-    const { getByText, getByRole, getByAltText } = render(props)
-    getByText('Attach the pipette')
-    getByText(
+    render(props)
+    screen.getByText('Attach the pipette')
+    screen.getByText(
       'Push in the white connector tab until you feel it plug into the pipette.'
     )
-    getByAltText('attach-left-multi-GEN1-tab')
-    const goBack = getByRole('button', { name: 'Go back' })
+    screen.getByAltText('attach-left-multi-GEN1-tab')
+    const goBack = screen.getByRole('button', { name: 'Go back' })
     fireEvent.click(goBack)
     expect(props.prevStep).toHaveBeenCalled()
-    getByText('mock check pipettes button')
+    screen.getByText('mock check pipettes button')
   })
 
   it('renders the attach flow 2nd page when a p10 8 channel is selected and the pipette is wrong', () => {
@@ -247,15 +247,15 @@ describe('Instructions', () => {
       currentStepCount: 2,
       attachedWrong: true,
     }
-    const { getByText, getByRole, getByAltText } = render(props)
-    getByText('Attach the pipette')
-    getByText(
+    render(props)
+    screen.getByText('Attach the pipette')
+    screen.getByText(
       'Push in the white connector tab until you feel it plug into the pipette.'
     )
-    getByAltText('attach-left-multi-GEN1-tab')
-    const goBack = getByRole('button', { name: 'Go back' })
+    screen.getByAltText('attach-left-multi-GEN1-tab')
+    const goBack = screen.getByRole('button', { name: 'Go back' })
     fireEvent.click(goBack)
     expect(props.prevStep).toHaveBeenCalled()
-    getByText('mock check pipettes button')
+    screen.getByText('mock check pipettes button')
   })
 })

@@ -2,7 +2,7 @@
 
 from typing_extensions import Annotated, Literal
 from typing import TYPE_CHECKING, List, Dict, Tuple, Any, NewType
-from pydantic import ConfigDict, BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field, conlist
 from enum import Enum
 
 
@@ -24,6 +24,7 @@ class GripperModel(str, Enum):
     v1 = "gripperV1"
     v1_1 = "gripperV1.1"
     v1_2 = "gripperV1.2"
+    v1_3 = "gripperV1.3"
 
     def __str__(self) -> str:
         """Model name."""
@@ -31,6 +32,7 @@ class GripperModel(str, Enum):
             self.__class__.v1: "gripperV1",
             self.__class__.v1_1: "gripperV1.1",
             self.__class__.v1_2: "gripperV1.2",
+            self.__class__.v1_3: "gripperV1.3",
         }
         return enum_to_str[self]
 
@@ -46,6 +48,14 @@ if TYPE_CHECKING:
 else:
     _StrictNonNegativeInt = Annotated[int, Field(strict=True, ge=0)]
     _StrictNonNegativeFloat = Annotated[float, Field(strict=True, ge=0.0)]
+
+
+PolynomialTerm = Tuple[_StrictNonNegativeInt, float]
+
+if TYPE_CHECKING:
+    _Polynomial = List[PolynomialTerm]
+else:
+    _Polynomial = conlist(PolynomialTerm, min_length=1)
 
 
 class GripperBaseModel(BaseModel):
@@ -70,16 +80,12 @@ class Geometry(GripperBaseModel):
     max_allowed_grip_error: _StrictNonNegativeFloat
 
 
-PolynomialTerm = Tuple[_StrictNonNegativeInt, float]
-
-
 class GripForceProfile(GripperBaseModel):
     """Gripper force profile."""
 
-    polynomial: List[PolynomialTerm] = Field(
+    polynomial: _Polynomial = Field(
         ...,
         description="Polynomial function to convert a grip force in Newton to the jaw motor duty cycle value, which will be read by the gripper firmware.",
-        min_length=1,
     )
     default_grip_force: _StrictNonNegativeFloat
     default_idle_force: _StrictNonNegativeFloat

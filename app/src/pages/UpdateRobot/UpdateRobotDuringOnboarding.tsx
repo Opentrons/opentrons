@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { Flex, SPACING, DIRECTION_ROW } from '@opentrons/components'
@@ -34,7 +34,7 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
     isShowCheckingUpdates,
     setIsShowCheckingUpdates,
   ] = React.useState<boolean>(true)
-  const history = useHistory()
+  const navigate = useNavigate()
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
   const dispatch = useDispatch<Dispatch>()
@@ -86,12 +86,14 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
               buttonText={t('proceed_without_updating')}
               onClick={() => {
                 dispatch(clearRobotUpdateSession())
-                history.push('/emergency-stop')
+                navigate('/emergency-stop')
               }}
             />
             <MediumButton
               flex="1"
-              onClick={() => dispatchStartRobotUpdate(robotName)}
+              onClick={() => {
+                dispatchStartRobotUpdate(robotName)
+              }}
               buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
             />
           </Flex>
@@ -101,7 +103,11 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
       ) : localRobot === null ||
         localRobot.status === UNREACHABLE ||
         robotUpdateType !== 'upgrade' ? (
-        <NoUpdateFound onContinue={() => history.push('/emergency-stop')} />
+        <NoUpdateFound
+          onContinue={() => {
+            navigate('/emergency-stop')
+          }}
+        />
       ) : (
         <UpdateRobotSoftware
           localRobot={localRobot}

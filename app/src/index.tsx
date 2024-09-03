@@ -2,15 +2,13 @@
 import React from 'react'
 import ReactDom from 'react-dom/client'
 import { Provider } from 'react-redux'
-
-import { ConnectedRouter } from 'connected-react-router'
+import { HashRouter } from 'react-router-dom'
 
 import { ApiClientProvider } from '@opentrons/react-api-client'
 
 import { createLogger } from './logger'
 
 import { uiInitialized } from './redux/shell'
-import { history } from './redux/reducer'
 import { store } from './redux/store'
 
 import '../src/atoms/SoftwareKeyboard/AlphanumericKeyboard'
@@ -34,10 +32,10 @@ if (container == null) throw new Error('Failed to find the root element')
 const root = ReactDom.createRoot(container)
 root.render(
   <Provider store={store}>
-    <ConnectedRouter history={history}>
+    <HashRouter>
       <ApiClientProvider>
         <App />
       </ApiClientProvider>
-    </ConnectedRouter>
+    </HashRouter>
   </Provider>
 )

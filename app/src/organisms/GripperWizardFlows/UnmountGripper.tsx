@@ -11,7 +11,7 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
@@ -19,8 +19,10 @@ import { css } from 'styled-components'
 import { getIsOnDevice } from '../../redux/config'
 import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '../../molecules/SimpleWizardBody'
 import unmountGripper from '../../assets/videos/gripper-wizards/UNMOUNT_GRIPPER.webm'
 
 import type { GripperWizardStepProps } from './types'
@@ -93,7 +95,7 @@ export const UnmountGripper = (
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
@@ -111,11 +113,13 @@ export const UnmountGripper = (
       >
         <Btn
           paddingLeft={isOnDevice ? 0 : SPACING.spacing32}
-          onClick={() => setShowGripperStillDetected(false)}
+          onClick={() => {
+            setShowGripperStillDetected(false)
+          }}
         >
-          <StyledText css={GO_BACK_BUTTON_TEXT_STYLE}>
+          <LegacyStyledText css={GO_BACK_BUTTON_TEXT_STYLE}>
             {t('shared:go_back')}
-          </StyledText>
+          </LegacyStyledText>
         </Btn>
         {isOnDevice ? (
           <SmallButton
@@ -148,7 +152,9 @@ export const UnmountGripper = (
         </video>
       }
       bodyText={
-        <StyledText as="p">{t('hold_gripper_and_loosen_screws')}</StyledText>
+        <LegacyStyledText as="p">
+          {t('hold_gripper_and_loosen_screws')}
+        </LegacyStyledText>
       }
       proceedButtonText={t('continue')}
       proceed={handleContinue}

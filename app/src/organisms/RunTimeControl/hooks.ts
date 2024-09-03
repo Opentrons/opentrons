@@ -16,12 +16,8 @@ import {
 } from '@opentrons/api-client'
 import { useRunActionMutations } from '@opentrons/react-api-client'
 
-import {
-  useCloneRun,
-  useCurrentRunId,
-  useRunCommands,
-} from '../ProtocolUpload/hooks'
-import { useNotifyRunQuery } from '../../resources/runs'
+import { useCloneRun, useRunCommands } from '../ProtocolUpload/hooks'
+import { useNotifyRunQuery, useCurrentRunId } from '../../resources/runs'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import type { UseQueryOptions } from 'react-query'
@@ -99,7 +95,10 @@ export function useRunStatus(
   )
   const runStartTime = firstPlay?.createdAt
 
-  // display an idle status as 'running' in the UI after a run has started
+  // display an idle status as 'running' in the UI after a run has started.
+  // todo(mm, 2024-06-24): This may not be necessary anymore. It looks like it was
+  // working around prior (?) server behavior where a run's status would briefly flicker
+  // to idle in between commands.
   const adjustedRunStatus: RunStatus | null =
     runStatus === RUN_STATUS_IDLE && runStartTime != null
       ? RUN_STATUS_RUNNING

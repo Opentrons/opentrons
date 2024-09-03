@@ -9,7 +9,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -73,13 +73,13 @@ export function UpdateChannel({
         paddingX={SPACING.spacing40}
         marginTop="7.75rem"
       >
-        <StyledText
+        <LegacyStyledText
           fontSize={TYPOGRAPHY.fontSize28}
           lineHeight={TYPOGRAPHY.lineHeight36}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
         >
           {t('update_channel_description')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}
@@ -98,15 +98,15 @@ export function UpdateChannel({
                 htmlFor={radio.label}
                 isSelected={radio.value === channel}
               >
-                <StyledText
+                <LegacyStyledText
                   fontSize={TYPOGRAPHY.fontSize28}
                   lineHeight="1.875rem"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
                   {radio.label}
-                </StyledText>
+                </LegacyStyledText>
                 {radio.label === 'Alpha' ? (
-                  <StyledText
+                  <LegacyStyledText
                     marginTop={SPACING.spacing4}
                     fontSize={TYPOGRAPHY.fontSize28}
                     lineHeight={TYPOGRAPHY.lineHeight36}
@@ -116,7 +116,7 @@ export function UpdateChannel({
                     }
                   >
                     {t('alpha_description')}
-                  </StyledText>
+                  </LegacyStyledText>
                 ) : null}
               </SettingButtonLabel>
             </React.Fragment>

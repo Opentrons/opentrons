@@ -5,15 +5,13 @@ import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
+import { COLORS } from '@opentrons/components'
 import {
   useProtocolQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
-import {
-  RUN_STATUS_FAILED,
-  simpleAnalysisFileFixture,
-} from '@opentrons/api-client'
-import { COLORS } from '@opentrons/components'
+import { simpleAnalysisFileFixture } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
@@ -28,21 +26,17 @@ import { useCloneRun } from '../../../ProtocolUpload/hooks'
 import { useRerunnableStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
 import { useNotifyAllRunsQuery } from '../../../../resources/runs'
-import {
-  useRobotInitializationStatus,
-  INIT_STATUS,
-} from '../../../../resources/health/hooks'
 
-import type { useHistory } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useHistory>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -56,7 +50,6 @@ vi.mock('../../../../organisms/ProtocolUpload/hooks')
 vi.mock('../../../../redux/analytics')
 vi.mock('../hooks')
 vi.mock('../../../../resources/runs')
-vi.mock('../../../../resources/health/hooks')
 
 const RUN_ID = 'mockRunId'
 const ROBOT_NAME = 'otie'
@@ -162,15 +155,13 @@ describe('RecentRunProtocolCard', () => {
         runTimeParameters: [],
       },
     } as any)
-    vi.mocked(useRobotInitializationStatus).mockReturnValue(
-      INIT_STATUS.SUCCEEDED
-    )
     when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
-    when(useCloneRun)
-      .calledWith(RUN_ID, expect.anything())
-      .thenReturn({ cloneRun: mockCloneRun, isLoading: false })
+    vi.mocked(useCloneRun).mockReturnValue({
+      cloneRun: mockCloneRun,
+      isLoading: false,
+    })
   })
 
   afterEach(() => {
@@ -271,20 +262,6 @@ describe('RecentRunProtocolCard', () => {
     screen.getByText('mock Skeleton')
   })
 
-  it('should render the skeleton when the robot server is initializing', () => {
-    vi.mocked(useRobotInitializationStatus).mockReturnValue(
-      INIT_STATUS.INITIALIZING
-    )
-    const [{ getByText }] = render(props)
-    getByText('mock Skeleton')
-  })
-
-  it('should render the skeleton when the robot server is unresponsive', () => {
-    vi.mocked(useRobotInitializationStatus).mockReturnValue(null)
-    const [{ getByText }] = render(props)
-    getByText('mock Skeleton')
-  })
-
   it('should push to protocol details if protocol contains runtime parameters', () => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: simpleAnalysisFileFixture,
@@ -292,6 +269,6 @@ describe('RecentRunProtocolCard', () => {
     render(props)
     const button = screen.getByLabelText('RecentRunProtocolCard')
     fireEvent.click(button)
-    expect(mockPush).toBeCalledWith('/protocols/mockProtocolId')
+    expect(mockNavigate).toBeCalledWith('/protocols/mockProtocolId')
   })
 })

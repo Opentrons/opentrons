@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+
 import {
   getModuleDisplayName,
   CELSIUS,
@@ -11,12 +12,13 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InputField,
+  LegacyStyledText,
   SPACING,
-  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { Slideout } from '../../atoms/Slideout'
-import { InputField } from '../../atoms/InputField'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
 
 import type { HeaterShakerModule } from '../../redux/modules/types'
@@ -94,27 +96,27 @@ export const HeaterShakerSlideout = (
         />
       }
     >
-      <StyledText
+      <LegacyStyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing4}
         data-testid={`HeaterShakerSlideout_title_${module.serialNumber}`}
       >
         {t('set_target_temp_of_hs')}
-      </StyledText>
+      </LegacyStyledText>
       <Flex
         marginTop={SPACING.spacing16}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`HeaterShakerSlideout_input_field_${module.serialNumber}`}
       >
-        <StyledText
+        <LegacyStyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.grey50}
           marginBottom={SPACING.spacing8}
         >
           {t('set_block_temp')}
-        </StyledText>
+        </LegacyStyledText>
         <form id="HeaterShakerSlideout_submitValue">
           <InputField
             data-testid={`${String(module.moduleModel)}_setTemp`}
@@ -122,7 +124,9 @@ export const HeaterShakerSlideout = (
             units={unit}
             autoFocus
             value={hsValue != null ? Math.round(hsValue) : null}
-            onChange={e => setHsValue(e.target.valueAsNumber)}
+            onChange={e => {
+              setHsValue(e.target.valueAsNumber)
+            }}
             type="number"
             caption={t('module_status_range', {
               min: inputMin,

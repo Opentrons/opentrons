@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
@@ -12,12 +12,12 @@ import {
   JUSTIFY_CENTER,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
+  Modal,
 } from '@opentrons/components'
 
 import { StatusLabel } from '../../atoms/StatusLabel'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import { TaskList } from '../TaskList'
 
 import {
@@ -25,7 +25,7 @@ import {
   useCalibrationTaskList,
   useRunHasStarted,
 } from '../Devices/hooks'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../resources/runs'
 
 import type { DashboardCalOffsetInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
 import type { DashboardCalTipLengthInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
@@ -55,7 +55,7 @@ export function CalibrationTaskList({
     setShowCompletionScreen,
   ] = React.useState<boolean>(false)
   const { t } = useTranslation(['robot_calibration', 'device_settings'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const { activeIndex, taskList, taskListStatus } = useCalibrationTaskList(
     pipOffsetCalLauncher,
     tipLengthCalLauncher,
@@ -108,11 +108,11 @@ export function CalibrationTaskList({
   }
 
   return (
-    <LegacyModal
+    <Modal
       title={`${robotName} ${t('calibration_dashboard')}`}
-      onClose={() =>
-        history.push(`/devices/${robotName}/robot-settings/calibration`)
-      }
+      onClose={() => {
+        navigate(`/devices/${robotName}/robot-settings/calibration`)
+      }}
       fullPage
       backgroundColor={COLORS.grey10}
       childrenPadding={`${SPACING.spacing16} ${SPACING.spacing24} ${SPACING.spacing24} ${SPACING.spacing4}`}
@@ -120,6 +120,7 @@ export function CalibrationTaskList({
         width: 50rem;
         height: 47.5rem;
       `}
+      marginLeft="0"
     >
       {showCompletionScreen ? (
         <Flex
@@ -137,16 +138,16 @@ export function CalibrationTaskList({
             ) : (
               <Icon name="ot-check" size="3rem" color={COLORS.green50} />
             )}
-            <StyledText as="h1" marginTop={SPACING.spacing24}>
+            <LegacyStyledText as="h1" marginTop={SPACING.spacing24}>
               {exitBeforeDeckConfigCompletion
                 ? t('using_current_calibrations')
                 : t('calibrations_complete')}
-            </StyledText>
+            </LegacyStyledText>
             <PrimaryButton
               marginTop={SPACING.spacing24}
-              onClick={() =>
-                history.push(`/devices/${robotName}/robot-settings/calibration`)
-              }
+              onClick={() => {
+                navigate(`/devices/${robotName}/robot-settings/calibration`)
+              }}
             >
               {t('device_settings:done')}
             </PrimaryButton>
@@ -160,9 +161,9 @@ export function CalibrationTaskList({
             padding={SPACING.spacing16}
             paddingBottom={SPACING.spacing32}
           >
-            <StyledText css={TYPOGRAPHY.h2SemiBold}>
+            <LegacyStyledText css={TYPOGRAPHY.h2SemiBold}>
               {t('calibration_status')}
-            </StyledText>
+            </LegacyStyledText>
             <StatusLabel
               status={statusLabelText}
               backgroundColor={statusLabelBackgroundColor}
@@ -176,11 +177,13 @@ export function CalibrationTaskList({
             activeIndex={activeIndex}
             taskList={taskList}
             taskListStatus={taskListStatus}
-            generalTaskClickHandler={() => setHasLaunchedWizard(true)}
+            generalTaskClickHandler={() => {
+              setHasLaunchedWizard(true)
+            }}
             generalTaskDisabledReason={generalTaskDisabledReason}
           />
         </>
       )}
-    </LegacyModal>
+    </Modal>
   )
 }

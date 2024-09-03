@@ -1,0 +1,46 @@
+name: 'OpentronsAI edge continuous deployment to dev'
+
+on:
+  push:
+    branches:
+      - edge
+    paths:
+      - 'opentrons-ai-server/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.run_id }}
+  cancel-in-progress: true
+
+env:
+  CI: true
+
+jobs:
+  js-unit-test:
+    runs-on: 'ubuntu-latest'
+    permissions:
+      id-token: write
+      contents: read
+    name: 'OpentronsAI server edge continuous deployment to staging'
+    timeout-minutes: 10
+    steps:
+      - name: Checkout opentrons repo
+        uses: 'actions/checkout@v4'
+
+      - name: Setup Python
+        uses: 'actions/setup-python@v5'
+        with:
+          python-version: '3.12'
+          cache: 'pipenv'
+          cache-dependency-path: opentrons-ai-server/Pipfile.lock
+      - name: Setup
+        id: install
+        working-directory: ./opentrons-ai-server
+        run: make setup
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.STAGING_AI_ROLE_ARN }}
+          aws-region: ${{ secrets.STAGING_AI_REGION }}
+      - name: 'deploy api to staging'
+        run: |
+          make -C opentrons-ai-server deploy ENV=staging

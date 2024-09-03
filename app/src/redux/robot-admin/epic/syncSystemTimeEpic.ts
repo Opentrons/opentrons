@@ -7,8 +7,12 @@ import { withRobotHost } from '../../robot-api/operators'
 import * as Constants from '../constants'
 
 import type { Action, Epic } from '../../types'
-import type { RobotApiRequestOptions } from '../../robot-api/types'
+import type {
+  RobotApiRequestOptions,
+  RobotApiResponse,
+} from '../../robot-api/types'
 import type { SyncSystemTimeAction } from '../types'
+import type { OperatorFunction } from 'rxjs'
 
 const SYNC_THRESHOLD_SEC = 60
 
@@ -43,7 +47,7 @@ export const syncSystemTimeEpic: Epic = (action$, state$) => {
         filter(response => response.ok),
         map(response => response.body.data.systemTime),
         filter(systemTimeString => {
-          const systemTime = parseISO(systemTimeString)
+          const systemTime = parseISO(systemTimeString as string)
           const drift = differenceInSeconds(systemTime, new Date())
           return Math.abs(drift) > SYNC_THRESHOLD_SEC
         }),
@@ -53,6 +57,6 @@ export const syncSystemTimeEpic: Epic = (action$, state$) => {
         })
       )
     }),
-    ignoreElements()
+    ignoreElements() as OperatorFunction<RobotApiResponse, Action>
   )
 }

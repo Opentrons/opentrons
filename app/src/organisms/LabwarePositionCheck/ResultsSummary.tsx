@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
@@ -17,16 +17,17 @@ import {
   ALIGN_FLEX_END,
   BORDERS,
   COLORS,
+  DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LocationIcon,
   MODULE_ICON_NAME_BY_TYPE,
+  OVERFLOW_AUTO,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
@@ -37,7 +38,7 @@ import {
 import { SmallButton } from '../../atoms/buttons'
 import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
-import { getLabwareDefinitionsFromCommands } from './utils/labware'
+import { getLabwareDefinitionsFromCommands } from '../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type {
@@ -49,6 +50,7 @@ import type {
   LabwareOffsetCreateData,
 } from '@opentrons/api-client'
 import type { ResultsSummaryStep, WorkingOffset } from './types'
+import type { TFunction } from 'i18next'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -157,7 +159,17 @@ export const ResultsSummary = (
       <Flex
         flexDirection={DIRECTION_COLUMN}
         maxHeight="20rem"
-        overflowY="scroll"
+        css={css`
+          overflow-y: ${OVERFLOW_AUTO};
+          &::-webkit-scrollbar {
+            width: 0.75rem;
+            background-color: transparent;
+          }
+          &::-webkit-scrollbar-thumb {
+            background: ${COLORS.grey50};
+            border-radius: 11px;
+          }
+        `}
       >
         <Header>{t('new_labware_offset_data')}</Header>
         {isLabwareOffsetCodeSnippetsOn ? (
@@ -174,7 +186,9 @@ export const ResultsSummary = (
       {isOnDevice ? (
         <SmallButton
           alignSelf={ALIGN_FLEX_END}
-          onClick={() => handleApplyOffsets(offsetsToApply)}
+          onClick={() => {
+            handleApplyOffsets(offsetsToApply)
+          }}
           buttonText={i18n.format(t('apply_offsets'), 'capitalize')}
           iconName={isSubmittingAndClosing ? 'ot-spinner' : null}
           iconPlacement={isSubmittingAndClosing ? 'startIcon' : null}
@@ -189,7 +203,9 @@ export const ResultsSummary = (
         >
           <NeedHelpLink href={LPC_HELP_LINK_URL} />
           <PrimaryButton
-            onClick={() => handleApplyOffsets(offsetsToApply)}
+            onClick={() => {
+              handleApplyOffsets(offsetsToApply)
+            }}
             disabled={isSubmittingAndClosing}
           >
             <Flex>
@@ -201,9 +217,9 @@ export const ResultsSummary = (
                   marginRight={SPACING.spacing8}
                 />
               ) : null}
-              <StyledText>
+              <LegacyStyledText>
                 {i18n.format(t('apply_offsets'), 'capitalize')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </PrimaryButton>
         </Flex>
@@ -279,15 +295,20 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                     ${BORDERS.borderRadius4};
                 `}
               >
-                <StyledText
+                <LegacyStyledText
                   as="p"
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
                 >
-                  {getDisplayLocation(location, labwareDefinitions, t, i18n)}
-                </StyledText>
+                  {getDisplayLocation(
+                    location,
+                    labwareDefinitions,
+                    t as TFunction,
+                    i18n
+                  )}
+                </LegacyStyledText>
               </TableDatum>
               <TableDatum>
-                <StyledText as="p">{labwareDisplayName}</StyledText>
+                <LegacyStyledText as="p">{labwareDisplayName}</LegacyStyledText>
               </TableDatum>
               <TableDatum
                 css={`
@@ -296,20 +317,22 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                 `}
               >
                 {isEqual(vector, IDENTITY_VECTOR) ? (
-                  <StyledText>{t('no_labware_offsets')}</StyledText>
+                  <LegacyStyledText>{t('no_labware_offsets')}</LegacyStyledText>
                 ) : (
                   <Flex>
                     {[vector.x, vector.y, vector.z].map((axis, index) => (
                       <React.Fragment key={index}>
-                        <StyledText
+                        <LegacyStyledText
                           as="p"
                           marginLeft={index > 0 ? SPACING.spacing8 : 0}
                           marginRight={SPACING.spacing4}
                           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                         >
                           {['X', 'Y', 'Z'][index]}
-                        </StyledText>
-                        <StyledText as="p">{axis.toFixed(1)}</StyledText>
+                        </LegacyStyledText>
+                        <LegacyStyledText as="p">
+                          {axis.toFixed(1)}
+                        </LegacyStyledText>
                       </React.Fragment>
                     ))}
                   </Flex>
@@ -350,9 +373,9 @@ export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
           return (
             <TerseTableRow key={index}>
               <TerseTableDatum>
-                <LocationIcon slotName={location.slotName} />
+                <DeckInfoLabel deckLabel={location.slotName} />
                 {location.moduleModel != null ? (
-                  <LocationIcon
+                  <DeckInfoLabel
                     iconName={
                       MODULE_ICON_NAME_BY_TYPE[
                         getModuleType(location.moduleModel)
@@ -362,24 +385,35 @@ export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
                 ) : null}
               </TerseTableDatum>
               <TerseTableDatum>
-                <StyledText as="p">{labwareDisplayName}</StyledText>
+                <LegacyStyledText
+                  fontSize={TYPOGRAPHY.fontSize20}
+                  lineHeight={TYPOGRAPHY.lineHeight24}
+                >
+                  {labwareDisplayName}
+                </LegacyStyledText>
               </TerseTableDatum>
               <TerseTableDatum>
                 {isEqual(vector, IDENTITY_VECTOR) ? (
-                  <StyledText>{t('no_labware_offsets')}</StyledText>
+                  <LegacyStyledText>{t('no_labware_offsets')}</LegacyStyledText>
                 ) : (
                   <Flex>
                     {[vector.x, vector.y, vector.z].map((axis, index) => (
                       <React.Fragment key={index}>
-                        <StyledText
-                          as="p"
+                        <LegacyStyledText
+                          fontSize={TYPOGRAPHY.fontSize20}
+                          lineHeight={TYPOGRAPHY.lineHeight24}
                           marginLeft={index > 0 ? SPACING.spacing8 : 0}
                           marginRight={SPACING.spacing4}
                           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                         >
                           {['X', 'Y', 'Z'][index]}
-                        </StyledText>
-                        <StyledText as="p">{axis.toFixed(1)}</StyledText>
+                        </LegacyStyledText>
+                        <LegacyStyledText
+                          fontSize={TYPOGRAPHY.fontSize20}
+                          lineHeight={TYPOGRAPHY.lineHeight24}
+                        >
+                          {axis.toFixed(1)}
+                        </LegacyStyledText>
                       </React.Fragment>
                     ))}
                   </Flex>

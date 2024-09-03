@@ -3,7 +3,7 @@ from functools import lru_cache
 from typing import Callable, Dict, Union, Optional, cast
 from collections import OrderedDict
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.types import Mount, Point
 from opentrons.calibration_storage.types import AttitudeMatrix

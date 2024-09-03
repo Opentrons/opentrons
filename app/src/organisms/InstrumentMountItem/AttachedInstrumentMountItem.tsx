@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 
@@ -33,8 +33,7 @@ interface AttachedInstrumentMountItemProps {
 export function AttachedInstrumentMountItem(
   props: AttachedInstrumentMountItemProps
 ): JSX.Element {
-  const history = useHistory()
-  console.log(history)
+  const navigate = useNavigate()
   const { mount, attachedInstrument, setWizardProps } = props
 
   const [showChoosePipetteModal, setShowChoosePipetteModal] = React.useState(
@@ -53,14 +52,16 @@ export function AttachedInstrumentMountItem(
         flowType: GRIPPER_FLOW_TYPES.ATTACH,
         attachedGripper: attachedInstrument,
         onComplete: () => {
-          history.push(
-            attachedInstrument == null ? `/instruments` : `/instrument/${mount}`
+          navigate(
+            attachedInstrument == null ? '/instruments' : `/instrument/${mount}`
           )
         },
-        closeFlow: () => setWizardProps(null),
+        closeFlow: () => {
+          setWizardProps(null)
+        },
       })
     } else {
-      history.push(`/instruments/${mount}`)
+      navigate(`/instruments/${mount}`)
     }
   }
 
@@ -99,7 +100,7 @@ export function AttachedInstrumentMountItem(
                 setShowChoosePipetteModal(false)
               },
               onComplete: () => {
-                history.push(
+                navigate(
                   attachedInstrument == null
                     ? `/instruments`
                     : `/instrument/${mount}`

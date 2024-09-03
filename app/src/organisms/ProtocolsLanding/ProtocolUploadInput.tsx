@@ -5,10 +5,11 @@ import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
+  ERROR_TOAST,
   Flex,
   Link,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { UploadInput } from '../../molecules/UploadInput'
 import { addProtocol } from '../../redux/protocol-storage'
@@ -17,11 +18,16 @@ import {
   ANALYTICS_IMPORT_PROTOCOL_TO_APP,
 } from '../../redux/analytics'
 import { useLogger } from '../../logger'
+import { useToaster } from '../ToasterOven'
 
 import type { Dispatch } from '../../redux/types'
 
 export interface UploadInputProps {
   onUpload?: () => void
+}
+
+const isValidProtocolFileName = (protocolFileName: string): boolean => {
+  return protocolFileName.endsWith('.py') || protocolFileName.endsWith('.json')
 }
 
 export function ProtocolUploadInput(
@@ -31,17 +37,24 @@ export function ProtocolUploadInput(
   const dispatch = useDispatch<Dispatch>()
   const logger = useLogger(new URL('', import.meta.url).pathname)
   const trackEvent = useTrackEvent()
+  const { makeToast } = useToaster()
 
   const handleUpload = (file: File): void => {
     if (file.path === null) {
       logger.warn('Failed to upload file, path not found')
     }
-    dispatch(addProtocol(file.path))
+    if (isValidProtocolFileName(file.name)) {
+      dispatch(addProtocol(file.path))
+    } else {
+      makeToast(t('incompatible_file_type') as string, ERROR_TOAST, {
+        closeButton: true,
+      })
+    }
+    props.onUpload?.()
     trackEvent({
       name: ANALYTICS_IMPORT_PROTOCOL_TO_APP,
       properties: { protocolFileName: file.name },
     })
-    props.onUpload?.()
   }
 
   return (
@@ -51,10 +64,12 @@ export function ProtocolUploadInput(
       marginY={SPACING.spacing20}
     >
       <UploadInput
-        onUpload={(file: File) => handleUpload(file)}
+        onUpload={(file: File) => {
+          handleUpload(file)
+        }}
         uploadText={t('valid_file_types')}
         dragAndDropText={
-          <StyledText as="p">
+          <LegacyStyledText as="p">
             <Trans
               t={t}
               i18nKey="shared:drag_and_drop"
@@ -62,7 +77,7 @@ export function ProtocolUploadInput(
                 a: <Link color={COLORS.blue55} role="button" />,
               }}
             />
-          </StyledText>
+          </LegacyStyledText>
         }
       />
     </Flex>

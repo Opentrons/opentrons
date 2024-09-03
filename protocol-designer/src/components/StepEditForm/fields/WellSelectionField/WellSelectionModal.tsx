@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import omit from 'lodash/omit'
 
 import {
-  Modal,
+  LegacyModal,
   OutlineButton,
   LabeledValue,
   WELL_LABEL_OPTIONS,
@@ -74,7 +74,7 @@ const WellSelectionModalComponent = (
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
 
   return (
-    <Modal
+    <LegacyModal
       className={modalStyles.modal}
       contentsClassName={cx(
         modalStyles.modal_contents,
@@ -85,7 +85,7 @@ const WellSelectionModalComponent = (
       <div className={styles.top_row}>
         <LabeledValue
           label="Pipette"
-          value={pipetteSpec ? pipetteSpec.displayName : ''}
+          value={pipetteSpec != null ? pipetteSpec.displayName : ''}
           className={styles.inverted_text}
         />
         <OutlineButton onClick={handleSave} inverted>
@@ -93,7 +93,7 @@ const WellSelectionModalComponent = (
         </OutlineButton>
       </div>
 
-      {labwareDef && (
+      {labwareDef != null ? (
         <SelectableLabware
           labwareProps={{
             wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
@@ -112,10 +112,10 @@ const WellSelectionModalComponent = (
           ingredNames={ingredNames}
           wellContents={wellContents}
         />
-      )}
+      ) : null}
 
       <WellSelectionInstructions />
-    </Modal>
+    </LegacyModal>
   )
 }
 
@@ -141,11 +141,12 @@ export const WellSelectionModal = (
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
 
   // selector-derived data
-  const labwareDef = (labwareId && labwareEntities[labwareId]?.def) || null
+  const labwareDef =
+    (labwareId != null ? labwareEntities[labwareId]?.def : null) ?? null
   const pipette = pipetteId != null ? pipetteEntities[pipetteId] : null
 
   const initialSelectedPrimaryWells = Array.isArray(wellFieldData)
-    ? arrayToWellGroup(wellFieldData)
+    ? arrayToWellGroup(wellFieldData as string[])
     : {}
 
   // component state

@@ -5,6 +5,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
+  ABSORBANCE_READER_TYPE,
 } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '../labware-defs'
 import type { LabwareOnDeck } from '../step-forms'
@@ -39,6 +40,7 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
     'opentrons_24_aluminumblock_nest_0.5ml_screwcap',
     'opentrons_96_well_aluminum_block',
     'opentrons_aluminum_flat_bottom_plate',
+    'opentrons_96_deep_well_temp_mod_adapter',
   ],
   [MAGNETIC_MODULE_TYPE]: [
     'biorad_96_wellplate_200ul_pcr',
@@ -65,6 +67,7 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
     'armadillo_96_wellplate_200ul_pcr_full_skirt',
     'biorad_96_wellplate_200ul_pcr',
   ],
+  [ABSORBANCE_READER_TYPE]: [],
 }
 export const getLabwareIsCompatible = (
   def: LabwareDefinition2,
@@ -85,12 +88,15 @@ const PCR_ADAPTER_LOADNAME = 'opentrons_96_pcr_adapter'
 const UNIVERSAL_FLAT_ADAPTER_LOADNAME = 'opentrons_universal_flat_adapter'
 const ALUMINUM_BLOCK_96_LOADNAME = 'opentrons_96_well_aluminum_block'
 const ALUMINUM_FLAT_BOTTOM_PLATE = 'opentrons_aluminum_flat_bottom_plate'
+const TEMP_DEEP_WELL_ADAPTER_LOADNAME =
+  'opentrons_96_deep_well_temp_mod_adapter'
 export const ADAPTER_96_CHANNEL = 'opentrons_flex_96_tiprack_adapter'
 
 export const COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER: Record<
   string,
   string[]
 > = {
+  [TEMP_DEEP_WELL_ADAPTER_LOADNAME]: ['opentrons/nest_96_wellplate_2ml_deep/2'],
   [DEEP_WELL_ADAPTER_LOADNAME]: ['opentrons/nest_96_wellplate_2ml_deep/2'],
   [FLAT_BOTTOM_ADAPTER_LOADNAME]: ['opentrons/nest_96_wellplate_200ul_flat/2'],
   [PCR_ADAPTER_LOADNAME]: [
@@ -202,6 +208,9 @@ export const getAdapterLabwareIsAMatch = (
   const adapter96ChannelPairs =
     loadName === ADAPTER_96_CHANNEL &&
     adapter96Tipracks.includes(draggedLabwareLoadname)
+  const tempDeepWellAdapterPairs =
+    loadName === TEMP_DEEP_WELL_ADAPTER_LOADNAME &&
+    draggedLabwareLoadname === 'nest_96_wellplate_2ml_deep'
 
   if (
     deepWellPair ||
@@ -210,7 +219,8 @@ export const getAdapterLabwareIsAMatch = (
     universalPair ||
     aluminumBlock96Pairs ||
     aluminumFlatBottomPlatePairs ||
-    adapter96ChannelPairs
+    adapter96ChannelPairs ||
+    tempDeepWellAdapterPairs
   ) {
     return true
   } else {

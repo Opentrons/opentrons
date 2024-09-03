@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { useConditionalConfirm } from '@opentrons/components'
+import { useConditionalConfirm, ModalShell } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
 import {
@@ -18,7 +18,6 @@ import {
   LoadingState,
   ConfirmExit,
 } from '../../organisms/CalibrationPanels'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { getTopPortalEl } from '../../App/portal'
 import { ReturnTip } from './ReturnTip'
@@ -175,7 +174,7 @@ export function CheckCalibration(
       ? PANEL_BY_STEP[currentStep]
       : null
   return createPortal(
-    <LegacyModalShell
+    <ModalShell
       width="47rem"
       header={
         <WizardHeader
@@ -219,7 +218,7 @@ export function CheckCalibration(
           activePipette={activePipette}
         />
       )}
-    </LegacyModalShell>,
+    </ModalShell>,
     getTopPortalEl()
   )
 }

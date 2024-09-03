@@ -4,7 +4,7 @@ import pytest
 from _pytest.fixtures import SubRequest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.types import Location, Mount
 from opentrons.protocol_api.core.common import LabwareCore, ProtocolCore

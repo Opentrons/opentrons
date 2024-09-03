@@ -18,10 +18,10 @@
     "default": {
         "aionotify": {
             "hashes": [
-                "sha256:385e1becfaac2d9f4326673033d53912ef9565b6febdedbec593ee966df392c6",
-                "sha256:64b702ad0eb115034533f9f62730a9253b79f5ff0fbf3d100c392124cdf12507"
+                "sha256:25816a9eef030c774beaee22189a24e29bc43f81cebe574ef723851eaf89ddee",
+                "sha256:9651e1373873c75786101330e302e114f85b6e8b5ad70b491497c8b3609a8449"
             ],
-            "version": "==0.2.0"
+            "version": "==0.3.1"
         },
         "anyio": {
             "hashes": [

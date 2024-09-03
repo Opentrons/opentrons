@@ -12,7 +12,7 @@ from typing import (
     Set,
     TypeVar,
 )
-from opentrons_shared_data.pipette.dev_types import (
+from opentrons_shared_data.pipette.types import (
     PipetteName,
 )
 from opentrons.config.types import GantryLoad, OutputOptions
@@ -142,15 +142,16 @@ class FlexBackend(Protocol):
     async def liquid_probe(
         self,
         mount: OT3Mount,
-        max_z_distance: float,
+        max_p_distance: float,
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
+        plunger_impulse_time: float,
+        num_baseline_reads: int,
         output_format: OutputOptions = OutputOptions.can_bus_only,
         data_files: Optional[Dict[InstrumentProbeType, str]] = None,
-        auto_zero_sensor: bool = True,
-        num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
+        force_both_sensors: bool = False,
     ) -> float:
         ...
 
@@ -365,7 +366,9 @@ class FlexBackend(Protocol):
         distance_mm: float,
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
-        probe: InstrumentProbeType,
+        probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
+        output_format: OutputOptions = OutputOptions.sync_only,
+        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
     ) -> bool:
         ...
 

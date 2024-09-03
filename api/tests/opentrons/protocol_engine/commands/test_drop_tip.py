@@ -9,7 +9,7 @@ from opentrons.protocol_engine import (
     WellOffset,
     DeckPoint,
 )
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.execution import MovementHandler, TipHandler
 from opentrons.types import Point
 

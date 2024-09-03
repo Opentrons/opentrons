@@ -1,4 +1,5 @@
 """Router for /maintenance_runs endpoints dealing with labware offsets and definitions."""
+from typing import Annotated
 import logging
 from fastapi import APIRouter, Depends, status
 
@@ -9,8 +10,8 @@ from robot_server.errors.error_responses import ErrorBody
 from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResponse
 
 from ..maintenance_run_models import MaintenanceRun, LabwareDefinitionSummary
-from ..maintenance_engine_store import MaintenanceEngineStore
-from ..dependencies import get_maintenance_engine_store
+from ..maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
+from ..dependencies import get_maintenance_run_orchestrator_store
 from .base_router import RunNotFound, RunNotIdle, get_run_data_from_url
 
 log = logging.getLogger(__name__)
@@ -37,17 +38,19 @@ labware_router = APIRouter()
 )
 async def add_labware_offset(
     request_body: RequestModel[LabwareOffsetCreate],
-    engine_store: MaintenanceEngineStore = Depends(get_maintenance_engine_store),
-    run: MaintenanceRun = Depends(get_run_data_from_url),
+    run_orchestrator_store: Annotated[
+        MaintenanceRunOrchestratorStore, Depends(get_maintenance_run_orchestrator_store)
+    ],
+    run: Annotated[MaintenanceRun, Depends(get_run_data_from_url)],
 ) -> PydanticResponse[SimpleBody[LabwareOffset]]:
     """Add a labware offset to a maintenance run.
 
     Args:
         request_body: New labware offset request data from request body.
-        engine_store: Engine storage interface.
+        run_orchestrator_store: Engine storage interface.
         run: Run response data by ID from URL; ensures 404 if run not found.
     """
-    added_offset = engine_store.engine.add_labware_offset(request_body.data)
+    added_offset = run_orchestrator_store.add_labware_offset(request_body.data)
     log.info(f'Added labware offset "{added_offset.id}"' f' to run "{run.id}".')
 
     return await PydanticResponse.create(
@@ -74,17 +77,19 @@ async def add_labware_offset(
 )
 async def add_labware_definition(
     request_body: RequestModel[LabwareDefinition],
-    engine_store: MaintenanceEngineStore = Depends(get_maintenance_engine_store),
-    run: MaintenanceRun = Depends(get_run_data_from_url),
+    run_orchestrator_store: Annotated[
+        MaintenanceRunOrchestratorStore, Depends(get_maintenance_run_orchestrator_store)
+    ],
+    run: Annotated[MaintenanceRun, Depends(get_run_data_from_url)],
 ) -> PydanticResponse[SimpleBody[LabwareDefinitionSummary]]:
     """Add a labware offset to a run.
 
     Args:
         request_body: New labware offset request data from request body.
-        engine_store: Engine storage interface.
+        run_orchestrator_store: Engine storage interface.
         run: Run response data by ID from URL; ensures 404 if run not found.
     """
-    uri = engine_store.engine.add_labware_definition(request_body.data)
+    uri = run_orchestrator_store.add_labware_definition(request_body.data)
     log.info(f'Added labware definition "{uri}"' f' to run "{run.id}".')
 
     return PydanticResponse(

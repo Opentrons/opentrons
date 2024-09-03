@@ -5,27 +5,28 @@ import flatMap from 'lodash/flatMap'
 
 import { LabwareOutline } from './LabwareOutline'
 import { Well } from './Well'
+import { STYLE_BY_WELL_CONTENTS } from './StyledWells'
+import { COLORS } from '../../../helix-design-system'
 
 import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
 import type { WellMouseEvent } from './types'
-import { STYLE_BY_WELL_CONTENTS } from './StyledWells'
-import { COLORS } from '../../../helix-design-system'
+import type { CSSProperties } from 'styled-components'
 
 export interface StaticLabwareProps {
   /** Labware definition to render */
   definition: LabwareDefinition2
-  /** Hide labware outline */
-  hideOutline?: boolean
   /** Add thicker blurred blue border to labware, defaults to false */
   highlight?: boolean
+  /** adds a drop shadow to the highlight border */
+  highlightShadow?: boolean
   /** Optional callback to be executed when entire labware element is clicked */
   onLabwareClick?: () => void
   /** Optional callback to be executed when mouse enters a well element */
   onMouseEnterWell?: (e: WellMouseEvent) => unknown
   /** Optional callback to be executed when mouse leaves a well element */
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
-  /** Provides well data attribute */
-  isInteractive?: boolean
+  fill?: CSSProperties['fill']
+  showRadius?: boolean
 }
 
 const TipDecoration = React.memo(function TipDecoration(props: {
@@ -55,22 +56,27 @@ const LabwareDetailGroup = styled.g`
 export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
   const {
     definition,
-    hideOutline = false,
     highlight,
-    isInteractive,
+    highlightShadow,
     onLabwareClick,
     onMouseEnterWell,
     onMouseLeaveWell,
+    fill,
+    showRadius = true,
   } = props
 
   const { isTiprack } = definition.parameters
   return (
     <g onClick={onLabwareClick}>
-      {!hideOutline ? (
-        <LabwareDetailGroup>
-          <LabwareOutline definition={definition} highlight={highlight} />
-        </LabwareDetailGroup>
-      ) : null}
+      <LabwareDetailGroup>
+        <LabwareOutline
+          definition={definition}
+          highlight={highlight}
+          highlightShadow={highlightShadow}
+          fill={fill}
+          showRadius={showRadius}
+        />
+      </LabwareDetailGroup>
       <g>
         {flatMap(
           definition.ordering,
@@ -83,10 +89,10 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
                     well={definition.wells[wellName]}
                     onMouseEnterWell={onMouseEnterWell}
                     onMouseLeaveWell={onMouseLeaveWell}
-                    isInteractive={isInteractive}
                     {...(isTiprack
                       ? STYLE_BY_WELL_CONTENTS.tipPresent
                       : STYLE_BY_WELL_CONTENTS.defaultWell)}
+                    fill={fill}
                   />
 
                   {isTiprack ? (

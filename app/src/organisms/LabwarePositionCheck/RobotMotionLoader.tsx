@@ -10,7 +10,7 @@ import {
   RESPONSIVENESS,
   SIZE_4,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -31,7 +31,7 @@ export function RobotMotionLoader(props: RobotMotionLoaderProps): JSX.Element {
     >
       <Icon name="ot-spinner" spin size={SIZE_4} color={COLORS.grey50} />
       {header != null ? <LoadingText>{header}</LoadingText> : null}
-      {body != null ? <StyledText as="p">{body}</StyledText> : null}
+      {body != null ? <LegacyStyledText as="p">{body}</LegacyStyledText> : null}
     </Flex>
   )
 }

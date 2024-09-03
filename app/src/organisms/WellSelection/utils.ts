@@ -26,7 +26,19 @@ export function clientRectToBoundingRect(rect: ClientRect): BoundingRect {
   }
 }
 
+// TODO(jh, 07-17-24): Consider checking specific well labels instead of elementAtPoint as a more robust alternative.
 export const getCollidingWells = (rectPositions: GenericRect): WellGroup => {
+  const isElementVisible = (element: HTMLElement): boolean => {
+    const rect = element.getBoundingClientRect()
+    // If multiple well elements occupy the same x,y coordinate space, document.elementFromPoint() selects
+    // ONLY the "topmost" well element, accounting for z-index, stacking order, visibility, and opacity.
+    const elementAtPoint = document.elementFromPoint(
+      rect.left + rect.width / 2,
+      rect.top + rect.height / 2
+    )
+    return element.contains(elementAtPoint)
+  }
+
   // Returns set of selected wells under a collision rect
   const { x0, y0, x1, y1 } = rectPositions
   const selectionBoundingRect = {
@@ -41,12 +53,26 @@ export const getCollidingWells = (rectPositions: GenericRect): WellGroup => {
       `[${INTERACTIVE_WELL_DATA_ATTRIBUTE}]`
     ),
   ]
-  const collidedElems = selectableElems.filter((selectableElem, i) =>
-    rectCollision(
-      selectionBoundingRect,
-      clientRectToBoundingRect(selectableElem.getBoundingClientRect())
+
+  const collidedElems = selectableElems.filter(selectableElem => {
+    const rect = selectableElem.getBoundingClientRect()
+
+    // Check if the element is in the viewport and not obscured.
+    const isInViewport =
+      rect.top >= 0 &&
+      rect.left >= 0 &&
+      rect.bottom <=
+        (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+
+    const isVisible = isInViewport && isElementVisible(selectableElem)
+
+    return (
+      isVisible &&
+      rectCollision(selectionBoundingRect, clientRectToBoundingRect(rect))
     )
-  )
+  })
+
   const collidedWellData = collidedElems.reduce(
     (acc: WellGroup, elem): WellGroup => {
       if (

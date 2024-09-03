@@ -25,7 +25,7 @@ from opentrons_shared_data.gripper.gripper_definition import (
     GripperModelStr,
     GripperModel,
 )
-from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
+from opentrons_shared_data.pipette.types import PipetteName, PipetteModel
 from opentrons.hardware_control.protocols.types import FlexRobotType, OT2RobotType
 
 from robot_server.instruments.instrument_models import (

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
-  Tooltip,
+  LegacyTooltip,
   DeprecatedPrimaryButton,
   useHoverTooltip,
   TOOLTIP_RIGHT,
@@ -21,6 +21,7 @@ import {
   selectors as stepFormSelectors,
   getIsModuleOnDeck,
 } from '../step-forms'
+import { getEnableComment } from '../feature-flags/selectors'
 import {
   ConfirmDeleteModal,
   CLOSE_UNSAVED_STEP_FORM,
@@ -53,15 +54,21 @@ export const StepCreationButtonComponent = (
   return (
     <div
       className={styles.list_item_button}
-      onMouseLeave={() => setExpanded(false)}
+      onMouseLeave={() => {
+        setExpanded(false)
+      }}
       {...targetProps}
     >
       {disabled && (
-        <Tooltip {...tooltipProps}>{t(`disabled_step_creation`)}</Tooltip>
+        <LegacyTooltip {...tooltipProps}>
+          {t(`disabled_step_creation`)}
+        </LegacyTooltip>
       )}
       <DeprecatedPrimaryButton
         id="StepCreationButton"
-        onClick={() => setExpanded(!expanded)}
+        onClick={() => {
+          setExpanded(!expanded)
+        }}
         disabled={disabled}
       >
         {t('button:add_step')}
@@ -95,24 +102,39 @@ export function StepButtonItem(props: StepButtonItemProps): JSX.Element {
           {t(`application:stepType.${stepType}`, stepType)}
         </DeprecatedPrimaryButton>
       </div>
-      <Tooltip {...tooltipProps}>{tooltipMessage}</Tooltip>
+      <LegacyTooltip {...tooltipProps}>{tooltipMessage}</LegacyTooltip>
     </>
   )
 }
 
 export const StepCreationButton = (): JSX.Element => {
+  const enableComment = useSelector(getEnableComment)
+
   const getSupportedSteps = (): Array<
     Exclude<StepType, 'manualIntervention'>
-  > => [
-    'moveLabware',
-    'moveLiquid',
-    'mix',
-    'pause',
-    'heaterShaker',
-    'magnet',
-    'temperature',
-    'thermocycler',
-  ]
+  > =>
+    enableComment
+      ? [
+          'comment',
+          'moveLabware',
+          'moveLiquid',
+          'mix',
+          'pause',
+          'heaterShaker',
+          'magnet',
+          'temperature',
+          'thermocycler',
+        ]
+      : [
+          'moveLabware',
+          'moveLiquid',
+          'mix',
+          'pause',
+          'heaterShaker',
+          'magnet',
+          'temperature',
+          'thermocycler',
+        ]
 
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
@@ -126,6 +148,7 @@ export const StepCreationButton = (): JSX.Element => {
     Exclude<StepType, 'manualIntervention'>,
     boolean
   > = {
+    comment: enableComment,
     moveLabware: true,
     moveLiquid: true,
     mix: true,
@@ -171,7 +194,9 @@ export const StepCreationButton = (): JSX.Element => {
         createPortal(
           <ConfirmDeleteModal
             modalType={CLOSE_UNSAVED_STEP_FORM}
-            onCancelClick={() => setEnqueuedStepType(null)}
+            onCancelClick={() => {
+              setEnqueuedStepType(null)
+            }}
             onContinueClick={() => {
               if (enqueuedStepType !== null) {
                 addStep(enqueuedStepType)

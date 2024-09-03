@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { formatDistance } from 'date-fns'
 import last from 'lodash/last'
 
@@ -15,7 +15,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_WRAP_BREAK_WORD,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -37,12 +37,8 @@ import { Skeleton } from '../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
 import { useRerunnableStatusText } from './hooks'
-import {
-  useRobotInitializationStatus,
-  INIT_STATUS,
-} from '../../../resources/health/hooks'
 
-import type { Run, RunData, RunStatus } from '@opentrons/api-client'
+import type { RunData, RunStatus } from '@opentrons/api-client'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
 interface RecentRunProtocolCardProps {
@@ -55,7 +51,8 @@ export function RecentRunProtocolCard({
   const { data, isLoading } = useProtocolQuery(runData.protocolId ?? null)
   const protocolData = data?.data ?? null
   const isProtocolFetching = isLoading
-  return protocolData == null ? null : (
+  return protocolData == null ||
+    protocolData.protocolKind === 'quick-transfer' ? null : (
     <ProtocolWithLastRun
       protocolData={protocolData}
       runData={runData}
@@ -81,7 +78,7 @@ export function ProtocolWithLastRun({
     isLoading: isLookingForHardware,
     conflictedSlots,
   } = useMissingProtocolHardware(protocolData.id)
-  const history = useHistory()
+  const navigate = useNavigate()
   const isOk = 'ok' in runData ? !(runData?.ok === false) : true
   const isReadyToBeReRun = isOk && missingProtocolHardware.length === 0
   const chipText = useRerunnableStatusText(
@@ -92,12 +89,7 @@ export function ProtocolWithLastRun({
   const trackEvent = useTrackEvent()
   // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
   // const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runData.id)
-  const onResetSuccess = (createRunResponse: Run): void =>
-    history.push(`runs/${createRunResponse.data.id}/setup`)
-  const { cloneRun } = useCloneRun(runData.id, onResetSuccess)
-  const robotInitStatus = useRobotInitializationStatus()
-  const isRobotInitializing =
-    robotInitStatus === INIT_STATUS.INITIALIZING || robotInitStatus == null
+  const { cloneRun } = useCloneRun(runData.id)
   const [showSpinner, setShowSpinner] = React.useState<boolean>(false)
 
   const protocolName =
@@ -146,9 +138,12 @@ export function ProtocolWithLastRun({
   const handleCardClick = (): void => {
     setShowSpinner(true)
     if (hasRunTimeParameters) {
-      history.push(`/protocols/${protocolId}`)
+      navigate(`/protocols/${protocolId}`)
     } else {
       cloneRun()
+      // Navigate to a dummy setup skeleton until TopLevelRedirects routes to the proper setup page. Doing so prevents
+      // needing to manage complex UI state updates for protocol cards, overzealous dashboard rendering, and potential navigation pitfalls.
+      navigate('/runs/1234/setup')
       trackEvent({
         name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
         properties: { sourceLocation: 'RecentRunProtocolCard' },
@@ -172,7 +167,7 @@ export function ProtocolWithLastRun({
     }
   ).replace('about ', '')
 
-  return isProtocolFetching || isLookingForHardware || isRobotInitializing ? (
+  return isProtocolFetching || isLookingForHardware ? (
     <Skeleton
       height="24.5rem"
       width="25.8125rem"
@@ -216,16 +211,16 @@ export function ProtocolWithLastRun({
         )}
       </Flex>
       <Flex width="100%" height="14rem">
-        <StyledText
+        <LegacyStyledText
           fontSize={TYPOGRAPHY.fontSize32}
           fontWeight={TYPOGRAPHY.fontWeightBold}
           lineHeight={TYPOGRAPHY.lineHeight42}
           css={PROTOCOL_TEXT_STYLE}
         >
           {protocolName}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
-      <StyledText
+      <LegacyStyledText
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         lineHeight={TYPOGRAPHY.lineHeight28}
@@ -235,7 +230,7 @@ export function ProtocolWithLastRun({
           `${terminationTypeMap[runData.status] ?? ''} ${formattedLastRunTime}`,
           'capitalize'
         )}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

@@ -11,7 +11,7 @@ from opentrons.protocol_engine import (
     Command,
 )
 
-from .maintenance_engine_store import MaintenanceEngineStore
+from .maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
 from .maintenance_run_models import MaintenanceRun, MaintenanceRunNotFoundError
 
 from opentrons.protocol_engine.types import DeckConfigurationType
@@ -32,6 +32,7 @@ def _build_run(
         pipettes=[],
         modules=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
     return MaintenanceRun.model_construct(
         id=run_id,
@@ -47,6 +48,7 @@ def _build_run(
         completedAt=state_summary.completedAt,
         startedAt=state_summary.startedAt,
         liquids=state_summary.liquids,
+        hasEverEnteredErrorRecovery=state_summary.hasEverEnteredErrorRecovery,
     )
 
 
@@ -57,25 +59,25 @@ class RunNotCurrentError(ValueError):
 class MaintenanceRunDataManager:
     """Collaborator to manage current maintenance run data.
 
-    Provides a facade to a MaintenanceEngineStore.
+    Provides a facade to a MaintenanceRunOrchestratorStore.
     Returns `MaintenanceRun` response models to the router.
 
     Args:
-        engine_store: In-memory store of the current run's ProtocolEngine.
+        run_orchestrator_store: In-memory store of the current run's ProtocolEngine.
     """
 
     def __init__(
         self,
-        engine_store: MaintenanceEngineStore,
+        run_orchestrator_store: MaintenanceRunOrchestratorStore,
         maintenance_runs_publisher: MaintenanceRunsPublisher,
     ) -> None:
-        self._engine_store = engine_store
+        self._run_orchestrator_store = run_orchestrator_store
         self._maintenance_runs_publisher = maintenance_runs_publisher
 
     @property
     def current_run_id(self) -> Optional[str]:
         """The identifier of the current run, if any."""
-        return self._engine_store.current_run_id
+        return self._run_orchestrator_store.current_run_id
 
     async def create(
         self,
@@ -96,10 +98,10 @@ class MaintenanceRunDataManager:
         Returns:
             The run resource.
         """
-        if self._engine_store.current_run_id is not None:
-            await self._engine_store.clear()
+        if self._run_orchestrator_store.current_run_id is not None:
+            await self._run_orchestrator_store.clear()
 
-        state_summary = await self._engine_store.create(
+        state_summary = await self._run_orchestrator_store.create(
             run_id=run_id,
             created_at=created_at,
             labware_offsets=labware_offsets,
@@ -113,7 +115,7 @@ class MaintenanceRunDataManager:
             state_summary=state_summary,
         )
 
-        await self._maintenance_runs_publisher.publish_current_maintenance_run()
+        self._maintenance_runs_publisher.publish_current_maintenance_run()
 
         return maintenance_run_data
 
@@ -129,10 +131,10 @@ class MaintenanceRunDataManager:
         Raises:
             RunNotCurrentError: The given run identifier does not exist.
         """
-        current_id = self._engine_store.current_run_id
+        current_id = self._run_orchestrator_store.current_run_id
         if current_id != run_id:
             raise MaintenanceRunNotFoundError(run_id=run_id)
-        created_at = self._engine_store.current_run_created_at
+        created_at = self._run_orchestrator_store.current_run_created_at
         state_summary = self._get_state_summary(run_id=run_id)
 
         return _build_run(
@@ -148,14 +150,14 @@ class MaintenanceRunDataManager:
             run_id: The identifier of the run to remove.
 
         Raises:
-            EngineConflictError: If deleting the current run, the current run
+            RunConflictError: If deleting the current run, the current run
                 is not idle and cannot be deleted.
             RunNotFoundError: The given run identifier was not found.
         """
-        if run_id == self._engine_store.current_run_id:
-            await self._engine_store.clear()
+        if run_id == self._run_orchestrator_store.current_run_id:
+            await self._run_orchestrator_store.clear()
 
-            await self._maintenance_runs_publisher.publish_current_maintenance_run()
+            self._maintenance_runs_publisher.publish_current_maintenance_run()
 
         else:
             raise MaintenanceRunNotFoundError(run_id=run_id)
@@ -176,9 +178,9 @@ class MaintenanceRunDataManager:
         Raises:
             RunNotCurrentError: The given run identifier doesn't belong to a current run.
         """
-        if run_id != self._engine_store.current_run_id:
+        if run_id != self._run_orchestrator_store.current_run_id:
             raise MaintenanceRunNotFoundError(run_id=run_id)
-        the_slice = self._engine_store.engine.state_view.commands.get_slice(
+        the_slice = self._run_orchestrator_store.get_command_slice(
             cursor=cursor, length=length
         )
         return the_slice
@@ -192,8 +194,8 @@ class MaintenanceRunDataManager:
         Args:
             run_id: ID of the run.
         """
-        if self._engine_store.current_run_id == run_id:
-            return self._engine_store.engine.state_view.commands.get_current()
+        if self._run_orchestrator_store.current_run_id == run_id:
+            return self._run_orchestrator_store.get_current_command()
         else:
             # todo(mm, 2024-05-20):
             # For historical runs to behave consistently with the current run,
@@ -208,8 +210,8 @@ class MaintenanceRunDataManager:
         Args:
             run_id: ID of the run.
         """
-        if self._engine_store.current_run_id == run_id:
-            return self._engine_store.engine.state_view.commands.get_recovery_target()
+        if self._run_orchestrator_store.current_run_id == run_id:
+            return self._run_orchestrator_store.get_command_recovery_target()
         else:
             # Historical runs can't have any ongoing error recovery.
             return None
@@ -225,9 +227,9 @@ class MaintenanceRunDataManager:
             RunNotCurrentError: The given run identifier doesn't belong to the current run.
             CommandNotFoundError: The given command identifier was not found.
         """
-        if run_id != self._engine_store.current_run_id:
+        if run_id != self._run_orchestrator_store.current_run_id:
             raise MaintenanceRunNotFoundError(run_id=run_id)
-        return self._engine_store.engine.state_view.commands.get(command_id=command_id)
+        return self._run_orchestrator_store.get_command(command_id=command_id)
 
     def _get_state_summary(self, run_id: str) -> Optional[StateSummary]:
-        return self._engine_store.engine.state_view.get_summary()
+        return self._run_orchestrator_store.get_state_summary()

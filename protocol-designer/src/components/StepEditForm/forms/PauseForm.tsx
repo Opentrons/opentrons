@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 import {
   FormGroup,
   useHoverTooltip,
-  Tooltip,
+  LegacyTooltip,
   TOOLTIP_BOTTOM,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
@@ -113,13 +113,13 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
           )}
 
           {pauseUntilModuleEnabled ? null : (
-            <Tooltip {...tooltipProps}>
+            <LegacyTooltip {...tooltipProps}>
               {getSingleSelectDisabledTooltip(
                 'wait_until_temp',
                 'pauseAction',
                 t
               )}
-            </Tooltip>
+            </LegacyTooltip>
           )}
           <div {...targetProps}>
             <div className={styles.checkbox_row}>
@@ -164,21 +164,25 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
           </div>
         </div>
         <div className={styles.section_column}>
-          <div className={styles.form_row}>
-            {/* TODO: Ian 2019-03-25 consider making this a component eg `TextAreaField.js` if used anywhere else */}
-            <FormGroup
-              className={styles.full_width_field}
-              label={t('form:step_edit_form.field.pauseMessage.label')}
-            >
-              <textarea
-                className={styles.textarea_field}
-                value={propsForFields.pauseMessage.value as string}
-                onChange={(e: React.ChangeEvent<any>) =>
-                  propsForFields.pauseMessage.updateValue(e.currentTarget.value)
-                }
-              />
-            </FormGroup>
-          </div>
+          {pauseAction === PAUSE_UNTIL_TEMP ? null : (
+            <div className={styles.form_row}>
+              {/* TODO: Ian 2019-03-25 consider making this a component eg `TextAreaField.js` if used anywhere else */}
+              <FormGroup
+                className={styles.full_width_field}
+                label={t('form:step_edit_form.field.pauseMessage.label')}
+              >
+                <textarea
+                  className={styles.textarea_field}
+                  value={propsForFields.pauseMessage.value as string}
+                  onChange={(e: React.ChangeEvent<any>) => {
+                    propsForFields.pauseMessage.updateValue(
+                      e.currentTarget.value
+                    )
+                  }}
+                />
+              </FormGroup>
+            </div>
+          )}
         </div>
       </div>
     </div>

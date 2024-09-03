@@ -6,7 +6,7 @@ import {
   Flex,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Slideout } from '../../atoms/Slideout'
@@ -42,32 +42,32 @@ export const AboutGripperSlideout = (
       <Flex flexDirection={DIRECTION_COLUMN}>
         {firmwareVersion != null && (
           <>
-            <StyledText
+            <LegacyStyledText
               as="h6"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.grey60}
             >
               {i18n.format(t('current_version'), 'upperCase')}
-            </StyledText>
-            <StyledText
+            </LegacyStyledText>
+            <LegacyStyledText
               as="p"
               paddingTop={SPACING.spacing4}
               paddingBottom={SPACING.spacing16}
             >
               {firmwareVersion}
-            </StyledText>
+            </LegacyStyledText>
           </>
         )}
-        <StyledText
+        <LegacyStyledText
           as="h6"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.grey60}
         >
           {i18n.format(t('serial_number'), 'upperCase')}
-        </StyledText>
-        <StyledText as="p" paddingTop={SPACING.spacing4}>
+        </LegacyStyledText>
+        <LegacyStyledText as="p" paddingTop={SPACING.spacing4}>
           {serialNumber}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
     </Slideout>
   )

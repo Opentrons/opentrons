@@ -9,11 +9,13 @@ import type {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
   HEATERSHAKER_MODULE_V1,
+  ABSORBANCE_READER_V1,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
+  ABSORBANCE_READER_TYPE,
   GEN1,
   GEN2,
   FLEX,
@@ -22,6 +24,7 @@ import type {
   GRIPPER_V1,
   GRIPPER_V1_1,
   GRIPPER_V1_2,
+  GRIPPER_V1_3,
   EXTENSION,
   MAGNETIC_BLOCK_V1,
 } from './constants'
@@ -50,6 +53,7 @@ export interface WellDefinition {
   y: number
   z: number
   'total-liquid-volume': number
+  geometryDefinitionId?: string | null
 }
 
 // typedef for labware definitions under v1 labware schema
@@ -128,19 +132,19 @@ export interface LabwareBrand {
   links?: string[]
 }
 
-export interface CircularWellShapeProperties {
+export interface CircularWellShape {
   shape: 'circular'
   diameter: number
 }
-export interface RectangularWellShapeProperties {
+export interface RectangularWellShape {
   shape: 'rectangular'
   xDimension: number
   yDimension: number
 }
 
 export type LabwareWellShapeProperties =
-  | CircularWellShapeProperties
-  | RectangularWellShapeProperties
+  | CircularWellShape
+  | RectangularWellShape
 
 // well without x,y,z
 export type LabwareWellProperties = LabwareWellShapeProperties & {
@@ -152,6 +156,41 @@ export type LabwareWell = LabwareWellProperties & {
   x: number
   y: number
   z: number
+  geometryDefinitionId?: string
+}
+
+export interface CircularCrossSection {
+  shape: 'circular'
+  diameter: number
+}
+
+export interface RectangularCrossSection {
+  shape: 'rectangular'
+  xDimension: number
+  yDimension: number
+}
+
+export interface SphericalSegment {
+  shape: 'spherical'
+  radiusOfCurvature: number
+  depth: number
+}
+
+export type TopCrossSection = CircularCrossSection | RectangularCrossSection
+
+export type BottomShape =
+  | CircularCrossSection
+  | RectangularCrossSection
+  | SphericalSegment
+
+export interface BoundedSection {
+  geometry: TopCrossSection
+  topHeight: number
+}
+
+export interface InnerWellGeometry {
+  frusta: BoundedSection[]
+  bottomShape: BottomShape
 }
 
 // TODO(mc, 2019-03-21): exact object is tough to use with the initial value in
@@ -186,6 +225,26 @@ export interface LabwareDefinition2 {
   wells: LabwareWellMap
   groups: LabwareWellGroup[]
   allowedRoles?: LabwareRoles[]
+  stackingOffsetWithLabware?: Record<string, LabwareOffset>
+  stackingOffsetWithModule?: Record<string, LabwareOffset>
+}
+
+export interface LabwareDefinition3 {
+  version: number
+  schemaVersion: 3
+  namespace: string
+  metadata: LabwareMetadata
+  dimensions: LabwareDimensions
+  cornerOffsetFromSlot: LabwareOffset
+  parameters: LabwareParameters
+  brand: LabwareBrand
+  ordering: string[][]
+  wells: LabwareWellMap
+  groups: LabwareWellGroup[]
+  allowedRoles?: LabwareRoles[]
+  stackingOffsetWithLabware?: Record<string, LabwareOffset>
+  stackingOffsetWithModule?: Record<string, LabwareOffset>
+  innerLabwareGeometry?: Record<string, InnerWellGeometry> | null
 }
 
 export interface LabwareDefByDefURI {
@@ -201,6 +260,7 @@ export type ModuleType =
   | typeof THERMOCYCLER_MODULE_TYPE
   | typeof HEATERSHAKER_MODULE_TYPE
   | typeof MAGNETIC_BLOCK_TYPE
+  | typeof ABSORBANCE_READER_TYPE
 
 // ModuleModel corresponds to top-level keys in shared-data/module/definitions/2
 export type MagneticModuleModel =
@@ -219,17 +279,21 @@ export type HeaterShakerModuleModel = typeof HEATERSHAKER_MODULE_V1
 
 export type MagneticBlockModel = typeof MAGNETIC_BLOCK_V1
 
+export type AbsorbanceReaderModel = typeof ABSORBANCE_READER_V1
+
 export type ModuleModel =
   | MagneticModuleModel
   | TemperatureModuleModel
   | ThermocyclerModuleModel
   | HeaterShakerModuleModel
   | MagneticBlockModel
+  | AbsorbanceReaderModel
 
 export type GripperModel =
   | typeof GRIPPER_V1
   | typeof GRIPPER_V1_1
   | typeof GRIPPER_V1_2
+  | typeof GRIPPER_V1_3
 
 export type ModuleModelWithLegacy =
   | ModuleModel
@@ -290,6 +354,7 @@ type AreaType =
   | 'wasteChute'
   | 'fixedTrash'
   | 'stagingSlot'
+  | 'lidDock'
 
 export interface AddressableArea {
   id: AddressableAreaName
@@ -400,17 +465,28 @@ export interface FlowRateSpec {
   max: number
 }
 
+interface pressAndCamConfigurationValues {
+  speed: number
+  distance: number
+  current: number
+  tipOverlaps: { [version: string]: { [labwareURI: string]: number } }
+}
 export interface PipetteV2GeneralSpecs {
   displayName: string
   model: string
   displayCategory: PipetteDisplayCategory
+  validNozzleMaps: {
+    maps: { [nozzleMapKey: string]: string[] }
+  }
   pickUpTipConfigurations: {
     pressFit: {
-      speedByTipCount: Record<string, number>
       presses: number
       increment: number
-      distanceByTipCount: Record<string, number>
-      currentByTipCount: Record<string, number>
+      configurationsByNozzleMap: {
+        [nozzleMapKey: string]: {
+          [tipType: string]: pressAndCamConfigurationValues
+        }
+      }
     }
   }
   dropTipConfigurations: {
@@ -502,7 +578,6 @@ export interface SupportedTips {
 export interface PipetteV2LiquidSpecs {
   $otSharedSchema: string
   supportedTips: SupportedTips
-  defaultTipOverlapDictionary: Record<string, number>
   maxVolume: number
   minVolume: number
   defaultTipracks: string[]
@@ -602,50 +677,96 @@ export interface NumberParameter extends BaseRunTimeParameter {
   min: number
   max: number
   default: number
+  value: number
 }
 
-export interface Choice {
+export interface NumberChoice {
   displayName: string
-  value: number | boolean | string
+  value: number
 }
 
-interface ChoiceParameter extends BaseRunTimeParameter {
-  type: RunTimeParameterType
-  choices: Choice[]
-  default: number | boolean | string
+export interface BooleanChoice {
+  displayName: string
+  value: boolean
 }
+
+export interface StringChoice {
+  displayName: string
+  value: string
+}
+
+export type Choice = NumberChoice | BooleanChoice | StringChoice
+
+interface NumberChoiceParameter extends BaseRunTimeParameter {
+  type: NumberParameterType
+  choices: NumberChoice[]
+  default: number
+  value: number
+}
+
+interface BooleanChoiceParameter extends BaseRunTimeParameter {
+  type: BooleanParameterType
+  choices: BooleanChoice[]
+  default: boolean
+  value: boolean
+}
+
+interface StringChoiceParameter extends BaseRunTimeParameter {
+  type: StringParameterType
+  choices: StringChoice[]
+  default: string
+  value: string
+}
+
+export type ChoiceParameter =
+  | NumberChoiceParameter
+  | BooleanChoiceParameter
+  | StringChoiceParameter
 
 interface BooleanParameter extends BaseRunTimeParameter {
   type: BooleanParameterType
   default: boolean
+  value: boolean
+}
+
+export interface CsvFileParameterFileData {
+  id?: string
+  file?: File | null
+  filePath?: string
+  fileName?: string
+  name?: string
+}
+
+export interface CsvFileParameter extends BaseRunTimeParameter {
+  type: CsvFileParameterType
+  file?: CsvFileParameterFileData | null
 }
 
 type NumberParameterType = 'int' | 'float'
 type BooleanParameterType = 'bool'
 type StringParameterType = 'str'
-type RunTimeParameterType =
-  | NumberParameter
-  | BooleanParameterType
-  | StringParameterType
+type CsvFileParameterType = 'csv_file'
 
 interface BaseRunTimeParameter {
   displayName: string
   variableName: string
   description: string
-  value: number | boolean | string
   suffix?: string
 }
+
+export type ValueRunTimeParameter = Exclude<RunTimeParameter, CsvFileParameter>
 
 export type RunTimeParameter =
   | BooleanParameter
   | ChoiceParameter
   | NumberParameter
+  | CsvFileParameter
 
 // TODO(BC, 10/25/2023): this type (and others in this file) probably belong in api-client, not here
 export interface CompletedProtocolAnalysis {
   id: string
   status?: 'completed'
-  result: 'ok' | 'not-ok' | 'error'
+  result: 'ok' | 'not-ok' | 'error' | 'parameter-value-required'
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
   modules: LoadedModule[]
@@ -664,6 +785,7 @@ export interface ProtocolResource {
   id: string
   createdAt: string
   protocolType: 'json' | 'python'
+  protocolKind: 'standard' | 'quick-transfer'
   robotType: RobotType
   metadata: ProtocolMetadata
   analysisSummaries: ProtocolAnalysisSummary[]

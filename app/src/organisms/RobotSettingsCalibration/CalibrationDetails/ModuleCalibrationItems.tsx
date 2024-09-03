@@ -6,7 +6,7 @@ import {
   BORDERS,
   COLORS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
@@ -45,21 +45,23 @@ export function ModuleCalibrationItems({
         {attachedModules.map(attachedModule => (
           <StyledTableRow key={attachedModule.id}>
             <StyledTableCell>
-              <StyledText as="p">
+              <LegacyStyledText as="p">
                 {getModuleDisplayName(attachedModule.moduleModel)}
-              </StyledText>
+              </LegacyStyledText>
             </StyledTableCell>
             <StyledTableCell>
-              <StyledText as="p">{attachedModule.serialNumber}</StyledText>
+              <LegacyStyledText as="p">
+                {attachedModule.serialNumber}
+              </LegacyStyledText>
             </StyledTableCell>
             <StyledTableCell>
-              <StyledText as="p">
+              <LegacyStyledText as="p">
                 {attachedModule.moduleOffset?.last_modified != null
                   ? formatLastCalibrated(
                       attachedModule.moduleOffset?.last_modified
                     )
                   : t('not_calibrated_short')}
-              </StyledText>
+              </LegacyStyledText>
             </StyledTableCell>
             <StyledTableCell>
               <ModuleCalibrationOverflowMenu

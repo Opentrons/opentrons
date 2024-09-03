@@ -5,16 +5,16 @@ import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { DeckConfigurationDiscardChangesModal } from '../DeckConfigurationDiscardChangesModal'
-import type { useHistory } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
 const mockFunc = vi.fn()
-const mockGoBack = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useHistory>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
-    useHistory: () => ({ goBack: mockGoBack }),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -51,7 +51,7 @@ describe('DeckConfigurationDiscardChangesModal', () => {
     render(props)
     fireEvent.click(screen.getByText('Discard changes'))
     expect(mockFunc).toHaveBeenCalledWith(false)
-    expect(mockGoBack).toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalled()
   })
 
   it('should call a mock function when tapping continue editing button', () => {

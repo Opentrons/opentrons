@@ -16,7 +16,6 @@ from typing import (
 from opentrons_shared_data.errors.exceptions import MotionPlanningFailureError
 from opentrons_shared_data.module import FLEX_TC_LID_COLLISION_ZONE
 
-from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
 from opentrons.motion_planning import adjacent_slots_getters
@@ -62,21 +61,6 @@ class UnsuitableTiprackForPipetteMotion(MotionPlanningFailureError):
 
 
 _log = logging.getLogger(__name__)
-
-# TODO (spp, 2023-12-06): move this to a location like motion planning where we can
-#  derive these values from geometry definitions
-#  Also, verify y-axis extents values for the nozzle columns.
-# Bounding box measurements
-A12_column_front_left_bound = Point(x=-11.03, y=2)
-A12_column_back_right_bound = Point(x=526.77, y=506.2)
-
-_NOZZLE_PITCH = 9
-A1_column_front_left_bound = Point(
-    x=A12_column_front_left_bound.x - _NOZZLE_PITCH * 11, y=2
-)
-A1_column_back_right_bound = Point(
-    x=A12_column_back_right_bound.x - _NOZZLE_PITCH * 11, y=506.2
-)
 
 _FLEX_TC_LID_BACK_LEFT_PT = Point(
     x=FLEX_TC_LID_COLLISION_ZONE["back_left"]["x"],
@@ -244,8 +228,15 @@ def check_safe_for_pipette_movement(
     )
     primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
 
+    pipette_bounds_at_well_location = (
+        engine_state.pipettes.get_pipette_bounds_at_specified_move_to_position(
+            pipette_id=pipette_id, destination_position=well_location_point
+        )
+    )
     if not _is_within_pipette_extents(
-        engine_state=engine_state, pipette_id=pipette_id, location=well_location_point
+        engine_state=engine_state,
+        pipette_id=pipette_id,
+        pipette_bounding_box_at_loc=pipette_bounds_at_well_location,
     ):
         raise PartialTipMovementNotAllowedError(
             f"Requested motion with the {primary_nozzle} nozzle partial configuration"
@@ -253,11 +244,7 @@ def check_safe_for_pipette_movement(
         )
 
     labware_slot = engine_state.geometry.get_ancestor_slot_name(labware_id)
-    pipette_bounds_at_well_location = (
-        engine_state.pipettes.get_pipette_bounds_at_specified_move_to_position(
-            pipette_id=pipette_id, destination_position=well_location_point
-        )
-    )
+
     surrounding_slots = adjacent_slots_getters.get_surrounding_slots(
         slot=labware_slot.as_int(), robot_type=engine_state.config.robot_type
     )
@@ -423,42 +410,55 @@ def check_safe_for_tip_pickup_and_return(
         )
 
 
-# TODO (spp, 2023-02-06): update the extents check to use all nozzle bounds instead of
-#  just position of primary nozzle when checking if the pipette is out-of-bounds
 def _is_within_pipette_extents(
     engine_state: StateView,
     pipette_id: str,
-    location: Point,
+    pipette_bounding_box_at_loc: Tuple[Point, Point, Point, Point],
 ) -> bool:
     """Whether a given point is within the extents of a configured pipette on the specified robot."""
-    robot_type = engine_state.config.robot_type
-    pipette_channels = engine_state.pipettes.get_channels(pipette_id)
-    nozzle_config = engine_state.pipettes.get_nozzle_layout_type(pipette_id)
-    primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
-    if robot_type == "OT-3 Standard":
-        if pipette_channels == 96 and nozzle_config == NozzleConfigurationType.COLUMN:
-            # TODO (spp, 2023-12-18): change this eventually to use column mappings in
-            #  the pipette geometry definitions.
-            if primary_nozzle == "A12":
-                return (
-                    A12_column_front_left_bound.x
-                    <= location.x
-                    <= A12_column_back_right_bound.x
-                    and A12_column_front_left_bound.y
-                    <= location.y
-                    <= A12_column_back_right_bound.y
-                )
-            elif primary_nozzle == "A1":
-                return (
-                    A1_column_front_left_bound.x
-                    <= location.x
-                    <= A1_column_back_right_bound.x
-                    and A1_column_front_left_bound.y
-                    <= location.y
-                    <= A1_column_back_right_bound.y
-                )
-    # TODO (spp, 2023-11-07): check for 8-channel nozzle A1 & H1 extents on Flex & OT2
-    return True
+    channels = engine_state.pipettes.get_channels(pipette_id)
+    robot_extents = engine_state.geometry.absolute_deck_extents
+    (
+        pip_back_left_bound,
+        pip_front_right_bound,
+        pip_back_right_bound,
+        pip_front_left_bound,
+    ) = pipette_bounding_box_at_loc
+
+    # Given the padding values accounted for against the deck extents,
+    # a pipette is within extents when all of the following are true:
+
+    # Each corner slot full pickup case:
+    # A1: Front right nozzle is within the rear and left-side padding limits
+    # D1: Back right nozzle is within the front and left-side padding limits
+    # A3 Front left nozzle is within the rear and right-side padding limits
+    # D3: Back left nozzle is within the front and right-side padding limits
+    # Thermocycler Column A2: Front right nozzle is within padding limits
+
+    if channels == 96:
+        return (
+            pip_front_right_bound.y
+            <= robot_extents.deck_extents.y + robot_extents.padding_rear
+            and pip_front_right_bound.x >= robot_extents.padding_left_side
+            and pip_back_right_bound.y >= robot_extents.padding_front
+            and pip_back_right_bound.x >= robot_extents.padding_left_side
+            and pip_front_left_bound.y
+            <= robot_extents.deck_extents.y + robot_extents.padding_rear
+            and pip_front_left_bound.x
+            <= robot_extents.deck_extents.x + robot_extents.padding_right_side
+            and pip_back_left_bound.y >= robot_extents.padding_front
+            and pip_back_left_bound.x
+            <= robot_extents.deck_extents.x + robot_extents.padding_right_side
+        )
+    # For 8ch pipettes we only check the rear and front extents
+    return (
+        pip_front_right_bound.y
+        <= robot_extents.deck_extents.y + robot_extents.padding_rear
+        and pip_back_right_bound.y >= robot_extents.padding_front
+        and pip_front_left_bound.y
+        <= robot_extents.deck_extents.y + robot_extents.padding_rear
+        and pip_back_left_bound.y >= robot_extents.padding_front
+    )
 
 
 def _map_labware(

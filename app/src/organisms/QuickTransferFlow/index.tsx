@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   useConditionalConfirm,
@@ -25,7 +25,7 @@ const QUICK_TRANSFER_WIZARD_STEPS = 8
 const initialQuickTransferState: QuickTransferWizardState = {}
 
 export const QuickTransferFlow = (): JSX.Element => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const [state, dispatch] = React.useReducer(
     quickTransferWizardReducer,
@@ -37,7 +37,9 @@ export const QuickTransferFlow = (): JSX.Element => {
     confirm: confirmExit,
     showConfirmation: showConfirmExit,
     cancel: cancelExit,
-  } = useConditionalConfirm(() => history.push('protocols'), true)
+  } = useConditionalConfirm(() => {
+    navigate('/quick-transfer')
+  }, true)
 
   const exitButtonProps: React.ComponentProps<typeof SmallButton> = {
     buttonType: 'tertiaryLowLight',
@@ -47,15 +49,21 @@ export const QuickTransferFlow = (): JSX.Element => {
   const sharedMiddleStepProps = {
     state,
     dispatch,
-    onBack: () => setCurrentStep(prevStep => prevStep - 1),
-    onNext: () => setCurrentStep(prevStep => prevStep + 1),
+    onBack: () => {
+      setCurrentStep(prevStep => prevStep - 1)
+    },
+    onNext: () => {
+      setCurrentStep(prevStep => prevStep + 1)
+    },
     exitButtonProps,
   }
 
   const contentInOrder: JSX.Element[] = [
     <CreateNewTransfer
       key={0}
-      onNext={() => setCurrentStep(prevStep => prevStep + 1)}
+      onNext={() => {
+        setCurrentStep(prevStep => prevStep + 1)
+      }}
       exitButtonProps={exitButtonProps}
     />,
     <SelectPipette key={1} {...sharedMiddleStepProps} />,
@@ -65,14 +73,7 @@ export const QuickTransferFlow = (): JSX.Element => {
     <SelectDestLabware key={5} {...sharedMiddleStepProps} />,
     <SelectDestWells key={6} {...sharedMiddleStepProps} />,
     <VolumeEntry key={7} {...sharedMiddleStepProps} />,
-    <SummaryAndSettings
-      key={8}
-      {...sharedMiddleStepProps}
-      onNext={() => {
-        console.log('final quick transfer flow state:', state)
-        history.push('protocols')
-      }}
-    />,
+    <SummaryAndSettings key={8} {...sharedMiddleStepProps} />,
   ]
 
   return (

@@ -9,7 +9,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import type { IconName } from '@opentrons/components'
 
@@ -53,7 +53,7 @@ export function Collapsible({
         onClick={toggleExpanded}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="h5">{title}</StyledText>
+          <LegacyStyledText as="h5">{title}</LegacyStyledText>
         </Flex>
         <Icon
           size={SIZE_1}

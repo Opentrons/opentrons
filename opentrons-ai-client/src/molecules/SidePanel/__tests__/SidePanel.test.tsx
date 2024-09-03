@@ -1,11 +1,14 @@
 import React from 'react'
 import { screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { useFormContext } from 'react-hook-form'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
 import { SidePanel } from '../index'
+
+vi.mock('react-hook-form')
 
 const LOGO_FILE_NAME =
   '/opentrons-ai-client/src/assets/images/opentrons_logo.svg'
@@ -19,6 +22,12 @@ const render = (): ReturnType<typeof renderWithProviders> => {
 }
 
 describe('SidePanel', () => {
+  beforeEach(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    vi.mocked(useFormContext).mockReturnValue({
+      setValue: vi.fn(),
+    } as any)
+  })
   it('should render logo and text', () => {
     render()
     const image = screen.getByRole('img')

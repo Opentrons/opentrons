@@ -16,29 +16,25 @@ import {
   useModuleRenderInfoForProtocolById,
   useStoredProtocolAnalysis,
 } from '../../hooks'
-import { BackToTopButton } from '../BackToTopButton'
 import { SetupLabwareMap } from './SetupLabwareMap'
 import { SetupLabwareList } from './SetupLabwareList'
 
-import type { StepKey } from '../ProtocolRunSetup'
-
 interface SetupLabwareProps {
-  protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
   robotName: string
   runId: string
-  nextStep: StepKey | null
-  expandStep: (step: StepKey) => void
+  labwareConfirmed: boolean
+  setLabwareConfirmed: (confirmed: boolean) => void
 }
 
 export function SetupLabware(props: SetupLabwareProps): JSX.Element {
-  const { robotName, runId, nextStep, expandStep, protocolRunHeaderRef } = props
+  const { robotName, runId, labwareConfirmed, setLabwareConfirmed } = props
   const { t } = useTranslation('protocol_setup')
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
   const [selectedValue, toggleGroup] = useToggleGroup(
-    t('list_view'),
-    t('map_view')
+    t('list_view') as string,
+    t('map_view') as string
   )
   const isFlex = useIsFlex(robotName)
 
@@ -71,18 +67,14 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
         )}
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing16}>
-        {nextStep == null ? (
-          <BackToTopButton
-            protocolRunHeaderRef={protocolRunHeaderRef}
-            robotName={robotName}
-            runId={runId}
-            sourceLocation="SetupLabware"
-          />
-        ) : (
-          <PrimaryButton onClick={() => expandStep(nextStep)}>
-            {t('proceed_to_liquid_setup_step')}
-          </PrimaryButton>
-        )}
+        <PrimaryButton
+          onClick={() => {
+            setLabwareConfirmed(true)
+          }}
+          disabled={labwareConfirmed}
+        >
+          {t('confirm_placements')}
+        </PrimaryButton>
       </Flex>
     </>
   )

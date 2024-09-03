@@ -17,7 +17,7 @@ from opentrons.hardware_control import HardwareControlAPI
 
 if TYPE_CHECKING:
     from ..execution import PipettingHandler
-    from ..state import StateView
+    from ..state.state import StateView
 
 
 BlowOutInPlaceCommandType = Literal["blowOutInPlace"]

@@ -241,8 +241,8 @@ describe('CalibrationDataDownload', () => {
   it('renders disabled button when e-stop is pressed', () => {
     when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
     when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
-    const [{ getByRole }] = render()
-    const downloadButton = getByRole('button', {
+    render()
+    const downloadButton = screen.getByRole('button', {
       name: 'Download calibration logs',
     })
     expect(downloadButton).toBeDisabled()

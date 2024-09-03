@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
-import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'
+import {
+  LegacyTooltip,
+  useHoverTooltip,
+  TOOLTIP_FIXED,
+} from '@opentrons/components'
 import { PDListItem } from '../lists'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 import styles from './StepItem.module.css'
@@ -71,9 +75,9 @@ export function ModuleStepItems(props: ModuleStepItemsProps): JSX.Element {
           <span>{action}</span>
         </li>
       ) : null}
-      <Tooltip {...tooltipProps}>
+      <LegacyTooltip {...tooltipProps}>
         <LabwareTooltipContents labwareNickname={labwareNickname} />
-      </Tooltip>
+      </LegacyTooltip>
       <ModuleStepItemRow
         label={labwareNickname}
         targetProps={targetProps}

@@ -6,7 +6,7 @@ from typing import Any, Dict, Sequence, Union, Optional
 
 import anyio
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.errors.exceptions import EnumeratedError, PythonException
 
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION

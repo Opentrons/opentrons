@@ -136,6 +136,21 @@ describe('getNumSlotsAvailable', () => {
     const result = getNumSlotsAvailable(null, mockAdditionalEquipment)
     expect(result).toBe(1)
   })
+  it('shoult return 1 when it is for the waste chute and all slots are occupied with the staging area in slot d3', () => {
+    const mockAdditionalEquipment: AdditionalEquipment[] = [
+      'trashBin',
+      'trashBin',
+      'stagingArea_cutoutA3',
+      'stagingArea_cutoutB3',
+      'stagingArea_cutoutC3',
+      'stagingArea_cutoutD3',
+      'trashBin',
+      'gripper',
+      'trashBin',
+    ]
+    const result = getNumSlotsAvailable(null, mockAdditionalEquipment, true)
+    expect(result).toBe(1)
+  })
   it('should return 8 even when there is a magnetic block', () => {
     const mockModules = {
       0: {

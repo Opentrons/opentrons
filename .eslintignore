@@ -28,8 +28,9 @@ robot-server/**
 shared-data/python/**
 hardware-testing/**
 
-# app-testing don't format the json protocols
-app-testing/files
-# app testing don't format the snapshots
-app-testing/tests/__snapshots__
+# analyses-snapshot-testing don't format the json protocols
+analyses-snapshot-testing/files
+# don't format the snapshots
+analyses-snapshot-testing/tests/__snapshots__
 opentrons-ai-server/package
+opentrons-ai-server/api/storage/index/

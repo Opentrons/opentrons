@@ -6,7 +6,7 @@ from opentrons.hardware_control.ot3api import OT3API
 
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 
-from opentrons_shared_data.pipette.dev_types import UlPerMm
+from opentrons_shared_data.pipette.types import UlPerMm
 
 from .types import OT3Mount
 

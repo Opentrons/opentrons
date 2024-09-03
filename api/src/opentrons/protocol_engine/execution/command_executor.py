@@ -12,9 +12,8 @@ from opentrons_shared_data.errors.exceptions import (
 )
 
 from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
-from ..state import StateStore
+from ..state.state import StateStore
 from ..resources import ModelUtils
 from ..commands import CommandStatus
 from ..actions import (
@@ -84,7 +83,6 @@ class CommandExecutor:
         run_control: RunControlHandler,
         rail_lights: RailLightsHandler,
         status_bar: StatusBarHandler,
-        error_recovery_policy: ErrorRecoveryPolicy,
         model_utils: Optional[ModelUtils] = None,
         command_note_tracker_provider: Optional[CommandNoteTrackerProvider] = None,
     ) -> None:
@@ -105,7 +103,6 @@ class CommandExecutor:
         self._command_note_tracker_provider = (
             command_note_tracker_provider or _NoteTracker
         )
-        self._error_recovery_policy = error_recovery_policy
 
     async def execute(self, command_id: str) -> None:
         """Run a given command's execution procedure.
@@ -138,6 +135,7 @@ class CommandExecutor:
             RunCommandAction(command_id=queued_command.id, started_at=started_at)
         )
         running_command = self._state_store.commands.get(queued_command.id)
+        error_recovery_policy = self._state_store.commands.get_error_recovery_policy()
 
         log.debug(
             f"Executing {running_command.id}, {running_command.commandType}, {running_command.params}"
@@ -168,7 +166,8 @@ class CommandExecutor:
                     error_id=self._model_utils.generate_id(),
                     failed_at=self._model_utils.get_timestamp(),
                     notes=note_tracker.get_notes(),
-                    type=self._error_recovery_policy(
+                    type=error_recovery_policy(
+                        self._state_store.config,
                         running_command,
                         None,
                     ),
@@ -199,6 +198,10 @@ class CommandExecutor:
                         error_id=result.public.id,
                         failed_at=result.public.createdAt,
                         notes=note_tracker.get_notes(),
-                        type=self._error_recovery_policy(running_command, result),
+                        type=error_recovery_policy(
+                            self._state_store.config,
+                            running_command,
+                            result,
+                        ),
                     )
                 )

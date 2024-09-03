@@ -183,11 +183,11 @@ describe('ThermocyclerModuleData', () => {
   })
 
   it('renders thermocycler gen 1 block temperature data', () => {
-    const { getByText, getByTitle } = render(props)
+    render(props)
 
-    getByText('Block')
-    getByTitle('tc_target_temp')
-    getByTitle('tc_current_temp')
+    screen.getByText('Block')
+    screen.getByTitle('tc_target_temp')
+    screen.getByTitle('tc_current_temp')
   })
 
   it('renders all 3 of the thermocycler gen 2 status labels', () => {

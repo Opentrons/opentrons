@@ -8,6 +8,8 @@ import json
 import logging
 from json import JSONDecodeError
 import pathlib
+import subprocess
+import sys
 import tempfile
 from typing import (
     Dict,
@@ -21,7 +23,15 @@ from typing import (
 
 from jsonschema import ValidationError  # type: ignore
 
-from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
+from opentrons.calibration_storage.deck_configuration import (
+    deserialize_deck_configuration,
+)
+from opentrons.config import (
+    ARCHITECTURE,
+    IS_ROBOT,
+    JUPYTER_NOTEBOOK_LABWARE_DIR,
+    SystemArchitecture,
+)
 from opentrons.protocol_api import labware
 from opentrons.calibration_storage import helpers
 from opentrons.protocol_engine.errors.error_occurrence import (
@@ -32,7 +42,7 @@ from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 from opentrons.protocols.types import JsonProtocol, Protocol, PythonProtocol
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
+    from opentrons_shared_data.labware.types import LabwareDefinition
 
 
 log = logging.getLogger(__name__)
@@ -125,12 +135,52 @@ def datafiles_from_paths(paths: Sequence[Union[str, pathlib.Path]]) -> Dict[str,
 
 
 def get_deck_configuration() -> DeckConfigurationType:
-    """Return the host robot's current deck configuration."""
-    # TODO: Search for the file where robot-server stores it.
-    # Flex: /var/lib/opentrons-robot-server/deck_configuration.json
-    # OT-2: /data/opentrons_robot_server/deck_configuration.json
-    # https://opentrons.atlassian.net/browse/RSS-400
-    return []
+    """Return the host robot's current deck configuration.
+
+    This is a hacky implementation because the deck configuration is owned by
+    robot-server. See `robot_server.deck_configuration.cli`.
+    """
+    match ARCHITECTURE:
+        # These hard-coded paths need to be kept in sync with robot-server's
+        # systemd configuration:
+        case SystemArchitecture.BUILDROOT:
+            robot_server_persistence_dir = "/data/opentrons_robot_server"
+        case SystemArchitecture.YOCTO:
+            robot_server_persistence_dir = "/var/lib/opentrons-robot-server"
+        case SystemArchitecture.HOST:
+            # todo(mm, 2024-08-13):
+            # It's unclear what should happen if you run an `opentrons.execute` entry
+            # point on a non-robot device that doesn't have robot-server. I can't
+            # imagine we'd let actual users do this, but it might happen in internal
+            # testing. This empty list return value is totally arbitrary and will
+            # probably not do the right thing.
+            return []
+
+    proc = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "robot_server.deck_configuration.cli",
+            "--persistence-directory",
+            robot_server_persistence_dir,
+        ],
+        check=True,
+        capture_output=True,
+    )
+    deserialized_deck_configuration = deserialize_deck_configuration(proc.stdout)
+    if deserialized_deck_configuration is None:
+        raise RuntimeError("Error getting the host robot's deck configuration.")
+
+    cutout_fixture_placements, _ = deserialized_deck_configuration
+
+    return [
+        (
+            cutout_fixture_placement.cutout_id,
+            cutout_fixture_placement.cutout_fixture_id,
+            cutout_fixture_placement.opentrons_module_serial_number,
+        )
+        for cutout_fixture_placement in cutout_fixture_placements
+    ]
 
 
 @contextlib.contextmanager

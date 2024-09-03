@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 
@@ -13,9 +13,9 @@ vi.mock('../LabwareListItem')
 
 const render = (props: React.ComponentProps<typeof OffDeckLabwareList>) => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <OffDeckLabwareList {...props} />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }

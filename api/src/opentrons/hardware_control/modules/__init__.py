@@ -10,7 +10,6 @@ from .types import (
     ThermocyclerStep,
     UploadFunction,
     BundledFirmware,
-    UpdateError,
     ModuleAtPort,
     SimulatingModuleAtPort,
     SimulatingModule,
@@ -19,9 +18,15 @@ from .types import (
     TemperatureStatus,
     MagneticStatus,
     HeaterShakerStatus,
+    AbsorbanceReaderStatus,
     SpeedStatus,
     LiveData,
 )
+from .errors import (
+    UpdateError,
+    AbsorbanceReaderDisconnectedError,
+)
+
 
 __all__ = [
     "MODULE_TYPE_BY_NAME",
@@ -47,4 +52,7 @@ __all__ = [
     "SpeedStatus",
     "LiveData",
     "AbsorbanceReader",
+    "AbsorbanceReaderStatus",
+    "AbsorbanceReaderDisconnectedError",
+    "ModuleDisconnectedCallback",
 ]

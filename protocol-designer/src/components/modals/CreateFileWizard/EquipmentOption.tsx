@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  MAGNETIC_BLOCK_TYPE,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 
 import {
   Flex,
@@ -14,13 +18,14 @@ import {
   COLORS,
   TYPOGRAPHY,
   useHoverTooltip,
-  Tooltip,
+  LegacyTooltip,
   DIRECTION_COLUMN,
   Box,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
+import { MAX_MAGNETIC_BLOCKS, MAX_MOAM_MODULES } from './ModulesAndOtherTile'
 import type { StyleProps } from '@opentrons/components'
-import type { RobotType } from '@opentrons/shared-data'
+import type { ModuleType, RobotType } from '@opentrons/shared-data'
 
 const ARROW_STYLE = css`
   color: ${COLORS.grey50};
@@ -43,6 +48,7 @@ const ARROW_STYLE_DISABLED = css`
 `
 
 interface MultiplesProps {
+  moduleType: ModuleType
   numItems: number
   maxItems: number
   setValue: (num: number) => void
@@ -74,8 +80,10 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
   } = props
   const { t } = useTranslation(['tooltip', 'shared'])
   const [equipmentTargetProps, equipmentTooltipProps] = useHoverTooltip()
-  const [tempTargetProps, tempTooltipProps] = useHoverTooltip()
-  const [numMultiples, setNumMultiples] = React.useState<number>(0)
+  const [moamTargetProps, moamTooltipProps] = useHoverTooltip()
+  const [numMultiples, setNumMultiples] = React.useState<number>(
+    multiples?.numItems ?? 0
+  )
 
   const EQUIPMENT_OPTION_STYLE = css`
     background-color: ${COLORS.white};
@@ -151,6 +159,11 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
     } else if (numItems > 0) {
       downArrowStyle = ARROW_STYLE_ACTIVE
     }
+
+    let maxMoam = MAX_MOAM_MODULES
+    if (multiples.moduleType === MAGNETIC_BLOCK_TYPE) {
+      maxMoam = MAX_MAGNETIC_BLOCKS
+    }
     iconInfo = (
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -159,10 +172,10 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         alignItems={ALIGN_CENTER}
       >
         <Flex
-          {...tempTargetProps}
+          {...moamTargetProps}
           data-testid="EquipmentOption_upArrow"
           onClick={
-            isDisabled || numMultiples === 7
+            isDisabled || numMultiples === maxMoam
               ? undefined
               : () => {
                   multiples.setValue(numMultiples + 1)
@@ -189,10 +202,10 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
             name="ot-arrow-down"
           />
         </Flex>
-        {isDisabled || numMultiples === 7 ? (
-          <Tooltip {...tempTooltipProps}>
-            {t('not_enough_space_for_temp')}
-          </Tooltip>
+        {isDisabled || numMultiples === maxMoam ? (
+          <LegacyTooltip {...moamTooltipProps}>
+            {t(`not_enough_space_for_${multiples.moduleType}`)}
+          </LegacyTooltip>
         ) : null}
       </Flex>
     )
@@ -238,7 +251,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
           {image}
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <StyledText
+          <LegacyStyledText
             css={css`
               user-select: none;
             `}
@@ -246,7 +259,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
             color={disabled ? COLORS.grey50 : COLORS.black90}
           >
             {text}
-          </StyledText>
+          </LegacyStyledText>
           {multiples != null ? (
             <>
               <Box borderBottom={BORDERS.lineBorder} data-testid="line" />
@@ -264,7 +277,9 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         </Flex>
       </Flex>
       {disabled ? (
-        <Tooltip {...equipmentTooltipProps}>{optionTooltip}</Tooltip>
+        <LegacyTooltip {...equipmentTooltipProps}>
+          {optionTooltip}
+        </LegacyTooltip>
       ) : null}
     </>
   )

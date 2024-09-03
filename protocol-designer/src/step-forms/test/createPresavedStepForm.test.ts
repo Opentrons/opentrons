@@ -143,7 +143,10 @@ describe('createPresavedStepForm', () => {
       stepType: 'moveLiquid',
       tipRack: null,
       // default fields
+      dropTip_wellNames: undefined,
       dropTip_location: 'mockTrash',
+      pickUpTip_location: undefined,
+      pickUpTip_wellNames: undefined,
       aspirate_airGap_checkbox: false,
       aspirate_airGap_volume: '1',
       aspirate_delay_checkbox: false,
@@ -205,7 +208,10 @@ describe('createPresavedStepForm', () => {
         // default fields
         labware: null,
         nozzles: null,
+        dropTip_wellNames: undefined,
         dropTip_location: 'mockTrash',
+        pickUpTip_location: undefined,
+        pickUpTip_wellNames: undefined,
         wells: [],
         aspirate_delay_checkbox: false,
         aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,

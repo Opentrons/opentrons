@@ -39,11 +39,11 @@ export function useDeleteMaintenanceRunMutation(
           ])
           queryClient
             .invalidateQueries([host, 'maintenance_runs'])
-            .catch((e: Error) =>
+            .catch((e: Error) => {
               console.error(
                 `error invalidating maintenance_runs query: ${e.message}`
               )
-            )
+            })
           return response.data
         }
       ),

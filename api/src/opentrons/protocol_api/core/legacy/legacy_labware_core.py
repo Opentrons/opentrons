@@ -6,7 +6,7 @@ from opentrons.protocols.api_support.tip_tracker import TipTracker
 
 from opentrons.types import DeckSlotName, Location, Point
 from opentrons.hardware_control.nozzle_manager import NozzleMap
-from opentrons_shared_data.labware.dev_types import LabwareParameters, LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareParameters, LabwareDefinition
 
 from ..labware import AbstractLabware, LabwareLoadParams
 from .legacy_well_core import LegacyWellCore

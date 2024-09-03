@@ -8,8 +8,9 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   SPACING,
-  StyledText,
+  Tooltip,
   TOOLTIP_LEFT,
   TYPOGRAPHY,
   useHoverTooltip,
@@ -17,7 +18,6 @@ import {
 
 import { getTopPortalEl } from '../../App/portal'
 import { TertiaryButton } from '../../atoms/buttons'
-import { Tooltip } from '../../atoms/Tooltip'
 import { AskForCalibrationBlockModal } from '../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import {
   useTrackEvent,
@@ -142,12 +142,12 @@ export function CalibrationHealthCheck({
       justifyContent={JUSTIFY_SPACE_BETWEEN}
     >
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('calibration_health_check_title')}
-        </StyledText>
-        <StyledText as="p">
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
           {t('calibration_health_check_description')}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <TertiaryButton
         {...targetProps}
@@ -166,7 +166,9 @@ export function CalibrationHealthCheck({
             <AskForCalibrationBlockModal
               onResponse={handleHealthCheck}
               titleBarTitle={t('robot_calibration:health_check_title')}
-              closePrompt={() => setShowCalBlockModal(false)}
+              closePrompt={() => {
+                setShowCalBlockModal(false)
+              }}
             />,
             getTopPortalEl()
           )

@@ -36,7 +36,9 @@ const DropdownFormField = (props: DropdownFormFieldProps): JSX.Element => {
       id={`DisposalVolumeField_dropdown`}
       value={props.value ? String(props.value) : null}
       onBlur={props.onFieldBlur}
-      onChange={e => props.updateValue(e.currentTarget.value)}
+      onChange={e => {
+        props.updateValue(e.currentTarget.value)
+      }}
       onFocus={props.onFieldFocus}
     />
   )
@@ -69,7 +71,6 @@ export const DisposalVolumeField = (
 
   const disposalOptions = useSelector(uiLabwareSelectors.getDisposalOptions)
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
-  const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const blowoutLocationOptions = getBlowoutLocationOptionsForForm({
     path,
     stepType,
@@ -83,8 +84,7 @@ export const DisposalVolumeField = (
       volume,
       tipRack,
     },
-    pipetteEntities,
-    labwareEntities
+    pipetteEntities
   )
   const disposalDestinationOptions = [
     ...disposalOptions,
@@ -121,7 +121,9 @@ export const DisposalVolumeField = (
             label="Disposal Volume"
             value={Boolean(value)}
             className={cx(styles.checkbox_field, styles.large_field)}
-            onChange={(e: React.ChangeEvent<any>) => updateValue(!value)}
+            onChange={(e: React.ChangeEvent<any>) => {
+              updateValue(!value)
+            }}
           />
           {value ? volumeField : null}
         </div>

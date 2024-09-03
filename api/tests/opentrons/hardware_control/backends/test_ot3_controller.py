@@ -95,7 +95,7 @@ from opentrons_shared_data.errors.exceptions import (
     EStopNotPresentError,
     FirmwareUpdateRequiredError,
     FailedGripperPickupError,
-    LiquidNotFoundError,
+    PipetteLiquidNotFoundError,
 )
 
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
@@ -176,16 +176,16 @@ def controller(
 @pytest.fixture
 def fake_liquid_settings() -> LiquidProbeSettings:
     return LiquidProbeSettings(
-        starting_mount_height=100,
-        max_z_distance=15,
         mount_speed=40,
         plunger_speed=10,
+        plunger_impulse_time=0.2,
         sensor_threshold_pascals=15,
-        expected_liquid_height=109,
         output_option=OutputOptions.can_bus_only,
         aspirate_while_sensing=False,
-        auto_zero_sensor=False,
-        num_baseline_reads=8,
+        z_overlap_between_passes_mm=0.1,
+        plunger_reset_offset=2.0,
+        samples_for_baselining=20,
+        sample_time_sec=0.004,
         data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
     )
 
@@ -715,25 +715,31 @@ async def test_liquid_probe(
     mock_move_group_run: mock.AsyncMock,
     mock_send_stop_threshold: mock.AsyncMock,
 ) -> None:
+    fake_max_p_dist = 70
     try:
         await controller.liquid_probe(
             mount=mount,
-            max_z_distance=fake_liquid_settings.max_z_distance,
+            max_p_distance=fake_max_p_dist,
             mount_speed=fake_liquid_settings.mount_speed,
             plunger_speed=fake_liquid_settings.plunger_speed,
             threshold_pascals=fake_liquid_settings.sensor_threshold_pascals,
+            plunger_impulse_time=fake_liquid_settings.plunger_impulse_time,
+            num_baseline_reads=fake_liquid_settings.samples_for_baselining,
             output_option=fake_liquid_settings.output_option,
         )
-    except LiquidNotFoundError:
+    except PipetteLiquidNotFoundError:
         # the move raises a liquid not found now since we don't call the move group and it doesn't
         # get any positions back
         pass
-    move_groups = (mock_move_group_run.call_args_list[0][0][0]._move_groups)[0][0]
+    move_groups = mock_move_group_run.call_args_list[0][0][0]._move_groups
     head_node = axis_to_node(Axis.by_mount(mount))
     tool_node = sensor_node_for_mount(mount)
-    assert move_groups[head_node].stop_condition == MoveStopCondition.sync_line
+    #  in tool_sensors, pipette moves down, then sensor move goes
+    assert move_groups[0][0][tool_node].stop_condition == MoveStopCondition.none
+    assert move_groups[1][0][tool_node].stop_condition == MoveStopCondition.sync_line
     assert len(move_groups) == 2
-    assert move_groups[head_node], move_groups[tool_node]
+    assert move_groups[0][0][tool_node]
+    assert move_groups[1][0][head_node], move_groups[2][0][tool_node]
 
 
 async def test_tip_action(

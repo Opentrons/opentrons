@@ -6,7 +6,7 @@ import { COLORS, Flex, POSITION_FIXED } from '@opentrons/components'
 const BACKGROUND_OVERLAY_STYLE = css`
   position: ${POSITION_FIXED};
   inset: 0;
-  z-index: 3;
+  z-index: 4;
   background-color: ${COLORS.black90}${COLORS.opacity60HexCode};
 `
 

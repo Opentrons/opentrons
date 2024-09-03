@@ -31,7 +31,7 @@ from ..types import (
 )
 from ..load_data import _geometry, _physical, _liquid
 from ..pipette_load_name_conversions import convert_pipette_model
-from ..dev_types import PipetteModel
+from ..types import PipetteModel
 
 """
 Instructions:

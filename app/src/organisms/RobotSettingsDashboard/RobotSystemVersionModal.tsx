@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   DIRECTION_COLUMN,
@@ -13,9 +13,9 @@ import {
 import { SmallButton } from '../../atoms/buttons'
 import { InlineNotification } from '../../atoms/InlineNotification'
 import { ReleaseNotes } from '../../molecules/ReleaseNotes'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface RobotSystemVersionModalProps {
   version: string
@@ -29,16 +29,16 @@ export function RobotSystemVersionModal({
   setShowModal,
 }: RobotSystemVersionModalProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
 
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('robot_system_version_available', {
       releaseVersion: version,
     }),
   }
 
   return (
-    <Modal header={modalHeader} modalSize="large">
+    <OddModal header={modalHeader} modalSize="large">
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
@@ -59,17 +59,21 @@ export function RobotSystemVersionModal({
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
           <SmallButton
             flex="1"
-            onClick={() => setShowModal(false)}
+            onClick={() => {
+              setShowModal(false)
+            }}
             buttonText={t('not_now')}
             buttonType="secondary"
           />
           <SmallButton
             flex="1"
-            onClick={() => history.push('/robot-settings/update-robot')}
+            onClick={() => {
+              navigate('/robot-settings/update-robot')
+            }}
             buttonText={t('shared:update')}
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

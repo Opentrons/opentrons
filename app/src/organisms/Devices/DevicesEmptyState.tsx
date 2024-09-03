@@ -16,7 +16,7 @@ import {
   PrimaryButton,
   SPACING_5,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -39,7 +39,7 @@ export function DevicesEmptyState(): JSX.Element {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
     >
       <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
-        <StyledText
+        <LegacyStyledText
           as="h1"
           fontWeight={FONT_WEIGHT_REGULAR}
           paddingBottom={SPACING.spacing16}
@@ -47,7 +47,7 @@ export function DevicesEmptyState(): JSX.Element {
           marginTop="20vh"
         >
           {t('no_robots_found')}
-        </StyledText>
+        </LegacyStyledText>
         <Box paddingBottom={SPACING.spacing16}>
           <PrimaryButton
             onClick={handleRefresh}

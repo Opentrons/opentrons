@@ -5,12 +5,15 @@ import {
   ALIGN_CENTER,
   Btn,
   COLORS,
+  SPACING,
   DISPLAY_FLEX,
   JUSTIFY_CENTER,
   Icon,
 } from '@opentrons/components'
 
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+
+import type { FlattenSimpleInterpolation } from 'styled-components'
 
 // ToDo (kk:10/17/2023) This component will be modified more later.
 // This is the initial step to reduce ProtocolSetup component's code.
@@ -29,39 +32,14 @@ export function PlayButton({
   ready,
   isDoorOpen,
 }: PlayButtonProps): JSX.Element {
-  const playButtonStyle = css`
-    -webkit-tap-highlight-color: transparent;
-    &:focus {
-      background-color: ${ready && !isDoorOpen ? COLORS.blue60 : COLORS.grey50};
-      color: ${COLORS.white};
-    }
+  const isEnabled = !disabled && ready && !isDoorOpen
 
-    &:hover {
-      background-color: ${ready && !isDoorOpen ? COLORS.blue50 : COLORS.grey35};
-      color: ${COLORS.white};
-    }
+  const playButtonStyle = getPlayButtonStyle(isEnabled)
 
-    &:focus-visible {
-      box-shadow: ${ODD_FOCUS_VISIBLE};
-      background-color: ${ready && !isDoorOpen ? COLORS.blue50 : COLORS.grey35};
-    }
-
-    &:active {
-      background-color: ${ready && !isDoorOpen ? COLORS.blue60 : COLORS.grey50};
-      color: ${COLORS.white};
-    }
-
-    &:disabled {
-      background-color: ${COLORS.grey35};
-      color: ${COLORS.grey50};
-    }
-  `
   return (
     <Btn
       alignItems={ALIGN_CENTER}
-      backgroundColor={
-        disabled || !ready || isDoorOpen ? COLORS.grey35 : COLORS.blue50
-      }
+      backgroundColor={isEnabled ? COLORS.blue50 : COLORS.grey35}
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}
       height="6.25rem"
@@ -73,7 +51,7 @@ export function PlayButton({
       css={playButtonStyle}
     >
       <Icon
-        color={disabled || !ready || isDoorOpen ? COLORS.grey50 : COLORS.white}
+        color={isEnabled ? COLORS.white : COLORS.grey50}
         name="play-icon"
         size="2.5rem"
       />
@@ -131,3 +109,35 @@ const CLOSE_BUTTON_STYLE = css`
     color: ${COLORS.grey50};
   }
 `
+
+function getPlayButtonStyle(isEnabled: boolean): FlattenSimpleInterpolation {
+  return css`
+    -webkit-tap-highlight-color: transparent;
+    &:focus {
+      background-color: ${isEnabled ? COLORS.blue60 : COLORS.grey35};
+      color: ${COLORS.white};
+    }
+
+    &:hover {
+      background-color: ${isEnabled ? COLORS.blue50 : COLORS.grey35};
+      color: ${COLORS.white};
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0 0 ${SPACING.spacing4} ${
+    isEnabled ? COLORS.blue50 : COLORS.grey50
+  }
+      background-color: ${isEnabled ? COLORS.blue50 : COLORS.grey35};
+    }
+
+    &:active {
+      background-color: ${isEnabled ? COLORS.blue60 : COLORS.grey35};
+      color: ${COLORS.white};
+    }
+
+    &:disabled {
+      background-color: ${COLORS.grey35};
+      color: ${COLORS.grey50};
+    }
+  `
+}

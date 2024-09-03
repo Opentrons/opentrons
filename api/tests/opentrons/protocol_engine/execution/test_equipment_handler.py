@@ -1,13 +1,14 @@
 """Test equipment command execution side effects."""
 import pytest
+from _pytest.fixtures import SubRequest
 import inspect
 from datetime import datetime
 from decoy import Decoy, matchers
-from typing import Any, Optional, cast
+from typing import Any, Optional, cast, Dict
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.pipette import pipette_definition
-from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.labware.types import LabwareUri
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.types import Mount as HwMount, MountType, DeckSlotName, Point
@@ -38,7 +39,8 @@ from opentrons.protocol_engine.types import (
     FlowRates,
 )
 
-from opentrons.protocol_engine.state import Config, StateStore
+from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.state.modules import HardwareModule
 from opentrons.protocol_engine.resources import (
     ModelUtils,
@@ -121,9 +123,16 @@ async def temp_module_v2(decoy: Decoy) -> TempDeck:
     return temp_mod
 
 
+@pytest.fixture(params=["v0", "v1", "v3"])
+def tip_overlap_versions(request: SubRequest) -> str:
+    """Get a series of tip overlap versions."""
+    return cast(str, request.param)
+
+
 @pytest.fixture
 def loaded_static_pipette_data(
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+    target_tip_overlap_data: Dict[str, float],
 ) -> LoadedStaticPipetteData:
     """Get a pipette config data value object."""
     return LoadedStaticPipetteData(
@@ -138,13 +147,20 @@ def loaded_static_pipette_data(
             default_dispense={"c": 7.89},
         ),
         tip_configuration_lookup_table={4.56: supported_tip_fixture},
-        nominal_tip_overlap={"default": 9.87},
+        nominal_tip_overlap=target_tip_overlap_data,
         home_position=10.11,
         nozzle_offset_z=12.13,
         nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
         back_left_corner_offset=Point(x=1, y=2, z=3),
         front_right_corner_offset=Point(x=4, y=5, z=6),
+        pipette_lld_settings={},
     )
+
+
+@pytest.fixture
+def target_tip_overlap_data(tip_overlap_versions: str) -> Dict[str, float]:
+    """Get the corresponding overlap data for the version."""
+    return {"default": 2.13 * int(tip_overlap_versions[1:])}
 
 
 @pytest.fixture
@@ -606,6 +622,7 @@ async def test_load_pipette(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
     loaded_static_pipette_data: LoadedStaticPipetteData,
+    tip_overlap_versions: str,
     subject: EquipmentHandler,
 ) -> None:
     """It should load pipette data, check attachment, and generate an ID."""
@@ -621,7 +638,14 @@ async def test_load_pipette(
     )
 
     decoy.when(
-        pipette_data_provider.get_pipette_static_config(pipette_dict)
+        pipette_data_provider.validate_and_default_tip_overlap_version(
+            tip_overlap_versions
+        )
+    ).then_return(tip_overlap_versions)
+    decoy.when(
+        pipette_data_provider.get_pipette_static_config(
+            pipette_dict=pipette_dict, tip_overlap_version=tip_overlap_versions
+        ),
     ).then_return(loaded_static_pipette_data)
 
     decoy.when(hardware_api.get_instrument_max_height(mount=HwMount.LEFT)).then_return(
@@ -632,6 +656,7 @@ async def test_load_pipette(
         pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
         pipette_id=None,
+        tip_overlap_version=tip_overlap_versions,
     )
 
     assert result == LoadedPipetteData(
@@ -656,6 +681,7 @@ async def test_load_pipette_96_channels(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
     loaded_static_pipette_data: LoadedStaticPipetteData,
+    tip_overlap_versions: str,
     subject: EquipmentHandler,
 ) -> None:
     """It should load pipette data, check attachment, and generate an ID."""
@@ -667,7 +693,14 @@ async def test_load_pipette_96_channels(
         pipette_dict
     )
     decoy.when(
-        pipette_data_provider.get_pipette_static_config(pipette_dict)
+        pipette_data_provider.validate_and_default_tip_overlap_version(
+            tip_overlap_versions
+        )
+    ).then_return(tip_overlap_versions)
+    decoy.when(
+        pipette_data_provider.get_pipette_static_config(
+            pipette_dict=pipette_dict, tip_overlap_version=tip_overlap_versions
+        )
     ).then_return(loaded_static_pipette_data)
 
     decoy.when(hardware_api.get_instrument_max_height(mount=HwMount.LEFT)).then_return(
@@ -678,6 +711,7 @@ async def test_load_pipette_96_channels(
         pipette_name=PipetteNameType.P1000_96,
         mount=MountType.LEFT,
         pipette_id=None,
+        tip_overlap_version=tip_overlap_versions,
     )
 
     assert result == LoadedPipetteData(
@@ -692,6 +726,7 @@ async def test_load_pipette_uses_provided_id(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
     loaded_static_pipette_data: LoadedStaticPipetteData,
+    tip_overlap_versions: str,
     subject: EquipmentHandler,
 ) -> None:
     """It should use the provided ID rather than generating an ID for the pipette."""
@@ -702,13 +737,21 @@ async def test_load_pipette_uses_provided_id(
         pipette_dict
     )
     decoy.when(
-        pipette_data_provider.get_pipette_static_config(pipette_dict)
+        pipette_data_provider.validate_and_default_tip_overlap_version(
+            tip_overlap_versions
+        )
+    ).then_return(tip_overlap_versions)
+    decoy.when(
+        pipette_data_provider.get_pipette_static_config(
+            pipette_dict=pipette_dict, tip_overlap_version=tip_overlap_versions
+        )
     ).then_return(loaded_static_pipette_data)
 
     result = await subject.load_pipette(
         pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
         pipette_id="my-pipette-id",
+        tip_overlap_version=tip_overlap_versions,
     )
 
     assert result == LoadedPipetteData(
@@ -724,6 +767,7 @@ async def test_load_pipette_use_virtual(
     state_store: StateStore,
     loaded_static_pipette_data: LoadedStaticPipetteData,
     subject: EquipmentHandler,
+    tip_overlap_versions: str,
     virtual_pipette_data_provider: pipette_data_provider.VirtualPipetteDataProvider,
 ) -> None:
     """It should use the provided ID rather than generating an ID for the pipette."""
@@ -733,15 +777,22 @@ async def test_load_pipette_use_virtual(
     decoy.when(model_utils.generate_id(prefix="fake-serial-number-")).then_return(
         "fake-serial"
     )
-
+    decoy.when(
+        pipette_data_provider.validate_and_default_tip_overlap_version(
+            tip_overlap_versions
+        )
+    ).then_return(tip_overlap_versions)
     decoy.when(
         virtual_pipette_data_provider.get_virtual_pipette_static_config(
-            PipetteNameType.P300_SINGLE.value, "unique-id"
+            PipetteNameType.P300_SINGLE.value, "unique-id", tip_overlap_versions
         )
     ).then_return(loaded_static_pipette_data)
 
     result = await subject.load_pipette(
-        pipette_name=PipetteNameType.P300_SINGLE, mount=MountType.LEFT, pipette_id=None
+        pipette_name=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
+        pipette_id=None,
+        tip_overlap_version=tip_overlap_versions,
     )
 
     assert result == LoadedPipetteData(
@@ -781,6 +832,7 @@ async def test_load_pipette_raises_if_pipette_not_attached(
             pipette_name=PipetteNameType.P300_SINGLE,
             mount=MountType.LEFT,
             pipette_id=None,
+            tip_overlap_version="v9999",
         )
 
 

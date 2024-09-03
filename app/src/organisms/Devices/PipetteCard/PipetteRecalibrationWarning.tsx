@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Banner } from '../../../atoms/Banner'
@@ -22,20 +22,25 @@ export const PipetteRecalibrationWarning = (): JSX.Element | null => {
         iconMarginLeft={SPACING.spacing8}
         type="warning"
         size={SPACING.spacing20}
-        onCloseClick={() => setShowBanner(false)}
+        onCloseClick={() => {
+          setShowBanner(false)
+        }}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText
+          <LegacyStyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             data-testid="PipetteRecalibrationWarning_title"
           >
             {t('pipette_recalibration_recommended')}
-          </StyledText>
+          </LegacyStyledText>
 
-          <StyledText as="p" data-testid="PipetteRecalibrationWarning_body">
+          <LegacyStyledText
+            as="p"
+            data-testid="PipetteRecalibrationWarning_body"
+          >
             {`${t('pipette_calibrations_differ')}`}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       </Banner>
     </Box>

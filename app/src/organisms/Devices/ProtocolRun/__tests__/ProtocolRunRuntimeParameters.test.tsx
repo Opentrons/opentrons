@@ -8,8 +8,12 @@ import { i18n } from '../../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useRunStatus } from '../../../RunTimeControl/hooks'
 import { useNotifyRunQuery } from '../../../../resources/runs'
-import { mockSucceededRun } from '../../../RunTimeControl/__fixtures__'
+import {
+  mockSucceededRun,
+  mockIdleUnstartedRun,
+} from '../../../RunTimeControl/__fixtures__'
 import { ProtocolRunRuntimeParameters } from '../ProtocolRunRunTimeParameters'
+
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
 import type {
@@ -27,6 +31,7 @@ vi.mock('@opentrons/components', async importOriginal => {
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../../RunTimeControl/hooks')
 vi.mock('../../../../resources/runs')
+vi.mock('../../../../redux/config')
 
 const RUN_ID = 'mockId'
 
@@ -84,6 +89,17 @@ const mockRunTimeParameterData: RunTimeParameter[] = [
   },
 ]
 
+const mockCsvRtp = {
+  displayName: 'CSV File',
+  variableName: 'csv_file_var',
+  description: '',
+  type: 'csv_file',
+  file: {
+    id: 'mock_csv_id',
+    name: 'mock.csv',
+  },
+}
+
 const render = (
   props: React.ComponentProps<typeof ProtocolRunRuntimeParameters>
 ) => {
@@ -115,6 +131,13 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   it('should render title, and banner when RunTimeParameters are not empty and all values are default', () => {
+    when(useNotifyRunQuery)
+      .calledWith(RUN_ID)
+      .thenReturn({
+        data: {
+          data: mockIdleUnstartedRun,
+        },
+      } as any)
     render(props)
     screen.getByText('Parameters')
     screen.getByText('Default values')
@@ -138,6 +161,13 @@ describe('ProtocolRunRuntimeParameters', () => {
         },
       ],
     } as CompletedProtocolAnalysis)
+    when(useNotifyRunQuery)
+      .calledWith(RUN_ID)
+      .thenReturn({
+        data: {
+          data: mockIdleUnstartedRun,
+        },
+      } as any)
     render(props)
     screen.getByText('Parameters')
     screen.getByText('Custom values')
@@ -145,6 +175,39 @@ describe('ProtocolRunRuntimeParameters', () => {
     screen.getByText('Cancel the run and restart setup to edit')
     screen.getByText('Name')
     screen.getByText('Value')
+  })
+
+  it('should render title, and banner when RunTimeParameters from view protocol run record overflow menu button', () => {
+    when(useNotifyRunQuery)
+      .calledWith(RUN_ID)
+      .thenReturn({
+        data: {
+          data: {
+            ...mockSucceededRun,
+            runTimeParameters: mockRunTimeParameterData,
+          },
+        },
+      } as any)
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
+      runTimeParameters: [
+        ...mockRunTimeParameterData,
+        {
+          displayName: 'Dry Run',
+          variableName: 'DRYRUN',
+          description: 'Is this a dry or wet run? Wet is true, dry is false',
+          type: 'bool',
+          default: false,
+          value: true,
+        },
+      ],
+    } as CompletedProtocolAnalysis)
+
+    vi.mocked(useRunStatus).mockReturnValue('succeeded')
+    render(props)
+    screen.getByText('Download files')
+    screen.getByText(
+      'All files associated with the protocol run are available on the robot detail screen.'
+    )
   })
 
   it('should render RunTimeParameters when RunTimeParameters are not empty', () => {
@@ -169,6 +232,16 @@ describe('ProtocolRunRuntimeParameters', () => {
     expect(screen.queryByText('Parameters')).not.toBeInTheDocument()
     expect(screen.queryByText('Default values')).not.toBeInTheDocument()
     screen.getByText('mock InfoScreen')
+  })
+
+  it('should render csv row if a protocol requires a csv', () => {
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
+      runTimeParameters: [...mockRunTimeParameterData, mockCsvRtp],
+    } as CompletedProtocolAnalysis)
+
+    render(props)
+    screen.getByText('CSV File')
+    screen.getByText('mock.csv')
   })
 
   // ToDo Additional test will be implemented when chip component is added

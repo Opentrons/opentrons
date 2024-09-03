@@ -7,25 +7,23 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 
 import welcomeModalImage from '../../assets/images/on-device-display/welcome_dashboard_modal.png'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 
 interface WelcomeModalProps {
-  setShowAnalyticsOptInModal: (showAnalyticsOptInModal: boolean) => void
   setShowWelcomeModal: (showWelcomeModal: boolean) => void
 }
 
 export function WelcomeModal({
-  setShowAnalyticsOptInModal,
   setShowWelcomeModal,
 }: WelcomeModalProps): JSX.Element {
   const { t } = useTranslation(['device_details', 'shared'])
@@ -40,20 +38,19 @@ export function WelcomeModal({
     createLiveCommand({
       command: animationCommand,
       waitUntilComplete: false,
-    }).catch((e: Error) =>
+    }).catch((e: Error) => {
       console.warn(`cannot run status bar animation: ${e.message}`)
-    )
+    })
   }
 
   const handleCloseModal = (): void => {
     setShowWelcomeModal(false)
-    setShowAnalyticsOptInModal(true)
   }
 
   React.useEffect(startDiscoAnimation, [])
 
   return (
-    <Modal modalSize="small" onOutsideClick={handleCloseModal}>
+    <OddModal modalSize="small" onOutsideClick={handleCloseModal}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_CENTER}
@@ -67,24 +64,24 @@ export function WelcomeModal({
             width="454px"
             height="128px"
           />
-          <StyledText
+          <LegacyStyledText
             as="h4"
             fontWeight={TYPOGRAPHY.fontWeightBold}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {t('welcome_to_your_dashboard')}
-          </StyledText>
-          <StyledText
+          </LegacyStyledText>
+          <LegacyStyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             color={COLORS.grey60}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {t('welcome_modal_description')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <SmallButton buttonText={t('shared:next')} onClick={handleCloseModal} />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

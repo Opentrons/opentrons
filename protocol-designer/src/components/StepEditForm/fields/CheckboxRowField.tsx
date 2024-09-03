@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
   DeprecatedCheckboxField,
   useHoverTooltip,
-  Tooltip,
+  LegacyTooltip,
   TOOLTIP_TOP,
 } from '@opentrons/components'
 import cx from 'classnames'
@@ -38,9 +38,9 @@ export const CheckboxRowField = (props: CheckboxRowProps): JSX.Element => {
   return (
     <>
       {tooltipContent && (
-        <Tooltip lineHeight="1.5" {...tooltipProps}>
+        <LegacyTooltip lineHeight="1.5" {...tooltipProps}>
           {tooltipContent}
-        </Tooltip>
+        </LegacyTooltip>
       )}
       <div className={styles.checkbox_row}>
         <DeprecatedCheckboxField
@@ -50,9 +50,9 @@ export const CheckboxRowField = (props: CheckboxRowProps): JSX.Element => {
           label={label}
           labelProps={targetProps}
           name={name}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
             updateValue(!value)
-          }
+          }}
           value={disabled ? false : Boolean(value)}
         />
         {value && !disabled && !isIndeterminate ? children : null}

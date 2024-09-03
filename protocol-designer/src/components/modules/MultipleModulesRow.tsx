@@ -44,8 +44,12 @@ export function MultipleModulesRow(
     moduleOnDeck?.map(module => module.slot) ?? []
   ).join(', ')
 
-  const setCurrentModule = (moduleType: ModuleType, moduleId?: string) => () =>
+  const setCurrentModule = (
+    moduleType: ModuleType,
+    moduleId?: string
+  ) => () => {
     openEditModuleModal(moduleType, moduleId)
+  }
 
   const addRemoveText = moduleOnDeck ? t('shared:remove') : t('shared:add')
 
@@ -72,7 +76,7 @@ export function MultipleModulesRow(
         />
         {t(
           `module_display_names.${
-            occupiedSlots.length > 1 ? 'multipleTemperatureModuleTypes' : type
+            occupiedSlots.length > 1 ? `multiple${type}s` : type
           }`
         )}
       </h4>

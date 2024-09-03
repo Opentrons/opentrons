@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import Optional, List, Dict, Union
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.types import DeckSlotName, StagingSlotName
 

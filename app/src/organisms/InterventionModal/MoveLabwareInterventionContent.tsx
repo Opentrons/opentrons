@@ -7,28 +7,29 @@ import {
   BORDERS,
   Box,
   COLORS,
+  DeckInfoLabel,
   DIRECTION_COLUMN,
   DISPLAY_NONE,
   Flex,
   Icon,
   LabwareRender,
-  LocationIcon,
   Module,
   MoveLabwareOnDeck,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TEXT_TRANSFORM_UPPERCASE,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   OT2_ROBOT_TYPE,
+  TC_MODULE_LOCATION_OT2,
+  TC_MODULE_LOCATION_OT3,
+  THERMOCYCLER_MODULE_TYPE,
+  inferModuleOrientationFromXCoordinate,
   getDeckDefFromRobotType,
-  getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
-  getModuleDisplayName,
   getModuleType,
-  getOccludedSlotCountForModule,
 } from '@opentrons/shared-data'
 
 import {
@@ -36,13 +37,12 @@ import {
   getRunModuleRenderInfo,
   getLabwareNameFromRunData,
   getModuleModelFromRunData,
-  getModuleDisplayLocationFromRunData,
 } from './utils'
 import { Divider } from '../../atoms/structure'
 import {
   getLoadedLabware,
   getLoadedModule,
-} from '../CommandText/utils/accessors'
+} from '../../molecules/Command/utils/accessors'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type {
@@ -165,12 +165,12 @@ export function MoveLabwareInterventionContent({
         >
           <Flex css={LABWARE_DESCRIPTION_STYLE}>
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="h2" css={LABWARE_NAME_TITLE_STYLE}>
+              <LegacyStyledText as="h2" css={LABWARE_NAME_TITLE_STYLE}>
                 {t('labware_name')}
-              </StyledText>
-              <StyledText as="p" css={LABWARE_NAME_STYLE}>
+              </LegacyStyledText>
+              <LegacyStyledText as="p" css={LABWARE_NAME_STYLE}>
                 {labwareName}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
             <Divider css={DIVIDER_STYLE} />
             <Flex css={LABWARE_DIRECTION_STYLE}>
@@ -214,7 +214,13 @@ export function MoveLabwareInterventionContent({
                       nestedLabwareDef,
                       nestedLabwareId,
                     }) => (
-                      <Module key={moduleId} def={moduleDef} x={x} y={y}>
+                      <Module
+                        key={moduleId}
+                        def={moduleDef}
+                        x={x}
+                        y={y}
+                        orientation={inferModuleOrientationFromXCoordinate(x)}
+                      >
                         {nestedLabwareDef != null &&
                         nestedLabwareId !== command.params.labwareId ? (
                           <LabwareRender definition={nestedLabwareDef} />
@@ -252,15 +258,15 @@ function LabwareDisplayLocation(
   props: LabwareDisplayLocationProps
 ): JSX.Element {
   const { t } = useTranslation('protocol_command_text')
-  const { protocolData, location, robotType, labwareDefsByUri } = props
-  let displayLocation: React.ReactNode = ''
+  const { protocolData, location, robotType } = props
+  let displayLocation: string = ''
   if (location === 'offDeck') {
     // TODO(BC, 08/28/23): remove this string cast after update i18next to >23 (see https://www.i18next.com/overview/typescript#argument-of-type-defaulttfuncreturn-is-not-assignable-to-parameter-of-type-xyz)
-    displayLocation = <LocationIcon slotName={String(t('offdeck'))} />
+    displayLocation = String(t('offdeck'))
   } else if ('slotName' in location) {
-    displayLocation = <LocationIcon slotName={location.slotName} />
+    displayLocation = location.slotName
   } else if ('addressableAreaName' in location) {
-    displayLocation = <LocationIcon slotName={location.addressableAreaName} />
+    displayLocation = location.addressableAreaName
   } else if ('moduleId' in location) {
     const moduleModel = getModuleModelFromRunData(
       protocolData,
@@ -269,41 +275,32 @@ function LabwareDisplayLocation(
     if (moduleModel == null) {
       console.warn('labware is located on an unknown module model')
     } else {
-      displayLocation = t('module_in_slot', {
-        count: getOccludedSlotCountForModule(
-          getModuleType(moduleModel),
-          robotType
-        ),
-        module: getModuleDisplayName(moduleModel),
-        slot_name: getModuleDisplayLocationFromRunData(
-          protocolData,
-          location.moduleId
-        ),
-      })
+      const slotName =
+        getLoadedModule(protocolData, location.moduleId)?.location?.slotName ??
+        ''
+      const isModuleUnderAdapterThermocycler =
+        getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE
+      if (isModuleUnderAdapterThermocycler) {
+        displayLocation =
+          robotType === OT2_ROBOT_TYPE
+            ? TC_MODULE_LOCATION_OT2
+            : TC_MODULE_LOCATION_OT3
+      } else {
+        displayLocation = slotName
+      }
     }
   } else if ('labwareId' in location) {
     const adapter = protocolData.labware.find(
       lw => lw.id === location.labwareId
     )
-    const adapterDef =
-      adapter != null ? labwareDefsByUri[adapter.definitionUri] : null
-    const adapterDisplayName =
-      adapterDef != null ? getLabwareDisplayName(adapterDef) : ''
-
     if (adapter == null) {
       console.warn('labware is located on an unknown adapter')
     } else if (adapter.location === 'offDeck') {
       displayLocation = t('off_deck')
     } else if ('slotName' in adapter.location) {
-      displayLocation = t('adapter_in_slot', {
-        adapter: adapterDisplayName,
-        slot_name: adapter.location.slotName,
-      })
+      displayLocation = adapter.location.slotName
     } else if ('addressableAreaName' in adapter.location) {
-      return t('adapter_in_slot', {
-        adapter: adapterDisplayName,
-        slot: adapter.location.addressableAreaName,
-      })
+      displayLocation = adapter.location.addressableAreaName
     } else if ('moduleId' in adapter.location) {
       const moduleIdUnderAdapter = adapter.location.moduleId
       const moduleModel = protocolData.modules.find(
@@ -315,19 +312,20 @@ function LabwareDisplayLocation(
         const slotName =
           getLoadedModule(protocolData, adapter.location.moduleId)?.location
             ?.slotName ?? ''
-        displayLocation = t('adapter_in_module_in_slot', {
-          count: getOccludedSlotCountForModule(
-            getModuleType(moduleModel),
-            robotType ?? OT2_ROBOT_TYPE
-          ),
-          module: getModuleDisplayName(moduleModel),
-          adapter: adapterDisplayName,
-          slot_name: slotName,
-        })
+        const isModuleUnderAdapterThermocycler =
+          getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE
+        if (isModuleUnderAdapterThermocycler) {
+          displayLocation =
+            robotType === OT2_ROBOT_TYPE
+              ? TC_MODULE_LOCATION_OT2
+              : TC_MODULE_LOCATION_OT3
+        } else {
+          displayLocation = slotName
+        }
       }
     } else {
       console.warn('display location could not be established: ', location)
     }
   }
-  return <>{displayLocation}</>
+  return <DeckInfoLabel deckLabel={displayLocation} />
 }

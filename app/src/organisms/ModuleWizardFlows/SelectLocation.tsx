@@ -21,7 +21,7 @@ import {
   RESPONSIVENESS,
   SIZE_1,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Banner } from '../../atoms/Banner'
@@ -69,9 +69,9 @@ export const SelectLocation = (
   )
   const bodyText = (
     <>
-      <StyledText css={BODY_STYLE}>
+      <LegacyStyledText css={BODY_STYLE}>
         {t('select_the_slot', { module: moduleName })}
-      </StyledText>
+      </LegacyStyledText>
       <Banner type="warning" size={SIZE_1} marginY={SPACING.spacing4}>
         {t('module_secured')}
       </Banner>

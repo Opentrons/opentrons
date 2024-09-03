@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional, cast
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons.types import MountType
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import ErrorOccurrence, commands as cmd
@@ -606,6 +606,44 @@ def create_reload_labware_command(
     )
 
     return cmd.ReloadLabware(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
+def create_unsafe_blow_out_in_place_command(
+    pipette_id: str,
+    flow_rate: float,
+) -> cmd.unsafe.UnsafeBlowOutInPlace:
+    """Create a completed UnsafeBlowOutInPlace command."""
+    params = cmd.unsafe.UnsafeBlowOutInPlaceParams(
+        pipetteId=pipette_id, flowRate=flow_rate
+    )
+    result = cmd.unsafe.UnsafeBlowOutInPlaceResult()
+
+    return cmd.unsafe.UnsafeBlowOutInPlace(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
+def create_unsafe_drop_tip_in_place_command(
+    pipette_id: str,
+) -> cmd.unsafe.UnsafeDropTipInPlace:
+    """Get a completed UnsafeDropTipInPlace command."""
+    params = cmd.unsafe.UnsafeDropTipInPlaceParams(pipetteId=pipette_id)
+
+    result = cmd.unsafe.UnsafeDropTipInPlaceResult()
+
+    return cmd.unsafe.UnsafeDropTipInPlace(
         id="command-id",
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,

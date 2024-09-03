@@ -6,7 +6,6 @@ context('The Labware Creator Landing Page', () => {
   beforeEach(() => {
     cy.visit('/create')
     cy.viewport('macbook-15')
-    cy.contains('NO').click({ force: true })
   })
 
   describe('The initial text', () => {

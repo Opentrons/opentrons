@@ -1,14 +1,15 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  Flex,
+  InputField,
+  SPACING,
 } from '@opentrons/components'
 
 import { ChildNavigation } from '../ChildNavigation'
-import { InputField } from '../../atoms/InputField'
 import { NumericalKeyboard } from '../../atoms/SoftwareKeyboard'
 import { getVolumeRange } from './utils'
 import { CONSOLIDATE, DISTRIBUTE } from './constants'
@@ -58,15 +59,21 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
       onNext()
     }
   }
-
-  const error =
+  let error = null
+  if (volumeRange.min > volumeRange.max) {
+    error =
+      state.transferType === 'consolidate'
+        ? t('consolidate_volume_error')
+        : t('distribute_volume_error')
+  } else if (
     volume !== '' &&
     (volumeAsNumber < volumeRange.min || volumeAsNumber > volumeRange.max)
-      ? t(`value_out_of_range`, {
-          min: volumeRange.min,
-          max: volumeRange.max,
-        })
-      : null
+  ) {
+    error = t(`value_out_of_range`, {
+      min: volumeRange.min,
+      max: volumeRange.max,
+    })
+  }
 
   return (
     <Flex>
@@ -111,7 +118,9 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
         >
           <NumericalKeyboard
             keyboardRef={keyboardRef}
-            onChange={e => setVolume(e)}
+            onChange={e => {
+              setVolume(e)
+            }}
           />
         </Flex>
       </Flex>

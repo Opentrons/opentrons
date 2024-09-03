@@ -59,7 +59,7 @@ import pcr_plate_adapter from './images/pcr_plate_adapter.jpg'
 import universal_flat_adapter from './images/universal_flat_adapter.jpg'
 import flat_bottom_aluminum from './images/flat_bottom_aluminum.png'
 import opentrons_96_aluminumblock_side_view from './images/opentrons_96_aluminumblock_side_view.jpg'
-
+import opentrons_96_deep_well_temp_mod_adapter_img from './images/opentrons_96_deep_well_temp_mod_adapter.png'
 export const labwareImages: Record<string, string[]> = {
   agilent_1_reservoir_290ml: [agilent_1_reservoir_290ml_side_view],
   axygen_1_reservoir_90ml: [axygen_1_reservoir_90ml_side_view],
@@ -251,5 +251,8 @@ export const labwareImages: Record<string, string[]> = {
   opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat: [
     universal_flat_adapter,
     corning_384_wellplate_112ul_flat_photo_three_quarters,
+  ],
+  opentrons_96_deep_well_temp_mod_adapter: [
+    opentrons_96_deep_well_temp_mod_adapter_img,
   ],
 }

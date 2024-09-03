@@ -35,7 +35,16 @@ describe('Export', () => {
   })
 
   it('should render button when section is visible', () => {
-    render(wrapInFormik(<Export onExportClick={onExportClick} />, formikConfig))
+    render(
+      wrapInFormik(
+        <Export
+          onExportClick={onExportClick}
+          isOnRunApp={false}
+          disabled={false}
+        />,
+        formikConfig
+      )
+    )
 
     screen.getByRole('button', { name: /export/i })
   })

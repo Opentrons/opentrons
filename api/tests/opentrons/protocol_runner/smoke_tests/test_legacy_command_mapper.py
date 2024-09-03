@@ -20,10 +20,12 @@ from opentrons.protocol_engine import (
     DeckPoint,
 )
 from opentrons.protocol_reader import ProtocolReader
-from opentrons.protocol_runner import create_simulating_runner
+from opentrons.protocol_runner.create_simulating_orchestrator import (
+    create_simulating_orchestrator,
+)
 from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandParams
 from opentrons.types import MountType, DeckSlotName
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 
 async def simulate_and_get_commands(protocol_file: Path) -> List[commands.Command]:
@@ -33,9 +35,8 @@ async def simulate_and_get_commands(protocol_file: Path) -> List[commands.Comman
         files=[protocol_file],
         directory=None,
     )
-    subject = await create_simulating_runner(
-        robot_type="OT-2 Standard",
-        protocol_config=protocol_source.config,
+    subject = await create_simulating_orchestrator(
+        robot_type="OT-2 Standard", protocol_config=protocol_source.config
     )
     result = await subject.run(deck_configuration=[], protocol_source=protocol_source)
     assert result.state_summary.errors == []
@@ -795,3 +796,30 @@ async def test_air_gap(tmp_path: Path) -> None:
     # TODO(mm, 2024-04-23): This commands.Custom looks wrong. This should be a commands.MoveToWell.
     assert isinstance(move_to_well, commands.Custom)
     assert isinstance(air_gap_aspirate, commands.Aspirate)
+
+
+async def test_comment(tmp_path: Path) -> None:
+    """A `ProtocolContext.comment()` should be mapped to a `comment` command."""
+    path = tmp_path / "protocol.py"
+    path.write_text(
+        dedent(
+            """\
+            metadata = {"apiLevel": "2.13"}
+            def run(protocol):
+                protocol.comment("oy.")
+            """
+        )
+    )
+    result_commands = await simulate_and_get_commands(path)
+    [initial_home, comment] = result_commands
+    assert comment == commands.Comment.construct(
+        status=commands.CommandStatus.SUCCEEDED,
+        params=commands.CommentParams(message="oy."),
+        notes=[],
+        result=commands.CommentResult(),
+        createdAt=matchers.Anything(),
+        startedAt=matchers.Anything(),
+        completedAt=matchers.Anything(),
+        id=matchers.Anything(),
+        key=matchers.Anything(),
+    )

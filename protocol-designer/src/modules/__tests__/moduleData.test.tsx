@@ -3,6 +3,16 @@ import { getNextAvailableModuleSlot } from '../moduleData'
 import type { InitialDeckSetup } from '../../step-forms'
 
 describe('getNextAvailableModuleSlot', () => {
+  it('renders slot D2 when it is the magnetic block', () => {
+    const mockInitialDeckSetup: InitialDeckSetup = {
+      modules: {},
+      labware: {},
+      pipettes: {},
+      additionalEquipmentOnDeck: {},
+    }
+    const result = getNextAvailableModuleSlot(mockInitialDeckSetup, true)
+    expect(result).toBe('D2')
+  })
   it('renders slot D1 when no slots are occupied', () => {
     const mockInitialDeckSetup: InitialDeckSetup = {
       modules: {},
@@ -10,7 +20,7 @@ describe('getNextAvailableModuleSlot', () => {
       pipettes: {},
       additionalEquipmentOnDeck: {},
     }
-    const result = getNextAvailableModuleSlot(mockInitialDeckSetup)
+    const result = getNextAvailableModuleSlot(mockInitialDeckSetup, false)
     expect(result).toBe('D1')
   })
   it('renders slot C1 when other slots are occupied', () => {
@@ -31,7 +41,7 @@ describe('getNextAvailableModuleSlot', () => {
         },
       },
     }
-    const result = getNextAvailableModuleSlot(mockInitialDeckSetup)
+    const result = getNextAvailableModuleSlot(mockInitialDeckSetup, false)
     expect(result).toBe('C1')
   })
   it('renders undefined when all slots are occupied', () => {
@@ -82,7 +92,7 @@ describe('getNextAvailableModuleSlot', () => {
         },
       },
     }
-    const result = getNextAvailableModuleSlot(mockInitialDeckSetup)
+    const result = getNextAvailableModuleSlot(mockInitialDeckSetup, false)
     expect(result).toBe(undefined)
   })
 })

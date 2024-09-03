@@ -4,7 +4,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Generic, List, NamedTuple, Optional, TypeVar
 
-from opentrons_shared_data.labware.dev_types import (
+from opentrons_shared_data.labware.types import (
     LabwareUri,
     LabwareParameters as LabwareParametersDict,
     LabwareDefinition as LabwareDefinitionDict,

@@ -12,7 +12,7 @@ import {
   Link,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -78,10 +78,12 @@ export function ConnectRobotSlideout({
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" marginBottom={SPACING.spacing8}>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing8}>
           {t('ip_description_first')}
-        </StyledText>
-        <StyledText as="p">{t('branded:ip_description_second')}</StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
+          {t('branded:ip_description_second')}
+        </LegacyStyledText>
         <ExternalLink
           href={SUPPORT_PAGE_LINK}
           css={TYPOGRAPHY.pSemiBold}
@@ -91,9 +93,9 @@ export function ConnectRobotSlideout({
           {t('connect_ip_link')}
         </ExternalLink>
         <Divider marginY={SPACING.spacing24} />
-        <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
+        <LegacyStyledText as="p" css={TYPOGRAPHY.pSemiBold}>
           {t('add_ip_hostname')}
-        </StyledText>
+        </LegacyStyledText>
         <ManualIpHostnameForm setMostRecentAddition={setMostRecentAddition} />
 
         <Flex
@@ -103,30 +105,30 @@ export function ConnectRobotSlideout({
         >
           {Boolean(isScanning) ? (
             <Flex flexDirection={DIRECTION_ROW}>
-              <StyledText
+              <LegacyStyledText
                 as="p"
                 color={COLORS.grey50}
                 marginRight={SPACING.spacing8}
               >
                 {t('searching')}
-              </StyledText>{' '}
+              </LegacyStyledText>{' '}
               <Icon name="ot-spinner" size="1.25rem" spin />
             </Flex>
           ) : (
             [
               mostRecentAddition != null && !(mostRecentDiscovered ?? false) ? (
                 <>
-                  <StyledText
+                  <LegacyStyledText
                     as="p"
                     color={COLORS.grey50}
                     marginX={SPACING.spacing4}
                   >
                     {t('discovery_timeout')}
-                  </StyledText>
-                  {displayLinkButton(t('shared:try_again'))}
+                  </LegacyStyledText>
+                  {displayLinkButton(t('shared:try_again') as string)}
                 </>
               ) : (
-                displayLinkButton(t('shared:refresh'))
+                displayLinkButton(t('shared:refresh') as string)
               ),
             ]
           )}

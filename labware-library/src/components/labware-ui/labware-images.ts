@@ -462,4 +462,10 @@ export const labwareImages: Record<string, string[]> = {
       import.meta.url
     ).href,
   ],
+  opentrons_96_deep_well_temp_mod_adapter: [
+    new URL(
+      '../../images/opentrons_96_deep_well_temp_mod_adapter.png',
+      import.meta.url
+    ).href,
+  ],
 }

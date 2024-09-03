@@ -4,7 +4,6 @@ from typing import (
     List,
     Literal,
     Tuple,
-    ClassVar,
     runtime_checkable,
     TypeVar,
 )
@@ -36,6 +35,20 @@ ErrorCodeNames = Literal[
     "BYONOY_ERROR_INTERNAL",
 ]
 
+SlotStateNames = Literal[
+    "UNKNOWN",
+    "EMPTY",
+    "OCCUPIED",
+    "UNDETERMINED",
+]
+
+DeviceStateNames = Literal[
+    "UNKNOWN",
+    "OK",
+    "BROKEN_FW",
+    "ERROR",
+]
+
 
 @runtime_checkable
 class AbsorbanceHidInterface(Protocol):
@@ -51,7 +64,9 @@ class AbsorbanceHidInterface(Protocol):
 
     @runtime_checkable
     class SlotState(Protocol):
-        __members__: ClassVar[Dict[str, int]]
+        __members__: Dict[SlotStateNames, int]
+        name: SlotStateNames
+        value: int
 
     @runtime_checkable
     class MeasurementConfig(Protocol):
@@ -65,7 +80,9 @@ class AbsorbanceHidInterface(Protocol):
 
     @runtime_checkable
     class DeviceState(Protocol):
-        __members__: ClassVar[Dict[str, int]]
+        __members__: Dict[DeviceStateNames, int]
+        name: DeviceStateNames
+        value: int
 
     def ByonoyAbs96SingleMeasurementConfig(self) -> MeasurementConfig:
         ...
@@ -76,14 +93,25 @@ class AbsorbanceHidInterface(Protocol):
     def byonoy_free_device(self, device_handle: int) -> Tuple[ErrorCode, bool]:
         ...
 
+    def byonoy_device_open(self, device_handle: int) -> bool:
+        ...
+
     def byonoy_get_device_information(
         self, device_handle: int
     ) -> Tuple[ErrorCode, DeviceInfo]:
         ...
 
+    def byonoy_update_device(
+        self, device_handle: int, firmware_file_path: str
+    ) -> ErrorCode:
+        ...
+
     def byonoy_get_device_status(
         self, device_handle: int
     ) -> Tuple[ErrorCode, DeviceState]:
+        ...
+
+    def byonoy_get_device_uptime(self, device_handle: int) -> Tuple[ErrorCode, int]:
         ...
 
     def byonoy_get_device_slot_status(

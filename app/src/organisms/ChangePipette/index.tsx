@@ -1,10 +1,15 @@
 import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 import { useSelector, useDispatch } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { SPACING, TYPOGRAPHY, StyledText } from '@opentrons/components'
+import {
+  SPACING,
+  TYPOGRAPHY,
+  LegacyStyledText,
+  ModalShell,
+} from '@opentrons/components'
 
 import {
   useDispatchApiRequests,
@@ -24,7 +29,6 @@ import {
   HOME,
 } from '../../redux/robot-controls'
 
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { useAttachedPipettes } from '../Devices/hooks'
@@ -57,7 +61,7 @@ interface Props {
 export function ChangePipette(props: Props): JSX.Element | null {
   const { robotName, mount, closeModal } = props
   const { t } = useTranslation(['change_pipette', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useDispatch<Dispatch>()
   const finalRequestId = React.useRef<string | null | undefined>(null)
   const [dispatchApiRequests] = useDispatchApiRequests(dispatchedAction => {
@@ -105,10 +109,9 @@ export function ChangePipette(props: Props): JSX.Element | null {
     if (homePipStatus === SUCCESS) closeModal()
   }, [homePipStatus, closeModal])
 
-  const homePipAndExit = React.useCallback(
-    () => dispatchApiRequests(home(robotName, PIPETTE, mount)),
-    [dispatchApiRequests, robotName, mount]
-  )
+  const homePipAndExit = React.useCallback(() => {
+    dispatchApiRequests(home(robotName, PIPETTE, mount))
+  }, [dispatchApiRequests, robotName, mount])
 
   const baseProps = {
     title: t('pipette_setup'),
@@ -143,7 +146,9 @@ export function ChangePipette(props: Props): JSX.Element | null {
 
   const exitModal = (
     <ExitModal
-      back={() => setConfirmExit(false)}
+      back={() => {
+        setConfirmExit(false)
+      }}
       isDisabled={isButtonDisabled}
       exit={homePipAndExit}
       direction={direction}
@@ -179,13 +184,13 @@ export function ChangePipette(props: Props): JSX.Element | null {
   if (movementStatus === MOVING) {
     contents = (
       <InProgressModal>
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.h1Default}
           marginTop={SPACING.spacing24}
           marginBottom={SPACING.spacing8}
         >
           {t('shared:stand_back_robot_is_in_motion')}
-        </StyledText>
+        </LegacyStyledText>
       </InProgressModal>
     )
   } else if (wizardStep === CLEAR_DECK) {
@@ -222,7 +227,11 @@ export function ChangePipette(props: Props): JSX.Element | null {
           })
     }
 
-    exitWizardHeader = confirmExit ? undefined : () => setConfirmExit(true)
+    exitWizardHeader = confirmExit
+      ? undefined
+      : () => {
+          setConfirmExit(true)
+        }
     wizardTitle = title
 
     contents = confirmExit ? (
@@ -234,11 +243,19 @@ export function ChangePipette(props: Props): JSX.Element | null {
           attachedWrong: attachedIncorrectPipette,
           direction,
           setWantedName,
-          confirm: () => setWizardStep(CONFIRM),
-          back: () => setWizardStep(CLEAR_DECK),
+          confirm: () => {
+            setWizardStep(CONFIRM)
+          },
+          back: () => {
+            setWizardStep(CLEAR_DECK)
+          },
           currentStepCount,
-          nextStep: () => setCurrentStepCount(currentStepCount + 1),
-          prevStep: () => setCurrentStepCount(currentStepCount - 1),
+          nextStep: () => {
+            setCurrentStepCount(currentStepCount + 1)
+          },
+          prevStep: () => {
+            setCurrentStepCount(currentStepCount - 1)
+          },
           totalSteps: eightChannel ? EIGHT_CHANNEL_STEPS : SINGLE_CHANNEL_STEPS,
           title:
             actualPipette?.displayName != null
@@ -254,11 +271,15 @@ export function ChangePipette(props: Props): JSX.Element | null {
     const toCalDashboard = (): void => {
       dispatchApiRequests(home(robotName, ROBOT))
       closeModal()
-      history.push(`/devices/${robotName}/robot-settings/calibration/dashboard`)
+      navigate(`/devices/${robotName}/robot-settings/calibration/dashboard`)
     }
 
     exitWizardHeader =
-      success || confirmExit ? undefined : () => setConfirmExit(true)
+      success || confirmExit
+        ? undefined
+        : () => {
+            setConfirmExit(true)
+          }
 
     let wizardTitleConfirmPipette
     if (wantedPipette == null && actualPipette == null) {
@@ -289,7 +310,9 @@ export function ChangePipette(props: Props): JSX.Element | null {
             setWizardStep(INSTRUCTIONS)
             setCurrentStepCount(currentStepCount - 1)
           },
-          nextStep: () => setCurrentStepCount(currentStepCount + 1),
+          nextStep: () => {
+            setCurrentStepCount(currentStepCount + 1)
+          },
           wrongWantedPipette: wrongWantedPipette,
           setWrongWantedPipette: setWrongWantedPipette,
           setConfirmPipetteLevel: setConfirmPipetteLevel,
@@ -303,7 +326,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     )
   }
   return (
-    <LegacyModalShell width="42.375rem">
+    <ModalShell width="42.375rem">
       <WizardHeader
         totalSteps={eightChannel ? EIGHT_CHANNEL_STEPS : SINGLE_CHANNEL_STEPS}
         currentStep={currentStepCount}
@@ -311,6 +334,6 @@ export function ChangePipette(props: Props): JSX.Element | null {
         onExit={exitWizardHeader}
       />
       {contents}
-    </LegacyModalShell>
+    </ModalShell>
   )
 }

@@ -7,7 +7,6 @@ from decoy import Decoy, matchers
 from opentrons.protocol_engine import (
     CommandSlice,
     CommandPointer,
-    ProtocolEngine,
     commands as pe_commands,
     errors as pe_errors,
 )
@@ -16,21 +15,20 @@ from opentrons.protocol_engine.errors import CommandDoesNotExistError
 from robot_server.errors.error_responses import ApiError
 from robot_server.service.json_api import MultiBodyMeta
 
-from robot_server.maintenance_runs.maintenance_engine_store import (
-    MaintenanceEngineStore,
+from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
+    MaintenanceRunOrchestratorStore,
 )
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
 )
 from robot_server.maintenance_runs.maintenance_run_models import (
-    MaintenanceRunCommandSummary,
     MaintenanceRunNotFoundError,
 )
 from robot_server.maintenance_runs.router.commands_router import (
     create_run_command,
     get_run_command,
     get_run_commands,
-    get_current_run_engine_from_url,
+    get_current_run_from_url,
 )
 from robot_server.runs.command_models import (
     RequestModelWithCommandCreate,
@@ -38,36 +36,39 @@ from robot_server.runs.command_models import (
     CommandLink,
     CommandLinkMeta,
 )
+from robot_server.runs.run_models import RunCommandSummary
 
 
-async def test_get_current_run_engine_from_url(
+async def test_get_current_run_from_url(
     decoy: Decoy,
-    mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
 ) -> None:
     """Should get an instance of a maintenance run protocol engine."""
-    decoy.when(mock_maintenance_engine_store.current_run_id).then_return("run-id")
-
-    result = await get_current_run_engine_from_url(
-        runId="run-id",
-        engine_store=mock_maintenance_engine_store,
+    decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
+        "run-id"
     )
 
-    assert result is mock_maintenance_engine_store.engine
+    result = await get_current_run_from_url(
+        runId="run-id",
+        run_orchestrator_store=mock_maintenance_run_orchestrator_store,
+    )
+
+    assert result == "run-id"
 
 
-async def test_get_current_run_engine_from_url_not_current(
+async def test_get_current_run_from_url_not_current(
     decoy: Decoy,
-    mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
 ) -> None:
     """It should 404 if you try to add commands to non-current/non-existent run."""
-    decoy.when(mock_maintenance_engine_store.current_run_id).then_return(
+    decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
         "some-other-run-id"
     )
 
     with pytest.raises(ApiError) as exc_info:
-        await get_current_run_engine_from_url(
+        await get_current_run_from_url(
             runId="run-id",
-            engine_store=mock_maintenance_engine_store,
+            run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         )
 
     assert exc_info.value.status_code == 404
@@ -76,7 +77,7 @@ async def test_get_current_run_engine_from_url_not_current(
 
 async def test_create_run_command(
     decoy: Decoy,
-    mock_protocol_engine: ProtocolEngine,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
 ) -> None:
     """It should add the requested command to the ProtocolEngine and return it."""
     command_request = pe_commands.WaitForResumeCreate(
@@ -91,48 +92,42 @@ async def test_create_run_command(
         params=pe_commands.WaitForResumeParams(message="Hello"),
     )
 
-    def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
-        decoy.when(
-            mock_protocol_engine.state_view.commands.get("command-id")
-        ).then_return(command_once_added)
-        return command_once_added
-
     decoy.when(
-        mock_protocol_engine.add_command(
-            pe_commands.WaitForResumeCreate(
+        await mock_maintenance_run_orchestrator_store.add_command_and_wait_for_interval(
+            request=pe_commands.WaitForResumeCreate(
                 params=pe_commands.WaitForResumeParams(message="Hello"),
                 intent=pe_commands.CommandIntent.SETUP,
-            )
+            ),
+            wait_until_complete=False,
+            timeout=None,
         )
-    ).then_do(_stub_queued_command_state)
+    ).then_return(command_once_added)
+
+    decoy.when(
+        mock_maintenance_run_orchestrator_store.get_command("command-id")
+    ).then_return(command_once_added)
 
     result = await create_run_command(
+        run_id="run-id",
         request_body=RequestModelWithCommandCreate(data=command_request),
         waitUntilComplete=False,
-        protocol_engine=mock_protocol_engine,
+        run_orchestrator_store=mock_maintenance_run_orchestrator_store,
+        timeout=None,
+        check_estop=True,
     )
 
     assert result.content.data == command_once_added
     assert result.status_code == 201
-    decoy.verify(await mock_protocol_engine.wait_for_command("command-id"), times=0)
 
 
 async def test_create_run_command_blocking_completion(
     decoy: Decoy,
-    mock_protocol_engine: ProtocolEngine,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
 ) -> None:
     """It should be able to create a command and wait for it to execute."""
     command_request = pe_commands.WaitForResumeCreate(
         params=pe_commands.WaitForResumeParams(message="Hello"),
         intent=pe_commands.CommandIntent.SETUP,
-    )
-
-    command_once_added = pe_commands.WaitForResume(
-        id="command-id",
-        key="command-key",
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=pe_commands.CommandStatus.QUEUED,
-        params=pe_commands.WaitForResumeParams(message="Hello"),
     )
 
     command_once_completed = pe_commands.WaitForResume(
@@ -144,31 +139,23 @@ async def test_create_run_command_blocking_completion(
         result=pe_commands.WaitForResumeResult(),
     )
 
-    def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
-        decoy.when(
-            mock_protocol_engine.state_view.commands.get("command-id")
-        ).then_return(command_once_added)
+    decoy.when(
+        await mock_maintenance_run_orchestrator_store.add_command_and_wait_for_interval(
+            request=command_request, wait_until_complete=True, timeout=999
+        )
+    ).then_return(command_once_completed)
 
-        return command_once_added
-
-    def _stub_completed_command_state(*_a: object, **_k: object) -> None:
-        decoy.when(
-            mock_protocol_engine.state_view.commands.get("command-id")
-        ).then_return(command_once_completed)
-
-    decoy.when(mock_protocol_engine.add_command(command_request)).then_do(
-        _stub_queued_command_state
-    )
-
-    decoy.when(await mock_protocol_engine.wait_for_command("command-id")).then_do(
-        _stub_completed_command_state
-    )
+    decoy.when(
+        mock_maintenance_run_orchestrator_store.get_command("command-id")
+    ).then_return(command_once_completed)
 
     result = await create_run_command(
+        run_id="run-id",
         request_body=RequestModelWithCommandCreate(data=command_request),
         waitUntilComplete=True,
         timeout=999,
-        protocol_engine=mock_protocol_engine,
+        run_orchestrator_store=mock_maintenance_run_orchestrator_store,
+        check_estop=True,
     )
 
     assert result.content.data == command_once_completed
@@ -194,6 +181,7 @@ async def test_get_run_commands(
             createdAt=datetime(year=2024, month=4, day=4),
             detail="Things are not looking good.",
         ),
+        failedCommandId="failed-command-id",
     )
 
     decoy.when(
@@ -233,7 +221,7 @@ async def test_get_run_commands(
     )
 
     assert result.content.data == [
-        MaintenanceRunCommandSummary(
+        RunCommandSummary(
             id="command-id",
             key="command-key",
             commandType="waitForResume",
@@ -249,6 +237,7 @@ async def test_get_run_commands(
                 createdAt=datetime(year=2024, month=4, day=4),
                 detail="Things are not looking good.",
             ),
+            failedCommandId="failed-command-id",
         )
     ]
     assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)

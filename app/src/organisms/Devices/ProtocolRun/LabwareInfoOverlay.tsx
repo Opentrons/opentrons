@@ -15,7 +15,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   RobotCoordsForeignDiv,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { OffsetVector } from '../../../molecules/OffsetVector'
@@ -60,26 +60,26 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
         alignItems={ALIGN_FLEX_START}
         gridGap={SPACING.spacing4}
       >
-        <StyledText
+        <LegacyStyledText
           as="h6"
           css={labwareDisplayNameStyle}
           title={definitionDisplayName}
         >
           {displayName ?? definitionDisplayName}
-        </StyledText>
+        </LegacyStyledText>
         {props.labwareHasLiquid && (
           <Icon name="water" color={COLORS.white} width="0" minWidth="1rem" />
         )}
       </Flex>
       {vector != null && (
         <>
-          <StyledText
+          <LegacyStyledText
             as="h6"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             textTransform="uppercase"
           >
             {t('offset_data')}
-          </StyledText>
+          </LegacyStyledText>
           <OffsetVector {...vector} />
         </>
       )}

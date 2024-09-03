@@ -1,9 +1,12 @@
 """Test pipette data provider."""
+from typing import Dict
+from sys import maxsize
 import pytest
-from opentrons_shared_data.pipette.dev_types import PipetteNameType, PipetteModel
+from opentrons_shared_data.pipette.types import PipetteNameType, PipetteModel
 from opentrons_shared_data.pipette import pipette_definition, types as pip_types
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteBoundingBoxOffsetDefinition,
+    TIP_OVERLAP_VERSION_MAXIMUM,
 )
 
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -11,9 +14,12 @@ from opentrons.protocol_engine.types import FlowRates
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
     VirtualPipetteDataProvider,
+    validate_and_default_tip_overlap_version,
+    get_latest_tip_overlap_before_version,
 )
 
 from opentrons.protocol_engine.resources import pipette_data_provider as subject
+from opentrons.protocol_engine.errors.exceptions import InvalidLoadPipetteSpecsError
 from ..pipette_fixtures import get_default_nozzle_map
 from opentrons.types import Point
 
@@ -29,7 +35,7 @@ def test_get_virtual_pipette_static_config(
 ) -> None:
     """It should return config data given a pipette name."""
     result = subject_instance.get_virtual_pipette_static_config(
-        PipetteNameType.P20_SINGLE_GEN2.value, "some-id"
+        PipetteNameType.P20_SINGLE_GEN2.value, "some-id", "v0"
     )
 
     assert result == LoadedStaticPipetteData(
@@ -58,6 +64,7 @@ def test_get_virtual_pipette_static_config(
         nozzle_map=result.nozzle_map,
         back_left_corner_offset=Point(0, 0, 10.45),
         front_right_corner_offset=Point(0, 0, 10.45),
+        pipette_lld_settings={},
     )
 
 
@@ -66,7 +73,7 @@ def test_configure_virtual_pipette_for_volume(
 ) -> None:
     """It should return an updated config if the liquid class changes."""
     result1 = subject_instance.get_virtual_pipette_static_config(
-        PipetteNameType.P50_SINGLE_FLEX.value, "my-pipette"
+        PipetteNameType.P50_SINGLE_FLEX.value, "my-pipette", "v0"
     )
     assert result1 == LoadedStaticPipetteData(
         model="p50_single_v3.6",
@@ -86,12 +93,13 @@ def test_configure_virtual_pipette_for_volume(
         nozzle_map=result1.nozzle_map,
         back_left_corner_offset=Point(-8.0, -22.0, -259.15),
         front_right_corner_offset=Point(-8.0, -22.0, -259.15),
+        pipette_lld_settings={"t50": {"minHeight": 1.0, "minVolume": 0.0}},
     )
     subject_instance.configure_virtual_pipette_for_volume(
         "my-pipette", 1, result1.model
     )
     result2 = subject_instance.get_virtual_pipette_static_config(
-        PipetteNameType.P50_SINGLE_FLEX.value, "my-pipette"
+        PipetteNameType.P50_SINGLE_FLEX.value, "my-pipette", "v0"
     )
     assert result2 == LoadedStaticPipetteData(
         model="p50_single_v3.6",
@@ -111,6 +119,7 @@ def test_configure_virtual_pipette_for_volume(
         nozzle_map=result2.nozzle_map,
         back_left_corner_offset=Point(-8.0, -22.0, -259.15),
         front_right_corner_offset=Point(-8.0, -22.0, -259.15),
+        pipette_lld_settings={"t50": {"minHeight": 1.0, "minVolume": 0.0}},
     )
 
 
@@ -119,7 +128,7 @@ def test_load_virtual_pipette_by_model_string(
 ) -> None:
     """It should return config data given a pipette model."""
     result = subject_instance.get_virtual_pipette_static_config_by_model_string(
-        "p300_multi_v2.1", "my-pipette"
+        "p300_multi_v2.1", "my-pipette", "v0"
     )
     assert result == LoadedStaticPipetteData(
         model="p300_multi_v2.1",
@@ -139,6 +148,7 @@ def test_load_virtual_pipette_by_model_string(
         nozzle_map=result.nozzle_map,
         back_left_corner_offset=Point(-16.0, 43.15, 35.52),
         front_right_corner_offset=Point(16.0, -43.15, 35.52),
+        pipette_lld_settings={},
     )
 
 
@@ -147,13 +157,13 @@ def test_load_virtual_pipette_nozzle_layout(
 ) -> None:
     """It should return a NozzleMap object."""
     subject_instance.configure_virtual_pipette_nozzle_layout(
-        "my-pipette", "p300_multi_v2.1", "A1", "E1", "A1"
+        "my-pipette", "p300_multi_v2.1", "D1", "H1", "H1"
     )
     result = subject_instance.get_nozzle_layout_for_pipette("my-pipette")
     assert result.configuration.value == "COLUMN"
-    assert result.starting_nozzle == "A1"
-    assert result.front_right == "E1"
-    assert result.back_left == "A1"
+    assert result.starting_nozzle == "H1"
+    assert result.front_right == "H1"
+    assert result.back_left == "D1"
 
     subject_instance.configure_virtual_pipette_nozzle_layout(
         "my-pipette", "p300_multi_v2.1"
@@ -180,12 +190,12 @@ def test_load_virtual_pipette_nozzle_layout(
     assert result.configuration.value == "COLUMN"
 
 
-def test_get_pipette_static_config(
+@pytest.fixture
+def pipette_dict(
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
-) -> None:
-    """It should return config data given a PipetteDict."""
-    dummy_nozzle_map = get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2)
-    pipette_dict: PipetteDict = {
+) -> PipetteDict:
+    """Get a pipette dict."""
+    return {
         "name": "p300_single_gen2",
         "min_volume": 20,
         "max_volume": 300,
@@ -204,6 +214,12 @@ def test_get_pipette_static_config(
             "opentrons/opentrons_96_tiprack_300ul/1": 8.2,
             "opentrons/opentrons_96_filtertiprack_200ul/1": 8.2,
         },
+        "versioned_tip_overlap": {
+            "v0": {
+                "default": 8.2,
+            },
+            "v2": {"default": 9.3},
+        },
         "available_volume": 300.0,
         "return_tip_height": 0.5,
         "default_aspirate_flow_rates": {"2.0": 46.43, "2.1": 92.86},
@@ -220,14 +236,36 @@ def test_get_pipette_static_config(
         "default_aspirate_speeds": {"2.0": 5.021202, "2.6": 10.042404},
         "default_push_out_volume": 3,
         "supported_tips": {pip_types.PipetteTipType.t300: supported_tip_fixture},
-        "current_nozzle_map": dummy_nozzle_map,
+        "current_nozzle_map": get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
         "pipette_bounding_box_offsets": PipetteBoundingBoxOffsetDefinition(
             backLeftCorner=[10, 20, 30],
             frontRightCorner=[40, 50, 60],
         ),
+        "lld_settings": {
+            "t50": {"minHeight": 0.5, "minVolume": 0},
+            "t200": {"minHeight": 0.5, "minVolume": 0},
+            "t1000": {"minHeight": 0.5, "minVolume": 0},
+        },
     }
 
-    result = subject.get_pipette_static_config(pipette_dict)
+
+@pytest.mark.parametrize(
+    "tip_overlap_version,overlap_data",
+    [
+        ("v0", {"default": 8.2}),
+        ("v1", {"default": 8.2}),
+        ("v2", {"default": 9.3}),
+        ("v10000", {"default": 9.3}),
+    ],
+)
+def test_get_pipette_static_config(
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+    pipette_dict: PipetteDict,
+    tip_overlap_version: str,
+    overlap_data: Dict[str, float],
+) -> None:
+    """It should return config data given a PipetteDict."""
+    result = subject.get_pipette_static_config(pipette_dict, tip_overlap_version)
 
     assert result == LoadedStaticPipetteData(
         model="p300_single_v2.0",
@@ -241,16 +279,67 @@ def test_get_pipette_static_config(
             default_blow_out={"2.0": 46.43, "2.2": 92.86},
         ),
         tip_configuration_lookup_table={300: supported_tip_fixture},
-        nominal_tip_overlap={
-            "default": 8.2,
-            "opentrons/opentrons_96_tiprack_300ul/1": 8.2,
-            "opentrons/opentrons_96_filtertiprack_200ul/1": 8.2,
-        },
+        nominal_tip_overlap=overlap_data,
         # TODO(mc, 2023-02-28): these two values are not present in PipetteDict
         # https://opentrons.atlassian.net/browse/RCORE-655
         nozzle_offset_z=0,
         home_position=0,
-        nozzle_map=dummy_nozzle_map,
+        nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
         back_left_corner_offset=Point(10, 20, 30),
         front_right_corner_offset=Point(40, 50, 60),
+        pipette_lld_settings={
+            "t50": {"minHeight": 0.5, "minVolume": 0},
+            "t200": {"minHeight": 0.5, "minVolume": 0},
+            "t1000": {"minHeight": 0.5, "minVolume": 0},
+        },
     )
+
+
+@pytest.mark.parametrize(
+    "version",
+    [
+        "",
+        "qwe",
+        "v",
+        "v-1",
+        "vab",
+    ],
+)
+def test_validate_bad_tip_overlap_versions(version: str) -> None:
+    """Raise for bad tip overlap version specs."""
+    with pytest.raises(InvalidLoadPipetteSpecsError):
+        validate_and_default_tip_overlap_version(version)
+
+
+def test_default_tip_overlap_versions() -> None:
+    """Default None tip overlap version specs."""
+    assert (
+        validate_and_default_tip_overlap_version(None)
+        == f"v{TIP_OVERLAP_VERSION_MAXIMUM}"
+    )
+
+
+@pytest.mark.parametrize("version", ["v0", "v1", f"v{maxsize+1}"])
+def test_pass_valid_tip_overlap_versions(version: str) -> None:
+    """Pass valid tip overlap specs."""
+    assert validate_and_default_tip_overlap_version(version) == version
+
+
+@pytest.mark.parametrize(
+    "version,target_data",
+    [
+        ("v0", {"default": 123.0}),
+        ("v1", {"default": 321.1}),
+        ("v3", {"default": 333.5}),
+        ("v9999", {"default": 4414.99}),
+    ],
+)
+def test_get_latest_tip_overlap(version: str, target_data: Dict[str, float]) -> None:
+    """Test the search function for latest offset."""
+    overlap = {
+        "v0": {"default": 123.0},
+        "v1": {"default": 321.1},
+        "v2": {"default": 333.5},
+        "v1231": {"default": 4414.99},
+    }
+    assert get_latest_tip_overlap_before_version(overlap, version) == target_data

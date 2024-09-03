@@ -2,22 +2,15 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
-import { StyledText } from '../StyledText'
-import { ALIGN_CENTER, DIRECTION_ROW } from '../../styles'
+import { LegacyStyledText } from '../StyledText'
+import { ALIGN_CENTER, DIRECTION_ROW, FLEX_MAX_CONTENT } from '../../styles'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { Icon } from '../../icons'
 
 import type { IconName } from '../../icons'
 import type { StyleProps } from '../../primitives'
 
-// ToDo (kk:03/26/2024) basic will be removed when we add Tag component
-export type ChipType =
-  | 'basic'
-  | 'error'
-  | 'info'
-  | 'neutral'
-  | 'success'
-  | 'warning'
+export type ChipType = 'error' | 'info' | 'neutral' | 'success' | 'warning'
 
 type ChipSize = 'medium' | 'small'
 
@@ -46,39 +39,34 @@ const CHIP_PROPS_BY_TYPE: Record<
     textColor: string
   }
 > = {
-  basic: {
-    backgroundColor: `${COLORS.black90}${COLORS.opacity20HexCode}`,
-    borderRadius: BORDERS.borderRadius4,
-    textColor: COLORS.grey60,
-  },
   error: {
     backgroundColor: COLORS.red35,
-    borderRadius: BORDERS.borderRadius40,
+    borderRadius: BORDERS.borderRadiusFull,
     iconColor: COLORS.red60,
     textColor: COLORS.red60,
   },
   info: {
     backgroundColor: COLORS.blue35,
-    borderRadius: BORDERS.borderRadius40,
+    borderRadius: BORDERS.borderRadiusFull,
     iconColor: COLORS.blue60,
     textColor: COLORS.blue60,
   },
   neutral: {
     backgroundColor: `${COLORS.black90}${COLORS.opacity20HexCode}`,
-    borderRadius: BORDERS.borderRadius40,
+    borderRadius: BORDERS.borderRadiusFull,
     iconColor: COLORS.grey60,
     textColor: COLORS.grey60,
   },
   success: {
     backgroundColor: COLORS.green35,
-    borderRadius: BORDERS.borderRadius40,
+    borderRadius: BORDERS.borderRadiusFull,
     iconColor: COLORS.green60,
     iconName: 'ot-check',
     textColor: COLORS.green60,
   },
   warning: {
     backgroundColor: COLORS.yellow35,
-    borderRadius: BORDERS.borderRadius40,
+    borderRadius: BORDERS.borderRadiusFull,
     iconColor: COLORS.yellow60,
     textColor: COLORS.yellow60,
   },
@@ -95,7 +83,7 @@ export function Chip(props: ChipProps): JSX.Element {
     ...styleProps
   } = props
   const backgroundColor =
-    background === false && type !== 'basic'
+    background === false
       ? COLORS.transparent
       : CHIP_PROPS_BY_TYPE[type].backgroundColor
   const icon = iconName ?? CHIP_PROPS_BY_TYPE[type].iconName ?? 'ot-alert'
@@ -103,6 +91,7 @@ export function Chip(props: ChipProps): JSX.Element {
   const MEDIUM_CONTAINER_STYLE = css`
     padding: ${SPACING.spacing2} ${background === false ? 0 : SPACING.spacing8};
     grid-gap: ${SPACING.spacing4};
+
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       padding: ${SPACING.spacing8}
         ${background === false ? 0 : SPACING.spacing16};
@@ -113,6 +102,7 @@ export function Chip(props: ChipProps): JSX.Element {
   const SMALL_CONTAINER_STYLE = css`
     padding: ${SPACING.spacing4} ${background === false ? 0 : SPACING.spacing6};
     grid-gap: ${SPACING.spacing4};
+
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       padding: ${SPACING.spacing4}
         ${background === false ? 0 : SPACING.spacing8};
@@ -123,6 +113,7 @@ export function Chip(props: ChipProps): JSX.Element {
   const ICON_STYLE = css`
     width: ${chipSize === 'medium' ? '1rem' : '0.75rem'};
     height: ${chipSize === 'medium' ? '1rem' : '0.75rem'};
+
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       width: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
       height: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
@@ -131,6 +122,7 @@ export function Chip(props: ChipProps): JSX.Element {
 
   const TEXT_STYLE = css`
     ${chipSize === 'medium' ? WEB_MEDIUM_TEXT_STYLE : WEB_SMALL_TEXT_STYLE}
+
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       ${chipSize === 'medium'
         ? TYPOGRAPHY.bodyTextSemiBold
@@ -144,13 +136,14 @@ export function Chip(props: ChipProps): JSX.Element {
       backgroundColor={backgroundColor}
       borderRadius={CHIP_PROPS_BY_TYPE[type].borderRadius}
       flexDirection={DIRECTION_ROW}
+      height={FLEX_MAX_CONTENT}
       css={
         chipSize === 'medium' ? MEDIUM_CONTAINER_STYLE : SMALL_CONTAINER_STYLE
       }
       data-testid={`Chip_${type}`}
       {...styleProps}
     >
-      {type !== 'basic' && hasIcon ? (
+      {hasIcon ? (
         <Icon
           name={icon}
           color={CHIP_PROPS_BY_TYPE[type].iconColor}
@@ -158,9 +151,12 @@ export function Chip(props: ChipProps): JSX.Element {
           css={ICON_STYLE}
         />
       ) : null}
-      <StyledText css={TEXT_STYLE} color={CHIP_PROPS_BY_TYPE[type].textColor}>
+      <LegacyStyledText
+        css={TEXT_STYLE}
+        color={CHIP_PROPS_BY_TYPE[type].textColor}
+      >
         {text}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

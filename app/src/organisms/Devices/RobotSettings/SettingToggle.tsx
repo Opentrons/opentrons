@@ -7,7 +7,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -49,10 +49,13 @@ export function SettingToggle({
       marginBottom={SPACING.spacing16}
     >
       <Box width="70%">
-        <StyledText css={TYPOGRAPHY.pSemiBold} paddingBottom={SPACING.spacing4}>
+        <LegacyStyledText
+          css={TYPOGRAPHY.pSemiBold}
+          paddingBottom={SPACING.spacing4}
+        >
           {title}
-        </StyledText>
-        <StyledText as="p">{description}</StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText as="p">{description}</LegacyStyledText>
       </Box>
       <ToggleButton
         label={title}

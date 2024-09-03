@@ -31,20 +31,40 @@ export function readLabwareDirectory(dir: string): Promise<string[]> {
 }
 
 export function parseLabwareFiles(
-  files: string[]
+  filesOrContent: string | string[]
 ): Promise<UncheckedLabwareFile[]> {
-  const tasks = files.map(f => {
-    const readTask = fs.readJson(f, { throws: false })
-    const statTask = fs.stat(f)
+  if (typeof filesOrContent === 'string') {
+    return new Promise((resolve, reject) => {
+      try {
+        const data = JSON.parse(filesOrContent)
+        const modified = Date.now()
+        const filename = `${data.parameters?.loadName}.json` ?? 'unknown_file'
 
-    return Promise.all([readTask, statTask]).then(([data, stats]) => ({
-      filename: f,
-      modified: stats.mtimeMs,
-      data,
-    }))
-  })
+        resolve([{ filename, modified, data }])
+      } catch (error) {
+        reject(error)
+      }
+    })
+  } else if (Array.isArray(filesOrContent)) {
+    const tasks = filesOrContent.map(f => {
+      const readTask = fs.readJson(f, { throws: false })
+      const statTask = fs.stat(f)
 
-  return Promise.all(tasks)
+      return Promise.all([readTask, statTask]).then(([data, stats]) => ({
+        filename: f,
+        modified: stats.mtimeMs,
+        data,
+      }))
+    })
+
+    return Promise.all(tasks)
+  } else {
+    return Promise.reject(
+      new Error(
+        'Invalid input: expected an inported file or data from App Labware Creator'
+      )
+    )
+  }
 }
 
 // get a filename, adding an incrementor to avoid collisions
@@ -72,6 +92,20 @@ export function addLabwareFile(file: string, dir: string): Promise<void> {
   return getFileName(dir, basename, extname).then(destName =>
     fs.readJson(file).then(data => fs.outputJson(destName, data))
   )
+}
+
+export function addLabwareFileFromCreator(
+  fileContent: string,
+  dir: string,
+  fileName: string
+): Promise<void> {
+  const extname = path.extname(fileName)
+  const basename = path.basename(fileName, extname)
+
+  return getFileName(dir, basename, extname).then(destName => {
+    const data = JSON.parse(fileContent)
+    return fs.outputJson(destName, data)
+  })
 }
 
 export function removeLabwareFile(file: string): Promise<void> {

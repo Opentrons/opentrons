@@ -9,10 +9,11 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  InputField,
+  LegacyStyledText,
   Link,
   PrimaryButton,
   SPACING,
-  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -22,7 +23,6 @@ import {
 } from '@opentrons/react-api-client'
 
 import { ToggleButton } from '../../../../../atoms/buttons'
-import { InputField } from '../../../../../atoms/InputField'
 import { MultiSlideout } from '../../../../../atoms/Slideout/MultiSlideout'
 import { FileUpload } from '../../../../../molecules/FileUpload'
 import { UploadInput } from '../../../../../molecules/UploadInput'
@@ -224,7 +224,7 @@ export function FactoryModeSlideout({
           <Controller
             control={control}
             name="factoryModeInput"
-            render={({ field, fieldState }) => (
+            render={({ field }) => (
               <InputField
                 id="factoryModeInput"
                 name="factoryModeInput"
@@ -234,63 +234,62 @@ export function FactoryModeSlideout({
                   clearErrors()
                 }}
                 value={field.value}
-                error={fieldState.error?.message && ' '}
+                error={
+                  errors.factoryModeInput != null
+                    ? errors.factoryModeInput.message
+                    : null
+                }
                 onBlur={field.onBlur}
                 title={t('enter_factory_password')}
               />
             )}
           />
-          {errors.factoryModeInput != null ? (
-            <StyledText
-              as="label"
-              color={COLORS.red50}
-              marginTop={SPACING.spacing4}
-            >
-              {errors.factoryModeInput.message}
-            </StyledText>
-          ) : null}
         </Flex>
       ) : null}
       {currentStep === 2 ? (
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText
+            <LegacyStyledText
               css={TYPOGRAPHY.pSemiBold}
               paddingBottom={SPACING.spacing4}
             >
               {t('oem_mode')}
-            </StyledText>
+            </LegacyStyledText>
             <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing6}>
               <ToggleButton
                 label="oem_mode_toggle"
                 toggledOn={toggleValue}
                 onClick={handleToggleClick}
               />
-              <StyledText as="p" marginBottom={SPACING.spacing4}>
+              <LegacyStyledText as="p" marginBottom={SPACING.spacing4}>
                 {toggleValue ? t('on') : t('off')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
-            <StyledText as="p">{t('branded:oem_mode_description')}</StyledText>
+            <LegacyStyledText as="p">
+              {t('branded:oem_mode_description')}
+            </LegacyStyledText>
           </Flex>
           {toggleValue ? (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing6}>
-                <StyledText css={TYPOGRAPHY.pSemiBold}>
+                <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
                   {t('upload_custom_logo')}
-                </StyledText>
-                <StyledText as="p">
+                </LegacyStyledText>
+                <LegacyStyledText as="p">
                   {t('upload_custom_logo_description')}
-                </StyledText>
-                <StyledText as="p">
+                </LegacyStyledText>
+                <LegacyStyledText as="p">
                   {t('upload_custom_logo_dimensions')}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
               {file == null ? (
                 <UploadInput
                   uploadButtonText={t('choose_file')}
-                  onUpload={(file: File) => handleChooseFile(file)}
+                  onUpload={(file: File) => {
+                    handleChooseFile(file)
+                  }}
                   dragAndDropText={
-                    <StyledText as="p">
+                    <LegacyStyledText as="p">
                       <Trans
                         t={t}
                         i18nKey="shared:drag_and_drop"
@@ -298,7 +297,7 @@ export function FactoryModeSlideout({
                           a: <Link color={COLORS.blue55} role="button" />,
                         }}
                       />
-                    </StyledText>
+                    </LegacyStyledText>
                   }
                 />
               ) : (

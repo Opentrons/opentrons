@@ -9,9 +9,16 @@ import * as Constants from '../constants'
 import type { Action, Epic } from '../../types'
 
 import type { ResponseToActionMapper } from '../../robot-api/operators'
-import type { RobotApiRequestOptions } from '../../robot-api/types'
+import type {
+  RobotApiRequestOptions,
+  RobotApiV2ErrorResponseBody,
+} from '../../robot-api/types'
 
-import type { FetchSessionAction, CreateSessionCommandAction } from '../types'
+import type {
+  FetchSessionAction,
+  CreateSessionCommandAction,
+  SessionResponse,
+} from '../types'
 
 export const mapActionToRequest = (
   action: FetchSessionAction | CreateSessionCommandAction
@@ -28,11 +35,11 @@ const mapResponseToAction: ResponseToActionMapper<FetchSessionAction> = (
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.fetchSessionSuccess(host.name, body, meta)
+    ? Actions.fetchSessionSuccess(host.name, body as SessionResponse, meta)
     : Actions.fetchSessionFailure(
         host.name,
         originalAction.payload.sessionId,
-        body,
+        body as RobotApiV2ErrorResponseBody,
         meta
       )
 }

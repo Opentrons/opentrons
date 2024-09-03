@@ -21,12 +21,14 @@ from .actions import (
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddLiquidAction,
+    SetDeckConfigurationAction,
     AddAddressableAreaAction,
     AddModuleAction,
     FinishErrorDetails,
     DoorChangeAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
+    AddAbsorbanceReaderLidAction,
 )
 
 __all__ = [
@@ -49,11 +51,13 @@ __all__ = [
     "AddLabwareOffsetAction",
     "AddLabwareDefinitionAction",
     "AddLiquidAction",
+    "SetDeckConfigurationAction",
     "AddAddressableAreaAction",
     "AddModuleAction",
     "DoorChangeAction",
     "ResetTipsAction",
     "SetPipetteMovementSpeedAction",
+    "AddAbsorbanceReaderLidAction",
     # action payload values
     "PauseSource",
     "FinishErrorDetails",

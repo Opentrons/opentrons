@@ -130,6 +130,14 @@ class LiquidHandler(
         """
         ...
 
+    async def tip_pickup_moves(
+        self,
+        mount: MountArgType,
+        presses: Optional[int] = None,
+        increment: Optional[float] = None,
+    ) -> None:
+        ...
+
     async def pick_up_tip(
         self,
         mount: MountArgType,
@@ -169,5 +177,18 @@ class LiquidHandler(
                                 is used in case the plunger motor skipped while
                                 dropping the tip, and is also used to recover
                                 the ejector shroud after a drop.
+        """
+        ...
+
+    async def liquid_probe(
+        self,
+        mount: MountArgType,
+        max_z_dist: float,
+    ) -> float:
+        """Search for and return liquid level height using this pipette
+        at the current location.
+
+        mount : Mount.LEFT or Mount.RIGHT
+        max_z_dist : maximum depth to probe for liquid
         """
         ...

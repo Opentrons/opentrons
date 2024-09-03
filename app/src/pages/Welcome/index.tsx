@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { MediumButton } from '../../atoms/buttons'
@@ -18,7 +18,7 @@ const IMAGE_ALT = 'Welcome screen background image'
 
 export function Welcome(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared', 'branded'])
-  const history = useHistory()
+  const navigate = useNavigate()
 
   return (
     <Flex
@@ -29,25 +29,27 @@ export function Welcome(): JSX.Element {
     >
       <img alt={IMAGE_ALT} src={screenImage} width="904px" height="189px" />
       <Flex justifyContent={JUSTIFY_CENTER}>
-        <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+        <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('branded:welcome_title')}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER}>
-        <StyledText
+        <LegacyStyledText
           as="h4"
           color={COLORS.grey60}
           textAlign={TYPOGRAPHY.textAlignCenter}
           width="39.875rem"
         >
           {t('welcome_description')}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginTop="1.75rem">
         <MediumButton
           buttonCategory="rounded"
           buttonText={t('shared:get_started')}
-          onClick={() => history.push('/network-setup')}
+          onClick={() => {
+            navigate('/network-setup')
+          }}
         />
       </Flex>
     </Flex>

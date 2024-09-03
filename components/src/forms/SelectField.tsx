@@ -84,9 +84,11 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
           const value = (opt as SelectOption).value
           onValueChange?.(name, value, e)
         }}
-        onBlur={() => onLoseFocus && onLoseFocus(name)}
+        onBlur={() => {
+          if (onLoseFocus != null) onLoseFocus(name)
+        }}
       />
-      {caption && <p className={captionCx}>{caption}</p>}
+      {caption != null ? <p className={captionCx}>{caption}</p> : null}
     </div>
   )
 }

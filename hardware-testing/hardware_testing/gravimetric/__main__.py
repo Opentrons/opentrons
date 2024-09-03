@@ -38,7 +38,7 @@ from .config import (
     get_tip_volumes_for_qc,
 )
 from .measurement.record import GravimetricRecorder
-from .measurement import DELAY_FOR_MEASUREMENT
+from .measurement import DELAY_FOR_MEASUREMENT, SupportedLiquid
 from .measurement.scale import Scale
 from .trial import TestResources, _change_pipettes
 from .tips import get_tips
@@ -148,6 +148,7 @@ class RunArgs:
     ctx: ProtocolContext
     protocol_cfg: Any
     test_report: report.CSVReport
+    liquid: str
 
     @classmethod
     def _get_protocol_context(cls, args: argparse.Namespace) -> ProtocolContext:
@@ -366,6 +367,7 @@ class RunArgs:
             ctx=_ctx,
             protocol_cfg=protocol_cfg,
             test_report=report,
+            liquid=args.liquid,
         )
 
 
@@ -414,6 +416,7 @@ def build_gravimetric_cfg(
         same_tip=same_tip,
         ignore_fail=ignore_fail,
         mode=mode,
+        liquid=run_args.liquid,
     )
 
 
@@ -575,6 +578,12 @@ if __name__ == "__main__":
     parser.add_argument("--dye-well-col-offset", nargs="+", type=int, default=[1])
     parser.add_argument(
         "--mode", type=str, choices=["", "default", "lowVolumeDefault"], default=""
+    )
+    parser.add_argument(
+        "--liquid",
+        type=str,
+        choices=[liq.value.lower() for liq in SupportedLiquid],
+        default="water",
     )
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)

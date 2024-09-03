@@ -2,14 +2,12 @@ from __future__ import annotations
 
 import logging
 import json
-import os
 
 from pathlib import Path
-from typing import Any, AnyStr, List, Dict, Optional, Union
+from typing import Any, AnyStr, Dict, Optional, Union
 
 import jsonschema  # type: ignore
 
-from opentrons.protocols.api_support.util import ModifiedList
 from opentrons_shared_data import load_shared_data, get_shared_data_root
 from opentrons.protocols.api_support.constants import (
     OPENTRONS_NAMESPACE,
@@ -17,7 +15,7 @@ from opentrons.protocols.api_support.constants import (
     STANDARD_DEFS_PATH,
     USER_DEFS_PATH,
 )
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -63,29 +61,6 @@ def get_labware_definition(
     return _get_standard_labware_definition(load_name, namespace, version)
 
 
-def get_all_labware_definitions() -> List[str]:
-    """
-    Return a list of standard and custom labware definitions with load_name +
-        name_space + version existing on the robot
-    """
-    labware_list = ModifiedList()
-
-    def _check_for_subdirectories(path):
-        with os.scandir(path) as top_path:
-            for sub_dir in top_path:
-                if sub_dir.is_dir():
-                    labware_list.append(sub_dir.name)
-
-    # check for standard labware
-    _check_for_subdirectories(get_shared_data_root() / STANDARD_DEFS_PATH)
-
-    # check for custom labware
-    for namespace in os.scandir(USER_DEFS_PATH):
-        _check_for_subdirectories(namespace)
-
-    return labware_list
-
-
 def save_definition(
     labware_def: LabwareDefinition, force: bool = False, location: Optional[Path] = None
 ) -> None:
@@ -114,7 +89,6 @@ def save_definition(
             f'Saving definitions to the "{OPENTRONS_NAMESPACE}" namespace '
             + "is not permitted"
         )
-
     def_path = _get_path_to_labware(load_name, namespace, version, location)
 
     if not force and def_path.is_file():
@@ -150,7 +124,7 @@ def verify_definition(
     jsonschema.validate(to_return, labware_schema_v2)
     # we can type ignore this because if it passes the jsonschema it has
     # the correct structure
-    return to_return  # type: ignore
+    return to_return  # type: ignore[return-value]
 
 
 def _get_labware_definition_from_bundle(
@@ -219,7 +193,6 @@ def _get_standard_labware_definition(
         Definitions Folder from the Opentrons App before
         uploading your protocol.
         """
-
     if namespace is None:
         for fallback_namespace in [OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE]:
             try:
@@ -244,8 +217,7 @@ def _get_standard_labware_definition(
             f'Labware "{load_name}" not found with version {checked_version} '
             f'in namespace "{namespace}".'
         )
-
-    return labware_def
+    return labware_def  # type: ignore[no-any-return]
 
 
 def _get_path_to_labware(
@@ -253,9 +225,21 @@ def _get_path_to_labware(
 ) -> Path:
     if namespace == OPENTRONS_NAMESPACE:
         # all labware in OPENTRONS_NAMESPACE is stored in shared data
-        return (
-            get_shared_data_root() / STANDARD_DEFS_PATH / load_name / f"{version}.json"
+        schema_3_path = (
+            get_shared_data_root()
+            / STANDARD_DEFS_PATH
+            / "3"
+            / load_name
+            / f"{version}.json"
         )
+        schema_2_path = (
+            get_shared_data_root()
+            / STANDARD_DEFS_PATH
+            / "2"
+            / load_name
+            / f"{version}.json"
+        )
+        return schema_3_path if schema_3_path.exists() else schema_2_path
     if not base_path:
         base_path = USER_DEFS_PATH
     def_path = base_path / namespace / load_name / f"{version}.json"

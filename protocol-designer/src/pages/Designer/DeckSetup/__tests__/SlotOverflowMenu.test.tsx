@@ -1,0 +1,107 @@
+import * as React from 'react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { fixture96Plate } from '@opentrons/shared-data'
+import { i18n } from '../../../../assets/localization'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import {
+  deleteContainer,
+  duplicateLabware,
+  openIngredientSelector,
+} from '../../../../labware-ingred/actions'
+import { EditNickNameModal } from '../../../../organisms'
+import { deleteModule } from '../../../../step-forms/actions'
+import { deleteDeckFixture } from '../../../../step-forms/actions/additionalItems'
+import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
+import { SlotOverflowMenu } from '../SlotOverflowMenu'
+
+import type { NavigateFunction } from 'react-router-dom'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
+const mockNavigate = vi.fn()
+
+vi.mock('../../../../top-selectors/labware-locations')
+vi.mock('../../../../step-forms/actions')
+vi.mock('../../../../labware-ingred/actions')
+vi.mock('../../../../step-forms/actions/additionalItems')
+vi.mock('../../../../organisms')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<NavigateFunction>()
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  }
+})
+
+const render = (props: React.ComponentProps<typeof SlotOverflowMenu>) => {
+  return renderWithProviders(<SlotOverflowMenu {...props} />, {
+    i18nInstance: i18n,
+  })[0]
+}
+
+describe('SlotOverflowMenu', () => {
+  let props: React.ComponentProps<typeof SlotOverflowMenu>
+
+  beforeEach(() => {
+    props = {
+      slot: 'D3',
+      setShowMenuList: vi.fn(),
+      addEquipment: vi.fn(),
+    }
+
+    vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
+      labware: {
+        labId: {
+          slot: 'D3',
+          id: 'labId',
+          labwareDefURI: 'mockUri',
+          def: fixture96Plate as LabwareDefinition2,
+        },
+        lab2: {
+          slot: 'labId',
+          id: 'labId2',
+          labwareDefURI: 'mockUri',
+          def: fixture96Plate as LabwareDefinition2,
+        },
+      },
+      pipettes: {},
+      modules: {
+        mod: {
+          model: 'heaterShakerModuleV1',
+          type: 'heaterShakerModuleType',
+          id: 'modId',
+          slot: 'D3',
+          moduleState: {} as any,
+        },
+      },
+      additionalEquipmentOnDeck: {
+        fixture: { name: 'stagingArea', id: 'mockId', location: 'cutoutD3' },
+      },
+    })
+    vi.mocked(EditNickNameModal).mockReturnValue(
+      <div>mockEditNickNameModal</div>
+    )
+  })
+  it('should renders all buttons as enabled and clicking on them calls ctas', () => {
+    render(props)
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Add hardware/labware' })
+    )
+    expect(props.addEquipment).toHaveBeenCalled()
+    expect(props.setShowMenuList).toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Rename labware' }))
+    screen.getByText('mockEditNickNameModal')
+    fireEvent.click(screen.getByRole('button', { name: 'Add liquid' }))
+    expect(mockNavigate).toHaveBeenCalled()
+    expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Duplicate' }))
+    expect(vi.mocked(duplicateLabware)).toHaveBeenCalled()
+    expect(props.setShowMenuList).toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Clear slot' }))
+    expect(vi.mocked(deleteContainer)).toHaveBeenCalledTimes(2)
+    expect(vi.mocked(deleteModule)).toHaveBeenCalled()
+    expect(vi.mocked(deleteDeckFixture)).toHaveBeenCalled()
+    expect(props.setShowMenuList).toHaveBeenCalled()
+  })
+})

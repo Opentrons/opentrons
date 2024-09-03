@@ -40,6 +40,8 @@ export const makeAutofillOnChange = ({
     setTouched({
       ...touched,
       ...namesToTrue,
+      compatibleAdapters: {},
+      compatibleModules: {},
     })
   } else {
     console.error(

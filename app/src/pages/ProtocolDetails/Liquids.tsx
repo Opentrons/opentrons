@@ -2,7 +2,6 @@ import * as React from 'react'
 import last from 'lodash/last'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-import { MICRO_LITERS } from '@opentrons/shared-data'
 import {
   BORDERS,
   COLORS,
@@ -11,15 +10,11 @@ import {
   Flex,
   Icon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import {
-  parseLabwareInfoByLiquidId,
-  parseLiquidsInLoadOrder,
-} from '@opentrons/api-client'
-import { getTotalVolumePerLiquidId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
+import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
 import { EmptySection } from './EmptySection'
 
 import {
@@ -76,9 +71,6 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
     (mostRecentAnalysis as CompletedProtocolAnalysis).liquids ?? [],
     (mostRecentAnalysis as CompletedProtocolAnalysis).commands ?? []
   )
-  const labwareByLiquidId = parseLabwareInfoByLiquidId(
-    (mostRecentAnalysis as CompletedProtocolAnalysis).commands ?? []
-  )
   const { t, i18n } = useTranslation('protocol_details')
 
   return liquidsInOrder.length === 0 ? (
@@ -89,10 +81,6 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
         <tr>
           <TableHeader>
             {i18n.format(t('liquid_name'), 'titleCase')}
-          </TableHeader>
-
-          <TableHeader>
-            {i18n.format(t('total_volume'), 'titleCase')}
           </TableHeader>
         </tr>
       </thead>
@@ -120,28 +108,13 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                     />
                   </Flex>
                   <Flex flexDirection={DIRECTION_COLUMN}>
-                    <StyledText as="p">
+                    <LegacyStyledText as="p">
                       {i18n.format(liquid.displayName, 'titleCase')}
-                    </StyledText>
-                    <StyledText as="p" color={COLORS.grey60}>
+                    </LegacyStyledText>
+                    <LegacyStyledText as="p" color={COLORS.grey60}>
                       {i18n.format(liquid.description, 'titleCase')}
-                    </StyledText>
+                    </LegacyStyledText>
                   </Flex>
-                </Flex>
-              </TableDatum>
-
-              <TableDatum>
-                <Flex
-                  backgroundColor={COLORS.grey35}
-                  borderRadius={BORDERS.borderRadius4}
-                  height="2.75rem"
-                  padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
-                  width="max-content"
-                  alignItems={TYPOGRAPHY.textAlignCenter}
-                  marginRight={SPACING.spacingAuto}
-                >
-                  {getTotalVolumePerLiquidId(liquid.id, labwareByLiquidId)}{' '}
-                  {MICRO_LITERS}
                 </Flex>
               </TableDatum>
             </TableRow>

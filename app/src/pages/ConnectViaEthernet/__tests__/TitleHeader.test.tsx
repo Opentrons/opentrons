@@ -1,18 +1,18 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { TitleHeader } from '../../../pages/ConnectViaEthernet/TitleHeader'
 
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof ReactRouterDom>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -30,14 +30,14 @@ describe('TitleHeader', () => {
   })
 
   it('should render text and button', () => {
-    const [{ getByText, getByTestId }] = render(props)
-    getByText('Ethernet')
-    getByTestId('Ethernet_header_back_button')
+    render(props)
+    screen.getByText('Ethernet')
+    screen.getByTestId('Ethernet_header_back_button')
   })
 
   it('should call a mock function when tapping back button', () => {
-    const [{ getByTestId }] = render(props)
-    fireEvent.click(getByTestId('Ethernet_header_back_button'))
-    expect(mockPush).toHaveBeenCalledWith('/network-setup')
+    render(props)
+    fireEvent.click(screen.getByTestId('Ethernet_header_back_button'))
+    expect(mockNavigate).toHaveBeenCalledWith('/network-setup')
   })
 })

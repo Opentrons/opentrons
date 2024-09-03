@@ -1,3 +1,4 @@
+import { getSelectedWellCount } from './'
 import type { QuickTransferWizardState } from '../types'
 
 export function getVolumeRange(
@@ -33,7 +34,19 @@ export function getVolumeRange(
     })
   )
   let maxVolume = maxPipetteVolume
-  if (state.sourceWells.length === state.destinationWells.length) {
+  const destLabwareDefinition =
+    state.destination === 'source' ? state.source : state.destination
+  const sourceWellCount = getSelectedWellCount(
+    state.pipette,
+    state.source,
+    state.sourceWells
+  )
+  const destWellCount = getSelectedWellCount(
+    state.pipette,
+    destLabwareDefinition,
+    state.destinationWells
+  )
+  if (sourceWellCount === destWellCount) {
     // 1 to 1 transfer
     maxVolume = Math.min(
       ...[
@@ -43,9 +56,9 @@ export function getVolumeRange(
         destLabwareVolume,
       ]
     )
-  } else if (state.sourceWells.length < state.destinationWells.length) {
+  } else if (sourceWellCount < destWellCount) {
     // 1 to n transfer
-    const ratio = state.sourceWells.length / state.destinationWells.length
+    const ratio = sourceWellCount / destWellCount
 
     maxVolume = Math.min(
       ...[
@@ -55,9 +68,9 @@ export function getVolumeRange(
         destLabwareVolume,
       ]
     )
-  } else if (state.sourceWells.length > state.destinationWells.length) {
+  } else if (sourceWellCount > destWellCount) {
     // n to 1 transfer
-    const ratio = state.destinationWells.length / state.sourceWells.length
+    const ratio = destWellCount / sourceWellCount
 
     maxVolume = Math.min(
       ...[
@@ -68,6 +81,5 @@ export function getVolumeRange(
       ]
     )
   }
-
-  return { min: minPipetteVolume, max: maxVolume }
+  return { min: minPipetteVolume, max: Math.floor(maxVolume) }
 }

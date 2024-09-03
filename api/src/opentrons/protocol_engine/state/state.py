@@ -5,14 +5,16 @@ from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Sequence, TypeVar
 from typing_extensions import ParamSpec
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.robot.types import RobotDefinition
 
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.protocol_engine.types import ModuleOffsetData
 from opentrons.util.change_notifier import ChangeNotifier
 
 from ..resources import DeckFixedLabware
 from ..actions import Action, ActionHandler
-from .abstract_store import HasState, HandlesActions
+from ._abstract_store import HasState, HandlesActions
 from .commands import CommandState, CommandStore, CommandView
 from .addressable_areas import (
     AddressableAreaState,
@@ -127,6 +129,7 @@ class StateView(HasState[State]):
             completedAt=self._state.commands.run_completed_at,
             startedAt=self._state.commands.run_started_at,
             liquids=self._liquid.get_all(),
+            hasEverEnteredErrorRecovery=self._commands.get_has_entered_recovery_mode(),
         )
 
 
@@ -144,7 +147,9 @@ class StateStore(StateView, ActionHandler):
         config: Config,
         deck_definition: DeckDefinitionV5,
         deck_fixed_labware: Sequence[DeckFixedLabware],
+        robot_definition: RobotDefinition,
         is_door_open: bool,
+        error_recovery_policy: ErrorRecoveryPolicy,
         change_notifier: Optional[ChangeNotifier] = None,
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
         deck_configuration: Optional[DeckConfigurationType] = None,
@@ -159,12 +164,18 @@ class StateStore(StateView, ActionHandler):
             deck_fixed_labware: Labware definitions from the deck
                 definition to preload into labware state.
             is_door_open: Whether the robot's door is currently open.
+            error_recovery_policy: The run's initial error recovery policy.
             change_notifier: Internal state change notifier.
             module_calibration_offsets: Module offsets to preload.
             deck_configuration: The initial deck configuration the addressable area store will be instantiated with.
+            robot_definition: Static information about the robot type being used.
             notify_publishers: Notifies robot server publishers of internal state change.
         """
-        self._command_store = CommandStore(config=config, is_door_open=is_door_open)
+        self._command_store = CommandStore(
+            config=config,
+            is_door_open=is_door_open,
+            error_recovery_policy=error_recovery_policy,
+        )
         self._pipette_store = PipetteStore()
         if deck_configuration is None:
             deck_configuration = []
@@ -172,6 +183,7 @@ class StateStore(StateView, ActionHandler):
             deck_configuration=deck_configuration,
             config=config,
             deck_definition=deck_definition,
+            robot_definition=robot_definition,
         )
         self._labware_store = LabwareStore(
             deck_fixed_labware=deck_fixed_labware,
@@ -179,6 +191,7 @@ class StateStore(StateView, ActionHandler):
         )
         self._module_store = ModuleStore(
             config=config,
+            deck_fixed_labware=deck_fixed_labware,
             module_calibration_offsets=module_calibration_offsets,
         )
         self._liquid_store = LiquidStore()

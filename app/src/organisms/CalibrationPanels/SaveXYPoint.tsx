@@ -10,7 +10,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { useLogger } from '../../logger'
@@ -222,14 +222,14 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
           gridGap={SPACING.spacing8}
         >
           <Flex flexDirection={DIRECTION_COLUMN} flex="1">
-            <StyledText as="h1" marginBottom={SPACING.spacing16}>
+            <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
               {t(isHealthCheck ? 'check_xy_axes' : 'calibrate_xy_axes', {
                 slotName: slotNumber,
               })}
-            </StyledText>
-            <StyledText as="p">
+            </LegacyStyledText>
+            <LegacyStyledText as="p">
               {t('jog_pipette_to_touch_cross', { slotName: slotNumber })}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
           <Box flex="1">
             <video

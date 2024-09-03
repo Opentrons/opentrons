@@ -22,7 +22,7 @@ export const parseProtocolRunAnalyticsData = (
   robot: DiscoveredRobot | null
 ) => () => {
   const hashTasks = [
-    hash(protocolAnalysis?.metadata?.author) ?? '',
+    hash(protocolAnalysis?.metadata?.author as string) ?? '',
     hash(storedProtocol?.srcFiles?.toString() ?? '') ?? '',
   ]
 
@@ -56,8 +56,8 @@ export const parseProtocolRunAnalyticsData = (
           ? protocolAnalysis?.runTimeParameters?.length > 0
           : false,
       protocolHasRunTimeParameterCustomValues:
-        protocolAnalysis?.runTimeParameters?.some(
-          param => param.value !== param.default
+        protocolAnalysis?.runTimeParameters?.some(param =>
+          param.type === 'csv_file' ? true : param.value !== param.default
         ) ?? false,
       robotType:
         protocolAnalysis?.robotType != null
@@ -94,7 +94,10 @@ export function useProtocolRunAnalyticsData(
   )
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const storedProtocol = useSelector((state: State) =>
-    getStoredProtocol(state, storedProtocolAnalysis?.metadata?.protocolKey)
+    getStoredProtocol(
+      state,
+      storedProtocolAnalysis?.metadata?.protocolKey as string | undefined
+    )
   )
   const protocolAnalysis =
     robotProtocolAnalysis != null && robotProtocolMetadata != null

@@ -1,6 +1,6 @@
 from typing import Sequence, Dict, Optional, Any
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.errors.exceptions import EnumeratedError
 

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_START,
@@ -16,7 +16,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -41,6 +41,10 @@ import { useIsFlex } from './hooks'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
+import {
+  ErrorRecoveryBanner,
+  useErrorRecoveryBanner,
+} from '../ErrorRecoveryBanner'
 
 import type { GripperData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
@@ -54,10 +58,12 @@ interface RobotCardProps {
 export function RobotCard(props: RobotCardProps): JSX.Element | null {
   const { robot } = props
   const { name: robotName, local } = robot
-  const history = useHistory()
+  const navigate = useNavigate()
   const robotModel = useSelector((state: State) =>
     getRobotModelByName(state, robotName)
   )
+
+  const { showRecoveryBanner, recoveryIntent } = useErrorRecoveryBanner()
 
   return robot != null ? (
     <Flex
@@ -70,7 +76,9 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       minWidth="36rem"
       padding={SPACING.spacing16}
       position={POSITION_RELATIVE}
-      onClick={() => history.push(`/devices/${robotName}`)}
+      onClick={() => {
+        navigate(`/devices/${robotName}`)
+      }}
     >
       <img
         src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}
@@ -85,6 +93,12 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       >
         <UpdateRobotBanner robot={robot} marginRight={SPACING.spacing24} />
         <ReachableBanner robot={robot} />
+        {showRecoveryBanner ? (
+          <ErrorRecoveryBanner
+            recoveryIntent={recoveryIntent}
+            marginRight={SPACING.spacing24}
+          />
+        ) : null}
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
           <RobotStatusHeader
             local={local}
@@ -129,13 +143,13 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
 
   return !isModulesQueryLoading && attachedModules.length > 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-      <StyledText
+      <LegacyStyledText
         as="h6"
         textTransform={TYPOGRAPHY.textTransformUppercase}
         color={COLORS.grey60}
       >
         {t('modules')}
-      </StyledText>
+      </LegacyStyledText>
       <Flex>
         {attachedModules.map((module, i) => (
           <ModuleIcon
@@ -185,9 +199,9 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
       gridGap={SPACING.spacing4}
       minWidth="24rem"
     >
-      <StyledText as="h6" color={COLORS.grey60}>
+      <LegacyStyledText as="h6" color={COLORS.grey60}>
         {t('shared:instruments')}
-      </StyledText>
+      </LegacyStyledText>
 
       {isPipetteQueryLoading || isInstrumentsQueryLoading ? null : (
         <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>

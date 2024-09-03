@@ -1,7 +1,7 @@
 // main application wrapper component
 import * as React from 'react'
 import cx from 'classnames'
-
+import { useLocation } from 'react-router-dom'
 import { DefinitionRoute } from '../../definitions'
 import { useFilters } from '../../filters'
 import { Nav, Breadcrumbs } from '../Nav'
@@ -14,7 +14,8 @@ import styles from './styles.module.css'
 import type { DefinitionRouteRenderProps } from '../../definitions'
 
 export function AppComponent(props: DefinitionRouteRenderProps): JSX.Element {
-  const { definition, location } = props
+  const { definition } = props
+  const location = useLocation()
   const scrollRef = React.useRef<HTMLDivElement | null>(null)
   const filters = useFilters(location)
   const isDetailPage = Boolean(definition)

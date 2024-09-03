@@ -12,11 +12,15 @@ from abr_testing.automation import google_drive_tool
 def get_run_ids_from_robot(ip: str) -> Set[str]:
     """Get all completed runs from each robot."""
     run_ids = set()
-    response = requests.get(
-        f"http://{ip}:31950/runs", headers={"opentrons-version": "3"}
-    )
-    run_data = response.json()
-    run_list = run_data["data"]
+    try:
+        response = requests.get(
+            f"http://{ip}:31950/runs", headers={"opentrons-version": "3"}
+        )
+        run_data = response.json()
+        run_list = run_data["data"]
+    except requests.exceptions.RequestException:
+        print(f"Could not connect to robot with IP {ip}")
+        run_list = []
     for run in run_list:
         run_id = run["id"]
         if not run["current"]:

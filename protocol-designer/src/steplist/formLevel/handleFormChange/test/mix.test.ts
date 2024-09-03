@@ -128,6 +128,7 @@ describe('well selection should update', () => {
       wells: ['A1'],
       mix_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
       mix_touchTip_mmFromBottom: null,
+      mix_touchTip_checkbox: false,
     })
   })
   it('select labware with multiple wells', () => {
@@ -140,6 +141,7 @@ describe('well selection should update', () => {
       wells: [],
       mix_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
       mix_touchTip_mmFromBottom: null,
+      mix_touchTip_checkbox: false,
     })
   })
 })

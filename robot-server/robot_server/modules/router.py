@@ -1,6 +1,6 @@
 """Modules routes."""
 from fastapi import APIRouter, Depends, status
-from typing import List, Dict
+from typing import Annotated, List, Dict
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import module_calibration
@@ -34,10 +34,10 @@ modules_router = APIRouter()
     },
 )
 async def get_attached_modules(
-    requested_version: int = Depends(get_requested_version),
-    hardware: HardwareControlAPI = Depends(get_hardware),
-    module_identifier: ModuleIdentifier = Depends(ModuleIdentifier),
-    module_data_mapper: ModuleDataMapper = Depends(ModuleDataMapper),
+    requested_version: Annotated[int, Depends(get_requested_version)],
+    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    module_identifier: Annotated[ModuleIdentifier, Depends(ModuleIdentifier)],
+    module_data_mapper: Annotated[ModuleDataMapper, Depends(ModuleDataMapper)],
 ) -> PydanticResponse[SimpleMultiBody[AttachedModule]]:
     """Get a list of all attached modules."""
     if requested_version <= 2:

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
-import { useHoverTooltip } from '@opentrons/components'
+import { MenuItem, Tooltip, useHoverTooltip } from '@opentrons/components'
 import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -9,9 +9,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { Tooltip } from '../../atoms/Tooltip'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../resources/runs'
 
 import type {
   HeaterShakerCloseLatchCreateCommand,
@@ -140,7 +138,9 @@ export function useModuleOverflowMenu(
       id={`about_module_${String(module.moduleModel)}`}
       data-testid={`about_module_${String(module.moduleModel)}`}
       disabled={isIncompatibleWithOT3}
-      onClick={() => handleAboutClick()}
+      onClick={() => {
+        handleAboutClick()
+      }}
     >
       {t('overflow_menu_about')}
     </MenuItem>
@@ -150,7 +150,9 @@ export function useModuleOverflowMenu(
     <MenuItem
       key={`hs_attach_to_deck_${String(module.moduleModel)}`}
       data-testid={`hs_attach_to_deck_${String(module.moduleModel)}`}
-      onClick={() => handleInstructionsClick()}
+      onClick={() => {
+        handleInstructionsClick()
+      }}
       whiteSpace="nowrap"
     >
       {t('heater_shaker:show_attachment_instructions')}
@@ -164,15 +166,17 @@ export function useModuleOverflowMenu(
         id={`test_shake_${String(module.moduleModel)}`}
         data-testid={`test_shake_${String(module.moduleModel)}`}
         disabled={isDisabled}
-        onClick={() =>
+        onClick={() => {
           handleDeactivationCommand('heaterShaker/deactivateShaker')
-        }
+        }}
       >
         {t('heater_shaker:deactivate_shaker')}
       </MenuItem>
     ) : (
       <MenuItem
-        onClick={() => handleTestShakeClick()}
+        onClick={() => {
+          handleTestShakeClick()
+        }}
         key={`hs_test_shake_btn_${String(module.moduleModel)}`}
         disabled={isDisabled}
       >
@@ -228,8 +232,12 @@ export function useModuleOverflowMenu(
   const sendBlockTempCommand =
     module.moduleType === THERMOCYCLER_MODULE_TYPE &&
     module.data.targetTemperature != null
-      ? () => handleDeactivationCommand('thermocycler/deactivateBlock')
-      : () => handleSlideoutClick(false)
+      ? () => {
+          handleDeactivationCommand('thermocycler/deactivateBlock')
+        }
+      : () => {
+          handleSlideoutClick(false)
+        }
 
   const thermoSetBlockTempBtn = (
     <MenuItem
@@ -257,8 +265,12 @@ export function useModuleOverflowMenu(
         onClick:
           module.moduleType === THERMOCYCLER_MODULE_TYPE &&
           module.data.lidTargetTemperature != null
-            ? () => handleDeactivationCommand('thermocycler/deactivateLid')
-            : () => handleSlideoutClick(true),
+            ? () => {
+                handleDeactivationCommand('thermocycler/deactivateLid')
+              }
+            : () => {
+                handleSlideoutClick(true)
+              },
       },
       {
         setSetting:
@@ -282,8 +294,12 @@ export function useModuleOverflowMenu(
         menuButtons: [aboutModuleBtn],
         onClick:
           module.data.status !== 'idle'
-            ? () => handleDeactivationCommand('temperatureModule/deactivate')
-            : () => handleSlideoutClick(false),
+            ? () => {
+                handleDeactivationCommand('temperatureModule/deactivate')
+              }
+            : () => {
+                handleSlideoutClick(false)
+              },
       },
     ],
     magneticModuleType: [
@@ -297,8 +313,12 @@ export function useModuleOverflowMenu(
         menuButtons: [aboutModuleBtn],
         onClick:
           module.data.status !== 'disengaged'
-            ? () => handleDeactivationCommand('magneticModule/disengage')
-            : () => handleSlideoutClick(false),
+            ? () => {
+                handleDeactivationCommand('magneticModule/disengage')
+              }
+            : () => {
+                handleSlideoutClick(false)
+              },
       },
     ],
     heaterShakerModuleType: [
@@ -319,10 +339,15 @@ export function useModuleOverflowMenu(
           module.moduleType === HEATERSHAKER_MODULE_TYPE &&
           module.data.temperatureStatus !== 'idle' &&
           module.data.status !== 'idle'
-            ? () => handleDeactivationCommand('heaterShaker/deactivateHeater')
-            : () => handleSlideoutClick(false),
+            ? () => {
+                handleDeactivationCommand('heaterShaker/deactivateHeater')
+              }
+            : () => {
+                handleSlideoutClick(false)
+              },
       },
     ],
+    absorbanceReaderType: [],
   }
 
   return {

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
@@ -26,11 +26,11 @@ import {
 import { mockLeftProtoPipette } from '../../../redux/pipettes/__fixtures__'
 
 vi.mock('../../Devices/hooks')
-vi.mock('../../ProtocolUpload/hooks')
+vi.mock('../../../resources/runs')
 
 const render = (robotName: string = 'otie') => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <CalibrationTaskList
         robotName={robotName}
         pipOffsetCalLauncher={mockPipOffsetCalLauncher}
@@ -38,7 +38,7 @@ const render = (robotName: string = 'otie') => {
         deckCalLauncher={mockDeckCalLauncher}
         exitBeforeDeckConfigCompletion={false}
       />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }
@@ -67,8 +67,8 @@ describe('CalibrationTaskList', () => {
   })
 
   it('does not show the Calibrations complete screen when viewing a completed task list', () => {
-    const [{ queryByText }] = render()
-    expect(queryByText('Calibrations complete!')).toBeFalsy()
+    render()
+    expect(screen.queryByText('Calibrations complete!')).toBeFalsy()
   })
 
   it('shows the Calibrations complete screen after the calibrations are completed', () => {
@@ -82,7 +82,7 @@ describe('CalibrationTaskList', () => {
     // Complete screen will only render if a wizard has been launched
     fireEvent.click(screen.getByText('Calibrate'))
     rerender(
-      <StaticRouter>
+      <MemoryRouter>
         <CalibrationTaskList
           robotName={'otie'}
           pipOffsetCalLauncher={mockPipOffsetCalLauncher}
@@ -90,7 +90,7 @@ describe('CalibrationTaskList', () => {
           deckCalLauncher={mockDeckCalLauncher}
           exitBeforeDeckConfigCompletion={false}
         />
-      </StaticRouter>
+      </MemoryRouter>
     )
     expect(screen.getByText('Calibrations complete!')).toBeTruthy()
   })
@@ -108,7 +108,7 @@ describe('CalibrationTaskList', () => {
     screen.getByText('Right Mount')
     fireEvent.click(screen.getByText('Calibrate'))
     rerender(
-      <StaticRouter>
+      <MemoryRouter>
         <CalibrationTaskList
           robotName={'otie'}
           pipOffsetCalLauncher={mockPipOffsetCalLauncher}
@@ -116,7 +116,7 @@ describe('CalibrationTaskList', () => {
           deckCalLauncher={mockDeckCalLauncher}
           exitBeforeDeckConfigCompletion={false}
         />
-      </StaticRouter>
+      </MemoryRouter>
     )
     expect(screen.getByText('Calibrations complete!')).toBeTruthy()
   })
@@ -133,7 +133,7 @@ describe('CalibrationTaskList', () => {
     screen.getByText('Right Mount')
     fireEvent.click(screen.getByText('Calibrate'))
     rerender(
-      <StaticRouter>
+      <MemoryRouter>
         <CalibrationTaskList
           robotName={'otie'}
           pipOffsetCalLauncher={mockPipOffsetCalLauncher}
@@ -141,7 +141,7 @@ describe('CalibrationTaskList', () => {
           deckCalLauncher={mockDeckCalLauncher}
           exitBeforeDeckConfigCompletion={false}
         />
-      </StaticRouter>
+      </MemoryRouter>
     )
     expect(screen.getByText('Calibrations complete!')).toBeTruthy()
   })
@@ -158,7 +158,7 @@ describe('CalibrationTaskList', () => {
     screen.getByText('Right Mount')
     fireEvent.click(screen.getByText('Calibrate'))
     rerender(
-      <StaticRouter>
+      <MemoryRouter>
         <CalibrationTaskList
           robotName={'otie'}
           pipOffsetCalLauncher={mockPipOffsetCalLauncher}
@@ -166,7 +166,7 @@ describe('CalibrationTaskList', () => {
           deckCalLauncher={mockDeckCalLauncher}
           exitBeforeDeckConfigCompletion={false}
         />
-      </StaticRouter>
+      </MemoryRouter>
     )
     expect(screen.getByText('Calibrations complete!')).toBeTruthy()
   })
@@ -182,7 +182,7 @@ describe('CalibrationTaskList', () => {
     expect(recalibrateLinks).toHaveLength(3)
     fireEvent.click(recalibrateLinks[2])
     rerender(
-      <StaticRouter>
+      <MemoryRouter>
         <CalibrationTaskList
           robotName={'otie'}
           pipOffsetCalLauncher={mockPipOffsetCalLauncher}
@@ -190,7 +190,7 @@ describe('CalibrationTaskList', () => {
           deckCalLauncher={mockDeckCalLauncher}
           exitBeforeDeckConfigCompletion={false}
         />
-      </StaticRouter>
+      </MemoryRouter>
     )
     expect(screen.getByText('Calibrations complete!')).toBeTruthy()
   })
@@ -206,7 +206,7 @@ describe('CalibrationTaskList', () => {
     expect(recalibrateLinks).toHaveLength(3)
     fireEvent.click(recalibrateLinks[0])
     rerender(
-      <StaticRouter>
+      <MemoryRouter>
         <CalibrationTaskList
           robotName={'otie'}
           pipOffsetCalLauncher={mockPipOffsetCalLauncher}
@@ -214,7 +214,7 @@ describe('CalibrationTaskList', () => {
           deckCalLauncher={mockDeckCalLauncher}
           exitBeforeDeckConfigCompletion={false}
         />
-      </StaticRouter>
+      </MemoryRouter>
     )
     expect(screen.getByText('Calibrations complete!')).toBeTruthy()
   })
@@ -228,7 +228,7 @@ describe('CalibrationTaskList', () => {
     const recalibrateLink = screen.getByText('Recalibrate')
     fireEvent.click(recalibrateLink)
     rerender(
-      <StaticRouter>
+      <MemoryRouter>
         <CalibrationTaskList
           robotName={'otie'}
           pipOffsetCalLauncher={mockPipOffsetCalLauncher}
@@ -236,7 +236,7 @@ describe('CalibrationTaskList', () => {
           deckCalLauncher={mockDeckCalLauncher}
           exitBeforeDeckConfigCompletion={true}
         />
-      </StaticRouter>
+      </MemoryRouter>
     )
     expect(screen.getByText('Using current calibrations.')).toBeTruthy()
   })
@@ -253,7 +253,7 @@ describe('CalibrationTaskList', () => {
     fireEvent.click(calibrateButtons[0])
     expect(mockDeckCalLauncher).not.toHaveBeenCalled()
     rerender(
-      <StaticRouter>
+      <MemoryRouter>
         <CalibrationTaskList
           robotName={'otie'}
           pipOffsetCalLauncher={mockPipOffsetCalLauncher}
@@ -261,7 +261,7 @@ describe('CalibrationTaskList', () => {
           deckCalLauncher={mockDeckCalLauncher}
           exitBeforeDeckConfigCompletion={false}
         />
-      </StaticRouter>
+      </MemoryRouter>
     )
     const recalibrateLinks = screen.getAllByText('Recalibrate')
     expect(recalibrateLinks).toHaveLength(1) // only deck's recalibration link should be shown
@@ -281,7 +281,7 @@ describe('CalibrationTaskList', () => {
     fireEvent.click(calibrateButtons[0])
     expect(mockTipLengthCalLauncher).not.toHaveBeenCalled()
     rerender(
-      <StaticRouter>
+      <MemoryRouter>
         <CalibrationTaskList
           robotName={'otie'}
           pipOffsetCalLauncher={mockPipOffsetCalLauncher}
@@ -289,7 +289,7 @@ describe('CalibrationTaskList', () => {
           deckCalLauncher={mockDeckCalLauncher}
           exitBeforeDeckConfigCompletion={false}
         />
-      </StaticRouter>
+      </MemoryRouter>
     )
     fireEvent.click(screen.getByText('Left Mount'))
     const recalibrateLinks = screen.getAllByText('Recalibrate')

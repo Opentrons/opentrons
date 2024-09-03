@@ -18,9 +18,9 @@ i18n.use(initReactI18next).init(
       format: function (value, format, lng) {
         if (format === 'upperCase') return value.toUpperCase()
         if (format === 'lowerCase') return value.toLowerCase()
-        if (format === 'capitalize') return capitalize(value)
-        if (format === 'sentenceCase') return startCase(value)
-        if (format === 'titleCase') return titleCase(value)
+        if (format === 'capitalize') return capitalize(value as string)
+        if (format === 'sentenceCase') return startCase(value as string)
+        if (format === 'titleCase') return titleCase(value as string)
         return value
       },
     },

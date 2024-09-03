@@ -151,7 +151,11 @@ export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
               }
             }}
           />
-          <PrimaryButton onClick={() => proceed()}>
+          <PrimaryButton
+            onClick={() => {
+              proceed()
+            }}
+          >
             {t('application:next')}
           </PrimaryButton>
         </Flex>

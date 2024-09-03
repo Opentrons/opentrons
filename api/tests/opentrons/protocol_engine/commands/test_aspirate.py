@@ -1,7 +1,14 @@
 """Test aspirate commands."""
-import pytest
-from decoy import Decoy
+from datetime import datetime
 
+from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
+from decoy import matchers, Decoy
+import pytest
+
+from opentrons.protocol_engine.commands.pipetting_common import (
+    OverpressureError,
+    OverpressureErrorInternalData,
+)
 from opentrons.types import MountType, Point
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
 
@@ -10,14 +17,15 @@ from opentrons.protocol_engine.commands.aspirate import (
     AspirateResult,
     AspirateImplementation,
 )
-from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
 
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 
 from opentrons.protocol_engine.execution import (
     MovementHandler,
     PipettingHandler,
 )
+from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.protocol_engine.types import CurrentWell, LoadedPipette
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.notes import CommandNoteAdder
@@ -30,6 +38,7 @@ def subject(
     movement: MovementHandler,
     pipetting: PipettingHandler,
     mock_command_note_adder: CommandNoteAdder,
+    model_utils: ModelUtils,
 ) -> AspirateImplementation:
     """Get the implementation subject."""
     return AspirateImplementation(
@@ -38,6 +47,7 @@ def subject(
         movement=movement,
         hardware_api=hardware_api,
         command_note_adder=mock_command_note_adder,
+        model_utils=model_utils,
     )
 
 
@@ -189,3 +199,74 @@ async def test_aspirate_raises_volume_error(
 
     with pytest.raises(AssertionError):
         await subject.execute(data)
+
+
+async def test_overpressure_error(
+    decoy: Decoy,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
+    subject: AspirateImplementation,
+    model_utils: ModelUtils,
+    mock_command_note_adder: CommandNoteAdder,
+) -> None:
+    """It should return an overpressure error if the hardware API indicates that."""
+    pipette_id = "pipette-id"
+    labware_id = "labware-id"
+    well_name = "well-name"
+    well_location = WellLocation(
+        origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
+    )
+
+    position = Point(x=1, y=2, z=3)
+
+    error_id = "error-id"
+    error_timestamp = datetime(year=2020, month=1, day=2)
+
+    data = AspirateParams(
+        pipetteId=pipette_id,
+        labwareId=labware_id,
+        wellName=well_name,
+        wellLocation=well_location,
+        volume=50,
+        flowRate=1.23,
+    )
+
+    decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id=pipette_id)).then_return(
+        True
+    )
+
+    decoy.when(
+        await movement.move_to_well(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+            current_well=None,
+        ),
+    ).then_return(position)
+
+    decoy.when(
+        await pipetting.aspirate_in_place(
+            pipette_id=pipette_id,
+            volume=50,
+            flow_rate=1.23,
+            command_note_adder=mock_command_note_adder,
+        ),
+    ).then_raise(PipetteOverpressureError())
+
+    decoy.when(model_utils.generate_id()).then_return(error_id)
+    decoy.when(model_utils.get_timestamp()).then_return(error_timestamp)
+
+    result = await subject.execute(data)
+
+    assert result == DefinedErrorData(
+        public=OverpressureError.construct(
+            id=error_id,
+            createdAt=error_timestamp,
+            wrappedErrors=[matchers.Anything()],
+            errorInfo={"retryLocation": (position.x, position.y, position.z)},
+        ),
+        private=OverpressureErrorInternalData(
+            position=DeckPoint(x=position.x, y=position.y, z=position.z)
+        ),
+    )

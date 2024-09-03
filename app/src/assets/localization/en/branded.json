@@ -1,5 +1,7 @@
 {
   "a_robot_software_update_is_available": "A robot software update is required to run protocols with this version of the Opentrons App. <robotLink>Go to Robot</robotLink>",
+  "attach_a_pipette": "Attach a pipette to your Flex",
+  "attach_a_pipette_for_quick_transfer": "To create a quick transfer, you need to attach a pipette to your Opentrons Flex.",
   "about_flex_gripper": "About Flex Gripper",
   "alternative_security_types_description": "The Opentrons App supports connecting Flex to various enterprise access points. Connect via USB and finish setup in the app.",
   "calibration_block_description": "<block>This block is a specially made tool that fits perfectly on your deck and helps with calibration.</block><block>If you do not have a Calibration Block, please email <supportLink>support@opentrons.com</supportLink> so we can send you one. In your message, be sure to include your name, company or institution name, and shipping address. While you wait for the block to arrive, you can use the flat surface on the trash bin of your robot instead.</block>",
@@ -15,6 +17,7 @@
   "contact_support_for_connection_help": "If none of these work, contact Opentrons Support for help (via the question mark link in this app, or by emailing {{support_email}}.)",
   "deck_fixture_setup_modal_bottom_description": "For details on installing different fixture types, scan the QR code or search for “deck configuration” on support.opentrons.com",
   "delete_protocol_from_app": "Delete the protocol, make changes to address the error, and resend the protocol to this robot from the Opentrons App.",
+  "delete_transfer_from_app": "Delete the quick transfer, make changes to address the error, and recreate this transfer on the Flex display.",
   "error_boundary_description": "You need to restart the touchscreen. Then download the robot logs from the Opentrons App and send them to support@opentrons.com for assistance.",
   "estop_pressed_description": "First, safely clear the deck of any labware or spills. Then, twist the E-stop button clockwise. Finally, have Flex move the gantry to its home position.",
   "find_your_robot": "Find your robot in the Opentrons App to install software updates.",
@@ -62,6 +65,7 @@
   "share_logs_with_opentrons_description": "Help Opentrons improve its products and services by automatically sending anonymous robot logs. Opentrons uses these logs to troubleshoot robot issues and spot error trends.",
   "show_labware_offset_snippets_description": "Only for users who need to apply labware offset data outside of the Opentrons App. When enabled, code snippets for Jupyter Notebook and SSH are available during protocol setup.",
   "something_seems_wrong": "There may be a problem with your pipette. Exit setup and contact Opentrons Support for assistance.",
+  "storage_limit_reached_description": "Your Opentrons Flex has reached the limit of quick transfers that it can store. You must delete an existing quick transfer before creating a new one.",
   "these_are_advanced_settings": "<block>These are advanced settings. Please do not attempt to adjust without assistance from Opentrons Support. Changing these settings may affect the lifespan of your pipette.</block><block>These settings do not override any pipette settings defined in protocols.</block>",
   "update_requires_restarting_app": "Updating requires restarting the Opentrons App.",
   "update_robot_software_description": "Bypass the Opentrons App auto-update process and update the robot software manually.",

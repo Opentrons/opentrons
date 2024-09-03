@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, Optional, List, Union
 
-from .abstract_store import HasState, HandlesActions
+from ._abstract_store import HasState, HandlesActions
 from ..actions import (
     Action,
     SucceedCommandAction,
@@ -17,6 +17,7 @@ from ..commands import (
     PickUpTipResult,
     DropTipResult,
     DropTipInPlaceResult,
+    unsafe,
 )
 from ..commands.configuring_common import (
     PipetteConfigUpdateResultMixin,
@@ -126,7 +127,10 @@ class TipStore(HasState[TipState], HandlesActions):
             )
             self._state.length_by_pipette_id[pipette_id] = length
 
-        elif isinstance(command.result, (DropTipResult, DropTipInPlaceResult)):
+        elif isinstance(
+            command.result,
+            (DropTipResult, DropTipInPlaceResult, unsafe.UnsafeDropTipInPlaceResult),
+        ):
             pipette_id = command.params.pipetteId
             self._state.length_by_pipette_id.pop(pipette_id, None)
 
@@ -267,6 +271,14 @@ class TipView(HasState[TipState]):
             elif all(wells[well] == TipRackWellState.USED for well in tip_cluster):
                 return None
             else:
+                # In the case of an 8ch pipette where a column has mixed state tips we may simply progress to the next column in our search
+                if (
+                    nozzle_map is not None
+                    and len(nozzle_map.full_instrument_map_store) == 8
+                ):
+                    return None
+
+                # In the case of a 96ch we can attempt to index in by singular rows and columns assuming that indexed direction is safe
                 # The tip cluster list is ordered: Each row from a column in order by columns
                 tip_cluster_final_column = []
                 for i in range(active_rows):
@@ -297,7 +309,7 @@ class TipView(HasState[TipState]):
             critical_column = active_columns - 1
             critical_row = active_rows - 1
 
-            while critical_column <= len(columns):
+            while critical_column < len(columns):
                 tip_cluster = _identify_tip_cluster(
                     active_columns, active_rows, critical_column, critical_row, "A1"
                 )
@@ -309,10 +321,10 @@ class TipView(HasState[TipState]):
                         return result
                     elif isinstance(result, int) and result == -1:
                         return None
-                if critical_row + active_rows < len(columns[0]):
-                    critical_row = critical_row + active_rows
+                if critical_row + 1 < len(columns[0]):
+                    critical_row = critical_row + 1
                 else:
-                    critical_column = critical_column + 1
+                    critical_column += 1
                     critical_row = active_rows - 1
             return None
 
@@ -333,10 +345,10 @@ class TipView(HasState[TipState]):
                         return result
                     elif isinstance(result, int) and result == -1:
                         return None
-                if critical_row + active_rows < len(columns[0]):
-                    critical_row = critical_row + active_rows
+                if critical_row + 1 < len(columns[0]):
+                    critical_row = critical_row + 1
                 else:
-                    critical_column = critical_column - 1
+                    critical_column -= 1
                     critical_row = active_rows - 1
             return None
 
@@ -357,10 +369,12 @@ class TipView(HasState[TipState]):
                         return result
                     elif isinstance(result, int) and result == -1:
                         return None
-                if critical_row - active_rows >= 0:
-                    critical_row = critical_row - active_rows
+                if critical_row - 1 >= 0:
+                    critical_row = critical_row - 1
                 else:
-                    critical_column = critical_column + 1
+                    critical_column += 1
+                    if critical_column >= len(columns):
+                        return None
                     critical_row = len(columns[critical_column]) - active_rows
             return None
 
@@ -381,10 +395,12 @@ class TipView(HasState[TipState]):
                         return result
                     elif isinstance(result, int) and result == -1:
                         return None
-                if critical_row - active_rows >= 0:
-                    critical_row = critical_row - active_rows
+                if critical_row - 1 >= 0:
+                    critical_row = critical_row - 1
                 else:
-                    critical_column = critical_column - 1
+                    critical_column -= 1
+                    if critical_column < 0:
+                        return None
                     critical_row = len(columns[critical_column]) - active_rows
             return None
 

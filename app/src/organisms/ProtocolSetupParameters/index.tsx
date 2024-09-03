@@ -1,10 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   useCreateProtocolAnalysisMutation,
   useCreateRunMutation,
   useHost,
+  useUploadCsvFileMutation,
 } from '@opentrons/react-api-client'
 import { useQueryClient } from 'react-query'
 import {
@@ -13,41 +14,63 @@ import {
   Flex,
   SPACING,
 } from '@opentrons/components'
-import { formatRunTimeParameterValue } from '@opentrons/shared-data'
+import {
+  formatRunTimeParameterValue,
+  sortRuntimeParameters,
+} from '@opentrons/shared-data'
 
-import { ProtocolSetupStep } from '../../pages/ProtocolSetup'
-import { getRunTimeParameterValuesForRun } from '../Devices/utils'
+import {
+  getRunTimeParameterFilesForRun,
+  getRunTimeParameterValuesForRun,
+} from '../Devices/utils'
 import { ChildNavigation } from '../ChildNavigation'
 import { ResetValuesModal } from './ResetValuesModal'
 import { ChooseEnum } from './ChooseEnum'
 import { ChooseNumber } from './ChooseNumber'
-
-import type { NumberParameter, RunTimeParameter } from '@opentrons/shared-data'
-import type { LabwareOffsetCreateData } from '@opentrons/api-client'
+import { ChooseCsvFile } from './ChooseCsvFile'
+import { useToaster } from '../ToasterOven'
+import { ProtocolSetupStep } from '../../pages/ProtocolSetup'
+import type {
+  CompletedProtocolAnalysis,
+  ChoiceParameter,
+  CsvFileParameter,
+  NumberParameter,
+  RunTimeParameter,
+  ValueRunTimeParameter,
+  CsvFileParameterFileData,
+} from '@opentrons/shared-data'
+import type { ProtocolSetupStepStatus } from '../../pages/ProtocolSetup'
+import type { FileData, LabwareOffsetCreateData } from '@opentrons/api-client'
 
 interface ProtocolSetupParametersProps {
   protocolId: string
   runTimeParameters: RunTimeParameter[]
   labwareOffsets?: LabwareOffsetCreateData[]
+  mostRecentAnalysis?: CompletedProtocolAnalysis | null
 }
 
 export function ProtocolSetupParameters({
   protocolId,
   labwareOffsets,
   runTimeParameters,
+  mostRecentAnalysis,
 }: ProtocolSetupParametersProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const history = useHistory()
+  const navigate = useNavigate()
   const host = useHost()
   const queryClient = useQueryClient()
   const [
     chooseValueScreen,
     setChooseValueScreen,
-  ] = React.useState<RunTimeParameter | null>(null)
+  ] = React.useState<ChoiceParameter | null>(null)
   const [
     showNumericalInputScreen,
     setShowNumericalInputScreen,
   ] = React.useState<NumberParameter | null>(null)
+  const [
+    chooseCsvFileScreen,
+    setChooseCsvFileScreen,
+  ] = React.useState<CsvFileParameter | null>(null)
   const [resetValuesModal, showResetValuesModal] = React.useState<boolean>(
     false
   )
@@ -56,29 +79,53 @@ export function ProtocolSetupParameters({
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
   ] = React.useState<RunTimeParameter[]>(
-    // present defaults rather than last-set value
-    runTimeParameters.map(param => {
-      return { ...param, value: param.default }
-    })
+    runTimeParameters.map(parameter =>
+      parameter.type === 'csv_file'
+        ? { ...parameter, file: null }
+        : // TODO (nd: 06/13/2024) create individual ChoiceParameter types for correct narrowing
+          // eslint-disable-next-line
+          ({ ...parameter, value: parameter.default } as ValueRunTimeParameter)
+    )
   )
 
+  const hasMissingFileParam =
+    runTimeParametersOverrides?.some((parameter): boolean => {
+      if (parameter.type !== 'csv_file') {
+        return false
+      }
+
+      if (parameter.file == null) {
+        return true
+      }
+
+      return (
+        parameter.file.id == null &&
+        parameter.file.file == null &&
+        parameter.file.filePath == null
+      )
+    }) ?? false
+
+  const { makeSnackbar } = useToaster()
+
   const updateParameters = (
-    value: boolean | string | number,
+    value: boolean | string | number | CsvFileParameterFileData,
     variableName: string
   ): void => {
     const updatedParameters = runTimeParametersOverrides.map(parameter => {
       if (parameter.variableName === variableName) {
-        return { ...parameter, value }
+        return parameter.type === 'csv_file'
+          ? { ...parameter, file: value }
+          : { ...parameter, value }
       }
       return parameter
     })
-    setRunTimeParametersOverrides(updatedParameters)
+    setRunTimeParametersOverrides(updatedParameters as RunTimeParameter[])
     if (chooseValueScreen && chooseValueScreen.variableName === variableName) {
       const updatedParameter = updatedParameters.find(
         parameter => parameter.variableName === variableName
       )
-      if (updatedParameter != null) {
-        setChooseValueScreen(updatedParameter)
+      if (updatedParameter != null && 'choices' in updatedParameter) {
+        setChooseValueScreen(updatedParameter as ChoiceParameter)
       }
     }
     if (
@@ -92,38 +139,95 @@ export function ProtocolSetupParameters({
         setShowNumericalInputScreen(updatedParameter as NumberParameter)
       }
     }
+    if (
+      chooseCsvFileScreen &&
+      chooseCsvFileScreen.variableName === variableName
+    ) {
+      const updatedParameter = updatedParameters.find(
+        parameter => parameter.variableName === variableName
+      )
+      if (updatedParameter != null && updatedParameter.type === 'csv_file') {
+        setChooseCsvFileScreen(updatedParameter as CsvFileParameter)
+      }
+    }
   }
 
-  const runTimeParameterValues = getRunTimeParameterValuesForRun(
-    runTimeParametersOverrides
-  )
-  const { createProtocolAnalysis } = useCreateProtocolAnalysisMutation(
-    protocolId,
-    host
-  )
+  const {
+    createProtocolAnalysis,
+    isLoading: isAnalysisLoading,
+  } = useCreateProtocolAnalysisMutation(protocolId, host)
 
-  const { createRun, isLoading } = useCreateRunMutation({
+  const { uploadCsvFile } = useUploadCsvFileMutation({}, host)
+
+  const { createRun, isLoading: isRunLoading } = useCreateRunMutation({
     onSuccess: data => {
-      queryClient
-        .invalidateQueries([host, 'runs'])
-        .catch((e: Error) =>
-          console.error(`could not invalidate runs cache: ${e.message}`)
-        )
+      queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
+        console.error(`could not invalidate runs cache: ${e.message}`)
+      })
     },
   })
   const handleConfirmValues = (): void => {
-    setStartSetup(true)
-    createProtocolAnalysis({
-      protocolKey: protocolId,
-      runTimeParameterValues: runTimeParameterValues,
-    })
-    createRun({
-      protocolId,
-      labwareOffsets,
-      runTimeParameterValues: getRunTimeParameterValuesForRun(
-        runTimeParametersOverrides
-      ),
-    })
+    if (hasMissingFileParam) {
+      makeSnackbar(t('protocol_requires_csv') as string)
+    } else {
+      const dataFilesForProtocolMap = runTimeParametersOverrides.reduce<
+        Record<string, FileData>
+      >((acc, parameter) => {
+        // create {variableName: FileData} map for sending to /dataFiles endpoint
+        if (
+          parameter.type === 'csv_file' &&
+          parameter.file?.id == null &&
+          parameter.file?.file != null
+        ) {
+          return { [parameter.variableName]: parameter.file.file }
+        } else if (
+          parameter.type === 'csv_file' &&
+          parameter.file?.id == null &&
+          parameter.file?.filePath != null
+        ) {
+          return { [parameter.variableName]: parameter.file.filePath }
+        }
+        return acc
+      }, {})
+      void Promise.all(
+        Object.entries(dataFilesForProtocolMap).map(([key, fileData]) => {
+          const fileResponse = uploadCsvFile(fileData)
+          const varName = Promise.resolve(key)
+          return Promise.all([fileResponse, varName])
+        })
+      ).then(responseTuples => {
+        const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
+          Record<string, string>
+        >((acc, [uploadedFileResponse, variableName]) => {
+          return { ...acc, [variableName]: uploadedFileResponse.data.id }
+        }, {})
+        const runTimeParameterValues = getRunTimeParameterValuesForRun(
+          runTimeParametersOverrides
+        )
+        const runTimeParameterFiles = getRunTimeParameterFilesForRun(
+          runTimeParametersOverrides,
+          mappedResolvedCsvVariableToFileId
+        )
+        setStartSetup(true)
+        createProtocolAnalysis(
+          {
+            protocolKey: protocolId,
+            runTimeParameterValues,
+            runTimeParameterFiles,
+          },
+          {
+            onSuccess: () => {
+              createRun({
+                protocolId,
+                labwareOffsets,
+                runTimeParameterValues,
+                runTimeParameterFiles,
+              })
+            },
+          }
+        )
+      })
+    }
   }
 
   const handleSetParameter = (parameter: RunTimeParameter): void => {
@@ -133,9 +237,11 @@ export function ProtocolSetupParameters({
       updateParameters(!parameter.value, parameter.variableName)
     } else if (parameter.type === 'int' || parameter.type === 'float') {
       setShowNumericalInputScreen(parameter)
+    } else if (parameter.type === 'csv_file') {
+      setChooseCsvFileScreen(parameter)
     } else {
       // bad param
-      console.log('error')
+      console.error('error: bad param. not expected to reach this')
     }
   }
 
@@ -143,16 +249,26 @@ export function ProtocolSetupParameters({
     <>
       <ChildNavigation
         header={t('parameters')}
-        onClickBack={() => history.goBack()}
+        onClickBack={() => {
+          navigate(-1)
+        }}
         onClickButton={handleConfirmValues}
         buttonText={t('confirm_values')}
-        iconName={isLoading || startSetup ? 'ot-spinner' : undefined}
+        ariaDisabled={hasMissingFileParam}
+        buttonIsDisabled={hasMissingFileParam}
+        iconName={
+          isRunLoading || isAnalysisLoading || startSetup
+            ? 'ot-spinner'
+            : undefined
+        }
         iconPlacement="startIcon"
         secondaryButtonProps={{
           buttonType: 'tertiaryLowLight',
           buttonText: t('restore_defaults'),
-          disabled: isLoading || startSetup,
-          onClick: () => showResetValuesModal(true),
+          disabled: isRunLoading || isAnalysisLoading || startSetup,
+          onClick: () => {
+            showResetValuesModal(true)
+          },
         }}
       />
       <Flex
@@ -163,29 +279,70 @@ export function ProtocolSetupParameters({
         paddingX={SPACING.spacing40}
         paddingBottom={SPACING.spacing40}
       >
-        {runTimeParametersOverrides.map((parameter, index) => {
-          return (
-            <React.Fragment key={`${parameter.displayName}_${index}`}>
-              <ProtocolSetupStep
-                hasIcon={!(parameter.type === 'bool')}
-                status="inform"
-                title={parameter.displayName}
-                onClickSetupStep={() => handleSetParameter(parameter)}
-                detail={formatRunTimeParameterValue(parameter, t)}
-                description={parameter.description}
-                fontSize="h4"
-                disabled={startSetup}
-              />
-            </React.Fragment>
-          )
-        })}
+        {sortRuntimeParameters(runTimeParametersOverrides).map(
+          (parameter, index) => {
+            let detail: string = ''
+            let setupStatus: ProtocolSetupStepStatus
+            if (parameter.type === 'csv_file') {
+              if (parameter.file?.fileName == null) {
+                detail = t('required')
+                setupStatus = 'not ready'
+              } else {
+                detail = parameter.file.fileName
+                setupStatus = 'ready'
+              }
+            } else {
+              detail = formatRunTimeParameterValue(parameter, t)
+              setupStatus = 'inform'
+            }
+            return (
+              <React.Fragment key={`${parameter.displayName}_${index}`}>
+                <ProtocolSetupStep
+                  hasRightIcon={!(parameter.type === 'bool')}
+                  hasLeftIcon={false}
+                  status={setupStatus}
+                  title={
+                    parameter.type === 'csv_file'
+                      ? t('csv_file')
+                      : parameter.displayName
+                  }
+                  onClickSetupStep={() => {
+                    handleSetParameter(parameter)
+                  }}
+                  detail={detail}
+                  description={
+                    parameter.type === 'csv_file' ? null : parameter.description
+                  }
+                  fontSize="h4"
+                  disabled={startSetup}
+                />
+              </React.Fragment>
+            )
+          }
+        )}
       </Flex>
     </>
   )
+
+  // ToDo (kk:06/18/2024) ff will be removed when we freeze the code
+  if (chooseCsvFileScreen != null) {
+    children = (
+      <ChooseCsvFile
+        protocolId={protocolId}
+        handleGoBack={() => {
+          setChooseCsvFileScreen(null)
+        }}
+        parameter={chooseCsvFileScreen}
+        setParameter={updateParameters}
+      />
+    )
+  }
   if (chooseValueScreen != null) {
     children = (
       <ChooseEnum
-        handleGoBack={() => setChooseValueScreen(null)}
+        handleGoBack={() => {
+          setChooseValueScreen(null)
+        }}
         parameter={chooseValueScreen}
         setParameter={updateParameters}
         rawValue={chooseValueScreen.value}
@@ -195,7 +352,9 @@ export function ProtocolSetupParameters({
   if (showNumericalInputScreen != null) {
     children = (
       <ChooseNumber
-        handleGoBack={() => setShowNumericalInputScreen(null)}
+        handleGoBack={() => {
+          setShowNumericalInputScreen(null)
+        }}
         parameter={showNumericalInputScreen}
         setParameter={updateParameters}
       />
@@ -208,7 +367,9 @@ export function ProtocolSetupParameters({
         <ResetValuesModal
           runTimeParametersOverrides={runTimeParametersOverrides}
           setRunTimeParametersOverrides={setRunTimeParametersOverrides}
-          handleGoBack={() => showResetValuesModal(false)}
+          handleGoBack={() => {
+            showResetValuesModal(false)
+          }}
         />
       ) : null}
       {children}

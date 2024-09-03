@@ -1,18 +1,22 @@
 from unittest import mock
 
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
 from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
 from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
 from opentrons.types import Point
 from opentrons.protocol_api import InstrumentContext, labware, MAX_SUPPORTED_VERSION
 from opentrons.protocols.execution.execute_json_v5 import _move_to_well
+from opentrons_shared_data.protocol.types import MoveToWellParams
 
 
-def test_move_to_well_with_optional_params():
+def test_move_to_well_with_optional_params() -> None:
+    mock_parent = mock.create_autospec(labware.Labware)
+    mock_parent_core = mock.create_autospec(LegacyLabwareCore)
     pipette_mock = mock.create_autospec(InstrumentContext)
     instruments = {"somePipetteId": pipette_mock}
 
     well = labware.Well(
-        parent=None,
+        parent=mock_parent,
         core=LegacyWellCore(
             well_geometry=WellGeometry(
                 {
@@ -25,7 +29,7 @@ def test_move_to_well_with_optional_params():
                     "z": 3,
                 },
                 parent_point=Point(10, 20, 30),
-                parent_object=1,
+                parent_object=mock_parent_core,
             ),
             display_name="some well",
             has_tip=False,
@@ -36,7 +40,7 @@ def test_move_to_well_with_optional_params():
 
     mock_get_well = mock.MagicMock(return_value=well, name="mock_get_well")
 
-    params = {
+    params: "MoveToWellParams" = {
         "pipette": "somePipetteId",
         "labware": "someLabwareId",
         "well": "someWell",
@@ -61,12 +65,14 @@ def test_move_to_well_with_optional_params():
     assert mock_get_well.mock_calls == [mock.call(mock.sentinel.loaded_labware, params)]
 
 
-def test_move_to_well_without_optional_params():
+def test_move_to_well_without_optional_params() -> None:
+    mock_parent = mock.create_autospec(labware.Labware)
+    mock_parent_core = mock.create_autospec(LegacyLabwareCore)
     pipette_mock = mock.create_autospec(InstrumentContext)
     instruments = {"somePipetteId": pipette_mock}
 
     well = labware.Well(
-        parent=None,
+        parent=mock_parent,
         core=LegacyWellCore(
             well_geometry=WellGeometry(
                 {
@@ -79,7 +85,7 @@ def test_move_to_well_without_optional_params():
                     "z": 3,
                 },
                 parent_point=Point(10, 20, 30),
-                parent_object=1,
+                parent_object=mock_parent_core,
             ),
             display_name="some well",
             has_tip=False,
@@ -90,7 +96,7 @@ def test_move_to_well_without_optional_params():
 
     mock_get_well = mock.MagicMock(return_value=well, name="mock_get_well")
 
-    params = {
+    params: "MoveToWellParams" = {
         "pipette": "somePipetteId",
         "labware": "someLabwareId",
         "well": "someWell",

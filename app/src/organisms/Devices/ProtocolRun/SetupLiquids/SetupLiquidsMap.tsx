@@ -1,11 +1,7 @@
 import * as React from 'react'
 import map from 'lodash/map'
 import isEmpty from 'lodash/isEmpty'
-import {
-  parseInitialLoadedLabwareByAdapter,
-  parseLabwareInfoByLiquidId,
-  parseLiquidsInLoadOrder,
-} from '@opentrons/api-client'
+
 import {
   ALIGN_CENTER,
   BaseDeck,
@@ -18,6 +14,9 @@ import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getSimplestDeckConfigForProtocol,
+  parseInitialLoadedLabwareByAdapter,
+  parseLabwareInfoByLiquidId,
+  parseLiquidsInLoadOrder,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
@@ -82,7 +81,7 @@ export function SetupLiquidsMap(
       labwareInAdapterInMod?.params.displayName ??
       module.nestedLabwareDisplayName
     const nestedLabwareWellFill = getWellFillFromLabwareId(
-      module.nestedLabwareId ?? '',
+      topLabwareId ?? '',
       liquids,
       labwareByLiquidId
     )
@@ -101,11 +100,17 @@ export function SetupLiquidsMap(
       moduleChildren:
         topLabwareDefinition != null && topLabwareId != null ? (
           <g
-            onMouseEnter={() => setHoverLabwareId(topLabwareId)}
-            onMouseLeave={() => setHoverLabwareId('')}
-            onClick={() =>
-              labwareHasLiquid ? setLiquidDetailsLabwareId(topLabwareId) : null
-            }
+            onMouseEnter={() => {
+              setHoverLabwareId(topLabwareId)
+            }}
+            onMouseLeave={() => {
+              setHoverLabwareId('')
+            }}
+            onClick={() => {
+              if (labwareHasLiquid) {
+                setLiquidDetailsLabwareId(topLabwareId)
+              }
+            }}
             cursor={labwareHasLiquid ? 'pointer' : ''}
           >
             <LabwareInfoOverlay
@@ -158,13 +163,17 @@ export function SetupLiquidsMap(
               >
                 <g
                   transform={`translate(${x},${y})`}
-                  onMouseEnter={() => setHoverLabwareId(topLabwareId)}
-                  onMouseLeave={() => setHoverLabwareId('')}
-                  onClick={() =>
-                    labwareHasLiquid
-                      ? setLiquidDetailsLabwareId(topLabwareId)
-                      : null
-                  }
+                  onMouseEnter={() => {
+                    setHoverLabwareId(topLabwareId)
+                  }}
+                  onMouseLeave={() => {
+                    setHoverLabwareId('')
+                  }}
+                  onClick={() => {
+                    if (labwareHasLiquid) {
+                      setLiquidDetailsLabwareId(topLabwareId)
+                    }
+                  }}
                   cursor={labwareHasLiquid ? 'pointer' : ''}
                 >
                   <LabwareRender
@@ -190,7 +199,9 @@ export function SetupLiquidsMap(
         <LiquidsLabwareDetailsModal
           labwareId={liquidDetailsLabwareId}
           runId={runId}
-          closeModal={() => setLiquidDetailsLabwareId(null)}
+          closeModal={() => {
+            setLiquidDetailsLabwareId(null)
+          }}
         />
       )}
     </Flex>

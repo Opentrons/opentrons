@@ -5,6 +5,7 @@ and uploading to a google sheet using credentials and google_sheets_tools module
 saved in a local directory.
 """
 import csv
+import subprocess
 from datetime import datetime
 import os
 from abr_testing.data_collection.error_levels import ERROR_LEVELS_PATH
@@ -60,24 +61,75 @@ def lpc_data(
     return runs_and_lpc, headers_lpc
 
 
-def command_time(command: Dict[str, str]) -> Tuple[float, float]:
+def command_time(command: Dict[str, str]) -> float:
     """Calculate total create and complete time per command."""
     try:
-        create_time = datetime.strptime(
-            command.get("createdAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
-        )
         start_time = datetime.strptime(
             command.get("startedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
         )
         complete_time = datetime.strptime(
             command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
         )
-        create_to_start = (start_time - create_time).total_seconds()
         start_to_complete = (complete_time - start_time).total_seconds()
     except ValueError:
-        create_to_start = 0
         start_to_complete = 0
-    return create_to_start, start_to_complete
+    return start_to_complete
+
+
+def instrument_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
+    """Count number of pipette and gripper commands per run."""
+    pipettes = file_results.get("pipettes", "")
+    commandData = file_results.get("commands", "")
+    left_tip_pick_up = 0.0
+    left_aspirate = 0.0
+    right_tip_pick_up = 0.0
+    right_aspirate = 0.0
+    left_dispense = 0.0
+    right_dispense = 0.0
+    right_pipette_id = ""
+    left_pipette_id = ""
+    gripper_pickups = 0.0
+    # Match pipette mount to id
+    for pipette in pipettes:
+        if pipette["mount"] == "right":
+            right_pipette_id = pipette["id"]
+        elif pipette["mount"] == "left":
+            left_pipette_id = pipette["id"]
+    for command in commandData:
+        commandType = command["commandType"]
+        # Count tip pick ups
+        if commandType == "pickUpTip":
+            if command["params"].get("pipetteId", "") == right_pipette_id:
+                right_tip_pick_up += 1
+            elif command["params"].get("pipetteId", "") == left_pipette_id:
+                left_tip_pick_up += 1
+        # Count aspirates
+        elif commandType == "aspirate":
+            if command["params"].get("pipetteId", "") == right_pipette_id:
+                right_aspirate += 1
+            elif command["params"].get("pipetteId", "") == left_pipette_id:
+                left_aspirate += 1
+        # count dispenses/blowouts
+        elif commandType == "dispense" or commandType == "blowout":
+            if command["params"].get("pipetteId", "") == right_pipette_id:
+                right_dispense += 1
+            elif command["params"].get("pipetteId", "") == left_pipette_id:
+                left_dispense += 1
+        elif (
+            commandType == "moveLabware"
+            and command["params"]["strategy"] == "usingGripper"
+        ):
+            gripper_pickups += 1
+    pipette_dict = {
+        "Left Pipette Total Tip Pick Up(s)": left_tip_pick_up,
+        "Left Pipette Total Aspirates": left_aspirate,
+        "Left Pipette Total Dispenses": left_dispense,
+        "Right Pipette Total Tip Pick Up(s)": right_tip_pick_up,
+        "Right Pipette Total Aspirates": right_aspirate,
+        "Right Pipette Total Dispenses": right_dispense,
+        "Gripper Pick Ups": gripper_pickups,
+    }
+    return pipette_dict
 
 
 def hs_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
@@ -93,6 +145,7 @@ def hs_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
     temp_time = None
     shake_time = None
     deactivate_time = None
+
     for command in commandData:
         commandType = command["commandType"]
         # Heatershaker
@@ -152,10 +205,11 @@ def hs_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
     return hs_dict
 
 
-def temperature_module_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
+def temperature_module_commands(file_results: Dict[str, Any]) -> Dict[str, Any]:
     """Get # of temp changes and total temp on time for temperature module from run log."""
     # TODO: modify for cases that have more than 1 temperature module.
     tm_temp_change = 0
+    time_to_4c = 0.0
     tm_temps: Dict[str, float] = dict()
     temp_time = None
     deactivate_time = None
@@ -163,9 +217,13 @@ def temperature_module_commands(file_results: Dict[str, Any]) -> Dict[str, float
     for command in commandData:
         commandType = command["commandType"]
         if commandType == "temperatureModule/setTargetTemperature":
+            temp_time = datetime.strptime(
+                command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+            )
             tm_temp = command["params"]["celsius"]
             tm_temp_change += 1
-        if commandType == "temperatureModule/waitForTemperature":
+        if commandType == "temperatureModule/waitForTemperature" and int(tm_temp) == 4:
+            time_to_4c = command_time(command)
             temp_time = datetime.strptime(
                 command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
             )
@@ -187,6 +245,7 @@ def temperature_module_commands(file_results: Dict[str, Any]) -> Dict[str, float
     tm_dict = {
         "Temp Module # of Temp Changes": tm_temp_change,
         "Temp Module Temp On Time (sec)": tm_total_temp_time,
+        "Temp Mod Time to 4C (sec)": time_to_4c,
     }
     return tm_dict
 
@@ -198,6 +257,8 @@ def thermocycler_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
     lid_engagements: float = 0.0
     block_temp_changes: float = 0.0
     lid_temp_changes: float = 0.0
+    block_to_4c = 0.0
+    lid_to_105c = 0.0
     lid_temps: Dict[str, float] = dict()
     block_temps: Dict[str, float] = dict()
     lid_on_time = None
@@ -217,12 +278,19 @@ def thermocycler_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
             block_on_time = datetime.strptime(
                 command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
             )
+        if (
+            commandType == "thermocycler/waitForBlockTemperature"
+            and int(block_temp) == 4
+        ):
+            block_to_4c = command_time(command)
         if commandType == "thermocycler/setTargetLidTemperature":
             lid_temp_changes += 1
             lid_temp = command["params"]["celsius"]
             lid_on_time = datetime.strptime(
                 command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
             )
+        if commandType == "thermocycler/waitForLidTemperature" and int(lid_temp) == 105:
+            lid_to_105c = command_time(command)
         if commandType == "thermocycler/deactivateLid":
             lid_off_time = datetime.strptime(
                 command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
@@ -269,8 +337,10 @@ def thermocycler_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
         "Thermocycler # of Lid Open/Close": lid_sets,
         "Thermocycler Block # of Temp Changes": block_temp_changes,
         "Thermocycler Block Temp On Time (sec)": block_total_time,
+        "Thermocycler Block Time to 4C (sec)": block_to_4c,
         "Thermocycler Lid # of Temp Changes": lid_temp_changes,
         "Thermocycler Lid Temp On Time (sec)": lid_total_time,
+        "Thermocycler Lid Time to 105C (sec)": lid_to_105c,
     }
 
     return tc_dict
@@ -314,6 +384,9 @@ def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, st
         error_str = 0
     if error_str > 1:
         error_type = run_command_error["error"].get("errorType", "")
+        if error_type == "PythonException":
+            # Reassign error_type to be more descriptive
+            error_type = run_command_error.get("detail", "").split(":")[0]
         error_code = run_command_error["error"].get("errorCode", "")
         try:
             # Instrument Error
@@ -496,23 +569,58 @@ def get_calibration_offsets(
 
 def get_logs(storage_directory: str, ip: str) -> List[str]:
     """Get Robot logs."""
-    log_types = ["api.log", "server.log", "serial.log", "touchscreen.log"]
+    log_types: List[Dict[str, Any]] = [
+        {"log type": "api.log", "records": 1000},
+        {"log type": "server.log", "records": 10000},
+        {"log type": "serial.log", "records": 10000},
+        {"log type": "touchscreen.log", "records": 1000},
+    ]
     all_paths = []
     for log_type in log_types:
         try:
+            log_type_name = log_type["log type"]
+            print(log_type_name)
+            log_records = int(log_type["records"])
+            print(log_records)
             response = requests.get(
-                f"http://{ip}:31950/logs/{log_type}",
-                headers={"log_identifier": log_type},
-                params={"records": 5000},
+                f"http://{ip}:31950/logs/{log_type_name}",
+                headers={"log_identifier": log_type_name},
+                params={"records": log_records},
             )
             response.raise_for_status()
             log_data = response.text
-            log_name = ip + "_" + log_type.split(".")[0] + ".log"
+            log_name = ip + "_" + log_type_name.split(".")[0] + ".log"
             file_path = os.path.join(storage_directory, log_name)
             with open(file_path, mode="w", encoding="utf-8") as file:
                 file.write(log_data)
         except RuntimeError:
-            print(f"Request exception. Did not save {log_type}")
+            print(f"Request exception. Did not save {log_type_name}")
             continue
         all_paths.append(file_path)
+    # Get weston.log using scp
+    # Split the path into parts
+    parts = storage_directory.split(os.sep)
+    # Find the index of 'Users'
+    index = parts.index("Users")
+    user_name = parts[index + 1]
+    # Define the SCP command
+    scp_command = [
+        "scp",
+        "-r",
+        "-i",
+        f"C:\\Users\\{user_name}\\.ssh\\robot_key",
+        f"root@{ip}:/var/log/weston.log",
+        storage_directory,
+    ]
+    # Execute the SCP command
+    try:
+        subprocess.run(scp_command, check=True, capture_output=True, text=True)
+        file_path = os.path.join(storage_directory, "weston.log")
+        all_paths.append(file_path)
+    except subprocess.CalledProcessError as e:
+        print("Error during SCP command execution")
+        print("Return code:", e.returncode)
+        print("Output:", e.output)
+        print("Error output:", e.stderr)
+        subprocess.run(["scp", "weston.log", "root@10.14.19.40:/var/log/weston.log"])
     return all_paths

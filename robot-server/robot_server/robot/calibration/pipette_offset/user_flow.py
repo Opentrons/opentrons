@@ -29,7 +29,7 @@ from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipett
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
-from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.pipette.types import LabwareUri
 from opentrons.protocol_api import labware
 from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Mount, Point, Location
@@ -56,7 +56,7 @@ from .state_machine import (
     PipetteOffsetWithTipLengthStateMachine,
 )
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -328,7 +328,7 @@ class PipetteOffsetCalibrationUserFlow:
     def _get_tip_length(self) -> float:
         stored_tip_length_cal = self._get_stored_tip_length_cal()
         if stored_tip_length_cal is None or self._should_perform_tip_length:
-            tip_overlap = self._hw_pipette.tip_overlap.get(self._tip_rack.uri, 0)
+            tip_overlap = self._hw_pipette.tip_overlap["v0"].get(self._tip_rack.uri, 0)
             tip_length = self._tip_rack.tip_length
             return tip_length - tip_overlap
         else:

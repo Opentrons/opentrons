@@ -1,19 +1,42 @@
 """Tests for the InstrumentContext public interface."""
-from collections import OrderedDict
 import inspect
-
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from collections import OrderedDict
+from datetime import datetime
+from typing import ContextManager, Optional, Any
+from unittest.mock import sentinel
+
 from decoy import Decoy
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+
+from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
+from opentrons.protocol_engine.errors.error_occurrence import (
+    ProtocolCommandFailedError,
+)
 
 from opentrons.legacy_broker import LegacyBroker
-from typing import ContextManager, Optional
-from contextlib import nullcontext as does_not_raise
 
+from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
+from tests.opentrons.protocol_api.partial_tip_configurations import (
+    PipetteReliantNozzleConfigSpec,
+    PIPETTE_RELIANT_TEST_SPECS,
+    NozzleLayoutArgs,
+    PipetteIndependentNozzleConfigSpec,
+    PIPETTE_INDEPENDENT_TEST_SPECS,
+    InstrumentCoreNozzleConfigSpec,
+    INSTRUMENT_CORE_NOZZLE_LAYOUT_TEST_SPECS,
+    ExpectedCoreArgs,
+)
+from tests.opentrons.protocol_engine.pipette_fixtures import (
+    NINETY_SIX_COLS,
+    NINETY_SIX_MAP,
+    NINETY_SIX_ROWS,
+)
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     APIVersionError,
+    UnsupportedAPIError,
     FlowRates,
     PlungerSpeeds,
 )
@@ -33,7 +56,7 @@ from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
-from opentrons.protocol_api._nozzle_layout import NozzleLayout
+from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 from opentrons.types import Location, Mount, Point
 
 from opentrons_shared_data.errors.exceptions import (
@@ -264,7 +287,7 @@ def test_pick_up_from_well_deprecated_args(
     """It should pick up a specific tip."""
     mock_well = decoy.mock(cls=Well)
 
-    with pytest.raises(APIVersionError):
+    with pytest.raises(UnsupportedAPIError):
         subject.pick_up_tip(mock_well, presses=1, increment=2.0, prep_after=False)
 
 
@@ -515,6 +538,7 @@ MOCK_MAP = NozzleMap.build(
     starting_nozzle="A1",
     back_left_nozzle="A1",
     front_right_nozzle="A1",
+    valid_nozzle_maps=ValidNozzleMaps(maps={"Full": ["A1"]}),
 )
 
 
@@ -1057,6 +1081,16 @@ def test_flow_rate(
     assert result == flow_rates
 
 
+def test_liquid_presence_detection(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should have a default liquid presence detection boolean set to False."""
+    decoy.when(mock_instrument_core.get_liquid_presence_detection()).then_return(False)
+    assert subject.liquid_presence_detection is False
+    subject.liquid_presence_detection = True
+    decoy.verify(mock_instrument_core.set_liquid_presence_detection(True), times=1)
+
+
 @pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
 @pytest.mark.parametrize(
     "mock_instrument_core",
@@ -1079,7 +1113,7 @@ def test_plunger_speed(
 @pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
 def test_plunger_speed_removed(subject: InstrumentContext) -> None:
     """It should raise an error on PAPI >= v2.14."""
-    with pytest.raises(APIVersionError):
+    with pytest.raises(UnsupportedAPIError):
         subject.speed
 
 
@@ -1102,23 +1136,86 @@ def test_prepare_to_aspirate_checks_volume(
 
 
 @pytest.mark.parametrize(
-    argnames=["style", "primary_nozzle", "front_right_nozzle", "exception"],
-    argvalues=[
-        [NozzleLayout.COLUMN, "A1", "H1", does_not_raise()],
-        [NozzleLayout.SINGLE, None, None, pytest.raises(ValueError)],
-        [NozzleLayout.ROW, "E1", None, pytest.raises(ValueError)],
-    ],
+    argnames=PipetteReliantNozzleConfigSpec._fields,
+    argvalues=PIPETTE_RELIANT_TEST_SPECS,
+)
+def test_configure_pip_reliant_nozzle_layout_checks_for_config_validity(
+    subject: InstrumentContext,
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    pipette_channels: int,
+    nozzle_layout_args: NozzleLayoutArgs,
+    expected_raise: ContextManager[Any],
+) -> None:
+    """It should raise an error if you specify the wrong arguments for the nozzle configuration."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(pipette_channels)
+    with expected_raise:
+        subject.configure_nozzle_layout(
+            style=nozzle_layout_args.style,
+            start=nozzle_layout_args.start,
+            end=nozzle_layout_args.end,
+            front_right=nozzle_layout_args.front_right,
+            back_left=nozzle_layout_args.back_left,
+        )
+
+
+@pytest.mark.parametrize(
+    "pipette_channels",
+    [1, 8, 96],
+)
+@pytest.mark.parametrize(
+    argnames=PipetteIndependentNozzleConfigSpec._fields,
+    argvalues=PIPETTE_INDEPENDENT_TEST_SPECS,
+)
+def test_configure_pip_independent_nozzle_layout_checks_for_config_validity(
+    subject: InstrumentContext,
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    pipette_channels: int,
+    nozzle_layout_args: NozzleLayoutArgs,
+    expected_raise: ContextManager[Any],
+) -> None:
+    """It should raise an error if you specify the wrong arguments for the nozzle configuration."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(pipette_channels)
+    with expected_raise:
+        subject.configure_nozzle_layout(
+            style=nozzle_layout_args.style,
+            start=nozzle_layout_args.start,
+            end=nozzle_layout_args.end,
+            front_right=nozzle_layout_args.front_right,
+            back_left=nozzle_layout_args.back_left,
+        )
+
+
+@pytest.mark.parametrize(
+    argnames=InstrumentCoreNozzleConfigSpec._fields,
+    argvalues=INSTRUMENT_CORE_NOZZLE_LAYOUT_TEST_SPECS,
 )
 def test_configure_nozzle_layout(
     subject: InstrumentContext,
-    style: NozzleLayout,
-    primary_nozzle: Optional[str],
-    front_right_nozzle: Optional[str],
-    exception: ContextManager[None],
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    pipette_channels: int,
+    nozzle_layout_args: NozzleLayoutArgs,
+    expected_core_args: ExpectedCoreArgs,
 ) -> None:
-    """The correct model is passed to the engine client."""
-    with exception:
-        subject.configure_nozzle_layout(style, primary_nozzle, front_right_nozzle)
+    """It should pass the correct configuration model to the engine client."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(pipette_channels)
+    subject.configure_nozzle_layout(
+        style=nozzle_layout_args.style,
+        start=nozzle_layout_args.start,
+        end=nozzle_layout_args.end,
+        front_right=nozzle_layout_args.front_right,
+        back_left=nozzle_layout_args.back_left,
+    )
+    decoy.verify(
+        mock_instrument_core.configure_nozzle_layout(
+            style=nozzle_layout_args.style,
+            primary_nozzle=expected_core_args.primary_nozzle,
+            front_right_nozzle=expected_core_args.front_right_nozzle,
+            back_left_nozzle=expected_core_args.back_left_nozzle,
+        )
+    )
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
@@ -1256,3 +1353,126 @@ def test_aspirate_0_volume_means_aspirate_nothing(
         ),
         times=1,
     )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
+def test_detect_liquid_presence(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should only return booleans. Not raise an exception."""
+    mock_well = decoy.mock(cls=Well)
+    decoy.when(
+        mock_instrument_core.detect_liquid_presence(mock_well._core, mock_well.top())
+    ).then_return(sentinel.inner_result)
+    outer_result = subject.detect_liquid_presence(mock_well)
+    assert outer_result is sentinel.inner_result
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
+def test_require_liquid_presence(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should raise an exception when called."""
+    mock_well = decoy.mock(cls=Well)
+    lnfe = LiquidNotFoundError(id="1234", createdAt=datetime.now())
+    errorToRaise = ProtocolCommandFailedError(
+        original_error=lnfe,
+        message=f"{lnfe.errorType}: {lnfe.detail}",
+    )
+    decoy.when(
+        mock_instrument_core.liquid_probe_with_recovery(
+            mock_well._core, mock_well.top()
+        )
+    )
+    subject.require_liquid_presence(mock_well)
+    decoy.when(
+        mock_instrument_core.liquid_probe_with_recovery(
+            mock_well._core, mock_well.top()
+        )
+    ).then_raise(errorToRaise)
+    with pytest.raises(ProtocolCommandFailedError) as pcfe:
+        subject.require_liquid_presence(mock_well)
+    assert pcfe.value is errorToRaise
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 20)])
+def test_measure_liquid_height(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should raise an exception when called."""
+    mock_well = decoy.mock(cls=Well)
+    lnfe = LiquidNotFoundError(id="1234", createdAt=datetime.now())
+    errorToRaise = ProtocolCommandFailedError(
+        original_error=lnfe,
+        message=f"{lnfe.errorType}: {lnfe.detail}",
+    )
+    decoy.when(
+        mock_instrument_core.liquid_probe_without_recovery(
+            mock_well._core, mock_well.top()
+        )
+    ).then_raise(errorToRaise)
+    with pytest.raises(ProtocolCommandFailedError) as pcfe:
+        subject.measure_liquid_height(mock_well)
+    assert pcfe.value is errorToRaise
+
+
+def test_96_tip_config_valid(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should error when there's no tips on the correct corner nozzles."""
+    nozzle_map = NozzleMap.build(
+        physical_nozzles=NINETY_SIX_MAP,
+        physical_rows=NINETY_SIX_ROWS,
+        physical_columns=NINETY_SIX_COLS,
+        starting_nozzle="A5",
+        back_left_nozzle="A5",
+        front_right_nozzle="H5",
+        valid_nozzle_maps=ValidNozzleMaps(maps={"Column12": NINETY_SIX_COLS["5"]}),
+    )
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(nozzle_map)
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(96)
+    with pytest.raises(TipNotAttachedError):
+        subject._96_tip_config_valid()
+
+
+def test_96_tip_config_invalid(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should return True when there are tips on the correct corner nozzles."""
+    nozzle_map = NozzleMap.build(
+        physical_nozzles=NINETY_SIX_MAP,
+        physical_rows=NINETY_SIX_ROWS,
+        physical_columns=NINETY_SIX_COLS,
+        starting_nozzle="A1",
+        back_left_nozzle="A1",
+        front_right_nozzle="H12",
+        valid_nozzle_maps=ValidNozzleMaps(
+            maps={
+                "Full": sum(
+                    [
+                        NINETY_SIX_ROWS["A"],
+                        NINETY_SIX_ROWS["B"],
+                        NINETY_SIX_ROWS["C"],
+                        NINETY_SIX_ROWS["D"],
+                        NINETY_SIX_ROWS["E"],
+                        NINETY_SIX_ROWS["F"],
+                        NINETY_SIX_ROWS["G"],
+                        NINETY_SIX_ROWS["H"],
+                    ],
+                    [],
+                )
+            }
+        ),
+    )
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(nozzle_map)
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(96)
+    assert subject._96_tip_config_valid() is True

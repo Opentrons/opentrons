@@ -523,6 +523,28 @@ class ReadLimitSwitchResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class MaxSensorValueRequest(BaseMessage):  # noqa: D101
+    payload: payloads.ReadFromSensorRequestPayload
+    payload_type: Type[
+        payloads.ReadFromSensorRequestPayload
+    ] = payloads.ReadFromSensorRequestPayload
+    message_id: Literal[
+        MessageId.max_sensor_value_request
+    ] = MessageId.max_sensor_value_request
+
+
+@dataclass
+class MaxSensorValueResponse(BaseMessage):  # noqa: D101
+    payload: payloads.ReadFromSensorRequestPayload
+    payload_type: Type[
+        payloads.ReadFromSensorRequestPayload
+    ] = payloads.ReadFromSensorRequestPayload
+    message_id: Literal[
+        MessageId.max_sensor_value_response
+    ] = MessageId.max_sensor_value_response
+
+
+@dataclass
 class ReadFromSensorRequest(BaseMessage):  # noqa: D101
     payload: payloads.ReadFromSensorRequestPayload
     payload_type: Type[
@@ -1024,13 +1046,13 @@ class GetHepaUVStateResponse(BaseMessage):
 
 
 @dataclass
-class SendAccumulatedPressureDataRequest(BaseMessage):
+class SendAccumulatedSensorDataRequest(BaseMessage):
     """Send all the saved sensor data."""
 
-    payload: payloads.SendAccumulatedPressureDataPayload
+    payload: payloads.SendAccumulatedSensorDataPayload
     payload_type: Type[
-        payloads.SendAccumulatedPressureDataPayload
-    ] = payloads.SendAccumulatedPressureDataPayload
+        payloads.SendAccumulatedSensorDataPayload
+    ] = payloads.SendAccumulatedSensorDataPayload
     message_id: Literal[
-        MessageId.send_accumulated_pressure_data
-    ] = MessageId.send_accumulated_pressure_data
+        MessageId.send_accumulated_sensor_data
+    ] = MessageId.send_accumulated_sensor_data

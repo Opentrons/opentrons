@@ -16,7 +16,7 @@ import {
   Link,
   SPACING_AUTO,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   useMountEffect,
 } from '@opentrons/components'
@@ -111,13 +111,17 @@ export function GeneralSettings(): JSX.Element {
           >
             <Banner
               type="warning"
-              onCloseClick={() => setShowUpdateBanner(false)}
+              onCloseClick={() => {
+                setShowUpdateBanner(false)
+              }}
             >
               {t('branded:opentrons_app_update_available_variation')}
               <Link
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 role="button"
-                onClick={() => setShowUpdateModal(true)}
+                onClick={() => {
+                  setShowUpdateModal(true)
+                }}
                 marginLeft={SPACING.spacing4}
               >
                 {t('view_update')}
@@ -135,24 +139,26 @@ export function GeneralSettings(): JSX.Element {
             {showConnectRobotSlideout && (
               <ConnectRobotSlideout
                 isExpanded={showConnectRobotSlideout}
-                onCloseClick={() => setShowConnectRobotSlideout(false)}
+                onCloseClick={() => {
+                  setShowConnectRobotSlideout(false)
+                }}
               />
             )}
             <Box width="65%">
-              <StyledText
+              <LegacyStyledText
                 css={TYPOGRAPHY.h3SemiBold}
                 paddingBottom={SPACING.spacing8}
               >
                 {t('software_version')}
-              </StyledText>
-              <StyledText
+              </LegacyStyledText>
+              <LegacyStyledText
                 as="p"
                 paddingBottom={SPACING.spacing8}
                 id="GeneralSettings_currentVersion"
               >
                 {CURRENT_VERSION}
-              </StyledText>
-              <StyledText as="p">
+              </LegacyStyledText>
+              <LegacyStyledText as="p">
                 {t('shared:view_latest_release_notes')}
                 <Link
                   external
@@ -160,39 +166,43 @@ export function GeneralSettings(): JSX.Element {
                   css={TYPOGRAPHY.linkPSemiBold}
                   id="GeneralSettings_GitHubLink"
                 >{` ${t('shared:github')}`}</Link>
-              </StyledText>
+              </LegacyStyledText>
             </Box>
             {updateAvailable ? (
               <TertiaryButton
                 disabled={!updateAvailable}
                 marginLeft={SPACING_AUTO}
-                onClick={() => setShowUpdateModal(true)}
+                onClick={() => {
+                  setShowUpdateModal(true)
+                }}
                 id="GeneralSettings_softwareUpdate"
               >
                 {t('view_software_update')}
               </TertiaryButton>
             ) : (
-              <StyledText
+              <LegacyStyledText
                 fontSize={TYPOGRAPHY.fontSizeLabel}
                 lineHeight={TYPOGRAPHY.lineHeight12}
                 color={COLORS.grey60}
                 paddingY={SPACING.spacing24}
               >
                 {t('up_to_date')}
-              </StyledText>
+              </LegacyStyledText>
             )}
           </Flex>
           <Box width="70%">
-            <StyledText as="p" paddingY={SPACING.spacing8}>
+            <LegacyStyledText as="p" paddingY={SPACING.spacing8}>
               {t('manage_versions')}
-            </StyledText>
+            </LegacyStyledText>
           </Box>
           <Box>
             <Flex flexDirection={DIRECTION_COLUMN}>
               <Link
                 role="button"
                 css={TYPOGRAPHY.linkPSemiBold}
-                onClick={() => setShowPreviousVersionModal(true)}
+                onClick={() => {
+                  setShowPreviousVersionModal(true)
+                }}
                 id="GeneralSettings_previousVersionLink"
               >
                 {t('restore_previous')}
@@ -207,18 +217,20 @@ export function GeneralSettings(): JSX.Element {
           </Box>
         </Box>
         <Divider marginY={SPACING.spacing24} />
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
         >
           {t('update_alerts')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <StyledText as="p">{t('branded:receive_alert')}</StyledText>
+          <LegacyStyledText as="p">
+            {t('branded:receive_alert')}
+          </LegacyStyledText>
           <ToggleButton
             label={ENABLE_APP_UPDATE_NOTIFICATIONS}
             marginRight={SPACING.spacing16}
@@ -233,16 +245,18 @@ export function GeneralSettings(): JSX.Element {
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <StyledText
+          <LegacyStyledText
             css={TYPOGRAPHY.h3SemiBold}
             paddingBottom={SPACING.spacing8}
           >
             {t('connect_ip')}
-          </StyledText>
+          </LegacyStyledText>
           <TertiaryButton
             marginLeft={SPACING_AUTO}
             id="GeneralSettings_setUpConnection"
-            onClick={() => setShowConnectRobotSlideout(true)}
+            onClick={() => {
+              setShowConnectRobotSlideout(true)
+            }}
           >
             {t('setup_connection')}
           </TertiaryButton>
@@ -250,13 +264,19 @@ export function GeneralSettings(): JSX.Element {
       </Box>
       {showUpdateModal
         ? createPortal(
-            <UpdateAppModal closeModal={() => setShowUpdateModal(false)} />,
+            <UpdateAppModal
+              closeModal={() => {
+                setShowUpdateModal(false)
+              }}
+            />,
             getTopPortalEl()
           )
         : null}
       {showPreviousVersionModal ? (
         <PreviousVersionModal
-          closeModal={() => setShowPreviousVersionModal(false)}
+          closeModal={() => {
+            setShowPreviousVersionModal(false)
+          }}
         />
       ) : null}
     </>

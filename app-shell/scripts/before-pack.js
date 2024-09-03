@@ -118,7 +118,16 @@ module.exports = function beforeBuild(context) {
 
       // TODO(mc, 2022-05-16): explore virtualenvs for a more reliable
       // implementation of this install
-      return execa(HOST_PYTHON, [
+      console.log(
+        `Installing python native deps using ${path.join(
+          PYTHON_DESTINATION,
+          'python3.10'
+        )}`
+      )
+      const invokablePython = platformName.includes('darwin')
+        ? path.join(PYTHON_DESTINATION, 'python/bin/python3.10')
+        : HOST_PYTHON
+      return execa(invokablePython, [
         '-m',
         'pip',
         'install',

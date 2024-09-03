@@ -1,8 +1,6 @@
 """Typing protocols describing a hardware controller."""
 from typing_extensions import Protocol, Type
 
-from opentrons.hardware_control.types import Axis
-
 from .module_provider import ModuleProvider
 from .hardware_manager import HardwareManager
 from .chassis_accessory_manager import ChassisAccessoryManager
@@ -20,6 +18,7 @@ from .identifiable import Identifiable
 from .gripper_controller import GripperController
 from .flex_calibratable import FlexCalibratable
 from .flex_instrument_configurer import FlexInstrumentConfigurer
+from .position_estimator import PositionEstimator
 
 from .types import (
     CalibrationType,
@@ -59,8 +58,12 @@ class HardwareControlInterface(
     def get_robot_type(self) -> Type[OT2RobotType]:
         return OT2RobotType
 
+    def cache_tip(self, mount: MountArgType, tip_length: float) -> None:
+        ...
+
 
 class FlexHardwareControlInterface(
+    PositionEstimator,
     ModuleProvider,
     ExecutionControllable,
     LiquidHandler[CalibrationType, MountArgType, ConfigType],
@@ -84,10 +87,7 @@ class FlexHardwareControlInterface(
     def get_robot_type(self) -> Type[FlexRobotType]:
         return FlexRobotType
 
-    def motor_status_ok(self, axis: Axis) -> bool:
-        ...
-
-    def encoder_status_ok(self, axis: Axis) -> bool:
+    def cache_tip(self, mount: MountArgType, tip_length: float) -> None:
         ...
 
 

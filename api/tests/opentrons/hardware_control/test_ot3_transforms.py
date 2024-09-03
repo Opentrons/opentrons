@@ -5,7 +5,7 @@ from opentrons import types
 from opentrons.hardware_control import ot3api
 from opentrons.hardware_control.types import Axis
 from opentrons_shared_data.pipette import name_for_model
-from opentrons_shared_data.pipette.dev_types import PipetteModel
+from opentrons_shared_data.pipette.types import PipetteModel
 
 
 @pytest.mark.parametrize(

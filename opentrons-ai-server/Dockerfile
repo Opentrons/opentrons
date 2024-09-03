@@ -1,13 +1,18 @@
-FROM --platform=linux/amd64 public.ecr.aws/lambda/python:3.12
+FROM --platform=linux/amd64 python:3.12.4-slim
 
-COPY --from=public.ecr.aws/datadog/lambda-extension:57 /opt/. /opt/
+ENV PYTHONUNBUFFERED True
+ENV DOCKER_RUNNING True
 
-WORKDIR ${LAMBDA_TASK_ROOT}
+WORKDIR /code
 
-COPY requirements.txt .
+ARG CACHEBUST=1
 
-RUN pip install -r requirements.txt
+COPY ./requirements.txt /code/requirements.txt
 
-COPY api ${LAMBDA_TASK_ROOT}/api
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
-CMD [ "datadog_lambda.handler.handler" ]
+COPY ./api /code/api
+
+EXPOSE 8000
+
+CMD ["ddtrace-run", "uvicorn", "api.handler.fast:app", "--proxy-headers",  "--host", "0.0.0.0", "--port", "8000", "--timeout-keep-alive", "190", "--workers", "3"]

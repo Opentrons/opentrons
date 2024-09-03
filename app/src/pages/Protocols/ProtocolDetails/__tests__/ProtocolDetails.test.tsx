@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { Route, MemoryRouter } from 'react-router-dom'
+import { screen } from '@testing-library/react'
+import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { when } from 'vitest-when'
 import { renderWithProviders } from '../../../../__testing-utils__'
 
@@ -33,12 +34,10 @@ const MOCK_STATE: State = {
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/protocols/:protocolKey">
-        <ProtocolDetails />
-      </Route>
-      <Route path="/protocols">
-        <div>protocols</div>
-      </Route>
+      <Routes>
+        <Route path="/protocols/:protocolKey" element={<ProtocolDetails />} />
+        <Route path="/protocols" element={<div>protocols</div>} />
+      </Routes>
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -76,7 +75,7 @@ describe('ProtocolDetails', () => {
     when(vi.mocked(getStoredProtocol))
       .calledWith(MOCK_STATE, mockProtocolKey)
       .thenReturn(null)
-    const { getByText } = render('/protocols')
-    getByText('protocols')
+    render('/protocols')
+    screen.getByText('protocols')
   })
 })

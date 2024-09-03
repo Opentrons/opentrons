@@ -10,7 +10,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -60,7 +60,7 @@ export function FailedToConnect({
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
           >
-            <StyledText
+            <LegacyStyledText
               as="h3"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginTop={SPACING.spacing40}
@@ -68,16 +68,16 @@ export function FailedToConnect({
               {isInvalidPassword
                 ? t('incorrect_password_for_ssid', { ssid: selectedSsid })
                 : t('failed_to_connect_to_ssid', { ssid: selectedSsid })}
-            </StyledText>
+            </LegacyStyledText>
             {!isInvalidPassword &&
               requestState != null &&
               'error' in requestState &&
               requestState.error != null &&
               'message' in requestState.error &&
               requestState.error.message != null && (
-                <StyledText marginTop={SPACING.spacing16}>
+                <LegacyStyledText marginTop={SPACING.spacing16}>
                   {requestState.error.message}
-                </StyledText>
+                </LegacyStyledText>
               )}
           </Flex>
         </Flex>

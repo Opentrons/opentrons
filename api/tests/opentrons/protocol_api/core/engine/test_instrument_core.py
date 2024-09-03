@@ -1,10 +1,12 @@
 """Test for the ProtocolEngine-based instrument API core."""
 from typing import cast, Optional, Union
 
+from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 import pytest
 from decoy import Decoy
+from decoy import errors
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -19,6 +21,7 @@ from opentrons.protocol_engine import (
     DropTipWellLocation,
     DropTipWellOrigin,
 )
+from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients.sync_client import SyncClient
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
@@ -46,6 +49,8 @@ from opentrons.protocol_api.core.engine import (
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Location, Mount, MountType, Point
+
+from ... import versions_below, versions_at_or_above
 
 
 @pytest.fixture
@@ -187,16 +192,18 @@ def test_move_to_well(
     )
 
     decoy.verify(
-        mock_engine_client.move_to_well(
-            pipette_id="abc123",
-            labware_id="labware-id",
-            well_name="well-name",
-            well_location=WellLocation(
-                origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
-            ),
-            force_direct=True,
-            minimum_z_height=9.87,
-            speed=6.54,
+        mock_engine_client.execute_command(
+            cmd.MoveToWellParams(
+                pipetteId="abc123",
+                labwareId="labware-id",
+                wellName="well-name",
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+                ),
+                forceDirect=True,
+                minimumZHeight=9.87,
+                speed=6.54,
+            )
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
@@ -220,12 +227,14 @@ def test_move_to_coordinates(
     )
 
     decoy.verify(
-        mock_engine_client.move_to_coordinates(
-            pipette_id="abc123",
-            coordinates=DeckPoint(x=1, y=2, z=3),
-            minimum_z_height=42.0,
-            force_direct=True,
-            speed=4.56,
+        mock_engine_client.execute_command(
+            cmd.MoveToCoordinatesParams(
+                pipetteId="abc123",
+                coordinates=DeckPoint(x=1, y=2, z=3),
+                minimumZHeight=42.0,
+                forceDirect=True,
+                speed=4.56,
+            )
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
@@ -276,13 +285,15 @@ def test_pick_up_tip(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
         ),
-        mock_engine_client.pick_up_tip_wait_for_recovery(
-            pipette_id="abc123",
-            labware_id="labware-id",
-            well_name="well-name",
-            well_location=WellLocation(
-                origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
-            ),
+        mock_engine_client.execute_command(
+            cmd.PickUpTipParams(
+                pipetteId="abc123",
+                labwareId="labware-id",
+                wellName="well-name",
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+                ),
+            )
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
@@ -324,16 +335,18 @@ def test_drop_tip_no_location(
                 offset=WellOffset(x=0, y=0, z=0),
             ),
         ),
-        mock_engine_client.drop_tip(
-            pipette_id="abc123",
-            labware_id="labware-id",
-            well_name="well-name",
-            well_location=DropTipWellLocation(
-                origin=DropTipWellOrigin.DEFAULT,
-                offset=WellOffset(x=0, y=0, z=0),
-            ),
-            home_after=True,
-            alternateDropLocation=False,
+        mock_engine_client.execute_command(
+            cmd.DropTipParams(
+                pipetteId="abc123",
+                labwareId="labware-id",
+                wellName="well-name",
+                wellLocation=DropTipWellLocation(
+                    origin=DropTipWellOrigin.DEFAULT,
+                    offset=WellOffset(x=0, y=0, z=0),
+                ),
+                homeAfter=True,
+                alternateDropLocation=False,
+            )
         ),
     )
 
@@ -377,15 +390,17 @@ def test_drop_tip_with_location(
                 origin=DropTipWellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
         ),
-        mock_engine_client.drop_tip(
-            pipette_id="abc123",
-            labware_id="labware-id",
-            well_name="well-name",
-            well_location=DropTipWellLocation(
-                origin=DropTipWellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
-            ),
-            home_after=True,
-            alternateDropLocation=False,
+        mock_engine_client.execute_command(
+            cmd.DropTipParams(
+                pipetteId="abc123",
+                labwareId="labware-id",
+                wellName="well-name",
+                wellLocation=DropTipWellLocation(
+                    origin=DropTipWellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+                ),
+                homeAfter=True,
+                alternateDropLocation=False,
+            )
         ),
     )
 
@@ -404,19 +419,23 @@ def test_drop_tip_in_trash_bin(
     )
 
     decoy.verify(
-        mock_engine_client.move_to_addressable_area_for_drop_tip(
-            pipette_id="abc123",
-            addressable_area_name="my tubular area",
-            offset=AddressableOffsetVector(x=1, y=2, z=3),
-            force_direct=False,
-            speed=None,
-            minimum_z_height=None,
-            alternate_drop_location=True,
-            ignore_tip_configuration=True,
+        mock_engine_client.execute_command(
+            cmd.MoveToAddressableAreaForDropTipParams(
+                pipetteId="abc123",
+                addressableAreaName="my tubular area",
+                offset=AddressableOffsetVector(x=1, y=2, z=3),
+                forceDirect=False,
+                speed=None,
+                minimumZHeight=None,
+                alternateDropLocation=True,
+                ignoreTipConfiguration=True,
+            )
         ),
-        mock_engine_client.drop_tip_in_place(
-            pipette_id="abc123",
-            home_after=True,
+        mock_engine_client.execute_command(
+            cmd.DropTipInPlaceParams(
+                pipetteId="abc123",
+                homeAfter=True,
+            )
         ),
     )
 
@@ -437,17 +456,21 @@ def test_drop_tip_in_waste_chute(
     )
 
     decoy.verify(
-        mock_engine_client.move_to_addressable_area(
-            pipette_id="abc123",
-            addressable_area_name="96ChannelWasteChute",
-            offset=AddressableOffsetVector(x=4, y=5, z=6),
-            force_direct=False,
-            speed=None,
-            minimum_z_height=None,
+        mock_engine_client.execute_command(
+            cmd.MoveToAddressableAreaParams(
+                pipetteId="abc123",
+                addressableAreaName="96ChannelWasteChute",
+                offset=AddressableOffsetVector(x=4, y=5, z=6),
+                forceDirect=False,
+                speed=None,
+                minimumZHeight=None,
+            )
         ),
-        mock_engine_client.drop_tip_in_place(
-            pipette_id="abc123",
-            home_after=True,
+        mock_engine_client.execute_command(
+            cmd.DropTipInPlaceParams(
+                pipetteId="abc123",
+                homeAfter=True,
+            )
         ),
     )
 
@@ -490,15 +513,17 @@ def test_aspirate_from_well(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
         ),
-        mock_engine_client.aspirate(
-            pipette_id="abc123",
-            labware_id="123abc",
-            well_name="my cool well",
-            well_location=WellLocation(
-                origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
-            ),
-            volume=12.34,
-            flow_rate=7.8,
+        mock_engine_client.execute_command(
+            cmd.AspirateParams(
+                pipetteId="abc123",
+                labwareId="123abc",
+                wellName="my cool well",
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+                ),
+                volume=12.34,
+                flowRate=7.8,
+            )
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
@@ -522,17 +547,21 @@ def test_aspirate_from_location(
     )
 
     decoy.verify(
-        mock_engine_client.move_to_coordinates(
-            pipette_id="abc123",
-            coordinates=DeckPoint(x=1, y=2, z=3),
-            minimum_z_height=None,
-            force_direct=False,
-            speed=None,
+        mock_engine_client.execute_command(
+            cmd.MoveToCoordinatesParams(
+                pipetteId="abc123",
+                coordinates=DeckPoint(x=1, y=2, z=3),
+                minimumZHeight=None,
+                forceDirect=False,
+                speed=None,
+            )
         ),
-        mock_engine_client.aspirate_in_place(
-            pipette_id="abc123",
-            volume=12.34,
-            flow_rate=7.8,
+        mock_engine_client.execute_command(
+            cmd.AspirateInPlaceParams(
+                pipetteId="abc123",
+                volume=12.34,
+                flowRate=7.8,
+            )
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
@@ -556,10 +585,12 @@ def test_aspirate_in_place(
     )
 
     decoy.verify(
-        mock_engine_client.aspirate_in_place(
-            pipette_id="abc123",
-            volume=12.34,
-            flow_rate=7.8,
+        mock_engine_client.execute_command(
+            cmd.AspirateInPlaceParams(
+                pipetteId="abc123",
+                volume=12.34,
+                flowRate=7.8,
+            )
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
@@ -596,14 +627,16 @@ def test_blow_out_to_well(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
         ),
-        mock_engine_client.blow_out(
-            pipette_id="abc123",
-            labware_id="123abc",
-            well_name="my cool well",
-            well_location=WellLocation(
-                origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
-            ),
-            flow_rate=6.7,
+        mock_engine_client.execute_command(
+            cmd.BlowOutParams(
+                pipetteId="abc123",
+                labwareId="123abc",
+                wellName="my cool well",
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+                ),
+                flowRate=6.7,
+            )
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
@@ -621,16 +654,20 @@ def test_blow_to_coordinates(
     subject.blow_out(location=location, well_core=None, in_place=False)
 
     decoy.verify(
-        mock_engine_client.move_to_coordinates(
-            pipette_id="abc123",
-            coordinates=DeckPoint(x=1, y=2, z=3),
-            minimum_z_height=None,
-            speed=None,
-            force_direct=False,
+        mock_engine_client.execute_command(
+            cmd.MoveToCoordinatesParams(
+                pipetteId="abc123",
+                coordinates=DeckPoint(x=1, y=2, z=3),
+                minimumZHeight=None,
+                speed=None,
+                forceDirect=False,
+            )
         ),
-        mock_engine_client.blow_out_in_place(
-            pipette_id="abc123",
-            flow_rate=6.7,
+        mock_engine_client.execute_command(
+            cmd.BlowOutInPlaceParams(
+                pipetteId="abc123",
+                flowRate=6.7,
+            )
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
@@ -651,9 +688,11 @@ def test_blow_out_in_place(
     )
 
     decoy.verify(
-        mock_engine_client.blow_out_in_place(
-            pipette_id="abc123",
-            flow_rate=6.7,
+        mock_engine_client.execute_command(
+            cmd.BlowOutInPlaceParams(
+                pipetteId="abc123",
+                flowRate=6.7,
+            )
         ),
     )
 
@@ -699,16 +738,18 @@ def test_dispense_to_well(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
         ),
-        mock_engine_client.dispense(
-            pipette_id="abc123",
-            labware_id="123abc",
-            well_name="my cool well",
-            well_location=WellLocation(
-                origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
-            ),
-            volume=12.34,
-            flow_rate=6.0,
-            push_out=7,
+        mock_engine_client.execute_command(
+            cmd.DispenseParams(
+                pipetteId="abc123",
+                labwareId="123abc",
+                wellName="my cool well",
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+                ),
+                volume=12.34,
+                flowRate=6.0,
+                pushOut=7,
+            )
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
@@ -734,8 +775,10 @@ def test_dispense_in_place(
     )
 
     decoy.verify(
-        mock_engine_client.dispense_in_place(
-            pipette_id="abc123", volume=12.34, flow_rate=7.8, push_out=None
+        mock_engine_client.execute_command(
+            cmd.DispenseInPlaceParams(
+                pipetteId="abc123", volume=12.34, flowRate=7.8, pushOut=None
+            )
         ),
     )
 
@@ -760,15 +803,19 @@ def test_dispense_to_coordinates(
     )
 
     decoy.verify(
-        mock_engine_client.move_to_coordinates(
-            pipette_id="abc123",
-            coordinates=DeckPoint(x=1, y=2, z=3),
-            minimum_z_height=None,
-            force_direct=False,
-            speed=None,
+        mock_engine_client.execute_command(
+            cmd.MoveToCoordinatesParams(
+                pipetteId="abc123",
+                coordinates=DeckPoint(x=1, y=2, z=3),
+                minimumZHeight=None,
+                forceDirect=False,
+                speed=None,
+            )
         ),
-        mock_engine_client.dispense_in_place(
-            pipette_id="abc123", volume=12.34, flow_rate=7.8, push_out=None
+        mock_engine_client.execute_command(
+            cmd.DispenseInPlaceParams(
+                pipetteId="abc123", volume=12.34, flowRate=7.8, pushOut=None
+            )
         ),
     )
 
@@ -803,17 +850,21 @@ def test_dispense_conditionally_clamps_volume(
 
     if expect_clampage:
         decoy.verify(
-            mock_engine_client.dispense_in_place(
-                pipette_id="abc123", volume=111.111, flow_rate=7.8, push_out=None
+            mock_engine_client.execute_command(
+                cmd.DispenseInPlaceParams(
+                    pipetteId="abc123", volume=111.111, flowRate=7.8, pushOut=None
+                )
             ),
         )
     else:
         decoy.verify(
-            mock_engine_client.dispense_in_place(
-                pipette_id="abc123",
-                volume=99999999.99999999,
-                flow_rate=7.8,
-                push_out=None,
+            mock_engine_client.execute_command(
+                cmd.DispenseInPlaceParams(
+                    pipetteId="abc123",
+                    volume=99999999.99999999,
+                    flowRate=7.8,
+                    pushOut=None,
+                )
             ),
         )
 
@@ -1013,7 +1064,9 @@ def test_home_z(
     subject.home()
 
     decoy.verify(
-        mock_engine_client.home(axes=[MotorAxis.RIGHT_Z, MotorAxis.RIGHT_PLUNGER]),
+        mock_engine_client.execute_command(
+            cmd.HomeParams(axes=[MotorAxis.RIGHT_Z, MotorAxis.RIGHT_PLUNGER])
+        ),
         times=1,
     )
 
@@ -1031,7 +1084,9 @@ def test_home_plunger(
     subject.home_plunger()
 
     decoy.verify(
-        mock_engine_client.home(axes=[MotorAxis.LEFT_PLUNGER]),
+        mock_engine_client.execute_command(
+            cmd.HomeParams(axes=[MotorAxis.LEFT_PLUNGER])
+        ),
         times=1,
     )
 
@@ -1067,15 +1122,17 @@ def test_touch_tip(
                 origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=4.56)
             ),
         ),
-        mock_engine_client.touch_tip(
-            pipette_id="abc123",
-            labware_id="123abc",
-            well_name="my cool well",
-            well_location=WellLocation(
-                origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=4.56)
-            ),
-            radius=1.23,
-            speed=7.89,
+        mock_engine_client.execute_command(
+            cmd.TouchTipParams(
+                pipetteId="abc123",
+                labwareId="123abc",
+                wellName="my cool well",
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=4.56)
+                ),
+                radius=1.23,
+                speed=7.89,
+            )
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
@@ -1094,24 +1151,47 @@ def test_has_tip(
     assert subject.has_tip() is True
 
 
+def test_liquid_presence_detection(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should have a default liquid presence detection boolean set to False."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_liquid_presence_detection(
+            subject.pipette_id
+        )
+    ).then_return(False)
+    assert subject.get_liquid_presence_detection() is False
+
+
 @pytest.mark.parametrize(
-    argnames=["style", "primary_nozzle", "front_right_nozzle", "expected_model"],
+    argnames=[
+        "style",
+        "primary_nozzle",
+        "front_right_nozzle",
+        "back_left_nozzle",
+        "expected_model",
+    ],
     argvalues=[
         [
             NozzleLayout.COLUMN,
             "A1",
             "H1",
+            None,
             ColumnNozzleLayoutConfiguration(primaryNozzle="A1"),
         ],
         [
             NozzleLayout.SINGLE,
             "H12",
             None,
+            None,
             SingleNozzleLayoutConfiguration(primaryNozzle="H12"),
         ],
         [
             NozzleLayout.ROW,
             "A12",
+            None,
             None,
             RowNozzleLayoutConfiguration(primaryNozzle="A12"),
         ],
@@ -1124,13 +1204,20 @@ def test_configure_nozzle_layout(
     style: NozzleLayout,
     primary_nozzle: Optional[str],
     front_right_nozzle: Optional[str],
+    back_left_nozzle: Optional[str],
     expected_model: NozzleLayoutConfigurationType,
 ) -> None:
     """The correct model is passed to the engine client."""
-    subject.configure_nozzle_layout(style, primary_nozzle, front_right_nozzle)
+    subject.configure_nozzle_layout(
+        style, primary_nozzle, front_right_nozzle, back_left_nozzle
+    )
 
     decoy.verify(
-        mock_engine_client.configure_nozzle_layout(subject._pipette_id, expected_model)
+        mock_engine_client.execute_command(
+            cmd.ConfigureNozzleLayoutParams(
+                pipetteId=subject._pipette_id, configurationParams=expected_model
+            )
+        )
     )
 
 
@@ -1147,7 +1234,7 @@ def test_configure_nozzle_layout(
         (8, NozzleConfigurationType.FULL, "A1", True),
         (8, NozzleConfigurationType.FULL, None, True),
         (8, NozzleConfigurationType.SINGLE, "H1", True),
-        (8, NozzleConfigurationType.SINGLE, "A1", False),
+        (8, NozzleConfigurationType.SINGLE, "A1", True),
         (1, NozzleConfigurationType.FULL, None, True),
     ],
 )
@@ -1171,3 +1258,154 @@ def test_is_tip_tracking_available(
         mock_engine_client.state.pipettes.get_primary_nozzle(subject.pipette_id)
     ).then_return(primary_nozzle)
     assert subject.is_tip_tracking_available() == expected_result
+
+
+@pytest.mark.parametrize("version", versions_below(APIVersion(2, 19), flex_only=False))
+def test_configure_for_volume_pre_219(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+    version: APIVersion,
+) -> None:
+    """Configure_for_volume should specify overlap version."""
+    decoy.when(mock_protocol_core.api_version).then_return(version)
+    subject.configure_for_volume(123.0)
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.ConfigureForVolumeParams(
+                pipetteId=subject.pipette_id,
+                volume=123.0,
+                tipOverlapNotAfterVersion="v0",
+            )
+        )
+    )
+
+
+@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 19)))
+def test_configure_for_volume_post_219(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+    version: APIVersion,
+) -> None:
+    """Configure_for_volume should specify overlap version."""
+    decoy.when(mock_protocol_core.api_version).then_return(version)
+    subject.configure_for_volume(123.0)
+    try:
+        decoy.verify(
+            mock_engine_client.execute_command(
+                cmd.ConfigureForVolumeParams(
+                    pipetteId=subject.pipette_id,
+                    volume=123.0,
+                    tipOverlapNotAfterVersion="v1",
+                )
+            )
+        )
+    except errors.VerifyError:
+        decoy.verify(
+            mock_engine_client.execute_command(
+                cmd.ConfigureForVolumeParams(
+                    pipetteId=subject.pipette_id,
+                    volume=123.0,
+                    tipOverlapNotAfterVersion="v3",
+                )
+            )
+        )
+
+
+@pytest.mark.parametrize(
+    ("returned_from_engine", "expected_return_from_core"),
+    [
+        (None, False),
+        (0, True),
+        (1, True),
+    ],
+)
+def test_detect_liquid_presence(
+    returned_from_engine: Optional[float],
+    expected_return_from_core: bool,
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+) -> None:
+    """It should convert a height result from the engine to True/False."""
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.TryLiquidProbeParams(
+                pipetteId=subject.pipette_id,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                ),
+                wellName=well_core.get_name(),
+                labwareId=well_core.labware_id,
+            )
+        )
+    ).then_return(
+        cmd.TryLiquidProbeResult.construct(
+            z_position=returned_from_engine,
+            position=object(),
+        )
+    )
+    loc = Location(Point(0, 0, 0), None)
+
+    result = subject.detect_liquid_presence(well_core=well_core, loc=loc)
+    assert result == expected_return_from_core
+
+    decoy.verify(mock_protocol_core.set_last_location(loc, mount=subject.get_mount()))
+
+
+def test_liquid_probe_without_recovery(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+) -> None:
+    """It should raise an exception on an empty well and return a float on a valid well."""
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LiquidProbeParams(
+                pipetteId=subject.pipette_id,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
+                ),
+                wellName=well_core.get_name(),
+                labwareId=well_core.labware_id,
+            )
+        )
+    ).then_raise(PipetteLiquidNotFoundError())
+    loc = Location(Point(0, 0, 0), None)
+    with pytest.raises(PipetteLiquidNotFoundError):
+        subject.liquid_probe_without_recovery(well_core=well_core, loc=loc)
+
+
+def test_liquid_probe_with_recovery(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+) -> None:
+    """It should not raise an exception on an empty well."""
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
+    loc = Location(Point(0, 0, 0), None)
+    subject.liquid_probe_with_recovery(well_core=well_core, loc=loc)
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.LiquidProbeParams(
+                pipetteId=subject.pipette_id,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2.0)
+                ),
+                wellName=well_core.get_name(),
+                labwareId=well_core.labware_id,
+            )
+        )
+    )

@@ -7,15 +7,15 @@ import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { ConfirmRobotName } from '../ConfirmRobotName'
 
-import type { useHistory } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useHistory>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -49,6 +49,6 @@ describe('ConfirmRobotName', () => {
     render(props)
     const button = screen.getByText('Finish setup')
     fireEvent.click(button)
-    expect(mockPush).toBeCalledWith('/dashboard')
+    expect(mockNavigate).toBeCalledWith('/dashboard')
   })
 })

@@ -8,7 +8,7 @@ import {
   Flex,
   Link,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import {
   addCustomLabwareFile,
@@ -58,7 +58,7 @@ export function AddCustomLabwareSlideout(
           }}
           uploadText={t('choose_file_to_upload')}
           dragAndDropText={
-            <StyledText as="p">
+            <LegacyStyledText as="p">
               <Trans
                 t={t}
                 i18nKey="shared:drag_and_drop"
@@ -72,7 +72,7 @@ export function AddCustomLabwareSlideout(
                   ),
                 }}
               />
-            </StyledText>
+            </LegacyStyledText>
           }
         />
       </Flex>

@@ -1,9 +1,13 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Dict, Optional, List, TYPE_CHECKING
+from typing import Dict, Optional, List, Tuple, TYPE_CHECKING
 
-from opentrons.drivers.types import AbsorbanceReaderLidStatus
+from opentrons.drivers.types import (
+    AbsorbanceReaderLidStatus,
+    AbsorbanceReaderDeviceState,
+    AbsorbanceReaderPlatePresence,
+)
 from opentrons.drivers.absorbance_reader.abstract import AbstractAbsorbanceReaderDriver
 from opentrons.drivers.rpi_drivers.types import USBPort
 
@@ -28,15 +32,6 @@ class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
     def __init__(self, connection: AsyncByonoyType) -> None:
         self._connection = connection
 
-    async def get_device_info(self) -> Dict[str, str]:
-        """Get device info"""
-        connected = await self.is_connected()
-        if not connected:
-            info = await self._connection.get_device_static_info()
-        else:
-            info = await self._connection.get_device_information()
-        return info
-
     async def connect(self) -> None:
         """Connect to absorbance reader"""
         await self._connection.open()
@@ -49,6 +44,16 @@ class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
         """Check connection to absorbance reader"""
         return await self._connection.is_open()
 
+    async def get_device_info(self) -> Dict[str, str]:
+        """Get device info"""
+        return await self._connection.get_device_information()
+
+    async def update_firmware(self, firmware_file_path: str) -> Tuple[bool, str]:
+        return await self._connection.update_firmware(firmware_file_path)
+
+    async def get_uptime(self) -> int:
+        return await self._connection.get_device_uptime()
+
     async def get_lid_status(self) -> AbsorbanceReaderLidStatus:
         return await self._connection.get_lid_status()
 
@@ -56,10 +61,14 @@ class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
         return await self._connection.get_supported_wavelengths()
 
     async def get_single_measurement(self, wavelength: int) -> List[float]:
+        # TODO (cb, 08-02-2024): The list of measurements for 96 wells is rotated 180 degrees (well A1 is where well H12 should be) this must be corrected
         return await self._connection.get_single_measurement(wavelength)
 
     async def initialize_measurement(self, wavelength: int) -> None:
         await self._connection.initialize(wavelength)
 
-    async def get_status(self) -> None:
-        pass
+    async def get_status(self) -> AbsorbanceReaderDeviceState:
+        return await self._connection.get_device_status()
+
+    async def get_plate_presence(self) -> AbsorbanceReaderPlatePresence:
+        return await self._connection.get_plate_presence()

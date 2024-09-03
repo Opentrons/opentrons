@@ -11,15 +11,15 @@ import { ConnectViaUSB } from '../../../pages/ConnectViaUSB'
 
 import type { UseQueryResult } from 'react-query'
 import type { ActiveConnections } from '@opentrons/api-client'
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof ReactRouterDom>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 vi.mock('@opentrons/react-api-client')
@@ -58,7 +58,7 @@ describe('ConnectViaUSB', () => {
   it('should call a mock function when tapping back button', () => {
     const [{ getByRole }] = render()
     fireEvent.click(getByRole('button'))
-    expect(mockPush).toHaveBeenCalledWith('/network-setup')
+    expect(mockNavigate).toHaveBeenCalledWith('/network-setup')
   })
 
   it('should render successful connection text and button', () => {
@@ -81,6 +81,6 @@ describe('ConnectViaUSB', () => {
     const [{ getByText }] = render()
     const button = getByText('Continue')
     fireEvent.click(button)
-    expect(mockPush).toHaveBeenCalledWith('/emergency-stop')
+    expect(mockNavigate).toHaveBeenCalledWith('/emergency-stop')
   })
 })

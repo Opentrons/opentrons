@@ -4,7 +4,8 @@ import { useHost } from '../api'
 import type {
   ErrorResponse,
   HostConfig,
-  RunTimeParameterCreateData,
+  RunTimeParameterFilesCreateData,
+  RunTimeParameterValuesCreateData,
 } from '@opentrons/api-client'
 import type { ProtocolAnalysisSummary } from '@opentrons/shared-data'
 import type { AxiosError } from 'axios'
@@ -16,7 +17,8 @@ import type {
 
 export interface CreateProtocolAnalysisVariables {
   protocolKey: string
-  runTimeParameterValues?: RunTimeParameterCreateData
+  runTimeParameterValues?: RunTimeParameterValuesCreateData
+  runTimeParameterFiles?: RunTimeParameterFilesCreateData
   forceReAnalyze?: boolean
 }
 export type UseCreateProtocolMutationResult = UseMutationResult<
@@ -53,22 +55,22 @@ export function useCreateProtocolAnalysisMutation(
     CreateProtocolAnalysisVariables
   >(
     [host, 'protocols', protocolId, 'analyses'],
-    ({ protocolKey, runTimeParameterValues, forceReAnalyze }) =>
+    ({
+      protocolKey,
+      runTimeParameterValues,
+      runTimeParameterFiles,
+      forceReAnalyze,
+    }) =>
       createProtocolAnalysis(
         host as HostConfig,
         protocolKey,
         runTimeParameterValues,
+        runTimeParameterFiles,
         forceReAnalyze
       )
         .then(response => {
           queryClient
-            .invalidateQueries([host, 'protocols', protocolId, 'analyses'])
-            .then(() =>
-              queryClient.setQueryData(
-                [host, 'protocols', protocolId, 'analyses'],
-                response.data
-              )
-            )
+            .invalidateQueries([host, 'protocols'])
             .catch((e: Error) => {
               throw e
             })

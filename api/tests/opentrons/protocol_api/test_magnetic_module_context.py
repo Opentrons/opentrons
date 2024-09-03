@@ -5,7 +5,7 @@ from decoy import Decoy, matchers
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules import MagneticStatus
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.protocols.api_support.util import UnsupportedAPIError
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MagneticModuleContext
 from opentrons.protocol_api.core.common import ProtocolCore, MagneticModuleCore
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
@@ -117,9 +117,9 @@ def test_engage_height_from_home_raises_on_high_version(
     subject: MagneticModuleContext,
 ) -> None:
     """It should error if given a raw motor height and the apiLevel is high."""
-    with pytest.raises(APIVersionError):
+    with pytest.raises(UnsupportedAPIError):
         subject.engage(height=42.0)
-    with pytest.raises(APIVersionError):
+    with pytest.raises(UnsupportedAPIError):
         subject.engage(42.0)
 
 
@@ -130,7 +130,7 @@ def test_calibrate_raises_on_high_version(
     subject: MagneticModuleContext,
 ) -> None:
     """It should raise a deprecation error."""
-    with pytest.raises(APIVersionError):
+    with pytest.raises(UnsupportedAPIError):
         subject.calibrate()
 
 

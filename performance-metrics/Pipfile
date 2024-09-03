@@ -4,8 +4,9 @@ verify_ssl  = true
 name        = "pypi"
 
 [packages]
-opentrons-shared-data = {file = "../shared-data/python", editable = true}
 performance-metrics = {file = ".", editable = true}
+psutil = "==6.0.0"
+systemd-python = {version="==234", markers="sys_platform=='win32'" }
 
 [dev-packages]
 pytest  = "==7.4.4"
@@ -16,6 +17,7 @@ flake8-docstrings = "~=1.7.0"
 flake8-noqa = "~=1.4.0"
 black = "==22.3.0"
 pytest-asyncio = "~=0.23.0"
+types-psutil = "==6.0.0.20240621"
 
 [requires]
 python_version = "3.10"

@@ -6,6 +6,7 @@ from fastapi import Depends, status
 from typing import (
     TYPE_CHECKING,
     cast,
+    Annotated,
     Awaitable,
     Callable,
     Iterator,
@@ -18,7 +19,7 @@ from traceback import format_exception_only, TracebackException
 from contextlib import contextmanager, suppress
 
 from opentrons_shared_data import deck
-from opentrons_shared_data.robot.dev_types import RobotType, RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
 from opentrons import initialize as initialize_api, should_use_ot3
 from opentrons.config import (
@@ -241,7 +242,7 @@ async def fbl_clean_up(app_state: AppState) -> None:
 # TODO(mm, 2022-10-18): Deduplicate this background initialization infrastructure
 # with similar code used for initializing the persistence layer.
 async def get_thread_manager(
-    app_state: AppState = Depends(get_app_state),
+    app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> ThreadManagedHardware:
     """Get the ThreadManager'd HardwareAPI as a route dependency.
 
@@ -285,7 +286,7 @@ async def get_thread_manager(
 
 
 async def get_hardware(
-    thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
+    thread_manager: Annotated[ThreadManagedHardware, Depends(get_thread_manager)],
 ) -> HardwareControlAPI:
     """Get the HardwareAPI as a route dependency.
 
@@ -323,7 +324,7 @@ def get_ot3_hardware(
 
 
 def get_ot2_hardware(
-    thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
+    thread_manager: Annotated[ThreadManagedHardware, Depends(get_thread_manager)],
 ) -> "API":
     """Get an OT2 hardware controller."""
     if not thread_manager.wraps_instance(API):
@@ -334,9 +335,9 @@ def get_ot2_hardware(
 
 
 async def get_firmware_update_manager(
-    app_state: AppState = Depends(get_app_state),
-    thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
-    task_runner: TaskRunner = Depends(get_task_runner),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    thread_manager: Annotated[ThreadManagedHardware, Depends(get_thread_manager)],
+    task_runner: Annotated[TaskRunner, Depends(get_task_runner)],
 ) -> FirmwareUpdateManager:
     """Get an update manager to track firmware update statuses."""
     hardware = get_ot3_hardware(thread_manager)
@@ -351,8 +352,8 @@ async def get_firmware_update_manager(
 
 
 async def get_estop_handler(
-    app_state: AppState = Depends(get_app_state),
-    thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    thread_manager: Annotated[ThreadManagedHardware, Depends(get_thread_manager)],
 ) -> EstopHandler:
     """Get an Estop Handler for working with the estop."""
     hardware = get_ot3_hardware(thread_manager)
@@ -380,8 +381,8 @@ async def get_deck_type() -> DeckType:
 
 
 async def get_deck_definition(
-    deck_type: DeckType = Depends(get_deck_type),
-) -> deck.dev_types.DeckDefinitionV5:
+    deck_type: Annotated[DeckType, Depends(get_deck_type)],
+) -> deck.types.DeckDefinitionV5:
     """Return this robot's deck definition."""
     return deck.load(deck_type, version=5)
 

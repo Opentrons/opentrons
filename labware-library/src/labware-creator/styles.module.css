@@ -109,6 +109,13 @@
   border: none;
 }
 
+.flex_row_no_columns {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 1rem 0 2rem;
+  flex-direction: column;
+}
+
 .flex_row {
   display: flex;
   flex-wrap: wrap;

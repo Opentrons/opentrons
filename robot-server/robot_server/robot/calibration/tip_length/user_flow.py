@@ -9,8 +9,8 @@ from opentrons.protocols.api_support.deck_type import (
 from opentrons.protocol_api import labware
 from opentrons.protocol_api.core.legacy.deck import Deck
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.pipette.types import LabwareUri
 
 from robot_server.robot.calibration import util
 from robot_server.service.errors import RobotServerError
@@ -200,7 +200,7 @@ class TipCalibrationUserFlow:
     def _get_default_tip_length(self) -> float:
         tiprack: labware.Labware = self._deck[TIP_RACK_SLOT]  # type: ignore
         full_length = tiprack.tip_length
-        overlap_dict: Dict[str, float] = self._hw_pipette.tip_overlap
+        overlap_dict: Dict[str, float] = self._hw_pipette.tip_overlap["v0"]
         overlap = overlap_dict.get(tiprack.uri, 0)
         return full_length - overlap
 

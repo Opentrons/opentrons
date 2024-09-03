@@ -8,7 +8,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -27,27 +27,27 @@ export function PreventRobotCaching(): JSX.Element {
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
           id="AdvancedSettings_unavailableRobots"
         >
           {t('prevent_robot_caching')}
-        </StyledText>
-        <StyledText as="p">
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
           <Trans
             t={t}
             i18nKey="prevent_robot_caching_description"
             components={{
               strong: (
-                <StyledText
+                <LegacyStyledText
                   as="span"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 />
               ),
             }}
           />
-        </StyledText>
+        </LegacyStyledText>
       </Box>
       <ToggleButton
         label="display_unavailable_robots"

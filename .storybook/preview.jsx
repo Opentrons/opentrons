@@ -3,6 +3,15 @@ import { I18nextProvider } from 'react-i18next'
 import { GlobalStyle } from '../app/src/atoms/GlobalStyle'
 import { i18n } from '../app/src/i18n'
 
+global.APP_SHELL_REMOTE = {
+  ipcRenderer: {
+    on: (topic, cb) => {},
+    invoke: (callname, args) => {},
+    send: (message, payload) => {},
+  },
+}
+global._PKG_VERSION_ = '0.0.0-storybook'
+
 export const customViewports = {
   onDeviceDisplay: {
     name: 'Touchscreen',
@@ -10,6 +19,27 @@ export const customViewports = {
     styles: {
       width: '1024px',
       height: '600px',
+    },
+  },
+  desktopMinWidth: {
+    // retains a 4:3 aspect ratio... minHeight is not set so the user
+    // could drag the app up to a thin strip, but that's not terribly
+    // useful for viewing designs
+    name: 'Desktop Minimum Width',
+    type: 'desktop',
+    styles: {
+      width: '600px',
+      height: '450px',
+    },
+  },
+  desktopSmall: {
+    // A size typically used in figma app backgrounds, useful for viewing
+    // larger components in context
+    name: 'Desktop Typical Small',
+    type: 'desktop',
+    styles: {
+      width: '1024px',
+      height: '700px',
     },
   },
 }
@@ -20,7 +50,14 @@ export const parameters = {
   options: {
     storySort: {
       method: 'alphabetical',
-      order: ['Design Tokens', 'Library', 'App', 'ODD', 'AI'],
+      order: [
+        'Design Tokens',
+        'Library',
+        'App',
+        'ODD',
+        'Protocol-Designer',
+        'AI',
+      ],
     },
   },
 }
@@ -29,7 +66,7 @@ export const parameters = {
 export const decorators = [
   Story => (
     <I18nextProvider i18n={i18n}>
-      <GlobalStyle isOnDevice={true} />
+      <GlobalStyle />
       <Story />
     </I18nextProvider>
   ),

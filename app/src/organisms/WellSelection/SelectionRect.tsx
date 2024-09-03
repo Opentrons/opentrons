@@ -113,7 +113,7 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
       justifyContent={JUSTIFY_CENTER}
       width="100%"
     >
-      <Flex width="75%">{children}</Flex>
+      {children}
     </Flex>
   )
 }

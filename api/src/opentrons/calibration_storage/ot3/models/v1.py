@@ -6,7 +6,7 @@ from opentrons.hardware_control.types import OT3Mount
 from pydantic import field_validator, BaseModel, Field, PlainSerializer
 from datetime import datetime
 
-from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.pipette.types import LabwareUri
 
 from opentrons.types import Point
 from opentrons.calibration_storage import types

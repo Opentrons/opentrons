@@ -87,7 +87,7 @@ describe('RobotSettingsPipetteOffsetCalibration', () => {
 
   it('renders Not calibrated yet when no pipette offset calibrations data', () => {
     vi.mocked(usePipetteOffsetCalibrations).mockReturnValue(null)
-    const [{ getByText }] = render()
-    getByText('No pipette attached')
+    render()
+    screen.getByText('No pipette attached')
   })
 })

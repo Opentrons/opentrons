@@ -11,17 +11,25 @@ from typing import (
     Callable,
     Dict,
     List,
+    Iterator,
     Optional,
     TypeVar,
     Union,
     cast,
+    KeysView,
+    ItemsView,
 )
 
 from opentrons import types as top_types
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.util import ot2_axis_to_string
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.errors.exceptions import (
+    APIRemoved,
+    IncorrectAPIVersion,
+    UnsupportedHardwareCommand,
+)
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Well, Labware
@@ -37,16 +45,22 @@ if TYPE_CHECKING:
 MODULE_LOG = logging.getLogger(__name__)
 
 
-class APIVersionError(Exception):
-    """
-    Error raised when a protocol attempts to access behavior not implemented
-    """
+class RobotTypeError(UnsupportedHardwareCommand):
+    """Error raised when a protocol attempts to access behavior not available to the robot type in use."""
 
     pass
 
 
-class UnsupportedAPIError(Exception):
+class APIVersionError(IncorrectAPIVersion):
+    """Error raised when a protocol attempts to access behavior not implemented in the API in use."""
+
+    pass
+
+
+class UnsupportedAPIError(APIRemoved):
     """Error raised when a protocol attempts to use unsupported API."""
+
+    pass
 
 
 def _assert_gzero(val: Any, message: str) -> float:
@@ -169,7 +183,7 @@ class FlowRates:
         return self._instr.get_aspirate_flow_rate()
 
     @aspirate.setter
-    def aspirate(self, new_val: float):
+    def aspirate(self, new_val: float) -> None:
         self._instr.set_flow_rate(
             aspirate=_assert_gzero(
                 new_val, "flow rate should be a numerical value in ul/s"
@@ -181,7 +195,7 @@ class FlowRates:
         return self._instr.get_dispense_flow_rate()
 
     @dispense.setter
-    def dispense(self, new_val: float):
+    def dispense(self, new_val: float) -> None:
         self._instr.set_flow_rate(
             dispense=_assert_gzero(
                 new_val, "flow rate should be a numerical value in ul/s"
@@ -193,7 +207,7 @@ class FlowRates:
         return self._instr.get_blow_out_flow_rate()
 
     @blow_out.setter
-    def blow_out(self, new_val: float):
+    def blow_out(self, new_val: float) -> None:
         self._instr.set_flow_rate(
             blow_out=_assert_gzero(
                 new_val, "flow rate should be a numerical value in ul/s"
@@ -236,7 +250,7 @@ class PlungerSpeeds:
         return self._instr.get_hardware_state()["aspirate_speed"]
 
     @aspirate.setter
-    def aspirate(self, new_val: float):
+    def aspirate(self, new_val: float) -> None:
         self._instr.set_pipette_speed(
             aspirate=_assert_gzero(new_val, "speed should be a numerical value in mm/s")
         )
@@ -246,7 +260,7 @@ class PlungerSpeeds:
         return self._instr.get_hardware_state()["dispense_speed"]
 
     @dispense.setter
-    def dispense(self, new_val: float):
+    def dispense(self, new_val: float) -> None:
         self._instr.set_pipette_speed(
             dispense=_assert_gzero(new_val, "speed should be a numerical value in mm/s")
         )
@@ -256,13 +270,13 @@ class PlungerSpeeds:
         return self._instr.get_hardware_state()["blow_out_speed"]
 
     @blow_out.setter
-    def blow_out(self, new_val: float):
+    def blow_out(self, new_val: float) -> None:
         self._instr.set_pipette_speed(
             blow_out=_assert_gzero(new_val, "speed should be a numerical value in mm/s")
         )
 
 
-class AxisMaxSpeeds(UserDict):
+class AxisMaxSpeeds(UserDict[Union[str, Axis], float]):
     """Special mapping allowing internal storage by Mount enums and
     user access by string
     """
@@ -272,12 +286,12 @@ class AxisMaxSpeeds(UserDict):
         super().__init__()
         self._robot_type = robot_type
 
-    def __getitem__(self, key: Union[str, Axis]):
+    def __getitem__(self, key: Union[str, Axis]) -> float:
         checked_key = AxisMaxSpeeds._verify_key(key)
         return self.data[checked_key]
 
     @staticmethod
-    def _verify_key(key: Any) -> Axis:
+    def _verify_key(key: object) -> Axis:
         if isinstance(key, Axis):
             checked_key: Optional[Axis] = key
         elif isinstance(key, str):
@@ -288,47 +302,40 @@ class AxisMaxSpeeds(UserDict):
             raise KeyError(key)
         return checked_key
 
-    def __setitem__(self, key: Any, value: Any):
-        if value is None:
-            del self[key]
-            return
+    def __setitem__(self, key: object, value: object) -> None:
 
         checked_key = AxisMaxSpeeds._verify_key(key)
+        if value is None:
+            del self[checked_key]
+            return
+
         checked_val = _assert_gzero(
             value, "max speeds should be numerical values in mm/s"
         )
 
         self.data[checked_key] = checked_val
 
-    def __delitem__(self, key: Union[str, Axis]):
+    def _axis_to_string(self, axis: Union[str, Axis]) -> str:
+        if isinstance(axis, str):
+            return axis
+        if self._robot_type == "OT-3 Standard":
+            return axis.name
+        return ot2_axis_to_string(axis)
+
+    def __delitem__(self, key: Union[str, Axis]) -> None:
         checked_key = AxisMaxSpeeds._verify_key(key)
         del self.data[checked_key]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         """keys() and dict iteration return string keys"""
-        string_keys = (
-            k.name if self._robot_type == "OT-3 Standard" else ot2_axis_to_string(k)
-            for k in self.data.keys()
-        )
+        string_keys = (self._axis_to_string(k) for k in self.data.keys())
         return string_keys
 
-    def keys(self):
-        string_keys = (
-            k.name if self._robot_type == "OT-3 Standard" else ot2_axis_to_string(k)
-            for k in self.data.keys()
-        )
-        return string_keys
+    def keys(self) -> KeysView[str]:
+        return ({self._axis_to_string(k): v for k, v in self.data.items()}).keys()
 
-    def items(self):
-        return (
-            (
-                k.name
-                if self._robot_type == "OT-3 Standard"
-                else ot2_axis_to_string(k),
-                v,
-            )
-            for k, v in self.data.items()
-        )
+    def items(self) -> ItemsView[str, float]:
+        return ({self._axis_to_string(k): v for k, v in self.data.items()}).items()
 
 
 def clamp_value(
@@ -375,21 +382,12 @@ def requires_version(major: int, minor: int) -> Callable[[FuncT], FuncT]:
                 name = getattr(decorated_obj, "__qualname__", str(decorated_obj))
 
                 raise APIVersionError(
-                    f"{name} was added in {added_in}, but your "
-                    f"protocol requested version {current_version}. You "
-                    f"must increase your API version to {added_in} to "
-                    "use this functionality."
+                    api_element=name,
+                    until_version=added_in,
+                    current_version=current_version,
                 )
             return decorated_obj(*args, **kwargs)
 
         return cast(FuncT, _check_version_wrapper)
 
     return _set_version
-
-
-class ModifiedList(list):
-    def __contains__(self, item):
-        for name in self:
-            if name == item.replace("-", "_").lower():
-                return True
-        return False

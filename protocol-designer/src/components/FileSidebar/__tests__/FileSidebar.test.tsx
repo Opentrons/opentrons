@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { fireEvent, screen, cleanup } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE, fixtureTiprack300ul } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { createFile, getRobotType } from '../../../file-data/selectors'
@@ -8,7 +8,7 @@ import {
   getCurrentPage,
   getNewProtocolModal,
 } from '../../../navigation/selectors'
-import { i18n } from '../../../localization'
+import { i18n } from '../../../assets/localization'
 import {
   getAdditionalEquipment,
   getInitialDeckSetup,
@@ -69,7 +69,6 @@ describe('FileSidebar', () => {
   })
   afterEach(() => {
     vi.resetAllMocks()
-    cleanup()
   })
   it('renders the file sidebar and exports with blocking hint for exporting', () => {
     vi.mocked(useBlockingHint).mockReturnValue(<div>mock blocking hint</div>)

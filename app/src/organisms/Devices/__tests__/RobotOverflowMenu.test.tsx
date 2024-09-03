@@ -5,7 +5,7 @@ import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../../resources/runs'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { RobotOverflowMenu } from '../RobotOverflowMenu'
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
@@ -17,7 +17,7 @@ import {
 } from '../../../redux/discovery/__fixtures__'
 
 vi.mock('../../../redux/robot-update/selectors')
-vi.mock('../../ProtocolUpload/hooks')
+vi.mock('../../../resources/runs')
 vi.mock('../../ChooseProtocolSlideout')
 vi.mock('../hooks')
 vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')

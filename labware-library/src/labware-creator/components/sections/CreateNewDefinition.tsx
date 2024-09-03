@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
 import cx from 'classnames'
-import { PrimaryBtn } from '@opentrons/components'
+import { PrimaryButton } from '@opentrons/components'
 import { Dropdown } from '../../components/Dropdown'
 import { isEveryFieldHidden, makeAutofillOnChange } from '../../utils'
 import { labwareTypeOptions, labwareTypeAutofills } from '../../fields'
@@ -63,13 +63,13 @@ export const CreateNewDefinition = (props: Props): JSX.Element | null => {
         </>
       )}
 
-      <PrimaryBtn
+      <PrimaryButton
         className={styles.start_creating_btn}
         disabled={disabled}
         onClick={onClick}
       >
-        start creating labware
-      </PrimaryBtn>
+        Start creating labware
+      </PrimaryButton>
     </div>
   )
 

@@ -3,8 +3,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { screen, cleanup, fireEvent } from '@testing-library/react'
 import { BORDERS, COLORS } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { i18n } from '../../../../localization'
+import {
+  FLEX_ROBOT_TYPE,
+  MAGNETIC_BLOCK_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+} from '@opentrons/shared-data'
+import { i18n } from '../../../../assets/localization'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { EquipmentOption } from '../EquipmentOption'
 
@@ -82,6 +86,7 @@ describe('EquipmentOption', () => {
         maxItems: 4,
         setValue: vi.fn(),
         isDisabled: false,
+        moduleType: TEMPERATURE_MODULE_TYPE,
       },
     }
     render(props)
@@ -99,13 +104,14 @@ describe('EquipmentOption', () => {
         maxItems: 4,
         setValue: vi.fn(),
         isDisabled: true,
+        moduleType: TEMPERATURE_MODULE_TYPE,
       },
     }
     render(props)
     fireEvent.click(screen.getByTestId('EquipmentOption_upArrow'))
     expect(props.multiples?.setValue).not.toHaveBeenCalled()
   })
-  it('renders the equipment option with multiples allowed cta disabled from hitting max number', () => {
+  it('renders the equipment option with multiples allowed cta disabled from hitting max number for temp module', () => {
     props = {
       ...props,
       multiples: {
@@ -113,6 +119,7 @@ describe('EquipmentOption', () => {
         maxItems: 7,
         setValue: vi.fn(),
         isDisabled: false,
+        moduleType: TEMPERATURE_MODULE_TYPE,
       },
     }
     render(props)
@@ -121,5 +128,23 @@ describe('EquipmentOption', () => {
       fireEvent.click(screen.getByTestId('EquipmentOption_upArrow'))
     }
     expect(props.multiples?.setValue).toHaveBeenCalledTimes(6)
+  })
+  it('renders the equipment option with multiples allowed cta disabled from hitting max number for magnetic block', () => {
+    props = {
+      ...props,
+      multiples: {
+        numItems: 1,
+        maxItems: 7,
+        setValue: vi.fn(),
+        isDisabled: false,
+        moduleType: MAGNETIC_BLOCK_TYPE,
+      },
+    }
+    render(props)
+    screen.getByText('1')
+    for (let i = 1; i < 10; i++) {
+      fireEvent.click(screen.getByTestId('EquipmentOption_upArrow'))
+    }
+    expect(props.multiples?.setValue).toHaveBeenCalledTimes(9)
   })
 })

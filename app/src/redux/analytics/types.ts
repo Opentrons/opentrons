@@ -1,13 +1,13 @@
 import type { PipetteMount as Mount } from '@opentrons/shared-data'
 import type { CalibrationCheckComparisonsPerCalibration } from '../sessions/types'
 import type { DeckCalibrationStatus } from '../calibration/types'
-import type { ConfigV0 } from '../config/types'
+import type { Config } from '../config/types'
 import type {
   ANALYTICS_PIPETTE_OFFSET_STARTED,
   ANALYTICS_TIP_LENGTH_STARTED,
 } from './constants'
 
-export type AnalyticsConfig = ConfigV0['analytics']
+export type AnalyticsConfig = Config['analytics']
 
 export interface ProtocolAnalyticsData {
   protocolType: string

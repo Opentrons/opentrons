@@ -6,10 +6,10 @@ import {
   JUSTIFY_FLEX_END,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
+  Modal,
 } from '@opentrons/components'
 
-import { LegacyModal } from '../../molecules/LegacyModal'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 
 export const UNINSTALL_APP_URL =
@@ -27,11 +27,11 @@ export function PreviousVersionModal(
   const { t } = useTranslation(['app_settings', 'branded'])
 
   return (
-    <LegacyModal onClose={props.closeModal} title={t('how_to_restore')}>
+    <Modal onClose={props.closeModal} title={t('how_to_restore')}>
       <Box>
-        <StyledText as="p" paddingBottom={SPACING.spacing8}>
+        <LegacyStyledText as="p" paddingBottom={SPACING.spacing8}>
           {t('branded:restore_description')}
-        </StyledText>
+        </LegacyStyledText>
         <ExternalLink
           href={UNINSTALL_APP_URL}
           id="PreviousVersionModal_uninstallingAppLink"
@@ -55,6 +55,6 @@ export function PreviousVersionModal(
           {t('close')}
         </PrimaryButton>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

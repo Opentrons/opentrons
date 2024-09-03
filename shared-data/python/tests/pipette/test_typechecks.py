@@ -9,7 +9,7 @@ from opentrons_shared_data.pipette import (
     fuse_specs,
     dummy_model_for_name,
 )
-from opentrons_shared_data.pipette.dev_types import (
+from opentrons_shared_data.pipette.types import (
     PipetteModelSpecs,
     PipetteNameSpecs,
     PipetteFusedSpec,

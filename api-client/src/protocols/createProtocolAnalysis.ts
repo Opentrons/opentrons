@@ -3,21 +3,27 @@ import { POST, request } from '../request'
 import type { ProtocolAnalysisSummary } from '@opentrons/shared-data'
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
-import type { RunTimeParameterCreateData } from '../runs'
+import type {
+  RunTimeParameterFilesCreateData,
+  RunTimeParameterValuesCreateData,
+} from '../runs'
 
 interface CreateProtocolAnalysisData {
-  runTimeParameterValues: RunTimeParameterCreateData
+  runTimeParameterValues: RunTimeParameterValuesCreateData
+  runTimeParameterFiles: RunTimeParameterFilesCreateData
   forceReAnalyze: boolean
 }
 
 export function createProtocolAnalysis(
   config: HostConfig,
   protocolKey: string,
-  runTimeParameterValues?: RunTimeParameterCreateData,
+  runTimeParameterValues?: RunTimeParameterValuesCreateData,
+  runTimeParameterFiles?: RunTimeParameterFilesCreateData,
   forceReAnalyze?: boolean
 ): ResponsePromise<ProtocolAnalysisSummary[]> {
   const data = {
     runTimeParameterValues: runTimeParameterValues ?? {},
+    runTimeParameterFiles: runTimeParameterFiles ?? {},
     forceReAnalyze: forceReAnalyze ?? false,
   }
   const response = request<

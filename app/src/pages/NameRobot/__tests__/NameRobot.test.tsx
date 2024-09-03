@@ -19,20 +19,20 @@ import {
 } from '../../../redux/discovery/__fixtures__'
 
 import { NameRobot } from '..'
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('../../../redux/discovery/selectors')
 vi.mock('../../../redux/config')
 vi.mock('../../../redux/analytics')
 vi.mock('../../../organisms/RobotSettingsDashboard/NetworkSettings/hooks')
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof ReactRouterDom>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -142,6 +142,6 @@ describe('NameRobot', () => {
     vi.mocked(useIsUnboxingFlowOngoing).mockReturnValue(false)
     render()
     fireEvent.click(screen.getByTestId('name_back_button'))
-    expect(mockPush).toHaveBeenCalledWith('/robot-settings')
+    expect(mockNavigate).toHaveBeenCalledWith('/robot-settings')
   })
 })

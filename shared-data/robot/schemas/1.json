@@ -5,11 +5,18 @@
     "robotType": {
       "type": "string",
       "enum": ["OT-2 Standard", "OT-3 Standard"]
+    },
+    "xyzArray": {
+      "type": "array",
+      "description": "Array of 3 numbers, [x, y, z]",
+      "items": { "type": "number" },
+      "minItems": 3,
+      "maxItems": 3
     }
   },
   "description": "Describes an Opentrons liquid handling robot.",
   "type": "object",
-  "required": ["displayName", "robotType", "models"],
+  "required": ["displayName", "robotType", "models", "extents", "mountOffsets"],
   "properties": {
     "displayName": {
       "description": "A user-facing friendly name for the machine.",
@@ -24,6 +31,52 @@
       "type": "array",
       "items": {
         "type": "string"
+      }
+    },
+    "extents": {
+      "description": "The maximum addressable coordinates of the deck without instruments.",
+      "$ref": "#/definitions/xyzArray"
+    },
+    "paddingOffsets": {
+      "description": "The distance from a given edge of a deck extent by which the maximum amount of travel is limited.",
+      "type": "object",
+      "required": ["rear", "front", "leftSide", "rightSide"],
+      "properties": {
+        "rear": {
+          "description": "The padding distance from the rear edge of the deck extents which the front nozzles of a pipette must not exceed.",
+          "type": "number"
+        },
+        "front": {
+          "description": "The padding distance from the front edge of the deck extents which the rear nozzles of a pipette must not exceed.",
+          "type": "number"
+        },
+        "leftSide": {
+          "description": "The padding distance from the left edge of the deck extents which the right-most nozzles of a pipette must not exceed.",
+          "type": "number"
+        },
+        "rightSide": {
+          "description": "The padding distance from the right edge of the deck extents which the left-most nozzles of a pipette must not exceed.",
+          "type": "number"
+        }
+      }
+    },
+    "mountOffsets": {
+      "description": "The physical mount offsets from the center of the instrument carriage.",
+      "type": "object",
+      "required": ["left", "right"],
+      "properties": {
+        "left": {
+          "description": "The left mount offset from the center of the carriage to the center of the left mount",
+          "$ref": "#/definitions/xyzArray"
+        },
+        "right": {
+          "description": "The right mount offset from the center of the carriage to the center of the right mount",
+          "$ref": "#/definitions/xyzArray"
+        },
+        "gripper": {
+          "description": "The gripper mount offset from the center of the carriage to the center of the gripper, only on OT-3 Standard definitions",
+          "$ref": "#/definitions/xyzArray"
+        }
       }
     }
   }

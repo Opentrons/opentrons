@@ -2,11 +2,10 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getRun, getCommands, getProtocol } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
-import { ERROR_TOAST, INFO_TOAST } from '../../../atoms/Toast'
+import { ERROR_TOAST, INFO_TOAST } from '@opentrons/components'
 import { useToaster } from '../../../organisms/ToasterOven'
 import { downloadFile } from '../utils'
 import type { IconProps } from '@opentrons/components'
-import type { HostConfig } from '@opentrons/api-client'
 
 export function useDownloadRunLog(
   robotName: string,
@@ -22,24 +21,24 @@ export function useDownloadRunLog(
 
   const downloadRunLog = (): void => {
     setIsLoading(true)
-    makeToast(t('downloading_run_log'), INFO_TOAST, {
+    makeToast(t('downloading_run_log') as string, INFO_TOAST, {
       icon: toastIcon,
     })
-
+    if (host == null) return
     // first getCommands to get total length of commands
-    getCommands(host as HostConfig, runId as string, {
+    getCommands(host, runId, {
       cursor: null,
       pageLength: 0,
     })
       .then(response => {
         const { totalLength } = response.data.meta
-        getCommands(host as HostConfig, runId as string, {
+        getCommands(host, runId, {
           cursor: 0,
           pageLength: totalLength,
         })
           .then(response => {
             const commands = response.data
-            getRun(host as HostConfig, runId as string)
+            getRun(host, runId)
               .then(response => {
                 const runRecord = response.data
                 const runDetails = {
@@ -55,7 +54,7 @@ export function useDownloadRunLog(
                 }_${createdAt}.json`
 
                 if (protocolId != null) {
-                  getProtocol(host as HostConfig, protocolId)
+                  getProtocol(host, protocolId)
                     .then(response => {
                       const protocolName =
                         response.data.data.metadata.protocolName

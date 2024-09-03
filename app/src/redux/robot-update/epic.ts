@@ -79,6 +79,7 @@ import type {
   RobotUpdateSession,
   RobotUpdateStatusAction,
   RobotUpdateFileInfoAction,
+  UpdateSessionStage,
 } from './types'
 
 export const POLL_INTERVAL_MS = 2000
@@ -113,7 +114,7 @@ export const startUpdateEpic: Epic = (action$, state$) =>
       // ROBOTUPDATE_START_UPDATE will set the active updating robot in state
       const { robotName, systemFile } = action.payload
       const host = getRobotUpdateRobot(state)
-      const serverHealth = host?.serverHealth || null
+      const serverHealth = host?.serverHealth ?? null
 
       // we need the target robot's update server to be up to do anything
       if (host === null || serverHealth === null) {
@@ -122,7 +123,7 @@ export const startUpdateEpic: Epic = (action$, state$) =>
         )
       }
 
-      const capabilities = serverHealth.capabilities || null
+      const capabilities = serverHealth.capabilities ?? null
 
       // if action passed a system file, we need to read that file
       if (systemFile !== null) {
@@ -180,13 +181,13 @@ export const startSessionAfterFileInfoEpic: Epic = (action$, state$) => {
     withLatestFrom(state$),
     map<[RobotUpdateFileInfoAction, State], any>(([action, state]) => {
       const host = getRobotUpdateRobot(state)
-      const serverHealth = host?.serverHealth || null
-      const capabilities = serverHealth?.capabilities || null
+      const serverHealth = host?.serverHealth ?? null
+      const capabilities = serverHealth?.capabilities ?? null
       // otherwise robot is ready for migration or update, so get token
       // capabilities response has the correct request path to use
       const sessionPath =
-        capabilities?.buildrootUpdate ||
-        capabilities?.buildrootMigration ||
+        capabilities?.buildrootUpdate ??
+        capabilities?.buildrootMigration ??
         capabilities?.systemUpdate
 
       if (sessionPath == null) {
@@ -217,7 +218,9 @@ export const createSessionEpic: Epic = action$ => {
       const pathPrefix = path.replace('/begin', '')
 
       if (ok) {
-        return of(createSessionSuccess(host, resp.body.token, pathPrefix))
+        return of(
+          createSessionSuccess(host, resp.body.token as string, pathPrefix)
+        )
       }
 
       if (!ok && status === 409) {
@@ -275,8 +278,8 @@ export const statusPollEpic: Epic = (action$, state$) => {
           filter(resp => resp.ok),
           map<RobotApiResponse, RobotUpdateStatusAction>(successResp =>
             robotUpdateStatus(
-              successResp.body.stage,
-              successResp.body.message,
+              successResp.body.stage as UpdateSessionStage,
+              successResp.body.message as string,
               successResp.body.progress != null
                 ? Math.round(successResp.body.progress * 100)
                 : null
@@ -297,7 +300,7 @@ const passActiveSession = (props: Partial<RobotUpdateSession>) => (
 
   return (
     robot !== null &&
-    !session?.error &&
+    session?.error == null &&
     every(
       props,
       (value, key) => session?.[key as keyof RobotUpdateSession] === value
@@ -321,7 +324,7 @@ export const uploadFileEpic: Epic = (_, state$) => {
       const token: string = session?.token as any
       const systemFile = session?.fileInfo?.systemFile
 
-      return systemFile
+      return systemFile != null
         ? uploadRobotUpdateFile(host, `${pathPrefix}/${token}/file`, systemFile)
         : unexpectedRobotUpdateError(UNABLE_TO_FIND_SYSTEM_FILE)
     })
@@ -361,7 +364,7 @@ export const restartAfterCommitEpic: Epic = (_, state$) => {
     ),
     switchMap<State, Observable<any>>(stateWithSession => {
       const host: ViewableRobot = getRobotUpdateRobot(stateWithSession) as any
-      const path = host.serverHealth?.capabilities?.restart || RESTART_PATH
+      const path = host.serverHealth?.capabilities?.restart ?? RESTART_PATH
       // @ts-expect-error TODO: host is actually of type Robot|ReachableRobot but this action expects a RobotHost
       const request$ = fetchRobotApi(host, { method: POST, path }).pipe(
         switchMap(resp => {
@@ -399,7 +402,7 @@ export const finishAfterRestartEpic: Epic = (action$, state$) => {
       return (
         restartDone &&
         robot?.name === action.payload.robotName &&
-        !session?.error &&
+        session?.error == null &&
         session?.step === RESTART
       )
     }),

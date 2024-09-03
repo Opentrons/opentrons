@@ -224,7 +224,7 @@ describe('mergeSubstepRowsSingleChannel', () => {
       ],
     },
   ]
-  testCases.forEach(({ testName, showDispenseVol, substepRows, expected }) =>
+  testCases.forEach(({ testName, showDispenseVol, substepRows, expected }) => {
     it(testName, () => {
       const result = mergeSubstepRowsSingleChannel({
         substepRows,
@@ -232,7 +232,7 @@ describe('mergeSubstepRowsSingleChannel', () => {
       })
       expect(result).toEqual(expected)
     })
-  )
+  })
 })
 
 describe('mergeSubstepRowsMultiChannel', () => {
@@ -272,7 +272,7 @@ describe('mergeSubstepRowsMultiChannel', () => {
       substepRows: distributeRowsFixture,
     },
   ]
-  testCases.forEach(({ testName, isMixStep, showDispenseVol, substepRows }) =>
+  testCases.forEach(({ testName, isMixStep, showDispenseVol, substepRows }) => {
     it(testName, () => {
       const channels = 8
       const result = mergeSubstepRowsMultiChannel({
@@ -283,5 +283,5 @@ describe('mergeSubstepRowsMultiChannel', () => {
       })
       expect(result).toMatchSnapshot()
     })
-  )
+  })
 })

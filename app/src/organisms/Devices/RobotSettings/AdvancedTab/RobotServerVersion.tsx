@@ -10,7 +10,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Link,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { TertiaryButton } from '../../../../atoms/buttons'
@@ -27,7 +27,7 @@ interface RobotServerVersionProps {
 }
 
 const GITHUB_LINK =
-  'https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md'
+  'https://github.com/Opentrons/opentrons/blob/edge/api/release-notes.md'
 
 export function RobotServerVersion({
   robotName,
@@ -51,24 +51,24 @@ export function RobotServerVersion({
       ) : null}
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Box width="70%">
-          <StyledText
+          <LegacyStyledText
             css={TYPOGRAPHY.pSemiBold}
             paddingBottom={SPACING.spacing4}
             id="AdvancedSettings_RobotServerVersion"
           >
             {t('robot_server_version')}
-          </StyledText>
-          <StyledText as="p" paddingBottom={SPACING.spacing4}>
+          </LegacyStyledText>
+          <LegacyStyledText as="p" paddingBottom={SPACING.spacing4}>
             {robotServerVersion != null
               ? `v${robotServerVersion}`
               : t('robot_settings_advanced_unknown')}
-          </StyledText>
+          </LegacyStyledText>
           {isFlex ? (
-            <StyledText as="p" paddingBottom={SPACING.spacing4}>
+            <LegacyStyledText as="p" paddingBottom={SPACING.spacing4}>
               {t('branded:robot_server_version_ot3_description')}
-            </StyledText>
+            </LegacyStyledText>
           ) : null}
-          <StyledText as="p">
+          <LegacyStyledText as="p">
             {t('shared:view_latest_release_notes')}
             <Link
               external
@@ -76,19 +76,21 @@ export function RobotServerVersion({
               id="AdvancedSettings_GitHubLink"
               css={TYPOGRAPHY.linkPSemiBold}
             >{` ${t('shared:github')}`}</Link>
-          </StyledText>
+          </LegacyStyledText>
         </Box>
         {autoUpdateAction !== 'reinstall' && robot != null ? null : (
           <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
-            <StyledText
+            <LegacyStyledText
               as="label"
               color={COLORS.grey50}
               paddingRight={SPACING.spacing16}
             >
               {t('up_to_date')}
-            </StyledText>
+            </LegacyStyledText>
             <TertiaryButton
-              onClick={() => handleUpdateBuildroot(robot)}
+              onClick={() => {
+                handleUpdateBuildroot(robot)
+              }}
               textTransform={TYPOGRAPHY.textTransformCapitalize}
             >
               {t('reinstall')}

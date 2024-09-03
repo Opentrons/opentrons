@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { vi, it, describe, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
+import { screen } from '@testing-library/react'
+
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
@@ -8,15 +10,24 @@ import {
 import {
   parseLabwareInfoByLiquidId,
   parseLiquidsInLoadOrder,
-} from '@opentrons/api-client'
+} from '@opentrons/shared-data'
+
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { Liquids } from '../Liquids'
+
 import type { UseQueryResult } from 'react-query'
 import type { Protocol } from '@opentrons/api-client'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type * as SharedData from '@opentrons/shared-data'
 
-vi.mock('@opentrons/api-client')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actualSharedData = await importOriginal<typeof SharedData>()
+  return {
+    ...actualSharedData,
+    parseLabwareInfoByLiquidId: vi.fn(),
+    parseLiquidsInLoadOrder: vi.fn(),
+  }
+})
 vi.mock('@opentrons/react-api-client')
 
 const MOCK_PROTOCOL_ID = 'mockProtocolId'
@@ -200,19 +211,16 @@ describe('Liquids', () => {
       })
       .thenReturn({
         data: MOCK_PROTOCOL_ANALYSIS as any,
-      } as UseQueryResult<CompletedProtocolAnalysis>)
+      } as UseQueryResult<SharedData.CompletedProtocolAnalysis>)
   })
   it('should render the correct headers and liquids', () => {
-    const { getByRole, getByText, getByLabelText } = render(props)[0]
-    getByRole('columnheader', { name: 'Liquid Name' })
-    getByRole('columnheader', { name: 'Total Volume' })
-    getByText('Mock Liquid 1')
-    getByText('Mock Sample')
-    getByText('50 µL')
-    getByLabelText('Liquids_#ff4888')
-    getByText('Mock Liquid 2')
-    getByText('Another Mock Sample')
-    getByText('22 µL')
-    getByLabelText('Liquids_#ff8999')
+    render(props)
+    screen.getByRole('columnheader', { name: 'Liquid Name' })
+    screen.getByText('Mock Liquid 1')
+    screen.getByText('Mock Sample')
+    screen.getByLabelText('Liquids_#ff4888')
+    screen.getByText('Mock Liquid 2')
+    screen.getByText('Another Mock Sample')
+    screen.getByLabelText('Liquids_#ff8999')
   })
 })

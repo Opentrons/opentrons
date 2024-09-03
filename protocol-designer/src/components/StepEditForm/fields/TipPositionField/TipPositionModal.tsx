@@ -6,11 +6,11 @@ import {
   AlertModal,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
+  LegacyInputField,
   RadioGroup,
   SPACING,
-  StyledText,
-  Tooltip,
+  LegacyStyledText,
+  LegacyTooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
@@ -242,10 +242,10 @@ export const TipPositionModal = (
   const TipPositionInputField = !isDefault ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        <StyledText as="label" paddingLeft={SPACING.spacing24}>
+        <LegacyStyledText as="label" paddingLeft={SPACING.spacing24}>
           {t('tip_position.field_titles.x_position')}
-        </StyledText>
-        <InputField
+        </LegacyStyledText>
+        <LegacyInputField
           caption={t('tip_position.caption', {
             min: roundedXMin,
             max: roundedXMax,
@@ -264,10 +264,10 @@ export const TipPositionModal = (
         width="max-content"
         {...targetProps}
       >
-        <StyledText as="label" paddingLeft={SPACING.spacing24}>
+        <LegacyStyledText as="label" paddingLeft={SPACING.spacing24}>
           {t('tip_position.field_titles.y_position')}
-        </StyledText>
-        <InputField
+        </LegacyStyledText>
+        <LegacyInputField
           caption={t('tip_position.caption', {
             min: roundedYMin,
             max: roundedYMax,
@@ -279,13 +279,15 @@ export const TipPositionModal = (
           units="mm"
           value={yValue ?? ''}
         />
-        <Tooltip {...tooltipProps}>{t('tooltip:y_position_value')}</Tooltip>
+        <LegacyTooltip {...tooltipProps}>
+          {t('tooltip:y_position_value')}
+        </LegacyTooltip>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        <StyledText as="label" paddingLeft={SPACING.spacing24}>
+        <LegacyStyledText as="label" paddingLeft={SPACING.spacing24}>
           {t('tip_position.field_titles.z_position')}
-        </StyledText>
-        <InputField
+        </LegacyStyledText>
+        <LegacyInputField
           caption={t('tip_position.caption', {
             min: minMmFromBottom,
             max: maxMmFromBottom,

@@ -3,18 +3,30 @@
   "displayName": "P300 Single-Channel GEN2",
   "model": "p300",
   "displayCategory": "GEN2",
+  "validNozzleMaps": {
+    "maps": {
+      "SingleA1": ["A1"]
+    }
+  },
   "pickUpTipConfigurations": {
     "pressFit": {
-      "speedByTipCount": {
-        "1": 10.0
-      },
       "presses": 1,
       "increment": 0.0,
-      "distanceByTipCount": {
-        "1": 17.0
-      },
-      "currentByTipCount": {
-        "1": 0.125
+      "configurationsByNozzleMap": {
+        "SingleA1": {
+          "default": {
+            "speed": 10.0,
+            "distance": 17.0,
+            "current": 0.125,
+            "tipOverlaps": {
+              "v0": {
+                "default": 8.2,
+                "opentrons/opentrons_96_tiprack_300ul/1": 8.2,
+                "opentrons/opentrons_96_filtertiprack_200ul/1": 8.2
+              }
+            }
+          }
+        }
       }
     }
   },

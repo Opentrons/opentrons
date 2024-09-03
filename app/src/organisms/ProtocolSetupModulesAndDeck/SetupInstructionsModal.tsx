@@ -9,12 +9,12 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 import imgSrc from '../../assets/images/on-device-display/setup_instructions_qr_code.png'
 
@@ -27,7 +27,7 @@ export function SetupInstructionsModal({
   setShowSetupInstructionsModal,
 }: SetupInstructionsModalProps): JSX.Element {
   const { i18n, t } = useTranslation(['protocol_setup', 'branded'])
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: i18n.format(t('setup_instructions'), 'capitalize'),
     iconName: 'information',
     iconColor: COLORS.black90,
@@ -35,9 +35,11 @@ export function SetupInstructionsModal({
   }
 
   return (
-    <Modal
+    <OddModal
       header={modalHeader}
-      onOutsideClick={() => setShowSetupInstructionsModal(false)}
+      onOutsideClick={() => {
+        setShowSetupInstructionsModal(false)
+      }}
     >
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -45,17 +47,17 @@ export function SetupInstructionsModal({
         gridGap={SPACING.spacing40}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-          <StyledText as="p">
+          <LegacyStyledText as="p">
             {t('branded:setup_instructions_description')}
-          </StyledText>
+          </LegacyStyledText>
           <Flex
             backgroundColor={COLORS.grey35}
             borderRadius={BORDERS.borderRadius8}
             padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           >
-            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {INSTRUCTIONS_URL}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         </Flex>
         <img
@@ -65,6 +67,6 @@ export function SetupInstructionsModal({
           height="178px"
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

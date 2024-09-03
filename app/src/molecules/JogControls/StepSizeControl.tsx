@@ -13,7 +13,7 @@ import {
   Icon,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -127,17 +127,17 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
         <Flex flexDirection={DIRECTION_COLUMN} flex="1">
           <Flex flexDirection={DIRECTION_ROW}>
             <Icon name="jump-size" width="1.2rem" css={JUMP_SIZE_ICON_STYLE} />
-            <StyledText
+            <LegacyStyledText
               textTransform={TEXT_TRANSFORM_CAPITALIZE}
               css={TYPOGRAPHY.pSemiBold}
               marginLeft={SPACING.spacing8}
             >
               {t('jump_size')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
-          <StyledText color={COLORS.grey60} css={TYPOGRAPHY.labelRegular}>
+          <LegacyStyledText color={COLORS.grey60} css={TYPOGRAPHY.labelRegular}>
             {JUMP_SIZE_SUBTITLE}
-          </StyledText>
+          </LegacyStyledText>
           <Box css={BUTTON_WRAPPER_STYLE}>
             {stepSizes.map((stepSize: StepSize, index) => {
               return (
@@ -152,10 +152,10 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
                   onClick={handleStepSelect}
                 >
                   {t(stepSizeTranslationKeyByStep[stepSize])}
-                  <StyledText
+                  <LegacyStyledText
                     color={COLORS.grey60}
                     css={TYPOGRAPHY.labelRegular}
-                  >{`${stepSize} mm`}</StyledText>
+                  >{`${stepSize} mm`}</LegacyStyledText>
                 </PrimaryButton>
               )
             })}
@@ -195,19 +195,19 @@ export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
               flexDirection={DIRECTION_COLUMN}
               alignItems={ALIGN_FLEX_START}
             >
-              <StyledText
+              <LegacyStyledText
                 as="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 color={selected ? COLORS.white : COLORS.black90}
               >
                 {t(stepSizeTranslationKeyByStep[stepSize])}
-              </StyledText>
-              <StyledText
+              </LegacyStyledText>
+              <LegacyStyledText
                 as="p"
                 color={selected ? COLORS.white : COLORS.grey60}
               >
                 {`${stepSize} mm`}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </TouchControlButton>
         )

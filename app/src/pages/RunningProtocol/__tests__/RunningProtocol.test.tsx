@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Route, MemoryRouter } from 'react-router-dom'
+import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
@@ -9,6 +9,7 @@ import {
   RUN_STATUS_IDLE,
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import {
   useProtocolAnalysesQuery,
@@ -17,7 +18,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
+import { mockRobotSideAnalysis } from '../../../molecules/Command/__fixtures__'
 import {
   CurrentRunningProtocolCommand,
   RunningProtocolSkeleton,
@@ -43,6 +44,10 @@ import {
   useErrorRecoveryFlows,
 } from '../../../organisms/ErrorRecoveryFlows'
 import { useLastRunCommand } from '../../../organisms/Devices/hooks/useLastRunCommand'
+import {
+  useInterventionModal,
+  InterventionModal,
+} from '../../../organisms/InterventionModal'
 
 import type { UseQueryResult } from 'react-query'
 import type { ProtocolAnalyses, RunCommandSummary } from '@opentrons/api-client'
@@ -63,6 +68,7 @@ vi.mock('../../../resources/runs')
 vi.mock('../../../redux/config')
 vi.mock('../../../organisms/ErrorRecoveryFlows')
 vi.mock('../../../organisms/Devices/hooks/useLastRunCommand')
+vi.mock('../../../organisms/InterventionModal')
 
 const RUN_ID = 'run_id'
 const ROBOT_NAME = 'otie'
@@ -81,9 +87,9 @@ const mockResumeRunFromRecovery = vi.fn()
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/runs/:runId/run">
-        <RunningProtocol />
-      </Route>
+      <Routes>
+        <Route path="/runs/:runId/run" element={<RunningProtocol />} />
+      </Routes>
     </MemoryRouter>
   )
 }
@@ -158,6 +164,13 @@ describe('RunningProtocol', () => {
       isERActive: false,
       failedCommand: {} as any,
     })
+    vi.mocked(useInterventionModal).mockReturnValue({
+      showModal: false,
+      modalProps: {} as any,
+    })
+    vi.mocked(InterventionModal).mockReturnValue(
+      <div>MOCK_INTERVENTION_MODAL</div>
+    )
   })
 
   afterEach(() => {
@@ -191,6 +204,14 @@ describe('RunningProtocol', () => {
     expect(vi.mocked(OpenDoorAlertModal)).toHaveBeenCalled()
   })
 
+  it(`should render not open door alert modal, when run status is ${RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR}`, () => {
+    when(vi.mocked(useRunStatus))
+      .calledWith(RUN_ID, { refetchInterval: 5000 })
+      .thenReturn(RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR)
+    render(`/runs/${RUN_ID}/run`)
+    expect(vi.mocked(OpenDoorAlertModal)).not.toHaveBeenCalled()
+  })
+
   it(`should display a Run Paused splash screen if the run status is "${RUN_STATUS_AWAITING_RECOVERY}"`, () => {
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID, { refetchInterval: 5000 })
@@ -208,6 +229,16 @@ describe('RunningProtocol', () => {
     })
     render(`/runs/${RUN_ID}/run`)
     screen.getByText('MOCK ERROR RECOVERY')
+  })
+
+  it('should render an InterventionModal appropriately', () => {
+    vi.mocked(useInterventionModal).mockReturnValue({
+      showModal: true,
+      modalProps: {} as any,
+    })
+    render(`/runs/${RUN_ID}/run`)
+
+    screen.getByText('MOCK_INTERVENTION_MODAL')
   })
 
   // ToDo (kj:04/04/2023) need to figure out the way to simulate swipe

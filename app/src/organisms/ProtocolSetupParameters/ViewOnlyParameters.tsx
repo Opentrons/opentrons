@@ -1,6 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { formatRunTimeParameterValue } from '@opentrons/shared-data'
+import { css } from 'styled-components'
+
+import {
+  formatRunTimeParameterValue,
+  sortRuntimeParameters,
+} from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -10,7 +15,7 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -32,7 +37,7 @@ export function ViewOnlyParameters({
   const { makeSnackbar } = useToaster()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const handleOnClick = (): void => {
-    makeSnackbar(t('reset_setup'))
+    makeSnackbar(t('reset_setup') as string)
   }
 
   const parameters = mostRecentAnalysis?.runTimeParameters ?? []
@@ -41,7 +46,9 @@ export function ViewOnlyParameters({
     <>
       <ChildNavigation
         header={t('parameters')}
-        onClickBack={() => setSetupScreen('prepare to run')}
+        onClickBack={() => {
+          setSetupScreen('prepare to run')
+        }}
         inlineNotification={{
           type: 'neutral',
           heading: t('values_are_view_only'),
@@ -60,12 +67,12 @@ export function ViewOnlyParameters({
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight={TYPOGRAPHY.lineHeight24}
         >
-          <StyledText paddingLeft={SPACING.spacing16} width="50%">
+          <LegacyStyledText paddingLeft={SPACING.spacing16} width="50%">
             {t('name')}
-          </StyledText>
-          <StyledText>{t('value')}</StyledText>
+          </LegacyStyledText>
+          <LegacyStyledText>{t('value')}</LegacyStyledText>
         </Flex>
-        {parameters.map((parameter, index) => {
+        {sortRuntimeParameters(parameters).map((parameter, index) => {
           return (
             <Flex
               onClick={handleOnClick}
@@ -76,22 +83,23 @@ export function ViewOnlyParameters({
               padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
               gridGap={SPACING.spacing24}
             >
-              <StyledText
+              <LegacyStyledText
                 width="48%"
                 as="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
                 {parameter.displayName}
-              </StyledText>
+              </LegacyStyledText>
               <Flex
                 alignItems={ALIGN_CENTER}
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing8}
               >
-                <StyledText as="p" color={COLORS.grey60}>
+                <LegacyStyledText as="p" css={PARAMETER_VALUE_STYLE}>
                   {formatRunTimeParameterValue(parameter, t)}
-                </StyledText>
-                {parameter.value !== parameter.default ? (
+                </LegacyStyledText>
+                {parameter.type === 'csv_file' ||
+                parameter.value !== parameter.default ? (
                   <Chip
                     data-testid={`Chip_${parameter.variableName}`}
                     type="success"
@@ -108,3 +116,14 @@ export function ViewOnlyParameters({
     </>
   )
 }
+
+const PARAMETER_VALUE_STYLE = css`
+  color: ${COLORS.grey60};
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  -webkit-line-clamp: 1;
+  max-width: 15rem;
+`

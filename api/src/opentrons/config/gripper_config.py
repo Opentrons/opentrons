@@ -24,7 +24,12 @@ def info_num_to_model(num: str) -> GripperModel:
     # PVT will now be 1.2
     model_map = {
         "0": {"0": GripperModel.v1, "1": GripperModel.v1},
-        "1": {"0": GripperModel.v1, "1": GripperModel.v1_1, "2": GripperModel.v1_2},
+        "1": {
+            "0": GripperModel.v1,
+            "1": GripperModel.v1_1,
+            "2": GripperModel.v1_2,
+            "3": GripperModel.v1_3,
+        },
     }
     return model_map[major_model][minor_model]
 
@@ -45,6 +50,6 @@ def duty_cycle_by_force(newton: float, profile: GripForceProfile) -> float:
     :return: the duty-cycle value for the specified force
     """
     if profile.min <= newton <= profile.max:
-        return sum(ele[1] * (newton ** ele[0]) for ele in profile.polynomial)
+        return sum(ele[1] * (newton ** ele[0]) for ele in profile.polynomial)  # type: ignore[no-any-return]
     else:
         raise ValueError("Gripper force out of bounds")

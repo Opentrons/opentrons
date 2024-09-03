@@ -71,6 +71,15 @@ electron := yarn electron . \
 	--ui.url.path="localhost:$(PORT)" \
 	--python.pathToPythonOverride=$(shell cd ../api && pipenv --venv)
 
+electron-dist := yarn electron . \
+	--devtools \
+	--log.level.console="debug" \
+	--disable_ui.webPreferences.webSecurity \
+	--ui.url.protocol="file:" \
+	--ui.url.path="$(ui_dir)/dist/index.html"
+	--python.pathToPythonOverride=$(shell cd ../api && pipenv --venv)
+
+
 # standard targets
 #####################################################################
 
@@ -97,6 +106,7 @@ clean:
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
+	echo "Building app shell JS bundle (electron layer)"
 	vite build
 
 .PHONY: deps
@@ -122,7 +132,7 @@ dist-posix: package-deps
 
 .PHONY: dist-osx
 dist-osx: package-deps
-	$(builder) --mac
+	$(builder) --mac --x64
 	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-linux
@@ -144,9 +154,6 @@ dist-ot3: package-deps
 # workflows
 .PHONY: dist-macos-latest
 dist-macos-latest: dist-osx
-
-.PHONY: dist-macos-11
-dist-macos-11: dist-osx
 
 .PHONY: dist-ubuntu-latest
 dist-ubuntu-latest: dist-linux
@@ -183,6 +190,13 @@ dev: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
 dev: dev-app-update-file
 	vite build
 	$(electron)
+
+.PHONY: dev-dist
+dev: export NODE_ENV := development
+dev-dist: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
+dev-dist: package-deps
+	vite build
+	$(electron-dist)
 
 .PHONY: test
 test:

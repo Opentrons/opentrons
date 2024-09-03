@@ -9,7 +9,7 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -32,21 +32,21 @@ export function EmptyRecentRun(): JSX.Element {
         width="284px"
         height="166px"
       />
-      <StyledText
+      <LegacyStyledText
         as="h3"
         fontWeight={TYPOGRAPHY.fontWeightBold}
         marginTop={SPACING.spacing16}
         marginBottom={SPACING.spacing8}
       >
         {t('no_recent_runs')}
-      </StyledText>
-      <StyledText
+      </LegacyStyledText>
+      <LegacyStyledText
         as="h4"
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         color={COLORS.grey60}
       >
         {t('no_recent_runs_description')}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

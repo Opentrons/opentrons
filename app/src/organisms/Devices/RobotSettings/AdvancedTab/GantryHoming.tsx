@@ -9,7 +9,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { ToggleButton } from '../../../../atoms/buttons'
@@ -43,14 +43,16 @@ export function GantryHoming({
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.pSemiBold}
           paddingBottom={SPACING.spacing4}
           id="AdvancedSettings_homing"
         >
           {t('gantry_homing')}
-        </StyledText>
-        <StyledText as="p">{t('gantry_homing_description')}</StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
+          {t('gantry_homing_description')}
+        </LegacyStyledText>
       </Box>
       <ToggleButton
         label="gantry_homing"

@@ -1,4 +1,5 @@
 from __future__ import annotations
+import asyncio
 import logging
 import re
 from typing import TYPE_CHECKING, List, Optional, Union
@@ -9,12 +10,13 @@ from opentrons.drivers.rpi_drivers import types, interfaces, usb, usb_simulator
 from opentrons.hardware_control.emulation.module_server.helpers import (
     listen_module_connection,
 )
+from opentrons.hardware_control.modules.absorbance_reader import AbsorbanceReader
 from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
     load_module_calibration_offset,
     save_module_calibration_offset,
 )
-from opentrons.hardware_control.modules.types import ModuleType
+from opentrons.hardware_control.modules.types import ModuleAtPort, ModuleType
 from opentrons.hardware_control.modules import SimulatingModuleAtPort
 
 from opentrons.types import Point
@@ -29,9 +31,11 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 MODULE_PORT_REGEX = re.compile(
+    # add a negative lookbehind to suppress matches on OT-2 tempfiles udev creates
+    r"(?<!\.#ot_module_)"
     # capture all modules by name using alternation
-    "(" + "|".join(modules.MODULE_TYPE_BY_NAME.keys()) + ")"
-    # add a negative lookahead to suppress matches on tempfiles udev creates
+    + "(" + "|".join(modules.MODULE_TYPE_BY_NAME.keys()) + ")"
+    # add a negative lookahead to suppress matches on Flex tempfiles udev creates
     + r"\d+(?!\.tmp-c\d+:\d+)",
     re.I,
 )
@@ -97,6 +101,15 @@ class AttachedModulesControl:
             execution_manager=self._api._execution_manager,
             sim_model=sim_model,
             sim_serial_number=sim_serial_number,
+            disconnected_callback=self._disconnected_callback,
+        )
+
+    def _disconnected_callback(self, port: str, serial: Optional[str]) -> None:
+        """Used by the module to indicate that it was disconnected and should be deleted."""
+        mod = ModuleAtPort(port=port, serial=serial, name="")
+        asyncio.run_coroutine_threadsafe(
+            self.unregister_modules([mod]),
+            self._api.loop,
         )
 
     async def unregister_modules(
@@ -113,8 +126,12 @@ class AttachedModulesControl:
         removed_modules = []
         for mod in mods_at_ports:
             for attached_mod in self.available_modules:
-                if attached_mod.port == mod.port:
+                if (
+                    attached_mod.serial_number == mod.serial
+                    or attached_mod.port == mod.port
+                ):
                     removed_modules.append(attached_mod)
+
         for removed_mod in removed_modules:
             try:
                 self._available_modules.remove(removed_mod)
@@ -229,9 +246,35 @@ class AttachedModulesControl:
         removed_modules = None
         if maybe_module_at_port is not None:
             if hasattr(event.flags, "DELETE") or hasattr(event.flags, "MOVED_FROM"):
+                # NOTE: The absorbance reader is a hidraw device, when we first
+                # plug it into the Flex, udev rules create a
+                # /dev/ot_module_absorbancereader(n) symlink which aionotify
+                # detects as a CREATE event and registers an absorbance module.
+                # When we create this Absorbance module and connect to it,
+                # the Byonoy library opens the device via hidapi which removes
+                # the symlink and triggers a DELETE action from aionoify.
+                # When the device is deleted, we disconnect from it causing
+                # the /dev/ot_module_absorbance(n) symlink to get created, repeating
+                # the cycle.
+
+                # This DELETE action would normally delete the device, but in this case
+                # Lets ignore these events for the absorbance reader and handle
+                # cleanup when the poller attempts to read data and fails.
+                if maybe_module_at_port.name == "absorbancereader":
+                    return
                 removed_modules = [maybe_module_at_port]
                 log.info(f"Module Removed: {maybe_module_at_port}")
             elif hasattr(event.flags, "CREATE") or hasattr(event.flags, "MOVED_TO"):
+                # NOTE: Absorbance reader gets disonnected when updating, so
+                # if the device is updating, dont create a new instance.
+                for module in self._available_modules:
+                    if (
+                        maybe_module_at_port.name == "absorbancereader"
+                        and isinstance(module, AbsorbanceReader)
+                        and module.updating
+                    ):
+                        return
+
                 new_modules = [maybe_module_at_port]
                 log.info(f"Module Added: {maybe_module_at_port}")
             try:

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 
 import { opentrons96PcrAdapterV1 } from '@opentrons/shared-data'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -68,9 +68,9 @@ const mockNickName = 'nickName'
 
 const render = (props: React.ComponentProps<typeof LabwareListItem>) => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <LabwareListItem {...props} />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }
@@ -172,6 +172,7 @@ describe('LabwareListItem', () => {
     })
     screen.getByText('Mock Labware Definition')
     screen.getByTestId('slot_info_7')
+    screen.getByTestId('DeckInfoLabel_stacked')
     screen.getByText('Magnetic Module GEN1')
     const button = screen.getByText('Secure labware instructions')
     fireEvent.click(button)
@@ -206,6 +207,7 @@ describe('LabwareListItem', () => {
     })
     screen.getByText('Mock Labware Definition')
     screen.getByTestId('slot_info_7')
+    screen.getByTestId('DeckInfoLabel_stacked')
     screen.getByText('Temperature Module GEN1')
     screen.getByText('nickName')
   })
@@ -314,7 +316,6 @@ describe('LabwareListItem', () => {
     screen.getByText('mock nested display name')
     screen.getByText('nestedLabwareNickName')
     screen.getByText('nickName')
-    screen.getByText('On deck')
   })
 
   it('renders the correct info for a labware on top of a heater shaker', () => {
@@ -375,6 +376,6 @@ describe('LabwareListItem', () => {
       nestedLabwareInfo: null,
     })
     screen.getByText('Mock Labware Definition')
-    screen.getByText('Off deck')
+    screen.getByTestId('slot_info_OFF DECK')
   })
 })

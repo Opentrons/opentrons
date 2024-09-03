@@ -1,6 +1,6 @@
 """Router for /runs endpoints dealing with labware offsets and definitions."""
 import logging
-from typing import Union
+from typing import Annotated, Union
 
 from fastapi import APIRouter, Depends, status
 
@@ -21,8 +21,8 @@ from robot_server.service.json_api import (
 
 from ..run_models import Run, LabwareDefinitionSummary
 from ..run_data_manager import RunDataManager, RunNotCurrentError
-from ..engine_store import EngineStore
-from ..dependencies import get_engine_store, get_run_data_manager
+from ..run_orchestrator_store import RunOrchestratorStore
+from ..dependencies import get_run_orchestrator_store, get_run_data_manager
 from .base_router import RunNotFound, RunStopped, RunNotIdle, get_run_data_from_url
 
 log = logging.getLogger(__name__)
@@ -49,14 +49,16 @@ labware_router = APIRouter()
 )
 async def add_labware_offset(
     request_body: RequestModel[LabwareOffsetCreate],
-    engine_store: EngineStore = Depends(get_engine_store),
-    run: Run = Depends(get_run_data_from_url),
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
+    run: Annotated[Run, Depends(get_run_data_from_url)],
 ) -> PydanticResponse[SimpleBody[LabwareOffset]]:
     """Add a labware offset to a run.
 
     Args:
         request_body: New labware offset request data from request body.
-        engine_store: Engine storage interface.
+        run_orchestrator_store: Engine storage interface.
         run: Run response data by ID from URL; ensures 404 if run not found.
     """
     if run.current is False:
@@ -64,7 +66,7 @@ async def add_labware_offset(
             status.HTTP_409_CONFLICT
         )
 
-    added_offset = engine_store.engine.add_labware_offset(request_body.data)
+    added_offset = run_orchestrator_store.add_labware_offset(request_body.data)
     log.info(f'Added labware offset "{added_offset.id}"' f' to run "{run.id}".')
 
     return await PydanticResponse.create(
@@ -91,14 +93,16 @@ async def add_labware_offset(
 )
 async def add_labware_definition(
     request_body: RequestModel[LabwareDefinition],
-    engine_store: EngineStore = Depends(get_engine_store),
-    run: Run = Depends(get_run_data_from_url),
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
+    run: Annotated[Run, Depends(get_run_data_from_url)],
 ) -> PydanticResponse[SimpleBody[LabwareDefinitionSummary]]:
     """Add a labware offset to a run.
 
     Args:
         request_body: New labware offset request data from request body.
-        engine_store: Engine storage interface.
+        run_orchestrator_store: Engine storage interface.
         run: Run response data by ID from URL; ensures 404 if run not found.
     """
     if run.current is False:
@@ -106,7 +110,7 @@ async def add_labware_definition(
             status.HTTP_409_CONFLICT
         )
 
-    uri = engine_store.engine.add_labware_definition(request_body.data)
+    uri = run_orchestrator_store.add_labware_definition(request_body.data)
     log.info(f'Added labware definition "{uri}"' f' to run "{run.id}".')
 
     return PydanticResponse(
@@ -136,7 +140,7 @@ async def add_labware_definition(
 )
 async def get_run_loaded_labware_definitions(
     runId: str,
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[SimpleBody[ResponseList[SD_LabwareDefinition]]]:
     """Get a run's loaded labware definition by the run ID.
 

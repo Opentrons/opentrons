@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
@@ -10,20 +9,19 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  LegacyStyledText,
   POSITION_STATIC,
   POSITION_STICKY,
   SPACING,
-  StyledText,
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
-import { SmallButton, FloatingActionButton } from '../../atoms/buttons'
+import { SmallButton } from '../../atoms/buttons'
 import { Navigation } from '../../organisms/Navigation'
 import {
   getPinnedProtocolIds,
   getProtocolsOnDeviceSortKey,
   updateConfigValue,
-  useFeatureFlag,
 } from '../../redux/config'
 import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
 import { sortProtocols } from './utils'
@@ -39,7 +37,6 @@ import type { ProtocolResource } from '@opentrons/shared-data'
 export function ProtocolDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()
   const runs = useNotifyAllRunsQuery()
-  const history = useHistory()
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
   const [navMenuIsOpened, setNavMenuIsOpened] = React.useState<boolean>(false)
@@ -52,18 +49,17 @@ export function ProtocolDashboard(): JSX.Element {
     setShowDeleteConfirmationModal,
   ] = React.useState<boolean>(false)
   const [targetProtocolId, setTargetProtocolId] = React.useState<string>('')
+  const [isRequiredCSV, setIsRequiredCSV] = React.useState<boolean>(false)
   const sortBy = useSelector(getProtocolsOnDeviceSortKey) ?? 'alphabetical'
-  const protocolsData = protocols.data?.data ?? []
+  const protocolsData =
+    protocols.data?.data.filter(
+      protocol => protocol.protocolKind !== 'quick-transfer'
+    ) ?? []
   let unpinnedProtocols: ProtocolResource[] = protocolsData
 
   // The pinned protocols are stored as an array of IDs in config
   const pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const pinnedProtocols: ProtocolResource[] = []
-
-  // TODO(sb, 4/15/24): The quick transfer button is going to be moved to a new quick transfer
-  // tab before the feature is released. Because of this, we're not adding test cov
-  // for this button in ProtocolDashboard
-  const enableQuickTransferFF = useFeatureFlag('enableQuickTransfer')
 
   // We only need to grab out the pinned protocol data once all the protocols load
   // and if we have pinned ids stored in config.
@@ -164,18 +160,19 @@ export function ProtocolDashboard(): JSX.Element {
               flexDirection={DIRECTION_COLUMN}
               marginBottom={SPACING.spacing32}
             >
-              <StyledText
+              <LegacyStyledText
                 as="p"
                 marginBottom={SPACING.spacing8}
                 color={COLORS.grey60}
               >
                 {t('pinned_protocols')}
-              </StyledText>
+              </LegacyStyledText>
               <PinnedProtocolCarousel
                 pinnedProtocols={pinnedProtocols}
                 longPress={setLongPressModalOpened}
                 setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
                 setTargetProtocolId={setTargetProtocolId}
+                isRequiredCSV={isRequiredCSV}
               />
             </Flex>
           )}
@@ -269,6 +266,7 @@ export function ProtocolDashboard(): JSX.Element {
                         setShowDeleteConfirmationModal
                       }
                       setTargetProtocolId={setTargetProtocolId}
+                      setIsRequiredCSV={setIsRequiredCSV}
                     />
                   )
                 })}
@@ -279,15 +277,6 @@ export function ProtocolDashboard(): JSX.Element {
           ) : null}
         </Box>
       </Flex>
-      {enableQuickTransferFF && (
-        <FloatingActionButton
-          buttonText={t('quick_transfer')}
-          iconName="plus"
-          onClick={() => {
-            history.push('/quick-transfer')
-          }}
-        />
-      )}
     </>
   )
 }

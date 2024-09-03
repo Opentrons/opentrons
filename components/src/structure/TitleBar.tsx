@@ -23,7 +23,7 @@ export interface TitleBarProps {
 }
 
 /**
- * @deprecated Use `InterstitialTitleBar` instead
+ * @deprecated Use 'ModalHeader' instead
  */
 
 export function TitleBar(props: TitleBarProps): JSX.Element {

@@ -6,17 +6,19 @@ import {
   OT2_ROBOT_TYPE,
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
+import { i18n } from '../../assets/localization'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { getDismissedHints } from '../../tutorial/selectors'
-import { EditModules } from '../EditModules'
-import { EditModulesModal } from '../modals/EditModulesModal'
+import { getEnableMoam } from '../../feature-flags/selectors'
 import { renderWithProviders } from '../../__testing-utils__'
 import { getRobotType } from '../../file-data/selectors'
 import { EditMultipleModulesModal } from '../modals/EditModulesModal/EditMultipleModulesModal'
+import { EditModules } from '../EditModules'
+import { EditModulesModal } from '../modals/EditModulesModal'
 
 import type { HintKey } from '../../tutorial'
 
+vi.mock('../../feature-flags/selectors')
 vi.mock('../../step-forms/selectors')
 vi.mock('../modals/EditModulesModal/EditMultipleModulesModal')
 vi.mock('../modals/EditModulesModal')
@@ -56,6 +58,7 @@ describe('EditModules', () => {
       labware: {},
       additionalEquipmentOnDeck: {},
     })
+    vi.mocked(getEnableMoam).mockReturnValue(true)
     vi.mocked(EditModulesModal).mockReturnValue(
       <div>mock EditModulesModal</div>
     )

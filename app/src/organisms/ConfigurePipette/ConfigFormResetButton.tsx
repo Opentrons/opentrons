@@ -5,7 +5,7 @@ import {
   Flex,
   SecondaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Divider } from '../../atoms/structure'
@@ -26,7 +26,7 @@ export function ConfigFormResetButton(props: ButtonProps): JSX.Element {
         i18nKey="branded:these_are_advanced_settings"
         components={{
           block: (
-            <StyledText
+            <LegacyStyledText
               fontSize={TYPOGRAPHY.fontSizeP}
               paddingBottom={SPACING.spacing4}
             />

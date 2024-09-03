@@ -48,7 +48,9 @@ export function useHover(options: UseHoverOptions = {}): UseHoverResult {
           // TODO(mc, 2021-03-08): use window.setTimeout or a separate const
           // for the handler to tell TS that we're using DOM setTimeout, not Node.js
           // eslint-disable-next-line @typescript-eslint/no-implied-eval
-          (() => setHovered(value)) as TimerHandler,
+          (() => {
+            setHovered(value)
+          }) as TimerHandler,
           delay
         )
       } else {
@@ -60,14 +62,23 @@ export function useHover(options: UseHoverOptions = {}): UseHoverResult {
 
   const handlers = useMemo(
     () => ({
-      onPointerEnter: () => handleHoverChange(true, enterDelay),
-      onPointerLeave: () => handleHoverChange(false, leaveDelay),
+      onPointerEnter: () => {
+        handleHoverChange(true, enterDelay)
+      },
+      onPointerLeave: () => {
+        handleHoverChange(false, leaveDelay)
+      },
     }),
     [handleHoverChange, enterDelay, leaveDelay]
   )
 
   // cleanup timeout on unmount
-  useEffect(() => () => clearTimeout(timeoutRef.current), [])
+  useEffect(
+    () => () => {
+      clearTimeout(timeoutRef.current)
+    },
+    []
+  )
 
   return [hovered, handlers]
 }

@@ -53,9 +53,7 @@ CLASSIFIERS = [
 KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 DESCRIPTION = "Library for working with performance metrics on the Opentrons robots"
 PACKAGES = find_packages(where="src", exclude=["tests.*", "tests"])
-INSTALL_REQUIRES = [
-    f"opentrons-shared-data=={VERSION}",
-]
+INSTALL_REQUIRES = []
 
 
 def read(*parts):

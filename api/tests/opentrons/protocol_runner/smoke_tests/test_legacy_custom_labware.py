@@ -13,8 +13,9 @@ from opentrons_shared_data import load_shared_data
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import DeckSlotLocation, LoadedLabware
 from opentrons.protocol_reader import ProtocolReader
-from opentrons.protocol_runner import create_simulating_runner
-
+from opentrons.protocol_runner.create_simulating_orchestrator import (
+    create_simulating_orchestrator,
+)
 
 FIXTURE_LABWARE_DEF = load_shared_data("labware/fixtures/2/fixture_96_plate.json")
 CUSTOM_LABWARE_PROTOCOL = textwrap.dedent(
@@ -52,9 +53,8 @@ async def test_legacy_custom_labware(custom_labware_protocol_files: List[Path]) 
         directory=None,
     )
 
-    subject = await create_simulating_runner(
-        robot_type="OT-2 Standard",
-        protocol_config=protocol_source.config,
+    subject = await create_simulating_orchestrator(
+        robot_type="OT-2 Standard", protocol_config=protocol_source.config
     )
     result = await subject.run(deck_configuration=[], protocol_source=protocol_source)
 

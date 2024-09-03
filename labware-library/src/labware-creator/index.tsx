@@ -5,8 +5,22 @@ import { Formik } from 'formik'
 import { saveAs } from 'file-saver'
 import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
-import { AlertModal } from '@opentrons/components'
-import { labwareSchemaV2 as labwareSchema } from '@opentrons/shared-data'
+import {
+  ALIGN_CENTER,
+  ALIGN_END,
+  AlertModal,
+  Box,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  ModalShell,
+  PrimaryButton,
+} from '@opentrons/components'
+import {
+  getAllDefinitions,
+  labwareSchemaV2 as labwareSchema,
+} from '@opentrons/shared-data'
 import {
   aluminumBlockAutofills,
   aluminumBlockChildTypeOptions,
@@ -47,9 +61,10 @@ import { WellShapeAndSides } from './components/sections/WellShapeAndSides'
 import { WellSpacing } from './components/sections/WellSpacing'
 import { getDefaultedDef } from './getDefaultedDef'
 import { getIsXYGeometryChanged } from './utils/getIsXYGeometryChanged'
+import { StackingOffsets } from './components/sections/StackingOffsets'
+import { WizardHeader } from './WizardHeader'
 
-import styles from './styles.module.css'
-
+import type { FormikErrors } from 'formik'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareCreatorErrors } from './formLevelValidation'
 import type {
@@ -59,14 +74,62 @@ import type {
   ProcessedLabwareFields,
 } from './fields'
 
+import styles from './styles.module.css'
+
 const ajv = new Ajv()
 const validateLabwareSchema = ajv.compile(labwareSchema)
+type WizardStep =
+  | 'intro'
+  | 'regularity'
+  | 'footprint'
+  | 'height'
+  | 'grid'
+  | 'volume'
+  | 'shape'
+  | 'depth'
+  | 'spacing'
+  | 'gridOffset'
+  | 'stackingOffset'
+  | 'preview'
 
-export const LabwareCreator = (): JSX.Element => {
+const WIZARD_STEPS: WizardStep[] = [
+  'intro',
+  'regularity',
+  'footprint',
+  'height',
+  'grid',
+  'volume',
+  'shape',
+  'depth',
+  'spacing',
+  'gridOffset',
+  'stackingOffset',
+  'preview',
+]
+
+interface LabwareCreatorProps {
+  isOnRunApp?: boolean
+  /** only for Run App usage */
+  goBack?: () => void
+  /** only for Run App usage */
+  save?: (fileContent: any) => void
+}
+
+export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
+  const { save, goBack, isOnRunApp = false } = props
   const [
     showExportErrorModal,
     _setShowExportErrorModal,
   ] = React.useState<boolean>(false)
+  const labwareDefinitions = getAllDefinitions()
+  const adapterDefinitions = Object.values(
+    labwareDefinitions
+  ).filter(definition => definition.allowedRoles?.includes('adapter'))
+  const [wizardSteps, setWizardSteps] = React.useState<WizardStep[]>(
+    WIZARD_STEPS
+  )
+  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
+
   const setShowExportErrorModal = React.useMemo(
     () => (v: boolean, fieldValues?: LabwareFields) => {
       // NOTE: values that take a default will remain null in this event
@@ -161,6 +224,27 @@ export const LabwareCreator = (): JSX.Element => {
     }
   }, [showCreatorForm, scrollToForm])
 
+  const wizardHeader = (
+    <WizardHeader
+      title={'Labware Creator'}
+      currentStep={currentStepIndex}
+      totalSteps={wizardSteps.length - 1}
+      onExit={goBack}
+    />
+  )
+
+  const currentWizardStep = wizardSteps[currentStepIndex]
+  const goBackWizard = (stepsBack: number = 1): void => {
+    if (currentStepIndex >= 0 + stepsBack) {
+      setCurrentStepIndex(currentStepIndex - stepsBack)
+    }
+  }
+  const proceed = (stepsForward: number = 1): void => {
+    if (currentStepIndex + stepsForward < wizardSteps.length) {
+      setCurrentStepIndex(currentStepIndex + stepsForward)
+    }
+  }
+
   const onUpload = React.useCallback(
     (
       event:
@@ -218,7 +302,10 @@ export const LabwareCreator = (): JSX.Element => {
             })
             return
           }
-          const fields = labwareDefToFields(parsedLabwareDef)
+          const fields = labwareDefToFields(
+            parsedLabwareDef,
+            adapterDefinitions
+          )
           if (fields == null) {
             setImportError(
               { key: 'UNSUPPORTED_LABWARE_PROPERTIES' },
@@ -233,13 +320,17 @@ export const LabwareCreator = (): JSX.Element => {
             fields.labwareType === 'tipRack'
           ) {
             // no additional required labware type child fields, we can scroll right away
-            scrollToForm()
+            if (isOnRunApp) {
+              proceed()
+            } else {
+              scrollToForm()
+            }
           }
         }
         reader.readAsText(file)
       }
     },
-    [scrollToForm, setLastUploaded, setImportError]
+    [scrollToForm, proceed, setLastUploaded, setImportError]
   )
 
   React.useEffect(() => {
@@ -253,11 +344,13 @@ export const LabwareCreator = (): JSX.Element => {
     }
   })
 
-  return (
-    <LabwareCreatorComponent>
+  const body = (
+    <>
       {importError != null ? (
         <ImportErrorModal
-          onClose={() => setImportError(null)}
+          onClose={() => {
+            setImportError(null)
+          }}
           importError={importError}
         />
       ) : null}
@@ -265,10 +358,14 @@ export const LabwareCreator = (): JSX.Element => {
         <AlertModal
           className={styles.error_modal}
           heading="Cannot export file"
-          onCloseClick={() => setShowExportErrorModal(false)}
+          onCloseClick={() => {
+            setShowExportErrorModal(false)
+          }}
           buttons={[
             {
-              onClick: () => setShowExportErrorModal(false),
+              onClick: () => {
+                setShowExportErrorModal(false)
+              },
               children: 'close',
             },
           ]}
@@ -287,13 +384,23 @@ export const LabwareCreator = (): JSX.Element => {
           const castValues: ProcessedLabwareFields = labwareFormSchema.cast(
             values
           )
-          const def = fieldsToLabware(castValues)
+          const def = fieldsToLabware(castValues, adapterDefinitions)
           const { displayName } = def.metadata
           const { loadName } = def.parameters
           const blob = new Blob([JSON.stringify(def, null, 4)], {
             type: 'text/plain;charset=utf-8',
           })
-          saveAs(blob, `${loadName}.json`)
+          if (save != null) {
+            const fileReader = new FileReader()
+            fileReader.onload = function (event) {
+              const fileContent =
+                event.target != null ? event.target.result : null
+              save(fileContent)
+            }
+            fileReader.readAsText(blob)
+          } else {
+            saveAs(blob, `${loadName}.json`)
+          }
 
           reportEvent({
             name: 'labwareCreatorFileExport',
@@ -332,12 +439,14 @@ export const LabwareCreator = (): JSX.Element => {
               prevValues: values,
             })
           }
-
           const onExportClick = (): void => {
             if (!isValid && !showExportErrorModal) {
               setShowExportErrorModal(true, values)
             }
             handleSubmit()
+            if (goBack != null) {
+              goBack()
+            }
           }
 
           // @ts-expect-error(IL, 2021-03-24): values/errors/touched not typed for reportErrors to be happy
@@ -397,9 +506,27 @@ export const LabwareCreator = (): JSX.Element => {
             </>
           )
 
-          return (
+          return isOnRunApp && goBack != null ? (
+            <ModalShell width="48rem" header={wizardHeader}>
+              <Box padding="2rem">
+                <CreateForm
+                  values={values}
+                  errors={errors}
+                  onExportClick={onExportClick}
+                  currentWizardStep={currentWizardStep}
+                  proceed={proceed}
+                  goBack={goBackWizard}
+                  setWizardSteps={setWizardSteps}
+                  canProceedToForm={canProceedToForm}
+                  onUpload={onUpload}
+                  lastUploaded={lastUploaded}
+                  labwareTypeChildFields={labwareTypeChildFields}
+                />
+              </Box>
+            </ModalShell>
+          ) : (
             <div className={styles.labware_creator}>
-              <h2>Custom Labware Creator BETA</h2>
+              <h2>Custom Labware Creator</h2>
               <IntroCopy />
               <div className={styles.flex_row}>
                 <CreateNewDefinition
@@ -430,16 +557,440 @@ export const LabwareCreator = (): JSX.Element => {
                   <WellBottomAndDepth />
                   <WellSpacing />
                   <GridOffset />
+                  <StackingOffsets />
                   <Preview />
                   <Description />
                   <File />
-                  <Export onExportClick={onExportClick} />
+                  <Export
+                    disabled={false}
+                    onExportClick={onExportClick}
+                    isOnRunApp={isOnRunApp}
+                  />
                 </>
               )}
             </div>
           )
         }}
       </Formik>
-    </LabwareCreatorComponent>
+    </>
   )
+
+  return goBack != null ? (
+    body
+  ) : (
+    <LabwareCreatorComponent>{body}</LabwareCreatorComponent>
+  )
+}
+
+interface CreateFileFormProps {
+  values: LabwareFields
+  errors: FormikErrors<
+    LabwareFields & {
+      FORM_LEVEL_ERRORS: Partial<Record<any, string>>
+    }
+  >
+  lastUploaded: LabwareFields | null
+  canProceedToForm: boolean
+  labwareTypeChildFields: any
+  currentWizardStep: WizardStep
+  onUpload: (
+    event:
+      | React.DragEvent<HTMLLabelElement>
+      | React.ChangeEvent<HTMLInputElement>
+  ) => void
+  goBack: (stepsBack: number) => void
+  onExportClick: () => void
+  proceed: (stepsForward: number) => void
+  setWizardSteps: React.Dispatch<React.SetStateAction<WizardStep[]>>
+}
+
+function CreateForm(props: CreateFileFormProps): JSX.Element {
+  const {
+    currentWizardStep,
+    errors,
+    proceed,
+    goBack,
+    onUpload,
+    lastUploaded,
+    canProceedToForm,
+    onExportClick,
+    labwareTypeChildFields,
+    values,
+  } = props
+
+  const skipStackingOffset =
+    values.labwareType === 'aluminumBlock' || values.labwareType === 'reservoir'
+  const skipSpacing =
+    values.gridRows != null &&
+    values.gridRows === '1' &&
+    values.gridColumns != null &&
+    values.gridColumns === '1'
+
+  switch (currentWizardStep) {
+    case 'intro':
+      return (
+        <>
+          <h2>Custom Labware Creator BETA</h2>
+          <IntroCopy />
+          <div className={styles.flex_row}>
+            <CreateNewDefinition
+              showDropDownOptions={lastUploaded === null}
+              disabled={!canProceedToForm || lastUploaded !== null}
+              labwareTypeChildFields={labwareTypeChildFields}
+              onClick={() => {
+                proceed(1)
+              }}
+            />
+            <UploadExisting
+              disabled={!canProceedToForm}
+              labwareTypeChildFields={labwareTypeChildFields}
+              lastUploaded={lastUploaded}
+              onClick={() => {
+                proceed(1)
+              }}
+              onUpload={onUpload}
+            />
+          </div>
+        </>
+      )
+    case 'regularity':
+      return (
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap="1rem">
+          <Flex flexDirection={DIRECTION_COLUMN} height="100%">
+            <CustomTiprackWarning />
+            <HandPlacedTipFit />
+            <Regularity />
+          </Flex>
+          <Flex
+            alignItems={ALIGN_END}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            width="100%"
+          >
+            <PrimaryButton
+              onClick={() => {
+                goBack(1)
+              }}
+            >
+              Go back
+            </PrimaryButton>
+            <PrimaryButton
+              onClick={() => {
+                proceed(1)
+              }}
+              disabled={errors.homogeneousWells != null}
+            >
+              Next
+            </PrimaryButton>
+          </Flex>
+        </Flex>
+      )
+    case 'footprint':
+      return (
+        <>
+          <Footprint />
+          <Flex
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            width="100%"
+          >
+            <PrimaryButton
+              onClick={() => {
+                goBack(1)
+              }}
+            >
+              Go back
+            </PrimaryButton>
+            <PrimaryButton
+              onClick={() => {
+                proceed(1)
+              }}
+              disabled={
+                !(
+                  errors.footprintXDimension == null &&
+                  errors.footprintYDimension == null
+                )
+              }
+            >
+              Next
+            </PrimaryButton>
+          </Flex>
+        </>
+      )
+    case 'height':
+      return (
+        <>
+          <Height />
+          <Flex
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            width="100%"
+          >
+            <PrimaryButton
+              onClick={() => {
+                goBack(1)
+              }}
+            >
+              Go back
+            </PrimaryButton>
+            <PrimaryButton
+              onClick={() => {
+                proceed(1)
+              }}
+              disabled={errors.labwareZDimension != null}
+            >
+              Next
+            </PrimaryButton>
+          </Flex>
+        </>
+      )
+    case 'grid':
+      return (
+        <>
+          <Grid />
+          <Flex
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            width="100%"
+          >
+            <PrimaryButton
+              onClick={() => {
+                goBack(1)
+              }}
+            >
+              Go back
+            </PrimaryButton>
+            <PrimaryButton
+              onClick={() => {
+                proceed(1)
+              }}
+              disabled={
+                !(
+                  errors.gridColumns == null &&
+                  errors.gridRows == null &&
+                  errors.regularColumnSpacing == null &&
+                  errors.regularRowSpacing == null
+                )
+              }
+            >
+              Next
+            </PrimaryButton>
+          </Flex>
+        </>
+      )
+    case 'volume':
+      return (
+        <>
+          <Volume />
+          <Flex
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            width="100%"
+          >
+            <PrimaryButton
+              onClick={() => {
+                goBack(1)
+              }}
+            >
+              Go back
+            </PrimaryButton>
+            <PrimaryButton
+              onClick={() => {
+                proceed(1)
+              }}
+              disabled={errors.wellVolume != null}
+            >
+              Next
+            </PrimaryButton>
+          </Flex>
+        </>
+      )
+    case 'shape':
+      return (
+        <>
+          <WellShapeAndSides />
+          <Flex
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            width="100%"
+          >
+            <PrimaryButton
+              onClick={() => {
+                goBack(1)
+              }}
+            >
+              Go back
+            </PrimaryButton>
+            <PrimaryButton
+              onClick={() => {
+                proceed(1)
+              }}
+              //  TODO fix this tho
+              disabled={
+                errors.wellDiameter != null ||
+                !(
+                  errors.wellXDimension == null && errors.wellYDimension == null
+                )
+              }
+            >
+              Next
+            </PrimaryButton>
+          </Flex>
+        </>
+      )
+    case 'depth':
+      return (
+        <>
+          <WellBottomAndDepth />
+          <Flex
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            width="100%"
+          >
+            <PrimaryButton
+              onClick={() => {
+                goBack(1)
+              }}
+            >
+              Go back
+            </PrimaryButton>
+            <PrimaryButton
+              onClick={() => {
+                if (skipSpacing) {
+                  proceed(2)
+                } else {
+                  proceed(1)
+                }
+              }}
+              disabled={errors.wellDepth != null}
+            >
+              Next
+            </PrimaryButton>
+          </Flex>
+        </>
+      )
+    case 'spacing':
+      return (
+        <>
+          <WellSpacing />
+          <Flex
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            width="100%"
+          >
+            <PrimaryButton
+              onClick={() => {
+                if (skipSpacing) {
+                  goBack(2)
+                } else {
+                  goBack(1)
+                }
+              }}
+            >
+              Go back
+            </PrimaryButton>
+            <PrimaryButton
+              onClick={() => {
+                proceed(1)
+              }}
+              disabled={
+                !(errors.gridSpacingX == null && errors.gridSpacingY == null)
+              }
+            >
+              Next
+            </PrimaryButton>
+          </Flex>
+        </>
+      )
+    case 'gridOffset':
+      return (
+        <>
+          <GridOffset />
+          <Flex
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            width="100%"
+          >
+            <PrimaryButton
+              onClick={() => {
+                goBack(1)
+              }}
+            >
+              Go back
+            </PrimaryButton>
+            <PrimaryButton
+              onClick={() => {
+                if (skipStackingOffset) {
+                  proceed(2)
+                } else {
+                  proceed(1)
+                }
+              }}
+              disabled={
+                !(errors.gridOffsetX == null && errors.gridOffsetY == null)
+              }
+            >
+              Next
+            </PrimaryButton>
+          </Flex>
+        </>
+      )
+    case 'stackingOffset':
+      return (
+        <>
+          <StackingOffsets />
+          <Flex
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            width="100%"
+          >
+            <PrimaryButton
+              onClick={() => {
+                goBack(1)
+              }}
+            >
+              Go back
+            </PrimaryButton>
+            <PrimaryButton
+              onClick={() => {
+                proceed(1)
+              }}
+            >
+              Next
+            </PrimaryButton>
+          </Flex>
+        </>
+      )
+    case 'preview':
+      return (
+        <>
+          <Preview />
+          <Description />
+          <File />
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+          >
+            <PrimaryButton
+              alignSelf="center"
+              onClick={() => {
+                if (skipStackingOffset) {
+                  goBack(2)
+                } else {
+                  goBack(1)
+                }
+              }}
+            >
+              Go back
+            </PrimaryButton>
+            <Export
+              onExportClick={onExportClick}
+              isOnRunApp={true}
+              disabled={Object.keys(errors).length > 0}
+            />
+          </Flex>
+        </>
+      )
+    default:
+      return <div></div>
+  }
 }

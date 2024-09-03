@@ -25,7 +25,7 @@ from .command import (
 )
 
 if TYPE_CHECKING:
-    from ..state import StateView
+    from ..state.state import StateView
     from ..execution import MovementHandler, TipHandler
 
 
@@ -72,12 +72,13 @@ class TipPhysicallyMissingError(ErrorOccurrence):
     of the pipette.
     """
 
+    isDefined: bool = True
     errorType: Literal["tipPhysicallyMissing"] = "tipPhysicallyMissing"
     errorCode: str = ErrorCodes.TIP_PICKUP_FAILED.value.code
     detail: str = "No tip detected."
 
 
-@dataclass
+@dataclass(frozen=True)
 class TipPhysicallyMissingErrorInternalData:
     """Internal-to-ProtocolEngine data about a TipPhysicallyMissingError."""
 

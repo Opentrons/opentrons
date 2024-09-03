@@ -9,10 +9,10 @@ import {
   JUSTIFY_FLEX_END,
   Link,
   SPACING,
-  StyledText,
+  Modal,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LegacyModal } from '../../molecules/LegacyModal'
 
 interface ConfirmDeleteProtocolModalProps {
   cancelDeleteProtocol: React.MouseEventHandler<HTMLAnchorElement> | undefined
@@ -24,15 +24,15 @@ export function ConfirmDeleteProtocolModal(
 ): JSX.Element {
   const { t } = useTranslation(['protocol_list', 'shared'])
   return (
-    <LegacyModal
+    <Modal
       type="warning"
       onClose={props.cancelDeleteProtocol}
       title={t('delete_this_protocol')}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" marginBottom={SPACING.spacing24}>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing24}>
           {t('this_protocol_will_be_trashed')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
           <Link
             role="button"
@@ -51,6 +51,6 @@ export function ConfirmDeleteProtocolModal(
           </AlertPrimaryButton>
         </Flex>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

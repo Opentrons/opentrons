@@ -5,13 +5,15 @@ import type { HostConfig } from '../types'
 import type {
   Run,
   LabwareOffsetCreateData,
-  RunTimeParameterCreateData,
+  RunTimeParameterValuesCreateData,
+  RunTimeParameterFilesCreateData,
 } from './types'
 
 export interface CreateRunData {
   protocolId?: string
   labwareOffsets?: LabwareOffsetCreateData[]
-  runTimeParameterValues?: RunTimeParameterCreateData
+  runTimeParameterValues?: RunTimeParameterValuesCreateData
+  runTimeParameterFiles?: RunTimeParameterFilesCreateData
 }
 
 export function createRun(

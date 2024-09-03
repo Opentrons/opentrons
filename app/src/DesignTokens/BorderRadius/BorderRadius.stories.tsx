@@ -7,7 +7,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -46,9 +46,9 @@ const Template: Story<BorderRadiusStorybookProps> = args => {
           width="100%"
           height="6rem"
         >
-          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {`${br[0]}" ${br[1]}`}
-          </StyledText>
+          </LegacyStyledText>
           <Box
             width="10rem"
             height="4rem"

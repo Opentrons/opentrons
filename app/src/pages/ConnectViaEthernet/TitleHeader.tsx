@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
@@ -11,7 +11,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -21,7 +21,7 @@ interface TitleHeaderProps {
 
 // Note (kj:05/12/2023) This might be a component later
 export function TitleHeader({ title }: TitleHeaderProps): JSX.Element {
-  const history = useHistory()
+  const navigate = useNavigate()
   return (
     <Flex
       flexDirection={DIRECTION_ROW}
@@ -31,7 +31,9 @@ export function TitleHeader({ title }: TitleHeaderProps): JSX.Element {
       position={POSITION_RELATIVE}
     >
       <Btn
-        onClick={() => history.push('/network-setup')}
+        onClick={() => {
+          navigate('/network-setup')
+        }}
         data-testid={`${title}_header_back_button`}
       >
         <Flex
@@ -44,9 +46,9 @@ export function TitleHeader({ title }: TitleHeaderProps): JSX.Element {
           <Icon name="back" size="3rem" />
         </Flex>
       </Btn>
-      <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+      <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
         {title}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

@@ -3,7 +3,7 @@ import enum
 from math import sqrt, isclose
 from typing import TYPE_CHECKING, Any, NamedTuple, Iterator, Union, List
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from .protocols.api_support.labware_like import LabwareLike
 
@@ -281,6 +281,23 @@ class DeckSlotName(enum.Enum):
     def from_primitive(cls, value: DeckLocation) -> DeckSlotName:
         str_val = str(value).upper()
         return cls(str_val)
+
+    @classmethod
+    def ot3_slots(cls) -> List["DeckSlotName"]:
+        return [
+            DeckSlotName.SLOT_A1,
+            DeckSlotName.SLOT_A2,
+            DeckSlotName.SLOT_A3,
+            DeckSlotName.SLOT_B1,
+            DeckSlotName.SLOT_B2,
+            DeckSlotName.SLOT_B3,
+            DeckSlotName.SLOT_C1,
+            DeckSlotName.SLOT_C2,
+            DeckSlotName.SLOT_C3,
+            DeckSlotName.SLOT_D1,
+            DeckSlotName.SLOT_D2,
+            DeckSlotName.SLOT_D3,
+        ]
 
     # TODO(mm, 2023-05-08):
     # Migrate callers off of this method. https://opentrons.atlassian.net/browse/RLAB-345

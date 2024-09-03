@@ -1,8 +1,12 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Flex, SPACING, DIRECTION_COLUMN } from '@opentrons/components'
+import {
+  Flex,
+  SPACING,
+  DIRECTION_COLUMN,
+  RadioButton,
+} from '@opentrons/components'
 import { getAllDefinitions } from '@opentrons/shared-data'
-import { LargeButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -64,15 +68,14 @@ export function SelectTipRack(props: SelectTipRackProps): JSX.Element {
           const tipRackDef = allLabwareDefinitionsByUri[tipRack]
 
           return tipRackDef != null ? (
-            <LargeButton
+            <RadioButton
               key={tipRack}
-              buttonType={
-                selectedTipRack === tipRackDef ? 'primary' : 'secondary'
-              }
-              onClick={() => {
+              isSelected={selectedTipRack === tipRackDef}
+              buttonValue={tipRack}
+              buttonLabel={tipRackDef.metadata.displayName}
+              onChange={() => {
                 setSelectedTipRack(tipRackDef)
               }}
-              buttonText={tipRackDef.metadata.displayName}
             />
           ) : null
         })}

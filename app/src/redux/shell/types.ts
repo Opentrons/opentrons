@@ -67,6 +67,7 @@ export type ShellUpdateAction =
 export interface ShellState {
   update: ShellUpdateState
   isReady: boolean
+  filePaths: string[]
 }
 
 export interface UiInitializedAction {
@@ -143,12 +144,21 @@ export type NotifyTopic =
   | `robot-server/runs/${string}`
   | 'robot-server/deck_configuration'
   | `robot-server/runs/pre_serialized_commands/${string}`
+  | `robot-server/clientData/${string}`
 
 export interface NotifySubscribeAction {
   type: 'shell:NOTIFY_SUBSCRIBE'
   payload: {
     hostname: string
     topic: NotifyTopic
+  }
+  meta: { shell: true }
+}
+
+export interface SendFilePathsAction {
+  type: 'shell:SEND_FILE_PATHS'
+  payload: {
+    filePaths: string[]
   }
   meta: { shell: true }
 }
@@ -166,6 +176,7 @@ export type ShellAction =
   | RobotMassStorageDeviceEnumerated
   | RobotMassStorageDeviceRemoved
   | NotifySubscribeAction
+  | SendFilePathsAction
 
 export type IPCSafeFormDataEntry =
   | {

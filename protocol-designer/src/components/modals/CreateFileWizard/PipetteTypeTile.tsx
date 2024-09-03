@@ -112,8 +112,18 @@ export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           width="100%"
         >
-          <GoBack onClick={() => goBack()} />
-          <PrimaryButton onClick={() => proceed()}>{t('next')}</PrimaryButton>
+          <GoBack
+            onClick={() => {
+              goBack()
+            }}
+          />
+          <PrimaryButton
+            onClick={() => {
+              proceed()
+            }}
+          >
+            {t('next')}
+          </PrimaryButton>
         </Flex>
       </Flex>
     </HandleEnter>
@@ -171,7 +181,7 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
     >
       {pipetteOptions.map(o => (
         <EquipmentOption
-          robotType={fields.robotType}
+          robotType={fields.robotType ?? OT2_ROBOT_TYPE}
           key={o.name}
           isSelected={currentValue === o.value}
           image={

@@ -10,7 +10,7 @@ import {
   ALIGN_STRETCH,
   ALIGN_FLEX_END,
   PrimaryButton,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
@@ -64,14 +64,16 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
           gridGap={SPACING.spacing8}
         >
           <Flex flexDirection={DIRECTION_COLUMN} flex="1">
-            <StyledText as="h1" marginBottom={SPACING.spacing16}>
+            <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
               {t('position_pipette_over_tip')}
-            </StyledText>
+            </LegacyStyledText>
             <Trans
               t={t}
               i18nKey="tip_pick_up_instructions"
               components={{
-                block: <StyledText as="p" marginBottom={SPACING.spacing8} />,
+                block: (
+                  <LegacyStyledText as="p" marginBottom={SPACING.spacing8} />
+                ),
               }}
             />
           </Flex>

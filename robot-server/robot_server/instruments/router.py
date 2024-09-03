@@ -1,5 +1,5 @@
 """Instruments routes."""
-from typing import Optional, Dict, List, cast
+from typing import Annotated, Optional, Dict, List, cast
 
 from fastapi import APIRouter, status, Depends
 
@@ -154,7 +154,7 @@ async def _get_gripper_instrument_data(
     attached_gripper: Optional[GripperDict],
 ) -> Optional[AttachedItem]:
     subsys = HWSubSystem.of_mount(OT3Mount.GRIPPER)
-    status = hardware.attached_subsystems.get(key=subsys)
+    status = hardware.attached_subsystems.get(key=subsys)  # type: ignore[call-overload]
     if status and (status.fw_update_needed or not status.ok):
         return _bad_gripper_response()
     if attached_gripper:
@@ -265,7 +265,7 @@ async def _get_attached_instruments_ot2(
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[AttachedItem]}},
 )
 async def get_attached_instruments(
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> PydanticResponse[SimpleMultiBody[AttachedItem]]:
     """Get a list of all attached instruments."""
     try:

@@ -17,10 +17,16 @@
       "path": "../shared-data"
     },
     {
+      "path": "../step-generation"
+    },
+    {
       "path": "../api-client"
     },
     {
       "path": "../react-api-client"
+    },
+    {
+      "path": "../labware-library"
     }
   ],
   "compilerOptions": {

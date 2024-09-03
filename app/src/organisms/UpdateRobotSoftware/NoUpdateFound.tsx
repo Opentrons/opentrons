@@ -10,7 +10,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -45,9 +45,9 @@ export function NoUpdateFound(props: NoUpdateFoundProps): JSX.Element {
           color={COLORS.green50}
           data-testid="NoUpdateFound_check_circle_icon"
         />
-        <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+        <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('software_is_up_to_date')}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <MediumButton
         buttonText={i18n.format(t('shared:continue'), 'capitalize')}

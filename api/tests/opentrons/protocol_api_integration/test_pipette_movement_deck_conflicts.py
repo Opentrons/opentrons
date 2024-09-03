@@ -3,7 +3,7 @@
 import pytest
 
 from opentrons import simulate
-from opentrons.protocol_api import COLUMN, ALL
+from opentrons.protocol_api import COLUMN, ALL, SINGLE
 from opentrons.protocol_api.core.engine.deck_conflict import (
     PartialTipMovementNotAllowedError,
 )
@@ -61,8 +61,7 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
     ):
         instrument.pick_up_tip(badly_placed_tiprack.wells_by_name()["A1"])
 
-    # No error since no tall item in west slot of destination slot
-    instrument.pick_up_tip(well_placed_tiprack.wells_by_name()["A1"])
+    instrument.pick_up_tip(well_placed_tiprack.wells_by_name()["A12"])
     instrument.aspirate(50, well_placed_labware.wells_by_name()["A4"])
 
     with pytest.raises(
@@ -75,14 +74,19 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
     ):
         instrument.dispense(10, tc_adjacent_plate.wells_by_name()["A1"])
 
+    instrument.dispense(10, tc_adjacent_plate.wells_by_name()["H2"])
+
     # No error cuz dispensing from high above plate, so it clears tuberack in west slot
     instrument.dispense(15, badly_placed_labware.wells_by_name()["A1"].top(150))
 
     thermocycler.open_lid()  # type: ignore[union-attr]
 
-    # Will NOT raise error since first column of TC labware is accessible
-    # (it is just a few mm away from the left bound)
-    instrument.dispense(25, accessible_plate.wells_by_name()["A1"])
+    with pytest.raises(
+        PartialTipMovementNotAllowedError, match="outside of robot bounds"
+    ):
+        # Dispensing to A1 in an east-most slot using a configuration with column 12 would
+        # result in a collision with the side of the robot.
+        instrument.dispense(25, accessible_plate.wells_by_name()["A1"])
 
     instrument.drop_tip()
 
@@ -102,7 +106,7 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
 @pytest.mark.ot3_only
 def test_close_shave_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
     """Shouldn't raise errors for "almost collision"s."""
-    protocol_context = simulate.get_protocol_api(version="2.16", robot_type="Flex")
+    protocol_context = simulate.get_protocol_api(version="2.20", robot_type="Flex")
     res12 = protocol_context.load_labware("nest_12_reservoir_15ml", "C3")
 
     # Mag block and tiprack adapter are very close to the destination reservoir labware
@@ -113,18 +117,19 @@ def test_close_shave_deck_conflicts_for_96_ch_a12_column_configuration() -> None
         adapter="opentrons_flex_96_tiprack_adapter",
     )
     tiprack_8 = protocol_context.load_labware("opentrons_flex_96_tiprack_200ul", "B2")
-    hs = protocol_context.load_module("heaterShakerModuleV1", "D1")
+    hs = protocol_context.load_module("heaterShakerModuleV1", "C1")
     hs_adapter = hs.load_adapter("opentrons_96_deep_well_adapter")
     deepwell = hs_adapter.load_labware("nest_96_wellplate_2ml_deep")
     protocol_context.load_trash_bin("A3")
     p1000_96 = protocol_context.load_instrument("flex_96channel_1000")
-    p1000_96.configure_nozzle_layout(style=COLUMN, start="A12", tip_racks=[tiprack_8])
+    p1000_96.configure_nozzle_layout(style=SINGLE, start="A12", tip_racks=[tiprack_8])
 
     hs.close_labware_latch()  # type: ignore[union-attr]
+    # Note
     p1000_96.distribute(
         15,
-        res12.wells()[0],
-        deepwell.rows()[0],
+        res12["A6"],
+        deepwell.columns()[6],
         disposal_vol=0,
     )
 
@@ -180,7 +185,14 @@ def test_deck_conflicts_for_96_ch_a1_column_configuration() -> None:
     with pytest.raises(
         PartialTipMovementNotAllowedError, match="outside of robot bounds"
     ):
+        # Moving the 96 channel in column configuration with column 1
+        # is incompatible with moving to a plate in B3 in the right most
+        # column.
         instrument.aspirate(25, well_placed_plate.wells_by_name()["A11"])
+
+    # No error because we're moving to column 1 of the plate with
+    # column 1 of the 96 channel.
+    instrument.aspirate(25, well_placed_plate.wells_by_name()["A1"])
 
     # No error cuz no taller labware on the right
     instrument.aspirate(10, my_tuberack.wells_by_name()["A1"])

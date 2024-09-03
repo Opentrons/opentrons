@@ -50,11 +50,9 @@ export function useCreateLiveCommandMutation(): UseCreateLiveCommandMutationResu
       waitUntilComplete,
       timeout,
     }).then(response => {
-      queryClient
-        .invalidateQueries([host, 'commands'])
-        .catch((e: Error) =>
-          console.error(`error invalidating commands query: ${e.message}`)
-        )
+      queryClient.invalidateQueries([host, 'commands']).catch((e: Error) => {
+        console.error(`error invalidating commands query: ${e.message}`)
+      })
       return response.data
     })
   )

@@ -1,0 +1,78 @@
+{
+  "commands": [
+    {
+      "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c9cac9dba72ab541665f112752004fbc",
+      "notes": [],
+      "params": {
+        "message": "variable pipette has value flex_1channel_50"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      18
+    ],
+    "protocolType": "python"
+  },
+  "createdAt": "TIMESTAMP",
+  "errors": [],
+  "files": [
+    {
+      "name": "OT2_S_v2_18_None_None_duplicateChoiceValue.py",
+      "role": "main"
+    }
+  ],
+  "labware": [],
+  "liquids": [],
+  "metadata": {
+    "protocolName": "Duplicate choice value"
+  },
+  "modules": [],
+  "pipettes": [],
+  "result": "ok",
+  "robotType": "OT-2 Standard",
+  "runTimeParameters": [
+    {
+      "choices": [
+        {
+          "displayName": "Single channel 50µL",
+          "value": "flex_1channel_50"
+        },
+        {
+          "displayName": "Eight Channel 50µL",
+          "value": "flex_8channel_50"
+        },
+        {
+          "displayName": "Single channel 50µL again",
+          "value": "flex_1channel_50"
+        }
+      ],
+      "default": "flex_1channel_50",
+      "description": "What pipette to use during the protocol.",
+      "displayName": "Pipette Name",
+      "type": "str",
+      "value": "flex_1channel_50",
+      "variableName": "pipette"
+    }
+  ]
+}

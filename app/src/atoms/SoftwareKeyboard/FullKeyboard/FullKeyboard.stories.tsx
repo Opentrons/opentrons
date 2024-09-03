@@ -2,11 +2,11 @@ import * as React from 'react'
 import {
   DIRECTION_COLUMN,
   Flex,
+  InputField,
   POSITION_ABSOLUTE,
   SPACING,
   VIEWPORT,
 } from '@opentrons/components'
-import { InputField } from '../../InputField'
 import { FullKeyboard } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'

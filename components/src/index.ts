@@ -18,11 +18,10 @@ export * from './lists'
 export * from './modals'
 export * from './nav'
 export * from './primitives'
-export * from './tabbedNav'
 export * from './slotmap'
 export * from './structure'
 export * from './tooltips'
-
+export * from './organisms'
 // styles
 export * from './styles'
 // new ui-overhaul style vars

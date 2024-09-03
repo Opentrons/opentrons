@@ -7,9 +7,12 @@ import type { HostConfig, Run } from '@opentrons/api-client'
 
 export function useRunQuery<TError = Error>(
   runId: string | null,
-  options: UseQueryOptions<Run, TError> = {}
+  options: UseQueryOptions<Run, TError> = {},
+  hostOverride?: HostConfig | null
 ): UseQueryResult<Run, TError> {
-  const host = useHost()
+  const contextHost = useHost()
+  const host =
+    hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const query = useQuery<Run, TError>(
     [host, 'runs', runId, 'details'],
     () =>

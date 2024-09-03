@@ -51,7 +51,7 @@ const stepPillStyles = css`
 const StepPill = (props: StepPillProps): JSX.Element => {
   const { t } = useTranslation('application')
   const { count, stepType } = props
-  const label = `${startCase(t(`stepType.${stepType}`))} (${count})`
+  const label = `${startCase(t(`stepType.${stepType}`) as string)} (${count})`
   return (
     <Flex css={stepPillStyles} key={stepType}>
       <Text fontSize={FONT_SIZE_BODY_1}>{label}</Text>

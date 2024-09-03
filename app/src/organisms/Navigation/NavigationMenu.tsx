@@ -1,22 +1,24 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
   COLORS,
   Flex,
   Icon,
+  LegacyStyledText,
+  MenuItem,
+  MenuList,
   SPACING,
-  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { MenuList } from '../../atoms/MenuList'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { home, ROBOT } from '../../redux/robot-controls'
 import { useLights } from '../Devices/hooks'
+import { getTopPortalEl } from '../../App/portal'
 import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
 
 import type { Dispatch } from '../../redux/types'
@@ -37,7 +39,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
     setShowRestartRobotConfirmationModal,
   ] = React.useState<boolean>(false)
 
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const handleRestart = (): void => {
     setShowRestartRobotConfirmationModal(true)
@@ -48,9 +50,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
     setShowNavMenu(false)
   }
 
-  // ToDo (kk:10/02/2023)
-  // Need to update a function for onClick
-  return (
+  return createPortal(
     <>
       {showRestartRobotConfirmationModal ? (
         <RestartRobotConfirmationModal
@@ -68,13 +68,13 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
               aria-label="reset-position_icon"
               size="2.5rem"
             />
-            <StyledText
+            <LegacyStyledText
               as="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing12}
             >
               {t('home_gantry')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         </MenuItem>
         <MenuItem key="restart" onClick={handleRestart}>
@@ -85,28 +85,30 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
               color={COLORS.black90}
               aria-label="restart_icon"
             />
-            <StyledText
+            <LegacyStyledText
               as="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing12}
             >
               {t('robot_controls:restart_label')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         </MenuItem>
         <MenuItem
           key="deck-configuration"
-          onClick={() => history.push('/deck-configuration')}
+          onClick={() => {
+            navigate('/deck-configuration')
+          }}
         >
           <Flex alignItems={ALIGN_CENTER}>
             <Icon name="deck-map" aria-label="deck-map_icon" size="2.5rem" />
-            <StyledText
+            <LegacyStyledText
               as="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing12}
             >
               {t('deck_configuration')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         </MenuItem>
         <MenuItem key="light" onClick={toggleLights}>
@@ -117,7 +119,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
               color={COLORS.black90}
               aria-label="light_icon"
             />
-            <StyledText
+            <LegacyStyledText
               as="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing12}
@@ -126,10 +128,11 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
                 t(lightsOn ? 'lights_off' : 'lights_on'),
                 'capitalize'
               )}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         </MenuItem>
       </MenuList>
-    </>
+    </>,
+    getTopPortalEl()
   )
 }

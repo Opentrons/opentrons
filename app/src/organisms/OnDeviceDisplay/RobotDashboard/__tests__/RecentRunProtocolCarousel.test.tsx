@@ -18,6 +18,7 @@ const mockRun = {
   createdAt: '2023-04-12T15:13:52.110602+00:00',
   current: false,
   errors: [],
+  hasEverEnteredErrorRecovery: false,
   id: '853a3fae-8043-47de-8f03-5d28b3ee3d35',
   labware: [],
   labwareOffsets: [],

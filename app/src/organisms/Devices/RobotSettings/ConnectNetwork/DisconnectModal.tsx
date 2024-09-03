@@ -14,11 +14,11 @@ import {
   Link,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
+  Modal,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import { CONNECTABLE } from '../../../../redux/discovery'
 import {
@@ -120,7 +120,7 @@ export const DisconnectModal = ({
   }, [isDisconnected])
 
   return (
-    <LegacyModal
+    <Modal
       type="warning"
       title={
         isDisconnected
@@ -131,21 +131,21 @@ export const DisconnectModal = ({
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         {isError ? (
-          <StyledText as="p" marginBottom={SPACING.spacing24}>
+          <LegacyStyledText as="p" marginBottom={SPACING.spacing24}>
             {requestState != null &&
             'error' in requestState &&
             'message' in requestState?.error
               ? requestState?.error?.message
               : t('shared:unknown_error')}
-          </StyledText>
+          </LegacyStyledText>
         ) : null}
-        <StyledText as="p" marginBottom={SPACING.spacing24}>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing24}>
           {disconnectModalBody}
-        </StyledText>
+        </LegacyStyledText>
         {isError ? (
-          <StyledText as="p" marginBottom={SPACING.spacing24}>
+          <LegacyStyledText as="p" marginBottom={SPACING.spacing24}>
             {t('branded:general_error_message')}
-          </StyledText>
+          </LegacyStyledText>
         ) : null}
         <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
           {isDisconnected ? (
@@ -182,6 +182,6 @@ export const DisconnectModal = ({
           )}
         </Flex>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

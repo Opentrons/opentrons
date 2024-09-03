@@ -80,7 +80,11 @@ export const useDrag = (position: ElementPosition): UseDragResult => {
     },
     position: elementPosition,
     isEnabled,
-    enable: () => setIsEnabled(true),
-    disable: () => setIsEnabled(false),
+    enable: () => {
+      setIsEnabled(true)
+    },
+    disable: () => {
+      setIsEnabled(false)
+    },
   }
 }

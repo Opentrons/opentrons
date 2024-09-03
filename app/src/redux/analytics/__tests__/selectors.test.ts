@@ -41,20 +41,6 @@ describe('analytics selectors', () => {
       } as any
       expect(Selectors.getAnalyticsOptedIn(mockState)).toBe(true)
     })
-
-    it('should return true for getAnalyticsOptInSeen if no config', () => {
-      const mockState = { config: null } as any
-      expect(Selectors.getAnalyticsOptInSeen(mockState)).toBe(true)
-    })
-
-    it('should return config.analytics.seenOptIn with getAnalyticsOptInSeen', () => {
-      const mockState = {
-        config: {
-          analytics: { appId: 'foobar', optedIn: false, seenOptIn: false },
-        },
-      } as any
-      expect(Selectors.getAnalyticsOptInSeen(mockState)).toBe(false)
-    })
   })
 
   describe('analytics calibration selectors', () => {

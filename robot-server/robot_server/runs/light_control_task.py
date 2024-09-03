@@ -4,7 +4,7 @@ from logging import getLogger
 import asyncio
 from dataclasses import dataclass
 
-from .engine_store import EngineStore
+from .run_orchestrator_store import RunOrchestratorStore
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.types import EngineStatus
 from opentrons.hardware_control.types import (
@@ -37,8 +37,14 @@ def _engine_status_to_status_bar(
             return StatusBarState.IDLE if initialization_done else StatusBarState.OFF
         case EngineStatus.RUNNING:
             return StatusBarState.RUNNING
-        case EngineStatus.PAUSED | EngineStatus.AWAITING_RECOVERY | EngineStatus.BLOCKED_BY_OPEN_DOOR:
+        case EngineStatus.PAUSED | EngineStatus.BLOCKED_BY_OPEN_DOOR:
             return StatusBarState.PAUSED
+        case (
+            EngineStatus.AWAITING_RECOVERY
+            | EngineStatus.AWAITING_RECOVERY_PAUSED
+            | EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR
+        ):
+            return StatusBarState.ERROR_RECOVERY
         case EngineStatus.STOP_REQUESTED | EngineStatus.FINISHING:
             return StatusBarState.UPDATING
         case EngineStatus.STOPPED:
@@ -83,20 +89,24 @@ class LightController:
     """LightController sets the Flex's status bar to match the protocol status."""
 
     def __init__(
-        self, api: HardwareControlAPI, engine_store: Optional[EngineStore]
+        self,
+        api: HardwareControlAPI,
+        run_orchestrator_store: Optional[RunOrchestratorStore],
     ) -> None:
         """Create a new LightController."""
         self._api = api
-        self._engine_store = engine_store
+        self._run_orchestrator_store = run_orchestrator_store
         self._initialization_done = False
 
     def mark_initialization_done(self) -> None:
         """Called once the robot server hardware initialization finishes."""
         self._initialization_done = True
 
-    def update_engine_store(self, engine_store: EngineStore) -> None:
+    def update_run_orchestrator_store(
+        self, run_orchestrator_store: RunOrchestratorStore
+    ) -> None:
         """Provide a handle to an EngineStore for the light control task."""
-        self._engine_store = engine_store
+        self._run_orchestrator_store = run_orchestrator_store
 
     async def update(self, prev_status: Optional[Status], new_status: Status) -> None:
         """Update the status bar if the current run status has changed."""
@@ -131,11 +141,11 @@ class LightController:
 
     def _get_current_engine_status(self) -> Optional[EngineStatus]:
         """Get the `status` value from the engine's active run engine."""
-        if self._engine_store is None:
+        if self._run_orchestrator_store is None:
             return None
-        current_id = self._engine_store.current_run_id
+        current_id = self._run_orchestrator_store.current_run_id
         if current_id is not None:
-            return self._engine_store.engine.state_view.commands.get_status()
+            return self._run_orchestrator_store.get_status()
 
         return None
 

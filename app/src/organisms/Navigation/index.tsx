@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { NavLink } from 'react-router-dom'
+import { useLocation, NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
@@ -16,10 +16,14 @@ import {
   truncateString,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
+  DISPLAY_FLEX,
+  ALIGN_FLEX_START,
   POSITION_STICKY,
+  POSITION_ABSOLUTE,
   POSITION_STATIC,
   BORDERS,
   RESPONSIVENESS,
+  OVERFLOW_SCROLL,
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 
@@ -30,9 +34,28 @@ import type { ON_DEVICE_DISPLAY_PATHS } from '../../App/OnDeviceDisplayApp'
 
 const NAV_LINKS: Array<typeof ON_DEVICE_DISPLAY_PATHS[number]> = [
   '/protocols',
+  '/quick-transfer',
   '/instruments',
   '/robot-settings',
 ]
+
+const CarouselWrapper = styled.div`
+  display: ${DISPLAY_FLEX};
+  flex-direction: ${DIRECTION_ROW};
+  align-items: ${ALIGN_FLEX_START};
+  width: 56.75rem;
+  overflow-x: ${OVERFLOW_SCROLL};
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 0%,
+    black 96.5%,
+    transparent 100%
+  );
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`
 
 const CHAR_LIMIT_WITH_ICON = 12
 const CHAR_LIMIT_NO_ICON = 15
@@ -46,6 +69,7 @@ interface NavigationProps {
 export function Navigation(props: NavigationProps): JSX.Element {
   const { setNavMenuIsOpened, longPressModalIsOpened } = props
   const { t } = useTranslation('top_navigation')
+  const location = useLocation()
   const localRobot = useSelector(getLocalRobot)
   const [showNavMenu, setShowNavMenu] = React.useState<boolean>(false)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
@@ -76,14 +100,25 @@ export function Navigation(props: NavigationProps): JSX.Element {
   if (scrollRef.current != null) {
     observer.observe(scrollRef.current)
   }
+
+  const navBarScrollRef = React.useRef<HTMLDivElement>(null)
+  React.useEffect(() => {
+    navBarScrollRef?.current?.scrollIntoView({
+      behavior: 'auto',
+      inline: 'center',
+    })
+  }, [])
+
   function getPathDisplayName(path: typeof NAV_LINKS[number]): string {
     switch (path) {
       case '/instruments':
         return t('instruments')
       case '/protocols':
-        return t('all_protocols')
+        return t('protocols')
       case '/robot-settings':
         return t('settings')
+      case '/quick-transfer':
+        return t('quick_transfer')
       default:
         return ''
     }
@@ -113,32 +148,49 @@ export function Navigation(props: NavigationProps): JSX.Element {
         aria-label="Navigation_container"
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing32}>
-          <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
-            <NavigationLink
-              to="/dashboard"
-              name={truncateString(
-                robotName,
-                iconName != null ? CHAR_LIMIT_WITH_ICON : CHAR_LIMIT_NO_ICON
-              )}
-            />
-            {iconName != null ? (
-              <Icon
-                aria-label="network icon"
-                name={iconName}
-                size="2.5rem"
-                color={COLORS.grey60}
-              />
-            ) : null}
-          </Flex>
-          {NAV_LINKS.map(path => (
-            <NavigationLink
-              key={path}
-              to={path}
-              name={getPathDisplayName(path)}
-            />
-          ))}
+          <CarouselWrapper>
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              gridGap={SPACING.spacing32}
+              marginRight={SPACING.spacing24}
+            >
+              <Flex
+                ref={
+                  location.pathname === '/dashboard' ? navBarScrollRef : null
+                }
+              >
+                <NavigationLink
+                  to="/dashboard"
+                  name={truncateString(
+                    robotName,
+                    iconName != null ? CHAR_LIMIT_WITH_ICON : CHAR_LIMIT_NO_ICON
+                  )}
+                />
+              </Flex>
+              {iconName != null ? (
+                <Icon
+                  aria-label="network icon"
+                  name={iconName}
+                  size="2.5rem"
+                  color={COLORS.grey60}
+                />
+              ) : null}
+              {NAV_LINKS.map(path => (
+                <Flex
+                  ref={path === location.pathname ? navBarScrollRef : null}
+                  key={path}
+                >
+                  <NavigationLink to={path} name={getPathDisplayName(path)} />
+                </Flex>
+              ))}
+            </Flex>
+          </CarouselWrapper>
         </Flex>
-        <Flex marginTop={`-${SPACING.spacing12}`}>
+        <Flex
+          marginTop={`-${SPACING.spacing12}`}
+          position={POSITION_ABSOLUTE}
+          right={SPACING.spacing16}
+        >
           <IconButton
             aria-label="overflow menu button"
             onClick={() => {

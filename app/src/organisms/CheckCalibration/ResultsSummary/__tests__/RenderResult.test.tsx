@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { it, describe, expect, beforeEach } from 'vitest'
+import { screen } from '@testing-library/react'
 
 import { COLORS, SIZE_1 } from '@opentrons/components'
 
@@ -24,9 +25,9 @@ describe('RenderResult', () => {
   })
 
   it('should render calibration result and icon - isBadCal: false', () => {
-    const { getByText, getByTestId } = render(props)
-    getByText('Good calibration')
-    const icon = getByTestId('RenderResult_icon')
+    render(props)
+    screen.getByText('Good calibration')
+    const icon = screen.getByTestId('RenderResult_icon')
     expect(icon).toHaveStyle(`color: ${String(COLORS.green50)}`)
     expect(icon).toHaveStyle(`height: ${String(SIZE_1)}`)
     expect(icon).toHaveStyle(`width: ${String(SIZE_1)}`)
@@ -34,9 +35,9 @@ describe('RenderResult', () => {
 
   it('should render calibration result and icon - isBadCal: true', () => {
     props.isBadCal = true
-    const { getByText, getByTestId } = render(props)
-    getByText('Recalibration recommended')
-    const icon = getByTestId('RenderResult_icon')
+    render(props)
+    screen.getByText('Recalibration recommended')
+    const icon = screen.getByTestId('RenderResult_icon')
     expect(icon).toHaveStyle(`color: ${String(COLORS.yellow50)}`)
     expect(icon).toHaveStyle(`height: ${String(SIZE_1)}`)
     expect(icon).toHaveStyle(`width: ${String(SIZE_1)}`)

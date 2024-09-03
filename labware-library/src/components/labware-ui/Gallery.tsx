@@ -46,7 +46,12 @@ export function Gallery(props: GalleryProps): JSX.Element {
       {images.length > 1 && (
         <div className={styles.gallery_thumbnail_row}>
           {images.map((img, index) => (
-            <Thumbnail key={index} onClick={() => setCurrentImage(index)}>
+            <Thumbnail
+              key={index}
+              onClick={() => {
+                setCurrentImage(index)
+              }}
+            >
               {img}
             </Thumbnail>
           ))}

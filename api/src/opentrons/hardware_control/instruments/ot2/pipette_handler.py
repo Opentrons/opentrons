@@ -21,7 +21,7 @@ from opentrons_shared_data.errors.exceptions import (
     UnexpectedTipRemovalError,
     UnexpectedTipAttachError,
 )
-from opentrons_shared_data.pipette.dev_types import UlPerMmAction
+from opentrons_shared_data.pipette.types import UlPerMmAction
 from opentrons_shared_data.pipette.types import Quirks
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
@@ -212,6 +212,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                 "blow_out_flow_rate",
                 "working_volume",
                 "tip_overlap",
+                "versioned_tip_overlap",
                 "available_volume",
                 "return_tip_height",
                 "default_aspirate_flow_rates",
@@ -219,6 +220,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                 "default_dispense_flow_rates",
                 "back_compat_names",
                 "supported_tips",
+                "lld_settings",
             ]
 
             instr_dict = instr.as_dict()
@@ -258,6 +260,7 @@ class PipetteHandlerProvider(Generic[MountType]):
             result[
                 "pipette_bounding_box_offsets"
             ] = instr.config.pipette_bounding_box_offsets
+            result["lld_settings"] = instr.config.lld_settings
         return cast(PipetteDict, result)
 
     @property
@@ -744,9 +747,9 @@ class PipetteHandlerProvider(Generic[MountType]):
     def plan_check_pick_up_tip(
         self,
         mount: top_types.Mount,
-        tip_length: float,
         presses: Optional[int],
         increment: Optional[float],
+        tip_length: float = 0,
     ) -> Tuple[PickUpTipSpec, Callable[[], None]]:
         ...
 
@@ -754,25 +757,25 @@ class PipetteHandlerProvider(Generic[MountType]):
     def plan_check_pick_up_tip(
         self,
         mount: OT3Mount,
-        tip_length: float,
         presses: Optional[int],
         increment: Optional[float],
+        tip_length: float = 0,
     ) -> Tuple[PickUpTipSpec, Callable[[], None]]:
         ...
 
     def plan_check_pick_up_tip(  # type: ignore[no-untyped-def]
         self,
         mount,
-        tip_length,
         presses,
         increment,
+        tip_length=0,
     ):
         # Prechecks: ready for pickup tip and press/increment are valid
         instrument = self.get_pipette(mount)
         if instrument.has_tip:
             raise UnexpectedTipAttachError("pick_up_tip", instrument.name, mount.name)
         self._ihp_log.debug(f"Picking up tip on {mount.name}")
-        tip_count = instrument.nozzle_manager.current_configuration.tip_count
+
         if presses is None or presses < 0:
             checked_presses = instrument.pick_up_configurations.press_fit.presses
         else:
@@ -783,11 +786,12 @@ class PipetteHandlerProvider(Generic[MountType]):
         else:
             check_incr = increment
 
-        pick_up_speed = instrument.pick_up_configurations.press_fit.speed_by_tip_count[
-            tip_count
-        ]
-        pick_up_distance = (
-            instrument.pick_up_configurations.press_fit.distance_by_tip_count[tip_count]
+        pick_up_speed = instrument.get_pick_up_speed_by_configuration(
+            instrument.pick_up_configurations.press_fit
+        )
+
+        pick_up_distance = instrument.get_pick_up_distance_by_configuration(
+            instrument.pick_up_configurations.press_fit
         )
 
         def build_presses() -> Iterator[Tuple[float, float]]:
@@ -817,9 +821,9 @@ class PipetteHandlerProvider(Generic[MountType]):
                             current={
                                 Axis.by_mount(
                                     mount
-                                ): instrument.pick_up_configurations.press_fit.current_by_tip_count[
-                                    tip_count
-                                ]
+                                ): instrument.get_pick_up_current_by_configuration(
+                                    instrument.pick_up_configurations.press_fit
+                                )
                             },
                             speed=pick_up_speed,
                             relative_down=top_types.Point(0, 0, press_dist),
@@ -846,9 +850,9 @@ class PipetteHandlerProvider(Generic[MountType]):
                             current={
                                 Axis.by_mount(
                                     mount
-                                ): instrument.pick_up_configurations.press_fit.current_by_tip_count[
-                                    instrument.nozzle_manager.current_configuration.tip_count
-                                ]
+                                ): instrument.get_pick_up_current_by_configuration(
+                                    instrument.pick_up_configurations.press_fit
+                                )
                             },
                             speed=pick_up_speed,
                             relative_down=top_types.Point(0, 0, press_dist),

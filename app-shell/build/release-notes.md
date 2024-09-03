@@ -4,6 +4,52 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [technical change log]: https://github.com/Opentrons/opentrons/releases
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
+By installing and using Opentrons software, you agree to the Opentrons End-User License Agreement (EULA). You can view the EULA at [opentrons.com/eula](https://opentrons.com/eula).
+
+---
+
+## Opentrons App Changes in 8.0.0
+
+Welcome to the v8.0.0 release of the Opentrons App!
+
+### New Features
+
+- Recover from errors during a protocol run on Flex. If certain types of errors occur, you will have the option to manually correct the error and resume your protocol. Follow detailed recovery instructions on the touchscreen or in the app.
+- Perform quick transfers on Flex. Set up a new quick transfer directly on the touchscreen, specifying a tip rack and up to two labware for pipetting — no protocol file or coding required! You can save and reuse up to 20 quick transfers on a particular Flex robot.
+- Use CSV files as runtime parameters. When setting up a protocol in the app, choose any file on your computer. Or on Flex, select from files already stored on the robot or on an attached USB drive. See the Python API documentation for more information on adding CSV capability to your protocols.
+
+### Improved Features
+
+- Run protocols using the latest version of the Python API (2.20), which adds more partial tip pickup configurations (Flex and OT-2 GEN2 pipettes) and the ability to detect whether a well contains liquid (Flex pipettes only).
+- Tap or click on any labware on the deck map to see adapters and modules that are stacked below it.
+- Lists of liquids now separately show the total volume and per-well volume (when it is the same in each well containing that liquid).
+- Improved instructions for what to do when a Flex protocol completes or is canceled with liquid-filled tips attached to the pipette.
+
+### Known Issues
+
+- Labware offsets can't be applied to protocols that require selecting a CSV file as a runtime parameter value. Write the protocol in such a way that it passes analysis with or without the CSV file, or run Labware Position Check after confirming parameter values.
+- Error recovery can't perform partial tip pickup, because it doesn't account for the pipette nozzle configuration of 8- and 96-channel pipettes. If a recovery step requires partial tip pickup, cancel the protocol instead.
+
+---
+
+## Opentrons App Changes in 7.5.0
+
+Welcome to the v7.5.0 release of the Opentrons App!
+
+There are no changes to the Opentrons App in v7.5.0, but it is required for updating the robot software to support the [Opentrons Flex HEPA/UV Module](https://opentrons.com/products/opentrons-flex-hepa-uv-module) and the latest Flex Gripper model (serial numbers beginning `GRPV13`).
+
+---
+
+## Opentrons App Changes in 7.3.1
+
+Welcome to the v7.3.1 release of the Opentrons App!
+
+There are no changes to the Opentrons App in v7.3.1, but it is required for updating the robot software to improve some features.
+
+### Known Issue
+
+- Robots that have completed a run won't appear as available until you clear the run completion notification. This appears as a banner on the protocol run screen in the app, or as a splash screen on the Flex touchscreen.
+
 ---
 
 ## Opentrons App Changes in 7.3.0
@@ -39,6 +85,11 @@ Modules in Deck Configuration
 
 - All run log steps now appear in the same font size.
 - The app now properly sends custom labware definitions, along with the corresponding Python protocol, to Flex robots connected via USB.
+
+### Known Issues
+
+- Previously saved labware offset data may not be available when setting up a run via a USB connection from a Windows computer. Re-run Labware Position Check or use a Wi-Fi connection instead.
+- If you apply labware offset data for a particular type of labware, and then load a different type of labware in its place via a runtime parameter, the new labware type will have default offsets (0.0 on all axes). Re-run Labware Position Check to set offsets for the new labware.
 
 ---
 

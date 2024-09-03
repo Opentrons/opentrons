@@ -2,7 +2,7 @@ import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent, renderHook } from '@testing-library/react'
+import { fireEvent, renderHook, screen } from '@testing-library/react'
 
 import { useLongPress } from '@opentrons/components'
 import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
@@ -48,17 +48,17 @@ describe('Long Press Modal', () => {
   it('should display the three options', () => {
     const { result } = renderHook(() => useLongPress())
     result.current.isLongPressed = true
-    const [{ getByText }] = render(result.current)
-    getByText('Run protocol')
-    getByText('Pin protocol')
-    getByText('Delete protocol')
+    render(result.current)
+    screen.getByText('Run protocol')
+    screen.getByText('Pin protocol')
+    screen.getByText('Delete protocol')
   })
 
   it('should call mock function when tapping delete protocol', () => {
     const { result } = renderHook(() => useLongPress())
     result.current.isLongPressed = true
-    const [{ getByText }] = render(result.current)
-    const button = getByText('Delete protocol')
+    render(result.current)
+    const button = screen.getByText('Delete protocol')
     fireEvent.click(button)
     expect(mockSetTargetProtocolId).toHaveBeenCalledWith('mockProtocol1')
     expect(mockFunc).toHaveBeenCalled()
@@ -71,8 +71,8 @@ describe('Long Press Modal', () => {
 
     const { result } = renderHook(() => useLongPress())
     result.current.isLongPressed = true
-    const [{ getByText }] = render(result.current)
-    const runButton = getByText('Run protocol')
+    render(result.current)
+    const runButton = screen.getByText('Run protocol')
     fireEvent.click(runButton)
     expect(mockCreateRun).toHaveBeenCalled()
   })

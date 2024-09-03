@@ -7,7 +7,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -17,7 +17,6 @@ import {
   RecentRunProtocolCarousel,
 } from '../../organisms/OnDeviceDisplay/RobotDashboard'
 import { getOnDeviceDisplaySettings } from '../../redux/config'
-import { AnalyticsOptInModal } from './AnalyticsOptInModal'
 import { WelcomeModal } from './WelcomeModal'
 import { ServerInitializing } from '../../organisms/OnDeviceDisplay/RobotDashboard/ServerInitializing'
 import { useNotifyAllRunsQuery } from '../../resources/runs'
@@ -38,10 +37,6 @@ export function RobotDashboard(): JSX.Element {
   const [showWelcomeModal, setShowWelcomeModal] = React.useState<boolean>(
     unfinishedUnboxingFlowRoute !== null
   )
-  const [
-    showAnalyticsOptInModal,
-    setShowAnalyticsOptInModal,
-  ] = React.useState<boolean>(false)
 
   const recentRunsOfUniqueProtocols = (allRunsQueryData?.data ?? [])
     .reverse() // newest runs first
@@ -65,13 +60,13 @@ export function RobotDashboard(): JSX.Element {
   } else if (recentRunsOfUniqueProtocols.length > 0) {
     contents = (
       <>
-        <StyledText
+        <LegacyStyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.grey60}
         >
           {t('run_again')}
-        </StyledText>
+        </LegacyStyledText>
         <RecentRunProtocolCarousel
           recentRunsOfUniqueProtocols={recentRunsOfUniqueProtocols}
         />
@@ -88,15 +83,7 @@ export function RobotDashboard(): JSX.Element {
         gridGap={SPACING.spacing16}
       >
         {showWelcomeModal ? (
-          <WelcomeModal
-            setShowAnalyticsOptInModal={setShowAnalyticsOptInModal}
-            setShowWelcomeModal={setShowWelcomeModal}
-          />
-        ) : null}
-        {showAnalyticsOptInModal ? (
-          <AnalyticsOptInModal
-            setShowAnalyticsOptInModal={setShowAnalyticsOptInModal}
-          />
+          <WelcomeModal setShowWelcomeModal={setShowWelcomeModal} />
         ) : null}
         {contents}
       </Flex>

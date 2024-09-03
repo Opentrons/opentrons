@@ -43,7 +43,7 @@ make -C labware-library all
 make -C labware-library clean dist
 
 # start a hot-reloading development server
-# (optional) specify port with PORT; default is 8080
+# (optional) specify port with PORT; default is 5173
 make -C labware-library dev
 make -C labware-library dev PORT=8081
 
@@ -53,11 +53,10 @@ make -C labware-library serve
 make -C labware-library serve PORT=9091
 ```
 
-### webpack setup
+### vite setup
 
-This project (along with our other front-end projects) uses [webpack][] to generate artifacts.
+This project (along with our other front-end projects) uses [vite][] to generate artifacts.
 
-- Extends our [base webpack config][base-config]
 - Entry point is [`labware-library/src/index.tsx`][entry]
 - [Handlebars][] HTML template is [`labware-library/src/index.hbs`][template]
   - Post-build, the site is crawled and prerendered with [react-snap][]
@@ -68,10 +67,10 @@ This project (along with our other front-end projects) uses [webpack][] to gener
 [handlebars]: https://handlebarsjs.com/
 [css modules]: https://github.com/css-modules/css-modules
 [react-snap]: https://github.com/stereobooster/react-snap
-[base-config]: ../webpack-config
 [entry]: ./src/index.js
 [template]: ./src/index.hbs
 [global-style]: ./src/global.module.css
+[vite]: https://vitejs.dev/
 
 ### environment variables
 

@@ -2,8 +2,8 @@
 from typing import List, Set, cast, Dict, Optional
 
 import pytest
-from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.deck.types import DeckDefinitionV5
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from opentrons.types import DeckSlotName
@@ -74,6 +74,23 @@ def get_addressable_area_view(
         or {},
         deck_definition=deck_definition or cast(DeckDefinitionV5, {"otId": "fake"}),
         deck_configuration=deck_configuration or [],
+        robot_definition={
+            "displayName": "OT-3",
+            "robotType": "OT-3 Standard",
+            "models": ["OT-3 Standard"],
+            "extents": [477.2, 493.8, 0.0],
+            "paddingOffsets": {
+                "rear": -177.42,
+                "front": 51.8,
+                "leftSide": 31.88,
+                "rightSide": -80.32,
+            },
+            "mountOffsets": {
+                "left": [-13.5, -60.5, 255.675],
+                "right": [40.5, -60.5, 255.675],
+                "gripper": [84.55, -12.75, 93.85],
+            },
+        },
         robot_type=robot_type,
         use_simulated_deck_config=use_simulated_deck_config,
     )
@@ -85,6 +102,7 @@ def test_initial_state() -> None:
     """It should initialize the module state."""
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
+        deck_fixed_labware=[],
     )
 
     assert subject.state == ModuleState(
@@ -95,6 +113,7 @@ def test_initial_state() -> None:
         substate_by_module_id={},
         module_offset_by_serial={},
         additional_slots_occupied_by_module_id={},
+        deck_fixed_labware=[],
     )
 
 
@@ -195,6 +214,7 @@ def test_load_module(
 
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
+        deck_fixed_labware=[],
     )
     subject.handle_action(action)
 
@@ -211,6 +231,7 @@ def test_load_module(
         substate_by_module_id={"module-id": expected_substate},
         module_offset_by_serial={},
         additional_slots_occupied_by_module_id={},
+        deck_fixed_labware=[],
     )
 
 
@@ -261,6 +282,7 @@ def test_load_thermocycler_in_thermocycler_slot(
             robot_type=robot_type,
             deck_type=deck_type,
         ),
+        deck_fixed_labware=[],
     )
     subject.handle_action(action)
 
@@ -341,6 +363,7 @@ def test_add_module_action(
 
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
+        deck_fixed_labware=[],
     )
     subject.handle_action(action)
 
@@ -357,6 +380,7 @@ def test_add_module_action(
         substate_by_module_id={"module-id": expected_substate},
         module_offset_by_serial={},
         additional_slots_occupied_by_module_id={},
+        deck_fixed_labware=[],
     )
 
 
@@ -384,6 +408,7 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
     )
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
+        deck_fixed_labware=[],
     )
 
     subject.handle_action(
@@ -437,6 +462,7 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
     )
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
+        deck_fixed_labware=[],
     )
 
     subject.handle_action(
@@ -492,6 +518,7 @@ def test_handle_hs_labware_latch_commands(
     )
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
+        deck_fixed_labware=[],
     )
 
     subject.handle_action(
@@ -558,6 +585,7 @@ def test_handle_tempdeck_temperature_commands(
     )
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
+        deck_fixed_labware=[],
     )
 
     subject.handle_action(
@@ -619,6 +647,7 @@ def test_handle_thermocycler_temperature_commands(
     )
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
+        deck_fixed_labware=[],
     )
 
     subject.handle_action(
@@ -702,6 +731,7 @@ def test_handle_thermocycler_lid_commands(
             robot_type="OT-3 Standard",
             deck_type=DeckType.OT3_STANDARD,
         ),
+        deck_fixed_labware=[],
     )
 
     subject.handle_action(

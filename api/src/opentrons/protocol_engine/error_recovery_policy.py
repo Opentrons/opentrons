@@ -1,15 +1,16 @@
 # noqa: D100
 
-import enum
-from typing import Optional, Protocol
+from __future__ import annotations
 
-from opentrons.config import feature_flags as ff
-from opentrons.protocol_engine.commands import (
-    Command,
-    CommandDefinedErrorData,
-    PickUpTip,
-)
-from opentrons.protocol_engine.commands.pick_up_tip import TipPhysicallyMissingError
+import enum
+from typing import Optional, Protocol, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from opentrons.protocol_engine.commands import (
+        Command,
+        CommandDefinedErrorData,
+    )
+    from opentrons.protocol_engine.state.config import Config
 
 
 class ErrorRecoveryType(enum.Enum):
@@ -27,10 +28,8 @@ class ErrorRecoveryType(enum.Enum):
     WAIT_FOR_RECOVERY = enum.auto()
     """Stop and wait for the error to be recovered from manually."""
 
-    # TODO(mm, 2023-03-18): Add something like this for
-    # https://opentrons.atlassian.net/browse/EXEC-302.
-    # CONTINUE = enum.auto()
-    # """Continue with the run, as if the command never failed."""
+    IGNORE_AND_CONTINUE = enum.auto()
+    """Continue with the run, as if the command never failed."""
 
 
 class ErrorRecoveryPolicy(Protocol):
@@ -50,37 +49,22 @@ class ErrorRecoveryPolicy(Protocol):
 
     @staticmethod
     def __call__(  # noqa: D102
-        failed_command: Command, defined_error_data: Optional[CommandDefinedErrorData]
+        config: Config,
+        failed_command: Command,
+        defined_error_data: Optional[CommandDefinedErrorData],
     ) -> ErrorRecoveryType:
         ...
 
 
-def error_recovery_by_ff(
-    failed_command: Command, defined_error_data: Optional[CommandDefinedErrorData]
+def never_recover(
+    config: Config,
+    failed_command: Command,
+    defined_error_data: Optional[CommandDefinedErrorData],
 ) -> ErrorRecoveryType:
-    """Use API feature flags to decide how to handle an error.
+    """An error recovery policy where error recovery is never attempted.
 
-    This is just for development. This should be replaced by a proper config
-    system exposed through robot-server's HTTP API.
+    This makes sense for things like the `opentrons_simulate` and `opentrons_execute`
+    CLIs. Those don't expose any way to bring the run out of recovery mode after it's
+    been entered, so we need to avoid entering recovery mode in the first place.
     """
-    # todo(mm, 2024-03-18): Do we need to do anything explicit here to disable
-    # error recovery on the OT-2?
-    if ff.enable_error_recovery_experiments() and _is_recoverable(
-        failed_command, defined_error_data
-    ):
-        return ErrorRecoveryType.WAIT_FOR_RECOVERY
-    else:
-        return ErrorRecoveryType.FAIL_RUN
-
-
-def _is_recoverable(
-    failed_command: Command, error_data: Optional[CommandDefinedErrorData]
-) -> bool:
-    if (
-        isinstance(failed_command, PickUpTip)
-        and error_data is not None
-        and isinstance(error_data.public, TipPhysicallyMissingError)
-    ):
-        return True
-    else:
-        return False
+    return ErrorRecoveryType.FAIL_RUN

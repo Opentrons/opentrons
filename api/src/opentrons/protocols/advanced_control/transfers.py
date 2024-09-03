@@ -9,18 +9,39 @@ from typing import (
     Callable,
     Generator,
     Iterator,
+    Iterable,
+    Sequence,
     Tuple,
+    TypedDict,
+    TypeAlias,
     TYPE_CHECKING,
     TypeVar,
 )
 from opentrons.protocol_api.labware import Labware, Well
 from opentrons import types
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
+
+
+AdvancedLiquidHandling = Union[
+    Well,
+    types.Location,
+    Sequence[Union[Well, types.Location]],
+    Sequence[Sequence[Well]],
+]
+
+
+class TransferStep(TypedDict):
+    method: str
+    args: Optional[List[Any]]
+    kwargs: Optional[Dict[Any, Any]]
 
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
-    from opentrons.protocols.execution.dev_types import Dictable
+
+_PARTIAL_TIP_SUPPORT_ADDED = APIVersion(2, 18)
+"""The version after which partial tip support and nozzle maps were made available."""
 
 
 class MixStrategy(enum.Enum):
@@ -331,6 +352,11 @@ class TransferOptions(NamedTuple):
     dispense: DispenseOpts = DispenseOpts()
 
 
+FormatDictArgs: TypeAlias = Union[
+    PickUpTipOpts, MixOpts, BlowOutOpts, TouchTipOpts, AspirateOpts, DispenseOpts
+]
+
+
 TransferOptions.transfer.__doc__ = """
     Options pertaining to behavior of the transfer.
 
@@ -382,9 +408,9 @@ class TransferPlan:
 
     def __init__(
         self,
-        volume,
-        sources,
-        dests,
+        volume: Union[float, Sequence[float]],
+        srcs: AdvancedLiquidHandling,
+        dsts: AdvancedLiquidHandling,
         # todo(mm, 2021-03-10):
         # Refactor to not need an InstrumentContext, so we can more
         # easily test this class's logic on its own.
@@ -409,25 +435,47 @@ class TransferPlan:
         # then avoid iterating through its Wells.
         # ii. if using single channel pipettes, flatten a multi-dimensional
         # list of Wells into a 1 dimensional list of Wells
-        if self._instr.channels > 1:
-            sources, dests = self._multichannel_transfer(sources, dests)
+        pipette_configuration_type = NozzleConfigurationType.FULL
+        normalized_sources: List[Union[Well, types.Location]]
+        normalized_dests: List[Union[Well, types.Location]]
+        if self._api_version >= _PARTIAL_TIP_SUPPORT_ADDED:
+            pipette_configuration_type = (
+                self._instr._core.get_nozzle_map().configuration
+            )
+        if (
+            self._instr.channels > 1
+            and pipette_configuration_type == NozzleConfigurationType.FULL
+        ):
+            normalized_sources, normalized_dests = self._multichannel_transfer(
+                srcs, dsts
+            )
         else:
-            if isinstance(sources, List) and isinstance(sources[0], List):
-                # Source is a List[List[Well]]
-                sources = [well for well_list in sources for well in well_list]
-            elif isinstance(sources, Well) or isinstance(sources, types.Location):
-                sources = [sources]
-            if isinstance(dests, List) and isinstance(dests[0], List):
-                # Dest is a List[List[Well]]
-                dests = [well for well_list in dests for well in well_list]
-            elif isinstance(dests, Well) or isinstance(dests, types.Location):
-                dests = [dests]
+            if isinstance(srcs, List):
+                if isinstance(srcs[0], List):
+                    # Source is a List[List[Well]]
+                    normalized_sources = [
+                        well for well_list in srcs for well in well_list
+                    ]
+                else:
+                    normalized_sources = srcs
+            elif isinstance(srcs, Well) or isinstance(srcs, types.Location):
+                normalized_sources = [srcs]
+            if isinstance(dsts, List):
+                if isinstance(dsts[0], List):
+                    # Dest is a List[List[Well]]
+                    normalized_dests = [
+                        well for well_list in dsts for well in well_list
+                    ]
+                else:
+                    normalized_dests = dsts
+            elif isinstance(dsts, Well) or isinstance(dsts, types.Location):
+                normalized_dests = [dsts]
 
-        total_xfers = max(len(sources), len(dests))
+        total_xfers = max(len(normalized_sources), len(normalized_dests))
 
         self._volumes = self._create_volume_list(volume, total_xfers)
-        self._sources = sources
-        self._dests = dests
+        self._sources = normalized_sources
+        self._dests = normalized_dests
         self._options = options or TransferOptions()
         self._strategy = self._options.transfer
         self._tip_opts = self._options.pick_up_tip
@@ -439,7 +487,7 @@ class TransferPlan:
 
         self._mode = TransferMode[mode.upper()]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[TransferStep]:
         if self._strategy.new_tip == types.TransferTipPolicy.ONCE:
             yield self._format_dict("pick_up_tip", kwargs=self._tip_opts)
         yield from {
@@ -453,7 +501,7 @@ class TransferPlan:
             else:
                 yield self._format_dict("drop_tip")
 
-    def _plan_transfer(self):
+    def _plan_transfer(self) -> Generator[TransferStep, None, None]:
         """
         * **Source/ Dest:** Multiple sources to multiple destinations.
                             Src & dest should be equal length
@@ -520,7 +568,7 @@ class TransferPlan:
     def _extend_source_target_lists(
         sources: List[Union[Well, types.Location]],
         targets: List[Union[Well, types.Location]],
-    ):
+    ) -> Tuple[List[Union[Well, types.Location]], List[Union[Well, types.Location]]]:
         """Extend source or target list to match the length of the other"""
         if len(sources) < len(targets):
             if len(targets) % len(sources) != 0:
@@ -540,7 +588,7 @@ class TransferPlan:
             ]
         return sources, targets
 
-    def _plan_distribute(self):
+    def _plan_distribute(self) -> Generator[TransferStep, None, None]:
         """
         * **Source/ Dest:** One source to many destinations
         * **Volume:** Single volume or List of volumes is acceptable. This list
@@ -605,7 +653,7 @@ class TransferPlan:
         if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
             yield self._format_dict("pick_up_tip", kwargs=self._tip_opts)
         while not done:
-            asp_grouped: List[Tuple[float, Well]] = []
+            asp_grouped: List[Tuple[float, Well | types.Location]] = []
             try:
                 while (
                     sum(a[0] for a in asp_grouped)
@@ -629,6 +677,7 @@ class TransferPlan:
                 self._sources[0],
             )
             for step in asp_grouped:
+
                 yield from self._dispense_actions(
                     vol=step[0],
                     src=self._sources[0],
@@ -641,7 +690,7 @@ class TransferPlan:
 
     @staticmethod
     def _expand_for_volume_constraints(
-        volumes: Iterator[float], targets: Iterator[Target], max_volume: float
+        volumes: Iterable[float], targets: Iterable[Target], max_volume: float
     ) -> Generator[Tuple[float, "Target"], None, None]:
         """Split a sequence of proposed transfers if necessary to keep each
         transfer under the given max volume.
@@ -660,7 +709,7 @@ class TransferPlan:
                 yield volume, target
             yield volume, target
 
-    def _plan_consolidate(self):
+    def _plan_consolidate(self) -> Generator[TransferStep, None, None]:
         """
         * **Source/ Dest:** Many sources to one destination
         * **Volume:** Single volume or List of volumes is acceptable. This list
@@ -716,7 +765,7 @@ class TransferPlan:
             yield self._format_dict("pick_up_tip", kwargs=self._tip_opts)
         done = False
         while not done:
-            asp_grouped: List[Tuple[float, Well]] = []
+            asp_grouped: List[Tuple[float, Union[Well, types.Location]]] = []
             try:
                 while (
                     sum([a[0] for a in asp_grouped])
@@ -747,18 +796,28 @@ class TransferPlan:
             )
         yield from self._new_tip_action()
 
-    def _aspirate_actions(self, vol, loc):
+    def _aspirate_actions(
+        self, vol: float, loc: Union[Well, types.Location]
+    ) -> Generator[TransferStep, None, None]:
         yield from self._before_aspirate(loc)
         yield self._format_dict("aspirate", [vol, loc, self._options.aspirate.rate])
         yield from self._after_aspirate()
 
-    def _dispense_actions(self, vol, dest, src=None, is_disp_next=False):
+    def _dispense_actions(
+        self,
+        vol: float,
+        dest: Union[Well, types.Location],
+        src: Optional[Union[Well, types.Location]] = None,
+        is_disp_next: bool = False,
+    ) -> Generator[TransferStep, None, None]:
         if self._strategy.air_gap:
             vol += self._strategy.air_gap
         yield self._format_dict("dispense", [vol, dest, self._options.dispense.rate])
         yield from self._after_dispense(dest=dest, src=src, is_disp_next=is_disp_next)
 
-    def _before_aspirate(self, loc):
+    def _before_aspirate(
+        self, loc: Union[Well, types.Location]
+    ) -> Generator[TransferStep, None, None]:
         if (
             self._strategy.mix_strategy == MixStrategy.BEFORE
             or self._strategy.mix_strategy == MixStrategy.BOTH
@@ -768,13 +827,33 @@ class TransferPlan:
                 mix_before_opts["location"] = loc
                 yield self._format_dict("mix", kwargs=mix_before_opts)
 
-    def _after_aspirate(self):
+    def _after_aspirate(self) -> Generator[TransferStep, None, None]:
         if self._strategy.air_gap:
             yield self._format_dict("air_gap", [self._strategy.air_gap])
         if self._strategy.touch_tip_strategy == TouchTipStrategy.ALWAYS:
             yield self._format_dict("touch_tip", kwargs=self._touch_tip_opts)
 
-    def _after_dispense(self, dest, src, is_disp_next=False):  # noqa: C901
+    def _after_dispense_trash(self) -> Generator[TransferStep, None, None]:
+        if isinstance(self._instr.trash_container, Labware):
+            yield self._format_dict(
+                "blow_out", [self._instr.trash_container.wells()[0]]
+            )
+        else:
+            yield self._format_dict("blow_out", [self._instr.trash_container])
+
+    def _after_dispense_helper(self) -> Generator[TransferStep, None, None]:
+        # Used by distribute
+        if self._strategy.air_gap:
+            yield self._format_dict("air_gap", [self._strategy.air_gap])
+        if self._strategy.touch_tip_strategy == TouchTipStrategy.ALWAYS:
+            yield self._format_dict("touch_tip", kwargs=self._touch_tip_opts)
+
+    def _after_dispense(
+        self,
+        dest: Union[Well, types.Location],
+        src: Optional[Union[types.Location, Well]],
+        is_disp_next: bool = False,
+    ) -> Generator[TransferStep, None, None]:
         # This sequence of actions is subject to change
         if not is_disp_next:
             # If the next command is an aspirate, we are switching
@@ -801,21 +880,11 @@ class TransferPlan:
                 self._strategy.blow_out_strategy == BlowOutStrategy.TRASH
                 or self._strategy.disposal_volume
             ):
-                if isinstance(self._instr.trash_container, Labware):
-                    yield self._format_dict(
-                        "blow_out", [self._instr.trash_container.wells()[0]]
-                    )
-                else:
-                    yield self._format_dict("blow_out", [self._instr.trash_container])
-
+                yield from self._after_dispense_trash()
         else:
-            # Used by distribute
-            if self._strategy.air_gap:
-                yield self._format_dict("air_gap", [self._strategy.air_gap])
-            if self._strategy.touch_tip_strategy == TouchTipStrategy.ALWAYS:
-                yield self._format_dict("touch_tip", kwargs=self._touch_tip_opts)
+            yield from self._after_dispense_helper()
 
-    def _new_tip_action(self):
+    def _new_tip_action(self) -> Generator[TransferStep, None, None]:
         if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
             if self._strategy.drop_tip_strategy == DropTipStrategy.RETURN:
                 yield self._format_dict("return_tip")
@@ -825,9 +894,9 @@ class TransferPlan:
     def _format_dict(
         self,
         method: str,
-        args: List = None,
-        kwargs: Union["Dictable", Dict[str, Any]] = None,
-    ):
+        args: Optional[List[Any]] = None,
+        kwargs: Optional[Union[Dict[Any, Any], FormatDictArgs]] = None,
+    ) -> TransferStep:
         if kwargs:
             if isinstance(kwargs, Dict):
                 params = {key: val for key, val in kwargs.items() if val}
@@ -839,9 +908,11 @@ class TransferPlan:
             args = []
         return {"method": method, "args": args, "kwargs": params}
 
-    def _create_volume_list(self, volume, total_xfers):
+    def _create_volume_list(
+        self, volume: Union[Union[float, int], Sequence[float]], total_xfers: int
+    ) -> List[float]:
         if isinstance(volume, (float, int)):
-            return [volume] * total_xfers
+            return [float(volume)] * total_xfers
         elif isinstance(volume, tuple):
             return self._create_volume_gradient(
                 volume[0], volume[-1], total_xfers, self._strategy.gradient_function
@@ -858,11 +929,17 @@ class TransferPlan:
                 )
             return volume
 
-    def _create_volume_gradient(self, min_v, max_v, total, gradient=None):
+    def _create_volume_gradient(
+        self,
+        min_v: float,
+        max_v: float,
+        total: int,
+        gradient: Optional[Callable[[float], float]] = None,
+    ) -> List[float]:
 
         diff_vol = max_v - min_v
 
-        def _map_volume(i):
+        def _map_volume(i: int) -> float:
             nonlocal diff_vol, total
             rel_x = i / (total - 1)
             rel_y = gradient(rel_x) if gradient else rel_x
@@ -872,7 +949,7 @@ class TransferPlan:
 
     def _check_valid_volume_parameters(
         self, disposal_volume: float, air_gap: float, max_volume: float
-    ):
+    ) -> None:
         if air_gap >= max_volume:
             raise ValueError(
                 "The air gap must be less than the maximum volume of the pipette"
@@ -886,7 +963,9 @@ class TransferPlan:
                 "The sum of the air gap and disposal volume must be less than the maximum volume of the pipette"
             )
 
-    def _check_valid_well_list(self, well_list, id, old_well_list):
+    def _check_valid_well_list(
+        self, well_list: List[Any], id: str, old_well_list: List[Any]
+    ) -> None:
         if self._api_version >= APIVersion(2, 2) and len(well_list) < 1:
             raise RuntimeError(
                 f"Invalid {id} for multichannel transfer: {old_well_list}"
@@ -902,7 +981,9 @@ class TransferPlan:
             return True
         return False
 
-    def _multichannel_transfer(self, s, d):
+    def _multichannel_transfer(
+        self, s: AdvancedLiquidHandling, d: AdvancedLiquidHandling
+    ) -> Tuple[List[Union[Well, types.Location]], List[Union[Well, types.Location]]]:
         # TODO: add a check for container being multi-channel compatible?
         # Helper function for multi-channel use-case
         assert (
@@ -946,7 +1027,7 @@ class TransferPlan:
         self._check_valid_well_list(new_dst, "target", d)
         return new_src, new_dst
 
-    def _is_valid_row(self, well: Union[Well, types.Location]):
+    def _is_valid_row(self, well: Union[Well, types.Location]) -> bool:
         if isinstance(well, types.Location):
             test_well = well.labware.as_well()
         else:

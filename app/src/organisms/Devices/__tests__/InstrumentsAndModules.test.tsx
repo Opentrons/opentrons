@@ -13,7 +13,6 @@ import {
 import { i18n } from '../../../i18n'
 import { Banner } from '../../../atoms/Banner'
 import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useIsFlex, useIsRobotViewable, useRunStatuses } from '../hooks'
 import { ModuleCard } from '../../ModuleCard'
 import { InstrumentsAndModules } from '../InstrumentsAndModules'
@@ -23,6 +22,7 @@ import { FlexPipetteCard } from '../PipetteCard/FlexPipetteCard'
 import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
 import { getShowPipetteCalibrationWarning } from '../utils'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useCurrentRunId } from '../../../resources/runs'
 import type * as Components from '@opentrons/components'
 
 vi.mock('@opentrons/components', async importOriginal => {
@@ -39,7 +39,7 @@ vi.mock('../../ModuleCard')
 vi.mock('../PipetteCard')
 vi.mock('../PipetteCard/FlexPipetteCard')
 vi.mock('../PipetteCard/PipetteRecalibrationWarning')
-vi.mock('../../ProtocolUpload/hooks')
+vi.mock('../../../resources/runs')
 vi.mock('../../../atoms/Banner')
 vi.mock('../utils')
 vi.mock('../../RunTimeControl/hooks')

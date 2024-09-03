@@ -9,17 +9,16 @@ import {
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   Flex,
-  JUSTIFY_SPACE_AROUND,
+  JUSTIFY_FLEX_START,
   SIZE_4,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { HistoricalProtocolRun } from './HistoricalProtocolRun'
 import { useIsRobotViewable, useRunStatuses } from './hooks'
-import { useNotifyAllRunsQuery } from '../../resources/runs'
+import { useNotifyAllRunsQuery, useCurrentRunId } from '../../resources/runs'
 
 interface RecentProtocolRunsProps {
   robotName: string
@@ -48,7 +47,7 @@ export function RecentProtocolRuns({
       width="100%"
       marginBottom="6rem"
     >
-      <StyledText
+      <LegacyStyledText
         as="h3"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         borderBottom={BORDERS.lineBorder}
@@ -57,7 +56,7 @@ export function RecentProtocolRuns({
         id="RecentProtocolRuns_title"
       >
         {t('recent_protocol_runs')}
-      </StyledText>
+      </LegacyStyledText>
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
@@ -68,46 +67,48 @@ export function RecentProtocolRuns({
         {isRobotViewable && runs && runs.length > 0 && (
           <>
             <Flex
-              justifyContent={JUSTIFY_SPACE_AROUND}
+              justifyContent={JUSTIFY_FLEX_START}
               padding={SPACING.spacing8}
-              width="100%"
+              width="88%"
+              marginRight="12%"
+              gridGap={SPACING.spacing20}
+              color={COLORS.grey60}
             >
-              <StyledText
-                marginLeft={SPACING.spacing24}
+              <LegacyStyledText
+                as="p"
                 width="25%"
-                as="label"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 data-testid="RecentProtocolRuns_RunTitle"
               >
                 {t('run')}
-              </StyledText>
-
-              <StyledText
-                as="label"
-                width="35%"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              </LegacyStyledText>
+              <LegacyStyledText
+                as="p"
+                width="27%"
                 data-testid="RecentProtocolRuns_ProtocolTitle"
               >
                 {t('protocol')}
-              </StyledText>
-
-              <StyledText
-                as="label"
-                width="20%"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              </LegacyStyledText>
+              <LegacyStyledText
+                as="p"
+                width="5%"
+                data-testid="RecentProtocolRuns_FilesTitle"
+              >
+                {t('files')}
+              </LegacyStyledText>
+              <LegacyStyledText
+                as="p"
+                width="14%"
                 data-testid="RecentProtocolRuns_StatusTitle"
               >
                 {t('status')}
-              </StyledText>
-              <StyledText
-                as="label"
-                width="20%"
-                marginRight="20px"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              </LegacyStyledText>
+              <LegacyStyledText
+                as="p"
+                width="14%"
                 data-testid="RecentProtocolRuns_DurationTitle"
               >
                 {t('run_duration')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
             {runs
               .sort(
@@ -119,14 +120,15 @@ export function RecentProtocolRuns({
                 const protocol = protocols?.data?.data.find(
                   protocol => protocol.id === run.protocolId
                 )
-
+                const isQuickTransfer =
+                  protocol?.protocolKind === 'quick-transfer'
                 const protocolName =
                   protocol?.metadata.protocolName ??
                   protocol?.files[0].name ??
                   t('shared:loading') ??
                   ''
 
-                return (
+                return !isQuickTransfer ? (
                   <HistoricalProtocolRun
                     run={run}
                     protocolName={protocolName}
@@ -135,12 +137,12 @@ export function RecentProtocolRuns({
                     robotIsBusy={robotIsBusy}
                     key={index}
                   />
-                )
+                ) : null
               })}
           </>
         )}
         {!isRobotViewable && (
-          <StyledText
+          <LegacyStyledText
             as="p"
             alignItems={ALIGN_CENTER}
             color={COLORS.grey50}
@@ -149,10 +151,10 @@ export function RecentProtocolRuns({
             id="RecentProtocolRuns_offline"
           >
             {t('offline_recent_protocol_runs')}
-          </StyledText>
+          </LegacyStyledText>
         )}
         {isRobotViewable && (runs == null || runs.length === 0) && (
-          <StyledText
+          <LegacyStyledText
             as="p"
             alignItems={ALIGN_CENTER}
             display={DISPLAY_FLEX}
@@ -160,7 +162,7 @@ export function RecentProtocolRuns({
             id="RecentProtocolRuns_no_runs"
           >
             {t('no_protocol_runs')}
-          </StyledText>
+          </LegacyStyledText>
         )}
       </Flex>
     </Flex>

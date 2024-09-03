@@ -1,10 +1,12 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { COLORS, StyledText } from '@opentrons/components'
+import { COLORS, LegacyStyledText } from '@opentrons/components'
 import { EXTENSION } from '@opentrons/shared-data'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '../../molecules/SimpleWizardBody'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
 import {
   GRIPPER_FLOW_TYPES,
@@ -96,7 +98,7 @@ export const BeforeBeginning = (
         proceed()
       })
       .catch(error => {
-        setErrorMessage(error.message)
+        setErrorMessage(error.message as string)
       })
   }
 
@@ -119,7 +121,7 @@ export const BeforeBeginning = (
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
@@ -142,7 +144,7 @@ export const BeforeBeginning = (
         <Trans
           t={t}
           i18nKey={bodyI18nKey}
-          components={{ block: <StyledText as="p" /> }}
+          components={{ block: <LegacyStyledText as="p" /> }}
         />
       }
       proceedButtonText={t('move_gantry_to_front')}

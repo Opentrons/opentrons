@@ -99,6 +99,7 @@ const mockStoredProtocolData = [
       ],
       runTimeParameters: [],
       errors: [],
+      result: 'ok',
     } as ProtocolAnalysisOutput,
   },
   {
@@ -186,6 +187,7 @@ const mockStoredProtocolData = [
       ],
       runTimeParameters: [],
       errors: [],
+      result: 'ok',
     } as ProtocolAnalysisOutput,
   },
   {
@@ -277,6 +279,7 @@ const mockStoredProtocolData = [
       ],
       runTimeParameters: [],
       errors: [],
+      result: 'ok',
     } as ProtocolAnalysisOutput,
   },
 ] as StoredProtocolData[]

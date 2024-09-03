@@ -2,13 +2,13 @@
 from dataclasses import dataclass
 from typing import Iterator, List, Mapping, Optional, Tuple, Union
 
-from opentrons_shared_data.deck.dev_types import SlotDefV3
+from opentrons_shared_data.deck.types import SlotDefV3
 
 from opentrons.motion_planning import adjacent_slots_getters
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import DeckLocation, DeckSlotName, StagingSlotName, Location, Point
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 
 from .core.common import ProtocolCore
@@ -107,8 +107,9 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
             # * PAPIv2.14 (Protocol Engine): No
             # * PAPIv2.15 (Protocol Engine): Yes
             raise APIVersionError(
-                f"Deleting deck elements is not supported with apiLevel {self._api_version}."
-                f" Try increasing your apiLevel to {APIVersion(2, 15)}."
+                api_element="Deleting deck elements",
+                until_version="2.15",
+                current_version=f"{self._api_version}",
             )
 
         slot_name = _get_slot_name(

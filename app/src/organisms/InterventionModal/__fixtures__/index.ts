@@ -180,7 +180,7 @@ export const mockThermocyclerModule: LoadedModule = {
 export const mockLiquid: Liquid = {
   id: 'mockLiquid',
   displayName: 'mock liquid',
-  description: 'this is my mock liquid',
+  description: 'this is my mock liquid description',
 }
 
 export const mockRunData: RunData = {
@@ -192,6 +192,7 @@ export const mockRunData: RunData = {
   status: 'running',
   actions: [],
   errors: [],
+  hasEverEnteredErrorRecovery: false,
   pipettes: [],
   labware: [mockLabwareOnModule, mockLabwareOnSlot, mockLabwareOffDeck],
   modules: [mockModule],

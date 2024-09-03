@@ -6,10 +6,12 @@ import { Icon } from '../../icons'
 import {
   ALIGN_CENTER,
   DIRECTION_ROW,
+  FLEX_MAX_CONTENT,
   JUSTIFY_SPACE_BETWEEN,
 } from '../../styles'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 import { StyledText } from '../StyledText'
+import { truncateString } from '../../utils'
 
 export interface CheckboxProps {
   /** checkbox is checked if value is true */
@@ -31,38 +33,53 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
     tabIndex = 0,
     disabled = false,
   } = props
+  const truncatedLabel = truncateString(labelText, 25)
+
+  const CHECKBOX_STYLE = css`
+    width: ${FLEX_MAX_CONTENT};
+    grid-gap: ${SPACING.spacing12};
+    border: none;
+    align-items: ${ALIGN_CENTER};
+    flex-direction: ${DIRECTION_ROW};
+    color: ${isChecked ? COLORS.white : COLORS.black90};
+    background-color: ${isChecked ? COLORS.blue50 : COLORS.blue35};
+    border-radius: ${BORDERS.borderRadiusFull};
+    padding: ${SPACING.spacing12} ${SPACING.spacing16};
+    justify-content: ${JUSTIFY_SPACE_BETWEEN};
+    cursor: pointer;
+
+    &:active {
+      background-color: ${isChecked ? COLORS.blue55 : COLORS.blue40};
+    }
+    &:focus-visible {
+      background-color: ${isChecked ? COLORS.blue50 : COLORS.blue35};
+      outline: 3px ${BORDERS.styleSolid} ${COLORS.blue50};
+      outline-offset: 2px;
+    }
+    &:disabled {
+      background-color: ${COLORS.grey35};
+      color: ${COLORS.grey50};
+    }
+
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      padding: ${SPACING.spacing20};
+      border-radius: ${BORDERS.borderRadius16};
+      width: 100%;
+      cursor: auto;
+    }
+  `
+
   return (
     <Flex
       as="button"
       role="checkbox"
-      width="100%"
-      flexDirection={DIRECTION_ROW}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      alignItems={ALIGN_CENTER}
-      padding={SPACING.spacing20}
-      borderRadius={BORDERS.borderRadius16}
-      backgroundColor={isChecked ? COLORS.blue50 : COLORS.blue35}
-      color={isChecked ? COLORS.white : COLORS.black90}
       onClick={onClick}
       tabIndex={tabIndex}
       disabled={disabled}
-      css={css`
-        &:active {
-          background-color: ${isChecked ? COLORS.blue55 : COLORS.blue40};
-        }
-        &:focus-visible {
-          background-color: ${isChecked ? COLORS.blue50 : COLORS.blue35};
-          outline: 3px ${BORDERS.styleSolid} ${COLORS.blue50};
-          outline-offset: 2px;
-        }
-        &:disabled {
-          background-color: ${COLORS.grey35};
-          color: ${COLORS.grey50};
-        }
-      `}
+      css={CHECKBOX_STYLE}
     >
-      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {labelText}
+      <StyledText desktopStyle="bodyDefaultRegular" oddStyle="bodyTextSemiBold">
+        {truncatedLabel}
       </StyledText>
       <Check isChecked={isChecked} />
     </Flex>
@@ -74,12 +91,23 @@ interface CheckProps {
 }
 function Check(props: CheckProps): JSX.Element {
   return props.isChecked ? (
-    <Icon name="ot-checkbox" size="1.75rem" color={COLORS.white} />
+    <Flex css={CHECK_STYLE}>
+      <Icon name="ot-checkbox" color={COLORS.white} />
+    </Flex>
   ) : (
     <Flex
-      size="1.75rem"
+      css={CHECK_STYLE}
       border={`2px solid ${COLORS.black90}`}
       borderRadius={BORDERS.borderRadius4}
     />
   )
 }
+
+const CHECK_STYLE = css`
+  width: 1rem;
+  height: 1rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+`

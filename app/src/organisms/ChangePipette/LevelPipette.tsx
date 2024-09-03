@@ -10,7 +10,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -85,13 +85,13 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
                   />
                 ),
                 h1: (
-                  <StyledText
+                  <LegacyStyledText
                     css={TYPOGRAPHY.h1Default}
                     marginBottom={SPACING.spacing16}
                   />
                 ),
                 block: (
-                  <StyledText
+                  <LegacyStyledText
                     css={css`
                       display: list-item;
                     `}

@@ -5,11 +5,11 @@ import {
   DIRECTION_COLUMN,
   Flex,
   FormGroup,
+  InputField,
+  LegacyStyledText,
   SPACING,
-  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { InputField } from '../../atoms/InputField'
 import styles from './styles.module.css'
 
 import type { Control } from 'react-hook-form'
@@ -78,14 +78,14 @@ export function ConfigFormRow(props: ConfigFormRowProps): JSX.Element {
       paddingTop={SPACING.spacing4}
       paddingBottom={SPACING.spacing4}
     >
-      <StyledText
+      <LegacyStyledText
         as="label"
         id={props.labelFor}
         paddingBottom={SPACING.spacing8}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         {props.label}
-      </StyledText>
+      </LegacyStyledText>
       {props.children}
     </Flex>
   )
@@ -147,9 +147,12 @@ export function ConfigCheckbox(props: ConfigCheckboxProps): JSX.Element {
           />
         )}
       />
-      <StyledText paddingLeft={SPACING.spacing8} paddingTop={SPACING.spacing2}>
+      <LegacyStyledText
+        paddingLeft={SPACING.spacing8}
+        paddingTop={SPACING.spacing2}
+      >
         {displayName}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

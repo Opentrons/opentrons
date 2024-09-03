@@ -9,13 +9,15 @@ import {
   RESPONSIVENESS,
   SecondaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LEFT, RIGHT, NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 import { SmallButton } from '../../atoms/buttons'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '../../molecules/SimpleWizardBody'
 import { usePipetteNameSpecs } from '../../resources/instruments/hooks'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
@@ -85,7 +87,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
   switch (flowType) {
     case FLOWS.CALIBRATE: {
       header = t(hasCalData ? 'pip_recal_success' : 'pip_cal_success', {
-        pipetteName: pipetteName,
+        pipetteName,
       })
       break
     }
@@ -95,7 +97,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
         (attachedPipettes[mount] != null && requiredPipette == null) ||
         Boolean(isCorrectPipette)
       ) {
-        header = t('pipette_attached', { pipetteName: pipetteName })
+        header = t('pipette_attached', { pipetteName })
         buttonText = t('cal_pipette')
         // attached wrong pipette
       } else if (
@@ -116,7 +118,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
     }
     case FLOWS.DETACH: {
       if (attachedPipettes[mount] != null) {
-        header = t('pipette_failed_to_detach', { pipetteName: pipetteName })
+        header = t('pipette_failed_to_detach', { pipetteName })
         iconColor = COLORS.red50
         isSuccess = false
       } else {
@@ -173,7 +175,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
           proceed()
         })
         .catch(error => {
-          setShowErrorMessage(error.message)
+          setShowErrorMessage(error.message as string)
         })
     } else if (
       isSuccess &&
@@ -190,13 +192,13 @@ export const Results = (props: ResultsProps): JSX.Element => {
             params: {
               pipetteName: attachedPipettes[mount]?.instrumentName ?? '',
               pipetteId: attachedPipettes[mount]?.serialNumber ?? '',
-              mount: mount,
+              mount,
             },
           },
           {
             commandType: 'home' as const,
             params: {
-              axes: axes,
+              axes,
             },
           },
         ],
@@ -206,13 +208,13 @@ export const Results = (props: ResultsProps): JSX.Element => {
           proceed()
         })
         .catch(error => {
-          setShowErrorMessage(error.message)
+          setShowErrorMessage(error.message as string)
         })
     } else {
       proceed()
     }
   }
-  let button: JSX.Element = isOnDevice ? (
+  let button: JSX.Element = Boolean(isOnDevice) ? (
     <SmallButton
       textTransform={TYPOGRAPHY.textTransformCapitalize}
       onClick={handleProceed}
@@ -272,11 +274,11 @@ export const Results = (props: ResultsProps): JSX.Element => {
       numberOfTryAgains > 2 ? t('branded:something_seems_wrong') : undefined
     button = (
       <>
-        {isOnDevice ? (
+        {Boolean(isOnDevice) ? (
           <Btn onClick={goBack} aria-label="back">
-            <StyledText css={GO_BACK_BUTTON_STYLE}>
+            <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
               {t('shared:go_back')}
-            </StyledText>
+            </LegacyStyledText>
           </Btn>
         ) : (
           <SecondaryButton
@@ -293,7 +295,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
           </SecondaryButton>
         )}
         <CheckPipetteButton
-          proceed={() => setNumberOfTryAgains(numberOfTryAgains + 1)}
+          proceed={() => {
+            setNumberOfTryAgains(numberOfTryAgains + 1)
+          }}
           proceedButtonText={i18n.format(t('try_again'), 'capitalize')}
           setFetching={setFetching}
           isFetching={isFetching}
@@ -302,7 +306,8 @@ export const Results = (props: ResultsProps): JSX.Element => {
       </>
     )
   }
-  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
+  if (isRobotMoving)
+    return <SimpleWizardInProgressBody description={t('stand_back')} />
   if (errorMessage != null) {
     return (
       <SimpleWizardBody
@@ -322,7 +327,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       isPending={isFetching}
       width="100%"
       justifyContentForOddButton={
-        isOnDevice && isSuccess ? ALIGN_FLEX_END : undefined
+        Boolean(isOnDevice) && isSuccess ? ALIGN_FLEX_END : undefined
       }
     >
       {button}

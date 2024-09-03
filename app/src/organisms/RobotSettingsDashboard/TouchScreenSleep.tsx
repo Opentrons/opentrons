@@ -2,9 +2,13 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import {
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  RadioButton,
+} from '@opentrons/components'
 
-import { RadioButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
   getOnDeviceDisplaySettings,
@@ -57,7 +61,9 @@ export function TouchScreenSleep({
     <Flex flexDirection={DIRECTION_COLUMN} ref={screenRef}>
       <ChildNavigation
         header={t('touchscreen_sleep')}
-        onClickBack={() => setCurrentOption(null)}
+        onClickBack={() => {
+          setCurrentOption(null)
+        }}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}

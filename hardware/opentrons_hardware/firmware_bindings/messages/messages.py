@@ -66,6 +66,8 @@ MessageDefinition = Union[
     defs.FirmwareUpdateStartApp,
     defs.ReadLimitSwitchRequest,
     defs.ReadLimitSwitchResponse,
+    defs.MaxSensorValueRequest,
+    defs.MaxSensorValueResponse,
     defs.ReadFromSensorRequest,
     defs.WriteToSensorRequest,
     defs.BaselineSensorRequest,
@@ -109,9 +111,8 @@ MessageDefinition = Union[
     defs.SetHepaUVStateRequest,
     defs.GetHepaUVStateRequest,
     defs.GetHepaUVStateResponse,
-    defs.SendAccumulatedPressureDataRequest,
+    defs.SendAccumulatedSensorDataRequest,
     defs.AddSensorLinearMoveRequest,
-    defs.SendAccumulatedPressureDataRequest,
 ]
 
 

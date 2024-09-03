@@ -8,7 +8,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SIZE_2,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -34,15 +34,18 @@ export function PrivacySettings(): JSX.Element {
       gridGap={SPACING.spacing16}
     >
       <Box width="70%">
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
         >
           {t('share_app_analytics')}
-        </StyledText>
-        <StyledText css={TYPOGRAPHY.pRegular} paddingBottom={SPACING.spacing8}>
+        </LegacyStyledText>
+        <LegacyStyledText
+          css={TYPOGRAPHY.pRegular}
+          paddingBottom={SPACING.spacing8}
+        >
           {t('share_app_analytics_description')}
-        </StyledText>
+        </LegacyStyledText>
       </Box>
       <ToggleButton
         label="analytics_opt_in"

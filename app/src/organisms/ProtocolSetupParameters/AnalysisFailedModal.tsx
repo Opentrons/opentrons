@@ -1,48 +1,60 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
+import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface AnalysisFailedModalProps {
   errors: string[]
   protocolId: string | null
+  runId: string
   setShowAnalysisFailedModal: (showAnalysisFailedModal: boolean) => void
 }
 
 export function AnalysisFailedModal({
   errors,
   protocolId,
+  runId,
   setShowAnalysisFailedModal,
 }: AnalysisFailedModalProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const history = useHistory()
-  const modalHeader: ModalHeaderBaseProps = {
+  const navigate = useNavigate()
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('protocol_analysis_failed'),
     iconName: 'information',
     iconColor: COLORS.black90,
     hasExitIcon: true,
   }
 
+  const {
+    isLoading: isDismissing,
+    mutateAsync: dismissCurrentRunAsync,
+  } = useDismissCurrentRunMutation()
+
   const handleRestartSetup = (): void => {
-    history.push(protocolId != null ? `/protocols/${protocolId}` : '/protocols')
+    dismissCurrentRunAsync(runId).then(() => {
+      navigate(protocolId != null ? `/protocols/${protocolId}` : '/protocols')
+    })
   }
 
   return (
-    <Modal
+    <OddModal
       header={modalHeader}
-      onOutsideClick={() => setShowAnalysisFailedModal(false)}
+      onOutsideClick={() => {
+        setShowAnalysisFailedModal(false)
+      }}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -50,7 +62,9 @@ export function AnalysisFailedModal({
         width="100%"
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-          <StyledText as="p">{t('with_the_chosen_value')}</StyledText>
+          <LegacyStyledText as="p">
+            {t('with_the_chosen_value')}
+          </LegacyStyledText>
           <Flex
             flexDirection={DIRECTION_COLUMN}
             borderRadius={BORDERS.borderRadius8}
@@ -59,19 +73,24 @@ export function AnalysisFailedModal({
             overflowY="auto"
           >
             {errors.map((error, index) => (
-              <StyledText key={index} as="p">
+              <LegacyStyledText key={index} as="p">
                 {error}
-              </StyledText>
+              </LegacyStyledText>
             ))}
           </Flex>
-          <StyledText as="p">{t('restart_setup_and_try')}</StyledText>
+          <LegacyStyledText as="p">
+            {t('restart_setup_and_try')}
+          </LegacyStyledText>
         </Flex>
         <SmallButton
           onClick={handleRestartSetup}
           buttonText={t('restart_setup')}
           buttonType="alert"
+          iconName={isDismissing ? 'ot-spinner' : null}
+          iconPlacement="startIcon"
+          disabled={isDismissing}
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

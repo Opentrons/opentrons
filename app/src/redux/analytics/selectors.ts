@@ -57,10 +57,6 @@ export function getAnalyticsOptedIn(state: State): boolean {
   return state.config?.analytics.optedIn ?? true
 }
 
-export function getAnalyticsOptInSeen(state: State): boolean {
-  return state.config?.analytics.seenOptIn ?? true
-}
-
 export function getAnalyticsSessionExitDetails(
   state: State,
   robotName: string,

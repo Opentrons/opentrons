@@ -9,7 +9,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { ToggleButton } from '../../../../atoms/buttons'
 import { useLEDLights } from '../../hooks'
@@ -33,14 +33,16 @@ export function EnableStatusLight({
     >
       <Box width="70%">
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <StyledText
+          <LegacyStyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             id="AdvancedSettings_Enable_Status_Light"
           >
             {t('enable_status_light')}
-          </StyledText>
-          <StyledText as="p">{t('enable_status_light_description')}</StyledText>
+          </LegacyStyledText>
+          <LegacyStyledText as="p">
+            {t('enable_status_light_description')}
+          </LegacyStyledText>
         </Flex>
       </Box>
       <ToggleButton

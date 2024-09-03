@@ -1,7 +1,6 @@
 import * as React from 'react'
 import map from 'lodash/map'
 
-import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
 import {
   BaseDeck,
   Flex,
@@ -13,6 +12,7 @@ import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getSimplestDeckConfigForProtocol,
+  parseInitialLoadedLabwareByAdapter,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
@@ -27,6 +27,7 @@ import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
+import { LabwareStackModal } from './LabwareStackModal'
 
 interface SetupLabwareMapProps {
   runId: string
@@ -38,6 +39,14 @@ export function SetupLabwareMap({
   protocolAnalysis,
 }: SetupLabwareMapProps): JSX.Element | null {
   // early return null if no protocol analysis
+  const [
+    labwareStackDetailsLabwareId,
+    setLabwareStackDetailsLabwareId,
+  ] = React.useState<string | null>(null)
+  const [hoverLabwareId, setHoverLabwareId] = React.useState<string | null>(
+    null
+  )
+
   if (protocolAnalysis == null) return null
 
   const commands = protocolAnalysis.commands
@@ -75,8 +84,33 @@ export function SetupLabwareMap({
           : {},
 
       nestedLabwareDef: topLabwareDefinition,
+      highlightLabware:
+        topLabwareDefinition != null &&
+        topLabwareId != null &&
+        hoverLabwareId === topLabwareId,
+      highlightShadowLabware:
+        topLabwareDefinition != null &&
+        topLabwareId != null &&
+        hoverLabwareId === topLabwareId,
+      stacked: topLabwareDefinition != null && topLabwareId != null,
       moduleChildren: (
-        <>
+        // open modal
+        <g
+          onClick={() => {
+            if (topLabwareDefinition != null && topLabwareId != null) {
+              setLabwareStackDetailsLabwareId(topLabwareId)
+            }
+          }}
+          onMouseEnter={() => {
+            if (topLabwareDefinition != null && topLabwareId != null) {
+              setHoverLabwareId(topLabwareId)
+            }
+          }}
+          onMouseLeave={() => {
+            setHoverLabwareId(null)
+          }}
+          cursor="pointer"
+        >
           {topLabwareDefinition != null && topLabwareId != null ? (
             <LabwareInfoOverlay
               definition={topLabwareDefinition}
@@ -85,7 +119,7 @@ export function SetupLabwareMap({
               runId={runId}
             />
           ) : null}
-        </>
+        </g>
       ),
     }
   })
@@ -98,7 +132,7 @@ export function SetupLabwareMap({
 
   const labwareOnDeck = map(
     labwareRenderInfo,
-    ({ x, y, labwareDef, displayName, slotName }, labwareId) => {
+    ({ labwareDef, displayName, slotName }, labwareId) => {
       const labwareInAdapter = initialLoadedLabwareByAdapter[labwareId]
       //  only rendering the labware on top most layer so
       //  either the adapter or the labware are rendered but not both
@@ -107,20 +141,44 @@ export function SetupLabwareMap({
       const topLabwareId = labwareInAdapter?.result?.labwareId ?? labwareId
       const topLabwareDisplayName =
         labwareInAdapter?.params.displayName ?? displayName
+      const isLabwareInStack =
+        topLabwareDefinition != null &&
+        topLabwareId != null &&
+        labwareInAdapter != null
 
       return {
         labwareLocation: { slotName },
         definition: topLabwareDefinition,
         topLabwareId,
         topLabwareDisplayName,
+        highlight: isLabwareInStack && hoverLabwareId === topLabwareId,
+        highlightShadow: isLabwareInStack && hoverLabwareId === topLabwareId,
         labwareChildren: (
-          <LabwareInfoOverlay
-            definition={topLabwareDefinition}
-            labwareId={topLabwareId}
-            displayName={topLabwareDisplayName}
-            runId={runId}
-          />
+          <g
+            cursor={isLabwareInStack ? 'pointer' : ''}
+            onClick={() => {
+              if (isLabwareInStack) {
+                setLabwareStackDetailsLabwareId(topLabwareId)
+              }
+            }}
+            onMouseEnter={() => {
+              if (topLabwareDefinition != null && topLabwareId != null) {
+                setHoverLabwareId(() => topLabwareId)
+              }
+            }}
+            onMouseLeave={() => {
+              setHoverLabwareId(null)
+            }}
+          >
+            <LabwareInfoOverlay
+              definition={topLabwareDefinition}
+              labwareId={topLabwareId}
+              displayName={topLabwareDisplayName}
+              runId={runId}
+            />
+          </g>
         ),
+        stacked: isLabwareInStack,
       }
     }
   )
@@ -143,6 +201,16 @@ export function SetupLabwareMap({
           commands={commands}
         />
       </Flex>
+      {labwareStackDetailsLabwareId != null && (
+        <LabwareStackModal
+          labwareIdTop={labwareStackDetailsLabwareId}
+          commands={commands}
+          closeModal={() => {
+            setLabwareStackDetailsLabwareId(null)
+          }}
+          robotType={robotType}
+        />
+      )}
     </Flex>
   )
 }

@@ -5,7 +5,7 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -53,11 +53,11 @@ export function EstopBanner({ status }: EstopBannerProps): JSX.Element {
   return (
     <Banner type="error" width="100%">
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing2}>
-        <StyledText as="p">{bannerText}</StyledText>
+        <LegacyStyledText as="p">{bannerText}</LegacyStyledText>
         <Btn onClick={handleClick}>
-          <StyledText textDecoration={TYPOGRAPHY.textDecorationUnderline}>
+          <LegacyStyledText textDecoration={TYPOGRAPHY.textDecorationUnderline}>
             {buttonText}
-          </StyledText>
+          </LegacyStyledText>
         </Btn>
       </Flex>
     </Banner>

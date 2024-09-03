@@ -92,4 +92,22 @@ class RobotServerSettings(BaseSettings):
             " currently exists."
         ),
     )
+
     model_config = SettingsConfigDict(env_prefix="OT_ROBOT_SERVER_")
+
+    maximum_quick_transfer_protocols: int = Field(
+        default=20,
+        gt=0,
+        description=(
+            'The maximum number of "quick transfer protocols" to allow before auto-deleting'
+            " old ones."
+        ),
+    )
+
+    maximum_data_files: int = Field(
+        default=50,
+        gt=0,
+        description=(
+            "The maximum number of data files to allow before auto-deleting old ones."
+        ),
+    )

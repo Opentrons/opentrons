@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { vi, describe, expect, afterEach, beforeEach, it } from 'vitest'
-import { cleanup, fireEvent, screen } from '@testing-library/react'
+import { vi, describe, expect, beforeEach, it } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../__testing-utils__'
-import { i18n } from '../../localization'
+import { i18n } from '../../assets/localization'
 import { getFileMetadata } from '../../file-data/selectors'
 import {
   getInitialDeckSetup,
@@ -50,9 +50,6 @@ describe('File Page', () => {
     vi.mocked(FilePipettesModal).mockReturnValue(
       <div>mock FilePipettesModal</div>
     )
-  })
-  afterEach(() => {
-    cleanup()
   })
   it('renders file page with all the information', () => {
     render()

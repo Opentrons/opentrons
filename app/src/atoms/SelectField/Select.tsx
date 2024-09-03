@@ -20,7 +20,7 @@ import type {
   CSSObjectWithLabel,
   DropdownIndicatorProps,
 } from 'react-select'
-import type { DropdownBorder } from '../MenuList/DropdownMenu'
+import type { DropdownBorder } from '@opentrons/components'
 
 export interface SelectOption {
   value: string

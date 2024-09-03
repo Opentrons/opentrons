@@ -22,7 +22,7 @@ import {
 
 import { checkShellUpdate } from '../redux/shell'
 import { useToaster } from '../organisms/ToasterOven'
-import { useNotifyAllRunsQuery, useNotifyRunQuery } from '../resources/runs'
+import { useCurrentRunId, useNotifyRunQuery } from '../resources/runs'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { Dispatch } from '../redux/types'
@@ -90,7 +90,7 @@ export function useProtocolReceiptToast(): void {
             makeToast(
               t('protocol_added', {
                 protocol_name: truncateString(name, 30),
-              }),
+              }) as string,
               'success',
               {
                 closeButton: true,
@@ -103,16 +103,16 @@ export function useProtocolReceiptToast(): void {
         .then(() => {
           queryClient
             .invalidateQueries([host, 'protocols'])
-            .catch((e: Error) =>
+            .catch((e: Error) => {
               console.error(`error invalidating protocols query: ${e.message}`)
-            )
+            })
         })
         .then(() => {
           createLiveCommand({
             command: animationCommand,
-          }).catch((e: Error) =>
+          }).catch((e: Error) => {
             console.warn(`cannot run status bar animation: ${e.message}`)
-          )
+          })
         })
         .catch((e: Error) => {
           console.error(e)
@@ -125,28 +125,21 @@ export function useProtocolReceiptToast(): void {
 }
 
 export function useCurrentRunRoute(): string | null {
-  const { data: allRuns } = useNotifyAllRunsQuery(
-    { pageLength: 1 },
-    { refetchInterval: CURRENT_RUN_POLL }
-  )
-  const currentRunLink = allRuns?.links?.current ?? null
-  const currentRun =
-    currentRunLink != null &&
-    typeof currentRunLink !== 'string' &&
-    'href' in currentRunLink
-      ? allRuns?.data.find(
-          run => run.id === currentRunLink.href.replace('/runs/', '')
-        ) // trim link path down to only runId
-      : null
-  const currentRunId = currentRun?.id ?? null
-  const { data: runRecord } = useNotifyRunQuery(currentRunId, {
-    staleTime: Infinity,
-    enabled: currentRunId != null,
+  const currentRunId = useCurrentRunId({ refetchInterval: CURRENT_RUN_POLL })
+  const { data: runRecord, isFetching } = useNotifyRunQuery(currentRunId, {
+    refetchInterval: CURRENT_RUN_POLL,
   })
 
   const runStatus = runRecord?.data.status
   const runActions = runRecord?.data.actions
-  if (runRecord == null || runStatus == null || runActions == null) return null
+  if (
+    runRecord == null ||
+    runStatus == null ||
+    runActions == null ||
+    isFetching
+  ) {
+    return null
+  }
   // grabbing run id off of the run query to have all routing info come from one source of truth
   const runId = runRecord.data.id
   const hasRunStarted = runActions?.some(

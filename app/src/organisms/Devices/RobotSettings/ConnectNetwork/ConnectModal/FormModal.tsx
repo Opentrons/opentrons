@@ -31,7 +31,7 @@ const StyledFlex = styled(Flex)`
   margin-top: 0.5rem;
 `
 
-const StyledTextField = styled(TextField)`
+const LegacyStyledTextField = styled(TextField)`
   ${fieldStyle}
 `
 
@@ -134,7 +134,7 @@ export const FormModal = (props: FormModalProps): JSX.Element => {
               //  @ts-expect-error: ts can't tell that name is the correct value
               name={name}
               render={({ field, fieldState }) => (
-                <StyledTextField
+                <LegacyStyledTextField
                   key={name}
                   id={fieldId}
                   {...fieldProps}

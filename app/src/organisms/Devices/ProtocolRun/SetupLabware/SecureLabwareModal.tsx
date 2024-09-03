@@ -10,11 +10,11 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
+  Modal,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
-import { LegacyModal } from '../../../../molecules/LegacyModal'
 import secureMagModBracketImage from '../../../../assets/images/secure_mag_mod_bracket.png'
 import secureTCLatchImage from '../../../../assets/images/secure_tc_latch.png'
 import { getModuleName } from '../utils/getModuleName'
@@ -32,7 +32,7 @@ export const SecureLabwareModal = (
   const { t } = useTranslation(['protocol_setup', 'shared', 'branded'])
   const moduleName = getModuleName(props.type)
   return createPortal(
-    <LegacyModal
+    <Modal
       title={t(`secure_labware_modal`, {
         name: moduleName,
       })}
@@ -53,7 +53,7 @@ export const SecureLabwareModal = (
                 )}`}
                 components={{
                   block: (
-                    <StyledText
+                    <LegacyStyledText
                       as="p"
                       marginBottom={SPACING.spacing4}
                       marginRight="3.625rem"
@@ -75,9 +75,9 @@ export const SecureLabwareModal = (
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
-            <StyledText as="p" marginRight="3.625rem">
+            <LegacyStyledText as="p" marginRight="3.625rem">
               {t(`branded:secure_labware_explanation_${snakeCase(moduleName)}`)}
-            </StyledText>
+            </LegacyStyledText>
             <img
               src={secureTCLatchImage}
               width="288px"
@@ -94,7 +94,7 @@ export const SecureLabwareModal = (
           {t('shared:close')}
         </PrimaryButton>
       </Flex>
-    </LegacyModal>,
+    </Modal>,
     getTopPortalEl()
   )
 }

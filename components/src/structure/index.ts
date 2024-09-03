@@ -1,6 +1,5 @@
 // structure components
 
-export * from './PageTabs'
 export * from './TitleBar'
 export * from './Card'
 export * from './Splash'

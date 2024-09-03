@@ -1,0 +1,48 @@
+# This workflow runs lint on pull requests that touch anything in the analyses-snapshot-testing directory
+
+name: 'analyses-snapshot-testing lint'
+
+on:
+  pull_request:
+    paths:
+      - 'analyses-snapshot-testing/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint:
+    name: 'analyses-snapshot-testing lint'
+    timeout-minutes: 5
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Checkout opentrons repo
+        uses: 'actions/checkout@v4'
+
+      - name: Setup Python
+        uses: 'actions/setup-python@v5'
+        with:
+          python-version: '3.12'
+          cache: 'pipenv'
+          cache-dependency-path: analyses-snapshot-testing/Pipfile.lock
+      - name: Setup
+        id: install
+        working-directory: ./analyses-snapshot-testing
+        run: make setup
+      - name: black-check
+        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
+        working-directory: ./analyses-snapshot-testing
+        run: make black-check
+      - name: ruff
+        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
+        working-directory: ./analyses-snapshot-testing
+        run: make ruff-check
+      - name: mypy
+        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
+        working-directory: ./analyses-snapshot-testing
+        run: make mypy

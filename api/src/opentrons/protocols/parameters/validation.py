@@ -1,15 +1,16 @@
 import keyword
 from typing import List, Set, Optional, Union, Literal
 
-from .types import (
-    AllowedTypes,
-    ParamType,
-    ParameterChoice,
-    ParameterNameError,
+from .exceptions import (
     ParameterValueError,
     ParameterDefinitionError,
+    ParameterNameError,
 )
-
+from .types import (
+    PrimitiveAllowedTypes,
+    ParamType,
+    ParameterChoice,
+)
 
 UNIT_MAX_LEN = 10
 DISPLAY_NAME_MAX_LEN = 30
@@ -83,7 +84,7 @@ def ensure_unit_string_length(unit: Optional[str]) -> Optional[str]:
 
 def ensure_value_type(
     value: Union[float, bool, str], parameter_type: type
-) -> AllowedTypes:
+) -> PrimitiveAllowedTypes:
     """Ensures that the value type coming in from the client matches the given type.
 
     This does not guarantee that the value will be the correct type for the given parameter, only that any data coming
@@ -94,7 +95,7 @@ def ensure_value_type(
     If something is labelled as a type but does not get converted here, that will be caught when it is attempted to be
     set as the parameter value and will raise the appropriate error there.
     """
-    validated_value: AllowedTypes = value
+    validated_value: PrimitiveAllowedTypes = value
     if isinstance(value, float):
         if parameter_type is bool and (value == 0 or value == 1):
             validated_value = bool(value)
@@ -236,7 +237,7 @@ def validate_type(value: ParamType, parameter_type: type) -> None:
     """Validate parameter value is the correct type."""
     if not isinstance(value, parameter_type):
         raise ParameterValueError(
-            f"Parameter value {value} has type '{type(value).__name__}',"
+            f"Parameter value {value!r} has type '{type(value).__name__}',"
             f" but must be of type '{parameter_type.__name__}'."
         )
 
@@ -251,7 +252,7 @@ def validate_options(
     """Validate default values and all possible constraints for a valid parameter definition."""
     if not isinstance(default, parameter_type):
         raise ParameterValueError(
-            f"Parameter default {default} has type '{type(default).__name__}',"
+            f"Parameter default {default!r} has type '{type(default).__name__}',"
             f" but must be of type '{parameter_type.__name__}'."
         )
 

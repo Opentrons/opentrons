@@ -13,14 +13,14 @@ import {
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
-  StyledText,
+  Modal,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
 import RobotCalHelpImage from '../../assets/images/robot_calibration_help.png'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
-import { LegacyModal } from '../../molecules/LegacyModal'
 
 const ROBOT_CAL_HELP_ARTICLE =
   'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
@@ -33,15 +33,15 @@ export function HowCalibrationWorksModal({
 }: HowCalibrationWorksModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'shared'])
   return createPortal(
-    <LegacyModal
+    <Modal
       title={t('robot_cal_help_title')}
       onClose={onCloseClick}
       maxHeight="28.125rem"
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" marginBottom={SPACING.spacing16}>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
           {t('robot_cal_description')}
-        </StyledText>
+        </LegacyStyledText>
         <ExternalLink
           href={ROBOT_CAL_HELP_ARTICLE}
           id="RobotCalModal_helpArticleLink"
@@ -53,14 +53,14 @@ export function HowCalibrationWorksModal({
           <img src={RobotCalHelpImage} width="100%" />
         </Box>
         {/* deck calibration */}
-        <StyledText
+        <LegacyStyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing16}
           role="heading"
         >
           {t('deck_calibration_title')}
-        </StyledText>
+        </LegacyStyledText>
         <CalibrationSteps
           description={t('deck_cal_description')}
           steps={[
@@ -68,27 +68,27 @@ export function HowCalibrationWorksModal({
             t('deck_cal_description_bullet_2'),
           ]}
         />
-        <StyledText
+        <LegacyStyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing16}
           role="heading"
         >
           {t('tip_length_cal_title')}
-        </StyledText>
+        </LegacyStyledText>
         <CalibrationSteps
           description={t('tip_length_cal_description')}
           steps={[t('tip_length_cal_description_bullet')]}
         />
         {/* pipette offset calibration */}
-        <StyledText
+        <LegacyStyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing16}
           role="heading"
         >
           {t('pipette_offset_cal')}
-        </StyledText>
+        </LegacyStyledText>
         <CalibrationSteps
           description={t('pipette_offset_cal_description')}
           steps={[
@@ -109,7 +109,7 @@ export function HowCalibrationWorksModal({
           {t('shared:close')}
         </PrimaryButton>
       </Flex>
-    </LegacyModal>,
+    </Modal>,
     getTopPortalEl()
   )
 }
@@ -124,9 +124,9 @@ function CalibrationSteps({
 }: CalibrationStepsProps): JSX.Element {
   return (
     <Box marginTop={SPACING.spacing4}>
-      <StyledText as="p" marginBottom={SPACING.spacing8}>
+      <LegacyStyledText as="p" marginBottom={SPACING.spacing8}>
         {description}
-      </StyledText>
+      </LegacyStyledText>
       <ul>
         {steps.map(step => (
           <li
@@ -135,7 +135,7 @@ function CalibrationSteps({
             `}
             key={step}
           >
-            <StyledText as="p">{step}</StyledText>
+            <LegacyStyledText as="p">{step}</LegacyStyledText>
           </li>
         ))}
       </ul>

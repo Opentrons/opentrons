@@ -21,8 +21,8 @@ from opentrons.protocol_api.core.legacy_simulator.legacy_protocol_core import (
     LegacyProtocolCoreSimulator,
 )
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 
 @pytest.fixture

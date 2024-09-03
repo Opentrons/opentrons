@@ -8,7 +8,7 @@ Add new tests to test_command_state.py, where they can be tested together.
 import pytest
 from contextlib import nullcontext as does_not_raise
 from datetime import datetime
-from typing import Dict, List, NamedTuple, Optional, Sequence, Type, Union
+from typing import Any, Dict, List, NamedTuple, Optional, Sequence, Type, Union
 
 from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
 from opentrons.protocol_engine.actions import (
@@ -25,6 +25,7 @@ from opentrons.protocol_engine.state.commands import (
     CommandState,
     CommandView,
     CommandSlice,
+    CommandErrorSlice,
     CommandPointer,
     RunResult,
     QueueStatus,
@@ -46,6 +47,15 @@ from .command_fixtures import (
 )
 
 
+def _placeholder_error_recovery_policy(*args: object, **kwargs: object) -> Any:
+    """A placeholder `ErrorRecoveryPolicy` for tests that don't care about it.
+
+    That should be all the tests in this file, since error recovery was added
+    after this file was deprecated.
+    """
+    raise NotImplementedError()
+
+
 def get_command_view(  # noqa: C901
     queue_status: QueueStatus = QueueStatus.SETUP,
     run_completed_at: Optional[datetime] = None,
@@ -63,6 +73,8 @@ def get_command_view(  # noqa: C901
     finish_error: Optional[errors.ErrorOccurrence] = None,
     commands: Sequence[cmd.Command] = (),
     latest_command_hash: Optional[str] = None,
+    failed_command_errors: Optional[List[ErrorOccurrence]] = None,
+    has_entered_error_recovery: bool = False,
 ) -> CommandView:
     """Get a command view test subject."""
     command_history = CommandHistory()
@@ -99,6 +111,9 @@ def get_command_view(  # noqa: C901
         run_started_at=run_started_at,
         latest_protocol_command_hash=latest_command_hash,
         stopped_by_estop=False,
+        failed_command_errors=failed_command_errors or [],
+        has_entered_error_recovery=has_entered_error_recovery,
+        error_recovery_policy=_placeholder_error_recovery_policy,
     )
 
     return CommandView(state=state)
@@ -216,7 +231,9 @@ def test_get_next_to_execute_returns_no_commands_if_paused() -> None:
     assert result is None
 
 
-def test_get_next_to_execute_returns_no_commands_if_awaiting_recovery_no_fixit() -> None:
+def test_get_next_to_execute_returns_no_commands_if_awaiting_recovery_no_fixit() -> (
+    None
+):
     """It should not return any type of command if the engine is awaiting-recovery."""
     subject = get_command_view(
         queue_status=QueueStatus.AWAITING_RECOVERY,
@@ -398,25 +415,19 @@ action_allowed_specs: List[ActionAllowedSpec] = [
     # play is allowed if the engine is idle
     ActionAllowedSpec(
         subject=get_command_view(queue_status=QueueStatus.SETUP),
-        action=PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        ),
+        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
         expected_error=None,
     ),
     # play is allowed if engine is idle, even if door is blocking
     ActionAllowedSpec(
         subject=get_command_view(is_door_blocking=True, queue_status=QueueStatus.SETUP),
-        action=PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        ),
+        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
         expected_error=None,
     ),
     # play is allowed if the engine is paused
     ActionAllowedSpec(
         subject=get_command_view(queue_status=QueueStatus.PAUSED),
-        action=PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        ),
+        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
         expected_error=None,
     ),
     # pause is allowed if the engine is running
@@ -447,17 +458,13 @@ action_allowed_specs: List[ActionAllowedSpec] = [
         subject=get_command_view(
             is_door_blocking=True, queue_status=QueueStatus.PAUSED
         ),
-        action=PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        ),
+        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
         expected_error=errors.RobotDoorOpenError,
     ),
     # play is disallowed if stop has been requested
     ActionAllowedSpec(
         subject=get_command_view(run_result=RunResult.STOPPED),
-        action=PlayAction(
-            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
-        ),
+        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
         expected_error=errors.RunStoppedError,
     ),
     # pause is disallowed if stop has been requested
@@ -864,7 +871,7 @@ def test_get_current() -> None:
         created_at=datetime(year=2022, month=2, day=2),
     )
     subject = get_command_view(commands=[command_1, command_2])
-    subject.state.command_history._set_terminal_command_id(command_1.id)
+    subject.state.command_history._set_most_recently_completed_command_id(command_1.id)
 
     assert subject.get_current() == CommandPointer(
         index=1,
@@ -884,7 +891,7 @@ def test_get_current() -> None:
         created_at=datetime(year=2022, month=2, day=2),
     )
     subject = get_command_view(commands=[command_1, command_2])
-    subject.state.command_history._set_terminal_command_id(command_1.id)
+    subject.state.command_history._set_most_recently_completed_command_id(command_1.id)
 
     assert subject.get_current() == CommandPointer(
         index=1,
@@ -897,7 +904,7 @@ def test_get_current() -> None:
 def test_get_slice_empty() -> None:
     """It should return a slice from the tail if no current command."""
     subject = get_command_view(commands=[])
-    result = subject.get_slice(cursor=None, length=2)
+    result = subject.get_slice(cursor=0, length=2)
 
     assert result == CommandSlice(commands=[], cursor=0, total_length=0)
 
@@ -999,30 +1006,37 @@ def test_get_slice_default_cursor_running() -> None:
     )
 
 
-def test_get_slice_default_cursor_queued() -> None:
-    """It should select a cursor automatically."""
-    command_1 = create_succeeded_command(command_id="command-id-1")
-    command_2 = create_succeeded_command(command_id="command-id-2")
-    command_3 = create_succeeded_command(command_id="command-id-3")
-    command_4 = create_queued_command(command_id="command-id-4")
-    command_5 = create_queued_command(command_id="command-id-5")
+def test_get_errors_slice_empty() -> None:
+    """It should return a slice from the tail if no current command."""
+    subject = get_command_view(failed_command_errors=[])
+    result = subject.get_errors_slice(cursor=0, length=2)
+
+    assert result == CommandErrorSlice(commands_errors=[], cursor=0, total_length=0)
+
+
+def test_get_errors_slice() -> None:
+    """It should return a slice of all command errors."""
+    error_1 = ErrorOccurrence.model_construct(id="error-id-1")  # type: ignore[call-arg]
+    error_2 = ErrorOccurrence.model_construct(id="error-id-2")  # type: ignore[call-arg]
+    error_3 = ErrorOccurrence.model_construct(id="error-id-3")  # type: ignore[call-arg]
+    error_4 = ErrorOccurrence.model_construct(id="error-id-4")  # type: ignore[call-arg]
 
     subject = get_command_view(
-        commands=[command_1, command_2, command_3, command_4, command_5],
-        running_command_id=None,
-        queued_command_ids=[command_4.id, command_5.id],
+        failed_command_errors=[error_1, error_2, error_3, error_4]
     )
 
-    result = subject.get_slice(cursor=None, length=2)
+    result = subject.get_errors_slice(cursor=1, length=3)
 
-    assert result == CommandSlice(
-        commands=[command_3, command_4],
-        cursor=2,
-        total_length=5,
+    assert result == CommandErrorSlice(
+        commands_errors=[error_2, error_3, error_4],
+        cursor=1,
+        total_length=4,
     )
 
+    result = subject.get_errors_slice(cursor=-3, length=10)
 
-def test_get_latest_command_hash() -> None:
-    """It should get the latest command hash from state, if set."""
-    subject = get_command_view(latest_command_hash="abc123")
-    assert subject.get_latest_protocol_command_hash() == "abc123"
+    assert result == CommandErrorSlice(
+        commands_errors=[error_1, error_2, error_3, error_4],
+        cursor=0,
+        total_length=4,
+    )

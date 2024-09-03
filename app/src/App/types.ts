@@ -6,7 +6,6 @@ export interface RouteProps {
    * drop developed components into slots held by placeholder div components
    */
   Component: React.FC
-  exact?: boolean
   /**
    * a route/page name to render in the nav bar
    */
@@ -23,7 +22,6 @@ export type RobotSettingsTab =
   | 'networking'
   | 'advanced'
   | 'feature-flags'
-  | 'privacy'
 
 export type AppSettingsTab =
   | 'general'
@@ -56,4 +54,5 @@ export interface DesktopRouteParams {
 export interface OnDeviceRouteParams {
   protocolId: string
   runId: string
+  quickTransferId: string
 }

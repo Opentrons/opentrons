@@ -1,12 +1,12 @@
 """ProtocolEngine class definition."""
 from contextlib import AsyncExitStack
 from logging import getLogger
-from typing import Dict, Optional, Union
-from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
-from opentrons.protocol_engine.error_recovery_policy import (
-    ErrorRecoveryPolicy,
-    error_recovery_by_ff,
+from typing import Dict, Optional, Union, AsyncGenerator, Callable
+from opentrons.protocol_engine.actions.actions import (
+    ResumeFromRecoveryAction,
+    SetErrorRecoveryPolicyAction,
 )
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
@@ -38,7 +38,7 @@ from .execution import (
     DoorWatcher,
     HardwareStopper,
 )
-from .state import StateStore, StateView
+from .state.state import StateStore, StateView
 from .plugins import AbstractPlugin, PluginStarter
 from .actions import (
     ActionDispatcher,
@@ -52,11 +52,13 @@ from .actions import (
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddLiquidAction,
+    SetDeckConfigurationAction,
     AddAddressableAreaAction,
     AddModuleAction,
     HardwareStoppedAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
+    AddAbsorbanceReaderLidAction,
 )
 
 
@@ -93,7 +95,6 @@ class ProtocolEngine:
         hardware_stopper: Optional[HardwareStopper] = None,
         door_watcher: Optional[DoorWatcher] = None,
         module_data_provider: Optional[ModuleDataProvider] = None,
-        error_recovery_policy: ErrorRecoveryPolicy = error_recovery_by_ff,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
@@ -105,19 +106,12 @@ class ProtocolEngine:
         self._hardware_api = hardware_api
         self._state_store = state_store
         self._model_utils = model_utils or ModelUtils()
-
         self._action_dispatcher = action_dispatcher or ActionDispatcher(
             sink=self._state_store
         )
         self._plugin_starter = plugin_starter or PluginStarter(
             state=self._state_store,
             action_dispatcher=self._action_dispatcher,
-        )
-        self._queue_worker = queue_worker or create_queue_worker(
-            hardware_api=hardware_api,
-            state_store=self._state_store,
-            action_dispatcher=self._action_dispatcher,
-            error_recovery_policy=error_recovery_policy,
         )
         self._hardware_stopper = hardware_stopper or HardwareStopper(
             hardware_api=hardware_api,
@@ -129,8 +123,9 @@ class ProtocolEngine:
             action_dispatcher=self._action_dispatcher,
         )
         self._module_data_provider = module_data_provider or ModuleDataProvider()
-
-        self._queue_worker.start()
+        self._queue_worker = queue_worker
+        if self._queue_worker:
+            self._queue_worker.start()
         self._door_watcher.start()
 
     @property
@@ -138,17 +133,37 @@ class ProtocolEngine:
         """Get an interface to retrieve calculated state values."""
         return self._state_store
 
+    @property
+    def _get_queue_worker(self) -> QueueWorker:
+        """Get the queue worker instance."""
+        assert self._queue_worker is not None
+        return self._queue_worker
+
     def add_plugin(self, plugin: AbstractPlugin) -> None:
         """Add a plugin to the engine to customize behavior."""
         self._plugin_starter.start(plugin)
 
-    def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
+    def set_deck_configuration(
+        self, deck_configuration: Optional[DeckConfigurationType]
+    ) -> None:
+        """Inform the engine of the robot's current deck configuration.
+
+        If `Config.use_simulated_deck_config` is `True`, this is meaningless and unused.
+        You can call this with `None` if you want to be explicit--it will no-op.
+
+        If `Config.use_simulated_deck_config` is `False`, you should call this with the
+        robot's actual, full, non-`None` deck configuration, before you play the run for
+        the first time. Do not call this in the middle of a run.
+        """
+        self._action_dispatcher.dispatch(SetDeckConfigurationAction(deck_configuration))
+
+    def play(self) -> None:
         """Start or resume executing commands in the queue."""
         requested_at = self._model_utils.get_timestamp()
         # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
         # homed if necessary
         action = self._state_store.commands.validate_action_allowed(
-            PlayAction(requested_at=requested_at, deck_configuration=deck_configuration)
+            PlayAction(requested_at=requested_at)
         )
         self._action_dispatcher.dispatch(action)
 
@@ -326,7 +341,7 @@ class ProtocolEngine:
         # against the E-stop exception propagating up from lower layers. But we need to
         # do this because we want to make sure non-hardware commands, like
         # `waitForDuration`, are also interrupted.
-        self._queue_worker.cancel()
+        self._get_queue_worker.cancel()
         # Unlike self.request_stop(), we don't need to do
         # self._hardware_api.cancel_execution_and_running_tasks(). Since this was an
         # E-stop event, the hardware API already knows.
@@ -346,7 +361,7 @@ class ProtocolEngine:
         """
         action = self._state_store.commands.validate_action_allowed(StopAction())
         self._action_dispatcher.dispatch(action)
-        self._queue_worker.cancel()
+        self._get_queue_worker.cancel()
         if self._hardware_api.is_movement_execution_taskified():
             # We 'taskify' hardware controller movement functions when running protocols
             # that are not backed by the engine. Such runs cannot be stopped by cancelling
@@ -419,9 +434,9 @@ class ProtocolEngine:
             # We don't use self._hardware_api.get_estop_state() because the E-stop may have been
             # released by the time we get here.
             if isinstance(error, EnumeratedError):
-                if self._code_in_error_tree(
+                if code_in_error_tree(
                     root_error=error, code=ErrorCodes.E_STOP_ACTIVATED
-                ) or self._code_in_error_tree(
+                ) or code_in_error_tree(
                     # Request from the hardware team for the v7.0 betas: to help in-house debugging
                     # of pipette overpressure events, leave the pipette where it was like we do
                     # for E-stops.
@@ -467,7 +482,7 @@ class ProtocolEngine:
             self._hardware_stopper.do_halt,
             disengage_before_stopping=disengage_before_stopping,
         )
-        exit_stack.push_async_callback(self._queue_worker.join)  # First step.
+        exit_stack.push_async_callback(self._get_queue_worker.join)  # First step.
         try:
             # If any teardown steps failed, this will raise something.
             await exit_stack.aclose()
@@ -547,6 +562,12 @@ class ProtocolEngine:
             AddAddressableAreaAction(addressable_area=area)
         )
 
+    def add_absorbance_reader_lid(self, module_id: str, lid_id: str) -> None:
+        """Add an absorbance reader lid to the module state."""
+        self._action_dispatcher.dispatch(
+            AddAbsorbanceReaderLidAction(module_id=module_id, lid_id=lid_id)
+        )
+
     def reset_tips(self, labware_id: str) -> None:
         """Reset the tip state of a given labware."""
         # TODO(mm, 2023-03-10): Safely raise an error if the given labware isn't a
@@ -588,36 +609,52 @@ class ProtocolEngine:
         for a in actions:
             self._action_dispatcher.dispatch(a)
 
-    # TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence
-    @staticmethod
-    def _code_in_error_tree(
-        root_error: Union[EnumeratedError, ErrorOccurrence], code: ErrorCodes
-    ) -> bool:
-        if isinstance(root_error, ErrorOccurrence):
-            # ErrorOccurrence is not the same as the enumerated error exceptions. Check the
-            # code by a string value.
-            if root_error.errorCode == code.value.code:
-                return True
-            return any(
-                ProtocolEngine._code_in_error_tree(wrapped, code)
-                for wrapped in root_error.wrappedErrors
-            )
-
-        # From here we have an exception, can just check the code + recurse to wrapped errors.
-        if root_error.code == code:
-            return True
-
-        if (
-            isinstance(root_error, ProtocolCommandFailedError)
-            and root_error.original_error is not None
-        ):
-            # For this specific EnumeratedError child, we recurse on the original_error field
-            # in favor of the general error.wrapping field.
-            return ProtocolEngine._code_in_error_tree(root_error.original_error, code)
-
-        if len(root_error.wrapping) == 0:
-            return False
-        return any(
-            ProtocolEngine._code_in_error_tree(wrapped_error, code)
-            for wrapped_error in root_error.wrapping
+    def set_and_start_queue_worker(
+        self, command_generator: Callable[[], AsyncGenerator[str, None]]
+    ) -> None:
+        """Set QueueWorker and start it."""
+        assert self._queue_worker is None
+        self._queue_worker = create_queue_worker(
+            hardware_api=self._hardware_api,
+            state_store=self._state_store,
+            action_dispatcher=self._action_dispatcher,
+            command_generator=command_generator,
         )
+        self._queue_worker.start()
+
+    def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
+        """Replace the run's error recovery policy with a new one."""
+        self._action_dispatcher.dispatch(SetErrorRecoveryPolicyAction(policy))
+
+
+# TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence
+def code_in_error_tree(
+    root_error: Union[EnumeratedError, ErrorOccurrence], code: ErrorCodes
+) -> bool:
+    """Check if the specified error code can be found in the given error tree."""
+    if isinstance(root_error, ErrorOccurrence):
+        # ErrorOccurrence is not the same as the enumerated error exceptions. Check the
+        # code by a string value.
+        if root_error.errorCode == code.value.code:
+            return True
+        return any(
+            code_in_error_tree(wrapped, code) for wrapped in root_error.wrappedErrors
+        )
+
+    # From here we have an exception, can just check the code + recurse to wrapped errors.
+    if root_error.code == code:
+        return True
+
+    if (
+        isinstance(root_error, ProtocolCommandFailedError)
+        and root_error.original_error is not None
+    ):
+        # For this specific EnumeratedError child, we recurse on the original_error field
+        # in favor of the general error.wrapping field.
+        return code_in_error_tree(root_error.original_error, code)
+
+    if len(root_error.wrapping) == 0:
+        return False
+    return any(
+        code_in_error_tree(wrapped_error, code) for wrapped_error in root_error.wrapping
+    )

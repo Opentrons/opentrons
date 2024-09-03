@@ -1,7 +1,8 @@
 import * as React from 'react'
 import Markdown from 'react-markdown'
 
-import { StyledText } from '@opentrons/components'
+import { Box, COLORS, SPACING, LegacyStyledText } from '@opentrons/components'
+
 import { useIsOEMMode } from '../../resources/robot-settings/hooks'
 
 import styles from './styles.module.css'
@@ -28,6 +29,7 @@ export function ReleaseNotes(props: ReleaseNotesProps): JSX.Element {
             li: ListItemText,
             p: ParagraphText,
             a: ExternalLink,
+            hr: HorizontalRule,
           }}
         >
           {source}
@@ -44,17 +46,27 @@ function ExternalLink(props: JSX.IntrinsicAttributes): JSX.Element {
 }
 
 function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="p" />
+  return <LegacyStyledText {...props} as="p" />
 }
 
 function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="h3" />
+  return <LegacyStyledText {...props} as="h3" />
 }
 
 function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="li" />
+  return <LegacyStyledText {...props} as="li" />
 }
 
 function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="ul" />
+  return <LegacyStyledText {...props} as="ul" />
+}
+
+function HorizontalRule(): JSX.Element {
+  return (
+    <Box
+      borderBottom={`1px solid ${String(COLORS.grey30)}`}
+      marginY={SPACING.spacing16}
+      data-testid="divider"
+    />
+  )
 }

@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
-import { useCurrentRunId } from './useCurrentRunId'
+import { useCurrentRunId } from '../../../resources/runs'
 
 import type { UseDismissCurrentRunMutationOptions } from '@opentrons/react-api-client/src/runs/useDismissCurrentRunMutation'
 
@@ -23,8 +23,10 @@ export function useCloseCurrentRun(): {
   ): void => {
     if (currentRunId != null) {
       dismissCurrentRun(currentRunId, {
+        onError: () => {
+          console.warn('failed to dismiss current')
+        },
         ...options,
-        onError: () => console.warn('failed to dismiss current'),
       })
     }
   }

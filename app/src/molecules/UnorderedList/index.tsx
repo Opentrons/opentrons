@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { SPACING, StyledText } from '@opentrons/components'
+import { SPACING, LegacyStyledText } from '@opentrons/components'
 
 interface UnorderedListProps {
   items: React.ReactNode[]
@@ -16,7 +16,7 @@ export function UnorderedList(props: UnorderedListProps): JSX.Element {
             margin-left: ${SPACING.spacing24};
           `}
         >
-          <StyledText as="p">{item}</StyledText>
+          <LegacyStyledText as="p">{item}</LegacyStyledText>
         </li>
       ))}
     </ul>

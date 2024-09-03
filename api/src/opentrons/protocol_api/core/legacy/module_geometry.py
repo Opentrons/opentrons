@@ -16,7 +16,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from opentrons_shared_data import module
-from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
+from opentrons_shared_data.module.types import ModuleDefinitionV3
 from opentrons_shared_data.module import OLD_TC_GEN2_LABWARE_OFFSET
 
 from opentrons.types import Location, Point, LocationLabware

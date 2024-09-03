@@ -11,11 +11,11 @@ import {
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
+  Modal,
 } from '@opentrons/components'
 import { useAttachedModules } from '../hooks'
-import { LegacyModal } from '../../../molecules/LegacyModal'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
@@ -83,13 +83,13 @@ export const HeaterShakerIsRunningModal = (
   }
 
   return (
-    <LegacyModal onClose={closeModal} title={title}>
+    <Modal onClose={closeModal} title={title}>
       <Box>
         <HeaterShakerModuleCard module={module} />
       </Box>
-      <StyledText fontSize={TYPOGRAPHY.fontSizeP}>
+      <LegacyStyledText fontSize={TYPOGRAPHY.fontSizeP}>
         {t('continue_shaking_protocol_start_prompt')}
-      </StyledText>
+      </LegacyStyledText>
 
       <Flex justifyContent={JUSTIFY_FLEX_END}>
         <SecondaryButton
@@ -110,6 +110,6 @@ export const HeaterShakerIsRunningModal = (
           {t('keep_shaking_start_run')}
         </PrimaryButton>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

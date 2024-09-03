@@ -9,11 +9,10 @@ import {
   Link,
   PrimaryButton,
   SPACING,
-  StyledText,
+  Modal,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { LegacyModal } from '../../molecules/LegacyModal'
 
 const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'
@@ -26,12 +25,11 @@ export function ConnectionTroubleshootingModal(props: Props): JSX.Element {
   const { t } = useTranslation(['devices_landing', 'shared'])
 
   return (
-    <LegacyModal
-      title={t('why_is_this_robot_unavailable')}
-      onClose={props.onClose}
-    >
+    <Modal title={t('why_is_this_robot_unavailable')} onClose={props.onClose}>
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p">{t('connection_troubleshooting_intro')}</StyledText>
+        <LegacyStyledText as="p">
+          {t('connection_troubleshooting_intro')}
+        </LegacyStyledText>
         <TroubleshootingSteps
           label={t('if_connecting_via_usb')}
           steps={[
@@ -47,11 +45,11 @@ export function ConnectionTroubleshootingModal(props: Props): JSX.Element {
           label={t('if_still_having_issues')}
           steps={[t('restart_the_robot'), t('restart_the_app')]}
         />
-        <StyledText as="p" marginTop={SPACING.spacing16}>
+        <LegacyStyledText as="p" marginTop={SPACING.spacing16}>
           {t('branded:contact_support_for_connection_help', {
             support_email: SUPPORT_EMAIL,
           })}
-        </StyledText>
+        </LegacyStyledText>
         <Link
           external
           css={TYPOGRAPHY.linkPSemiBold}
@@ -62,14 +60,16 @@ export function ConnectionTroubleshootingModal(props: Props): JSX.Element {
           {t('learn_more_about_troubleshooting_connection')}
         </Link>
         <PrimaryButton
-          onClick={() => props.onClose()}
+          onClick={() => {
+            props.onClose()
+          }}
           alignSelf={ALIGN_FLEX_END}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
         >
           {t('shared:close')}
         </PrimaryButton>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }
 
@@ -81,9 +81,9 @@ function TroubleshootingSteps(props: TroubleshootingStepsProps): JSX.Element {
   const { label, steps } = props
   return (
     <Box marginTop={SPACING.spacing16}>
-      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {label}:
-      </StyledText>
+      </LegacyStyledText>
       <ul>
         {steps.map(step => (
           <li
@@ -92,7 +92,7 @@ function TroubleshootingSteps(props: TroubleshootingStepsProps): JSX.Element {
             `}
             key={step}
           >
-            <StyledText as="p">{step}</StyledText>
+            <LegacyStyledText as="p">{step}</LegacyStyledText>
           </li>
         ))}
       </ul>

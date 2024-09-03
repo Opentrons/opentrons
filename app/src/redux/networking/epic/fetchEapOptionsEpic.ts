@@ -10,7 +10,8 @@ import type {
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 import type { Action, Epic } from '../../types'
-import type { FetchEapOptionsAction } from '../types'
+import type { EapOption, FetchEapOptionsAction } from '../types'
+import type { RobotApiErrorResponse } from '../../robot-api/types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchEapOptionsAction> = action => ({
   method: GET,
@@ -25,8 +26,8 @@ const mapResponseToAction: ResponseToActionMapper<FetchEapOptionsAction> = (
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? fetchEapOptionsSuccess(host.name, body.options, meta)
-    : fetchEapOptionsFailure(host.name, body, meta)
+    ? fetchEapOptionsSuccess(host.name, body.options as EapOption[], meta)
+    : fetchEapOptionsFailure(host.name, body as RobotApiErrorResponse, meta)
 }
 
 export const fetchEapOptionsEpic: Epic = (action$, state$) => {

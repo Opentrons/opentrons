@@ -30,6 +30,7 @@ export const ROBOT_MASS_STORAGE_DEVICE_ENUMERATED: 'shell:ROBOT_MASS_STORAGE_DEV
   'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED'
 export const NOTIFY_SUBSCRIBE: 'shell:NOTIFY_SUBSCRIBE' =
   'shell:NOTIFY_SUBSCRIBE'
+export const SEND_FILE_PATHS: 'shell:SEND_FILE_PATHS' = 'shell:SEND_FILE_PATHS'
 
 export const uiInitialized = (): UiInitializedAction => ({
   type: UI_INITIALIZED,

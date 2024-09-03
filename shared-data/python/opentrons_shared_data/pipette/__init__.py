@@ -11,7 +11,7 @@ from functools import lru_cache
 from .. import load_shared_data
 
 if TYPE_CHECKING:
-    from .dev_types import (
+    from .types import (
         PipetteNameSpecs,
         PipetteModelSpecs,
         PipetteName,

@@ -28,8 +28,8 @@ const mapResponseToAction: ResponseToActionMapper<FetchLightsAction> = (
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.fetchLightsSuccess(host.name, body.on, meta)
-    : Actions.fetchLightsFailure(host.name, body, meta)
+    ? Actions.fetchLightsSuccess(host.name, body.on as boolean, meta)
+    : Actions.fetchLightsFailure(host.name, body as { message: string }, meta)
 }
 
 export const fetchLightsEpic: Epic = (action$, state$) => {

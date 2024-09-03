@@ -8,15 +8,15 @@ import {
   Flex,
   Icon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { usePipetteModelSpecs } from '../../resources/instruments/hooks'
 
 import type { InstrumentData, PipetteData } from '@opentrons/api-client'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface UpdateResultsModalProps {
   isSuccess: boolean
@@ -31,7 +31,7 @@ export function UpdateResultsModal(
   const { isSuccess, shouldExit, onClose, instrument } = props
   const { i18n, t } = useTranslation(['firmware_update', 'shared', 'branded'])
 
-  const updateFailedHeader: ModalHeaderBaseProps = {
+  const updateFailedHeader: OddModalHeaderBaseProps = {
     title: t('update_failed'),
     iconName: 'ot-alert',
     iconColor: COLORS.red50,
@@ -51,11 +51,11 @@ export function UpdateResultsModal(
   return (
     <>
       {!isSuccess ? (
-        <Modal header={updateFailedHeader}>
+        <OddModal header={updateFailedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="p" marginBottom={SPACING.spacing32}>
+            <LegacyStyledText as="p" marginBottom={SPACING.spacing32}>
               {t('branded:firmware_update_download_logs')}
-            </StyledText>
+            </LegacyStyledText>
             <SmallButton
               onClick={onClose}
               buttonText={
@@ -66,9 +66,9 @@ export function UpdateResultsModal(
               width="100%"
             />
           </Flex>
-        </Modal>
+        </OddModal>
       ) : (
-        <Modal>
+        <OddModal>
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing32}
@@ -92,14 +92,14 @@ export function UpdateResultsModal(
                 size="2.5rem"
                 marginBottom={SPACING.spacing16}
               />
-              <StyledText
+              <LegacyStyledText
                 as="h4"
                 marginBottom={SPACING.spacing4}
                 fontWeight={TYPOGRAPHY.fontWeightBold}
               >
                 {t('successful_update')}
-              </StyledText>
-              <StyledText as="p" textAlign={TYPOGRAPHY.textAlignCenter}>
+              </LegacyStyledText>
+              <LegacyStyledText as="p" textAlign={TYPOGRAPHY.textAlignCenter}>
                 <Trans
                   t={t}
                   i18nKey="ready_to_use"
@@ -110,7 +110,7 @@ export function UpdateResultsModal(
                     bold: <strong />,
                   }}
                 />
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
             <SmallButton
               onClick={onClose}
@@ -122,7 +122,7 @@ export function UpdateResultsModal(
               width="100%"
             />
           </Flex>
-        </Modal>
+        </OddModal>
       )}
     </>
   )

@@ -8,6 +8,11 @@ from opentrons.protocol_api import (
     ModuleContext,
     ThermocyclerContext,
 )
+from opentrons_shared_data.protocol.types import (
+    MagneticModuleCommand,
+    TemperatureModuleCommand,
+    ThermocyclerCommand,
+)
 from .execute_json_v3 import _delay, _move_to_slot
 from opentrons.protocols.execution.types import LoadedLabware, Instruments
 from opentrons_shared_data.protocol.constants import (
@@ -17,7 +22,7 @@ from opentrons_shared_data.protocol.constants import (
 
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.protocol.dev_types import (
+    from opentrons_shared_data.protocol.types import (
         JsonProtocolV4,
         JsonProtocolV5,
         MagneticModuleEngageParams,
@@ -277,21 +282,21 @@ def dispatch_json(
                 params,  # type: ignore
                 modules,
                 command_type,  # type: ignore
-                magnetic_module_command_map,
+                magnetic_module_command_map,  # type: ignore[arg-type]
             )
         elif command_type in temperature_module_command_map:
             handleTemperatureCommand(
-                params,  # type: ignore
+                params,  # type: ignore[arg-type]
                 modules,
                 command_type,  # type: ignore
-                temperature_module_command_map,
+                temperature_module_command_map,  # type: ignore[arg-type]
             )
         elif command_type in thermocycler_module_command_map:
             handleThermocyclerCommand(
                 params,  # type: ignore
                 modules,  # type: ignore
                 command_type,  # type: ignore
-                thermocycler_module_command_map,
+                thermocycler_module_command_map,  # type: ignore[arg-type]
             )
         elif command_item["command"] == JsonRobotCommand.delay.value:
             _delay(context, params)  # type: ignore
@@ -305,12 +310,12 @@ def handleTemperatureCommand(
     params: Union["TemperatureParams", "ModuleIDParams"],
     modules: Dict[str, ModuleContext],
     command_type: "TemperatureModuleCommandId",
-    temperature_module_command_map,
+    temperature_module_command_map: TemperatureModuleCommand,
 ) -> None:
     module_id = params["module"]
     module = modules[module_id]
     if isinstance(module, TemperatureModuleContext):
-        temperature_module_command_map[command_type](module, params)
+        temperature_module_command_map[command_type](module, params)  # type: ignore[typeddict-item]
     else:
         raise RuntimeError(
             "Temperature Module does not match " + "TemperatureModuleContext interface"
@@ -326,12 +331,12 @@ def handleThermocyclerCommand(
     ],
     modules: Dict[str, ThermocyclerContext],
     command_type: "ThermocyclerCommandId",
-    thermocycler_module_command_map,
+    thermocycler_module_command_map: ThermocyclerCommand,
 ) -> None:
     module_id = params["module"]
     module = modules[module_id]
     if isinstance(module, ThermocyclerContext):
-        thermocycler_module_command_map[command_type](module, params)
+        thermocycler_module_command_map[command_type](module, params)  # type: ignore[typeddict-item]
     else:
         raise RuntimeError(
             "Thermocycler Module does not match ThermocyclerContext interface"
@@ -342,12 +347,12 @@ def handleMagnetCommand(
     params: Union["ModuleIDParams", "MagneticModuleEngageParams"],
     modules: Dict[str, ModuleContext],
     command_type: "MagneticModuleCommandId",
-    magnetic_module_command_map,
+    magnetic_module_command_map: MagneticModuleCommand,
 ) -> None:
     module_id = params["module"]
     module = modules[module_id]
     if isinstance(module, MagneticModuleContext):
-        magnetic_module_command_map[command_type](module, params)
+        magnetic_module_command_map[command_type](module, params)  # type: ignore[typeddict-item]
     else:
         raise RuntimeError(
             "Magnetic Module does not match MagneticModuleContext interface"

@@ -11,11 +11,11 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
+  RadioButton,
 } from '@opentrons/components'
 
-import { RadioButton } from '../../atoms/buttons'
 import { getLocalRobot } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
@@ -102,29 +102,31 @@ export function SelectAuthenticationType({
             ))}
           </Flex>
           <Flex marginY={SPACING.spacing24}>
-            <StyledText
+            <LegacyStyledText
               as="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               color={COLORS.grey60}
             >
               {t('your_mac_address_is', { macAddress: wifi?.macAddress })}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
           <Btn
             display={DISPLAY_FLEX}
             width="100%"
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
-            onClick={() => setShowAlternativeSecurityTypeModal(true)}
+            onClick={() => {
+              setShowAlternativeSecurityTypeModal(true)
+            }}
             padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           >
-            <StyledText
+            <LegacyStyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.grey60}
             >
               {t('need_another_security_type')}
-            </StyledText>
+            </LegacyStyledText>
           </Btn>
         </Flex>
       </Flex>

@@ -1,19 +1,20 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-
+import { useNavigate } from 'react-router-dom'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
+import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 
 import { getTopPortalEl } from '../../App/portal'
 import { FloatingActionButton } from '../../atoms/buttons'
@@ -22,6 +23,7 @@ import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useRunStatus } from '../RunTimeControl/hooks'
 import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
@@ -29,14 +31,11 @@ import {
 import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { FixtureTable } from './FixtureTable'
 import { ModuleTable } from './ModuleTable'
-import { ModulesAndDeckMapViewModal } from './ModulesAndDeckMapViewModal'
+import { ModulesAndDeckMapView } from './ModulesAndDeckMapView'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type { CutoutId, CutoutFixtureId } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
-import { useRunStatus } from '../RunTimeControl/hooks'
-import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
-import { useHistory } from 'react-router-dom'
 
 const ATTACHED_MODULE_POLL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000
@@ -58,18 +57,18 @@ export function ProtocolSetupModulesAndDeck({
   setProvidedFixtureOptions,
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
-  const history = useHistory()
+  const navigate = useNavigate()
   const runStatus = useRunStatus(runId)
   React.useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED) {
-      history.push('/protocols')
+      navigate('/protocols')
     }
-  }, [runStatus, history])
+  }, [runStatus, navigate])
   const [
     showSetupInstructionsModal,
     setShowSetupInstructionsModal,
   ] = React.useState<boolean>(false)
-  const [showDeckMapModal, setShowDeckMapModal] = React.useState<boolean>(false)
+  const [showMapView, setShowMapView] = React.useState<boolean>(false)
   const [
     clearModuleMismatchBanner,
     setClearModuleMismatchBanner,
@@ -114,25 +113,21 @@ export function ProtocolSetupModulesAndDeck({
               setShowSetupInstructionsModal={setShowSetupInstructionsModal}
             />
           ) : null}
-          {showDeckMapModal ? (
-            <ModulesAndDeckMapViewModal
-              setShowDeckMapModal={setShowDeckMapModal}
-              attachedProtocolModuleMatches={attachedProtocolModuleMatches}
-              runId={runId}
-              protocolAnalysis={mostRecentAnalysis}
-            />
-          ) : null}
         </>,
         getTopPortalEl()
       )}
       <ChildNavigation
         header={t('deck_hardware')}
-        onClickBack={() => setSetupScreen('prepare to run')}
+        onClickBack={() => {
+          setSetupScreen('prepare to run')
+        }}
         buttonText={i18n.format(t('setup_instructions'), 'titleCase')}
         buttonType="tertiaryLowLight"
         iconName="information"
         iconPlacement="startIcon"
-        onClickButton={() => setShowSetupInstructionsModal(true)}
+        onClickButton={() => {
+          setShowSetupInstructionsModal(true)
+        }}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -140,51 +135,70 @@ export function ProtocolSetupModulesAndDeck({
         marginTop="5.75rem"
         marginBottom={SPACING.spacing80}
       >
-        {isModuleMismatch && !clearModuleMismatchBanner ? (
-          <InlineNotification
-            type="alert"
-            onCloseClick={e => {
-              e.stopPropagation()
-              setClearModuleMismatchBanner(true)
-            }}
-            heading={t('extra_module_attached')}
-            message={t('module_mismatch_body')}
+        {showMapView ? (
+          <ModulesAndDeckMapView
+            attachedProtocolModuleMatches={attachedProtocolModuleMatches}
+            runId={runId}
+            protocolAnalysis={mostRecentAnalysis}
           />
-        ) : null}
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          <Flex
-            color={COLORS.grey60}
-            fontSize={TYPOGRAPHY.fontSize22}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            gridGap={SPACING.spacing24}
-            lineHeight={TYPOGRAPHY.lineHeight28}
-            paddingX={SPACING.spacing24}
-          >
-            <StyledText flex="3.5 0 0">
-              {i18n.format(t('deck_hardware'), 'titleCase')}
-            </StyledText>
-            <StyledText flex="2 0 0">{t('location')}</StyledText>
-            <StyledText flex="4 0 0"> {t('status')}</StyledText>
-          </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-            {hasModules ? (
-              <ModuleTable
-                attachedProtocolModuleMatches={attachedProtocolModuleMatches}
-                deckDef={deckDef}
-                runId={runId}
+        ) : (
+          <>
+            {isModuleMismatch && !clearModuleMismatchBanner ? (
+              <InlineNotification
+                type="alert"
+                onCloseClick={e => {
+                  e.stopPropagation()
+                  setClearModuleMismatchBanner(true)
+                }}
+                heading={t('extra_module_attached')}
+                message={t('module_mismatch_body')}
               />
             ) : null}
-            <FixtureTable
-              robotType={FLEX_ROBOT_TYPE}
-              mostRecentAnalysis={mostRecentAnalysis}
-              setSetupScreen={setSetupScreen}
-              setCutoutId={setCutoutId}
-              setProvidedFixtureOptions={setProvidedFixtureOptions}
-            />
-          </Flex>
-        </Flex>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+              <Flex
+                color={COLORS.grey60}
+                fontSize={TYPOGRAPHY.fontSize22}
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                gridGap={SPACING.spacing24}
+                lineHeight={TYPOGRAPHY.lineHeight28}
+                paddingX={SPACING.spacing24}
+              >
+                <LegacyStyledText flex="3.5 0 0">
+                  {i18n.format(t('deck_hardware'), 'titleCase')}
+                </LegacyStyledText>
+                <LegacyStyledText flex="2 0 0">
+                  {t('location')}
+                </LegacyStyledText>
+                <LegacyStyledText flex="4 0 0"> {t('status')}</LegacyStyledText>
+              </Flex>
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+                {hasModules ? (
+                  <ModuleTable
+                    attachedProtocolModuleMatches={
+                      attachedProtocolModuleMatches
+                    }
+                    deckDef={deckDef}
+                    runId={runId}
+                  />
+                ) : null}
+                <FixtureTable
+                  robotType={FLEX_ROBOT_TYPE}
+                  mostRecentAnalysis={mostRecentAnalysis}
+                  setSetupScreen={setSetupScreen}
+                  setCutoutId={setCutoutId}
+                  setProvidedFixtureOptions={setProvidedFixtureOptions}
+                />
+              </Flex>
+            </Flex>
+          </>
+        )}
       </Flex>
-      <FloatingActionButton onClick={() => setShowDeckMapModal(true)} />
+      <FloatingActionButton
+        buttonText={showMapView ? t('list_view') : t('map_view')}
+        onClick={() => {
+          setShowMapView(mapView => !mapView)
+        }}
+      />
     </>
   )
 }

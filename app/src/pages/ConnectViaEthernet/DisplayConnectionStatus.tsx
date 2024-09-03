@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
@@ -12,7 +12,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -28,7 +28,7 @@ export function DisplayConnectionStatus({
   setShowNetworkDetailsModal,
 }: DisplayConnectionStatusProps): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
-  const history = useHistory()
+  const navigate = useNavigate()
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
@@ -60,11 +60,11 @@ export function DisplayConnectionStatus({
           gridGap={isConnected ? '0' : SPACING.spacing4}
           alignItems={ALIGN_CENTER}
         >
-          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {isConnected ? t('successfully_connected') : t('no_network_found')}
-          </StyledText>
+          </LegacyStyledText>
           {isConnected ? null : (
-            <StyledText
+            <LegacyStyledText
               as="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               textAlign={TYPOGRAPHY.textAlignCenter}
@@ -72,7 +72,7 @@ export function DisplayConnectionStatus({
               margin="0 2rem"
             >
               {t('ethernet_connection_description')}
-            </StyledText>
+            </LegacyStyledText>
           )}
         </Flex>
       </Flex>
@@ -85,15 +85,17 @@ export function DisplayConnectionStatus({
           flex="1"
           buttonType={isConnected ? 'secondary' : 'primary'}
           buttonText={t('view_network_details')}
-          onClick={() => setShowNetworkDetailsModal(true)}
+          onClick={() => {
+            setShowNetworkDetailsModal(true)
+          }}
         />
         {isConnected ? (
           <MediumButton
             flex="1"
             buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-            onClick={() =>
-              history.push('/robot-settings/update-robot-during-onboarding')
-            }
+            onClick={() => {
+              navigate('/robot-settings/update-robot-during-onboarding')
+            }}
           />
         ) : null}
       </Flex>

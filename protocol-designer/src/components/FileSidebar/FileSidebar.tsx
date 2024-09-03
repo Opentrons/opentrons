@@ -278,9 +278,9 @@ export function v8WarningContent(t: any): JSX.Element {
   return (
     <div>
       <p>
-        {t(`hint.export_v8_1_protocol_7_3.body1`)}{' '}
-        <strong>{t(`hint.export_v8_1_protocol_7_3.body2`)}</strong>
-        {t(`hint.export_v8_1_protocol_7_3.body3`)}
+        {t(`alert:hint.export_v8_1_protocol_7_3.body1`)}{' '}
+        <strong>{t(`alert:hint.export_v8_1_protocol_7_3.body2`)}</strong>
+        {t(`alert:hint.export_v8_1_protocol_7_3.body3`)}
       </p>
     </div>
   )
@@ -323,12 +323,14 @@ export function FileSidebar(): JSX.Element {
   }
   const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
 
-  const cancelModal = (): void => setShowExportWarningModal(false)
+  const cancelModal = (): void => {
+    setShowExportWarningModal(false)
+  }
 
   const loadFile = (
     fileChangeEvent: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    if (!hasUnsavedChanges || window.confirm(t('confirm_import'))) {
+    if (!hasUnsavedChanges || window.confirm(t('confirm_import') as string)) {
       dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
     }
   }
@@ -402,7 +404,9 @@ export function FileSidebar(): JSX.Element {
     enabled: showBlockingHint,
     hintKey,
     content,
-    handleCancel: () => setShowBlockingHint(false),
+    handleCancel: () => {
+      setShowBlockingHint(false)
+    },
     handleContinue: () => {
       setShowBlockingHint(false)
       dispatch(loadFileActions.saveProtocolFile())

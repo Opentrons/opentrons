@@ -5,7 +5,7 @@ from opentrons_shared_data.deck import (
     list_names as list_deck_definition_names,
     load as load_deck_definition,
 )
-from opentrons_shared_data.deck.dev_types import (
+from opentrons_shared_data.deck.types import (
     DeckDefinitionV3,
     DeckDefinitionV5,
 )

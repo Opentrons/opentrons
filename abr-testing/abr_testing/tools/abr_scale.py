@@ -9,11 +9,14 @@ from abr_testing.automation import google_sheets_tool
 import requests
 from typing import Any, Tuple
 import sys
+import json
 
 
-def get_protocol_step_as_int() -> Tuple[int, int, str]:
+def get_protocol_step_as_int(
+    storage_directory: str, robot: str
+) -> Tuple[int, float, str]:
     """Get user input as integer."""
-    expected_liquid_moved = 0
+    expected_liquid_moved = 0.0
     ip = ""
     while True:
         try:
@@ -26,23 +29,46 @@ def get_protocol_step_as_int() -> Tuple[int, int, str]:
             print("Protocol step should be an integer value 1, 2, or 3.")
 
     if int(protocol_step) == 3:
-        ip = input("Robot IP: ")
-        while True:
+        # setup IP sheet
+        ip_json_file = os.path.join(storage_directory, "IP_N_VOLUMES.json")
+        # create an dict copying the contents of IP_N_Volumes
+        try:
+            ip_file = json.load(open(ip_json_file))
             try:
-                expected_liquid_moved = int(input("Expected volume moved: "))
-                if expected_liquid_moved >= 0:
-                    break
-            except ValueError:
-                print("Expected liquid moved volume should be an integer.")
+                # grab IP and volume from the dict
+                tot_info = ip_file["information"]
+                robot_info = tot_info[robot]
+                IP_add = robot_info["IP"]
+                exp_volume = robot_info["volume"]
+                # sets return variables equal to those grabbed from the sheet
+                ip = IP_add
+                expected_liquid_moved = float(exp_volume)
+            except KeyError:
+                ip = input("Robot IP: ")
+                while True:
+                    try:
+                        expected_liquid_moved = float(input("Expected volume moved: "))
+                        if expected_liquid_moved >= 0 or expected_liquid_moved <= 0:
+                            break
+                    except ValueError:
+                        print("Expected liquid moved volume should be an float.")
+        except FileNotFoundError:
+            print(
+                f"Please add json file with robot IPs and expected volumes to: {storage_directory}."
+            )
+            sys.exit()
+
     return protocol_step, expected_liquid_moved, ip
 
 
 def get_all_plate_readings(
-    robot: str, plate: str, mass_3: float, expected_moved: int, google_sheet: Any
+    robot: str, plate: str, mass_3: float, expected_moved: float, google_sheet: Any
 ) -> float:
     """Calculate accuracy of liquid moved on final measurement step."""
     accuracy = 0.0
-    all_data = google_sheet.get_all_data()
+    header_list = google_sheet.get_row(1)
+    all_data = google_sheet.get_all_data(header_list)
+
     # Get mass of first reading
     mass_1_readings = []
     for row in all_data:
@@ -74,7 +100,7 @@ def get_all_plate_readings(
     else:
         starting_liquid = 0
     actual_moved = ((mass_3 - mass_1) * 1000) - starting_liquid
-    accuracy = ((float(expected_moved) - actual_moved) / actual_moved) * 100
+    accuracy = ((expected_moved - actual_moved) / actual_moved) * 100
     return accuracy
 
 
@@ -97,9 +123,25 @@ def get_most_recent_run_and_record(
     most_recent_run_id = run_list[-1]["id"]
     results = get_run_logs.get_run_data(most_recent_run_id, ip)
     # Save run information to local directory as .json file
-    read_robot_logs.save_run_log_to_json(ip, results, storage_directory)
+    saved_file_path = read_robot_logs.save_run_log_to_json(
+        ip, results, storage_directory
+    )
+    # Check that last run is completed.
+    with open(saved_file_path) as file:
+        file_results = json.load(file)
+        try:
+            file_results["completedAt"]
+        except ValueError:
+            # no completedAt field, get run before the last run.
+            most_recent_run_id = run_list[-2]["id"]
+            results = get_run_logs.get_run_data(most_recent_run_id, ip)
+            # Save run information to local directory as .json file
+            saved_file_path = read_robot_logs.save_run_log_to_json(
+                ip, results, storage_directory
+            )
     # Record run to google sheets.
     print(most_recent_run_id)
+
     (
         runs_and_robots,
         headers,
@@ -115,7 +157,9 @@ def get_most_recent_run_and_record(
     google_sheet_abr_data.batch_update_cells(runs_and_robots, "A", start_row, "0")
     print("Wrote run to ABR-run-data")
     # Add LPC to google sheet
-    google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
+    google_sheet_lpc = google_sheets_tool.google_sheet(
+        credentials_path, "ABR-LPC", tab_number=0
+    )
     start_row_lpc = google_sheet_lpc.get_index_row() + 1
     google_sheet_lpc.batch_update_cells(runs_and_lpc, "A", start_row_lpc, "0")
 
@@ -166,8 +210,11 @@ if __name__ == "__main__":
     )
     robot = input("Robot: ")
     labware = input("Labware: ")
-    protocol_step, expected_liquid_moved, ip = get_protocol_step_as_int()
-
+    protocol_step, expected_liquid_moved, ip = get_protocol_step_as_int(
+        storage_directory, robot
+    )
+    print(ip)
+    print(expected_liquid_moved)
     # Scale Loop
     grams, is_stable = scale.read_mass()
     grams, is_stable = scale.read_mass()
@@ -195,16 +242,23 @@ if __name__ == "__main__":
                 get_most_recent_run_and_record(ip, storage_directory, labware, accuracy)
 
             is_stable = False
-            y_or_no = input("Do you want to weigh another sample? (Y/N): ")
-            if y_or_no == "Y":
-                # Uses same storage directory and file.
-                grams, is_stable = scale.read_mass()
-                is_stable = False
-                robot = input("Robot: ")
-                labware = input("Labware: ")
-                protocol_step, expected_liquid_moved, ip = get_protocol_step_as_int()
-                grams, is_stable = scale.read_mass()
-            elif y_or_no == "N":
-                break_all = True
+            while True:
+                y_or_no = input("Do you want to weigh another sample? (Y/N): ")
+                if y_or_no == "Y" or y_or_no == "y":
+                    # Uses same storage directory and file.
+                    grams, is_stable = scale.read_mass()
+                    is_stable = False
+                    robot = input("Robot: ")
+                    labware = input("Labware: ")
+                    protocol_step, expected_liquid_moved, ip = get_protocol_step_as_int(
+                        storage_directory, robot
+                    )
+                    grams, is_stable = scale.read_mass()
+                    break
+                elif y_or_no == "N" or y_or_no == "n":
+                    break_all = True
+                    break
+                else:
+                    print("Please Choose a Valid Option")
         if break_all:
             break

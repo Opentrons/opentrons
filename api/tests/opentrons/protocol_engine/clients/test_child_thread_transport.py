@@ -8,7 +8,7 @@ from typing import Any
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.labware.models import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands, DeckPoint

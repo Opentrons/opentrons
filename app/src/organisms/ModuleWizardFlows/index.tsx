@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
-import { COLORS, StyledText } from '@opentrons/components'
+import { COLORS, LegacyStyledText, ModalShell } from '@opentrons/components'
 import {
   getModuleType,
   getModuleDisplayName,
@@ -14,9 +14,7 @@ import {
   getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'
 import {
@@ -24,7 +22,10 @@ import {
   useCreateTargetedMaintenanceRunMutation,
 } from '../../resources/runs'
 import { getIsOnDevice } from '../../redux/config'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '../../molecules/SimpleWizardBody'
 import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'
 import { FLEX_SLOT_NAMES_BY_MOD_TYPE, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -263,7 +264,7 @@ export const ModuleWizardFlows = (
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (isPrepCommandLoading) {
     modalContent = (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={t('prepping_module', {
           module: getModuleDisplayName(attachedModule.moduleModel),
         })}
@@ -288,7 +289,7 @@ export const ModuleWizardFlows = (
               i18nKey={'branded:module_calibration_failed'}
               values={{ error: errorMessage }}
               components={{
-                block: <StyledText as="p" />,
+                block: <LegacyStyledText as="p" />,
               }}
             />
           )
@@ -296,7 +297,11 @@ export const ModuleWizardFlows = (
       />
     )
   } else if (isExiting) {
-    modalContent = <InProgressModal description={t('stand_back_exiting')} />
+    modalContent = (
+      <SimpleWizardInProgressBody
+        description={t('stand_back_robot_in_motion')}
+      />
+    )
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     modalContent = <BeforeBeginning {...currentStep} {...calibrateBaseProps} />
   } else if (currentStep.section === SECTIONS.SELECT_LOCATION) {
@@ -357,14 +362,14 @@ export const ModuleWizardFlows = (
 
   return createPortal(
     isOnDevice ? (
-      <LegacyModalShell>
+      <ModalShell>
         {wizardHeader}
         {modalContent}
-      </LegacyModalShell>
+      </ModalShell>
     ) : (
-      <LegacyModalShell width="47rem" height="auto" header={wizardHeader}>
+      <ModalShell width="47rem" height="auto" header={wizardHeader}>
         {modalContent}
-      </LegacyModalShell>
+      </ModalShell>
     ),
     getTopPortalEl()
   )

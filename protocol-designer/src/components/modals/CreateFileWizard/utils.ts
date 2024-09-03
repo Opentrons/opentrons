@@ -68,21 +68,26 @@ const TOTAL_MODULE_SLOTS = 8
 
 export const getNumSlotsAvailable = (
   modules: FormState['modules'],
-  additionalEquipment: FormState['additionalEquipment']
+  additionalEquipment: FormState['additionalEquipment'],
+  //  special-casing the wasteChute available slots when there is a staging area in slot 3
+  isWasteChute?: boolean
 ): number => {
   const additionalEquipmentLength = additionalEquipment.length
   const hasTC = Object.values(modules || {}).some(
     module => module.type === THERMOCYCLER_MODULE_TYPE
   )
-  const hasMagneticBlock = Object.values(modules || {}).some(
+  const magneticBlocks = Object.values(modules || {}).filter(
     module => module.type === MAGNETIC_BLOCK_TYPE
   )
   let filteredModuleLength = modules != null ? Object.keys(modules).length : 0
   if (hasTC) {
     filteredModuleLength = filteredModuleLength + 1
   }
-  if (hasMagneticBlock) {
-    filteredModuleLength = filteredModuleLength - 1
+  if (magneticBlocks.length > 0) {
+    //  once blocks exceed 4, then we dont' want to subtract the amount available
+    //  because block can go into the center slots where all other modules/trashes can not
+    const numBlocks = magneticBlocks.length > 4 ? 4 : magneticBlocks.length
+    filteredModuleLength = filteredModuleLength - numBlocks
   }
 
   const hasWasteChute = additionalEquipment.some(equipment =>
@@ -97,6 +102,9 @@ export const getNumSlotsAvailable = (
 
   let filteredAdditionalEquipmentLength = additionalEquipmentLength
   if (hasWasteChute && isStagingAreaInD3) {
+    filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
+  }
+  if (isWasteChute && isStagingAreaInD3) {
     filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
   }
   if (hasGripper) {
@@ -132,7 +140,11 @@ export const getTrashOptionDisabled = (
 ): boolean => {
   const { additionalEquipment, modules, trashType } = props
   const hasNoSlotsAvailable =
-    getNumSlotsAvailable(modules, additionalEquipment) === 0
+    getNumSlotsAvailable(
+      modules,
+      additionalEquipment,
+      trashType === 'wasteChute'
+    ) === 0
   return hasNoSlotsAvailable && !additionalEquipment.includes(trashType)
 }
 

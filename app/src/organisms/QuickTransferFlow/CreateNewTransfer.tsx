@@ -4,7 +4,7 @@ import { useTranslation, Trans } from 'react-i18next'
 import {
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   DeckConfigurator,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
@@ -48,7 +48,7 @@ export function CreateNewTransfer(props: CreateNewTransferProps): JSX.Element {
               i18nKey="use_deck_slots"
               components={{
                 block: (
-                  <StyledText
+                  <LegacyStyledText
                     css={TYPOGRAPHY.level4HeaderRegular}
                     marginBottom={SPACING.spacing16}
                   />

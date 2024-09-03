@@ -30,7 +30,7 @@ export function RobotSettingsJoinOtherNetwork({
       setSelectedSsid(inputSsid)
       setCurrentOption('RobotSettingsSelectAuthenticationType')
     } else {
-      setErrorMessage(t('join_other_network_error_message'))
+      setErrorMessage(t('join_other_network_error_message') as string)
     }
   }
 
@@ -39,7 +39,9 @@ export function RobotSettingsJoinOtherNetwork({
       <ChildNavigation
         buttonText={i18n.format(t('continue'), 'capitalize')}
         header={t('join_other_network')}
-        onClickBack={() => setCurrentOption('RobotSettingsWifi')}
+        onClickBack={() => {
+          setCurrentOption('RobotSettingsWifi')
+        }}
         onClickButton={handleContinue}
       />
       <SetWifiSsid

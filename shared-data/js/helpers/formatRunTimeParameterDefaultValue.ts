@@ -1,4 +1,4 @@
-import type { RunTimeParameter } from '../types'
+import type { ValueRunTimeParameter } from '../types'
 
 /**
  * Formats the runtime parameter's default value.
@@ -11,7 +11,7 @@ import type { RunTimeParameter } from '../types'
  */
 
 export const formatRunTimeParameterDefaultValue = (
-  runTimeParameter: RunTimeParameter,
+  runTimeParameter: ValueRunTimeParameter,
   t?: any
 ): string => {
   const { type, default: defaultValue } = runTimeParameter

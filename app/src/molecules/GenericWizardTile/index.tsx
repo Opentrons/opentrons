@@ -2,11 +2,10 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
-  Btn,
-  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_INLINE_BLOCK,
@@ -18,14 +17,14 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
+
 import { getIsOnDevice } from '../../redux/config'
-import { Tooltip } from '../../atoms/Tooltip'
 import { NeedHelpLink } from '../../organisms/CalibrationPanels'
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton, TextOnlyButton } from '../../atoms/buttons'
 
 const ALIGN_BUTTONS = css`
   align-items: ${ALIGN_FLEX_END};
@@ -40,29 +39,7 @@ const CAPITALIZE_FIRST_LETTER_STYLE = css`
     text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   }
 `
-const GO_BACK_BUTTON_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.grey50};
 
-  &:hover {
-    opacity: 70%;
-  }
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-    font-size: ${TYPOGRAPHY.fontSize22};
-    &:hover {
-      opacity: 100%;
-    }
-    &:active {
-      opacity: 70%;
-    }
-  }
-`
-const GO_BACK_BUTTON_DISABLED_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.grey60};
-`
 const Title = styled.h1`
   ${TYPOGRAPHY.h1Default};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -148,17 +125,12 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
       </Flex>
       <Flex justifyContent={buttonPositioning} css={ALIGN_BUTTONS}>
         {back != null ? (
-          <Btn onClick={back} disabled={backIsDisabled} aria-label="back">
-            <StyledText
-              css={
-                backIsDisabled ?? false
-                  ? GO_BACK_BUTTON_DISABLED_STYLE
-                  : GO_BACK_BUTTON_STYLE
-              }
-            >
-              {t('go_back')}
-            </StyledText>
-          </Btn>
+          <TextOnlyButton
+            disabled={backIsDisabled}
+            onClick={back}
+            aria-label="back"
+            buttonText={t('go_back')}
+          />
         ) : null}
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
         {proceed != null && proceedButton == null ? (

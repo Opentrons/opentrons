@@ -1,0 +1,54 @@
+{
+  "commands": [],
+  "config": {
+    "apiVersion": [
+      2,
+      18
+    ],
+    "protocolType": "python"
+  },
+  "createdAt": "TIMESTAMP",
+  "errors": [
+    {
+      "createdAt": "TIMESTAMP",
+      "detail": "TypeError [line 11]: ParameterContext.add_int() missing 1 required positional argument: 'display_name'",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
+      "isDefined": false,
+      "wrappedErrors": [
+        {
+          "createdAt": "TIMESTAMP",
+          "detail": "TypeError: ParameterContext.add_int() missing 1 required positional argument: 'display_name'",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "(\"ParameterContext.add_int() missing 1 required positional argument: 'display_name'\",)",
+            "class": "TypeError",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_X_v2_18_None_None_NoRTPdisplay_name.py\", line N, in add_parameters\n"
+          },
+          "errorType": "PythonException",
+          "id": "UUID",
+          "isDefined": false,
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "name": "OT2_X_v2_18_None_None_NoRTPdisplay_name.py",
+      "role": "main"
+    }
+  ],
+  "labware": [],
+  "liquids": [],
+  "metadata": {
+    "protocolName": "No RTP Display Name"
+  },
+  "modules": [],
+  "pipettes": [],
+  "result": "not-ok",
+  "robotType": "OT-2 Standard",
+  "runTimeParameters": []
+}

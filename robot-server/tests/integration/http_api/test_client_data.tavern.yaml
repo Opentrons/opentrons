@@ -1,0 +1,112 @@
+test_name: Test getting and setting client data
+
+marks:
+  - usefixtures:
+      - ot3_server_base_url
+
+stages:
+  - name: Check the initial client data
+    request:
+      method: GET
+      url: '{ot3_server_base_url}/clientData/foo'
+    response:
+      status_code: 404
+
+  - name: Set client data
+    request:
+      method: PUT
+      url: '{ot3_server_base_url}/clientData/foo'
+      json:
+        data: &put_data
+          stringField: string value
+          numberField: 123.456
+          boolField: true
+          nullField: null
+          objectField:
+            key: value
+    response:
+      status_code: 200
+      json:
+        data: *put_data
+
+  - name: Check that PUT rejects non-object data
+    request:
+      method: PUT
+      url: '{ot3_server_base_url}/clientData/foo'
+      json:
+        data: This is a string and not an object.
+    response:
+      status_code: 422
+
+  - name: Retrieve client data
+    request:
+      method: GET
+      url: '{ot3_server_base_url}/clientData/foo'
+    response:
+      status_code: 200
+      json:
+        data: *put_data
+
+  - name: Check that trailing slashes are ignored
+    request:
+      method: GET
+      url: '{ot3_server_base_url}/clientData/foo/'
+      follow_redirects: true # FastAPI redirects when given a trailing slash.
+    response:
+      status_code: 200
+      json:
+        data: *put_data
+
+  - name: Delete client data
+    request:
+      method: DELETE
+      url: '{ot3_server_base_url}/clientData/foo'
+    response:
+      status_code: 200
+
+  - name: Check that it was deleted
+    request:
+      method: GET
+      url: '{ot3_server_base_url}/clientData/foo'
+    response:
+      status_code: 404
+
+---
+test_name: Test client data key validation
+
+marks:
+  - usefixtures:
+      - ot3_server_base_url
+  - parametrize:
+      key:
+        - bad_key
+        - expected_status_code
+      vals:
+        - ['foo/bar', 404]
+        - ['foo*', 422]
+        - ['+', 422] # "+" is a wildcard in MQTT, but HTTP-brained code might decode it as a space.
+        - ['foo+bar', 422]
+
+stages:
+  - name: Check that PUT rejects bad keys
+    request:
+      method: PUT
+      url: '{ot3_server_base_url}/clientData/{bad_key}'
+      json:
+        data: {}
+    response:
+      status_code: !int '{expected_status_code}'
+
+  - name: Check that GET rejects bad keys
+    request:
+      method: GET
+      url: '{ot3_server_base_url}/clientData/{bad_key}'
+    response:
+      status_code: !int '{expected_status_code}'
+
+  - name: Check that DELETE rejects bad keys
+    request:
+      method: DELETE
+      url: '{ot3_server_base_url}/clientData/{bad_key}'
+    response:
+      status_code: !int '{expected_status_code}'

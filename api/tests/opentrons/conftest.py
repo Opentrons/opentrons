@@ -33,11 +33,11 @@ try:
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
-from opentrons_shared_data.protocol.dev_types import JsonProtocol
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
-from opentrons_shared_data.deck.dev_types import (
+from opentrons_shared_data.robot.types import RobotTypeEnum
+from opentrons_shared_data.protocol.types import JsonProtocol
+from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.module.types import ModuleDefinitionV3
+from opentrons_shared_data.deck.types import (
     RobotModel,
     DeckDefinitionV3,
     DeckDefinitionV5,
@@ -61,10 +61,13 @@ from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabware
 from opentrons.protocol_api.core.legacy.deck import (
     DEFAULT_LEGACY_DECK_DEFINITION_VERSION,
 )
-from opentrons.protocol_engine import (
+from opentrons.protocol_engine.create_protocol_engine import (
     create_protocol_engine_in_thread,
+)
+from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
     DeckType,
+    error_recovery_policy,
 )
 from opentrons.protocols.api_support import deck_type
 from opentrons.protocols.api_support.types import APIVersion
@@ -313,6 +316,8 @@ def _make_ot3_pe_ctx(
             use_simulated_deck_config=True,
             block_on_door_open=False,
         ),
+        deck_configuration=None,
+        error_recovery_policy=error_recovery_policy.never_recover,
         drop_tips_after_run=False,
         post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
         # TODO(jbl 10-30-2023) load_fixed_trash being hardcoded to True will be refactored once we need tests to have

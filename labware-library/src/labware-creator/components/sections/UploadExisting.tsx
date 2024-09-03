@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { DeprecatedPrimaryButton } from '@opentrons/components'
+import { PrimaryButton } from '@opentrons/components'
 import { ImportLabware } from '../ImportLabware'
 import styles from '../../styles.module.css'
 
@@ -33,13 +33,13 @@ export const UploadExisting = (props: Props): JSX.Element => {
       ) : (
         <div className={styles.labware_type_fields}>
           {labwareTypeChildFields}
-          <DeprecatedPrimaryButton
+          <PrimaryButton
             className={styles.start_creating_btn}
             onClick={onClick}
             disabled={disabled}
           >
             start editing labware
-          </DeprecatedPrimaryButton>
+          </PrimaryButton>
         </div>
       )}
     </div>

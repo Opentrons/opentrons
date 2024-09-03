@@ -13,6 +13,7 @@ opentrons = { editable = true, path = "." }
 opentrons-hardware = { editable = true, path = "./../hardware", extras=["FLEX"] }
 performance-metrics = {file = "../performance-metrics", editable = true}
 numpy = "==1.22.3"
+packaging = "==21.3"
 pyusb = "==1.2.1"
 
 [dev-packages]

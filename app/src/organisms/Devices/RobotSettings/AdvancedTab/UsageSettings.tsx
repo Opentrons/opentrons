@@ -8,7 +8,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -47,21 +47,23 @@ export function UsageSettings({
       marginTop={SPACING.spacing24}
     >
       <Box width="70%">
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.h2SemiBold}
           marginBottom={SPACING.spacing16}
           id="AdvancedSettings_UsageSettings"
         >
           {t('usage_settings')}
-        </StyledText>
-        <StyledText
+        </LegacyStyledText>
+        <LegacyStyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing4}
         >
           {t('pause_protocol')}
-        </StyledText>
-        <StyledText as="p">{t('pause_protocol_description')}</StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
+          {t('pause_protocol_description')}
+        </LegacyStyledText>
       </Box>
       <ToggleButton
         label="usage_settings_pause_protocol"

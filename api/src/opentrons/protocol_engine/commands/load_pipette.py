@@ -6,12 +6,12 @@ from opentrons_shared_data.pipette.pipette_load_name_conversions import (
 )
 from opentrons_shared_data.pipette.types import PipetteGenerationType
 from opentrons_shared_data.robot import user_facing_robot_type
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotTypeEnum
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons.types import MountType
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
@@ -21,7 +21,7 @@ from ..errors import InvalidSpecificationForRobotTypeError, InvalidLoadPipetteSp
 
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler
-    from ..state import StateView
+    from ..state.state import StateView
 
 
 LoadPipetteCommandType = Literal["loadPipette"]
@@ -48,6 +48,17 @@ class LoadPipetteParams(BaseModel):
         None,
         description="An optional ID to assign to this pipette. If None, an ID "
         "will be generated.",
+    )
+    tipOverlapNotAfterVersion: Optional[str] = Field(
+        None,
+        description="A version of tip overlap data to not exceed. The highest-versioned "
+        "tip overlap data that does not exceed this version will be used. Versions are "
+        "expressed as vN where N is an integer, counting up from v0. If None, the current "
+        "highest version will be used.",
+    )
+    liquidPresenceDetection: Optional[bool] = Field(
+        None,
+        description="Enable liquid presence detection for this pipette. Defaults to False.",
     )
 
 
@@ -109,6 +120,7 @@ class LoadPipetteImplementation(
             pipette_name=params.pipetteName,
             mount=params.mount,
             pipette_id=params.pipetteId,
+            tip_overlap_version=params.tipOverlapNotAfterVersion,
         )
 
         return SuccessData(

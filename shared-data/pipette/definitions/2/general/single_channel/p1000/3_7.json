@@ -1,0 +1,81 @@
+{
+  "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
+  "displayName": "Flex 1-Channel 1000 μL",
+  "model": "p1000",
+  "displayCategory": "FLEX",
+  "validNozzleMaps": {
+    "maps": {
+      "SingleA1": ["A1"]
+    }
+  },
+  "pickUpTipConfigurations": {
+    "pressFit": {
+      "presses": 1,
+      "increment": 0.0,
+      "configurationsByNozzleMap": {
+        "SingleA1": {
+          "default": {
+            "speed": 10.0,
+            "distance": 13.0,
+            "current": 0.2,
+            "tipOverlaps": {
+              "v0": {
+                "default": 10.5,
+                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.65,
+                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.76,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.09,
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.65,
+                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.76,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.09
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "dropTipConfigurations": {
+    "plungerEject": {
+      "current": 1.0,
+      "speed": 15
+    }
+  },
+  "plungerMotorConfigurations": {
+    "idle": 0.3,
+    "run": 1.0
+  },
+  "plungerPositionsConfigurations": {
+    "default": {
+      "top": 0.0,
+      "bottom": 71.5,
+      "blowout": 76.5,
+      "drop": 90.5
+    }
+  },
+  "availableSensors": {
+    "sensors": ["pressure", "capacitive", "environment"],
+    "pressure": {
+      "count": 1
+    },
+    "capacitive": {
+      "count": 1
+    },
+    "environment": {
+      "count": 1
+    }
+  },
+  "partialTipConfigurations": {
+    "partialTipSupported": false,
+    "availableConfigurations": null
+  },
+  "backCompatNames": [],
+  "channels": 1,
+  "shaftDiameter": 4.5,
+  "shaftULperMM": 15.904,
+  "backlashDistance": 0.1,
+  "quirks": [],
+  "plungerHomingConfigurations": {
+    "current": 1.0,
+    "speed": 30
+  }
+}

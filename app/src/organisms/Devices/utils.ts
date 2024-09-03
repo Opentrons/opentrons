@@ -9,7 +9,8 @@ import type {
   Instruments,
   PipetteData,
   PipetteOffsetCalibration,
-  RunTimeParameterCreateData,
+  RunTimeParameterFilesCreateData,
+  RunTimeParameterValuesCreateData,
 } from '@opentrons/api-client'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
@@ -32,9 +33,10 @@ export function onDeviceDisplayFormatTimestamp(timestamp: string): string {
     : timestamp
 }
 
-export function downloadFile(data: object, fileName: string): void {
+export function downloadFile(data: object | string, fileName: string): void {
   // Create a blob with the data we want to download as a file
-  const blob = new Blob([JSON.stringify(data)], { type: 'text/json' })
+  const blobContent = typeof data === 'string' ? data : JSON.stringify(data)
+  const blob = new Blob([blobContent], { type: 'text/json' })
   // Create an anchor element and dispatch a click event on it
   // to trigger a download
   const a = document.createElement('a')
@@ -92,14 +94,44 @@ export function getShowPipetteCalibrationWarning(
   )
 }
 
+/**
+ * prepares object to send to endpoints requiring RunTimeParameterValuesCreateData
+ * @param {RunTimeParameter[]} runTimeParameters array of updated RunTimeParameter overrides
+ * @returns {RunTimeParameterValuesCreateData} object mapping variable name to value
+ */
 export function getRunTimeParameterValuesForRun(
   runTimeParameters: RunTimeParameter[]
-): RunTimeParameterCreateData {
-  return runTimeParameters.reduce(
-    (acc, param) =>
-      param.value !== param.default
-        ? { ...acc, [param.variableName]: param.value }
-        : acc,
-    {}
-  )
+): RunTimeParameterValuesCreateData {
+  return runTimeParameters.reduce((acc, param) => {
+    const { variableName } = param
+    if (param.type !== 'csv_file' && param.value !== param.default) {
+      return { ...acc, [variableName]: param.value }
+    }
+    return acc
+  }, {})
+}
+
+/**
+ * prepares object to send to endpoints requiring RunTimeParameterFilesCreateData
+ * @param {RunTimeParameter[]} runTimeParameters array of updated RunTimeParameter overrides
+ * @param {Record<string, string>} [fileIdMap] mapping of variable name to file ID created and returned by robot server
+ * @returns {RunTimeParameterFilesCreateData} object mapping variable name to file ID
+ */
+export function getRunTimeParameterFilesForRun(
+  runTimeParameters: RunTimeParameter[],
+  fileIdMap?: Record<string, string>
+): RunTimeParameterFilesCreateData {
+  return runTimeParameters.reduce((acc, param) => {
+    const { variableName } = param
+    if (param.type === 'csv_file' && param.file?.id != null) {
+      return { ...acc, [variableName]: param.file.id }
+    } else if (
+      param.type === 'csv_file' &&
+      fileIdMap != null &&
+      variableName in fileIdMap
+    ) {
+      return { ...acc, [variableName]: fileIdMap[variableName] }
+    }
+    return acc
+  }, {})
 }

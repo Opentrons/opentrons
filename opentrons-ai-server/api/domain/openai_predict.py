@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from typing import List, Tuple
 
@@ -22,7 +23,9 @@ from api.domain.prompts import (
     tools,
 )
 from api.domain.utils import refine_characters
-from api.settings import Settings, is_running_on_lambda
+from api.settings import Settings
+
+logger = logging.getLogger(__name__)
 
 ROOT_PATH: Path = Path(Path(__file__)).parent.parent.parent
 
@@ -37,11 +40,13 @@ class OpenAIPredict:
 
     def get_docs_all(self, query: str) -> Tuple[str, str, str]:
         commands = self.extract_atomic_description(query)
-        print(f"commands: {commands}")
+        logger.info("Commands", extra={"commands": commands})
 
         # define file paths for storage
         example_command_path = str(ROOT_PATH / "api" / "storage" / "index" / "commands")
-        documentation_path = str(ROOT_PATH / "api" / "storage" / "index" / "v215")
+        documentation_path = str(ROOT_PATH / "api" / "storage" / "index" / "v219")
+        documentation_ref_path = str(ROOT_PATH / "api" / "storage" / "index" / "v219_ref")
+
         labware_api_path = standard_labware_api
 
         # retrieve example commands
@@ -62,15 +67,23 @@ class OpenAIPredict:
         # retrieve documentation
         storage_context = StorageContext.from_defaults(persist_dir=documentation_path)
         index = load_index_from_storage(storage_context)
-        retriever = index.as_retriever(similarity_top_k=3)
+        retriever = index.as_retriever(similarity_top_k=2)
         nodes = retriever.retrieve(query)
         docs = "\n".join(node.text.strip() for node in nodes)
-        docs_v215 = f"\n{'='*15} DOCUMENTATION {'='*15}\n\n" + docs
+        docs = f"\n{'='*15} DOCUMENTATION {'='*15}\n\n" + docs
+
+        # retrieve reference
+        storage_context = StorageContext.from_defaults(persist_dir=documentation_ref_path)
+        index = load_index_from_storage(storage_context)
+        retriever = index.as_retriever(similarity_top_k=2)
+        nodes = retriever.retrieve(query)
+        docs_ref = "\n".join(node.text.strip() for node in nodes)
+        docs_ref = f"\n{'='*15} DOCUMENTATION REFERENCE {'='*15}\n\n" + docs_ref
 
         # standard api names
         standard_api_names = f"\n{'='*15} STANDARD API NAMES {'='*15}\n\n" + labware_api_path
 
-        return example_commands, docs_v215, standard_api_names
+        return example_commands, docs + docs_ref, standard_api_names
 
     def extract_atomic_description(self, protocol_description: str) -> List[str]:
         class atomic_descr(BaseModel):
@@ -82,30 +95,29 @@ class OpenAIPredict:
 
         program = OpenAIPydanticProgram.from_defaults(
             output_cls=atomic_descr,
-            prompt_template_str=prompt_template_str.format(protocol_description=protocol_description),
+            prompt_template_str=prompt_template_str,
             verbose=False,
-            llm=li_OpenAI(model=self.settings.OPENAI_MODEL_NAME),
+            llm=li_OpenAI(model=self.settings.openai_model_name, api_key=self.settings.openai_api_key.get_secret_value()),
         )
         details = program(protocol_description=protocol_description)
         descriptions = []
-        print("=" * 50)
         for x in details.desc:
             if x not in ["Modules:", "Adapter:", "Labware:", "Pipette mount:", "Commands:", "Well Allocation:", "No modules"]:
                 descriptions.append(x)
         return descriptions
 
-    def refine_response(self, assitant_message: str) -> str:
-        if assitant_message is None:
+    def refine_response(self, assistant_message: str) -> str:
+        if assistant_message is None:
             return ""
         system_message: ChatCompletionMessageParam = {
             "role": "system",
             "content": f"{general_rules_1}\n Please leave useful comments for each command.",
         }
 
-        user_message: ChatCompletionMessageParam = {"role": "user", "content": assitant_message}
+        user_message: ChatCompletionMessageParam = {"role": "user", "content": assistant_message}
 
         response = self.client.chat.completions.create(
-            model=self.settings.OPENAI_MODEL_NAME,
+            model=self.settings.openai_model_name,
             messages=[system_message, user_message],
             stream=False,
             temperature=0.005,
@@ -124,20 +136,20 @@ class OpenAIPredict:
         if chat_completion_message_params:
             messages += chat_completion_message_params
 
-        example_commands, docs_v215, standard_api_names = self.get_docs_all(prompt)
+        example_commands, docs_refs, standard_api_names = self.get_docs_all(prompt)
 
         user_message: ChatCompletionMessageParam = {
             "role": "user",
             "content": f"QUESTION/DESCRIPTION: \n{prompt}\n\n"
             f"PYTHON API V2 DOCUMENTATION: \n{example_commands}\n"
-            f"{pipette_type}\n{example_pcr_1}\n\n{docs_v215}\n\n"
+            f"{pipette_type}\n{example_pcr_1}\n\n{docs_refs}\n\n"
             f"{rules_for_transfer}\n\n{standard_api_names}\n\n",
         }
 
         messages.append(user_message)
 
         response: ChatCompletion = self.client.chat.completions.create(
-            model=self.settings.OPENAI_MODEL_NAME,
+            model=self.settings.openai_model_name,
             messages=messages,
             stream=False,
             temperature=0.005,
@@ -155,7 +167,7 @@ class OpenAIPredict:
         assistant_message.content = str(self.refine_response(assistant_message.content))
 
         if assistant_message.tool_calls and assistant_message.tool_calls[0]:
-            print("Simulation is started.")
+            logger.info("Simulation has started")
             if assistant_message.tool_calls[0]:
                 assistant_message.content = str(assistant_message.tool_calls[0].function)
                 messages.append({"role": assistant_message.role, "content": assistant_message.content})
@@ -167,7 +179,7 @@ class OpenAIPredict:
                     ChatCompletionFunctionMessageParam(role="function", name=tool_call.function.name, content=str(function_response))
                 )
                 response2: ChatCompletion = self.client.chat.completions.create(
-                    model=self.settings.OPENAI_MODEL_NAME,
+                    model=self.settings.openai_model_name,
                     messages=messages,
                     stream=False,
                     temperature=0,
@@ -183,12 +195,10 @@ class OpenAIPredict:
 
 def main() -> None:
     """Intended for testing this class locally."""
-    if is_running_on_lambda():
-        return
     from rich import print
     from rich.prompt import Prompt
 
-    settings = Settings.build()
+    settings = Settings()
     openai = OpenAIPredict(settings)
     prompt = Prompt.ask("Type a prompt to send to the OpenAI API:")
     completion = openai.predict(prompt)

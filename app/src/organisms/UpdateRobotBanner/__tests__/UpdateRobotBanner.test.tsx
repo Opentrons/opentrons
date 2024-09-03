@@ -38,11 +38,11 @@ describe('UpdateRobotBanner', () => {
   })
 
   it('should display correct information', () => {
-    const { getByText, getByRole } = render(props)
-    getByText(
+    render(props)
+    screen.getByText(
       'A robot software update is required to run protocols with this version of the Opentrons App.'
     )
-    const btn = getByRole('button', { name: 'View update' })
+    const btn = screen.getByRole('button', { name: 'View update' })
     fireEvent.click(btn)
     expect(handleUpdateBuildroot).toHaveBeenCalled()
   })
@@ -65,8 +65,8 @@ describe('UpdateRobotBanner', () => {
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    const { getByText } = render(props)
-    getByText(
+    render(props)
+    screen.getByText(
       'A robot software update is required to run protocols with this version of the Opentrons App.'
     )
   })

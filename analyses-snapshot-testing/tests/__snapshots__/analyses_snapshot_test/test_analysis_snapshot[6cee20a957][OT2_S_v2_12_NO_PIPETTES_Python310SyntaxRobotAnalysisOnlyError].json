@@ -1,0 +1,110 @@
+{
+  "commands": [
+    {
+      "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "command.COMMENT-0",
+      "notes": [],
+      "params": {
+        "message": "Where is the point? (0,0) Origin is the point's location."
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "command.COMMENT-1",
+      "notes": [],
+      "params": {
+        "message": "Where is the point? (0,1) Y=1 and the point is on the y-axis."
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "command.COMMENT-2",
+      "notes": [],
+      "params": {
+        "message": "Where is the point? (1,0) X=1 and the point is on the x-axis."
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "command.COMMENT-3",
+      "notes": [],
+      "params": {
+        "message": "Where is the point? (1,1) The point is located somewhere else on the plane."
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      12
+    ],
+    "protocolType": "python"
+  },
+  "createdAt": "TIMESTAMP",
+  "errors": [],
+  "files": [
+    {
+      "name": "OT2_S_v2_12_NO_PIPETTES_Python310SyntaxRobotAnalysisOnlyError.py",
+      "role": "main"
+    }
+  ],
+  "labware": [
+    {
+      "definitionUri": "opentrons/opentrons_1_trash_1100ml_fixed/1",
+      "id": "UUID",
+      "loadName": "opentrons_1_trash_1100ml_fixed",
+      "location": {
+        "slotName": "12"
+      }
+    }
+  ],
+  "liquids": [],
+  "metadata": {
+    "apiLevel": "2.12",
+    "author": "Opentrons Engineering <engineering@opentrons.com>",
+    "description": "Python 3.10 Only",
+    "protocolName": "🛠 3.10 only Python 🛠",
+    "source": "Software Testing Team"
+  },
+  "modules": [],
+  "pipettes": [],
+  "result": "ok",
+  "robotType": "OT-2 Standard",
+  "runTimeParameters": []
+}

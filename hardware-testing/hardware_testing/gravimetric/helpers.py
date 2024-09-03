@@ -26,7 +26,7 @@ from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 from opentrons import execute, simulate
 from opentrons.types import Point, Location, Mount
 from opentrons.config.types import OT3Config, RobotConfig
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition
 
 from hardware_testing.opentrons_api import helpers_ot3
 from opentrons.protocol_api import ProtocolContext, InstrumentContext
@@ -109,6 +109,11 @@ def get_api_context(
             extra_labware=extra_labware,
             hardware_simulator=ThreadManager(_thread_manager_build_hw_api),
             robot_type="Flex",
+            # use_virtual_hardware=False makes this simulation work unlike
+            # opentrons_simulate, app-side analysis, and server-side analysis.
+            # We need to do this because some of our hardware testing scripts still
+            # interact directly with the OT3API and there is no way to tell Protocol
+            # Engine's hardware virtualization about those updates.
             use_virtual_hardware=False,
         )
     else:
@@ -168,7 +173,7 @@ def _jog_to_find_liquid_height(
     ctx: ProtocolContext, pipette: InstrumentContext, well: Well
 ) -> float:
     _well_depth = well.depth
-    _liquid_height = _well_depth
+    _liquid_height = _well_depth + 2
     _jog_size = -1.0
     if ctx.is_simulating():
         return _liquid_height - 1
@@ -200,11 +205,11 @@ def _sense_liquid_height(
     lps = config._get_liquid_probe_settings(cfg, well)
     # NOTE: very important that probing is done only 1x time,
     #       with a DRY tip, for reliability
-    probed_z = hwapi.liquid_probe(OT3Mount.LEFT, lps)
+    probed_z = hwapi.liquid_probe(OT3Mount.LEFT, well.depth, lps)
     if ctx.is_simulating():
         probed_z = well.top().point.z - 1
     liq_height = probed_z - well.bottom().point.z
-    if abs(liq_height - lps.max_z_distance) < 0.01:
+    if abs(liq_height - well.depth) < 0.01:
         raise RuntimeError("unable to probe liquid, reach max travel distance")
     return liq_height
 
@@ -445,7 +450,10 @@ def _load_pipette(
     #       so we need to decrease the pick-up current to work with 1 tip.
     if pipette.channels == 8 and not increment and not photometric:
         pipette._core.configure_nozzle_layout(
-            style=NozzleLayout.SINGLE, primary_nozzle="A1", front_right_nozzle="A1"
+            style=NozzleLayout.SINGLE,
+            primary_nozzle="A1",
+            front_right_nozzle="A1",
+            back_left_nozzle="A1",
         )
         # override deck conflict checking cause we specially lay out our tipracks
         DeckConflit.check_safe_for_pipette_movement = (

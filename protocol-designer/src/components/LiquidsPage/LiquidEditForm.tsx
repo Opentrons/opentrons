@@ -8,7 +8,7 @@ import {
   Card,
   DeprecatedCheckboxField,
   FormGroup,
-  InputField,
+  LegacyInputField,
   OutlineButton,
   DeprecatedPrimaryButton,
   Flex,
@@ -89,9 +89,9 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
   const liquidId = selectedLiquid.liquidGroupId ?? nextGroupId
   const { t } = useTranslation(['form', 'button'])
   const initialValues: LiquidEditFormValues = {
-    name: propName || '',
+    name: propName ?? '',
     displayColor: displayColor ?? swatchColors(liquidId),
-    description: propDescription || '',
+    description: propDescription ?? '',
     serialize: serialize || false,
   }
 
@@ -103,6 +103,7 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
     setValue,
   } = useForm<LiquidEditFormValues>({
     defaultValues: initialValues,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     resolver: yupResolver(liquidEditFormSchema),
   })
   const name = watch('name')
@@ -113,8 +114,8 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
     saveForm({
       name: values.name,
       displayColor: values.displayColor,
-      description: values.description || null,
-      serialize: values.serialize || false,
+      description: values.description ?? null,
+      serialize: values.serialize ?? false,
     })
   }
 
@@ -132,9 +133,11 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
                 control={control}
                 name="name"
                 render={({ field }) => (
-                  <InputField
+                  <LegacyInputField
                     name="name"
-                    error={touchedFields.name ? errors.name?.message : null}
+                    error={
+                      touchedFields.name != null ? errors.name?.message : null
+                    }
                     value={name}
                     onChange={field.onChange}
                     onBlur={field.onBlur}
@@ -150,7 +153,7 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
                 control={control}
                 name="description"
                 render={({ field }) => (
-                  <InputField
+                  <LegacyInputField
                     name="description"
                     value={description}
                     onChange={field.onChange}
@@ -199,9 +202,9 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
                 name="serialize"
                 label={t('liquid_edit.serialize')}
                 value={field.value}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   field.onChange(e)
-                }
+                }}
               />
             )}
           />
@@ -216,7 +219,7 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
           </DeprecatedPrimaryButton>
           <DeprecatedPrimaryButton
             disabled={
-              !touchedFields.name ||
+              touchedFields.name == null ||
               errors.name != null ||
               name === '' ||
               errors.displayColor != null

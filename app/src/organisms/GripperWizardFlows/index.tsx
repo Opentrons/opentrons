@@ -9,13 +9,13 @@ import {
   POSITION_ABSOLUTE,
   COLORS,
   BORDERS,
+  ModalShell,
 } from '@opentrons/components'
 import {
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -120,11 +120,22 @@ export function GripperWizardFlows(
     if (props?.onComplete != null) props.onComplete()
     if (maintenanceRunData != null) {
       deleteMaintenanceRun(maintenanceRunData?.data.id)
+    } else {
+      closeFlow()
     }
-    closeFlow()
   }
 
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({})
+  const {
+    deleteMaintenanceRun,
+    isLoading: isDeleteLoading,
+  } = useDeleteMaintenanceRunMutation({
+    onSuccess: () => {
+      closeFlow()
+    },
+    onError: () => {
+      closeFlow()
+    },
+  })
 
   const handleCleanUpAndClose = (): void => {
     if (maintenanceRunData?.data.id == null) handleClose()
@@ -139,7 +150,7 @@ export function GripperWizardFlows(
         })
         .catch(error => {
           setIsExiting(true)
-          setErrorMessage(error.message)
+          setErrorMessage(error.message as string)
         })
     }
   }
@@ -153,7 +164,10 @@ export function GripperWizardFlows(
       createMaintenanceRun={createTargetedMaintenanceRun}
       isCreateLoading={isCreateLoading}
       isRobotMoving={
-        isChainCommandMutationLoading || isCommandLoading || isExiting
+        isChainCommandMutationLoading ||
+        isCommandLoading ||
+        isExiting ||
+        isDeleteLoading
       }
       handleCleanUpAndClose={handleCleanUpAndClose}
       handleClose={handleClose}
@@ -378,9 +392,9 @@ export const GripperWizard = (
         {modalContent}
       </Flex>
     ) : (
-      <LegacyModalShell width="48rem" header={wizardHeader}>
+      <ModalShell width="48rem" header={wizardHeader}>
         {modalContent}
-      </LegacyModalShell>
+      </ModalShell>
     ),
     getTopPortalEl()
   )

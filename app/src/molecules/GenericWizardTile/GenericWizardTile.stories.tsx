@@ -6,15 +6,15 @@ import {
   Flex,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
+  ModalShell,
 } from '@opentrons/components'
 import { Skeleton } from '../../atoms/Skeleton'
-import { LegacyModalShell } from '../LegacyModal'
 import { WizardHeader } from '../WizardHeader'
 import { configReducer } from '../../redux/config/reducer'
 import { GenericWizardTile } from './index'
 
-import type { Store } from 'redux'
+import type { Store, StoreEnhancer } from 'redux'
 import type { Story, Meta } from '@storybook/react'
 
 const dummyConfig = {
@@ -23,7 +23,10 @@ const dummyConfig = {
   },
 } as any
 
-const store: Store<any> = createStore(configReducer, dummyConfig)
+const store: Store<any> = createStore(
+  configReducer,
+  dummyConfig as StoreEnhancer
+)
 
 export default {
   title: 'App/Molecules/GenericWizardTile',
@@ -34,27 +37,27 @@ const Template: Story<
   React.ComponentProps<typeof GenericWizardTile>
 > = args => (
   <Provider store={store}>
-    <LegacyModalShell>
+    <ModalShell>
       <WizardHeader currentStep={3} totalSteps={4} title="Example Title" />
       <GenericWizardTile {...args} />
-    </LegacyModalShell>
+    </ModalShell>
   </Provider>
 )
 const body = (
-  <StyledText as="p">
+  <LegacyStyledText as="p">
     {
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
     }
-  </StyledText>
+  </LegacyStyledText>
 )
 const rightHandBody = (
   <Flex flexDirection={DIRECTION_COLUMN}>
-    <StyledText as="h1">{'You will need:'}</StyledText>
-    <StyledText as="p" marginTop={SPACING.spacing16}>
+    <LegacyStyledText as="h1">{'You will need:'}</LegacyStyledText>
+    <LegacyStyledText as="p" marginTop={SPACING.spacing16}>
       {'this'}
-    </StyledText>
-    <StyledText as="p">{'and this'}</StyledText>
-    <StyledText as="p">{'and this'}</StyledText>
+    </LegacyStyledText>
+    <LegacyStyledText as="p">{'and this'}</LegacyStyledText>
+    <LegacyStyledText as="p">{'and this'}</LegacyStyledText>
   </Flex>
 )
 const skeleton = (
@@ -84,7 +87,9 @@ WithBackButton.args = {
   rightHandBody: rightHandBody,
   bodyText: body,
   header: 'example header',
-  back: () => console.log('back'),
+  back: () => {
+    console.log('back')
+  },
   proceedButtonText: 'Continue',
 }
 
@@ -95,7 +100,9 @@ WithSkeletons.args = {
   ),
   bodyText: skeletons,
   header: <Skeleton width="17rem" height="1.75rem" backgroundSize="47rem" />,
-  back: () => console.log('back'),
+  back: () => {
+    console.log('back')
+  },
   backIsDisabled: true,
   proceedButton: <PrimaryButton disabled={true}>{'Continue'}</PrimaryButton>,
 }

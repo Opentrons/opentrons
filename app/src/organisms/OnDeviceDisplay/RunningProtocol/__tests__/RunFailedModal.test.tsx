@@ -9,46 +9,51 @@ import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { RunFailedModal } from '../RunFailedModal'
 
-import type { useHistory } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 
 const RUN_ID = 'mock_runID'
 const mockFn = vi.fn()
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 const mockErrors = [
   {
     id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
     errorType: 'generalError',
+    isDefined: false as const,
     createdAt: '2023-04-09T21:41:51.333171+00:00',
     detail: 'Error with code 4000 (lowest priority)',
     errorInfo: {},
-    errorCode: '4000',
+    errorCode: '4000' as const,
     wrappedErrors: [
       {
         id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
         errorType: 'roboticsInteractionError',
+        isDefined: false as const,
         createdAt: '2023-04-09T21:41:51.333171+00:00',
         detail: 'Error with code 3000 (second lowest priortiy)',
         errorInfo: {},
-        errorCode: '3000',
+        errorCode: '3000' as const,
         wrappedErrors: [],
       },
       {
         id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
         errorType: 'roboticsControlError',
+        isDefined: false as const,
         createdAt: '2023-04-09T21:41:51.333171+00:00',
         detail: 'Error with code 2000 (second highest priority)',
         errorInfo: {},
-        errorCode: '2000',
+        errorCode: '2000' as const,
         wrappedErrors: [
           {
             id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
             errorType: 'hardwareCommunicationError',
+            isDefined: false as const,
             createdAt: '2023-04-09T21:41:51.333171+00:00',
             detail: 'Error with code 1000 (highest priority)',
             errorInfo: {},
-            errorCode: '1000',
+            errorCode: '1000' as const,
             wrappedErrors: [],
           },
         ],
@@ -58,10 +63,11 @@ const mockErrors = [
   {
     id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
     errorType: 'roboticsInteractionError',
+    isDefined: false as const,
     createdAt: '2023-04-09T21:41:51.333171+00:00',
     detail: 'Error with code 2001 (second highest priortiy)',
     errorInfo: {},
-    errorCode: '2001',
+    errorCode: '2001' as const,
     wrappedErrors: [],
   },
 ]
@@ -69,10 +75,10 @@ const mockErrors = [
 const mockStopRun = vi.fn((_runId, opts) => opts.onSuccess())
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useHistory>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -95,6 +101,7 @@ describe('RunFailedModal', () => {
       runId: RUN_ID,
       setShowRunFailedModal: mockFn,
       errors: mockErrors,
+      runStatus: RUN_STATUS_FAILED,
     }
 
     vi.mocked(useStopRunMutation).mockReturnValue({
@@ -118,6 +125,6 @@ describe('RunFailedModal', () => {
     const button = screen.getByText('Close')
     fireEvent.click(button)
     expect(mockStopRun).toHaveBeenCalled()
-    expect(mockPush).toHaveBeenCalledWith('/dashboard')
+    expect(mockNavigate).toHaveBeenCalledWith('/dashboard')
   })
 })

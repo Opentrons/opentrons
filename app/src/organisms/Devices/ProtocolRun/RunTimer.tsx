@@ -1,7 +1,11 @@
 import * as React from 'react'
 
 import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
-import { useInterval, TYPOGRAPHY, StyledText } from '@opentrons/components'
+import {
+  useInterval,
+  TYPOGRAPHY,
+  LegacyStyledText,
+} from '@opentrons/components'
 
 import { formatInterval } from '../../../organisms/RunTimeControl/utils'
 import { EMPTY_TIMESTAMP } from '../constants'
@@ -21,7 +25,13 @@ export function RunTimer({
   style?: CSSProp
 }): JSX.Element {
   const [now, setNow] = React.useState(Date())
-  useInterval(() => setNow(Date()), 500, true)
+  useInterval(
+    () => {
+      setNow(Date())
+    },
+    500,
+    true
+  )
 
   const endTime =
     runStatus === RUN_STATUS_STOP_REQUESTED && stoppedAt != null
@@ -32,8 +42,8 @@ export function RunTimer({
     startedAt != null ? formatInterval(startedAt, endTime) : EMPTY_TIMESTAMP
 
   return (
-    <StyledText css={style != null ? style : TYPOGRAPHY.pRegular}>
+    <LegacyStyledText css={style != null ? style : TYPOGRAPHY.pRegular}>
       {runTime}
-    </StyledText>
+    </LegacyStyledText>
   )
 }

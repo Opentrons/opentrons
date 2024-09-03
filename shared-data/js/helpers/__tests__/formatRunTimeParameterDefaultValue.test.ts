@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { formatRunTimeParameterDefaultValue } from '../formatRunTimeParameterDefaultValue'
 
-import type { RunTimeParameter } from '../../types'
+import type { ValueRunTimeParameter } from '../../types'
 
 const capitalizeFirstLetter = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1)
@@ -21,7 +21,7 @@ describe('formatRunTimeParameterDefaultValue', () => {
       max: 10,
       default: 6,
       suffix: 'samples',
-    } as RunTimeParameter
+    } as ValueRunTimeParameter
     const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
     expect(result).toEqual('6 samples')
   })
@@ -37,7 +37,7 @@ describe('formatRunTimeParameterDefaultValue', () => {
       min: 1.5,
       max: 10.0,
       default: 6.5,
-    } as RunTimeParameter
+    } as ValueRunTimeParameter
     const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
     expect(result).toEqual('6.5 mL')
   })
@@ -60,7 +60,7 @@ describe('formatRunTimeParameterDefaultValue', () => {
         },
       ],
       default: 'left',
-    } as RunTimeParameter
+    } as ValueRunTimeParameter
     const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
     expect(result).toEqual('Left')
   })
@@ -86,7 +86,7 @@ describe('formatRunTimeParameterDefaultValue', () => {
         },
       ],
       default: 5,
-    } as RunTimeParameter
+    } as ValueRunTimeParameter
     const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
     expect(result).toEqual('5 mL')
   })
@@ -112,7 +112,7 @@ describe('formatRunTimeParameterDefaultValue', () => {
         },
       ],
       default: 5.0,
-    } as RunTimeParameter
+    } as ValueRunTimeParameter
     const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
     expect(result).toEqual('5 mL')
   })
@@ -125,7 +125,7 @@ describe('formatRunTimeParameterDefaultValue', () => {
       description: 'deactivate temperature on the module',
       type: 'bool',
       default: true,
-    } as RunTimeParameter
+    } as ValueRunTimeParameter
     const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
     expect(result).toEqual('On')
   })
@@ -138,7 +138,7 @@ describe('formatRunTimeParameterDefaultValue', () => {
       description: 'Is this a dry or wet run? Wet is true, dry is false',
       type: 'bool',
       default: false,
-    } as RunTimeParameter
+    } as ValueRunTimeParameter
     const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
     expect(result).toEqual('Off')
   })

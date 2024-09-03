@@ -5,9 +5,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  //   POSITION_STICKY,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { InputPrompt } from '../InputPrompt'
@@ -17,15 +16,14 @@ export function ChatFooter(): JSX.Element {
 
   return (
     <Flex
-      //   position={POSITION_STICKY}
-      bottom="0"
-      width="100%"
       gridGap={SPACING.spacing24}
       flexDirection={DIRECTION_COLUMN}
-      minHeight="calc(100vh-15rem)"
+      paddingBottom={SPACING.spacing24}
     >
       <InputPrompt />
-      <StyledText css={DISCLAIMER_TEXT_STYLE}>{t('disclaimer')}</StyledText>
+      <LegacyStyledText css={DISCLAIMER_TEXT_STYLE}>
+        {t('disclaimer')}
+      </LegacyStyledText>
     </Flex>
   )
 }
@@ -35,4 +33,5 @@ const DISCLAIMER_TEXT_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSize20};
   line-height: ${TYPOGRAPHY.lineHeight24};
   text-align: ${TYPOGRAPHY.textAlignCenter};
+  padding-bottom: ${SPACING.spacing24};
 `

@@ -4,13 +4,14 @@ from contextlib import nullcontext as do_not_raise
 
 from decoy import Decoy
 import pytest
+import re
 
 from opentrons_shared_data.labware.models import (
     LabwareRole,
     Parameters as LabwareDefinitionParameters,
 )
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.types import Mount, DeckSlotName, StagingSlotName, Location, Point
 from opentrons.hardware_control.modules.types import (
@@ -188,7 +189,9 @@ def test_ensure_and_convert_deck_slot(
             "A1",
             APIVersion(2, 0),
             APIVersionError,
-            '"A1" requires apiLevel 2.15. Increase your protocol\'s apiLevel, or use slot "10" instead.',
+            re.escape(
+                "Error 4011 INCORRECT_API_VERSION (APIVersionError): Specifying a deck slot like 'A1' is not available until API version 2.15. You are currently using API version 2.0. Increase your protocol's apiLevel, or use slot '10' instead."
+            ),
         ),
         ("A4", APIVersion(2, 15), APIVersionError, "Using a staging deck slot"),
     ],

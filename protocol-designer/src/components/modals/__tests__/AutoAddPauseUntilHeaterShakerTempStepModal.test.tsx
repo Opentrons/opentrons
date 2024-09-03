@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { fireEvent, screen, cleanup } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../localization'
+import { i18n } from '../../../assets/localization'
 import { AutoAddPauseUntilHeaterShakerTempStepModal } from '../AutoAddPauseUntilHeaterShakerTempStepModal'
 
 const render = (
@@ -26,9 +26,6 @@ describe('AutoAddPauseUntilHeaterShakerTempStepModal ', () => {
       handleCancelClick: vi.fn(),
       handleContinueClick: vi.fn(),
     }
-  })
-  afterEach(() => {
-    cleanup()
   })
 
   it('should render the correct text with 10 C temp and buttons are clickable', () => {

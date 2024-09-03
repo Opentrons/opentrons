@@ -11,6 +11,7 @@ import { getConfig } from '../../../redux/config'
 
 import type { DispatchApiRequestType } from '../../../redux/robot-api'
 import type { State } from '../../../redux/types'
+import { screen } from '@testing-library/react'
 
 vi.mock('../../../redux/robot-api')
 vi.mock('../../../redux/config')
@@ -56,9 +57,9 @@ describe('ConfigurePipette', () => {
   })
 
   it('renders correct number of text boxes given the pipette settings data supplied by getAttachedPipetteSettingsFieldsById', () => {
-    const { getAllByRole } = render(props)
+    render(props)
 
-    const inputs = getAllByRole('textbox')
+    const inputs = screen.getAllByRole('textbox')
     expect(inputs.length).toBe(13)
   })
 })

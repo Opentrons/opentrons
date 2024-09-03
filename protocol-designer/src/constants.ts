@@ -13,6 +13,8 @@ import {
   THERMOCYCLER_MODULE_V2,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
+  ABSORBANCE_READER_TYPE,
+  ABSORBANCE_READER_V1,
 } from '@opentrons/shared-data'
 import type {
   LabwareDefinition2,
@@ -138,6 +140,12 @@ export const MODELS_FOR_MODULE_TYPE: Record<
       value: MAGNETIC_BLOCK_V1,
     },
   ],
+  [ABSORBANCE_READER_TYPE]: [
+    {
+      name: 'GEN1',
+      value: ABSORBANCE_READER_V1,
+    },
+  ],
 }
 
 export const DEFAULT_MODEL_FOR_MODULE_TYPE: Record<ModuleType, ModuleModel> = {
@@ -146,6 +154,7 @@ export const DEFAULT_MODEL_FOR_MODULE_TYPE: Record<ModuleType, ModuleModel> = {
   [THERMOCYCLER_MODULE_TYPE]: THERMOCYCLER_MODULE_V2,
   [HEATERSHAKER_MODULE_TYPE]: HEATERSHAKER_MODULE_V1,
   [MAGNETIC_BLOCK_TYPE]: MAGNETIC_BLOCK_V1,
+  [ABSORBANCE_READER_TYPE]: ABSORBANCE_READER_V1,
 }
 // Values for pauseAction field
 export const PAUSE_UNTIL_RESUME: 'untilResume' = 'untilResume'

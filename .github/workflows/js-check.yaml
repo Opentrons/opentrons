@@ -75,12 +75,12 @@ jobs:
           make setup-js
         # Use the if to run all the lint checks even of some fail
         shell: bash
-      - name: 'lint js'
-        if: always() && steps.setup-js.outcome == 'success'
-        run: make lint-js
       - name: 'typechecks'
         if: always() && steps.setup-js.outcome == 'success'
         run: make check-js
+      - name: 'lint js'
+        if: always() && steps.setup-js.outcome == 'success'
+        run: make lint-js
       - name: 'circular deps'
         if: always() && steps.setup-js.outcome == 'success'
         run: make circular-dependencies-js

@@ -13,7 +13,7 @@ import {
   DIRECTION_ROW,
 } from '@opentrons/components'
 import { getCutoutDisplayName } from '@opentrons/shared-data'
-import stagingAreaImage from '../../images/staging_area.png'
+import stagingAreaImage from '../../assets/images/staging_area.png'
 import { getStagingAreaSlots } from '../../utils'
 import { getTopPortalEl } from '../portals/TopPortal'
 import { StagingAreasModal } from './StagingAreasModal'
@@ -43,7 +43,9 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
       {stagingAreaModal
         ? createPortal(
             <StagingAreasModal
-              onCloseClick={() => openStagingAreaModal(false)}
+              onCloseClick={() => {
+                openStagingAreaModal(false)
+              }}
               stagingAreas={stagingAreas}
             />,
             getTopPortalEl()
@@ -86,7 +88,9 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
           >
             {hasStagingAreas ? (
               <OutlineButton
-                onClick={() => openStagingAreaModal(true)}
+                onClick={() => {
+                  openStagingAreaModal(true)
+                }}
                 className={styles.module_button}
               >
                 {t('shared:edit')}
@@ -102,7 +106,9 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
                 onClick={
                   hasStagingAreas
                     ? handleAttachment
-                    : () => openStagingAreaModal(true)
+                    : () => {
+                        openStagingAreaModal(true)
+                      }
                 }
               >
                 {hasStagingAreas ? t('shared:remove') : t('shared:add')}

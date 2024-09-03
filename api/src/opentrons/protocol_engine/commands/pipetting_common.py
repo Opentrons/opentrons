@@ -1,6 +1,11 @@
 """Common pipetting command base models."""
+from dataclasses import dataclass
+from opentrons_shared_data.errors import ErrorCodes
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Literal, Optional, Tuple
+from typing_extensions import TypedDict
+
+from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
 
 from ..types import WellLocation, DeckPoint
 
@@ -117,3 +122,59 @@ class DestinationPositionResult(BaseModel):
             " after the move was completed."
         ),
     )
+
+
+class ErrorLocationInfo(TypedDict):
+    """Holds a retry location for in-place error recovery."""
+
+    retryLocation: Tuple[float, float, float]
+
+
+class OverpressureError(ErrorOccurrence):
+    """Returned when sensors detect an overpressure error while moving liquid.
+
+    The pipette plunger motion is stopped at the point of the error.
+
+    The next thing to move the plunger must account for the robot not having a valid
+    estimate of its position. It should be a `home`, `unsafe/updatePositionEstimators`,
+    `unsafe/dropTipInPlace`, or `unsafe/blowOutInPlace`.
+    """
+
+    isDefined: bool = True
+
+    errorType: Literal["overpressure"] = "overpressure"
+
+    errorCode: str = ErrorCodes.PIPETTE_OVERPRESSURE.value.code
+    detail: str = ErrorCodes.PIPETTE_OVERPRESSURE.value.detail
+
+    errorInfo: ErrorLocationInfo
+
+
+@dataclass(frozen=True)
+class OverpressureErrorInternalData:
+    """Internal-to-ProtocolEngine data about an OverpressureError."""
+
+    position: DeckPoint
+    """Same meaning as DestinationPositionResult.position."""
+
+
+class LiquidNotFoundError(ErrorOccurrence):
+    """Returned when no liquid is detected during the liquid probe process/move.
+
+    After a failed probing, the pipette returns to the process start position.
+    """
+
+    isDefined: bool = True
+
+    errorType: Literal["liquidNotFound"] = "liquidNotFound"
+
+    errorCode: str = ErrorCodes.PIPETTE_LIQUID_NOT_FOUND.value.code
+    detail: str = ErrorCodes.PIPETTE_LIQUID_NOT_FOUND.value.detail
+
+
+@dataclass(frozen=True)
+class LiquidNotFoundErrorInternalData:
+    """Internal-to-ProtocolEngine data about a LiquidNotFoundError."""
+
+    position: DeckPoint
+    """Same meaning as DestinationPositionResult.position."""

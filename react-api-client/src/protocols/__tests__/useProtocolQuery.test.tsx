@@ -16,6 +16,7 @@ const PROTOCOL_ID = '1'
 const PROTOCOL_RESPONSE = {
   data: {
     protocolType: 'json',
+    protocolKind: 'standard',
     createdAt: 'now',
     id: '1',
     metadata: {},

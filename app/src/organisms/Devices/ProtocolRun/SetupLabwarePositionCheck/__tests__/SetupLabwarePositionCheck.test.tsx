@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { when } from 'vitest-when'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { screen, fireEvent } from '@testing-library/react'
 import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
 
@@ -42,14 +42,19 @@ const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 
 const render = () => {
+  let areOffsetsConfirmed = false
+  const confirmOffsets = vi.fn((offsetsConfirmed: boolean) => {
+    areOffsetsConfirmed = offsetsConfirmed
+  })
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <SetupLabwarePositionCheck
-        expandLabwareStep={vi.fn()}
+        offsetsConfirmed={areOffsetsConfirmed}
+        setOffsetsConfirmed={confirmOffsets}
         robotName={ROBOT_NAME}
         runId={RUN_ID}
       />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }

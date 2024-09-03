@@ -17,7 +17,7 @@ import {
   Link,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -179,18 +179,23 @@ export function DeviceResetSlideout({
             marginRight={SPACING.spacing8}
             color={COLORS.yellow60}
           />
-          <StyledText as="p">{t('resets_cannot_be_undone')}</StyledText>
+          <LegacyStyledText as="p">
+            {t('resets_cannot_be_undone')}
+          </LegacyStyledText>
         </Flex>
         {isFlex ? (
           <>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing20}>
               <Flex flexDirection={DIRECTION_COLUMN}>
-                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                <LegacyStyledText
+                  as="p"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   {t('clear_all_data')}
-                </StyledText>
-                <StyledText as="p" marginY={SPACING.spacing8}>
+                </LegacyStyledText>
+                <LegacyStyledText as="p" marginY={SPACING.spacing8}>
                   {t('clear_all_stored_data_description')}
-                </StyledText>
+                </LegacyStyledText>
                 <CheckboxField
                   onChange={() => {
                     setResetOptions(
@@ -216,12 +221,12 @@ export function DeviceResetSlideout({
           </>
         ) : null}
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {t('clear_individual_data')}
-          </StyledText>
-          <StyledText as="p">
+          </LegacyStyledText>
+          <LegacyStyledText as="p">
             {t('device_reset_slideout_description')}
-          </StyledText>
+          </LegacyStyledText>
           <Flex
             marginTop={SPACING.spacing20}
             flexDirection={DIRECTION_COLUMN}
@@ -234,9 +239,9 @@ export function DeviceResetSlideout({
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 marginBottom="0.625rem"
               >
-                <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
+                <LegacyStyledText as="p" css={TYPOGRAPHY.pSemiBold}>
                   {t('robot_calibration_data')}
-                </StyledText>
+                </LegacyStyledText>
                 <Link
                   role="button"
                   css={TYPOGRAPHY.linkPSemiBold}
@@ -262,12 +267,12 @@ export function DeviceResetSlideout({
                     calibrationName !== '' && (
                       <CheckboxField
                         key={opt.id}
-                        onChange={() =>
+                        onChange={() => {
                           setResetOptions({
                             ...resetOptions,
                             [opt.id]: !(resetOptions[opt.id] ?? false),
                           })
-                        }
+                        }}
                         value={resetOptions[opt.id]}
                         label={calibrationName}
                       />
@@ -282,9 +287,9 @@ export function DeviceResetSlideout({
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 marginBottom={SPACING.spacing8}
               >
-                <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
+                <LegacyStyledText as="p" css={TYPOGRAPHY.pSemiBold}>
                   {t('protocol_run_history')}
-                </StyledText>
+                </LegacyStyledText>
                 <Link
                   role="button"
                   css={TYPOGRAPHY.linkPSemiBold}
@@ -296,56 +301,56 @@ export function DeviceResetSlideout({
               {runHistoryOption.map(opt => (
                 <CheckboxField
                   key={opt.id}
-                  onChange={() =>
+                  onChange={() => {
                     setResetOptions({
                       ...resetOptions,
                       [opt.id]: !(resetOptions[opt.id] ?? false),
                     })
-                  }
+                  }}
                   value={resetOptions[opt.id]}
                   label={t(`clear_option_${snakeCase(opt.id)}`)}
                 />
               ))}
             </Box>
             <Box>
-              <StyledText
+              <LegacyStyledText
                 as="p"
                 css={TYPOGRAPHY.pSemiBold}
                 marginBottom={SPACING.spacing8}
               >
                 {t('boot_scripts')}
-              </StyledText>
+              </LegacyStyledText>
               {bootScriptOption.map(opt => (
                 <CheckboxField
                   key={opt.id}
-                  onChange={() =>
+                  onChange={() => {
                     setResetOptions({
                       ...resetOptions,
                       [opt.id]: !(resetOptions[opt.id] ?? false),
                     })
-                  }
+                  }}
                   value={resetOptions[opt.id]}
                   label={t(`clear_option_${snakeCase(opt.id)}`)}
                 />
               ))}
             </Box>
             <Box>
-              <StyledText
+              <LegacyStyledText
                 as="p"
                 css={TYPOGRAPHY.pSemiBold}
                 marginBottom={SPACING.spacing8}
               >
                 {t('ssh_public_keys')}
-              </StyledText>
+              </LegacyStyledText>
               {sshKeyOption.map(opt => (
                 <CheckboxField
                   key={opt.id}
-                  onChange={() =>
+                  onChange={() => {
                     setResetOptions({
                       ...resetOptions,
                       [opt.id]: !(resetOptions[opt.id] ?? false),
                     })
-                  }
+                  }}
                   value={resetOptions[opt.id]}
                   label={t(`clear_option_${snakeCase(opt.id)}`)}
                 />

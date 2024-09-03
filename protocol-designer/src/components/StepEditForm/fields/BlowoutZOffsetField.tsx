@@ -4,11 +4,12 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
+import { getWellDepth } from '@opentrons/shared-data'
 import {
   COLORS,
   Flex,
   Icon,
-  Tooltip,
+  LegacyTooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 import { getLabwareEntities } from '../../../step-forms/selectors'
@@ -45,26 +46,34 @@ export function BlowoutZOffsetField(
     labwareId = destLabwareId
   }
 
-  const labwareZDimension =
-    labwareId != null
-      ? labwareEntities[String(labwareId)]?.def.dimensions.zDimension
+  const labwareWellDepth =
+    labwareId != null && labwareEntities[String(labwareId)]?.def != null
+      ? getWellDepth(labwareEntities[String(labwareId)].def, 'A1')
       : 0
 
   return (
     <>
-      <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
+      <LegacyTooltip {...tooltipProps}>{tooltipContent}</LegacyTooltip>
       {isModalOpen ? (
         <ZTipPositionModal
-          closeModal={() => setModalOpen(false)}
+          closeModal={() => {
+            setModalOpen(false)
+          }}
           name={name}
           zValue={Number(value)}
           updateValue={updateValue}
-          wellDepthMm={labwareZDimension}
+          wellDepthMm={labwareWellDepth}
         />
       ) : null}
       <Flex
         {...targetProps}
-        onClick={disabled ? undefined : () => setModalOpen(true)}
+        onClick={
+          disabled
+            ? undefined
+            : () => {
+                setModalOpen(true)
+              }
+        }
         id={`BlowoutZOffsetField_${name}`}
         data-testid={`BlowoutZOffsetField_${name}`}
       >

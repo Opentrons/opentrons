@@ -5,13 +5,13 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InputField,
+  LegacyStyledText,
   POSITION_FIXED,
   SPACING,
   TYPOGRAPHY,
-  StyledText,
 } from '@opentrons/components'
 
-import { InputField } from '../../atoms/InputField'
 import { FullKeyboard } from '../../atoms/SoftwareKeyboard'
 import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
 
@@ -38,21 +38,25 @@ export function SetWifiSsid({
         gridGap={SPACING.spacing8}
         marginTop={isUnboxingFlowOngoing ? undefined : '7.75rem'}
       >
-        <StyledText
+        <LegacyStyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={errorMessage != null ? COLORS.red50 : COLORS.black90}
         >
           {t('enter_network_name')}
-        </StyledText>
+        </LegacyStyledText>
         <InputField
           aria-label="wifi_ssid"
           value={inputSsid}
           id="wifiSsid"
-          onChange={e => setInputSsid(e.target.value)}
+          onChange={e => {
+            setInputSsid(e.target.value)
+          }}
           type="text"
           error={errorMessage}
-          onBlur={e => e.target.focus()}
+          onBlur={e => {
+            e.target.focus()
+          }}
           autoFocus
         />
       </Flex>

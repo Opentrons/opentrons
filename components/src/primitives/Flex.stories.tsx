@@ -2,7 +2,7 @@ import * as React from 'react'
 import { BORDERS, COLORS } from '../helix-design-system'
 import { SPACING } from '../ui-style-constants'
 import { DIRECTION_COLUMN, JUSTIFY_SPACE_AROUND } from '../styles'
-import { StyledText } from '../atoms/StyledText'
+import { LegacyStyledText } from '../atoms/StyledText'
 import { Box, Flex as FlexComponent } from '../primitives'
 
 import type { Meta, StoryObj } from '@storybook/react'
@@ -25,9 +25,9 @@ export const Flex: Story = {
         padding={SPACING.spacing16}
         borderRadius={BORDERS.borderRadius4}
       >
-        <StyledText as="p" color={COLORS.white}>
+        <LegacyStyledText as="p" color={COLORS.white}>
           This is a flex child
-        </StyledText>
+        </LegacyStyledText>
       </Box>,
       <Box
         key="2"
@@ -35,9 +35,9 @@ export const Flex: Story = {
         padding={SPACING.spacing16}
         borderRadius={BORDERS.borderRadius4}
       >
-        <StyledText as="p" color={COLORS.white}>
+        <LegacyStyledText as="p" color={COLORS.white}>
           This is a flex child
-        </StyledText>
+        </LegacyStyledText>
       </Box>,
     ],
     flexDirection: DIRECTION_COLUMN,

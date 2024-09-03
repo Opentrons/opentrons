@@ -24,6 +24,7 @@ from opentrons_shared_data.errors.exceptions import (
     InvalidLiquidClassName,
     CommandPreconditionViolated,
     PythonException,
+    InvalidInstrumentData,
 )
 from opentrons_shared_data.pipette.ul_per_mm import (
     piecewise_volume_conversion,
@@ -36,7 +37,7 @@ from .instrument_calibration import (
     load_pipette_offset,
     PipetteOffsetByPipetteMount,
 )
-from opentrons_shared_data.pipette.dev_types import (
+from opentrons_shared_data.pipette.types import (
     UlPerMmAction,
     PipetteName,
     PipetteModel,
@@ -48,6 +49,13 @@ from opentrons_shared_data.pipette import (
 from opentrons.hardware_control.types import CriticalPoint, OT3Mount
 from opentrons.hardware_control.errors import InvalidCriticalPoint
 from opentrons.hardware_control import nozzle_manager
+
+from opentrons.hardware_control.util import (
+    pick_up_speed_by_configuration,
+    pick_up_distance_by_configuration,
+    pick_up_current_by_configuration,
+    nominal_tip_overlap_dictionary_by_configuration,
+)
 
 mod_log = logging.getLogger(__name__)
 
@@ -96,9 +104,16 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             pipette_channels=config.channels,
             pipette_version=config.version,
         )
+        self._valid_nozzle_maps = load_pipette_data.load_valid_nozzle_maps(
+            self._pipette_model.pipette_type,
+            self._pipette_model.pipette_channels,
+            self._pipette_model.pipette_version,
+        )
         self._nozzle_offset = self._config.nozzle_offset
         self._nozzle_manager = (
-            nozzle_manager.NozzleConfigurationManager.build_from_config(self._config)
+            nozzle_manager.NozzleConfigurationManager.build_from_config(
+                self._config, self._valid_nozzle_maps
+            )
         )
         self._current_volume = 0.0
         self._working_volume = float(self._liquid_class.max_volume)
@@ -133,7 +148,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
 
-        self._tip_overlap_lookup = self._liquid_class.tip_overlap_dictionary
+        self._versioned_tip_overlap_dictionary = (
+            self.get_nominal_tip_overlap_dictionary_by_configuration()
+        )
 
         if use_old_aspiration_functions:
             self._pipetting_function_version = PIPETTING_FUNCTION_FALLBACK_VERSION
@@ -161,8 +178,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._backlash_distance
 
     @property
-    def tip_overlap(self) -> Dict[str, float]:
-        return self._tip_overlap_lookup
+    def tip_overlap(self) -> Dict[str, Dict[str, float]]:
+        return self._versioned_tip_overlap_dictionary
 
     @property
     def nozzle_offset(self) -> Point:
@@ -254,9 +271,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
 
-        self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
+        self._versioned_tip_overlap_dictionary = (
+            self.get_nominal_tip_overlap_dictionary_by_configuration()
+        )
         self._nozzle_manager = (
-            nozzle_manager.NozzleConfigurationManager.build_from_config(self._config)
+            nozzle_manager.NozzleConfigurationManager.build_from_config(
+                self._config, self._valid_nozzle_maps
+            )
         )
 
     def reset_pipette_offset(self, mount: OT3Mount, to_default: bool) -> None:
@@ -560,7 +581,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "default_flow_acceleration": self.active_tip_settings.default_flow_acceleration,
                 "tip_length": self.current_tip_length,
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,
-                "tip_overlap": self.tip_overlap,
+                "tip_overlap": self.tip_overlap["v0"],
+                "versioned_tip_overlap": self.tip_overlap,
                 "back_compat_names": self._config.pipette_backcompat_names,
                 "supported_tips": self.liquid_class.supported_tips,
             }
@@ -631,12 +653,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         try:
             new_tips = self._liquid_class.supported_tips[tip_type]
         except KeyError as e:
-            raise InvalidLiquidClassName(
-                message=f"There is no configuration for {tip_type.name} in liquid class {str(self._liquid_class_name)} on a {self._config.display_name}",
-                detail={
-                    "current-liquid-class": str(self._liquid_class_name),
-                    "requested-type": tip_type.name,
-                },
+            raise InvalidInstrumentData(
+                message=f"There is no configuration for {tip_type.name} in the pick up tip configurations for a {self._config.display_name}",
                 wrapping=[PythonException(e)],
             ) from e
 
@@ -655,11 +673,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
 
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
-        self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
+        self._versioned_tip_overlap_dictionary = (
+            self.get_nominal_tip_overlap_dictionary_by_configuration()
+        )
         self._working_volume = min(tip_type.value, self.liquid_class.max_volume)
 
-    def get_pick_up_configuration_for_tip_count(
-        self, count: int
+    def get_pick_up_configuration(  # noqa: C901
+        self,
     ) -> Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration]:
         for config in (
             self._config.pick_up_tip_configurations.press_fit,
@@ -667,20 +687,76 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         ):
             if not config:
                 continue
-
-            if isinstance(config, PressFitPickUpTipConfiguration) and all(
-                [
-                    config.speed_by_tip_count.get(count),
-                    config.distance_by_tip_count.get(count),
-                    config.current_by_tip_count.get(count),
-                ]
-            ):
-                return config
-            elif config.current_by_tip_count.get(count) is not None:
-                return config
+            config_values = None
+            try:
+                config_values = config.configuration_by_nozzle_map[
+                    self._nozzle_manager.current_configuration.valid_map_key
+                ][self._active_tip_setting_name.name]
+            except KeyError:
+                try:
+                    config_values = config.configuration_by_nozzle_map[
+                        self._nozzle_manager.current_configuration.valid_map_key
+                    ].get("default")
+                    if config_values is None:
+                        raise KeyError(
+                            f"Default tip type configuration values do not exist for Nozzle Map {self._nozzle_manager.current_configuration.valid_map_key}."
+                        )
+                except KeyError:
+                    # No valid key found for the approved nozzle map under this configuration - try the next
+                    continue
+            if config_values is not None:
+                if isinstance(config, PressFitPickUpTipConfiguration) and all(
+                    [
+                        config_values.speed,
+                        config_values.distance,
+                        config_values.current,
+                    ]
+                ):
+                    return config
+                elif config_values.current is not None:
+                    return config
 
         raise CommandPreconditionViolated(
-            message=f"No pick up tip configuration for {count} tips",
+            message="No valid pick up tip configuration values found in instrument definition.",
+        )
+
+    def get_pick_up_speed_by_configuration(
+        self,
+        config: Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration],
+    ) -> float:
+        return pick_up_speed_by_configuration(
+            config,
+            self._nozzle_manager.current_configuration.valid_map_key,
+            self._active_tip_setting_name,
+        )
+
+    def get_pick_up_distance_by_configuration(
+        self,
+        config: Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration],
+    ) -> float:
+        return pick_up_distance_by_configuration(
+            config,
+            self._nozzle_manager.current_configuration.valid_map_key,
+            self._active_tip_setting_name,
+        )
+
+    def get_pick_up_current_by_configuration(
+        self,
+        config: Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration],
+    ) -> float:
+        return pick_up_current_by_configuration(
+            config,
+            self._nozzle_manager.current_configuration.valid_map_key,
+            self._active_tip_setting_name,
+        )
+
+    def get_nominal_tip_overlap_dictionary_by_configuration(
+        self,
+    ) -> Dict[str, Dict[str, float]]:
+        return nominal_tip_overlap_dictionary_by_configuration(
+            self._config,
+            self._nozzle_manager.current_configuration.valid_map_key,
+            self._active_tip_setting_name,
         )
 
 

@@ -5,6 +5,8 @@ from typing import Callable, Dict, IO, List
 
 import pytest
 
+from robot_server.persistence.file_and_directory_names import LATEST_VERSION_DIRECTORY
+
 from tests.integration.dev_server import DevServer
 from tests.integration.robot_client import RobotClient
 from tests.integration.protocol_files import get_py_protocol, get_json_protocol
@@ -120,10 +122,10 @@ async def test_protocol_labware_files_persist() -> None:
             assert restarted_protocol_detail == protocol_detail
 
             four_tuberack = Path(
-                f"{server.persistence_directory}/4/protocols/{protocol_id}/cpx_4_tuberack_100ul.json"
+                f"{server.persistence_directory}/{LATEST_VERSION_DIRECTORY}/protocols/{protocol_id}/cpx_4_tuberack_100ul.json"
             )
             six_tuberack = Path(
-                f"{server.persistence_directory}/4/protocols/{protocol_id}/cpx_6_tuberack_100ul.json"
+                f"{server.persistence_directory}/{LATEST_VERSION_DIRECTORY}/protocols/{protocol_id}/cpx_6_tuberack_100ul.json"
             )
             assert four_tuberack.is_file()
             assert six_tuberack.is_file()

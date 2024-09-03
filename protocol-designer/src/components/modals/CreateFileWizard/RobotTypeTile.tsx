@@ -24,8 +24,8 @@ import {
   OT2_DISPLAY_NAME,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import opentronsFlexImage from '../../../images/OpentronsFlex.png'
-import OT2Image from '../../../images/OT2.png'
+import opentronsFlexImage from '../../../assets/images/OpentronsFlex.png'
+import OT2Image from '../../../assets/images/OT2.png'
 import { HandleEnter } from './HandleEnter'
 
 import type { RobotType } from '@opentrons/shared-data'
@@ -70,7 +70,11 @@ export function RobotTypeTile(props: WizardTileProps): JSX.Element {
           justifyContent={JUSTIFY_FLEX_END}
           width="100%"
         >
-          <PrimaryButton onClick={() => proceed()}>
+          <PrimaryButton
+            onClick={() => {
+              proceed()
+            }}
+          >
             {t('application:next')}
           </PrimaryButton>
         </Flex>

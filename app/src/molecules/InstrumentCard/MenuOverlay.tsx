@@ -1,14 +1,14 @@
 import * as React from 'react'
 
 import {
-  Flex,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  Flex,
+  MenuItem,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
 
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Divider } from '../../atoms/structure'
 
 import type { StyleProps } from '@opentrons/components'

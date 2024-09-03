@@ -5,9 +5,12 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
+import { useIsOEMMode } from '../../../resources/robot-settings/hooks'
 import { SelectPipette } from '../SelectPipette'
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('../../../resources/robot-settings/hooks')
+
 const render = (props: React.ComponentProps<typeof SelectPipette>) => {
   return renderWithProviders(<SelectPipette {...props} />, {
     i18nInstance: i18n,
@@ -53,6 +56,7 @@ describe('SelectPipette', () => {
         ],
       },
     } as any)
+    vi.mocked(useIsOEMMode).mockReturnValue(false)
   })
   afterEach(() => {
     vi.resetAllMocks()

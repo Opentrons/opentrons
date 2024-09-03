@@ -19,7 +19,7 @@ from pathlib import Path
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.module.dev_types import (
+    from opentrons_shared_data.module.types import (
         ThermocyclerModuleType,
         MagneticModuleType,
         TemperatureModuleType,
@@ -39,6 +39,9 @@ class ThermocyclerStep(ThermocyclerStepBase, total=False):
 
 
 UploadFunction = Callable[[str, str, Dict[str, Any]], Awaitable[Tuple[bool, str]]]
+
+
+ModuleDisconnectedCallback = Optional[Callable[[str, str | None], None]]
 
 
 class LiveData(TypedDict):
@@ -80,6 +83,8 @@ class ModuleType(str, Enum):
             return "heaterShakerModuleV1"
         if module_type == ModuleType.MAGNETIC_BLOCK:
             return "magneticBlockV1"
+        if module_type == ModuleType.ABSORBANCE_READER:
+            return "absorbanceReaderV1"
         else:
             raise ValueError(
                 f"Module Type {module_type} does not have a related fixture ID."
@@ -133,6 +138,7 @@ def module_model_from_string(model_string: str) -> ModuleModel:
 class ModuleAtPort:
     port: str
     name: str
+    serial: Optional[str] = None
     usb_port: USBPort = USBPort(name="", port_number=0)
 
 
@@ -155,10 +161,6 @@ class BundledFirmware(NamedTuple):
 
     def __repr__(self) -> str:
         return f"<BundledFirmware {self.version}, path={self.path}>"
-
-
-class UpdateError(RuntimeError):
-    pass
 
 
 class ModuleInfo(NamedTuple):
@@ -209,4 +211,11 @@ class HeaterShakerStatus(str, Enum):
 class AbsorbanceReaderStatus(str, Enum):
     IDLE = "idle"
     MEASURING = "measuring"
+    ERROR = "error"
+
+
+class LidStatus(str, Enum):
+    ON = "on"
+    OFF = "off"
+    UNKNOWN = "unknown"
     ERROR = "error"

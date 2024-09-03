@@ -160,8 +160,8 @@ describe('RobotConfigurationDetails', () => {
       isLoading: false,
       robotType: OT2_STANDARD_MODEL,
     }
-    const { queryByText } = render(props)
-    expect(queryByText('extension mount')).not.toBeInTheDocument()
+    render(props)
+    expect(screen.queryByText('extension mount')).not.toBeInTheDocument()
   })
 
   it('renders the magnetic module when the protocol contains a magnetic module', () => {
@@ -176,7 +176,7 @@ describe('RobotConfigurationDetails', () => {
     }
 
     render(props)
-    screen.getByText('1')
+    screen.getByText('Slot 1')
     screen.getByText('Magnetic Module GEN2')
   })
 

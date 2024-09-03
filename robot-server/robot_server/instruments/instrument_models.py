@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 
 from opentrons.calibration_storage.types import SourceType
 from opentrons.protocol_engine.types import Vec3f
-from opentrons_shared_data.pipette.dev_types import (
+from opentrons_shared_data.pipette.types import (
     PipetteName,
     PipetteModel,
     ChannelCount,
@@ -57,7 +57,8 @@ class _GenericInstrument(BaseModel, Generic[InstrumentModelT, InstrumentDataT]):
         ..., description="Whether this instrument is OK and ready to go"
     )
     firmwareVersion: Optional[str] = Field(
-        default=None, description="The firmware version of this instrument (if applicable)"
+        default=None,
+        description="The firmware version of this instrument (if applicable)",
     )
     data: InstrumentDataT
 
@@ -78,7 +79,7 @@ class GripperData(BaseModel):
     # TODO (spp, 2023-01-03): update calibration field as decided after
     #  spike https://opentrons.atlassian.net/browse/RSS-167
     calibratedOffset: Optional[InstrumentCalibrationData] = Field(
-       default=None, description="Calibrated gripper offset."
+        default=None, description="Calibrated gripper offset."
     )
 
 

@@ -10,7 +10,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -42,9 +42,9 @@ export function ConnectingNetwork({
             aria-label="spinner"
             spin
           />
-          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+          <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {t('connecting_to', { ssid: ssid })}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       </Flex>
     </Flex>

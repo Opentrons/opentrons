@@ -3,6 +3,7 @@ export {
   waitForTemperature,
   blowout,
   consolidate,
+  comment,
   distribute,
   deactivateTemperature,
   delay,

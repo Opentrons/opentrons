@@ -1,6 +1,7 @@
 import assert from 'assert'
 import produce from 'immer'
 import { stripNoOpCommands } from '../utils/stripNoOpCommands'
+import { forLoadLiquid } from './forLoadLiquid'
 import { forAspirate } from './forAspirate'
 import { forDispense } from './forDispense'
 import { forBlowout } from './forBlowout'
@@ -99,6 +100,32 @@ function _getNextRobotStateAndWarningsSingleCommand(
       forMoveLabware(command.params, invariantContext, robotStateAndWarnings)
       break
 
+    // the following commands currently don't effect tracked robot state
+    case 'touchTip': // pipetting
+    case 'configureForVolume':
+    case 'loadPipette': // setup VVV
+    case 'loadLabware':
+    case 'loadModule':
+    case 'home': // gantry VVV
+    case 'moveRelative':
+    case 'moveToAddressableArea':
+    case 'moveToAddressableAreaForDropTip':
+    case 'moveToSlot':
+    case 'moveToCoordinates':
+    case 'moveToWell':
+    case 'savePosition':
+    case 'waitForResume': // timing VVV
+    case 'waitForDuration':
+    case 'pause': // deprecated, use waitForResume instead
+    case 'delay': // deprecated, use waitForDuration instead
+    case 'custom': // fall-back
+    case 'comment':
+      break
+
+    case 'loadLiquid':
+      forLoadLiquid(command.params, invariantContext, robotStateAndWarnings)
+      break
+
     case 'aspirateInPlace':
       forAspirateInPlace(
         command.params,
@@ -129,17 +156,6 @@ function _getNextRobotStateAndWarningsSingleCommand(
         invariantContext,
         robotStateAndWarnings
       )
-      break
-
-    case 'touchTip':
-    case 'waitForDuration':
-    case 'waitForResume':
-    case 'moveToWell':
-    case 'delay':
-    case 'configureForVolume':
-    case 'moveToAddressableArea':
-    case 'moveToAddressableAreaForDropTip':
-      // these commands don't have any effects on the state
       break
 
     case 'temperatureModule/setTargetTemperature':

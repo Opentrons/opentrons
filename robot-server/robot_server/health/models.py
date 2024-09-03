@@ -1,7 +1,7 @@
 """HTTP request and response models for /health endpoints."""
 import typing
 from pydantic import BaseModel, Field
-from opentrons_shared_data.deck.dev_types import RobotModel
+from opentrons_shared_data.deck.types import RobotModel
 from robot_server.service.json_api import BaseResponseBody
 
 
@@ -10,26 +10,44 @@ class HealthLinks(BaseModel):
 
     apiLog: str = Field(
         ...,
-        description="The path to the API logs endpoint",
+        description=(
+            "The path to the API logs endpoint."
+            " Deprecated: Use the `logs` field of the `GET /health` response"
+            " or refer to the OpenAPI specification of the `/logs` endpoint, instead."
+        ),
         examples=["/logs/api.log"],
+        json_schema_extra={'deprecated': True}
     )
     serialLog: str = Field(
         ...,
-        description="The path to the motor control serial communication logs endpoint",
+        description=(
+            "The path to the motor control serial communication logs endpoint."
+            " Deprecated: Use the `logs` field of the `GET /health` response"
+            " or refer to the OpenAPI specification of the `/logs` endpoint, instead."
+        ),
         examples=["/logs/serial.log"],
+        json_schema_extra={'deprecated': True}
     )
     serverLog: str = Field(
         ...,
-        description="The path to the HTTP server logs endpoint",
+        description=(
+            "The path to the HTTP server logs endpoint."
+            " Deprecated: Use the `logs` field of the `GET /health` response"
+            " or refer to the OpenAPI specification of the `/logs` endpoint, instead."
+        ),
         examples=["/logs/server.log"],
+        json_schema_extra={'deprecated': True}
     )
     oddLog: typing.Optional[str] = Field(
         default=None,
         description=(
             "The path to the on-device display app logs endpoint"
-            " (only present on the Opentrons Flex)"
+            " (only present on the Opentrons Flex)."
+            " Deprecated: Use the `logs` field of the `GET /health` response"
+            " or refer to the OpenAPI specification of the `/logs` endpoint, instead."
         ),
         examples=["/logs/touchscreen.log"],
+        json_schema_extra={'deprecated': True}
     )
     apiSpec: str = Field(
         ...,

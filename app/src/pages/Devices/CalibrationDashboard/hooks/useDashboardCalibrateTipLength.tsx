@@ -2,10 +2,10 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { ModalShell } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../../App/portal'
 import { WizardHeader } from '../../../../molecules/WizardHeader'
-import { LegacyModalShell } from '../../../../molecules/LegacyModal'
 import { CalibrateTipLength } from '../../../../organisms/CalibrateTipLength'
 import { AskForCalibrationBlockModal } from '../../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import { LoadingState } from '../../../../organisms/CalibrationPanels'
@@ -163,16 +163,18 @@ export function useDashboardCalibrateTipLength(
             }
           }}
           titleBarTitle={t('tip_length_calibration')}
-          closePrompt={() => setShowCalBlockModal(false)}
+          closePrompt={() => {
+            setShowCalBlockModal(false)
+          }}
         />
       ) : null}
       {startingSession ? (
-        <LegacyModalShell
+        <ModalShell
           width="47rem"
           header={<WizardHeader title={t('tip_length_calibration')} />}
         >
           <LoadingState />
-        </LegacyModalShell>
+        </ModalShell>
       ) : null}
       <CalibrateTipLength
         session={tipLengthCalibrationSession}

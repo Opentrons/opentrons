@@ -84,6 +84,34 @@
       "patternProperties": {
         "[A-Z]+[0-9]+": { "$ref": "#/definitions/xyzArray" }
       }
+    },
+    "lldSettings": {
+      "type": "object",
+      "description": "Minimum space requirements for Liquid Level Detection to work properly",
+      "additionalProperties": false,
+      "properties": {
+        "t50": {
+          "type": "object",
+          "properties": {
+            "minHeight": { "type": "number" },
+            "minVolume": { "type": "number" }
+          }
+        },
+        "t200": {
+          "type": "object",
+          "properties": {
+            "minHeight": { "type": "number" },
+            "minVolume": { "type": "number" }
+          }
+        },
+        "t1000": {
+          "type": "object",
+          "properties": {
+            "minHeight": { "type": "number" },
+            "minVolume": { "type": "number" }
+          }
+        }
+      }
     }
   }
 }

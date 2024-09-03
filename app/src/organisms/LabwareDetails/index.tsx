@@ -13,18 +13,18 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
   OVERFLOW_WRAP_ANYWHERE,
   SIZE_1,
   SPACING,
-  StyledText,
   TOOLTIP_TOP_START,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
 import { getUniqueWellProperties } from '@opentrons/shared-data'
 import { Slideout } from '../../atoms/Slideout'
-import { Tooltip } from '../../atoms/Tooltip'
 import { getWellLabel } from './helpers/labels'
 import { WellCount } from './WellCount'
 import { WellProperties } from './WellProperties'
@@ -89,7 +89,9 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   }
 
   React.useEffect(() => {
-    const timer = setTimeout(() => setShowToolTip(false), 2000)
+    const timer = setTimeout(() => {
+      setShowToolTip(false)
+    }, 2000)
     return () => {
       clearTimeout(timer)
     }
@@ -106,9 +108,9 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <StyledText css={TYPOGRAPHY.h2SemiBold}>
+        <LegacyStyledText css={TYPOGRAPHY.h2SemiBold}>
           {props.labware.definition.metadata.displayName}
-        </StyledText>
+        </LegacyStyledText>
         <Link
           onClick={props.onClose}
           role="button"
@@ -124,13 +126,13 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       {!isCustomDefinition && (
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
           <Icon color={COLORS.blue50} name="check-decagram" height=".7rem" />{' '}
-          <StyledText
+          <LegacyStyledText
             as="label"
             id="LabwareDetails_opentronsDef"
             marginLeft={SPACING.spacing4}
           >
             {t('branded:opentrons_def')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       )}
       {modified != null && filename != null && (
@@ -140,13 +142,13 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           paddingRight={SPACING.spacing2}
           alignItems={ALIGN_CENTER}
         >
-          <StyledText
+          <LegacyStyledText
             as="label"
             color={COLORS.grey50}
             id="LabwareDetails_dateAdded"
           >
             {t('last_updated')} {format(new Date(modified), 'MM/dd/yyyy')}
-          </StyledText>
+          </LegacyStyledText>
           <CustomLabwareOverflowMenu
             filename={filename}
             onDelete={props.onClose}
@@ -165,7 +167,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         marginBottom={SPACING.spacing24}
         borderRadius={BORDERS.borderRadius4}
       >
-        <StyledText as="h6">{t('api_name')}</StyledText>
+        <LegacyStyledText as="h6">{t('api_name')}</LegacyStyledText>
         <Link
           css={TYPOGRAPHY.pRegular}
           onClick={handleCopy}

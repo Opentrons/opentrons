@@ -8,7 +8,7 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 34
+    return 35
 
 
 # make sure to set a boolean value in default_file_settings only if
@@ -20,7 +20,6 @@ def default_file_settings() -> Dict[str, Any]:
         "deckCalibrationDots": None,
         "disableHomeOnBoot": None,
         "useOldAspirationFunctions": None,
-        "disableLogAggregation": None,
         "enableDoorSafetySwitch": None,
         "enableOT3HardwareController": None,
         "rearPanelIntegration": True,
@@ -69,7 +68,6 @@ def v2_config(v1_config: Dict[str, Any]) -> Dict[str, Any]:
     r.update(
         {
             "_version": 2,
-            "disableLogAggregation": True,
         }
     )
     return r
@@ -525,15 +523,12 @@ def test_ignores_invalid_keys(
 
 
 def test_ensures_config() -> None:
-    assert _ensure(
-        {"_version": 3, "shortFixedTrash": False, "disableLogAggregation": True}
-    ) == {
+    assert _ensure({"_version": 3, "shortFixedTrash": False}) == {
         "_version": 3,
         "shortFixedTrash": False,
         "deckCalibrationDots": None,
         "disableHomeOnBoot": None,
         "useOldAspirationFunctions": None,
-        "disableLogAggregation": True,
         "enableDoorSafetySwitch": None,
         "enableOT3HardwareController": None,
         "rearPanelIntegration": None,

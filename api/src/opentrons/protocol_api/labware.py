@@ -15,18 +15,21 @@ import logging
 from itertools import dropwhile
 from typing import TYPE_CHECKING, Any, List, Dict, Optional, Union, Tuple, cast
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition, LabwareParameters
+from opentrons_shared_data.labware.types import LabwareDefinition, LabwareParameters
 
 from opentrons.types import Location, Point
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import requires_version, APIVersionError
+from opentrons.protocols.api_support.util import (
+    requires_version,
+    APIVersionError,
+    UnsupportedAPIError,
+)
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 
 # TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
 # remove when their usage is no longer needed
 from opentrons.protocols.labware import (  # noqa: F401
     get_labware_definition as get_labware_definition,
-    get_all_labware_definitions as get_all_labware_definitions,
     verify_definition as verify_definition,
     save_definition as save_definition,
 )
@@ -126,7 +129,7 @@ class Well:
     def geometry(self) -> WellGeometry:
         if isinstance(self._core, LegacyWellCore):
             return self._core.geometry
-        raise APIVersionError("Well.geometry has been deprecated.")
+        raise UnsupportedAPIError(api_element="Well.geometry")
 
     @property
     @requires_version(2, 0)
@@ -354,7 +357,11 @@ class Labware:
     @property
     def separate_calibration(self) -> bool:
         if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise APIVersionError("Labware.separate_calibration has been removed")
+            raise UnsupportedAPIError(
+                api_element="Labware.separate_calibration",
+                since_version=f"{ENGINE_CORE_API_VERSION}",
+                current_version=f"{self._api_version}",
+            )
 
         _log.warning(
             "Labware.separate_calibrations is a deprecated internal property."
@@ -440,7 +447,11 @@ class Labware:
             Set the name of labware in `load_labware` instead.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise APIVersionError("Labware.name setter has been deprecated")
+            raise UnsupportedAPIError(
+                api_element="Labware.name setter",
+                since_version=f"{ENGINE_CORE_API_VERSION}",
+                current_version=f"{self._api_version}",
+            )
 
         # TODO(mc, 2023-02-06): this assert should be enough for mypy
         # investigate if upgrading mypy allows the `cast` to be removed
@@ -565,10 +576,11 @@ class Labware:
         .. deprecated:: 2.14
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise APIVersionError(
-                "Labware.set_calibration() is not supported when apiLevel is 2.14 or higher."
-                " Use a lower apiLevel"
-                " or use the Opentrons App's Labware Position Check."
+            raise UnsupportedAPIError(
+                api_element="Labware.set_calibration()",
+                since_version=f"{ENGINE_CORE_API_VERSION}",
+                current_version=f"{self._api_version}",
+                extra_message="Try using the Opentrons App's Labware Position Check.",
             )
         self._core.set_calibration(delta)
 
@@ -616,9 +628,10 @@ class Labware:
             and self._api_version < SET_OFFSET_RESTORED_API_VERSION
         ):
             raise APIVersionError(
-                "Labware.set_offset() is not supported when apiLevel is 2.14, 2.15, 2.16, or 2.17."
-                " Use apilevel 2.13 or below, or 2.18 or above to set offset,"
-                " or use the Opentrons App's Labware Position Check."
+                api_element="Labware.set_offset()",
+                until_version=f"{SET_OFFSET_RESTORED_API_VERSION}",
+                current_version=f"{self._api_version}",
+                extra_message="This feature not available in versions 2.14 thorugh 2.17. You can also use the Opentrons App's Labware Position Check.",
             )
         else:
             self._core.set_calibration(Point(x=x, y=y, z=z))
@@ -889,7 +902,11 @@ class Labware:
             and/or use the Opentrons App's tip length calibration feature.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise APIVersionError("Labware.tip_length setter has been deprecated")
+            raise UnsupportedAPIError(
+                api_element="Labware.tip_length setter",
+                since_version=f"{ENGINE_CORE_API_VERSION}",
+                current_version=f"{self._api_version}",
+            )
 
         # TODO(mc, 2023-02-06): this assert should be enough for mypy
         # investigate if upgrading mypy allows the `cast` to be removed
@@ -952,9 +969,11 @@ class Labware:
             Modification of tip tracking state outside :py:meth:`.reset` has been deprecated.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise APIVersionError(
-                "Labware.use_tips has been deprecated."
-                " To modify tip state, use Labware.reset"
+            raise UnsupportedAPIError(
+                api_element="Labware.use_tips",
+                since_version=f"{ENGINE_CORE_API_VERSION}",
+                current_version=f"{self._api_version}",
+                extra_message="To modify tip state, use Labware.reset.",
             )
 
         assert num_channels > 0, "Bad call to use_tips: num_channels<=0"
@@ -996,8 +1015,10 @@ class Labware:
             This method has been removed.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise APIVersionError(
-                "Labware.previous_tip is unsupported in this API version."
+            raise UnsupportedAPIError(
+                api_element="Labware.previous_tip",
+                since_version=f"{ENGINE_CORE_API_VERSION}",
+                current_version=f"{self._api_version}",
             )
 
         # This logic is the inverse of :py:meth:`next_tip`
@@ -1038,9 +1059,11 @@ class Labware:
             This method has been removed. Use :py:meth:`.reset` instead.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise APIVersionError(
-                "Labware.return_tips() is unsupported in this API version."
-                " Use Labware.reset() instead."
+            raise UnsupportedAPIError(
+                api_element="Labware.return_tips()",
+                since_version=f"{ENGINE_CORE_API_VERSION}",
+                current_version=f"{self._api_version}",
+                extra_message="Use Labware.reset() instead.",
             )
 
         # This logic is the inverse of :py:meth:`use_tips`

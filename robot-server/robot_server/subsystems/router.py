@@ -1,7 +1,7 @@
 """The router for the /subsystems endpoints."""
 
 from datetime import datetime
-from typing import Optional, TYPE_CHECKING
+from typing import Annotated, Optional, TYPE_CHECKING
 
 from fastapi import APIRouter, status, Depends, Response, Request
 from typing_extensions import Literal
@@ -117,7 +117,7 @@ class NoOngoingUpdate(ErrorDetails):
     },
 )
 async def get_attached_subsystems(
-    thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
+    thread_manager: Annotated[ThreadManagedHardware, Depends(get_thread_manager)],
 ) -> PydanticResponse[SimpleMultiBody[PresentSubsystem]]:
     """Return all subsystems currently present on the machine."""
     hardware = get_ot3_hardware(thread_manager)
@@ -151,7 +151,7 @@ async def get_attached_subsystems(
 )
 async def get_attached_subsystem(
     subsystem: SubSystem,
-    thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
+    thread_manager: Annotated[ThreadManagedHardware, Depends(get_thread_manager)],
 ) -> PydanticResponse[SimpleBody[PresentSubsystem]]:
     """Return the status of a single attached subsystem.
 
@@ -190,7 +190,9 @@ async def get_attached_subsystem(
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressSummary]}},
 )
 async def get_subsystem_updates(
-    update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager),
+    update_manager: Annotated[
+        FirmwareUpdateManager, Depends(get_firmware_update_manager)
+    ],
 ) -> PydanticResponse[SimpleMultiBody[UpdateProgressSummary]]:
     """Return all currently-running firmware update process summaries."""
     handles = await update_manager.all_ongoing_processes()
@@ -221,7 +223,9 @@ async def get_subsystem_updates(
 )
 async def get_subsystem_update(
     subsystem: SubSystem,
-    update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager),
+    update_manager: Annotated[
+        FirmwareUpdateManager, Depends(get_firmware_update_manager)
+    ],
 ) -> PydanticResponse[SimpleBody[UpdateProgressData]]:
     """Return full data about a specific currently-running update process."""
     try:
@@ -262,7 +266,9 @@ async def get_subsystem_update(
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressData]}},
 )
 async def get_update_processes(
-    update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager),
+    update_manager: Annotated[
+        FirmwareUpdateManager, Depends(get_firmware_update_manager)
+    ],
 ) -> PydanticResponse[SimpleMultiBody[UpdateProgressSummary]]:
     """Return summaries of all past (since robot boot) or present update processes."""
     data = [
@@ -289,7 +295,9 @@ async def get_update_processes(
 )
 async def get_update_process(
     id: str,
-    update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager),
+    update_manager: Annotated[
+        FirmwareUpdateManager, Depends(get_firmware_update_manager)
+    ],
 ) -> PydanticResponse[SimpleBody[UpdateProgressData]]:
     """Return the progress of a specific past or present update process."""
     try:
@@ -330,9 +338,11 @@ async def begin_subsystem_update(
     subsystem: SubSystem,
     response: Response,
     request: Request,
-    update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager),
-    update_process_id: str = Depends(get_unique_id),
-    created_at: datetime = Depends(get_current_time),
+    update_manager: Annotated[
+        FirmwareUpdateManager, Depends(get_firmware_update_manager)
+    ],
+    update_process_id: Annotated[str, Depends(get_unique_id)],
+    created_at: Annotated[datetime, Depends(get_current_time)],
 ) -> PydanticResponse[SimpleBody[UpdateProgressData]]:
     """Update the firmware of the OT3 instrument on the specified mount."""
     try:

@@ -9,7 +9,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -67,7 +67,9 @@ export function RobotSystemVersion({
                 }
               : undefined
           }
-          onClickBack={() => setCurrentOption(null)}
+          onClickBack={() => {
+            setCurrentOption(null)
+          }}
         />
         <Flex
           gridGap="16rem"
@@ -76,9 +78,9 @@ export function RobotSystemVersion({
           marginTop="7.75rem"
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-            <StyledText as="p">
+            <LegacyStyledText as="p">
               {t('branded:view_latest_release_notes_at', { url: GITHUB_URL })}
-            </StyledText>
+            </LegacyStyledText>
             <Flex
               backgroundColor={COLORS.grey35}
               flexDirection={DIRECTION_ROW}
@@ -86,11 +88,11 @@ export function RobotSystemVersion({
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               borderRadius={BORDERS.borderRadius8}
             >
-              <StyledText
+              <LegacyStyledText
                 as="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              >{`${t('device_details:current_version')}`}</StyledText>
-              <StyledText as="p">{currentVersion}</StyledText>
+              >{`${t('device_details:current_version')}`}</LegacyStyledText>
+              <LegacyStyledText as="p">{currentVersion}</LegacyStyledText>
             </Flex>
           </Flex>
           <Flex>
@@ -98,7 +100,9 @@ export function RobotSystemVersion({
               <MediumButton
                 flex="1"
                 buttonText={t('view_update')}
-                onClick={() => setShowModal(true)}
+                onClick={() => {
+                  setShowModal(true)
+                }}
               />
             ) : null}
           </Flex>

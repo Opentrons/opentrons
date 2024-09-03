@@ -11,7 +11,7 @@ import { InstrumentInfo } from '..'
 import type { GripperData } from '@opentrons/api-client'
 import type * as Dom from 'react-router-dom'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('../../PipetteWizardFlows')
 vi.mock('../../GripperWizardFlows')
@@ -19,7 +19,7 @@ vi.mock('react-router-dom', async importOriginal => {
   const reactRouterDom = await importOriginal<typeof Dom>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 

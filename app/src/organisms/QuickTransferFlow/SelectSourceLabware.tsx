@@ -8,9 +8,10 @@ import {
   COLORS,
   POSITION_FIXED,
   ALIGN_CENTER,
+  Tabs,
+  RadioButton,
 } from '@opentrons/components'
 
-import { LargeButton, TabbedButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { getCompatibleLabwareByCategory } from './utils'
 
@@ -95,17 +96,16 @@ export function SelectSourceLabware(
           marginBottom={SPACING.spacing24}
           alignItems={ALIGN_CENTER}
         >
-          {labwareDisplayCategoryFilters.map(category => (
-            <TabbedButton
-              key={category}
-              title={category}
-              isSelected={category === selectedCategory}
-              onClick={() => setSelectedCategory(category)}
-              height={SPACING.spacing60}
-            >
-              {t(category)}
-            </TabbedButton>
-          ))}
+          <Tabs
+            tabs={labwareDisplayCategoryFilters.map(category => ({
+              text: t(category),
+              onClick: () => {
+                setSelectedCategory(category)
+              },
+              isActive: category === selectedCategory,
+              disabled: false,
+            }))}
+          />
         </Flex>
         <Flex
           gridGap={SPACING.spacing4}
@@ -114,18 +114,17 @@ export function SelectSourceLabware(
         >
           {compatibleLabwareDefinitions?.map(definition => {
             return definition.metadata.displayName != null ? (
-              <LargeButton
+              <RadioButton
                 key={`${selectedCategory}-${definition.metadata.displayName}`}
-                buttonType={
+                isSelected={
                   selectedLabware?.metadata.displayName ===
                   definition.metadata.displayName
-                    ? 'primary'
-                    : 'secondary'
                 }
-                onClick={() => {
+                onChange={() => {
                   setSelectedLabware(definition)
                 }}
-                buttonText={definition.metadata.displayName}
+                buttonValue={definition.metadata.displayName}
+                buttonLabel={definition.metadata.displayName}
               />
             ) : null
           })}

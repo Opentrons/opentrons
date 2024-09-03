@@ -1,12 +1,14 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InputField,
+  LegacyStyledText,
   SPACING,
-  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -15,9 +17,10 @@ import {
   TEMP_MAX,
   TEMP_MIN,
 } from '@opentrons/shared-data'
+
 import { Slideout } from '../../atoms/Slideout'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
-import { InputField } from '../../atoms/InputField'
+
 import type { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
 import type { TemperatureModule } from '../../redux/modules/types'
 
@@ -77,7 +80,7 @@ export const TemperatureModuleSlideout = (
         />
       }
     >
-      <StyledText
+      <LegacyStyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing4}
@@ -86,20 +89,20 @@ export const TemperatureModuleSlideout = (
         {t('tempdeck_slideout_body', {
           model: name,
         })}
-      </StyledText>
+      </LegacyStyledText>
       <Flex
         marginTop={SPACING.spacing16}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`TemperatureSlideout_input_field_${module.serialNumber}`}
       >
-        <StyledText
+        <LegacyStyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.black90}
           paddingBottom={SPACING.spacing8}
         >
           {t('set_temperature')}
-        </StyledText>
+        </LegacyStyledText>
         <form id="TemperatureModuleSlideout_submitValue">
           <InputField
             id={`${String(module.moduleModel)}`}
@@ -109,7 +112,9 @@ export const TemperatureModuleSlideout = (
               temperatureValue != null ? Math.round(temperatureValue) : null
             }
             autoFocus
-            onChange={e => setTemperatureValue(e.target.valueAsNumber)}
+            onChange={e => {
+              setTemperatureValue(e.target.valueAsNumber)
+            }}
             type="number"
             caption={t('module_status_range', {
               min: TEMP_MIN,

@@ -37,6 +37,7 @@ import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
 import { ErrorInfo } from '../ErrorInfo'
 import { ModuleCard } from '..'
 
+import type { NavigateFunction } from 'react-router-dom'
 import type {
   HeaterShakerModule,
   MagneticModule,
@@ -57,6 +58,13 @@ vi.mock('../../../redux/robot-api')
 vi.mock('../../../organisms/ToasterOven')
 vi.mock('../../../organisms/Devices/hooks')
 vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<NavigateFunction>()
+  return {
+    ...actual,
+    useNavigate: () => vi.fn(),
+  }
+})
 
 const mockMagneticModuleHub = {
   id: 'magdeck_id',
@@ -229,9 +237,7 @@ describe('ModuleCard', () => {
       eatToast: mockEatToast,
     })
     vi.mocked(getRequestById).mockReturnValue(null)
-    when(useCurrentRunStatus)
-      .calledWith(expect.any(Object))
-      .thenReturn(RUN_STATUS_IDLE)
+    when(useCurrentRunStatus).calledWith().thenReturn(RUN_STATUS_IDLE)
     when(useIsFlex).calledWith(props.robotName).thenReturn(true)
     when(useIsEstopNotDisengaged).calledWith(props.robotName).thenReturn(false)
   })
@@ -303,9 +309,7 @@ describe('ModuleCard', () => {
   })
 
   it('renders kebab icon and it is disabled when run is in progress', () => {
-    when(useCurrentRunStatus)
-      .calledWith(expect.any(Object))
-      .thenReturn(RUN_STATUS_RUNNING)
+    when(useCurrentRunStatus).calledWith().thenReturn(RUN_STATUS_RUNNING)
     render({
       ...props,
       module: mockMagneticModule,

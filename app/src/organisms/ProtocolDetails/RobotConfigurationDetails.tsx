@@ -63,9 +63,16 @@ export const RobotConfigurationDetails = (
   } = props
   const { t } = useTranslation(['protocol_details', 'shared'])
 
-  const loadingText = <StyledText as="p">{t('shared:loading')}</StyledText>
+  const loadingText = (
+    <StyledText desktopStyle="bodyDefaultRegular">
+      {t('shared:loading')}
+    </StyledText>
+  )
   const emptyText = (
-    <StyledText as="p" textTransform={TYPOGRAPHY.textTransformCapitalize}>
+    <StyledText
+      desktopStyle="bodyDefaultRegular"
+      textTransform={TYPOGRAPHY.textTransformCapitalize}
+    >
       {t('shared:empty')}
     </StyledText>
   )
@@ -115,13 +122,15 @@ export const RobotConfigurationDetails = (
           isLoading ? (
             loadingText
           ) : (
-            <StyledText as="p">{getRobotTypeDisplayName(robotType)}</StyledText>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {getRobotTypeDisplayName(robotType)}
+            </StyledText>
           )
         }
       />
       <Divider marginY={SPACING.spacing12} width="100%" />
       <RobotConfigurationDetailsItem
-        label={is96PipetteUsed ? t('both_mounts') : t('left_mount')}
+        label={is96PipetteUsed ? t('left_and_right_mounts') : t('left_mount')}
         item={isLoading ? loadingText : leftMountItem}
       />
       {!is96PipetteUsed && (
@@ -147,11 +156,11 @@ export const RobotConfigurationDetails = (
           <React.Fragment key={`module_${index}`}>
             <Divider marginY={SPACING.spacing12} width="100%" />
             <RobotConfigurationDetailsItem
-              label={
+              label={`${t('slot')} ${
                 getModuleType(module.params.model) === THERMOCYCLER_MODULE_TYPE
                   ? getSlotsForThermocycler(robotType)
                   : module.params.location.slotName
-              }
+              }`}
               item={
                 <>
                   <ModuleIcon
@@ -164,7 +173,7 @@ export const RobotConfigurationDetails = (
                     minWidth={SIZE_1}
                     minHeight={SIZE_1}
                   />
-                  <StyledText as="p">
+                  <StyledText desktopStyle="bodyDefaultRegular">
                     {getModuleDisplayName(module.params.model)}
                   </StyledText>
                 </>
@@ -178,7 +187,7 @@ export const RobotConfigurationDetails = (
           <React.Fragment key={`fixture_${index}`}>
             <Divider marginY={SPACING.spacing12} width="100%" />
             <RobotConfigurationDetailsItem
-              label={getCutoutDisplayName(fixture.cutoutId)}
+              label={`${t('slot')} ${getCutoutDisplayName(fixture.cutoutId)}`}
               item={
                 <>
                   {MAGNETIC_BLOCK_FIXTURES.includes(fixture.cutoutFixtureId) ? (
@@ -193,7 +202,7 @@ export const RobotConfigurationDetails = (
                       minHeight={SIZE_1}
                     />
                   ) : null}
-                  <StyledText as="p">
+                  <StyledText desktopStyle="bodyDefaultRegular">
                     {getFixtureDisplayName(fixture.cutoutFixtureId)}
                   </StyledText>
                 </>
@@ -222,13 +231,12 @@ export const RobotConfigurationDetailsItem = (
       alignItems={ALIGN_CENTER}
     >
       <StyledText
-        as="label"
+        desktopStyle="bodyDefaultRegular"
         flex="0 0 auto"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginRight={SPACING.spacing16}
         color={COLORS.grey60}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
-        width="4.625rem"
+        width="9.375rem"
       >
         {label}
       </StyledText>

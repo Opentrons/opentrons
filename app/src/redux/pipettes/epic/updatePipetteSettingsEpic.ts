@@ -14,7 +14,10 @@ import type {
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 
-import type { UpdatePipetteSettingsAction } from '../types'
+import type {
+  PipetteSettingsFieldsMap,
+  UpdatePipetteSettingsAction,
+} from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<UpdatePipetteSettingsAction> = action => ({
   method: PATCH,
@@ -38,10 +41,15 @@ const mapResponseToAction: ResponseToActionMapper<UpdatePipetteSettingsAction> =
     ? Actions.updatePipetteSettingsSuccess(
         host.name,
         pipetteId,
-        body.fields,
+        body.fields as PipetteSettingsFieldsMap,
         meta
       )
-    : Actions.updatePipetteSettingsFailure(host.name, pipetteId, body, meta)
+    : Actions.updatePipetteSettingsFailure(
+        host.name,
+        pipetteId,
+        body as Record<string, unknown>,
+        meta
+      )
 }
 
 export const updatePipetteSettingsEpic: Epic = (action$, state$) => {

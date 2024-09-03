@@ -98,7 +98,7 @@ class ProtocolSchemaV8(BaseModel):
     liquids: Dict[str, Liquid]
     labwareDefinitionSchemaId: Literal["opentronsLabwareSchemaV2"]
     labwareDefinitions: Dict[str, LabwareDefinition]
-    commandSchemaId: Literal["opentronsCommandSchemaV8"]
+    commandSchemaId: Literal["opentronsCommandSchemaV8", "opentronsCommandSchemaV9"]
     commands: List[Command]
     commandAnnotationSchemaId: Literal["opentronsCommandAnnotationSchemaV1"]
     commandAnnotations: List[CommandAnnotation]

@@ -26,7 +26,7 @@ from ..module_control import AttachedModulesControl
 from ..util import ot2_axis_to_string
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
+    from opentrons_shared_data.pipette.types import PipetteName, PipetteModel
     from ..dev_types import (
         AttachedPipette,
         AttachedInstruments,

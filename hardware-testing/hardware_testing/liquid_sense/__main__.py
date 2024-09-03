@@ -6,8 +6,9 @@ from pathlib import Path
 import subprocess
 from time import sleep
 import os
-from typing import List, Any, Optional
+from typing import List, Any, Optional, Dict
 import traceback
+import sys
 
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.gravimetric import helpers, workarounds
@@ -25,36 +26,59 @@ from hardware_testing.data import (
     get_git_description,
     get_testing_data_directory,
 )
+from opentrons_hardware.hardware_control.motion_planning import move_utils
 
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 from opentrons.protocol_engine.types import LabwareOffset
 
 from hardware_testing.liquid_sense import execute
 from .report import build_ls_report, store_config, store_serial_numbers
-from .post_process import process_csv_directory
+from .post_process import process_csv_directory, process_google_sheet
 
 from hardware_testing.protocols.liquid_sense_lpc import (
-    liquid_sense_ot3_p50_single,
-    liquid_sense_ot3_p50_multi,
-    liquid_sense_ot3_p1000_single,
-    liquid_sense_ot3_p1000_multi,
-    liquid_sense_ot3_p1000_96,
+    liquid_sense_ot3_p50_single_vial,
+    liquid_sense_ot3_p50_multi_vial,
+    liquid_sense_ot3_p1000_96_vial,
+    liquid_sense_ot3_p1000_single_vial,
+    liquid_sense_ot3_p1000_multi_vial,
 )
+
+try:
+    from abr_testing.automation import google_sheets_tool, google_drive_tool
+except ImportError:
+    ui.print_error(
+        "Unable to import abr repo if this isn't a simulation push the abr_testing package"
+    )
+    pass
+
+CREDENTIALS_PATH = "/var/lib/jupyter/notebooks/abr.json"
 
 API_LEVEL = "2.18"
 
 LABWARE_OFFSETS: List[LabwareOffset] = []
 
+# NOTE: (sigler) plunger on 1ch/8ch won't move faster than ~20mm second
+#       which means it take ~3.5 seconds to reach full plunger travel.
+#       Therefore, there is no need for any probing in this test script to
+#       take longer than 3.5 seconds.
+# NOTE: (sigler) configuring the starting height of each probing sequence
+#       not based on millimeters but instead on the number seconds it takes
+#       before the tip contacts the meniscus will help make sure that adjusting
+#       the Z-speed will inadvertently affect the pressure's rate-of-change
+#       (which could happen if the meniscus seal is formed at wildly different
+#       positions along the plunger travel).
+MAX_PROBE_SECONDS = 3.5
 
-LIQUID_SENSE_CFG = {
+
+LIQUID_SENSE_CFG: Dict[int, Dict[int, Any]] = {
     50: {
-        1: liquid_sense_ot3_p50_single,
-        8: liquid_sense_ot3_p50_multi,
+        1: liquid_sense_ot3_p50_single_vial,
+        8: liquid_sense_ot3_p50_multi_vial,
     },
     1000: {
-        1: liquid_sense_ot3_p1000_single,
-        8: liquid_sense_ot3_p1000_multi,
-        96: liquid_sense_ot3_p1000_96,
+        1: liquid_sense_ot3_p1000_single_vial,
+        8: liquid_sense_ot3_p1000_multi_vial,
+        96: liquid_sense_ot3_p1000_96_vial,
     },
 }
 
@@ -91,12 +115,14 @@ class RunArgs:
     ctx: ProtocolContext
     protocol_cfg: Any
     test_report: CSVReport
-    start_height_offset: float
     aspirate: bool
     dial_indicator: Optional[mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator]
     plunger_speed: float
     trials_before_jog: int
-    multi_passes: int
+    no_multi_pass: int
+    test_well: str
+    wet: bool
+    dial_front_channel: bool
 
     @classmethod
     def _get_protocol_context(cls, args: argparse.Namespace) -> ProtocolContext:
@@ -141,15 +167,13 @@ class RunArgs:
         """Build."""
         _ctx = RunArgs._get_protocol_context(args)
         run_id, start_time = create_run_id_and_start_time()
-        environment_sensor = asair_sensor.BuildAsairSensor(
-            _ctx.is_simulating() or args.ignore_env
-        )
+        environment_sensor = asair_sensor.BuildAsairSensor(simulate=True)
         git_description = get_git_description()
         protocol_cfg = LIQUID_SENSE_CFG[args.pipette][args.channels]
-        name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
+        name = protocol_cfg.metadata["protocolName"]  # type: ignore[union-attr]
         ui.print_header("LOAD PIPETTE")
         pipette = _ctx.load_instrument(
-            f"flex_{args.channels}channel_{args.pipette}", "left"
+            f"flex_{args.channels}channel_{args.pipette}", args.mount
         )
         loaded_labwares = _ctx.loaded_labwares
         if 12 in loaded_labwares.keys():
@@ -159,13 +183,7 @@ class RunArgs:
         pipette.trash_container = trash
         pipette_tag = helpers._get_tag_from_pipette(pipette, False, False)
 
-        if args.trials == 0:
-            if args.channels < 96:
-                trials = 10
-            else:
-                trials = 7
-        else:
-            trials = args.trials
+        trials = args.trials
 
         if args.tip == 0:
             if args.pipette == 1000:
@@ -175,17 +193,17 @@ class RunArgs:
         else:
             tip_volumes = [args.tip]
 
-        scale = Scale.build(simulate=_ctx.is_simulating() or args.ignore_scale)
+        scale = Scale.build(simulate=True)
         recorder: GravimetricRecorder = execute._load_scale(
             name,
             scale,
             run_id,
             pipette_tag,
             start_time,
-            _ctx.is_simulating() or args.ignore_scale,
+            simulating=True,
         )
         dial: Optional[mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator] = None
-        if not _ctx.is_simulating() and not args.ignore_dial:
+        if not _ctx.is_simulating():
             dial_port = list_ports_and_select("Dial Indicator")
             dial = mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator(
                 port=dial_port
@@ -209,11 +227,10 @@ class RunArgs:
             args.pipette,
             tip_volumes,
             trials,
-            args.plunger_direction,
+            "aspirate" if args.aspirate else "dispense",
             args.liquid,
-            protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[attr-defined]
+            protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[union-attr]
             args.z_speed,
-            args.start_height_offset,
         )
         return RunArgs(
             tip_volumes=tip_volumes,
@@ -232,76 +249,99 @@ class RunArgs:
             ctx=_ctx,
             protocol_cfg=protocol_cfg,
             test_report=report,
-            start_height_offset=args.start_height_offset,
-            aspirate=args.plunger_direction == "aspirate",
+            aspirate=args.aspirate,
             dial_indicator=dial,
             plunger_speed=args.plunger_speed,
             trials_before_jog=args.trials_before_jog,
-            multi_passes=args.multi_passes,
+            no_multi_pass=args.no_multi_pass,
+            test_well=args.test_well,
+            wet=args.wet,
+            dial_front_channel=args.dial_front_channel,
         )
 
 
 if __name__ == "__main__":
+    move_utils.MINIMUM_DISPLACEMENT = 0.01
+
     parser = argparse.ArgumentParser("Pipette Testing")
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--pipette", type=int, choices=[50, 1000], required=True)
+    parser.add_argument("--mount", type=str, choices=["left", "right"], default="left")
     parser.add_argument("--channels", type=int, choices=[1, 8, 96], default=1)
     parser.add_argument("--tip", type=int, choices=[0, 50, 200, 1000], default=0)
-    parser.add_argument("--trials", type=int, default=0)
     parser.add_argument("--return-tip", action="store_true")
-    parser.add_argument("--skip-labware-offsets", action="store_true")
-    parser.add_argument(
-        "--liquid", type=str, choices=["water", "glycerol", "alchohol"], default="water"
-    )
+    parser.add_argument("--trials", type=int, default=7)
+    parser.add_argument("--trials-before-jog", type=int, default=7)
     parser.add_argument("--z-speed", type=float, default=5)
+    parser.add_argument("--aspirate", action="store_true")
+    parser.add_argument("--plunger-speed", type=float, default=15)
+    parser.add_argument("--no-multi-pass", action="store_true")
+    parser.add_argument("--wet", action="store_true")
+    parser.add_argument("--starting-tip", type=str, default="A1")
+    parser.add_argument("--test-well", type=str, default="A1")
+    parser.add_argument("--p-solo-time", type=float, default=0)
+    parser.add_argument("--google-sheet-name", type=str, default="LLD-Shared-Data")
     parser.add_argument(
-        "--plunger-direction",
-        type=str,
-        choices=["aspirate", "dispense"],
-        default="aspirate",
+        "--gd-parent-folder", type=str, default="1b2V85fDPA0tNqjEhyHOGCWRZYgn8KsGf"
     )
-    parser.add_argument("--labware-type", type=str, default="nest_1_reservoir_195ml")
-    parser.add_argument("--plunger-speed", type=float, default=-1.0)
-    parser.add_argument("--isolate-plungers", action="store_true")
-    parser.add_argument("--start-height-offset", type=float, default=0)
-    parser.add_argument("--ignore-scale", action="store_true")
-    parser.add_argument("--ignore-env", action="store_true")
-    parser.add_argument("--ignore-dial", action="store_true")
-    parser.add_argument("--trials-before-jog", type=int, default=10)
-    parser.add_argument("--multi-passes", type=int, default=1)
+    parser.add_argument("--liquid", type=str, default="unknown")
+    parser.add_argument("--skip-labware-offsets", action="store_true")
+    parser.add_argument("--dial-front-channel", action="store_true")
 
     args = parser.parse_args()
+
     run_args = RunArgs.build_run_args(args)
-    exit_error = os.EX_OK
+    exit_error = 0
+    serial_logger: Optional[subprocess.Popen] = None
+    data_dir = get_testing_data_directory()
+    data_file = f"/{data_dir}/{run_args.name}/{run_args.run_id}/serial.log"
     try:
         if not run_args.ctx.is_simulating():
-            data_dir = get_testing_data_directory()
-            data_file = f"/{data_dir}/{run_args.name}/{run_args.run_id}/serial.log"
             ui.print_info(f"logging can data to {data_file}")
             serial_logger = subprocess.Popen(
                 [f"python3 -m opentrons_hardware.scripts.can_mon > {data_file}"],
                 shell=True,
             )
             sleep(1)
+            # Connect to Google Sheet
+            ui.print_info(f"robot has credentials: {os.path.exists(CREDENTIALS_PATH)}")
+            google_sheet: Optional[
+                google_sheets_tool.google_sheet
+            ] = google_sheets_tool.google_sheet(
+                CREDENTIALS_PATH, args.google_sheet_name, 0
+            )
+            sheet_id = google_sheet.create_worksheet(run_args.run_id)  # type: ignore[union-attr]
+            try:
+                sys.path.insert(0, "/var/lib/jupyter/notebooks/")
+
+                google_drive: Optional[
+                    google_drive_tool.google_drive
+                ] = google_drive_tool.google_drive(
+                    CREDENTIALS_PATH,
+                    args.gd_parent_folder,
+                    "rhyann.clarke@opentrons.com",
+                )
+            except ImportError:
+                raise ImportError(
+                    "Run on robot. Make sure google_drive_tool.py is in jupyter notebook."
+                )
+        else:
+            google_sheet = None
+            sheet_id = None
+            google_drive = None
         hw = run_args.ctx._core.get_hardware()
-        if not run_args.ctx.is_simulating():
-            ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         ui.print_info("homing...")
         run_args.ctx.home()
         for tip in run_args.tip_volumes:
-            if args.channels == 96 and not run_args.ctx.is_simulating():
-                ui.alert_user_ready(f"prepare the {tip}ul tipracks", hw)
-            execute.run(tip, run_args)
+            execute.run(tip, run_args, google_sheet, sheet_id, args.starting_tip)
     except Exception as e:
-        ui.print_info(f"got error {e}")
-        ui.print_info(traceback.format_exc())
+        ui.print_error(f"got error {e}")
+        ui.print_error(traceback.format_exc())
         exit_error = 1
     finally:
         if run_args.recorder is not None:
             ui.print_info("ending recording")
-            run_args.recorder.stop()
-            run_args.recorder.deactivate()
-        if not run_args.ctx.is_simulating():
+        if not run_args.ctx.is_simulating() and serial_logger:
             ui.print_info("killing serial log")
             serial_logger.terminate()
         if run_args.dial_indicator is not None:
@@ -310,11 +350,43 @@ if __name__ == "__main__":
         run_args.test_report.print_results()
         ui.print_info("done\n\n")
         if not run_args.ctx.is_simulating():
-            process_csv_directory(
-                f"{data_dir}/{run_args.name}/{run_args.run_id}",
-                run_args.tip_volumes,
-                run_args.trials,
+            new_folder_name = (
+                f"MS{args.z_speed}_PS{args.plunger_speed}_{run_args.run_id}"
             )
+            try:
+                process_csv_directory(
+                    f"{data_dir}/{run_args.name}/{run_args.run_id}",
+                    run_args.tip_volumes,
+                    run_args.trials,
+                    google_sheet,
+                    google_drive,
+                    run_args.run_id,
+                    sheet_id,
+                    new_folder_name,
+                    make_graph=False,
+                )
+                # Log to Google Sheet
+                if args.aspirate is False:
+                    plunger_direction = "dispense"
+                else:
+                    plunger_direction = "aspirate"
+                test_info = [
+                    run_args.run_id,
+                    run_args.pipette_tag,
+                    args.pipette,
+                    args.tip,
+                    args.z_speed,
+                    args.plunger_speed,
+                    "threshold",
+                    plunger_direction,
+                ]
+                process_google_sheet(google_sheet, run_args, test_info, sheet_id)
+            except Exception as e:
+                ui.print_error("error making graphs or logging data on google sheet")
+                ui.print_error(f"got error {e}")
+                ui.print_error(traceback.format_exc())
+                exit_error = 2
+
         run_args.ctx.cleanup()
         if not args.simulate:
             helpers_ot3.restart_server_ot3()

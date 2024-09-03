@@ -7,7 +7,7 @@ import { css } from 'styled-components'
 
 import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { useConditionalConfirm } from '@opentrons/components'
+import { useConditionalConfirm, ModalShell } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
 import {
@@ -21,7 +21,6 @@ import {
   LoadingState,
   CompleteConfirmation,
 } from '../../organisms/CalibrationPanels'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { getTopPortalEl } from '../../App/portal'
 
@@ -104,11 +103,9 @@ export function CalibrateTipLength(
   }
 
   function cleanUpAndExit(): void {
-    queryClient
-      .invalidateQueries([host, 'calibration'])
-      .catch((e: Error) =>
-        console.error(`error invalidating calibration queries: ${e.message}`)
-      )
+    queryClient.invalidateQueries([host, 'calibration']).catch((e: Error) => {
+      console.error(`error invalidating calibration queries: ${e.message}`)
+    })
     if (session?.id != null) {
       dispatchRequests(
         Sessions.createSessionCommand(robotName, session.id, {
@@ -137,7 +134,7 @@ export function CalibrateTipLength(
       ? PANEL_BY_STEP[currentStep]
       : null
   return createPortal(
-    <LegacyModalShell
+    <ModalShell
       width="47rem"
       header={
         <WizardHeader
@@ -178,7 +175,7 @@ export function CalibrateTipLength(
           allowChangeTipRack={allowChangeTipRack}
         />
       )}
-    </LegacyModalShell>,
+    </ModalShell>,
     getTopPortalEl()
   )
 }

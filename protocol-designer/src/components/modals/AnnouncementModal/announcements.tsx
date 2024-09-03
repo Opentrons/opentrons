@@ -8,15 +8,15 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import magTempCombined from '../../../images/modules/magdeck_tempdeck_combined.png'
-import thermocycler from '../../../images/modules/thermocycler.png'
-import multiSelect from '../../../images/announcements/multi_select.gif'
-import batchEdit from '../../../images/announcements/batch_edit.gif'
-import heaterShaker from '../../../images/modules/heatershaker.png'
-import thermocyclerGen2 from '../../../images/modules/thermocycler_gen2.png'
-import liquidEnhancements from '../../../images/announcements/liquid-enhancements.gif'
-import opentronsFlex from '../../../images/OpentronsFlex.png'
-import deckConfigutation from '../../../images/deck_configuration.png'
+import magTempCombined from '../../../assets/images/modules/magdeck_tempdeck_combined.png'
+import thermocycler from '../../../assets/images/modules/thermocycler.png'
+import multiSelect from '../../../assets/images/announcements/multi_select.gif'
+import batchEdit from '../../../assets/images/announcements/batch_edit.gif'
+import heaterShaker from '../../../assets/images/modules/heatershaker.png'
+import thermocyclerGen2 from '../../../assets/images/modules/thermocycler_gen2.png'
+import liquidEnhancements from '../../../assets/images/announcements/liquid-enhancements.gif'
+import opentronsFlex from '../../../assets/images/OpentronsFlex.png'
+import deckConfigutation from '../../../assets/images/deck_configuration.png'
 
 import styles from './AnnouncementModal.module.css'
 

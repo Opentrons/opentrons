@@ -1,17 +1,26 @@
 """Protocol file models."""
+
 from datetime import datetime
 from pydantic import ConfigDict, BaseModel, Field
 from typing import Any, List, Optional
+from enum import Enum
 
 from opentrons.protocol_reader import (
     ProtocolType as ProtocolType,
     ProtocolFileRole as ProtocolFileRole,
 )
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from robot_server.service.json_api import ResourceModel
 from .analysis_models import AnalysisSummary
+
+
+class ProtocolKind(str, Enum):
+    """Kind of protocol, standard or quick-transfer."""
+
+    STANDARD = "standard"
+    QUICK_TRANSFER = "quick-transfer"
 
 
 class ProtocolFile(BaseModel):
@@ -102,4 +111,11 @@ class Protocol(ResourceModel):
             "An arbitrary client-defined string, set when this protocol was uploaded."
             " See `POST /protocols`."
         ),
+    )
+
+    protocolKind: Optional[ProtocolKind] = Field(
+        ...,
+        description="The kind of protocol (standard or quick-transfer)."
+        "The client provides this field when the protocol is uploaded."
+        " See `POST /protocols`.",
     )

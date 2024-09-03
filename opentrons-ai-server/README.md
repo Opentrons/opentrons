@@ -13,16 +13,18 @@ The Opentrons AI application's server.
 1. clone the repository `gh repo clone Opentrons/opentrons`
 1. `cd opentrons/opentrons-ai-server`
 1. Have pyenv installed per [DEV_SETUP.md](../DEV_SETUP.md)
-1. Use pyenv to install python `pyenv install 3.12.3` or latest 3.12.\*
+1. Use pyenv to install python `pyenv install 3.12.4` or latest 3.12.\*
 1. Have nodejs and yarn installed per [DEV_SETUP.md](../DEV_SETUP.md)
    1. This allows formatting of of `.md` and `.json` files
-1. select the python version `pyenv local 3.12.3`
+1. select the python version `pyenv local 3.12.4`
    1. This will create a `.python-version` file in this directory
 1. select the node version with `nvs` or `nvm` currently 18.19\*
 1. Install pipenv and python dependencies `make setup`
-1. to build and deploy you must have
-1. AWS credentials and the right roles
-1. docker installed
+
+## For building and deploying
+
+1. AWS credentials and config
+1. docker
 
 ## Install a dev dependency
 
@@ -32,30 +34,27 @@ The Opentrons AI application's server.
 
 `python -m pipenv install openai==1.25.1`
 
-## Lambda Code Organizations and Separation of Concerns
+## FastAPI Code Organization and Separation of Concerns
 
 - handler
-  - the lambda handler
+  - the router and request/response handling
 - domain
-  - the business logic
+  - business logic
 - integration
-  - the integration with other services
+  - integration with other services
 
 ## Dev process
 
 1. Make your changes
-1. Fix what can be automatically then lent and unit test like CI will `make pre-commit`
+1. Fix what can be automatically then lint and unit test like CI will `make pre-commit`
 1. `make pre-commit` passes
-1. deploy to sandbox `make deploy test-live ENV=sandbox AWS_PROFILE=the-profile`
+1. run locally `make run` this runs the FastAPI server directly at localhost:8000
+   1. this watches for changes and restarts the server
+1. test locally `make live-test` (ENV=local is the default in the Makefile)
+1. use the live client `make live-client`
 
-## Custom runtime
+## ECS Fargate
 
-- Due to the size requirements of `llama-index` and our data we switched to a custom runtime
-- This also allows us to use HTTP streaming
-- The runtime is defined in the `Dockerfile`
-- deploy.py contains the steps to
-  1. build the container image
-  1. tag the container image (currently uses the epoch until versioning in place)
-  1. log into and push to the correct ECR
-  1. create a new lambda version against the new image
-  1. await the function to be ready
+- Our first version of this service is a long running POST that may take from 1-3 minutes to complete
+- This forces us to use CloudFront(Max 180) + Load Balancer + ECS Fargate FastAPI container
+- An AWS service ticket is needed to increase the max CloudFront response time from 60 to 180 seconds

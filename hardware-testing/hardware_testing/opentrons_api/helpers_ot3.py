@@ -556,9 +556,11 @@ async def update_pick_up_current(
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
     config_model = pipette.pick_up_configurations.press_fit
-    config_model.current_by_tip_count = {
-        k: current for k in config_model.current_by_tip_count.keys()
-    }
+    for map_key in config_model.configuration_by_nozzle_map.keys():
+        for tip_type in config_model.configuration_by_nozzle_map[map_key].keys():
+            config_model.configuration_by_nozzle_map[map_key][
+                tip_type
+            ].current = current
     pipette.pick_up_configurations.press_fit = config_model
 
 
@@ -568,9 +570,11 @@ async def update_pick_up_distance(
     """Update pick-up-tip distance."""
     pipette = _get_pipette_from_mount(api, mount)
     config_model = pipette.pick_up_configurations.press_fit
-    config_model.distance_by_tip_count = {
-        k: distance for k in config_model.distance_by_tip_count.keys()
-    }
+    for map_key in config_model.configuration_by_nozzle_map.keys():
+        for tip_type in config_model.configuration_by_nozzle_map[map_key].keys():
+            config_model.configuration_by_nozzle_map[map_key][
+                tip_type
+            ].distance = distance
     pipette.pick_up_configurations.press_fit = config_model
 
 

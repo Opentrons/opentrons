@@ -11,7 +11,7 @@ from opentrons_shared_data.errors.exceptions import (
 )
 
 from ..resources import LabwareDataProvider, ensure_ot3_hardware
-from ..state import StateView
+from ..state.state import StateView
 from ..types import TipGeometry, TipPresenceStatus
 from ..errors import (
     HardwareNotSupportedError,
@@ -28,6 +28,13 @@ PRIMARY_NOZZLE_TO_ENDING_NOZZLE_MAP = {
     "H12": {"COLUMN": "A12", "ROW": "H1"},
 }
 
+PRIMARY_NOZZLE_TO_BACK_LEFT_NOZZLE_MAP = {
+    "A1": {"COLUMN": "A1", "ROW": "A1"},
+    "H1": {"COLUMN": "A1", "ROW": "H1"},
+    "A12": {"COLUMN": "A12", "ROW": "A1"},
+    "H12": {"COLUMN": "A12", "ROW": "H1"},
+}
+
 
 class TipHandler(TypingProtocol):
     """Pick up and drop tips."""
@@ -38,6 +45,7 @@ class TipHandler(TypingProtocol):
         style: str,
         primary_nozzle: Optional[str] = None,
         front_right_nozzle: Optional[str] = None,
+        back_left_nozzle: Optional[str] = None,
     ) -> Dict[str, str]:
         """Check nozzle layout is compatible with the pipette.
 
@@ -82,11 +90,12 @@ class TipHandler(TypingProtocol):
         """Verify the expected tip presence status."""
 
 
-async def _available_for_nozzle_layout(
+async def _available_for_nozzle_layout(  # noqa: C901
     channels: int,
     style: str,
     primary_nozzle: Optional[str],
     front_right_nozzle: Optional[str],
+    back_left_nozzle: Optional[str],
 ) -> Dict[str, str]:
     """Check nozzle layout is compatible with the pipette.
 
@@ -106,20 +115,60 @@ async def _available_for_nozzle_layout(
             limit_statement="RowNozzleLayout is incompatible with {channels} channel pipettes.",
             actual_value=str(primary_nozzle),
         )
+    if style == "PARTIAL_COLUM" and channels == 96:
+        raise CommandParameterLimitViolated(
+            command_name="configure_nozzle_layout",
+            parameter_name="PartialColumnNozzleLayout",
+            limit_statement="PartialColumnNozzleLayout is incompatible with {channels} channel pipettes.",
+            actual_value=str(primary_nozzle),
+        )
     if not primary_nozzle:
         return {"primary_nozzle": "A1"}
     if style == "SINGLE":
         return {"primary_nozzle": primary_nozzle}
-    if not front_right_nozzle:
+    if style == "QUADRANT" and front_right_nozzle and not back_left_nozzle:
+        return {
+            "primary_nozzle": primary_nozzle,
+            "front_right_nozzle": front_right_nozzle,
+            "back_left_nozzle": primary_nozzle,
+        }
+    if style == "QUADRANT" and back_left_nozzle and not front_right_nozzle:
+        return {
+            "primary_nozzle": primary_nozzle,
+            "front_right_nozzle": primary_nozzle,
+            "back_left_nozzle": back_left_nozzle,
+        }
+    if not front_right_nozzle and back_left_nozzle:
         return {
             "primary_nozzle": primary_nozzle,
             "front_right_nozzle": PRIMARY_NOZZLE_TO_ENDING_NOZZLE_MAP[primary_nozzle][
                 style
             ],
+            "back_left_nozzle": back_left_nozzle,
         }
+    if front_right_nozzle and not back_left_nozzle:
+        return {
+            "primary_nozzle": primary_nozzle,
+            "front_right_nozzle": front_right_nozzle,
+            "back_left_nozzle": PRIMARY_NOZZLE_TO_BACK_LEFT_NOZZLE_MAP[primary_nozzle][
+                style
+            ],
+        }
+    if front_right_nozzle and back_left_nozzle:
+        return {
+            "primary_nozzle": primary_nozzle,
+            "front_right_nozzle": front_right_nozzle,
+            "back_left_nozzle": back_left_nozzle,
+        }
+
     return {
         "primary_nozzle": primary_nozzle,
-        "front_right_nozzle": front_right_nozzle,
+        "front_right_nozzle": PRIMARY_NOZZLE_TO_ENDING_NOZZLE_MAP[primary_nozzle][
+            style
+        ],
+        "back_left_nozzle": PRIMARY_NOZZLE_TO_BACK_LEFT_NOZZLE_MAP[primary_nozzle][
+            style
+        ],
     }
 
 
@@ -142,6 +191,7 @@ class HardwareTipHandler(TipHandler):
         style: str,
         primary_nozzle: Optional[str] = None,
         front_right_nozzle: Optional[str] = None,
+        back_left_nozzle: Optional[str] = None,
     ) -> Dict[str, str]:
         """Returns configuration for nozzle layout to pass to configure_nozzle_layout."""
         if self._state_view.pipettes.get_attached_tip(pipette_id):
@@ -150,7 +200,7 @@ class HardwareTipHandler(TipHandler):
             )
         channels = self._state_view.pipettes.get_channels(pipette_id)
         return await _available_for_nozzle_layout(
-            channels, style, primary_nozzle, front_right_nozzle
+            channels, style, primary_nozzle, front_right_nozzle, back_left_nozzle
         )
 
     async def pick_up_tip(
@@ -172,13 +222,13 @@ class HardwareTipHandler(TipHandler):
             nominal_fallback=nominal_tip_geometry.length,
         )
 
-        await self._hardware_api.pick_up_tip(
-            mount=hw_mount,
-            tip_length=actual_tip_length,
-            presses=None,
-            increment=None,
+        await self._hardware_api.tip_pickup_moves(
+            mount=hw_mount, presses=None, increment=None
         )
         await self.verify_tip_presence(pipette_id, TipPresenceStatus.PRESENT)
+
+        self._hardware_api.cache_tip(hw_mount, actual_tip_length)
+        await self._hardware_api.prepare_for_aspirate(hw_mount)
 
         self._hardware_api.set_current_tiprack_diameter(
             mount=hw_mount,
@@ -307,6 +357,7 @@ class VirtualTipHandler(TipHandler):
         style: str,
         primary_nozzle: Optional[str] = None,
         front_right_nozzle: Optional[str] = None,
+        back_left_nozzle: Optional[str] = None,
     ) -> Dict[str, str]:
         """Returns configuration for nozzle layout to pass to configure_nozzle_layout."""
         if self._state_view.pipettes.get_attached_tip(pipette_id):
@@ -315,7 +366,7 @@ class VirtualTipHandler(TipHandler):
             )
         channels = self._state_view.pipettes.get_channels(pipette_id)
         return await _available_for_nozzle_layout(
-            channels, style, primary_nozzle, front_right_nozzle
+            channels, style, primary_nozzle, front_right_nozzle, back_left_nozzle
         )
 
     async def drop_tip(

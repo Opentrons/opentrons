@@ -11,7 +11,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { CheckPipettesButton } from './CheckPipettesButton'
@@ -86,7 +86,13 @@ export function Instructions(props: Props): JSX.Element {
 
   //  hide continue button if no pipette is selected
   const continueButton = noPipetteSelected ? null : (
-    <PrimaryButton onClick={() => nextStep()}>{t('continue')}</PrimaryButton>
+    <PrimaryButton
+      onClick={() => {
+        nextStep()
+      }}
+    >
+      {t('continue')}
+    </PrimaryButton>
   )
 
   return (
@@ -127,12 +133,12 @@ export function Instructions(props: Props): JSX.Element {
                     i18nKey={currentStepCount === 1 ? stepOne : stepTwo}
                     components={{
                       h1: (
-                        <StyledText
+                        <LegacyStyledText
                           css={TYPOGRAPHY.h1Default}
                           marginBottom={SPACING.spacing16}
                         />
                       ),
-                      block: <StyledText as="p" />,
+                      block: <LegacyStyledText as="p" />,
                     }}
                   />
 
@@ -151,7 +157,7 @@ export function Instructions(props: Props): JSX.Element {
                               />
                             ),
                             block: (
-                              <StyledText
+                              <LegacyStyledText
                                 as="p"
                                 marginTop={SPACING.spacing16}
                               />
@@ -160,9 +166,9 @@ export function Instructions(props: Props): JSX.Element {
                         />
                       </Flex>
                     ) : (
-                      <StyledText marginTop={SPACING.spacing16} as="p">
+                      <LegacyStyledText marginTop={SPACING.spacing16} as="p">
                         {t('tighten_screws_single')}
-                      </StyledText>
+                      </LegacyStyledText>
                     )
                   ) : null}
                 </Flex>
@@ -189,7 +195,9 @@ export function Instructions(props: Props): JSX.Element {
                 }
               }}
             >
-              <StyledText css={GO_BACK_BUTTON_STYLE}>{t('go_back')}</StyledText>
+              <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
+                {t('go_back')}
+              </LegacyStyledText>
             </Btn>
             {currentStepCount < 2 ? (
               continueButton

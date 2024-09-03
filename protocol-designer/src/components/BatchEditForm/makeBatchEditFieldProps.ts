@@ -33,7 +33,9 @@ export const makeBatchEditFieldProps = (
     acc[name] = {
       disabled: name in disabledFields,
       name,
-      updateValue: value => handleChangeFormInput(name, value),
+      updateValue: value => {
+        handleChangeFormInput(name, value)
+      },
       value: fieldValues[name].value,
       errorToShow: null,
       onFieldBlur: noop,

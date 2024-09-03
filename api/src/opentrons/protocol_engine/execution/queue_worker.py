@@ -1,12 +1,10 @@
 """Command queue execution worker module."""
 import asyncio
 from logging import getLogger
-from typing import Optional
+from typing import Optional, AsyncGenerator, Callable
 
-from ..state import StateStore
-from ..errors import RunStoppedError
+from ..state.state import StateStore
 from .command_executor import CommandExecutor
-
 
 log = getLogger(__name__)
 
@@ -18,6 +16,7 @@ class QueueWorker:
         self,
         state_store: StateStore,
         command_executor: CommandExecutor,
+        command_generator: Callable[[], AsyncGenerator[str, None]],
     ) -> None:
         """Initialize the queue worker's dependencies and state.
 
@@ -25,9 +24,11 @@ class QueueWorker:
             state_store: The source of truth for protocol state, including
                 all queued commands.
             command_executor: Interface used to execute and update commands.
+            command_generator: Command generator to get the next command to execute.
         """
         self._state_store: StateStore = state_store
         self._command_executor: CommandExecutor = command_executor
+        self._command_generator = command_generator
         self._worker_task: Optional["asyncio.Task[None]"] = None
 
     def start(self) -> None:
@@ -67,20 +68,8 @@ class QueueWorker:
                 raise e
 
     async def _run_commands(self) -> None:
-        while True:
-            try:
-                command_id = await self._state_store.wait_for(
-                    condition=self._state_store.commands.get_next_to_execute
-                )
-                # Assert for type hinting. This is valid because the wait_for() above
-                # only returns when the value is truthy.
-                assert command_id is not None
-            except RunStoppedError:
-                # There are no more commands that we should execute, either because the run has
-                # completed on its own, or because a client requested it to stop.
-                break
-            else:
-                await self._command_executor.execute(command_id=command_id)
-                # Yield to the event loop in case we're executing a long sequence of commands
-                # that never yields internally. For example, a long sequence of comment commands.
-                await asyncio.sleep(0)
+        async for command_id in self._command_generator():
+            await self._command_executor.execute(command_id=command_id)
+            # Yield to the event loop in case we're executing a long sequence of commands
+            # that never yields internally. For example, a long sequence of comment commands.
+            await asyncio.sleep(0)

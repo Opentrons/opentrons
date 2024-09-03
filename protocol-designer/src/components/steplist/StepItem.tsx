@@ -25,6 +25,7 @@ import { ModuleStepItems, ModuleStepItemRow } from './ModuleStepItems'
 import { PauseStepItems } from './PauseStepItems'
 import { MoveLabwareHeader } from './MoveLabwareHeader'
 import { SourceDestSubstep } from './SourceDestSubstep'
+import { CommentStepItems } from './CommentStepItems'
 import styles from './StepItem.module.css'
 
 import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
@@ -241,7 +242,9 @@ const CollapsibleSubstep = (props: CollapsibleSubstepProps): JSX.Element => {
         {props.headerContent}
         <span
           className={styles.inner_carat}
-          onClick={() => setContentCollapsed(!contentCollapsed)}
+          onClick={() => {
+            setContentCollapsed(!contentCollapsed)
+          }}
         >
           <Icon name={contentCollapsed ? 'chevron-down' : 'chevron-up'} />
         </span>
@@ -310,6 +313,10 @@ export const StepItemContents = (
   // pause substep component uses the delay args directly
   if (substeps && substeps.substepType === 'pause') {
     return <PauseStepItems pauseArgs={substeps.pauseStepArgs} />
+  }
+
+  if (substeps && substeps.substepType === 'comment') {
+    return <CommentStepItems commentArgs={substeps.commentStepArgs} />
   }
 
   if (substeps && substeps.substepType === 'magnet') {

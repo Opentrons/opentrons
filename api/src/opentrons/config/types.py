@@ -103,12 +103,25 @@ class OT3CurrentSettings:
         )
 
 
+class OutputOptions(int, Enum):
+    """Specifies where we should report sensor data to during a sensor pass."""
+
+    stream_to_csv = 0x1  # compile sensor data stream into a csv file, in addition to can_bus_only behavior
+    sync_buffer_to_csv = 0x2  # collect sensor data on pipette mcu, then stream to robot server and compile into a csv file, in addition to can_bus_only behavior
+    can_bus_only = (
+        0x4  # stream sensor data over CAN bus, in addition to sync_only behavior
+    )
+    sync_only = 0x8  # trigger pipette sync line upon sensor's detection of something
+
+
 @dataclass(frozen=True)
 class CapacitivePassSettings:
     prep_distance_mm: float
     max_overrun_distance_mm: float
     speed_mm_per_s: float
     sensor_threshold_pf: float
+    output_option: OutputOptions
+    data_files: Optional[Dict[InstrumentProbeType, str]] = None
 
 
 @dataclass(frozen=True)
@@ -116,28 +129,18 @@ class ZSenseSettings:
     pass_settings: CapacitivePassSettings
 
 
-# str enum so it can be json serializable
-class OutputOptions(int, Enum):
-    """Specifies where we should report sensor data to during a sensor pass."""
-
-    stream_to_csv = 0x1
-    sync_buffer_to_csv = 0x2
-    can_bus_only = 0x4
-    sync_only = 0x8
-
-
 @dataclass
 class LiquidProbeSettings:
-    starting_mount_height: float
-    max_z_distance: float
     mount_speed: float
     plunger_speed: float
+    plunger_impulse_time: float
     sensor_threshold_pascals: float
-    expected_liquid_height: float
     output_option: OutputOptions
     aspirate_while_sensing: bool
-    auto_zero_sensor: bool
-    num_baseline_reads: int
+    z_overlap_between_passes_mm: float
+    plunger_reset_offset: float
+    samples_for_baselining: int
+    sample_time_sec: float
     data_files: Optional[Dict[InstrumentProbeType, str]]
 
 

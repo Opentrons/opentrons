@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { saveAs } from 'file-saver'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
@@ -71,23 +71,23 @@ describe('ResultsSummary', () => {
   })
 
   it('should render components', () => {
-    const { getByText, getAllByText } = render(props)
-    getByText('mock calibration health check results')
-    expect(getAllByText('mock render mount information').length).toBe(2)
+    render(props)
+    screen.getByText('mock calibration health check results')
+    expect(screen.getAllByText('mock render mount information').length).toBe(2)
     // deck + pipetteOffset x 2 + tipLength x 2
-    expect(getAllByText('mock calibration result').length).toBe(5)
+    expect(screen.getAllByText('mock calibration result').length).toBe(5)
   })
 
   it('saves the calibration report when clicking the button', () => {
-    const { getByTestId } = render(props)
-    const button = getByTestId('ResultsSummary_Download_Button')
+    render(props)
+    const button = screen.getByTestId('ResultsSummary_Download_Button')
     fireEvent.click(button)
     expect(vi.mocked(saveAs)).toHaveBeenCalled()
   })
 
   it('calls mock function when clicking finish', () => {
-    const { getByRole } = render(props)
-    const button = getByRole('button', { name: 'Finish' })
+    render(props)
+    const button = screen.getByRole('button', { name: 'Finish' })
     fireEvent.click(button)
     expect(mockDeleteSession).toHaveBeenCalled()
   })

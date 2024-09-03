@@ -4,7 +4,7 @@ import isEqual from 'lodash/isEqual'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import { useConditionalConfirm } from '@opentrons/components'
+import { useConditionalConfirm, ModalShell } from '@opentrons/components'
 import {
   useCreateLabwareOffsetMutation,
   useCreateMaintenanceCommandMutation,
@@ -16,7 +16,6 @@ import { getTopPortalEl } from '../../App/portal'
 import { IntroScreen } from './IntroScreen'
 import { ExitConfirmation } from './ExitConfirmation'
 import { CheckItem } from './CheckItem'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { getIsOnDevice } from '../../redux/config'
 import { AttachProbe } from './AttachProbe'
@@ -25,7 +24,7 @@ import { PickUpTip } from './PickUpTip'
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
 import { useChainMaintenanceCommands } from '../../resources/runs'
-import { FatalErrorModal } from './FatalErrorModal'
+import { FatalError } from './FatalErrorModal'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
@@ -279,13 +278,15 @@ export const LabwarePositionCheckComponent = (
         maintenanceRunId,
         command: {
           commandType: 'moveRelative',
-          params: { pipetteId: pipetteId, distance: step * dir, axis },
+          params: { pipetteId, distance: step * dir, axis },
         },
         waitUntilComplete: true,
         timeout: JOG_COMMAND_TIMEOUT,
       })
         .then(data => {
-          onSuccess?.(data?.data?.result?.position ?? null)
+          onSuccess?.(
+            (data?.data?.result?.position ?? null) as Coordinates | null
+          )
         })
         .catch((e: Error) => {
           setFatalError(`error issuing jog command: ${e.message}`)
@@ -332,10 +333,10 @@ export const LabwarePositionCheckComponent = (
     )
   } else if (fatalError != null) {
     modalContent = (
-      <FatalErrorModal
+      <FatalError
         errorMessage={fatalError}
         shouldUseMetalProbe={shouldUseMetalProbe}
-        onClose={handleCleanUpAndClose}
+        onClose={onCloseClick}
       />
     )
   } else if (showConfirmation) {
@@ -412,31 +413,25 @@ export const LabwarePositionCheckComponent = (
   const wizardHeader = (
     <WizardHeader
       title={t('labware_position_check_title')}
-      currentStep={currentStepIndex}
-      totalSteps={totalStepCount}
+      currentStep={fatalError != null ? undefined : currentStepIndex}
+      totalSteps={fatalError != null ? undefined : totalStepCount}
       onExit={
-        showConfirmation || isExiting
+        showConfirmation || isExiting || fatalError != null
           ? undefined
-          : () => {
-              if (fatalError != null) {
-                handleCleanUpAndClose()
-              } else {
-                confirmExitLPC()
-              }
-            }
+          : confirmExitLPC
       }
     />
   )
   return createPortal(
     isOnDevice ? (
-      <LegacyModalShell fullPage>
+      <ModalShell fullPage>
         {wizardHeader}
         {modalContent}
-      </LegacyModalShell>
+      </ModalShell>
     ) : (
-      <LegacyModalShell width="47rem" header={wizardHeader}>
+      <ModalShell width="47rem" header={wizardHeader}>
         {modalContent}
-      </LegacyModalShell>
+      </ModalShell>
     ),
     getTopPortalEl()
   )

@@ -14,7 +14,8 @@ import {
 } from '../../constants'
 import type * as React from 'react'
 import type { StepFieldName } from '../../form-types'
-import type { LabwareEntities } from '@opentrons/step-generation'
+import type { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
+import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
 /*******************
  ** Error Messages **
  ********************/
@@ -152,7 +153,10 @@ export const incompatibleLabware = (
   const { labware, pipette } = fields
   if (!labware || !pipette) return null
   //  trashBin and wasteChute cannot mix into a labware
-  return !canPipetteUseLabware(pipette.spec, labware.def)
+  return !canPipetteUseLabware(
+    pipette.spec as PipetteV2Specs,
+    labware.def as LabwareDefinition2
+  )
     ? INCOMPATIBLE_LABWARE
     : null
 }
@@ -162,9 +166,11 @@ export const incompatibleDispenseLabware = (
   const { dispense_labware, pipette } = fields
   if (!dispense_labware || !pipette) return null
   return !canPipetteUseLabware(
-    pipette.spec,
-    'def' in dispense_labware ? dispense_labware.def : undefined,
-    'name' in dispense_labware ? dispense_labware.name : undefined
+    pipette.spec as PipetteV2Specs,
+    'def' in dispense_labware
+      ? (dispense_labware.def as LabwareDefinition2)
+      : undefined,
+    'name' in dispense_labware ? (dispense_labware.name as string) : undefined
   )
     ? INCOMPATIBLE_DISPENSE_LABWARE
     : null
@@ -175,7 +181,10 @@ export const incompatibleAspirateLabware = (
   const { aspirate_labware, pipette } = fields
   if (!aspirate_labware || !pipette) return null
   //  trashBin and wasteChute cannot aspirate into a labware
-  return !canPipetteUseLabware(pipette.spec, aspirate_labware.def)
+  return !canPipetteUseLabware(
+    pipette.spec as PipetteV2Specs,
+    aspirate_labware.def as LabwareDefinition2
+  )
     ? INCOMPATIBLE_ASPIRATE_LABWARE
     : null
 }
@@ -193,9 +202,9 @@ export const pauseForTimeOrUntilTold = (
 
   if (pauseAction === PAUSE_UNTIL_TIME) {
     // user selected pause for amount of time
-    const hours = parseFloat(pauseHour) || 0
-    const minutes = parseFloat(pauseMinute) || 0
-    const seconds = parseFloat(pauseSecond) || 0
+    const hours = parseFloat(pauseHour as string) ?? 0
+    const minutes = parseFloat(pauseMinute as string) ?? 0
+    const seconds = parseFloat(pauseSecond as string) ?? 0
     const totalSeconds = hours * 3600 + minutes * 60 + seconds
     return totalSeconds <= 0 ? TIME_PARAM_REQUIRED : null
   } else if (pauseAction === PAUSE_UNTIL_TEMP) {
@@ -234,21 +243,21 @@ export const wellRatioMoveLiquid = (
     ? WELL_RATIO_MOVE_LIQUID_INTO_WASTE_CHUTE
     : WELL_RATIO_MOVE_LIQUID
 
-  return getWellRatio(aspirate_wells, dispense_wells, isDispensingIntoTrash)
+  return getWellRatio(
+    aspirate_wells as string[],
+    dispense_wells as string[],
+    isDispensingIntoTrash
+  ) != null
     ? null
     : wellRatioFormError
 }
-export const volumeTooHigh = (
-  fields: HydratedFormData,
-  labwareEntities?: LabwareEntities
-): FormError | null => {
+export const volumeTooHigh = (fields: HydratedFormData): FormError | null => {
   const { pipette, tipRack } = fields
   const volume = Number(fields.volume)
 
   const pipetteCapacity = getPipetteCapacity(
-    pipette,
-    labwareEntities ?? {},
-    tipRack
+    pipette as PipetteEntity,
+    tipRack as string
   )
   if (
     !Number.isNaN(volume) &&

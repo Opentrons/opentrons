@@ -10,6 +10,7 @@ const mockProtocols = [
     createdAt: '2022-05-03T21:36:12.494778+00:00',
     robotType: 'OT-3 Standard',
     protocolType: 'json',
+    protocolKind: 'standard',
     metadata: {
       protocolName: 'yay mock protocol',
       author: 'engineering',

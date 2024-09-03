@@ -15,7 +15,6 @@ from .publishers import (
     get_runs_publisher,
     get_deck_configuration_publisher,
 )
-from .topics import Topics
 
 __all__ = [
     # main export
@@ -35,5 +34,4 @@ __all__ = [
     "get_deck_configuration_publisher",
     # for testing
     "PublisherNotifier",
-    "Topics",
 ]

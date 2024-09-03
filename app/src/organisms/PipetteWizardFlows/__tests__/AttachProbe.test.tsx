@@ -195,15 +195,15 @@ describe('AttachProbe', () => {
       ...props,
       isOnDevice: true,
     }
-    const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
-    getByText('Attach calibration probe')
-    getByText(
+    render(props)
+    screen.getByText('Attach calibration probe')
+    screen.getByText(
       'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
     )
-    getByTestId(
+    screen.getByTestId(
       '/app/src/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
     )
-    fireEvent.click(getByRole('button', { name: 'Begin calibration' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Begin calibration' }))
     await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
@@ -245,7 +245,7 @@ describe('AttachProbe', () => {
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
     })
-    fireEvent.click(getByLabelText('back'))
+    fireEvent.click(screen.getByLabelText('back'))
     expect(props.goBack).toHaveBeenCalled()
   })
 

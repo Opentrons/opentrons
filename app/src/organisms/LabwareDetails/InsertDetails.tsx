@@ -3,7 +3,7 @@ import {
   BORDERS,
   Box,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getUniqueWellProperties } from '@opentrons/shared-data'
@@ -35,12 +35,12 @@ export function InsertDetails(props: InsertDetailsProps): JSX.Element {
             marginY={SPACING.spacing16}
           >
             <Box padding={SPACING.spacing16}>
-              <StyledText
+              <LegacyStyledText
                 css={TYPOGRAPHY.h2SemiBold}
                 paddingBottom={SPACING.spacing8}
               >
                 {wellProps.metadata.displayName}
-              </StyledText>
+              </LegacyStyledText>
               <WellProperties
                 wellProperties={wellProps}
                 wellLabel={wellLabel}

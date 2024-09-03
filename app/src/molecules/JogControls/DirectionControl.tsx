@@ -22,7 +22,7 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TEXT_ALIGN_LEFT,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -263,14 +263,14 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
                   flex="1 1 auto"
                 >
                   {title}
-                  <StyledText
+                  <LegacyStyledText
                     textAlign={TEXT_ALIGN_LEFT}
                     alignSelf={ALIGN_STRETCH}
                     color={COLORS.grey50}
                     css={TYPOGRAPHY.labelRegular}
                   >
                     {subtitle}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
               </PrimaryButton>
             )
@@ -483,13 +483,13 @@ export function TouchDirectionControl(
                   justifyContent={JUSTIFY_CENTER}
                   height="74px"
                 >
-                  <StyledText
+                  <LegacyStyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     color={selected ? COLORS.white : COLORS.black90}
                   >
                     {CONTROLS_CONTENTS_BY_PLANE[plane].title}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
               </TouchControlButton>
             )

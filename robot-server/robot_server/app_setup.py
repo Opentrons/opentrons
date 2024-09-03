@@ -87,7 +87,7 @@ async def on_startup() -> None:
             fbl_mark_persistence_init_complete
         ],
     )
-    await initialize_notifications(
+    initialize_notifications(
         app_state=app.state,
     )
 

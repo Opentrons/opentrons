@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { Route, MemoryRouter } from 'react-router-dom'
+import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
@@ -24,7 +24,7 @@ import {
 
 import { i18n } from '../../../i18n'
 import { useToaster } from '../../../organisms/ToasterOven'
-import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
+import { mockRobotSideAnalysis } from '../../../molecules/Command/__fixtures__'
 import {
   useAttachedModules,
   useLPCDisabledReason,
@@ -39,10 +39,13 @@ import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../redux/analytics'
 import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupModulesAndDeck } from '../../../organisms/ProtocolSetupModulesAndDeck'
+import { ProtocolSetupLabware } from '../../../organisms/ProtocolSetupLabware'
+import { ProtocolSetupOffsets } from '../../../organisms/ProtocolSetupOffsets'
 import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModulesAndDeck/utils'
 import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchLPC'
 import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import { mockProtocolModuleInfo } from '../../../organisms/ProtocolSetupInstruments/__fixtures__'
+import { getIncompleteInstrumentCount } from '../../../organisms/ProtocolSetupInstruments/utils'
 import {
   useProtocolHasRunTimeParameters,
   useRunControls,
@@ -51,9 +54,9 @@ import {
 import { useIsHeaterShakerInProtocol } from '../../../organisms/ModuleCard/hooks'
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { ConfirmAttachedModal } from '../../../pages/ProtocolSetup/ConfirmAttachedModal'
+import { ConfirmSetupStepsCompleteModal } from '../../../pages/ProtocolSetup/ConfirmSetupStepsCompleteModal'
 import { ProtocolSetup } from '../../../pages/ProtocolSetup'
 import { useNotifyRunQuery } from '../../../resources/runs'
-import { useFeatureFlag } from '../../../redux/config'
 import { ViewOnlyParameters } from '../../../organisms/ProtocolSetupParameters/ViewOnlyParameters'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { mockRunTimeParameterData } from '../../ProtocolDetails/fixtures'
@@ -61,7 +64,7 @@ import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configu
 
 import type { UseQueryResult } from 'react-query'
 import type * as SharedData from '@opentrons/shared-data'
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 // Mock IntersectionObserver
 class IntersectionObserver {
   observe = vi.fn()
@@ -75,7 +78,7 @@ Object.defineProperty(window, 'IntersectionObserver', {
   value: IntersectionObserver,
 })
 
-let mockHistoryPush = vi.fn()
+let mockNavigate = vi.fn()
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const sharedData = await importOriginal<typeof SharedData>()
@@ -86,29 +89,29 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 })
 
 vi.mock('react-router-dom', async importOriginal => {
-  const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
+  const reactRouterDom = await importOriginal<NavigateFunction>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({
-      push: mockHistoryPush,
-    }),
+    useNavigate: () => mockNavigate,
   }
 })
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../organisms/LabwarePositionCheck/useLaunchLPC')
 vi.mock('../../../organisms/Devices/hooks')
-vi.mock('../../../redux/config')
 vi.mock('../../../organisms/ProtocolSetupParameters/ViewOnlyParameters')
 vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
+vi.mock('../../../organisms/ProtocolSetupInstruments/utils')
 vi.mock('../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
 vi.mock('../../../organisms/ProtocolSetupModulesAndDeck')
 vi.mock('../../../organisms/ProtocolSetupModulesAndDeck/utils')
 vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol')
 vi.mock('../../../organisms/RunTimeControl/hooks')
 vi.mock('../../../organisms/ProtocolSetupLiquids')
+vi.mock('../../../organisms/ProtocolSetupLabware')
+vi.mock('../../../organisms/ProtocolSetupOffsets')
 vi.mock('../../../organisms/ModuleCard/hooks')
 vi.mock('../../../redux/discovery/selectors')
 vi.mock('../ConfirmAttachedModal')
@@ -116,13 +119,14 @@ vi.mock('../../../organisms/ToasterOven')
 vi.mock('../../../resources/deck_configuration/hooks')
 vi.mock('../../../resources/runs')
 vi.mock('../../../resources/deck_configuration')
+vi.mock('../ConfirmSetupStepsCompleteModal')
 
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/runs/:runId/setup/">
-        <ProtocolSetup />
-      </Route>
+      <Routes>
+        <Route path="/runs/:runId/setup/" element={<ProtocolSetup />} />
+      </Routes>
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -130,6 +134,12 @@ const render = (path = '/') => {
   )
 }
 
+const MockProtocolSetupLabware = vi.mocked(ProtocolSetupLabware)
+const MockProtocolSetupLiquids = vi.mocked(ProtocolSetupLiquids)
+const MockProtocolSetupOffsets = vi.mocked(ProtocolSetupOffsets)
+const MockConfirmSetupStepsCompleteModal = vi.mocked(
+  ConfirmSetupStepsCompleteModal
+)
 const ROBOT_NAME = 'fake-robot-name'
 const RUN_ID = 'my-run-id'
 const ROBOT_SERIAL_NUMBER = 'OT123'
@@ -195,8 +205,31 @@ describe('ProtocolSetup', () => {
   let mockLaunchLPC = vi.fn()
   beforeEach(() => {
     mockLaunchLPC = vi.fn()
-    mockHistoryPush = vi.fn()
-    vi.mocked(useFeatureFlag).mockReturnValue(false)
+    mockNavigate = vi.fn()
+    MockProtocolSetupLiquids.mockImplementation(
+      vi.fn(({ setIsConfirmed, setSetupScreen }) => {
+        setIsConfirmed(true)
+        setSetupScreen('prepare to run')
+        return <div>Mock ProtocolSetupLiquids</div>
+      })
+    )
+    MockProtocolSetupLabware.mockImplementation(
+      vi.fn(({ setIsConfirmed, setSetupScreen }) => {
+        setIsConfirmed(true)
+        setSetupScreen('prepare to run')
+        return <div>Mock ProtocolSetupLabware</div>
+      })
+    )
+    MockProtocolSetupOffsets.mockImplementation(
+      vi.fn(({ setIsConfirmed, setSetupScreen }) => {
+        setIsConfirmed(true)
+        setSetupScreen('prepare to run')
+        return <div>Mock ProtocolSetupOffsets</div>
+      })
+    )
+    MockConfirmSetupStepsCompleteModal.mockReturnValue(
+      <div>Mock ConfirmSetupStepsCompleteModal</div>
+    )
     vi.mocked(useLPCDisabledReason).mockReturnValue(null)
     vi.mocked(useAttachedModules).mockReturnValue([])
     vi.mocked(useModuleCalibrationStatus).mockReturnValue({ complete: true })
@@ -295,10 +328,6 @@ describe('ProtocolSetup', () => {
       .thenReturn({ trackProtocolRunEvent: mockTrackProtocolRunEvent })
   })
 
-  afterEach(() => {
-    vi.resetAllMocks()
-  })
-
   it('should render text, image, and buttons', () => {
     render(`/runs/${RUN_ID}/setup/`)
     screen.getByText('Prepare to run')
@@ -310,9 +339,47 @@ describe('ProtocolSetup', () => {
   })
 
   it('should play protocol when click play button', () => {
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+      data: { ...mockRobotSideAnalysis, liquids: mockLiquids },
+    } as any)
+    when(vi.mocked(getProtocolModulesInfo))
+      .calledWith(
+        { ...mockRobotSideAnalysis, liquids: mockLiquids },
+        flexDeckDefV5 as any
+      )
+      .thenReturn(mockProtocolModuleInfo)
+    when(vi.mocked(getUnmatchedModulesForProtocol))
+      .calledWith([], mockProtocolModuleInfo)
+      .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
+    vi.mocked(getIncompleteInstrumentCount).mockReturnValue(0)
+    MockProtocolSetupLiquids.mockImplementation(
+      vi.fn(({ setIsConfirmed, setSetupScreen }) => {
+        setIsConfirmed(true)
+        setSetupScreen('prepare to run')
+        return <div>Mock ProtocolSetupLiquids</div>
+      })
+    )
+    MockProtocolSetupLabware.mockImplementation(
+      vi.fn(({ setIsConfirmed, setSetupScreen }) => {
+        setIsConfirmed(true)
+        setSetupScreen('prepare to run')
+        return <div>Mock ProtocolSetupLabware</div>
+      })
+    )
+    MockProtocolSetupOffsets.mockImplementation(
+      vi.fn(({ setIsConfirmed, setSetupScreen }) => {
+        setIsConfirmed(true)
+        setSetupScreen('prepare to run')
+        return <div>Mock ProtocolSetupOffsets</div>
+      })
+    )
     render(`/runs/${RUN_ID}/setup/`)
+    fireEvent.click(screen.getByText('Labware Position Check'))
+    fireEvent.click(screen.getByText('Labware'))
+    fireEvent.click(screen.getByText('Liquids'))
     expect(mockPlay).toBeCalledTimes(0)
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
+    expect(MockConfirmSetupStepsCompleteModal).toBeCalledTimes(0)
     expect(mockPlay).toBeCalledTimes(1)
   })
 
@@ -353,11 +420,28 @@ describe('ProtocolSetup', () => {
     render(`/runs/${RUN_ID}/setup/`)
     screen.getByText('1 initial liquid')
     fireEvent.click(screen.getByText('Liquids'))
-    expect(vi.mocked(ProtocolSetupLiquids)).toHaveBeenCalled()
+    expect(MockProtocolSetupLiquids).toHaveBeenCalled()
+  })
+
+  it('should launch protocol setup labware screen when click labware', () => {
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+      data: { ...mockRobotSideAnalysis, liquids: mockLiquids },
+    } as any)
+    when(vi.mocked(getProtocolModulesInfo))
+      .calledWith(
+        { ...mockRobotSideAnalysis, liquids: mockLiquids },
+        flexDeckDefV5 as any
+      )
+      .thenReturn(mockProtocolModuleInfo)
+    when(vi.mocked(getUnmatchedModulesForProtocol))
+      .calledWith([], mockProtocolModuleInfo)
+      .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
+    render(`/runs/${RUN_ID}/setup`)
+    fireEvent.click(screen.getByTestId('SetupButton_Labware'))
+    expect(MockProtocolSetupLabware).toHaveBeenCalled()
   })
 
   it('should launch view only parameters screen when click parameters', () => {
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
     vi.mocked(useProtocolHasRunTimeParameters).mockReturnValue(true)
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: {
@@ -382,20 +466,70 @@ describe('ProtocolSetup', () => {
     expect(vi.mocked(ViewOnlyParameters)).toHaveBeenCalled()
   })
 
-  it('should launch LPC when clicked', () => {
-    vi.mocked(useLPCDisabledReason).mockReturnValue(null)
+  it('should launch offsets screen when click offsets', () => {
+    MockProtocolSetupOffsets.mockImplementation(
+      vi.fn(() => <div>Mock ProtocolSetupOffsets</div>)
+    )
     render(`/runs/${RUN_ID}/setup/`)
-    screen.getByText(/Recommended/)
-    screen.getByText(/1 offset applied/)
     fireEvent.click(screen.getByText('Labware Position Check'))
-    expect(mockLaunchLPC).toHaveBeenCalled()
-    screen.getByText('mock LPC Wizard')
+    expect(MockProtocolSetupOffsets).toHaveBeenCalled()
+    screen.getByText(/Mock ProtocolSetupOffsets/)
   })
 
   it('should render a confirmation modal when heater-shaker is in a protocol and it is not shaking', () => {
     vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(true)
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+      data: { ...mockRobotSideAnalysis, liquids: mockLiquids },
+    } as any)
+    when(vi.mocked(getProtocolModulesInfo))
+      .calledWith(
+        { ...mockRobotSideAnalysis, liquids: mockLiquids },
+        flexDeckDefV5 as any
+      )
+      .thenReturn(mockProtocolModuleInfo)
+    when(vi.mocked(getUnmatchedModulesForProtocol))
+      .calledWith([], mockProtocolModuleInfo)
+      .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
+    vi.mocked(getIncompleteInstrumentCount).mockReturnValue(0)
+    MockProtocolSetupLiquids.mockImplementation(
+      vi.fn(({ setIsConfirmed, setSetupScreen }) => {
+        setIsConfirmed(true)
+        setSetupScreen('prepare to run')
+        return <div>Mock ProtocolSetupLiquids</div>
+      })
+    )
+    MockProtocolSetupLabware.mockImplementation(
+      vi.fn(({ setIsConfirmed, setSetupScreen }) => {
+        setIsConfirmed(true)
+        setSetupScreen('prepare to run')
+        return <div>Mock ProtocolSetupLabware</div>
+      })
+    )
+    MockProtocolSetupOffsets.mockImplementation(
+      vi.fn(({ setIsConfirmed, setSetupScreen }) => {
+        setIsConfirmed(true)
+        setSetupScreen('prepare to run')
+        return <div>Mock ProtocolSetupOffsets</div>
+      })
+    )
+    render(`/runs/${RUN_ID}/setup/`)
+    fireEvent.click(screen.getByText('Labware Position Check'))
+    fireEvent.click(screen.getByText('Labware'))
+    fireEvent.click(screen.getByText('Liquids'))
+    fireEvent.click(screen.getByRole('button', { name: 'play' }))
+    expect(vi.mocked(ConfirmAttachedModal)).toHaveBeenCalled()
+  })
+  it('should go from skip steps to heater-shaker modal', () => {
+    vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(true)
+    MockConfirmSetupStepsCompleteModal.mockImplementation(
+      ({ onConfirmClick }) => {
+        onConfirmClick()
+        return <div>Mock ConfirmSetupStepsCompleteModal</div>
+      }
+    )
     render(`/runs/${RUN_ID}/setup/`)
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
+    expect(MockConfirmSetupStepsCompleteModal).toHaveBeenCalled()
     expect(vi.mocked(ConfirmAttachedModal)).toHaveBeenCalled()
   })
   it('should render a loading skeleton while awaiting a response from the server', () => {
@@ -422,7 +556,21 @@ describe('ProtocolSetup', () => {
   })
 
   it('calls trackProtocolRunEvent when tapping play button', () => {
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+      data: { ...mockRobotSideAnalysis, liquids: mockLiquids },
+    } as any)
+    when(vi.mocked(getProtocolModulesInfo))
+      .calledWith(
+        { ...mockRobotSideAnalysis, liquids: mockLiquids },
+        flexDeckDefV5 as any
+      )
+      .thenReturn(mockProtocolModuleInfo)
+    when(vi.mocked(getUnmatchedModulesForProtocol))
+      .calledWith([], mockProtocolModuleInfo)
+      .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
+    vi.mocked(getIncompleteInstrumentCount).mockReturnValue(0)
     render(`/runs/${RUN_ID}/setup/`)
+
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
     expect(mockTrackProtocolRunEvent).toBeCalledTimes(1)
     expect(mockTrackProtocolRunEvent).toHaveBeenCalledWith({
@@ -434,6 +582,6 @@ describe('ProtocolSetup', () => {
   it('should redirect to the protocols page when a run is stopped', () => {
     vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_STOPPED)
     render(`/runs/${RUN_ID}/setup/`)
-    expect(mockHistoryPush).toHaveBeenCalledWith('/protocols')
+    expect(mockNavigate).toHaveBeenCalledWith('/protocols')
   })
 })

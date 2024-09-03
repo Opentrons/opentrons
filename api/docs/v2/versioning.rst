@@ -68,7 +68,7 @@ The maximum supported API version for your robot is listed in the Opentrons App 
 
 If you upload a protocol that specifies a higher API level than the maximum supported, your robot won't be able to analyze or run your protocol. You can increase the maximum supported version by updating your robot software and Opentrons App. 
 
-Opentrons robots running the latest software (7.3.0) support the following version ranges: 
+Opentrons robots running the latest software (8.0.0) support the following version ranges: 
 
     * **Flex:** version 2.15–|apiLevel|.
     * **OT-2:** versions 2.0–|apiLevel|.
@@ -84,6 +84,10 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+------------------------------+
 | API Version | Introduced in Robot Software |
 +=============+==============================+
+|     2.20    |          8.0.0               |
++-------------+------------------------------+
+|     2.19    |          7.3.1               |
++-------------+------------------------------+
 |     2.18    |          7.3.0               |
 +-------------+------------------------------+
 |     2.17    |          7.2.0               |
@@ -129,6 +133,19 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 Changes in API Versions
 =======================
+
+Version 2.20
+------------
+
+- :py:meth:`.configure_nozzle_layout` now accepts row, single, and partial column layout constants. See :ref:`partial-tip-pickup`.
+- You can now call :py:obj:`.ProtocolContext.define_liquid()` without supplying a ``description`` or ``display_color``.
+
+Version 2.19
+------------
+
+Opentrons recommends updating protocols from ``apiLevel`` 2.18 to 2.19 to take advantage of improved pipetting behavior.
+
+- This version uses new values for how much a tip overlaps with the pipette nozzle when the pipette picks up tips. This can correct errors caused by the robot positioning the tip slightly lower than intended, potentially making contact with labware. See :py:meth:`.pick_up_tip` for additional details.
 
 Version 2.18
 ------------

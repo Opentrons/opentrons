@@ -1,22 +1,23 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { formatDistance } from 'date-fns'
 import styled, { css } from 'styled-components'
 
 import {
   ALIGN_FLEX_START,
   BORDERS,
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
   TYPOGRAPHY,
   useLongPress,
-  StyledText,
 } from '@opentrons/components'
 
 import { LongPressModal } from './LongPressModal'
@@ -38,54 +39,61 @@ const cardStyleBySize: {
 } = {
   full: {
     fontSize: TYPOGRAPHY.fontSize32,
-    height: '8.875rem',
+    height: '11.75rem',
     lineHeight: TYPOGRAPHY.lineHeight42,
     fontWeight: TYPOGRAPHY.fontWeightBold,
     width: '59rem',
   },
+  // Note (kk:06/13/2024) height has been updated from 10.75rem because of a protocol with RTP CSV file
   half: {
     fontSize: TYPOGRAPHY.fontSize28,
-    height: '10.75rem',
+    height: '13.25rem',
     lineHeight: TYPOGRAPHY.lineHeight36,
     fontWeight: TYPOGRAPHY.fontWeightSemiBold,
     width: '29.25rem',
   },
   regular: {
     fontSize: TYPOGRAPHY.fontSize28,
-    height: '10.75rem',
+    height: '13.25rem',
     lineHeight: TYPOGRAPHY.lineHeight36,
     fontWeight: TYPOGRAPHY.fontWeightSemiBold,
     width: '28.375rem',
   },
 }
 
-export function PinnedProtocol(props: {
+interface PinnedProtocolProps {
   protocol: ProtocolResource
   longPress: React.Dispatch<React.SetStateAction<boolean>>
-  cardSize?: CardSizeType
-  lastRun?: string
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
   setTargetProtocolId: (targetProtocolId: string) => void
-}): JSX.Element {
+  cardSize?: CardSizeType
+  lastRun?: string
+  isRequiredCSV?: boolean
+}
+
+export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
   const {
-    lastRun,
     protocol,
     longPress,
     setShowDeleteConfirmationModal,
     setTargetProtocolId,
+    lastRun,
+    cardSize: size,
+    isRequiredCSV = false,
   } = props
-  const cardSize = props.cardSize ?? 'full'
-  const history = useHistory()
+  const cardSize = size ?? 'full'
+  const navigate = useNavigate()
   const longpress = useLongPress()
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
   const { t } = useTranslation('protocol_info')
 
+  // ToDo (kk:06/18/2024) this will be removed later
   const handleProtocolClick = (
     longpress: UseLongPressResult,
     protocolId: string
   ): void => {
     if (!longpress.isLongPressed) {
-      history.push(`/protocols/${protocolId}`)
+      navigate(`/protocols/${protocolId}`)
     }
   }
   React.useEffect(() => {
@@ -94,16 +102,17 @@ export function PinnedProtocol(props: {
     }
   }, [longpress.isLongPressed, longPress])
 
+  const pushedBackgroundColor = isRequiredCSV ? COLORS.yellow40 : COLORS.grey50
   const PUSHED_STATE_STYLE = css`
     &:active {
-      background-color: ${longpress.isLongPressed ? '' : COLORS.grey50};
+      background-color: ${longpress.isLongPressed ? '' : pushedBackgroundColor};
     }
   `
 
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={COLORS.grey35}
+      backgroundColor={isRequiredCSV ? COLORS.yellow35 : COLORS.grey35}
       borderRadius={BORDERS.borderRadius16}
       css={PUSHED_STATE_STYLE}
       flexDirection={DIRECTION_COLUMN}
@@ -112,19 +121,32 @@ export function PinnedProtocol(props: {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       maxWidth={cardStyleBySize[cardSize].width}
       minWidth={cardStyleBySize[cardSize].width}
-      onClick={() => handleProtocolClick(longpress, protocol.id)}
+      onClick={() => {
+        handleProtocolClick(longpress, protocol.id)
+      }}
       overflowWrap={OVERFLOW_WRAP_ANYWHERE}
       padding={SPACING.spacing24}
       ref={longpress.ref}
+      data-testid={`${cardSize}_pinned_protocol_card`}
     >
-      <ProtocolNameText
-        cardSize={cardSize}
-        fontSize={cardStyleBySize[cardSize].fontSize}
-        fontWeight={cardStyleBySize[cardSize].fontWeight}
-        lineHeight={cardStyleBySize[cardSize].lineHeight}
-      >
-        {protocolName}
-      </ProtocolNameText>
+      <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
+        {isRequiredCSV ? (
+          <Chip
+            type="warning"
+            iconName="ot-alert"
+            chipSize="small"
+            text={t('requires_csv')}
+          />
+        ) : null}
+        <ProtocolNameText
+          cardSize={cardSize}
+          fontSize={cardStyleBySize[cardSize].fontSize}
+          fontWeight={cardStyleBySize[cardSize].fontWeight}
+          lineHeight={cardStyleBySize[cardSize].lineHeight}
+        >
+          {protocolName}
+        </ProtocolNameText>
+      </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
         gridGap={SPACING.spacing8}
@@ -132,16 +154,16 @@ export function PinnedProtocol(props: {
         width="100%"
         color={COLORS.grey60}
       >
-        <StyledText as="p">
+        <LegacyStyledText as="p">
           {lastRun !== undefined
             ? `${formatDistance(new Date(lastRun), new Date(), {
                 addSuffix: true,
               }).replace('about ', '')}`
             : t('no_history')}
-        </StyledText>
-        <StyledText as="p">
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
           {formatTimeWithUtcLabel(protocol.createdAt)}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       {longpress.isLongPressed && (
         <LongPressModal
@@ -155,7 +177,7 @@ export function PinnedProtocol(props: {
   )
 }
 
-const ProtocolNameText = styled(StyledText)`
+const ProtocolNameText = styled(LegacyStyledText)`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: ${(props: { cardSize: CardSizeType }) =>

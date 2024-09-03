@@ -10,10 +10,10 @@ import {
   Icon,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import type { Subsystem } from '@opentrons/api-client'
 
 interface UpdateInProgressModalProps {
@@ -36,7 +36,7 @@ export function UpdateInProgressModal(
   const { t } = useTranslation('firmware_update')
 
   return (
-    <Modal>
+    <OddModal>
       <Flex
         height="17.25rem"
         width="100%"
@@ -48,13 +48,13 @@ export function UpdateInProgressModal(
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing40}
       >
-        <StyledText
+        <LegacyStyledText
           as="h4"
           marginBottom={SPACING.spacing4}
           fontWeight={TYPOGRAPHY.fontWeightBold}
         >
           {t('updating_firmware', { subsystem: t(subsystem) })}
-        </StyledText>
+        </LegacyStyledText>
         <Icon
           name="ot-spinner"
           aria-label="spinner"
@@ -63,6 +63,6 @@ export function UpdateInProgressModal(
           spin
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

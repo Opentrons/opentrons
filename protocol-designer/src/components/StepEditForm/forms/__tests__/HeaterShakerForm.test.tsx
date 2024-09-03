@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { describe, it, beforeEach, afterEach, vi } from 'vitest'
-import { screen, cleanup } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { getHeaterShakerLabwareOptions } from '../../../../ui/modules/selectors'
-import { i18n } from '../../../../localization'
+import { i18n } from '../../../../assets/localization'
 import { HeaterShakerForm } from '../HeaterShakerForm'
 import type * as ModulesSelectors from '../../../../ui/modules/selectors'
 import type * as Fields from '../../fields'
@@ -111,7 +111,6 @@ describe('HeaterShakerForm', () => {
   })
   afterEach(() => {
     vi.restoreAllMocks()
-    cleanup()
   })
   it('should render a title', () => {
     render(props)

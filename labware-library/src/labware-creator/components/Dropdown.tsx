@@ -3,7 +3,7 @@ import * as React from 'react'
 import {
   Box,
   SelectField,
-  Tooltip,
+  LegacyTooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 import { Field } from 'formik'
@@ -54,7 +54,9 @@ export const Dropdown = (props: DropdownProps): JSX.Element => {
 
   return (
     <>
-      {tooltip != null && <Tooltip {...tooltipProps}>{tooltip}</Tooltip>}
+      {tooltip != null && (
+        <LegacyTooltip {...tooltipProps}>{tooltip}</LegacyTooltip>
+      )}
 
       <div {...targetProps} className={fieldStyles.field_wrapper}>
         <label
@@ -66,7 +68,10 @@ export const Dropdown = (props: DropdownProps): JSX.Element => {
             {/* @ts-expect-error(IL, 2021-03-24): formik types need cleanup w LabwareFields */}
             {({ field, form }) => (
               <Box {...styleProps}>
-                {getLabel(field.name, form.values)}
+                {getLabel(
+                  field.name as keyof LabwareFields,
+                  form.values as LabwareFields
+                )}
                 <SelectField
                   disabled={disabled}
                   name={field.name}

@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from datetime import datetime, timezone
 from uuid import uuid4
 from fastapi import Depends
@@ -21,8 +23,8 @@ async def get_motion_lock() -> ThreadedAsyncLock:
 
 @call_once
 async def get_session_manager(
-    hardware_api: HardwareControlAPI = Depends(get_hardware),
-    motion_lock: ThreadedAsyncLock = Depends(get_motion_lock),
+    hardware_api: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    motion_lock: Annotated[ThreadedAsyncLock, Depends(get_motion_lock)],
 ) -> SessionManager:
     """The single session manager instance"""
     return SessionManager(

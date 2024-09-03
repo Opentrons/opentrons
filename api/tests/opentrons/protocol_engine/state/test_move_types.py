@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from opentrons.types import Point
 from opentrons.motion_planning.types import MoveType
-from opentrons.protocol_engine.state import move_types as subject
+from opentrons.protocol_engine.state import _move_types as subject
 from opentrons.protocol_engine.types import CurrentWell
 
 

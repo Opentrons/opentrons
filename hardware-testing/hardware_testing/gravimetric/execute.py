@@ -40,6 +40,7 @@ from .measurement import (
     record_measurement_data,
     calculate_change_in_volume,
     create_measurement_tag,
+    SupportedLiquid,
 )
 from .measurement.environment import get_min_reading, get_max_reading
 from .measurement.record import (
@@ -335,8 +336,9 @@ def _run_trial(
     ui.print_info(f"\tinitial grams: {m_data_init.grams_average} g")
     # update the vials volumes, using the last-known weight
     if _PREV_TRIAL_GRAMS is not None:
+        liq = SupportedLiquid.from_string(trial.cfg.liquid)
         _evaporation_loss_ul = abs(
-            calculate_change_in_volume(_PREV_TRIAL_GRAMS, m_data_init)
+            calculate_change_in_volume(_PREV_TRIAL_GRAMS, m_data_init, liq)
         )
         ui.print_info(f"{_evaporation_loss_ul} ul evaporated since last trial")
         trial.liquid_tracker.update_affected_wells(
@@ -386,8 +388,9 @@ def _run_trial(
     m_data_dispense = _record_measurement_and_store(MeasurementType.DISPENSE)
     ui.print_info(f"\tgrams after dispense: {m_data_dispense.grams_average} g")
     # calculate volumes
-    volume_aspirate = calculate_change_in_volume(m_data_init, m_data_aspirate)
-    volume_dispense = calculate_change_in_volume(m_data_aspirate, m_data_dispense)
+    liq = SupportedLiquid.from_string(trial.cfg.liquid)
+    volume_aspirate = calculate_change_in_volume(m_data_init, m_data_aspirate, liq)
+    volume_dispense = calculate_change_in_volume(m_data_aspirate, m_data_dispense, liq)
     return volume_aspirate, m_data_aspirate, volume_dispense, m_data_dispense
 
 

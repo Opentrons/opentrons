@@ -3,16 +3,16 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_START,
-  DIRECTION_COLUMN,
-  SPACING,
-  TYPOGRAPHY,
   Btn,
-  useHoverTooltip,
+  DIRECTION_COLUMN,
   Flex,
+  SPACING,
+  Tooltip,
+  TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import { Banner } from '../../atoms/Banner'
-import { Tooltip } from '../../atoms/Tooltip'
 import { useIsFlex } from '../../organisms/Devices/hooks'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
@@ -86,7 +86,9 @@ export const UpdateBanner = ({
       >
         <Banner
           type={bannerType}
-          onCloseClick={() => setShowBanner(false)}
+          onCloseClick={() => {
+            setShowBanner(false)
+          }}
           closeButton={closeButtonRendered}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
@@ -95,7 +97,9 @@ export const UpdateBanner = ({
               textAlign={ALIGN_START}
               fontSize={TYPOGRAPHY.fontSizeP}
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
-              onClick={() => handleUpdateClick()}
+              onClick={() => {
+                handleUpdateClick()
+              }}
             >
               {hyperlinkText}
             </Btn>

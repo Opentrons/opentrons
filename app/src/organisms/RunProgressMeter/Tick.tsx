@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -8,12 +9,12 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   SPACING,
-  StyledText,
+  Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { Tooltip } from '../../atoms/Tooltip'
 import { getModalPortalEl } from '../../App/portal'
 
 import type { IconName } from '@opentrons/components'
@@ -83,7 +84,9 @@ export function Tick(props: TickProps): JSX.Element {
       left={`${percent}%`}
       transform={`translateX(-${percent}%)`}
     >
-      <StyledText as="h6">{isAggregatedTick ? count : null}</StyledText>
+      <LegacyStyledText as="h6">
+        {isAggregatedTick ? count : null}
+      </LegacyStyledText>
       {createPortal(
         <Tooltip tooltipProps={tooltipProps}>
           <Flex
@@ -95,18 +98,18 @@ export function Tick(props: TickProps): JSX.Element {
               <Icon name={iconName} size={SPACING.spacing20} />
             ) : null}
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="label">
+              <LegacyStyledText as="label">
                 {t('step_number', {
                   step_number: isAggregatedTick
                     ? `${stepNumber} - ${stepNumber + range}`
                     : stepNumber,
                 })}
-              </StyledText>
-              <StyledText as="label">
+              </LegacyStyledText>
+              <LegacyStyledText as="label">
                 {commandTKey != null ? t(commandTKey) : null}
-              </StyledText>
+              </LegacyStyledText>
               {isAggregatedTick ? (
-                <StyledText>{t('plus_more', { count })}</StyledText>
+                <LegacyStyledText>{t('plus_more', { count })}</LegacyStyledText>
               ) : null}
             </Flex>
           </Flex>

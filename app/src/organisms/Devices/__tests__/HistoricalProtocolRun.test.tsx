@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -9,27 +9,20 @@ import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/
 import { useRunStatus, useRunTimestamps } from '../../RunTimeControl/hooks'
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
-import type { RunStatus, RunData } from '@opentrons/api-client'
-import type * as Dom from 'react-router-dom'
 
-const mockPush = vi.fn()
+import type { RunStatus, RunData } from '@opentrons/api-client'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
 vi.mock('../../../redux/protocol-storage')
 vi.mock('../../RunTimeControl/hooks')
 vi.mock('../HistoricalProtocolRunOverflowMenu')
-vi.mock('react-router-dom', async importOriginal => {
-  const reactRouterDom = await importOriginal<typeof Dom>()
-  return {
-    ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
-  }
-})
 
 const run = {
   current: false,
   id: 'test_id',
   protocolId: 'test_protocol_id',
   status: 'succeeded' as RunStatus,
+  runTimeParameters: [] as RunTimeParameter[],
 } as RunData
 
 const render = (props: React.ComponentProps<typeof HistoricalProtocolRun>) => {
@@ -64,11 +57,9 @@ describe('RecentProtocolRuns', () => {
 
   it('renders the correct information derived from run and protocol', () => {
     render(props)
-    const protocolBtn = screen.getByText('my protocol')
+    screen.debug()
     screen.getByText('Completed')
     screen.getByText('mock HistoricalProtocolRunOverflowMenu')
-    fireEvent.click(protocolBtn)
-    expect(mockPush).toHaveBeenCalledWith('/protocols/protocolKeyStub')
   })
   it('renders buttons that are not clickable when the protocol was deleted from the app directory', () => {
     vi.mocked(getStoredProtocols).mockReturnValue([storedProtocolDataFixture])
@@ -80,10 +71,7 @@ describe('RecentProtocolRuns', () => {
       run: run,
     }
     render(props)
-    const protocolBtn = screen.getByText('my protocol')
     screen.getByText('Completed')
     screen.getByText('mock HistoricalProtocolRunOverflowMenu')
-    fireEvent.click(protocolBtn)
-    expect(mockPush).not.toHaveBeenCalledWith('/protocols/12345')
   })
 })

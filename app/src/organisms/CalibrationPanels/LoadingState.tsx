@@ -7,7 +7,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SIZE_4,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 interface LoadingStateProps {
@@ -25,8 +25,10 @@ export function LoadingState(props: LoadingStateProps): JSX.Element {
       minHeight="32rem"
     >
       <Icon name="ot-spinner" spin size={SIZE_4} color={COLORS.grey50} />
-      {header != null ? <StyledText as="h1">{header}</StyledText> : null}
-      {body != null ? <StyledText as="p">{body}</StyledText> : null}
+      {header != null ? (
+        <LegacyStyledText as="h1">{header}</LegacyStyledText>
+      ) : null}
+      {body != null ? <LegacyStyledText as="p">{body}</LegacyStyledText> : null}
     </Flex>
   )
 }

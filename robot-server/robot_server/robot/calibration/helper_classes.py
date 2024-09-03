@@ -5,7 +5,7 @@ from enum import Enum
 from dataclasses import dataclass, fields
 from pydantic import BaseModel, Field
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons.protocol_api import labware
 from opentrons.types import DeckLocation
 

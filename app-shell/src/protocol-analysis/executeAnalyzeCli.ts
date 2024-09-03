@@ -25,6 +25,6 @@ export function executeAnalyzeCli(
           ? error.stderr
           : error.message
 
-      throw new Error(message)
+      throw new Error(message as string)
     })
 }

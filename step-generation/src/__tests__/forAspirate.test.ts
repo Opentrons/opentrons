@@ -399,4 +399,6 @@ describe('8-channel trough', () => {
   )
 
   it.todo('aspirate from 384 plate starting from B row') // TODO
+
+  it.todo('aspirating from a full 96-channel and a reservoir labware')
 })

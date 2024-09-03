@@ -1,53 +1,57 @@
 import * as React from 'react'
+import { action } from '@storybook/addon-actions'
 import {
   COLORS,
   PrimaryBtn,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Slideout } from './index'
+import { Slideout as SlideoutComponent } from './index'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof SlideoutComponent> = {
   title: 'App/Atoms/Slideout',
-  component: Slideout,
-  argTypes: { onClick: { action: 'clicked' } },
-} as Meta
+  component: SlideoutComponent,
+  args: {
+    onCloseClick: action('clicked'),
+  },
+}
 
-const Template: Story<React.ComponentProps<typeof Slideout>> = args => (
-  <Slideout {...args} />
-)
+export default meta
+
+type Story = StoryObj<typeof SlideoutComponent>
 
 const Children = (
   <React.Fragment>
-    <StyledText
+    <LegacyStyledText
       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       fontSize={TYPOGRAPHY.fontSizeP}
       paddingTop={SPACING.spacing4}
     >
       {'this is where the slideout body goes'}
-    </StyledText>
+    </LegacyStyledText>
 
     <PrimaryBtn
       backgroundColor={COLORS.blue50}
       marginTop="28rem"
       textTransform={TYPOGRAPHY.textTransformNone}
     >
-      <StyledText
+      <LegacyStyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
       >
         {'btn text'}
-      </StyledText>
+      </LegacyStyledText>
     </PrimaryBtn>
   </React.Fragment>
 )
 
-export const Primary = Template.bind({})
-Primary.args = {
-  title: 'This is the slideout title with the max width',
-  children: Children,
-  isExpanded: 'true',
+export const Slideout: Story = {
+  args: {
+    title: 'This is the slideout title with the max width',
+    children: Children,
+    isExpanded: true,
+  },
 }

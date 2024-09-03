@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import List, Optional, TypeVar, ClassVar
+from typing import List, Dict, Optional, TypeVar, ClassVar
 
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
@@ -343,3 +343,33 @@ class AbstractMagneticBlockCore(AbstractModuleCore):
     """Core control interface for an attached Magnetic Block."""
 
     MODULE_TYPE: ClassVar = ModuleType.MAGNETIC_BLOCK
+
+
+class AbstractAbsorbanceReaderCore(AbstractModuleCore):
+    """Core control interface for an attached Absorbance Reader Module."""
+
+    MODULE_TYPE: ClassVar = ModuleType.ABSORBANCE_READER
+
+    @abstractmethod
+    def get_serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+
+    @abstractmethod
+    def initialize(self, wavelength: int) -> None:
+        """Initialize the Absorbance Reader by taking zero reading."""
+
+    @abstractmethod
+    def read(self) -> Optional[Dict[str, float]]:
+        """Get an absorbance reading from the Absorbance Reader."""
+
+    @abstractmethod
+    def close_lid(self) -> None:
+        """Close the Absorbance Reader's lid."""
+
+    @abstractmethod
+    def open_lid(self) -> None:
+        """Open the Absorbance Reader's lid."""
+
+    @abstractmethod
+    def is_lid_on(self) -> bool:
+        """Return True if the Absorbance Reader's lid is currently closed."""

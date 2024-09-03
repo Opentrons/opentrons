@@ -2,7 +2,7 @@
 import asyncio
 from typing import Any, Dict, Optional, Union, cast
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition
 
 from opentrons.hardware_control import (
     HardwareControlAPI,

@@ -41,13 +41,20 @@ export const THERMOCYCLER_MODULE_V2: 'thermocyclerModuleV2' =
   'thermocyclerModuleV2'
 export const HEATERSHAKER_MODULE_V1: 'heaterShakerModuleV1' =
   'heaterShakerModuleV1'
+export const ABSORBANCE_READER_V1: 'absorbanceReaderV1' = 'absorbanceReaderV1'
 
 export const MAGNETIC_BLOCK_V1: 'magneticBlockV1' = 'magneticBlockV1'
 
 export const GRIPPER_V1: 'gripperV1' = 'gripperV1'
 export const GRIPPER_V1_1: 'gripperV1.1' = 'gripperV1.1'
 export const GRIPPER_V1_2: 'gripperV1.2' = 'gripperV1.2'
-export const GRIPPER_MODELS = [GRIPPER_V1, GRIPPER_V1_1, GRIPPER_V1_2]
+export const GRIPPER_V1_3: 'gripperV1.3' = 'gripperV1.3'
+export const GRIPPER_MODELS = [
+  GRIPPER_V1,
+  GRIPPER_V1_1,
+  GRIPPER_V1_2,
+  GRIPPER_V1_3,
+]
 
 // robot display name
 export const OT2_DISPLAY_NAME: 'Opentrons OT-2' = 'Opentrons OT-2'
@@ -75,6 +82,8 @@ export const THERMOCYCLER_MODULE_TYPE: 'thermocyclerModuleType' =
 export const HEATERSHAKER_MODULE_TYPE: 'heaterShakerModuleType' =
   'heaterShakerModuleType'
 export const MAGNETIC_BLOCK_TYPE: 'magneticBlockType' = 'magneticBlockType'
+export const ABSORBANCE_READER_TYPE: 'absorbanceReaderType' =
+  'absorbanceReaderType'
 
 export const MAGNETIC_MODULE_MODELS = [MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2]
 
@@ -92,6 +101,8 @@ export const THERMOCYCLER_MODULE_MODELS = [
 
 export const HEATERSHAKER_MODULE_MODELS = [HEATERSHAKER_MODULE_V1]
 
+export const ABSORBANCE_READER_MODELS = [ABSORBANCE_READER_V1]
+
 export const MAGNETIC_BLOCK_MODELS = [MAGNETIC_BLOCK_V1]
 
 export const MODULE_MODELS = [
@@ -100,6 +111,7 @@ export const MODULE_MODELS = [
   ...THERMOCYCLER_MODULE_MODELS,
   ...HEATERSHAKER_MODULE_MODELS,
   ...MAGNETIC_BLOCK_MODELS,
+  ...ABSORBANCE_READER_MODELS,
 ]
 
 export const MODULE_MODELS_OT2_ONLY = [
@@ -114,6 +126,7 @@ export const MODULE_TYPES = [
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
+  ABSORBANCE_READER_TYPE,
 ]
 
 export const GEN_ONE_MULTI_PIPETTES = ['p10_multi', 'p50_multi', 'p300_multi']
@@ -239,6 +252,12 @@ export const HEATER_SHAKER_CUTOUTS: CutoutId[] = [
   ...SINGLE_LEFT_CUTOUTS,
 ]
 export const THERMOCYCLER_MODULE_CUTOUTS: CutoutId[] = ['cutoutA1', 'cutoutB1']
+export const ABSORBANCE_READER_CUTOUTS: CutoutId[] = [
+  'cutoutA3',
+  'cutoutB3',
+  'cutoutC3',
+  'cutoutD3',
+]
 
 export const WASTE_CHUTE_CUTOUT: 'cutoutD3' = 'cutoutD3'
 
@@ -344,6 +363,22 @@ export const MAGNETIC_BLOCK_C3_ADDRESSABLE_AREA: 'magneticBlockV1C3' =
   'magneticBlockV1C3'
 export const MAGNETIC_BLOCK_D3_ADDRESSABLE_AREA: 'magneticBlockV1D3' =
   'magneticBlockV1D3'
+export const ABSORBANCE_READER_D3_ADDRESSABLE_AREA: 'absorbanceReaderV1D3' =
+  'absorbanceReaderV1D3'
+export const ABSORBANCE_READER_C3_ADDRESSABLE_AREA: 'absorbanceReaderV1C3' =
+  'absorbanceReaderV1C3'
+export const ABSORBANCE_READER_B3_ADDRESSABLE_AREA: 'absorbanceReaderV1B3' =
+  'absorbanceReaderV1B3'
+export const ABSORBANCE_READER_A3_ADDRESSABLE_AREA: 'absorbanceReaderV1A3' =
+  'absorbanceReaderV1A3'
+export const ABSORBANCE_READER_LID_DOCK_A4_ADDRESSABLE_AREA: 'absorbanceReaderV1LidDockA4' =
+  'absorbanceReaderV1LidDockA4'
+export const ABSORBANCE_READER_LID_DOCK_B4_ADDRESSABLE_AREA: 'absorbanceReaderV1LidDockB4' =
+  'absorbanceReaderV1LidDockB4'
+export const ABSORBANCE_READER_LID_DOCK_C4_ADDRESSABLE_AREA: 'absorbanceReaderV1LidDockC4' =
+  'absorbanceReaderV1LidDockC4'
+export const ABSORBANCE_READER_LID_DOCK_D4_ADDRESSABLE_AREA: 'absorbanceReaderV1LidDockD4' =
+  'absorbanceReaderV1LidDockD4'
 
 export const MAGNETIC_BLOCK_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   MAGNETIC_BLOCK_A1_ADDRESSABLE_AREA,
@@ -382,8 +417,20 @@ export const HEATERSHAKER_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   HEATERSHAKER_D3_ADDRESSABLE_AREA,
 ]
 
+export const ABSORBANCE_READER_ADDRESSABLE_AREAS: AddressableAreaName[] = [
+  ABSORBANCE_READER_A3_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_B3_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_C3_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_D3_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_A4_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_B4_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_C4_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_D4_ADDRESSABLE_AREA,
+]
+
 export const FLEX_USB_MODULE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   THERMOCYCLER_ADDRESSABLE_AREA,
+  ...ABSORBANCE_READER_ADDRESSABLE_AREAS,
   ...HEATERSHAKER_ADDRESSABLE_AREAS,
   ...TEMPERATURE_MODULE_ADDRESSABLE_AREAS,
 ]
@@ -488,6 +535,8 @@ export const THERMOCYCLER_V2_REAR_FIXTURE: 'thermocyclerModuleV2Rear' =
   'thermocyclerModuleV2Rear'
 export const THERMOCYCLER_V2_FRONT_FIXTURE: 'thermocyclerModuleV2Front' =
   'thermocyclerModuleV2Front'
+export const ABSORBANCE_READER_V1_FIXTURE: 'absorbanceReaderV1' =
+  'absorbanceReaderV1'
 
 export const MODULE_FIXTURES_BY_MODEL: {
   [moduleModel in ModuleModel]?: CutoutFixtureId[]
@@ -499,6 +548,7 @@ export const MODULE_FIXTURES_BY_MODEL: {
     THERMOCYCLER_V2_REAR_FIXTURE,
     THERMOCYCLER_V2_FRONT_FIXTURE,
   ],
+  [ABSORBANCE_READER_V1]: [ABSORBANCE_READER_V1_FIXTURE],
 }
 
 export const FLEX_USB_MODULE_FIXTURES: CutoutFixtureId[] = [
@@ -506,6 +556,7 @@ export const FLEX_USB_MODULE_FIXTURES: CutoutFixtureId[] = [
   TEMPERATURE_MODULE_V2_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
   THERMOCYCLER_V2_FRONT_FIXTURE,
+  ABSORBANCE_READER_V1_FIXTURE,
 ]
 
 export const MAGNETIC_BLOCK_FIXTURES: CutoutFixtureId[] = [

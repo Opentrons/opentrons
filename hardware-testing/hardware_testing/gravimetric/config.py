@@ -49,6 +49,7 @@ class GravimetricConfig(VolumetricConfig):
     scale_delay: int
     isolate_channels: List[int]
     isolate_volumes: List[float]
+    liquid: str
 
 
 @dataclass
@@ -89,80 +90,69 @@ LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
     50: {
         1: {
             50: {
-                "max_z_distance": 20,
-                "mount_speed": 11,
-                "plunger_speed": 21,
-                "sensor_threshold_pascals": 150,
+                "mount_speed": 5,
+                "plunger_speed": 20,
+                "sensor_threshold_pascals": 15,
             },
         },
         8: {
             50: {
-                "max_z_distance": 20,
-                "mount_speed": 11,
-                "plunger_speed": 21,
-                "sensor_threshold_pascals": 150,
+                "mount_speed": 5,
+                "plunger_speed": 20,
+                "sensor_threshold_pascals": 15,
             },
         },
     },
     1000: {
         1: {
             50: {
-                "max_z_distance": 20,
                 "mount_speed": 5,
-                "plunger_speed": 10,
-                "sensor_threshold_pascals": 200,
+                "plunger_speed": 20,
+                "sensor_threshold_pascals": 15,
             },
             200: {
-                "max_z_distance": 20,
                 "mount_speed": 5,
-                "plunger_speed": 10,
-                "sensor_threshold_pascals": 200,
+                "plunger_speed": 20,
+                "sensor_threshold_pascals": 15,
             },
             1000: {
-                "max_z_distance": 20,
                 "mount_speed": 5,
-                "plunger_speed": 11,
-                "sensor_threshold_pascals": 150,
+                "plunger_speed": 20,
+                "sensor_threshold_pascals": 15,
             },
         },
         8: {
             50: {
-                "max_z_distance": 20,
                 "mount_speed": 5,
-                "plunger_speed": 10,
-                "sensor_threshold_pascals": 200,
+                "plunger_speed": 20,
+                "sensor_threshold_pascals": 15,
             },
             200: {
-                "max_z_distance": 20,
                 "mount_speed": 5,
-                "plunger_speed": 10,
-                "sensor_threshold_pascals": 200,
+                "plunger_speed": 20,
+                "sensor_threshold_pascals": 15,
             },
             1000: {
-                "max_z_distance": 20,
                 "mount_speed": 5,
-                "plunger_speed": 11,
-                "sensor_threshold_pascals": 150,
+                "plunger_speed": 20,
+                "sensor_threshold_pascals": 15,
             },
         },
         96: {
             50: {
-                "max_z_distance": 20,
                 "mount_speed": 5,
-                "plunger_speed": 10,
-                "sensor_threshold_pascals": 200,
+                "plunger_speed": 20,
+                "sensor_threshold_pascals": 15,
             },
             200: {
-                "max_z_distance": 20,
                 "mount_speed": 5,
-                "plunger_speed": 10,
-                "sensor_threshold_pascals": 200,
+                "plunger_speed": 20,
+                "sensor_threshold_pascals": 15,
             },
             1000: {
-                "max_z_distance": 20,
                 "mount_speed": 5,
-                "plunger_speed": 11,
-                "sensor_threshold_pascals": 150,
+                "plunger_speed": 20,
+                "sensor_threshold_pascals": 15,
             },
         },
     },
@@ -176,16 +166,16 @@ def _get_liquid_probe_settings(
         cfg.pipette_channels
     ][cfg.tip_volume]
     return LiquidProbeSettings(
-        starting_mount_height=well.top().point.z,
-        max_z_distance=min(well.depth, lqid_cfg["max_z_distance"]),
         mount_speed=lqid_cfg["mount_speed"],
         plunger_speed=lqid_cfg["plunger_speed"],
+        plunger_impulse_time=0.2,
         sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
-        expected_liquid_height=110,
         output_option=OutputOptions.sync_only,
         aspirate_while_sensing=False,
-        auto_zero_sensor=True,
-        num_baseline_reads=10,
+        z_overlap_between_passes_mm=0.1,
+        plunger_reset_offset=2.0,
+        samples_for_baselining=20,
+        sample_time_sec=0.004,
         data_files={InstrumentProbeType.PRIMARY: "/data/testing_data/pressure.csv"},
     )
 

@@ -7,7 +7,6 @@ describe('Create a Tip Rack', () => {
   before(() => {
     cy.visit('/create')
     cy.viewport('macbook-15')
-    cy.contains('NO').click({ force: true })
   })
   it('Should create a tip rack', () => {
     // Tip Rack Selection from drop down
@@ -17,13 +16,13 @@ describe('Create a Tip Rack', () => {
       .first()
       .trigger('mousedown')
     cy.get('*[class^="_option_label"]').contains('Tip Rack').click()
-    cy.get('button').contains('start creating labware').click({ force: true })
+    cy.get('button').contains('Start creating labware').click({ force: true })
 
     // Custom Tip Racks Are Not Recommended
     cy.get('#CustomTiprackWarning p')
       .first()
       .contains(
-        'Opentrons tip racks are recommended for use with the OT-2 because they are specifically designed and verified for automation.'
+        'Opentrons tip racks are recommended for use with the OT-2 and Flex because they are specifically designed and verified for automation.'
       )
       .should('exist')
     cy.get('#CustomTiprackWarning p')

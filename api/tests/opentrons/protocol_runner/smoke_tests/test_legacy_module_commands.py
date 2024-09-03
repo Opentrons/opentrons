@@ -9,7 +9,9 @@ from pathlib import Path
 from opentrons.protocol_engine import ModuleModel, commands
 
 from opentrons.protocol_reader import ProtocolReader
-from opentrons.protocol_runner import create_simulating_runner
+from opentrons.protocol_runner.create_simulating_orchestrator import (
+    create_simulating_orchestrator,
+)
 
 
 @pytest.fixture()
@@ -60,9 +62,8 @@ async def test_runner_with_modules_in_legacy_python(
         directory=None,
     )
 
-    subject = await create_simulating_runner(
-        robot_type="OT-2 Standard",
-        protocol_config=protocol_source.config,
+    subject = await create_simulating_orchestrator(
+        robot_type="OT-2 Standard", protocol_config=protocol_source.config
     )
     result = await subject.run(deck_configuration=[], protocol_source=protocol_source)
     commands_result = result.commands

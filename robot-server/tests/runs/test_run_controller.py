@@ -12,20 +12,20 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
 )
 from opentrons.protocol_engine.types import RunTimeParameter, BooleanParameter
-from opentrons.protocol_runner import RunResult, JsonRunner, PythonAndLegacyRunner
+from opentrons.protocol_runner import RunResult
 
-from robot_server.service.notifications import RunsPublisher
+from robot_server.service.notifications import RunsPublisher, MaintenanceRunsPublisher
 from robot_server.service.task_runner import TaskRunner
 from robot_server.runs.action_models import RunAction, RunActionType
-from robot_server.runs.engine_store import EngineStore
+from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
 from robot_server.runs.run_store import RunStore
 from robot_server.runs.run_controller import RunController, RunActionNotAllowedError
 
 
 @pytest.fixture
-def mock_engine_store(decoy: Decoy, run_id: str) -> EngineStore:
+def mock_run_orchestrator_store(decoy: Decoy, run_id: str) -> RunOrchestratorStore:
     """Get a mock EngineStore."""
-    mock = decoy.mock(cls=EngineStore)
+    mock = decoy.mock(cls=RunOrchestratorStore)
     decoy.when(mock.current_run_id).then_return(run_id)
     return mock
 
@@ -48,6 +48,12 @@ def mock_runs_publisher(decoy: Decoy) -> RunsPublisher:
     return decoy.mock(cls=RunsPublisher)
 
 
+@pytest.fixture()
+def mock_maintenance_runs_publisher(decoy: Decoy) -> MaintenanceRunsPublisher:
+    """Get a mock RunsPublisher."""
+    return decoy.mock(cls=MaintenanceRunsPublisher)
+
+
 @pytest.fixture
 def run_id() -> str:
     """A run identifier value."""
@@ -65,6 +71,7 @@ def engine_state_summary() -> StateSummary:
         pipettes=[],
         modules=[],
         liquids=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
 
@@ -94,32 +101,32 @@ def protocol_commands() -> List[pe_commands.Command]:
 @pytest.fixture
 def subject(
     run_id: str,
-    mock_engine_store: EngineStore,
+    mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
     mock_task_runner: TaskRunner,
     mock_runs_publisher: RunsPublisher,
+    mock_maintenance_runs_publisher: MaintenanceRunsPublisher,
 ) -> RunController:
     """Get a RunController test subject."""
     return RunController(
         run_id=run_id,
-        engine_store=mock_engine_store,
+        run_orchestrator_store=mock_run_orchestrator_store,
         run_store=mock_run_store,
         task_runner=mock_task_runner,
         runs_publisher=mock_runs_publisher,
+        maintenance_runs_publisher=mock_maintenance_runs_publisher,
     )
 
 
 async def test_create_play_action_to_resume(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
+    mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
     run_id: str,
     subject: RunController,
 ) -> None:
     """It should resume a run."""
-    mock_json_runner = decoy.mock(cls=JsonRunner)
-    decoy.when(mock_engine_store.runner).then_return(mock_json_runner)
-    decoy.when(mock_json_runner.was_started()).then_return(True)
+    decoy.when(mock_run_orchestrator_store.run_was_started()).then_return(True)
 
     result = subject.create_action(
         action_id="some-action-id",
@@ -135,16 +142,17 @@ async def test_create_play_action_to_resume(
     )
 
     decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
-    decoy.verify(mock_json_runner.play(), times=1)
-    decoy.verify(await mock_json_runner.run(deck_configuration=[]), times=0)
+    decoy.verify(mock_run_orchestrator_store.play(), times=1)
+    decoy.verify(await mock_run_orchestrator_store.run(deck_configuration=[]), times=0)
 
 
 async def test_create_play_action_to_start(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
+    mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
     mock_task_runner: TaskRunner,
     mock_runs_publisher: RunsPublisher,
+    mock_maintenance_runs_publisher: MaintenanceRunsPublisher,
     engine_state_summary: StateSummary,
     run_time_parameters: List[RunTimeParameter],
     protocol_commands: List[pe_commands.Command],
@@ -152,9 +160,7 @@ async def test_create_play_action_to_start(
     subject: RunController,
 ) -> None:
     """It should start a run."""
-    mock_python_runner = decoy.mock(cls=PythonAndLegacyRunner)
-    decoy.when(mock_engine_store.runner).then_return(mock_python_runner)
-    decoy.when(mock_python_runner.was_started()).then_return(False)
+    decoy.when(mock_run_orchestrator_store.run_was_started()).then_return(False)
 
     result = subject.create_action(
         action_id="some-action-id",
@@ -174,7 +180,9 @@ async def test_create_play_action_to_start(
     background_task_captor = matchers.Captor()
     decoy.verify(mock_task_runner.run(background_task_captor, deck_configuration=[]))
 
-    decoy.when(await mock_python_runner.run(deck_configuration=[])).then_return(
+    decoy.when(
+        await mock_run_orchestrator_store.run(deck_configuration=[])
+    ).then_return(
         RunResult(
             commands=protocol_commands,
             state_summary=engine_state_summary,
@@ -191,14 +199,32 @@ async def test_create_play_action_to_start(
             commands=protocol_commands,
             run_time_parameters=run_time_parameters,
         ),
-        await mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
+        mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
+        times=1,
+    )
+
+    # Verify maintenance run publication after background task execution
+    decoy.verify(
+        mock_maintenance_runs_publisher.publish_current_maintenance_run(),
+        times=1,
+    )
+
+    # Verify maintenance run publication after background task execution
+    decoy.verify(
+        mock_maintenance_runs_publisher.publish_current_maintenance_run(),
+        times=1,
+    )
+
+    # Verify maintenance run publication after background task execution
+    decoy.verify(
+        mock_maintenance_runs_publisher.publish_current_maintenance_run(),
         times=1,
     )
 
 
 def test_create_pause_action(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
+    mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
     run_id: str,
     subject: RunController,
@@ -218,12 +244,12 @@ def test_create_pause_action(
     )
 
     decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
-    decoy.verify(mock_engine_store.runner.pause(), times=1)
+    decoy.verify(mock_run_orchestrator_store.pause(), times=1)
 
 
 def test_create_stop_action(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
+    mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
     mock_task_runner: TaskRunner,
     run_id: str,
@@ -244,12 +270,12 @@ def test_create_stop_action(
     )
 
     decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
-    decoy.verify(mock_task_runner.run(mock_engine_store.runner.stop), times=1)
+    decoy.verify(mock_task_runner.run(mock_run_orchestrator_store.stop), times=1)
 
 
 def test_create_resume_from_recovery_action(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
+    mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
     mock_task_runner: TaskRunner,
     run_id: str,
@@ -270,7 +296,7 @@ def test_create_resume_from_recovery_action(
     )
 
     decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
-    decoy.verify(mock_engine_store.runner.resume_from_recovery())
+    decoy.verify(mock_run_orchestrator_store.resume_from_recovery())
 
 
 @pytest.mark.parametrize(
@@ -283,7 +309,7 @@ def test_create_resume_from_recovery_action(
 )
 async def test_action_not_allowed(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
+    mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
     mock_task_runner: TaskRunner,
     run_id: str,
@@ -292,9 +318,9 @@ async def test_action_not_allowed(
     exception: Exception,
 ) -> None:
     """It should raise a RunActionNotAllowedError if a play/pause action is rejected."""
-    decoy.when(mock_engine_store.runner.was_started()).then_return(True)
-    decoy.when(mock_engine_store.runner.play()).then_raise(exception)
-    decoy.when(mock_engine_store.runner.pause()).then_raise(exception)
+    decoy.when(mock_run_orchestrator_store.run_was_started()).then_return(True)
+    decoy.when(mock_run_orchestrator_store.play()).then_raise(exception)
+    decoy.when(mock_run_orchestrator_store.pause()).then_raise(exception)
 
     with pytest.raises(RunActionNotAllowedError, match="oh no"):
         subject.create_action(

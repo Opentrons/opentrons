@@ -51,20 +51,18 @@ export interface LabwareRenderProps {
   labwareStroke?: CSSProperties['stroke']
   /** adds thicker blue border with blur to labware */
   highlight?: boolean
+  /** adds a drop shadow to the highlight border */
+  highlightShadow?: boolean
   /** Optional callback, called with WellMouseEvent args onMouseEnter */
   onMouseEnterWell?: (e: WellMouseEvent) => unknown
   /** Optional callback, called with WellMouseEvent args onMouseLeave */
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
   gRef?: React.RefObject<SVGGElement>
   onLabwareClick?: () => void
-  /** Hide labware outline */
-  hideOutline?: boolean
-  /** Provides well data attribute */
-  isInteractive?: boolean
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
-  const { gRef, definition, hideOutline, isInteractive } = props
+  const { gRef, definition } = props
 
   const cornerOffsetFromSlot = definition.cornerOffsetFromSlot
   const labwareLoadName = definition.parameters.loadName
@@ -82,11 +80,19 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         }
       >
         <g
-          transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
+          transform={
+            shouldRotateAdapterOrientation
+              ? `translate(${-cornerOffsetFromSlot.x}, ${-cornerOffsetFromSlot.y})`
+              : `translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`
+          }
           ref={gRef}
+          onClick={props.onLabwareClick}
         >
           <LabwareAdapter
             labwareLoadName={labwareLoadName as LabwareAdapterLoadName}
+            definition={definition}
+            highlight={props.highlight}
+            highlightShadow={props.highlightShadow}
           />
         </g>
       </g>
@@ -98,15 +104,13 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
       transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
       ref={gRef}
     >
-      {/* TODO(bh, 2024-05-13): refactor rendering of wells - multiple layers of styled wells, DOM ordering determines which are visible */}
       <StaticLabware
         definition={props.definition}
         onMouseEnterWell={props.onMouseEnterWell}
         onMouseLeaveWell={props.onMouseLeaveWell}
         onLabwareClick={props.onLabwareClick}
         highlight={props.highlight}
-        hideOutline={hideOutline}
-        isInteractive={isInteractive}
+        highlightShadow={props.highlightShadow}
       />
       {props.wellStroke != null ? (
         <StrokedWells

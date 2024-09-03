@@ -15,8 +15,9 @@ import {
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
+  Modal,
 } from '@opentrons/components'
 import {
   getCutoutDisplayName,
@@ -29,8 +30,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../../../App/portal'
-import { LegacyModal } from '../../../../molecules/LegacyModal'
-import { Modal } from '../../../../molecules/Modal'
+import { OddModal } from '../../../../molecules/OddModal'
 import { SmallButton } from '../../../../atoms/buttons/SmallButton'
 import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
 
@@ -175,7 +175,7 @@ export const LocationConflictModal = (
 
   return createPortal(
     isOnDevice ? (
-      <Modal
+      <OddModal
         onOutsideClick={onCloseClick}
         header={{
           title: t('deck_conflict'),
@@ -198,18 +198,18 @@ export const LocationConflictModal = (
               cutout: getCutoutDisplayName(cutoutId),
             }}
             components={{
-              block: <StyledText as="p" />,
+              block: <LegacyStyledText as="p" />,
               strong: <strong />,
             }}
           />
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText
+            <LegacyStyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightBold}
               paddingBottom={SPACING.spacing8}
             >
               {t('slot_location', { slotName: displaySlotName })}
-            </StyledText>
+            </LegacyStyledText>
             <Flex
               flexDirection={DIRECTION_COLUMN}
               paddingTop={SPACING.spacing8}
@@ -223,13 +223,16 @@ export const LocationConflictModal = (
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 borderRadius={BORDERS.borderRadius4}
               >
-                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                <LegacyStyledText
+                  as="p"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   {t('protocol_specifies')}
-                </StyledText>
+                </LegacyStyledText>
 
-                <StyledText as="p" color={COLORS.grey60}>
+                <LegacyStyledText as="p" color={COLORS.grey60}>
                   {protocolSpecifiesDisplayName}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
               <Flex
                 padding={SPACING.spacing24}
@@ -239,13 +242,16 @@ export const LocationConflictModal = (
                 alignItems={ALIGN_CENTER}
                 borderRadius={BORDERS.borderRadius4}
               >
-                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                <LegacyStyledText
+                  as="p"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   {t('currently_configured')}
-                </StyledText>
+                </LegacyStyledText>
 
-                <StyledText as="p" color={COLORS.grey60}>
+                <LegacyStyledText as="p" color={COLORS.grey60}>
                   {currentFixtureDisplayName}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
             </Flex>
           </Flex>
@@ -267,9 +273,9 @@ export const LocationConflictModal = (
             />
           </Flex>
         </Flex>
-      </Modal>
+      </OddModal>
     ) : (
-      <LegacyModal
+      <Modal
         title={
           <Flex
             flexDirection={DIRECTION_ROW}
@@ -277,9 +283,12 @@ export const LocationConflictModal = (
             alignItems={ALIGN_CENTER}
           >
             <Icon name="ot-alert" size="1rem" color={COLORS.yellow50} />
-            <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <LegacyStyledText
+              as="h3"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
               {t('deck_conflict')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         }
         onClose={onCloseClick}
@@ -298,17 +307,17 @@ export const LocationConflictModal = (
               cutout: getCutoutDisplayName(cutoutId),
             }}
             components={{
-              block: <StyledText fontSize={TYPOGRAPHY.fontSizeH4} />,
+              block: <LegacyStyledText fontSize={TYPOGRAPHY.fontSizeH4} />,
               strong: <strong />,
             }}
           />
           <Flex paddingY={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
-            <StyledText
+            <LegacyStyledText
               fontSize={TYPOGRAPHY.fontSizeH4}
               fontWeight={TYPOGRAPHY.fontWeightBold}
             >
               {t('slot_location', { slotName: displaySlotName })}
-            </StyledText>
+            </LegacyStyledText>
             <Flex
               flexDirection={DIRECTION_COLUMN}
               paddingTop={SPACING.spacing8}
@@ -322,12 +331,12 @@ export const LocationConflictModal = (
                 alignItems={ALIGN_CENTER}
                 borderRadius={BORDERS.borderRadius4}
               >
-                <StyledText as="label" width={SPACING.spacing120}>
+                <LegacyStyledText as="label" width={SPACING.spacing120}>
                   {t('protocol_specifies')}
-                </StyledText>
-                <StyledText as="label" flex="1">
+                </LegacyStyledText>
+                <LegacyStyledText as="label" flex="1">
                   {protocolSpecifiesDisplayName}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
               <Flex
                 padding={SPACING.spacing8}
@@ -337,14 +346,14 @@ export const LocationConflictModal = (
                 alignItems={ALIGN_CENTER}
                 borderRadius={BORDERS.borderRadius4}
               >
-                <StyledText as="label" width={SPACING.spacing120}>
+                <LegacyStyledText as="label" width={SPACING.spacing120}>
                   {t('currently_configured')}
-                </StyledText>
-                <StyledText as="label" flex="1">
+                </LegacyStyledText>
+                <LegacyStyledText as="label" flex="1">
                   {isThermocycler
                     ? currentThermocyclerFixtureDisplayName
                     : currentFixtureDisplayName}
-                </StyledText>
+                </LegacyStyledText>
               </Flex>
             </Flex>
           </Flex>
@@ -362,7 +371,7 @@ export const LocationConflictModal = (
             </PrimaryButton>
           </Flex>
         </Flex>
-      </LegacyModal>
+      </Modal>
     ),
     getTopPortalEl()
   )

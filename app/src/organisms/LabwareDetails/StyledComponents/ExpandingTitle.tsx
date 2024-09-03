@@ -8,7 +8,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Link,
   SIZE_1,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Divider } from '../../../atoms/structure'
@@ -20,8 +20,9 @@ interface ExpandingTitleProps {
 
 export function ExpandingTitle(props: ExpandingTitleProps): JSX.Element {
   const [diagramVisible, setDiagramVisible] = React.useState<boolean>(false)
-  const toggleDiagramVisible = (): void =>
+  const toggleDiagramVisible = (): void => {
     setDiagramVisible(currentDiagramVisible => !currentDiagramVisible)
+  }
   const { label, diagram } = props
 
   return (
@@ -31,9 +32,9 @@ export function ExpandingTitle(props: ExpandingTitleProps): JSX.Element {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
       >
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {label}
-        </StyledText>
+        </LegacyStyledText>
         {diagram != null && (
           <Link role="button" onClick={toggleDiagramVisible}>
             <Icon

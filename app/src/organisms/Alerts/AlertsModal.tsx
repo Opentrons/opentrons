@@ -2,13 +2,12 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import head from 'lodash/head'
+import { SUCCESS_TOAST, WARNING_TOAST } from '@opentrons/components'
 
 import * as AppAlerts from '../../redux/alerts'
 import { getHasJustUpdated, toggleConfigValue } from '../../redux/config'
 import { getAvailableShellUpdate } from '../../redux/shell'
-import { SUCCESS_TOAST, WARNING_TOAST } from '../../atoms/Toast'
 import { useToaster } from '../ToasterOven'
-import { AnalyticsSettingsModal } from '../AnalyticsSettingsModal'
 import { UpdateAppModal } from '../UpdateAppModal'
 import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
 import { useRemoveActiveAppUpdateToast } from '.'
@@ -55,7 +54,7 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
   React.useEffect(() => {
     if (hasJustUpdated) {
       makeToast(
-        t('branded:opentrons_app_successfully_updated'),
+        t('branded:opentrons_app_successfully_updated') as string,
         SUCCESS_TOAST,
         {
           closeButton: true,
@@ -69,13 +68,15 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
   React.useEffect(() => {
     if (createAppUpdateAvailableToast) {
       toastIdRef.current = makeToast(
-        t('branded:opentrons_app_update_available_variation'),
+        t('branded:opentrons_app_update_available_variation') as string,
         WARNING_TOAST,
         {
           closeButton: true,
           disableTimeout: true,
           linkText: t('view_update'),
-          onLinkClick: () => setShowUpdateModal(true),
+          onLinkClick: () => {
+            setShowUpdateModal(true)
+          },
         }
       )
     } else if (removeToast && toastIdRef.current) {
@@ -85,15 +86,15 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
 
   return (
     <>
-      {/* TODO(mc, 2020-05-07): AnalyticsSettingsModal currently controls its
-            own render; move its logic into `state.alerts` */}
-      <AnalyticsSettingsModal />
-
       {activeAlertId === AppAlerts.ALERT_U2E_DRIVER_OUTDATED ? (
         <U2EDriverOutdatedAlert dismissAlert={dismissDriverAlert} />
       ) : null}
       {showUpdateModal ? (
-        <UpdateAppModal closeModal={() => setShowUpdateModal(false)} />
+        <UpdateAppModal
+          closeModal={() => {
+            setShowUpdateModal(false)
+          }}
+        />
       ) : null}
     </>
   )

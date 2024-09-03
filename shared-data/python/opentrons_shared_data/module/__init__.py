@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Union, cast, overload
 
 from ..load import load_shared_data
-from .dev_types import (
+from .types import (
     SchemaVersions,
     ModuleSchema,
     SchemaV1,

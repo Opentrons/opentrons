@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { when } from 'vitest-when'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
@@ -86,9 +86,9 @@ const mockTCModule = {
 
 const render = (props: React.ComponentProps<typeof SetupLabwareMap>) => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <SetupLabwareMap {...props} />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }

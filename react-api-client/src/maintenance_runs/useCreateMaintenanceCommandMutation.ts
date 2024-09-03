@@ -53,11 +53,11 @@ export function useCreateMaintenanceCommandMutation(): UseCreateMaintenanceComma
     }).then(response => {
       queryClient
         .invalidateQueries([host, 'maintenance_runs'])
-        .catch((e: Error) =>
+        .catch((e: Error) => {
           console.error(
             `error invalidating maintenance runs query: ${e.message}`
           )
-        )
+        })
       return response.data
     })
   )

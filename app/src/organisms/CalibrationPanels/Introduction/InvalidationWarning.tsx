@@ -1,5 +1,10 @@
 import * as React from 'react'
-import { Flex, SPACING, TYPOGRAPHY, StyledText } from '@opentrons/components'
+import {
+  Flex,
+  SPACING,
+  TYPOGRAPHY,
+  LegacyStyledText,
+} from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { Banner } from '../../../atoms/Banner'
 import * as Sessions from '../../../redux/sessions'
@@ -20,19 +25,19 @@ export function InvalidationWarning(
   if (sessionType === Sessions.SESSION_TYPE_DECK_CALIBRATION) {
     warningBody = (
       <>
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('deck_invalidates_pipette_offset')}
-        </StyledText>
-        <StyledText as="p">
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
           {t('pipette_offset_recalibrate_both_mounts')}
-        </StyledText>
+        </LegacyStyledText>
       </>
     )
   } else {
     warningBody = (
-      <StyledText as="p">
+      <LegacyStyledText as="p">
         {t('tip_length_invalidates_pipette_offset')}
-      </StyledText>
+      </LegacyStyledText>
     )
   }
 

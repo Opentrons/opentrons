@@ -4,8 +4,8 @@ from contextlib import nullcontext
 
 import pytest
 
-from opentrons_shared_data.labware.dev_types import LabwareUri
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.labware.types import LabwareUri
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.motion_planning import deck_conflict
 

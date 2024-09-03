@@ -14,15 +14,17 @@ import {
   RESPONSIVENESS,
   SIZE_1,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '../../molecules/SimpleWizardBody'
 import { Skeleton } from '../../atoms/Skeleton'
 import { SmallButton } from '../../atoms/buttons'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { BODY_STYLE, SECTIONS } from './constants'
 import { getPipetteAnimations, getPipetteAnimations96 } from './utils'
 import type { PipetteWizardStepProps } from './types'
@@ -115,7 +117,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
         proceed()
       })
       .catch(error => {
-        setShowErrorMessage(error.message)
+        setShowErrorMessage(error.message as string)
       })
   }
 
@@ -159,11 +161,13 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
   } else {
     bodyText = (
       <>
-        <StyledText css={BODY_STYLE}>{t('hold_and_loosen')}</StyledText>
+        <LegacyStyledText css={BODY_STYLE}>
+          {t('hold_and_loosen')}
+        </LegacyStyledText>
         {is96ChannelPipette && (
           <Banner
             type="warning"
-            size={isOnDevice ? '1.5rem' : SIZE_1}
+            size={Boolean(isOnDevice) ? '1.5rem' : SIZE_1}
             marginY={SPACING.spacing4}
           >
             {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
@@ -173,29 +177,32 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     )
   }
 
-  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
+  if (isRobotMoving)
+    return <SimpleWizardInProgressBody description={t('stand_back')} />
   if (showPipetteStillAttached) {
     return (
       <SimpleWizardBody
         iconColor={COLORS.red50}
-        header={t('pipette_failed_to_detach', { pipetteName: pipetteName })}
+        header={t('pipette_failed_to_detach', { pipetteName })}
         isSuccess={false}
       >
         <Flex
           width="100%"
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          alignItems={isOnDevice ? ALIGN_CENTER : ALIGN_FLEX_END}
+          alignItems={Boolean(isOnDevice) ? ALIGN_CENTER : ALIGN_FLEX_END}
           gridGap={SPACING.spacing8}
         >
           <Btn
-            onClick={() => setShowPipetteStillAttached(false)}
+            onClick={() => {
+              setShowPipetteStillAttached(false)
+            }}
             marginLeft={SPACING.spacing32}
           >
-            <StyledText css={GO_BACK_BUTTON_TEXT_STYLE}>
+            <LegacyStyledText css={GO_BACK_BUTTON_TEXT_STYLE}>
               {t('shared:go_back')}
-            </StyledText>
+            </LegacyStyledText>
           </Btn>
-          {isOnDevice ? (
+          {Boolean(isOnDevice) ? (
             <SmallButton
               disabled={isFetching}
               buttonText={i18n.format(t('try_again'), 'capitalize')}
@@ -242,7 +249,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
         ) : is96ChannelPipette ? (
           getPipetteAnimations96({
             section: pipetteWizardStep.section,
-            flowType: flowType,
+            flowType,
           })
         ) : (
           getPipetteAnimations({ pipetteWizardStep, channel })

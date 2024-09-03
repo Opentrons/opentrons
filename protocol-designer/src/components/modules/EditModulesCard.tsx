@@ -83,6 +83,9 @@ export function EditModulesCard(props: Props): JSX.Element {
   const moduleRestrictionsDisabled = Boolean(
     useSelector(featureFlagSelectors.getDisableModuleRestrictions)
   )
+  const enableAbsorbanceReader = Boolean(
+    useSelector(featureFlagSelectors.getEnableAbsorbanceReader)
+  )
 
   const showHeaterShakerPipetteCollisions =
     isHeaterShakerOnDeck &&
@@ -99,6 +102,8 @@ export function EditModulesCard(props: Props): JSX.Element {
       isFlex
         ? moduleType !== 'magneticModuleType'
         : moduleType !== 'magneticBlockType'
+  ).filter(moduleType =>
+    enableAbsorbanceReader ? true : moduleType !== 'absorbanceReaderType'
   )
 
   const handleDeleteStagingAreas = (): void => {
@@ -148,7 +153,7 @@ export function EditModulesCard(props: Props): JSX.Element {
               <MultipleModulesRow
                 moduleType={moduleType}
                 moduleOnDeck={moduleData}
-                key={`${moduleType}_${i}`}
+                key={`${moduleType}_${i}_${moduleData[0].id}`}
                 moduleOnDeckType={moduleData[0].type}
                 moduleOnDeckModel={moduleData[0].model}
                 openEditModuleModal={openEditModuleModal}

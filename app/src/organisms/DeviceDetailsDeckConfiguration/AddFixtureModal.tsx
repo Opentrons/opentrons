@@ -11,8 +11,9 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   SPACING,
-  StyledText,
+  Modal,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -22,6 +23,9 @@ import {
 import {
   getCutoutDisplayName,
   getFixtureDisplayName,
+  ABSORBANCE_READER_CUTOUTS,
+  ABSORBANCE_READER_V1,
+  ABSORBANCE_READER_V1_FIXTURE,
   HEATER_SHAKER_CUTOUTS,
   HEATERSHAKER_MODULE_V1,
   HEATERSHAKER_MODULE_V1_FIXTURE,
@@ -46,23 +50,20 @@ import {
 
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 import { TertiaryButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
-import { LegacyModal } from '../../molecules/LegacyModal'
+import { OddModal } from '../../molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration/'
 
 import type {
   CutoutConfig,
   CutoutId,
   CutoutFixtureId,
-  DeckConfiguration,
 } from '@opentrons/shared-data'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
-import type { LegacyModalProps } from '../../molecules/LegacyModal'
+import type { ModalProps } from '@opentrons/components'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
-  setShowAddFixtureModal: (showAddFixtureModal: boolean) => void
-  setCurrentDeckConfig?: React.Dispatch<React.SetStateAction<CutoutConfig[]>>
+  closeModal: () => void
   providedFixtureOptions?: CutoutFixtureId[]
   isOnDevice?: boolean
 }
@@ -75,8 +76,7 @@ type OptionStage =
 
 export function AddFixtureModal({
   cutoutId,
-  setShowAddFixtureModal,
-  setCurrentDeckConfig,
+  closeModal,
   providedFixtureOptions,
   isOnDevice = false,
 }: AddFixtureModalProps): JSX.Element {
@@ -104,23 +104,19 @@ export function AddFixtureModal({
     initialStage
   )
 
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('add_to_slot', {
       slotName: getCutoutDisplayName(cutoutId),
     }),
     hasExitIcon: providedFixtureOptions == null,
-    onClick: () => {
-      setShowAddFixtureModal(false)
-    },
+    onClick: closeModal,
   }
 
-  const modalProps: LegacyModalProps = {
+  const modalProps: ModalProps = {
     title: t('add_to_slot', {
       slotName: getCutoutDisplayName(cutoutId),
     }),
-    onClose: () => {
-      setShowAddFixtureModal(false)
-    },
+    onClose: closeModal,
     closeOnOutsideClick: true,
     childrenPadding: SPACING.spacing24,
     width: '26.75rem',
@@ -234,6 +230,24 @@ export function AddFixtureModal({
           ...unconfiguredTemperatureModules,
         ]
       }
+      if (
+        ABSORBANCE_READER_CUTOUTS.includes(cutoutId) &&
+        unconfiguredMods.some(m => m.moduleModel === ABSORBANCE_READER_V1)
+      ) {
+        const unconfiguredAbsorbanceReaders = unconfiguredMods
+          .filter(mod => mod.moduleModel === ABSORBANCE_READER_V1)
+          .map(mod => [
+            {
+              cutoutId,
+              cutoutFixtureId: ABSORBANCE_READER_V1_FIXTURE,
+              opentronsModuleSerialNumber: mod.serialNumber,
+            },
+          ])
+        availableOptions = [
+          ...availableOptions,
+          ...unconfiguredAbsorbanceReaders,
+        ]
+      }
     }
   } else if (optionStage === 'wasteChuteOptions') {
     availableOptions = WASTE_CHUTE_FIXTURES.map(fixture => [
@@ -289,22 +303,7 @@ export function AddFixtureModal({
     )
   }
 
-  const handleAddODD = (addedCutoutConfigs: CutoutConfig[]): void => {
-    if (setCurrentDeckConfig != null)
-      setCurrentDeckConfig(
-        (prevDeckConfig: DeckConfiguration): DeckConfiguration =>
-          prevDeckConfig.map((fixture: CutoutConfig) => {
-            const replacementCutoutConfig = addedCutoutConfigs.find(
-              c => c.cutoutId === fixture.cutoutId
-            )
-            return replacementCutoutConfig ?? fixture
-          })
-      )
-
-    setShowAddFixtureModal(false)
-  }
-
-  const handleAddDesktop = (addedCutoutConfigs: CutoutConfig[]): void => {
+  const handleAddFixture = (addedCutoutConfigs: CutoutConfig[]): void => {
     const newDeckConfig = deckConfig.map(fixture => {
       const replacementCutoutConfig = addedCutoutConfigs.find(
         c => c.cutoutId === fixture.cutoutId
@@ -313,7 +312,7 @@ export function AddFixtureModal({
     })
 
     updateDeckConfiguration(newDeckConfig)
-    setShowAddFixtureModal(false)
+    closeModal()
   }
 
   const fixtureOptions = availableOptions.map(cutoutConfigs => (
@@ -327,9 +326,7 @@ export function AddFixtureModal({
       )}
       buttonText={t('add')}
       onClickHandler={() => {
-        isOnDevice
-          ? handleAddODD(cutoutConfigs)
-          : handleAddDesktop(cutoutConfigs)
+        handleAddFixture(cutoutConfigs)
       }}
       isOnDevice={isOnDevice}
     />
@@ -338,26 +335,28 @@ export function AddFixtureModal({
   return (
     <>
       {isOnDevice ? (
-        <Modal
+        <OddModal
           header={modalHeader}
-          onOutsideClick={() =>
-            providedFixtureOptions != null
-              ? null
-              : setShowAddFixtureModal(false)
-          }
+          onOutsideClick={() => {
+            if (providedFixtureOptions == null) closeModal()
+          }}
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-            <StyledText as="p">{t('add_to_slot_description')}</StyledText>
+            <LegacyStyledText as="p">
+              {t('add_fixture_description')}
+            </LegacyStyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               {fixtureOptions}
               {nextStageOptions}
             </Flex>
           </Flex>
-        </Modal>
+        </OddModal>
       ) : (
-        <LegacyModal {...modalProps}>
+        <Modal {...modalProps}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-            <StyledText as="p">{t('add_fixture_description')}</StyledText>
+            <LegacyStyledText as="p">
+              {t('add_fixture_description')}
+            </LegacyStyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               {fixtureOptions}
               {nextStageOptions}
@@ -373,12 +372,12 @@ export function AddFixtureModal({
               marginTop={'1.44rem'}
               marginBottom={'0.56rem'}
             >
-              <StyledText css={GO_BACK_BUTTON_STYLE}>
+              <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
                 {t('shared:go_back')}
-              </StyledText>
+              </LegacyStyledText>
             </Btn>
           ) : null}
-        </LegacyModal>
+        </Modal>
       )}
     </>
   )
@@ -442,10 +441,10 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       css={FIXTURE_BUTTON_STYLE_ODD}
     >
-      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {props.optionName}
-      </StyledText>
-      <StyledText as="p">{props.buttonText}</StyledText>
+      </LegacyStyledText>
+      <LegacyStyledText as="p">{props.buttonText}</LegacyStyledText>
     </Btn>
   ) : (
     <Flex
@@ -456,7 +455,9 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
       backgroundColor={COLORS.grey20}
       borderRadius={BORDERS.borderRadius4}
     >
-      <StyledText css={TYPOGRAPHY.pSemiBold}>{optionName}</StyledText>
+      <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+        {optionName}
+      </LegacyStyledText>
       <TertiaryButton onClick={onClickHandler}>{buttonText}</TertiaryButton>
     </Flex>
   )

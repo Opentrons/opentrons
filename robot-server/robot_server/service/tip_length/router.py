@@ -1,6 +1,6 @@
 from starlette import status
 from fastapi import APIRouter, Depends, Query
-from typing import Optional, cast
+from typing import Annotated, Optional, cast
 
 from opentrons.calibration_storage import types as cal_types
 from opentrons.calibration_storage.ot2 import tip_length, models
@@ -12,7 +12,7 @@ from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.shared_models import calibration as cal_model
 
 from opentrons.hardware_control import API
-from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.pipette.types import LabwareUri
 
 
 router = APIRouter()
@@ -49,24 +49,29 @@ def _format_calibration(
     response_model=tl_models.MultipleCalibrationsResponse,
 )
 async def get_all_tip_length_calibrations(
-    tiprack_hash: Optional[str] = Query(
-        None,
-        description=(
-            "Filter results by their `tiprack` field."
-            " This is deprecated because it was prone to bugs where semantically identical"
-            " definitions had different hashes."
-            " Use `tiprack_uri` instead."
+    _: Annotated[API, Depends(get_ot2_hardware)],
+    tiprack_hash: Annotated[
+        Optional[str],
+        Query(
+            description=(
+                "Filter results by their `tiprack` field."
+                " This is deprecated because it was prone to bugs where semantically identical"
+                " definitions had different hashes."
+                " Use `tiprack_uri` instead."
+            ),
+            deprecated=True,
         ),
-        deprecated=True,
-    ),
-    pipette_id: Optional[str] = Query(
-        None, description="Filter results by their `pipette` field."
-    ),
-    tiprack_uri: Optional[str] = Query(
-        None,
-        description="Filter results by their `uri` field.",
-    ),
-    _: API = Depends(get_ot2_hardware),
+    ] = None,
+    pipette_id: Annotated[
+        Optional[str],
+        Query(description="Filter results by their `pipette` field."),
+    ] = None,
+    tiprack_uri: Annotated[
+        Optional[str],
+        Query(
+            description="Filter results by their `uri` field.",
+        ),
+    ] = None,
 ) -> tl_models.MultipleCalibrationsResponse:
     all_calibrations = tip_length.get_all_tip_length_calibrations()
     if not all_calibrations:
@@ -99,37 +104,44 @@ async def get_all_tip_length_calibrations(
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorBody}},
 )
 async def delete_specific_tip_length_calibration(
-    pipette_id: str = Query(
-        ...,
-        description=(
-            "The `pipette` field value of the calibration you want to delete."
-            " (See `GET /calibration/tip_length`.)"
+    _: Annotated[API, Depends(get_ot2_hardware)],
+    pipette_id: Annotated[
+        str,
+        Query(
+            ...,
+            description=(
+                "The `pipette` field value of the calibration you want to delete."
+                " (See `GET /calibration/tip_length`.)"
+            ),
         ),
-    ),
-    tiprack_hash: Optional[str] = Query(
-        None,
-        description=(
-            "The `tiprack` field value of the calibration you want to delete."
-            " (See `GET /calibration/tip_length`.)"
-            "\n\n"
-            " This is deprecated because it was prone to bugs where semantically identical"
-            " definitions had different hashes."
-            " Use `tiprack_uri` instead."
-            "\n\n"
-            "You must supply either this or `tiprack_uri`."
+    ],
+    tiprack_hash: Annotated[
+        Optional[str],
+        Query(
+            description=(
+                "The `tiprack` field value of the calibration you want to delete."
+                " (See `GET /calibration/tip_length`.)"
+                "\n\n"
+                " This is deprecated because it was prone to bugs where semantically identical"
+                " definitions had different hashes."
+                " Use `tiprack_uri` instead."
+                "\n\n"
+                "You must supply either this or `tiprack_uri`."
+            ),
+            deprecated=True,
         ),
-        deprecated=True,
-    ),
-    tiprack_uri: Optional[str] = Query(
-        None,
-        description=(
-            "The `uri` field value of the calibration you want to delete."
-            " (See `GET /calibration/tip_length`.)"
-            "\n\n"
-            " You must supply either this or `tiprack_hash`."
+    ] = None,
+    tiprack_uri: Annotated[
+        Optional[str],
+        Query(
+            description=(
+                "The `uri` field value of the calibration you want to delete."
+                " (See `GET /calibration/tip_length`.)"
+                "\n\n"
+                " You must supply either this or `tiprack_hash`."
+            ),
         ),
-    ),
-    _: API = Depends(get_ot2_hardware),
+    ] = None,
 ):
     try:
         tip_length.delete_tip_length_calibration(

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
@@ -25,14 +25,14 @@ const ROBOT_SERIAL_NUMBER = 'OT123'
 
 const render = () => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <BackToTopButton
         protocolRunHeaderRef={null}
         robotName={ROBOT_NAME}
         runId={RUN_ID}
         sourceLocation="test run button"
       />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }
@@ -58,8 +58,8 @@ describe('BackToTopButton', () => {
   })
 
   it('should be enabled with no tooltip if there are no missing Ids', () => {
-    const { getByRole } = render()
-    const button = getByRole('link', { name: 'Back to top' })
+    render()
+    const button = screen.getByRole('link', { name: 'Back to top' })
     expect(button).not.toBeDisabled()
     expect(button.getAttribute('href')).toEqual(
       '/devices/otie/protocol-runs/1/setup'

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { DeprecatedPrimaryButton, Icon } from '@opentrons/components'
+import { Icon, PrimaryButton } from '@opentrons/components'
 import styles from './importLabware.module.css'
 
 interface Props {
@@ -21,20 +21,29 @@ export function ImportLabware(props: Props): JSX.Element {
   )
 }
 
-const stopEvent = (e: React.SyntheticEvent): void => e.preventDefault()
+const stopEvent = (e: React.SyntheticEvent): void => {
+  e.preventDefault()
+}
 
 function UploadInput(props: UploadInputProps): JSX.Element {
   const { isButton, onUpload } = props
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
 
-  const Label = isButton ? DeprecatedPrimaryButton : 'label'
+  const handleButtonClick = (): void => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click()
+    }
+  }
+
+  const Label = isButton ? PrimaryButton : 'label'
 
   const labelText = isButton
-    ? 'upload labware file'
+    ? 'Upload labware file'
     : 'Drag and drop labware file here'
 
   const labelProps = isButton
     ? {
-        Component: 'label' as const,
+        onClick: handleButtonClick,
         className: styles.upload_button,
       }
     : { onDrop: onUpload, className: styles.file_drop }
@@ -42,9 +51,17 @@ function UploadInput(props: UploadInputProps): JSX.Element {
   return (
     <div className={styles.upload} onDragOver={stopEvent} onDrop={stopEvent}>
       <Label {...labelProps}>
-        {!isButton && <Icon name="upload" className={styles.file_drop_icon} />}
+        {!isButton ? (
+          <Icon name="upload" className={styles.file_drop_icon} />
+        ) : null}
         <span className={styles.label_text}>{labelText}</span>
-        <input className={styles.file_input} type="file" onChange={onUpload} />
+        <input
+          className={styles.file_input}
+          type="file"
+          onChange={onUpload}
+          ref={fileInputRef}
+          style={{ display: isButton ? 'none' : 'block' }}
+        />
       </Label>
     </div>
   )

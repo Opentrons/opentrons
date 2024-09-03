@@ -4,12 +4,12 @@ from datetime import datetime
 from decoy import Decoy
 
 from opentrons.protocol_engine import (
-    ProtocolEngine,
     CommandSlice,
     CommandPointer,
     commands as pe_commands,
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
+from opentrons.protocol_runner import RunOrchestrator
 
 from robot_server.service.json_api import MultiBodyMeta
 from robot_server.errors.error_responses import ApiError
@@ -22,14 +22,14 @@ from robot_server.commands.router import (
 
 
 @pytest.fixture()
-def protocol_engine(decoy: Decoy) -> ProtocolEngine:
-    """Get a mocked out ProtocolEngine."""
-    return decoy.mock(cls=ProtocolEngine)
+def run_orchestrator(decoy: Decoy) -> RunOrchestrator:
+    """Get a mocked out RunOrchestrator."""
+    return decoy.mock(cls=RunOrchestrator)
 
 
 async def test_create_command(
     decoy: Decoy,
-    protocol_engine: ProtocolEngine,
+    run_orchestrator: RunOrchestrator,
 ) -> None:
     """It should be able to create a command."""
     command_create = pe_commands.HomeCreate(params=pe_commands.HomeParams())
@@ -43,17 +43,17 @@ async def test_create_command(
     )
 
     def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
-        decoy.when(protocol_engine.state_view.commands.get("abc123")).then_return(
-            queued_command
-        )
+        decoy.when(run_orchestrator.get_command("abc123")).then_return(queued_command)
         return queued_command
 
     decoy.when(
-        protocol_engine.add_command(
-            pe_commands.HomeCreate(
+        await run_orchestrator.add_command_and_wait_for_interval(
+            command=pe_commands.HomeCreate(
                 params=pe_commands.HomeParams(),
                 intent=pe_commands.CommandIntent.SETUP,
-            )
+            ),
+            wait_until_complete=False,
+            timeout=42,
         )
     ).then_do(_stub_queued_command_state)
 
@@ -61,31 +61,23 @@ async def test_create_command(
         RequestModelWithStatelessCommandCreate(data=command_create),
         waitUntilComplete=False,
         timeout=42,
-        engine=protocol_engine,
+        orchestrator=run_orchestrator,
     )
 
     assert result.content.data == queued_command
     assert result.status_code == 201
-    decoy.verify(await protocol_engine.wait_for_command("abc123"), times=0)
 
 
 async def test_create_command_wait_for_complete(
     decoy: Decoy,
-    protocol_engine: ProtocolEngine,
+    run_orchestrator: RunOrchestrator,
 ) -> None:
     """It should be able to create a command."""
     command_create = pe_commands.HomeCreate(
         params=pe_commands.HomeParams(),
         intent=pe_commands.CommandIntent.SETUP,
     )
-    queued_command = pe_commands.Home(
-        id="abc123",
-        key="command-key",
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=pe_commands.CommandStatus.QUEUED,
-        params=pe_commands.HomeParams(),
-        result=None,
-    )
+
     completed_command = pe_commands.Home(
         id="abc123",
         key="command-key",
@@ -96,30 +88,21 @@ async def test_create_command_wait_for_complete(
         result=None,
     )
 
-    def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
-        decoy.when(protocol_engine.state_view.commands.get("abc123")).then_return(
-            queued_command
+    decoy.when(
+        await run_orchestrator.add_command_and_wait_for_interval(
+            command=command_create,
+            wait_until_complete=True,
+            timeout=42,
         )
-        return queued_command
+    ).then_return(completed_command)
 
-    def _stub_completed_command_state(*_a: object, **_k: object) -> None:
-        decoy.when(protocol_engine.state_view.commands.get("abc123")).then_return(
-            completed_command
-        )
-
-    decoy.when(protocol_engine.add_command(command_create)).then_do(
-        _stub_queued_command_state
-    )
-
-    decoy.when(await protocol_engine.wait_for_command("abc123")).then_do(
-        _stub_completed_command_state
-    )
+    decoy.when(run_orchestrator.get_command("abc123")).then_return(completed_command)
 
     result = await create_command(
         RequestModelWithStatelessCommandCreate(data=command_create),
         waitUntilComplete=True,
         timeout=42,
-        engine=protocol_engine,
+        orchestrator=run_orchestrator,
     )
 
     assert result.content.data == completed_command
@@ -128,7 +111,7 @@ async def test_create_command_wait_for_complete(
 
 async def test_get_commands_list(
     decoy: Decoy,
-    protocol_engine: ProtocolEngine,
+    run_orchestrator: RunOrchestrator,
 ) -> None:
     """It should get a list of commands."""
     command_1 = pe_commands.Home(
@@ -146,7 +129,7 @@ async def test_get_commands_list(
         params=pe_commands.HomeParams(),
     )
 
-    decoy.when(protocol_engine.state_view.commands.get_current()).then_return(
+    decoy.when(run_orchestrator.get_current_command()).then_return(
         CommandPointer(
             command_id="abc123",
             command_key="command-key-1",
@@ -154,14 +137,12 @@ async def test_get_commands_list(
             index=0,
         )
     )
-    decoy.when(
-        protocol_engine.state_view.commands.get_slice(cursor=1337, length=42)
-    ).then_return(
+    decoy.when(run_orchestrator.get_command_slice(cursor=1337, length=42)).then_return(
         CommandSlice(commands=[command_1, command_2], cursor=0, total_length=2)
     )
 
     result = await get_commands_list(
-        engine=protocol_engine,
+        orchestrator=run_orchestrator,
         cursor=1337,
         pageLength=42,
     )
@@ -173,7 +154,7 @@ async def test_get_commands_list(
 
 async def test_get_command(
     decoy: Decoy,
-    protocol_engine: ProtocolEngine,
+    run_orchestrator: RunOrchestrator,
 ) -> None:
     """It should get a single command by ID."""
     command_1 = pe_commands.Home(
@@ -184,9 +165,9 @@ async def test_get_command(
         params=pe_commands.HomeParams(),
     )
 
-    decoy.when(protocol_engine.state_view.commands.get("abc123")).then_return(command_1)
+    decoy.when(run_orchestrator.get_command("abc123")).then_return(command_1)
 
-    result = await get_command(commandId="abc123", engine=protocol_engine)
+    result = await get_command(commandId="abc123", orchestrator=run_orchestrator)
 
     assert result.content.data == command_1
     assert result.status_code == 200
@@ -194,15 +175,15 @@ async def test_get_command(
 
 async def test_get_command_not_found(
     decoy: Decoy,
-    protocol_engine: ProtocolEngine,
+    run_orchestrator: RunOrchestrator,
 ) -> None:
     """It should raise a 404 if command is not found."""
-    decoy.when(protocol_engine.state_view.commands.get("abc123")).then_raise(
+    decoy.when(run_orchestrator.get_command("abc123")).then_raise(
         CommandDoesNotExistError("oh no")
     )
 
     with pytest.raises(ApiError) as exc_info:
-        await get_command(commandId="abc123", engine=protocol_engine)
+        await get_command(commandId="abc123", orchestrator=run_orchestrator)
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "StatelessCommandNotFound"

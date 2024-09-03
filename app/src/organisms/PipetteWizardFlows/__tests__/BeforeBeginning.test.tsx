@@ -232,16 +232,18 @@ describe('BeforeBeginning', () => {
         attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
         flowType: FLOWS.DETACH,
       }
-      const { getByText, getByAltText, getByRole } = render(props)
-      getByText('Before you begin')
-      getByText(
+      render(props)
+      screen.getByText('Before you begin')
+      screen.getByText(
         'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
       )
-      getByAltText('2.5 mm Hex Screwdriver')
-      getByText(
+      screen.getByAltText('2.5 mm Hex Screwdriver')
+      screen.getByText(
         'Provided with the robot. Using another size can strip the instruments’s screws.'
       )
-      const proceedBtn = getByRole('button', { name: 'Move gantry to front' })
+      const proceedBtn = screen.getByRole('button', {
+        name: 'Move gantry to front',
+      })
       fireEvent.click(proceedBtn)
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [

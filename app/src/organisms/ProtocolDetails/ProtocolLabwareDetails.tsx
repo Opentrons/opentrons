@@ -9,19 +9,18 @@ import {
   Flex,
   Icon,
   InfoScreen,
+  MenuItem,
+  OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
+  useMenuHandleClickOutside,
 } from '@opentrons/components'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import { Divider } from '../../atoms/structure'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { getTopPortalEl } from '../../App/portal'
 import { LabwareDetails } from '../LabwareDetails'
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
@@ -61,8 +60,8 @@ export const ProtocolLabwareDetails = (
         <Flex flexDirection={DIRECTION_COLUMN} width="100%">
           <Flex flexDirection={DIRECTION_ROW}>
             <StyledText
-              as="label"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              desktopStyle="bodyDefaultRegular"
+              color={COLORS.grey60}
               marginBottom={SPACING.spacing8}
               data-testid="ProtocolLabwareDetails_labware_name"
               width="66%"
@@ -70,8 +69,8 @@ export const ProtocolLabwareDetails = (
               {t('labware_name')}
             </StyledText>
             <StyledText
-              as="label"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              desktopStyle="bodyDefaultRegular"
+              color={COLORS.grey60}
               data-testid="ProtocolLabwareDetails_quantity"
             >
               {t('quantity')}
@@ -124,19 +123,22 @@ export const ProtocolLabwareDetailItem = (
             <Icon
               color={COLORS.blue50}
               name="check-decagram"
-              height="0.75rem"
-              minHeight="0.75rem"
-              minWidth="0.75rem"
-              marginRight={SPACING.spacing8}
+              height="1rem"
+              minHeight="1rem"
+              minWidth="1rem"
+              marginRight={SPACING.spacing4}
             />
           ) : (
             <Flex marginLeft={SPACING.spacing20} />
           )}
-          <StyledText as="p" paddingRight={SPACING.spacing32}>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            paddingRight={SPACING.spacing32}
+          >
             {displayName}
           </StyledText>
         </Flex>
-        <StyledText as="p">{quantity}</StyledText>
+        <StyledText desktopStyle="bodyDefaultRegular">{quantity}</StyledText>
         <LabwareDetailOverflowMenu labware={labware} />
       </Flex>
     </>
@@ -201,7 +203,9 @@ export const LabwareDetailOverflowMenu = (
           {showLabwareDetailSlideout ? (
             <LabwareDetails
               labware={labware}
-              onClose={() => setShowLabwareDetailSlideout(false)}
+              onClose={() => {
+                setShowLabwareDetailSlideout(false)
+              }}
             />
           ) : null}
         </>,

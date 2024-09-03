@@ -8,7 +8,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -43,16 +43,16 @@ export function ShortTrashBin({
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.pSemiBold}
           paddingBottom={SPACING.spacing4}
           id="AdvancedSettings_devTools"
         >
           {t('short_trash_bin')}
-        </StyledText>
-        <StyledText css={TYPOGRAPHY.pRegular}>
+        </LegacyStyledText>
+        <LegacyStyledText css={TYPOGRAPHY.pRegular}>
           {t('short_trash_bin_description')}
-        </StyledText>
+        </LegacyStyledText>
       </Box>
       <ToggleButton
         label="short_trash_bin"

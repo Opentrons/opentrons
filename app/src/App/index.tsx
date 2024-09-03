@@ -9,7 +9,9 @@ import { DesktopApp } from './DesktopApp'
 import { OnDeviceDisplayApp } from './OnDeviceDisplayApp'
 import { TopPortalRoot } from './portal'
 
-const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
+const stopEvent = (event: React.MouseEvent): void => {
+  event.preventDefault()
+}
 
 export const App = (): JSX.Element | null => {
   const hasConfigLoaded = useSelector(getConfig) != null
@@ -18,7 +20,7 @@ export const App = (): JSX.Element | null => {
   // render null until getIsOnDevice returns the isOnDevice value from config
   return hasConfigLoaded ? (
     <>
-      <GlobalStyle isOnDevice={isOnDevice} />
+      <GlobalStyle />
       <Flex
         position={POSITION_FIXED}
         flexDirection={DIRECTION_ROW}

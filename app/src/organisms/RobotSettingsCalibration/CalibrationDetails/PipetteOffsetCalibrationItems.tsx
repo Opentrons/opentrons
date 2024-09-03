@@ -9,7 +9,7 @@ import {
   COLORS,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -93,26 +93,30 @@ export function PipetteOffsetCalibrationItems({
             attachedPipettes?.[calibration.mount] != null && (
               <StyledTableRow key={index}>
                 <StyledTableCell>
-                  <StyledText as="p">{calibration.modelName}</StyledText>
-                  <StyledText as="p">{calibration.serialNumber}</StyledText>
+                  <LegacyStyledText as="p">
+                    {calibration.modelName}
+                  </LegacyStyledText>
+                  <LegacyStyledText as="p">
+                    {calibration.serialNumber}
+                  </LegacyStyledText>
                 </StyledTableCell>
                 <StyledTableCell>
-                  <StyledText
+                  <LegacyStyledText
                     as="p"
                     textTransform={TYPOGRAPHY.textTransformCapitalize}
                   >
                     {is96Attached ? t('both') : calibration.mount}
-                  </StyledText>
+                  </LegacyStyledText>
                 </StyledTableCell>
                 {isFlex ? null : (
                   <StyledTableCell>
-                    <StyledText as="p">
+                    <LegacyStyledText as="p">
                       {calibration.tiprack != null &&
                         getDisplayNameForTipRack(
                           calibration.tiprack,
                           customLabwareDefs
                         )}
-                    </StyledText>
+                    </LegacyStyledText>
                   </StyledTableCell>
                 )}
                 <StyledTableCell>
@@ -120,12 +124,12 @@ export function PipetteOffsetCalibrationItems({
                     {calibration.lastCalibrated != null &&
                     !(calibration.markedBad ?? false) ? (
                       <>
-                        <StyledText as="p">
+                        <LegacyStyledText as="p">
                           {formatLastCalibrated(calibration.lastCalibrated)}
-                        </StyledText>
+                        </LegacyStyledText>
                       </>
                     ) : (
-                      <StyledText as="p">
+                      <LegacyStyledText as="p">
                         {calibration.lastCalibrated != null &&
                         calibration.markedBad === true ? (
                           <>
@@ -134,7 +138,7 @@ export function PipetteOffsetCalibrationItems({
                         ) : (
                           <>{t('not_calibrated_short')}</>
                         )}
-                      </StyledText>
+                      </LegacyStyledText>
                     )}
                   </Flex>
                 </StyledTableCell>

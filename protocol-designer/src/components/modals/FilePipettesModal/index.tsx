@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import * as Yup from 'yup'
 
-import { Modal, OutlineButton } from '@opentrons/components'
+import { LegacyModal, OutlineButton } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -432,6 +432,7 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
     getValues,
   } = useForm<FormState>({
     defaultValues: getInitialValues(),
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     resolver: yupResolver(validationSchema),
   })
   const pipettesByMount = watch('pipettesByMount')
@@ -481,7 +482,7 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
     crashablePipetteSelected && hasCrashableMagnetModuleSelected
 
   return (
-    <Modal
+    <LegacyModal
       contentsClassName={cx(
         styles.new_file_modal_contents,
         modalStyles.scrollable_modal_wrapper
@@ -535,12 +536,14 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
 
           {showEditPipetteConfirmation ? (
             <StepChangesConfirmModal
-              onCancel={() => setShowEditPipetteConfirmation(false)}
+              onCancel={() => {
+                setShowEditPipetteConfirmation(false)
+              }}
               onConfirm={() => handleSubmit(handleFormSubmit)()}
             />
           ) : null}
         </div>
       </div>
-    </Modal>
+    </LegacyModal>
   )
 }

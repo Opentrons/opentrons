@@ -77,6 +77,8 @@ export const commandCreatorFromStepArgs = (
         StepGeneration.heaterShaker,
         args
       )
+    case 'comment':
+      return StepGeneration.curryCommandCreator(StepGeneration.comment, args)
   }
   // @ts-expect-error we've exhausted all command creators, but keeping this console warn
   // for when we impelement the next command creator

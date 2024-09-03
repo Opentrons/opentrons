@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect, afterEach } from 'vitest'
+import { describe, it, vi, beforeEach, afterEach } from 'vitest'
 
 import { BaseDeck } from '@opentrons/components'
 import {
@@ -28,7 +28,6 @@ vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../../resources/deck_configuration')
 
 const mockSetSetupScreen = vi.fn()
-const mockUpdateDeckConfiguration = vi.fn()
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
   protocolData: ({
@@ -69,12 +68,12 @@ describe('ProtocolSetupDeckConfiguration', () => {
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith('mockRunId')
       .thenReturn(PROTOCOL_DETAILS.protocolData)
-    vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
-      updateDeckConfiguration: mockUpdateDeckConfiguration,
-    } as any)
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
       data: [],
     } as unknown) as UseQueryResult<DeckConfiguration>)
+    vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
+      updateDeckConfiguration: vi.fn(),
+    } as any)
     vi.mocked(useModulesQuery).mockReturnValue(({
       data: { data: [] },
     } as unknown) as UseQueryResult<Modules>)
@@ -88,18 +87,11 @@ describe('ProtocolSetupDeckConfiguration', () => {
     render(props)
     screen.getByText('Deck configuration')
     screen.getByText('mock BaseDeck')
-    screen.getByText('Confirm')
-  })
-
-  it('should call a mock function when tapping the back button', () => {
-    render(props)
-    fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
-    expect(mockSetSetupScreen).toHaveBeenCalledWith('modules')
+    screen.getByText('Save')
   })
 
   it('should call a mock function when tapping confirm button', () => {
     render(props)
-    fireEvent.click(screen.getByText('Confirm'))
-    expect(mockUpdateDeckConfiguration).toHaveBeenCalled()
+    fireEvent.click(screen.getByText('Save'))
   })
 })

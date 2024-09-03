@@ -11,12 +11,18 @@ import type {
 export const pauseFormToArgs = (
   formData: FormData
 ): PauseArgs | WaitForTemperatureArgs | null => {
-  const hours = parseFloat(formData.pauseHour) || 0
-  const minutes = parseFloat(formData.pauseMinute) || 0
-  const seconds = parseFloat(formData.pauseSecond) || 0
+  const hours = isNaN(parseFloat(formData.pauseHour as string))
+    ? 0
+    : parseFloat(formData.pauseHour as string)
+  const minutes = isNaN(parseFloat(formData.pauseMinute as string))
+    ? 0
+    : parseFloat(formData.pauseMinute as string)
+  const seconds = isNaN(parseFloat(formData.pauseSecond as string))
+    ? 0
+    : parseFloat(formData.pauseSecond as string)
   const totalSeconds = hours * 3600 + minutes * 60 + seconds
-  const temperature = parseFloat(formData.pauseTemperature)
-  const message = formData.pauseMessage || ''
+  const temperature = parseFloat(formData.pauseTemperature as string)
+  const message = formData.pauseMessage ?? ''
 
   switch (formData.pauseAction) {
     case PAUSE_UNTIL_TEMP:
@@ -32,7 +38,7 @@ export const pauseFormToArgs = (
         commandCreatorFnName: 'delay',
         name: `Pause ${formData.id}`,
         // TODO real name for steps
-        description: formData.description || '',
+        description: formData.description ?? '',
         // TODO get from form
         wait: totalSeconds,
         message,
@@ -48,7 +54,7 @@ export const pauseFormToArgs = (
         commandCreatorFnName: 'delay',
         name: `Pause ${formData.id}`,
         // TODO real name for steps
-        description: formData.description || '',
+        description: formData.description ?? '',
         // TODO get from form
         wait: true,
         message,

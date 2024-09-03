@@ -4,7 +4,8 @@ import asyncio
 import csv
 
 from typing import Optional, AsyncIterator, Any, Sequence
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
+from logging import getLogger
 
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
@@ -45,6 +46,8 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 )
 from .sensor_abc import AbstractSensorDriver
 from .scheduler import SensorScheduler
+
+LOG = getLogger(__name__)
 
 
 class SensorDriver(AbstractSensorDriver):
@@ -127,13 +130,14 @@ class SensorDriver(AbstractSensorDriver):
         self,
         can_messenger: CanMessenger,
         sensor: ThresholdSensorType,
+        mode: SensorThresholdMode = SensorThresholdMode.absolute,
         timeout: int = 1,
-    ) -> Optional[SensorReturnType]:
+    ) -> Optional[SensorDataType]:
         """Send threshold for stopping a move."""
         write = SensorThresholdInformation(
             sensor.sensor,
             SensorDataType.build(sensor.stop_threshold, sensor.sensor.sensor_type),
-            SensorThresholdMode.absolute,
+            mode,
         )
         threshold_data = await self._scheduler.send_threshold(write, can_messenger)
         if not threshold_data:
@@ -146,7 +150,7 @@ class SensorDriver(AbstractSensorDriver):
         can_messenger: CanMessenger,
         sensor: ThresholdSensorType,
         timeout: int = 1,
-    ) -> Optional[SensorReturnType]:
+    ) -> Optional[SensorDataType]:
         """Send the zero threshold which the offset value is compared to."""
         write = SensorThresholdInformation(
             sensor.sensor,
@@ -249,14 +253,16 @@ class LogListener:
         """Close csv file."""
         self.data_file.close()
 
-    async def wait_for_complete(self, wait_time: float = 2.0) -> None:
+    async def wait_for_complete(
+        self, wait_time: float = 10, message_index: int = 0
+    ) -> None:
         """Wait for the data to stop, only use this with a send_accumulated_data_request."""
         self.event = asyncio.Event()
-        recieving = True
-        while recieving:
-            await asyncio.sleep(wait_time)
-            recieving = self.event.is_set()
-            self.event.clear()
+        self.expected_ack = message_index
+        with suppress(asyncio.TimeoutError):
+            await asyncio.wait_for(self.event.wait(), wait_time)
+        if not self.event.is_set():
+            LOG.error("Did not receive the full data set from the sensor")
         self.event = None
 
     def __call__(
@@ -272,5 +278,9 @@ class LogListener:
             self.response_queue.put_nowait(data)
             current_time = round((time.time() - self.start_time), 3)
             self.csv_writer.writerow([current_time, data])  # type: ignore
-            if self.event is not None:
+        if isinstance(message, message_definitions.Acknowledgement):
+            if (
+                self.event is not None
+                and message.payload.message_index.value == self.expected_ack
+            ):
                 self.event.set()

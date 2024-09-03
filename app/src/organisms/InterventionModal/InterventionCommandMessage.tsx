@@ -8,7 +8,7 @@ import {
   Flex,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TEXT_TRANSFORM_CAPITALIZE,
   TEXT_TRANSFORM_UPPERCASE,
   TYPOGRAPHY,
@@ -51,16 +51,16 @@ export function InterventionCommandMessage({
 
   return (
     <Flex css={INTERVENTION_COMMAND_STYLE}>
-      <StyledText css={INTERVENTION_COMMAND_NOTES_STYLE}>
+      <LegacyStyledText css={INTERVENTION_COMMAND_NOTES_STYLE}>
         {t('notes')}
-      </StyledText>
-      <StyledText css={INTERVENTION_COMMAND_MESSAGE_STYLE}>
+      </LegacyStyledText>
+      <LegacyStyledText css={INTERVENTION_COMMAND_MESSAGE_STYLE}>
         {commandMessage != null && commandMessage !== ''
           ? commandMessage.length > 220
             ? `${commandMessage.substring(0, 217)}...`
             : commandMessage
           : t('wait_for_resume')}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

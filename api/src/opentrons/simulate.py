@@ -27,7 +27,7 @@ from typing import (
 )
 from typing_extensions import Literal
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 import opentrons
 from opentrons import should_use_ot3
@@ -41,14 +41,16 @@ from opentrons.hardware_control.types import HardwareFeatureFlags
 from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
 from opentrons.protocol_api.protocol_context import ProtocolContext
-from opentrons.protocol_engine import create_protocol_engine
 from opentrons.protocol_engine.create_protocol_engine import (
     create_protocol_engine_in_thread,
+    create_protocol_engine,
 )
+from opentrons.protocol_engine import error_recovery_policy
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.types import DeckType, EngineStatus, PostRunHardwareState
 from opentrons.protocol_reader.protocol_source import ProtocolSource
-from opentrons.protocol_runner.protocol_runner import create_protocol_runner
+from opentrons.protocol_runner.protocol_runner import create_protocol_runner, LiveRunner
+from opentrons.protocol_runner import RunOrchestrator
 from opentrons.protocols.duration import DurationEstimator
 from opentrons.protocols.execution import execute
 from opentrons.legacy_broker import LegacyBroker
@@ -74,7 +76,7 @@ from opentrons_shared_data.labware.models import LabwareDefinition
 from .util import entrypoint_util
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import (
+    from opentrons_shared_data.labware.types import (
         LabwareDefinition as LabwareDefinitionDict,
     )
 
@@ -226,10 +228,9 @@ def get_protocol_api(
     use_virtual_hardware: bool = True,
 ) -> protocol_api.ProtocolContext:
     """
-    Build and return a ``protocol_api.ProtocolContext``
-    connected to Virtual Smoothie.
+    Build and return a ``protocol_api.ProtocolContext`` that simulates robot control.
 
-    This can be used to run protocols from interactive Python sessions
+    This can be used to simulate protocols from interactive Python sessions
     such as Jupyter or an interpreter on the command line:
 
     .. code-block:: python
@@ -240,28 +241,31 @@ def get_protocol_api(
         >>> instr.home()
 
     :param version: The API version to use. This must be lower than
-                    ``opentrons.protocol_api.MAX_SUPPORTED_VERSION``.
-                    It may be specified either as a string (``'2.0'``) or
-                    as a ``protocols.types.APIVersion``
-                    (``APIVersion(2, 0)``).
+        ``opentrons.protocol_api.MAX_SUPPORTED_VERSION``.
+        It may be specified either as a string (``'2.0'``) or
+        as a ``protocols.types.APIVersion``
+        (``APIVersion(2, 0)``).
     :param bundled_labware: If specified, a mapping from labware names to
-                            labware definitions for labware to consider in the
-                            protocol. Note that if you specify this, _only_
-                            labware in this argument will be allowed in the
-                            protocol. This is preparation for a beta feature
-                            and is best not used.
+        labware definitions for labware to consider in the
+        protocol. Note that if you specify this, *only*
+        labware in this argument will be allowed in the
+        protocol. This is preparation for a beta feature
+        and is best not used.
     :param bundled_data: If specified, a mapping from filenames to contents
-                         for data to be available in the protocol from
-                         :py:obj:`opentrons.protocol_api.ProtocolContext.bundled_data`.
+        for data to be available in the protocol from
+        :py:obj:`opentrons.protocol_api.ProtocolContext.bundled_data`.
     :param extra_labware: A mapping from labware load names to custom labware definitions.
-                          If this is ``None`` (the default), and this function is called on a robot,
-                          it will look for labware in the ``labware`` subdirectory of the Jupyter
-                          data directory.
-    :param hardware_simulator: If specified, a hardware simulator instance.
+        If this is ``None`` (the default), and this function is called on a robot,
+        it will look for labware in the ``labware`` subdirectory of the Jupyter
+        data directory.
+    :param hardware_simulator: This is only for internal use by Opentrons. If specified,
+        it's a hardware simulator instance to reuse instead of creating a fresh one.
     :param robot_type: The type of robot to simulate: either ``"Flex"`` or ``"OT-2"``.
-                       If you're running this function on a robot, the default is the type of that
-                       robot. Otherwise, the default is ``"OT-2"``, for backwards compatibility.
-    :param use_virtual_hardware: If true, use the protocol engines virtual hardware, if false use the lower level hardware simulator.
+        If you're running this function on a robot, the default is the type of that
+        robot. Otherwise, the default is ``"OT-2"``, for backwards compatibility.
+    :param use_virtual_hardware: This is only for internal use by Opentrons.
+        If ``True``, use the Protocol Engine's virtual hardware. If ``False``, use the
+        lower level hardware simulator.
     :return: The protocol context.
     """
     if isinstance(version, str):
@@ -319,12 +323,18 @@ def get_protocol_api(
             hardware_api=checked_hardware,
             bundled_data=bundled_data,
             extra_labware=extra_labware,
-            use_virtual_hardware=use_virtual_hardware,
+            use_pe_virtual_hardware=use_virtual_hardware,
         )
 
     # Intentional difference from execute.get_protocol_api():
     # For the caller's convenience, we home the virtual hardware so they don't get MustHomeErrors.
     # Since this hardware is virtual, there's no harm in commanding this "movement" implicitly.
+    #
+    # Calling `checked_hardware_sync.home()` is a hack. It ought to be redundant with
+    # `context.home()`. We need it here to work around a Protocol Engine simulation bug
+    # where both the `HardwareControlAPI` level and the `ProtocolEngine` level need to
+    # be homed for certain commands to work. https://opentrons.atlassian.net/browse/EXEC-646
+    checked_hardware.sync.home()
     context.home()
 
     return context
@@ -433,15 +443,15 @@ def simulate(
     """
     Simulate the protocol itself.
 
-    This is a one-stop function to simulate a protocol, whether python or json,
-    no matter the api version, from external (i.e. not bound up in other
+    This is a one-stop function to simulate a protocol, whether Python or JSON,
+    no matter the API version, from external (i.e. not bound up in other
     internal server infrastructure) sources.
 
-    To simulate an opentrons protocol from other places, pass in a file like
-    object as protocol_file; this function either returns (if the simulation
+    To simulate an opentrons protocol from other places, pass in a file-like
+    object as ``protocol_file``; this function either returns (if the simulation
     has no problems) or raises an exception.
 
-    To call from the command line use either the autogenerated entrypoint
+    To call from the command line, use either the autogenerated entrypoint
     ``opentrons_simulate`` (``opentrons_simulate.exe``, on windows) or
     ``python -m opentrons.simulate``.
 
@@ -472,36 +482,37 @@ def simulate(
     :param protocol_file: The protocol file to simulate.
     :param file_name: The name of the file
     :param custom_labware_paths: A list of directories to search for custom labware.
-                                 Loads valid labware from these paths and makes them available
-                                 to the protocol context. If this is ``None`` (the default), and
-                                 this function is called on a robot, it will look in the ``labware``
-                                 subdirectory of the Jupyter data directory.
+        Loads valid labware from these paths and makes them available
+        to the protocol context. If this is ``None`` (the default), and
+        this function is called on a robot, it will look in the ``labware``
+        subdirectory of the Jupyter data directory.
     :param custom_data_paths: A list of directories or files to load custom
-                              data files from. Ignored if the apiv2 feature
-                              flag if not set. Entries may be either files or
-                              directories. Specified files and the
-                              non-recursive contents of specified directories
-                              are presented by the protocol context in
-                              ``protocol_api.ProtocolContext.bundled_data``.
-    :param hardware_simulator_file_path: A path to a JSON file defining a
-                                         hardware simulator.
+        data files from. Ignored if the apiv2 feature
+        flag if not set. Entries may be either files or
+        directories. Specified files and the
+        non-recursive contents of specified directories
+        are presented by the protocol context in
+        ``protocol_api.ProtocolContext.bundled_data``.
+    :param hardware_simulator_file_path: A path to a JSON file defining the simulated
+        hardware. This is mainly for internal use by Opentrons, and is not necessary
+        to simulate protocols.
     :param duration_estimator: For internal use only.
-                               Optional duration estimator object.
+        Optional duration estimator object.
     :param propagate_logs: Whether this function should allow logs from the
-                           Opentrons stack to propagate up to the root handler.
-                           This can be useful if you're integrating this
-                           function in a larger application, but most logs that
-                           occur during protocol simulation are best associated
-                           with the actions in the protocol that cause them.
-                           Default: ``False``
+        Opentrons stack to propagate up to the root handler.
+        This can be useful if you're integrating this
+        function in a larger application, but most logs that
+        occur during protocol simulation are best associated
+        with the actions in the protocol that cause them.
+        Default: ``False``
     :param log_level: The level of logs to capture in the run log:
-                      ``"debug"``, ``"info"``, ``"warning"``, or ``"error"``.
-                      Defaults to ``"warning"``.
+        ``"debug"``, ``"info"``, ``"warning"``, or ``"error"``.
+        Defaults to ``"warning"``.
     :returns: A tuple of a run log for user output, and possibly the required
-              data to write to a bundle to bundle this protocol. The bundle is
-              only emitted if bundling is allowed
-              and this is an unbundled Protocol API
-              v2 python protocol. In other cases it is None.
+        data to write to a bundle to bundle this protocol. The bundle is
+        only emitted if bundling is allowed
+        and this is an unbundled Protocol API
+        v2 python protocol. In other cases it is None.
     """
     stack_logger = logging.getLogger("opentrons")
     stack_logger.propagate = propagate_logs
@@ -531,11 +542,10 @@ def simulate(
             extra_data=extra_data,
         )
     except parse.JSONSchemaVersionTooNewError as e:
-        if e.attempted_schema_version == 6:
-            # See Jira RCORE-535.
-            raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
-        else:
-            raise
+        # opentrons.protocols.parse() doesn't support new JSON protocols.
+        # The code to do that should be moved from opentrons.protocol_reader.
+        # See https://opentrons.atlassian.net/browse/PLAT-94.
+        raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
 
     if protocol.api_level < APIVersion(2, 0):
         raise ApiDeprecationError(version=protocol.api_level)
@@ -635,8 +645,7 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     Useful if you want to use this module as a component of another CLI program
     and want to add its arguments.
 
-    :param parser: A parser to add arguments to. If not specified, one will be
-                   created.
+    :param parser: A parser to add arguments to. If not specified, one will be created.
     :returns argparse.ArgumentParser: The parser with arguments added.
     """
     parser.add_argument(
@@ -793,18 +802,20 @@ def _create_live_context_pe(
     deck_type: str,
     extra_labware: Dict[str, "LabwareDefinitionDict"],
     bundled_data: Optional[Dict[str, bytes]],
-    use_virtual_hardware: bool = True,
+    use_pe_virtual_hardware: bool = True,
 ) -> ProtocolContext:
     """Return a live ProtocolContext that controls the robot through ProtocolEngine."""
     assert api_version >= ENGINE_CORE_API_VERSION
-
+    hardware_api_wrapped = hardware_api.wrapped()
     global _LIVE_PROTOCOL_ENGINE_CONTEXTS
     pe, loop = _LIVE_PROTOCOL_ENGINE_CONTEXTS.enter_context(
         create_protocol_engine_in_thread(
-            hardware_api=hardware_api.wrapped(),
+            hardware_api=hardware_api_wrapped,
             config=_get_protocol_engine_config(
-                robot_type, virtual=use_virtual_hardware
+                robot_type, use_pe_virtual_hardware=use_pe_virtual_hardware
             ),
+            deck_configuration=None,
+            error_recovery_policy=error_recovery_policy.never_recover,
             drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             load_fixed_trash=should_load_fixed_trash_labware_for_python_protocol(
@@ -907,21 +918,47 @@ def _run_file_pe(
     """Run a protocol file with Protocol Engine."""
 
     async def run(protocol_source: ProtocolSource) -> _SimulateResult:
+        hardware_api_wrapped = hardware_api.wrapped()
         protocol_engine = await create_protocol_engine(
-            hardware_api=hardware_api.wrapped(),
-            config=_get_protocol_engine_config(robot_type, virtual=True),
+            hardware_api=hardware_api_wrapped,
+            config=_get_protocol_engine_config(
+                robot_type, use_pe_virtual_hardware=True
+            ),
+            error_recovery_policy=error_recovery_policy.never_recover,
             load_fixed_trash=should_load_fixed_trash(protocol_source.config),
         )
 
         protocol_runner = create_protocol_runner(
             protocol_config=protocol_source.config,
             protocol_engine=protocol_engine,
-            hardware_api=hardware_api.wrapped(),
+            hardware_api=hardware_api_wrapped,
         )
+
+        orchestrator = RunOrchestrator(
+            hardware_api=hardware_api_wrapped,
+            protocol_engine=protocol_engine,
+            json_or_python_protocol_runner=protocol_runner,
+            fixit_runner=LiveRunner(
+                protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
+            ),
+            setup_runner=LiveRunner(
+                protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
+            ),
+            protocol_live_runner=LiveRunner(
+                protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
+            ),
+        )
+
+        # TODO(mm, 2024-08-06): This home is theoretically redundant with Protocol
+        # Engine `home` commands within the `RunOrchestrator`. However, we need this to
+        # work around Protocol Engine bugs where both the `HardwareControlAPI` level
+        # and the `ProtocolEngine` level need to be homed for certain commands to work.
+        # https://opentrons.atlassian.net/browse/EXEC-646
+        await hardware_api_wrapped.home()
 
         scraper = _CommandScraper(stack_logger, log_level, protocol_runner.broker)
         with scraper.scrape():
-            result = await protocol_runner.run(
+            result = await orchestrator.run(
                 # deck_configuration=[] is a placeholder value, ignored because
                 # the Protocol Engine config specifies use_simulated_deck_config=True.
                 deck_configuration=[],
@@ -944,15 +981,17 @@ def _run_file_pe(
         return asyncio.run(run(protocol_source))
 
 
-def _get_protocol_engine_config(robot_type: RobotType, virtual: bool) -> Config:
+def _get_protocol_engine_config(
+    robot_type: RobotType, use_pe_virtual_hardware: bool
+) -> Config:
     """Return a Protocol Engine config to execute protocols on this device."""
     return Config(
         robot_type=robot_type,
         deck_type=DeckType(deck_type_for_simulation(robot_type)),
         ignore_pause=True,
-        use_virtual_pipettes=virtual,
-        use_virtual_modules=virtual,
-        use_virtual_gripper=virtual,
+        use_virtual_pipettes=use_pe_virtual_hardware,
+        use_virtual_modules=use_pe_virtual_hardware,
+        use_virtual_gripper=use_pe_virtual_hardware,
         use_simulated_deck_config=True,
     )
 
@@ -975,10 +1014,9 @@ def main() -> int:
     parser = get_arguments(parser)
 
     args = parser.parse_args()
-    # Try to migrate api v1 containers if needed
 
     # TODO(mm, 2022-12-01): Configure the DurationEstimator with the correct deck type.
-    duration_estimator = DurationEstimator() if args.estimate_duration else None  # type: ignore[no-untyped-call]
+    duration_estimator = DurationEstimator() if args.estimate_duration else None
 
     try:
         runlog, maybe_bundle = simulate(

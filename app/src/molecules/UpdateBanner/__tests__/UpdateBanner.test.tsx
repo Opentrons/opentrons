@@ -99,8 +99,8 @@ describe('Module Update Banner', () => {
       ...props,
       calibratePipetteRequired: true,
     }
-    const { queryByText } = render(props)
-    expect(queryByText('Calibrate now')).not.toBeInTheDocument()
+    render(props)
+    expect(screen.queryByText('Calibrate now')).not.toBeInTheDocument()
   })
 
   it('should not render a calibrate link if pipette firmware update is required', () => {

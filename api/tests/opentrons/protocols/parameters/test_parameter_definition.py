@@ -5,7 +5,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons.protocols.parameters import validation as mock_validation
-from opentrons.protocols.parameters.types import ParameterValueError
+from opentrons.protocols.parameters.exceptions import ParameterValueError
 from opentrons.protocols.parameters.parameter_definition import (
     create_int_parameter,
     create_float_parameter,

@@ -10,7 +10,7 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -35,16 +35,16 @@ export function CompleteUpdateSoftware({
         justifyContent={JUSTIFY_CENTER}
         borderRadius={BORDERS.borderRadius12}
       >
-        <StyledText
+        <LegacyStyledText
           as="h2"
           fontWeight={TYPOGRAPHY.fontWeightBold}
           color={COLORS.black90}
         >
           {t('update_complete')}
-        </StyledText>
-        <StyledText as="h3" marginTop={SPACING.spacing16}>
+        </LegacyStyledText>
+        <LegacyStyledText as="h3" marginTop={SPACING.spacing16}>
           {t('restarting_robot')}
-        </StyledText>
+        </LegacyStyledText>
         <Box width="47.5rem">
           <ProgressBar percentComplete={100} />
         </Box>

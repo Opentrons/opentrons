@@ -8,7 +8,7 @@ import {
   Icon,
   SIZE_1,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -36,7 +36,7 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
       marginY={SPACING.spacing8}
       gridGap={SPACING.spacing4}
     >
-      <StyledText
+      <LegacyStyledText
         as="label"
         fontWeight={
           isOnDevice
@@ -45,7 +45,7 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
         }
       >
         {i18n.format(t('labware_offset_data'), 'capitalize')}
-      </StyledText>
+      </LegacyStyledText>
       <Flex
         alignItems={ALIGN_CENTER}
         border={`${BORDERS.styleSolid} 1px ${COLORS.grey30}`}
@@ -56,15 +56,15 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
         <Icon name="reticle" size={isOnDevice ? '1.5rem' : SIZE_1} />
         {[x, y, z].map((axis, index) => (
           <React.Fragment key={index}>
-            <StyledText
+            <LegacyStyledText
               as="p"
               marginLeft={SPACING.spacing8}
               marginRight={SPACING.spacing4}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {axisLabels[index]}
-            </StyledText>
-            <StyledText as="p">{axis.toFixed(1)}</StyledText>
+            </LegacyStyledText>
+            <LegacyStyledText as="p">{axis.toFixed(1)}</LegacyStyledText>
           </React.Fragment>
         ))}
       </Flex>

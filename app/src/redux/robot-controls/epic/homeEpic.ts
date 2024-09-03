@@ -33,7 +33,7 @@ const mapResponseToAction: ResponseToActionMapper<HomeAction> = (
 
   return response.ok
     ? Actions.homeSuccess(host.name, meta)
-    : Actions.homeFailure(host.name, body, meta)
+    : Actions.homeFailure(host.name, body as { message: string }, meta)
 }
 
 export const homeEpic: Epic = (action$, state$) => {

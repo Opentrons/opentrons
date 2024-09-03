@@ -8,8 +8,8 @@ import {
   JUSTIFY_SPACE_EVENLY,
   LabwareRender,
   RobotWorkSpace,
-  SPACING,
   SPACING_AUTO,
+  SPACING,
 } from '@opentrons/components'
 import { labwareImages } from './labware-images'
 
@@ -51,10 +51,10 @@ export function Gallery(props: GalleryProps): JSX.Element {
   const images = staticImages != null ? [render, ...staticImages] : [render]
 
   return (
-    <Box>
+    <Box paddingBottom={SPACING.spacing24}>
       <Box
-        height="224px"
-        width="224px"
+        height="max-content"
+        width="14rem"
         display={DISPLAY_BLOCK}
         margin={SPACING_AUTO}
       >
@@ -71,7 +71,9 @@ export function Gallery(props: GalleryProps): JSX.Element {
               <Box
                 padding={SPACING.spacing8}
                 key={index}
-                onClick={() => setCurrentImage(index)}
+                onClick={() => {
+                  setCurrentImage(index)
+                }}
                 data-testid="gallery_mini_image"
               >
                 <Box width="5rem">{img}</Box>

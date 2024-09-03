@@ -12,7 +12,7 @@ import {
   PrimaryButton,
   SIZE_3,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -45,13 +45,13 @@ export function CompleteConfirmation(
         ) : (
           <Icon name="ot-check" size={SIZE_3} color={COLORS.green50} />
         )}
-        <StyledText as="h1" marginTop={SPACING.spacing24}>
+        <LegacyStyledText as="h1" marginTop={SPACING.spacing24}>
           {t('flow_complete', { flowName })}
-        </StyledText>
+        </LegacyStyledText>
         {body != null ? (
-          <StyledText as="p" marginTop={SPACING.spacing8}>
+          <LegacyStyledText as="p" marginTop={SPACING.spacing8}>
             {body}
-          </StyledText>
+          </LegacyStyledText>
         ) : null}
       </Flex>
       <Flex

@@ -1,5 +1,4 @@
 """Protocol run control and management."""
-import asyncio
 from typing import List, NamedTuple, Optional, Union
 
 from abc import ABC, abstractmethod
@@ -11,6 +10,8 @@ from opentrons import protocol_reader
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import ParameterContext
 from opentrons.protocol_api.core.legacy.load_info import LoadInfo
+from opentrons.protocol_engine.commands.command import CommandStatus
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -23,6 +24,7 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
 )
 from opentrons.protocols.parse import PythonParseMode
+from opentrons.util.async_helpers import asyncio_yield
 from opentrons.util.broker import Broker
 
 from .task_queue import TaskQueue
@@ -41,7 +43,8 @@ from ..protocol_engine.types import (
     PostRunHardwareState,
     DeckConfigurationType,
     RunTimeParameter,
-    RunTimeParamValuesType,
+    PrimitiveRunTimeParamValuesType,
+    CSVRuntimeParamPaths,
 )
 from ..protocols.types import PythonProtocol
 
@@ -98,7 +101,11 @@ class AbstractRunner(ABC):
 
     def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
         """Start or resume the run."""
-        self._protocol_engine.play(deck_configuration=deck_configuration)
+        # todo(mm, 2024-07-09): The deck configuration is set at the same time here for
+        # historical reasons. It's unsafe to change the deck configuration mid-run
+        # and we're relying on the caller to not do that.
+        self._protocol_engine.set_deck_configuration(deck_configuration)
+        self._protocol_engine.play()
 
     def pause(self) -> None:
         """Pause the run."""
@@ -124,7 +131,7 @@ class AbstractRunner(ABC):
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
-        run_time_param_values: Optional[RunTimeParamValuesType] = None,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
         """Run a given protocol to completion."""
 
@@ -178,7 +185,8 @@ class PythonAndLegacyRunner(AbstractRunner):
         self,
         protocol_source: ProtocolSource,
         python_parse_mode: PythonParseMode,
-        run_time_param_values: Optional[RunTimeParamValuesType],
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
+        run_time_param_paths: Optional[CSVRuntimeParamPaths],
     ) -> None:
         """Load a Python or JSONv5(& older) ProtocolSource into managed ProtocolEngine."""
         labware_definitions = await protocol_reader.extract_labware_definitions(
@@ -201,6 +209,7 @@ class PythonAndLegacyRunner(AbstractRunner):
                     protocol=protocol,
                     parameter_context=self._parameter_context,
                     run_time_param_overrides=run_time_param_values,
+                    run_time_param_file_overrides=run_time_param_paths,
                 )
             )
         else:
@@ -244,7 +253,8 @@ class PythonAndLegacyRunner(AbstractRunner):
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
-        run_time_param_values: Optional[RunTimeParamValuesType] = None,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
+        run_time_param_paths: Optional[CSVRuntimeParamPaths] = None,
         python_parse_mode: PythonParseMode = PythonParseMode.NORMAL,
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
@@ -254,6 +264,7 @@ class PythonAndLegacyRunner(AbstractRunner):
                 protocol_source=protocol_source,
                 python_parse_mode=python_parse_mode,
                 run_time_param_values=run_time_param_values,
+                run_time_param_paths=run_time_param_paths,
             )
 
         self.play(deck_configuration=deck_configuration)
@@ -284,7 +295,6 @@ class JsonRunner(AbstractRunner):
         """Initialize the JsonRunner with its dependencies."""
         super().__init__(protocol_engine)
         self._protocol_engine = protocol_engine
-        self._hardware_api = hardware_api
         self._json_file_reader = json_file_reader or JsonFileReader()
         self._json_translator = json_translator or JsonTranslator()
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
@@ -298,7 +308,7 @@ class JsonRunner(AbstractRunner):
             post_run_hardware_state=post_run_hardware_state,
         )
 
-        self._hardware_api.should_taskify_movement_execution(taskify=False)
+        hardware_api.should_taskify_movement_execution(taskify=False)
         self._queued_commands: List[pe_commands.CommandCreate] = []
 
     async def load(self, protocol_source: ProtocolSource) -> None:
@@ -340,7 +350,7 @@ class JsonRunner(AbstractRunner):
                 description=liquid.description,
                 color=liquid.displayColor,
             )
-            await _yield()
+            await asyncio_yield()
 
         initial_home_command = pe_commands.HomeCreate(
             params=pe_commands.HomeParams(axes=None)
@@ -350,13 +360,13 @@ class JsonRunner(AbstractRunner):
 
         self._queued_commands = commands
 
-        self._task_queue.set_run_func(func=self._add_command_and_execute)
+        self._task_queue.set_run_func(func=self._add_and_execute_commands)
 
     async def run(  # noqa: D102
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
-        run_time_param_values: Optional[RunTimeParamValuesType] = None,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
@@ -371,14 +381,34 @@ class JsonRunner(AbstractRunner):
         commands = self._protocol_engine.state_view.commands.get_all()
         return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
-    async def _add_command_and_execute(self) -> None:
-        for command in self._queued_commands:
-            result = await self._protocol_engine.add_and_execute_command(command)
-            if result and result.error:
-                raise ProtocolCommandFailedError(
-                    original_error=result.error,
-                    message=f"{result.error.errorType}: {result.error.detail}",
+    async def _add_and_execute_commands(self) -> None:
+        for command_request in self._queued_commands:
+            # todo(mm, 2024-07-05): This logic to handle the various command execution
+            # outcomes mirrors PAPI's ChildThreadTransport. Simplify or deduplicate it.
+            executed_command = (
+                await self._protocol_engine.add_and_execute_command_wait_for_recovery(
+                    command_request
                 )
+            )
+            if executed_command.error is not None:
+                error_recovery_type = (
+                    self._protocol_engine.state_view.commands.get_error_recovery_type(
+                        executed_command.id
+                    )
+                )
+                error_should_fail_run = (
+                    error_recovery_type == ErrorRecoveryType.FAIL_RUN
+                )
+                if error_should_fail_run:
+                    raise ProtocolCommandFailedError(
+                        original_error=executed_command.error,
+                        message=f"{executed_command.error.errorType}: {executed_command.error.detail}",
+                    )
+            elif executed_command.status == CommandStatus.QUEUED:
+                # This can happen if another task stops the ProtocolEngine before
+                # the ProtocolEngine gets around to executing this command.
+                # See docs on add_and_execute_command_wait_for_recovery().
+                break
 
 
 class LiveRunner(AbstractRunner):
@@ -401,6 +431,7 @@ class LiveRunner(AbstractRunner):
 
         self._hardware_api.should_taskify_movement_execution(taskify=False)
 
+    # TODO(tz, 6-10-2024): explore moving this method into the constructor.
     def prepare(self) -> None:
         """Set the task queue to wait until all commands are executed."""
         self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)
@@ -409,7 +440,7 @@ class LiveRunner(AbstractRunner):
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
-        run_time_param_values: Optional[RunTimeParamValuesType] = None,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
         assert protocol_source is None
         await self._hardware_api.home()
@@ -463,8 +494,3 @@ def create_protocol_runner(
             post_run_hardware_state=post_run_hardware_state,
             drop_tips_after_run=drop_tips_after_run,
         )
-
-
-async def _yield() -> None:
-    """Yield execution to the event loop, giving other tasks a chance to run."""
-    await asyncio.sleep(0)

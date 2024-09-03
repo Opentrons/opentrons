@@ -4,8 +4,8 @@ from typing import cast
 from decoy import Decoy
 
 from opentrons.protocol_engine.errors import LocationIsOccupiedError
-from opentrons.protocol_engine.state import StateView
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons.protocol_engine.state.state import StateView
+from opentrons_shared_data.robot.types import RobotType
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
@@ -29,7 +29,7 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
 )
-from opentrons_shared_data.deck.dev_types import (
+from opentrons_shared_data.deck.types import (
     DeckDefinitionV5,
     SlotDefV3,
 )
@@ -147,6 +147,62 @@ async def test_load_module_implementation_mag_block(
             serialNumber=None,
             model=ModuleModel.MAGNETIC_BLOCK_V1,
             definition=mag_block_v1_def,
+        ),
+        private=None,
+    )
+
+
+async def test_load_module_implementation_abs_reader(
+    decoy: Decoy,
+    equipment: EquipmentHandler,
+    state_view: StateView,
+    abs_reader_v1_def: ModuleDefinition,
+) -> None:
+    """A loadModule command for abs reader should have an execution implementation."""
+    subject = LoadModuleImplementation(equipment=equipment, state_view=state_view)
+
+    data = LoadModuleParams(
+        model=ModuleModel.ABSORBANCE_READER_V1,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
+        moduleId="some-id",
+    )
+
+    deck_def = load_deck(STANDARD_OT3_DECK, 5)
+
+    decoy.when(state_view.addressable_areas.state.deck_definition).then_return(deck_def)
+    decoy.when(
+        state_view.addressable_areas.get_cutout_id_by_deck_slot_name(
+            DeckSlotName.SLOT_D3
+        )
+    ).then_return("cutout" + DeckSlotName.SLOT_D3.value)
+
+    decoy.when(
+        state_view.geometry.ensure_location_not_occupied(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_D3)
+        )
+    ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_D3))
+
+    decoy.when(
+        await equipment.load_module(
+            model=ModuleModel.ABSORBANCE_READER_V1,
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
+            module_id="some-id",
+        )
+    ).then_return(
+        LoadedModuleData(
+            module_id="module-id",
+            serial_number=None,
+            definition=abs_reader_v1_def,
+        )
+    )
+
+    result = await subject.execute(data)
+    assert result == SuccessData(
+        public=LoadModuleResult(
+            moduleId="module-id",
+            serialNumber=None,
+            model=ModuleModel.ABSORBANCE_READER_V1,
+            definition=abs_reader_v1_def,
         ),
         private=None,
     )

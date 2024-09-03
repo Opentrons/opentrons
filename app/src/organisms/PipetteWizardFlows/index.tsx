@@ -4,7 +4,11 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
-import { useConditionalConfirm, COLORS } from '@opentrons/components'
+import {
+  useConditionalConfirm,
+  COLORS,
+  ModalShell,
+} from '@opentrons/components'
 import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 import {
   useHost,
@@ -17,7 +21,6 @@ import {
   useChainMaintenanceCommands,
 } from '../../resources/runs'
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
@@ -88,7 +91,8 @@ export const PipetteWizardFlows = (
   )
   const host = useHost()
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
-  const totalStepCount = pipetteWizardSteps ? pipetteWizardSteps.length - 1 : 0
+  const totalStepCount =
+    pipetteWizardSteps != null ? pipetteWizardSteps.length - 1 : 0
   const currentStep = pipetteWizardSteps?.[currentStepIndex] ?? null
   const [isFetchingPipettes, setIsFetchingPipettes] = React.useState<boolean>(
     false
@@ -183,11 +187,22 @@ export const PipetteWizardFlows = (
     if (onComplete != null) onComplete()
     if (maintenanceRunData != null) {
       deleteMaintenanceRun(maintenanceRunData?.data.id)
+    } else {
+      closeFlow()
     }
-    closeFlow()
   }
 
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({})
+  const {
+    deleteMaintenanceRun,
+    isLoading: isDeleteLoading,
+  } = useDeleteMaintenanceRunMutation({
+    onSuccess: () => {
+      closeFlow()
+    },
+    onError: () => {
+      closeFlow()
+    },
+  })
 
   const handleCleanUpAndClose = (): void => {
     if (maintenanceRunData?.data.id == null) handleClose()
@@ -202,7 +217,7 @@ export const PipetteWizardFlows = (
         })
         .catch(error => {
           setIsExiting(true)
-          setShowErrorMessage(error.message)
+          setShowErrorMessage(error.message as string)
         })
     }
   }
@@ -232,7 +247,7 @@ export const PipetteWizardFlows = (
       : undefined
   const calibrateBaseProps = {
     chainRunCommands: chainMaintenanceRunCommands,
-    isRobotMoving: isCommandMutationLoading,
+    isRobotMoving: isCommandMutationLoading || isDeleteLoading,
     proceed,
     maintenanceRunId,
     goBack,
@@ -253,11 +268,11 @@ export const PipetteWizardFlows = (
       proceed={handleCleanUpAndClose}
       goBack={cancelExit}
       isOnDevice={isOnDevice}
-      isRobotMoving={isCommandMutationLoading}
+      isRobotMoving={isCommandMutationLoading || isDeleteLoading}
     />
   ) : (
     <ExitModal
-      isRobotMoving={isCommandMutationLoading}
+      isRobotMoving={isCommandMutationLoading || isDeleteLoading}
       goBack={cancelExit}
       proceed={handleCleanUpAndClose}
       flowType={flowType}
@@ -381,7 +396,7 @@ export const PipetteWizardFlows = (
   }
 
   let exitWizardButton = onExit
-  if (isCommandMutationLoading) {
+  if (isCommandMutationLoading || isDeleteLoading) {
     exitWizardButton = undefined
   } else if (errorMessage != null && isExiting) {
     exitWizardButton = handleClose
@@ -406,12 +421,12 @@ export const PipetteWizardFlows = (
 
   return createPortal(
     isOnDevice ? (
-      <LegacyModalShell>
+      <ModalShell>
         {wizardHeader}
         {modalContent}
-      </LegacyModalShell>
+      </ModalShell>
     ) : (
-      <LegacyModalShell
+      <ModalShell
         width="47rem"
         height={
           //  changing modal height for now on BeforeBeginning 96 channel attach flow
@@ -425,7 +440,7 @@ export const PipetteWizardFlows = (
         header={wizardHeader}
       >
         {modalContent}
-      </LegacyModalShell>
+      </ModalShell>
     ),
     getTopPortalEl()
   )

@@ -226,6 +226,7 @@ def test_unrecognized_cutout_fixture() -> None:
                     "heaterShakerModuleV1",
                     "temperatureModuleV2",
                     "magneticBlockV1",
+                    "absorbanceReaderV1",
                     "stagingAreaSlotWithMagneticBlockV1",
                 ]
             ),

@@ -12,7 +12,9 @@ import { useRobot } from '../../../organisms/Devices/hooks'
 import type { DesktopRouteParams } from '../../../App/types'
 
 export function CalibrationDashboard(): JSX.Element {
-  const { robotName } = useParams<DesktopRouteParams>()
+  const { robotName } = useParams<
+    keyof DesktopRouteParams
+  >() as DesktopRouteParams
   const robot = useRobot(robotName)
   const [
     dashboardOffsetCalLauncher,

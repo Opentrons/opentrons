@@ -34,7 +34,9 @@ export function LiquidsSidebar(): JSX.Element {
         <PDTitledList
           key={ingredientId}
           selected={selectedLiquid === ingredientId}
-          onClick={() => selectLiquid(ingredientId)}
+          onClick={() => {
+            selectLiquid(ingredientId)
+          }}
           iconName="circle"
           iconProps={{
             style: {

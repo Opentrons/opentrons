@@ -4,7 +4,7 @@ from typing import Dict, Generator, Optional
 from unittest.mock import MagicMock, patch
 
 from opentrons.config import advanced_settings, CONFIG
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
 
 @pytest.fixture

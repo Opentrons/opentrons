@@ -89,12 +89,6 @@
       "defaultPushOutVolume": 0
     }
   },
-  "defaultTipOverlapDictionary": {
-    "default": 7.47,
-    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
-    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
-    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47
-  },
   "maxVolume": 50,
   "minVolume": 5.0,
   "defaultTipracks": [

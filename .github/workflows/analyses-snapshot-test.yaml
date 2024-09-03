@@ -3,70 +3,137 @@ name: Analyses Snapshot Test
 on:
   workflow_dispatch:
     inputs:
-      TARGET:
-        description: 'Target branch or tag'
+      ANALYSIS_REF:
+        description: 'Branch or tag that provides the analysis output at test runtime'
         required: true
         default: 'edge'
-      TEST_SOURCE:
-        description: 'Target for the test code'
+      SNAPSHOT_REF:
+        description: 'Branch or tag that provides the snapshot and test code at test runtime'
         required: true
         default: 'edge'
+      OPEN_PR_ON_FAILURE:
+        description: 'If the test fails, open a PR to update the snapshots'
+        type: boolean
+        required: true
+        default: false
   schedule:
-    - cron:  '26 7 * * *' # 7:26 AM UTC
+    - cron: '26 7 * * *' # 7:26 AM UTC
+  pull_request:
+    paths:
+      - 'api/**'
+      - '!api/tests/**'
+      - '!api/docs/**'
+      - '!api/release-notes-internal.md'
+      - '!api/release-notes.md'
+      - 'shared-data/**/*'
+      - '!shared-data/js/**'
+      - '.github/workflows/analyses-snapshot-test.yaml'
+      - 'analyses-snapshot-testing/**'
+
+    types:
+      - opened #default
+      - synchronize #default
+      - reopened #default
+      - labeled
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-and-test:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     env:
-      TARGET: ${{ github.event.inputs.TARGET || 'edge' }}
-      TEST_SOURCE: ${{ github.event.inputs.TEST_SOURCE || 'edge' }}
-
+      ANALYSIS_REF: ${{ github.event.inputs.ANALYSIS_REF || github.head_ref || 'edge' }}
+      SNAPSHOT_REF: ${{ github.event.inputs.SNAPSHOT_REF || github.head_ref || 'edge' }}
+      # If we're running because of workflow_dispatch, use the user input to decide
+      # whether to open a PR on failure. Otherwise, there is no user input, so always
+      # open a PR on failure.
+      OPEN_PR_ON_FAILURE: ${{ (github.event_name == 'workflow_dispatch' && github.events.inputs.OPEN_PR_ON_FAILURE) || ((github.event_name != 'workflow_dispatch') && (contains(github.event.pull_request.labels.*.name, 'gen-analyses-snapshot-pr'))) }}
+      PR_TARGET_BRANCH: ${{ github.event.pull_request.base.ref || 'not a pr'}}
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-      with:
-        ref: ${{ env.TEST_SOURCE }}
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SNAPSHOT_REF }}
 
-    - name: Docker Build
-      working-directory: app-testing
-      run: make build-opentrons-analysis
+      - name: Are the analyses snapshots in my PR branch in sync with the target branch?
+        if: github.event_name == 'pull_request'
+        run: |
+          git fetch origin ${{ env.PR_TARGET_BRANCH }}
+          DIFF_OUTPUT=$(git diff HEAD origin/${{ env.PR_TARGET_BRANCH }} -- analyses-snapshot-testing/tests/__snapshots__/analyses_snapshot_test)
+          if [ -n "$DIFF_OUTPUT" ]; then
+            echo "Analyses snapshots do NOT match ${{ env.PR_TARGET_BRANCH }} snapshots."
+            echo "Is this becasue you have not pulled and merged ${{ env.PR_TARGET_BRANCH }}?"
+            echo "Or is this because you have already updated your snapshots and are all good 😊?"
+          else
+            echo "Analyses snapshots match ${{ env.PR_TARGET_BRANCH }} snapshots."
+          fi
 
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-        cache: 'pipenv'
-        cache-dependency-path: app-testing/Pipfile.lock
+      - name: Docker Build
+        working-directory: analyses-snapshot-testing
+        run: make build-opentrons-analysis
 
-    - name: Setup Python Dependencies
-      working-directory: app-testing
-      run: make setup
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pipenv'
+          cache-dependency-path: analyses-snapshot-testing/Pipfile.lock
 
-    - name: Run Test
-      id: run_test
-      working-directory: app-testing
-      run: make snapshot-test
+      - name: Setup Python Dependencies
+        working-directory: analyses-snapshot-testing
+        run: make setup
 
-    - name: Upload Report
-      if: '!cancelled()'
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-report
-        path: app-testing/results/
+      - name: Run Test
+        id: run_test
+        working-directory: analyses-snapshot-testing
+        run: make snapshot-test
 
-    - name: Handle Test Failure
-      if: failure()
-      working-directory: app-testing
-      run: make snapshot-test-update
+      - name: Upload Report
+        if: '!cancelled()'
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: analyses-snapshot-testing/results/
 
-    - name: Create Snapshot update Request
-      if: failure()
-      uses: peter-evans/create-pull-request@v5
-      with:
-          commit-message: 'fix(app-testing): snapshot failure capture'
-          title: 'fix(app-testing): snapshot failure capture'
-          body: 'This PR is an automated snapshot update request. Please review the changes and merge if they are acceptable or find you bug and fix it.'
-          branch: 'app-testing/${{ env.TARGET }}-from-${{ env.TEST_SOURCE}}'
-          base: ${{ env.TEST_SOURCE}}
+      - name: Handle Test Failure
+        id: handle_failure
+        if: always() && steps.run_test.outcome == 'failure' && (env.OPEN_PR_ON_FAILURE == 'true' || github.event_name == 'schedule')
+        working-directory: analyses-snapshot-testing
+        run: make snapshot-test-update
 
+      - name: Create Snapshot update Request
+        id: create_pull_request
+        if: always() && steps.handle_failure.outcome == 'success' && env.OPEN_PR_ON_FAILURE == 'true' && github.event_name == 'pull_request'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: 'fix(analyses-snapshot-testing): heal analyses snapshots'
+          title: 'fix(analyses-snapshot-testing): heal ${{ env.ANALYSIS_REF }} snapshots'
+          body: 'This PR was requested on the PR https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
+          branch: 'analyses-snapshot-testing/${{ env.ANALYSIS_REF }}-from-${{ env.SNAPSHOT_REF}}'
+          base: ${{ env.SNAPSHOT_REF}}
+
+      - name: Comment on feature PR
+        if: always() && steps.create_pull_request.outcome == 'success' && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const message = 'A PR has been opened to address analyses snapshot changes. Please review the changes here: https://github.com/${{ github.repository }}/pull/${{ steps.create_pull_request.outputs.pull-request-number }}';
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: message
+            });
+
+      - name: Create Snapshot update Request on edge overnight failure
+        if: always() && steps.handle_failure.outcome == 'success' && github.event_name == 'schedule'
+        uses: peter-evans/create-pull-request@v6
+        with: # scheduled run uses the default values for ANALYSIS_REF and SNAPSHOT_REF which are edge
+          commit-message: 'fix(analyses-snapshot-testing): heal ${{ env.ANALYSIS_REF }} snapshots'
+          title: 'fix(analyses-snapshot-testing): heal ${{ env.ANALYSIS_REF }} snapshots'
+          body: 'The ${{ env.ANALYSIS_REF }} overnight analyses snapshot test is failing. This PR was opened to alert us to the failure.'
+          branch: 'analyses-snapshot-testing/${{ env.ANALYSIS_REF }}-from-${{ env.SNAPSHOT_REF}}'
+          base: ${{ env.SNAPSHOT_REF}}

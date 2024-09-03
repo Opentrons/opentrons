@@ -14,7 +14,7 @@ import {
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { useChainLiveCommands } from '../../../resources/runs'
-import { mockRobotSideAnalysis } from '../../CommandText/__fixtures__'
+import { mockRobotSideAnalysis } from '../../../molecules/Command/__fixtures__'
 import {
   useAttachedModules,
   useRunCalibrationStatus,
@@ -33,7 +33,7 @@ import { LocationConflictModal } from '../../Devices/ProtocolRun/SetupModuleAndD
 import { ModuleWizardFlows } from '../../ModuleWizardFlows'
 import { SetupInstructionsModal } from '../SetupInstructionsModal'
 import { FixtureTable } from '../FixtureTable'
-import { ModulesAndDeckMapViewModal } from '../ModulesAndDeckMapViewModal'
+import { ModulesAndDeckMapView } from '../ModulesAndDeckMapView'
 import { ProtocolSetupModulesAndDeck } from '..'
 import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 import { useRunStatus } from '../../RunTimeControl/hooks'
@@ -54,7 +54,7 @@ vi.mock('../SetupInstructionsModal')
 vi.mock('../../ModuleWizardFlows')
 vi.mock('../FixtureTable')
 vi.mock('../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal')
-vi.mock('../ModulesAndDeckMapViewModal')
+vi.mock('../ModulesAndDeckMapView')
 vi.mock('../../RunTimeControl/hooks')
 
 const ROBOT_NAME = 'otie'
@@ -327,10 +327,10 @@ describe('ProtocolSetupModulesAndDeck', () => {
     screen.getByText('mock location conflict modal')
   })
 
-  it('should render ModulesAndDeckMapViewModal when tapping map view button', () => {
+  it('should render ModulesAndDeckMapView when tapping map view button', () => {
     render()
     fireEvent.click(screen.getByText('Map View'))
     screen.debug()
-    expect(vi.mocked(ModulesAndDeckMapViewModal)).toHaveBeenCalled()
+    expect(vi.mocked(ModulesAndDeckMapView)).toHaveBeenCalled()
   })
 })

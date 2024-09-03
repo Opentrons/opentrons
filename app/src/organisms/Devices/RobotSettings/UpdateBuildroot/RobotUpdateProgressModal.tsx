@@ -13,11 +13,11 @@ import {
   JUSTIFY_FLEX_END,
   NewPrimaryBtn,
   SPACING,
-  StyledText,
+  Modal,
+  LegacyStyledText,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
-import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { ProgressBar } from '../../../../atoms/ProgressBar'
 import { FOOTER_BUTTON_STYLE } from './UpdateRobotModal'
 import {
@@ -113,7 +113,7 @@ export function RobotUpdateProgressModal({
   )
 
   return (
-    <LegacyModal
+    <Modal
       title={`${t('updating')} ${robotName}`}
       width="40rem"
       textAlign="center"
@@ -141,12 +141,12 @@ export function RobotUpdateProgressModal({
           alignItems={ALIGN_CENTER}
           padding={SPACING.spacing48}
         >
-          <StyledText>{modalBodyText}</StyledText>
+          <LegacyStyledText>{modalBodyText}</LegacyStyledText>
           <ProgressBar
             percentComplete={progressPercent}
             outerStyles={UPDATE_PROGRESS_BAR_STYLE}
           />
-          <StyledText css={UPDATE_TEXT_STYLE}>
+          <LegacyStyledText css={UPDATE_TEXT_STYLE}>
             {letUserExitUpdate &&
             updateStep !== 'restart' &&
             updateStep !== 'finished' ? (
@@ -164,10 +164,10 @@ export function RobotUpdateProgressModal({
             ) : (
               subProgressBarText
             )}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       )}
-    </LegacyModal>
+    </Modal>
   )
 }
 
@@ -218,9 +218,9 @@ function SuccessOrError({ errorMessage }: SuccessOrErrorProps): JSX.Element {
   return (
     <>
       {renderedImg}
-      <StyledText>
+      <LegacyStyledText>
         {!errorMessage ? t('robot_update_success') : errorMessage}
-      </StyledText>
+      </LegacyStyledText>
     </>
   )
 }
@@ -282,9 +282,9 @@ function useStatusBarAnimation(isError: boolean): void {
     createLiveCommand({
       command: updatingCommand,
       waitUntilComplete: false,
-    }).catch((e: Error) =>
+    }).catch((e: Error) => {
       console.warn(`cannot run status bar animation: ${e.message}`)
-    )
+    })
   }
 
   const startIdleAnimationIfFailed = (): void => {
@@ -292,9 +292,9 @@ function useStatusBarAnimation(isError: boolean): void {
       createLiveCommand({
         command: idleCommand,
         waitUntilComplete: false,
-      }).catch((e: Error) =>
+      }).catch((e: Error) => {
         console.warn(`cannot run status bar animation: ${e.message}`)
-      )
+      })
     }
   }
 

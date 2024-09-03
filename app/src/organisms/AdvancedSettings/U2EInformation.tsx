@@ -11,7 +11,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Link,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -37,22 +37,22 @@ export function U2EInformation(): JSX.Element {
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box>
-        <StyledText
+        <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
           id="AdvancedSettings_u2eInformation"
         >
           {t('usb_to_ethernet_adapter_info')}
-        </StyledText>
-        <StyledText as="p">
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
           {t('usb_to_ethernet_adapter_info_description')}
-        </StyledText>
+        </LegacyStyledText>
         {driverOutdated && (
           <Banner type="warning" marginTop={SPACING.spacing16}>
             <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-              <StyledText as="p" color={COLORS.black90}>
+              <LegacyStyledText as="p" color={COLORS.black90}>
                 {t('usb_to_ethernet_adapter_toast_message')}
-              </StyledText>
+              </LegacyStyledText>
               <Link
                 external
                 href={REALTEK_URL}
@@ -67,9 +67,9 @@ export function U2EInformation(): JSX.Element {
           </Banner>
         )}
         {device === null ? (
-          <StyledText as="p" marginTop={SPACING.spacing16}>
+          <LegacyStyledText as="p" marginTop={SPACING.spacing16}>
             {t('usb_to_ethernet_not_connected')}
-          </StyledText>
+          </LegacyStyledText>
         ) : (
           <Flex
             justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -79,37 +79,37 @@ export function U2EInformation(): JSX.Element {
               flexDirection={DIRECTION_COLUMN}
               paddingRight={SPACING.spacing16}
             >
-              <StyledText css={TYPOGRAPHY.pSemiBold}>
+              <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
                 {t('usb_to_ethernet_adapter_description')}
-              </StyledText>
-              <StyledText as="p">
+              </LegacyStyledText>
+              <LegacyStyledText as="p">
                 {device?.productName ?? t('usb_to_ethernet_unknown_product')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
             <Flex
               flexDirection={DIRECTION_COLUMN}
               paddingRight={SPACING.spacing16}
             >
-              <StyledText css={TYPOGRAPHY.pSemiBold}>
+              <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
                 {t('usb_to_ethernet_adapter_manufacturer')}
-              </StyledText>
-              <StyledText as="p">
+              </LegacyStyledText>
+              <LegacyStyledText as="p">
                 {device?.manufacturerName ??
                   t('usb_to_ethernet_unknown_manufacturer')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
             <Flex
               flexDirection={DIRECTION_COLUMN}
               paddingRight={SPACING.spacing16}
             >
-              <StyledText css={TYPOGRAPHY.pSemiBold}>
+              <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
                 {t('usb_to_ethernet_adapter_driver_version')}
-              </StyledText>
-              <StyledText as="p">
+              </LegacyStyledText>
+              <LegacyStyledText as="p">
                 {device?.windowsDriverVersion != null
                   ? device.windowsDriverVersion
                   : t('usb_to_ethernet_adapter_no_driver_version')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </Flex>
         )}

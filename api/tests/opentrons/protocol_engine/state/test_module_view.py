@@ -17,8 +17,8 @@ from typing import (
     cast,
 )
 
-from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.deck.types import DeckDefinitionV5
 
 from opentrons_shared_data import load_shared_data
 from opentrons.types import DeckSlotName, MountType
@@ -87,6 +87,23 @@ def get_addressable_area_view(
         or {},
         deck_definition=deck_definition or cast(DeckDefinitionV5, {"otId": "fake"}),
         deck_configuration=deck_configuration or [],
+        robot_definition={
+            "displayName": "OT-3",
+            "robotType": "OT-3 Standard",
+            "models": ["OT-3 Standard"],
+            "extents": [477.2, 493.8, 0.0],
+            "paddingOffsets": {
+                "rear": -177.42,
+                "front": 51.8,
+                "leftSide": 31.88,
+                "rightSide": -80.32,
+            },
+            "mountOffsets": {
+                "left": [-13.5, -60.5, 255.675],
+                "right": [40.5, -60.5, 255.675],
+                "gripper": [84.55, -12.75, 93.85],
+            },
+        },
         robot_type=robot_type,
         use_simulated_deck_config=use_simulated_deck_config,
     )
@@ -115,6 +132,7 @@ def make_module_view(
         module_offset_by_serial=module_offset_by_serial or {},
         additional_slots_occupied_by_module_id=additional_slots_occupied_by_module_id
         or {},
+        deck_fixed_labware=[],
     )
 
     return ModuleView(state=state)

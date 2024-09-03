@@ -2,8 +2,8 @@
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.robot.types import RobotType
 from opentrons.types import MountType, Point
 
 from opentrons.protocol_engine.errors import InvalidSpecificationForRobotTypeError
@@ -12,7 +12,7 @@ from opentrons.protocol_engine.execution import LoadedPipetteData, EquipmentHand
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
 )
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.load_pipette import (
     LoadPipetteParams,
@@ -23,10 +23,27 @@ from opentrons.protocol_engine.commands.load_pipette import (
 from ..pipette_fixtures import get_default_nozzle_map
 
 
+@pytest.mark.parametrize(
+    "data",
+    [
+        LoadPipetteParams(
+            pipetteName=PipetteNameType.P300_SINGLE,
+            mount=MountType.LEFT,
+            pipetteId="some id",
+        ),
+        LoadPipetteParams(
+            pipetteName=PipetteNameType.P300_SINGLE,
+            mount=MountType.LEFT,
+            pipetteId="some id",
+            tipOverlapNotAfterVersion="v2",
+        ),
+    ],
+)
 async def test_load_pipette_implementation(
     decoy: Decoy,
     equipment: EquipmentHandler,
     state_view: StateView,
+    data: LoadPipetteParams,
 ) -> None:
     """A LoadPipette command should have an execution implementation."""
     subject = LoadPipetteImplementation(equipment=equipment, state_view=state_view)
@@ -46,11 +63,7 @@ async def test_load_pipette_implementation(
         nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI),
         back_left_corner_offset=Point(x=1, y=2, z=3),
         front_right_corner_offset=Point(x=4, y=5, z=6),
-    )
-    data = LoadPipetteParams(
-        pipetteName=PipetteNameType.P300_SINGLE,
-        mount=MountType.LEFT,
-        pipetteId="some id",
+        pipette_lld_settings={},
     )
 
     decoy.when(
@@ -58,6 +71,7 @@ async def test_load_pipette_implementation(
             pipette_name=PipetteNameType.P300_SINGLE,
             mount=MountType.LEFT,
             pipette_id="some id",
+            tip_overlap_version=data.tipOverlapNotAfterVersion,
         )
     ).then_return(
         LoadedPipetteData(
@@ -106,6 +120,7 @@ async def test_load_pipette_implementation_96_channel(
         nozzle_map=get_default_nozzle_map(PipetteNameType.P1000_96),
         back_left_corner_offset=Point(x=1, y=2, z=3),
         front_right_corner_offset=Point(x=4, y=5, z=6),
+        pipette_lld_settings={},
     )
 
     decoy.when(
@@ -113,6 +128,7 @@ async def test_load_pipette_implementation_96_channel(
             pipette_name=PipetteNameType.P1000_96,
             mount=MountType.LEFT,
             pipette_id="some id",
+            tip_overlap_version=None,
         )
     ).then_return(
         LoadedPipetteData(

@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { ProtocolUploadInput } from './ProtocolUploadInput'
@@ -22,9 +22,9 @@ export function ProtocolsEmptyState(): JSX.Element | null {
       paddingTop={SPACING.spacing32}
       transform="translateY(25%)"
     >
-      <StyledText role="complementary" as="h1">
+      <LegacyStyledText role="complementary" as="h1">
         {t('import_a_file')}
-      </StyledText>
+      </LegacyStyledText>
       <ProtocolUploadInput />
       <EmptyStateLinks title={t('no_protocol_yet')} />
     </Flex>

@@ -26,6 +26,8 @@ import type {
   LabwareWellGroup as WellGroup,
   LabwareOffset as Offset,
   LabwareVolumeUnits as VolumeUnits,
+  ModuleModel,
+  LabwareOffset,
 } from '../types'
 
 // NOTE: leaving this 'beta' to reduce conflicts with future labware cloud namespaces
@@ -62,6 +64,8 @@ export interface BaseLabwareProps {
   namespace?: string
   loadNamePostfix?: string[]
   strict?: boolean | null // If true, throws error on failed validation
+  stackingOffsetWithLabware?: Record<string, LabwareOffset>
+  stackingOffsetWithModule?: Record<ModuleModel, LabwareOffset>
 }
 
 export interface RegularLabwareProps extends BaseLabwareProps {
@@ -354,7 +358,16 @@ export function createDefaultDisplayName(args: RegularNameProps): string {
 // For further info on these parameters look at labware examples in __tests__
 // or the labware definition schema in labware/schemas/
 export function createRegularLabware(args: RegularLabwareProps): Definition {
-  const { offset, dimensions, grid, spacing, well, loadNamePostfix } = args
+  const {
+    offset,
+    dimensions,
+    grid,
+    spacing,
+    well,
+    loadNamePostfix,
+    stackingOffsetWithLabware,
+    stackingOffsetWithModule,
+  } = args
   const strict = args.strict
   const version = args.version || 1
   const namespace = args.namespace || DEFAULT_CUSTOM_NAMESPACE
@@ -393,6 +406,8 @@ export function createRegularLabware(args: RegularLabwareProps): Definition {
         y: 0,
         z: 0,
       },
+      stackingOffsetWithLabware,
+      stackingOffsetWithModule,
     },
     strict
   )

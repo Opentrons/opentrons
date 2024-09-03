@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { it, describe, beforeEach, afterEach, expect, vi } from 'vitest'
-import { fireEvent, cleanup } from '@testing-library/react'
+import { it, describe, beforeEach, expect, vi } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../localization'
+import { i18n } from '../../../../assets/localization'
 import { GoBack } from '../GoBack'
 
 const render = (props: React.ComponentProps<typeof GoBack>) => {
@@ -20,14 +20,10 @@ describe('GoBack', () => {
     }
   })
 
-  afterEach(() => {
-    cleanup()
-  })
-
   it('the go back renders and clicking on it calls prop', () => {
-    const { getByLabelText } = render(props)
+    render(props)
 
-    fireEvent.click(getByLabelText('GoBack_button'))
+    fireEvent.click(screen.getByLabelText('GoBack_button'))
     expect(props.onClick).toHaveBeenCalled()
   })
 })

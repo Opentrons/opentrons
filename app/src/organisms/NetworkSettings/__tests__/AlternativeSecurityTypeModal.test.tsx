@@ -6,15 +6,15 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { AlternativeSecurityTypeModal } from '../AlternativeSecurityTypeModal'
 
-import type { useHistory } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
 const mockFunc = vi.fn()
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof useHistory>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -55,6 +55,6 @@ describe('AlternativeSecurityTypeModal', () => {
     const button = screen.getByText('Connect via USB')
     fireEvent.click(button)
     expect(mockFunc).toHaveBeenCalled()
-    expect(mockPush).toHaveBeenCalledWith('/network-setup/usb')
+    expect(mockNavigate).toHaveBeenCalledWith('/network-setup/usb')
   })
 })

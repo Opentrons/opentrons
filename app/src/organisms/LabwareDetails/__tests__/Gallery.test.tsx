@@ -21,17 +21,17 @@ describe('Gallery', () => {
 
   it('renders one main SVG and no mini images if definition contains no images', () => {
     labwareImages.mock_definition = []
-    const [{ queryAllByTestId }] = render(props)
+    render(props)
 
     screen.getByTestId('gallery_main_svg')
-    expect(queryAllByTestId('gallery_mini_image')).toHaveLength(0)
+    expect(screen.queryAllByTestId('gallery_mini_image')).toHaveLength(0)
   })
 
   it('renders one main SVG and two mini images if definition contains one image', () => {
-    const [{ queryAllByTestId }] = render(props)
+    render(props)
 
     screen.getByTestId('gallery_main_svg')
-    expect(queryAllByTestId('gallery_mini_image')).toHaveLength(2)
+    expect(screen.queryAllByTestId('gallery_mini_image')).toHaveLength(2)
   })
 
   it('renders image in main image when mini image is clicked', () => {

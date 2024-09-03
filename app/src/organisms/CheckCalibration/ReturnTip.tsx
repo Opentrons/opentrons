@@ -6,7 +6,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 import uniq from 'lodash/uniq'
 
@@ -58,11 +58,11 @@ export function ReturnTip(props: CalibrationPanelProps): JSX.Element {
       minHeight="32rem"
     >
       <Flex alignSelf={ALIGN_STRETCH}>
-        <StyledText as="h1">
+        <LegacyStyledText as="h1">
           {onFinalPipette
             ? t('return_tip_and_exit')
             : t('return_tip_and_continue')}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <Flex
         width="100%"

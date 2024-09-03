@@ -111,7 +111,7 @@ export function EditLabwareOffDeck(
             window.confirm(
               t('warning.cancelForSure', {
                 adapterName: getLabwareDisplayName(labwareEntity.def),
-              })
+              }) as string
             ) && dispatch(deleteContainer({ labwareId: labwareEntity.id }))
           }}
         >

@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
-import { MemoryRouter, Route } from 'react-router-dom'
+import { screen } from '@testing-library/react'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 
@@ -28,10 +29,10 @@ vi.mock('../../../../redux/discovery')
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/devices/:robotName">
-        <DeviceDetails />
-      </Route>
-      <Route path="/devices">devices page</Route>
+      <Routes>
+        <Route path="/devices/:robotName" element={<DeviceDetails />} />
+        <Route path="/devices" element={<>devices page</>} />
+      </Routes>
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -48,9 +49,9 @@ describe('DeviceDetails', () => {
   })
 
   it('redirects to devices page when a robot is not found and not scanning', () => {
-    const [{ getByText }] = render('/devices/otie')
+    render('/devices/otie')
 
-    getByText('devices page')
+    screen.getByText('devices page')
   })
 
   it('renders null when a robot is not found and discovery client is scanning', () => {

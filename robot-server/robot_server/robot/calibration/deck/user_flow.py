@@ -41,8 +41,8 @@ from opentrons.protocols.api_support.deck_type import (
 from opentrons.types import Mount, Point, Location
 from opentrons.util import linal
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.pipette.types import LabwareUri
 
 from robot_server.robot.calibration.constants import TIP_RACK_LOOKUP_BY_MAX_VOL
 from robot_server.service.errors import RobotServerError
@@ -365,7 +365,7 @@ class DeckCalibrationUserFlow:
                 self._tip_rack._core.get_definition(),
             ).tipLength
         except cal_types.TipLengthCalNotFound:
-            tip_overlap = self._hw_pipette.tip_overlap.get(self._tip_rack.uri, 0)
+            tip_overlap = self._hw_pipette.tip_overlap["v0"].get(self._tip_rack.uri, 0)
             tip_length = self._tip_rack.tip_length
             return tip_length - tip_overlap
 

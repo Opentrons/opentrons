@@ -14,15 +14,15 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { MediumButton } from '../atoms/buttons'
-import { Modal } from '../molecules/Modal'
+import { OddModal } from '../molecules/OddModal'
 import { appRestart, sendLog } from '../redux/shell'
 
 import type { Dispatch } from '../redux/types'
-import type { ModalHeaderBaseProps } from '../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../molecules/OddModal/types'
 
 export function OnDeviceDisplayAppFallback({
   error,
@@ -38,9 +38,9 @@ export function OnDeviceDisplayAppFallback({
       name: ANALYTICS_ODD_APP_ERROR,
       properties: { errorMessage: error.message, robotSerialNumber },
     })
-    dispatch(appRestart(error.message))
+    dispatch(appRestart(error.message as string))
   }
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('error_boundary_title'),
     iconName: 'ot-alert',
     iconColor: COLORS.red50,
@@ -52,16 +52,16 @@ export function OnDeviceDisplayAppFallback({
   }, [])
 
   return (
-    <Modal header={modalHeader}>
+    <OddModal header={modalHeader}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
       >
-        <StyledText as="p">
+        <LegacyStyledText as="p">
           {t('branded:error_boundary_description')}
-        </StyledText>
+        </LegacyStyledText>
         <MediumButton
           width="100%"
           buttonType="alert"
@@ -69,6 +69,6 @@ export function OnDeviceDisplayAppFallback({
           onClick={handleRestartClick}
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

@@ -39,7 +39,9 @@ export function establishBrokerConnection(): Promise<void> {
       notifyLog.debug(`Successfully connected to ${robotName} on ${ip}`)
       void connectionStore
         .setConnected(client)
-        .then(() => establishListeners())
+        .then(() => {
+          establishListeners()
+        })
         .catch((error: Error) => notifyLog.debug(error.message))
     })
     .catch((error: Error) => {

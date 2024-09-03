@@ -23,7 +23,7 @@ from ..pipette_definition import (
     PlungerEjectDropTipConfiguration,
 )
 
-from ..dev_types import PipetteModelSpec
+from ..types import PipetteModelSpec
 
 
 PIPETTE_DEFINITION_ROOT = Path("pipette") / "definitions" / "2"
@@ -65,11 +65,7 @@ def _build_pickup_tip_data(
     )
     return PickUpTipConfigurations(
         pressFit=PressFitPickUpTipConfiguration(
-            speedByTipCount={},
-            presses=presses,
-            increment=increment,
-            distanceByTipCount={},
-            currentByTipCount={},
+            presses=presses, increment=increment, configurationsByNozzleMap={}
         )
     )
 

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 
@@ -13,7 +13,7 @@ const render = (
   props: Partial<React.ComponentProps<typeof ProtocolAnalysisFailure>> = {}
 ) => {
   return renderWithProviders(
-    <StaticRouter>
+    <MemoryRouter>
       <ProtocolAnalysisFailure
         {...{
           protocolKey: 'fakeProtocolKey',
@@ -21,7 +21,7 @@ const render = (
           ...props,
         }}
       />
-    </StaticRouter>,
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }
@@ -44,8 +44,8 @@ describe('ProtocolAnalysisFailure', () => {
     expect(screen.queryByRole('button', { name: 'close' })).toBeNull()
   })
   it('dispatches reanalyze action on click', () => {
-    const [{ getByRole }, store] = render()
-    const reanalyzeButton = getByRole('button', { name: 'Reanalyze' })
+    const store = render()[1]
+    const reanalyzeButton = screen.getByRole('button', { name: 'Reanalyze' })
     fireEvent.click(reanalyzeButton)
     expect(store.dispatch).toHaveBeenCalledWith(
       analyzeProtocol('fakeProtocolKey')

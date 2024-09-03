@@ -132,14 +132,13 @@ const wellRatioUpdater = makeConditionalPatchUpdater(wellRatioUpdatesMap)
 export function updatePatchPathField(
   patch: FormPatch,
   rawForm: FormData,
-  pipetteEntities: PipetteEntities,
-  labwareEntities: LabwareEntities
+  pipetteEntities: PipetteEntities
 ): FormPatch {
   const { id, stepType, ...stepData } = rawForm
   const appliedPatch = { ...(stepData as FormPatch), ...patch }
   const { path, changeTip } = appliedPatch
 
-  if (!path) {
+  if (path == null) {
     // invalid well ratio - fall back to 'single'
     return { ...patch, path: 'single' }
   }
@@ -147,15 +146,14 @@ export function updatePatchPathField(
   let pipetteCapacityExceeded = false
 
   if (
-    appliedPatch.volume &&
+    appliedPatch.volume != null &&
     typeof appliedPatch.pipette === 'string' &&
     appliedPatch.pipette in pipetteEntities
   ) {
     pipetteCapacityExceeded = !volumeInCapacityForMulti(
       // @ts-expect-error(sa, 2021-6-14): appliedPatch is not of type FormData, address in #3161
       appliedPatch,
-      pipetteEntities,
-      labwareEntities
+      pipetteEntities
     )
   }
 
@@ -192,7 +190,8 @@ const updatePatchOnLabwareChange = (
     ? {
         ...getDefaultFields(
           'aspirate_mmFromBottom',
-          'aspirate_touchTip_mmFromBottom'
+          'aspirate_touchTip_mmFromBottom',
+          'aspirate_touchTip_checkbox'
         ),
         aspirate_wells: getDefaultWells({
           // @ts-expect-error(sa, 2021-6-14): appliedPatch.pipette is type ?unknown. Address in #3161
@@ -207,7 +206,8 @@ const updatePatchOnLabwareChange = (
     ? {
         ...getDefaultFields(
           'dispense_mmFromBottom',
-          'dispense_touchTip_mmFromBottom'
+          'dispense_touchTip_mmFromBottom',
+          'dispense_touchTip_checkbox'
         ),
         dispense_wells: getDefaultWells({
           // @ts-expect-error(sa, 2021-6-14): appliedPatch.pipette is type ?unknown. Address in #3161
@@ -218,6 +218,7 @@ const updatePatchOnLabwareChange = (
         }),
       }
     : {}
+
   return { ...sourceLabwarePatch, ...destLabwarePatch }
 }
 
@@ -271,7 +272,7 @@ const clampAspirateAirGapVolume = (
   const tipRack = rawForm.tipRack
 
   if (
-    patchedAspirateAirgapVolume &&
+    patchedAspirateAirgapVolume != null &&
     typeof pipetteId === 'string' &&
     pipetteId in pipetteEntities
   ) {
@@ -280,7 +281,7 @@ const clampAspirateAirGapVolume = (
     const minAirGapVolume = 0 // NOTE: a form level warning will occur if the air gap volume is below the pipette min volume
 
     const maxAirGapVolume =
-      getPipetteCapacity(pipetteEntity, tipRack) - minPipetteVolume
+      getPipetteCapacity(pipetteEntity, tipRack as string) - minPipetteVolume
     const clampedAirGapVolume = clamp(
       Number(patchedAspirateAirgapVolume),
       minAirGapVolume,
@@ -297,18 +298,21 @@ const clampAspirateAirGapVolume = (
 const clampDispenseAirGapVolume = (
   patch: FormPatch,
   rawForm: FormData,
-  pipetteEntities: PipetteEntities,
-  labwareEntities: LabwareEntities
+  pipetteEntities: PipetteEntities
 ): FormPatch => {
   const { id, stepType, ...stepData } = rawForm
   const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
   // @ts-expect-error(sa, 2021-6-14): appliedPatch.pipette does not exist. Address in #3161
   const pipetteId: string = appliedPatch.pipette
-  // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_checkbox does not exist. Address in #3161
-  const disposalVolume = appliedPatch.disposalVolume_checkbox
-    ? // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_volume does not exist. Address in #3161
-      Number(appliedPatch.disposalVolume_volume) || 0
-    : 0
+  const disposalVolume =
+    // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_volume does not exist. Address in #3161
+    appliedPatch.disposalVolume_checkbox != null
+      ? // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_volume does not exist. Address in #3161
+        isNaN(Number(appliedPatch.disposalVolume_volume))
+        ? 0
+        : // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_volume does not exist. Address in #3161
+          Number(appliedPatch.disposalVolume_volume)
+      : 0
   // @ts-expect-error(sa, 2021-6-14): appliedPatch.volume does not exist. Address in #3161
   const transferVolume = Number(appliedPatch.volume)
   // @ts-expect-error(sa, 2021-6-14): appliedPatch.dispense_airGap_volume does not exist. Address in #3161
@@ -317,12 +321,12 @@ const clampDispenseAirGapVolume = (
   const tipRack = String(appliedPatch.tipRack)
   if (
     // @ts-expect-error(sa, 2021-6-14): appliedPatch.dispense_airGap_volume does not exist. Address in #3161
-    appliedPatch.dispense_airGap_volume &&
+    appliedPatch.dispense_airGap_volume != null &&
     typeof pipetteId === 'string' &&
     pipetteId in pipetteEntities
   ) {
     const pipetteEntity = pipetteEntities[pipetteId]
-    const capacity = getPipetteCapacity(pipetteEntity, labwareEntities, tipRack)
+    const capacity = getPipetteCapacity(pipetteEntity, tipRack)
     const minAirGapVolume = 0 // NOTE: a form level warning will occur if the air gap volume is below the pipette min volume
 
     const maxAirGapVolume =
@@ -350,7 +354,7 @@ const updatePatchDisposalVolumeFields = (
   const { id, stepType, ...stepData } = rawForm
   const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
   const pathChangedFromMultiDispense =
-    patch.path &&
+    patch.path != null &&
     patch.path !== 'multiDispense' &&
     rawForm.path === 'multiDispense'
 
@@ -362,8 +366,8 @@ const updatePatchDisposalVolumeFields = (
 
   const shouldReinitializeDisposalVolume =
     (patch.path === 'multiDispense' && rawForm.path !== 'multiDispense') ||
-    (patch.pipette && patch.pipette !== rawForm.pipette) ||
-    patch.disposalVolume_checkbox
+    (patch.pipette != null && patch.pipette !== rawForm.pipette) ||
+    Boolean(patch.disposalVolume_checkbox)
 
   if (
     shouldReinitializeDisposalVolume &&
@@ -402,8 +406,7 @@ const updatePatchDisposalVolumeFields = (
 const clampDisposalVolume = (
   patch: FormPatch,
   rawForm: FormData,
-  pipetteEntities: PipetteEntities,
-  labwareEntities: LabwareEntities
+  pipetteEntities: PipetteEntities
 ): FormPatch => {
   const { id, stepType, ...stepData } = rawForm
   const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
@@ -414,8 +417,7 @@ const clampDisposalVolume = (
   const maxDisposalVolume = getMaxDisposalVolumeForMultidispense(
     // @ts-expect-error(sa, 2021-6-14): appliedPatch isn't well-typed, address in #3161
     appliedPatch,
-    pipetteEntities,
-    labwareEntities
+    pipetteEntities
   )
 
   if (maxDisposalVolume == null) {
@@ -447,7 +449,7 @@ const clampDisposalVolume = (
     ? {
         ...patch,
         // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_checkbox does not exist. Address in #3161
-        disposalVolume_volume: appliedPatch.disposalVolume_checkbox
+        disposalVolume_volume: Boolean(appliedPatch.disposalVolume_checkbox)
           ? '0'
           : null,
       }
@@ -462,13 +464,18 @@ const updatePatchOnPipetteChannelChange = (
 ): FormPatch => {
   if (patch.pipette === undefined) return patch
   let update: FormPatch = {}
-  const prevChannels = getChannels(rawForm.pipette, pipetteEntities)
+  const prevChannels = getChannels(rawForm.pipette as string, pipetteEntities)
   const nextChannels =
     typeof patch.pipette === 'string'
       ? getChannels(patch.pipette, pipetteEntities)
       : null
   const { id, stepType, ...stepData } = rawForm
-  const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
+  const appliedPatch: FormPatch = {
+    ...(stepData as FormPatch),
+    ...patch,
+    id,
+    stepType,
+  }
   const singleToMulti =
     prevChannels === 1 && (nextChannels === 8 || nextChannels === 96)
   const multiToSingle =
@@ -500,26 +507,22 @@ const updatePatchOnPipetteChannelChange = (
       channels = 96
     }
     // multi-channel to single-channel: convert primary wells to all wells
-    // @ts-expect-error(sa, 2021-06-14): appliedPatch.aspirate_labware is type ?unknown. Address in #3161
-    const sourceLabwareId: string = appliedPatch.aspirate_labware
-    // @ts-expect-error(sa, 2021-06-14): appliedPatch.dispense_labware is type ?unknown. Address in #3161
-    const destLabwareId: string = appliedPatch.dispense_labware
-    const sourceLabware = sourceLabwareId && labwareEntities[sourceLabwareId]
-    const sourceLabwareDef = sourceLabware && sourceLabware.def
-    const destLabware = destLabwareId && labwareEntities[destLabwareId]
-    const destLabwareDef = destLabware && destLabware.def
+    const sourceLabwareId: string = appliedPatch.aspirate_labware as string
+    const destLabwareId: string = appliedPatch.dispense_labware as string
+    const sourceLabware = labwareEntities[sourceLabwareId]
+    const sourceLabwareDef = sourceLabware.def
+    const destLabware = labwareEntities[destLabwareId]
+    const destLabwareDef = destLabware.def
     update = {
       aspirate_wells: getAllWellsFromPrimaryWells(
-        // @ts-expect-error(sa, 2021-06-14): appliedPatch.aspirate_wells is type ?unknown. Address in #3161
-        appliedPatch.aspirate_wells, // @ts-expect-error(sa, 2021-06-14): sourceLabwareDef is not typed properly. Address in #3161
+        appliedPatch.aspirate_wells as string[],
         sourceLabwareDef,
-        channels
+        channels as 8 | 96
       ),
       dispense_wells: getAllWellsFromPrimaryWells(
-        // @ts-expect-error(sa, 2021-06-14): appliedPatch.dispense_wells is type ?unknown. Address in #3161
-        appliedPatch.dispense_wells, // @ts-expect-error(sa, 2021-06-14): destLabwareDef is not typed properly. Address in #3161
+        appliedPatch.dispense_wells as string[],
         destLabwareDef,
-        channels
+        channels as 8 | 96
       ),
     }
   }
@@ -533,18 +536,18 @@ function updatePatchOnWellRatioChange(
 ): FormPatch {
   const appliedPatch = { ...rawForm, ...patch }
   const prevWellRatio = getWellRatio(
-    rawForm.aspirate_wells,
-    rawForm.dispense_wells
+    rawForm.aspirate_wells as string[],
+    rawForm.dispense_wells as string[]
   )
   const nextWellRatio = getWellRatio(
-    appliedPatch.aspirate_wells,
-    appliedPatch.dispense_wells
+    appliedPatch.aspirate_wells as string[],
+    appliedPatch.dispense_wells as string[]
   )
 
-  if (!nextWellRatio || !prevWellRatio) {
+  if (nextWellRatio == null || prevWellRatio == null) {
     // selected invalid well combo (eg 2:3, 0:1, etc). Reset path to 'single' and reset changeTip if invalid
     const resetChangeTip = ['perSource', 'perDest'].includes(
-      appliedPatch.changeTip
+      appliedPatch.changeTip as string
     )
     const resetPath = { ...patch, path: 'single' }
     return resetChangeTip ? { ...resetPath, changeTip: 'always' } : resetPath
@@ -562,7 +565,7 @@ function updatePatchOnWellRatioChange(
 }
 
 function updatePatchMixFields(patch: FormPatch, rawForm: FormData): FormPatch {
-  if (patch.path) {
+  if (patch.path != null) {
     if (patch.path === 'multiAspirate') {
       return {
         ...patch,
@@ -594,10 +597,14 @@ export function updatePatchBlowoutFields(
   rawForm: FormData
 ): FormPatch {
   const { id, stepType, ...stepData } = rawForm
-  const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
+  const appliedPatch: FormPatch = {
+    ...(stepData as FormPatch),
+    ...patch,
+    id,
+    stepType,
+  }
 
   if (fieldHasChanged(rawForm, patch, 'path')) {
-    // @ts-expect-error(sa, 2021-06-14): appliedPatch.blowout_location does not exist. Address in #3161
     const { path, blowout_location } = appliedPatch
     // reset blowout_location when path changes to avoid invalid location for path
     // or reset whenever checkbox is toggled
@@ -639,32 +646,15 @@ export function dependentFieldsUpdateMoveLiquid(
     chainPatch =>
       updatePatchOnPipetteChange(chainPatch, rawForm, pipetteEntities),
     chainPatch => updatePatchOnWellRatioChange(chainPatch, rawForm),
-    chainPatch =>
-      updatePatchPathField(
-        chainPatch,
-        rawForm,
-        pipetteEntities,
-        labwareEntities
-      ),
+    chainPatch => updatePatchPathField(chainPatch, rawForm, pipetteEntities),
     chainPatch =>
       updatePatchDisposalVolumeFields(chainPatch, rawForm, pipetteEntities),
     chainPatch =>
       clampAspirateAirGapVolume(chainPatch, rawForm, pipetteEntities),
-    chainPatch =>
-      clampDisposalVolume(
-        chainPatch,
-        rawForm,
-        pipetteEntities,
-        labwareEntities
-      ),
+    chainPatch => clampDisposalVolume(chainPatch, rawForm, pipetteEntities),
     chainPatch => updatePatchMixFields(chainPatch, rawForm),
     chainPatch => updatePatchBlowoutFields(chainPatch, rawForm),
     chainPatch =>
-      clampDispenseAirGapVolume(
-        chainPatch,
-        rawForm,
-        pipetteEntities,
-        labwareEntities
-      ),
+      clampDispenseAirGapVolume(chainPatch, rawForm, pipetteEntities),
   ])
 }

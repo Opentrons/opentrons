@@ -36,11 +36,9 @@ export function useCreateLabwareDefinitionMutation(): UseCreateLabwareDefinition
   >(({ runId, data }) =>
     createLabwareDefinition(host as HostConfig, runId, data)
       .then(response => {
-        queryClient
-          .invalidateQueries([host, 'runs'])
-          .catch((e: Error) =>
-            console.error(`error invalidating runs query: ${e.message}`)
-          )
+        queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
+          console.error(`error invalidating runs query: ${e.message}`)
+        })
         return response.data
       })
       .catch((e: Error) => {

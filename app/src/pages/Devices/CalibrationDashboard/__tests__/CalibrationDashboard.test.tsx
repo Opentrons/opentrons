@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { vi, describe, it, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-import { MemoryRouter, Route } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
@@ -27,9 +27,12 @@ vi.mock('../../../../resources/runs')
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/devices/:robotName/robot-settings/calibration/dashboard">
-        <CalibrationDashboard />
-      </Route>
+      <Routes>
+        <Route
+          path="/devices/:robotName/robot-settings/calibration/dashboard"
+          element={<CalibrationDashboard />}
+        />
+      </Routes>
     </MemoryRouter>,
     {
       i18nInstance: i18n,

@@ -13,17 +13,23 @@ import type { ProtocolResource } from '@opentrons/shared-data'
 import type { CardSizeType } from './PinnedProtocol'
 import styled from 'styled-components'
 
-export function PinnedProtocolCarousel(props: {
+interface PinnedProtocolCarouselProps {
   pinnedProtocols: ProtocolResource[]
   longPress: React.Dispatch<React.SetStateAction<boolean>>
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
   setTargetProtocolId: (targetProtocolId: string) => void
-}): JSX.Element {
+  isRequiredCSV?: boolean
+}
+
+export function PinnedProtocolCarousel(
+  props: PinnedProtocolCarouselProps
+): JSX.Element {
   const {
     pinnedProtocols,
     longPress,
     setShowDeleteConfirmationModal,
     setTargetProtocolId,
+    isRequiredCSV = false,
   } = props
   const runs = useNotifyAllRunsQuery()
   const cardSize = (): CardSizeType => {
@@ -54,6 +60,7 @@ export function PinnedProtocolCarousel(props: {
               longPress={longPress}
               setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
               setTargetProtocolId={setTargetProtocolId}
+              isRequiredCSV={isRequiredCSV}
             />
           )
         })}

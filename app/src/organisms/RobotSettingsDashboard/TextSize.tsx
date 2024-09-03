@@ -14,7 +14,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -47,17 +47,22 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex justifyContent={JUSTIFY_FLEX_START} alignItems={ALIGN_CENTER}>
         <Btn
-          onClick={() => setCurrentOption(null)}
+          onClick={() => {
+            setCurrentOption(null)
+          }}
           data-testid="DisplayTextSize_back_button"
         >
           <Icon name="chevron-left" size="2.5rem" />
         </Btn>
-        <StyledText fontSize="2rem" textAlign={TYPOGRAPHY.textAlignCenter}>
+        <LegacyStyledText
+          fontSize="2rem"
+          textAlign={TYPOGRAPHY.textAlignCenter}
+        >
           {t('text_size')}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} marginTop="8.125rem">
-        <StyledText
+        <LegacyStyledText
           textSize="1.375rem"
           lineHeight="1.75rem"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -65,7 +70,7 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {t('text_size_description')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex
           flexDirection={DIRECTION_ROW}
           width="56.5rem"
@@ -75,7 +80,9 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
           justifyContent={JUSTIFY_CENTER}
         >
           <Btn
-            onClick={() => handleClick('down')}
+            onClick={() => {
+              handleClick('down')
+            }}
             data-testid="DisplayTextSize_decrease"
           >
             <Icon size="5rem" name="minus" />
@@ -88,7 +95,9 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
           </Flex>
 
           <Btn
-            onClick={() => handleClick('up')}
+            onClick={() => {
+              handleClick('up')
+            }}
             data-testid="DisplayTextSize_increase"
           >
             <Icon size="5rem" name="plus" />

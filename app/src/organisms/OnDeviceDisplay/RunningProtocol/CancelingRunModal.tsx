@@ -10,16 +10,16 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Modal } from '../../../molecules/Modal'
+import { OddModal } from '../../../molecules/OddModal'
 
 export function CancelingRunModal(): JSX.Element {
   const { t, i18n } = useTranslation('run_details')
 
   return (
-    <Modal>
+    <OddModal>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_CENTER}
@@ -37,10 +37,10 @@ export function CancelingRunModal(): JSX.Element {
           color={COLORS.grey60}
           aria-label="CancelingRunModal_icon"
         />
-        <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
+        <LegacyStyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {i18n.format(t('canceling_run_dot'), 'capitalize')}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

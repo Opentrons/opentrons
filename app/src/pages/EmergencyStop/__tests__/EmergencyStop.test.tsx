@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { useEstopQuery } from '@opentrons/react-api-client'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
 import { EmergencyStop } from '..'
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('@opentrons/react-api-client')
 
@@ -19,12 +19,12 @@ const mockDisconnectedEstop = {
     rightEstopPhysicalStatus: 'notPresent',
   },
 } as any
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof ReactRouterDom>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -44,13 +44,15 @@ describe('EmergencyStop', () => {
   })
 
   it('should render text, image, and button when e-stop button is not connected', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText(
+    render()
+    screen.getByText(
       'Connect the E-stop to an auxiliary port on the back of the robot.'
     )
-    getByText('Continue')
-    expect(getByRole('button')).toBeDisabled()
-    expect(getByRole('img').getAttribute('src')).toContain(ESTOP_IMAGE_NAME)
+    screen.getByText('Continue')
+    expect(screen.getByRole('button')).toBeDisabled()
+    expect(screen.getByRole('img').getAttribute('src')).toContain(
+      ESTOP_IMAGE_NAME
+    )
   })
 
   it('should render text, icon, button when e-stop button is connected', () => {
@@ -64,10 +66,10 @@ describe('EmergencyStop', () => {
     vi.mocked(useEstopQuery).mockReturnValue({
       data: mockConnectedEstop,
     } as any)
-    const [{ getByText, getByTestId, getByRole }] = render()
-    getByTestId('EmergencyStop_connected_icon')
-    getByText('E-stop successfully connected')
-    expect(getByRole('button')).not.toBeDisabled()
+    render()
+    screen.getByTestId('EmergencyStop_connected_icon')
+    screen.getByText('E-stop successfully connected')
+    expect(screen.getByRole('button')).not.toBeDisabled()
   })
 
   it('should call a mock function when tapping continue button', () => {
@@ -81,8 +83,8 @@ describe('EmergencyStop', () => {
     vi.mocked(useEstopQuery).mockReturnValue({
       data: mockConnectedEstop,
     } as any)
-    const [{ getByRole }] = render()
-    fireEvent.click(getByRole('button'))
-    expect(mockPush).toHaveBeenCalledWith('/robot-settings/rename-robot')
+    render()
+    fireEvent.click(screen.getByRole('button'))
+    expect(mockNavigate).toHaveBeenCalledWith('/robot-settings/rename-robot')
   })
 })

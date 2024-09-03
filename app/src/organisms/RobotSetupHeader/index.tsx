@@ -10,7 +10,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -52,9 +52,9 @@ export function RobotSetupHeader({
             <Icon name="back" size="3rem" color={COLORS.black90} />
           </Btn>
         ) : null}
-        <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+        <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {header}
-        </StyledText>
+        </LegacyStyledText>
         {onClickButton != null && buttonText != null ? (
           <SmallButton
             buttonCategory="rounded"

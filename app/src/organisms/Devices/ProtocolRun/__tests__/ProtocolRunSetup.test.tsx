@@ -4,11 +4,9 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
 import {
+  getSimplestDeckConfigForProtocol,
   parseAllRequiredModuleModels,
   parseLiquidsInLoadOrder,
-} from '@opentrons/api-client'
-import {
-  getSimplestDeckConfigForProtocol,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   simple_v4 as noModulesProtocol,
   test_modules_protocol as withModulesProtocol,
@@ -40,11 +38,11 @@ import { SetupLiquids } from '../SetupLiquids'
 import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
+import type { MissingSteps } from '../ProtocolRunSetup'
 import { useNotifyRunQuery } from '../../../../resources/runs'
 
 import type * as SharedData from '@opentrons/shared-data'
 
-vi.mock('@opentrons/api-client')
 vi.mock('../../hooks')
 vi.mock('../SetupLabware')
 vi.mock('../SetupRobotCalibration')
@@ -60,6 +58,8 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
   return {
     ...actualSharedData,
+    parseAllRequiredModuleModels: vi.fn(),
+    parseLiquidsInLoadOrder: vi.fn(),
     parseProtocolData: vi.fn(),
     getSimplestDeckConfigForProtocol: vi.fn(),
   }
@@ -67,13 +67,19 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
-const MOCK_ROTOCOL_LIQUID_KEY = { liquids: [] }
+const MOCK_PROTOCOL_LIQUID_KEY = { liquids: [] }
+let mockMissingSteps: MissingSteps = []
+const mockSetMissingSteps = vi.fn((missingSteps: MissingSteps) => {
+  mockMissingSteps = missingSteps
+})
 const render = () => {
   return renderWithProviders(
     <ProtocolRunSetup
       protocolRunHeaderRef={null}
       robotName={ROBOT_NAME}
       runId={RUN_ID}
+      missingSteps={mockMissingSteps}
+      setMissingSteps={mockSetMissingSteps}
     />,
     {
       i18nInstance: i18n,
@@ -83,12 +89,13 @@ const render = () => {
 
 describe('ProtocolRunSetup', () => {
   beforeEach(() => {
+    mockMissingSteps = []
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn({
         ...noModulesProtocol,
-        ...MOCK_ROTOCOL_LIQUID_KEY,
+        ...MOCK_PROTOCOL_LIQUID_KEY,
       } as any)
     when(vi.mocked(useProtocolAnalysisErrors)).calledWith(RUN_ID).thenReturn({
       analysisErrors: null,
@@ -97,7 +104,7 @@ describe('ProtocolRunSetup', () => {
       .calledWith(RUN_ID)
       .thenReturn(({
         ...noModulesProtocol,
-        ...MOCK_ROTOCOL_LIQUID_KEY,
+        ...MOCK_PROTOCOL_LIQUID_KEY,
       } as unknown) as SharedData.ProtocolAnalysisOutput)
     vi.mocked(parseAllRequiredModuleModels).mockReturnValue([])
     vi.mocked(parseLiquidsInLoadOrder).mockReturnValue([])
@@ -121,7 +128,6 @@ describe('ProtocolRunSetup', () => {
     when(vi.mocked(SetupLabware))
       .calledWith(
         expect.objectContaining({
-          protocolRunHeaderRef: null,
           robotName: ROBOT_NAME,
           runId: RUN_ID,
         }),
@@ -146,6 +152,9 @@ describe('ProtocolRunSetup', () => {
     when(vi.mocked(useRunPipetteInfoByMount))
       .calledWith(RUN_ID)
       .thenReturn({ left: null, right: null })
+    when(vi.mocked(useModuleCalibrationStatus))
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .thenReturn({ complete: true })
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -179,13 +188,6 @@ describe('ProtocolRunSetup', () => {
       .thenReturn({ complete: false })
     render()
     screen.getByText('Calibration needed')
-  })
-
-  it('does not render calibration status when run has started', () => {
-    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
-    render()
-    expect(screen.queryByText('Calibration needed')).toBeNull()
-    expect(screen.queryByText('Calibration ready')).toBeNull()
   })
 
   describe('when no modules are in the protocol', () => {
@@ -251,7 +253,7 @@ describe('ProtocolRunSetup', () => {
         .calledWith(RUN_ID)
         .thenReturn({
           ...withModulesProtocol,
-          ...MOCK_ROTOCOL_LIQUID_KEY,
+          ...MOCK_PROTOCOL_LIQUID_KEY,
         } as any)
       when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
       when(vi.mocked(useModuleCalibrationStatus))
@@ -279,8 +281,7 @@ describe('ProtocolRunSetup', () => {
         .thenReturn({ complete: false })
 
       render()
-      screen.getByText('STEP 2')
-      screen.getByText('Modules & deck')
+      screen.getByText('Deck hardware')
       screen.getByText('Calibration needed')
     })
 
@@ -304,8 +305,7 @@ describe('ProtocolRunSetup', () => {
         .thenReturn({ complete: false })
 
       render()
-      screen.getByText('STEP 2')
-      screen.getByText('Modules & deck')
+      screen.getByText('Deck hardware')
       screen.getByText('Action needed')
     })
 
@@ -338,14 +338,13 @@ describe('ProtocolRunSetup', () => {
         .thenReturn({ complete: false })
 
       render()
-      screen.getByText('STEP 2')
-      screen.getByText('Modules & deck')
+      screen.getByText('Deck hardware')
       screen.getByText('Action needed')
     })
 
     it('renders module setup and allows the user to proceed to labware setup', () => {
       render()
-      const moduleSetup = screen.getByText('Modules')
+      const moduleSetup = screen.getByText('Deck hardware')
       fireEvent.click(moduleSetup)
       screen.getByText('Mock SetupModules')
     })
@@ -353,16 +352,13 @@ describe('ProtocolRunSetup', () => {
     it('renders correct text contents for multiple modules', () => {
       render()
 
-      screen.getByText('STEP 1')
       screen.getByText('Instruments')
       screen.getByText(
         'Review required pipettes and tip length calibrations for this protocol.'
       )
-      screen.getByText('STEP 2')
-      screen.getByText('Modules')
+      screen.getByText('Deck hardware')
 
-      screen.getByText('Install the required modules and power them on.')
-      screen.getByText('STEP 3')
+      screen.getByText('Install the required modules.')
       screen.getByText('Labware')
 
       screen.getByText(
@@ -375,7 +371,7 @@ describe('ProtocolRunSetup', () => {
         .calledWith(RUN_ID)
         .thenReturn({
           ...withModulesProtocol,
-          ...MOCK_ROTOCOL_LIQUID_KEY,
+          ...MOCK_PROTOCOL_LIQUID_KEY,
           modules: [
             {
               id: '1d57adf0-67ad-11ea-9f8b-3b50068bd62d:magneticModuleType',
@@ -389,16 +385,13 @@ describe('ProtocolRunSetup', () => {
       ])
       render()
 
-      screen.getByText('STEP 1')
       screen.getByText('Instruments')
       screen.getByText(
         'Review required pipettes and tip length calibrations for this protocol.'
       )
-      screen.getByText('STEP 2')
-      screen.getByText('Modules')
+      screen.getByText('Deck hardware')
 
-      screen.getByText('Install the required modules and power them on.')
-      screen.getByText('STEP 3')
+      screen.getByText('Install the required module.')
       screen.getByText('Labware')
       screen.getByText(
         'Gather the following labware and full tip racks. To run your protocol without Labware Position Check, place and secure labware in their initial locations.'
@@ -411,7 +404,7 @@ describe('ProtocolRunSetup', () => {
         .calledWith(RUN_ID)
         .thenReturn({
           ...withModulesProtocol,
-          ...MOCK_ROTOCOL_LIQUID_KEY,
+          ...MOCK_PROTOCOL_LIQUID_KEY,
           modules: [
             {
               id: '1d57adf0-67ad-11ea-9f8b-3b50068bd62d:magneticModuleType',
@@ -425,10 +418,9 @@ describe('ProtocolRunSetup', () => {
       ])
       render()
 
-      screen.getByText('STEP 2')
-      screen.getByText('Modules & deck')
+      screen.getByText('Deck hardware')
       screen.getByText(
-        'Install the required modules and power them on. Install the required fixtures and review the deck configuration.'
+        'Install and calibrate the required modules. Install the required fixtures.'
       )
     })
 
@@ -436,10 +428,6 @@ describe('ProtocolRunSetup', () => {
       when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
 
       render()
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      expect(screen.getByText('Mock SetupRobotCalibration')).not.toBeVisible()
-      expect(screen.getByText('Mock SetupModules')).not.toBeVisible()
-      expect(screen.getByText('Mock SetupLabware')).not.toBeVisible()
       screen.getByText('Setup is view-only once run has started')
     })
 

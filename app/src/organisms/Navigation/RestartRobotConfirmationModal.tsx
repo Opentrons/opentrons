@@ -8,15 +8,15 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { restartRobot } from '../../redux/robot-admin'
 
 import type { Dispatch } from '../../redux/types'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface RestartRobotConfirmationModalProps {
   robotName: string
@@ -29,7 +29,7 @@ export function RestartRobotConfirmationModal({
   setShowRestartRobotConfirmationModal,
 }: RestartRobotConfirmationModalProps): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('restart_now'),
     iconName: 'ot-alert',
     iconColor: COLORS.yellow50,
@@ -37,7 +37,7 @@ export function RestartRobotConfirmationModal({
   const dispatch = useDispatch<Dispatch>()
 
   return (
-    <Modal header={modalHeader}>
+    <OddModal header={modalHeader}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
@@ -50,7 +50,7 @@ export function RestartRobotConfirmationModal({
           components={{
             bold: <strong />,
             span: (
-              <StyledText
+              <LegacyStyledText
                 as="p"
                 data-testid="restart_robot_confirmation_description"
               />
@@ -61,7 +61,9 @@ export function RestartRobotConfirmationModal({
           <SmallButton
             flex="1"
             buttonText={t('shared:go_back')}
-            onClick={() => setShowRestartRobotConfirmationModal(false)}
+            onClick={() => {
+              setShowRestartRobotConfirmationModal(false)
+            }}
           />
           <SmallButton
             flex="1"
@@ -71,6 +73,6 @@ export function RestartRobotConfirmationModal({
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

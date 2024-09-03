@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { fireEvent, screen, cleanup } from '@testing-library/react'
+import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../localization'
+import { i18n } from '../../../assets/localization'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { getSlotIsEmpty } from '../../../step-forms'
 import { StagingAreasModal } from '../StagingAreasModal'
@@ -39,9 +39,6 @@ describe('StagingAreasModal', () => {
       modules: {},
     })
     vi.mocked(getSlotIsEmpty).mockReturnValue(true)
-  })
-  afterEach(() => {
-    cleanup()
   })
   it('renders the deck, header, and buttons work as expected', () => {
     render(props)

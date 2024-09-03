@@ -10,7 +10,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from './constants'
@@ -168,13 +168,13 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
           size={SPACING.spacing40}
         />
       )}
-      <StyledText
+      <LegacyStyledText
         fontSize={TYPOGRAPHY.fontSize28}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         lineHeight={TYPOGRAPHY.lineHeight36}
       >
         {buttonText}
-      </StyledText>
+      </LegacyStyledText>
     </Btn>
   )
 }

@@ -5,12 +5,12 @@ import {
   BORDERS,
   COLORS,
   Chip,
+  DeckInfoLabel,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LocationIcon,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -162,7 +162,9 @@ function FixtureTableItem({
           }
           onClick={
             isConflictingFixtureConfigured
-              ? () => setShowLocationConflictModal(true)
+              ? () => {
+                  setShowLocationConflictModal(true)
+                }
               : () => {
                   setCutoutId(cutoutId)
                   setProvidedFixtureOptions(compatibleCutoutFixtureIds)
@@ -186,7 +188,9 @@ function FixtureTableItem({
     <React.Fragment key={cutoutId}>
       {showLocationConflictModal ? (
         <LocationConflictModal
-          onCloseClick={() => setShowLocationConflictModal(false)}
+          onCloseClick={() => {
+            setShowLocationConflictModal(false)
+          }}
           cutoutId={cutoutId}
           requiredFixtureId={compatibleCutoutFixtureIds[0]}
           isOnDevice={true}
@@ -207,15 +211,15 @@ function FixtureTableItem({
         marginBottom={lastItem ? SPACING.spacing68 : 'none'}
       >
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {cutoutFixtureId != null &&
             (isCurrentFixtureCompatible || isRequiredSingleSlotMissing)
               ? getFixtureDisplayName(cutoutFixtureId)
               : getFixtureDisplayName(compatibleCutoutFixtureIds?.[0])}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
-          <LocationIcon slotName={getCutoutDisplayName(cutoutId)} />
+          <DeckInfoLabel deckLabel={getCutoutDisplayName(cutoutId)} />
         </Flex>
         <Flex
           flex="4 0 0"

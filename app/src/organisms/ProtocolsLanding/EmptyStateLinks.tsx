@@ -9,7 +9,7 @@ import {
   JUSTIFY_CENTER,
   Link,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -33,20 +33,20 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
       paddingBottom={SPACING.spacing8}
       width="96.5%"
     >
-      <StyledText
+      <LegacyStyledText
         role="complementary"
         as="p"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginBottom={SPACING.spacing8}
       >
         {props.title}
-      </StyledText>
+      </LegacyStyledText>
       <Flex
         justifyContent={JUSTIFY_CENTER}
         flexDirection={DIRECTION_ROW}
         flexWrap={WRAP}
       >
-        <StyledText>
+        <LegacyStyledText>
           <Link
             css={TYPOGRAPHY.darkLinkLabelSemiBold}
             href={PROTOCOL_LIBRARY_URL}
@@ -61,8 +61,8 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
               size="0.5rem"
             />
           </Link>
-        </StyledText>
-        <StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText>
           <Link
             css={TYPOGRAPHY.darkLinkLabelSemiBold}
             href={PROTOCOL_DESIGNER_URL}
@@ -78,8 +78,8 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
               size="0.5rem"
             />
           </Link>
-        </StyledText>
-        <StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText>
           <Link
             css={TYPOGRAPHY.darkLinkLabelSemiBold}
             href={API_DOCS_URL}
@@ -94,7 +94,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
               size="0.5rem"
             />
           </Link>
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
     </Flex>
   )

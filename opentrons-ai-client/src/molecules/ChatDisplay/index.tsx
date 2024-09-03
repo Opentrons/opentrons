@@ -16,7 +16,8 @@ import {
   POSITION_RELATIVE,
   PrimaryButton,
   SPACING,
-  StyledText,
+  LegacyStyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import type { ChatData } from '../../resources/types'
@@ -51,7 +52,9 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
       paddingRight={isUser ? undefined : SPACING.spacing40}
     >
       <Flex justifyContent={isUser ? JUSTIFY_FLEX_END : JUSTIFY_FLEX_START}>
-        <StyledText>{isUser ? t('you') : t('opentronsai')}</StyledText>
+        <LegacyStyledText>
+          {isUser ? t('you') : t('opentronsai')}
+        </LegacyStyledText>
       </Flex>
       {/* text should be markdown so this component will have a package or function to parse markdown */}
       <Flex
@@ -71,12 +74,13 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
             h2: HeaderText,
             li: ListItemText,
             p: ParagraphText,
-            a: ExternalLink,
+            a: isUser ? ParagraphText : ExternalLink,
             code: CodeText,
           }}
         >
           {reply}
         </Markdown>
+
         {!isUser ? (
           <PrimaryButton
             position={POSITION_ABSOLUTE}
@@ -105,26 +109,34 @@ function ExternalLink(props: JSX.IntrinsicAttributes): JSX.Element {
 }
 
 function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="p" />
+  return (
+    <LegacyStyledText
+      {...props}
+      fontSize={TYPOGRAPHY.fontSize20}
+      lineHeight={TYPOGRAPHY.lineHeight24}
+    />
+  )
 }
 
 function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="h3" />
+  return <LegacyStyledText {...props} as="h3" />
 }
 
 function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="li" />
+  return <LegacyStyledText {...props} as="li" marginLeft={SPACING.spacing16} />
 }
 
 function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="ul" />
+  return <LegacyStyledText {...props} as="ul" />
 }
 
 const CodeWrapper = styled(Flex)`
+  display: inline-flex;
   font-family: monospace;
-  padding: ${SPACING.spacing16};
-  color: ${COLORS.white};
-  background-color: ${COLORS.black90};
-  border-radius: ${BORDERS.borderRadius8};
+  padding: ${SPACING.spacing4};
+  color: ${COLORS.black80};
+  background-color: ${COLORS.grey20};
+  border-radius: ${BORDERS.borderRadius4};
   overflow: auto;
+  border: 1px solid ${COLORS.blue35};
 `

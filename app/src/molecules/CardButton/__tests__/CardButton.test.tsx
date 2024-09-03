@@ -7,15 +7,15 @@ import { COLORS } from '@opentrons/components'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { CardButton } from '..'
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
+  const reactRouterDom = await importOriginal<NavigateFunction>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
@@ -65,6 +65,6 @@ describe('CardButton', () => {
     render(props)
     const button = screen.getByRole('button')
     fireEvent.click(button)
-    expect(mockPush).toHaveBeenCalledWith('/mockPath')
+    expect(mockNavigate).toHaveBeenCalledWith('/mockPath')
   })
 })

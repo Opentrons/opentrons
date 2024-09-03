@@ -5,7 +5,7 @@ from opentrons.protocols.execution.types import LoadedLabware, Instruments
 from .execute_json_v3 import _get_well
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.protocol.dev_types import MoveToWellParams
+    from opentrons_shared_data.protocol.types import MoveToWellParams
 
 MODULE_LOG = logging.getLogger(__name__)
 

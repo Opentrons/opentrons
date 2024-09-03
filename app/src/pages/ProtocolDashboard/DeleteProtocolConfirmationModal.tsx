@@ -18,10 +18,10 @@ import {
 import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { useToaster } from '../../organisms/ToasterOven'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface DeleteProtocolConfirmationModalProps {
   protocolId: string
@@ -35,7 +35,7 @@ export function DeleteProtocolConfirmationModal({
   const { i18n, t } = useTranslation(['protocol_list', 'shared'])
   const { makeSnackbar } = useToaster()
   const [showIcon, setShowIcon] = React.useState<boolean>(false)
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('delete_this_protocol'),
     iconName: 'ot-alert',
     iconColor: COLORS.yellow50,
@@ -67,14 +67,14 @@ export function DeleteProtocolConfirmationModal({
         .then(() =>
           queryClient
             .invalidateQueries([host, 'protocols'])
-            .catch((e: Error) =>
+            .catch((e: Error) => {
               console.error(`error invalidating runs query: ${e.message}`)
-            )
+            })
         )
         .then(() => {
           setShowIcon(false)
           setShowDeleteConfirmationModal(false)
-          makeSnackbar(t('protocol_deleted'))
+          makeSnackbar(t('protocol_deleted') as string)
         })
         .catch((e: Error) => {
           console.error(`error deleting resources: ${e.message}`)
@@ -86,7 +86,7 @@ export function DeleteProtocolConfirmationModal({
     }
   }
   return (
-    <Modal header={modalHeader}>
+    <OddModal header={modalHeader}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
@@ -116,7 +116,7 @@ export function DeleteProtocolConfirmationModal({
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }
 

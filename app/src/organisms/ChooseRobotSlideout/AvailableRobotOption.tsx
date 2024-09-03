@@ -12,7 +12,7 @@ import {
   Icon,
   SIZE_1,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -22,7 +22,7 @@ import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 import { appShellRequestor } from '../../redux/shell/remote'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import FLEX_PNG from '../../assets/images/FLEX.png'
-import { useNotifyAllRunsQuery } from '../../resources/runs'
+import { useCurrentRunId, useNotifyRunQuery } from '../../resources/runs'
 
 import type { IconName } from '@opentrons/components'
 import type { Runs } from '@opentrons/api-client'
@@ -59,14 +59,15 @@ export function AvailableRobotOption(
     getRobotModelByName(state, robotName)
   )
 
-  const { data: runsData } = useNotifyAllRunsQuery(
-    { pageLength: 0 },
+  const [isBusy, setIsBusy] = React.useState(true)
+
+  const currentRunId = useCurrentRunId(
     {
       onSuccess: data => {
-        if ((data as Runs)?.links?.current != null)
-          registerRobotBusyStatus({ type: 'robotIsBusy', robotName })
-        else {
+        const definitelyIdle = (data as Runs)?.links?.current == null
+        if (definitelyIdle) {
           registerRobotBusyStatus({ type: 'robotIsIdle', robotName })
+          setIsBusy(false)
         }
       },
     },
@@ -75,7 +76,28 @@ export function AvailableRobotOption(
       requestor: ip === OPENTRONS_USB ? appShellRequestor : undefined,
     }
   )
-  const robotHasCurrentRun = runsData?.links?.current != null
+
+  useNotifyRunQuery(
+    currentRunId,
+    {
+      onSuccess: data => {
+        const busy = data?.data != null && data.data.completedAt == null
+        registerRobotBusyStatus({
+          type: busy ? 'robotIsBusy' : 'robotIsIdle',
+          robotName,
+        })
+        setIsBusy(busy)
+      },
+      onError: () => {
+        registerRobotBusyStatus({ type: 'robotIsIdle', robotName })
+        setIsBusy(false)
+      },
+    },
+    {
+      hostname: ip,
+      requestor: ip === OPENTRONS_USB ? appShellRequestor : undefined,
+    }
+  )
 
   const { ethernet, wifi } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
@@ -95,7 +117,7 @@ export function AvailableRobotOption(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return showIdleOnly && robotHasCurrentRun ? null : (
+  return showIdleOnly && isBusy ? null : (
     <>
       <MiniCard
         onClick={onClick}
@@ -117,11 +139,11 @@ export function AvailableRobotOption(
           marginTop={SPACING.spacing8}
           marginBottom={SPACING.spacing16}
         >
-          <StyledText as="h6" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText as="h6" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {robotModel}
-          </StyledText>
+          </LegacyStyledText>
           <Box maxWidth="9.5rem">
-            <StyledText
+            <LegacyStyledText
               as="p"
               overflowWrap="break-word"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -134,7 +156,7 @@ export function AvailableRobotOption(
                 name={iconName ?? 'wifi'}
                 size={SIZE_1}
               />
-            </StyledText>
+            </LegacyStyledText>
           </Box>
         </Flex>
         {(isError || isSelectedRobotOnDifferentSoftwareVersion) &&
@@ -147,7 +169,7 @@ export function AvailableRobotOption(
       </MiniCard>
 
       {isSelectedRobotOnDifferentSoftwareVersion && isSelected ? (
-        <StyledText
+        <LegacyStyledText
           as="label"
           color={COLORS.red60}
           marginBottom={SPACING.spacing8}
@@ -165,7 +187,7 @@ export function AvailableRobotOption(
               robotLink: <NavLink to={`/devices/${robotName}`} />,
             }}
           />
-        </StyledText>
+        </LegacyStyledText>
       ) : null}
     </>
   )

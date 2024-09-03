@@ -38,6 +38,8 @@ import {
   THERMOCYCLER_V2_REAR_FIXTURE,
   THERMOCYCLER_MODULE_V2,
   THERMOCYCLER_V2_FRONT_FIXTURE,
+  ABSORBANCE_READER_V1_FIXTURE,
+  ABSORBANCE_READER_V1,
   MODULE_FIXTURES_BY_MODEL,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
 } from './constants'
@@ -282,6 +284,12 @@ export function getFixtureDisplayName(
             THERMOCYCLER_MODULE_V2
           )} in USB-${usbPortNumber}`
         : getModuleDisplayName(THERMOCYCLER_MODULE_V2)
+    case ABSORBANCE_READER_V1_FIXTURE:
+      return usbPortNumber != null
+        ? `${getModuleDisplayName(
+            ABSORBANCE_READER_V1
+          )} in USB-${usbPortNumber}`
+        : getModuleDisplayName(ABSORBANCE_READER_V1)
     default:
       return 'Slot'
   }

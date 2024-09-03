@@ -7,7 +7,7 @@ import {
   Icon,
   SIZE_1,
   SPACING,
-  StyledText,
+  LegacyStyledText,
 } from '@opentrons/components'
 
 interface RenderResultProps {
@@ -19,12 +19,12 @@ export const RenderResult = ({ isBadCal }: RenderResultProps): JSX.Element => {
 
   return (
     <Flex alignItems={ALIGN_CENTER}>
-      <StyledText
+      <LegacyStyledText
         color={isBadCal ? COLORS.yellow60 : COLORS.green60}
         marginRight={SPACING.spacing8}
       >
         {isBadCal ? t('recalibration_recommended') : t('good_calibration')}
-      </StyledText>
+      </LegacyStyledText>
       <Icon
         name={isBadCal ? 'alert-circle' : 'check-circle'}
         size={SIZE_1}

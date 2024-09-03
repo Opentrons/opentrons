@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { vi, it, describe, beforeEach, afterEach } from 'vitest'
+import { screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import {
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
@@ -59,6 +60,13 @@ describe('Hardware', () => {
             connected: false,
           },
           {
+            hardwareType: 'module',
+            moduleModel: 'thermocyclerModuleV2',
+            slot: 'B1',
+            hasSlotConflict: false,
+            connected: false,
+          },
+          {
             hardwareType: 'fixture',
             cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
             location: { cutout: WASTE_CHUTE_CUTOUT },
@@ -79,19 +87,20 @@ describe('Hardware', () => {
   })
 
   it('should render column headers that indicate where the hardware is, what is called, and whether it is connected', () => {
-    const { getByRole } = render(props)[0]
-    getByRole('columnheader', { name: 'Location' })
-    getByRole('columnheader', { name: 'Hardware' })
+    render(props)
+    screen.getByRole('columnheader', { name: 'Location' })
+    screen.getByRole('columnheader', { name: 'Hardware' })
   })
   it('should render the correct location, name, and connected status in each table row', () => {
-    const { getByRole } = render(props)[0]
-    getByRole('row', { name: 'Left Mount P10 Single-Channel GEN1' })
-    getByRole('row', {
+    render(props)
+    screen.getByRole('row', { name: 'Left Mount P10 Single-Channel GEN1' })
+    screen.getByRole('row', {
       name: 'Right Mount P1000 Single-Channel GEN1',
     })
-    getByRole('row', { name: '1 Heater-Shaker Module GEN1' })
-    getByRole('row', { name: '3 Temperature Module GEN2' })
-    getByRole('row', { name: 'D3 Waste chute only' })
-    getByRole('row', { name: 'B3 Staging area slot' })
+    screen.getByRole('row', { name: '1 Heater-Shaker Module GEN1' })
+    screen.getByRole('row', { name: '3 Temperature Module GEN2' })
+    screen.getByRole('row', { name: 'A1+B1 Thermocycler Module GEN2' })
+    screen.getByRole('row', { name: 'D3 Waste chute only' })
+    screen.getByRole('row', { name: 'B3 Staging area slot' })
   })
 })

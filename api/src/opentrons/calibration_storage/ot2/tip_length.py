@@ -7,7 +7,7 @@ from dataclasses import asdict
 from opentrons import config
 
 from .. import file_operators as io, helpers, types as local_types
-from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.pipette.types import LabwareUri
 
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.util.helpers import utc_now
@@ -16,7 +16,7 @@ from opentrons.util.helpers import utc_now
 from .models import v1
 
 if typing.TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
+    from opentrons_shared_data.labware.types import LabwareDefinition
 
 
 log = logging.getLogger(__name__)

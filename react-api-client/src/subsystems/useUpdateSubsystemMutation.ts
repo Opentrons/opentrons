@@ -47,9 +47,9 @@ export function useUpdateSubsystemMutation(
         queryClient.removeQueries([host, 'subsystems/updates'])
         queryClient
           .invalidateQueries([host, 'subsystems/updates'])
-          .catch((e: Error) =>
+          .catch((e: Error) => {
             console.error(`error invalidating subsystems query: ${e.message}`)
-          )
+          })
         return response.data
       }),
     options

@@ -25,6 +25,7 @@
   "import_a_file": "Import a protocol to get started",
   "import_new_protocol": "Import a Protocol",
   "import": "Import",
+  "incompatible_file_type": "Incompatible file type",
   "instrument_cal_data_title": "Calibration data",
   "instrument_not_attached": "Not attached",
   "instruments_title": "Required Pipettes",
@@ -64,10 +65,10 @@
   "protocol_title": "Protocol - {{protocol_name}}",
   "protocol_upload_failed": "Protocol upload failed. Fix the error and try again",
   "protocols": "Protocols",
-  "quick_transfer": "Quick transfer",
   "required_cal_data_title": "Calibration Data",
   "required_quantity_title": "Quantity",
   "required_type_title": "Type",
+  "requires_csv": "Requires CSV",
   "robot_name_last_run": "{{robot_name}}’s last run",
   "robot_type_first": "{{robotType}} protocols first",
   "run_again": "Run again",
@@ -80,7 +81,7 @@
   "unpin_protocol": "Unpin protocol",
   "unpinned_protocol": "Unpinned protocol",
   "update_robot_for_custom_labware": "You have custom labware definitions saved to your app, but this robot needs to be updated before you can use these definitions with Python protocols",
-  "upload": "Upload",
   "upload_and_simulate": "Open a protocol to run on {{robot_name}}",
+  "upload": "Upload",
   "valid_file_types": "Valid file types: Python files (.py) or Protocol Designer files (.json)"
 }

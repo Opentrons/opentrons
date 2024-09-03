@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { Flex, SPACING, DIRECTION_ROW } from '@opentrons/components'
@@ -23,7 +23,7 @@ import {
 import type { State, Dispatch } from '../../redux/types'
 
 export function UpdateRobot(): JSX.Element {
-  const history = useHistory()
+  const navigate = useNavigate()
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const localRobot = useSelector(getLocalRobot)
   const robotUpdateType = useSelector((state: State) => {
@@ -48,7 +48,7 @@ export function UpdateRobot(): JSX.Element {
               buttonText={t('cancel_software_update')}
               onClick={() => {
                 dispatch(clearRobotUpdateSession())
-                history.goBack()
+                navigate(-1)
               }}
             />
             <MediumButton
@@ -64,7 +64,11 @@ export function UpdateRobot(): JSX.Element {
       ) : localRobot === null ||
         localRobot.status === UNREACHABLE ||
         robotUpdateType !== 'upgrade' ? (
-        <NoUpdateFound onContinue={history.goBack} />
+        <NoUpdateFound
+          onContinue={() => {
+            navigate(-1)
+          }}
+        />
       ) : (
         <UpdateRobotSoftware
           localRobot={localRobot}

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -9,7 +9,7 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -27,10 +27,10 @@ export function ConfirmRobotName({
   robotName,
 }: ConfirmRobotNameProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const handleClick = (): void => {
-    history.push('/dashboard')
+    navigate('/dashboard')
   }
   return (
     <>
@@ -40,9 +40,9 @@ export function ConfirmRobotName({
         flexDirection={DIRECTION_COLUMN}
       >
         <Flex justifyContent={JUSTIFY_CENTER} marginBottom="3.041875rem">
-          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+          <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {t('name_love_it', { name: robotName })}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
         <Flex height="26.5625rem" justifyContent={JUSTIFY_CENTER}>
           <Flex
@@ -56,7 +56,7 @@ export function ConfirmRobotName({
               width="944px"
               height="236px"
             />
-            <StyledText
+            <LegacyStyledText
               as="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               marginTop={SPACING.spacing12}
@@ -64,7 +64,7 @@ export function ConfirmRobotName({
               color={COLORS.grey60}
             >
               {t('your_robot_is_ready_to_go')}
-            </StyledText>
+            </LegacyStyledText>
             <MediumButton
               buttonType="primary"
               buttonCategory="rounded"

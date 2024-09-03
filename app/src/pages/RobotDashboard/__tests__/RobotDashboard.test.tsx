@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
+import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
@@ -18,15 +19,15 @@ import { RobotDashboard } from '..'
 import { useNotifyAllRunsQuery } from '../../../resources/runs'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
-const mockPush = vi.fn()
+const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof ReactRouterDom>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 vi.mock('@opentrons/react-api-client')
@@ -54,6 +55,7 @@ const mockProtocol: ProtocolResource = {
   id: 'mockProtocol1',
   createdAt: '2022-05-03T21:36:12.494778+00:00',
   protocolType: 'json',
+  protocolKind: 'standard',
   robotType: 'OT-3 Standard',
   metadata: {
     protocolName: 'yay mock protocol',
@@ -107,9 +109,9 @@ describe('RobotDashboard', () => {
     vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
       data: { data: [mockRunData] },
     } as any)
-    const [{ getByText }] = render()
+    render()
     expect(vi.mocked(Navigation)).toHaveBeenCalled()
-    getByText('Run again')
+    screen.getByText('Run again')
     expect(vi.mocked(RecentRunProtocolCarousel)).toHaveBeenCalled()
   })
 

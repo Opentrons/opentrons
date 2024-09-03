@@ -9,7 +9,7 @@ import {
   Icon,
   SIZE_1,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
@@ -43,7 +43,7 @@ export const HeaterShakerModuleCard = (
       >
         <img src={heaterShakerModule} alt="Heater-Shaker" />
         <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing8}>
-          <StyledText
+          <LegacyStyledText
             textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.grey50}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -55,7 +55,7 @@ export const HeaterShakerModuleCard = (
                   port: module?.usbPort?.port,
                 })
               : t('usb_port_not_connected')}
-          </StyledText>
+          </LegacyStyledText>
           <Flex paddingBottom={SPACING.spacing4}>
             <Icon
               name="ot-heater-shaker"
@@ -64,9 +64,9 @@ export const HeaterShakerModuleCard = (
               marginRight={SPACING.spacing4}
               color={COLORS.grey50}
             />
-            <StyledText fontSize={TYPOGRAPHY.fontSizeP}>
+            <LegacyStyledText fontSize={TYPOGRAPHY.fontSizeP}>
               {getModuleDisplayName(module.moduleModel)}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
           <HeaterShakerModuleData
             moduleData={module.data}

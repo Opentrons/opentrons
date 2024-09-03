@@ -1,8 +1,8 @@
 import * as React from 'react'
 
 import {
-  ALIGN_FLEX_START,
   ALIGN_CENTER,
+  ALIGN_FLEX_START,
   BORDERS,
   Box,
   COLORS,
@@ -10,16 +10,16 @@ import {
   Flex,
   InstrumentDiagram,
   JUSTIFY_CENTER,
+  LegacyStyledText,
+  OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  StyledText,
   TYPOGRAPHY,
+  useMenuHandleClickOutside,
 } from '@opentrons/components'
 import flexGripper from '../../assets/images/flex_gripper.png'
 
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuOverlay } from './MenuOverlay'
 
 import type { InstrumentDiagramProps, StyleProps } from '@opentrons/components'
@@ -103,15 +103,15 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
         width="100%"
       >
         {banner}
-        <StyledText
+        <LegacyStyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.grey50}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
         >
           {label}
-        </StyledText>
-        <StyledText as="p">{description}</StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText as="p">{description}</LegacyStyledText>
       </Flex>
       {menuOverlayItems != null && (
         <Box

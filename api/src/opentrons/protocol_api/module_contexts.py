@@ -1,17 +1,21 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Optional, Union, cast
+from typing import List, Dict, Optional, Union, cast
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.module.dev_types import ModuleModel, ModuleType
+from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.module.types import ModuleModel, ModuleType
 
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules import ThermocyclerStep
 from opentrons.legacy_commands import module_commands as cmds
 from opentrons.legacy_commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import APIVersionError, requires_version
+from opentrons.protocols.api_support.util import (
+    APIVersionError,
+    requires_version,
+    UnsupportedAPIError,
+)
 
 from .core.common import (
     ProtocolCore,
@@ -22,6 +26,7 @@ from .core.common import (
     ThermocyclerCore,
     HeaterShakerCore,
     MagneticBlockCore,
+    AbsorbanceReaderCore,
 )
 from .core.core_map import LoadedCoreMap
 from .core.engine import ENGINE_CORE_API_VERSION
@@ -94,15 +99,16 @@ class ModuleContext(CommandPublisher):
         .. deprecated:: 2.14
             Use :py:meth:`load_labware` or :py:meth:`load_labware_by_definition`.
         """
-        deprecation_message = (
-            "`ModuleContext.load_labware_object` is an internal, deprecated method."
-            " Use `ModuleContext.load_labware` or `load_labware_by_definition` instead."
-        )
-
         if not isinstance(self._core, LegacyModuleCore):
-            raise APIVersionError(deprecation_message)
+            raise UnsupportedAPIError(
+                api_element="`ModuleContext.load_labware_object`",
+                since_version="2.14",
+                extra_message="Use `ModuleContext.load_labware` or `load_labware_by_definition` instead.",
+            )
 
-        _log.warning(deprecation_message)
+        _log.warning(
+            "`ModuleContext.load_labware_object` is an internal, deprecated method. Use `ModuleContext.load_labware` or `load_labware_by_definition` instead."
+        )
 
         assert (
             labware.parent == self._core.geometry
@@ -142,7 +148,9 @@ class ModuleContext(CommandPublisher):
         if adapter is not None:
             if self._api_version < APIVersion(2, 15):
                 raise APIVersionError(
-                    "Loading a labware on an adapter requires apiLevel 2.15 or higher."
+                    api_element="Loading a labware on an adapter",
+                    until_version="2.15",
+                    current_version=f"{self._api_version}",
                 )
             loaded_adapter = self.load_adapter(
                 name=adapter,
@@ -294,9 +302,10 @@ class ModuleContext(CommandPublisher):
         if isinstance(self._core, LegacyModuleCore):
             return self._core.geometry
 
-        raise APIVersionError(
-            "`ModuleContext.geometry` has been deprecated;"
-            " use properties of the `ModuleContext` itself, instead."
+        raise UnsupportedAPIError(
+            api_element="`ModuleContext.geometry`",
+            since_version="2.14",
+            extra_message="Use properties of the `ModuleContext` itself.",
         )
 
     def __repr__(self) -> str:
@@ -425,7 +434,10 @@ class MagneticModuleContext(ModuleContext):
             )
             self._core._sync_module_hardware.calibrate()  # type: ignore[attr-defined]
         else:
-            raise APIVersionError("`MagneticModuleContext.calibrate` has been removed.")
+            raise UnsupportedAPIError(
+                api_element="`MagneticModuleContext.calibrate`",
+                since_version="2.14",
+            )
 
     @publish(command=cmds.magdeck_engage)
     @requires_version(2, 0)
@@ -466,10 +478,11 @@ class MagneticModuleContext(ModuleContext):
         """
         if height is not None:
             if self._api_version >= _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN:
-                raise APIVersionError(
-                    f"The height parameter of MagneticModuleContext.engage() was removed"
-                    f" in {_MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN}."
-                    f" Use offset or height_from_base instead."
+                raise UnsupportedAPIError(
+                    api_element="The height parameter of MagneticModuleContext.engage()",
+                    since_version=f"{_MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN}",
+                    current_version=f"{self._api_version}",
+                    extra_message="Use offset or height_from_base.",
                 )
             self._core.engage(height_from_home=height)
 
@@ -955,3 +968,46 @@ class MagneticBlockContext(ModuleContext):
     """
 
     _core: MagneticBlockCore
+
+
+class AbsorbanceReaderContext(ModuleContext):
+    """An object representing a connected Absorbance Reader Module.
+
+    It should not be instantiated directly; instead, it should be
+    created through :py:meth:`.ProtocolContext.load_module`.
+
+    .. versionadded:: 2.21
+    """
+
+    _core: AbsorbanceReaderCore
+
+    @property
+    @requires_version(2, 21)
+    def serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+        return self._core.get_serial_number()
+
+    @requires_version(2, 21)
+    def close_lid(self) -> None:
+        """Close the lid of the Absorbance Reader."""
+        self._core.close_lid()
+
+    @requires_version(2, 21)
+    def open_lid(self) -> None:
+        """Open the lid of the Absorbance Reader."""
+        self._core.open_lid()
+
+    @requires_version(2, 21)
+    def is_lid_on(self) -> bool:
+        """Return ``True`` if the Absorbance Reader's lid is currently closed."""
+        return self._core.is_lid_on()
+
+    @requires_version(2, 21)
+    def initialize(self, wavelength: int) -> None:
+        """Initialize the Absorbance Reader by taking zero reading."""
+        self._core.initialize(wavelength)
+
+    @requires_version(2, 21)
+    def read(self) -> Optional[Dict[str, float]]:
+        """Initiate read on the Absorbance Reader. Returns a dictionary of values ordered by well name."""
+        return self._core.read()

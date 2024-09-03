@@ -5,7 +5,7 @@ install-pipenv:
 
 .PHONY: setup
 setup: install-pipenv
-	python -m pipenv install --dev --python 3.12.3
+	python -m pipenv install --dev --python 3.12.4
 
 .PHONY: teardown
 teardown:
@@ -67,12 +67,17 @@ gen-requirements:
 	@echo "Generating requirements.txt from Pipfile.lock..."
 	python -m pipenv requirements > requirements.txt
 
-ENV ?= sandbox
+ENV ?= local
+TAG ?=
 
 .PHONY: deploy
 deploy: gen-requirements
 	@echo "Deploying to environment: $(ENV)"
-	python -m pipenv run python deploy.py --env $(ENV)
+	python -m pipenv run python deploy.py --env $(ENV) $(if $(TAG),--tag $(TAG),)
+
+.PHONY: prompted-deploy
+prompted-deploy: gen-requirements
+	python -m pipenv run python deploy.py
 
 .PHONY: direct-chat-completion
 direct-chat-completion:
@@ -86,6 +91,45 @@ print-client-settings-vars:
 live-client:
 	python -m pipenv run python -m tests.helpers.client
 
+.PHONY: live-hf
+live-hf:
+	python -m pipenv run python -m tests.helpers.huggingface_client
+
 .PHONY: test-live
 test-live:
 	python -m pipenv run python -m pytest tests -m live --env $(ENV)
+
+IMAGE_NAME=ai-server-local
+CONTAINER_NAME=ai-server-container
+ENV_FILE=.env
+
+CACHEBUST := $(shell date +%s)
+
+.PHONY: build
+build:
+	docker build --build-arg CACHEBUST=$(CACHEBUST) -t $(IMAGE_NAME) .
+
+.PHONY: run
+run:
+	docker run --name $(CONTAINER_NAME) --env-file $(ENV_FILE) -p 8000:8000 $(IMAGE_NAME)
+	docker logs -f $(CONTAINER_NAME)
+
+.PHONY: clean
+clean:
+	docker stop $(CONTAINER_NAME) || true
+	docker rm $(CONTAINER_NAME) || true
+
+.PHONY: rebuild
+rebuild: clean build run
+
+.PHONY: local-run
+local-run:
+	python -m pipenv run python -m api.handler.local_run --env $(ENV)
+
+.PHONY: run-shell
+run-shell:
+	docker run -d --name $(CONTAINER_NAME) --env-file $(ENV_FILE) -p 8000:8000 $(IMAGE_NAME) tail -f /dev/null
+
+.PHONY: shell
+shell:
+	docker exec -it $(CONTAINER_NAME) /bin/bash]

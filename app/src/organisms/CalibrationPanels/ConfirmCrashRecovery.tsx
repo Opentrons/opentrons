@@ -10,7 +10,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Link,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -33,11 +33,15 @@ export function ConfirmCrashRecovery(
       minHeight="25rem"
     >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        <StyledText as="h1" marginBottom={SPACING.spacing16}>
+        <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
           {t('start_over_question')}
-        </StyledText>
-        <StyledText as="p">{t('starting_over_loses_progress')}</StyledText>
-        <StyledText as="p">{t('if_tip_bent_replace_it')}</StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
+          {t('starting_over_loses_progress')}
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
+          {t('if_tip_bent_replace_it')}
+        </LegacyStyledText>
       </Flex>
       <Flex
         width="100%"

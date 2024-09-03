@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Redirect, Route, Switch, useRouteMatch } from 'react-router-dom'
+import { Navigate, Route, Routes, useMatch } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
 import { I18nextProvider } from 'react-i18next'
 
@@ -32,6 +32,7 @@ import { IncompatibleModuleTakeover } from '../organisms/IncompatibleModule'
 import { OPENTRONS_USB } from '../redux/discovery'
 import { appShellRequestor } from '../redux/shell/remote'
 import { useRobot, useIsFlex } from '../organisms/Devices/hooks'
+import { ProtocolTimeline } from '../pages/Protocols/ProtocolDetails/ProtocolTimeline'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { DesktopAppFallback } from './DesktopAppFallback'
 
@@ -47,16 +48,19 @@ export const DesktopApp = (): JSX.Element => {
   const desktopRoutes: RouteProps[] = [
     {
       Component: ProtocolsLanding,
-      exact: true,
       name: 'Protocols',
       navLinkTo: '/protocols',
       path: '/protocols',
     },
     {
       Component: ProtocolDetails,
-      exact: true,
       name: 'Protocol Details',
       path: '/protocols/:protocolKey',
+    },
+    {
+      Component: ProtocolTimeline,
+      name: 'Protocol Timeline',
+      path: '/protocols/:protocolKey/timeline',
     },
     {
       Component: Labware,
@@ -66,26 +70,22 @@ export const DesktopApp = (): JSX.Element => {
     },
     {
       Component: DevicesLanding,
-      exact: true,
       name: 'Devices',
       navLinkTo: '/devices',
       path: '/devices',
     },
     {
       Component: DeviceDetails,
-      exact: true,
       name: 'Device',
       path: '/devices/:robotName',
     },
     {
       Component: RobotSettings,
-      exact: true,
       name: 'Robot Settings',
       path: '/devices/:robotName/robot-settings/:robotSettingsTab?',
     },
     {
       Component: CalibrationDashboard,
-      exact: true,
       name: 'Calibration Dashboard',
       path: '/devices/:robotName/robot-settings/calibration/dashboard',
     },
@@ -96,7 +96,6 @@ export const DesktopApp = (): JSX.Element => {
     },
     {
       Component: AppSettings,
-      exact: true,
       name: 'App Settings',
       path: '/app-settings/:appSettingsTab?',
     },
@@ -116,28 +115,37 @@ export const DesktopApp = (): JSX.Element => {
             >
               <Box width="100%">
                 <Alerts>
-                  <Switch>
-                    {desktopRoutes.map(
-                      ({ Component, exact, path }: RouteProps) => {
-                        return (
-                          <Route key={path} exact={exact} path={path}>
-                            <Breadcrumbs />
-                            <Box
-                              position={POSITION_RELATIVE}
-                              width="100%"
-                              height="100%"
-                              backgroundColor={COLORS.grey10}
-                              overflow={OVERFLOW_AUTO}
-                            >
-                              <ModalPortalRoot />
-                              <Component />
-                            </Box>
-                          </Route>
-                        )
-                      }
-                    )}
-                    <Redirect exact from="/" to="/protocols" />
-                  </Switch>
+                  <Routes>
+                    {desktopRoutes.map(({ Component, path }: RouteProps) => {
+                      return (
+                        <Route
+                          key={path}
+                          element={
+                            <React.Fragment key={Component.name}>
+                              <Breadcrumbs />
+                              <Box
+                                position={POSITION_RELATIVE}
+                                width="100%"
+                                height="100%"
+                              >
+                                <Box
+                                  width="100%"
+                                  height="100%"
+                                  backgroundColor={COLORS.grey10}
+                                  overflow={OVERFLOW_AUTO}
+                                >
+                                  <ModalPortalRoot />
+                                  <Component />
+                                </Box>
+                              </Box>
+                            </React.Fragment>
+                          }
+                          path={path}
+                        />
+                      )
+                    })}
+                    <Route path="*" element={<Navigate to="/protocols" />} />
+                  </Routes>
                   <RobotControlTakeover />
                 </Alerts>
               </Box>
@@ -150,7 +158,7 @@ export const DesktopApp = (): JSX.Element => {
 }
 
 function RobotControlTakeover(): JSX.Element | null {
-  const deviceRouteMatch = useRouteMatch({ path: '/devices/:robotName' })
+  const deviceRouteMatch = useMatch('/devices/:robotName')
   const params = deviceRouteMatch?.params as DesktopRouteParams
   const robotName = params?.robotName
   const robot = useRobot(robotName)

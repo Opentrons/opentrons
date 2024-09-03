@@ -1,15 +1,16 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useForm, Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InputField,
+  LegacyStyledText,
   PrimaryButton,
   SPACING,
-  StyledText,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import {
@@ -23,7 +24,6 @@ import {
   ANALYTICS_RENAME_ROBOT,
 } from '../../../../../redux/analytics'
 import { Slideout } from '../../../../../atoms/Slideout'
-import { InputField } from '../../../../../atoms/InputField'
 import { Banner } from '../../../../../atoms/Banner'
 import { useIsFlex } from '../../../hooks'
 
@@ -57,7 +57,7 @@ export function RenameRobotSlideout({
   )
   const isFlex = useIsFlex(robotName)
   const trackEvent = useTrackEvent()
-  const history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useDispatch<Dispatch>()
   const connectableRobots = useSelector((state: State) =>
     getConnectableRobots(state)
@@ -136,10 +136,10 @@ export function RenameRobotSlideout({
   const { updateRobotName } = useUpdateRobotNameMutation({
     onSuccess: (data: UpdatedRobotName) => {
       // TODO: 6/10/2022 kj for the robot name, we need to use GET: /server/name
-      // data.name != null && history.push(`/devices/${data.name}/robot-settings`)
+      // data.name != null && navigate(`/devices/${data.name}/robot-settings`)
       // TODO 6/9/2022 kj this is a temporary fix to avoid the issue
       // https://github.com/Opentrons/opentrons/issues/10709
-      data.name != null && history.push(`/devices`)
+      data.name != null && navigate('/devices')
       dispatch(removeRobot(previousRobotName))
     },
     onError: (error: Error) => {
@@ -181,9 +181,9 @@ export function RenameRobotSlideout({
             {t('rename_robot_prefer_usb_connection')}
           </Banner>
         )}
-        <StyledText as="p" marginBottom={SPACING.spacing16}>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
           {t('rename_robot_input_limitation_detail')}
-        </StyledText>
+        </LegacyStyledText>
         <Controller
           control={control}
           name="newRobotName"
@@ -204,17 +204,17 @@ export function RenameRobotSlideout({
             />
           )}
         />
-        <StyledText as="label" color={COLORS.grey50}>
+        <LegacyStyledText as="label" color={COLORS.grey50}>
           {t('characters_max')}
-        </StyledText>
+        </LegacyStyledText>
         {errors.newRobotName != null ? (
-          <StyledText
+          <LegacyStyledText
             as="label"
             color={COLORS.red50}
             marginTop={SPACING.spacing4}
           >
             {errors.newRobotName.message}
-          </StyledText>
+          </LegacyStyledText>
         ) : null}
       </Flex>
     </Slideout>

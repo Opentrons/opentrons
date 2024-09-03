@@ -60,7 +60,9 @@ export function LabwareItem(props: Props): JSX.Element {
           target="_blank"
           rel="noopener noreferrer"
           href={`${LABWARE_LIBRARY_PAGE_PATH}/${labwareLoadName}`}
-          onClick={e => e.stopPropagation()}
+          onClick={e => {
+            e.stopPropagation()
+          }}
         >
           {t('labware_selection.view_measurements')}
         </a>

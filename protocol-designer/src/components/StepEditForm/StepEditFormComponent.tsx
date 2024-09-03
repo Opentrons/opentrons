@@ -7,6 +7,7 @@ import {
   MoveLabwareForm,
   MoveLiquidForm,
   PauseForm,
+  CommentForm,
   MagnetForm,
   TemperatureForm,
   ThermocyclerForm,
@@ -33,6 +34,7 @@ const STEP_FORM_MAP: StepFormMap = {
   temperature: TemperatureForm,
   thermocycler: ThermocyclerForm,
   heaterShaker: HeaterShakerForm,
+  comment: CommentForm,
 }
 
 interface Props {

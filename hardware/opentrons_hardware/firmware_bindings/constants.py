@@ -4,6 +4,7 @@ This file is used as a source for code generation, which does not run in a venv
 by default. Please do not unconditionally import things outside the python standard
 library.
 """
+
 from enum import Enum, unique
 from typing import Union, Dict, List
 
@@ -45,7 +46,7 @@ class NodeId(int, Enum):
         """Mapping between bootloader_node and nodes.
 
         Note: The ordering of the Node list matters as the first element
-        represents the core appliaction node for that given node. For example
+        represents the core application node for that given node. For example
 
         NodeId.head_bootloader : [NodeId.head, NodeId.head_l, NodeId.head_r]
 
@@ -240,6 +241,9 @@ class MessageId(int, Enum):
     gear_write_motor_driver_request = 0x506
     gear_read_motor_driver_request = 0x507
 
+    max_sensor_value_request = 0x70
+    max_sensor_value_response = 0x71
+
     read_sensor_request = 0x82
     write_sensor_request = 0x83
     baseline_sensor_request = 0x84
@@ -253,7 +257,7 @@ class MessageId(int, Enum):
     peripheral_status_request = 0x8C
     peripheral_status_response = 0x8D
     baseline_sensor_response = 0x8E
-    send_accumulated_pressure_data = 0x8F
+    send_accumulated_sensor_data = 0x8F
 
     set_hepa_fan_state_request = 0x90
     get_hepa_fan_state_request = 0x91
@@ -294,6 +298,7 @@ class ErrorCode(int, Enum):
     door_open = 0x0E
     reed_open = 0x0F
     motor_driver_error_detected = 0x10
+    safety_relay_inactive = 0x11
 
 
 @unique
@@ -372,6 +377,8 @@ class SensorOutputBinding(int, Enum):
     sync = 0x01
     report = 0x02
     max_threshold_sync = 0x04
+    auto_baseline_report = 0x08
+    multi_sensor_sync = 0x10
 
 
 @unique

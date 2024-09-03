@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
   COLORS,
   PrimaryBtn,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { MultiSlideout } from './MultiSlideout'
@@ -24,9 +24,9 @@ const Template: Story<React.ComponentProps<typeof MultiSlideout>> = args => {
 
   const children = (
     <>
-      <StyledText as="p">
+      <LegacyStyledText as="p">
         {firstPage ? 'first page body' : 'second page body'}
-      </StyledText>
+      </LegacyStyledText>
 
       <PrimaryBtn
         marginTop="28rem"
@@ -34,9 +34,9 @@ const Template: Story<React.ComponentProps<typeof MultiSlideout>> = args => {
         backgroundColor={COLORS.blue50}
         textTransform={TYPOGRAPHY.textTransformNone}
       >
-        <StyledText as="p">
+        <LegacyStyledText as="p">
           {firstPage ? 'Go to Second Page' : 'Go to First Page'}
-        </StyledText>
+        </LegacyStyledText>
       </PrimaryBtn>
     </>
   )

@@ -3,18 +3,18 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
-
+from pathlib import Path
 from typing import (
     Any,
     Dict,
     FrozenSet,
     List,
+    Mapping,
     NamedTuple,
     Optional,
     Tuple,
     Union,
 )
-from typing_extensions import Literal, TypeGuard
 
 from pydantic import (
     BaseModel,
@@ -25,8 +25,9 @@ from pydantic import (
     StrictInt,
     StrictStr,
 )
+from typing_extensions import Literal, TypeGuard
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName, StagingSlotName
 from opentrons.hardware_control.types import (
     TipStateType as HwTipStateType,
@@ -36,35 +37,81 @@ from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
 )
 
-from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
+from opentrons_shared_data.pipette.types import (  # noqa: F401
     # convenience re-export of LabwareUri type
     LabwareUri as LabwareUri,
 )
-from opentrons_shared_data.module.dev_types import ModuleType as SharedDataModuleType
+
 from opentrons_shared_data.labware import models as lw_models
 from opentrons_shared_data.types import Vec3f as SD_Vec3f
+from opentrons_shared_data.module.types import ModuleType as SharedDataModuleType
 
 
+# todo(mm, 2024-06-24): This monolithic status field is getting to be a bit much.
+# We should consider splitting this up into multiple fields.
 class EngineStatus(str, Enum):
-    """Current execution status of a ProtocolEngine."""
+    """Current execution status of a ProtocolEngine.
+
+    This is a high-level summary of what the robot is doing and what interactions are
+    appropriate.
+    """
+
+    # Statuses for an ongoing run:
 
     IDLE = "idle"
+    """The protocol has not been started yet.
+
+    The robot may truly be idle, or it may be executing commands with `intent: "setup"`.
+    """
+
     RUNNING = "running"
+    """The engine is actively running the protocol."""
+
     PAUSED = "paused"
+    """A pause has been requested. Activity is paused, or will pause soon.
+
+    (There is currently no way to tell which.)
+    """
+
     BLOCKED_BY_OPEN_DOOR = "blocked-by-open-door"
+    """The robot's door is open. Activity is paused, or will pause soon."""
+
     STOP_REQUESTED = "stop-requested"
-    STOPPED = "stopped"
+    """A stop has been requested. Activity will stop soon."""
+
     FINISHING = "finishing"
-    FAILED = "failed"
-    SUCCEEDED = "succeeded"
+    """The robot is doing post-run cleanup, like homing and dropping tips."""
+
+    # Statuses for error recovery mode:
 
     AWAITING_RECOVERY = "awaiting-recovery"
     """The engine is waiting for external input to recover from a nonfatal error.
 
-    New fixup commands may be enqueued, which will run immediately.
+    New commands with `intent: "fixit"` may be enqueued, which will run immediately.
     The run can't be paused in this state, but it can be canceled, or resumed from the
     next protocol command if recovery is complete.
     """
+
+    AWAITING_RECOVERY_PAUSED = "awaiting-recovery-paused"
+    """The engine is paused while in error recovery mode. Activity is paused, or will pause soon.
+
+    This state is not possible to enter manually. It happens when an open door
+    gets closed during error recovery.
+    """
+
+    AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR = "awaiting-recovery-blocked-by-open-door"
+    """The robot's door is open while in recovery mode. Activity is paused, or will pause soon."""
+
+    # Terminal statuses:
+
+    STOPPED = "stopped"
+    """All activity is over; it was stopped by an explicit external request."""
+
+    FAILED = "failed"
+    """All activity is over; there was a fatal error."""
+
+    SUCCEEDED = "succeeded"
+    """All activity is over; things completed without any fatal error."""
 
 
 class DeckSlotLocation(BaseModel):
@@ -314,7 +361,7 @@ class MotorAxis(str, Enum):
     EXTENSION_JAW = "extensionJaw"
 
 
-# TODO(mc, 2022-01-18): use opentrons_shared_data.module.dev_types.ModuleModel
+# TODO(mc, 2022-01-18): use opentrons_shared_data.module.types.ModuleModel
 class ModuleModel(str, Enum):
     """All available modules' models."""
 
@@ -326,6 +373,7 @@ class ModuleModel(str, Enum):
     THERMOCYCLER_MODULE_V2 = "thermocyclerModuleV2"
     HEATER_SHAKER_MODULE_V1 = "heaterShakerModuleV1"
     MAGNETIC_BLOCK_V1 = "magneticBlockV1"
+    ABSORBANCE_READER_V1 = "absorbanceReaderV1"
 
     def as_type(self) -> ModuleType:
         """Get the ModuleType of this model."""
@@ -339,6 +387,8 @@ class ModuleModel(str, Enum):
             return ModuleType.HEATER_SHAKER
         elif ModuleModel.is_magnetic_block(self):
             return ModuleType.MAGNETIC_BLOCK
+        elif ModuleModel.is_absorbance_reader(self):
+            return ModuleType.ABSORBANCE_READER
 
         assert False, f"Invalid ModuleModel {self}"
 
@@ -375,6 +425,13 @@ class ModuleModel(str, Enum):
         """Whether a given model is a Magnetic block."""
         return model == cls.MAGNETIC_BLOCK_V1
 
+    @classmethod
+    def is_absorbance_reader(
+        cls, model: ModuleModel
+    ) -> TypeGuard[AbsorbanceReaderModel]:
+        """Whether a given model is an Absorbance Plate Reader."""
+        return model == cls.ABSORBANCE_READER_V1
+
 
 TemperatureModuleModel = Literal[
     ModuleModel.TEMPERATURE_MODULE_V1, ModuleModel.TEMPERATURE_MODULE_V2
@@ -387,6 +444,7 @@ ThermocyclerModuleModel = Literal[
 ]
 HeaterShakerModuleModel = Literal[ModuleModel.HEATER_SHAKER_MODULE_V1]
 MagneticBlockModel = Literal[ModuleModel.MAGNETIC_BLOCK_V1]
+AbsorbanceReaderModel = Literal[ModuleModel.ABSORBANCE_READER_V1]
 
 
 class ModuleDimensions(BaseModel):
@@ -707,6 +765,8 @@ class AreaType(Enum):
     HEATER_SHAKER = "heaterShaker"
     TEMPERATURE = "temperatureModule"
     MAGNETICBLOCK = "magneticBlock"
+    ABSORBANCE_READER = "absorbanceReader"
+    LID_DOCK = "lidDock"
 
 
 @dataclass(frozen=True)
@@ -801,6 +861,11 @@ class QuadrantNozzleLayoutConfiguration(BaseModel):
         ...,
         pattern=NOZZLE_NAME_REGEX,
         description="The front right nozzle in your configuration.",
+    )
+    backLeftNozzle: str = Field(
+        ...,
+        pattern=NOZZLE_NAME_REGEX,
+        description="The back left nozzle in your configuration.",
     )
 
 
@@ -945,8 +1010,34 @@ class EnumParameter(RTPBase):
     )
 
 
-RunTimeParameter = Union[NumberParameter, EnumParameter, BooleanParameter]
+class FileInfo(BaseModel):
+    """A file UUID descriptor."""
 
-RunTimeParamValuesType = Dict[
+    id: str = Field(
+        ...,
+        description="The UUID identifier of the file stored on the robot.",
+    )
+    name: str = Field(..., description="Name of the file, including the extension.")
+
+
+class CSVParameter(RTPBase):
+    """A CSV file parameter defined in a protocol."""
+
+    type: Literal["csv_file"] = Field(
+        default="csv_file", description="String specifying the type of this parameter"
+    )
+    file: Optional[FileInfo] = Field(
+        default=None,
+        description="ID of the CSV file stored on the robot; to be used for fetching the CSV file."
+        " For local analysis this will most likely be empty.",
+    )
+
+
+RunTimeParameter = Union[NumberParameter, EnumParameter, BooleanParameter, CSVParameter]
+
+PrimitiveRunTimeParamValuesType = Mapping[
     StrictStr, Union[StrictInt, StrictFloat, StrictBool, StrictStr]
 ]  # update value types as more RTP types are added
+
+CSVRunTimeParamFilesType = Mapping[StrictStr, StrictStr]
+CSVRuntimeParamPaths = Dict[str, Path]

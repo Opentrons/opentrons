@@ -11,7 +11,7 @@ import {
   JUSTIFY_CENTER,
   SIZE_AUTO,
   SPACING,
-  StyledText,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
@@ -176,21 +176,21 @@ export const StatRow = (props: StatRowProps): JSX.Element => {
   return (
     <Flex flexDirection={DIRECTION_ROW}>
       <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
-        <StyledText
+        <LegacyStyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginX={SPACING.spacing16}
         >
           {displayName}
-        </StyledText>
-        <StyledText
+        </LegacyStyledText>
+        <LegacyStyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={COLORS.grey50}
           marginX={SPACING.spacing16}
         >
           {description}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <Flex
         backgroundColor={COLORS.black90 + '1A'}
@@ -201,9 +201,9 @@ export const StatRow = (props: StatRowProps): JSX.Element => {
         alignSelf={ALIGN_CENTER}
         marginLeft={SIZE_AUTO}
       >
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
           {datum}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
     </Flex>
   )

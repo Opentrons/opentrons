@@ -1,15 +1,11 @@
 """Router for /runs commands endpoints."""
 import textwrap
-from typing import Optional, Union
-from typing_extensions import Final, Literal
+from typing import Annotated, Final, Literal, Optional, Union
 
-from anyio import move_on_after
 from fastapi import APIRouter, Depends, Query, status
-
 
 from opentrons.protocol_engine import (
     CommandPointer,
-    ProtocolEngine,
     commands as pe_commands,
     errors as pe_errors,
 )
@@ -31,11 +27,18 @@ from ..command_models import (
     CommandLinkMeta,
 )
 from ..run_models import RunCommandSummary
-from ..run_data_manager import RunDataManager, PreSerializedCommandsNotAvailableError
-from ..engine_store import EngineStore
-from ..run_store import RunStore, CommandNotFoundError
+from ..run_data_manager import (
+    RunDataManager,
+    PreSerializedCommandsNotAvailableError,
+)
+from ..run_orchestrator_store import RunOrchestratorStore
+from ..run_store import CommandNotFoundError, RunStore
 from ..run_models import RunNotFoundError
-from ..dependencies import get_engine_store, get_run_data_manager, get_run_store
+from ..dependencies import (
+    get_run_orchestrator_store,
+    get_run_data_manager,
+    get_run_store,
+)
 from .base_router import RunNotFound, RunStopped
 
 
@@ -77,16 +80,18 @@ class PreSerializedCommandsNotAvailable(ErrorDetails):
     )
 
 
-async def get_current_run_engine_from_url(
+async def get_current_run_from_url(
     runId: str,
-    engine_store: EngineStore = Depends(get_engine_store),
-    run_store: RunStore = Depends(get_run_store),
-) -> ProtocolEngine:
-    """Get run protocol engine.
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
+    run_store: Annotated[RunStore, Depends(get_run_store)],
+) -> str:
+    """Get run from url.
 
     Args:
         runId: Run ID to associate the command with.
-        engine_store: Engine store to pull current run ProtocolEngine.
+        run_orchestrator_store: Engine store to pull current run ProtocolEngine.
         run_store: Run data storage.
     """
     if not run_store.has(runId):
@@ -94,12 +99,12 @@ async def get_current_run_engine_from_url(
             status.HTTP_404_NOT_FOUND
         )
 
-    if runId != engine_store.current_run_id:
+    if runId != run_orchestrator_store.current_run_id:
         raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
             status.HTTP_409_CONFLICT
         )
 
-    return engine_store.engine
+    return runId
 
 
 @PydanticResponse.wrap_route(
@@ -151,42 +156,51 @@ async def get_current_run_engine_from_url(
 )
 async def create_run_command(
     request_body: RequestModelWithCommandCreate,
-    waitUntilComplete: bool = Query(
-        default=False,
-        description=(
-            "If `false`, return immediately, while the new command is still queued."
-            " If `true`, only return once the new command succeeds or fails,"
-            " or when the timeout is reached. See the `timeout` query parameter."
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
+    check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
+    run_id: Annotated[str, Depends(get_current_run_from_url)],
+    waitUntilComplete: Annotated[
+        bool,
+        Query(
+            description=(
+                "If `false`, return immediately, while the new command is still queued."
+                " If `true`, only return once the new command succeeds or fails,"
+                " or when the timeout is reached. See the `timeout` query parameter."
+            ),
         ),
-    ),
-    timeout: Optional[int] = Query(
-        default=None,
-        gt=0,
-        description=(
-            "If `waitUntilComplete` is `true`,"
-            " the maximum time in milliseconds to wait before returning."
-            " The default is infinite."
-            "\n\n"
-            "The timer starts as soon as you enqueue the new command with this request,"
-            " *not* when the new command starts running. So if there are other commands"
-            " in the queue before the new one, they will also count towards the"
-            " timeout."
-            "\n\n"
-            "If the timeout elapses before the command succeeds or fails,"
-            " the command will be returned with its current status."
-            "\n\n"
-            "Compatibility note: on robot software v6.2.0 and older,"
-            " the default was 30 seconds, not infinite."
+    ] = False,
+    timeout: Annotated[
+        Optional[int],
+        Query(
+            gt=0,
+            description=(
+                "If `waitUntilComplete` is `true`,"
+                " the maximum time in milliseconds to wait before returning."
+                " The default is infinite."
+                "\n\n"
+                "The timer starts as soon as you enqueue the new command with this request,"
+                " *not* when the new command starts running. So if there are other commands"
+                " in the queue before the new one, they will also count towards the"
+                " timeout."
+                "\n\n"
+                "If the timeout elapses before the command succeeds or fails,"
+                " the command will be returned with its current status."
+                "\n\n"
+                "Compatibility note: on robot software v6.2.0 and older,"
+                " the default was 30 seconds, not infinite."
+            ),
         ),
-    ),
-    failedCommandId: Optional[str] = Query(
-        default=None,
-        description=(
-            "FIXIT command use only. Reference of the failed command id we are trying to fix."
+    ] = None,
+    failedCommandId: Annotated[
+        Optional[str],
+        Query(
+            description=(
+                "FIXIT command use only. Reference of the failed command id we are trying to fix."
+            ),
         ),
-    ),
-    protocol_engine: ProtocolEngine = Depends(get_current_run_engine_from_url),
-    check_estop: bool = Depends(require_estop_in_good_state),
+    ] = None,
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
 
@@ -199,17 +213,22 @@ async def create_run_command(
             Comes from a query parameter in the URL.
         failedCommandId: FIXIT command use only.
             Reference of the failed command id we are trying to fix.
-        protocol_engine: The run's `ProtocolEngine` on which the new
+        run_orchestrator_store: The run's `EngineStore` on which the new
             command will be enqueued.
         check_estop: Dependency to verify the estop is in a valid state.
+        run_id: Run identification to attach command to.
     """
     # TODO(mc, 2022-05-26): increment the HTTP API version so that default
     # behavior is to pass through `command_intent` without overriding it
     command_intent = request_body.data.intent or pe_commands.CommandIntent.SETUP
     command_create = request_body.data.copy(update={"intent": command_intent})
+
     try:
-        command = protocol_engine.add_command(
-            request=command_create, failed_command_id=failedCommandId
+        command = await run_orchestrator_store.add_command_and_wait_for_interval(
+            request=command_create,
+            failed_command_id=failedCommandId,
+            wait_until_complete=waitUntilComplete,
+            timeout=timeout,
         )
 
     except pe_errors.SetupCommandNotAllowedError as e:
@@ -219,12 +238,7 @@ async def create_run_command(
     except pe_errors.CommandNotAllowedError as e:
         raise CommandNotAllowed.from_exc(e).as_error(status.HTTP_400_BAD_REQUEST)
 
-    if waitUntilComplete:
-        timeout_sec = None if timeout is None else timeout / 1000.0
-        with move_on_after(timeout_sec):
-            await protocol_engine.wait_for_command(command.id)
-
-    response_data = protocol_engine.state_view.commands.get(command.id)
+    response_data = run_orchestrator_store.get_command(command.id)
 
     return await PydanticResponse.create(
         content=SimpleBody.model_construct(data=response_data),
@@ -254,19 +268,23 @@ async def create_run_command(
 )
 async def get_run_commands(
     runId: str,
-    cursor: Optional[int] = Query(
-        None,
-        description=(
-            "The starting index of the desired first command in the list."
-            " If unspecified, a cursor will be selected automatically"
-            " based on the currently running or most recently executed command."
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    cursor: Annotated[
+        Optional[int],
+        Query(
+            description=(
+                "The starting index of the desired first command in the list."
+                " If unspecified, a cursor will be selected automatically"
+                " based on the currently running or most recently executed command."
+            ),
         ),
-    ),
-    pageLength: int = Query(
-        _DEFAULT_COMMAND_LIST_LENGTH,
-        description="The maximum number of commands in the list to return.",
-    ),
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    ] = None,
+    pageLength: Annotated[
+        int,
+        Query(
+            description="The maximum number of commands in the list to return.",
+        ),
+    ] = _DEFAULT_COMMAND_LIST_LENGTH,
 ) -> PydanticResponse[MultiBody[RunCommandSummary, CommandCollectionLinks]]:
     """Get a summary of a set of commands in a run.
 
@@ -301,6 +319,7 @@ async def get_run_commands(
             params=c.params,
             error=c.error,
             notes=c.notes,
+            failedCommandId=c.failedCommandId,
         )
         for c in command_slice.commands
     ]
@@ -348,7 +367,7 @@ async def get_run_commands(
 )
 async def get_run_commands_as_pre_serialized_list(
     runId: str,
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[SimpleMultiBody[str]]:
     """Get all commands of a completed run as a list of pre-serialized (string encoded) commands.
 
@@ -389,7 +408,7 @@ async def get_run_commands_as_pre_serialized_list(
 async def get_run_command(
     runId: str,
     commandId: str,
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Get a specific command from a run.
 

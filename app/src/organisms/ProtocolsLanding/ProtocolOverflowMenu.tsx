@@ -3,28 +3,30 @@ import { css } from 'styled-components'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 import {
-  Flex,
+  ALIGN_FLEX_END,
   BORDERS,
   COLORS,
-  POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
+  Flex,
+  MenuItem,
+  OverflowBtn,
+  POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  ALIGN_FLEX_END,
   useConditionalConfirm,
+  useMenuHandleClickOutside,
 } from '@opentrons/components'
-import { FLEX_DISPLAY_NAME } from '@opentrons/shared-data'
+import { FLEX_DISPLAY_NAME, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../App/portal'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_DELETE_PROTOCOL_FROM_APP,
 } from '../../redux/analytics'
+import { useFeatureFlag } from '../../redux/config'
 import {
   analyzeProtocol,
   removeProtocol,
@@ -52,6 +54,7 @@ export function ProtocolOverflowMenu(
   } = props
   const { mostRecentAnalysis, protocolKey } = storedProtocolData
   const { t } = useTranslation(['protocol_list', 'shared'])
+  const enableProtocolTimeline = useFeatureFlag('protocolTimeline')
   const {
     menuOverlay,
     handleOverflowClick,
@@ -59,6 +62,7 @@ export function ProtocolOverflowMenu(
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const dispatch = useDispatch<Dispatch>()
+  const navigate = useNavigate()
   const trackEvent = useTrackEvent()
   const {
     confirm: confirmDeleteProtocol,
@@ -70,9 +74,7 @@ export function ProtocolOverflowMenu(
   }, true)
 
   const robotType =
-    mostRecentAnalysis != null && mostRecentAnalysis.errors.length === 0
-      ? mostRecentAnalysis?.robotType ?? null
-      : null
+    mostRecentAnalysis != null ? mostRecentAnalysis?.robotType ?? null : null
 
   const handleClickShowInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -108,11 +110,19 @@ export function ProtocolOverflowMenu(
     dispatch(analyzeProtocol(protocolKey))
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
+  const handleClickTimeline: React.MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    navigate(`/protocols/${protocolKey}/timeline`)
+    setShowOverflowMenu(prevShowOverflowMenu => !prevShowOverflowMenu)
+  }
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
-      onClick={(e: React.MouseEvent) => e.stopPropagation()}
+      onClick={(e: React.MouseEvent) => {
+        e.stopPropagation()
+      }}
     >
       <OverflowBtn
         alignSelf={ALIGN_FLEX_END}
@@ -147,6 +157,11 @@ export function ProtocolOverflowMenu(
           >
             {t('shared:reanalyze')}
           </MenuItem>
+          {enableProtocolTimeline && robotType === FLEX_ROBOT_TYPE ? (
+            <MenuItem onClick={handleClickTimeline}>
+              {t('go_to_timeline')}
+            </MenuItem>
+          ) : null}
           {robotType !== 'OT-2 Standard' ? (
             <MenuItem
               onClick={handleClickSendToOT3}
