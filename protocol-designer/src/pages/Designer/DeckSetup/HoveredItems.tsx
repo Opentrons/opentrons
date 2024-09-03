@@ -75,7 +75,6 @@ export const HoveredItems = (props: HoveredLabwareProps): JSX.Element => {
         />
       ) : null}
 
-      {/* TODO(ja): add labware labels with no module in a follow up */}
       {hoveredLabwareDef != null &&
       hoveredSlotPosition != null &&
       selectedModuleModel == null ? (

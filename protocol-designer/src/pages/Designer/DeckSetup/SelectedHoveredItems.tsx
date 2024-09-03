@@ -144,7 +144,6 @@ export const SelectedHoveredItems = (
         </Module>
       ) : null}
 
-      {/* TODO(ja): add labware labels with no module in a follow up */}
       {selectedLabwareDefUri != null &&
       slotPosition != null &&
       selectedModuleModel == null &&

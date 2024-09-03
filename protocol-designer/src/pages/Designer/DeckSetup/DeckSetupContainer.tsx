@@ -133,6 +133,9 @@ export function DeckSetupContainer(): JSX.Element {
         y: zoomInSlotPosition[1],
         deckDef,
       })
+      //  TODO(ja, 9/3/24): re-examine this usage. It is causing
+      //  a handful of rerendering of the DeckSetupTools which may
+      //  cause optimization issues??
       animateZoom({
         targetViewBox: zoomedInViewBox,
         viewBox,
