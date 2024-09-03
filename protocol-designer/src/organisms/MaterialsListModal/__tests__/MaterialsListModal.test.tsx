@@ -17,6 +17,37 @@ vi.mock('@opentrons/components', async importOriginal => {
 
 const mockSetShowMaterialsListModal = vi.fn()
 
+const mockHardWare = [
+  {
+    id: 'mockHardware',
+    model: 'temperatureModuleV2',
+    moduleState: {
+      type: 'temperatureModuleType',
+      status: 'TEMPERATURE_DEACTIVATED',
+      targetTemperature: null,
+    },
+    slot: 'C1',
+    type: 'temperatureModuleType',
+  },
+]
+
+const mockLabware = [
+  {
+    def: {
+      metadata: {
+        displayCategory: 'tipRack',
+        displayName: 'Opentrons Flex 96 Filter Tip Rack 50 µL',
+        displayVolumeUnits: 'µL',
+        tags: [],
+        namespace: 'opentrons',
+      },
+    },
+    id: 'mockLabware',
+    labwareDefURI: 'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
+    slot: 'D3',
+  },
+]
+
 const render = (props: React.ComponentProps<typeof MaterialsListModal>) => {
   return renderWithProviders(<MaterialsListModal {...props} />, {
     i18nInstance: i18n,
@@ -48,7 +79,25 @@ describe('MaterialsListModal', () => {
     expect(screen.getAllByText('mock InfoScreen').length).toBe(3)
   })
 
-  it('should render hardware info', () => {})
-  it('should render labware info', () => {})
-  it('should render liquids info', () => {})
+  it('should render hardware info', () => {
+    props = {
+      ...props,
+      hardware: mockHardWare,
+    }
+    render(props)
+    screen.getByText('C1')
+    screen.getByText('Temperature Module GEN2')
+  })
+  it('should render labware info', () => {
+    props = {
+      ...props,
+      labware: mockLabware,
+    }
+    render(props)
+    screen.getByText('D3')
+    screen.getByText('Opentrons Flex 96 Filter Tip Rack 50 µL')
+  })
+
+  // ToDo (kk:09/03/2024) add test when implementing liquids part completely
+  it.todo('should render liquids info', () => {})
 })

@@ -4,12 +4,40 @@ import { i18n } from '../../assets/localization'
 import { MaterialsListModal as MaterialsListModalComponent } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
-import type { LabwareOnDeck, ModuleOnDeck } from '@opentrons/components'
-import type { OrderedLiquids } from '../../labware-ingred/types'
 
-const mockHardware = [] as ModuleOnDeck[]
-const mockLabware = [] as LabwareOnDeck[]
-const mockLiquids = [] as OrderedLiquids
+const mockHardware = [
+  {
+    id: 'mockHardware',
+    model: 'temperatureModuleV2',
+    moduleState: {
+      type: 'temperatureModuleType',
+      status: 'TEMPERATURE_DEACTIVATED',
+      targetTemperature: null,
+    },
+    slot: 'C1',
+    type: 'temperatureModuleType',
+  },
+]
+
+const mockLabware = [
+  {
+    def: {
+      metadata: {
+        displayCategory: 'tipRack',
+        displayName: 'Opentrons Flex 96 Filter Tip Rack 50 µL',
+        displayVolumeUnits: 'µL',
+        tags: [],
+        namespace: 'opentrons',
+      },
+    },
+    id: 'mockLabware',
+    labwareDefURI: 'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
+    slot: 'D3',
+  },
+]
+
+// ToDo (kk:09/03/2024) add test when implementing liquids part completely
+const mockLiquids = [] as any[]
 
 const meta: Meta<typeof MaterialsListModalComponent> = {
   title: 'Protocol-Designer/Organisms/MaterialsListModal',
@@ -32,5 +60,13 @@ export const MaterialsListModal: Story = {
     hardware: mockHardware,
     labware: mockLabware,
     liquids: mockLiquids,
+  },
+}
+
+export const EmptyMaterialsListModal: Story = {
+  args: {
+    hardware: [],
+    labware: [],
+    liquids: [],
   },
 }
