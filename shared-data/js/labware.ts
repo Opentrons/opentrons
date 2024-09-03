@@ -35,6 +35,10 @@ import corning96Wellplate360UlFlatV1Uncasted from '../labware/definitions/2/corn
 import corning96Wellplate360UlFlatV2Uncasted from '../labware/definitions/2/corning_96_wellplate_360ul_flat/2.json'
 import eppendorf96Tiprack1000UlEptipsV1Uncasted from '../labware/definitions/2/eppendorf_96_tiprack_1000ul_eptips/1.json'
 import eppendorf96Tiprack10UlEptipsV1Uncasted from '../labware/definitions/2/eppendorf_96_tiprack_10ul_eptips/1.json'
+import eppendorf96Wellplate150ulV1Uncasted from '../labware/definitions/2/eppendorf_96_wellplate_150ul/1.json'
+import eppendorf96Wellplate1000ulV1Uncasted from '../labware/definitions/2/eppendorf_96_wellplate_1000ul/1.json'
+import eppendorf96Wellplate2000ulV1Uncasted from '../labware/definitions/2/eppendorf_96_wellplate_2000ul/1.json'
+import eppendorf384Wellplate45ulV1Uncasted from '../labware/definitions/2/eppendorf_twintec_384_wellplate_45ul/1.json'
 import geb96Tiprack1000UlV1Uncasted from '../labware/definitions/2/geb_96_tiprack_1000ul/1.json'
 import geb96Tiprack10UlV1Uncasted from '../labware/definitions/2/geb_96_tiprack_10ul/1.json'
 import nest12Reservoir15MlV1Uncasted from '../labware/definitions/2/nest_12_reservoir_15ml/1.json'
@@ -209,6 +213,10 @@ const corning96Wellplate360UlFlatV2 = corning96Wellplate360UlFlatV2Uncasted as L
 const corning96Wellplate360UlFlatV1 = corning96Wellplate360UlFlatV1Uncasted as LabwareDefinition2
 const eppendorf96Tiprack1000UlEptipsV1 = eppendorf96Tiprack1000UlEptipsV1Uncasted as LabwareDefinition2
 const eppendorf96Tiprack10UlEptipsV1 = eppendorf96Tiprack10UlEptipsV1Uncasted as LabwareDefinition2
+const eppendorf96Wellplate150ulV1 = eppendorf96Wellplate150ulV1Uncasted as LabwareDefinition2
+const eppendorf96Wellplate1000ulV1 = eppendorf96Wellplate1000ulV1Uncasted as LabwareDefinition2
+const eppendorf96Wellplate2000ulV1 = eppendorf96Wellplate2000ulV1Uncasted as LabwareDefinition2
+const eppendorf384Wellplate45ulV1 = eppendorf384Wellplate45ulV1Uncasted as LabwareDefinition2
 const geb96Tiprack1000UlV1 = geb96Tiprack1000UlV1Uncasted as LabwareDefinition2
 const geb96Tiprack10UlV1 = geb96Tiprack10UlV1Uncasted as LabwareDefinition2
 const nest12Reservoir15MlV1 = nest12Reservoir15MlV1Uncasted as LabwareDefinition2
@@ -376,6 +384,10 @@ const latestDefs = {
   corning96Wellplate360UlFlatV2,
   eppendorf96Tiprack1000UlEptipsV1,
   eppendorf96Tiprack10UlEptipsV1,
+  eppendorf96Wellplate150ulV1,
+  eppendorf96Wellplate1000ulV1,
+  eppendorf96Wellplate2000ulV1,
+  eppendorf384Wellplate45ulV1,
   geb96Tiprack1000UlV1,
   geb96Tiprack10UlV1,
   nest12Reservoir15MlV1,
