@@ -20,7 +20,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
-import { getInitialDeckSetup } from '../../step-forms/selectors'
+import {
+  getAdditionalEquipmentEntities,
+  getInitialDeckSetup,
+} from '../../step-forms/selectors'
 import { selectors as fileSelectors } from '../../file-data'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { actions as loadFileActions } from '../../load-file'
@@ -70,13 +73,13 @@ export function ProtocolOverview(): JSX.Element {
   const fileData = useSelector(fileSelectors.createFile)
   const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
-  // const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
-  const modulesOnDeck = initialDeckSetup.modules
-  const labwaresOnDeck = initialDeckSetup.labware
-
+  const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const liquidsOnDeck = useSelector(
     labwareIngredSelectors.allIngredientNamesIds
   )
+  const modulesOnDeck = initialDeckSetup.modules
+  const labwaresOnDeck = initialDeckSetup.labware
+
   const nonLoadCommands =
     fileData?.commands.filter(
       command => !LOAD_COMMANDS.includes(command.commandType)
@@ -182,6 +185,11 @@ export function ProtocolOverview(): JSX.Element {
       {showMaterialsListModal ? (
         <MaterialsListModal
           hardware={Object.values(modulesOnDeck)}
+          fixtures={
+            additionalEquipment != null
+              ? Object.values(additionalEquipment)
+              : []
+          }
           labware={Object.values(labwaresOnDeck)}
           liquids={liquidsOnDeck}
           setShowMaterialsListModal={setShowMaterialsListModal}

@@ -17,6 +17,7 @@
   "exit": "exit",
   "fixtures": "Fixtures",
   "go_back": "Go back",
+  "gripper": "Gripper",
   "import": "Import",
   "incorrect_file_header": "Invalid file type",
   "incorrect_file_type_body": "Protocol Designer only accepts JSON protocol files created with Protocol Designer. Upload a valid file to continue.",

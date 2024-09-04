@@ -23,24 +23,40 @@ import {
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../components/portals/TopPortal'
+
+import type { AdditionalEquipmentName } from '@opentrons/step-generation'
+import type { LabwareOnDeck, ModuleOnDeck } from '../../step-forms'
 import type { OrderedLiquids } from '../../labware-ingred/types'
 
+// ToDo (kk:09/04/2024) this should be removed when break-point is set up
 const MODAL_MIN_WIDTH = '36.1875rem'
 
+export interface FixtureInList {
+  name: AdditionalEquipmentName
+  id: string
+  location?: string
+}
+
 interface MaterialsListModalProps {
-  hardware: any[]
-  labware: any[]
+  hardware: ModuleOnDeck[]
+  fixtures: FixtureInList[]
+  labware: LabwareOnDeck[]
   liquids: OrderedLiquids
   setShowMaterialsListModal: (showMaterialsListModal: boolean) => void
 }
 
 export function MaterialsListModal({
   hardware,
+  fixtures,
   labware,
   liquids,
   setShowMaterialsListModal,
 }: MaterialsListModalProps): JSX.Element {
-  const { t } = useTranslation('protocol_overview')
+  const { t } = useTranslation(['protocol_overview', 'shared'])
+  // const fixturesWithoutGripper = fixtures.filter(
+  //   fixture => fixture.name !== 'gripper'
+  // )
+
   return createPortal(
     <Modal
       onClose={() => {
@@ -57,6 +73,36 @@ export function MaterialsListModal({
             {t('deck_hardware')}
           </StyledText>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+            {fixtures.length > 0
+              ? fixtures.map(fixture => {
+                  return (
+                    <ListItem type="noActive" key={fixture.id}>
+                      <ListItemDescriptor
+                        type="default"
+                        description={
+                          fixture.location != null ? (
+                            <DeckInfoLabel
+                              deckLabel={fixture.location.replace('cutout', '')}
+                            />
+                          ) : (
+                            ''
+                          )
+                        }
+                        content={
+                          <Flex
+                            alignItems={ALIGN_CENTER}
+                            grigGap={SPACING.spacing4}
+                          >
+                            <StyledText desktopStyle="bodyDefaultRegular">
+                              {t(`shared:${fixture.name}`)}
+                            </StyledText>
+                          </Flex>
+                        }
+                      />
+                    </ListItem>
+                  )
+                })
+              : null}
             {hardware.length > 0 ? (
               hardware.map((hw, id) => (
                 <ListItem type="noActive" key={`hardware${id}`}>

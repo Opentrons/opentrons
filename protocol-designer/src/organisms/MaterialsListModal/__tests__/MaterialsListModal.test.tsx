@@ -1,11 +1,14 @@
 import * as React from 'react'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { screen } from '@testing-library/react'
+
 import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { MaterialsListModal } from '..'
 
 import type { InfoScreen } from '@opentrons/components'
+import type { LabwareOnDeck, ModuleOnDeck } from '../../../step-forms'
+import type { FixtureInList } from '..'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof InfoScreen>()
@@ -29,7 +32,11 @@ const mockHardWare = [
     slot: 'C1',
     type: 'temperatureModuleType',
   },
-]
+] as ModuleOnDeck[]
+
+const mockFixture = [
+  { location: 'cutoutB3', name: 'trashBin', id: 'mockId:trashBin' },
+] as FixtureInList[]
 
 const mockLabware = [
   {
@@ -40,13 +47,13 @@ const mockLabware = [
         displayVolumeUnits: 'µL',
         tags: [],
         namespace: 'opentrons',
-      },
+      } as any,
     },
     id: 'mockLabware',
     labwareDefURI: 'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
     slot: 'D3',
   },
-]
+] as LabwareOnDeck[]
 
 const render = (props: React.ComponentProps<typeof MaterialsListModal>) => {
   return renderWithProviders(<MaterialsListModal {...props} />, {
@@ -60,6 +67,7 @@ describe('MaterialsListModal', () => {
   beforeEach(() => {
     props = {
       hardware: [],
+      fixtures: [],
       labware: [],
       liquids: [],
       setShowMaterialsListModal: mockSetShowMaterialsListModal,
@@ -83,10 +91,13 @@ describe('MaterialsListModal', () => {
     props = {
       ...props,
       hardware: mockHardWare,
+      fixtures: mockFixture,
     }
     render(props)
     screen.getByText('C1')
     screen.getByText('Temperature Module GEN2')
+    screen.getByText('B3')
+    screen.getByText('Trash Bin')
   })
   it('should render labware info', () => {
     props = {
