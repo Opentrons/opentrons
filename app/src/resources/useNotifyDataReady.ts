@@ -23,19 +23,17 @@ export interface QueryOptionsWithPolling<TData, TError = Error>
   forceHttpPolling?: boolean
 }
 
-interface useNotifyDataReadyProps<TData, TError = Error> {
+interface UseNotifyDataReadyProps<TData, TError = Error> {
   topic: NotifyTopic
   options: QueryOptionsWithPolling<TData, TError>
   hostOverride?: HostConfig | null
 }
 
-interface useNotifyDataReadyResults {
-  /* Reset notification refetch state. */
-  notifyOnSettled: () => void
-  /* Whether notifications indicate the server has new data ready. */
+interface UseNotifyDataReadyResults<TData, TError> {
+  /* React Query options with notification-specific logic. */
+  queryOptionsNotify: QueryOptionsWithPolling<TData, TError>
+  /* Whether notifications indicate the server has new data ready. Always returns false if notifications are disabled. */
   shouldRefetch: boolean
-  /* Whether notifications are enabled as determined by client options and notification health. */
-  isNotifyEnabled: boolean
 }
 
 // React query hooks perform refetches when instructed by the shell via a refetch mechanism, which useNotifyDataReady manages.
@@ -48,7 +46,10 @@ export function useNotifyDataReady<TData, TError = Error>({
   topic,
   options,
   hostOverride,
-}: useNotifyDataReadyProps<TData, TError>): useNotifyDataReadyResults {
+}: UseNotifyDataReadyProps<TData, TError>): UseNotifyDataReadyResults<
+  TData,
+  TError
+> {
   const dispatch = useDispatch()
   const hostFromProvider = useHost()
   const host = hostOverride ?? hostFromProvider
@@ -109,15 +110,24 @@ export function useNotifyDataReady<TData, TError = Error>({
     }
   }, [])
 
-  const notifyOnSettled = React.useCallback(() => {
-    if (refetch === 'once') {
-      setRefetch(null)
-    }
-  }, [refetch])
+  const notifyOnSettled = React.useCallback(
+    (data: TData | undefined, error: TError | null) => {
+      if (refetch === 'once') {
+        setRefetch(null)
+      }
+      options.onSettled?.(data, error)
+    },
+    [refetch, options.onSettled]
+  )
+
+  const queryOptionsNotify = {
+    ...options,
+    onSettled: isNotifyEnabled ? notifyOnSettled : options.onSettled,
+    refetchInterval: isNotifyEnabled ? false : options.refetchInterval,
+  }
 
   return {
-    notifyOnSettled,
-    shouldRefetch: refetch != null,
-    isNotifyEnabled,
+    queryOptionsNotify,
+    shouldRefetch: isNotifyEnabled && refetch != null,
   }
 }
