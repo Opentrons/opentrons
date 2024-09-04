@@ -14,18 +14,17 @@ import {
 } from '@opentrons/components'
 import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 import { getLabwareDefsByURI } from '../../labware-defs/selectors'
-import type { UseFormSetValue, UseFormWatch } from 'react-hook-form'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
-import type { WizardFormState } from './types'
+import type { FormPipettesByMount, PipetteOnDeck } from '../../step-forms'
 
 interface PipetteInfoItemProps {
   mount: PipetteMount
   pipetteName: PipetteName
   tiprackDefURIs: string[]
   editClick: () => void
-  setValue: UseFormSetValue<WizardFormState>
   cleanForm: () => void
-  watch: UseFormWatch<WizardFormState>
+  formPipettesByMount?: FormPipettesByMount
+  pipetteOnDeck?: PipetteOnDeck[]
 }
 
 export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
@@ -34,11 +33,10 @@ export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
     pipetteName,
     tiprackDefURIs,
     editClick,
-    setValue,
     cleanForm,
-    watch,
+    formPipettesByMount,
+    pipetteOnDeck,
   } = props
-  const pipettesByMount = watch('pipettesByMount')
   const { t, i18n } = useTranslation('create_new_protocol')
   const oppositeMount = mount === 'left' ? 'right' : 'left'
   const allLabware = useSelector(getLabwareDefsByURI)
@@ -86,11 +84,11 @@ export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
               {t('edit')}
             </StyledText>
           </Btn>
-          {pipettesByMount[oppositeMount].pipetteName == null ? null : (
+          {(formPipettesByMount != null &&
+            formPipettesByMount[oppositeMount].pipetteName == null) ||
+          (pipetteOnDeck != null && pipetteOnDeck.length === 1) ? null : (
             <Btn
               onClick={() => {
-                setValue(`pipettesByMount.${mount}.pipetteName`, undefined)
-                setValue(`pipettesByMount.${mount}.tiprackDefURI`, undefined)
                 cleanForm()
               }}
               textDecoration={TYPOGRAPHY.textDecorationUnderline}

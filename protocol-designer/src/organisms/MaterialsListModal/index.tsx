@@ -61,10 +61,6 @@ export function MaterialsListModal({
   const { t } = useTranslation(['protocol_overview', 'shared'])
   const robotType = useSelector(getRobotType)
 
-  const fixturesWithoutGripper = fixtures.filter(
-    fixture => fixture.name !== 'gripper'
-  )
-
   return createPortal(
     <Modal
       onClose={() => {
@@ -81,8 +77,8 @@ export function MaterialsListModal({
             {t('deck_hardware')}
           </StyledText>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-            {fixturesWithoutGripper.length > 0
-              ? fixturesWithoutGripper.map(fixture => (
+            {fixtures.length > 0
+              ? fixtures.map(fixture => (
                   <ListItem type="noActive" key={fixture.id}>
                     <ListItemDescriptor
                       type="default"
