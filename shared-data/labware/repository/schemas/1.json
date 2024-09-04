@@ -1,0 +1,81 @@
+{
+  "$id": "opentronsLabwareRepositorySchemaV1",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "format": "This schema defines the labware repository interface. Labware entries must be keyed by labware def uri, with values representing each labware's data",
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "name of the labware repository"
+        },
+        "owner": {
+          "type": "string",
+          "description": "owner of the labware repository"
+        },
+        "lastModifiedDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["name", "owner", "lastModifiedDate"]
+    }
+  },
+  "patternProperties": {
+    "^[0-9a-fA-F-]{36}$": {
+      "type": "object",
+      "properties": {
+        "labwareDefUri": {
+          "type": "string",
+          "format": "labware definition uri"
+        },
+        "definitionPath": {
+          "type": "string",
+          "description": "a path to the labware definition relative to the index file’s containing directory"
+        },
+        "additionalContent": {
+          "type": "array",
+          "description": "additional metadata for file contents for this labware",
+          "items": {
+            "type": "object",
+            "properties": {
+              "contentMimeType": {
+                "type": "string"
+              },
+              "semanticType": {
+                "type": "string",
+                "enum": [
+                  "orthographicViewImage",
+                  "topViewImage",
+                  "longSideViewImage",
+                  "shortSideViewImage"
+                ]
+              },
+              "contentPath": {
+                "type": "string"
+              }
+            },
+            "required": ["contentMimeType", "semanticType", "contentPath"]
+          }
+        },
+        "lastEditTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "valid": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "labwareDefUri",
+        "definitionPath",
+        "additionalContent",
+        "lastEditTimestamp",
+        "valid"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

@@ -2,6 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import { useLocation } from 'react-router-dom'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -32,6 +33,7 @@ export function LiquidsOverflowMenu(
   props: LiquidsOverflowMenuProps
 ): JSX.Element {
   const { onClose, showLiquidsModal, overflowWrapperRef } = props
+  const location = useLocation()
   const { t } = useTranslation(['starting_deck_state'])
   const liquids = useSelector(labwareIngredSelectors.allIngredientNamesIds)
   const dispatch: ThunkDispatch<any> = useDispatch()
@@ -40,7 +42,7 @@ export function LiquidsOverflowMenu(
     <Flex
       position={POSITION_ABSOLUTE}
       zIndex={5}
-      right="50px"
+      right={location.pathname === '/liquids' ? SPACING.spacing12 : '3.125rem'}
       top={`calc(${NAV_HEIGHT} - 6px)`}
       whiteSpace={NO_WRAP}
       ref={overflowWrapperRef}

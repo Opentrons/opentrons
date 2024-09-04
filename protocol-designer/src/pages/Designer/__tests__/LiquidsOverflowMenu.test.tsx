@@ -7,8 +7,19 @@ import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { LiquidsOverflowMenu } from '../LiquidsOverflowMenu'
 
+import type { NavigateFunction } from 'react-router-dom'
+
+const mockLocation = vi.fn()
+
 vi.mock('../../../labware-ingred/selectors')
 vi.mock('../../../labware-ingred/actions')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<NavigateFunction>()
+  return {
+    ...actual,
+    useLocation: () => mockLocation,
+  }
+})
 
 const render = (props: React.ComponentProps<typeof LiquidsOverflowMenu>) => {
   return renderWithProviders(<LiquidsOverflowMenu {...props} />, {

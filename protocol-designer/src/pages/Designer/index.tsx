@@ -10,7 +10,6 @@ import {
   Flex,
   INFO_TOAST,
   Icon,
-  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
@@ -23,7 +22,7 @@ import {
 import { useKitchen } from '../../organisms/Kitchen/hooks'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { getFileMetadata } from '../../file-data/selectors'
-import { DefineLiquidsModal } from '../../organisms'
+import { DefineLiquidsModal, ProtocolMetadataNav } from '../../organisms'
 import { DeckSetupContainer } from './DeckSetup'
 import { OffDeck } from './Offdeck'
 import { LiquidsOverflowMenu } from './LiquidsOverflowMenu'
@@ -131,18 +130,7 @@ export function Designer(): JSX.Element {
           {zoomInOnSlot != null ? null : (
             <Tabs tabs={[startingDeckTab, protocolStepTab]} />
           )}
-          <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText desktopStyle="bodyDefaultSemiBold">
-              {metadata?.protocolName != null && metadata?.protocolName !== ''
-                ? metadata?.protocolName
-                : t('untitled_protocol')}
-            </StyledText>
-            <Flex color={COLORS.grey60} justifyContent={JUSTIFY_CENTER}>
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {t('edit_protocol')}
-              </StyledText>
-            </Flex>
-          </Flex>
+          <ProtocolMetadataNav />
           <Flex gridGap={SPACING.spacing8}>
             <PrimaryButton
               onClick={() => {

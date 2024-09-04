@@ -24,6 +24,8 @@ type LargeButtonTypes =
   | 'alertStroke'
   | 'alertAlt'
 interface LargeButtonProps extends StyleProps {
+  /** used for form submission */
+  type?: 'submit'
   onClick?: () => void
   buttonType?: LargeButtonTypes
   buttonText: React.ReactNode
@@ -40,6 +42,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     iconName,
     ariaDisabled = false,
     disabled = false,
+    type,
     ...buttonProps
   } = props
 
@@ -239,6 +242,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
   `
   return (
     <Btn
+      type={type}
       display={DISPLAY_FLEX}
       css={LARGE_BUTTON_STYLE}
       disabled={ariaDisabled ? false : disabled}
