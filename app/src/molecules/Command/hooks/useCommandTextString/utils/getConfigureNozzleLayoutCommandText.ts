@@ -14,7 +14,7 @@ export function getConfigureNozzleLayoutCommandText({
   )?.pipetteName
 
   return t('configure_nozzle_layout', {
-    amount: configurationParams.style === 'COLUMN' ? '8' : 'all',
+    amount: configurationParams.style === 'SINGLE' || 'ROW' || 'COLUMN' || 'PARTIAL_COLUMN' ? '8' : 'all',
     pipette:
       pipetteName != null ? getPipetteSpecsV2(pipetteName)?.displayName : '',
   })
