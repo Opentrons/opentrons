@@ -170,7 +170,7 @@ export function ProtocolOverview(): JSX.Element {
       dispatch(loadFileActions.saveProtocolFile())
     },
   })
-  console.log('showEditMetadataModal', showEditMetadataModal)
+
   return (
     <>
       {showEditMetadataModal ? (
