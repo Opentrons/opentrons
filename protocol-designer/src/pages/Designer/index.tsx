@@ -94,13 +94,6 @@ export function Designer(): JSX.Element {
     }
   }, [])
 
-  //  navigate to landing if suddenly you have no created protocol
-  React.useEffect(() => {
-    if (metadata?.created == null) {
-      navigate('/')
-    }
-  }, [additionalEquipmentOnDeck, navigate])
-
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
       if (!showDefineLiquidModal) {
