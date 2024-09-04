@@ -98,18 +98,17 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
     }
   }, [selectedModuleModel, selectedFixture])
 
+  const moduleModels =
+    slot != null
+      ? getModuleModelsBySlot(enableAbsorbanceReader, robotType, slot)
+      : null
+  const [tab, setTab] = React.useState<'hardware' | 'labware'>(
+    moduleModels?.length === 0 || slot === 'offDeck' ? 'labware' : 'hardware'
+  )
+
   if (slot == null || (onDeckProps == null && slot !== 'offDeck')) {
     return null
   }
-
-  const moduleModels = getModuleModelsBySlot(
-    enableAbsorbanceReader,
-    robotType,
-    slot
-  )
-  const [tab, setTab] = React.useState<'hardware' | 'labware'>(
-    moduleModels.length === 0 || slot === 'offDeck' ? 'labware' : 'hardware'
-  )
 
   const {
     modules: deckSetupModules,
