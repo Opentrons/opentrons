@@ -1,6 +1,7 @@
 export * from './AssignLiquidsModal'
 export * from './DefineLiquidsModal'
 export * from './EditNickNameModal'
+export * from './EditProtocolMetadataModal'
 export * from './FeatureFlagsModal'
 export * from './FileUploadMessagesModal/'
 export * from './IncompatibleTipsModal'
