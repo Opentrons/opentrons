@@ -198,6 +198,7 @@ const MenuButton = styled.button`
   cursor: pointer;
   padding: ${SPACING.spacing8} ${SPACING.spacing12};
   border: none;
+  border-radius: inherit;
   &:hover {
     background-color: ${COLORS.blue10};
   }

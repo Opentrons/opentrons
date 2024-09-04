@@ -13,10 +13,9 @@ describe('Toolbox', () => {
 
   it('should render text and buttons', () => {
     props = {
-      title: 'header',
+      title: <div>'header'</div>,
       children: <div>mock children</div>,
       confirmButtonText: 'done',
-      titleIconName: 'swap-horizontal',
       onCloseClick: vi.fn(),
       closeButtonText: 'exit',
       onConfirmClick: vi.fn(),

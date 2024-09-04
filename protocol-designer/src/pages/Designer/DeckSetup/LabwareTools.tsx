@@ -216,12 +216,9 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
     [labwareByCategory, getIsLabwareFiltered, searchTerm]
   )
   const handleCategoryClick = (category: string): void => {
-    if (selectedCategory !== category) {
-      setSelectedCategory(category)
-    } else {
-      setSelectedCategory(null)
-    }
+    setSelectedCategory(selectedCategory === category ? null : category)
   }
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex
