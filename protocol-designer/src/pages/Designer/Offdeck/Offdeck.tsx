@@ -28,8 +28,8 @@ export function OffDeck(): JSX.Element {
   )
   const dispatch = useDispatch()
 
-  const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
-  const { selectedLabwareDefUri, zoomedInSlot } = zoomedInSlotInfo
+  const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
+  const { selectedLabwareDefUri, selectedSlot } = selectedSlotInfo
 
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const defs = getOnlyLatestDefs()
@@ -94,7 +94,7 @@ export function OffDeck(): JSX.Element {
 
   return (
     <>
-      {zoomedInSlot.slot === 'offDeck' ? (
+      {selectedSlot.slot === 'offDeck' ? (
         <>
           <Flex justifyContent={JUSTIFY_CENTER} width="calc(100% - 25rem)">
             <Flex

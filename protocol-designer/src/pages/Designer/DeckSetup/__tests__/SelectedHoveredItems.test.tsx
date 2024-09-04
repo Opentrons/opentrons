@@ -48,7 +48,7 @@ describe('SelectedHoveredItems', () => {
       selectedNestedLabwareDefUri: null,
       selectedFixture: 'trashBin',
       selectedModuleModel: null,
-      zoomedInSlot: { slot: 'D3', cutout: 'cutoutD3' },
+      selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
     })
     vi.mocked(getCustomLabwareDefsByURI).mockReturnValue({})
     vi.mocked(FixtureRender).mockReturnValue(<div>mock FixtureRender</div>)
@@ -66,7 +66,7 @@ describe('SelectedHoveredItems', () => {
       selectedNestedLabwareDefUri: null,
       selectedFixture: 'trashBin',
       selectedModuleModel: null,
-      zoomedInSlot: { slot: 'D3', cutout: 'cutoutD3' },
+      selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
     })
     render(props)
     screen.getByText('mock FixtureRender')
@@ -79,7 +79,7 @@ describe('SelectedHoveredItems', () => {
       selectedNestedLabwareDefUri: null,
       selectedFixture: null,
       selectedModuleModel: HEATERSHAKER_MODULE_V1,
-      zoomedInSlot: { slot: 'D3', cutout: 'cutoutD3' },
+      selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
     })
     render(props)
     screen.getByText('mock Module')
@@ -91,7 +91,7 @@ describe('SelectedHoveredItems', () => {
       selectedNestedLabwareDefUri: null,
       selectedFixture: null,
       selectedModuleModel: HEATERSHAKER_MODULE_V1,
-      zoomedInSlot: { slot: 'D3', cutout: 'cutoutD3' },
+      selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
     })
     render(props)
     screen.getByText('mock Module')
@@ -104,7 +104,7 @@ describe('SelectedHoveredItems', () => {
         'fixture/fixture_universal_flat_bottom_adapter/1',
       selectedFixture: 'trashBin',
       selectedModuleModel: null,
-      zoomedInSlot: { slot: 'D3', cutout: 'cutoutD3' },
+      selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
     })
     render(props)
     screen.getByText('mock FixtureRender')

@@ -34,7 +34,7 @@ interface DeckItemHoverProps {
   slotPosition: CoordinateTuple | null
   setShowMenuListForId: React.Dispatch<React.SetStateAction<string | null>>
   menuListId: DeckSlotId | null
-  isZoomed?: boolean
+  isSelected?: boolean
   selectedTerminalItemId?: TerminalItemId | null
 }
 
@@ -48,7 +48,7 @@ export function DeckItemHover(props: DeckItemHoverProps): JSX.Element | null {
     setShowMenuListForId,
     menuListId,
     slotPosition,
-    isZoomed = false,
+    isSelected = false,
   } = props
   const { t } = useTranslation('starting_deck_state')
   const deckSetup = useSelector(getDeckSetupForActiveItem)
@@ -58,7 +58,7 @@ export function DeckItemHover(props: DeckItemHoverProps): JSX.Element | null {
   if (
     selectedTerminalItemId !== START_TERMINAL_ITEM_ID ||
     slotPosition === null ||
-    isZoomed
+    isSelected
   )
     return null
 

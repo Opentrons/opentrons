@@ -37,14 +37,14 @@ export const SelectedHoveredItems = (
     hoveredLabware,
     slotPosition,
   } = props
-  const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
+  const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {
-    zoomedInSlot,
+    selectedSlot,
     selectedFixture,
     selectedLabwareDefUri,
     selectedModuleModel,
     selectedNestedLabwareDefUri,
-  } = zoomedInSlotInfo
+  } = selectedSlotInfo
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const defs = getOnlyLatestDefs()
 
@@ -98,12 +98,12 @@ export const SelectedHoveredItems = (
   return (
     <>
       {selectedFixture != null &&
-      zoomedInSlot.cutout != null &&
+      selectedSlot.cutout != null &&
       hoveredFixture == null &&
       hoveredModule == null ? (
         <FixtureRender
           fixture={selectedFixture}
-          cutout={zoomedInSlot.cutout}
+          cutout={selectedSlot.cutout}
           robotType={robotType}
           deckDef={deckDef}
         />
@@ -114,7 +114,7 @@ export const SelectedHoveredItems = (
       hoveredFixture == null &&
       orientation != null ? (
         <Module
-          key={`${selectedModuleModel}_${zoomedInSlot.slot}_selected`}
+          key={`${selectedModuleModel}_${selectedSlot.slot}_selected`}
           x={slotPosition[0]}
           y={slotPosition[1]}
           def={getModuleDef2(selectedModuleModel)}

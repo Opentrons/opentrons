@@ -31,7 +31,7 @@ describe('OffDeck', () => {
       selectedNestedLabwareDefUri: null,
       selectedFixture: null,
       selectedModuleModel: null,
-      zoomedInSlot: { slot: null, cutout: null },
+      selectedSlot: { slot: null, cutout: null },
     })
     vi.mocked(getCustomLabwareDefsByURI).mockReturnValue({})
   })

@@ -72,7 +72,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
   const { onCloseClick, setHoveredLabware, onDeckProps } = props
   const { t, i18n } = useTranslation(['starting_deck_state', 'shared'])
   const { makeSnackbar } = useKitchen()
-  const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
+  const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const enableAbsorbanceReader = useSelector(getEnableAbsorbanceReader)
@@ -82,23 +82,16 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
     selectedLabwareDefUri,
     selectedFixture,
     selectedModuleModel,
-    zoomedInSlot,
+    selectedSlot,
     selectedNestedLabwareDefUri,
-  } = zoomedInSlotInfo
-  const { slot, cutout } = zoomedInSlot
+  } = selectedSlotInfo
+  const { slot, cutout } = selectedSlot
   const [selectedHardware, setHardware] = React.useState<
     ModuleModel | Fixture | null
   >(null)
-  const moduleModels = getModuleModelsBySlot(
-    enableAbsorbanceReader,
-    robotType,
-    slot ?? ''
-  )
-  const [tab, setTab] = React.useState<'hardware' | 'labware'>(
-    moduleModels.length === 0 || slot === 'offDeck' ? 'labware' : 'hardware'
-  )
 
-  //  initialize the previously selected hardware
+  //  initialize the previously selected hardware because for some reason it does not
+  //  work initiating it in the above useState
   React.useEffect(() => {
     if (selectedModuleModel || selectedFixture) {
       setHardware(selectedModuleModel ?? selectedFixture ?? null)
@@ -108,6 +101,15 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
   if (slot == null || (onDeckProps == null && slot !== 'offDeck')) {
     return null
   }
+
+  const moduleModels = getModuleModelsBySlot(
+    enableAbsorbanceReader,
+    robotType,
+    slot
+  )
+  const [tab, setTab] = React.useState<'hardware' | 'labware'>(
+    moduleModels.length === 0 || slot === 'offDeck' ? 'labware' : 'hardware'
+  )
 
   const {
     modules: deckSetupModules,
@@ -249,7 +251,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
 
   return (
     <Toolbox
-      width="374px"
+      width="23.375rem"
       title={
         <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
           <DeckInfoLabel

@@ -56,5 +56,5 @@ export interface ZoomedIntoSlotInfoState {
   selectedNestedLabwareDefUri: string | null
   selectedModuleModel: ModuleModel | null
   selectedFixture: Fixture | null
-  zoomedInSlot: { slot: DeckSlot | null; cutout: CutoutId | null }
+  selectedSlot: { slot: DeckSlot | null; cutout: CutoutId | null }
 }

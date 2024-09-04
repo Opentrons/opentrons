@@ -58,7 +58,7 @@ describe('DeckSetupTools', () => {
       selectedNestedLabwareDefUri: null,
       selectedFixture: null,
       selectedModuleModel: null,
-      zoomedInSlot: { slot: 'D3', cutout: 'cutoutD3' },
+      selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
     })
     vi.mocked(LabwareTools).mockReturnValue(<div>mock labware tools</div>)
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
@@ -137,7 +137,7 @@ describe('DeckSetupTools', () => {
       selectedNestedLabwareDefUri: null,
       selectedFixture: null,
       selectedModuleModel: HEATERSHAKER_MODULE_V1,
-      zoomedInSlot: { slot: 'D3', cutout: 'cutoutD3' },
+      selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
     })
     render(props)
     fireEvent.click(screen.getByText('Heater-Shaker Module GEN1'))
@@ -151,7 +151,7 @@ describe('DeckSetupTools', () => {
       selectedNestedLabwareDefUri: null,
       selectedFixture: 'wasteChuteAndStagingArea',
       selectedModuleModel: HEATERSHAKER_MODULE_V1,
-      zoomedInSlot: { slot: 'D3', cutout: 'cutoutD3' },
+      selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
     })
     render(props)
     fireEvent.click(screen.getByText('Waste chute and staging area slot'))

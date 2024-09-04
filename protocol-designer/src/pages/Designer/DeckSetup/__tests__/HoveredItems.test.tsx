@@ -48,7 +48,7 @@ describe('HoveredItems', () => {
       selectedNestedLabwareDefUri: null,
       selectedFixture: null,
       selectedModuleModel: null,
-      zoomedInSlot: { slot: 'D3', cutout: 'cutoutD3' },
+      selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
     })
     vi.mocked(getCustomLabwareDefsByURI).mockReturnValue({})
     vi.mocked(FixtureRender).mockReturnValue(<div>mock FixtureRender</div>)

@@ -43,6 +43,10 @@ const ROBOT_BOTTOM_HALF_SLOTS = [
   '5',
   '6',
 ]
+const BOTTOM_SLOT_Y_POSITION = -70
+const TOP_SLOT_Y_POSITION = 50
+const TOP_SLOT_Y_POSITION_ALL_BUTTONS = 110
+const TOP_SLOT_Y_POSITION_2_BUTTONS = 35
 
 interface SlotOverflowMenuProps {
   slot: DeckSlotId
@@ -126,10 +130,14 @@ export function SlotOverflowMenu(
       nestedLabwareOnSlot == null) ||
     nestedLabwareOnSlot != null
 
-  let position = ROBOT_BOTTOM_HALF_SLOTS.includes(slot) ? -70 : 50
+  let position = ROBOT_BOTTOM_HALF_SLOTS.includes(slot)
+    ? BOTTOM_SLOT_Y_POSITION
+    : TOP_SLOT_Y_POSITION
 
-  if (showDuplicateBtn) {
-    position += showEditAndLiquidsBtns ? 110 : 35
+  if (showDuplicateBtn && !ROBOT_BOTTOM_HALF_SLOTS.includes(slot)) {
+    position += showEditAndLiquidsBtns
+      ? TOP_SLOT_Y_POSITION_ALL_BUTTONS
+      : TOP_SLOT_Y_POSITION_2_BUTTONS
   }
 
   const slotOverflowBody = (
@@ -237,13 +245,12 @@ export function SlotOverflowMenu(
     <RobotCoordsForeignDiv
       x={menuListSlotPosition[0] + 50}
       y={menuListSlotPosition[1] - position}
-      width="172px"
-      height="180px"
+      width="10.75rem"
+      height="11.25rem"
       innerDivProps={{
         style: {
           position: POSITION_ABSOLUTE,
           transform: 'rotate(180deg) scaleX(-1)',
-          zIndex: 5,
         },
       }}
     >

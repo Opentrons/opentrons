@@ -81,8 +81,8 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
     activeDeckSetup,
     robotType
   )
-  const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
-  const { zoomedInSlot } = zoomedInSlotInfo
+  const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
+  const { selectedSlot } = selectedSlotInfo
   const [menuListId, setShowMenuListForId] = React.useState<DeckSlotId | null>(
     null
   )
@@ -205,7 +205,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
           yDimension: labwareLoadedOnModule?.def.dimensions.yDimension ?? 0,
           zDimension: labwareLoadedOnModule?.def.dimensions.zDimension ?? 0,
         }
-        return moduleOnDeck.slot !== zoomedInSlot.slot ? (
+        return moduleOnDeck.slot !== selectedSlot.slot ? (
           <React.Fragment key={moduleOnDeck.id}>
             <Module
               key={moduleOnDeck.id}
@@ -227,7 +227,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
                     labwareOnDeck={labwareLoadedOnModule}
                   />
                   <DeckItemHover
-                    isZoomed={selectedZoomInSlot != null}
+                    isSelected={selectedZoomInSlot != null}
                     hover={hover}
                     setHover={setHover}
                     setShowMenuListForId={setShowMenuListForId}
@@ -242,7 +242,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
 
               {labwareLoadedOnModule == null ? (
                 <DeckItemHover
-                  isZoomed={selectedZoomInSlot != null}
+                  isSelected={selectedZoomInSlot != null}
                   hover={hover}
                   setHover={setHover}
                   setShowMenuListForId={setShowMenuListForId}
@@ -294,7 +294,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
           return (
             <React.Fragment key={addressableArea.id}>
               <DeckItemHover
-                isZoomed={selectedZoomInSlot != null}
+                isSelected={selectedZoomInSlot != null}
                 hover={hover}
                 setHover={setHover}
                 setShowMenuListForId={setShowMenuListForId}
@@ -328,7 +328,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
           console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
           return null
         }
-        return labware.slot !== zoomedInSlot.slot ? (
+        return labware.slot !== selectedSlot.slot ? (
           <React.Fragment key={labware.id}>
             <LabwareOnDeck
               x={slotPosition[0]}
@@ -336,7 +336,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
               labwareOnDeck={labware}
             />
             <DeckItemHover
-              isZoomed={selectedZoomInSlot != null}
+              isSelected={selectedZoomInSlot != null}
               hover={hover}
               setHover={setHover}
               setShowMenuListForId={setShowMenuListForId}
@@ -395,7 +395,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
               labwareOnDeck={labware}
             />
             <DeckItemHover
-              isZoomed={selectedZoomInSlot != null}
+              isSelected={selectedZoomInSlot != null}
               hover={hover}
               setShowMenuListForId={setShowMenuListForId}
               menuListId={menuListId}

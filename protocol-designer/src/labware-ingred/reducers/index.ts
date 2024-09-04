@@ -359,7 +359,7 @@ const selectedSlotInfoInitialState: ZoomedIntoSlotInfoState = {
   selectedNestedLabwareDefUri: null,
   selectedModuleModel: null,
   selectedFixture: null,
-  zoomedInSlot: { slot: null, cutout: null },
+  selectedSlot: { slot: null, cutout: null },
 }
 
 export const zoomedInSlotInfo = (
@@ -392,7 +392,7 @@ export const zoomedInSlotInfo = (
       const { slot, cutout } = action.payload
       return {
         ...state,
-        zoomedInSlot: {
+        selectedSlot: {
           slot,
           cutout,
         },

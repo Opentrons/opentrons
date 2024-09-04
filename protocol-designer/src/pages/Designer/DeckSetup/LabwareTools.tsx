@@ -71,6 +71,8 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
   const permittedTipracks = useSelector(stepFormSelectors.getPermittedTipracks)
   const pipetteEntities = useSelector(getPipetteEntities)
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
+  const has96Channel = getHas96Channel(pipetteEntities)
+  const defs = getOnlyLatestDefs()
   const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {
@@ -78,42 +80,33 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
     selectedModuleModel,
     selectedNestedLabwareDefUri,
   } = zoomedInSlotInfo
-  // TODO(ja, 8/16/24): We are never filtering recommended labware, check with designs
-  // where to add the filter checkbox/button
-  const [filterRecommended, setFilterRecommended] = React.useState<boolean>(
-    false
-  )
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
     null
   )
-  const [filterHeight, setFilterHeight] = React.useState<boolean>(false)
   const [searchTerm, setSearchTerm] = React.useState<string>('')
 
   const searchFilter = (termToCheck: string): boolean =>
     termToCheck.toLowerCase().includes(searchTerm.toLowerCase())
 
-  const has96Channel = getHas96Channel(pipetteEntities)
-  const defs = getOnlyLatestDefs()
   const modulesById = deckSetup.modules
-
   const moduleType =
     selectedModuleModel != null ? getModuleType(selectedModuleModel) : null
   const initialModules: ModuleOnDeck[] = Object.keys(modulesById).map(
     moduleId => modulesById[moduleId]
   )
+
+  // TODO(ja, 8/16/24): We are never filtering recommended labware, check with designs
+  // where to add the filter checkbox/button
+  const filterRecommended =
+    robotType === OT2_ROBOT_TYPE ? moduleType != null : false
   //    for OT-2 usage only due to H-S collisions
   const isNextToHeaterShaker = initialModules.some(
     hardwareModule =>
       hardwareModule.type === HEATERSHAKER_MODULE_TYPE &&
       getAreSlotsHorizontallyAdjacent(hardwareModule.slot, slot)
   )
-  // if you're adding labware to a module, check the recommended filter by default
-  React.useEffect(() => {
-    if (robotType === OT2_ROBOT_TYPE) {
-      setFilterRecommended(moduleType != null)
-      setFilterHeight(isNextToHeaterShaker)
-    }
-  }, [moduleType, isNextToHeaterShaker, robotType])
+  const filterHeight =
+    robotType === OT2_ROBOT_TYPE ? isNextToHeaterShaker : false
 
   const getLabwareCompatible = React.useCallback(
     (def: LabwareDefinition2) => {

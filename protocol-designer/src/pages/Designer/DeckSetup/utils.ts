@@ -155,8 +155,7 @@ export const getDeckErrors = (props: DeckErrorsProps): string | null => {
 
   if (robotType === OT2_ROBOT_TYPE) {
     const isModuleAdjacentToHeaterShaker =
-      // if the module is a heater shaker, it can't be adjacent to another heater shaker
-      // because PD does not support MoaM for OT-2
+      // modules can't be adjacent to heater shakers
       getModuleType(selectedModel) !== HEATERSHAKER_MODULE_TYPE &&
       some(
         modules,
@@ -172,8 +171,7 @@ export const getDeckErrors = (props: DeckErrorsProps): string | null => {
         modules,
         hwModule =>
           getAreSlotsAdjacent(hwModule.slot, selectedSlot) &&
-          // if the other module is a heater shaker it's the same heater shaker (reflecting current state)
-          // since the form has not been saved yet and PD does not support MoaM for OT-2
+          // if the module is a heater shaker, it can't be adjacent to another module
           hwModule.type !== HEATERSHAKER_MODULE_TYPE
       )
       if (isHeaterShakerAdjacentToAnotherModule) {

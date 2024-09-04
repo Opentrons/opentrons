@@ -170,7 +170,7 @@ const getZoomedInSlot: Selector<
   { slot: DeckSlot | null; cutout: CutoutId | null }
 > = createSelector(
   rootSelector,
-  rootState => rootState.zoomedInSlotInfo.zoomedInSlot
+  rootState => rootState.zoomedInSlotInfo.selectedSlot
 )
 
 // TODO: prune selectors

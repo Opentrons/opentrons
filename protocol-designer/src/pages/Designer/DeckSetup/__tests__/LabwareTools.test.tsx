@@ -65,7 +65,7 @@ describe('LabwareTools', () => {
       selectedNestedLabwareDefUri: null,
       selectedFixture: null,
       selectedModuleModel: null,
-      zoomedInSlot: { slot: 'D3', cutout: 'cutoutD3' },
+      selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
     })
     vi.mocked(getHas96Channel).mockReturnValue(false)
     vi.mocked(getInitialDeckSetup).mockReturnValue({
@@ -98,7 +98,7 @@ describe('LabwareTools', () => {
       selectedNestedLabwareDefUri: null,
       selectedFixture: null,
       selectedModuleModel: null,
-      zoomedInSlot: { slot: 'D3', cutout: 'cutoutD3' },
+      selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
     })
     render(props)
     screen.getByText('Adapter')
