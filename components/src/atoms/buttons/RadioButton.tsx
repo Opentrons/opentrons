@@ -21,12 +21,12 @@ interface RadioButtonProps extends StyleProps {
   onChange: React.ChangeEventHandler<HTMLInputElement>
   disabled?: boolean
   iconName?: IconName
-  id?: string
   isSelected?: boolean
   largeDesktopBorderRadius?: boolean
-  maxLines?: number | null
   radioButtonType?: 'large' | 'small'
   subButtonLabel?: string
+  id?: string
+  maxLines?: number | null
 }
 
 //  used for ODD and helix
@@ -98,6 +98,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
        display: ${maxLines != null ? '-webkit-box' : undefined};
         -webkit-line-clamp: ${maxLines ?? undefined};
         -webkit-box-orient: ${maxLines != null ? 'vertical' : undefined};
+        word-wrap: break-word;
       }
     }
   `

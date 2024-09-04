@@ -56,16 +56,8 @@ export function ConfirmCancelRunModal({
     isLoading: isDismissing,
   } = useDismissCurrentRunMutation({
     onSettled: () => {
-      if (isQuickTransfer && protocolId != null) {
+      if (isQuickTransfer) {
         deleteRun(runId)
-        navigate(`/quick-transfer/${protocolId}`)
-      } else if (isQuickTransfer) {
-        deleteRun(runId)
-        navigate('/quick-transfer')
-      } else if (protocolId != null) {
-        navigate(`/protocols/${protocolId}`)
-      } else {
-        navigate('/protocols')
       }
     },
   })
@@ -97,6 +89,15 @@ export function ConfirmCancelRunModal({
       trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
       if (!isActiveRun) {
         dismissCurrentRun(runId)
+        if (isQuickTransfer && protocolId != null) {
+          navigate(`/quick-transfer/${protocolId}`)
+        } else if (isQuickTransfer) {
+          navigate('/quick-transfer')
+        } else if (protocolId != null) {
+          navigate(`/protocols/${protocolId}`)
+        } else {
+          navigate('/protocols')
+        }
       }
     }
   }, [runStatus])
