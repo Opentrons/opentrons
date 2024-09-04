@@ -140,7 +140,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
 
   const hardwareTab = {
     text: t('deck_hardware'),
-    disabled: moduleModels.length === 0,
+    disabled: moduleModels?.length === 0,
     isActive: tab === 'hardware',
     onClick: () => {
       setTab('hardware')
@@ -296,7 +296,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
                   {t('add_module')}
                 </StyledText>
               </Flex>
-              {moduleModels.map(model => {
+              {moduleModels?.map(model => {
                 const modelSomewhereOnDeck = Object.values(
                   deckSetupModules
                 ).filter(
