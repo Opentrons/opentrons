@@ -101,7 +101,7 @@ def ot3_fixed_trash_def() -> LabwareDefinition:
 @pytest.fixture(scope="session")
 def ot3_absorbance_reader_lid() -> LabwareDefinition:
     """Get the definition of the OT-3 plate reader lid."""
-    return LabwareDefinition.parse_obj(
+    return LabwareDefinition.model_validate(
         load_definition("opentrons_flex_lid_absorbance_plate_reader_module", 1)
     )
 

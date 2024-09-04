@@ -174,7 +174,7 @@ class LegacyCommandMapper:
             completed_command: pe_commands.Command
             if command_error is None:
                 if isinstance(running_command, pe_commands.PickUpTip):
-                    completed_command = running_command.copy(
+                    completed_command = running_command.model_copy(
                         update={
                             "result": pe_commands.PickUpTipResult(
                                 tipVolume=command["payload"]["location"].max_volume,  # type: ignore[typeddict-item]
@@ -187,7 +187,7 @@ class LegacyCommandMapper:
                         }
                     )
                 elif isinstance(running_command, pe_commands.DropTip):
-                    completed_command = running_command.copy(
+                    completed_command = running_command.model_copy(
                         update={
                             "result": pe_commands.DropTipResult(
                                 position=pe_types.DeckPoint(x=0, y=0, z=0)
@@ -198,7 +198,7 @@ class LegacyCommandMapper:
                         }
                     )
                 elif isinstance(running_command, pe_commands.Aspirate):
-                    completed_command = running_command.copy(
+                    completed_command = running_command.model_copy(
                         update={
                             # Don't .construct() result, because we want to validate
                             # volume.
@@ -212,7 +212,7 @@ class LegacyCommandMapper:
                         }
                     )
                 elif isinstance(running_command, pe_commands.Dispense):
-                    completed_command = running_command.copy(
+                    completed_command = running_command.model_copy(
                         update={
                             # Don't .construct() result, because we want to validate
                             # volume.
@@ -226,7 +226,7 @@ class LegacyCommandMapper:
                         }
                     )
                 elif isinstance(running_command, pe_commands.BlowOut):
-                    completed_command = running_command.copy(
+                    completed_command = running_command.model_copy(
                         update={
                             "result": pe_commands.BlowOutResult(
                                 position=pe_types.DeckPoint(x=0, y=0, z=0)
@@ -237,7 +237,7 @@ class LegacyCommandMapper:
                         }
                     )
                 elif isinstance(running_command, pe_commands.Comment):
-                    completed_command = running_command.copy(
+                    completed_command = running_command.model_copy(
                         update={
                             "result": pe_commands.CommentResult.construct(),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
@@ -246,7 +246,7 @@ class LegacyCommandMapper:
                         }
                     )
                 elif isinstance(running_command, pe_commands.Custom):
-                    completed_command = running_command.copy(
+                    completed_command = running_command.model_copy(
                         update={
                             "result": pe_commands.CustomResult(),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
@@ -258,7 +258,7 @@ class LegacyCommandMapper:
                     # TODO(mm, 2024-06-13): This looks potentially wrong.
                     # We're creating a `SUCCEEDED` command that does not have a `result`,
                     # which is not normally possible.
-                    completed_command = running_command.copy(
+                    completed_command = running_command.model_copy(
                         update={
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,

@@ -210,7 +210,7 @@ def addressable_area_view(
 @pytest.fixture
 def nice_labware_definition() -> LabwareDefinition:
     """Load a nice labware def that won't blow up your terminal."""
-    return LabwareDefinition.parse_obj(
+    return LabwareDefinition.model_validate(
         json.loads(
             load_shared_data("labware/fixtures/2/fixture_12_trough_v2.json").decode(
                 "utf-8"
@@ -222,7 +222,7 @@ def nice_labware_definition() -> LabwareDefinition:
 @pytest.fixture
 def nice_adapter_definition() -> LabwareDefinition:
     """Load a friendly adapter definition."""
-    return LabwareDefinition.parse_obj(
+    return LabwareDefinition.model_validate(
         json.loads(
             load_shared_data(
                 "labware/definitions/2/opentrons_aluminum_flat_bottom_plate/1.json"

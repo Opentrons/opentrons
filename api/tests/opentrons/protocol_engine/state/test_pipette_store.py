@@ -533,7 +533,7 @@ def test_blow_out_clears_volume(
         ),
         (
             FailCommandAction(
-                running_command=cmd.LiquidProbe(  # type: ignore[call-arg]
+                running_command=cmd.LiquidProbe.model_construct(  # type: ignore[call-arg]
                     id="command-id",
                     createdAt=datetime.now(),
                     startedAt=datetime.now(),

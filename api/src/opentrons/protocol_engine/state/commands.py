@@ -314,7 +314,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
     def _handle_run_command_action(self, action: RunCommandAction) -> None:
         prev_entry = self._state.command_history.get(action.command_id)
 
-        running_command = prev_entry.command.copy(
+        running_command = prev_entry.command.model_copy(
             update={
                 "status": CommandStatus.RUNNING,
                 "startedAt": action.started_at,
@@ -503,7 +503,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         notes: Optional[List[CommandNote]],
     ) -> None:
         prev_entry = self._state.command_history.get(command_id)
-        failed_command = prev_entry.command.copy(
+        failed_command = prev_entry.command.model_copy(
             update={
                 "completedAt": failed_at,
                 "status": CommandStatus.FAILED,
