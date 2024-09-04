@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
+  DeckInfoLabel,
   Flex,
   ModuleIcon,
   RadioButton,
@@ -234,7 +235,14 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
   return (
     <Toolbox
       width="25rem"
-      title={t('customize_slot', { slotName: slot })}
+      title={
+        <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+          <DeckInfoLabel deckLabel={slot}></DeckInfoLabel>
+          <StyledText desktopStyle="bodyLargeSemiBold">
+            {t('customize_slot')}
+          </StyledText>
+        </Flex>
+      }
       closeButtonText={t('clear')}
       onCloseClick={() => {
         handleClear()
