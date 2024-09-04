@@ -16,7 +16,7 @@ class HealthLinks(BaseModel):
             " or refer to the OpenAPI specification of the `/logs` endpoint, instead."
         ),
         examples=["/logs/api.log"],
-        json_schema_extra={'deprecated': True}
+        json_schema_extra={"deprecated": True},
     )
     serialLog: str = Field(
         ...,
@@ -26,7 +26,7 @@ class HealthLinks(BaseModel):
             " or refer to the OpenAPI specification of the `/logs` endpoint, instead."
         ),
         examples=["/logs/serial.log"],
-        json_schema_extra={'deprecated': True}
+        json_schema_extra={"deprecated": True},
     )
     serverLog: str = Field(
         ...,
@@ -36,7 +36,7 @@ class HealthLinks(BaseModel):
             " or refer to the OpenAPI specification of the `/logs` endpoint, instead."
         ),
         examples=["/logs/server.log"],
-        json_schema_extra={'deprecated': True}
+        json_schema_extra={"deprecated": True},
     )
     oddLog: typing.Optional[str] = Field(
         default=None,
@@ -47,7 +47,7 @@ class HealthLinks(BaseModel):
             " or refer to the OpenAPI specification of the `/logs` endpoint, instead."
         ),
         examples=["/logs/touchscreen.log"],
-        json_schema_extra={'deprecated': True}
+        json_schema_extra={"deprecated": True},
     )
     apiSpec: str = Field(
         ...,

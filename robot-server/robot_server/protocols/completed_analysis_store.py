@@ -8,7 +8,6 @@ from dataclasses import dataclass
 
 import sqlalchemy
 import anyio
-from pydantic import TypeAdapter
 from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
 
 from robot_server.persistence.database import sqlite_rowid
@@ -26,7 +25,6 @@ from .rtp_resources import PrimitiveParameterResource, CSVParameterResource
 _log = getLogger(__name__)
 
 MAX_ANALYSES_TO_STORE = 5
-
 
 
 @dataclass

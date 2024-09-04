@@ -50,6 +50,6 @@ def duty_cycle_by_force(newton: float, profile: GripForceProfile) -> float:
     :return: the duty-cycle value for the specified force
     """
     if profile.min <= newton <= profile.max:
-        return sum(ele[1] * (newton ** ele[0]) for ele in profile.polynomial)  # type: ignore[no-any-return]
+        return sum(ele[1] * (newton ** ele[0]) for ele in profile.polynomial)
     else:
         raise ValueError("Gripper force out of bounds")
