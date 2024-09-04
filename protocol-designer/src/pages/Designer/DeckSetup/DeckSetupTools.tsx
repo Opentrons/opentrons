@@ -55,7 +55,7 @@ interface DeckSetupToolsProps {
 
 export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
   const { slot, onCloseClick, cutoutId } = props
-  const { t } = useTranslation(['starting_deck_state', 'shared'])
+  const { i18n, t } = useTranslation(['starting_deck_state', 'shared'])
   const { makeSnackbar } = useKitchen()
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch<ThunkDispatch<any>>()
@@ -237,7 +237,13 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
       width="25rem"
       title={
         <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-          <DeckInfoLabel deckLabel={slot}></DeckInfoLabel>
+          <DeckInfoLabel
+            deckLabel={
+              slot === 'offDeck'
+                ? i18n.format(t('off_deck_title'), 'upperCase')
+                : slot
+            }
+          />
           <StyledText desktopStyle="bodyLargeSemiBold">
             {t('customize_slot')}
           </StyledText>
