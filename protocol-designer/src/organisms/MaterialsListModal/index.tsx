@@ -53,9 +53,6 @@ export function MaterialsListModal({
   setShowMaterialsListModal,
 }: MaterialsListModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_overview', 'shared'])
-  // const fixturesWithoutGripper = fixtures.filter(
-  //   fixture => fixture.name !== 'gripper'
-  // )
 
   return createPortal(
     <Modal
@@ -74,55 +71,63 @@ export function MaterialsListModal({
           </StyledText>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             {fixtures.length > 0
-              ? fixtures.map(fixture => {
-                  return (
-                    <ListItem type="noActive" key={fixture.id}>
-                      <ListItemDescriptor
-                        type="default"
-                        description={
-                          fixture.location != null ? (
-                            <DeckInfoLabel
-                              deckLabel={fixture.location.replace('cutout', '')}
-                            />
-                          ) : (
-                            ''
-                          )
-                        }
-                        content={
-                          <Flex
-                            alignItems={ALIGN_CENTER}
-                            grigGap={SPACING.spacing4}
-                          >
-                            <StyledText desktopStyle="bodyDefaultRegular">
-                              {t(`shared:${fixture.name}`)}
-                            </StyledText>
-                          </Flex>
-                        }
-                      />
-                    </ListItem>
-                  )
-                })
+              ? fixtures.map(fixture => (
+                  <ListItem type="noActive" key={fixture.id}>
+                    <ListItemDescriptor
+                      type="default"
+                      description={
+                        fixture.location != null ? (
+                          <DeckInfoLabel
+                            deckLabel={fixture.location.replace('cutout', '')}
+                          />
+                        ) : (
+                          ''
+                        )
+                      }
+                      content={
+                        <Flex
+                          alignItems={ALIGN_CENTER}
+                          grigGap={SPACING.spacing4}
+                        >
+                          <StyledText desktopStyle="bodyDefaultRegular">
+                            {t(`shared:${fixture.name}`)}
+                          </StyledText>
+                        </Flex>
+                      }
+                    />
+                  </ListItem>
+                ))
               : null}
             {hardware.length > 0 ? (
-              hardware.map((hw, id) => (
-                <ListItem type="noActive" key={`hardware${id}`}>
-                  <ListItemDescriptor
-                    type="default"
-                    description={<DeckInfoLabel deckLabel={hw.slot} />}
-                    content={
-                      <Flex
-                        alignItems={ALIGN_CENTER}
-                        grigGap={SPACING.spacing4}
-                      >
-                        <ModuleIcon moduleType={hw.type} size="1rem" />
-                        <StyledText desktopStyle="bodyDefaultRegular">
-                          {getModuleDisplayName(hw.model)}
-                        </StyledText>
-                      </Flex>
-                    }
-                  />
-                </ListItem>
-              ))
+              hardware.map((hw, id) => {
+                const formatLocation = (slot: string): string => {
+                  if (slot === 'span7_8_10_11') {
+                    return '7,8,10,11'
+                  }
+                  return slot.replace('cutout', '')
+                }
+                return (
+                  <ListItem type="noActive" key={`hardware${id}`}>
+                    <ListItemDescriptor
+                      type="default"
+                      description={
+                        <DeckInfoLabel deckLabel={formatLocation(hw.slot)} />
+                      }
+                      content={
+                        <Flex
+                          alignItems={ALIGN_CENTER}
+                          grigGap={SPACING.spacing4}
+                        >
+                          <ModuleIcon moduleType={hw.type} size="1rem" />
+                          <StyledText desktopStyle="bodyDefaultRegular">
+                            {getModuleDisplayName(hw.model)}
+                          </StyledText>
+                        </Flex>
+                      }
+                    />
+                  </ListItem>
+                )
+              })
             ) : (
               <InfoScreen content={t('no_deck_hardware')} />
             )}
