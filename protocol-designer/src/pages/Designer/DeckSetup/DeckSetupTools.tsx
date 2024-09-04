@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
+  DeckInfoLabel,
   Flex,
   ModuleIcon,
   RadioButton,
@@ -54,7 +55,7 @@ interface DeckSetupToolsProps {
 
 export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
   const { slot, onCloseClick, cutoutId } = props
-  const { t } = useTranslation(['starting_deck_state', 'shared'])
+  const { i18n, t } = useTranslation(['starting_deck_state', 'shared'])
   const { makeSnackbar } = useKitchen()
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch<ThunkDispatch<any>>()
@@ -234,7 +235,20 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
   return (
     <Toolbox
       width="25rem"
-      title={t('customize_slot', { slotName: slot })}
+      title={
+        <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+          <DeckInfoLabel
+            deckLabel={
+              slot === 'offDeck'
+                ? i18n.format(t('off_deck_title'), 'upperCase')
+                : slot
+            }
+          />
+          <StyledText desktopStyle="bodyLargeSemiBold">
+            {t('customize_slot')}
+          </StyledText>
+        </Flex>
+      }
       closeButtonText={t('clear')}
       onCloseClick={() => {
         handleClear()

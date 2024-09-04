@@ -67,7 +67,13 @@ export function ListButtonRadioButton(
   `
 
   return (
-    <Flex width="100%" margin={SPACING.spacing4}>
+    <Flex
+      width="100%"
+      margin={SPACING.spacing4}
+      onClick={(e: React.MouseEvent) => {
+        e.stopPropagation()
+      }}
+    >
       <SettingButton
         checked={isSelected}
         id={id}

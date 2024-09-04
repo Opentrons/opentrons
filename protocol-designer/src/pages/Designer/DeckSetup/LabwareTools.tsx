@@ -8,6 +8,7 @@ import {
   DIRECTION_COLUMN,
   DISPLAY_INLINE_BLOCK,
   Flex,
+  InputField,
   ListButton,
   ListButtonAccordion,
   ListButtonAccordionContainer,
@@ -94,6 +95,10 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
     null
   )
   const [filterHeight, setFilterHeight] = React.useState<boolean>(false)
+  const [searchTerm, setSearchTerm] = React.useState<string>('')
+
+  const searchFilter = (termToCheck: string): boolean =>
+    termToCheck.toLowerCase().includes(searchTerm.toLowerCase())
 
   const has96Channel = getHas96Channel(pipetteEntities)
   const defs = getOnlyLatestDefs()
@@ -195,7 +200,11 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
       ORDERED_CATEGORIES.reduce((acc, category) => {
         const isDeckLocationCategory =
           slot === 'offDeck' ? category !== 'adapter' : true
-        return category in labwareByCategory && isDeckLocationCategory
+        return category in labwareByCategory &&
+          isDeckLocationCategory &&
+          labwareByCategory[category].some(lw =>
+            searchFilter(lw.metadata.displayName)
+          )
           ? {
               ...acc,
               [category]: labwareByCategory[category].some(
@@ -204,176 +213,196 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
             }
           : acc
       }, {}),
-    [labwareByCategory, getIsLabwareFiltered]
+    [labwareByCategory, getIsLabwareFiltered, searchTerm]
   )
+  const handleCategoryClick = (category: string): void => {
+    setSelectedCategory(selectedCategory === category ? null : category)
+  }
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
-      marginTop={SPACING.spacing16}
-    >
-      <Flex>TODO: add search bar</Flex>
-      <Flex marginBottom={SPACING.spacing4}>
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        marginY={SPACING.spacing16}
+        gridGap={SPACING.spacing8}
+      >
         <StyledText desktopStyle="bodyDefaultSemiBold">
           {t('add_labware')}
         </StyledText>
-      </Flex>
-      {customLabwareURIs.length === 0 ? null : (
-        <ListButton
-          key={`ListButton_${CUSTOM_CATEGORY}`}
-          type="noActive"
-          onClick={() => {
-            setSelectedCategory(CUSTOM_CATEGORY)
+        <InputField
+          value={searchTerm}
+          onChange={e => {
+            setSearchTerm(e.target.value)
           }}
-        >
-          <ListButtonAccordionContainer id={`${CUSTOM_CATEGORY}_${slot}`}>
-            <ListButtonAccordion
-              mainHeadline={t(`${CUSTOM_CATEGORY}`)}
-              isExpanded={CUSTOM_CATEGORY === selectedCategory}
-            >
-              {customLabwareURIs.map((labwareURI, index) => (
-                <ListButtonRadioButton
-                  key={`${index}_${labwareURI}`}
-                  id={`${index}_${labwareURI}`}
-                  buttonText={
-                    customLabwareDefs[labwareURI].metadata.displayName
-                  }
-                  buttonValue={labwareURI}
-                  onChange={e => {
-                    e.stopPropagation()
-                    setSelectedLabwareDefURI(labwareURI)
-                  }}
-                  isSelected={labwareURI === selecteLabwareDefURI}
-                />
-              ))}
-            </ListButtonAccordion>
-          </ListButtonAccordionContainer>
-        </ListButton>
-      )}
-      {ORDERED_CATEGORIES.map(category => {
-        const isPopulated = populatedCategories[category]
-        if (isPopulated) {
-          return (
-            <ListButton
-              key={`ListButton_${category}`}
-              type="noActive"
-              onClick={() => {
-                setSelectedCategory(category)
-              }}
-            >
-              <ListButtonAccordionContainer id={`${category}_${slot}`}>
-                <ListButtonAccordion
-                  mainHeadline={t(`${category}`)}
-                  isExpanded={category === selectedCategory}
-                >
-                  {labwareByCategory[category]?.map((labwareDef, index) => {
-                    const isFiltered = getIsLabwareFiltered(labwareDef)
-                    const labwareURI = getLabwareDefURI(labwareDef)
-                    const loadName = labwareDef.parameters.loadName
+          placeholder="Search for labware..."
+          size="medium"
+          leftIcon="search"
+          showDeleteIcon
+          onDelete={() => {
+            setSearchTerm('')
+          }}
+        />
+      </Flex>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        {customLabwareURIs.length === 0 ? null : (
+          <ListButton
+            key={`ListButton_${CUSTOM_CATEGORY}`}
+            type="noActive"
+            onClick={() => {
+              handleCategoryClick(CUSTOM_CATEGORY)
+            }}
+          >
+            <ListButtonAccordionContainer id={`${CUSTOM_CATEGORY}_${slot}`}>
+              <ListButtonAccordion
+                mainHeadline={t(`${CUSTOM_CATEGORY}`)}
+                isExpanded={CUSTOM_CATEGORY === selectedCategory}
+              >
+                {customLabwareURIs.map((labwareURI, index) => (
+                  <ListButtonRadioButton
+                    key={`${index}_${labwareURI}`}
+                    id={`${index}_${labwareURI}`}
+                    buttonText={
+                      customLabwareDefs[labwareURI].metadata.displayName
+                    }
+                    buttonValue={labwareURI}
+                    onChange={e => {
+                      e.stopPropagation()
+                      setSelectedLabwareDefURI(labwareURI)
+                    }}
+                    isSelected={labwareURI === selecteLabwareDefURI}
+                  />
+                ))}
+              </ListButtonAccordion>
+            </ListButtonAccordionContainer>
+          </ListButton>
+        )}
+        {ORDERED_CATEGORIES.map(category => {
+          const isPopulated = populatedCategories[category]
+          if (isPopulated) {
+            return (
+              <ListButton
+                key={`ListButton_${category}`}
+                type="noActive"
+                onClick={() => {
+                  handleCategoryClick(category)
+                }}
+              >
+                <ListButtonAccordionContainer id={`${category}_${slot}`}>
+                  <ListButtonAccordion
+                    mainHeadline={t(`${category}`)}
+                    isExpanded={category === selectedCategory}
+                  >
+                    {labwareByCategory[category]?.map((labwareDef, index) => {
+                      const isFiltered = getIsLabwareFiltered(labwareDef)
+                      const labwareURI = getLabwareDefURI(labwareDef)
+                      const loadName = labwareDef.parameters.loadName
+                      const isMatch = searchFilter(
+                        labwareDef.metadata.displayName
+                      )
+                      if (!isFiltered && isMatch) {
+                        return (
+                          <React.Fragment
+                            key={`${index}_${category}_${loadName}`}
+                          >
+                            <ListButtonRadioButton
+                              id={`${index}_${category}_${loadName}`}
+                              buttonText={labwareDef.metadata.displayName}
+                              buttonValue={labwareURI}
+                              onChange={e => {
+                                e.stopPropagation()
+                                setSelectedLabwareDefURI(
+                                  labwareURI === selecteLabwareDefURI
+                                    ? null
+                                    : labwareURI
+                                )
+                              }}
+                              isSelected={labwareURI === selecteLabwareDefURI}
+                            />
 
-                    if (!isFiltered) {
-                      return (
-                        <React.Fragment
-                          key={`${index}_${category}_${loadName}`}
-                        >
-                          <ListButtonRadioButton
-                            id={`${index}_${category}_${loadName}`}
-                            buttonText={labwareDef.metadata.displayName}
-                            buttonValue={labwareURI}
-                            onChange={e => {
-                              e.stopPropagation()
-                              setSelectedLabwareDefURI(
-                                labwareURI === selecteLabwareDefURI
-                                  ? null
-                                  : labwareURI
-                              )
-                            }}
-                            isSelected={labwareURI === selecteLabwareDefURI}
-                          />
-
-                          {labwareURI === selecteLabwareDefURI &&
-                            getLabwareCompatibleWithAdapter(loadName)?.length >
-                              0 && (
-                              <ListButtonAccordionContainer
-                                id={`nestedAccordionContainer_${loadName}`}
-                              >
-                                <ListButtonAccordion
-                                  key={`${index}_${category}_${loadName}_accordion`}
-                                  isNested
-                                  mainHeadline={t('adapter_compatible_lab')}
-                                  isExpanded={
-                                    labwareURI === selecteLabwareDefURI
-                                  }
+                            {labwareURI === selecteLabwareDefURI &&
+                              getLabwareCompatibleWithAdapter(loadName)
+                                ?.length > 0 && (
+                                <ListButtonAccordionContainer
+                                  id={`nestedAccordionContainer_${loadName}`}
                                 >
-                                  {has96Channel &&
-                                  loadName === ADAPTER_96_CHANNEL
-                                    ? permittedTipracks.map(
-                                        (tiprackDefUri, index) => {
-                                          const nestedDef = defs[tiprackDefUri]
+                                  <ListButtonAccordion
+                                    key={`${index}_${category}_${loadName}_accordion`}
+                                    isNested
+                                    mainHeadline={t('adapter_compatible_lab')}
+                                    isExpanded={
+                                      labwareURI === selecteLabwareDefURI
+                                    }
+                                  >
+                                    {has96Channel &&
+                                    loadName === ADAPTER_96_CHANNEL
+                                      ? permittedTipracks.map(
+                                          (tiprackDefUri, index) => {
+                                            const nestedDef =
+                                              defs[tiprackDefUri]
+                                            return (
+                                              <ListButtonRadioButton
+                                                key={`${index}_${category}_${loadName}_${tiprackDefUri}`}
+                                                id={`${index}_${category}_${loadName}_${tiprackDefUri}`}
+                                                buttonText={
+                                                  nestedDef?.metadata
+                                                    .displayName ?? ''
+                                                }
+                                                buttonValue={tiprackDefUri}
+                                                onChange={e => {
+                                                  e.stopPropagation()
+                                                  setNestedSelectedLabwareDefURI(
+                                                    tiprackDefUri
+                                                  )
+                                                }}
+                                                isSelected={
+                                                  tiprackDefUri ===
+                                                  selectedNestedSelectedLabwareDefURI
+                                                }
+                                              />
+                                            )
+                                          }
+                                        )
+                                      : getLabwareCompatibleWithAdapter(
+                                          loadName
+                                        ).map(nestedDefUri => {
+                                          const nestedDef = defs[nestedDefUri]
+
                                           return (
                                             <ListButtonRadioButton
-                                              key={`${index}_${category}_${loadName}_${tiprackDefUri}`}
-                                              id={`${index}_${category}_${loadName}_${tiprackDefUri}`}
+                                              key={`${index}_${category}_${loadName}_${nestedDefUri}`}
+                                              id={`${index}_${category}_${loadName}_${nestedDefUri}`}
                                               buttonText={
                                                 nestedDef?.metadata
                                                   .displayName ?? ''
                                               }
-                                              buttonValue={tiprackDefUri}
+                                              buttonValue={nestedDefUri}
                                               onChange={e => {
                                                 e.stopPropagation()
                                                 setNestedSelectedLabwareDefURI(
-                                                  tiprackDefUri
+                                                  nestedDefUri
                                                 )
                                               }}
                                               isSelected={
-                                                tiprackDefUri ===
+                                                nestedDefUri ===
                                                 selectedNestedSelectedLabwareDefURI
                                               }
                                             />
                                           )
-                                        }
-                                      )
-                                    : getLabwareCompatibleWithAdapter(
-                                        loadName
-                                      ).map(nestedDefUri => {
-                                        const nestedDef = defs[nestedDefUri]
-
-                                        return (
-                                          <ListButtonRadioButton
-                                            key={`${index}_${category}_${loadName}_${nestedDefUri}`}
-                                            id={`${index}_${category}_${loadName}_${nestedDefUri}`}
-                                            buttonText={
-                                              nestedDef?.metadata.displayName ??
-                                              ''
-                                            }
-                                            buttonValue={nestedDefUri}
-                                            onChange={e => {
-                                              e.stopPropagation()
-                                              setNestedSelectedLabwareDefURI(
-                                                nestedDefUri
-                                              )
-                                            }}
-                                            isSelected={
-                                              nestedDefUri ===
-                                              selectedNestedSelectedLabwareDefURI
-                                            }
-                                          />
-                                        )
-                                      })}
-                                </ListButtonAccordion>
-                              </ListButtonAccordionContainer>
-                            )}
-                        </React.Fragment>
-                      )
-                    }
-                  })}
-                </ListButtonAccordion>
-              </ListButtonAccordionContainer>
-            </ListButton>
-          )
-        }
-      })}
+                                        })}
+                                  </ListButtonAccordion>
+                                </ListButtonAccordionContainer>
+                              )}
+                          </React.Fragment>
+                        )
+                      }
+                    })}
+                  </ListButtonAccordion>
+                </ListButtonAccordionContainer>
+              </ListButton>
+            )
+          }
+        })}
+      </Flex>
       <StyledLabel>
         <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
           {t('custom_labware')}
