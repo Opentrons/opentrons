@@ -1269,6 +1269,20 @@ class GeometryView:
         return volume_from_height
 
     @staticmethod
+    def _reject_unacceptable_heights(
+        potential_heights: List[float], max_height: float
+    ) -> float:
+        if len(potential_heights) > 1:
+            for root in potential_heights:
+                # reject any heights that are negative or greater than the max height
+                if root > max_height:
+                    potential_heights.remove(root)
+                elif root < 0:
+                    potential_heights.remove(root)
+        assert len(potential_heights) == 1
+        return potential_heights[0]
+
+    @staticmethod
     def _height_from_volume(
         shape: str,
         volume: float,
@@ -1314,6 +1328,8 @@ class GeometryView:
         for r in height_from_volume_roots:
             if not iscomplex(r):
                 real_roots.append(r)
-        assert len(real_roots) == 1
-        height_from_volume = float(real_roots[0])
+        height_from_volume = GeometryView._reject_unacceptable_heights(
+            potential_heights=real_roots,
+            max_height=total_frustum_height,
+        )
         return height_from_volume
