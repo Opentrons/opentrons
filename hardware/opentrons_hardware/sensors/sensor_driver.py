@@ -232,7 +232,7 @@ class LogListener:
         sensor_metadata: Sequence[Any],
     ) -> None:
         """Build the capturer."""
-        self.csv_writer = Any
+        self.csv_writer: Optional[object] = None
         self.data_file = data_file
         self.file_heading = file_heading
         self.sensor_metadata = sensor_metadata

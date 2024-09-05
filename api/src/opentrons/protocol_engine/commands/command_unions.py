@@ -623,9 +623,9 @@ CommandCreate = Annotated[
 # Each time a TypeAdapter is instantiated, it will construct a new validator and
 # serializer. To improve performance, TypeAdapters are instantiated once.
 # See https://docs.pydantic.dev/latest/concepts/performance/#typeadapter-instantiated-once
-CommandCreateAdatper: TypeAdapter[CommandCreate] = TypeAdapter(CommandCreate)  # type: ignore[arg-type]
+CommandCreateAdapter: TypeAdapter[CommandCreate] = TypeAdapter(CommandCreate)
 
-CommandAdapter: TypeAdapter[Command] = TypeAdapter(Command)  # type: ignore[arg-type]
+CommandAdapter: TypeAdapter[Command] = TypeAdapter(Command)
 
 CommandResult = Union[
     AspirateResult,

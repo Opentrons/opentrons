@@ -62,7 +62,7 @@ def test_execute_command_without_recovery(
         result_from_transport
     )
     result_from_subject = subject.execute_command_without_recovery(params)
-    assert result_from_subject == result_from_transport
+    assert result_from_subject == result_from_transport  # type: ignore[comparison-overlap]
 
 
 def test_add_labware_definition(

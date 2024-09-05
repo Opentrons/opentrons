@@ -72,7 +72,7 @@ def thread_manager(decoy: Decoy, ot3_hardware_api: "OT3API") -> ThreadManagedHar
         from opentrons.hardware_control.ot3api import OT3API
     except ImportError:
         pytest.skip("Cannot run on OT-2 (for now)")
-    manager = decoy.mock(cls=ThreadManagedHardware)  # type: ignore[misc]
+    manager = decoy.mock(cls=ThreadManagedHardware)
     decoy.when(manager.wrapped()).then_return(ot3_hardware_api)
     decoy.when(manager.wraps_instance(OT3API)).then_return(True)
     return cast(ThreadManagedHardware, manager)

@@ -674,7 +674,7 @@ def _convert_state_to_sql_values(
     }
 
 
-_command_type_adapter = TypeAdapter(Command)
+_command_type_adapter: TypeAdapter[Command] = TypeAdapter(Command)
 
 
 def _parse_command(json_str: str) -> Command:

@@ -141,7 +141,7 @@ class Location:
            point, labware = location
            some_function_taking_both(*location)
         """
-        return iter((self._point, self._labware))  # type: ignore [arg-type]
+        return iter((self._point, self._labware))
 
     def __eq__(self, other: object) -> bool:
         return (

@@ -664,7 +664,7 @@ class LegacyCommandMapper:
         run_action = pe_actions.RunCommandAction(
             command_id=succeeded_command.id,
             # We just set this above, so we know it's not None.
-            started_at=succeeded_command.startedAt,
+            started_at=succeeded_command.startedAt,  # type: ignore[arg-type]
         )
         succeed_action = pe_actions.SucceedCommandAction(
             command=succeeded_command,
@@ -730,7 +730,7 @@ class LegacyCommandMapper:
         run_action = pe_actions.RunCommandAction(
             command_id=succeeded_command.id,
             # We just set this above, so we know it's not None.
-            started_at=succeeded_command.startedAt,
+            started_at=succeeded_command.startedAt,  # type: ignore[arg-type]
         )
         succeed_action = pe_actions.SucceedCommandAction(
             command=succeeded_command,
@@ -796,7 +796,7 @@ class LegacyCommandMapper:
         run_action = pe_actions.RunCommandAction(
             command_id=succeeded_command.id,
             # We just set this above, so we know it's not None.
-            started_at=succeeded_command.startedAt,
+            started_at=succeeded_command.startedAt,  # type: ignore[arg-type]
         )
         succeed_action = pe_actions.SucceedCommandAction(
             command=succeeded_command,

@@ -34,7 +34,7 @@ class CommandTranslatorError(Exception):
 # Each time a TypeAdapter is instantiated, it will construct a new validator and
 # serializer. To improve performance, TypeAdapters are instantiated once.
 # See https://docs.pydantic.dev/latest/concepts/performance/#typeadapter-instantiated-once
-LabwareLocationAdapter: TypeAdapter[LabwareLocation] = TypeAdapter(LabwareLocation)  # type: ignore[arg-type]
+LabwareLocationAdapter: TypeAdapter[LabwareLocation] = TypeAdapter(LabwareLocation)
 
 
 def _translate_labware_command(
@@ -194,7 +194,7 @@ def _translate_simple_command(
         else:
             dict_command["commandType"] = "waitForDuration"
 
-    return pe_commands.CommandCreateAdatper.validate_python(dict_command)
+    return pe_commands.CommandCreateAdapter.validate_python(dict_command)
 
 
 class JsonTranslator:
