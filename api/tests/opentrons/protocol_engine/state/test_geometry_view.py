@@ -3,7 +3,6 @@ import inspect
 import json
 import pytest
 from math import isclose
-from random import randint
 from decoy import Decoy
 from typing import cast, List, Tuple, Optional, NamedTuple, Dict
 from datetime import datetime
@@ -2643,7 +2642,6 @@ def test_rectangular_frustum_math_helpers(
 ) -> None:
     """Test both height and volume calculation within a given rectangular frustum."""
     # generate 5 random indices to test on for each frustum
-    random_indices = [randint(0, len(frustum["height"]) - 1) for i in range(5)]
 
     total_frustum_height = frustum["height"][0]
     bottom_length = frustum["length"][-1]
@@ -2677,7 +2675,7 @@ def test_rectangular_frustum_math_helpers(
 
         assert isclose(found_height, frustum["height"][index])
 
-    for i in random_indices:
+    for i in range(len(frustum["height"])):
         _find_volume_from_height_(i)
 
 
@@ -2689,7 +2687,6 @@ def test_circular_frustum_math_helpers(
 ) -> None:
     """Test both height and volume calculation within a given circular frustum."""
     # generate 5 random indices to test on for each frustum
-    random_indices = [randint(0, (len(frustum["height"]) - 1)) for i in range(5)]
 
     total_frustum_height = frustum["height"][0]
     bottom_radius = frustum["radius"][-1]
@@ -2717,5 +2714,5 @@ def test_circular_frustum_math_helpers(
 
         assert isclose(found_height, frustum["height"][index])
 
-    for i in random_indices:
+    for i in range(len(frustum["height"])):
         _find_volume_from_height_(i)
