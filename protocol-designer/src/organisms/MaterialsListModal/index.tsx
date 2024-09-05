@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
+import sum from 'lodash/sum'
 
 import {
   ALIGN_CENTER,
@@ -29,6 +30,7 @@ import {
 
 import { getRobotType } from '../../file-data/selectors'
 import { getTopPortalEl } from '../../components/portals/TopPortal'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type { LabwareOnDeck, ModuleOnDeck } from '../../step-forms'
@@ -60,7 +62,9 @@ export function MaterialsListModal({
 }: MaterialsListModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_overview', 'shared'])
   const robotType = useSelector(getRobotType)
-
+  const allLabwareWellContents = useSelector(
+    labwareIngredSelectors.getLiquidsByLabwareId
+  )
   return createPortal(
     <Modal
       onClose={() => {
@@ -190,33 +194,55 @@ export function MaterialsListModal({
                   desktopStyle="bodyDefaultRegular"
                   color={COLORS.grey60}
                 >
-                  {t('individual_well_volume')}
+                  {t('total_well_volume')}
                 </StyledText>
               </Flex>
             ) : null}
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+            <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
               {liquids.length > 0 ? (
-                liquids.map((liquid, id) => (
-                  <ListItem type="noActive" key={`liquid_${id}`}>
-                    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-                      <Flex
-                        alignItems={ALIGN_CENTER}
-                        gridGap={SPACING.spacing8}
-                        flex="1"
-                      >
-                        <LiquidIcon color={liquid.displayColor ?? ''} />
-                        <StyledText desktopStyle="bodyDefaultRegular">
-                          {liquid.name ?? t('n/a')}
-                        </StyledText>
-                      </Flex>
+                liquids.map((liquid, id) => {
+                  const volumePerWell = Object.values(
+                    allLabwareWellContents
+                  ).flatMap(labwareWithIngred =>
+                    Object.values(labwareWithIngred).map(
+                      ingred => ingred[liquid.ingredientId]?.volume ?? 0
+                    )
+                  )
+                  console.log(volumePerWell)
+                  const totalVolume = sum(volumePerWell)
 
-                      <Flex flex="1.27">
-                        {/* ToDo (kk:08/30/2024) get the well volume */}
-                        <Tag text={''} type="default" />
-                      </Flex>
-                    </Flex>
-                  </ListItem>
-                ))
+                  if (totalVolume === 0) {
+                    return null
+                  } else {
+                    return (
+                      <ListItem type="noActive" key={`liquid_${id}`}>
+                        <Flex
+                          justifyContent={JUSTIFY_SPACE_BETWEEN}
+                          width="100%"
+                          padding={SPACING.spacing12}
+                        >
+                          <Flex
+                            alignItems={ALIGN_CENTER}
+                            gridGap={SPACING.spacing8}
+                            flex="1"
+                          >
+                            <LiquidIcon color={liquid.displayColor ?? ''} />
+                            <StyledText desktopStyle="bodyDefaultRegular">
+                              {liquid.name ?? t('n/a')}
+                            </StyledText>
+                          </Flex>
+
+                          <Flex flex="1.27">
+                            <Tag
+                              text={`${totalVolume.toString()} uL`}
+                              type="default"
+                            />
+                          </Flex>
+                        </Flex>
+                      </ListItem>
+                    )
+                  }
+                })
               ) : (
                 <InfoScreen content={t('no_liquids')} />
               )}

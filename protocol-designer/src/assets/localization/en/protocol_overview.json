@@ -9,11 +9,11 @@
   "export_protocol": "Export protocol",
   "extension": "Extension mount",
   "gripper": "Opentrons Flex Gripper",
-  "individual_well_volume": "Individual Well Volume",
   "instruments": "Instruments",
   "labware": "Labware",
   "left_pip": "Left pipette",
   "liquid_defs": "Liquid Definitions",
+  "liquids": "Liquids",
   "materials_list": "Materials list",
   "modified": "Last exported",
   "na": "N/A",
@@ -28,6 +28,7 @@
   "robotType": "Robot type",
   "starting_deck": "Protocol Starting Deck",
   "step": "Protocol steps",
+  "total_well_volume": "Total Well Volume",
   "untitled_protocol": "Untitled protocol",
   "your_gripper": "Your gripper"
 }
