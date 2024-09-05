@@ -13,7 +13,8 @@ def reject_unacceptable_heights(
     for root in potential_heights:
         # reject any heights that are negative or greater than the max height
         if not iscomplex(root):
-            rounded_root = round(root, 4)
+            # take only the real component of the root and round to 4 decimal places
+            rounded_root = round(real(root), 4)
             if (rounded_root <= max_height) and (rounded_root >= 0):
                 valid_heights.append(rounded_root)
     if len(valid_heights) != 1:
@@ -121,15 +122,11 @@ def height_from_volume_circular(
     x_intercept_roots = (a, b, c, d)
 
     height_from_volume_roots = roots(x_intercept_roots)
-    real_roots = []
-    for r in height_from_volume_roots:
-        if not iscomplex(r):
-            real_roots.append(r)
     height = reject_unacceptable_heights(
-        potential_heights=real_roots,
+        potential_heights=list(height_from_volume_roots),
         max_height=total_frustum_height,
     )
-    return real(height)
+    return height
 
 
 def height_from_volume_rectangular(
@@ -152,15 +149,11 @@ def height_from_volume_rectangular(
     x_intercept_roots = (a, b, c, d)
 
     height_from_volume_roots = roots(x_intercept_roots)
-    real_roots = []
-    for r in height_from_volume_roots:
-        if not iscomplex(r):
-            real_roots.append(r)
     height = reject_unacceptable_heights(
-        potential_heights=real_roots,
+        potential_heights=list(height_from_volume_roots),
         max_height=total_frustum_height,
     )
-    return real(height)
+    return height
 
 
 def height_from_volume_spherical(
@@ -176,12 +169,8 @@ def height_from_volume_spherical(
     x_intercept_roots = (a, b, c, d)
 
     height_from_volume_roots = roots(x_intercept_roots)
-    # real_roots = []
-    # for r in height_from_volume_roots:
-    #     if not iscomplex(r):
-    #         real_roots.append(r)
     height = reject_unacceptable_heights(
         potential_heights=list(height_from_volume_roots),
         max_height=total_frustum_height,
     )
-    return real(height)
+    return height
