@@ -2629,7 +2629,7 @@ def test_get_offset_fails_with_off_deck_labware(
     assert offset_location is None
 
 
-@pytest.mark.parametrize("frustum", [f for f in RECTANGULAR_TEST_EXAMPLES])
+@pytest.mark.parametrize("frustum", RECTANGULAR_TEST_EXAMPLES)
 def test_rectangular_frustum_math_helpers(
     decoy: Decoy,
     frustum: Dict[str, List[float]],
