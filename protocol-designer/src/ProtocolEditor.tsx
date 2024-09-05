@@ -39,6 +39,8 @@ const routerBaseName =
     ? null
     : window.location.pathname.split('/')[1]
 
+console.log({ routerBaseName })
+
 function ProtocolEditorComponent(): JSX.Element {
   const flags = useSelector(getFeatureFlagData)
   const enableRedesign = useSelector(getEnableRedesign)
@@ -51,7 +53,9 @@ function ProtocolEditorComponent(): JSX.Element {
       {enableRedesign ? (
         <Flex flexDirection={DIRECTION_COLUMN}>
           {prereleaseModeEnabled ? <Bouncing /> : null}
-          <BrowserRouter {...(routerBaseName != null ? {baseName: routerBaseName} : {})}>
+          <BrowserRouter
+            {...(routerBaseName != null ? { baseName: routerBaseName } : {})}
+          >
             <ProtocolRoutes />
           </BrowserRouter>
         </Flex>
