@@ -14,30 +14,21 @@ export function useNotifyAllRunsQuery(
   options: QueryOptionsWithPolling<UseAllRunsQueryOptions, AxiosError> = {},
   hostOverride?: HostConfig | null
 ): UseQueryResult<Runs, AxiosError> {
-  const {
-    notifyOnSettled,
-    shouldRefetch,
-    isNotifyEnabled,
-  } = useNotifyDataReady({
+  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
     topic: 'robot-server/runs',
     options,
     hostOverride,
   })
 
-  const queryOptions = {
-    ...options,
-    onSettled: isNotifyEnabled ? notifyOnSettled : options.onSettled,
-    refetchInterval: isNotifyEnabled ? false : options.refetchInterval,
-  }
-  const httpResponse = useAllRunsQuery(
+  const httpQueryResult = useAllRunsQuery(
     params,
-    queryOptions as UseAllRunsQueryOptions,
+    queryOptionsNotify as UseAllRunsQueryOptions,
     hostOverride
   )
 
-  if (isNotifyEnabled && shouldRefetch) {
-    httpResponse.refetch()
+  if (shouldRefetch) {
+    void httpQueryResult.refetch()
   }
 
-  return httpResponse
+  return httpQueryResult
 }

@@ -206,7 +206,11 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
 
   return (
     <Toolbox
-      title={labwareDisplayName}
+      title={
+        <StyledText desktopStyle="bodyLargeSemiBold">
+          {labwareDisplayName}
+        </StyledText>
+      }
       confirmButtonText={t('shared:done')}
       onConfirmClick={onClose}
       onCloseClick={handleClearWells}
