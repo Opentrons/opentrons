@@ -162,7 +162,7 @@ jobs:
           OT_PD_MIXPANEL_ID: ${{ secrets.OT_PD_MIXPANEL_ID }}
           OT_PD_MIXPANEL_DEV_ID: ${{ secrets.OT_PD_MIXPANEL_DEV_ID }}
         run: |
-          make -C protocol-designer
+          make -C protocol-designer NODE_ENV=development
       - name: 'upload github artifact'
         uses: actions/upload-artifact@v3
         with:
