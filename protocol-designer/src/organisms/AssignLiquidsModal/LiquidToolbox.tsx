@@ -206,7 +206,11 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
 
   return (
     <Toolbox
-      title={labwareDisplayName}
+      title={
+        <StyledText desktopStyle="bodyLargeSemiBold">
+          {labwareDisplayName}
+        </StyledText>
+      }
       confirmButtonText={t('shared:done')}
       onConfirmClick={onClose}
       onCloseClick={handleClearWells}
@@ -329,7 +333,7 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
             </StyledText>
           ) : null}
           {liquidInfo.map(info => (
-            <>
+            <React.Fragment key={info.name}>
               <ListItem type="noActive">
                 <Flex
                   padding={SPACING.spacing12}
@@ -341,7 +345,7 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
                 </Flex>
               </ListItem>
               TODO: add the list of all liquid wells, similar to IngredientsList
-            </>
+            </React.Fragment>
           ))}
         </Flex>
       </form>

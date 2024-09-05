@@ -265,6 +265,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           closeFlow={() => {
             setShowCalModal(false)
           }}
+          isLoadedInRun={isLoadedInRun}
           isPrepCommandLoading={isCommandMutationLoading}
           prepCommandErrorMessage={
             prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage

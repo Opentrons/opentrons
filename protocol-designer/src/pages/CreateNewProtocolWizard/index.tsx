@@ -44,6 +44,7 @@ import { SelectGripper } from './SelectGripper'
 import { SelectModules } from './SelectModules'
 import { SelectFixtures } from './SelectFixtures'
 import { AddMetadata } from './AddMetadata'
+import { getTrashSlot } from './utils'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { NormalizedPipette } from '@opentrons/step-generation'
@@ -59,7 +60,6 @@ import type {
   PipetteName,
 } from '@opentrons/shared-data'
 import type { WizardFormState } from './types'
-import { getTrashSlot } from './utils'
 
 type WizardStep =
   | 'robot'

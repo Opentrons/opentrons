@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Icon } from '../../icons'
 import { Box, Btn, Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
@@ -12,10 +11,9 @@ import { BORDERS, COLORS } from '../../helix-design-system'
 import { SPACING } from '../../ui-style-constants'
 import { PrimaryButton, StyledText } from '../../atoms'
 import { textDecorationUnderline } from '../../ui-style-constants/typography'
-import type { IconName } from '../../icons'
 
 export interface ToolboxProps {
-  title: string
+  title: JSX.Element
   children: React.ReactNode
   confirmButtonText: string
   onConfirmClick: () => void
@@ -24,7 +22,6 @@ export interface ToolboxProps {
   disableCloseButton?: boolean
   width?: string
   height?: string
-  titleIconName?: IconName
 }
 
 export function Toolbox(props: ToolboxProps): JSX.Element {
@@ -34,7 +31,6 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
     confirmButtonText,
     onCloseClick,
     onConfirmClick,
-    titleIconName,
     closeButtonText,
     height = '100%',
     disableCloseButton = false,
@@ -83,12 +79,7 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
           borderBottom={`1px solid ${COLORS.grey30}`}
           gridGap={SPACING.spacing12}
         >
-          <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-            {titleIconName != null ? (
-              <Icon name={titleIconName} size="1.25rem" />
-            ) : null}
-            <StyledText desktopStyle="bodyLargeSemiBold">{title}</StyledText>
-          </Flex>
+          {title}
           <Btn
             onClick={onCloseClick}
             textDecoration={textDecorationUnderline}

@@ -83,7 +83,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
           marginBottom={SPACING.spacing40}
         >
           <StyledText desktopStyle="bodyDefaultSemiBold">
-            {i18n.format(t('off_deck_labware'), 'uppercase')}
+            {i18n.format(t('off_deck_labware'), 'upperCase')}
           </StyledText>
         </Flex>
 

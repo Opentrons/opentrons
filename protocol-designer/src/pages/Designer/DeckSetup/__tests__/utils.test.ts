@@ -10,7 +10,7 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { getModuleModelsBySlot, getOt2HeaterShakerDeckErrors } from '../utils'
+import { getModuleModelsBySlot, getDeckErrors } from '../utils'
 import { FLEX_MODULE_MODELS, OT2_MODULE_MODELS } from '../constants'
 
 describe('getModuleModelsBySlot', () => {
@@ -56,19 +56,21 @@ describe('getModuleModelsBySlot', () => {
   })
 })
 
-describe('getOt2HeaterShakerDeckErrors', () => {
+describe('getDeckErrors', () => {
   it('renders no error when there is no conflict', () => {
     expect(
-      getOt2HeaterShakerDeckErrors({
+      getDeckErrors({
         modules: {},
         selectedSlot: '1',
         selectedModel: MAGNETIC_MODULE_V1,
+        labware: {},
+        robotType: OT2_ROBOT_TYPE,
       })
     ).toEqual(null)
   })
   it('renders H-S adjacent error', () => {
     expect(
-      getOt2HeaterShakerDeckErrors({
+      getDeckErrors({
         modules: {
           hs: {
             model: HEATERSHAKER_MODULE_V1,
@@ -80,12 +82,14 @@ describe('getOt2HeaterShakerDeckErrors', () => {
         },
         selectedSlot: '1',
         selectedModel: MAGNETIC_MODULE_V1,
+        labware: {},
+        robotType: OT2_ROBOT_TYPE,
       })
     ).toEqual('heater_shaker_adjacent')
   })
   it('renders module adjacent error', () => {
     expect(
-      getOt2HeaterShakerDeckErrors({
+      getDeckErrors({
         modules: {
           hs: {
             model: MAGNETIC_MODULE_V1,
@@ -97,6 +101,8 @@ describe('getOt2HeaterShakerDeckErrors', () => {
         },
         selectedSlot: '1',
         selectedModel: HEATERSHAKER_MODULE_V1,
+        labware: {},
+        robotType: OT2_ROBOT_TYPE,
       })
     ).toEqual('heater_shaker_adjacent_to')
   })

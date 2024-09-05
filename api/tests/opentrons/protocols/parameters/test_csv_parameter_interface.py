@@ -1,3 +1,4 @@
+from typing import List, Tuple
 import pytest
 import platform
 from decoy import Decoy
@@ -42,6 +43,42 @@ def csv_file_mixed_quotes() -> bytes:
 def csv_file_different_delimiter() -> bytes:
     """A basic CSV file with a non-comma delimiter."""
     return b"x:y:z\na,:1,:2\nb,:3,:4\nc,:5,:6"
+
+
+@pytest.fixture
+def csv_file_basic_trailing_empty() -> Tuple[bytes, List[List[str]]]:
+    """A basic CSV file with quotes around strings and a trailing newline."""
+    return (
+        b'"x","y","z"\n"a",1,2\n"b",3,4\n"c",5,6\n',
+        [["x", "y", "z"], ["a", "1", "2"], ["b", "3", "4"], ["c", "5", "6"]],
+    )
+
+
+@pytest.fixture
+def csv_file_basic_three_trailing_empty() -> Tuple[bytes, List[List[str]]]:
+    """A basic CSV file with quotes around strings and three trailing newlines."""
+    return (
+        b'"x","y","z"\n"a",1,2\n"b",3,4\n"c",5,6\n\n\n',
+        [["x", "y", "z"], ["a", "1", "2"], ["b", "3", "4"], ["c", "5", "6"]],
+    )
+
+
+@pytest.fixture
+def csv_file_empty_row_and_trailing_empty() -> Tuple[bytes, List[List[str]]]:
+    """A basic CSV file with quotes around strings, an empty row, and a trailing newline."""
+    return (
+        b'"x","y","z"\n\n"b",3,4\n"c",5,6\n',
+        [["x", "y", "z"], [], ["b", "3", "4"], ["c", "5", "6"]],
+    )
+
+
+@pytest.fixture
+def csv_file_windows_empty_row_trailing_empty() -> Tuple[bytes, List[List[str]]]:
+    """A basic CSV file with quotes around strings, Windows-style newlines, an empty row, and a trailing newline."""
+    return (
+        b'"x","y","z"\r\n\r\n"b",3,4\r\n"c",5,6\r\n',
+        [["x", "y", "z"], [], ["b", "3", "4"], ["c", "5", "6"]],
+    )
 
 
 def test_csv_parameter(
@@ -125,3 +162,35 @@ def test_csv_parameter_dont_detect_dialect(
 
     assert rows[0] == ["x", ' "y"', ' "z"']
     assert rows[1] == ["a", " 1", " 2"]
+
+
+@pytest.mark.parametrize(
+    "csv_file_fixture",
+    [
+        "csv_file_basic_trailing_empty",
+        "csv_file_basic_three_trailing_empty",
+        "csv_file_empty_row_and_trailing_empty",
+        "csv_file_windows_empty_row_trailing_empty",
+    ],
+)
+def test_csv_parameter_trailing_empties(
+    decoy: Decoy,
+    api_version: APIVersion,
+    request: pytest.FixtureRequest,
+    csv_file_fixture: str,
+) -> None:
+    """It should load the rows as all strings.  Empty rows are allowed in the middle of the data but all trailing empty rows are removed."""
+    # Get the fixture value
+    csv_file: bytes
+    expected_output: List[List[str]]
+    csv_file, expected_output = request.getfixturevalue(csv_file_fixture)
+
+    subject = CSVParameter(csv_file, api_version)
+    parsed_csv = subject.parse_as_csv()
+
+    assert (
+        parsed_csv == expected_output
+    ), f"Expected {expected_output}, but got {parsed_csv}"
+    assert len(parsed_csv) == len(
+        expected_output
+    ), f"Expected {len(expected_output)} rows, but got {len(parsed_csv)}"

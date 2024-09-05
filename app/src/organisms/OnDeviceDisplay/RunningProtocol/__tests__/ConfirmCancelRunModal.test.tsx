@@ -150,6 +150,20 @@ describe('ConfirmCancelRunModal', () => {
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
   })
 
+  it('when quick transfer run is stopped, the run is dismissed and the modal closes if the run is not yet active', () => {
+    props = {
+      ...props,
+      isActiveRun: false,
+      isQuickTransfer: true,
+    }
+    when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_STOPPED)
+    render(props)
+
+    expect(mockDismissCurrentRun).toHaveBeenCalled()
+    expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith('/quick-transfer')
+  })
+
   it('when run is stopped, the run is not dismissed if the run is active', () => {
     when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_STOPPED)
     render(props)

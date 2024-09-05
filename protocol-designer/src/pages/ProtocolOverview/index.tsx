@@ -19,11 +19,19 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
-import { getInitialDeckSetup } from '../../step-forms/selectors'
+import {
+  getPipetteSpecsV2,
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
+import {
+  getAdditionalEquipmentEntities,
+  getInitialDeckSetup,
+} from '../../step-forms/selectors'
 import { selectors as fileSelectors } from '../../file-data'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { actions as loadFileActions } from '../../load-file'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import {
   getUnusedEntities,
   getUnusedStagingAreas,
@@ -32,8 +40,15 @@ import {
 import { resetScrollElements } from '../../ui/steps/utils'
 import { useBlockingHint } from '../../components/Hints/useBlockingHint'
 import { v8WarningContent } from '../../components/FileSidebar/FileSidebar'
+import { MaterialsListModal } from '../../organisms/MaterialsListModal'
+import {
+  EditProtocolMetadataModal,
+  EditInstrumentsModal,
+} from '../../organisms'
+import { DeckThumbnail } from './DeckThumbnail'
 
 import type { CreateCommand, PipetteName } from '@opentrons/shared-data'
+import type { DeckSlot } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../types'
 import type { HintKey } from '../../tutorial'
 
@@ -56,16 +71,37 @@ interface Fixture {
 export function ProtocolOverview(): JSX.Element {
   const { t } = useTranslation(['protocol_overview', 'alert', 'shared'])
   const navigate = useNavigate()
+  const [
+    showEditInstrumentsModal,
+    setShowEditInstrumentsModal,
+  ] = React.useState<boolean>(false)
+  const [
+    showEditMetadataModal,
+    setShowEditMetadataModal,
+  ] = React.useState<boolean>(false)
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
-  const deckSetup = useSelector(getInitialDeckSetup)
-
+  const initialDeckSetup = useSelector(getInitialDeckSetup)
   const dispatch: ThunkDispatch<any> = useDispatch()
+  const [hoverSlot, setHoverSlot] = React.useState<DeckSlot | null>(null)
+  // TODO: wire up the slot information from hoverSlot
   const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
+  const [
+    showMaterialsListModal,
+    setShowMaterialsListModal,
+  ] = React.useState<boolean>(false)
   const fileData = useSelector(fileSelectors.createFile)
-  const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
-  const modulesOnDeck = initialDeckSetup.modules
+  const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
+  const liquidsOnDeck = useSelector(
+    labwareIngredSelectors.allIngredientNamesIds
+  )
+  const {
+    modules: modulesOnDeck,
+    labware: labwaresOnDeck,
+    additionalEquipmentOnDeck,
+    pipettes,
+  } = initialDeckSetup
 
   const nonLoadCommands =
     fileData?.commands.filter(
@@ -85,36 +121,32 @@ export function ProtocolOverview(): JSX.Element {
     robotType
   )
   const pipettesWithoutStep = getUnusedEntities(
-    deckSetup.pipettes,
+    initialDeckSetup.pipettes,
     savedStepForms,
     'pipette',
     robotType
   )
-  const isGripperAttached = Object.values(
-    deckSetup.additionalEquipmentOnDeck
-  ).some(equipment => equipment?.name === 'gripper')
+  const isGripperAttached = Object.values(additionalEquipment).some(
+    equipment => equipment?.name === 'gripper'
+  )
   const gripperWithoutStep = isGripperAttached && !gripperInUse
 
   const { trashBinUnused, wasteChuteUnused } = getUnusedTrash(
-    deckSetup.additionalEquipmentOnDeck,
+    additionalEquipmentOnDeck,
     fileData?.commands
   )
   const fixtureWithoutStep: Fixture = {
     trashBin: trashBinUnused,
     wasteChute: wasteChuteUnused,
     stagingAreaSlots: getUnusedStagingAreas(
-      deckSetup.additionalEquipmentOnDeck,
+      additionalEquipmentOnDeck,
       fileData?.commands
     ),
   }
 
-  const additionalEquipmentOnDeck = Object.values(
-    deckSetup.additionalEquipmentOnDeck
-  )
-  const pipettesOnDeck = Object.values(deckSetup.pipettes)
+  const pipettesOnDeck = Object.values(pipettes)
   const leftPip = pipettesOnDeck.find(pip => pip.mount === 'left')
   const rightPip = pipettesOnDeck.find(pip => pip.mount === 'right')
-  const gripper = additionalEquipmentOnDeck.find(ae => ae.name === 'gripper')
   const {
     protocolName,
     description,
@@ -168,11 +200,39 @@ export function ProtocolOverview(): JSX.Element {
 
   return (
     <>
+      {showEditMetadataModal ? (
+        <EditProtocolMetadataModal
+          onClose={() => {
+            setShowEditMetadataModal(false)
+          }}
+        />
+      ) : null}
+      {showEditInstrumentsModal ? (
+        <EditInstrumentsModal
+          onClose={() => {
+            setShowEditInstrumentsModal(false)
+          }}
+        />
+      ) : null}
       {blockingExportHint}
+      {showMaterialsListModal ? (
+        <MaterialsListModal
+          hardware={Object.values(modulesOnDeck)}
+          fixtures={
+            robotType === OT2_ROBOT_TYPE
+              ? Object.values(additionalEquipmentOnDeck)
+              : []
+          }
+          labware={Object.values(labwaresOnDeck)}
+          liquids={liquidsOnDeck}
+          setShowMaterialsListModal={setShowMaterialsListModal}
+        />
+      ) : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         padding={`${SPACING.spacing60} ${SPACING.spacing80}`}
         gridGap={SPACING.spacing60}
+        width="100%"
       >
         <Flex
           justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -184,7 +244,9 @@ export function ProtocolOverview(): JSX.Element {
               desktopStyle="displayBold"
               css={PROTOCOL_NAME_TEXT_STYLE}
             >
-              {protocolName ?? t('untitled_protocol')}
+              {protocolName != null && protocolName !== ''
+                ? protocolName
+                : t('untitled_protocol')}
             </StyledText>
           </Flex>
 
@@ -195,6 +257,7 @@ export function ProtocolOverview(): JSX.Element {
             justifyContent={JUSTIFY_FLEX_END}
           >
             <LargeButton
+              buttonType="stroke"
               buttonText={t('edit_protocol')}
               onClick={() => {
                 navigate('/designer')
@@ -236,8 +299,9 @@ export function ProtocolOverview(): JSX.Element {
                 <Btn
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   onClick={() => {
-                    console.log('wire this up')
+                    setShowEditMetadataModal(true)
                   }}
+                  data-testid="ProtocolOverview_MetadataEditButton"
                 >
                   <StyledText desktopStyle="bodyDefaultRegular">
                     {t('edit')}
@@ -271,7 +335,7 @@ export function ProtocolOverview(): JSX.Element {
                 <Btn
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   onClick={() => {
-                    console.log('wire this up')
+                    setShowEditInstrumentsModal(true)
                   }}
                 >
                   <StyledText desktopStyle="bodyDefaultRegular">
@@ -320,7 +384,7 @@ export function ProtocolOverview(): JSX.Element {
                     <ListItemDescriptor
                       type="default"
                       description={t('extension')}
-                      content={gripper != null ? t(`$gripper.name}`) : 'N/A'}
+                      content={isGripperAttached ? t('gripper') : t('na')}
                     />
                   </ListItem>
                 ) : null}
@@ -371,8 +435,7 @@ export function ProtocolOverview(): JSX.Element {
                 data-testid="Materials_list"
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 onClick={() => {
-                  // ToDo (kk:08/27/2024) wire up material list modal
-                  console.log('open material list modal')
+                  setShowMaterialsListModal(true)
                 }}
               >
                 <StyledText desktopStyle="bodyDefaultRegular">
@@ -380,8 +443,15 @@ export function ProtocolOverview(): JSX.Element {
                 </StyledText>
               </Btn>
             </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-              TODO: wire this up
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing4}
+              alignItems={ALIGN_CENTER}
+            >
+              <DeckThumbnail
+                hoverSlot={hoverSlot}
+                setHoverSlot={setHoverSlot}
+              />
             </Flex>
           </Flex>
         </Flex>

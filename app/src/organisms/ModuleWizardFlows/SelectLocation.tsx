@@ -47,6 +47,7 @@ interface SelectLocationProps extends ModuleCalibrationWizardStepProps {
   occupiedCutouts: CutoutConfig[]
   deckConfig: DeckConfiguration
   configuredFixtureIdByCutoutId: { [cutoutId in CutoutId]?: CutoutFixtureId }
+  isLoadedInRun: boolean
 }
 export const SelectLocation = (
   props: SelectLocationProps
@@ -56,6 +57,7 @@ export const SelectLocation = (
     attachedModule,
     deckConfig,
     configuredFixtureIdByCutoutId,
+    isLoadedInRun,
   } = props
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
@@ -93,6 +95,8 @@ export const SelectLocation = (
           cutoutFixtureId
         ) && attachedModule.serialNumber === opentronsModuleSerialNumber
       if (
+        // in run setup, module calibration only available when module location is already correctly configured
+        !isLoadedInRun &&
         mayMountToCutoutIds.includes(cutoutId) &&
         (isCurrentConfiguration ||
           SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId))

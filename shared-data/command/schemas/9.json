@@ -4332,6 +4332,63 @@
       "title": "UnsafeDropTipInPlaceParams",
       "type": "object"
     },
+    "UnsafeEngageAxesCreate": {
+      "description": "UnsafeEngageAxes command request model.",
+      "properties": {
+        "commandType": {
+          "const": "unsafe/engageAxes",
+          "default": "unsafe/engageAxes",
+          "title": "Commandtype"
+        },
+        "params": {
+          "$ref": "#/$defs/UnsafeEngageAxesParams"
+        },
+        "intent": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CommandIntent"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating."
+        },
+        "key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key"
+        }
+      },
+      "required": ["params"],
+      "title": "UnsafeEngageAxesCreate",
+      "type": "object"
+    },
+    "UnsafeEngageAxesParams": {
+      "description": "Payload required for an UnsafeEngageAxes command.",
+      "properties": {
+        "axes": {
+          "description": "The axes for which to enable.",
+          "items": {
+            "$ref": "#/$defs/MotorAxis"
+          },
+          "title": "Axes",
+          "type": "array"
+        }
+      },
+      "required": ["axes"],
+      "title": "UnsafeEngageAxesParams",
+      "type": "object"
+    },
     "UpdatePositionEstimatorsCreate": {
       "description": "UpdatePositionEstimators command request model.",
       "properties": {
@@ -5303,6 +5360,7 @@
       "tryLiquidProbe": "#/$defs/TryLiquidProbeCreate",
       "unsafe/blowOutInPlace": "#/$defs/UnsafeBlowOutInPlaceCreate",
       "unsafe/dropTipInPlace": "#/$defs/UnsafeDropTipInPlaceCreate",
+      "unsafe/engageAxes": "#/$defs/UnsafeEngageAxesCreate",
       "unsafe/updatePositionEstimators": "#/$defs/UpdatePositionEstimatorsCreate",
       "verifyTipPresence": "#/$defs/VerifyTipPresenceCreate",
       "waitForDuration": "#/$defs/WaitForDurationCreate",
@@ -5517,6 +5575,9 @@
     },
     {
       "$ref": "#/$defs/UpdatePositionEstimatorsCreate"
+    },
+    {
+      "$ref": "#/$defs/UnsafeEngageAxesCreate"
     }
   ],
   "title": "CreateCommandUnion",

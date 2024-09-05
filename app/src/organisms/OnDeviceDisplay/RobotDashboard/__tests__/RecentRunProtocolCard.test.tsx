@@ -160,7 +160,8 @@ describe('RecentRunProtocolCard', () => {
     })
     vi.mocked(useCloneRun).mockReturnValue({
       cloneRun: mockCloneRun,
-      isLoading: false,
+      isLoadingRun: false,
+      isCloning: false,
     })
   })
 

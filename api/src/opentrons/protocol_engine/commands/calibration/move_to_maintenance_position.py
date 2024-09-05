@@ -108,10 +108,15 @@ class MoveToMaintenancePositionImplementation(
                 await ot3_api.move_axes(
                     {
                         Axis.Z_L: max_motion_range + _LEFT_MOUNT_Z_MARGIN,
+                    }
+                )
+                await ot3_api.disengage_axes([Axis.Z_L])
+                await ot3_api.move_axes(
+                    {
                         Axis.Z_R: max_motion_range + _RIGHT_MOUNT_Z_MARGIN,
                     }
                 )
-                await ot3_api.disengage_axes([Axis.Z_L, Axis.Z_R])
+                await ot3_api.disengage_axes([Axis.Z_R])
 
         return SuccessData(public=MoveToMaintenancePositionResult(), private=None)
 

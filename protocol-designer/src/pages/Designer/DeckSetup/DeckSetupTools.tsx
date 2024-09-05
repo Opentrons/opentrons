@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
+  DeckInfoLabel,
   Flex,
   ModuleIcon,
   RadioButton,
@@ -14,7 +15,6 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
-  MODULE_MODELS,
   OT2_ROBOT_TYPE,
   getModuleDisplayName,
   getModuleType,
@@ -30,89 +30,104 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import {
   createContainer,
   deleteContainer,
+  selectFixture,
+  selectLabware,
+  selectModule,
+  editSlotInfo,
+  selectZoomedIntoSlot,
+  selectNestedLabware,
 } from '../../../labware-ingred/actions'
 import {
   getEnableAbsorbanceReader,
   getEnableMoam,
 } from '../../../feature-flags/selectors'
+import { selectors } from '../../../labware-ingred/selectors'
 import { useKitchen } from '../../../organisms/Kitchen/hooks'
 import { createContainerAboveModule } from '../../../step-forms/actions/thunks'
 import { FIXTURES, MOAM_MODELS, MOAM_MODELS_WITH_FF } from './constants'
-import { getModuleModelsBySlot, getOt2HeaterShakerDeckErrors } from './utils'
+import { getSlotInformation } from '../utils'
+import { getModuleModelsBySlot, getDeckErrors } from './utils'
 import { LabwareTools } from './LabwareTools'
 
-import type { CutoutId, DeckSlotId, ModuleModel } from '@opentrons/shared-data'
-import type { DeckFixture } from '../../../step-forms/actions/additionalItems'
+import type { ModuleModel } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../../types'
 import type { Fixture } from './constants'
 
 interface DeckSetupToolsProps {
-  slot: DeckSlotId
   onCloseClick: () => void
-  cutoutId?: CutoutId
+  setHoveredLabware: (defUri: string | null) => void
+  onDeckProps: {
+    setHoveredModule: (model: ModuleModel | null) => void
+    setHoveredFixture: (fixture: Fixture | null) => void
+  } | null
 }
 
-export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
-  const { slot, onCloseClick, cutoutId } = props
-  const { t } = useTranslation(['starting_deck_state', 'shared'])
+const TRASH_TYPES: Fixture[] = [
+  'wasteChute',
+  'trashBin',
+  'wasteChuteAndStagingArea',
+]
+
+export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
+  const { onCloseClick, setHoveredLabware, onDeckProps } = props
+  const { t, i18n } = useTranslation(['starting_deck_state', 'shared'])
   const { makeSnackbar } = useKitchen()
+  const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const enableAbsorbanceReader = useSelector(getEnableAbsorbanceReader)
   const enableMoam = useSelector(getEnableMoam)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const {
-    labware: deckSetupLabware,
+    selectedLabwareDefUri,
+    selectedFixture,
+    selectedModuleModel,
+    selectedSlot,
+    selectedNestedLabwareDefUri,
+  } = selectedSlotInfo
+  const { slot, cutout } = selectedSlot
+  const [selectedHardware, setHardware] = React.useState<
+    ModuleModel | Fixture | null
+  >(null)
+
+  //  initialize the previously selected hardware because for some reason it does not
+  //  work initiating it in the above useState
+  React.useEffect(() => {
+    if (selectedModuleModel || selectedFixture) {
+      setHardware(selectedModuleModel ?? selectedFixture ?? null)
+    }
+  }, [selectedModuleModel, selectedFixture])
+
+  const moduleModels =
+    slot != null
+      ? getModuleModelsBySlot(enableAbsorbanceReader, robotType, slot)
+      : null
+  const [tab, setTab] = React.useState<'hardware' | 'labware'>(
+    moduleModels?.length === 0 || slot === 'offDeck' ? 'labware' : 'hardware'
+  )
+
+  if (slot == null || (onDeckProps == null && slot !== 'offDeck')) {
+    return null
+  }
+
+  const {
     modules: deckSetupModules,
     additionalEquipmentOnDeck,
+    labware: deckSetupLabware,
   } = deckSetup
   const hasTrash = Object.values(additionalEquipmentOnDeck).some(
     ae => ae.name === 'trashBin'
   )
-  const createdModuleForSlot = Object.values(deckSetupModules).find(
-    module => module.slot === slot
-  )
-  const createdLabwareForSlot = Object.values(deckSetupLabware).find(
-    lw => lw.slot === slot || lw.slot === createdModuleForSlot?.id
-  )
-  const createdNestedLabwareForSlot = Object.values(deckSetupLabware).find(lw =>
-    Object.keys(deckSetupLabware).includes(lw.slot)
-  )
-  const createFixtureForSlots = Object.values(additionalEquipmentOnDeck).filter(
-    ae => ae.location?.split('cutout')[1] === slot
+  const trashyEntities = Object.values(additionalEquipmentOnDeck).filter(
+    ae => ae.name === 'trashBin' || ae.name === 'wasteChute'
   )
 
-  const preSelectedFixture =
-    createFixtureForSlots != null && createFixtureForSlots.length === 2
-      ? ('wasteChuteAndStagingArea' as Fixture)
-      : (createFixtureForSlots[0]?.name as Fixture)
-
-  const [selectedHardware, setHardware] = React.useState<
-    ModuleModel | Fixture | null
-  >(createdModuleForSlot?.model ?? preSelectedFixture ?? null)
-
-  const [selecteLabwareDefURI, setSelectedLabwareDefURI] = React.useState<
-    string | null
-  >(createdLabwareForSlot?.labwareDefURI ?? null)
-  const [
-    nestedSelectedLabwareDefURI,
-    setNestedSelectedLabwareDefURI,
-  ] = React.useState<string | null>(
-    createdNestedLabwareForSlot?.labwareDefURI ?? null
-  )
-  const moduleModels = getModuleModelsBySlot(
-    enableAbsorbanceReader,
-    robotType,
-    slot
-  )
-
-  const [tab, setTab] = React.useState<'hardware' | 'labware'>(
-    moduleModels.length === 0 ||
-      createdModuleForSlot != null ||
-      slot === 'offDeck'
-      ? 'labware'
-      : 'hardware'
-  )
+  const {
+    createdNestedLabwareForSlot,
+    createdModuleForSlot,
+    createdLabwareForSlot,
+    createFixtureForSlots,
+  } = getSlotInformation({ deckSetup, slot })
 
   let fixtures: Fixture[] = []
   if (slot === 'D3') {
@@ -125,7 +140,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
 
   const hardwareTab = {
     text: t('deck_hardware'),
-    disabled: moduleModels.length === 0,
+    disabled: moduleModels?.length === 0,
     isActive: tab === 'hardware',
     onClick: () => {
       setTab('hardware')
@@ -134,13 +149,24 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
   const labwareTab = {
     text: t('labware'),
     disabled:
-      selectedHardware === 'wasteChute' ||
-      selectedHardware === 'wasteChuteAndStagingArea' ||
-      selectedHardware === 'trashBin',
+      selectedFixture === 'wasteChute' ||
+      selectedFixture === 'wasteChuteAndStagingArea' ||
+      selectedFixture === 'trashBin',
     isActive: tab === 'labware',
     onClick: () => {
       setTab('labware')
     },
+  }
+
+  const handleResetToolbox = (): void => {
+    dispatch(
+      editSlotInfo({
+        createdNestedLabwareForSlot: null,
+        createdLabwareForSlot: null,
+        createdModuleForSlot: null,
+        preSelectedFixture: null,
+      })
+    )
   }
 
   const handleClear = (): void => {
@@ -150,7 +176,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
         dispatch(deleteModule(createdModuleForSlot.id))
       }
       //  clear fixture(s) from slot
-      if (createFixtureForSlots.length > 0) {
+      if (createFixtureForSlots != null && createFixtureForSlots.length > 0) {
         createFixtureForSlots.forEach(fixture =>
           dispatch(deleteDeckFixture(fixture.id))
         )
@@ -164,81 +190,92 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
         dispatch(deleteContainer({ labwareId: createdNestedLabwareForSlot.id }))
       }
     }
+    handleResetToolbox()
+    setHardware(null)
   }
 
   const handleConfirm = (): void => {
     //  clear entities first before recreating them
     handleClear()
-    const fixture = FIXTURES.includes(selectedHardware as Fixture)
-      ? (selectedHardware as DeckFixture | 'wasteChuteAndStagingArea')
-      : undefined
-    const moduleModel = MODULE_MODELS.includes(selectedHardware as ModuleModel)
-      ? (selectedHardware as ModuleModel)
-      : undefined
 
-    if (fixture != null && cutoutId != null) {
+    if (selectedFixture != null && cutout != null) {
       //  create fixture(s)
-      if (fixture === 'wasteChuteAndStagingArea') {
-        dispatch(createDeckFixture('wasteChute', cutoutId))
-        dispatch(createDeckFixture('stagingArea', cutoutId))
+      if (selectedFixture === 'wasteChuteAndStagingArea') {
+        dispatch(createDeckFixture('wasteChute', cutout))
+        dispatch(createDeckFixture('stagingArea', cutout))
       } else {
-        dispatch(createDeckFixture(fixture, cutoutId))
+        dispatch(createDeckFixture(selectedFixture, cutout))
       }
     }
-    if (moduleModel != null) {
+    if (selectedModuleModel != null) {
       //  create module
       dispatch(
         createModule({
           slot,
-          type: getModuleType(moduleModel),
-          model: moduleModel,
+          type: getModuleType(selectedModuleModel),
+          model: selectedModuleModel,
         })
       )
     }
-    if (moduleModel == null && selecteLabwareDefURI != null) {
+    if (selectedModuleModel == null && selectedLabwareDefUri != null) {
       //  create adapter + labware on deck
       dispatch(
         createContainer({
           slot,
           labwareDefURI:
-            nestedSelectedLabwareDefURI == null
-              ? selecteLabwareDefURI
-              : nestedSelectedLabwareDefURI,
+            selectedNestedLabwareDefUri == null
+              ? selectedLabwareDefUri
+              : selectedNestedLabwareDefUri,
           adapterUnderLabwareDefURI:
-            nestedSelectedLabwareDefURI == null
+            selectedNestedLabwareDefUri == null
               ? undefined
-              : selecteLabwareDefURI,
+              : selectedLabwareDefUri,
         })
       )
     }
-    if (moduleModel != null && selecteLabwareDefURI != null) {
+    if (selectedModuleModel != null && selectedLabwareDefUri != null) {
       //   create adapter + labware on module
       dispatch(
         createContainerAboveModule({
           slot,
-          labwareDefURI: selecteLabwareDefURI,
-          nestedLabwareDefURI: nestedSelectedLabwareDefURI ?? undefined,
+          labwareDefURI: selectedLabwareDefUri,
+          nestedLabwareDefURI: selectedNestedLabwareDefUri ?? undefined,
         })
       )
     }
-
+    handleResetToolbox()
+    dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
     onCloseClick()
-  }
-
-  const handleResetToolbox = (): void => {
-    setHardware(null)
-    setSelectedLabwareDefURI(null)
-    setNestedSelectedLabwareDefURI(null)
   }
 
   return (
     <Toolbox
-      width="25rem"
-      title={t('customize_slot', { slotName: slot })}
+      width="23.375rem"
+      title={
+        <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+          <DeckInfoLabel
+            deckLabel={
+              slot === 'offDeck'
+                ? i18n.format(t('off_deck_title'), 'upperCase')
+                : slot
+            }
+          />
+          <StyledText desktopStyle="bodyLargeSemiBold">
+            {t('customize_slot')}
+          </StyledText>
+        </Flex>
+      }
       closeButtonText={t('clear')}
       onCloseClick={() => {
-        handleClear()
-        handleResetToolbox()
+        if (
+          trashyEntities.length === 1 &&
+          TRASH_TYPES.includes(selectedFixture as Fixture)
+        ) {
+          makeSnackbar(t('trash_required') as string)
+        } else {
+          handleClear()
+          handleResetToolbox()
+        }
       }}
       onConfirmClick={() => {
         handleConfirm()
@@ -259,7 +296,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
                   {t('add_module')}
                 </StyledText>
               </Flex>
-              {moduleModels.map(model => {
+              {moduleModels?.map(model => {
                 const modelSomewhereOnDeck = Object.values(
                   deckSetupModules
                 ).filter(
@@ -275,14 +312,26 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
                   ? MOAM_MODELS
                   : MOAM_MODELS_WITH_FF
 
-                const ot2CollisionError = getOt2HeaterShakerDeckErrors({
+                const collisionError = getDeckErrors({
                   modules: deckSetupModules,
                   selectedSlot: slot,
                   selectedModel: model,
+                  labware: deckSetupLabware,
+                  robotType: robotType,
                 })
 
                 return (
                   <RadioButton
+                    setNoHover={() => {
+                      if (onDeckProps?.setHoveredModule != null) {
+                        onDeckProps.setHoveredModule(null)
+                      }
+                    }}
+                    setHovered={() => {
+                      if (onDeckProps?.setHoveredModule != null) {
+                        onDeckProps.setHoveredModule(model)
+                      }
+                    }}
                     largeDesktopBorderRadius
                     buttonLabel={
                       <Flex
@@ -322,14 +371,20 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
                             ),
                           }) as string
                         )
+                      } else if (collisionError != null) {
+                        makeSnackbar(t(`${collisionError}`) as string)
                       } else if (
-                        robotType === OT2_ROBOT_TYPE &&
-                        ot2CollisionError != null
+                        trashyEntities.length === 1 &&
+                        TRASH_TYPES.includes(selectedFixture as Fixture)
                       ) {
-                        makeSnackbar(t(`${ot2CollisionError}`) as string)
+                        makeSnackbar(t('trash_required') as string)
                       } else {
                         setHardware(model)
-                        setSelectedLabwareDefURI(null)
+                        dispatch(selectModule({ moduleModel: model }))
+                        dispatch(selectLabware({ labwareDefUri: null }))
+                        dispatch(
+                          selectNestedLabware({ nestedLabwareDefUri: null })
+                        )
                       }
                     }}
                     isSelected={model === selectedHardware}
@@ -350,6 +405,16 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
                 </Flex>
                 {fixtures.map(fixture => (
                   <RadioButton
+                    setNoHover={() => {
+                      if (onDeckProps?.setHoveredFixture != null) {
+                        onDeckProps.setHoveredFixture(null)
+                      }
+                    }}
+                    setHovered={() => {
+                      if (onDeckProps?.setHoveredFixture != null) {
+                        onDeckProps.setHoveredFixture(fixture)
+                      }
+                    }}
                     largeDesktopBorderRadius
                     buttonLabel={t(`shared:${fixture}`)}
                     key={`${fixture}_${slot}`}
@@ -362,9 +427,18 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
                             hardware: t('shared:trashBin'),
                           }) as string
                         )
+                      } else if (
+                        trashyEntities.length === 1 &&
+                        TRASH_TYPES.includes(selectedFixture as Fixture)
+                      ) {
+                        makeSnackbar(t('trash_required') as string)
                       } else {
                         setHardware(fixture)
-                        setSelectedLabwareDefURI(null)
+                        dispatch(selectFixture({ fixture: fixture }))
+                        dispatch(selectLabware({ labwareDefUri: null }))
+                        dispatch(
+                          selectNestedLabware({ nestedLabwareDefUri: null })
+                        )
                       }
                     }}
                     isSelected={fixture === selectedHardware}
@@ -374,14 +448,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element {
             )}
           </>
         ) : (
-          <LabwareTools
-            selecteLabwareDefURI={selecteLabwareDefURI}
-            setSelectedLabwareDefURI={setSelectedLabwareDefURI}
-            setNestedSelectedLabwareDefURI={setNestedSelectedLabwareDefURI}
-            selectedNestedSelectedLabwareDefURI={nestedSelectedLabwareDefURI}
-            slot={slot}
-            selectedHardware={selectedHardware}
-          />
+          <LabwareTools setHoveredLabware={setHoveredLabware} slot={slot} />
         )}
       </Flex>
     </Toolbox>

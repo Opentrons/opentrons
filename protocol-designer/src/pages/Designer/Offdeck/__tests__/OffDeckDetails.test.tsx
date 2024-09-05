@@ -58,7 +58,7 @@ describe('OffDeckDetails', () => {
 
   it('renders off-deck overview with 1 labware', () => {
     render(props)
-    screen.getByText('Off-deck Labware')
+    screen.getByText('OFF-DECK LABWARE')
     screen.getByText('mock LabwareRender')
     screen.getByText('Add labware')
   })
