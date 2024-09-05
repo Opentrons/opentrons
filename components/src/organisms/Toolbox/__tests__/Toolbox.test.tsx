@@ -13,16 +13,15 @@ describe('Toolbox', () => {
 
   it('should render text and buttons', () => {
     props = {
-      title: 'header',
+      title: <div>mock header</div>,
       children: <div>mock children</div>,
       confirmButtonText: 'done',
-      titleIconName: 'swap-horizontal',
       onCloseClick: vi.fn(),
       closeButtonText: 'exit',
       onConfirmClick: vi.fn(),
     }
     render(props)
-    screen.getByText('header')
+    screen.getByText('mock header')
     screen.getByText('done')
     fireEvent.click(screen.getByTestId('Toolbox_confirmButton'))
     expect(props.onConfirmClick).toHaveBeenCalled()

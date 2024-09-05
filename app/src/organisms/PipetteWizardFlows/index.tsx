@@ -48,6 +48,7 @@ import type {
   PipetteMount,
 } from '@opentrons/shared-data'
 import type { CommandData, HostConfig } from '@opentrons/api-client'
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
@@ -283,13 +284,16 @@ export const PipetteWizardFlows = (
   let onExit
   if (currentStep == null) return null
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
-  if (isExiting && errorMessage != null) {
+  if (
+    (isExiting && errorMessage != null) ||
+    maintenanceRunData?.data.status === RUN_STATUS_FAILED
+  ) {
     modalContent = (
       <SimpleWizardBody
         isSuccess={false}
         iconColor={COLORS.red50}
         header={t('shared:error_encountered')}
-        subHeader={errorMessage}
+        subHeader={errorMessage ?? undefined}
       />
     )
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
@@ -398,7 +402,10 @@ export const PipetteWizardFlows = (
   let exitWizardButton = onExit
   if (isCommandMutationLoading || isDeleteLoading) {
     exitWizardButton = undefined
-  } else if (errorMessage != null && isExiting) {
+  } else if (
+    (errorMessage != null && isExiting) ||
+    maintenanceRunData?.data.status === RUN_STATUS_FAILED
+  ) {
     exitWizardButton = handleClose
   } else if (showConfirmExit) {
     exitWizardButton = handleCleanUpAndClose

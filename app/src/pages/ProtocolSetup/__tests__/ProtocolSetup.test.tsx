@@ -257,6 +257,7 @@ describe('ProtocolSetup', () => {
         isStopRunActionLoading: false,
         isResetRunLoading: false,
         isResumeRunFromRecoveryActionLoading: false,
+        isRunControlLoading: false,
       })
     when(vi.mocked(useRunStatus)).calledWith(RUN_ID).thenReturn(RUN_STATUS_IDLE)
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({

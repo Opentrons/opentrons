@@ -3,6 +3,7 @@ import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { EditProtocolMetadataModal } from '../../../organisms'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 import { getFileMetadata, getRobotType } from '../../../file-data/selectors'
@@ -18,6 +19,7 @@ vi.mock('../../../file-data/selectors')
 vi.mock('../../../components/Hints/useBlockingHint')
 vi.mock('../../../organisms/MaterialsListModal')
 vi.mock('../../../labware-ingred/selectors')
+vi.mock('../../../organisms')
 
 const mockNavigate = vi.fn()
 
@@ -118,5 +120,13 @@ describe('ProtocolOverview', () => {
     screen.getByText('mock MaterialsListModal')
   })
 
+  it('renders the edit protocol metadata modal', () => {
+    vi.mocked(EditProtocolMetadataModal).mockReturnValue(
+      <div>mock EditProtocolMetadataModal</div>
+    )
+    render()
+    fireEvent.click(screen.getByTestId('ProtocolOverview_MetadataEditButton'))
+    screen.getByText('mock EditProtocolMetadataModal')
+  })
   it.todo('warning modal tests')
 })

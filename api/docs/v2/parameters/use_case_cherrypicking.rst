@@ -126,7 +126,6 @@ The entire start of the ``run()`` function, including a pipette and fixed labwar
         )
         # load trash bin
         trash = protocol.load_trash_bin("A3")
-        )
         # load destination plate in deck slot C2
         dest_plate = protocol.load_labware(
             load_name="opentrons_96_wellplate_200ul_pcr_full_skirt",

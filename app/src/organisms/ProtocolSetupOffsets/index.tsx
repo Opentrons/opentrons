@@ -90,9 +90,8 @@ export function ProtocolSetupOffsets({
               <Chip
                 background
                 iconName="ot-check"
-                text={t('placements_ready')}
+                text={t('offsets_confirmed')}
                 type="success"
-                chipSize="small"
               />
             ) : (
               <SmallButton

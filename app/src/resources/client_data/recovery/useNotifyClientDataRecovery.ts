@@ -14,19 +14,19 @@ export function useNotifyClientDataRecovery(
     AxiosError
   > = {}
 ): UseQueryResult<ClientDataResponse<ClientDataRecovery>, AxiosError> {
-  const { notifyOnSettled, shouldRefetch } = useNotifyDataReady({
+  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
     topic: `robot-server/clientData/${KEYS.ERROR_RECOVERY}`,
     options,
   })
 
   const httpQueryResult = useClientData<ClientDataRecovery>(
     KEYS.ERROR_RECOVERY,
-    {
-      ...options,
-      enabled: options?.enabled !== false && shouldRefetch,
-      onSettled: notifyOnSettled,
-    }
+    queryOptionsNotify
   )
+
+  if (shouldRefetch) {
+    void httpQueryResult.refetch()
+  }
 
   return httpQueryResult
 }

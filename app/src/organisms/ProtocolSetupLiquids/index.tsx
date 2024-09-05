@@ -65,7 +65,6 @@ export function ProtocolSetupLiquids({
             iconName="ot-check"
             text={t('liquids_confirmed')}
             type="success"
-            chipSize="small"
           />
         ) : (
           <SmallButton

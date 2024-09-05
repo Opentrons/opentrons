@@ -50,16 +50,21 @@ export function useCreateMaintenanceCommandMutation(): UseCreateMaintenanceComma
     createMaintenanceCommand(host as HostConfig, maintenanceRunId, command, {
       waitUntilComplete,
       timeout,
-    }).then(response => {
-      queryClient
-        .invalidateQueries([host, 'maintenance_runs'])
-        .catch((e: Error) => {
-          console.error(
-            `error invalidating maintenance runs query: ${e.message}`
-          )
-        })
-      return response.data
     })
+      .then(response => {
+        queryClient
+          .invalidateQueries([host, 'maintenance_runs'])
+          .catch((e: Error) => {
+            console.error(
+              `error invalidating maintenance runs query: ${e.message}`
+            )
+          })
+        return response.data
+      })
+      .catch((e: any) => {
+        queryClient.invalidateQueries([host, 'robot/control/estopStatus'])
+        throw e
+      })
   )
 
   return {

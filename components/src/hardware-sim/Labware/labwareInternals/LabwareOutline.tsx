@@ -90,13 +90,6 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
             showRadius={showRadius}
             fill={backgroundFill}
           />
-          <LabwareBorder
-            borderThickness={2.2 * OUTLINE_THICKNESS_MM}
-            xDimension={dimensions.xDimension}
-            yDimension={dimensions.yDimension}
-            stroke={COLORS.blue50}
-            fill={backgroundFill}
-          />
         </>
       ) : (
         <LabwareBorder

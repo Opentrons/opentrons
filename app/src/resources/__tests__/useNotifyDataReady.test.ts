@@ -33,7 +33,6 @@ const MOCK_OPTIONS: QueryOptionsWithPolling<any, any> = {
 describe('useNotifyDataReady', () => {
   let mockDispatch: Mock
   let mockTrackEvent: Mock
-  let mockHTTPRefetch: Mock
 
   beforeEach(() => {
     mockDispatch = vi.fn()
@@ -52,7 +51,7 @@ describe('useNotifyDataReady', () => {
     vi.clearAllMocks()
   })
 
-  it('should trigger an HTTP refetch and subscribe action on a successful initial mount', () => {
+  it('should return queryOptionsNotify and shouldRefetch on a successful initial mount', () => {
     const { result } = renderHook(() =>
       useNotifyDataReady({
         topic: MOCK_TOPIC,
@@ -60,6 +59,7 @@ describe('useNotifyDataReady', () => {
       } as any)
     )
     expect(result.current.shouldRefetch).toEqual(true)
+    expect(result.current.queryOptionsNotify).toBeDefined()
     expect(mockDispatch).toHaveBeenCalledWith(
       notifySubscribeAction(MOCK_HOST_CONFIG.hostname, MOCK_TOPIC)
     )
@@ -73,7 +73,7 @@ describe('useNotifyDataReady', () => {
         options: { ...MOCK_OPTIONS, forceHttpPolling: true },
       } as any)
     )
-    expect(result.current.shouldRefetch).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(false)
     expect(appShellListener).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
@@ -85,7 +85,7 @@ describe('useNotifyDataReady', () => {
         options: { ...MOCK_OPTIONS, enabled: false },
       } as any)
     )
-    expect(result.current.shouldRefetch).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(false)
     expect(appShellListener).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
@@ -97,12 +97,12 @@ describe('useNotifyDataReady', () => {
         options: { ...MOCK_OPTIONS, staleTime: Infinity },
       } as any)
     )
-    expect(result.current.shouldRefetch).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(false)
     expect(appShellListener).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
-  it('should set HTTP refetch to always if there is an error', () => {
+  it('should set shouldRefetch to false if there is an error', () => {
     vi.mocked(useHost).mockReturnValue({ hostname: null } as any)
     const errorSpy = vi.spyOn(console, 'error')
     errorSpy.mockImplementation(() => {})
@@ -110,15 +110,14 @@ describe('useNotifyDataReady', () => {
     const { result } = renderHook(() =>
       useNotifyDataReady({
         topic: MOCK_TOPIC,
-        setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
 
-    expect(result.current.shouldRefetch).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(false)
   })
 
-  it('should return set HTTP refetch to always and fire an analytics reporting event if the connection was refused', () => {
+  it('should set shouldRefetch to false and fire an analytics reporting event if the connection was refused', () => {
     vi.mocked(appShellListener).mockImplementation(function ({
       callback,
     }): any {
@@ -128,16 +127,15 @@ describe('useNotifyDataReady', () => {
     const { rerender, result } = renderHook(() =>
       useNotifyDataReady({
         topic: MOCK_TOPIC,
-        setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
     expect(mockTrackEvent).toHaveBeenCalled()
     rerender()
-    expect(result.current.shouldRefetch).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(false)
   })
 
-  it('should trigger a single HTTP refetch if the refetch flag was returned', () => {
+  it('should set shouldRefetch to true if the refetch flag was returned', () => {
     vi.mocked(appShellListener).mockImplementation(function ({
       callback,
     }): any {
@@ -147,7 +145,6 @@ describe('useNotifyDataReady', () => {
     const { rerender, result } = renderHook(() =>
       useNotifyDataReady({
         topic: MOCK_TOPIC,
-        setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
@@ -155,7 +152,7 @@ describe('useNotifyDataReady', () => {
     expect(result.current.shouldRefetch).toEqual(true)
   })
 
-  it('should trigger a single HTTP refetch if the unsubscribe flag was returned', () => {
+  it('should set shouldRefetch to true if the unsubscribe flag was returned', () => {
     vi.mocked(appShellListener).mockImplementation(function ({
       callback,
     }): any {
@@ -210,7 +207,38 @@ describe('useNotifyDataReady', () => {
       } as any)
     )
 
-    expect(result.current.shouldRefetch).toEqual(true)
+    expect(result.current.shouldRefetch).toEqual(false)
     expect(appShellListener).not.toHaveBeenCalled()
+  })
+
+  it('should return queryOptionsNotify with modified onSettled and refetchInterval', () => {
+    const { result } = renderHook(() =>
+      useNotifyDataReady({
+        topic: MOCK_TOPIC,
+        options: {
+          ...MOCK_OPTIONS,
+          onSettled: vi.fn(),
+          refetchInterval: 5000,
+        },
+      } as any)
+    )
+    expect(result.current.queryOptionsNotify.onSettled).toBeDefined()
+    expect(result.current.queryOptionsNotify.refetchInterval).toBe(false)
+  })
+
+  it('should call the original onSettled function when notifications are disabled', () => {
+    const mockOnSettled = vi.fn()
+    const { result } = renderHook(() =>
+      useNotifyDataReady({
+        topic: MOCK_TOPIC,
+        options: {
+          ...MOCK_OPTIONS,
+          forceHttpPolling: true,
+          onSettled: mockOnSettled,
+        },
+      } as any)
+    )
+    result.current.queryOptionsNotify.onSettled?.(undefined, null)
+    expect(mockOnSettled).toHaveBeenCalled()
   })
 })

@@ -24,6 +24,7 @@ import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations
 import { getFileMetadata } from '../../file-data/selectors'
 import { DefineLiquidsModal, ProtocolMetadataNav } from '../../organisms'
 import { DeckSetupContainer } from './DeckSetup'
+import { selectors } from '../../labware-ingred/selectors'
 import { OffDeck } from './Offdeck'
 import { LiquidsOverflowMenu } from './LiquidsOverflowMenu'
 
@@ -43,6 +44,7 @@ export function Designer(): JSX.Element {
   ])
   const { bakeToast } = useKitchen()
   const navigate = useNavigate()
+  const zoomIn = useSelector(selectors.getZoomedInSlot)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const metadata = useSelector(getFileMetadata)
   const [liquidOverflowMenu, showLiquidOverflowMenu] = React.useState<boolean>(
@@ -51,7 +53,6 @@ export function Designer(): JSX.Element {
   const [showDefineLiquidModal, setDefineLiquidModal] = React.useState<boolean>(
     false
   )
-  const [zoomInOnSlot, setZoomInOnSlot] = React.useState<OpenSlot | null>(null)
   const [tab, setTab] = React.useState<'startingDeck' | 'protocolSteps'>(
     'startingDeck'
   )
@@ -101,6 +102,9 @@ export function Designer(): JSX.Element {
     },
   })
 
+  const deckViewItems =
+    deckView === leftString ? <DeckSetupContainer /> : <OffDeck />
+
   return (
     <>
       {showDefineLiquidModal ? (
@@ -127,7 +131,7 @@ export function Designer(): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           padding={SPACING.spacing12}
         >
-          {zoomInOnSlot != null ? null : (
+          {zoomIn.slot != null ? null : (
             <Tabs tabs={[startingDeckTab, protocolStepTab]} />
           )}
           <ProtocolMetadataNav />
@@ -156,33 +160,32 @@ export function Designer(): JSX.Element {
         </Flex>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          backgroundColor={COLORS.grey10}
-          padding={SPACING.spacing80}
+          backgroundColor={
+            tab === 'startingDeck' && deckView === rightString
+              ? COLORS.white
+              : COLORS.grey10
+          }
+          padding={zoomIn.slot != null ? '0' : SPACING.spacing80}
           height="calc(100vh - 64px)"
         >
           {tab === 'startingDeck' ? (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-              <Flex alignSelf={ALIGN_END}>
-                <ToggleGroup
-                  selectedValue={deckView}
-                  leftText={leftString}
-                  rightText={rightString}
-                  leftClick={() => {
-                    setDeckView(leftString)
-                  }}
-                  rightClick={() => {
-                    setDeckView(rightString)
-                  }}
-                />
-              </Flex>
-              {deckView === leftString ? (
-                <DeckSetupContainer
-                  setZoomInOnSlot={setZoomInOnSlot}
-                  zoomIn={zoomInOnSlot}
-                />
-              ) : (
-                <OffDeck />
-              )}
+              {zoomIn.slot == null ? (
+                <Flex alignSelf={ALIGN_END}>
+                  <ToggleGroup
+                    selectedValue={deckView}
+                    leftText={leftString}
+                    rightText={rightString}
+                    leftClick={() => {
+                      setDeckView(leftString)
+                    }}
+                    rightClick={() => {
+                      setDeckView(rightString)
+                    }}
+                  />
+                </Flex>
+              ) : null}
+              {deckViewItems}
             </Flex>
           ) : (
             <div>TODO wire this up</div>

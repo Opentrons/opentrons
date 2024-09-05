@@ -41,8 +41,11 @@ import { resetScrollElements } from '../../ui/steps/utils'
 import { useBlockingHint } from '../../components/Hints/useBlockingHint'
 import { v8WarningContent } from '../../components/FileSidebar/FileSidebar'
 import { MaterialsListModal } from '../../organisms/MaterialsListModal'
+import { EditProtocolMetadataModal } from '../../organisms'
+import { DeckThumbnail } from './DeckThumbnail'
 
 import type { CreateCommand, PipetteName } from '@opentrons/shared-data'
+import type { DeckSlot } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../types'
 import type { HintKey } from '../../tutorial'
 
@@ -65,10 +68,16 @@ interface Fixture {
 export function ProtocolOverview(): JSX.Element {
   const { t } = useTranslation(['protocol_overview', 'alert', 'shared'])
   const navigate = useNavigate()
+  const [
+    showEditMetadataModal,
+    setShowEditMetadataModal,
+  ] = React.useState<boolean>(false)
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
   const deckSetup = useSelector(getInitialDeckSetup)
   const dispatch: ThunkDispatch<any> = useDispatch()
+  const [hoverSlot, setHoverSlot] = React.useState<DeckSlot | null>(null)
+  // TODO: wire up the slot information from hoverSlot
   const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
   const [
     showMaterialsListModal,
@@ -184,6 +193,13 @@ export function ProtocolOverview(): JSX.Element {
 
   return (
     <>
+      {showEditMetadataModal ? (
+        <EditProtocolMetadataModal
+          onClose={() => {
+            setShowEditMetadataModal(false)
+          }}
+        />
+      ) : null}
       {blockingExportHint}
       {showMaterialsListModal ? (
         <MaterialsListModal
@@ -227,6 +243,7 @@ export function ProtocolOverview(): JSX.Element {
             justifyContent={JUSTIFY_FLEX_END}
           >
             <LargeButton
+              buttonType="stroke"
               buttonText={t('edit_protocol')}
               onClick={() => {
                 navigate('/designer')
@@ -268,8 +285,9 @@ export function ProtocolOverview(): JSX.Element {
                 <Btn
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   onClick={() => {
-                    console.log('wire this up')
+                    setShowEditMetadataModal(true)
                   }}
+                  data-testid="ProtocolOverview_MetadataEditButton"
                 >
                   <StyledText desktopStyle="bodyDefaultRegular">
                     {t('edit')}
@@ -411,8 +429,15 @@ export function ProtocolOverview(): JSX.Element {
                 </StyledText>
               </Btn>
             </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-              TODO: wire this up
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing4}
+              alignItems={ALIGN_CENTER}
+            >
+              <DeckThumbnail
+                hoverSlot={hoverSlot}
+                setHoverSlot={setHoverSlot}
+              />
             </Flex>
           </Flex>
         </Flex>
