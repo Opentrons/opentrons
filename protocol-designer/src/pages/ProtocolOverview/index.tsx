@@ -32,6 +32,7 @@ import {
 import { resetScrollElements } from '../../ui/steps/utils'
 import { useBlockingHint } from '../../components/Hints/useBlockingHint'
 import { v8WarningContent } from '../../components/FileSidebar/FileSidebar'
+import { EditProtocolMetadataModal } from '../../organisms'
 
 import type { CreateCommand, PipetteName } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../types'
@@ -56,6 +57,10 @@ interface Fixture {
 export function ProtocolOverview(): JSX.Element {
   const { t } = useTranslation(['protocol_overview', 'alert', 'shared'])
   const navigate = useNavigate()
+  const [
+    showEditMetadataModal,
+    setShowEditMetadataModal,
+  ] = React.useState<boolean>(false)
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
   const deckSetup = useSelector(getInitialDeckSetup)
@@ -168,6 +173,13 @@ export function ProtocolOverview(): JSX.Element {
 
   return (
     <>
+      {showEditMetadataModal ? (
+        <EditProtocolMetadataModal
+          onClose={() => {
+            setShowEditMetadataModal(false)
+          }}
+        />
+      ) : null}
       {blockingExportHint}
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -236,8 +248,9 @@ export function ProtocolOverview(): JSX.Element {
                 <Btn
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   onClick={() => {
-                    console.log('wire this up')
+                    setShowEditMetadataModal(true)
                   }}
+                  data-testid="ProtocolOverview_MetadataEditButton"
                 >
                   <StyledText desktopStyle="bodyDefaultRegular">
                     {t('edit')}
