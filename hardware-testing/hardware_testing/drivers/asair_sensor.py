@@ -8,7 +8,7 @@ import abc
 import codecs
 import logging
 import time
-from typing import Tuple
+from typing import Tuple, Optional
 from abc import ABC
 from dataclasses import dataclass
 from . import list_ports_and_select
@@ -42,7 +42,7 @@ addrs = {
 class AsairSensorError(Exception):
     """Asair sensor error."""
 
-    def __init__(self, ret_code: str = None) -> None:
+    def __init__(self, ret_code: Optional[str] = None) -> None:
         """Constructor."""
         super().__init__(ret_code)
 
