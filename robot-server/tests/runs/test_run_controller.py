@@ -221,6 +221,12 @@ async def test_create_play_action_to_start(
         times=1,
     )
 
+    # Verify maintenance run publication after background task execution
+    decoy.verify(
+        mock_maintenance_runs_publisher.publish_current_maintenance_run(),
+        times=1,
+    )
+
 
 def test_create_pause_action(
     decoy: Decoy,

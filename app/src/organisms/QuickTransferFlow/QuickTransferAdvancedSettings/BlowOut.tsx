@@ -1,4 +1,5 @@
 import * as React from 'react'
+import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 import {
@@ -197,7 +198,10 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
           {blowOutLocationItems.map(blowOutLocationItem => (
             <RadioButton
               key={blowOutLocationItem.description}
-              isSelected={blowOutLocation === blowOutLocationItem.location}
+              isSelected={
+                isEqual(blowOutLocation, blowOutLocationItem.location) ||
+                blowOutLocation === blowOutLocationItem.location
+              }
               onChange={() => {
                 setBlowOutLocation(
                   blowOutLocationItem.location as BlowOutLocation
