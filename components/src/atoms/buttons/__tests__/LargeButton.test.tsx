@@ -68,6 +68,18 @@ describe('LargeButton', () => {
     )
   })
 
+  it('renders the stroke button', () => {
+    props = {
+      ...props,
+      buttonType: 'stroke',
+    }
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.white}`
+    )
+    expect(screen.getByRole('button')).toHaveStyle(`color: ${COLORS.blue50}`)
+  })
+
   it('renders the button as disabled', () => {
     props = {
       ...props,
