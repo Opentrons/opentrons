@@ -383,6 +383,12 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
 
                                           return (
                                             <ListButtonRadioButton
+                                              setNoHover={() => {
+                                                setHoveredLabware(null)
+                                              }}
+                                              setHovered={() => {
+                                                setHoveredLabware(nestedDefUri)
+                                              }}
                                               key={`${index}_${category}_${loadName}_${nestedDefUri}`}
                                               id={`${index}_${category}_${loadName}_${nestedDefUri}`}
                                               buttonText={
