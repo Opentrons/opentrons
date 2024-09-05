@@ -59,7 +59,7 @@ import { createCustomTiprackDef } from '../../labware-defs/actions'
 import { deleteContainer } from '../../labware-ingred/actions'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { getSectionsFromPipetteName } from './utils'
-import { createPipettes } from './CreatePipettes'
+import { editPipettes } from './editPipettes'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 import type {
   Gen,
@@ -168,7 +168,7 @@ export function EditInstrumentsModal(
                 onClose()
               } else {
                 setPage('overview')
-                createPipettes(
+                editPipettes(
                   labware,
                   pipettes,
                   orderedStepIds,

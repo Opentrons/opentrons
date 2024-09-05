@@ -385,7 +385,7 @@ export function ProtocolOverview(): JSX.Element {
                     <ListItemDescriptor
                       type="default"
                       description={t('extension')}
-                      content={isGripperAttached ? t('gripper') : 'N/A'}
+                      content={isGripperAttached ? t('gripper') : t('na')}
                     />
                   </ListItem>
                 ) : null}

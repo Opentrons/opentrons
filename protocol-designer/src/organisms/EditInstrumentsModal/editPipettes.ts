@@ -1,5 +1,6 @@
 import filter from 'lodash/filter'
 import isEmpty from 'lodash/isEmpty'
+import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
 
 import { actions as stepFormActions } from '../../step-forms'
@@ -21,7 +22,7 @@ type PipetteFieldsData = Omit<
   'id' | 'spec' | 'tiprackLabwareDef'
 >
 
-export const createPipettes = (
+export const editPipettes = (
   labware: { [labwareId: string]: LabwareOnDeck },
   pipettes: { [pipetteId: string]: PipetteOnDeck },
   orderedStepIds: StepIdType[],
@@ -32,13 +33,13 @@ export const createPipettes = (
   leftPip?: PipetteOnDeck,
   rightPip?: PipetteOnDeck
 ): void => {
-  const otherPip = mount === 'left' ? rightPip : leftPip
+  const oppositePipette = mount === 'left' ? rightPip : leftPip
   const otherPipFields: PipetteFieldsData | null =
-    otherPip != null
+    oppositePipette != null
       ? {
-          mount: otherPip.mount,
-          name: otherPip.name,
-          tiprackDefURI: otherPip.tiprackDefURI,
+          mount: oppositePipette.mount,
+          name: oppositePipette.name,
+          tiprackDefURI: oppositePipette.tiprackDefURI,
         }
       : null
   const newPip: PipetteFieldsData = {
@@ -114,12 +115,14 @@ export const createPipettes = (
     stepFormActions.createPipettes(
       mapValues(
         nextPipettes,
-        (
-          p: typeof nextPipettes[keyof typeof nextPipettes]
-        ): NormalizedPipette => ({
-          id: p.id,
-          name: p.name,
-          tiprackDefURI: p.tiprackDefURI,
+        ({
+          id,
+          name,
+          tiprackDefURI,
+        }: typeof nextPipettes[keyof typeof nextPipettes]): NormalizedPipette => ({
+          id,
+          name,
+          tiprackDefURI,
         })
       )
     )
@@ -202,8 +205,7 @@ export const createPipettes = (
       stepFormActions.substituteStepFormPipettes({
         substitutionMap,
         startStepId: orderedStepIds[0],
-        // @ts-expect-error(sa, 2021-6-22): last might return undefined
-        endStepId: last(orderedStepIds),
+        endStepId: last(orderedStepIds) ?? '',
       })
     )
   }
