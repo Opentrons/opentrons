@@ -208,7 +208,6 @@ export function MaterialsListModal({
                       ingred => ingred[liquid.ingredientId]?.volume ?? 0
                     )
                   )
-                  console.log(volumePerWell)
                   const totalVolume = sum(volumePerWell)
 
                   if (totalVolume === 0) {
