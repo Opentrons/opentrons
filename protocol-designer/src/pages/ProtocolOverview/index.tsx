@@ -19,7 +19,11 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
+import {
+  getPipetteSpecsV2,
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 import {
   getAdditionalEquipmentEntities,
   getInitialDeckSetup,
@@ -71,14 +75,13 @@ export function ProtocolOverview(): JSX.Element {
     setShowMaterialsListModal,
   ] = React.useState<boolean>(false)
   const fileData = useSelector(fileSelectors.createFile)
-  const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const liquidsOnDeck = useSelector(
     labwareIngredSelectors.allIngredientNamesIds
   )
-  const modulesOnDeck = initialDeckSetup.modules
-  const labwaresOnDeck = initialDeckSetup.labware
+  const modulesOnDeck = deckSetup.modules
+  const labwaresOnDeck = deckSetup.labware
 
   const nonLoadCommands =
     fileData?.commands.filter(
@@ -186,7 +189,7 @@ export function ProtocolOverview(): JSX.Element {
         <MaterialsListModal
           hardware={Object.values(modulesOnDeck)}
           fixtures={
-            additionalEquipment != null
+            robotType === OT2_ROBOT_TYPE
               ? Object.values(additionalEquipment)
               : []
           }

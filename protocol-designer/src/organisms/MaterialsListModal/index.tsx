@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+import { useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -20,8 +21,13 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  getModuleDisplayName,
+  OT2_ROBOT_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 
+import { getRobotType } from '../../file-data/selectors'
 import { getTopPortalEl } from '../../components/portals/TopPortal'
 
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
@@ -53,6 +59,11 @@ export function MaterialsListModal({
   setShowMaterialsListModal,
 }: MaterialsListModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_overview', 'shared'])
+  const robotType = useSelector(getRobotType)
+
+  const fixturesWithoutGripper = fixtures.filter(
+    fixture => fixture.name !== 'gripper'
+  )
 
   return createPortal(
     <Modal
@@ -70,8 +81,8 @@ export function MaterialsListModal({
             {t('deck_hardware')}
           </StyledText>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-            {fixtures.length > 0
-              ? fixtures.map(fixture => (
+            {fixturesWithoutGripper.length > 0
+              ? fixturesWithoutGripper.map(fixture => (
                   <ListItem type="noActive" key={fixture.id}>
                     <ListItemDescriptor
                       type="default"
@@ -101,7 +112,11 @@ export function MaterialsListModal({
             {hardware.length > 0 ? (
               hardware.map((hw, id) => {
                 const formatLocation = (slot: string): string => {
-                  if (slot === 'span7_8_10_11') {
+                  if (
+                    slot === 'span7_8_10_11' &&
+                    robotType === OT2_ROBOT_TYPE &&
+                    hw.type === THERMOCYCLER_MODULE_TYPE
+                  ) {
                     return '7,8,10,11'
                   }
                   return slot.replace('cutout', '')
