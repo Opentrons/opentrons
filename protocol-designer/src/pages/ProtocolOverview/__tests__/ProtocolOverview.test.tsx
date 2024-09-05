@@ -10,9 +10,11 @@ import { getFileMetadata, getRobotType } from '../../../file-data/selectors'
 import {
   getAdditionalEquipmentEntities,
   getInitialDeckSetup,
+  getSavedStepForms,
 } from '../../../step-forms/selectors'
 import { useBlockingHint } from '../../../components/Hints/useBlockingHint'
 import { MaterialsListModal } from '../../../organisms/MaterialsListModal'
+import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { ProtocolOverview } from '../index'
 
 import type { NavigateFunction } from 'react-router-dom'
@@ -23,7 +25,7 @@ vi.mock('../../../components/Hints/useBlockingHint')
 vi.mock('../../../organisms/MaterialsListModal')
 vi.mock('../../../labware-ingred/selectors')
 vi.mock('../../../organisms')
-
+vi.mock('../../../labware-ingred/selectors')
 const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
@@ -43,6 +45,12 @@ const render = () => {
 describe('ProtocolOverview', () => {
   beforeEach(() => {
     vi.mocked(getAdditionalEquipmentEntities).mockReturnValue({})
+    vi.mocked(getSavedStepForms).mockReturnValue({
+      __INITIAL_DECK_SETUP_STEP__: {} as any,
+    })
+    vi.mocked(labwareIngredSelectors.allIngredientGroupFields).mockReturnValue(
+      {}
+    )
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       pipettes: {},
@@ -132,5 +140,6 @@ describe('ProtocolOverview', () => {
     fireEvent.click(screen.getByTestId('ProtocolOverview_MetadataEditButton'))
     screen.getByText('mock EditProtocolMetadataModal')
   })
+
   it.todo('warning modal tests')
 })

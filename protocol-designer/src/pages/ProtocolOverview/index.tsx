@@ -13,6 +13,7 @@ import {
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   LargeButton,
+  LiquidIcon,
   ListItem,
   ListItemDescriptor,
   SPACING,
@@ -82,6 +83,9 @@ export function ProtocolOverview(): JSX.Element {
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
   const initialDeckSetup = useSelector(getInitialDeckSetup)
+  const allIngredientGroupFields = useSelector(
+    labwareIngredSelectors.allIngredientGroupFields
+  )
   const dispatch: ThunkDispatch<any> = useDispatch()
   const [hoverSlot, setHoverSlot] = React.useState<DeckSlot | null>(null)
   // TODO: wire up the slot information from hoverSlot
@@ -397,13 +401,32 @@ export function ProtocolOverview(): JSX.Element {
                 </StyledText>
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                <ListItem type="noActive" key={`ProtocolOverview_Liquids`}>
-                  <ListItemDescriptor
-                    type="default"
-                    description={'TODO'}
-                    content={'WIRE THIS UP'}
-                  />
-                </ListItem>
+                {Object.keys(allIngredientGroupFields).length > 0
+                  ? Object.values(allIngredientGroupFields).map(
+                      (liquid, index) => (
+                        <ListItem
+                          type="noActive"
+                          key={`${liquid.name}_${liquid.displayColor}_${index}`}
+                        >
+                          <ListItemDescriptor
+                            type="default"
+                            description={
+                              <Flex
+                                alignItems={ALIGN_CENTER}
+                                gridGap={SPACING.spacing8}
+                              >
+                                <LiquidIcon color={liquid.displayColor} />
+                                <StyledText desktopStyle="bodyDefaultRegular">
+                                  {liquid.name}
+                                </StyledText>
+                              </Flex>
+                            }
+                            content={liquid.description ?? t('n/a')}
+                          />
+                        </ListItem>
+                      )
+                    )
+                  : 'TODO: wire up infoScreen'}
               </Flex>
             </Flex>
             <Flex flexDirection={DIRECTION_COLUMN}>
@@ -413,13 +436,19 @@ export function ProtocolOverview(): JSX.Element {
                 </StyledText>
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                <ListItem type="noActive" key={`ProtocolOverview_Step`}>
-                  <ListItemDescriptor
-                    type="default"
-                    description={'TODO'}
-                    content={'WIRE THIS UP'}
-                  />
-                </ListItem>
+                {Object.keys(savedStepForms).length === 1 ? (
+                  'TODO: wire up infoScreen'
+                ) : (
+                  <ListItem type="noActive" key={`ProtocolOverview_Step`}>
+                    <ListItemDescriptor
+                      type="default"
+                      description={'Steps:'}
+                      content={(
+                        Object.keys(savedStepForms).length - 1
+                      ).toString()}
+                    />
+                  </ListItem>
+                )}
               </Flex>
             </Flex>
           </Flex>
