@@ -2675,7 +2675,7 @@ def test_rectangular_frustum_math_helpers(
         _find_volume_from_height_(i)
 
 
-@pytest.mark.parametrize("frustum", [f for f in CIRCULAR_TEST_EXAMPLES])
+@pytest.mark.parametrize("frustum", CIRCULAR_TEST_EXAMPLES)
 def test_circular_frustum_math_helpers(
     decoy: Decoy,
     frustum: Dict[str, List[float]],
