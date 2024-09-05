@@ -71,7 +71,6 @@ export const Deck = (props: { protocolId: string }): JSX.Element => {
       }
     }
   }
-  console.log(selectedLabware)
 
   const selectedLabwareIsTopOfStack = mostRecentAnalysis?.commands.some(
     command =>
