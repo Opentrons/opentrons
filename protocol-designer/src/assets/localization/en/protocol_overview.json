@@ -1,4 +1,5 @@
 {
+  "add_gripper": "Add a gripper",
   "author": "Organization/Author",
   "created": "Date created",
   "deck_hardware": "Deck hardware",
@@ -25,5 +26,6 @@
   "robotType": "Robot type",
   "starting_deck": "Protocol Starting Deck",
   "step": "Protocol steps",
-  "untitled_protocol": "Untitled protocol"
+  "untitled_protocol": "Untitled protocol",
+  "your_gripper": "Your gripper"
 }

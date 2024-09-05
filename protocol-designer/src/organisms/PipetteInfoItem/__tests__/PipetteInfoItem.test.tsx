@@ -1,14 +1,11 @@
 import * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { PipetteInfoItem } from '../PipetteInfoItem'
-
-import type { WizardFormState } from '../types'
+import { PipetteInfoItem } from '..'
 
 vi.mock('../../../labware-defs/selectors')
 
@@ -18,33 +15,20 @@ const render = (props: React.ComponentProps<typeof PipetteInfoItem>) => {
   })[0]
 }
 
-const values = {
-  additionalEquipment: [],
-  fields: {
-    name: '',
-    description: '',
-    organizationOrAuthor: '',
-    robotType: FLEX_ROBOT_TYPE,
-  },
-  pipettesByMount: {
-    left: { pipetteName: 'p1000_single' },
-    right: { pipetteName: 'p50_single' },
-  },
-  modules: null,
-} as WizardFormState
-
 describe('PipetteInfoItem', () => {
   let props: React.ComponentProps<typeof PipetteInfoItem>
 
   beforeEach(() => {
     props = {
-      watch: vi.fn((name: keyof typeof values) => values[name]) as any,
       editClick: vi.fn(),
-      setValue: vi.fn(),
       cleanForm: vi.fn(),
       tiprackDefURIs: ['mockDefUri'],
       pipetteName: 'p1000_single',
       mount: 'left',
+      formPipettesByMount: {
+        left: { pipetteName: 'p1000_single' },
+        right: { pipetteName: 'p50_single' },
+      },
     }
 
     vi.mocked(getLabwareDefsByURI).mockReturnValue({
@@ -59,7 +43,6 @@ describe('PipetteInfoItem', () => {
     fireEvent.click(screen.getByText('Edit'))
     expect(props.editClick).toHaveBeenCalled()
     fireEvent.click(screen.getByText('Remove'))
-    expect(props.setValue).toHaveBeenCalled()
     expect(props.cleanForm).toHaveBeenCalled()
   })
 })

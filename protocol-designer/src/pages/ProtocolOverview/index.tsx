@@ -41,7 +41,10 @@ import { resetScrollElements } from '../../ui/steps/utils'
 import { useBlockingHint } from '../../components/Hints/useBlockingHint'
 import { v8WarningContent } from '../../components/FileSidebar/FileSidebar'
 import { MaterialsListModal } from '../../organisms/MaterialsListModal'
-import { EditProtocolMetadataModal } from '../../organisms'
+import {
+  EditProtocolMetadataModal,
+  EditInstrumentsModal,
+} from '../../organisms'
 import { DeckThumbnail } from './DeckThumbnail'
 
 import type { CreateCommand, PipetteName } from '@opentrons/shared-data'
@@ -69,12 +72,16 @@ export function ProtocolOverview(): JSX.Element {
   const { t } = useTranslation(['protocol_overview', 'alert', 'shared'])
   const navigate = useNavigate()
   const [
+    showEditInstrumentsModal,
+    setShowEditInstrumentsModal,
+  ] = React.useState<boolean>(false)
+  const [
     showEditMetadataModal,
     setShowEditMetadataModal,
   ] = React.useState<boolean>(false)
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
-  const deckSetup = useSelector(getInitialDeckSetup)
+  const initialDeckSetup = useSelector(getInitialDeckSetup)
   const dispatch: ThunkDispatch<any> = useDispatch()
   const [hoverSlot, setHoverSlot] = React.useState<DeckSlot | null>(null)
   // TODO: wire up the slot information from hoverSlot
@@ -89,8 +96,12 @@ export function ProtocolOverview(): JSX.Element {
   const liquidsOnDeck = useSelector(
     labwareIngredSelectors.allIngredientNamesIds
   )
-  const modulesOnDeck = deckSetup.modules
-  const labwaresOnDeck = deckSetup.labware
+  const {
+    modules: modulesOnDeck,
+    labware: labwaresOnDeck,
+    additionalEquipmentOnDeck,
+    pipettes,
+  } = initialDeckSetup
 
   const nonLoadCommands =
     fileData?.commands.filter(
@@ -110,36 +121,32 @@ export function ProtocolOverview(): JSX.Element {
     robotType
   )
   const pipettesWithoutStep = getUnusedEntities(
-    deckSetup.pipettes,
+    initialDeckSetup.pipettes,
     savedStepForms,
     'pipette',
     robotType
   )
-  const isGripperAttached = Object.values(
-    deckSetup.additionalEquipmentOnDeck
-  ).some(equipment => equipment?.name === 'gripper')
+  const isGripperAttached = Object.values(additionalEquipment).some(
+    equipment => equipment?.name === 'gripper'
+  )
   const gripperWithoutStep = isGripperAttached && !gripperInUse
 
   const { trashBinUnused, wasteChuteUnused } = getUnusedTrash(
-    deckSetup.additionalEquipmentOnDeck,
+    additionalEquipmentOnDeck,
     fileData?.commands
   )
   const fixtureWithoutStep: Fixture = {
     trashBin: trashBinUnused,
     wasteChute: wasteChuteUnused,
     stagingAreaSlots: getUnusedStagingAreas(
-      deckSetup.additionalEquipmentOnDeck,
+      additionalEquipmentOnDeck,
       fileData?.commands
     ),
   }
 
-  const additionalEquipmentOnDeck = Object.values(
-    deckSetup.additionalEquipmentOnDeck
-  )
-  const pipettesOnDeck = Object.values(deckSetup.pipettes)
+  const pipettesOnDeck = Object.values(pipettes)
   const leftPip = pipettesOnDeck.find(pip => pip.mount === 'left')
   const rightPip = pipettesOnDeck.find(pip => pip.mount === 'right')
-  const gripper = additionalEquipmentOnDeck.find(ae => ae.name === 'gripper')
   const {
     protocolName,
     description,
@@ -200,13 +207,20 @@ export function ProtocolOverview(): JSX.Element {
           }}
         />
       ) : null}
+      {showEditInstrumentsModal ? (
+        <EditInstrumentsModal
+          onClose={() => {
+            setShowEditInstrumentsModal(false)
+          }}
+        />
+      ) : null}
       {blockingExportHint}
       {showMaterialsListModal ? (
         <MaterialsListModal
           hardware={Object.values(modulesOnDeck)}
           fixtures={
             robotType === OT2_ROBOT_TYPE
-              ? Object.values(additionalEquipment)
+              ? Object.values(additionalEquipmentOnDeck)
               : []
           }
           labware={Object.values(labwaresOnDeck)}
@@ -321,7 +335,7 @@ export function ProtocolOverview(): JSX.Element {
                 <Btn
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   onClick={() => {
-                    console.log('wire this up')
+                    setShowEditInstrumentsModal(true)
                   }}
                 >
                   <StyledText desktopStyle="bodyDefaultRegular">
@@ -370,7 +384,7 @@ export function ProtocolOverview(): JSX.Element {
                     <ListItemDescriptor
                       type="default"
                       description={t('extension')}
-                      content={gripper != null ? t(`$gripper.name}`) : 'N/A'}
+                      content={isGripperAttached ? t('gripper') : t('na')}
                     />
                   </ListItem>
                 ) : null}

@@ -7,7 +7,10 @@ import { EditProtocolMetadataModal } from '../../../organisms'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 import { getFileMetadata, getRobotType } from '../../../file-data/selectors'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
+import {
+  getAdditionalEquipmentEntities,
+  getInitialDeckSetup,
+} from '../../../step-forms/selectors'
 import { useBlockingHint } from '../../../components/Hints/useBlockingHint'
 import { MaterialsListModal } from '../../../organisms/MaterialsListModal'
 import { ProtocolOverview } from '../index'
@@ -39,6 +42,7 @@ const render = () => {
 
 describe('ProtocolOverview', () => {
   beforeEach(() => {
+    vi.mocked(getAdditionalEquipmentEntities).mockReturnValue({})
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       pipettes: {},
