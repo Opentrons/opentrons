@@ -79,8 +79,10 @@ from opentrons.protocol_engine.state.addressable_areas import (
 )
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
 from opentrons.protocol_engine.state.frustum_helpers import (
-    height_from_volume,
-    volume_from_height,
+    height_from_volume_circular,
+    height_from_volume_rectangular,
+    volume_from_height_circular,
+    volume_from_height_rectangular,
 )
 from ..pipette_fixtures import get_default_nozzle_map
 from ..mock_circular_frusta import TEST_EXAMPLES as CIRCULAR_TEST_EXAMPLES
@@ -2641,7 +2643,7 @@ def test_rectangular_frustum_math_helpers(
 ) -> None:
     """Test both height and volume calculation within a given rectangular frustum."""
     # generate 5 random indices to test on for each frustum
-    random_indices = [randint(0, len(frustum["height"])) for i in range(5)]
+    random_indices = [randint(0, len(frustum["height"]) - 1) for i in range(5)]
 
     total_frustum_height = frustum["height"][0]
     bottom_length = frustum["length"][-1]
@@ -2653,8 +2655,8 @@ def test_rectangular_frustum_math_helpers(
         top_width = frustum["width"][index]
         target_height = frustum["height"][index]
 
-        found_volume = volume_from_height(
-            shape="rectangular",
+        found_volume = volume_from_height_rectangular(
+            # shape="rectangular",
             target_height=target_height,
             total_frustum_height=total_frustum_height,
             top_length=top_length,
@@ -2663,8 +2665,8 @@ def test_rectangular_frustum_math_helpers(
             bottom_width=bottom_width,
         )
 
-        found_height = height_from_volume(
-            shape="rectangular",
+        found_height = height_from_volume_rectangular(
+            # shape="rectangular",
             volume=found_volume,
             total_frustum_height=total_frustum_height,
             top_length=top_length,
@@ -2697,16 +2699,16 @@ def test_circular_frustum_math_helpers(
         top_radius = frustum["radius"][index]
         target_height = frustum["height"][index]
 
-        found_volume = volume_from_height(
-            shape="circular",
+        found_volume = volume_from_height_circular(
+            # shape="circular",
             target_height=target_height,
             total_frustum_height=total_frustum_height,
             top_radius=top_radius,
             bottom_radius=bottom_radius,
         )
 
-        found_height = height_from_volume(
-            shape="circular",
+        found_height = height_from_volume_circular(
+            # shape="circular",
             volume=found_volume,
             total_frustum_height=total_frustum_height,
             top_radius=top_radius,

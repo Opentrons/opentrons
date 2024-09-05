@@ -1,32 +1,26 @@
-from typing import List, Optional, Tuple, overload, Literal, Union, Any
+"""Helper functions for liquid-level related calculations inside a given frustum."""
+from typing import List, Tuple
 from numpy import pi, iscomplex, roots, real
 
 from ..errors.exceptions import InvalidLiquidHeightFound
-
-# CircularType = NewType("circular", str)
-# SphericalType = NewType("rectangular", str)
-# RectangularType = NewType("spherical", str)
-
-CircularType = Literal["circular"]
-RectangularType = Literal["rectangular"]
-SphericalType = Literal["spherical"]
 
 
 def reject_unacceptable_heights(
     potential_heights: List[float], max_height: float
 ) -> float:
-    if len(potential_heights) > 1:
-        for root in potential_heights:
-            # reject any heights that are negative or greater than the max height
-            if root > max_height:
-                potential_heights.remove(root)
-            elif root < 0:
-                potential_heights.remove(root)
-    if len(potential_heights) != 1:
+    """Reject any solutions to a polynomial equation that cannot be the height of a frustum."""
+    valid_heights = []
+    for root in potential_heights:
+        # reject any heights that are negative or greater than the max height
+        if not iscomplex(root):
+            rounded_root = round(root, 4)
+            if (rounded_root <= max_height) and (rounded_root >= 0):
+                valid_heights.append(rounded_root)
+    if len(valid_heights) != 1:
         raise InvalidLiquidHeightFound(
             message="Unable to estimate valid liquid height from volume."
         )
-    return potential_heights[0]
+    return valid_heights[0]
 
 
 def rectangular_frustum_polynomial_roots(
@@ -36,6 +30,7 @@ def rectangular_frustum_polynomial_roots(
     top_width: float,
     total_frustum_height: float,
 ) -> Tuple[float, float, float]:
+    """Polynomial representation of the volume of a rectangular frustum."""
     # roots of the polynomial with shape ax^3 + bx^2 + cx
     a = (
         (top_length - bottom_length)
@@ -55,177 +50,73 @@ def circular_frustum_polynomial_roots(
     top_radius: float,
     total_frustum_height: float,
 ) -> Tuple[float, float, float]:
+    """Polynomial representation of the volume of a circular frustum."""
+    # roots of the polynomial with shape ax^3 + bx^2 + cx
     a = pi * ((top_radius - bottom_radius) ** 2) / (3 * total_frustum_height**2)
     b = pi * bottom_radius * (top_radius - bottom_radius) / total_frustum_height
     c = pi * bottom_radius**2
     return a, b, c
 
 
-@overload
-def volume_from_height(
-    *,
-    shape: CircularType,
+def volume_from_height_circular(
     target_height: float,
     total_frustum_height: float,
     bottom_radius: float,
     top_radius: float,
 ) -> float:
-    ...
-
-
-@overload
-def volume_from_height(
-    *,
-    shape: RectangularType,
-    target_height: float,
-    total_frustum_height: float,
-    bottom_length: float,
-    bottom_width: float,
-    top_length: float,
-    top_width: float,
-) -> float:
-    ...
-
-
-@overload
-def volume_from_height(
-    *, shape: SphericalType, target_height: float, radius_of_curvature: float
-) -> float:
-    ...
-
-
-def volume_from_height(
-    *,
-    shape: Union[CircularType, RectangularType, SphericalType],
-    target_height: float,
-    total_frustum_height: Optional[float] = None,
-    bottom_radius: Optional[float] = None,
-    top_radius: Optional[float] = None,
-    bottom_length: Optional[float] = None,
-    bottom_width: Optional[float] = None,
-    top_length: Optional[float] = None,
-    top_width: Optional[float] = None,
-    radius_of_curvature: Optional[float] = None,
-) -> float:
-    if shape == "spherical":
-        assert radius_of_curvature
-        volume = (
-            (1 / 3)
-            * pi
-            * (target_height**2)
-            * (3 * radius_of_curvature - target_height)
-        )
-        return volume
-    assert total_frustum_height
-    volume_polynomial_form: Tuple[float, float, float]
-    if shape == "rectangular":
-        assert bottom_length
-        assert bottom_width
-        assert top_length
-        assert top_width
-        volume_polynomial_form = rectangular_frustum_polynomial_roots(
-            bottom_length=bottom_length,
-            bottom_width=bottom_width,
-            top_length=top_length,
-            top_width=top_width,
-            total_frustum_height=total_frustum_height,
-        )
-    elif shape == "circular":
-        assert top_radius
-        assert bottom_radius
-        volume_polynomial_form = circular_frustum_polynomial_roots(
-            bottom_radius=bottom_radius,
-            top_radius=top_radius,
-            total_frustum_height=total_frustum_height,
-        )
-    a, b, c = volume_polynomial_form
+    """Find the volume given a height within a circular frustum."""
+    a, b, c = circular_frustum_polynomial_roots(
+        bottom_radius=bottom_radius,
+        top_radius=top_radius,
+        total_frustum_height=total_frustum_height,
+    )
     volume = a * (target_height**3) + b * (target_height**2) + c * target_height
     return volume
 
 
-@overload
-def height_from_volume(
-    *,
-    shape: CircularType,
-    volume: float,
-    total_frustum_height: float,
-    bottom_radius: float,
-    top_radius: float,
-) -> float:
-    ...
-
-
-@overload
-def height_from_volume(
-    *,
-    shape: RectangularType,
-    volume: float,
+def volume_from_height_rectangular(
+    target_height: float,
     total_frustum_height: float,
     bottom_length: float,
     bottom_width: float,
     top_length: float,
     top_width: float,
 ) -> float:
-    ...
+    """Find the volume given a height within a rectangular frustum."""
+    a, b, c = rectangular_frustum_polynomial_roots(
+        bottom_length=bottom_length,
+        bottom_width=bottom_width,
+        top_length=top_length,
+        top_width=top_width,
+        total_frustum_height=total_frustum_height,
+    )
+    volume = a * (target_height**3) + b * (target_height**2) + c * target_height
+    return volume
 
 
-@overload
-def height_from_volume(
-    *,
-    shape: SphericalType,
-    volume: float,
+def volume_from_height_spherical(
+    target_height: float,
     radius_of_curvature: float,
-    total_frustum_height: float,
 ) -> float:
-    ...
+    """Find the volume given a height within a spherical frustum."""
+    volume = (
+        (1 / 3) * pi * (target_height**2) * (3 * radius_of_curvature - target_height)
+    )
+    return volume
 
 
-def height_from_volume(
-    *,
-    shape: str,
+def height_from_volume_circular(
     volume: float,
     total_frustum_height: float,
-    bottom_radius: Optional[float] = None,
-    top_radius: Optional[float] = None,
-    bottom_length: Optional[float] = None,
-    bottom_width: Optional[float] = None,
-    top_length: Optional[float] = None,
-    top_width: Optional[float] = None,
-    radius_of_curvature: Optional[float] = None,
-    # **kwargs: Any,
+    bottom_radius: float,
+    top_radius: float,
 ) -> float:
-    # get polynomial in the form:
-    # volume = ax^3 + bx^2 + cx
-    volume_polynomial_form: Tuple[float, float, float]
-    if shape == "spherical":
-        assert radius_of_curvature
-        a = -1 * pi / 3
-        b = pi * radius_of_curvature
-        c = 0.0
-        volume_polynomial_form = (a, b, c)
-    elif shape == "rectangular":
-        assert bottom_length
-        assert bottom_width
-        assert top_length
-        assert top_width
-        volume_polynomial_form = rectangular_frustum_polynomial_roots(
-            bottom_length=bottom_length,
-            bottom_width=bottom_width,
-            top_length=top_length,
-            top_width=top_width,
-            total_frustum_height=total_frustum_height,
-        )
-    elif shape == "circular":
-        assert top_radius
-        assert bottom_radius
-        volume_polynomial_form = circular_frustum_polynomial_roots(
-            bottom_radius=bottom_radius,
-            top_radius=top_radius,
-            total_frustum_height=total_frustum_height,
-        )
-    # change this to the form:
-    # 0 = ax^3 + bx^2 + cx - volume
-    a, b, c = volume_polynomial_form
+    """Find the height given a volume within a circular frustum."""
+    a, b, c = circular_frustum_polynomial_roots(
+        bottom_radius=bottom_radius,
+        top_radius=top_radius,
+        total_frustum_height=total_frustum_height,
+    )
     d = volume * -1
     x_intercept_roots = (a, b, c, d)
 
@@ -236,6 +127,61 @@ def height_from_volume(
             real_roots.append(r)
     height = reject_unacceptable_heights(
         potential_heights=real_roots,
+        max_height=total_frustum_height,
+    )
+    return real(height)
+
+
+def height_from_volume_rectangular(
+    volume: float,
+    total_frustum_height: float,
+    bottom_length: float,
+    bottom_width: float,
+    top_length: float,
+    top_width: float,
+) -> float:
+    """Find the height given a volume within a rectangular frustum."""
+    a, b, c = rectangular_frustum_polynomial_roots(
+        bottom_length=bottom_length,
+        bottom_width=bottom_width,
+        top_length=top_length,
+        top_width=top_width,
+        total_frustum_height=total_frustum_height,
+    )
+    d = volume * -1
+    x_intercept_roots = (a, b, c, d)
+
+    height_from_volume_roots = roots(x_intercept_roots)
+    real_roots = []
+    for r in height_from_volume_roots:
+        if not iscomplex(r):
+            real_roots.append(r)
+    height = reject_unacceptable_heights(
+        potential_heights=real_roots,
+        max_height=total_frustum_height,
+    )
+    return real(height)
+
+
+def height_from_volume_spherical(
+    volume: float,
+    radius_of_curvature: float,
+    total_frustum_height: float,
+) -> float:
+    """Find the height given a volume within a spherical frustum."""
+    a = -1 * pi / 3
+    b = pi * radius_of_curvature
+    c = 0.0
+    d = volume * -1
+    x_intercept_roots = (a, b, c, d)
+
+    height_from_volume_roots = roots(x_intercept_roots)
+    # real_roots = []
+    # for r in height_from_volume_roots:
+    #     if not iscomplex(r):
+    #         real_roots.append(r)
+    height = reject_unacceptable_heights(
+        potential_heights=list(height_from_volume_roots),
         max_height=total_frustum_height,
     )
     return real(height)
