@@ -113,7 +113,6 @@ export function MaterialsListModal({
               hardware.map((hw, id) => {
                 const formatLocation = (slot: string): string => {
                   if (
-                    slot === 'span7_8_10_11' &&
                     robotType === OT2_ROBOT_TYPE &&
                     hw.type === THERMOCYCLER_MODULE_TYPE
                   ) {
