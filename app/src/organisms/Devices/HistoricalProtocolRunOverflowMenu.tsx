@@ -134,7 +134,10 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   }
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
-  const { reset, isRunControlLoading } = useRunControls(runId, onResetSuccess)
+  const { reset, isResetRunLoading, isRunControlLoading } = useRunControls(
+    runId,
+    onResetSuccess
+  )
   const { deleteRun } = useDeleteRunMutation()
   const robot = useRobot(robotName)
   const robotSerialNumber =
@@ -189,7 +192,18 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
         }
         data-testid="RecentProtocolRun_OverflowMenu_rerunNow"
       >
-        {t('rerun_now')}
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+          {t('rerun_now')}
+          {isResetRunLoading ? (
+            <Icon
+              name="ot-spinner"
+              size={SIZE_1}
+              color={COLORS.grey50}
+              aria-label="spinner"
+              spin
+            />
+          ) : null}
+        </Flex>
       </MenuItem>
       {isRobotOnWrongVersionOfSoftware && (
         <Tooltip tooltipProps={tooltipProps}>
