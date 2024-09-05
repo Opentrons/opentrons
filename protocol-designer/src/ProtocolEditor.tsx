@@ -36,7 +36,7 @@ const showGateModal =
 // prod urls get deployed to designer.opentrons.com with no subdir, so we don't need to add a base name
 const routerBaseName =
   process.env.NODE_ENV === 'production'
-    ? ''
+    ? null
     : window.location.pathname.split('/')[1]
 
 function ProtocolEditorComponent(): JSX.Element {
@@ -51,7 +51,7 @@ function ProtocolEditorComponent(): JSX.Element {
       {enableRedesign ? (
         <Flex flexDirection={DIRECTION_COLUMN}>
           {prereleaseModeEnabled ? <Bouncing /> : null}
-          <BrowserRouter basename={routerBaseName}>
+          <BrowserRouter {...(routerBaseName != null ? {baseName: routerBaseName} : {})}>
             <ProtocolRoutes />
           </BrowserRouter>
         </Flex>
