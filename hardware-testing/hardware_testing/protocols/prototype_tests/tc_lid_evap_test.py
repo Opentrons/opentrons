@@ -28,7 +28,6 @@ LID_STARTING_SLOT = "D2"
 LID_COUNT = 2
 LID_DEFINITION = "tc_lid_march_2024_v1"
 LID_BOTTOM_DEFINITION = "tc_lid_march_2024_v1"
-ip = "10.14.19.38"
 
 EVAP_TEST = True
 QUICK_TEST = False
@@ -42,16 +41,6 @@ OFFSET_THERMOCYCLER = {
     "pick-up": {"x": 0, "y": 0, "z": -4},
     "drop": {"x": 0, "y": 0, "z": 0}
 }
-
-# THERMOCYLCER VARIABLES
-SERIAL_ACK = "\r\n"
-TC_COMMAND_TERMINATOR = SERIAL_ACK
-TC_ACK = "ok" + SERIAL_ACK + "ok" + SERIAL_ACK
-DEFAULT_TC_TIMEOUT = 40
-DEFAULT_COMMAND_RETRIES = 3
-class GCODE(str, Enum):
-    PLATE_LIFT_CODE = "M128"
-
 
 def _move_labware_with_offset(
     protocol: ProtocolContext,
@@ -69,73 +58,9 @@ def _move_labware_with_offset(
     )
 
 def run(protocol: ProtocolContext):
-    
-    # PLATE LIFT FUNCTIONS
-    async def _driver_plate_lift():
-        """Get Raw Power Output for each Thermocycler element."""
-        c = (
-            CommandBuilder(terminator=TC_COMMAND_TERMINATOR)
-            .add_gcode(gcode=GCODE.PLATE_LIFT_CODE)
-        )
-        if not protocol.is_simulating():
-            response = await tc_driver._connection.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
-        else:
-            response = TC_ACK  # SimulatingDriver has no `._connection` so need to return _something_ for that case
-        return response
-
-    async def _get_plate_lift():
-        await tc_async_module_hardware.wait_for_is_running()
-        response = await _driver_plate_lift()
-        return str(response)
-    
-    def tc_plate_lift():
-        tc_async_module_hardware._get_plate_lift = _get_plate_lift
-        tc_sync_module_hardware._get_plate_lift()
-    
-    # GET SERIAL NUMBERS
-    # THERMOCYCLER
-    response = requests.get(
-        f"http://{ip}:31950/modules", headers={"opentrons-version": "3"}
-    )
-    module_data = response.json()
-    thermocycler_serial = module_data["data"][0].get("serialNumber", "")
-    # Instruments Attached
-    response = requests.get(
-        f"http://{ip}:31950/instruments", headers={"opentrons-version": "3"}
-    )
-    instrument_data = response.json()
-    instruments = {}
-    for instrument in instrument_data["data"]:
-        instruments[instrument["mount"]] = instrument["serialNumber"]
-    pipette = instruments.get("left", "")
-    gripper = instruments.get("extension", "")
-    things_attached = f"TC: {thermocycler_serial} pipette: {pipette} gripper: {gripper}"
-    protocol.comment(things_attached)
-    try:
-        sys.path.insert(0, "/var/lib/jupyter/notebooks")
-        import google_sheets_tool  # type: ignore[import]
-        credentials_path = "/var/lib/jupyter/notebooks/abr.json"
-    except:
-            protocol.comment("Run on robot. Make sure google_sheets_tool.py is in jupyter notebook."
-        )
-    try:
-        google_sheet = google_sheets_tool.google_sheet(
-            credentials_path, "EVT-DVT lid testing", tab_number=0
-        )
-        protocol.comment("Connected to the google sheet.")
-    except:
-        protocol.comment(
-            "There are no google sheets credentials. Make sure credentials in jupyter notebook."
-        )
-    date = datetime.now()
-    data_row = [date, thermocycler_serial, pipette, gripper]
-    #google_sheet.write_to_row(data_row)
     # SETUP
     thermocycler = protocol.load_module("thermocyclerModuleV2")
-    tc_sync_module_hardware = thermocycler._core._sync_module_hardware
-    tc_async_module_hardware = tc_sync_module_hardware._obj_to_adapt
-    tc_driver = tc_async_module_hardware._driver
-    tiprack_50_1    = protocol.load_labware('opentrons_flex_96_tiprack_50ul', 'D1')
+    tiprack_50_1    = protocol.load_labware('opentrons_flex_96_tiprack_50ul', 'C3')
     p1000 = protocol.load_instrument("flex_8channel_1000", "left", tip_racks = [tiprack_50_1])
     trashA1 = protocol.load_trash_bin("A3") 
     wasteChute = protocol.load_waste_chute()
@@ -190,7 +115,6 @@ def run(protocol: ProtocolContext):
     def move_lid():
         # Move lid from thermocycler to deck to stack to waste chute
         thermocycler.open_lid()
-        tc_plate_lift()
         # Move Lid to Deck
         _move_labware_with_offset(protocol, top_lid, "B2", pick_up_offset = OFFSET_THERMOCYCLER["pick-up"], drop_offset=OFFSET_DECK["drop"])
         #google_sheet.update_cell("Sheet1", 2, 6, "Y")
