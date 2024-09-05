@@ -50,7 +50,7 @@ export const RunPreviewComponent = (
   { runId, jumpedIndex, makeHandleScrollToStep, robotType }: RunPreviewProps,
   ref: React.ForwardedRef<ViewportListRef>
 ): JSX.Element | null => {
-  const { t } = useTranslation('run_details')
+  const { t } = useTranslation(['run_details', 'protocol_setup'])
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const runStatus = useRunStatus(runId)
   const { data: runRecord } = useNotifyRunQuery(runId)
@@ -123,7 +123,7 @@ export const RunPreviewComponent = (
   }
   return commands.length === 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
-      <InfoScreen contentType="runNotStarted" />
+      <InfoScreen content={t('protocol_setup:run_never_started')} />
     </Flex>
   ) : (
     <Flex

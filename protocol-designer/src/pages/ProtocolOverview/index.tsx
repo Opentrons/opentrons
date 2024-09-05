@@ -19,11 +19,19 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
-import { getInitialDeckSetup } from '../../step-forms/selectors'
+import {
+  getPipetteSpecsV2,
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
+import {
+  getAdditionalEquipmentEntities,
+  getInitialDeckSetup,
+} from '../../step-forms/selectors'
 import { selectors as fileSelectors } from '../../file-data'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { actions as loadFileActions } from '../../load-file'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import {
   getUnusedEntities,
   getUnusedStagingAreas,
@@ -32,6 +40,7 @@ import {
 import { resetScrollElements } from '../../ui/steps/utils'
 import { useBlockingHint } from '../../components/Hints/useBlockingHint'
 import { v8WarningContent } from '../../components/FileSidebar/FileSidebar'
+import { MaterialsListModal } from '../../organisms/MaterialsListModal'
 import { EditProtocolMetadataModal } from '../../organisms'
 import { DeckThumbnail } from './DeckThumbnail'
 
@@ -66,15 +75,22 @@ export function ProtocolOverview(): JSX.Element {
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
   const deckSetup = useSelector(getInitialDeckSetup)
-
   const dispatch: ThunkDispatch<any> = useDispatch()
   const [hoverSlot, setHoverSlot] = React.useState<DeckSlot | null>(null)
   // TODO: wire up the slot information from hoverSlot
   const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
+  const [
+    showMaterialsListModal,
+    setShowMaterialsListModal,
+  ] = React.useState<boolean>(false)
   const fileData = useSelector(fileSelectors.createFile)
-  const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
-  const modulesOnDeck = initialDeckSetup.modules
+  const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
+  const liquidsOnDeck = useSelector(
+    labwareIngredSelectors.allIngredientNamesIds
+  )
+  const modulesOnDeck = deckSetup.modules
+  const labwaresOnDeck = deckSetup.labware
 
   const nonLoadCommands =
     fileData?.commands.filter(
@@ -185,10 +201,24 @@ export function ProtocolOverview(): JSX.Element {
         />
       ) : null}
       {blockingExportHint}
+      {showMaterialsListModal ? (
+        <MaterialsListModal
+          hardware={Object.values(modulesOnDeck)}
+          fixtures={
+            robotType === OT2_ROBOT_TYPE
+              ? Object.values(additionalEquipment)
+              : []
+          }
+          labware={Object.values(labwaresOnDeck)}
+          liquids={liquidsOnDeck}
+          setShowMaterialsListModal={setShowMaterialsListModal}
+        />
+      ) : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         padding={`${SPACING.spacing60} ${SPACING.spacing80}`}
         gridGap={SPACING.spacing60}
+        width="100%"
       >
         <Flex
           justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -200,7 +230,9 @@ export function ProtocolOverview(): JSX.Element {
               desktopStyle="displayBold"
               css={PROTOCOL_NAME_TEXT_STYLE}
             >
-              {protocolName ?? t('untitled_protocol')}
+              {protocolName != null && protocolName !== ''
+                ? protocolName
+                : t('untitled_protocol')}
             </StyledText>
           </Flex>
 
@@ -389,8 +421,7 @@ export function ProtocolOverview(): JSX.Element {
                 data-testid="Materials_list"
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 onClick={() => {
-                  // ToDo (kk:08/27/2024) wire up material list modal
-                  console.log('open material list modal')
+                  setShowMaterialsListModal(true)
                 }}
               >
                 <StyledText desktopStyle="bodyDefaultRegular">

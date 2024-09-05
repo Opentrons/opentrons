@@ -120,7 +120,7 @@ export function ProtocolSetupOffsets({
                 />
               </>
             ) : (
-              <InfoScreen contentType="noLabwareOffsetDataYet" />
+              <InfoScreen content={t('noLabwareOffsetDataYet')} />
             )}
           </Flex>
           <FloatingActionButton
