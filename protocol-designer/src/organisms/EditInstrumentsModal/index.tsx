@@ -163,6 +163,13 @@ export function EditInstrumentsModal(
             </SecondaryButton>
           )}
           <PrimaryButton
+            disabled={
+              page === 'add' &&
+              (pipetteVolume == null ||
+                pipetteType == null ||
+                pipetteGen == null ||
+                selectedTips.length === 0)
+            }
             onClick={() => {
               if (page === 'overview') {
                 onClose()
@@ -379,6 +386,7 @@ export function EditInstrumentsModal(
                       setPipetteType(type.value)
                       setPipetteGen('flex')
                       setPipetteVolume(null)
+                      setSelectedTips([])
                     }}
                     buttonLabel={t(`shared:${type.label}`)}
                     buttonValue="single"
@@ -406,6 +414,7 @@ export function EditInstrumentsModal(
                     onChange={() => {
                       setPipetteGen(gen)
                       setPipetteVolume(null)
+                      setSelectedTips([])
                     }}
                     buttonLabel={gen}
                     buttonValue={gen}
@@ -440,6 +449,7 @@ export function EditInstrumentsModal(
                         key={`${type.value}_${pipetteType}`}
                         onChange={() => {
                           setPipetteVolume(type.value)
+                          setSelectedTips([])
                         }}
                         buttonLabel={t('vol_label', { volume: type.label })}
                         buttonValue={type.value}
