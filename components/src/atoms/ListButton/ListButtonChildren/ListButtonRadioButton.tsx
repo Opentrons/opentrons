@@ -11,6 +11,8 @@ interface ListButtonRadioButtonProps extends StyleProps {
   buttonText: string
   buttonValue: string | number
   onChange: React.ChangeEventHandler<HTMLInputElement>
+  setNoHover?: () => void
+  setHovered?: () => void
   disabled?: boolean
   isSelected?: boolean
   id?: string
@@ -26,6 +28,8 @@ export function ListButtonRadioButton(
     isSelected = false,
     onChange,
     disabled = false,
+    setHovered,
+    setNoHover,
     id = buttonText,
   } = props
 
@@ -82,7 +86,12 @@ export function ListButtonRadioButton(
         type="radio"
         value={buttonValue}
       />
-      <SettingButtonLabel role="label" htmlFor={id}>
+      <SettingButtonLabel
+        role="label"
+        htmlFor={id}
+        onMouseEnter={setHovered}
+        onMouseLeave={setNoHover}
+      >
         <StyledText desktopStyle="bodyDefaultRegular">{buttonText}</StyledText>
       </SettingButtonLabel>
     </Flex>

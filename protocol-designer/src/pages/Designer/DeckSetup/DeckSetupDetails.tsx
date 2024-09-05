@@ -1,12 +1,9 @@
 import * as React from 'react'
 import compact from 'lodash/compact'
 import values from 'lodash/values'
+import { useDispatch, useSelector } from 'react-redux'
 
-import {
-  Module,
-  POSITION_ABSOLUTE,
-  RobotCoordsForeignDiv,
-} from '@opentrons/components'
+import { Module } from '@opentrons/components'
 import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 import {
   getAddressableAreaFromSlotId,
@@ -19,14 +16,18 @@ import {
   SPAN7_8_10_11_SLOT,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import {
-  getSlotIdsBlockedBySpanning,
-  getSlotIsEmpty,
-} from '../../../step-forms'
+import { getSlotIdsBlockedBySpanningForThermocycler } from '../../../step-forms'
 import { LabwareOnDeck } from '../../../components/DeckSetup/LabwareOnDeck'
+import { selectors } from '../../../labware-ingred/selectors'
 import { SlotWarning } from '../../../components/DeckSetup/SlotWarning'
 import { getStagingAreaAddressableAreas } from '../../../utils'
+import { editSlotInfo } from '../../../labware-ingred/actions'
+import { getRobotType } from '../../../file-data/selectors'
+import { getSlotInformation } from '../utils'
 import { DeckItemHover } from './DeckItemHover'
+import { SlotOverflowMenu } from './SlotOverflowMenu'
+import { HoveredItems } from './HoveredItems'
+import { SelectedHoveredItems } from './SelectedHoveredItems'
 
 import type { ModuleTemporalProperties } from '@opentrons/step-generation'
 import type {
@@ -35,6 +36,7 @@ import type {
   DeckDefinition,
   DeckSlotId,
   Dimensions,
+  ModuleModel,
 } from '@opentrons/shared-data'
 import type {
   InitialDeckSetup,
@@ -42,36 +44,77 @@ import type {
   ModuleOnDeck,
 } from '../../../step-forms'
 import type { TerminalItemId } from '../../../steplist'
-import { SlotOverflowMenu } from './SlotOverflowMenu'
+import type { Fixture } from './constants'
 
 interface DeckSetupDetailsProps {
   activeDeckSetup: InitialDeckSetup
-  showGen1MultichannelCollisionWarnings: boolean
-  deckDef: DeckDefinition
-  stagingAreaCutoutIds: CutoutId[]
-  trashSlot: string | null
   addEquipment: (slotId: string) => void
+  deckDef: DeckDefinition
   hover: string | null
+  hoveredFixture: Fixture | null
+  hoveredLabware: string | null
+  hoveredModule: ModuleModel | null
   setHover: React.Dispatch<React.SetStateAction<string | null>>
+  showGen1MultichannelCollisionWarnings: boolean
+  stagingAreaCutoutIds: CutoutId[]
   selectedTerminalItemId?: TerminalItemId | null
+  selectedZoomInSlot?: DeckSlotId
 }
 
 export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
   const {
     activeDeckSetup,
-    showGen1MultichannelCollisionWarnings,
-    deckDef,
-    trashSlot,
     addEquipment,
-    stagingAreaCutoutIds,
-    selectedTerminalItemId,
+    deckDef,
     hover,
+    hoveredFixture,
+    hoveredLabware,
+    hoveredModule,
+    selectedTerminalItemId,
+    selectedZoomInSlot,
     setHover,
+    showGen1MultichannelCollisionWarnings,
+    stagingAreaCutoutIds,
   } = props
-  const slotIdsBlockedBySpanning = getSlotIdsBlockedBySpanning(activeDeckSetup)
+  const robotType = useSelector(getRobotType)
+  const slotIdsBlockedBySpanning = getSlotIdsBlockedBySpanningForThermocycler(
+    activeDeckSetup,
+    robotType
+  )
+  const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
+  const { selectedSlot } = selectedSlotInfo
   const [menuListId, setShowMenuListForId] = React.useState<DeckSlotId | null>(
     null
   )
+  const dispatch = useDispatch<any>()
+
+  const {
+    createdLabwareForSlot,
+    createdNestedLabwareForSlot,
+    createdModuleForSlot,
+    preSelectedFixture,
+    slotPosition,
+  } = getSlotInformation({
+    deckSetup: activeDeckSetup,
+    slot: selectedZoomInSlot ?? '',
+    deckDef,
+  })
+  //  initiate the slot's info
+  React.useEffect(() => {
+    dispatch(
+      editSlotInfo({
+        createdNestedLabwareForSlot,
+        createdLabwareForSlot,
+        createdModuleForSlot,
+        preSelectedFixture,
+      })
+    )
+  }, [
+    createdLabwareForSlot,
+    createdNestedLabwareForSlot,
+    createdModuleForSlot,
+    preSelectedFixture,
+  ])
 
   const allLabware: LabwareOnDeckType[] = Object.keys(
     activeDeckSetup.labware
@@ -118,7 +161,6 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
           return null
         }
         const moduleDef = getModuleDef2(moduleOnDeck.model)
-
         const getModuleInnerProps = (
           moduleState: ModuleTemporalProperties['moduleState']
         ): React.ComponentProps<typeof Module>['innerProps'] => {
@@ -149,6 +191,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
             }
           }
         }
+
         const labwareLoadedOnModule = allLabware.find(
           lw => lw.slot === moduleOnDeck.id
         )
@@ -162,10 +205,10 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
           yDimension: labwareLoadedOnModule?.def.dimensions.yDimension ?? 0,
           zDimension: labwareLoadedOnModule?.def.dimensions.zDimension ?? 0,
         }
-        return (
+        return moduleOnDeck.slot !== selectedSlot.slot ? (
           <React.Fragment key={moduleOnDeck.id}>
             <Module
-              key={moduleOnDeck.slot}
+              key={moduleOnDeck.id}
               x={slotPosition[0]}
               y={slotPosition[1]}
               def={moduleDef}
@@ -184,6 +227,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
                     labwareOnDeck={labwareLoadedOnModule}
                   />
                   <DeckItemHover
+                    isSelected={selectedZoomInSlot != null}
                     hover={hover}
                     setHover={setHover}
                     setShowMenuListForId={setShowMenuListForId}
@@ -198,6 +242,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
 
               {labwareLoadedOnModule == null ? (
                 <DeckItemHover
+                  isSelected={selectedZoomInSlot != null}
                   hover={hover}
                   setHover={setHover}
                   setShowMenuListForId={setShowMenuListForId}
@@ -210,7 +255,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
               ) : null}
             </Module>
           </React.Fragment>
-        )
+        ) : null
       })}
 
       {/* on-deck warnings for OT-2 and GEN1 8-channels only */}
@@ -242,15 +287,14 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
             stagingAreaAddressableAreas.includes(addressableArea.id)
           return (
             addressableAreas &&
-            !slotIdsBlockedBySpanning.includes(addressableArea.id) &&
-            getSlotIsEmpty(activeDeckSetup, addressableArea.id) &&
-            addressableArea.id !== trashSlot
+            !slotIdsBlockedBySpanning.includes(addressableArea.id)
           )
         })
         .map(addressableArea => {
           return (
             <React.Fragment key={addressableArea.id}>
               <DeckItemHover
+                isSelected={selectedZoomInSlot != null}
                 hover={hover}
                 setHover={setHover}
                 setShowMenuListForId={setShowMenuListForId}
@@ -284,7 +328,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
           console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
           return null
         }
-        return (
+        return labware.slot !== selectedSlot.slot ? (
           <React.Fragment key={labware.id}>
             <LabwareOnDeck
               x={slotPosition[0]}
@@ -292,6 +336,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
               labwareOnDeck={labware}
             />
             <DeckItemHover
+              isSelected={selectedZoomInSlot != null}
               hover={hover}
               setHover={setHover}
               setShowMenuListForId={setShowMenuListForId}
@@ -302,7 +347,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
               selectedTerminalItemId={props.selectedTerminalItemId}
             />
           </React.Fragment>
-        )
+        ) : null
       })}
 
       {/* all nested labwares on deck  */}
@@ -350,6 +395,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
               labwareOnDeck={labware}
             />
             <DeckItemHover
+              isSelected={selectedZoomInSlot != null}
               hover={hover}
               setShowMenuListForId={setShowMenuListForId}
               menuListId={menuListId}
@@ -363,28 +409,36 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
         )
       })}
 
+      {/* selected hardware + labware */}
+      <SelectedHoveredItems
+        deckDef={deckDef}
+        robotType={robotType}
+        hoveredFixture={hoveredFixture}
+        hoveredLabware={hoveredLabware}
+        hoveredModule={hoveredModule}
+        slotPosition={slotPosition}
+      />
+
+      {/* hovered hardware + labware */}
+      <HoveredItems
+        hoveredSlotPosition={slotPosition}
+        deckDef={deckDef}
+        robotType={robotType}
+        hoveredFixture={hoveredFixture}
+        hoveredLabware={hoveredLabware}
+        hoveredModule={hoveredModule}
+      />
+
+      {/* slot overflow menu */}
       {menuListSlotPosition != null && menuListId != null ? (
-        <RobotCoordsForeignDiv
-          x={menuListSlotPosition[0] + 50}
-          y={menuListSlotPosition[1] - 160}
-          width="172px"
-          height="180px"
-          innerDivProps={{
-            style: {
-              position: POSITION_ABSOLUTE,
-              transform: 'rotate(180deg) scaleX(-1)',
-              zIndex: 5,
-            },
+        <SlotOverflowMenu
+          menuListSlotPosition={menuListSlotPosition}
+          slot={menuListId}
+          addEquipment={addEquipment}
+          setShowMenuList={() => {
+            setShowMenuListForId(null)
           }}
-        >
-          <SlotOverflowMenu
-            slot={menuListId}
-            addEquipment={addEquipment}
-            setShowMenuList={() => {
-              setShowMenuListForId(null)
-            }}
-          />
-        </RobotCoordsForeignDiv>
+        />
       ) : null}
     </>
   )
