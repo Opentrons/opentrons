@@ -323,7 +323,7 @@ export function ProtocolOverview(): JSX.Element {
                       <ListItemDescriptor
                         type="default"
                         description={t(`${title}`)}
-                        content={value ?? 'N/A'}
+                        content={value ?? t('na')}
                       />
                     </ListItem>
                   )
@@ -368,8 +368,8 @@ export function ProtocolOverview(): JSX.Element {
                     content={
                       leftPip != null
                         ? getPipetteSpecsV2(leftPip.name as PipetteName)
-                            ?.displayName ?? 'N/A'
-                        : 'N/A'
+                            ?.displayName ?? t('na')
+                        : t('na')
                     }
                   />
                 </ListItem>
@@ -380,8 +380,8 @@ export function ProtocolOverview(): JSX.Element {
                     content={
                       rightPip != null
                         ? getPipetteSpecsV2(rightPip.name as PipetteName)
-                            ?.displayName ?? 'N/A'
-                        : 'N/A'
+                            ?.displayName ?? t('na')
+                        : t('na')
                     }
                   />
                 </ListItem>
@@ -443,7 +443,7 @@ export function ProtocolOverview(): JSX.Element {
                 </StyledText>
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                {Object.keys(savedStepForms).length === 1 ? (
+                {Object.keys(savedStepForms).length <= 1 ? (
                   <InfoScreen
                     content={t('no_steps')}
                     backgroundColor={COLORS.grey35}
