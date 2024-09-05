@@ -9,6 +9,7 @@ import {
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
   FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import { hydrateField } from '../../steplist/fieldLevel'
@@ -22,6 +23,7 @@ import type {
   LoadModuleCreateCommand,
   ModuleType,
   MoveLabwareCreateCommand,
+  RobotType,
 } from '@opentrons/shared-data'
 import type {
   NormalizedPipette,
@@ -168,6 +170,23 @@ export const getSlotIdsBlockedBySpanning = (
 
   return []
 }
+
+export const getSlotIdsBlockedBySpanningForThermocycler = (
+  initialDeckSetup: InitialDeckSetup,
+  robotType: RobotType
+): DeckSlot[] => {
+  const loadedThermocycler = values(initialDeckSetup.modules).find(
+    ({ type }: ModuleOnDeck) => type === THERMOCYCLER_MODULE_TYPE
+  )
+  if (loadedThermocycler != null && robotType === FLEX_ROBOT_TYPE) {
+    return ['A1', 'B1']
+  } else if (loadedThermocycler != null && robotType === OT2_ROBOT_TYPE) {
+    return ['7', '8', '10', '11']
+  }
+
+  return []
+}
+
 //  TODO(jr, 3/13/24): refactor this util it is messy and confusing
 export const getSlotIsEmpty = (
   initialDeckSetup: InitialDeckSetup,

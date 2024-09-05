@@ -33,8 +33,10 @@ import { resetScrollElements } from '../../ui/steps/utils'
 import { useBlockingHint } from '../../components/Hints/useBlockingHint'
 import { v8WarningContent } from '../../components/FileSidebar/FileSidebar'
 import { EditProtocolMetadataModal } from '../../organisms'
+import { DeckThumbnail } from './DeckThumbnail'
 
 import type { CreateCommand, PipetteName } from '@opentrons/shared-data'
+import type { DeckSlot } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../types'
 import type { HintKey } from '../../tutorial'
 
@@ -66,6 +68,8 @@ export function ProtocolOverview(): JSX.Element {
   const deckSetup = useSelector(getInitialDeckSetup)
 
   const dispatch: ThunkDispatch<any> = useDispatch()
+  const [hoverSlot, setHoverSlot] = React.useState<DeckSlot | null>(null)
+  // TODO: wire up the slot information from hoverSlot
   const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
   const fileData = useSelector(fileSelectors.createFile)
   const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
@@ -394,8 +398,15 @@ export function ProtocolOverview(): JSX.Element {
                 </StyledText>
               </Btn>
             </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-              TODO: wire this up
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing4}
+              alignItems={ALIGN_CENTER}
+            >
+              <DeckThumbnail
+                hoverSlot={hoverSlot}
+                setHoverSlot={setHoverSlot}
+              />
             </Flex>
           </Flex>
         </Flex>
