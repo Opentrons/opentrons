@@ -220,14 +220,15 @@ export function RobotSettingsAdvanced({
             handleUpdateBuildroot(robot)
           }}
         />
+        <Divider marginY={SPACING.spacing16} />
         {isFlex ? (
           <>
-            <Divider marginY={SPACING.spacing16} />
             <FactoryMode
               isRobotBusy={isRobotBusy || isEstopNotDisengaged}
               setShowFactoryModeSlideout={setShowFactoryModeSlideout}
               sn={sn}
             />
+            <Divider marginY={SPACING.spacing16} />
           </>
         ) : null}
         <Troubleshooting robotName={robotName} />

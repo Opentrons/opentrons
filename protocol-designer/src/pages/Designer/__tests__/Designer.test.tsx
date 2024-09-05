@@ -7,6 +7,7 @@ import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { getFileMetadata } from '../../../file-data/selectors'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+import { selectors } from '../../../labware-ingred/selectors'
 import { DeckSetupContainer } from '../DeckSetup'
 import { Designer } from '../index'
 import { LiquidsOverflowMenu } from '../LiquidsOverflowMenu'
@@ -15,6 +16,7 @@ import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 
+vi.mock('../../../labware-ingred/selectors')
 vi.mock('../LiquidsOverflowMenu')
 vi.mock('../DeckSetup')
 vi.mock('../../../file-data/selectors')
@@ -55,6 +57,10 @@ describe('Designer', () => {
     vi.mocked(LiquidsOverflowMenu).mockReturnValue(
       <div>mock LiquidsOverflowMenu</div>
     )
+    vi.mocked(selectors.getZoomedInSlot).mockReturnValue({
+      slot: null,
+      cutout: null,
+    })
   })
 
   it('renders deck setup container and nav buttons', () => {

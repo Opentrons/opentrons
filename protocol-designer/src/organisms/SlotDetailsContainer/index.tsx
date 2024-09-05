@@ -54,8 +54,8 @@ export function SlotDetailsContainer(
   const labwareOnSlot = Object.values(deckSetupLabwares).find(
     lw => lw.slot === slot || lw.slot === moduleOnSlot?.id
   )
-  const nestedLabwareOnSlot = Object.values(deckSetupLabwares).find(lw =>
-    Object.keys(deckSetupLabwares).includes(lw.slot)
+  const nestedLabwareOnSlot = Object.values(deckSetupLabwares).find(
+    lw => lw.slot === labwareOnSlot?.id
   )
   const fixturesOnSlot = Object.values(additionalEquipmentOnDeck).filter(
     ae => ae.location?.split('cutout')[1] === slot

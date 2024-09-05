@@ -5,415 +5,461 @@ import type { Mount } from '../../redux/pipettes/types'
 import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import type { PipetteWizardStep } from './types'
 
+const calibrateAlreadyAttachedPipetteOn = (
+  mount: Mount
+): PipetteWizardStep[] => [
+  {
+    section: SECTIONS.BEFORE_BEGINNING,
+    mount,
+    flowType: FLOWS.CALIBRATE,
+  },
+  {
+    section: SECTIONS.ATTACH_PROBE,
+    mount,
+    flowType: FLOWS.CALIBRATE,
+  },
+  {
+    section: SECTIONS.DETACH_PROBE,
+    mount,
+    flowType: FLOWS.CALIBRATE,
+  },
+  { section: SECTIONS.RESULTS, mount, flowType: FLOWS.CALIBRATE },
+]
+
+const detachNinetySixAndAttachSingleMountOn = (
+  mount: Mount
+): PipetteWizardStep[] => [
+  {
+    section: SECTIONS.BEFORE_BEGINNING,
+    mount: LEFT,
+    flowType: FLOWS.DETACH,
+  },
+  {
+    section: SECTIONS.DETACH_PIPETTE,
+    mount: LEFT,
+    flowType: FLOWS.DETACH,
+  },
+  {
+    section: SECTIONS.MOUNTING_PLATE,
+    mount: LEFT,
+    flowType: FLOWS.DETACH,
+  },
+  {
+    section: SECTIONS.CARRIAGE,
+    mount: LEFT,
+    flowType: FLOWS.DETACH,
+  },
+  {
+    section: SECTIONS.RESULTS,
+    mount: LEFT,
+    flowType: FLOWS.DETACH,
+    nextMount: mount,
+  },
+  {
+    section: SECTIONS.MOUNT_PIPETTE,
+    mount,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.FIRMWARE_UPDATE,
+    mount,
+    flowType: FLOWS.ATTACH,
+  },
+  { section: SECTIONS.RESULTS, mount, flowType: FLOWS.ATTACH },
+  {
+    section: SECTIONS.ATTACH_PROBE,
+    mount,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.DETACH_PROBE,
+    mount,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.RESULTS,
+    mount,
+    flowType: FLOWS.CALIBRATE,
+  },
+]
+
+const detachSingleMountAndAttachSingleMountOn = (
+  mount: Mount
+): PipetteWizardStep[] => [
+  {
+    section: SECTIONS.BEFORE_BEGINNING,
+    mount,
+    flowType: FLOWS.DETACH,
+  },
+  {
+    section: SECTIONS.DETACH_PIPETTE,
+    mount,
+    flowType: FLOWS.DETACH,
+  },
+  { section: SECTIONS.RESULTS, mount, flowType: FLOWS.DETACH },
+  {
+    section: SECTIONS.MOUNT_PIPETTE,
+    mount,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.FIRMWARE_UPDATE,
+    mount,
+    flowType: FLOWS.ATTACH,
+  },
+  { section: SECTIONS.RESULTS, mount, flowType: FLOWS.ATTACH },
+  {
+    section: SECTIONS.ATTACH_PROBE,
+    mount,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.DETACH_PROBE,
+    mount,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.RESULTS,
+    mount,
+    flowType: FLOWS.CALIBRATE,
+  },
+]
+
+const detachTwoSingleMountsAndAttachNinetySix = (): PipetteWizardStep[] => [
+  {
+    section: SECTIONS.BEFORE_BEGINNING,
+    mount: LEFT,
+    flowType: FLOWS.DETACH,
+  },
+  {
+    section: SECTIONS.DETACH_PIPETTE,
+    mount: LEFT,
+    flowType: FLOWS.DETACH,
+  },
+  {
+    section: SECTIONS.RESULTS,
+    mount: LEFT,
+    flowType: FLOWS.DETACH,
+    nextMount: RIGHT,
+  },
+  {
+    section: SECTIONS.DETACH_PIPETTE,
+    mount: RIGHT,
+    flowType: FLOWS.DETACH,
+  },
+  {
+    section: SECTIONS.RESULTS,
+    mount: RIGHT,
+    flowType: FLOWS.DETACH,
+    nextMount: 'both',
+  },
+  {
+    section: SECTIONS.CARRIAGE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.MOUNTING_PLATE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.MOUNT_PIPETTE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.FIRMWARE_UPDATE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
+  {
+    section: SECTIONS.ATTACH_PROBE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.DETACH_PROBE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.RESULTS,
+    mount: LEFT,
+    flowType: FLOWS.CALIBRATE,
+  },
+]
+
+const detachSingleMountOnLeftAndAttachNinetySix = (): PipetteWizardStep[] => [
+  {
+    section: SECTIONS.BEFORE_BEGINNING,
+    mount: LEFT,
+    flowType: FLOWS.DETACH,
+  },
+  {
+    section: SECTIONS.DETACH_PIPETTE,
+    mount: LEFT,
+    flowType: FLOWS.DETACH,
+  },
+  {
+    section: SECTIONS.RESULTS,
+    mount: LEFT,
+    flowType: FLOWS.DETACH,
+    nextMount: 'both',
+  },
+  {
+    section: SECTIONS.CARRIAGE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.MOUNTING_PLATE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.MOUNT_PIPETTE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.FIRMWARE_UPDATE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
+  {
+    section: SECTIONS.ATTACH_PROBE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.DETACH_PROBE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.RESULTS,
+    mount: LEFT,
+    flowType: FLOWS.CALIBRATE,
+  },
+]
+
+const detachSingleMountOnRightAndAttachNinetySix = (): PipetteWizardStep[] => [
+  {
+    section: SECTIONS.BEFORE_BEGINNING,
+    mount: RIGHT,
+    flowType: FLOWS.DETACH,
+  },
+  {
+    section: SECTIONS.DETACH_PIPETTE,
+    mount: RIGHT,
+    flowType: FLOWS.DETACH,
+  },
+  {
+    section: SECTIONS.RESULTS,
+    mount: RIGHT,
+    flowType: FLOWS.DETACH,
+    nextMount: 'both',
+  },
+  {
+    section: SECTIONS.CARRIAGE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.MOUNTING_PLATE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.MOUNT_PIPETTE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.FIRMWARE_UPDATE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
+  {
+    section: SECTIONS.ATTACH_PROBE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.DETACH_PROBE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.RESULTS,
+    mount: LEFT,
+    flowType: FLOWS.CALIBRATE,
+  },
+]
+
+const fromEmptyGantryAttachNinetySix = (): PipetteWizardStep[] => [
+  {
+    section: SECTIONS.BEFORE_BEGINNING,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.CARRIAGE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.MOUNTING_PLATE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.MOUNT_PIPETTE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.FIRMWARE_UPDATE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
+  {
+    section: SECTIONS.ATTACH_PROBE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.DETACH_PROBE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.RESULTS,
+    mount: LEFT,
+    flowType: FLOWS.CALIBRATE,
+  },
+]
+
+const fromEmptyMountAttachSingleMountOn = (
+  mount: Mount
+): PipetteWizardStep[] => [
+  {
+    section: SECTIONS.BEFORE_BEGINNING,
+    mount,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.MOUNT_PIPETTE,
+    mount,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.FIRMWARE_UPDATE,
+    mount,
+    flowType: FLOWS.ATTACH,
+  },
+  { section: SECTIONS.RESULTS, mount, flowType: FLOWS.ATTACH },
+  {
+    section: SECTIONS.ATTACH_PROBE,
+    mount,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.DETACH_PROBE,
+    mount,
+    flowType: FLOWS.ATTACH,
+  },
+  {
+    section: SECTIONS.RESULTS,
+    mount,
+    flowType: FLOWS.CALIBRATE,
+  },
+]
+/**
++-------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+
+| requested > |96                                             |left                                          |right                                          |
+|             |                                               |                                              |                                               |
+| v attached  |                                               |                                              |                                               |
++-------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+
+| 96          | calibrateAlreadyAttachedPipetteOn(left)       | detachNinetySixAndAttachSingleMountOn(left)  | detachNinetySixAndAttachSingleMountOn(right)  |
++-------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+
+|             |                                               | calibrateAlreadyAttachedPipetteOn(left) or   | fromEmptyMountAttachSingleMountOn(right)      |
+| left only   | detachSingleMountOnLeftAndAttachNinetySix()   | detachSingleMountAndAttachSingleMountOn(left)|                                               |
+|             |                                               |                                              |                                               |
++-------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+
+|             |                                               |                                              | calibrateAlreadyAttachedPipetteOn(right) or   |
+| right only  | detachSingleMountOnRightAndAttachNinetySix()  |fromEmptyMountAttachSingleMountOn(left)       | detachSingleMountAndAttachSingleMountOn(right)|
+|             |                                               |                                              |                                               |
++-------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+
+| left and    |                                               | calibrateAlreadyAttachedPipetteOn(left) or   | calibrateAlreadyAttachedPipetteOn(right) or   |
+| right       | detachTwoSingleMountsAndAttachNinetySix()     | detachSingleMountAndAttachSingleMountOn(left)| detachSingleMountAndAttachSingleMountOn(right)|
+|             |                                               |                                              |                                               |
++-------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+
+|             |                                               |                                              |                                               |
+| nothing     | fromEmptyGantryAttachNinetySix()              | fromEmptyMountAttachSingleMountOn(left)      | fromEmptyMountAttachSingleMountOn(right)      |
+|             |                                               |                                              |                                               |
++-------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+
+ **/
+
 export const getPipetteWizardStepsForProtocol = (
   attachedPipettes: AttachedPipettesFromInstrumentsQuery,
   pipetteInfo: LoadedPipette[],
   mount: Mount
 ): PipetteWizardStep[] | null => {
   const requiredPipette = pipetteInfo.find(pipette => pipette.mount === mount)
-  const nintySixChannelAttached =
+  const ninetySixChannelAttached =
     attachedPipettes[LEFT]?.instrumentName === 'p1000_96'
+  const ninetySixChannelRequested = requiredPipette?.pipetteName === 'p1000_96'
 
-  //  return empty array if no pipette is required in the protocol
   if (requiredPipette == null) {
+    //  return empty array if no pipette is required in the protocol
     return null
-    // return calibration flow if correct pipette is attached
   } else if (
     requiredPipette?.pipetteName === attachedPipettes[mount]?.instrumentName
   ) {
-    return [
-      {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount,
-        flowType: FLOWS.CALIBRATE,
-      },
-      {
-        section: SECTIONS.ATTACH_PROBE,
-        mount,
-        flowType: FLOWS.CALIBRATE,
-      },
-      {
-        section: SECTIONS.DETACH_PROBE,
-        mount,
-        flowType: FLOWS.CALIBRATE,
-      },
-      { section: SECTIONS.RESULTS, mount, flowType: FLOWS.CALIBRATE },
-    ]
+    // return calibration flow if correct pipette is attached
+    return calibrateAlreadyAttachedPipetteOn(mount)
+  } else if (!ninetySixChannelRequested && ninetySixChannelAttached) {
+    // 96-channel pipette attached and need to attach single mount pipette
+    return detachNinetySixAndAttachSingleMountOn(mount)
+  } else if (!ninetySixChannelRequested && attachedPipettes[mount] != null) {
+    // Single mount pipette attached and need to attach new single mount pipette
+    return detachSingleMountAndAttachSingleMountOn(mount)
   } else if (
-    requiredPipette.pipetteName !== 'p1000_96' &&
-    attachedPipettes[mount] != null
-  ) {
-    //    96-channel pipette attached and need to attach single mount pipette
-    if (nintySixChannelAttached) {
-      return [
-        {
-          section: SECTIONS.BEFORE_BEGINNING,
-          mount: LEFT,
-          flowType: FLOWS.DETACH,
-        },
-        {
-          section: SECTIONS.DETACH_PIPETTE,
-          mount: LEFT,
-          flowType: FLOWS.DETACH,
-        },
-        {
-          section: SECTIONS.MOUNTING_PLATE,
-          mount: LEFT,
-          flowType: FLOWS.DETACH,
-        },
-        {
-          section: SECTIONS.CARRIAGE,
-          mount: LEFT,
-          flowType: FLOWS.DETACH,
-        },
-        {
-          section: SECTIONS.RESULTS,
-          mount: LEFT,
-          flowType: FLOWS.DETACH,
-          nextMount: mount,
-        },
-        {
-          section: SECTIONS.MOUNT_PIPETTE,
-          mount,
-          flowType: FLOWS.ATTACH,
-        },
-        {
-          section: SECTIONS.FIRMWARE_UPDATE,
-          mount,
-          flowType: FLOWS.ATTACH,
-        },
-        { section: SECTIONS.RESULTS, mount, flowType: FLOWS.ATTACH },
-        {
-          section: SECTIONS.ATTACH_PROBE,
-          mount,
-          flowType: FLOWS.ATTACH,
-        },
-        {
-          section: SECTIONS.DETACH_PROBE,
-          mount,
-          flowType: FLOWS.ATTACH,
-        },
-        {
-          section: SECTIONS.RESULTS,
-          mount,
-          flowType: FLOWS.CALIBRATE,
-        },
-      ]
-      //    Single mount pipette attached and need to attach new single mount pipette
-    } else {
-      return [
-        {
-          section: SECTIONS.BEFORE_BEGINNING,
-          mount,
-          flowType: FLOWS.DETACH,
-        },
-        {
-          section: SECTIONS.DETACH_PIPETTE,
-          mount,
-          flowType: FLOWS.DETACH,
-        },
-        { section: SECTIONS.RESULTS, mount, flowType: FLOWS.DETACH },
-        {
-          section: SECTIONS.MOUNT_PIPETTE,
-          mount,
-          flowType: FLOWS.ATTACH,
-        },
-        {
-          section: SECTIONS.FIRMWARE_UPDATE,
-          mount,
-          flowType: FLOWS.ATTACH,
-        },
-        { section: SECTIONS.RESULTS, mount, flowType: FLOWS.ATTACH },
-        {
-          section: SECTIONS.ATTACH_PROBE,
-          mount,
-          flowType: FLOWS.ATTACH,
-        },
-        {
-          section: SECTIONS.DETACH_PROBE,
-          mount,
-          flowType: FLOWS.ATTACH,
-        },
-        {
-          section: SECTIONS.RESULTS,
-          mount,
-          flowType: FLOWS.CALIBRATE,
-        },
-      ]
-    }
-    //  Single mount pipette attached to both mounts and need to attach 96-channel pipette
-  } else if (
-    requiredPipette.pipetteName === 'p1000_96' &&
+    ninetySixChannelRequested &&
     attachedPipettes[LEFT] != null &&
     attachedPipettes[RIGHT] != null
   ) {
-    return [
-      {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: LEFT,
-        flowType: FLOWS.DETACH,
-      },
-      {
-        section: SECTIONS.DETACH_PIPETTE,
-        mount: LEFT,
-        flowType: FLOWS.DETACH,
-      },
-      {
-        section: SECTIONS.RESULTS,
-        mount: LEFT,
-        flowType: FLOWS.DETACH,
-        nextMount: RIGHT,
-      },
-      {
-        section: SECTIONS.DETACH_PIPETTE,
-        mount: RIGHT,
-        flowType: FLOWS.DETACH,
-      },
-      {
-        section: SECTIONS.RESULTS,
-        mount: RIGHT,
-        flowType: FLOWS.DETACH,
-        nextMount: 'both',
-      },
-      {
-        section: SECTIONS.CARRIAGE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.MOUNTING_PLATE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.MOUNT_PIPETTE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.FIRMWARE_UPDATE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
-      {
-        section: SECTIONS.ATTACH_PROBE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.DETACH_PROBE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.RESULTS,
-        mount: LEFT,
-        flowType: FLOWS.CALIBRATE,
-      },
-    ]
-    //  Single mount pipette attached to left mount and need to attach 96-channel pipette
+    // Single mount pipette attached to both mounts and need to attach 96-channel pipette
+    return detachTwoSingleMountsAndAttachNinetySix()
   } else if (
-    requiredPipette.pipetteName === 'p1000_96' &&
+    ninetySixChannelRequested &&
     attachedPipettes[LEFT] != null &&
     attachedPipettes[RIGHT] == null
   ) {
-    return [
-      {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: LEFT,
-        flowType: FLOWS.DETACH,
-      },
-      {
-        section: SECTIONS.DETACH_PIPETTE,
-        mount: LEFT,
-        flowType: FLOWS.DETACH,
-      },
-      {
-        section: SECTIONS.RESULTS,
-        mount: LEFT,
-        flowType: FLOWS.DETACH,
-        nextMount: 'both',
-      },
-      {
-        section: SECTIONS.CARRIAGE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.MOUNTING_PLATE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.MOUNT_PIPETTE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.FIRMWARE_UPDATE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
-      {
-        section: SECTIONS.ATTACH_PROBE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.DETACH_PROBE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.RESULTS,
-        mount: LEFT,
-        flowType: FLOWS.CALIBRATE,
-      },
-    ]
-    //  Single mount pipette attached to right mount and need to attach 96-channel pipette
+    // Single mount pipette attached to left mount and need to attach 96-channel pipette
+    return detachSingleMountOnLeftAndAttachNinetySix()
   } else if (
-    requiredPipette.pipetteName === 'p1000_96' &&
+    ninetySixChannelRequested &&
     attachedPipettes[LEFT] == null &&
     attachedPipettes[RIGHT] != null
   ) {
-    return [
-      {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: RIGHT,
-        flowType: FLOWS.DETACH,
-      },
-      {
-        section: SECTIONS.DETACH_PIPETTE,
-        mount: RIGHT,
-        flowType: FLOWS.DETACH,
-      },
-      {
-        section: SECTIONS.RESULTS,
-        mount: RIGHT,
-        flowType: FLOWS.DETACH,
-        nextMount: 'both',
-      },
-      {
-        section: SECTIONS.CARRIAGE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.MOUNTING_PLATE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.MOUNT_PIPETTE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.FIRMWARE_UPDATE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
-      {
-        section: SECTIONS.ATTACH_PROBE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.DETACH_PROBE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.RESULTS,
-        mount: LEFT,
-        flowType: FLOWS.CALIBRATE,
-      },
-    ]
-    //  if no pipette is attached to gantry
+    // Single mount pipette attached to right mount and need to attach 96-channel pipette
+    return detachSingleMountOnRightAndAttachNinetySix()
   } else {
-    //  Gantry empty and need to attach 96-channel pipette
-    if (requiredPipette.pipetteName === 'p1000_96') {
-      return [
-        {
-          section: SECTIONS.BEFORE_BEGINNING,
-          mount: LEFT,
-          flowType: FLOWS.ATTACH,
-        },
-        {
-          section: SECTIONS.CARRIAGE,
-          mount: LEFT,
-          flowType: FLOWS.ATTACH,
-        },
-        {
-          section: SECTIONS.MOUNTING_PLATE,
-          mount: LEFT,
-          flowType: FLOWS.ATTACH,
-        },
-        {
-          section: SECTIONS.MOUNT_PIPETTE,
-          mount: LEFT,
-          flowType: FLOWS.ATTACH,
-        },
-        {
-          section: SECTIONS.FIRMWARE_UPDATE,
-          mount: LEFT,
-          flowType: FLOWS.ATTACH,
-        },
-        { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
-        {
-          section: SECTIONS.ATTACH_PROBE,
-          mount: LEFT,
-          flowType: FLOWS.ATTACH,
-        },
-        {
-          section: SECTIONS.DETACH_PROBE,
-          mount: LEFT,
-          flowType: FLOWS.ATTACH,
-        },
-        {
-          section: SECTIONS.RESULTS,
-          mount: LEFT,
-          flowType: FLOWS.CALIBRATE,
-        },
-      ]
-      //    Gantry empty and need to attach single mount pipette
+    // if no pipette is attached to gantry
+
+    if (ninetySixChannelRequested) {
+      // Gantry empty and need to attach 96-channel pipette
+      return fromEmptyGantryAttachNinetySix()
     } else {
-      return [
-        {
-          section: SECTIONS.BEFORE_BEGINNING,
-          mount,
-          flowType: FLOWS.ATTACH,
-        },
-        {
-          section: SECTIONS.MOUNT_PIPETTE,
-          mount,
-          flowType: FLOWS.ATTACH,
-        },
-        {
-          section: SECTIONS.FIRMWARE_UPDATE,
-          mount,
-          flowType: FLOWS.ATTACH,
-        },
-        { section: SECTIONS.RESULTS, mount, flowType: FLOWS.ATTACH },
-        {
-          section: SECTIONS.ATTACH_PROBE,
-          mount,
-          flowType: FLOWS.ATTACH,
-        },
-        {
-          section: SECTIONS.DETACH_PROBE,
-          mount,
-          flowType: FLOWS.ATTACH,
-        },
-        {
-          section: SECTIONS.RESULTS,
-          mount,
-          flowType: FLOWS.CALIBRATE,
-        },
-      ]
+      // Gantry empty and need to attach single mount pipette
+      return fromEmptyMountAttachSingleMountOn(mount)
     }
   }
 }

@@ -21,7 +21,6 @@ export function TipSelectionModal(
   const { t } = useTranslation('error_recovery')
 
   // If users end up in a state in which they deselect all wells, don't let them escape this modal.
-
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('change_tip_pickup_location'),
     hasExitIcon: areTipsSelected,
