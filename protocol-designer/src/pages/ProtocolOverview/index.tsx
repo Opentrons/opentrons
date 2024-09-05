@@ -8,8 +8,10 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   Btn,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InfoScreen,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   LargeButton,
@@ -397,36 +399,41 @@ export function ProtocolOverview(): JSX.Element {
             <Flex flexDirection={DIRECTION_COLUMN}>
               <Flex marginBottom={SPACING.spacing12}>
                 <StyledText desktopStyle="headingSmallBold">
-                  {t('liquids')}
+                  {t('liquid_defs')}
                 </StyledText>
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                {Object.keys(allIngredientGroupFields).length > 0
-                  ? Object.values(allIngredientGroupFields).map(
-                      (liquid, index) => (
-                        <ListItem
-                          type="noActive"
-                          key={`${liquid.name}_${liquid.displayColor}_${index}`}
-                        >
-                          <ListItemDescriptor
-                            type="default"
-                            description={
-                              <Flex
-                                alignItems={ALIGN_CENTER}
-                                gridGap={SPACING.spacing8}
-                              >
-                                <LiquidIcon color={liquid.displayColor} />
-                                <StyledText desktopStyle="bodyDefaultRegular">
-                                  {liquid.name}
-                                </StyledText>
-                              </Flex>
-                            }
-                            content={liquid.description ?? t('n/a')}
-                          />
-                        </ListItem>
-                      )
+                {Object.keys(allIngredientGroupFields).length > 0 ? (
+                  Object.values(allIngredientGroupFields).map(
+                    (liquid, index) => (
+                      <ListItem
+                        type="noActive"
+                        key={`${liquid.name}_${liquid.displayColor}_${index}`}
+                      >
+                        <ListItemDescriptor
+                          type="default"
+                          description={
+                            <Flex
+                              alignItems={ALIGN_CENTER}
+                              gridGap={SPACING.spacing8}
+                            >
+                              <LiquidIcon color={liquid.displayColor} />
+                              <StyledText desktopStyle="bodyDefaultRegular">
+                                {liquid.name}
+                              </StyledText>
+                            </Flex>
+                          }
+                          content={liquid.description ?? t('n/a')}
+                        />
+                      </ListItem>
                     )
-                  : 'TODO: wire up infoScreen'}
+                  )
+                ) : (
+                  <InfoScreen
+                    content={t('no_liquids_defined')}
+                    backgroundColor={COLORS.grey35}
+                  />
+                )}
               </Flex>
             </Flex>
             <Flex flexDirection={DIRECTION_COLUMN}>
@@ -437,7 +444,10 @@ export function ProtocolOverview(): JSX.Element {
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
                 {Object.keys(savedStepForms).length === 1 ? (
-                  'TODO: wire up infoScreen'
+                  <InfoScreen
+                    content={t('no_steps')}
+                    backgroundColor={COLORS.grey35}
+                  />
                 ) : (
                   <ListItem type="noActive" key={`ProtocolOverview_Step`}>
                     <ListItemDescriptor

@@ -78,7 +78,7 @@ describe('ProtocolOverview', () => {
 
     //  metadata
     screen.getByText('mockName')
-    screen.getByText('Protocol metadata')
+    screen.getByText('Protocol Metadata')
     screen.getAllByText('Edit')
     screen.getByText('Description')
     screen.getByText('mockDescription')
@@ -94,7 +94,7 @@ describe('ProtocolOverview', () => {
     screen.getByText('Right pipette')
     screen.getByText('Extension mount')
     //   liquids
-    screen.getByText('Liquids')
+    screen.getByText('Liquid Definitions')
     //  steps
     screen.getByText('Protocol steps')
   })
