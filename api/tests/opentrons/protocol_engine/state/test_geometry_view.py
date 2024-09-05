@@ -78,6 +78,10 @@ from opentrons.protocol_engine.state.addressable_areas import (
     AddressableAreaStore,
 )
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
+from opentrons.protocol_engine.state.frustum_helpers import (
+    height_from_volume,
+    volume_from_height,
+)
 from ..pipette_fixtures import get_default_nozzle_map
 from ..mock_circular_frusta import TEST_EXAMPLES as CIRCULAR_TEST_EXAMPLES
 from ..mock_rectangular_frusta import TEST_EXAMPLES as RECTANGULAR_TEST_EXAMPLES
@@ -2649,7 +2653,7 @@ def test_rectangular_frustum_math_helpers(
         top_width = frustum["width"][index]
         target_height = frustum["height"][index]
 
-        found_volume = GeometryView._volume_from_height(
+        found_volume = volume_from_height(
             shape="rectangular",
             target_height=target_height,
             total_frustum_height=total_frustum_height,
@@ -2659,7 +2663,7 @@ def test_rectangular_frustum_math_helpers(
             bottom_width=bottom_width,
         )
 
-        found_height = GeometryView._height_from_volume(
+        found_height = height_from_volume(
             shape="rectangular",
             volume=found_volume,
             total_frustum_height=total_frustum_height,
@@ -2693,7 +2697,7 @@ def test_circular_frustum_math_helpers(
         top_radius = frustum["radius"][index]
         target_height = frustum["height"][index]
 
-        found_volume = GeometryView._volume_from_height(
+        found_volume = volume_from_height(
             shape="circular",
             target_height=target_height,
             total_frustum_height=total_frustum_height,
@@ -2701,7 +2705,7 @@ def test_circular_frustum_math_helpers(
             bottom_radius=bottom_radius,
         )
 
-        found_height = GeometryView._height_from_volume(
+        found_height = height_from_volume(
             shape="circular",
             volume=found_volume,
             total_frustum_height=total_frustum_height,

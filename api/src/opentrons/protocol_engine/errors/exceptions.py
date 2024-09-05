@@ -1002,6 +1002,19 @@ class InvalidAxisForRobotType(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class InvalidLiquidHeightFound(ProtocolEngineError):
+    """Raised when attempting to use an axis that is not present on the given type of robot."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidLiquidHeightFound error."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class EStopActivatedError(ProtocolEngineError):
     """Represents an E-stop event."""
 
