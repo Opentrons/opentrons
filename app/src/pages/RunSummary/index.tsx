@@ -49,6 +49,7 @@ import {
 import {
   useRunCreatedAtTimestamp,
   useTrackProtocolRunEvent,
+  useTrackEventWithRobotSerial,
   useRobotAnalyticsData,
 } from '../../organisms/Devices/hooks'
 import { useCloseCurrentRun } from '../../organisms/ProtocolUpload/hooks'
@@ -59,6 +60,7 @@ import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_RUN_ACTION,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  ANALYTICS_QUICK_TRANSFER_RERUN,
 } from '../../redux/analytics'
 import { getLocalRobot } from '../../redux/discovery'
 import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
@@ -143,6 +145,8 @@ export function RunSummary(): JSX.Element {
 
   const { reset, isResetRunLoading } = useRunControls(runId, onCloneRunSuccess)
   const trackEvent = useTrackEvent()
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
+
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   // Close the current run only if it's active and then execute the onSuccess callback. Prefer this wrapper over
   // closeCurrentRun directly, since the callback is swallowed if currentRun is null.
@@ -261,11 +265,20 @@ export function RunSummary(): JSX.Element {
   const runAgain = (): void => {
     setShowRunAgainSpinner(true)
     reset()
-    trackEvent({
-      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-      properties: { sourceLocation: 'RunSummary', robotSerialNumber },
-    })
-    trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN })
+    if (isQuickTransfer) {
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_RERUN,
+        properties: {
+          name: protocolName,
+        },
+      })
+    } else {
+      trackEvent({
+        name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+        properties: { sourceLocation: 'RunSummary', robotSerialNumber },
+      })
+      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN })
+    }
   }
 
   // If no pipettes have tips attached, execute the routing callback.

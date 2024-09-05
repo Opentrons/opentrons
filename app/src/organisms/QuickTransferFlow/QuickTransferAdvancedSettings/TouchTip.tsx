@@ -9,10 +9,12 @@ import {
   COLORS,
   ALIGN_CENTER,
 } from '@opentrons/components'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '../../../redux/analytics'
 import { getTopPortalEl } from '../../../App/portal'
 import { RadioButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
 import { InputField } from '../../../atoms/InputField'
+import { useTrackEventWithRobotSerial } from '../../Devices/hooks'
 import { ACTIONS } from '../constants'
 
 import type {
@@ -33,6 +35,7 @@ interface TouchTipProps {
 export function TouchTip(props: TouchTipProps): JSX.Element {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = React.useRef(null)
 
   const [touchTipIsEnabled, setTouchTipIsEnabled] = React.useState<boolean>(
@@ -77,12 +80,24 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
     if (currentStep === 1) {
       if (!touchTipIsEnabled) {
         dispatch({ type: touchTipAction, position: undefined })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            setting: `TouchTip_${kind}`,
+          },
+        })
         onBack()
       } else {
         setCurrentStep(2)
       }
     } else if (currentStep === 2) {
       dispatch({ type: touchTipAction, position: position ?? undefined })
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+        properties: {
+          setting: `TouchTip_${kind}`,
+        },
+      })
       onBack()
     }
   }

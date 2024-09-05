@@ -14,7 +14,8 @@ import {
   SIZE_2,
   TEXT_ALIGN_LEFT,
 } from '@opentrons/components'
-
+import { ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB } from '../../../redux/analytics'
+import { useTrackEventWithRobotSerial } from '../../Devices/hooks'
 import type {
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
@@ -48,7 +49,15 @@ export function QuickTransferAdvancedSettings(
   const [selectedSetting, setSelectedSetting] = React.useState<string | null>(
     null
   )
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const { makeSnackbar } = useToaster()
+
+  React.useEffect(() => {
+    trackEventWithRobotSerial({
+      name: ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB,
+      properties: {},
+    })
+  }, [])
 
   function getBlowoutValueCopy(): string | undefined {
     if (state.blowOut === 'dest_well') {

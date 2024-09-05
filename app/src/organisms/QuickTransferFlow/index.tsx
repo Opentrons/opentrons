@@ -6,6 +6,8 @@ import {
   StepMeter,
   POSITION_STICKY,
 } from '@opentrons/components'
+import { ANALYTICS_QUICK_TRANSFER_EXIT_EARLY } from '../../redux/analytics'
+import { useTrackEventWithRobotSerial } from '../Devices/hooks'
 import { ConfirmExitModal } from './ConfirmExitModal'
 import { CreateNewTransfer } from './CreateNewTransfer'
 import { SelectPipette } from './SelectPipette'
@@ -27,17 +29,26 @@ const initialQuickTransferState: QuickTransferWizardState = {}
 export const QuickTransferFlow = (): JSX.Element => {
   const navigate = useNavigate()
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const [state, dispatch] = React.useReducer(
     quickTransferWizardReducer,
     initialQuickTransferState
   )
   const [currentStep, setCurrentStep] = React.useState(0)
 
+  const [analyticsStartTime] = React.useState<Date>(new Date())
+
   const {
     confirm: confirmExit,
     showConfirmation: showConfirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(() => {
+    trackEventWithRobotSerial({
+      name: ANALYTICS_QUICK_TRANSFER_EXIT_EARLY,
+      properties: {
+        step: currentStep,
+      },
+    })
     navigate('/quick-transfer')
   }, true)
 
@@ -73,7 +84,11 @@ export const QuickTransferFlow = (): JSX.Element => {
     <SelectDestLabware key={5} {...sharedMiddleStepProps} />,
     <SelectDestWells key={6} {...sharedMiddleStepProps} />,
     <VolumeEntry key={7} {...sharedMiddleStepProps} />,
-    <SummaryAndSettings key={8} {...sharedMiddleStepProps} />,
+    <SummaryAndSettings
+      key={8}
+      {...sharedMiddleStepProps}
+      analyticsStartTime={analyticsStartTime}
+    />,
   ]
 
   return (

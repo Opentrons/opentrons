@@ -14,6 +14,8 @@ import {
   ALIGN_CENTER,
 } from '@opentrons/components'
 import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
+import { ANALYTICS_QUICK_TRANSFER_TIP_MANAGEMENT_TAB } from '../../../redux/analytics'
+import { useTrackEventWithRobotSerial } from '../../Devices/hooks'
 import { ListItem } from '../../../atoms/ListItem'
 import { ChangeTip } from './ChangeTip'
 import { TipDropLocation } from './TipDropLocation'
@@ -31,9 +33,17 @@ interface TipManagementProps {
 export function TipManagement(props: TipManagementProps): JSX.Element | null {
   const { state, dispatch } = props
   const { t } = useTranslation(['quick_transfer', 'shared'])
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const [selectedSetting, setSelectedSetting] = React.useState<string | null>(
     null
   )
+
+  React.useEffect(() => {
+    trackEventWithRobotSerial({
+      name: ANALYTICS_QUICK_TRANSFER_TIP_MANAGEMENT_TAB,
+      properties: {},
+    })
+  }, [])
 
   const displayItems = [
     {

@@ -8,10 +8,12 @@ import {
   POSITION_FIXED,
   COLORS,
 } from '@opentrons/components'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '../../../redux/analytics'
 import { getTopPortalEl } from '../../../App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
 import { InputField } from '../../../atoms/InputField'
 import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
+import { useTrackEventWithRobotSerial } from '../../Devices/hooks'
 
 import type {
   QuickTransferSummaryState,
@@ -32,6 +34,7 @@ interface TipPositionEntryProps {
 export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
   const { onBack, state, dispatch, kind } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = React.useRef(null)
 
   const [tipPosition, setTipPosition] = React.useState<number>(
@@ -72,6 +75,12 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
       dispatch({
         type: tipPositionAction,
         position: tipPosition,
+      })
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+        properties: {
+          setting: `TipPosition_${kind}`,
+        },
       })
     }
     onBack()

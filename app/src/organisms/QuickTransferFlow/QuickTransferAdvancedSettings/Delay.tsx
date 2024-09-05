@@ -9,10 +9,12 @@ import {
   COLORS,
   ALIGN_CENTER,
 } from '@opentrons/components'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '../../../redux/analytics'
 import { getTopPortalEl } from '../../../App/portal'
 import { RadioButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
 import { InputField } from '../../../atoms/InputField'
+import { useTrackEventWithRobotSerial } from '../../Devices/hooks'
 import { ACTIONS } from '../constants'
 
 import type {
@@ -33,6 +35,7 @@ interface DelayProps {
 export function Delay(props: DelayProps): JSX.Element {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = React.useRef(null)
 
   const [currentStep, setCurrentStep] = React.useState<number>(1)
@@ -85,6 +88,12 @@ export function Delay(props: DelayProps): JSX.Element {
           type: action,
           delaySettings: undefined,
         })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            settting: `Delay_${kind}`,
+          },
+        })
         onBack()
       } else {
         setCurrentStep(2)
@@ -98,6 +107,12 @@ export function Delay(props: DelayProps): JSX.Element {
           delaySettings: {
             delayDuration,
             positionFromBottom: position,
+          },
+        })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            settting: `Delay_${kind}`,
           },
         })
       }

@@ -10,10 +10,12 @@ import {
   COLORS,
   ALIGN_CENTER,
 } from '@opentrons/components'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '../../../redux/analytics'
 import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 import { getTopPortalEl } from '../../../App/portal'
 import { RadioButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
+import { useTrackEventWithRobotSerial } from '../../Devices/hooks'
 import { useBlowOutLocationOptions } from './BlowOut'
 
 import type {
@@ -36,6 +38,7 @@ interface PipettePathProps {
 export function PipettePath(props: PipettePathProps): JSX.Element {
   const { onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = React.useRef(null)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
@@ -95,6 +98,12 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
           type: ACTIONS.SET_PIPETTE_PATH,
           path: selectedPath,
         })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            setting: `PipettePath`,
+          },
+        })
         onBack()
       } else {
         setCurrentStep(2)
@@ -107,6 +116,12 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
         path: selectedPath as PathOption,
         disposalVolume,
         blowOutLocation,
+      })
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+        properties: {
+          setting: `PipettePath`,
+        },
       })
       onBack()
     }

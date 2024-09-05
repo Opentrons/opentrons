@@ -12,6 +12,11 @@ import {
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
+import {
+  ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
+  ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
+} from '../../../redux/analytics'
+import { useTrackEventWithRobotSerial } from '../../../organisms/Devices/hooks'
 import { useHardwareStatusText } from '../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
 import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useMissingProtocolHardware } from '../../Protocols/hooks'
@@ -40,6 +45,7 @@ vi.mock('../../../organisms/ProtocolSetupParameters')
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../organisms/OnDeviceDisplay/RobotDashboard/hooks')
+vi.mock('../../../organisms/Devices/hooks')
 vi.mock(
   '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 )
@@ -70,6 +76,7 @@ const MOCK_DATA = {
     key: '26ed5a82-502f-4074-8981-57cdda1d066d',
   },
 }
+let mockTrackEventWithRobotSerial: any
 
 const render = (path = '/quick-transfer/fakeTransferId') => {
   return renderWithProviders(
@@ -89,6 +96,12 @@ const render = (path = '/quick-transfer/fakeTransferId') => {
 
 describe('ODDQuickTransferDetails', () => {
   beforeEach(() => {
+    mockTrackEventWithRobotSerial = vi.fn(
+      () => new Promise(resolve => resolve({}))
+    )
+    vi.mocked(useTrackEventWithRobotSerial).mockReturnValue({
+      trackEventWithRobotSerial: mockTrackEventWithRobotSerial,
+    })
     vi.mocked(useCreateRunMutation).mockReturnValue({
       createRun: mockCreateRun,
     } as any)
@@ -128,9 +141,33 @@ describe('ODDQuickTransferDetails', () => {
     )
   })
 
+  it('calls analytics tracking event for showing a quick transfer details page', () => {
+    render()
+    expect(mockTrackEventWithRobotSerial).toHaveBeenCalledWith({
+      name: ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
+      properties: {
+        name:
+          'Nextera XT DNA Library Prep Kit Protocol: Part 1/4 - Tagment Genomic DNA and Amplify Libraries',
+      },
+    })
+  })
+
   it('renders the start setup button', () => {
     render()
     screen.getByText('Start setup')
+  })
+
+  it('fires analytics event when start setup is pressed', () => {
+    render()
+    const setupBtn = screen.getByText('Start setup')
+    fireEvent.click(setupBtn)
+    expect(mockTrackEventWithRobotSerial).toHaveBeenCalledWith({
+      name: ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
+      properties: {
+        name:
+          'Nextera XT DNA Library Prep Kit Protocol: Part 1/4 - Tagment Genomic DNA and Amplify Libraries',
+      },
+    })
   })
 
   it('renders the transfer description', () => {
