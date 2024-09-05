@@ -32,6 +32,13 @@ import './css/reset.module.css'
 const showGateModal =
   process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
 
+// sandbox urls get deployed to subdirectories in sandbox.designer.opentrons.com/${subFolder}
+// prod urls get deployed to designer.opentrons.com with no subdir, so we don't need to add a base name
+const routerBaseName =
+  process.env.NODE_ENV === 'production'
+    ? ''
+    : window.location.pathname.split('/')[1]
+
 function ProtocolEditorComponent(): JSX.Element {
   const flags = useSelector(getFeatureFlagData)
   const enableRedesign = useSelector(getEnableRedesign)
@@ -44,7 +51,7 @@ function ProtocolEditorComponent(): JSX.Element {
       {enableRedesign ? (
         <Flex flexDirection={DIRECTION_COLUMN}>
           {prereleaseModeEnabled ? <Bouncing /> : null}
-          <BrowserRouter>
+          <BrowserRouter basename={routerBaseName}>
             <ProtocolRoutes />
           </BrowserRouter>
         </Flex>
