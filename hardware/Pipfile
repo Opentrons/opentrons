@@ -8,8 +8,8 @@ python-can = "==4.2.2"
 pyserial = "==3.5"
 typing-extensions = ">=4.0.0,<5"
 numpy = "==1.22.3"
-pydantic = "==2.6.4"
-pydantic-settings = "==2.2.1"
+pydantic = "==2.9.0"
+pydantic-settings = "==2.4.0"
 
 [dev-packages]
 pytest = "==7.4.4"

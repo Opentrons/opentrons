@@ -45,7 +45,7 @@ aiohttp = "==3.8.1"
 fastapi = "==0.100.0"
 python-dotenv = "==1.0.1"
 python-multipart = "==0.0.6"
-pydantic = "==2.6.4"
+pydantic = "==2.9.0"
 typing-extensions = ">=4.0.0,<5"
 uvicorn = "==0.27.0.post1"
 wsproto = "==1.2.0"
@@ -62,4 +62,4 @@ opentrons-shared-data = { editable = true, path = "../shared-data/python" }
 server-utils = {editable = true, path = "./../server-utils"}
 performance-metrics = {file = "../performance-metrics", editable = true}
 robot-server = { editable = true, path = "."}
-pydantic-settings = "==2.2.1"
+pydantic-settings = "==2.4.0"

@@ -50,7 +50,7 @@ INSTALL_REQUIRES = [
     "pyjwt==2.6.0",
     "systemd-python==234; sys_platform=='linux'",
     "sqlalchemy==1.4.51",
-    "pydantic-settings==2.2.1",
+    "pydantic-settings==2.4.0",
 ]
 
 
