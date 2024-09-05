@@ -55,11 +55,11 @@ export function EditProtocolMetadataModal(
       type="info"
       closeOnOutsideClick
       onClose={onClose}
+      childrenPadding={SPACING.spacing24}
       footer={
         <Flex
           justifyContent={JUSTIFY_END}
-          gridGap={SPACING.spacing8}
-          padding={SPACING.spacing24}
+          padding={`0 ${SPACING.spacing24} ${SPACING.spacing24}`}
         >
           <SecondaryButton onClick={onClose}>
             {t('shared:cancel')}
@@ -79,9 +79,9 @@ export function EditProtocolMetadataModal(
       <form onSubmit={handleSubmit(saveFileMetadata)}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-            <Flex color={COLORS.grey60}>
-              <StyledText desktopStyle="captionRegular">{t('name')}</StyledText>
-            </Flex>
+            <StyledText color={COLORS.grey60} desktopStyle="captionRegular">
+              {t('name')}
+            </StyledText>
             <InputField
               placeholder={protocolName}
               autoFocus
@@ -90,22 +90,19 @@ export function EditProtocolMetadataModal(
             />
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-            <Flex color={COLORS.grey60}>
-              <StyledText desktopStyle="captionRegular">
-                {t('description')}
-              </StyledText>
-            </Flex>
+            <StyledText color={COLORS.grey60} desktopStyle="captionRegular">
+              {t('description')}
+            </StyledText>
+
             <DescriptionField
               placeholder={description ?? ''}
               {...register('description')}
             />
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-            <Flex color={COLORS.grey60}>
-              <StyledText desktopStyle="captionRegular">
-                {t('author_org')}
-              </StyledText>
-            </Flex>
+            <StyledText color={COLORS.grey60} desktopStyle="captionRegular">
+              {t('author_org')}
+            </StyledText>
             <InputField
               placeholder={author ?? ''}
               fieldName="author"
