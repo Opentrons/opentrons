@@ -8,7 +8,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 import { getFileMetadata, getRobotType } from '../../../file-data/selectors'
 import {
-  getAdditionalEquipment,
+  getAdditionalEquipmentEntities,
   getInitialDeckSetup,
 } from '../../../step-forms/selectors'
 import { useBlockingHint } from '../../../components/Hints/useBlockingHint'
@@ -42,7 +42,7 @@ const render = () => {
 
 describe('ProtocolOverview', () => {
   beforeEach(() => {
-    vi.mocked(getAdditionalEquipment).mockReturnValue({})
+    vi.mocked(getAdditionalEquipmentEntities).mockReturnValue({})
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       pipettes: {},
