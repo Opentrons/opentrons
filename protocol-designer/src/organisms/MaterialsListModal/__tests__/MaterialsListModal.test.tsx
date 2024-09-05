@@ -2,14 +2,18 @@ import * as React from 'react'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
+import { getRobotType } from '../../../file-data/selectors'
 import { MaterialsListModal } from '..'
 
 import type { InfoScreen } from '@opentrons/components'
 import type { LabwareOnDeck, ModuleOnDeck } from '../../../step-forms'
 import type { FixtureInList } from '..'
 
+vi.mock('../../../file-data/selectors')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof InfoScreen>()
   return {
@@ -72,6 +76,7 @@ describe('MaterialsListModal', () => {
       liquids: [],
       setShowMaterialsListModal: mockSetShowMaterialsListModal,
     }
+    vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
   })
 
   it('should render render text', () => {
@@ -107,6 +112,30 @@ describe('MaterialsListModal', () => {
     render(props)
     screen.getByText('D3')
     screen.getByText('Opentrons Flex 96 Filter Tip Rack 50 µL')
+  })
+
+  it('should render 7,8,10,11 when a robot is ot-2 and a module is tc', () => {
+    vi.mocked(getRobotType).mockReturnValue(OT2_ROBOT_TYPE)
+    const mockHardwareForOt2 = [
+      {
+        id: 'mockHardware-tc',
+        model: 'thermocyclerModuleV1',
+        moduleState: {
+          type: 'thermocyclerModuleType',
+          blockTargetTemp: null,
+          lidTargetTemp: null,
+          lidOpen: false,
+        },
+        slot: 'span7_8_10_11',
+        type: 'thermocyclerModuleType',
+      },
+    ] as ModuleOnDeck[]
+    props = {
+      ...props,
+      hardware: mockHardwareForOt2,
+    }
+    render(props)
+    screen.getByText('7,8,10,11')
   })
 
   // ToDo (kk:09/03/2024) add test when implementing liquids part completely
