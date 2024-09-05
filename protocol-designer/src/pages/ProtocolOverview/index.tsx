@@ -26,7 +26,6 @@ import {
 } from '@opentrons/shared-data'
 import {
   getAdditionalEquipmentEntities,
-  getAdditionalEquipment,
   getInitialDeckSetup,
 } from '../../step-forms/selectors'
 import { selectors as fileSelectors } from '../../file-data'
