@@ -195,6 +195,7 @@ export function ProtocolOverview(): JSX.Element {
             justifyContent={JUSTIFY_FLEX_END}
           >
             <LargeButton
+              buttonType="stroke"
               buttonText={t('edit_protocol')}
               onClick={() => {
                 navigate('/designer')
