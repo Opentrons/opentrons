@@ -2641,8 +2641,6 @@ def test_rectangular_frustum_math_helpers(
     subject: GeometryView,
 ) -> None:
     """Test both height and volume calculation within a given rectangular frustum."""
-    # generate 5 random indices to test on for each frustum
-
     total_frustum_height = frustum["height"][0]
     bottom_length = frustum["length"][-1]
     bottom_width = frustum["width"][-1]
@@ -2654,7 +2652,6 @@ def test_rectangular_frustum_math_helpers(
         target_height = frustum["height"][index]
 
         found_volume = volume_from_height_rectangular(
-            # shape="rectangular",
             target_height=target_height,
             total_frustum_height=total_frustum_height,
             top_length=top_length,
@@ -2664,7 +2661,6 @@ def test_rectangular_frustum_math_helpers(
         )
 
         found_height = height_from_volume_rectangular(
-            # shape="rectangular",
             volume=found_volume,
             total_frustum_height=total_frustum_height,
             top_length=top_length,
@@ -2686,8 +2682,6 @@ def test_circular_frustum_math_helpers(
     subject: GeometryView,
 ) -> None:
     """Test both height and volume calculation within a given circular frustum."""
-    # generate 5 random indices to test on for each frustum
-
     total_frustum_height = frustum["height"][0]
     bottom_radius = frustum["radius"][-1]
 
@@ -2697,7 +2691,6 @@ def test_circular_frustum_math_helpers(
         target_height = frustum["height"][index]
 
         found_volume = volume_from_height_circular(
-            # shape="circular",
             target_height=target_height,
             total_frustum_height=total_frustum_height,
             top_radius=top_radius,
@@ -2705,7 +2698,6 @@ def test_circular_frustum_math_helpers(
         )
 
         found_height = height_from_volume_circular(
-            # shape="circular",
             volume=found_volume,
             total_frustum_height=total_frustum_height,
             top_radius=top_radius,
