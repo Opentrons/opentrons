@@ -44,7 +44,6 @@ export const useBlowOutLocationOptions = (
   transferType: TransferType
 ): Array<{ location: BlowOutLocation; description: string }> => {
   const { t } = useTranslation('quick_transfer')
-  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
   const trashLocations = deckConfig.filter(
     cutoutConfig =>
