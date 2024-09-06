@@ -39,13 +39,12 @@ const routerBaseName =
     ? null
     : `/${window.location.pathname.split('/')[1]}`
 
-console.log({ routerBaseName })
-
 function ProtocolEditorComponent(): JSX.Element {
   const flags = useSelector(getFeatureFlagData)
   const enableRedesign = useSelector(getEnableRedesign)
 
   const prereleaseModeEnabled = flags.PRERELEASE_MODE === true
+  console.log({ routerBaseName })
 
   return (
     <div id="protocol-editor">
