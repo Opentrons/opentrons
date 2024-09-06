@@ -6,10 +6,10 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
   JUSTIFY_CENTER,
+  LegacyStyledText,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
