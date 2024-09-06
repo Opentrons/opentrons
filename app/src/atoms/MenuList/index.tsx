@@ -8,6 +8,8 @@ import {
   BORDERS,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
+import { createPortal } from 'react-dom'
+import { getTopPortalEl } from '../../App/portal'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 
 interface MenuListProps {
@@ -19,19 +21,22 @@ interface MenuListProps {
 export const MenuList = (props: MenuListProps): JSX.Element | null => {
   const { children, isOnDevice = false, onClick = null } = props
   return isOnDevice && onClick != null ? (
-    <LegacyModalShell
-      borderRadius={BORDERS.borderRadius16}
-      width="max-content"
-      onOutsideClick={onClick}
-    >
-      <Flex
-        boxShadow={BORDERS.shadowSmall}
-        flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_CENTER}
+    createPortal(
+      <LegacyModalShell
+        borderRadius={BORDERS.borderRadius16}
+        width="max-content"
+        onOutsideClick={onClick}
       >
-        {children}
-      </Flex>
-    </LegacyModalShell>
+        <Flex
+          boxShadow={BORDERS.shadowSmall}
+          flexDirection={DIRECTION_COLUMN}
+          justifyContent={JUSTIFY_CENTER}
+        >
+          {children}
+        </Flex>
+      </LegacyModalShell>,
+      getTopPortalEl()
+    )
   ) : (
     <Flex
       borderRadius="4px 4px 0px 0px"
