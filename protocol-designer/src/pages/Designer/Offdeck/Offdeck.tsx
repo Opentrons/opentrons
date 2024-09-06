@@ -19,6 +19,7 @@ import { getOnlyLatestDefs } from '../../../labware-defs'
 import { selectors } from '../../../labware-ingred/selectors'
 import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { DeckSetupTools } from '../DeckSetup/DeckSetupTools'
+import { LabwareLabel } from '../LabwareLabel'
 import { OffDeckDetails } from './OffDeckDetails'
 
 export function OffDeck(): JSX.Element {
@@ -51,44 +52,51 @@ export function OffDeck(): JSX.Element {
   )
   if (hoveredLabwareDef != null && hoveredLabwareDef !== offDeckLabware) {
     labware = (
-      //  TODO(ja): adding deck labware sets in a followup
-      // <DeckLabelSet
-      //   deckLabels={[
-      //     {
-      //       text: hoveredLabwareDef.metadata.displayName,
-      //       isSelected: false,
-      //     },
-      //   ]}
-      // >
       <RobotWorkSpace
         key={hoveredLabwareDef.parameters.loadName}
-        viewBox={`${hoveredLabwareDef.cornerOffsetFromSlot.x} ${hoveredLabwareDef.cornerOffsetFromSlot.y} ${hoveredLabwareDef.dimensions.xDimension} ${hoveredLabwareDef.dimensions.yDimension}`}
+        viewBox={`0 -10 ${hoveredLabwareDef.dimensions.xDimension} ${hoveredLabwareDef.dimensions.yDimension}`}
         width="510.84px"
         height="342px"
       >
-        {() => <LabwareRender definition={hoveredLabwareDef} />}
+        {() => (
+          <>
+            <g transform="scale(0.8)">
+              <LabwareRender definition={hoveredLabwareDef} />
+              <LabwareLabel
+                isLast={true}
+                isSelected={false}
+                labwareDef={hoveredLabwareDef}
+                position={[0, 0, 0]}
+              />
+            </g>
+          </>
+        )}
       </RobotWorkSpace>
     )
   } else if (offDeckLabware != null) {
     const def = offDeckLabware
     labware = (
-      // <DeckLabelSet
-      //   deckLabels={[
-      //     {
-      //       text: def.metadata.displayName,
-      //       isSelected: true,
-      //     },
-      //   ]}
-      // >
       <RobotWorkSpace
         key={def.parameters.loadName}
-        viewBox={`${def.cornerOffsetFromSlot.x} ${def.cornerOffsetFromSlot.y} ${def.dimensions.xDimension} ${def.dimensions.yDimension}`}
+        viewBox={`0 -10 ${def.dimensions.xDimension} ${def.dimensions.yDimension}`}
         width="510.84px"
-        height="342px"
+        height="352px"
       >
-        {() => <LabwareRender definition={def} />}
+        {() => (
+          <>
+            <g transform=" scale(0.8)">
+              <LabwareRender definition={def} />
+
+              <LabwareLabel
+                isLast={true}
+                isSelected={true}
+                labwareDef={def}
+                position={[0, 0, 0]}
+              />
+            </g>
+          </>
+        )}
       </RobotWorkSpace>
-      // </DeckLabelSet>
     )
   }
 

@@ -250,6 +250,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
 
   return (
     <Toolbox
+      height="calc(100vh - 64px)"
       width="23.375rem"
       title={
         <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>

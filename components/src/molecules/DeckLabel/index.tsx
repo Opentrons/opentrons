@@ -21,8 +21,38 @@ export function DeckLabel({
   labelBorderRadius,
   isLast = false,
 }: DeckLabelProps): JSX.Element {
+  const DECK_LABEL_BASE_STYLE = (
+    labelBorderRadius?: string
+  ): FlattenSimpleInterpolation => css`
+    width: ${FLEX_MAX_CONTENT};
+    padding: ${SPACING.spacing2};
+    border-radius: ${labelBorderRadius ?? '0'};
+  `
+  const DECK_LABEL_SELECTED_STYLE = (
+    labelBorderRadius?: string
+  ): FlattenSimpleInterpolation => css`
+    ${DECK_LABEL_BASE_STYLE(labelBorderRadius)}
+    color: ${COLORS.white};
+    border: 1.5px solid ${COLORS.blue50};
+    background-color: ${COLORS.blue50};
+  `
+
+  const DECK_LABEL_UNSELECTED_STYLE = (
+    labelBorderRadius?: string,
+    isLast?: boolean
+  ): FlattenSimpleInterpolation => css`
+    ${DECK_LABEL_BASE_STYLE(labelBorderRadius)}
+    color: ${COLORS.blue50};
+    border-right: 1.5px solid ${COLORS.blue50};
+    border-bottom: ${isLast ? `1.5px solid ${COLORS.blue50}` : undefined};
+    border-left: 1.5px solid ${COLORS.blue50};
+    background-color: ${COLORS.white};
+    border-radius: ${isLast ? labelBorderRadius : '0'};
+  `
+
   return (
     <Flex
+      fontSize="6px"
       data-testid={`DeckLabel_${isSelected ? 'Selected' : 'UnSelected'}`}
       css={
         isSelected
@@ -30,42 +60,9 @@ export function DeckLabel({
           : DECK_LABEL_UNSELECTED_STYLE(labelBorderRadius, isLast)
       }
     >
-      <StyledText
-        desktopStyle="captionSemiBold"
-        color={isSelected ? COLORS.white : COLORS.blue50}
-      >
+      <StyledText color={isSelected ? COLORS.white : COLORS.blue50}>
         {text}
       </StyledText>
     </Flex>
   )
 }
-
-const DECK_LABEL_BASE_STYLE = (
-  labelBorderRadius?: string
-): FlattenSimpleInterpolation => css`
-  width: ${FLEX_MAX_CONTENT};
-  padding: ${SPACING.spacing4};
-  border-radius: ${labelBorderRadius ?? '0'};
-`
-
-const DECK_LABEL_SELECTED_STYLE = (
-  labelBorderRadius?: string
-): FlattenSimpleInterpolation => css`
-  ${DECK_LABEL_BASE_STYLE(labelBorderRadius)}
-  color: ${COLORS.white};
-  border: 3px solid ${COLORS.blue50};
-  background-color: ${COLORS.blue50};
-`
-
-const DECK_LABEL_UNSELECTED_STYLE = (
-  labelBorderRadius?: string,
-  isLast?: boolean
-): FlattenSimpleInterpolation => css`
-  ${DECK_LABEL_BASE_STYLE(labelBorderRadius)}
-  color: ${COLORS.blue50};
-  border-right: 3px solid ${COLORS.blue50};
-  border-bottom: ${isLast ? `3px solid ${COLORS.blue50}` : undefined};
-  border-left: 3px solid ${COLORS.blue50};
-  background-color: ${COLORS.white};
-  border-radius: ${isLast ? labelBorderRadius : '0'};
-`
