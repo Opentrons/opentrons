@@ -1003,7 +1003,7 @@ class InvalidAxisForRobotType(ProtocolEngineError):
 
 
 class InvalidLiquidHeightFound(ProtocolEngineError):
-    """Raised when attempting to use an axis that is not present on the given type of robot."""
+    """Raised when attempting to estimate liquid height based on volume fails."""
 
     def __init__(
         self,
