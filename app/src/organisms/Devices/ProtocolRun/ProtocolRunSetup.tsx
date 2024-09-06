@@ -184,8 +184,13 @@ export function ProtocolRunSetup({
     setLabwareSetupComplete,
   ] = React.useState<boolean>(false)
   const [liquidSetupComplete, setLiquidSetupComplete] = React.useState<boolean>(
-    !hasLiquids
+    false
   )
+  React.useEffect(() => {
+    if ((robotProtocolAnalysis || storedProtocolAnalysis) && !hasLiquids) {
+      setLiquidSetupComplete(true)
+    }
+  }, [robotProtocolAnalysis, storedProtocolAnalysis, hasLiquids])
   if (
     !hasLiquids &&
     protocolAnalysis != null &&
