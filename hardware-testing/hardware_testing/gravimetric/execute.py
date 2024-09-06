@@ -316,6 +316,8 @@ def _run_trial(
     if trial.mix:
         mix_with_liquid_class(
             trial.ctx,
+            trial.cfg.liquid,
+            trial.cfg.dilution,
             trial.pipette,
             trial.tip_volume,
             max(trial.volume, 5),
@@ -338,7 +340,9 @@ def _run_trial(
     if _PREV_TRIAL_GRAMS is not None:
         liq = SupportedLiquid.from_string(trial.cfg.liquid)
         _evaporation_loss_ul = abs(
-            calculate_change_in_volume(_PREV_TRIAL_GRAMS, m_data_init, liq)
+            calculate_change_in_volume(
+                _PREV_TRIAL_GRAMS, m_data_init, liq, dilution=trial.cfg.dilution
+            )
         )
         ui.print_info(f"{_evaporation_loss_ul} ul evaporated since last trial")
         trial.liquid_tracker.update_affected_wells(
@@ -349,6 +353,8 @@ def _run_trial(
     # RUN ASPIRATE
     aspirate_with_liquid_class(
         trial.ctx,
+        trial.cfg.liquid,
+        trial.cfg.dilution,
         trial.pipette,
         trial.tip_volume,
         trial.volume,
@@ -371,6 +377,8 @@ def _run_trial(
     # RUN DISPENSE
     dispense_with_liquid_class(
         trial.ctx,
+        trial.cfg.liquid,
+        trial.cfg.dilution,
         trial.pipette,
         trial.tip_volume,
         trial.volume,
@@ -389,8 +397,12 @@ def _run_trial(
     ui.print_info(f"\tgrams after dispense: {m_data_dispense.grams_average} g")
     # calculate volumes
     liq = SupportedLiquid.from_string(trial.cfg.liquid)
-    volume_aspirate = calculate_change_in_volume(m_data_init, m_data_aspirate, liq)
-    volume_dispense = calculate_change_in_volume(m_data_aspirate, m_data_dispense, liq)
+    volume_aspirate = calculate_change_in_volume(
+        m_data_init, m_data_aspirate, liq, dilution=trial.cfg.dilution
+    )
+    volume_dispense = calculate_change_in_volume(
+        m_data_aspirate, m_data_dispense, liq, dilution=trial.cfg.dilution
+    )
     return volume_aspirate, m_data_aspirate, volume_dispense, m_data_dispense
 
 

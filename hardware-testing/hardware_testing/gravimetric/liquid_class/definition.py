@@ -1,5 +1,6 @@
 """Liquid Class."""
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -10,7 +11,7 @@ class LiquidSettings:
     plunger_acceleration: float  # ul/sec/sec
     plunger_flow_rate: float  # ul/sec
     delay: float  # seconds
-    z_retract_discontinuity: float  # mm/sec
+    z_retract_discontinuity: Optional[float]  # mm/sec
     z_retract_height: float  # millimeters above meniscus
 
 
