@@ -32,6 +32,7 @@ def _build_run(
         pipettes=[],
         modules=[],
         liquids=[],
+        wells=[],
         hasEverEnteredErrorRecovery=False,
     )
     return MaintenanceRun.construct(
