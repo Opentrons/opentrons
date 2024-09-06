@@ -13,9 +13,12 @@ import {
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
+
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '../../../redux/analytics'
 import { getTopPortalEl } from '../../../App/portal'
 import { RadioButton } from '../../../atoms/buttons'
 import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import { useTrackEventWithRobotSerial } from '../../Devices/hooks'
 import { ChildNavigation } from '../../ChildNavigation'
 
 import type {
@@ -33,6 +36,7 @@ interface TipDropLocationProps {
 export function TipDropLocation(props: TipDropLocationProps): JSX.Element {
   const { onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
   const tipDropLocationOptions = deckConfig.filter(
@@ -59,6 +63,12 @@ export function TipDropLocation(props: TipDropLocationProps): JSX.Element {
       dispatch({
         type: 'SET_DROP_TIP_LOCATION',
         location: selectedTipDropLocation,
+      })
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+        properties: {
+          setting: 'TipDropLocation',
+        },
       })
     }
     onBack()

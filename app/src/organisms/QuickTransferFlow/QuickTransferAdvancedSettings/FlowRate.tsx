@@ -13,11 +13,13 @@ import {
   LOW_VOLUME_PIPETTES,
   getTipTypeFromTipRackDefinition,
 } from '@opentrons/shared-data'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '../../../redux/analytics'
 
 import { getTopPortalEl } from '../../../App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
 import { InputField } from '../../../atoms/InputField'
 import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
+import { useTrackEventWithRobotSerial } from '../../Devices/hooks'
 
 import { ACTIONS } from '../constants'
 import type { SupportedTip } from '@opentrons/shared-data'
@@ -37,6 +39,7 @@ interface FlowRateEntryProps {
 export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
   const { onBack, state, dispatch, kind } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = React.useRef(null)
 
   const [flowRate, setFlowRate] = React.useState<number>(
@@ -86,6 +89,12 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
       dispatch({
         type: flowRateAction,
         rate: flowRate,
+      })
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+        properties: {
+          setting: `FlowRate_${kind}`,
+        },
       })
     }
     onBack()

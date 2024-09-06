@@ -9,10 +9,12 @@ import {
   COLORS,
   ALIGN_CENTER,
 } from '@opentrons/components'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '../../../redux/analytics'
 import { getTopPortalEl } from '../../../App/portal'
 import { RadioButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
 import { InputField } from '../../../atoms/InputField'
+import { useTrackEventWithRobotSerial } from '../../Devices/hooks'
 import { ACTIONS } from '../constants'
 
 import type {
@@ -33,6 +35,7 @@ interface AirGapProps {
 export function AirGap(props: AirGapProps): JSX.Element {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = React.useRef(null)
 
   const [airGapEnabled, setAirGapEnabled] = React.useState<boolean>(
@@ -79,10 +82,22 @@ export function AirGap(props: AirGapProps): JSX.Element {
         setCurrentStep(currentStep + 1)
       } else {
         dispatch({ type: action, volume: undefined })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            setting: `AirGap_${kind}`,
+          },
+        })
         onBack()
       }
     } else if (currentStep === 2) {
       dispatch({ type: action, volume: volume ?? undefined })
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+        properties: {
+          setting: `AirGap_${kind}`,
+        },
+      })
       onBack()
     }
   }

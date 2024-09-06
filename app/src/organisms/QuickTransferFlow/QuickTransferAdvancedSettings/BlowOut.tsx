@@ -14,9 +14,11 @@ import {
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '../../../redux/analytics'
 import { getTopPortalEl } from '../../../App/portal'
 import { RadioButton } from '../../../atoms/buttons'
 import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import { useTrackEventWithRobotSerial } from '../../Devices/hooks'
 import { ChildNavigation } from '../../ChildNavigation'
 import { ACTIONS } from '../constants'
 
@@ -91,6 +93,7 @@ export const useBlowOutLocationOptions = (
 export function BlowOut(props: BlowOutProps): JSX.Element {
   const { onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
   const [isBlowOutEnabled, setisBlowOutEnabled] = React.useState<boolean>(
@@ -134,6 +137,12 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
           type: ACTIONS.SET_BLOW_OUT,
           location: undefined,
         })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            settting: `BlowOut`,
+          },
+        })
         onBack()
       } else {
         setCurrentStep(currentStep + 1)
@@ -142,6 +151,12 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
       dispatch({
         type: ACTIONS.SET_BLOW_OUT,
         location: blowOutLocation,
+      })
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+        properties: {
+          settting: `BlowOut`,
+        },
       })
       onBack()
     }

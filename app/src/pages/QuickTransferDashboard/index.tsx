@@ -20,9 +20,13 @@ import {
   useAllProtocolsQuery,
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
-
+import {
+  ANALYTICS_QUICK_TRANSFER_TAB_SELECTED,
+  ANALYTICS_QUICK_TRANSFER_FLOW_STARTED,
+} from '../../redux/analytics'
 import { SmallButton, FloatingActionButton } from '../../atoms/buttons'
 import { Navigation } from '../../organisms/Navigation'
+import { useTrackEventWithRobotSerial } from '../../organisms/Devices/hooks'
 import {
   getPinnedQuickTransferIds,
   getQuickTransfersOnDeviceSortKey,
@@ -69,6 +73,14 @@ export function QuickTransferDashboard(): JSX.Element {
   const [targetTransferId, setTargetTransferId] = React.useState<string>('')
   const sortBy = useSelector(getQuickTransfersOnDeviceSortKey) ?? 'alphabetical'
   const hasDismissedIntro = useSelector(getHasDismissedQuickTransferIntro)
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
+
+  React.useEffect(() => {
+    trackEventWithRobotSerial({
+      name: ANALYTICS_QUICK_TRANSFER_TAB_SELECTED,
+      properties: {},
+    })
+  }, [])
 
   const pipetteIsAttached = attachedInstruments?.data.some(
     (i): i is PipetteData => i.ok && i.instrumentType === 'pipette'
@@ -151,6 +163,10 @@ export function QuickTransferDashboard(): JSX.Element {
     } else if (quickTransfersData.length >= 20) {
       setShowStorageLimitReachedModal(true)
     } else {
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_FLOW_STARTED,
+        properties: {},
+      })
       navigate('/quick-transfer/new')
     }
   }
