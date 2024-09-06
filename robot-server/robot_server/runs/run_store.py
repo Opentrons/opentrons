@@ -429,7 +429,6 @@ class RunStore:
             )
             return []
 
-    # TODO (tz, 8-21-24): write tests without fixit
     def get_commands_slice(
         self,
         run_id: str,
@@ -497,7 +496,6 @@ class RunStore:
             commands=sliced_commands,
         )
 
-    # TODO (tz, 8-21-24): write tests without fixit
     def get_all_commands_as_preserialized_list(
         self, run_id: str, include_fixit_commands: bool
     ) -> List[str]:
@@ -513,11 +511,18 @@ class RunStore:
                     .order_by(run_command_table.c.index_in_run)
                 )
             else:
+                all_commands = (
+                    sqlalchemy.select(run_command_table.c.command)
+                    .where(
+                        run_command_table.c.run_id == run_id
+                    )
+                    .order_by(run_command_table.c.index_in_run))
+                all_commands_result = transaction.scalars(all_commands).all()
                 select_commands = (
                     sqlalchemy.select(run_command_table.c.command)
                     .where(
                         run_command_table.c.run_id == run_id
-                        and run_command_table.c.intent != "fixit"
+                        and run_command_table.c.command_intent != "fixit"
                     )
                     .order_by(run_command_table.c.index_in_run)
                 )
