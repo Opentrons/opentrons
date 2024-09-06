@@ -3,16 +3,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import {
-  ALIGN_CENTER,
   Btn,
   DIRECTION_COLUMN,
   DropdownMenu,
   Flex,
   InputField,
   JUSTIFY_SPACE_BETWEEN,
-  LargeButton,
-  LiquidIcon,
   ListItem,
+  PrimaryButton,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -28,8 +26,16 @@ import {
   setWellContents,
 } from '../../labware-ingred/actions'
 import { deselectAllWells } from '../../well-selection/actions'
+import { LiquidCard } from './LiquidCard'
+
 import type { DropdownOption } from '@opentrons/components'
 import type { ContentsByWell } from '../../labware-ingred/types'
+
+export interface LiquidInfo {
+  name: string
+  color: string
+  liquidIndex: string
+}
 
 interface ValidFormValues {
   selectedLiquidId: string
@@ -106,7 +112,7 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
     dispatch(deselectAllWells())
   }
 
-  const handleClearWells: () => void = () => {
+  const handleClearSelectedWells: () => void = () => {
     if (labwareId != null && selectedWells != null && selectionHasLiquids) {
       if (global.confirm(t('application:are_you_sure') as string)) {
         dispatch(
@@ -200,10 +206,14 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
       const foundLiquid = Object.values(liquids).find(
         id => id.ingredientId === liquid
       )
-      return { name: foundLiquid?.name, color: foundLiquid?.displayColor }
+      // TODO (nd: 09/05/2024): add description
+      return {
+        liquidIndex: liquid,
+        name: foundLiquid?.name ?? '',
+        color: foundLiquid?.displayColor ?? '',
+      } as LiquidInfo
     })
     .filter(Boolean)
-
   return (
     <Toolbox
       title={
@@ -213,7 +223,7 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
       }
       confirmButtonText={t('shared:done')}
       onConfirmClick={onClose}
-      onCloseClick={handleClearWells}
+      onCloseClick={handleClearSelectedWells}
       height="calc(100vh - 64px)"
       closeButtonText={t('clear_wells')}
       disableCloseButton={
@@ -222,105 +232,108 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
     >
       <form onSubmit={handleSubmit(handleSaveSubmit)}>
         <ListItem type="noActive">
-          <Flex
-            padding={SPACING.spacing12}
-            gridGap={SPACING.spacing12}
-            flexDirection={DIRECTION_COLUMN}
-          >
-            <StyledText desktopStyle="bodyDefaultSemiBold">
-              {t('add_liquid')}
-            </StyledText>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {t('liquid')}
+          {selectedWells.length > 0 ? (
+            <Flex
+              padding={SPACING.spacing12}
+              gridGap={SPACING.spacing12}
+              flexDirection={DIRECTION_COLUMN}
+            >
+              <StyledText desktopStyle="bodyDefaultSemiBold">
+                {t('add_liquid')}
               </StyledText>
-              <Controller
-                name="selectedLiquidId"
-                control={control}
-                rules={{
-                  required: true,
-                }}
-                render={({ field }) => {
-                  const fullOptions: DropdownOption[] = liquidSelectionOptions.map(
-                    option => {
-                      const liquid = liquids.find(
-                        liquid => liquid.ingredientId === option.value
-                      )
-
-                      return {
-                        name: option.name,
-                        value: option.value,
-                        liquidColor: liquid?.displayColor ?? '',
-                      }
-                    }
-                  )
-                  const selectedLiquid = fullOptions.find(
-                    option => option.value === selectedLiquidId
-                  )
-                  const selectLiquidIdName = selectedLiquid?.name
-                  const selectLiquidColor = selectedLiquid?.liquidColor
-
-                  return (
-                    <DropdownMenu
-                      width="254px"
-                      dropdownType="neutral"
-                      filterOptions={fullOptions}
-                      currentOption={{
-                        value: selectedLiquidId ?? '',
-                        name: selectLiquidIdName ?? '',
-                        liquidColor: selectLiquidColor,
-                      }}
-                      onClick={field.onChange}
-                    />
-                  )
-                }}
-              />
-            </Flex>
-
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {t('liquid_volume')}
-              </StyledText>
-              <Controller
-                name="volume"
-                control={control}
-                rules={{
-                  required: true,
-                }}
-                render={({ field }) => (
-                  <InputField
-                    name="volume"
-                    units={t('application:units.microliter')}
-                    value={volume}
-                    error={volumeErrors}
-                    onBlur={field.onBlur}
-                    onChange={handleChangeVolume}
-                  />
-                )}
-              />
-            </Flex>
-            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-              <Btn
-                textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                onClick={handleCancelForm}
-              >
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
                 <StyledText desktopStyle="bodyDefaultRegular">
-                  {t('shared:cancel')}
+                  {t('liquid')}
                 </StyledText>
-              </Btn>
-              <LargeButton
-                type="submit"
-                buttonText={t('add')}
-                disabled={
-                  volumeErrors != null ||
-                  volume == null ||
-                  volume === '' ||
-                  selectedLiquidId == null ||
-                  selectedLiquidId === ''
-                }
-              />
+                <Controller
+                  name="selectedLiquidId"
+                  control={control}
+                  rules={{
+                    required: true,
+                  }}
+                  render={({ field }) => {
+                    const fullOptions: DropdownOption[] = liquidSelectionOptions.map(
+                      option => {
+                        const liquid = liquids.find(
+                          liquid => liquid.ingredientId === option.value
+                        )
+
+                        return {
+                          name: option.name,
+                          value: option.value,
+                          liquidColor: liquid?.displayColor ?? '',
+                        }
+                      }
+                    )
+                    const selectedLiquid = fullOptions.find(
+                      option => option.value === selectedLiquidId
+                    )
+                    const selectLiquidIdName = selectedLiquid?.name
+                    const selectLiquidColor = selectedLiquid?.liquidColor
+
+                    return (
+                      <DropdownMenu
+                        width="254px"
+                        dropdownType="neutral"
+                        filterOptions={fullOptions}
+                        currentOption={{
+                          value: selectedLiquidId ?? '',
+                          name: selectLiquidIdName ?? '',
+                          liquidColor: selectLiquidColor,
+                        }}
+                        onClick={field.onChange}
+                      />
+                    )
+                  }}
+                />
+              </Flex>
+
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {t('liquid_volume')}
+                </StyledText>
+                <Controller
+                  name="volume"
+                  control={control}
+                  rules={{
+                    required: true,
+                  }}
+                  render={({ field }) => (
+                    <InputField
+                      name="volume"
+                      units={t('application:units.microliter')}
+                      value={volume}
+                      error={volumeErrors}
+                      onBlur={field.onBlur}
+                      onChange={handleChangeVolume}
+                    />
+                  )}
+                />
+              </Flex>
+              <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+                <Btn
+                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                  onClick={handleCancelForm}
+                >
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('shared:cancel')}
+                  </StyledText>
+                </Btn>
+                <PrimaryButton
+                  disabled={
+                    volumeErrors != null ||
+                    volume == null ||
+                    volume === '' ||
+                    selectedLiquidId == null ||
+                    selectedLiquidId === ''
+                  }
+                  type="submit"
+                >
+                  {t('save')}
+                </PrimaryButton>
+              </Flex>
             </Flex>
-          </Flex>
+          ) : null}
         </ListItem>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -332,21 +345,9 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
               {t('liquids_added')}
             </StyledText>
           ) : null}
-          {liquidInfo.map(info => (
-            <React.Fragment key={info.name}>
-              <ListItem type="noActive">
-                <Flex
-                  padding={SPACING.spacing12}
-                  alignItems={ALIGN_CENTER}
-                  gridGap={SPACING.spacing16}
-                >
-                  <LiquidIcon color={info.color ?? ''} size="medium" />
-                  {info.name}
-                </Flex>
-              </ListItem>
-              TODO: add the list of all liquid wells, similar to IngredientsList
-            </React.Fragment>
-          ))}
+          {liquidInfo.map(info => {
+            return <LiquidCard key={info.liquidIndex} info={info} />
+          })}
         </Flex>
       </form>
     </Toolbox>

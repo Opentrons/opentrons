@@ -11,5 +11,8 @@
   "liquid": "Liquid",
   "liquids_added": "Liquids added",
   "liquids": "Liquids",
-  "name": "Name"
+  "microliters": "µL",
+  "name": "Name",
+  "save": "Save",
+  "well": "Well"
 }
