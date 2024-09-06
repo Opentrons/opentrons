@@ -159,12 +159,18 @@ class InstrumentContext(publisher.CommandPublisher):
     def default_speed(self, speed: float) -> None:
         self._core.set_default_speed(speed)
 
+    # look at Aaron well-tracking PR, Caila doc
+    # find well volume (from height) if not already found, update well volume. Utilize existing well volume checking?
+    # error if not enough liquid to probe (aspirate (meniscus-relative) too?), error recovery option
+    # update old_well/new_well volumes after successful aspirate (using aspirated volume)
     @requires_version(2, 0)
     def aspirate(
         self,
         volume: Optional[float] = None,
         location: Optional[Union[types.Location, labware.Well]] = None,
         rate: float = 1.0,
+        meniscus_relative: bool = False,
+        offset_from_meniscus_mm: float = -2.0,
     ) -> InstrumentContext:
         """
         Draw liquid into a pipette tip.
@@ -256,14 +262,9 @@ class InstrumentContext(publisher.CommandPublisher):
             c_vol = self._core.get_available_volume() if not volume else volume
         flow_rate = self._core.get_aspirate_flow_rate(rate)
 
-        if (
-            self.api_version >= APIVersion(2, 20)
-            and well is not None
-            and self.liquid_presence_detection
-            and self._96_tip_config_valid()
-        ):
-            self.require_liquid_presence(well=well)
-            self.prepare_to_aspirate()
+        updated_position = self.liquid_probe_before_aspirate(well=well, meniscus_relative=meniscus_relative, offset_from_meniscus_mm=offset_from_meniscus_mm)
+        if updated_position is not None:
+            move_to_location = updated_position # better way to do this?
 
         with publisher.publish_context(
             broker=self.broker,
@@ -1690,6 +1691,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._core.get_liquid_presence_detection()
 
+    # Is this the `configure_liquid_presence_detection` wrapper? See Syntax and Semantics doc
     @liquid_presence_detection.setter
     @requires_version(2, 20)
     def liquid_presence_detection(self, enable: bool) -> None:
@@ -2133,6 +2135,35 @@ class InstrumentContext(publisher.CommandPublisher):
         )
         self._tip_racks = tip_racks or []
 
+    # ensure we have a Flex?!
+    @requires_version(2, 20)
+    def liquid_probe_before_aspirate(
+        self,
+        well: labware.Well,
+        meniscus_relative: bool,
+        offset_from_meniscus_mm: float,
+    ) -> Optional[types.Location]:
+        if (
+            self.api_version >= APIVersion(2, 21) # correct?
+            and well is not None
+            and self.liquid_presence_detection # need?
+            and meniscus_relative
+            and self._96_tip_config_valid()
+        ):
+            height = self.measure_liquid_height(well=well) # ensure there's a test for LiquidPresenceNotDetected error
+            move_to_location = well.bottom(z=height + offset_from_meniscus_mm) #confirm math (all things are relative to the same reference frame)
+            self.prepare_to_aspirate()
+            return move_to_location
+        elif ( # don't have to if meniscus_relative == True
+            self.api_version >= APIVersion(2, 20)
+            and well is not None
+            and self.liquid_presence_detection
+            and self._96_tip_config_valid()
+        ):
+            self.require_liquid_presence(well=well)
+            self.prepare_to_aspirate()
+            return None
+
     @requires_version(2, 20)
     def detect_liquid_presence(self, well: labware.Well) -> bool:
         """Checks for liquid in a well.
@@ -2172,7 +2203,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         loc = well.top()
         self._96_tip_config_valid()
-        height = self._core.liquid_probe_without_recovery(well._core, loc)
+        height = self._core.liquid_probe_without_recovery(well._core, loc) # can we make this with recovery?
         return height
 
     def _raise_if_configuration_not_supported_by_pipette(
