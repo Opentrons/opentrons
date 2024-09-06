@@ -26,9 +26,9 @@ export function Landing(): JSX.Element {
 
   React.useEffect(() => {
     if (metadata?.created != null) {
-      navigate('/overview')
+      console.log('would notmally navigate to /overview')
     } else {
-      navigate('/')
+      console.log('would notmally navigate to /')
     }
   }, [metadata, navigate])
 
