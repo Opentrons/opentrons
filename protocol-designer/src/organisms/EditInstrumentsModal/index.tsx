@@ -543,17 +543,11 @@ export function EditInstrumentsModal(
                       robotType === FLEX_ROBOT_TYPE ? null : (
                         <Btn
                           onClick={() => {
-                            if (allowAllTipracks) {
-                              dispatch(
-                                setFeatureFlags({
-                                  OT_PD_ALLOW_ALL_TIPRACKS: !allowAllTipracks,
-                                })
-                              )
-                            } else {
-                              console.log(
-                                'lol nested modal should not happen, TODO wire this up'
-                              )
-                            }
+                            dispatch(
+                              setFeatureFlags({
+                                OT_PD_ALLOW_ALL_TIPRACKS: !allowAllTipracks,
+                              })
+                            )
                           }}
                           textDecoration={TYPOGRAPHY.textDecorationUnderline}
                         >

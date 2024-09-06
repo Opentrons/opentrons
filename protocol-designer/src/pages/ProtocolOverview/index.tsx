@@ -8,11 +8,14 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   Btn,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InfoScreen,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   LargeButton,
+  LiquidIcon,
   ListItem,
   ListItemDescriptor,
   SPACING,
@@ -82,6 +85,9 @@ export function ProtocolOverview(): JSX.Element {
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
   const initialDeckSetup = useSelector(getInitialDeckSetup)
+  const allIngredientGroupFields = useSelector(
+    labwareIngredSelectors.allIngredientGroupFields
+  )
   const dispatch: ThunkDispatch<any> = useDispatch()
   const [hoverSlot, setHoverSlot] = React.useState<DeckSlot | null>(null)
   // TODO: wire up the slot information from hoverSlot
@@ -317,7 +323,7 @@ export function ProtocolOverview(): JSX.Element {
                       <ListItemDescriptor
                         type="default"
                         description={t(`${title}`)}
-                        content={value ?? 'N/A'}
+                        content={value ?? t('na')}
                       />
                     </ListItem>
                   )
@@ -362,8 +368,8 @@ export function ProtocolOverview(): JSX.Element {
                     content={
                       leftPip != null
                         ? getPipetteSpecsV2(leftPip.name as PipetteName)
-                            ?.displayName ?? 'N/A'
-                        : 'N/A'
+                            ?.displayName ?? t('na')
+                        : t('na')
                     }
                   />
                 </ListItem>
@@ -374,8 +380,8 @@ export function ProtocolOverview(): JSX.Element {
                     content={
                       rightPip != null
                         ? getPipetteSpecsV2(rightPip.name as PipetteName)
-                            ?.displayName ?? 'N/A'
-                        : 'N/A'
+                            ?.displayName ?? t('na')
+                        : t('na')
                     }
                   />
                 </ListItem>
@@ -393,17 +399,41 @@ export function ProtocolOverview(): JSX.Element {
             <Flex flexDirection={DIRECTION_COLUMN}>
               <Flex marginBottom={SPACING.spacing12}>
                 <StyledText desktopStyle="headingSmallBold">
-                  {t('liquids')}
+                  {t('liquid_defs')}
                 </StyledText>
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                <ListItem type="noActive" key={`ProtocolOverview_Liquids`}>
-                  <ListItemDescriptor
-                    type="default"
-                    description={'TODO'}
-                    content={'WIRE THIS UP'}
+                {Object.keys(allIngredientGroupFields).length > 0 ? (
+                  Object.values(allIngredientGroupFields).map(
+                    (liquid, index) => (
+                      <ListItem
+                        type="noActive"
+                        key={`${liquid.name}_${liquid.displayColor}_${index}`}
+                      >
+                        <ListItemDescriptor
+                          type="default"
+                          description={
+                            <Flex
+                              alignItems={ALIGN_CENTER}
+                              gridGap={SPACING.spacing8}
+                            >
+                              <LiquidIcon color={liquid.displayColor} />
+                              <StyledText desktopStyle="bodyDefaultRegular">
+                                {liquid.name}
+                              </StyledText>
+                            </Flex>
+                          }
+                          content={liquid.description ?? t('n/a')}
+                        />
+                      </ListItem>
+                    )
+                  )
+                ) : (
+                  <InfoScreen
+                    content={t('no_liquids_defined')}
+                    backgroundColor={COLORS.grey35}
                   />
-                </ListItem>
+                )}
               </Flex>
             </Flex>
             <Flex flexDirection={DIRECTION_COLUMN}>
@@ -413,13 +443,22 @@ export function ProtocolOverview(): JSX.Element {
                 </StyledText>
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                <ListItem type="noActive" key={`ProtocolOverview_Step`}>
-                  <ListItemDescriptor
-                    type="default"
-                    description={'TODO'}
-                    content={'WIRE THIS UP'}
+                {Object.keys(savedStepForms).length <= 1 ? (
+                  <InfoScreen
+                    content={t('no_steps')}
+                    backgroundColor={COLORS.grey35}
                   />
-                </ListItem>
+                ) : (
+                  <ListItem type="noActive" key="ProtocolOverview_Step">
+                    <ListItemDescriptor
+                      type="default"
+                      description={'Steps:'}
+                      content={(
+                        Object.keys(savedStepForms).length - 1
+                      ).toString()}
+                    />
+                  </ListItem>
+                )}
               </Flex>
             </Flex>
           </Flex>
