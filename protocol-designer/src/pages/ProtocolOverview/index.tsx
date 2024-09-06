@@ -449,7 +449,7 @@ export function ProtocolOverview(): JSX.Element {
                     backgroundColor={COLORS.grey35}
                   />
                 ) : (
-                  <ListItem type="noActive" key={`ProtocolOverview_Step`}>
+                  <ListItem type="noActive" key="ProtocolOverview_Step">
                     <ListItemDescriptor
                       type="default"
                       description={'Steps:'}
