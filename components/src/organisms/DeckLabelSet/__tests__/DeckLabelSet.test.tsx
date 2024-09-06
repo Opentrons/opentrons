@@ -42,9 +42,8 @@ describe('DeckLabelSet', () => {
   it('should render blue border and DeckLabel', () => {
     render(props)
     expect(screen.getAllByText('mock DeckLabels').length).toBe(2)
-    screen.getByText('test')
     const deckLabelSet = screen.getByTestId('DeckLabeSet')
-    expect(deckLabelSet).toHaveStyle(`border: 3px solid ${COLORS.blue50}`)
-    expect(deckLabelSet).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
+    expect(deckLabelSet).toHaveStyle(`border: 1.5px solid ${COLORS.blue50}`)
+    expect(deckLabelSet).toHaveStyle(`border-radius: ${BORDERS.borderRadius4}`)
   })
 })
