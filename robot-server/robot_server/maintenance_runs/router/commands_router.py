@@ -166,7 +166,7 @@ async def create_run_command(
     response_data = run_orchestrator_store.get_command(command.id)
 
     return await PydanticResponse.create(
-        content=SimpleBody.construct(data=response_data),
+        content=SimpleBody.model_construct(data=response_data),
         status_code=status.HTTP_201_CREATED,
     )
 
@@ -231,7 +231,7 @@ async def get_run_commands(
     recovery_target_command = run_data_manager.get_recovery_target_command(run_id=runId)
 
     data = [
-        RunCommandSummary.construct(
+        RunCommandSummary.model_construct(
             id=c.id,
             key=c.key,
             commandType=c.commandType,
@@ -258,7 +258,7 @@ async def get_run_commands(
     )
 
     return await PydanticResponse.create(
-        content=MultiBody.construct(data=data, meta=meta, links=links),
+        content=MultiBody.model_construct(data=data, meta=meta, links=links),
         status_code=status.HTTP_200_OK,
     )
 
@@ -300,7 +300,7 @@ async def get_run_command(
         raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
     return await PydanticResponse.create(
-        content=SimpleBody.construct(data=command),
+        content=SimpleBody.model_construct(data=command),
         status_code=status.HTTP_200_OK,
     )
 

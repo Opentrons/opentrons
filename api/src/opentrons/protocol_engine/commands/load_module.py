@@ -76,7 +76,7 @@ class LoadModuleResult(BaseModel):
 
     # TODO(mm, 2023-04-13): Remove this field. Jira RSS-221.
     definition: ModuleDefinition = Field(
-        deprecated=True,
+        json_schema_extra={"deprecated": True},
         description=(
             "The definition of the connected module."
             " This field is an implementation detail. We might change or remove it without warning."
@@ -227,7 +227,7 @@ class LoadModule(BaseCommand[LoadModuleParams, LoadModuleResult, ErrorOccurrence
 
     commandType: LoadModuleCommandType = "loadModule"
     params: LoadModuleParams
-    result: Optional[LoadModuleResult]
+    result: Optional[LoadModuleResult] = None
 
     _ImplementationCls: Type[LoadModuleImplementation] = LoadModuleImplementation
 

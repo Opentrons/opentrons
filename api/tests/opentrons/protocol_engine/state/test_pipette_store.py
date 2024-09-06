@@ -533,7 +533,7 @@ def test_blow_out_clears_volume(
         ),
         (
             FailCommandAction(
-                running_command=cmd.LiquidProbe(
+                running_command=cmd.LiquidProbe.model_construct(  # type: ignore[call-arg]
                     id="command-id",
                     createdAt=datetime.now(),
                     startedAt=datetime.now(),
@@ -890,9 +890,9 @@ def test_add_pipette_config(
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
     """It should update state from any pipette config private result."""
-    command = cmd.LoadPipette.construct(  # type: ignore[call-arg]
+    command = cmd.LoadPipette.construct(
         params=cmd.LoadPipetteParams.construct(
-            mount=MountType.LEFT, pipetteName="p300_single"  # type: ignore[arg-type]
+            mount=MountType.LEFT, pipetteName="p300_single"
         ),
         result=cmd.LoadPipetteResult(pipetteId="pipette-id"),
     )

@@ -4,8 +4,9 @@ from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
 
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.commands import LoadModuleResult
+
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.robot.types import RobotType
@@ -182,7 +183,7 @@ class ProtocolCore(
     ) -> LabwareLoadParams:
         """Add a labware definition to the set of loadable definitions."""
         uri = self._engine_client.add_labware_definition(
-            LabwareDefinition.parse_obj(definition)
+            LabwareDefinition.model_validate(definition)
         )
         return LabwareLoadParams.from_uri(uri)
 
@@ -743,9 +744,7 @@ class ProtocolCore(
             _id=liquid.id,
             name=liquid.displayName,
             description=liquid.description,
-            display_color=(
-                liquid.displayColor.__root__ if liquid.displayColor else None
-            ),
+            display_color=(liquid.displayColor.root if liquid.displayColor else None),
         )
 
     def get_labware_location(

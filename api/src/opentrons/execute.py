@@ -23,7 +23,8 @@ from typing import (
     Union,
 )
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+
+from opentrons_shared_data.labware.models import LabwareDefinition
 from opentrons_shared_data.robot.types import RobotType
 
 from opentrons import protocol_api, __version__, should_use_ot3
@@ -559,7 +560,9 @@ def _create_live_context_pe(
     # Non-async would use call_soon_threadsafe(), which makes the waiting harder.
     async def add_all_extra_labware() -> None:
         for labware_definition_dict in extra_labware.values():
-            labware_definition = LabwareDefinition.parse_obj(labware_definition_dict)
+            labware_definition = LabwareDefinition.model_validate(
+                labware_definition_dict
+            )
             pe.add_labware_definition(labware_definition)
 
     # Add extra_labware to ProtocolEngine, being careful not to modify ProtocolEngine from this

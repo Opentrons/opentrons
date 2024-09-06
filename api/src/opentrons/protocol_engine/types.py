@@ -1,29 +1,29 @@
 """Public protocol engine value types and models."""
 from __future__ import annotations
-import re
 from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
 from pathlib import Path
+from typing import (
+    Any,
+    Dict,
+    FrozenSet,
+    List,
+    Mapping,
+    NamedTuple,
+    Optional,
+    Tuple,
+    Union,
+)
+
 from pydantic import (
     BaseModel,
     Field,
+    RootModel,
     StrictBool,
     StrictFloat,
     StrictInt,
     StrictStr,
-    validator,
-)
-from typing import (
-    Optional,
-    Union,
-    List,
-    Dict,
-    Any,
-    NamedTuple,
-    Tuple,
-    FrozenSet,
-    Mapping,
 )
 from typing_extensions import Literal, TypeGuard
 
@@ -41,6 +41,9 @@ from opentrons_shared_data.pipette.types import (  # noqa: F401
     # convenience re-export of LabwareUri type
     LabwareUri as LabwareUri,
 )
+
+from opentrons_shared_data.labware import models as lw_models
+from opentrons_shared_data.types import Vec3f as SD_Vec3f
 from opentrons_shared_data.module.types import ModuleType as SharedDataModuleType
 
 
@@ -449,15 +452,10 @@ class ModuleDimensions(BaseModel):
 
     bareOverallHeight: float
     overLabwareHeight: float
-    lidHeight: Optional[float]
+    lidHeight: Optional[float] = None
 
 
-class Vec3f(BaseModel):
-    """A 3D vector of floats."""
-
-    x: float
-    y: float
-    z: float
+Vec3f = SD_Vec3f[float]
 
 
 # TODO(mm, 2022-11-07): Deduplicate with Vec3f.
@@ -469,29 +467,7 @@ class ModuleCalibrationPoint(BaseModel):
     z: float
 
 
-# TODO(mm, 2022-11-07): Deduplicate with Vec3f.
-class LabwareOffsetVector(BaseModel):
-    """Offset, in deck coordinates from nominal to actual position."""
-
-    x: float
-    y: float
-    z: float
-
-    def __add__(self, other: Any) -> LabwareOffsetVector:
-        """Adds two vectors together."""
-        if not isinstance(other, LabwareOffsetVector):
-            return NotImplemented
-        return LabwareOffsetVector(
-            x=self.x + other.x, y=self.y + other.y, z=self.z + other.z
-        )
-
-    def __sub__(self, other: Any) -> LabwareOffsetVector:
-        """Subtracts two vectors."""
-        if not isinstance(other, LabwareOffsetVector):
-            return NotImplemented
-        return LabwareOffsetVector(
-            x=self.x - other.x, y=self.y - other.y, z=self.z - other.z
-        )
+LabwareOffsetVector = lw_models.OffsetVector
 
 
 # TODO(mm, 2022-11-07): Deduplicate with Vec3f.
@@ -604,8 +580,8 @@ class LoadedModule(BaseModel):
 
     id: str
     model: ModuleModel
-    location: Optional[DeckSlotLocation]
-    serialNumber: Optional[str]
+    location: Optional[DeckSlotLocation] = None
+    serialNumber: Optional[str] = None
 
 
 class LabwareOffsetLocation(BaseModel):
@@ -714,17 +690,10 @@ class LoadedLabware(BaseModel):
     )
 
 
-class HexColor(BaseModel):
+class HexColor(RootModel[str]):
     """Hex color representation."""
 
-    __root__: str
-
-    @validator("__root__")
-    def _color_is_a_valid_hex(cls, v: str) -> str:
-        match = re.search(r"^#(?:[0-9a-fA-F]{3,4}){1,2}$", v)
-        if not match:
-            raise ValueError("Color is not a valid hex color.")
-        return v
+    root: str = Field(pattern=r"^#(?:[0-9a-fA-F]{3,4}){1,2}$")
 
 
 class Liquid(BaseModel):
@@ -733,7 +702,7 @@ class Liquid(BaseModel):
     id: str
     displayName: str
     description: str
-    displayColor: Optional[HexColor]
+    displayColor: Optional[HexColor] = None
 
 
 class SpeedRange(NamedTuple):
@@ -890,12 +859,12 @@ class QuadrantNozzleLayoutConfiguration(BaseModel):
     )
     frontRightNozzle: str = Field(
         ...,
-        regex=NOZZLE_NAME_REGEX,
+        pattern=NOZZLE_NAME_REGEX,
         description="The front right nozzle in your configuration.",
     )
     backLeftNozzle: str = Field(
         ...,
-        regex=NOZZLE_NAME_REGEX,
+        pattern=NOZZLE_NAME_REGEX,
         description="The back left nozzle in your configuration.",
     )
 

@@ -138,7 +138,7 @@ def _get_legacy_ot_types() -> List[_LegacyTypeInfo]:
         _LegacyTypeInfo(original_name="DeckSlotName", current_type=DeckSlotName)
     )
 
-    from opentrons_shared_data.labware.labware_definition import DisplayCategory
+    from opentrons_shared_data.labware.models import DisplayCategory
     _legacy_ot_types.append(
         _LegacyTypeInfo(original_name="DisplayCategory", current_type=DisplayCategory)
     )
@@ -158,7 +158,7 @@ def _get_legacy_ot_types() -> List[_LegacyTypeInfo]:
         _LegacyTypeInfo(original_name="LabwareMovementStrategy", current_type=LabwareMovementStrategy)
     )
 
-    from opentrons_shared_data.labware.labware_definition import LabwareRole
+    from opentrons_shared_data.labware.models import LabwareRole
     _legacy_ot_types.append(
         _LegacyTypeInfo(original_name="LabwareRole", current_type=LabwareRole)
     )

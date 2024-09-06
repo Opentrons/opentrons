@@ -71,7 +71,7 @@ class Home(BaseCommand[HomeParams, HomeResult, ErrorOccurrence]):
 
     commandType: HomeCommandType = "home"
     params: HomeParams
-    result: Optional[HomeResult]
+    result: Optional[HomeResult] = None
 
     _ImplementationCls: Type[HomeImplementation] = HomeImplementation
 

@@ -153,7 +153,7 @@ def load_liquid_model(
 ) -> Dict[str, PipetteLiquidPropertiesDefinition]:
     liquid_dict = _liquid(channels, model, version)
     return {
-        k: PipetteLiquidPropertiesDefinition.parse_obj(v)
+        k: PipetteLiquidPropertiesDefinition.model_validate(v)
         for k, v in liquid_dict.items()
     }
 
@@ -211,7 +211,7 @@ def update_pipette_configuration(
     Given an input of v1 mutable configs, look up the equivalent keyed
     value of that configuration."""
     quirks_list = []
-    dict_of_base_model = base_configurations.dict(by_alias=True)
+    dict_of_base_model = base_configurations.model_dump(by_alias=True)
 
     for c, v in v1_configuration_changes.items():
         lookup_key = _change_to_camel_case(c)
@@ -243,7 +243,7 @@ def update_pipette_configuration(
         k.name: v
         for k, v in dict_of_base_model["plungerPositionsConfigurations"].items()
     }
-    return PipetteConfigurations.parse_obj(dict_of_base_model)
+    return PipetteConfigurations.model_validate(dict_of_base_model)
 
 
 def load_definition(
@@ -264,7 +264,7 @@ def load_definition(
     generation = PipetteGenerationType(physical_dict["displayCategory"])
     mount_configs = MOUNT_CONFIG_LOOKUP_TABLE[generation][channels]
 
-    return PipetteConfigurations.parse_obj(
+    return PipetteConfigurations.model_validate(
         {
             **geometry_dict,
             **physical_dict,
@@ -287,4 +287,4 @@ def load_valid_nozzle_maps(
         raise KeyError("Pipette version not found.")
 
     physical_dict = _physical(channels, model, version)
-    return ValidNozzleMaps.parse_obj(physical_dict["validNozzleMaps"])
+    return ValidNozzleMaps.model_validate(physical_dict["validNozzleMaps"])

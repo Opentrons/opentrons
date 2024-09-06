@@ -122,7 +122,7 @@ class Dispense(BaseCommand[DispenseParams, DispenseResult, ErrorOccurrence]):
 
     commandType: DispenseCommandType = "dispense"
     params: DispenseParams
-    result: Optional[DispenseResult]
+    result: Optional[DispenseResult] = None
 
     _ImplementationCls: Type[DispenseImplementation] = DispenseImplementation
 

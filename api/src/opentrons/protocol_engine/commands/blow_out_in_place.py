@@ -69,7 +69,7 @@ class BlowOutInPlace(
 
     commandType: BlowOutInPlaceCommandType = "blowOutInPlace"
     params: BlowOutInPlaceParams
-    result: Optional[BlowOutInPlaceResult]
+    result: Optional[BlowOutInPlaceResult] = None
 
     _ImplementationCls: Type[
         BlowOutInPlaceImplementation

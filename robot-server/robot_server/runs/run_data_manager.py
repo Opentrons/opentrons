@@ -2,7 +2,7 @@
 from datetime import datetime
 from typing import List, Optional, Callable, Union
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 from opentrons_shared_data.errors.exceptions import InvalidStoredData, EnumeratedError
 from opentrons.protocol_engine import (
     EngineStatus,
@@ -42,7 +42,7 @@ def _build_run(
     # such that this default summary object is not needed
 
     if run_resource.ok and isinstance(state_summary, StateSummary):
-        return Run.construct(
+        return Run.model_construct(
             id=run_resource.run_id,
             protocolId=run_resource.protocol_id,
             createdAt=run_resource.created_at,
@@ -63,7 +63,7 @@ def _build_run(
 
     errors: List[EnumeratedError] = []
     if isinstance(state_summary, BadStateSummary):
-        state = StateSummary.construct(
+        state = StateSummary.model_construct(
             status=EngineStatus.STOPPED,
             errors=[],
             labware=[],
@@ -97,7 +97,7 @@ def _build_run(
             AssertionError("Logic error in parsing invalid run.")
         )
 
-    return BadRun.construct(
+    return BadRun.model_construct(
         dataError=run_loading_error,
         id=run_resource.run_id,
         protocolId=run_resource.protocol_id,

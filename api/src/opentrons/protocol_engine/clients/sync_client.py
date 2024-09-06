@@ -3,7 +3,7 @@
 from typing import cast, Any, Optional, overload
 
 from opentrons_shared_data.labware.types import LabwareUri
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 
 from .. import commands
 from ..commands.command_unions import CREATE_TYPES_BY_PARAMS_TYPE

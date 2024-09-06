@@ -148,7 +148,7 @@ class MoveToAddressableAreaForDropTip(
         "moveToAddressableAreaForDropTip"
     )
     params: MoveToAddressableAreaForDropTipParams
-    result: Optional[MoveToAddressableAreaForDropTipResult]
+    result: Optional[MoveToAddressableAreaForDropTipResult] = None
 
     _ImplementationCls: Type[
         MoveToAddressableAreaForDropTipImplementation

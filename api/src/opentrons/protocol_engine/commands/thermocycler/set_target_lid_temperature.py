@@ -85,7 +85,7 @@ class SetTargetLidTemperature(
         "thermocycler/setTargetLidTemperature"
     )
     params: SetTargetLidTemperatureParams
-    result: Optional[SetTargetLidTemperatureResult]
+    result: Optional[SetTargetLidTemperatureResult] = None
 
     _ImplementationCls: Type[SetTargetLidTemperatureImpl] = SetTargetLidTemperatureImpl
 

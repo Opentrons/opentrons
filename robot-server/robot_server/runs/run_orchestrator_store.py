@@ -10,7 +10,7 @@ from opentrons.protocol_engine.types import (
     CSVRuntimeParamPaths,
 )
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.robot.types import RobotTypeEnum
 

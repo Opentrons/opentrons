@@ -4,10 +4,10 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
-from typing import Dict, List, Optional, Literal, Union
+from typing import Dict, List, Optional, Literal, Union, cast
 
 import sqlalchemy
-from pydantic import ValidationError
+from pydantic import TypeAdapter, ValidationError
 
 from opentrons.util.helpers import utc_now
 from opentrons.protocol_engine import StateSummary, CommandSlice
@@ -415,6 +415,7 @@ class RunStore:
 
         try:
             return (
+                # TODO
                 json_to_pydantic_list(RunTimeParameter, row.run_time_parameters)  # type: ignore[arg-type]
                 if row.run_time_parameters is not None
                 else []
@@ -474,8 +475,7 @@ class RunStore:
             slice_result = transaction.execute(select_slice).all()
 
         sliced_commands: List[Command] = [
-            json_to_pydantic(Command, row.command)  # type: ignore[arg-type]
-            for row in slice_result
+            _parse_command(row.command) for row in slice_result
         ]
 
         return CommandSlice(
@@ -525,7 +525,7 @@ class RunStore:
             if command is None:
                 raise CommandNotFoundError(command_id=command_id)
 
-        return json_to_pydantic(Command, command)  # type: ignore[arg-type]
+        return _parse_command(command)
 
     def remove(self, run_id: str) -> None:
         """Remove a run by its unique identifier.
@@ -672,3 +672,11 @@ def _convert_state_to_sql_values(
         "_updated_at": utc_now(),
         "run_time_parameters": pydantic_list_to_json(run_time_parameters),
     }
+
+
+_command_type_adapter: TypeAdapter[Command] = TypeAdapter(Command)
+
+
+def _parse_command(json_str: str) -> Command:
+    """Parse a JSON string from the database into a `Command`."""
+    return cast(Command, json_to_pydantic(_command_type_adapter, json_str))

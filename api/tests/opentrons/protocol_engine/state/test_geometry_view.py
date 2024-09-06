@@ -15,7 +15,7 @@ from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import Point, DeckSlotName, MountType
 from opentrons_shared_data.pipette.types import PipetteNameType
-from opentrons_shared_data.labware.labware_definition import (
+from opentrons_shared_data.labware.models import (
     Dimensions as LabwareDimensions,
     Parameters as LabwareDefinitionParameters,
     CornerOffsetFromSlot,
@@ -218,7 +218,7 @@ def addressable_area_view(
 @pytest.fixture
 def nice_labware_definition() -> LabwareDefinition:
     """Load a nice labware def that won't blow up your terminal."""
-    return LabwareDefinition.parse_obj(
+    return LabwareDefinition.model_validate(
         json.loads(
             load_shared_data("labware/fixtures/2/fixture_12_trough_v2.json").decode(
                 "utf-8"
@@ -230,7 +230,7 @@ def nice_labware_definition() -> LabwareDefinition:
 @pytest.fixture
 def nice_adapter_definition() -> LabwareDefinition:
     """Load a friendly adapter definition."""
-    return LabwareDefinition.parse_obj(
+    return LabwareDefinition.model_validate(
         json.loads(
             load_shared_data(
                 "labware/definitions/2/opentrons_aluminum_flat_bottom_plate/1.json"
@@ -795,8 +795,8 @@ def test_get_all_obstacle_highest_z_with_modules(
     subject: GeometryView,
 ) -> None:
     """It should get the highest Z including modules."""
-    module_1 = LoadedModule.construct(id="module-id-1")  # type: ignore[call-arg]
-    module_2 = LoadedModule.construct(id="module-id-2")  # type: ignore[call-arg]
+    module_1 = LoadedModule.construct(id="module-id-1")
+    module_2 = LoadedModule.construct(id="module-id-2")
 
     decoy.when(mock_labware_view.get_all()).then_return([])
     decoy.when(mock_addressable_area_view.get_all()).then_return([])
@@ -1948,8 +1948,8 @@ def test_get_slot_item(
     subject: GeometryView,
 ) -> None:
     """It should get items in certain slots."""
-    labware = LoadedLabware.construct(id="cool-labware")  # type: ignore[call-arg]
-    module = LoadedModule.construct(id="cool-module")  # type: ignore[call-arg]
+    labware = LoadedLabware.construct(id="cool-labware")
+    module = LoadedModule.construct(id="cool-module")
 
     decoy.when(mock_labware_view.get_by_slot(DeckSlotName.SLOT_1)).then_return(None)
     decoy.when(mock_labware_view.get_by_slot(DeckSlotName.SLOT_2)).then_return(labware)
@@ -1976,7 +1976,7 @@ def test_get_slot_item_that_is_overflowed_module(
     subject: GeometryView,
 ) -> None:
     """It should return the module that occupies the slot, even if not loaded on it."""
-    module = LoadedModule.construct(id="cool-module")  # type: ignore[call-arg]
+    module = LoadedModule.construct(id="cool-module")
     decoy.when(mock_labware_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(None)
     decoy.when(mock_module_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(None)
     decoy.when(
@@ -2352,7 +2352,7 @@ def test_check_gripper_labware_tip_collision(
         )
     )
 
-    definition = LabwareDefinition.construct(  # type: ignore[call-arg]
+    definition = LabwareDefinition.construct(
         namespace="hello",
         dimensions=LabwareDimensions.construct(
             yDimension=1, zDimension=2, xDimension=3

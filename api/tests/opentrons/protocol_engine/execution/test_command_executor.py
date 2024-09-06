@@ -1,11 +1,12 @@
 """Smoke tests for the CommandExecutor class."""
+
 import asyncio
 from datetime import datetime
-from typing import Any, Optional, Type, Union, cast
+from typing import Optional, Type, cast, Any, Union
 
 import pytest
 from decoy import Decoy, matchers
-from pydantic import BaseModel
+from pydantic import BaseModel, PrivateAttr
 
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 
@@ -13,6 +14,7 @@ from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryPolicy,
     ErrorRecoveryType,
+    never_recover,
 )
 from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.errors.exceptions import (
@@ -250,6 +252,12 @@ async def test_execute(
     TestCommandImplCls = decoy.mock(func=_TestCommandImpl)
     command_impl = decoy.mock(cls=_TestCommandImpl)
 
+    # Note: private attrs (which are attrs that start with _) are instantiated via deep
+    # copy from a provided default in the model, so if
+    # _TestCommand()._ImplementationCls != _TestCommand._ImplementationCls.default if
+    # we provide a default. Therefore, provide a default factory, so we can always have
+    # the same object.
+
     class _TestCommand(
         BaseCommand[_TestCommandParams, _TestCommandResult, ErrorOccurrence]
     ):
@@ -257,14 +265,15 @@ async def test_execute(
         params: _TestCommandParams
         result: Optional[_TestCommandResult]
 
-        _ImplementationCls: Type[_TestCommandImpl] = TestCommandImplCls
+        _ImplementationCls: Type[_TestCommandImpl] = PrivateAttr(
+            default_factory=lambda: TestCommandImplCls
+        )
 
     command_params = _TestCommandParams()
     command_result = SuccessData(public=_TestCommandResult(), private=None)
-
     queued_command = cast(
         Command,
-        _TestCommand(
+        _TestCommand.model_construct(  # type: ignore[call-arg]
             id="command-id",
             key="command-key",
             createdAt=datetime(year=2021, month=1, day=1),
@@ -275,7 +284,7 @@ async def test_execute(
 
     running_command = cast(
         Command,
-        _TestCommand(
+        _TestCommand.model_construct(  # type: ignore[call-arg]
             id="command-id",
             key="command-key",
             createdAt=datetime(year=2021, month=1, day=1),
@@ -296,7 +305,7 @@ async def test_execute(
 
     expected_completed_command = cast(
         Command,
-        _TestCommand(
+        _TestCommand.model_construct(
             id="command-id",
             key="command-key",
             createdAt=datetime(year=2021, month=1, day=1),
@@ -324,7 +333,6 @@ async def test_execute(
             state_store.commands.get(command_id="command-id")
         ).then_return(running_command)
     )
-
     decoy.when(
         queued_command._ImplementationCls(
             state_view=state_store,
@@ -352,6 +360,10 @@ async def test_execute(
     decoy.when(model_utils.get_timestamp()).then_return(
         datetime(year=2022, month=2, day=2),
         datetime(year=2023, month=3, day=3),
+    )
+
+    decoy.when(state_store.commands.get_error_recovery_policy()).then_return(
+        never_recover
     )
 
     await subject.execute("command-id")
@@ -418,13 +430,15 @@ async def test_execute_undefined_error(
         params: _TestCommandParams
         result: Optional[_TestCommandResult]
 
-        _ImplementationCls: Type[_TestCommandImpl] = TestCommandImplCls
+        _ImplementationCls: Type[_TestCommandImpl] = PrivateAttr(
+            default_factory=lambda: TestCommandImplCls
+        )
 
     command_params = _TestCommandParams()
 
     queued_command = cast(
         Command,
-        _TestCommand(
+        _TestCommand.model_construct(  # type: ignore[call-arg]
             id="command-id",
             key="command-key",
             createdAt=datetime(year=2021, month=1, day=1),
@@ -435,7 +449,7 @@ async def test_execute_undefined_error(
 
     running_command = cast(
         Command,
-        _TestCommand(
+        _TestCommand.model_construct(  # type: ignore[call-arg]
             id="command-id",
             key="command-key",
             createdAt=datetime(year=2021, month=1, day=1),
@@ -551,7 +565,9 @@ async def test_execute_defined_error(
         params: _TestCommandParams
         result: Optional[_TestCommandResult]
 
-        _ImplementationCls: Type[_TestCommandImpl] = TestCommandImplCls
+        _ImplementationCls: Type[_TestCommandImpl] = PrivateAttr(
+            default_factory=lambda: TestCommandImplCls
+        )
 
     command_params = _TestCommandParams()
     command_id = "command-id"
@@ -565,7 +581,7 @@ async def test_execute_defined_error(
     )
     queued_command = cast(
         Command,
-        _TestCommand(
+        _TestCommand.model_construct(  # type: ignore[call-arg]
             id=command_id,
             key="command-key",
             createdAt=created_at,
@@ -575,7 +591,7 @@ async def test_execute_defined_error(
     )
     running_command = cast(
         Command,
-        _TestCommand(
+        _TestCommand.model_construct(  # type: ignore[call-arg]
             id=command_id,
             key="command-key",
             createdAt=created_at,

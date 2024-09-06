@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 
 from ..errors import LabwareIsNotAllowedInLocationError
 from ..resources import labware_validation, fixture_validation
@@ -165,7 +165,7 @@ class LoadLabware(BaseCommand[LoadLabwareParams, LoadLabwareResult, ErrorOccurre
 
     commandType: LoadLabwareCommandType = "loadLabware"
     params: LoadLabwareParams
-    result: Optional[LoadLabwareResult]
+    result: Optional[LoadLabwareResult] = None
 
     _ImplementationCls: Type[LoadLabwareImplementation] = LoadLabwareImplementation
 

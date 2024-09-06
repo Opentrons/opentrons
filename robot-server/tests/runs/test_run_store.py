@@ -168,10 +168,10 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
 @pytest.fixture
 def invalid_state_summary() -> StateSummary:
     """Should fail pydantic validation."""
-    analysis_error = pe_errors.ErrorOccurrence.construct(
+    analysis_error = pe_errors.ErrorOccurrence.model_construct(
         id="error-id",
         # Invalid value here should fail analysis
-        createdAt=MountType.LEFT,  # type: ignore
+        createdAt=MountType.LEFT,  # type: ignore[arg-type]
         errorType="BadError",
         detail="oh no",
     )
@@ -615,7 +615,7 @@ def test_get_run_time_parameters_invalid(
     state_summary: StateSummary,
 ) -> None:
     """It should return an empty list if there invalid parameters."""
-    bad_parameters = [pe_types.BooleanParameter.construct(foo="bar")]  # type: ignore[call-arg]
+    bad_parameters = [pe_types.BooleanParameter.construct(foo="bar")]
     subject.insert(
         run_id="run-id",
         protocol_id=None,

@@ -223,7 +223,7 @@ class MoveLabware(BaseCommand[MoveLabwareParams, MoveLabwareResult, ErrorOccurre
 
     commandType: MoveLabwareCommandType = "moveLabware"
     params: MoveLabwareParams
-    result: Optional[MoveLabwareResult]
+    result: Optional[MoveLabwareResult] = None
 
     _ImplementationCls: Type[MoveLabwareImplementation] = MoveLabwareImplementation
 

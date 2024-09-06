@@ -9,7 +9,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.labware.types import LabwareUri
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands, DeckPoint
 from opentrons.protocol_engine.errors import ProtocolCommandFailedError, ErrorOccurrence
@@ -104,7 +104,7 @@ async def test_call_method(
     subject: ChildThreadTransport,
 ) -> None:
     """It should call a synchronous method in a thread-safe manner."""
-    labware_def = LabwareDefinition.construct(namespace="hello")  # type: ignore[call-arg]
+    labware_def = LabwareDefinition.construct(namespace="hello")
     labware_uri = LabwareUri("hello/world/123")
     calling_thread_id = None
 

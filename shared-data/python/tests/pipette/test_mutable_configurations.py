@@ -272,7 +272,7 @@ def test_load_with_overrides(
     )
 
     if serial_number == TEST_SERIAL_NUMBER:
-        dict_loaded_configs = loaded_base_configurations.dict(by_alias=True)
+        dict_loaded_configs = loaded_base_configurations.model_dump(by_alias=True)
         for map_key in dict_loaded_configs["pickUpTipConfigurations"]["pressFit"][
             "configurationsByNozzleMap"
         ]:
@@ -283,7 +283,7 @@ def test_load_with_overrides(
                     "configurationsByNozzleMap"
                 ][map_key][tip_key]["speed"] = 5.0
 
-        updated_configurations_dict = updated_configurations.dict(by_alias=True)
+        updated_configurations_dict = updated_configurations.model_dump(by_alias=True)
         assert set(dict_loaded_configs.pop("quirks")) == set(
             updated_configurations_dict.pop("quirks")
         )

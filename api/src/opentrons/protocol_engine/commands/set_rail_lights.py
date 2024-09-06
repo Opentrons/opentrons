@@ -51,7 +51,7 @@ class SetRailLights(
 
     commandType: SetRailLightsCommandType = "setRailLights"
     params: SetRailLightsParams
-    result: Optional[SetRailLightsResult]
+    result: Optional[SetRailLightsResult] = None
 
     _ImplementationCls: Type[SetRailLightsImplementation] = SetRailLightsImplementation
 

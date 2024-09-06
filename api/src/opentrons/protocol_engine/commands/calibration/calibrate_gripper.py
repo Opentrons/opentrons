@@ -120,8 +120,8 @@ class CalibrateGripperImplementation(
             calibration_data = result
 
         return SuccessData(
-            public=CalibrateGripperResult.construct(
-                jawOffset=Vec3f.construct(
+            public=CalibrateGripperResult.model_construct(
+                jawOffset=Vec3f.model_construct(
                     x=probe_offset.x, y=probe_offset.y, z=probe_offset.z
                 ),
                 savedCalibration=calibration_data,
@@ -146,7 +146,7 @@ class CalibrateGripper(
 
     commandType: CalibrateGripperCommandType = "calibration/calibrateGripper"
     params: CalibrateGripperParams
-    result: Optional[CalibrateGripperResult]
+    result: Optional[CalibrateGripperResult] = None
 
     _ImplementationCls: Type[
         CalibrateGripperImplementation

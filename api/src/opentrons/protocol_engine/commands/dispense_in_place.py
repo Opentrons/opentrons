@@ -122,7 +122,7 @@ class DispenseInPlace(
 
     commandType: DispenseInPlaceCommandType = "dispenseInPlace"
     params: DispenseInPlaceParams
-    result: Optional[DispenseInPlaceResult]
+    result: Optional[DispenseInPlaceResult] = None
 
     _ImplementationCls: Type[
         DispenseInPlaceImplementation

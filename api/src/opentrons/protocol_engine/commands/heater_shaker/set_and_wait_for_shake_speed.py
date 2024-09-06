@@ -105,7 +105,7 @@ class SetAndWaitForShakeSpeed(
         "heaterShaker/setAndWaitForShakeSpeed"
     )
     params: SetAndWaitForShakeSpeedParams
-    result: Optional[SetAndWaitForShakeSpeedResult]
+    result: Optional[SetAndWaitForShakeSpeedResult] = None
 
     _ImplementationCls: Type[SetAndWaitForShakeSpeedImpl] = SetAndWaitForShakeSpeedImpl
 

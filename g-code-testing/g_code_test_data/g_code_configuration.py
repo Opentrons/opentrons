@@ -10,7 +10,7 @@ from typing import (
     Union,
 )
 from typing_extensions import (
-    Final,
+    Annotated, Final,
     Literal,
 )
 
@@ -22,9 +22,8 @@ from opentrons.hardware_control.emulation.settings import Settings, SmoothieSett
 from opentrons.protocols.api_support.types import APIVersion
 
 from pydantic import (
-    BaseModel,
+    StringConstraints, ConfigDict, BaseModel,
     Field,
-    constr,
     validator,
 )
 
@@ -41,16 +40,16 @@ class SharedFunctionsMixin:
 
 class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
     path: str
-    name: Optional[constr(regex=r'^[a-z0-9_]*$')]
+    name: Optional[Annotated[str, StringConstraints(pattern=r'^[a-z0-9_]*$')]] = None
     settings: Settings
     results_dir: ClassVar[str] = "protocols"
     driver: str = 'protocol'
     marks: List[Mark] = [pytest.mark.g_code_confirm]
-    versions: Set[Union[APIVersion,int]] = Field(..., min_items=1)
+    versions: Set[Union[APIVersion,int]] = Field(..., min_length=1)
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    class Config:
-        arbitrary_types_allowed = True
-
+    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
     @validator("name", pre=True, always=True)
     def name_from_path(cls, name, values) -> str:
         derived_name = os.path.splitext(os.path.basename(values["path"]))[0]
@@ -92,15 +91,13 @@ class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
 
 
 class HTTPGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
-    name: constr(regex=r'^[a-z0-9_]*$')
+    name: Annotated[str, StringConstraints(pattern=r'^[a-z0-9_]*$')]
     executable: Callable
     settings: Settings
     results_dir: ClassVar[str] = "http"
     driver: str = 'http'
     marks: List[Mark] = [pytest.mark.g_code_confirm]
-
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def _get_full_path(self) -> str:
         return os.path.join(COMPARISON_FILES_FOLDER_PATH, self.get_comparison_file_path())

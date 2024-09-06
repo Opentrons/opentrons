@@ -9,7 +9,7 @@ from typing import Set
 import pytest
 
 from opentrons_shared_data import get_shared_data_root
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_reader import (

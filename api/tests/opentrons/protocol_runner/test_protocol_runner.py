@@ -8,7 +8,7 @@ from decoy import Decoy, matchers
 from pathlib import Path
 from typing import List, cast, Union, Type
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 from opentrons_shared_data.labware.types import (
     LabwareDefinition as LabwareDefinitionTypedDict,
 )
@@ -354,7 +354,7 @@ async def test_run_json_runner_stop_requested_stops_enqueuing(
     json_translator: JsonTranslator,
 ) -> None:
     """It should run a protocol to completion."""
-    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
+    labware_definition = LabwareDefinition.model_construct()  # type: ignore[call-arg]
     json_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
         main_file=Path("/dev/null/abc.json"),
@@ -381,7 +381,7 @@ async def test_run_json_runner_stop_requested_stops_enqueuing(
         Liquid(id="water-id", displayName="water", description="water desc")
     ]
 
-    json_protocol = ProtocolSchemaV6.construct()  # type: ignore[call-arg]
+    json_protocol = ProtocolSchemaV6.model_construct()  # type: ignore[call-arg]
 
     decoy.when(
         await protocol_reader.extract_labware_definitions(json_protocol_source)
@@ -394,7 +394,7 @@ async def test_run_json_runner_stop_requested_stops_enqueuing(
             pe_commands.HomeCreate(params=pe_commands.HomeParams()),
         )
     ).then_return(
-        pe_commands.Home.construct(status=pe_commands.CommandStatus.SUCCEEDED)  # type: ignore[call-arg]
+        pe_commands.Home.model_construct(status=pe_commands.CommandStatus.SUCCEEDED)  # type: ignore[call-arg]
     )
     decoy.when(
         await protocol_engine.add_and_execute_command_wait_for_recovery(
@@ -403,7 +403,7 @@ async def test_run_json_runner_stop_requested_stops_enqueuing(
             ),
         )
     ).then_return(
-        pe_commands.WaitForDuration.construct(  # type: ignore[call-arg]
+        pe_commands.WaitForDuration.model_construct(  # type: ignore[call-arg]
             id="protocol-command-id",
             error=pe_errors.ErrorOccurrence.from_failed(
                 id="some-id",
@@ -444,8 +444,8 @@ async def test_run_json_runner_stop_requested_stops_enqueuing(
 @pytest.mark.parametrize(
     "schema_version, json_protocol",
     [
-        (6, ProtocolSchemaV6.construct()),  # type: ignore[call-arg]
-        (7, ProtocolSchemaV7.construct()),  # type: ignore[call-arg]
+        (6, ProtocolSchemaV6.model_construct()),  # type: ignore[call-arg]
+        (7, ProtocolSchemaV7.model_construct()),  # type: ignore[call-arg]
     ],
 )
 async def test_load_json_runner(
@@ -459,7 +459,7 @@ async def test_load_json_runner(
     json_protocol: Union[ProtocolSchemaV6, ProtocolSchemaV7],
 ) -> None:
     """It should load a JSON protocol file."""
-    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
+    labware_definition = LabwareDefinition.model_construct()  # type: ignore[call-arg]
 
     json_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
@@ -520,7 +520,7 @@ async def test_load_json_runner(
             ),
         )
     ).then_return(
-        pe_commands.WaitForResume.construct(  # type: ignore[call-arg]
+        pe_commands.WaitForResume.model_construct(  # type: ignore[call-arg]
             id="command-id-1",
             status=CommandStatus.SUCCEEDED,
             error=None,
@@ -533,7 +533,7 @@ async def test_load_json_runner(
             ),
         )
     ).then_return(
-        pe_commands.WaitForResume.construct(  # type: ignore[call-arg]
+        pe_commands.WaitForResume.model_construct(  # type: ignore[call-arg]
             id="command-id-2",
             status=CommandStatus.SUCCEEDED,
             error=None,
@@ -548,7 +548,7 @@ async def test_load_json_runner(
             ),
         )
     ).then_return(
-        pe_commands.WaitForResume.construct(  # type: ignore[call-arg]
+        pe_commands.WaitForResume.model_construct(  # type: ignore[call-arg]
             id="command-id-3",
             status=CommandStatus.SUCCEEDED,
             error=None,
@@ -593,7 +593,7 @@ async def test_load_legacy_python(
     python_runner_subject: PythonAndLegacyRunner,
 ) -> None:
     """It should load a legacy context-based Python protocol."""
-    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
+    labware_definition = LabwareDefinition.model_construct()  # type: ignore[call-arg]
 
     legacy_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
@@ -744,7 +744,7 @@ async def test_load_legacy_json(
     python_runner_subject: PythonAndLegacyRunner,
 ) -> None:
     """It should load a legacy context-based JSON protocol."""
-    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
+    labware_definition = LabwareDefinition.model_construct()  # type: ignore[call-arg]
 
     legacy_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),

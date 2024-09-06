@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "a123325c3bebd1451774ebfadc532a4ca78a92897b80cf1d20ded030e145bac2"
+            "sha256": "1d8970851c9da3c372b3f8a0d33dba82b002b12d5b3a43c822d22118ea167b75"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -48,18 +48,18 @@
             "hashes": [
                 "sha256:fd0e44bf70eadae45aadc292cb0a7eb5b0b6372cd1b391228047d33895db83e7"
             ],
-            "index": "pypi",
+            "markers": "sys_platform == 'win32'",
             "version": "==234"
         }
     },
     "develop": {
         "attrs": {
             "hashes": [
-                "sha256:935dc3b529c262f6cf76e50877d35a4bd3c1de194fd41f47a2b7ae8f19971f30",
-                "sha256:99b87a485a5820b23b879f04c2305b44b951b502fd64be915879d77a7e8fc6f1"
+                "sha256:5cfb1b9148b5b086569baec03f20d7b6bf3bcacc9a42bebf87ffaaca362f6346",
+                "sha256:81921eb96de3191c8258c199618104dd27ac608d9366f5e35d011eae1867ede2"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==23.2.0"
+            "version": "==24.2.0"
         },
         "black": {
             "hashes": [
@@ -101,11 +101,11 @@
         },
         "exceptiongroup": {
             "hashes": [
-                "sha256:5258b9ed329c5bbdd31a309f53cbfb0b155341807f6ff7606a1e801a891b29ad",
-                "sha256:a4785e48b045528f5bfe627b6ad554ff32def154f42372786903b7abcfe1aa16"
+                "sha256:3111b9d131c238bec2f8f516e123e14ba243563fb135d3fe885990585aa7795b",
+                "sha256:47c2edf7c6738fafb49fd34290706d1a1a2f4d1c6df275526b62cbb4aa5393cc"
             ],
             "markers": "python_version < '3.11'",
-            "version": "==1.2.1"
+            "version": "==1.2.2"
         },
         "flake8": {
             "hashes": [
@@ -268,12 +268,12 @@
         },
         "pytest-asyncio": {
             "hashes": [
-                "sha256:009b48127fbe44518a547bddd25611551b0e43ccdbf1e67d12479f569832c20b",
-                "sha256:5f5c72948f4c49e7db4f29f2521d4031f1c27f86e57b046126654083d4770268"
+                "sha256:50265d892689a5faefb84df80819d1ecef566eb3549cf915dfb33569359d1ce2",
+                "sha256:759b10b33a6dc61cce40a8bd5205e302978bbbcc00e279a8b61d9a6a3c82e4d3"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==0.23.7"
+            "version": "==0.23.8"
         },
         "snowballstemmer": {
             "hashes": [

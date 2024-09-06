@@ -64,7 +64,7 @@ class DropTipInPlace(
 
     commandType: DropTipInPlaceCommandType = "dropTipInPlace"
     params: DropTipInPlaceParams
-    result: Optional[DropTipInPlaceResult]
+    result: Optional[DropTipInPlaceResult] = None
 
     _ImplementationCls: Type[
         DropTipInPlaceImplementation

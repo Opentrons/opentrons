@@ -77,7 +77,7 @@ class VerifyTipPresence(
 
     commandType: VerifyTipPresenceCommandType = "verifyTipPresence"
     params: VerifyTipPresenceParams
-    result: Optional[VerifyTipPresenceResult]
+    result: Optional[VerifyTipPresenceResult] = None
 
     _ImplementationCls: Type[
         VerifyTipPresenceImplementation

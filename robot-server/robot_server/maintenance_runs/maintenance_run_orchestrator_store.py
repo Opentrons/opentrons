@@ -33,7 +33,7 @@ from opentrons.hardware_control.types import (
 
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 from opentrons_shared_data.labware.types import LabwareUri
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 
 _log = logging.getLogger(__name__)
 

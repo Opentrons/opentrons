@@ -314,16 +314,20 @@ async def _analyze(
     else:
         result = AnalysisResult.OK
 
-    results = AnalyzeResults.construct(
+    results = AnalyzeResults.model_construct(
         createdAt=datetime.now(tz=timezone.utc),
         files=[
-            ProtocolFile.construct(name=f.path.name, role=f.role)
+            ProtocolFile.model_construct(name=f.path.name, role=f.role)
             for f in protocol_source.files
         ],
         config=(
-            JsonConfig.construct(schemaVersion=protocol_source.config.schema_version)
+            JsonConfig.model_construct(
+                schemaVersion=protocol_source.config.schema_version
+            )
             if isinstance(protocol_source.config, JsonProtocolConfig)
-            else PythonConfig.construct(apiVersion=protocol_source.config.api_version)
+            else PythonConfig.model_construct(
+                apiVersion=protocol_source.config.api_version
+            )
         ),
         result=result,
         metadata=protocol_source.metadata,
@@ -341,14 +345,14 @@ async def _analyze(
         "json",
         outputs,
         lambda to_file: to_file.write(
-            results.json(exclude_none=True).encode("utf-8"),
+            results.model_dump_json(exclude_none=True).encode("utf-8"),
         ),
     )
     _call_for_output_of_kind(
         "human-json",
         outputs,
         lambda to_file: to_file.write(
-            results.json(exclude_none=True, indent=2).encode("utf-8")
+            results.model_dump_json(exclude_none=True, indent=2).encode("utf-8")
         ),
     )
     if check:

@@ -10,7 +10,7 @@ from opentrons_shared_data.labware.types import (
     LabwareUri,
     LabwareDefinition as LabwareDefDict,
 )
-from opentrons_shared_data.labware.labware_definition import (
+from opentrons_shared_data.labware.models import (
     LabwareDefinition,
     Parameters,
 )
@@ -55,10 +55,10 @@ def tip_rack_dict() -> LabwareDefDict:
 @pytest.fixture
 def tip_rack_model() -> LabwareDefinition:
     """Get a tip rack Pydantic model definition value object."""
-    return LabwareDefinition.construct(  # type: ignore[call-arg]
+    return LabwareDefinition.construct(
         namespace="test",
         version=1,
-        parameters=Parameters.construct(  # type: ignore[call-arg]
+        parameters=Parameters.construct(
             loadName="cool-labware",
             tipOverlap=None,  # add a None value to validate serialization to dictionary
         ),

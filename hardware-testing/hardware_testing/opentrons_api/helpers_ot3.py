@@ -6,7 +6,17 @@ from enum import Enum
 from math import pi
 from subprocess import run, Popen
 from time import time
-from typing import Callable, Coroutine, Dict, List, Optional, Tuple, Union, cast
+from typing import (
+    Callable,
+    Coroutine,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    Union,
+    cast,
+    Sequence,
+)
 import atexit
 from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
 from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
@@ -138,7 +148,7 @@ def _create_attached_instruments_dict(
 
 
 async def update_firmware(
-    api: OT3API, force: bool = False, subsystems: Optional[List[SubSystem]] = None
+    api: OT3API, force: bool = False, subsystems: Optional[Sequence[SubSystem]] = None
 ) -> None:
     """Update firmware of OT3."""
     if not api.is_simulator:
@@ -1009,13 +1019,13 @@ def set_pipette_offset_ot3(api: OT3API, mount: OT3Mount, offset: Point) -> None:
 
 def get_gripper_offset_ot3(api: OT3API) -> Point:
     """Get gripper offset OT3."""
-    assert api.has_gripper, "No gripper found"
+    assert api.has_gripper(), "No gripper found"
     return api._gripper_handler._gripper._calibration_offset.offset  # type: ignore[union-attr]
 
 
 def set_gripper_offset_ot3(api: OT3API, offset: Point) -> None:
     """Set gripper offset OT3."""
-    assert api.has_gripper, "No gripper found"
+    assert api.has_gripper(), "No gripper found"
     api._gripper_handler._gripper._calibration_offset.offset = offset  # type: ignore[union-attr]
 
 

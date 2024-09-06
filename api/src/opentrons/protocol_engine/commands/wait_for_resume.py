@@ -52,7 +52,7 @@ class WaitForResume(
 
     commandType: WaitForResumeCommandType = "waitForResume"
     params: WaitForResumeParams
-    result: Optional[WaitForResumeResult]
+    result: Optional[WaitForResumeResult] = None
 
     _ImplementationCls: Type[WaitForResumeImplementation] = WaitForResumeImplementation
 

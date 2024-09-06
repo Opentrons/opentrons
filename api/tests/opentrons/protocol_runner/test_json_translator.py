@@ -2,7 +2,7 @@
 import pytest
 from typing import Dict, List
 
-from opentrons_shared_data.labware.labware_definition import (
+from opentrons_shared_data.labware.models import (
     LabwareDefinition,
     Parameters,
     Metadata,
@@ -867,6 +867,6 @@ def test_load_liquid(
             id="liquid-id-555",
             displayName="water",
             description="water description",
-            displayColor=HexColor(__root__="#F00"),
+            displayColor=HexColor("#F00"),
         )
     ]

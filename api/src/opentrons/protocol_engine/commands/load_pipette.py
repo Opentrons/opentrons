@@ -138,7 +138,7 @@ class LoadPipette(BaseCommand[LoadPipetteParams, LoadPipetteResult, ErrorOccurre
 
     commandType: LoadPipetteCommandType = "loadPipette"
     params: LoadPipetteParams
-    result: Optional[LoadPipetteResult]
+    result: Optional[LoadPipetteResult] = None
 
     _ImplementationCls: Type[LoadPipetteImplementation] = LoadPipetteImplementation
 

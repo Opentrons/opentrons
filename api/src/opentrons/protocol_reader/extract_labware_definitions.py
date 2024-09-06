@@ -52,7 +52,7 @@ async def _extract_from_json_protocol_file(path: Path) -> List[LabwareDefinition
             # which require this labwareDefinitions key.
             unvalidated_definitions = json_contents["labwareDefinitions"].values()
             validated_definitions = [
-                LabwareDefinition.parse_obj(u) for u in unvalidated_definitions
+                LabwareDefinition.model_validate(u) for u in unvalidated_definitions
             ]
             return validated_definitions
 

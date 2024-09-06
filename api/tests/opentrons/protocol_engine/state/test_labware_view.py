@@ -8,7 +8,7 @@ from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.pipette.types import LabwareUri
 from opentrons_shared_data.labware import load_definition
-from opentrons_shared_data.labware.labware_definition import (
+from opentrons_shared_data.labware.models import (
     Parameters,
     LabwareRole,
     OverlapOffset as SharedDataOverlapOffset,
@@ -256,13 +256,13 @@ def test_find_custom_labware_params(
     namespace: Optional[str], version: Optional[int]
 ) -> None:
     """It should find the missing (if any) load labware parameters."""
-    labware_def = LabwareDefinition.construct(  # type: ignore[call-arg]
-        parameters=Parameters.construct(loadName="hello"),  # type: ignore[call-arg]
+    labware_def = LabwareDefinition.construct(
+        parameters=Parameters.construct(loadName="hello"),
         namespace="world",
         version=123,
     )
-    standard_def = LabwareDefinition.construct(  # type: ignore[call-arg]
-        parameters=Parameters.construct(loadName="goodbye"),  # type: ignore[call-arg]
+    standard_def = LabwareDefinition.construct(
+        parameters=Parameters.construct(loadName="goodbye"),
         namespace="opentrons",
         version=456,
     )
@@ -535,12 +535,12 @@ def test_validate_liquid_allowed_raises_incompatible_labware() -> None:
             ),
         },
         definitions_by_uri={
-            "some-tiprack-uri": LabwareDefinition.construct(  # type: ignore[call-arg]
-                parameters=Parameters.construct(isTiprack=True),  # type: ignore[call-arg]
+            "some-tiprack-uri": LabwareDefinition.construct(
+                parameters=Parameters.construct(isTiprack=True),
                 wells={},
             ),
-            "some-adapter-uri": LabwareDefinition.construct(  # type: ignore[call-arg]
-                parameters=Parameters.construct(isTiprack=False),  # type: ignore[call-arg]
+            "some-adapter-uri": LabwareDefinition.construct(
+                parameters=Parameters.construct(isTiprack=False),
                 allowedRoles=[LabwareRole.adapter],
                 wells={},
             ),
@@ -582,8 +582,8 @@ def test_get_tip_length_gets_length_from_definition(
 
 def test_get_tip_drop_z_offset() -> None:
     """It should get a tip drop z offset by scaling the tip length."""
-    tip_rack_def = LabwareDefinition.construct(  # type: ignore[call-arg]
-        parameters=Parameters.construct(  # type: ignore[call-arg]
+    tip_rack_def = LabwareDefinition.construct(
+        parameters=Parameters.construct(
             tipLength=100,
         )
     )
@@ -678,7 +678,7 @@ def test_get_labware_overlap_offsets() -> None:
     subject = get_labware_view(
         labware_by_id={"plate-id": plate},
         definitions_by_uri={
-            "some-plate-uri": LabwareDefinition.construct(  # type: ignore[call-arg]
+            "some-plate-uri": LabwareDefinition.construct(
                 stackingOffsetWithLabware={
                     "bottom-labware-name": SharedDataOverlapOffset(x=1, y=2, z=3)
                 }
@@ -768,7 +768,7 @@ def test_get_module_overlap_offsets(
         deck_definition=spec_deck_definition,
         labware_by_id={"plate-id": plate},
         definitions_by_uri={
-            "some-plate-uri": LabwareDefinition.construct(  # type: ignore[call-arg]
+            "some-plate-uri": LabwareDefinition.construct(
                 stackingOffsetWithModule=stacking_offset_with_module
             )
         },
@@ -1123,13 +1123,13 @@ def test_raise_if_labware_in_location(
 
 def test_get_by_slot() -> None:
     """It should get the labware in a given slot."""
-    labware_1 = LoadedLabware.construct(  # type: ignore[call-arg]
+    labware_1 = LoadedLabware.construct(
         id="1", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     )
-    labware_2 = LoadedLabware.construct(  # type: ignore[call-arg]
+    labware_2 = LoadedLabware.construct(
         id="2", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2)
     )
-    labware_3 = LoadedLabware.construct(  # type: ignore[call-arg]
+    labware_3 = LoadedLabware.construct(
         id="3", location=ModuleLocation(moduleId="cool-module")
     )
 
@@ -1175,7 +1175,7 @@ def test_get_edge_path_type(
         offsetId=None,
     )
 
-    labware_def = LabwareDefinition.construct(  # type: ignore[call-arg]
+    labware_def = LabwareDefinition.construct(
         ordering=[["abc", "def"], ["ghi", "jkl"], ["mno", "pqr"]]
     )
 
@@ -1299,10 +1299,8 @@ def test_raise_if_labware_cannot_be_stacked_is_adapter() -> None:
         errors.LabwareCannotBeStackedError, match="defined as an adapter"
     ):
         subject.raise_if_labware_cannot_be_stacked(
-            top_labware_definition=LabwareDefinition.construct(  # type: ignore[call-arg]
-                parameters=Parameters.construct(  # type: ignore[call-arg]
-                    loadName="name"
-                ),
+            top_labware_definition=LabwareDefinition.construct(
+                parameters=Parameters.construct(loadName="name"),
                 allowedRoles=[LabwareRole.adapter],
             ),
             bottom_labware_id="labware-id",
@@ -1326,10 +1324,8 @@ def test_raise_if_labware_cannot_be_stacked_not_validated() -> None:
         errors.LabwareCannotBeStackedError, match="loaded onto labware test"
     ):
         subject.raise_if_labware_cannot_be_stacked(
-            top_labware_definition=LabwareDefinition.construct(  # type: ignore[call-arg]
-                parameters=Parameters.construct(  # type: ignore[call-arg]
-                    loadName="name"
-                ),
+            top_labware_definition=LabwareDefinition.construct(
+                parameters=Parameters.construct(loadName="name"),
                 stackingOffsetWithLabware={},
             ),
             bottom_labware_id="labware-id",
@@ -1348,18 +1344,14 @@ def test_raise_if_labware_cannot_be_stacked_on_module_not_adapter() -> None:
             )
         },
         definitions_by_uri={
-            "def-uri": LabwareDefinition.construct(  # type: ignore[call-arg]
-                allowedRoles=[LabwareRole.labware]
-            )
+            "def-uri": LabwareDefinition.construct(allowedRoles=[LabwareRole.labware])
         },
     )
 
     with pytest.raises(errors.LabwareCannotBeStackedError, match="module"):
         subject.raise_if_labware_cannot_be_stacked(
-            top_labware_definition=LabwareDefinition.construct(  # type: ignore[call-arg]
-                parameters=Parameters.construct(  # type: ignore[call-arg]
-                    loadName="name"
-                ),
+            top_labware_definition=LabwareDefinition.construct(
+                parameters=Parameters.construct(loadName="name"),
                 stackingOffsetWithLabware={
                     "test": SharedDataOverlapOffset(x=0, y=0, z=0)
                 },
@@ -1386,18 +1378,14 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
             ),
         },
         definitions_by_uri={
-            "def-uri-2": LabwareDefinition.construct(  # type: ignore[call-arg]
-                allowedRoles=[LabwareRole.adapter]
-            )
+            "def-uri-2": LabwareDefinition.construct(allowedRoles=[LabwareRole.adapter])
         },
     )
 
     with pytest.raises(errors.LabwareCannotBeStackedError, match="on top of adapter"):
         subject.raise_if_labware_cannot_be_stacked(
-            top_labware_definition=LabwareDefinition.construct(  # type: ignore[call-arg]
-                parameters=Parameters.construct(  # type: ignore[call-arg]
-                    loadName="name"
-                ),
+            top_labware_definition=LabwareDefinition.construct(
+                parameters=Parameters.construct(loadName="name"),
                 stackingOffsetWithLabware={
                     "test": SharedDataOverlapOffset(x=0, y=0, z=0)
                 },
@@ -1458,7 +1446,7 @@ def test_get_labware_gripper_offsets_default_no_slots(
             )
         },
         definitions_by_uri={
-            "some-labware-uri": LabwareDefinition.construct(  # type: ignore[call-arg]
+            "some-labware-uri": LabwareDefinition.construct(
                 gripperOffsets={
                     "default": GripperOffsets(
                         pickUpOffset=OffsetVector(x=1, y=2, z=3),
@@ -1537,7 +1525,7 @@ def test_calculates_well_bounding_box(
     labware_to_check: str, well_bbox: Dimensions
 ) -> None:
     """It should be able to calculate well bounding boxes."""
-    definition = LabwareDefinition.parse_obj(load_definition(labware_to_check, 1))
+    definition = LabwareDefinition.model_validate(load_definition(labware_to_check, 1))
     labware = LoadedLabware(
         id="test-labware-id",
         loadName=labware_to_check,

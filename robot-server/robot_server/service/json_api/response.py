@@ -11,9 +11,8 @@ from typing import (
     ParamSpec,
     Callable,
 )
-from pydantic import Field, BaseModel
-from pydantic.generics import GenericModel
-from pydantic.typing import get_args
+from typing_extensions import get_args
+from pydantic import Field, BaseModel, RootModel, model_serializer
 from fastapi.responses import JSONResponse
 from fastapi.dependencies.utils import get_typed_return_annotation
 from .resource_links import ResourceLinks as DeprecatedResourceLinks
@@ -41,29 +40,24 @@ class BaseResponseBody(BaseModel):
     JSON responses adhere to the server's generated OpenAPI Spec.
     """
 
-    def dict(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
+    @model_serializer
+    def serializer(self) -> Dict[str, Any]:
         """Always exclude `None` when serializing to an object.
 
         The OpenAPI spec marks `Optional` BaseModel fields as omittable, but
         not nullable. This `dict` method override ensures that `null` is never
         returned in a response, which would violate the spec.
         """
-        kwargs["exclude_none"] = True
-        return super().dict(*args, **kwargs)
-
-    def json(self, *args: Any, **kwargs: Any) -> str:
-        """See notes in `.dict()`."""
-        kwargs["exclude_none"] = True
-        return super().json(*args, **kwargs)
+        return {k: v for k, v in self.__dict__.items() if v is not None}
 
 
-class SimpleBody(BaseResponseBody, GenericModel, Generic[ResponseDataT]):
+class SimpleBody(BaseResponseBody, BaseModel, Generic[ResponseDataT]):
     """A response that returns a single resource."""
 
     data: ResponseDataT = Field(..., description=DESCRIPTION_DATA)
 
 
-class Body(BaseResponseBody, GenericModel, Generic[ResponseDataT, ResponseLinksT]):
+class Body(BaseResponseBody, BaseModel, Generic[ResponseDataT, ResponseLinksT]):
     """A response that returns a single resource and stateful links."""
 
     data: ResponseDataT = Field(..., description=DESCRIPTION_DATA)
@@ -74,7 +68,7 @@ class SimpleEmptyBody(BaseResponseBody):
     """A response that returns no data and no links."""
 
 
-class EmptyBody(BaseResponseBody, GenericModel, Generic[ResponseLinksT]):
+class EmptyBody(BaseResponseBody, BaseModel, Generic[ResponseLinksT]):
     """A response that returns no data except stateful links."""
 
     links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)
@@ -94,7 +88,7 @@ class MultiBodyMeta(BaseModel):
     )
 
 
-class SimpleMultiBody(BaseResponseBody, GenericModel, Generic[ResponseDataT]):
+class SimpleMultiBody(BaseResponseBody, BaseModel, Generic[ResponseDataT]):
     """A response that returns multiple resources."""
 
     data: Sequence[ResponseDataT] = Field(..., description=DESCRIPTION_DATA)
@@ -116,7 +110,7 @@ class SimpleMultiBody(BaseResponseBody, GenericModel, Generic[ResponseDataT]):
 
 class MultiBody(
     BaseResponseBody,
-    GenericModel,
+    BaseModel,
     Generic[ResponseDataT, ResponseLinksT],
 ):
     """A response that returns multiple resources and stateful links."""
@@ -240,7 +234,7 @@ class DeprecatedResponseDataModel(BaseModel):
 
 
 # TODO(mc, 2021-12-09): remove this model
-class DeprecatedResponseModel(GenericModel, Generic[ResponseDataT]):
+class DeprecatedResponseModel(BaseModel, Generic[ResponseDataT]):
     """A response that returns a single resource and stateful links.
 
     This deprecated response model may serialize `Optional` fields to `null`,
@@ -259,7 +253,7 @@ class DeprecatedResponseModel(GenericModel, Generic[ResponseDataT]):
 
 # TODO(mc, 2021-12-09): remove this model
 class DeprecatedMultiResponseModel(
-    GenericModel,
+    BaseModel,
     Generic[ResponseDataT],
 ):
     """A response that returns multiple resources and stateful links.
@@ -278,10 +272,10 @@ class DeprecatedMultiResponseModel(
     )
 
 
-class ResponseList(BaseModel, Generic[ResponseDataT]):
+class ResponseList(RootModel[List[ResponseDataT]], Generic[ResponseDataT]):
     """A response that returns a list resource."""
 
-    __root__: List[ResponseDataT]
+    root: List[ResponseDataT]
 
 
 class NotifyRefetchBody(BaseResponseBody):

@@ -292,7 +292,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         # TODO(mc, 2021-06-22): mypy has trouble with this automatic
         # request > command mapping, figure out how to type precisely
         # (or wait for a future mypy version that can figure it out).
-        queued_command = action.request._CommandCls.construct(
+        queued_command = action.request._CommandCls.model_construct(  # type: ignore[call-arg]
             id=action.command_id,
             key=(
                 action.request.key
@@ -314,7 +314,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
     def _handle_run_command_action(self, action: RunCommandAction) -> None:
         prev_entry = self._state.command_history.get(action.command_id)
 
-        running_command = prev_entry.command.copy(
+        running_command = prev_entry.command.model_copy(
             update={
                 "status": CommandStatus.RUNNING,
                 "startedAt": action.started_at,
@@ -503,7 +503,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         notes: Optional[List[CommandNote]],
     ) -> None:
         prev_entry = self._state.command_history.get(command_id)
-        failed_command = prev_entry.command.copy(
+        failed_command = prev_entry.command.model_copy(
             update={
                 "completedAt": failed_at,
                 "status": CommandStatus.FAILED,
@@ -654,7 +654,7 @@ class CommandView(HasState[CommandState]):
         finish_error = self._state.finish_error
 
         if run_error and finish_error:
-            combined_error = ErrorOccurrence.construct(
+            combined_error = ErrorOccurrence(
                 id=finish_error.id,
                 createdAt=finish_error.createdAt,
                 errorType="RunAndFinishFailed",

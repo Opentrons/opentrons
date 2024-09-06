@@ -188,7 +188,7 @@ async def create_run(
 
     log.info(f'Created an empty run "{run_id}"".')
     return await PydanticResponse.create(
-        content=SimpleBody.construct(data=run_data),
+        content=SimpleBody.model_construct(data=run_data),
         status_code=status.HTTP_201_CREATED,
     )
 
@@ -221,11 +221,11 @@ async def get_current_run(
 
     data = run_data_manager.get(current_run_id)
     links = AllRunsLinks(
-        current=ResourceLink.construct(href=f"/maintenance_runs/{current_run_id}")
+        current=ResourceLink.model_construct(href=f"/maintenance_runs/{current_run_id}")
     )
 
     return await PydanticResponse.create(
-        content=Body.construct(data=data, links=links),
+        content=Body.model_construct(data=data, links=links),
         status_code=status.HTTP_200_OK,
     )
 
@@ -249,7 +249,7 @@ async def get_run(
         run_data: Data of the run specified in the runId url parameter.
     """
     return await PydanticResponse.create(
-        content=SimpleBody.construct(data=run_data),
+        content=SimpleBody.model_construct(data=run_data),
         status_code=status.HTTP_200_OK,
     )
 
@@ -285,6 +285,6 @@ async def remove_run(
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
     return await PydanticResponse.create(
-        content=SimpleEmptyBody.construct(),
+        content=SimpleEmptyBody.model_construct(),
         status_code=status.HTTP_200_OK,
     )

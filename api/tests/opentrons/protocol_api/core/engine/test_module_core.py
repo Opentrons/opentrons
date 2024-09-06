@@ -107,7 +107,7 @@ def test_get_display_name(
     decoy: Decoy, subject: ModuleCore, mock_engine_client: EngineClient
 ) -> None:
     """It should return the module display name."""
-    module_definition = ModuleDefinition.construct(  # type: ignore[call-arg]
+    module_definition = ModuleDefinition.construct(
         displayName="abra kadabra",
     )
     decoy.when(mock_engine_client.state.modules.get_definition("1234")).then_return(

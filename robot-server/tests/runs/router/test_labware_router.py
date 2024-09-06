@@ -19,7 +19,7 @@ from robot_server.runs.router.labware_router import (
     add_labware_definition,
     get_run_loaded_labware_definitions,
 )
-from opentrons_shared_data.labware.labware_definition import (
+from opentrons_shared_data.labware.models import (
     LabwareDefinition as SD_LabwareDefinition,
 )
 
@@ -47,7 +47,7 @@ def run() -> Run:
 @pytest.fixture()
 def labware_definition(minimal_labware_def: LabwareDefDict) -> LabwareDefinition:
     """Create a labware definition fixture."""
-    return LabwareDefinition.parse_obj(minimal_labware_def)
+    return LabwareDefinition.model_validate(minimal_labware_def)
 
 
 async def test_add_labware_offset(
@@ -160,8 +160,8 @@ async def test_get_run_labware_definition(
         mock_run_data_manager.get_run_loaded_labware_definitions(run_id="run-id")
     ).then_return(
         [
-            SD_LabwareDefinition.construct(namespace="test_1"),  # type: ignore[call-arg]
-            SD_LabwareDefinition.construct(namespace="test_2"),  # type: ignore[call-arg]
+            SD_LabwareDefinition.model_construct(namespace="test_1"),  # type: ignore[call-arg]
+            SD_LabwareDefinition.model_construct(namespace="test_2"),  # type: ignore[call-arg]
         ]
     )
 
@@ -169,8 +169,8 @@ async def test_get_run_labware_definition(
         runId="run-id", run_data_manager=mock_run_data_manager
     )
 
-    assert result.content.data.__root__ == [
-        SD_LabwareDefinition.construct(namespace="test_1"),  # type: ignore[call-arg]
-        SD_LabwareDefinition.construct(namespace="test_2"),  # type: ignore[call-arg]
+    assert result.content.data.root == [
+        SD_LabwareDefinition.model_construct(namespace="test_1"),  # type: ignore[call-arg]
+        SD_LabwareDefinition.model_construct(namespace="test_2"),  # type: ignore[call-arg]
     ]
     assert result.status_code == 200

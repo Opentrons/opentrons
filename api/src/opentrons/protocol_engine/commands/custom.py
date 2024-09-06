@@ -10,7 +10,7 @@ data still adheres to the shapes that ProtocolEngine expects.
 If you are implementing a custom command, you should probably
 put your own disambiguation identifier in the payload.
 """
-from pydantic import BaseModel, Extra
+from pydantic import ConfigDict, BaseModel, SerializeAsAny
 from typing import Optional, Type
 from typing_extensions import Literal
 
@@ -24,19 +24,13 @@ CustomCommandType = Literal["custom"]
 class CustomParams(BaseModel):
     """Payload used by a custom command."""
 
-    class Config:
-        """Allow arbitrary fields."""
-
-        extra = Extra.allow
+    model_config = ConfigDict(extra="allow")
 
 
 class CustomResult(BaseModel):
     """Result data from a custom command."""
 
-    class Config:
-        """Allow arbitrary fields."""
-
-        extra = Extra.allow
+    model_config = ConfigDict(extra="allow")
 
 
 class CustomImplementation(
@@ -49,15 +43,15 @@ class CustomImplementation(
     # for legacy RPC (pre-ProtocolEngine) payloads.
     async def execute(self, params: CustomParams) -> SuccessData[CustomResult, None]:
         """A custom command does nothing when executed directly."""
-        return SuccessData(public=CustomResult.construct(), private=None)
+        return SuccessData(public=CustomResult.model_construct(), private=None)
 
 
 class Custom(BaseCommand[CustomParams, CustomResult, ErrorOccurrence]):
     """Custom command model."""
 
     commandType: CustomCommandType = "custom"
-    params: CustomParams
-    result: Optional[CustomResult]
+    params: SerializeAsAny[CustomParams]
+    result: Optional[CustomResult] = None
 
     _ImplementationCls: Type[CustomImplementation] = CustomImplementation
 

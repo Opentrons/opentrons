@@ -2,7 +2,8 @@
 from dataclasses import dataclass
 from opentrons_shared_data.errors import ErrorCodes
 from pydantic import BaseModel, Field
-from typing import Literal, Optional, Tuple, TypedDict
+from typing import Literal, Optional, Tuple
+from typing_extensions import TypedDict
 
 from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
 

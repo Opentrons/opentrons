@@ -1016,10 +1016,10 @@ def test_get_errors_slice_empty() -> None:
 
 def test_get_errors_slice() -> None:
     """It should return a slice of all command errors."""
-    error_1 = ErrorOccurrence.construct(id="error-id-1")  # type: ignore[call-arg]
-    error_2 = ErrorOccurrence.construct(id="error-id-2")  # type: ignore[call-arg]
-    error_3 = ErrorOccurrence.construct(id="error-id-3")  # type: ignore[call-arg]
-    error_4 = ErrorOccurrence.construct(id="error-id-4")  # type: ignore[call-arg]
+    error_1 = ErrorOccurrence.model_construct(id="error-id-1")  # type: ignore[call-arg]
+    error_2 = ErrorOccurrence.model_construct(id="error-id-2")  # type: ignore[call-arg]
+    error_3 = ErrorOccurrence.model_construct(id="error-id-3")  # type: ignore[call-arg]
+    error_4 = ErrorOccurrence.model_construct(id="error-id-4")  # type: ignore[call-arg]
 
     subject = get_command_view(
         failed_command_errors=[error_1, error_2, error_3, error_4]
