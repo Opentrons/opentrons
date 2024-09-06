@@ -237,6 +237,7 @@ export function Delay(props: DelayProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              initialValue={String(delayDuration ?? '')}
               onChange={e => {
                 setDelayDuration(Number(e))
               }}
@@ -277,7 +278,7 @@ export function Delay(props: DelayProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={String(position)}
+              initialValue={String(position ?? '')}
               onChange={e => {
                 setPosition(Number(e))
               }}

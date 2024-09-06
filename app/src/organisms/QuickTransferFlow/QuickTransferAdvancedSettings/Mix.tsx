@@ -217,7 +217,7 @@ export function Mix(props: MixProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={String(mixVolume)}
+              initialValue={String(mixVolume ?? '')}
               onChange={e => {
                 setMixVolume(Number(e))
               }}

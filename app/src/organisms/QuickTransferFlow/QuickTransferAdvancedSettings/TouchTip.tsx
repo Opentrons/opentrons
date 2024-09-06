@@ -209,7 +209,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={String(position)}
+              initialValue={String(position ?? '')}
               onChange={e => {
                 setPosition(Number(e))
               }}
