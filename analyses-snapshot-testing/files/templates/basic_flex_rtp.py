@@ -1,10 +1,9 @@
 from dataclasses import dataclass
 from typing import Any, Optional, Union
-from opentrons.protocol_api import SINGLE, COLUMN, PARTIAL_COLUMN, ROW
+from opentrons.protocol_api import SINGLE, COLUMN, PARTIAL_COLUMN, ROW, ALL
 
 metadata = {
-    "protocolName": "RTP template for partial tip config",
-    "description": "These are all the viable partial tip configurations for the Flex 96 and 8 channel pipettes",
+    "protocolName": "Basic flex RTP template",
 }
 
 requirements = {
@@ -210,6 +209,16 @@ eight_partial_back_2_tips = PartialTipConfig(
     api_end="G1",
 )
 
+no_tip_config = PartialTipConfig(
+    key="no_tip_config",
+    description="Will discard and not set a partial tip config",
+    starting_tip="",
+    starting_nozzle="",
+    api_tip_config=ALL,
+    api_start="",
+    api_end="",
+)
+
 # make a list of all the partial tip configurations
 
 all_partial_configs = [
@@ -229,6 +238,7 @@ all_partial_configs = [
     eight_partial_back_5_tips,
     eight_partial_back_6_tips,
     eight_partial_back_7_tips,
+    no_tip_config,
 ]
 
 
@@ -240,11 +250,11 @@ def find_partial_tip_config(key: str) -> Optional[PartialTipConfig]:
     raise ValueError(f"Could not find partial tip config with key {key}")
 
 
-def add_parameters(p):
-    p.add_str(
+def add_parameters(parameters):
+    parameters.add_str(
         display_name="Partial Tip Configuration",
         variable_name="partial_tip_config_key",
-        default="eight_partial_back_5_tips",
+        default="no_tip_config",
         description="Partial tip configurations described relative to the tiprack.",
         choices=[  # value of each choice maps to the key of the partial tip config dataclass we defined
             {"display_name": "96 SINGLE back left", "value": "ninety_six_single_back_left"},
@@ -263,40 +273,142 @@ def add_parameters(p):
             {"display_name": "8 PARTIAL back left - 5 tips", "value": "eight_partial_back_5_tips"},
             {"display_name": "8 PARTIAL back left - 6 tips", "value": "eight_partial_back_6_tips"},
             {"display_name": "8 PARTIAL back left - 7 tips", "value": "eight_partial_back_7_tips"},
+            {"display_name": "No Partial tip config", "value": "no_tip_config"},
         ],
+    )
+
+    parameters.add_str(
+        display_name="Pipette",
+        variable_name="pipette_load_name",
+        choices=[
+            {
+                "display_name": "50µl single channel",
+                "value": "flex_1channel_50",
+            },
+            {
+                "display_name": "1000µl single channel",
+                "value": "flex_1channel_1000",
+            },
+            {
+                "display_name": "50µl 8 channel",
+                "value": "flex_8channel_50",
+            },
+            {
+                "display_name": "1000µl 8 channel",
+                "value": "flex_8channel_1000",
+            },
+            {
+                "display_name": "96-Channel Pipette",
+                "value": "flex_96channel_1000",
+            },
+        ],
+        default="flex_96channel_1000",
+        description="Select the pipette type",
+    )
+
+    parameters.add_str(
+        display_name="Tip Rack",
+        variable_name="tiprack_load_name",
+        choices=[
+            {
+                "display_name": "1000µl Filter Tip Rack",
+                "value": "opentrons_flex_96_filtertiprack_1000ul",
+            },
+            {
+                "display_name": "1000µl Standard Tip Rack",
+                "value": "opentrons_flex_96_tiprack_1000ul",
+            },
+            {
+                "display_name": "300µl Standard Tip Rack",
+                "value": "opentrons_flex_96_tiprack_300ul",
+            },
+            {
+                "display_name": "300µl Filter Tip Rack",
+                "value": "opentrons_flex_96_filtertiprack_300ul",
+            },
+            {
+                "display_name": "50µl Filter Tip Rack",
+                "value": "opentrons_flex_96_filtertiprack_50ul",
+            },
+            {
+                "display_name": "50µl Standard Tip Rack",
+                "value": "opentrons_flex_96_tiprack_50ul",
+            },
+        ],
+        default="opentrons_flex_96_tiprack_1000ul",
+        description="Select the tip rack type",
+    )
+
+    parameters.add_str(
+        display_name="Pipette Mount",
+        variable_name="pipette_mount",
+        choices=[
+            {"display_name": "left", "value": "left"},
+            {"display_name": "right", "value": "right"},
+        ],
+        default="left",
+        description="Select the pipette mount.",
     )
 
 
 ####### END RTP DEFINITIONS #######
 
 
-def set_configure_nozzle_layout(pipette, tipracks, tip_config):
+def set_configure_nozzle_layout(ctx, pipette, tipracks, tip_config):
     """Convenience function to set the nozzle layout of a pipette
     with the given tip config we have mapped to a RTP."""
-    pipette.configure_nozzle_layout(style=tip_config.api_tip_config, start=tip_config.api_start, end=tip_config.api_end, tip_racks=tipracks)
+    ctx.comment(f"Setting nozzle layout for {pipette}")
+    ctx.comment(f"Tip config: {tip_config}")
+    if tip_config.api_end:
+        pipette.configure_nozzle_layout(
+            style=tip_config.api_tip_config, start=tip_config.api_start, end=tip_config.api_end, tip_racks=tipracks
+        )
+    else:
+        pipette.configure_nozzle_layout(style=tip_config.api_tip_config, start=tip_config.api_start, tip_racks=tipracks)
 
 
-def comment_column_has_tip(ctx, tip_rack, column):
-    """Print out the tip status of a column in a tip rack."""
+def comment_tip_rack_status(ctx, tip_rack):
+    """
+    Print out the tip status for each row in a tip rack.
+    Each row (A-H) will print the well statuses for columns 1-12 in a single comment,
+    with a '🟢' for present tips and a '❌' for missing tips.
+    """
     range_A_to_H = [chr(i) for i in range(ord("A"), ord("H") + 1)]
-    wells = [f"{row}{column}" for row in range_A_to_H]
-    for well in wells:
-        ctx.comment(f"Tip rack in {tip_rack.parent}, well {well} has tip: {tip_rack.wells_by_name()[well].has_tip}")
+    range_1_to_12 = range(1, 13)
+
+    ctx.comment(f"Tip rack in {tip_rack.parent}")
+
+    for row in range_A_to_H:
+        status_line = f"{row}: "
+        for col in range_1_to_12:
+            well = f"{row}{col}"
+            has_tip = tip_rack.wells_by_name()[well].has_tip
+            status_emoji = "🟢" if has_tip else "❌"
+            status_line += f"{well} {status_emoji}  "
+
+        # Print the full status line for the row
+        ctx.comment(status_line)
 
 
 def run(ctx):
     # get the key from the parameters
     tip_config = find_partial_tip_config(ctx.params.partial_tip_config_key)
+    pipette_load_name = ctx.params.pipette_load_name
+    tiprack_load_name = ctx.params.tiprack_load_name
+    pipette_mount = ctx.params.pipette_mount
     # print out the tip config
     ctx.comment(f"Running with {tip_config}")
+    ctx.comment(f"Using pipette {pipette_load_name}")
+    ctx.comment(f"Using tip rack {tiprack_load_name}")
+    ctx.comment(f"Using pipette mount {pipette_mount}")
     # example code on Flex for a pipette
     # comment shows we picked up the tips we expected
-    tip_rack = ctx.load_labware("opentrons_flex_96_tiprack_1000ul", "B2")
-    pipette = ctx.load_instrument("flex_8channel_1000", "left")
+    if tip_config.key == "no_tip_config" and pipette_load_name == "flex_96channel_1000":
+        tip_rack = ctx.load_labware(tiprack_load_name, "B2", adapter="opentrons_flex_96_tiprack_adapter")
+    else:
+        tip_rack = ctx.load_labware(tiprack_load_name, "B2")
+    pipette = ctx.load_instrument(pipette_load_name, pipette_mount)
     # use this convenience function to set the nozzle layout
-    set_configure_nozzle_layout(pipette=pipette, tipracks=[tip_rack], tip_config=tip_config)
+    set_configure_nozzle_layout(ctx=ctx, pipette=pipette, tipracks=[tip_rack], tip_config=tip_config)
     pipette.pick_up_tip()
-    # our config picked up from column 1 of the tip rack
-    # print out the tip status of column 1 of the tip rack
-    # to confirm we picked up the tip(s) we expected
-    comment_column_has_tip(ctx, tip_rack, "1")
+    comment_tip_rack_status(ctx=ctx, tip_rack=tip_rack)
