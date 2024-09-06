@@ -37,7 +37,7 @@ const showGateModal =
 const routerBaseName =
   process.env.NODE_ENV === 'production'
     ? null
-    : window.location.pathname.split('/')[1]
+    : `/${window.location.pathname.split('/')[1]}`
 
 console.log({ routerBaseName })
 
