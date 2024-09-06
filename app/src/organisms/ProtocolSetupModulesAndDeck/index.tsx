@@ -9,6 +9,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -136,11 +137,13 @@ export function ProtocolSetupModulesAndDeck({
         marginBottom={SPACING.spacing80}
       >
         {showMapView ? (
-          <ModulesAndDeckMapView
-            attachedProtocolModuleMatches={attachedProtocolModuleMatches}
-            runId={runId}
-            protocolAnalysis={mostRecentAnalysis}
-          />
+          <Flex height="55vh" justifyContent={JUSTIFY_CENTER}>
+            <ModulesAndDeckMapView
+              attachedProtocolModuleMatches={attachedProtocolModuleMatches}
+              runId={runId}
+              protocolAnalysis={mostRecentAnalysis}
+            />
+          </Flex>
         ) : (
           <>
             {isModuleMismatch && !clearModuleMismatchBanner ? (
