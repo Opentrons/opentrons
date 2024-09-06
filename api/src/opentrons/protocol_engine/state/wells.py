@@ -10,7 +10,7 @@ from opentrons.protocol_engine.commands.liquid_probe import LiquidProbeResult
 from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
 from opentrons.protocol_engine.types import LiquidHeightInfo, LiquidHeightSummary
 
-from .abstract_store import HasState, HandlesActions
+from ._abstract_store import HasState, HandlesActions
 from ..actions import Action
 from ..commands import Command
 
