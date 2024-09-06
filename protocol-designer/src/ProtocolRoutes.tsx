@@ -54,7 +54,7 @@ export function ProtocolRoutes(): JSX.Element {
   const allRoutes: RouteProps[] = [...pdRoutes, landingPage]
   const { pathname } = useLocation()
   console.log({ pathname })
-  console.log({ rootPath: `/${location.pathname}/${LANDING_ROUTE}` })
+  console.log({ rootPath: location.pathname })
 
   return (
     <>
@@ -69,9 +69,7 @@ export function ProtocolRoutes(): JSX.Element {
             })}
             <Route
               path="*"
-              element={
-                <Navigate to={`/${location.pathname}/${LANDING_ROUTE}`} />
-              }
+              element={<Navigate to={`${location.pathname}`} />}
             />
           </Routes>
         </Box>
