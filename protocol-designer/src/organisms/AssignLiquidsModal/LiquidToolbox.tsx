@@ -201,7 +201,7 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
 
   const uniqueLiquids = Array.from(new Set(liquidsInLabware))
 
-  const liquidInfo = uniqueLiquids
+  const liquidInfo: LiquidInfo[] = uniqueLiquids
     .map(liquid => {
       const foundLiquid = Object.values(liquids).find(
         id => id.ingredientId === liquid
@@ -211,7 +211,7 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
         liquidIndex: liquid,
         name: foundLiquid?.name ?? '',
         color: foundLiquid?.displayColor ?? '',
-      } as LiquidInfo
+      }
     })
     .filter(Boolean)
   return (
