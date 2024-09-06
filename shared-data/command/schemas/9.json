@@ -39,7 +39,9 @@
         "style": {
           "const": "ALL",
           "default": "ALL",
-          "title": "Style"
+          "enum": ["ALL"],
+          "title": "Style",
+          "type": "string"
         }
       },
       "title": "AllNozzleLayoutConfiguration",
@@ -51,7 +53,9 @@
         "commandType": {
           "const": "aspirate",
           "default": "aspirate",
-          "title": "Commandtype"
+          "enum": ["aspirate"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/AspirateParams"
@@ -92,7 +96,9 @@
         "commandType": {
           "const": "aspirateInPlace",
           "default": "aspirateInPlace",
-          "title": "Commandtype"
+          "enum": ["aspirateInPlace"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/AspirateInPlaceParams"
@@ -166,11 +172,7 @@
           "type": "string"
         },
         "wellLocation": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/WellLocation"
-            }
-          ],
+          "$ref": "#/$defs/WellLocation",
           "description": "Relative well location at which to perform the operation"
         },
         "flowRate": {
@@ -201,7 +203,9 @@
         "commandType": {
           "const": "blowout",
           "default": "blowout",
-          "title": "Commandtype"
+          "enum": ["blowout"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/BlowOutParams"
@@ -242,7 +246,9 @@
         "commandType": {
           "const": "blowOutInPlace",
           "default": "blowOutInPlace",
-          "title": "Commandtype"
+          "enum": ["blowOutInPlace"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/BlowOutInPlaceParams"
@@ -310,11 +316,7 @@
           "type": "string"
         },
         "wellLocation": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/WellLocation"
-            }
-          ],
+          "$ref": "#/$defs/WellLocation",
           "description": "Relative well location at which to perform the operation"
         },
         "flowRate": {
@@ -339,7 +341,9 @@
         "commandType": {
           "const": "calibration/calibrateGripper",
           "default": "calibration/calibrateGripper",
-          "title": "Commandtype"
+          "enum": ["calibration/calibrateGripper"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/CalibrateGripperParams"
@@ -378,11 +382,7 @@
       "description": "Parameters for a `calibrateGripper` command.",
       "properties": {
         "jaw": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/CalibrateGripperParamsJaw"
-            }
-          ],
+          "$ref": "#/$defs/CalibrateGripperParamsJaw",
           "description": "Which of the gripper's jaws to use to measure its offset. The robot will assume that a human operator has already attached the capacitive probe to the jaw and none is attached to the other jaw."
         },
         "otherJawOffset": {
@@ -413,7 +413,9 @@
         "commandType": {
           "const": "calibration/calibrateModule",
           "default": "calibration/calibrateModule",
-          "title": "Commandtype"
+          "enum": ["calibration/calibrateModule"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/CalibrateModuleParams"
@@ -462,11 +464,7 @@
           "type": "string"
         },
         "mount": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/MountType"
-            }
-          ],
+          "$ref": "#/$defs/MountType",
           "description": "The instrument mount used to calibrate the module."
         }
       },
@@ -480,7 +478,9 @@
         "commandType": {
           "const": "calibration/calibratePipette",
           "default": "calibration/calibratePipette",
-          "title": "Commandtype"
+          "enum": ["calibration/calibratePipette"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/CalibratePipetteParams"
@@ -519,11 +519,7 @@
       "description": "Payload required to calibrate-pipette.",
       "properties": {
         "mount": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/MountType"
-            }
-          ],
+          "$ref": "#/$defs/MountType",
           "description": "Instrument mount to calibrate."
         }
       },
@@ -537,7 +533,9 @@
         "commandType": {
           "const": "heaterShaker/closeLabwareLatch",
           "default": "heaterShaker/closeLabwareLatch",
-          "title": "Commandtype"
+          "enum": ["heaterShaker/closeLabwareLatch"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/CloseLabwareLatchParams"
@@ -591,7 +589,9 @@
         "style": {
           "const": "COLUMN",
           "default": "COLUMN",
-          "title": "Style"
+          "enum": ["COLUMN"],
+          "title": "Style",
+          "type": "string"
         },
         "primaryNozzle": {
           "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
@@ -616,7 +616,9 @@
         "commandType": {
           "const": "comment",
           "default": "comment",
-          "title": "Commandtype"
+          "enum": ["comment"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/CommentParams"
@@ -670,7 +672,9 @@
         "commandType": {
           "const": "configureForVolume",
           "default": "configureForVolume",
-          "title": "Commandtype"
+          "enum": ["configureForVolume"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/ConfigureForVolumeParams"
@@ -743,7 +747,9 @@
         "commandType": {
           "const": "configureNozzleLayout",
           "default": "configureNozzleLayout",
-          "title": "Commandtype"
+          "enum": ["configureNozzleLayout"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/ConfigureNozzleLayoutParams"
@@ -817,7 +823,9 @@
         "commandType": {
           "const": "custom",
           "default": "custom",
-          "title": "Commandtype"
+          "enum": ["custom"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/CustomParams"
@@ -865,7 +873,9 @@
         "commandType": {
           "const": "thermocycler/deactivateBlock",
           "default": "thermocycler/deactivateBlock",
-          "title": "Commandtype"
+          "enum": ["thermocycler/deactivateBlock"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/DeactivateBlockParams"
@@ -919,7 +929,9 @@
         "commandType": {
           "const": "heaterShaker/deactivateHeater",
           "default": "heaterShaker/deactivateHeater",
-          "title": "Commandtype"
+          "enum": ["heaterShaker/deactivateHeater"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/DeactivateHeaterParams"
@@ -973,7 +985,9 @@
         "commandType": {
           "const": "thermocycler/deactivateLid",
           "default": "thermocycler/deactivateLid",
-          "title": "Commandtype"
+          "enum": ["thermocycler/deactivateLid"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/DeactivateLidParams"
@@ -1027,7 +1041,9 @@
         "commandType": {
           "const": "heaterShaker/deactivateShaker",
           "default": "heaterShaker/deactivateShaker",
-          "title": "Commandtype"
+          "enum": ["heaterShaker/deactivateShaker"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/DeactivateShakerParams"
@@ -1081,7 +1097,9 @@
         "commandType": {
           "const": "temperatureModule/deactivate",
           "default": "temperatureModule/deactivate",
-          "title": "Commandtype"
+          "enum": ["temperatureModule/deactivate"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/DeactivateTemperatureParams"
@@ -1153,11 +1171,7 @@
       "description": "The location of something placed in a single deck slot.",
       "properties": {
         "slotName": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/DeckSlotName"
-            }
-          ],
+          "$ref": "#/$defs/DeckSlotName",
           "description": "A slot on the robot's deck.\n\nThe plain numbers like `\"5\"` are for the OT-2, and the coordinates like `\"C2\"` are for the Flex.\n\nWhen you provide one of these values, you can use either style. It will automatically be converted to match the robot.\n\nWhen one of these values is returned, it will always match the robot."
         }
       },
@@ -1202,7 +1216,9 @@
         "commandType": {
           "const": "magneticModule/disengage",
           "default": "magneticModule/disengage",
-          "title": "Commandtype"
+          "enum": ["magneticModule/disengage"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/DisengageParams"
@@ -1256,7 +1272,9 @@
         "commandType": {
           "const": "dispense",
           "default": "dispense",
-          "title": "Commandtype"
+          "enum": ["dispense"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/DispenseParams"
@@ -1297,7 +1315,9 @@
         "commandType": {
           "const": "dispenseInPlace",
           "default": "dispenseInPlace",
-          "title": "Commandtype"
+          "enum": ["dispenseInPlace"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/DispenseInPlaceParams"
@@ -1384,11 +1404,7 @@
           "type": "string"
         },
         "wellLocation": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/WellLocation"
-            }
-          ],
+          "$ref": "#/$defs/WellLocation",
           "description": "Relative well location at which to perform the operation"
         },
         "flowRate": {
@@ -1432,7 +1448,9 @@
         "commandType": {
           "const": "dropTip",
           "default": "dropTip",
-          "title": "Commandtype"
+          "enum": ["dropTip"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/DropTipParams"
@@ -1473,7 +1491,9 @@
         "commandType": {
           "const": "dropTipInPlace",
           "default": "dropTipInPlace",
-          "title": "Commandtype"
+          "enum": ["dropTipInPlace"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/DropTipInPlaceParams"
@@ -1553,11 +1573,7 @@
           "type": "string"
         },
         "wellLocation": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/DropTipWellLocation"
-            }
-          ],
+          "$ref": "#/$defs/DropTipWellLocation",
           "description": "Relative well location at which to drop the tip."
         },
         "homeAfter": {
@@ -1595,11 +1611,7 @@
       "description": "Like WellLocation, but for dropping tips.\n\nUnlike a typical WellLocation, the location for a drop tip\ndefaults to location based on the tip length rather than the well's top.",
       "properties": {
         "origin": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/DropTipWellOrigin"
-            }
-          ],
+          "$ref": "#/$defs/DropTipWellOrigin",
           "default": "default"
         },
         "offset": {
@@ -1621,7 +1633,9 @@
         "commandType": {
           "const": "magneticModule/engage",
           "default": "magneticModule/engage",
-          "title": "Commandtype"
+          "enum": ["magneticModule/engage"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/EngageParams"
@@ -1680,7 +1694,9 @@
         "commandType": {
           "const": "getTipPresence",
           "default": "getTipPresence",
-          "title": "Commandtype"
+          "enum": ["getTipPresence"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/GetTipPresenceParams"
@@ -1734,7 +1750,9 @@
         "commandType": {
           "const": "home",
           "default": "home",
-          "title": "Commandtype"
+          "enum": ["home"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/HomeParams"
@@ -1810,7 +1828,9 @@
         "commandType": {
           "const": "absorbanceReader/initialize",
           "default": "absorbanceReader/initialize",
-          "title": "Commandtype"
+          "enum": ["absorbanceReader/initialize"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/InitializeParams"
@@ -1881,7 +1901,9 @@
         "commandType": {
           "const": "liquidProbe",
           "default": "liquidProbe",
-          "title": "Commandtype"
+          "enum": ["liquidProbe"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/LiquidProbeParams"
@@ -1930,11 +1952,7 @@
           "type": "string"
         },
         "wellLocation": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/WellLocation"
-            }
-          ],
+          "$ref": "#/$defs/WellLocation",
           "description": "Relative well location at which to perform the operation"
         },
         "pipetteId": {
@@ -1953,7 +1971,9 @@
         "commandType": {
           "const": "loadLabware",
           "default": "loadLabware",
-          "title": "Commandtype"
+          "enum": ["loadLabware"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/LoadLabwareParams"
@@ -2003,7 +2023,9 @@
               "$ref": "#/$defs/OnLabwareLocation"
             },
             {
-              "const": "offDeck"
+              "const": "offDeck",
+              "enum": ["offDeck"],
+              "type": "string"
             },
             {
               "$ref": "#/$defs/AddressableAreaLocation"
@@ -2064,7 +2086,9 @@
         "commandType": {
           "const": "loadLiquid",
           "default": "loadLiquid",
-          "title": "Commandtype"
+          "enum": ["loadLiquid"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/LoadLiquidParams"
@@ -2131,7 +2155,9 @@
         "commandType": {
           "const": "loadModule",
           "default": "loadModule",
-          "title": "Commandtype"
+          "enum": ["loadModule"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/LoadModuleParams"
@@ -2170,19 +2196,11 @@
       "description": "Payload required to load a module.",
       "properties": {
         "model": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/ModuleModel"
-            }
-          ],
+          "$ref": "#/$defs/ModuleModel",
           "description": "The model name of the module to load.\n\nProtocol Engine will look for a connected module that either exactly matches this one, or is compatible.\n\n For example, if you request a `temperatureModuleV1` here, Protocol Engine might load a `temperatureModuleV1` or a `temperatureModuleV2`.\n\n The model that it finds connected will be available through `result.model`."
         },
         "location": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/DeckSlotLocation"
-            }
-          ],
+          "$ref": "#/$defs/DeckSlotLocation",
           "description": "The location into which this module should be loaded.\n\nFor the Thermocycler Module, which occupies multiple deck slots, this should be the front-most occupied slot (normally slot 7)."
         },
         "moduleId": {
@@ -2209,7 +2227,9 @@
         "commandType": {
           "const": "loadPipette",
           "default": "loadPipette",
-          "title": "Commandtype"
+          "enum": ["loadPipette"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/LoadPipetteParams"
@@ -2248,19 +2268,11 @@
       "description": "Payload needed to load a pipette on to a mount.",
       "properties": {
         "pipetteName": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/PipetteNameType"
-            }
-          ],
+          "$ref": "#/$defs/PipetteNameType",
           "description": "The load name of the pipette to be required."
         },
         "mount": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/MountType"
-            }
-          ],
+          "$ref": "#/$defs/MountType",
           "description": "The mount the pipette should be present on."
         },
         "pipetteId": {
@@ -2368,7 +2380,9 @@
         "commandType": {
           "const": "moveLabware",
           "default": "moveLabware",
-          "title": "Commandtype"
+          "enum": ["moveLabware"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/MoveLabwareParams"
@@ -2423,7 +2437,9 @@
               "$ref": "#/$defs/OnLabwareLocation"
             },
             {
-              "const": "offDeck"
+              "const": "offDeck",
+              "enum": ["offDeck"],
+              "type": "string"
             },
             {
               "$ref": "#/$defs/AddressableAreaLocation"
@@ -2433,11 +2449,7 @@
           "title": "Newlocation"
         },
         "strategy": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/LabwareMovementStrategy"
-            }
-          ],
+          "$ref": "#/$defs/LabwareMovementStrategy",
           "description": "Whether to use the gripper to perform the labware movement or to perform a manual movement with an option to pause."
         },
         "pickUpOffset": {
@@ -2475,7 +2487,9 @@
         "commandType": {
           "const": "moveRelative",
           "default": "moveRelative",
-          "title": "Commandtype"
+          "enum": ["moveRelative"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/MoveRelativeParams"
@@ -2519,11 +2533,7 @@
           "type": "string"
         },
         "axis": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/MovementAxis"
-            }
-          ],
+          "$ref": "#/$defs/MovementAxis",
           "description": "Axis along which to move."
         },
         "distance": {
@@ -2542,7 +2552,9 @@
         "commandType": {
           "const": "moveToAddressableArea",
           "default": "moveToAddressableArea",
-          "title": "Commandtype"
+          "enum": ["moveToAddressableArea"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/MoveToAddressableAreaParams"
@@ -2583,7 +2595,9 @@
         "commandType": {
           "const": "moveToAddressableAreaForDropTip",
           "default": "moveToAddressableAreaForDropTip",
-          "title": "Commandtype"
+          "enum": ["moveToAddressableAreaForDropTip"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/MoveToAddressableAreaForDropTipParams"
@@ -2664,11 +2678,7 @@
           "type": "string"
         },
         "offset": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/AddressableOffsetVector"
-            }
-          ],
+          "$ref": "#/$defs/AddressableOffsetVector",
           "default": {
             "x": 0.0,
             "y": 0.0,
@@ -2753,11 +2763,7 @@
           "type": "string"
         },
         "offset": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/AddressableOffsetVector"
-            }
-          ],
+          "$ref": "#/$defs/AddressableOffsetVector",
           "default": {
             "x": 0.0,
             "y": 0.0,
@@ -2782,7 +2788,9 @@
         "commandType": {
           "const": "moveToCoordinates",
           "default": "moveToCoordinates",
-          "title": "Commandtype"
+          "enum": ["moveToCoordinates"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/MoveToCoordinatesParams"
@@ -2858,11 +2866,7 @@
           "type": "string"
         },
         "coordinates": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/DeckPoint"
-            }
-          ],
+          "$ref": "#/$defs/DeckPoint",
           "description": "X, Y and Z coordinates in mm from deck's origin location (left-front-bottom corner of work space)"
         }
       },
@@ -2876,7 +2880,9 @@
         "commandType": {
           "const": "calibration/moveToMaintenancePosition",
           "default": "calibration/moveToMaintenancePosition",
-          "title": "Commandtype"
+          "enum": ["calibration/moveToMaintenancePosition"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/MoveToMaintenancePositionParams"
@@ -2915,19 +2921,11 @@
       "description": "Calibration set up position command parameters.",
       "properties": {
         "mount": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/MountType"
-            }
-          ],
+          "$ref": "#/$defs/MountType",
           "description": "Gantry mount to move maintenance position."
         },
         "maintenancePosition": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/MaintenancePosition"
-            }
-          ],
+          "$ref": "#/$defs/MaintenancePosition",
           "default": "attachInstrument",
           "description": "The position the gantry mount needs to move to."
         }
@@ -2942,7 +2940,9 @@
         "commandType": {
           "const": "moveToWell",
           "default": "moveToWell",
-          "title": "Commandtype"
+          "enum": ["moveToWell"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/MoveToWellParams"
@@ -3023,11 +3023,7 @@
           "type": "string"
         },
         "wellLocation": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/WellLocation"
-            }
-          ],
+          "$ref": "#/$defs/WellLocation",
           "description": "Relative well location at which to perform the operation"
         },
         "pipetteId": {
@@ -3106,7 +3102,9 @@
         "commandType": {
           "const": "heaterShaker/openLabwareLatch",
           "default": "heaterShaker/openLabwareLatch",
-          "title": "Commandtype"
+          "enum": ["heaterShaker/openLabwareLatch"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/OpenLabwareLatchParams"
@@ -3160,7 +3158,9 @@
         "commandType": {
           "const": "pickUpTip",
           "default": "pickUpTip",
-          "title": "Commandtype"
+          "enum": ["pickUpTip"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/PickUpTipParams"
@@ -3209,11 +3209,7 @@
           "type": "string"
         },
         "wellLocation": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/WellLocation"
-            }
-          ],
+          "$ref": "#/$defs/WellLocation",
           "description": "Relative well location at which to perform the operation"
         },
         "pipetteId": {
@@ -3256,7 +3252,9 @@
         "commandType": {
           "const": "prepareToAspirate",
           "default": "prepareToAspirate",
-          "title": "Commandtype"
+          "enum": ["prepareToAspirate"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/PrepareToAspirateParams"
@@ -3310,7 +3308,9 @@
         "style": {
           "const": "QUADRANT",
           "default": "QUADRANT",
-          "title": "Style"
+          "enum": ["QUADRANT"],
+          "title": "Style",
+          "type": "string"
         },
         "primaryNozzle": {
           "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
@@ -3341,7 +3341,9 @@
         "commandType": {
           "const": "absorbanceReader/read",
           "default": "absorbanceReader/read",
-          "title": "Commandtype"
+          "enum": ["absorbanceReader/read"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/ReadAbsorbanceParams"
@@ -3400,7 +3402,9 @@
         "commandType": {
           "const": "reloadLabware",
           "default": "reloadLabware",
-          "title": "Commandtype"
+          "enum": ["reloadLabware"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/ReloadLabwareParams"
@@ -3454,7 +3458,9 @@
         "commandType": {
           "const": "retractAxis",
           "default": "retractAxis",
-          "title": "Commandtype"
+          "enum": ["retractAxis"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/RetractAxisParams"
@@ -3493,11 +3499,7 @@
       "description": "Payload required for a Retract Axis command.",
       "properties": {
         "axis": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/MotorAxis"
-            }
-          ],
+          "$ref": "#/$defs/MotorAxis",
           "description": "Axis to retract to its home position as quickly as safely possible. The difference between retracting an axis and homing an axis using the home command is that a home will always probe the limit switch and will work as the first motion command a robot will need to execute; On the other hand, retraction will rely on this previously determined  home position to move to it as fast as safely possible. So on the Flex, it will move (fast) the axis to the previously recorded home position and on the OT2, it will move (fast) the axis a safe distance from the previously recorded home position, and then slowly approach the limit switch."
         }
       },
@@ -3511,7 +3513,9 @@
         "style": {
           "const": "ROW",
           "default": "ROW",
-          "title": "Style"
+          "enum": ["ROW"],
+          "title": "Style",
+          "type": "string"
         },
         "primaryNozzle": {
           "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
@@ -3530,7 +3534,9 @@
         "commandType": {
           "const": "thermocycler/runProfile",
           "default": "thermocycler/runProfile",
-          "title": "Commandtype"
+          "enum": ["thermocycler/runProfile"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/RunProfileParams"
@@ -3623,7 +3629,9 @@
         "commandType": {
           "const": "savePosition",
           "default": "savePosition",
-          "title": "Commandtype"
+          "enum": ["savePosition"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/SavePositionParams"
@@ -3703,7 +3711,9 @@
         "commandType": {
           "const": "heaterShaker/setAndWaitForShakeSpeed",
           "default": "heaterShaker/setAndWaitForShakeSpeed",
-          "title": "Commandtype"
+          "enum": ["heaterShaker/setAndWaitForShakeSpeed"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/SetAndWaitForShakeSpeedParams"
@@ -3762,7 +3772,9 @@
         "commandType": {
           "const": "setRailLights",
           "default": "setRailLights",
-          "title": "Commandtype"
+          "enum": ["setRailLights"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/SetRailLightsParams"
@@ -3816,7 +3828,9 @@
         "commandType": {
           "const": "setStatusBar",
           "default": "setStatusBar",
-          "title": "Commandtype"
+          "enum": ["setStatusBar"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/SetStatusBarParams"
@@ -3855,11 +3869,7 @@
       "description": "Payload required to set the status bar to run an animation.",
       "properties": {
         "animation": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/StatusBarAnimation"
-            }
-          ],
+          "$ref": "#/$defs/StatusBarAnimation",
           "description": "The animation that should be executed on the status bar."
         }
       },
@@ -3873,7 +3883,9 @@
         "commandType": {
           "const": "thermocycler/setTargetBlockTemperature",
           "default": "thermocycler/setTargetBlockTemperature",
-          "title": "Commandtype"
+          "enum": ["thermocycler/setTargetBlockTemperature"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/SetTargetBlockTemperatureParams"
@@ -3958,7 +3970,9 @@
         "commandType": {
           "const": "thermocycler/setTargetLidTemperature",
           "default": "thermocycler/setTargetLidTemperature",
-          "title": "Commandtype"
+          "enum": ["thermocycler/setTargetLidTemperature"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/SetTargetLidTemperatureParams"
@@ -4017,7 +4031,9 @@
         "style": {
           "const": "SINGLE",
           "default": "SINGLE",
-          "title": "Style"
+          "enum": ["SINGLE"],
+          "title": "Style",
+          "type": "string"
         },
         "primaryNozzle": {
           "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
@@ -4048,7 +4064,9 @@
         "commandType": {
           "const": "touchTip",
           "default": "touchTip",
-          "title": "Commandtype"
+          "enum": ["touchTip"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/TouchTipParams"
@@ -4097,11 +4115,7 @@
           "type": "string"
         },
         "wellLocation": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/WellLocation"
-            }
-          ],
+          "$ref": "#/$defs/WellLocation",
           "description": "Relative well location at which to perform the operation"
         },
         "pipetteId": {
@@ -4139,7 +4153,9 @@
         "commandType": {
           "const": "tryLiquidProbe",
           "default": "tryLiquidProbe",
-          "title": "Commandtype"
+          "enum": ["tryLiquidProbe"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/TryLiquidProbeParams"
@@ -4188,11 +4204,7 @@
           "type": "string"
         },
         "wellLocation": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/WellLocation"
-            }
-          ],
+          "$ref": "#/$defs/WellLocation",
           "description": "Relative well location at which to perform the operation"
         },
         "pipetteId": {
@@ -4211,7 +4223,9 @@
         "commandType": {
           "const": "unsafe/blowOutInPlace",
           "default": "unsafe/blowOutInPlace",
-          "title": "Commandtype"
+          "enum": ["unsafe/blowOutInPlace"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/UnsafeBlowOutInPlaceParams"
@@ -4271,7 +4285,9 @@
         "commandType": {
           "const": "unsafe/dropTipInPlace",
           "default": "unsafe/dropTipInPlace",
-          "title": "Commandtype"
+          "enum": ["unsafe/dropTipInPlace"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/UnsafeDropTipInPlaceParams"
@@ -4338,7 +4354,9 @@
         "commandType": {
           "const": "unsafe/engageAxes",
           "default": "unsafe/engageAxes",
-          "title": "Commandtype"
+          "enum": ["unsafe/engageAxes"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/UnsafeEngageAxesParams"
@@ -4395,7 +4413,9 @@
         "commandType": {
           "const": "unsafe/updatePositionEstimators",
           "default": "unsafe/updatePositionEstimators",
-          "title": "Commandtype"
+          "enum": ["unsafe/updatePositionEstimators"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/UpdatePositionEstimatorsParams"
@@ -4471,7 +4491,9 @@
         "commandType": {
           "const": "verifyTipPresence",
           "default": "verifyTipPresence",
-          "title": "Commandtype"
+          "enum": ["verifyTipPresence"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/VerifyTipPresenceParams"
@@ -4515,11 +4537,7 @@
           "type": "string"
         },
         "expectedState": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/TipPresenceStatus"
-            }
-          ],
+          "$ref": "#/$defs/TipPresenceStatus",
           "description": "The expected tip presence status on the pipette."
         },
         "followSingularSensor": {
@@ -4545,7 +4563,9 @@
         "commandType": {
           "const": "thermocycler/waitForBlockTemperature",
           "default": "thermocycler/waitForBlockTemperature",
-          "title": "Commandtype"
+          "enum": ["thermocycler/waitForBlockTemperature"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/WaitForBlockTemperatureParams"
@@ -4599,7 +4619,9 @@
         "commandType": {
           "const": "waitForDuration",
           "default": "waitForDuration",
-          "title": "Commandtype"
+          "enum": ["waitForDuration"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/WaitForDurationParams"
@@ -4666,7 +4688,9 @@
         "commandType": {
           "const": "thermocycler/waitForLidTemperature",
           "default": "thermocycler/waitForLidTemperature",
-          "title": "Commandtype"
+          "enum": ["thermocycler/waitForLidTemperature"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/WaitForLidTemperatureParams"
@@ -4780,11 +4804,7 @@
       "description": "A relative location in reference to a well's location.",
       "properties": {
         "origin": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/WellOrigin"
-            }
-          ],
+          "$ref": "#/$defs/WellOrigin",
           "default": "top"
         },
         "offset": {
@@ -4828,7 +4848,9 @@
         "commandType": {
           "const": "absorbanceReader/closeLid",
           "default": "absorbanceReader/closeLid",
-          "title": "Commandtype"
+          "enum": ["absorbanceReader/closeLid"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/opentrons__protocol_engine__commands__absorbance_reader__close_lid__CloseLidParams"
@@ -4882,7 +4904,9 @@
         "commandType": {
           "const": "absorbanceReader/openLid",
           "default": "absorbanceReader/openLid",
-          "title": "Commandtype"
+          "enum": ["absorbanceReader/openLid"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/opentrons__protocol_engine__commands__absorbance_reader__open_lid__OpenLidParams"
@@ -4936,7 +4960,9 @@
         "commandType": {
           "const": "heaterShaker/setTargetTemperature",
           "default": "heaterShaker/setTargetTemperature",
-          "title": "Commandtype"
+          "enum": ["heaterShaker/setTargetTemperature"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__set_target_temperature__SetTargetTemperatureParams"
@@ -4995,7 +5021,9 @@
         "commandType": {
           "const": "heaterShaker/waitForTemperature",
           "default": "heaterShaker/waitForTemperature",
-          "title": "Commandtype"
+          "enum": ["heaterShaker/waitForTemperature"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureParams"
@@ -5062,7 +5090,9 @@
         "commandType": {
           "const": "temperatureModule/setTargetTemperature",
           "default": "temperatureModule/setTargetTemperature",
-          "title": "Commandtype"
+          "enum": ["temperatureModule/setTargetTemperature"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/opentrons__protocol_engine__commands__temperature_module__set_target_temperature__SetTargetTemperatureParams"
@@ -5121,7 +5151,9 @@
         "commandType": {
           "const": "temperatureModule/waitForTemperature",
           "default": "temperatureModule/waitForTemperature",
-          "title": "Commandtype"
+          "enum": ["temperatureModule/waitForTemperature"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/opentrons__protocol_engine__commands__temperature_module__wait_for_temperature__WaitForTemperatureParams"
@@ -5188,7 +5220,9 @@
         "commandType": {
           "const": "thermocycler/closeLid",
           "default": "thermocycler/closeLid",
-          "title": "Commandtype"
+          "enum": ["thermocycler/closeLid"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/opentrons__protocol_engine__commands__thermocycler__close_lid__CloseLidParams"
@@ -5242,7 +5276,9 @@
         "commandType": {
           "const": "thermocycler/openLid",
           "default": "thermocycler/openLid",
-          "title": "Commandtype"
+          "enum": ["thermocycler/openLid"],
+          "title": "Commandtype",
+          "type": "string"
         },
         "params": {
           "$ref": "#/$defs/opentrons__protocol_engine__commands__thermocycler__open_lid__OpenLidParams"
