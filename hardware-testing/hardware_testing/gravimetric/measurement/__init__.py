@@ -29,11 +29,11 @@ class SupportedLiquid(Enum):
         raise ValueError(f"no supported liquid matching {s}")
 
 
-RELATIVE_DENSITY: Dict[SupportedLiquid, float] = {
+RELATIVE_DENSITIES_WIKIPEDIA: Dict[SupportedLiquid, float] = {
     SupportedLiquid.WATER: 1.0,
-    SupportedLiquid.ETHANOL: 0.78905,  # wikipedia
-    SupportedLiquid.GLYCEROL: 1.261,  # wikipedia
-    SupportedLiquid.HEXANE: 0.6606,  # wikipedia
+    SupportedLiquid.ETHANOL: 0.78905,
+    SupportedLiquid.GLYCEROL: 1.261,
+    SupportedLiquid.HEXANE: 0.6606,
 }
 
 CONSTANT_SCALE_CALIBRATED_DENSITY_KG_M3: Final = 7950  # from certificate
@@ -187,9 +187,9 @@ def calculate_change_in_volume(
     before: MeasurementData,
     after: MeasurementData,
     liquid: SupportedLiquid = SupportedLiquid.WATER,
+    dilution: float = 1.0,
 ) -> float:
     """Calculate volume of water."""
-    # TODO: actually calculate volume
     avg_env = get_average_reading([before.environment, after.environment])
     water_density_at_this_temperature_kg_m3 = sum(
         [
@@ -200,9 +200,13 @@ def calculate_change_in_volume(
             CONSTANT_WATER_DENSITY["5"] * pow(10, -7) * pow(avg_env.celsius_liquid, 4),
         ]
     )
-    liquid_density_kg_m3 = (
-        RELATIVE_DENSITY[liquid] * water_density_at_this_temperature_kg_m3
+    # NOTE: dilution assumes we're diluting with deionized water
+    rel_density_liq = RELATIVE_DENSITIES_WIKIPEDIA[liquid]
+    rel_density_dih2o = RELATIVE_DENSITIES_WIKIPEDIA[SupportedLiquid.WATER]
+    rel_density_mix = (dilution * rel_density_liq) + (
+        (1.0 - dilution) * rel_density_dih2o
     )
+    liquid_density_kg_m3 = rel_density_mix * water_density_at_this_temperature_kg_m3
     # equations in ISO use hPa, so sticking with that
     air_pressure_hpa = avg_env.pascals_air / 100
     air_density_kg_m3 = (

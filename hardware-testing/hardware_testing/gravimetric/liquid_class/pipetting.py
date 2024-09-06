@@ -129,33 +129,33 @@ def _retract(
     channel_offset: Point,
     mm_above_well_bottom: float,
     speed: float,
-    z_discontinuity: float,
+    z_discontinuity: Optional[float] = None,
 ) -> None:
-    # change discontinuity per the liquid-class settings
     hw_api = ctx._core.get_hardware()
-    if pipette.channels == 96:
-        hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
-            OT3AxisKind.Z
-        ] = z_discontinuity
-    else:
-        hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
-            OT3AxisKind.Z
-        ] = z_discontinuity
-    # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
-    hw_api.set_gantry_load(hw_api.gantry_load)
+
+    def _set_z_disc(disc: float) -> None:
+        if pipette.channels == 96:
+            hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
+                OT3AxisKind.Z
+            ] = disc
+        else:
+            hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
+                OT3AxisKind.Z
+            ] = disc
+        # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
+        hw_api.set_gantry_load(hw_api.gantry_load)
+
+    if z_discontinuity:
+        # change discontinuity per the liquid-class settings
+        _set_z_disc(z_discontinuity)
     # retract out of the liquid (not out of the well)
     pipette.move_to(well.bottom(mm_above_well_bottom).move(channel_offset), speed=speed)
-    # reset discontinuity back to default
-    if pipette.channels == 96:
-        hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
-            OT3AxisKind.Z
-        ] = DEFAULT_MAX_SPEED_DISCONTINUITY.high_throughput[OT3AxisKind.Z]
-    else:
-        hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
-            OT3AxisKind.Z
-        ] = DEFAULT_MAX_SPEED_DISCONTINUITY.low_throughput[OT3AxisKind.Z]
-    # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
-    hw_api.set_gantry_load(hw_api.gantry_load)
+    if z_discontinuity:
+        # reset discontinuity back to default
+        if pipette.channels == 96:
+            _set_z_disc(DEFAULT_MAX_SPEED_DISCONTINUITY.high_throughput[OT3AxisKind.Z])
+        else:
+            _set_z_disc(DEFAULT_MAX_SPEED_DISCONTINUITY.low_throughput[OT3AxisKind.Z])
 
 
 def _pipette_with_liquid_settings(  # noqa: C901
@@ -239,32 +239,32 @@ def _pipette_with_liquid_settings(  # noqa: C901
             pipette.aspirate(liquid_class.aspirate.leading_air_gap)
 
     def _aspirate_on_mix() -> None:
-        callbacks.on_mixing()
-        _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
         _num_mixes = 5
         for i in range(_num_mixes):
             pipette.aspirate(mix)
             ctx.delay(liquid_class.aspirate.delay)
-            if i < _num_mixes - 1:
-                pipette.dispense(mix)
+            if added_blow_out and i == _num_mixes - 1:
+                # the LAST dispense pushes out air, to dispense all liquid from tip
+                push_out = min(
+                    liquid_class.dispense.blow_out_submerged, _get_max_blow_out_ul()
+                )
             else:
-                if added_blow_out:
-                    push_out = min(
-                        liquid_class.dispense.blow_out_submerged, _get_max_blow_out_ul()
-                    )
-                pipette.dispense(dispense, push_out=push_out)
+                push_out = 0
+            pipette.dispense(dispense, push_out=push_out)
             ctx.delay(liquid_class.dispense.delay)
-        # don't go all the way up to retract position, but instead just above liquid
-        _retract(
-            ctx, pipette, well, channel_offset, approach_mm, retract_speed, _z_disc
-        )
-        pipette.blow_out()
-        pipette.prepare_to_aspirate()
+        if added_blow_out:
+            # don't go all the way up to retract position, but instead just above liquid
+            _retract(
+                ctx, pipette, well, channel_offset, approach_mm, retract_speed, _z_disc
+            )
+            pipette.blow_out()
+            pipette.prepare_to_aspirate()
+            _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
         assert pipette.current_volume == 0
+        assert hw_pipette.ready_to_aspirate
 
     def _aspirate_on_submerge() -> None:
         # aspirate specified volume
-        callbacks.on_aspirating()
         pipette.aspirate(aspirate)
         # update liquid-height tracker
         liquid_tracker.update_affected_wells(
@@ -284,7 +284,6 @@ def _pipette_with_liquid_settings(  # noqa: C901
             pipette.dispense(liquid_class.aspirate.trailing_air_gap)
 
     def _dispense_on_submerge() -> None:
-        callbacks.on_dispensing()
         push_out = None
         if added_blow_out:
             push_out = min(
@@ -314,22 +313,28 @@ def _pipette_with_liquid_settings(  # noqa: C901
     pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
     pipette.flow_rate.dispense = liquid_class.dispense.plunger_flow_rate
     pipette.flow_rate.blow_out = liquid_class.dispense.plunger_flow_rate
+
+    # PHASE 1: APPROACH and SUBMERGE
     pipette.move_to(well.bottom(approach_mm).move(channel_offset))
     _aspirate_on_approach() if aspirate or mix else _dispense_on_approach()
+    callbacks.on_submerging()
+    _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
 
-    if mix:
-        # PHASE 2A: MIXING
-        _aspirate_on_mix()
+    # PHASE 2: MIX, ASPIRATE or DISPENSE
+    if aspirate:
+        if mix:
+            callbacks.on_mixing()
+            _aspirate_on_mix()
+        callbacks.on_aspirating()
+        _aspirate_on_submerge()
     else:
-        # PHASE 2B: ASPIRATE or DISPENSE
-        callbacks.on_submerging()
-        _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
-        _aspirate_on_submerge() if aspirate else _dispense_on_submerge()
+        callbacks.on_dispensing()
+        _dispense_on_submerge()
 
-        # PHASE 3: RETRACT
-        callbacks.on_retracting()
-        _retract(ctx, pipette, well, channel_offset, retract_mm, retract_speed, _z_disc)
-        _aspirate_on_retract() if aspirate else _dispense_on_retract()
+    # PHASE 3: RETRACT
+    callbacks.on_retracting()
+    _retract(ctx, pipette, well, channel_offset, retract_mm, retract_speed, _z_disc)
+    _aspirate_on_retract() if aspirate else _dispense_on_retract()
 
     # EXIT
     callbacks.on_exiting()
@@ -338,6 +343,8 @@ def _pipette_with_liquid_settings(  # noqa: C901
 
 def mix_with_liquid_class(
     ctx: ProtocolContext,
+    liquid: str,
+    dilution: float,
     pipette: InstrumentContext,
     tip_volume: int,
     mix_volume: float,
@@ -353,7 +360,12 @@ def mix_with_liquid_class(
 ) -> None:
     """Mix with liquid class."""
     liquid_class = get_liquid_class(
-        int(pipette.max_volume), pipette.channels, tip_volume, int(mix_volume)
+        liquid,
+        dilution,
+        int(pipette.max_volume),
+        pipette.channels,
+        tip_volume,
+        int(mix_volume),
     )
     _pipette_with_liquid_settings(
         ctx,
@@ -374,6 +386,8 @@ def mix_with_liquid_class(
 
 def aspirate_with_liquid_class(
     ctx: ProtocolContext,
+    liquid: str,
+    dilution: float,
     pipette: InstrumentContext,
     tip_volume: int,
     aspirate_volume: float,
@@ -390,7 +404,7 @@ def aspirate_with_liquid_class(
     """Aspirate with liquid class."""
     pip_size = 50 if "50" in pipette.name else 1000
     liquid_class = get_liquid_class(
-        pip_size, pipette.channels, tip_volume, int(aspirate_volume)
+        liquid, dilution, pip_size, pipette.channels, tip_volume, int(aspirate_volume)
     )
     _pipette_with_liquid_settings(
         ctx,
@@ -411,6 +425,8 @@ def aspirate_with_liquid_class(
 
 def dispense_with_liquid_class(
     ctx: ProtocolContext,
+    liquid: str,
+    dilution: float,
     pipette: InstrumentContext,
     tip_volume: int,
     dispense_volume: float,
@@ -428,7 +444,7 @@ def dispense_with_liquid_class(
     """Dispense with liquid class."""
     pip_size = 50 if "50" in pipette.name else 1000
     liquid_class = get_liquid_class(
-        pip_size, pipette.channels, tip_volume, int(dispense_volume)
+        liquid, dilution, pip_size, pipette.channels, tip_volume, int(dispense_volume)
     )
     _pipette_with_liquid_settings(
         ctx,

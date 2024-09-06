@@ -149,6 +149,7 @@ class RunArgs:
     protocol_cfg: Any
     test_report: report.CSVReport
     liquid: str
+    dilution: float
 
     @classmethod
     def _get_protocol_context(cls, args: argparse.Namespace) -> ProtocolContext:
@@ -329,7 +330,9 @@ class RunArgs:
             recorder = execute._load_scale(
                 name, scale, run_id, pipette_tag, start_time, _ctx.is_simulating()
             )
-
+            assert (
+                0.0 <= args.dilution <= 1.0
+            ), f"dilution must be between 0-1, not {args.dilution}"
             report = execute.build_gm_report(
                 test_volumes=volumes_list,
                 run_id=run_id,
@@ -368,6 +371,7 @@ class RunArgs:
             protocol_cfg=protocol_cfg,
             test_report=report,
             liquid=args.liquid,
+            dilution=args.dilution,
         )
 
 
@@ -417,6 +421,7 @@ def build_gravimetric_cfg(
         ignore_fail=ignore_fail,
         mode=mode,
         liquid=run_args.liquid,
+        dilution=run_args.dilution,
     )
 
 
@@ -585,6 +590,7 @@ if __name__ == "__main__":
         choices=[liq.value.lower() for liq in SupportedLiquid],
         default="water",
     )
+    parser.add_argument("--dilution", type=float, default=1.0)
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
     if not run_args.ctx.is_simulating():
