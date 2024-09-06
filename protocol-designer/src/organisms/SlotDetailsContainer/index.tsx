@@ -108,7 +108,7 @@ export function SlotDetailsContainer(
     <RobotCoordsForeignObject
       width="15.8125rem"
       height="26.75rem"
-      x={robotType === FLEX_ROBOT_TYPE ? '-400' : '-300'}
+      x="-400"
       y={getYPosition({ robotType, slot })}
     >
       <SlotInformation

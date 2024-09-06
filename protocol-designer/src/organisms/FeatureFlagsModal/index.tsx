@@ -19,10 +19,7 @@ import {
 } from '@opentrons/components'
 import { getFeatureFlagData } from '../../feature-flags/selectors'
 import { getTopPortalEl } from '../../components/portals/TopPortal'
-import {
-  userFacingFlags,
-  actions as featureFlagActions,
-} from '../../feature-flags'
+import { actions as featureFlagActions } from '../../feature-flags'
 
 import type { FlagTypes } from '../../feature-flags'
 
@@ -39,12 +36,10 @@ export function FeatureFlagsModal(props: FeatureFlagsModalProps): JSX.Element {
   const dispatch = useDispatch()
   const allFlags = Object.keys(flags) as FlagTypes[]
 
-  const prereleaseFlagNames = allFlags.filter(
-    flagName => !userFacingFlags.includes(flagName)
-  )
-
   const getDescription = (flag: FlagTypes): string => {
-    return t(`feature_flags:${flag}.description`)
+    return flag === 'OT_PD_DISABLE_MODULE_RESTRICTIONS'
+      ? t(`feature_flags:${flag}.description_1`)
+      : t(`feature_flags:${flag}.description`)
   }
 
   const setFeatureFlags = (
@@ -89,7 +84,7 @@ export function FeatureFlagsModal(props: FeatureFlagsModalProps): JSX.Element {
     )
   }
 
-  const prereleaseFlagRows = prereleaseFlagNames.map(toFlagRow)
+  const prereleaseFlagRows = allFlags.map(toFlagRow)
 
   return createPortal(
     <Modal

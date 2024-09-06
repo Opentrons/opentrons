@@ -1,5 +1,4 @@
 import * as React from 'react'
-import compact from 'lodash/compact'
 import values from 'lodash/values'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -7,13 +6,13 @@ import { Module } from '@opentrons/components'
 import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 import {
   getAddressableAreaFromSlotId,
+  getAreSlotsVerticallyAdjacent,
   getLabwareHasQuirk,
   getModuleDef2,
   getPositionFromSlotId,
   inferModuleOrientationFromSlot,
   inferModuleOrientationFromXCoordinate,
   isAddressableAreaStandardSlot,
-  SPAN7_8_10_11_SLOT,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getSlotIdsBlockedBySpanningForThermocycler } from '../../../step-forms'
@@ -31,6 +30,7 @@ import { SelectedHoveredItems } from './SelectedHoveredItems'
 
 import type { ModuleTemporalProperties } from '@opentrons/step-generation'
 import type {
+  AddressableArea,
   AddressableAreaName,
   CutoutId,
   DeckDefinition,
@@ -128,32 +128,33 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
   const allModules: ModuleOnDeck[] = values(activeDeckSetup.modules)
   const menuListSlotPosition = getPositionFromSlotId(menuListId ?? '', deckDef)
 
-  // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
   const multichannelWarningSlotIds: AddressableAreaName[] = showGen1MultichannelCollisionWarnings
-    ? compact([
-        allModules.some(
-          moduleOnDeck =>
-            moduleOnDeck.slot === '1' &&
-            MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
-        )
-          ? deckDef.locations.addressableAreas.find(s => s.id === '4')?.id
-          : null,
-        allModules.some(
-          moduleOnDeck =>
-            moduleOnDeck.slot === '3' &&
-            MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
-        )
-          ? deckDef.locations.addressableAreas.find(s => s.id === '6')?.id
-          : null,
-      ])
+    ? deckDef.locations.addressableAreas.reduce(
+        (acc: AddressableAreaName[], aa: AddressableArea) => {
+          const modulesWithCollisionsOnDeck = allModules.filter(module =>
+            MODULES_WITH_COLLISION_ISSUES.includes(module.model)
+          )
+          if (modulesWithCollisionsOnDeck.length === 0) {
+            return acc
+          }
+
+          const hasCollision = modulesWithCollisionsOnDeck.some(module =>
+            getAreSlotsVerticallyAdjacent(module.slot, aa.id)
+          )
+          if (hasCollision) {
+            acc.push(aa.id)
+          }
+          return acc
+        },
+        []
+      )
     : []
 
   return (
     <>
       {/* all modules */}
       {allModules.map(moduleOnDeck => {
-        const slotId =
-          moduleOnDeck.slot === SPAN7_8_10_11_SLOT ? '7' : moduleOnDeck.slot
+        const slotId = moduleOnDeck.slot
 
         const slotPosition = getPositionFromSlotId(slotId, deckDef)
         if (slotPosition == null) {
