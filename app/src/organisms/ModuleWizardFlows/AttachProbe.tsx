@@ -12,7 +12,7 @@ import { LEFT, WASTE_CHUTE_FIXTURES } from '@opentrons/shared-data'
 import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { SimpleWizardInProgressBody } from '../../molecules/SimpleWizardBody'
 
 import type {
   CreateCommand,
@@ -161,7 +161,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         // TODO ND: 9/6/23 use spinner until animations are made
         alternativeSpinner={null}
         description={t('stand_back')}

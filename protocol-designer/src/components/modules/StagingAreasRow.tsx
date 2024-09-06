@@ -13,7 +13,7 @@ import {
   DIRECTION_ROW,
 } from '@opentrons/components'
 import { getCutoutDisplayName } from '@opentrons/shared-data'
-import stagingAreaImage from '../../images/staging_area.png'
+import stagingAreaImage from '../../assets/images/staging_area.png'
 import { getStagingAreaSlots } from '../../utils'
 import { getTopPortalEl } from '../portals/TopPortal'
 import { StagingAreasModal } from './StagingAreasModal'

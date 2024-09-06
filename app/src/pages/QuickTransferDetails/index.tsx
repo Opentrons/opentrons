@@ -38,7 +38,7 @@ import {
   ProtocolDetailsSectionContentSkeleton,
 } from '../../organisms/OnDeviceDisplay/ProtocolDetails'
 import { useHardwareStatusText } from '../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
-import { SmallModalChildren } from '../../molecules/Modal'
+import { SmallModalChildren } from '../../molecules/OddModal'
 import { useToaster } from '../../organisms/ToasterOven'
 import {
   getApplyHistoricOffsets,
@@ -354,7 +354,7 @@ export function QuickTransferDetails(): JSX.Element | null {
       makeSnackbar(t('unpinned_transfer') as string)
     }
     dispatch(
-      updateConfigValue('protocols.pinnedTransferIds', pinnedTransferIds)
+      updateConfigValue('protocols.pinnedQuickTransferIds', pinnedTransferIds)
     )
   }
   const handleRunTransfer = (): void => {
@@ -403,7 +403,7 @@ export function QuickTransferDetails(): JSX.Element | null {
           isScrolled={isScrolled}
           isTransferFetching={isTransferFetching}
         />
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} paddingTop={SPACING.spacing6}>
           <TransferSectionTabs
             currentOption={currentOption}
             setCurrentOption={setCurrentOption}

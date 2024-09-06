@@ -17,6 +17,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  Modal,
 } from '@opentrons/components'
 import {
   getCutoutDisplayName,
@@ -26,11 +27,13 @@ import {
   THERMOCYCLER_MODULE_V2,
   getCutoutFixturesForModuleModel,
   getFixtureIdByCutoutIdFromModuleSlotName,
+  SINGLE_LEFT_SLOT_FIXTURE,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
+  THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../../../App/portal'
-import { LegacyModal } from '../../../../molecules/LegacyModal'
-import { Modal } from '../../../../molecules/Modal'
+import { OddModal } from '../../../../molecules/OddModal'
 import { SmallButton } from '../../../../atoms/buttons/SmallButton'
 import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
 
@@ -76,24 +79,19 @@ export const LocationConflictModal = (
     (deckFixture: CutoutConfig) => deckFixture.cutoutId === cutoutId
   )?.cutoutFixtureId
 
-  const isThermocycler =
+  const isThermocyclerRequired =
     requiredModule === THERMOCYCLER_MODULE_V1 ||
     requiredModule === THERMOCYCLER_MODULE_V2
+
+  // check if current fixture in cutoutId is thermocycler
+  const isThermocyclerCurrentFixture =
+    deckConfigurationAtLocationFixtureId === THERMOCYCLER_V2_REAR_FIXTURE ||
+    deckConfigurationAtLocationFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE
 
   const currentFixtureDisplayName =
     deckConfigurationAtLocationFixtureId != null
       ? getFixtureDisplayName(deckConfigurationAtLocationFixtureId)
       : ''
-
-  // get fixture display name at A1 for themocycler if B1 is slot
-  const deckConfigurationAtA1 = deckConfig.find(
-    (deckFixture: CutoutConfig) => deckFixture.cutoutId === 'cutoutA1'
-  )?.cutoutFixtureId
-
-  const currentThermocyclerFixtureDisplayName =
-    currentFixtureDisplayName === 'Slot' && deckConfigurationAtA1 != null
-      ? getFixtureDisplayName(deckConfigurationAtA1)
-      : currentFixtureDisplayName
 
   const handleConfigureModule = (moduleSerialNumber?: string): void => {
     if (requiredModule != null) {
@@ -111,14 +109,35 @@ export const LocationConflictModal = (
       const newDeckConfig = deckConfig.map(existingCutoutConfig => {
         const replacementCutoutFixtureId =
           moduleFixtureIdByCutoutId[existingCutoutConfig.cutoutId]
-        return existingCutoutConfig.cutoutId in moduleFixtureIdByCutoutId &&
+        if (
+          existingCutoutConfig.cutoutId in moduleFixtureIdByCutoutId &&
           replacementCutoutFixtureId != null
-          ? {
-              ...existingCutoutConfig,
-              cutoutFixtureId: replacementCutoutFixtureId,
-              opentronsModuleSerialNumber: moduleSerialNumber,
-            }
-          : existingCutoutConfig
+        ) {
+          return {
+            ...existingCutoutConfig,
+            cutoutFixtureId: replacementCutoutFixtureId,
+            opentronsModuleSerialNumber: moduleSerialNumber,
+          }
+        } else if (
+          isThermocyclerCurrentFixture &&
+          ((cutoutId === 'cutoutA1' &&
+            existingCutoutConfig.cutoutId === 'cutoutB1') ||
+            (cutoutId === 'cutoutB1' &&
+              existingCutoutConfig.cutoutId === 'cutoutA1'))
+        ) {
+          /**
+           * special-case for removing current thermocycler:
+           * set paired cutout (B1 for A1, A1 for B1) to single slot left fixture
+           * TODO(bh, 2024-08-29): generalize to remove all entities from FixtureGroup
+           */
+          return {
+            ...existingCutoutConfig,
+            cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
+            opentronsModuleSerialNumber: undefined,
+          }
+        } else {
+          return existingCutoutConfig
+        }
       })
       updateDeckConfiguration(newDeckConfig)
     }
@@ -129,15 +148,33 @@ export const LocationConflictModal = (
     if (requiredModule != null) {
       setShowModuleSelect(true)
     } else if (requiredFixtureId != null) {
-      const newRequiredFixtureDeckConfig = deckConfig.map(fixture =>
-        fixture.cutoutId === cutoutId
-          ? {
-              ...fixture,
-              cutoutFixtureId: requiredFixtureId,
-              opentronsModuleSerialNumber: undefined,
-            }
-          : fixture
-      )
+      const newRequiredFixtureDeckConfig = deckConfig.map(fixture => {
+        if (fixture.cutoutId === cutoutId) {
+          return {
+            ...fixture,
+            cutoutFixtureId: requiredFixtureId,
+            opentronsModuleSerialNumber: undefined,
+          }
+        } else if (
+          isThermocyclerCurrentFixture &&
+          ((cutoutId === 'cutoutA1' && fixture.cutoutId === 'cutoutB1') ||
+            (cutoutId === 'cutoutB1' && fixture.cutoutId === 'cutoutA1'))
+        ) {
+          /**
+           * special-case for removing current thermocycler:
+           * set paired cutout (B1 for A1, A1 for B1) to single slot left fixture
+           * TODO(bh, 2024-08-29): generalize to remove all entities from FixtureGroup
+           */
+          return {
+            ...fixture,
+            cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
+            opentronsModuleSerialNumber: undefined,
+          }
+        } else {
+          return fixture
+        }
+      })
+
       updateDeckConfiguration(newRequiredFixtureDeckConfig)
       onCloseClick()
     } else {
@@ -154,7 +191,7 @@ export const LocationConflictModal = (
     protocolSpecifiesDisplayName = getModuleDisplayName(requiredModule)
   }
 
-  const displaySlotName = isThermocycler
+  const displaySlotName = isThermocyclerRequired
     ? 'A1 + B1'
     : getCutoutDisplayName(cutoutId)
 
@@ -175,7 +212,7 @@ export const LocationConflictModal = (
 
   return createPortal(
     isOnDevice ? (
-      <Modal
+      <OddModal
         onOutsideClick={onCloseClick}
         header={{
           title: t('deck_conflict'),
@@ -189,7 +226,7 @@ export const LocationConflictModal = (
           <Trans
             t={t}
             i18nKey={
-              isThermocycler
+              isThermocyclerRequired
                 ? 'deck_conflict_info_thermocycler'
                 : 'deck_conflict_info'
             }
@@ -273,9 +310,9 @@ export const LocationConflictModal = (
             />
           </Flex>
         </Flex>
-      </Modal>
+      </OddModal>
     ) : (
-      <LegacyModal
+      <Modal
         title={
           <Flex
             flexDirection={DIRECTION_ROW}
@@ -298,7 +335,7 @@ export const LocationConflictModal = (
           <Trans
             t={t}
             i18nKey={
-              isThermocycler
+              isThermocyclerRequired
                 ? 'deck_conflict_info_thermocycler'
                 : 'deck_conflict_info'
             }
@@ -350,9 +387,7 @@ export const LocationConflictModal = (
                   {t('currently_configured')}
                 </LegacyStyledText>
                 <LegacyStyledText as="label" flex="1">
-                  {isThermocycler
-                    ? currentThermocyclerFixtureDisplayName
-                    : currentFixtureDisplayName}
+                  {currentFixtureDisplayName}
                 </LegacyStyledText>
               </Flex>
             </Flex>
@@ -371,7 +406,7 @@ export const LocationConflictModal = (
             </PrimaryButton>
           </Flex>
         </Flex>
-      </LegacyModal>
+      </Modal>
     ),
     getTopPortalEl()
   )

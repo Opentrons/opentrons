@@ -15,12 +15,9 @@ stages:
       save:
         json:
           csv_file_id: data.id
+          csv_file_name: data.name
+          file_created_at: data.createdAt
       status_code:
-      # If the file exists on the test server then accept 200 else 201.
-      # We have to do this because the persistent storage is scoped to a test session and
-      # there are tests elsewhere in the suite that upload the same file.
-      # We currently do not allow deleting data files over http, so this situation is not easy to change.
-      - 200
       - 201
       json:
         data:
@@ -94,6 +91,42 @@ stages:
                 - displayName: Liquid handling CSV file
                   variableName: liq_handling_csv_file
                   description: A CSV file that contains wells to use for pipetting
+                  type: csv_file
                   file:
                     id: '{csv_file_id}'
-                    name: ''
+                    name: 'sample_record.csv'
+
+  - name: Wait until analysis is completed
+    max_retries: 5
+    delay_after: 1
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}'
+    response:
+      status_code: 200
+      json:
+        data:
+          analyses: []
+          analysisSummaries:
+            - id: '{analysis_id}'
+              status: completed
+          id: !anything
+          protocolType: !anything
+          files: !anything
+          createdAt: !anything
+          robotType: !anything
+          protocolKind: !anything
+          metadata: !anything
+        links: !anything
+
+  - name: Get the data file used by protocol ID
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/dataFiles'
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          - id: '{csv_file_id}'
+            name: '{csv_file_name}'
+            createdAt: '{file_created_at}'

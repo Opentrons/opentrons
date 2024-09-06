@@ -18,14 +18,14 @@ import {
   ABSORBANCE_READER_V1,
 } from '@opentrons/shared-data'
 
-import magdeck_gen1 from '../../images/modules/magdeck_gen1.png'
-import magdeck_gen2 from '../../images/modules/magdeck_gen2.png'
-import tempdeck_gen1 from '../../images/modules/tempdeck_gen1.png'
-import temp_deck_gen_2_transparent from '../../images/modules/temp_deck_gen_2_transparent.png'
-import thermocycler from '../../images/modules/thermocycler.png'
-import thermocycler_gen2 from '../../images/modules/thermocycler_gen2.png'
-import heater_shaker_module_transparent from '../../images/modules/heater_shaker_module_transparent.png'
-import mag_block from '../../images/modules/mag_block.png'
+import magdeck_gen1 from '../../assets/images/modules/magdeck_gen1.png'
+import magdeck_gen2 from '../../assets/images/modules/magdeck_gen2.png'
+import tempdeck_gen1 from '../../assets/images/modules/tempdeck_gen1.png'
+import temp_deck_gen_2_transparent from '../../assets/images/modules/temp_deck_gen_2_transparent.png'
+import thermocycler from '../../assets/images/modules/thermocycler.png'
+import thermocycler_gen2 from '../../assets/images/modules/thermocycler_gen2.png'
+import heater_shaker_module_transparent from '../../assets/images/modules/heater_shaker_module_transparent.png'
+import mag_block from '../../assets/images/modules/mag_block.png'
 import type { ModuleType, ModuleModel } from '@opentrons/shared-data'
 
 interface Props {

@@ -9,38 +9,48 @@ import {
   SPACING,
   LegacyStyledText,
 } from '@opentrons/components'
+import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface AnalysisFailedModalProps {
   errors: string[]
   protocolId: string | null
+  runId: string
   setShowAnalysisFailedModal: (showAnalysisFailedModal: boolean) => void
 }
 
 export function AnalysisFailedModal({
   errors,
   protocolId,
+  runId,
   setShowAnalysisFailedModal,
 }: AnalysisFailedModalProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const navigate = useNavigate()
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('protocol_analysis_failed'),
     iconName: 'information',
     iconColor: COLORS.black90,
     hasExitIcon: true,
   }
 
+  const {
+    isLoading: isDismissing,
+    mutateAsync: dismissCurrentRunAsync,
+  } = useDismissCurrentRunMutation()
+
   const handleRestartSetup = (): void => {
-    navigate(protocolId != null ? `/protocols/${protocolId}` : '/protocols')
+    dismissCurrentRunAsync(runId).then(() => {
+      navigate(protocolId != null ? `/protocols/${protocolId}` : '/protocols')
+    })
   }
 
   return (
-    <Modal
+    <OddModal
       header={modalHeader}
       onOutsideClick={() => {
         setShowAnalysisFailedModal(false)
@@ -76,8 +86,11 @@ export function AnalysisFailedModal({
           onClick={handleRestartSetup}
           buttonText={t('restart_setup')}
           buttonType="alert"
+          iconName={isDismissing ? 'ot-spinner' : null}
+          iconPlacement="startIcon"
+          disabled={isDismissing}
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

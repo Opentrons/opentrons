@@ -14,8 +14,10 @@ import {
 } from '@opentrons/components'
 import { LEFT, RIGHT, NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 import { SmallButton } from '../../atoms/buttons'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '../../molecules/SimpleWizardBody'
 import { usePipetteNameSpecs } from '../../resources/instruments/hooks'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
@@ -304,7 +306,8 @@ export const Results = (props: ResultsProps): JSX.Element => {
       </>
     )
   }
-  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
+  if (isRobotMoving)
+    return <SimpleWizardInProgressBody description={t('stand_back')} />
   if (errorMessage != null) {
     return (
       <SimpleWizardBody

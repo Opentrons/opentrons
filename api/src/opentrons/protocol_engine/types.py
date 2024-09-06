@@ -4,6 +4,7 @@ import re
 from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
+from pathlib import Path
 from pydantic import (
     BaseModel,
     Field,
@@ -812,6 +813,7 @@ class AreaType(Enum):
     TEMPERATURE = "temperatureModule"
     MAGNETICBLOCK = "magneticBlock"
     ABSORBANCE_READER = "absorbanceReader"
+    LID_DOCK = "lidDock"
 
 
 @dataclass(frozen=True)
@@ -902,12 +904,12 @@ class QuadrantNozzleLayoutConfiguration(BaseModel):
         ...,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
-    frontRightNozzle: Optional[str] = Field(
+    frontRightNozzle: str = Field(
         ...,
         regex=NOZZLE_NAME_REGEX,
         description="The front right nozzle in your configuration.",
     )
-    backLeftNozzle: Optional[str] = Field(
+    backLeftNozzle: str = Field(
         ...,
         regex=NOZZLE_NAME_REGEX,
         description="The back left nozzle in your configuration.",
@@ -1085,3 +1087,4 @@ PrimitiveRunTimeParamValuesType = Mapping[
 ]  # update value types as more RTP types are added
 
 CSVRunTimeParamFilesType = Mapping[StrictStr, StrictStr]
+CSVRuntimeParamPaths = Dict[str, Path]

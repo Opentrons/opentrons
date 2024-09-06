@@ -251,16 +251,12 @@ export const wellRatioMoveLiquid = (
     ? null
     : wellRatioFormError
 }
-export const volumeTooHigh = (
-  fields: HydratedFormData,
-  labwareEntities?: LabwareEntities
-): FormError | null => {
+export const volumeTooHigh = (fields: HydratedFormData): FormError | null => {
   const { pipette, tipRack } = fields
   const volume = Number(fields.volume)
 
   const pipetteCapacity = getPipetteCapacity(
     pipette as PipetteEntity,
-    labwareEntities ?? {},
     tipRack as string
   )
   if (

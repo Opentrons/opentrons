@@ -10,7 +10,7 @@ from typing import Union, Generator
 
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.protocol_engine.errors import RunStoppedError
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_engine.types import PostRunHardwareState
@@ -337,7 +337,7 @@ async def test_load_json(
     await json_protocol_subject.load(
         protocol_source=protocol_source,
         run_time_param_values=None,
-        run_time_param_files=None,
+        run_time_param_paths=None,
         parse_mode=ParseMode.NORMAL,
     )
 
@@ -364,7 +364,7 @@ async def test_load_python(
         protocol_source=protocol_source,
         parse_mode=ParseMode.NORMAL,
         run_time_param_values=None,
-        run_time_param_files=None,
+        run_time_param_paths=None,
     )
 
     decoy.verify(
@@ -372,7 +372,7 @@ async def test_load_python(
             protocol_source=protocol_source,
             python_parse_mode=PythonParseMode.NORMAL,
             run_time_param_values=None,
-            run_time_param_files=None,
+            run_time_param_paths=None,
         )
     )
 
@@ -396,7 +396,7 @@ async def test_load_json_raises_no_protocol(
         await live_protocol_subject.load(
             protocol_source=protocol_source,
             run_time_param_values=None,
-            run_time_param_files=None,
+            run_time_param_paths=None,
             parse_mode=ParseMode.NORMAL,
         )
 

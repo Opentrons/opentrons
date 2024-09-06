@@ -1,18 +1,20 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+
 import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
-  POSITION_FIXED,
-  COLORS,
   ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  InputField,
+  RadioButton,
+  POSITION_FIXED,
+  SPACING,
 } from '@opentrons/components'
+
 import { getTopPortalEl } from '../../../App/portal'
-import { LargeButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
-import { InputField } from '../../../atoms/InputField'
 import { ACTIONS } from '../constants'
 
 import type {
@@ -138,9 +140,19 @@ export function Delay(props: DelayProps): JSX.Element {
         })
       : null
 
+  // allow a maximum of 10 digits for delay duration
+  const durationRange = { min: 1, max: 9999999999 }
+  const durationError =
+    delayDuration != null &&
+    (delayDuration < durationRange.min || delayDuration > durationRange.max)
+      ? t(`value_out_of_range`, {
+          min: durationRange.min,
+          max: durationRange.max,
+        })
+      : null
   let buttonIsDisabled = false
   if (currentStep === 2) {
-    buttonIsDisabled = delayDuration == null
+    buttonIsDisabled = delayDuration == null || durationError != null
   } else if (currentStep === 3) {
     buttonIsDisabled = positionError != null || position == null
   }
@@ -168,13 +180,13 @@ export function Delay(props: DelayProps): JSX.Element {
           width="100%"
         >
           {delayEnabledDisplayItems.map(displayItem => (
-            <LargeButton
+            <RadioButton
               key={displayItem.description}
-              buttonType={
-                delayIsEnabled === displayItem.option ? 'primary' : 'secondary'
-              }
-              onClick={displayItem.onClick}
-              buttonText={displayItem.description}
+              isSelected={delayIsEnabled === displayItem.option}
+              onChange={displayItem.onClick}
+              buttonValue={displayItem.description}
+              buttonLabel={displayItem.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>
@@ -199,6 +211,7 @@ export function Delay(props: DelayProps): JSX.Element {
             <InputField
               type="number"
               value={delayDuration}
+              error={durationError}
               title={t('delay_duration_s')}
               readOnly
             />
@@ -251,6 +264,7 @@ export function Delay(props: DelayProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              initialValue={String(position)}
               onChange={e => {
                 setPosition(Number(e))
               }}

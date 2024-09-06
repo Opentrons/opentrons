@@ -44,28 +44,48 @@ vi.mock('../shared', async importOriginal => {
   }
 })
 describe('useERWizard', () => {
-  it('has correct initial values', () => {
-    const { result } = renderHook(() => useERWizard())
-    expect(result.current.showERWizard).toBe(false)
-    expect(result.current.hasLaunchedRecovery).toBe(false)
-  })
-
-  it('correctly toggles showERWizard and updates hasLaunchedRecovery as expected', async () => {
-    const { result } = renderHook(() => useERWizard())
-
-    await act(async () => {
-      await result.current.toggleERWizard(true)
+  describe('useERWizard', () => {
+    it('has correct initial values', () => {
+      const { result } = renderHook(() => useERWizard())
+      expect(result.current.showERWizard).toBe(false)
+      expect(result.current.hasLaunchedRecovery).toBe(false)
     })
 
-    expect(result.current.showERWizard).toBe(true)
-    expect(result.current.hasLaunchedRecovery).toBe(true)
+    it('correctly toggles showERWizard and updates hasLaunchedRecovery when hasLaunchedER is provided', async () => {
+      const { result } = renderHook(() => useERWizard())
 
-    await act(async () => {
-      await result.current.toggleERWizard(false)
+      await act(async () => {
+        await result.current.toggleERWizard(true, true)
+      })
+
+      expect(result.current.showERWizard).toBe(true)
+      expect(result.current.hasLaunchedRecovery).toBe(true)
+
+      await act(async () => {
+        await result.current.toggleERWizard(false, false)
+      })
+
+      expect(result.current.showERWizard).toBe(false)
+      expect(result.current.hasLaunchedRecovery).toBe(false)
     })
 
-    expect(result.current.showERWizard).toBe(false)
-    expect(result.current.hasLaunchedRecovery).toBe(false)
+    it('does not update hasLaunchedRecovery when hasLaunchedER is undefined', async () => {
+      const { result } = renderHook(() => useERWizard())
+
+      await act(async () => {
+        await result.current.toggleERWizard(true)
+      })
+
+      expect(result.current.showERWizard).toBe(true)
+      expect(result.current.hasLaunchedRecovery).toBe(false)
+
+      await act(async () => {
+        await result.current.toggleERWizard(false)
+      })
+
+      expect(result.current.showERWizard).toBe(false)
+      expect(result.current.hasLaunchedRecovery).toBe(false)
+    })
   })
 })
 

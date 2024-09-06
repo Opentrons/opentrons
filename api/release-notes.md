@@ -4,17 +4,46 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [technical change log]: https://github.com/Opentrons/opentrons/releases
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
+By installing and using Opentrons software, you agree to the Opentrons End-User License Agreement (EULA). You can view the EULA at [opentrons.com/eula](https://opentrons.com/eula).
+
 ---
 
-## Opentrons Robot Software Changes in 7.4.0
+## Opentrons Robot Software Changes in 8.0.0
 
-Welcome to the v7.4.0 release of the Opentrons robot software!
+Welcome to the v8.0.0 release of the Opentrons robot software!
 
-This release adds support for the [Opentrons Flex HEPA/UV Module](https://opentrons.com/products/opentrons-flex-hepa-uv-module).
+### New Features
+
+- Create, store, and run quick transfers on Flex.
+- Define and use CSV runtime parameters in Python protocols.
+- Detect the presence or absence of liquid in a well (Flex pipettes only), and continue or pause the protocol based on the result.
+- Automatically pause Flex protocol runs when detecting overpressure, allowing for error recovery and run resumption.
+
+### Improved Features
+
+- Provides more partial tip pickup configurations. All multi-channel pipettes now support single and partial column pickup, and the Flex 96-channel pipette now supports row pickup.
+- Improves homing behavior when a Flex protocol completes or is canceled with liquid-filled tips attached to the pipette.
+
+---
+
+## Opentrons Robot Software Changes in 7.5.0
+
+Welcome to the v7.5.0 release of the Opentrons robot software!
+
+### Hardware Support
+
+- [Opentrons Flex HEPA/UV Module](https://opentrons.com/products/opentrons-flex-hepa-uv-module)
+- Latest Flex Gripper model (serial numbers beginning `GRPV13`)
 
 ### Bug Fixes
 
 - Fixed certain string runtime parameter values being misinterpreted as an incorrect type.
+- The `opentrons_execute` command-line tool and `opentrons.execute` Python API functions now take the deck configuration of Flex into account when planning gantry movement.
+
+### Known Issue
+
+- The HEPA/UV Module's buttons may not respond properly after its safety shutoff is activated. This happens when the module is removed from the top of Flex while its lights are on. Power cycle the module to restore normal behavior. The module is safe to use even if you do not power cycle it.
+
 ---
 
 ## Opentrons Robot Software Changes in 7.3.1

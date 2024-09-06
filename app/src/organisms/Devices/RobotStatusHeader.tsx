@@ -14,9 +14,10 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
-  LegacyStyledText,
+  Tooltip,
   truncateString,
   TYPOGRAPHY,
   useHoverTooltip,
@@ -24,9 +25,7 @@ import {
 } from '@opentrons/components'
 
 import { QuaternaryButton } from '../../atoms/buttons'
-import { Tooltip } from '../../atoms/Tooltip'
 import { useIsFlex } from '../../organisms/Devices/hooks'
-import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
 import {
   getRobotAddressesByName,
@@ -34,7 +33,7 @@ import {
   OPENTRONS_USB,
 } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
-import { useNotifyRunQuery } from '../../resources/runs'
+import { useNotifyRunQuery, useCurrentRunId } from '../../resources/runs'
 
 import type { IconName, StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'

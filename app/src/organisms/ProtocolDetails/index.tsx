@@ -31,27 +31,25 @@ import {
   Tabs,
   SIZE_1,
   SIZE_5,
+  Modal,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  parseInitialPipetteNamesByMount,
-  parseInitialLoadedModulesBySlot,
-  parseInitialLoadedLabwareBySlot,
-  parseInitialLoadedLabwareByModuleId,
-  parseInitialLoadedLabwareByAdapter,
-} from '@opentrons/api-client'
-import {
   MAGNETIC_BLOCK_TYPE,
   getGripperDisplayName,
   getModuleType,
   getSimplestDeckConfigForProtocol,
+  parseInitialLoadedLabwareByAdapter,
+  parseInitialLoadedLabwareByModuleId,
+  parseInitialLoadedLabwareBySlot,
+  parseInitialLoadedModulesBySlot,
+  parseInitialPipetteNamesByMount,
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -86,6 +84,12 @@ const GRID_STYLE = css`
   display: grid;
   width: 100%;
   grid-template-columns: 26.6% 26.6% 26.6% 20.2%;
+`
+
+const TWO_COL_GRID_STYLE = css`
+  display: grid;
+  grid-gap: ${SPACING.spacing24};
+  grid-template-columns: 22.5% 77.5%;
 `
 
 const ZOOM_ICON_STYLE = css`
@@ -132,7 +136,9 @@ function MetadataDetails({
         flexDirection={DIRECTION_COLUMN}
         data-testid="ProtocolDetails_description"
       >
-        <LegacyStyledText as="p">{description}</LegacyStyledText>
+        <LegacyStyledText as="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
+          {description}
+        </LegacyStyledText>
         {filteredMetaData.map((item, index) => {
           return (
             <React.Fragment key={index}>
@@ -167,9 +173,11 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
     : metadata.description
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacing16}>
       {isReadMore ? (
-        <LegacyStyledText as="p">{description.slice(0, 160)}</LegacyStyledText>
+        <LegacyStyledText as="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
+          {description.slice(0, 160)}
+        </LegacyStyledText>
       ) : (
         <MetadataDetails
           description={description}
@@ -389,14 +397,14 @@ export function ProtocolDetails(
     <>
       {showDeckViewModal
         ? createPortal(
-            <LegacyModal
+            <Modal
               title={t('deck_view')}
               onClose={() => {
                 setShowDeckViewModal(false)
               }}
             >
               {deckMap}
-            </LegacyModal>,
+            </Modal>,
             getTopPortalEl()
           )
         : null}
@@ -511,7 +519,7 @@ export function ProtocolDetails(
                 </Flex>
               </Flex>
               <Divider marginY={SPACING.spacing16} />
-              <Flex css={GRID_STYLE}>
+              <Flex css={TWO_COL_GRID_STYLE}>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_author"
@@ -521,7 +529,6 @@ export function ProtocolDetails(
                   </LegacyStyledText>
                   <LegacyStyledText
                     as="p"
-                    marginRight={SPACING.spacing20}
                     overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                   >
                     {analysisStatus === 'loading'

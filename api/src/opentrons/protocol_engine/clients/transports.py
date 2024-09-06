@@ -10,7 +10,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from ..protocol_engine import ProtocolEngine
 from ..errors import ProtocolCommandFailedError
 from ..error_recovery_policy import ErrorRecoveryType
-from ..state import StateView
+from ..state.state import StateView
 from ..commands import Command, CommandCreate, CommandResult, CommandStatus
 
 
@@ -125,11 +125,13 @@ class ChildThreadTransport:
             )
 
             if command.error is not None:
-                error_was_recovered_from = (
+                error_recovery_type = (
                     self._engine.state_view.commands.get_error_recovery_type(command.id)
-                    == ErrorRecoveryType.WAIT_FOR_RECOVERY
                 )
-                if not error_was_recovered_from:
+                error_should_fail_run = (
+                    error_recovery_type == ErrorRecoveryType.FAIL_RUN
+                )
+                if error_should_fail_run:
                     error = command.error
                     # TODO: this needs to have an actual code
                     raise ProtocolCommandFailedError(

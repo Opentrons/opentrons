@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -17,13 +16,6 @@ import type { ModuleRenderInfoForProtocol } from '../../hooks'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import type { LabwareSetupItem } from '../../../../pages/Protocols/utils'
 
-const HeaderRow = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 5.2fr 5.3fr;
-  grid-gap: ${SPACING.spacing16};
-  padding-left: ${SPACING.spacing24};
-  padding-top: ${SPACING.spacing20};
-`
 interface SetupLabwareListProps {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
   commands: RunTimeCommand[]
@@ -46,14 +38,22 @@ export function SetupLabwareList(
       gridGap={SPACING.spacing4}
       marginBottom={SPACING.spacing16}
     >
-      <HeaderRow>
-        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+      <Flex
+        gridGap={SPACING.spacing16}
+        paddingLeft={SPACING.spacing24}
+        paddingTop={SPACING.spacing20}
+      >
+        <StyledText
+          width="5rem"
+          desktopStyle="bodyDefaultRegular"
+          color={COLORS.grey60}
+        >
           {t('location')}
         </StyledText>
         <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
           {t('labware_name')}
         </StyledText>
-      </HeaderRow>
+      </Flex>
       {allItems.map((labwareItem, index) => {
         const labwareOnAdapter = allItems.find(
           item =>

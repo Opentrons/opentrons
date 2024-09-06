@@ -1,5 +1,5 @@
 import { createMaintenanceRun } from '@opentrons/api-client'
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 import { useHost } from '../api'
 import type { AxiosError } from 'axios'
 import type {
@@ -40,6 +40,7 @@ export function useCreateMaintenanceRunMutation(
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
+  const queryClient = useQueryClient()
   const mutation = useMutation<
     MaintenanceRun,
     AxiosError,
@@ -50,6 +51,7 @@ export function useCreateMaintenanceRunMutation(
       createMaintenanceRun(host as HostConfig, createMaintenanceRunData)
         .then(response => response.data)
         .catch(e => {
+          queryClient.invalidateQueries([host, 'robot/control/estopStatus'])
           throw e
         }),
     options

@@ -5,15 +5,16 @@ import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   Flex,
+  FLEX_MAX_CONTENT,
   Link,
   PrimaryButton,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  Modal,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../App/portal'
-import { LegacyModal } from '../../../molecules/LegacyModal'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 
 const NEW_FLEX_SETUP_SUPPORT_ARTICLE_HREF =
@@ -40,7 +41,7 @@ export function NewRobotSetupHelp(): JSX.Element {
       </Link>
       {showNewRobotHelpModal
         ? createPortal(
-            <LegacyModal
+            <Modal
               title={t('how_to_setup_a_robot')}
               onClose={() => {
                 setShowNewRobotHelpModal(false)
@@ -50,10 +51,16 @@ export function NewRobotSetupHelp(): JSX.Element {
                 <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
                   {t('new_robot_instructions')}
                 </LegacyStyledText>
-                <ExternalLink href={NEW_FLEX_SETUP_SUPPORT_ARTICLE_HREF}>
+                <ExternalLink
+                  href={NEW_FLEX_SETUP_SUPPORT_ARTICLE_HREF}
+                  width={FLEX_MAX_CONTENT}
+                >
                   {t('opentrons_flex_quickstart_guide')}
                 </ExternalLink>
-                <ExternalLink href={NEW_OT2_SETUP_SUPPORT_ARTICLE_HREF}>
+                <ExternalLink
+                  href={NEW_OT2_SETUP_SUPPORT_ARTICLE_HREF}
+                  width={FLEX_MAX_CONTENT}
+                >
                   {t('ot2_quickstart_guide')}
                 </ExternalLink>
                 <PrimaryButton
@@ -66,7 +73,7 @@ export function NewRobotSetupHelp(): JSX.Element {
                   {t('shared:close')}
                 </PrimaryButton>
               </Flex>
-            </LegacyModal>,
+            </Modal>,
             getTopPortalEl()
           )
         : null}

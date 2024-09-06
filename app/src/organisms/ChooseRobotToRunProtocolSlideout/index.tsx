@@ -5,20 +5,21 @@ import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
-  Icon,
-  Flex,
+  ALIGN_CENTER,
   DIRECTION_COLUMN,
-  PrimaryButton,
   DIRECTION_ROW,
+  Flex,
+  Icon,
+  NO_WRAP,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
+  Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 import { useUploadCsvFileMutation } from '@opentrons/react-api-client'
 
-import { Tooltip } from '../../atoms/Tooltip'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
-import { useFeatureFlag } from '../../redux/config'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { appShellRequestor } from '../../redux/shell/remote'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
@@ -96,8 +97,6 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       : null
   )
 
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
-
   const {
     createRunFromProtocolSource,
     runCreationError,
@@ -139,52 +138,41 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
     trackCreateProtocolRunEvent({ name: 'createProtocolRecordRequest' })
-    if (enableCsvFile) {
-      const dataFilesForProtocolMap = runTimeParametersOverrides.reduce<
-        Record<string, File>
-      >(
-        (acc, parameter) =>
-          parameter.type === 'csv_file' && parameter.file?.file != null
-            ? { ...acc, [parameter.variableName]: parameter.file.file }
-            : acc,
-        {}
-      )
-      Promise.all(
-        Object.entries(dataFilesForProtocolMap).map(([key, file]) => {
-          const fileResponse = uploadCsvFile(file)
-          const varName = Promise.resolve(key)
-          return Promise.all([fileResponse, varName])
-        })
-      ).then(responseTuples => {
-        const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
-          Record<string, string>
-        >((acc, [uploadedFileResponse, variableName]) => {
-          return { ...acc, [variableName]: uploadedFileResponse.data.id }
-        }, {})
-        const runTimeParameterValues = getRunTimeParameterValuesForRun(
-          runTimeParametersOverrides
-        )
-        const runTimeParameterFiles = getRunTimeParameterFilesForRun(
-          runTimeParametersOverrides,
-          mappedResolvedCsvVariableToFileId
-        )
-        createRunFromProtocolSource({
-          files: srcFileObjects,
-          protocolKey,
-          runTimeParameterValues,
-          runTimeParameterFiles,
-        })
+    const dataFilesForProtocolMap = runTimeParametersOverrides.reduce<
+      Record<string, File>
+    >(
+      (acc, parameter) =>
+        parameter.type === 'csv_file' && parameter.file?.file != null
+          ? { ...acc, [parameter.variableName]: parameter.file.file }
+          : acc,
+      {}
+    )
+    void Promise.all(
+      Object.entries(dataFilesForProtocolMap).map(([key, file]) => {
+        const fileResponse = uploadCsvFile(file)
+        const varName = Promise.resolve(key)
+        return Promise.all([fileResponse, varName])
       })
-    } else {
+    ).then(responseTuples => {
+      const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
+        Record<string, string>
+      >((acc, [uploadedFileResponse, variableName]) => {
+        return { ...acc, [variableName]: uploadedFileResponse.data.id }
+      }, {})
       const runTimeParameterValues = getRunTimeParameterValuesForRun(
         runTimeParametersOverrides
+      )
+      const runTimeParameterFiles = getRunTimeParameterFilesForRun(
+        runTimeParametersOverrides,
+        mappedResolvedCsvVariableToFileId
       )
       createRunFromProtocolSource({
         files: srcFileObjects,
         protocolKey,
         runTimeParameterValues,
+        runTimeParameterFiles,
       })
-    }
+    })
   }
 
   const { autoUpdateAction } = useSelector((state: State) =>
@@ -216,9 +204,9 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     first(srcFileNames) ??
     protocolKey
 
-  // intentionally show both robot types if analysis has any error
+  // intentionally show both robot types if analysis fails
   const robotType =
-    mostRecentAnalysis != null && mostRecentAnalysis.errors.length === 0
+    mostRecentAnalysis != null && mostRecentAnalysis.result !== 'not-ok'
       ? mostRecentAnalysis?.robotType ?? null
       : null
 
@@ -272,7 +260,11 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
             </PrimaryButton>
           </>
         ) : (
-          <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_ROW}>
+          <Flex
+            gridGap={SPACING.spacing8}
+            flexDirection={DIRECTION_ROW}
+            whiteSpace={NO_WRAP}
+          >
             <SecondaryButton
               onClick={() => {
                 setCurrentPage(1)
@@ -288,7 +280,15 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
               {...targetProps}
             >
               {isCreatingRun ? (
-                <Icon name="ot-spinner" spin size="1rem" />
+                <Flex
+                  gridGap={SPACING.spacing4}
+                  alignItems={ALIGN_CENTER}
+                  whiteSpace="nowrap"
+                  marginLeft={`-${SPACING.spacing4}`}
+                >
+                  <Icon name="ot-spinner" spin size="1rem" />
+                  {t('shared:confirm_values')}
+                </Flex>
               ) : (
                 t('shared:confirm_values')
               )}

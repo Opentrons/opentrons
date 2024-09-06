@@ -15,9 +15,9 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  Modal,
 } from '@opentrons/components'
 
-import { LegacyModal } from '../molecules/LegacyModal'
 import { reloadUi } from '../redux/shell'
 
 import type { Dispatch } from '../redux/types'
@@ -38,11 +38,7 @@ export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
   }
 
   return (
-    <LegacyModal
-      type="warning"
-      title={t('error_boundary_title')}
-      marginLeft="0"
-    >
+    <Modal type="warning" title={t('error_boundary_title')} marginLeft="0">
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <LegacyStyledText as="p">
@@ -59,6 +55,6 @@ export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
           {t('reload_app')}
         </AlertPrimaryButton>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

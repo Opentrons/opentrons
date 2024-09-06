@@ -33,7 +33,7 @@
     "classnames": "2.2.5",
     "interactjs": "^1.10.27",
     "lodash": "4.17.21",
-    "react-i18next": "13.5.0",
+    "react-i18next": "14.0.0",
     "react-popper": "1.0.0",
     "react-remove-scroll": "2.4.3",
     "react-select": "5.4.0",

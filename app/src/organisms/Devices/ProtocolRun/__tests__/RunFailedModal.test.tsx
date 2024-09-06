@@ -6,6 +6,7 @@ import { i18n } from '../../../../i18n'
 import { useDownloadRunLog } from '../../hooks'
 import { RunFailedModal } from '../RunFailedModal'
 
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import type { RunError } from '@opentrons/api-client'
 import { fireEvent, screen } from '@testing-library/react'
 
@@ -39,6 +40,7 @@ describe('RunFailedModal - DesktopApp', () => {
       runId: RUN_ID,
       setShowRunFailedModal: vi.fn(),
       highestPriorityError: mockError,
+      runStatus: RUN_STATUS_FAILED,
     }
     vi.mocked(useDownloadRunLog).mockReturnValue({
       downloadRunLog: vi.fn(),

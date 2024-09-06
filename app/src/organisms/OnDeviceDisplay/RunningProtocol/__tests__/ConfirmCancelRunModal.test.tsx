@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   useStopRunMutation,
+  useDeleteRunMutation,
   useDismissCurrentRunMutation,
 } from '@opentrons/react-api-client'
 
@@ -31,6 +32,7 @@ vi.mock('../CancelingRunModal')
 vi.mock('../../../../redux/discovery')
 const mockNavigate = vi.fn()
 const mockStopRun = vi.fn()
+const mockDeleteRun = vi.fn()
 const mockDismissCurrentRun = vi.fn()
 const mockTrackEvent = vi.fn()
 const mockTrackProtocolRunEvent = vi.fn(
@@ -69,10 +71,14 @@ describe('ConfirmCancelRunModal', () => {
       isActiveRun: true,
       runId: RUN_ID,
       setShowConfirmCancelRunModal: mockFn,
+      isQuickTransfer: false,
     }
 
     vi.mocked(useStopRunMutation).mockReturnValue({
       stopRun: mockStopRun,
+    } as any)
+    vi.mocked(useDeleteRunMutation).mockReturnValue({
+      deleteRun: mockDeleteRun,
     } as any)
     vi.mocked(useDismissCurrentRunMutation).mockReturnValue({
       dismissCurrentRun: mockDismissCurrentRun,
@@ -132,15 +138,7 @@ describe('ConfirmCancelRunModal', () => {
     expect(mockStopRun).toHaveBeenCalled()
   })
 
-  it('when run is stopped, the run is dismissed and the modal closes', () => {
-    when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_STOPPED)
-    render(props)
-
-    expect(mockDismissCurrentRun).toHaveBeenCalled()
-    expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
-  })
-
-  it('when run is stopped, the run is dismissed and the modal closes - in prepare to run', () => {
+  it('when run is stopped, the run is dismissed and the modal closes if the run is not yet active', () => {
     props = {
       ...props,
       isActiveRun: false,
@@ -150,6 +148,27 @@ describe('ConfirmCancelRunModal', () => {
 
     expect(mockDismissCurrentRun).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
-    expect(mockNavigate).toHaveBeenCalledWith('/protocols')
+  })
+
+  it('when quick transfer run is stopped, the run is dismissed and the modal closes if the run is not yet active', () => {
+    props = {
+      ...props,
+      isActiveRun: false,
+      isQuickTransfer: true,
+    }
+    when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_STOPPED)
+    render(props)
+
+    expect(mockDismissCurrentRun).toHaveBeenCalled()
+    expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith('/quick-transfer')
+  })
+
+  it('when run is stopped, the run is not dismissed if the run is active', () => {
+    when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_STOPPED)
+    render(props)
+
+    expect(mockDismissCurrentRun).not.toHaveBeenCalled()
+    expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
   })
 })

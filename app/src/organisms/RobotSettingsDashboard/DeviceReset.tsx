@@ -16,7 +16,7 @@ import {
 } from '@opentrons/components'
 
 import { MediumButton, SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
   getResetConfigOptions,
@@ -28,7 +28,7 @@ import { useDispatchApiRequest } from '../../redux/robot-api'
 import type { Dispatch, State } from '../../redux/types'
 import type { ResetConfigRequest } from '../../redux/robot-admin/types'
 import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface LabelProps {
   isSelected?: boolean
@@ -326,14 +326,14 @@ export const ConfirmClearDataModal = ({
   confirmClearData,
 }: ConfirmClearDataModalProps): JSX.Element => {
   const { t } = useTranslation(['device_settings', 'shared'])
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('confirm_device_reset_heading'),
     hasExitIcon: false,
     iconName: 'ot-alert',
     iconColor: COLORS.yellow50,
   }
   return (
-    <Modal
+    <OddModal
       modalSize="medium"
       header={modalHeader}
       onOutsideClick={cancelClearData}
@@ -366,6 +366,6 @@ export const ConfirmClearDataModal = ({
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

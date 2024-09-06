@@ -33,9 +33,10 @@ export function onDeviceDisplayFormatTimestamp(timestamp: string): string {
     : timestamp
 }
 
-export function downloadFile(data: object, fileName: string): void {
+export function downloadFile(data: object | string, fileName: string): void {
   // Create a blob with the data we want to download as a file
-  const blob = new Blob([JSON.stringify(data)], { type: 'text/json' })
+  const blobContent = typeof data === 'string' ? data : JSON.stringify(data)
+  const blob = new Blob([blobContent], { type: 'text/json' })
   // Create an anchor element and dispatch a click event on it
   // to trigger a download
   const a = document.createElement('a')

@@ -63,6 +63,7 @@ def engine_state_summary() -> StateSummary:
     return StateSummary(
         status=EngineStatus.IDLE,
         errors=[ErrorOccurrence.construct(id="some-error-id")],  # type: ignore[call-arg]
+        hasEverEnteredErrorRecovery=False,
         labware=[LoadedLabware.construct(id="some-labware-id")],  # type: ignore[call-arg]
         labwareOffsets=[LabwareOffset.construct(id="some-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="some-pipette-id")],  # type: ignore[call-arg]
@@ -133,6 +134,7 @@ async def test_create(
         status=engine_state_summary.status,
         actions=[],
         errors=engine_state_summary.errors,
+        hasEverEnteredErrorRecovery=engine_state_summary.hasEverEnteredErrorRecovery,
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
@@ -185,6 +187,7 @@ async def test_create_with_options(
         status=engine_state_summary.status,
         actions=[],
         errors=engine_state_summary.errors,
+        hasEverEnteredErrorRecovery=engine_state_summary.hasEverEnteredErrorRecovery,
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
@@ -253,6 +256,7 @@ async def test_get_current_run(
         status=engine_state_summary.status,
         actions=[],
         errors=engine_state_summary.errors,
+        hasEverEnteredErrorRecovery=engine_state_summary.hasEverEnteredErrorRecovery,
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,

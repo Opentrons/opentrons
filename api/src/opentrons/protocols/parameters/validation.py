@@ -237,7 +237,7 @@ def validate_type(value: ParamType, parameter_type: type) -> None:
     """Validate parameter value is the correct type."""
     if not isinstance(value, parameter_type):
         raise ParameterValueError(
-            f"Parameter value {value} has type '{type(value).__name__}',"
+            f"Parameter value {value!r} has type '{type(value).__name__}',"
             f" but must be of type '{parameter_type.__name__}'."
         )
 
@@ -252,7 +252,7 @@ def validate_options(
     """Validate default values and all possible constraints for a valid parameter definition."""
     if not isinstance(default, parameter_type):
         raise ParameterValueError(
-            f"Parameter default {default} has type '{type(default).__name__}',"
+            f"Parameter default {default!r} has type '{type(default).__name__}',"
             f" but must be of type '{parameter_type.__name__}'."
         )
 

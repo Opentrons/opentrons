@@ -1,6 +1,10 @@
 import type { RunCommandSummary } from '@opentrons/api-client'
 import type { ERROR_KINDS, RECOVERY_MAP, INVALID } from './constants'
 import type { ErrorRecoveryWizardProps } from './ErrorRecoveryWizard'
+import type {
+  DropTipFlowsRoute,
+  DropTipFlowsStep,
+} from '../DropTipWizardFlows/types'
 
 export type FailedCommand = RunCommandSummary
 export type InvalidStep = typeof INVALID
@@ -18,6 +22,13 @@ interface RecoveryMapDetails {
   ROUTE: string
   STEPS: Record<string, string>
   STEP_ORDER: RouteStep
+}
+
+export type ValidSubRoutes = DropTipFlowsRoute
+export type ValidSubSteps = DropTipFlowsStep
+export interface ValidSubMap {
+  route: ValidSubRoutes
+  step: ValidSubSteps | null
 }
 
 export type RecoveryMap = Record<string, RecoveryMapDetails>

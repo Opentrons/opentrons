@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { NavLink } from 'react-router-dom'
+import { useLocation, NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
@@ -29,25 +29,29 @@ import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 
 import { useNetworkConnection } from '../../resources/networking/hooks/useNetworkConnection'
 import { getLocalRobot } from '../../redux/discovery'
-import { useFeatureFlag } from '../../redux/config'
 import { NavigationMenu } from './NavigationMenu'
 import type { ON_DEVICE_DISPLAY_PATHS } from '../../App/OnDeviceDisplayApp'
 
-let NAV_LINKS: Array<typeof ON_DEVICE_DISPLAY_PATHS[number]> = [
+const NAV_LINKS: Array<typeof ON_DEVICE_DISPLAY_PATHS[number]> = [
   '/protocols',
+  '/quick-transfer',
   '/instruments',
   '/robot-settings',
 ]
 
-// TODO(sb:7/10/24): update this wrapper to fade on both sides only when not scrolled completely to that side
-// This will be accomplished in PLAT-399
 const CarouselWrapper = styled.div`
   display: ${DISPLAY_FLEX};
   flex-direction: ${DIRECTION_ROW};
   align-items: ${ALIGN_FLEX_START};
-  width: 42.25rem;
+  width: 56.75rem;
   overflow-x: ${OVERFLOW_SCROLL};
-  -webkit-mask-image: linear-gradient(90deg, #000 90%, transparent);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 0%,
+    black 96.5%,
+    transparent 100%
+  );
   &::-webkit-scrollbar {
     display: none;
   }
@@ -65,18 +69,10 @@ interface NavigationProps {
 export function Navigation(props: NavigationProps): JSX.Element {
   const { setNavMenuIsOpened, longPressModalIsOpened } = props
   const { t } = useTranslation('top_navigation')
+  const location = useLocation()
   const localRobot = useSelector(getLocalRobot)
   const [showNavMenu, setShowNavMenu] = React.useState<boolean>(false)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const enableQuickTransferFF = useFeatureFlag('enableQuickTransfer')
-  if (enableQuickTransferFF) {
-    NAV_LINKS = [
-      '/protocols',
-      '/quick-transfer',
-      '/instruments',
-      '/robot-settings',
-    ]
-  }
 
   // We need to display an icon for what type of network connection (if any)
   // is active next to the robot's name. The designs call for it to change color
@@ -104,6 +100,15 @@ export function Navigation(props: NavigationProps): JSX.Element {
   if (scrollRef.current != null) {
     observer.observe(scrollRef.current)
   }
+
+  const navBarScrollRef = React.useRef<HTMLDivElement>(null)
+  React.useEffect(() => {
+    navBarScrollRef?.current?.scrollIntoView({
+      behavior: 'auto',
+      inline: 'center',
+    })
+  }, [])
+
   function getPathDisplayName(path: typeof NAV_LINKS[number]): string {
     switch (path) {
       case '/instruments':
@@ -143,35 +148,40 @@ export function Navigation(props: NavigationProps): JSX.Element {
         aria-label="Navigation_container"
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing32}>
-          <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
-            <NavigationLink
-              to="/dashboard"
-              name={truncateString(
-                robotName,
-                iconName != null ? CHAR_LIMIT_WITH_ICON : CHAR_LIMIT_NO_ICON
-              )}
-            />
-            {iconName != null ? (
-              <Icon
-                aria-label="network icon"
-                name={iconName}
-                size="2.5rem"
-                color={COLORS.grey60}
-              />
-            ) : null}
-          </Flex>
           <CarouselWrapper>
             <Flex
               flexDirection={DIRECTION_ROW}
               gridGap={SPACING.spacing32}
-              marginRight={SPACING.spacing32}
+              marginRight={SPACING.spacing24}
             >
-              {NAV_LINKS.map(path => (
+              <Flex
+                ref={
+                  location.pathname === '/dashboard' ? navBarScrollRef : null
+                }
+              >
                 <NavigationLink
-                  key={path}
-                  to={path}
-                  name={getPathDisplayName(path)}
+                  to="/dashboard"
+                  name={truncateString(
+                    robotName,
+                    iconName != null ? CHAR_LIMIT_WITH_ICON : CHAR_LIMIT_NO_ICON
+                  )}
                 />
+              </Flex>
+              {iconName != null ? (
+                <Icon
+                  aria-label="network icon"
+                  name={iconName}
+                  size="2.5rem"
+                  color={COLORS.grey60}
+                />
+              ) : null}
+              {NAV_LINKS.map(path => (
+                <Flex
+                  ref={path === location.pathname ? navBarScrollRef : null}
+                  key={path}
+                >
+                  <NavigationLink to={path} name={getPathDisplayName(path)} />
+                </Flex>
               ))}
             </Flex>
           </CarouselWrapper>

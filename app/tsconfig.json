@@ -27,7 +27,7 @@
     },
     {
       "path": "../labware-library"
-    },
+    }
   ],
   "compilerOptions": {
     "composite": true,

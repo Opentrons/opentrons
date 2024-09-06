@@ -14,23 +14,25 @@ import {
 } from '@opentrons/components'
 import {
   useStopRunMutation,
+  useDeleteRunMutation,
   useDismissCurrentRunMutation,
 } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../../atoms/buttons'
-import { Modal } from '../../../molecules/Modal'
+import { OddModal } from '../../../molecules/OddModal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../redux/analytics'
 import { getLocalRobot } from '../../../redux/discovery'
 import { CancelingRunModal } from './CancelingRunModal'
 
-import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
 
 interface ConfirmCancelRunModalProps {
   runId: string
   setShowConfirmCancelRunModal: (showConfirmCancelRunModal: boolean) => void
   isActiveRun: boolean
+  isQuickTransfer: boolean
   protocolId?: string | null
 }
 
@@ -38,14 +40,27 @@ export function ConfirmCancelRunModal({
   runId,
   setShowConfirmCancelRunModal,
   isActiveRun,
+  isQuickTransfer,
   protocolId,
 }: ConfirmCancelRunModalProps): JSX.Element {
   const { t } = useTranslation(['run_details', 'shared'])
   const { stopRun } = useStopRunMutation()
+  const { deleteRun } = useDeleteRunMutation({
+    onError: error => {
+      setIsCanceling(false)
+      console.error('Error deleting quick transfer run', error)
+    },
+  })
   const {
     dismissCurrentRun,
     isLoading: isDismissing,
-  } = useDismissCurrentRunMutation()
+  } = useDismissCurrentRunMutation({
+    onSettled: () => {
+      if (isQuickTransfer) {
+        deleteRun(runId)
+      }
+    },
+  })
   const runStatus = useRunStatus(runId)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? ''
@@ -53,7 +68,7 @@ export function ConfirmCancelRunModal({
   const navigate = useNavigate()
   const [isCanceling, setIsCanceling] = React.useState(false)
 
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('cancel_run_modal_heading'),
     hasExitIcon: false,
     iconName: 'ot-alert',
@@ -72,9 +87,13 @@ export function ConfirmCancelRunModal({
   React.useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED) {
       trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
-      dismissCurrentRun(runId)
       if (!isActiveRun) {
-        if (protocolId != null) {
+        dismissCurrentRun(runId)
+        if (isQuickTransfer && protocolId != null) {
+          navigate(`/quick-transfer/${protocolId}`)
+        } else if (isQuickTransfer) {
+          navigate('/quick-transfer')
+        } else if (protocolId != null) {
           navigate(`/protocols/${protocolId}`)
         } else {
           navigate('/protocols')
@@ -86,7 +105,7 @@ export function ConfirmCancelRunModal({
   return isCanceling || isDismissing ? (
     <CancelingRunModal />
   ) : (
-    <Modal
+    <OddModal
       modalSize="medium"
       header={modalHeader}
       onOutsideClick={() => {
@@ -127,6 +146,6 @@ export function ConfirmCancelRunModal({
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

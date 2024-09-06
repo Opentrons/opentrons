@@ -9,6 +9,7 @@ import {
 
 import { ERROR_KINDS } from '../constants'
 import { getErrorKind } from '../utils'
+import { getLoadedLabware } from '../../../molecules/Command/utils/accessors'
 
 import type { WellGroup } from '@opentrons/components'
 import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
@@ -20,11 +21,11 @@ import type {
   DispenseRunTimeCommand,
   LiquidProbeRunTimeCommand,
 } from '@opentrons/shared-data'
-import { getLoadedLabware } from '../../../molecules/Command/utils/accessors'
 import type { ErrorRecoveryFlowsProps } from '..'
+import type { ERUtilsProps } from './useERUtils'
 
 interface UseFailedLabwareUtilsProps {
-  failedCommand: ErrorRecoveryFlowsProps['failedCommand']
+  failedCommandByRunRecord: ERUtilsProps['failedCommandByRunRecord']
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
   failedPipetteInfo: PipetteData | null
   runCommands?: CommandsData
@@ -49,15 +50,19 @@ export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
  * For no liquid detected errors, the relevant labware is the well in which no liquid was detected.
  */
 export function useFailedLabwareUtils({
-  failedCommand,
+  failedCommandByRunRecord,
   protocolAnalysis,
   failedPipetteInfo,
   runCommands,
   runRecord,
 }: UseFailedLabwareUtilsProps): UseFailedLabwareUtilsResult {
   const recentRelevantFailedLabwareCmd = React.useMemo(
-    () => getRelevantFailedLabwareCmdFrom({ failedCommand, runCommands }),
-    [failedCommand, runCommands]
+    () =>
+      getRelevantFailedLabwareCmdFrom({
+        failedCommandByRunRecord,
+        runCommands,
+      }),
+    [failedCommandByRunRecord?.key, runCommands?.meta.totalLength]
   )
 
   const tipSelectionUtils = useTipSelectionUtils(recentRelevantFailedLabwareCmd)
@@ -69,12 +74,12 @@ export function useFailedLabwareUtils({
         recentRelevantFailedLabwareCmd,
         runRecord
       ),
-    [protocolAnalysis, recentRelevantFailedLabwareCmd, runRecord]
+    [protocolAnalysis?.id, recentRelevantFailedLabwareCmd?.key]
   )
 
   const failedLabware = React.useMemo(
     () => getFailedLabware(recentRelevantFailedLabwareCmd, runRecord),
-    [recentRelevantFailedLabwareCmd, runRecord]
+    [recentRelevantFailedLabwareCmd?.key]
   )
 
   const relevantWellName = getRelevantWellName(
@@ -99,24 +104,24 @@ type FailedCommandRelevantLabware =
   | null
 
 interface RelevantFailedLabwareCmd {
-  failedCommand: ErrorRecoveryFlowsProps['failedCommand']
+  failedCommandByRunRecord: ErrorRecoveryFlowsProps['failedCommandByRunRecord']
   runCommands?: CommandsData
 }
 
 // Return the actual command that contains the info relating to the relevant labware.
 export function getRelevantFailedLabwareCmdFrom({
-  failedCommand,
+  failedCommandByRunRecord,
   runCommands,
 }: RelevantFailedLabwareCmd): FailedCommandRelevantLabware {
-  const errorKind = getErrorKind(failedCommand)
+  const errorKind = getErrorKind(failedCommandByRunRecord)
 
   switch (errorKind) {
     case ERROR_KINDS.NO_LIQUID_DETECTED:
-      return failedCommand as LiquidProbeRunTimeCommand
+      return failedCommandByRunRecord as LiquidProbeRunTimeCommand
     case ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE:
     case ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING:
     case ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING:
-      return getRelevantPickUpTipCommand(failedCommand, runCommands)
+      return getRelevantPickUpTipCommand(failedCommandByRunRecord, runCommands)
     case ERROR_KINDS.GENERAL_ERROR:
       return null
     default:
@@ -129,23 +134,23 @@ export function getRelevantFailedLabwareCmdFrom({
 
 // Returns the most recent pickUpTip command for the pipette used in the failed command, if any.
 function getRelevantPickUpTipCommand(
-  failedCommand: ErrorRecoveryFlowsProps['failedCommand'],
+  failedCommandByRunRecord: ErrorRecoveryFlowsProps['failedCommandByRunRecord'],
   runCommands?: CommandsData
 ): Omit<PickUpTipRunTimeCommand, 'result'> | null {
   if (
-    failedCommand == null ||
+    failedCommandByRunRecord == null ||
     runCommands == null ||
-    !('wellName' in failedCommand.params) ||
-    !('pipetteId' in failedCommand.params)
+    !('wellName' in failedCommandByRunRecord.params) ||
+    !('pipetteId' in failedCommandByRunRecord.params)
   ) {
     return null
   }
 
-  const failedCmdPipetteId = failedCommand.params.pipetteId
+  const failedCmdPipetteId = failedCommandByRunRecord.params.pipetteId
 
   // Reverse iteration is faster as long as # recovery commands < # run commands.
   const failedCommandIdx = runCommands.data.findLastIndex(
-    command => command.key === failedCommand.key
+    command => command.key === failedCommandByRunRecord.key
   )
 
   const recentPickUpTipCmd = runCommands.data
@@ -169,6 +174,7 @@ interface UseTipSelectionUtilsResult {
   tipSelectorDef: LabwareDefinition2
   selectTips: (tipGroup: WellGroup) => void
   deselectTips: (locations: string[]) => void
+  areTipsSelected: boolean
 }
 
 // TODO(jh, 06-18-24): Enforce failure/warning when accessing tipSelectionUtils
@@ -210,11 +216,15 @@ function useTipSelectionUtils(
     []
   )
 
+  const areTipsSelected =
+    selectedLocs != null && Object.keys(selectedLocs).length > 0
+
   return {
     selectedTipLocations: selectedLocs,
     tipSelectorDef,
     selectTips,
     deselectTips,
+    areTipsSelected,
   }
 }
 

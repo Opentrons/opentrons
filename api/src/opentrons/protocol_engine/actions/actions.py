@@ -20,7 +20,7 @@ from ..commands import (
     CommandDefinedErrorData,
     CommandPrivateResult,
 )
-from ..error_recovery_policy import ErrorRecoveryType
+from ..error_recovery_policy import ErrorRecoveryPolicy, ErrorRecoveryType
 from ..notes.notes import CommandNote
 from ..types import (
     LabwareOffsetCreate,
@@ -266,6 +266,24 @@ class SetPipetteMovementSpeedAction:
     speed: Optional[float]
 
 
+@dataclass(frozen=True)
+class AddAbsorbanceReaderLidAction:
+    """Add the absorbance reader lid id to the absorbance reader module substate.
+
+    This action is dispatched the absorbance reader module is first loaded.
+    """
+
+    module_id: str
+    lid_id: str
+
+
+@dataclass(frozen=True)
+class SetErrorRecoveryPolicyAction:
+    """See `ProtocolEngine.set_error_recovery_policy()`."""
+
+    error_recovery_policy: ErrorRecoveryPolicy
+
+
 Action = Union[
     PlayAction,
     PauseAction,
@@ -286,4 +304,6 @@ Action = Union[
     AddLiquidAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
+    AddAbsorbanceReaderLidAction,
+    SetErrorRecoveryPolicyAction,
 ]

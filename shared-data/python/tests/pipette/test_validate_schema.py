@@ -68,6 +68,7 @@ def test_pick_up_configs_configuration_by_nozzle_map_keys() -> None:
     for channel_dir in os.listdir(paths_to_validate):
         for model_dir in os.listdir(paths_to_validate / channel_dir):
             for version_file in os.listdir(paths_to_validate / channel_dir / model_dir):
+                print(version_file)
                 version_list = version_file.split(".json")[0].split("_")
                 built_model: PipetteModel = PipetteModel(
                     f"{model_dir}_{_channel_model_str[channel_dir]}_v{version_list[0]}.{version_list[1]}"

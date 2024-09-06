@@ -16,12 +16,8 @@ import {
 } from '@opentrons/api-client'
 import { useRunActionMutations } from '@opentrons/react-api-client'
 
-import {
-  useCloneRun,
-  useCurrentRunId,
-  useRunCommands,
-} from '../ProtocolUpload/hooks'
-import { useNotifyRunQuery } from '../../resources/runs'
+import { useCloneRun, useRunCommands } from '../ProtocolUpload/hooks'
+import { useNotifyRunQuery, useCurrentRunId } from '../../resources/runs'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import type { UseQueryOptions } from 'react-query'
@@ -38,6 +34,7 @@ export interface RunControls {
   isStopRunActionLoading: boolean
   isResumeRunFromRecoveryActionLoading: boolean
   isResetRunLoading: boolean
+  isRunControlLoading: boolean
 }
 
 export function useRunControls(
@@ -55,11 +52,11 @@ export function useRunControls(
     isResumeRunFromRecoveryActionLoading,
   } = useRunActionMutations(runId as string)
 
-  const { cloneRun, isLoading: isResetRunLoading } = useCloneRun(
-    runId ?? null,
-    onCloneRunSuccess,
-    true
-  )
+  const {
+    cloneRun,
+    isLoadingRun: isRunControlLoading,
+    isCloning: isResetRunLoading,
+  } = useCloneRun(runId ?? null, onCloneRunSuccess, true)
 
   return {
     play: playRun,
@@ -71,6 +68,7 @@ export function useRunControls(
     isPauseRunActionLoading,
     isStopRunActionLoading,
     isResumeRunFromRecoveryActionLoading,
+    isRunControlLoading,
     isResetRunLoading,
   }
 }

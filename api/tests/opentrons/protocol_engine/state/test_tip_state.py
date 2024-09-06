@@ -109,6 +109,17 @@ def drop_tip_in_place_command() -> commands.DropTipInPlace:
     )
 
 
+@pytest.fixture
+def unsafe_drop_tip_in_place_command() -> commands.unsafe.UnsafeDropTipInPlace:
+    """Get an unsafe drop-tip-in-place command."""
+    return commands.unsafe.UnsafeDropTipInPlace.construct(  # type: ignore[call-arg]
+        params=commands.unsafe.UnsafeDropTipInPlaceParams.construct(
+            pipetteId="pipette-id"
+        ),
+        result=commands.unsafe.UnsafeDropTipInPlaceResult.construct(),
+    )
+
+
 @pytest.mark.parametrize(
     "labware_definition",
     [
@@ -903,6 +914,7 @@ def test_drop_tip(
     pick_up_tip_command: commands.PickUpTip,
     drop_tip_command: commands.DropTip,
     drop_tip_in_place_command: commands.DropTipInPlace,
+    unsafe_drop_tip_in_place_command: commands.unsafe.UnsafeDropTipInPlace,
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
     """It should be clear tip length when a tip is dropped."""
@@ -963,6 +975,20 @@ def test_drop_tip(
     subject.handle_action(
         actions.SucceedCommandAction(
             private_result=None, command=drop_tip_in_place_command
+        )
+    )
+    result = TipView(subject.state).get_tip_length("pipette-id")
+    assert result == 0
+
+    subject.handle_action(
+        actions.SucceedCommandAction(private_result=None, command=pick_up_tip_command)
+    )
+    result = TipView(subject.state).get_tip_length("pipette-id")
+    assert result == 1.23
+
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            private_result=None, command=unsafe_drop_tip_in_place_command
         )
     )
     result = TipView(subject.state).get_tip_length("pipette-id")

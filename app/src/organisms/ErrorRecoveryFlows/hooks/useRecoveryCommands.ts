@@ -4,6 +4,7 @@ import head from 'lodash/head'
 import {
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
+  useUpdateErrorRecoveryPolicy,
 } from '@opentrons/react-api-client'
 
 import { useChainRunCommands } from '../../../resources/runs'
@@ -19,7 +20,10 @@ import type {
   DropTipInPlaceRunTimeCommand,
   PrepareToAspirateRunTimeCommand,
 } from '@opentrons/shared-data'
-import type { CommandData } from '@opentrons/api-client'
+import type {
+  CommandData,
+  RecoveryPolicyRulesParams,
+} from '@opentrons/api-client'
 import type { WellGroup } from '@opentrons/components'
 import type { FailedCommand } from '../types'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
@@ -27,10 +31,11 @@ import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
 import type { RecoveryToasts } from './useRecoveryToasts'
 import type { UseRecoveryAnalyticsResult } from './useRecoveryAnalytics'
 import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
+import type { ErrorRecoveryFlowsProps } from '../index'
 
 interface UseRecoveryCommandsParams {
   runId: string
-  failedCommand: FailedCommand | null
+  failedCommandByRunRecord: ErrorRecoveryFlowsProps['failedCommandByRunRecord']
   failedLabwareUtils: UseFailedLabwareUtilsResult
   routeUpdateActions: UseRouteUpdateActionsResult
   recoveryToastUtils: RecoveryToasts
@@ -58,7 +63,7 @@ export interface UseRecoveryCommandsResult {
 // Returns commands with a "fixit" intent. Commands may or may not terminate Error Recovery. See each command docstring for details.
 export function useRecoveryCommands({
   runId,
-  failedCommand,
+  failedCommandByRunRecord,
   failedLabwareUtils,
   routeUpdateActions,
   recoveryToastUtils,
@@ -66,11 +71,15 @@ export function useRecoveryCommands({
   selectedRecoveryOption,
 }: UseRecoveryCommandsParams): UseRecoveryCommandsResult {
   const { proceedToRouteAndStep } = routeUpdateActions
-  const { chainRunCommands } = useChainRunCommands(runId, failedCommand?.id)
+  const { chainRunCommands } = useChainRunCommands(
+    runId,
+    failedCommandByRunRecord?.id
+  )
   const {
     mutateAsync: resumeRunFromRecovery,
   } = useResumeRunFromRecoveryMutation()
   const { stopRun } = useStopRunMutation()
+  const { updateErrorRecoveryPolicy } = useUpdateErrorRecoveryPolicy(runId)
   const { makeSuccessToast } = recoveryToastUtils
 
   const buildRetryPrepMove = (): MoveToCoordinatesCreateCommand | null => {
@@ -93,22 +102,23 @@ export function useRecoveryCommands({
       IN_PLACE_COMMAND_TYPES.includes(
         (failedCommand as InPlaceCommand).commandType
       )
-    return failedCommand != null
-      ? isInPlace(failedCommand)
-        ? failedCommand.error?.isDefined &&
-          failedCommand.error?.errorType === 'overpressure' &&
+    return failedCommandByRunRecord != null
+      ? isInPlace(failedCommandByRunRecord)
+        ? failedCommandByRunRecord.error?.isDefined &&
+          failedCommandByRunRecord.error?.errorType === 'overpressure' &&
           // Paranoia: this value comes from the wire and may be unevenly implemented
-          typeof failedCommand.error?.errorInfo?.retryLocation?.at(0) ===
-            'number'
+          typeof failedCommandByRunRecord.error?.errorInfo?.retryLocation?.at(
+            0
+          ) === 'number'
           ? {
               commandType: 'moveToCoordinates',
               intent: 'fixit',
               params: {
-                pipetteId: failedCommand.params?.pipetteId,
+                pipetteId: failedCommandByRunRecord.params?.pipetteId,
                 coordinates: {
-                  x: failedCommand.error.errorInfo.retryLocation[0],
-                  y: failedCommand.error.errorInfo.retryLocation[1],
-                  z: failedCommand.error.errorInfo.retryLocation[2],
+                  x: failedCommandByRunRecord.error.errorInfo.retryLocation[0],
+                  y: failedCommandByRunRecord.error.errorInfo.retryLocation[1],
+                  z: failedCommandByRunRecord.error.errorInfo.retryLocation[2],
                 },
               },
             }
@@ -132,7 +142,7 @@ export function useRecoveryCommands({
   )
 
   const retryFailedCommand = React.useCallback((): Promise<CommandData[]> => {
-    const { commandType, params } = failedCommand as FailedCommand // Null case is handled before command could be issued.
+    const { commandType, params } = failedCommandByRunRecord as FailedCommand // Null case is handled before command could be issued.
     return chainRunRecoveryCommands(
       [
         // move back to the location of the command if it is an in-place command
@@ -140,7 +150,7 @@ export function useRecoveryCommands({
         { commandType, params }, // retry the command that failed
       ].filter(c => c != null) as CreateCommand[]
     ) // the created command is the same command that failed
-  }, [chainRunRecoveryCommands, failedCommand])
+  }, [chainRunRecoveryCommands, failedCommandByRunRecord?.key])
 
   // Homes the Z-axis of all attached pipettes.
   const homePipetteZAxes = React.useCallback((): Promise<CommandData[]> => {
@@ -153,7 +163,7 @@ export function useRecoveryCommands({
 
     const pickUpTipCmd = buildPickUpTips(
       selectedTipLocations,
-      failedCommand,
+      failedCommandByRunRecord,
       failedLabware
     )
 
@@ -162,7 +172,7 @@ export function useRecoveryCommands({
     } else {
       return chainRunRecoveryCommands([pickUpTipCmd])
     }
-  }, [chainRunRecoveryCommands, failedCommand, failedLabwareUtils])
+  }, [chainRunRecoveryCommands, failedCommandByRunRecord, failedLabwareUtils])
 
   const resumeRun = React.useCallback((): void => {
     void resumeRunFromRecovery(runId).then(() => {
@@ -184,9 +194,23 @@ export function useRecoveryCommands({
   }, [runId, resumeRunFromRecovery, makeSuccessToast])
 
   const ignoreErrorKindThisRun = React.useCallback((): Promise<void> => {
-    console.log('IGNORING ALL ERRORS OF THIS KIND THIS RUN')
-    return Promise.resolve()
-  }, [])
+    if (failedCommandByRunRecord?.error != null) {
+      const ignorePolicyRules = buildIgnorePolicyRules(
+        failedCommandByRunRecord.commandType,
+        failedCommandByRunRecord.error.errorType
+      )
+
+      updateErrorRecoveryPolicy(ignorePolicyRules)
+      return Promise.resolve()
+    } else {
+      return Promise.reject(
+        new Error('Could not execute command. No failed command.')
+      )
+    }
+  }, [
+    failedCommandByRunRecord?.error?.errorType,
+    failedCommandByRunRecord?.commandType,
+  ])
 
   return {
     resumeRun,
@@ -229,4 +253,17 @@ export const buildPickUpTips = (
       },
     }
   }
+}
+
+export const buildIgnorePolicyRules = (
+  commandType: FailedCommand['commandType'],
+  errorType: string
+): RecoveryPolicyRulesParams => {
+  return [
+    {
+      commandType,
+      errorType,
+      ifMatch: 'ignoreAndContinue',
+    },
+  ]
 }

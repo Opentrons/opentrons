@@ -36,7 +36,7 @@ import { ProtocolTimeline } from '../pages/Protocols/ProtocolDetails/ProtocolTim
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { DesktopAppFallback } from './DesktopAppFallback'
 
-import type { RouteProps, DesktopRouteParams } from './types'
+import type { RouteProps } from './types'
 
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
@@ -121,7 +121,7 @@ export const DesktopApp = (): JSX.Element => {
                         <Route
                           key={path}
                           element={
-                            <>
+                            <React.Fragment key={Component.name}>
                               <Breadcrumbs />
                               <Box
                                 position={POSITION_RELATIVE}
@@ -138,13 +138,13 @@ export const DesktopApp = (): JSX.Element => {
                                   <Component />
                                 </Box>
                               </Box>
-                            </>
+                            </React.Fragment>
                           }
                           path={path}
                         />
                       )
                     })}
-                    <Route path="/" element={<Navigate to="/protocols" />} />
+                    <Route path="*" element={<Navigate to="/protocols" />} />
                   </Routes>
                   <RobotControlTakeover />
                 </Alerts>
@@ -158,11 +158,10 @@ export const DesktopApp = (): JSX.Element => {
 }
 
 function RobotControlTakeover(): JSX.Element | null {
-  const deviceRouteMatch = useMatch('/devices/:robotName')
-  const params = deviceRouteMatch?.params as DesktopRouteParams
-  const robotName = params?.robotName
+  const deviceRouteMatch = useMatch('/devices/:robotName/*')
+  const params = deviceRouteMatch?.params
+  const robotName = params?.robotName ?? null
   const robot = useRobot(robotName)
-
   if (deviceRouteMatch == null || robot == null || robotName == null)
     return null
 

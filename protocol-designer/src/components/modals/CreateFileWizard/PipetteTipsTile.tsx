@@ -22,7 +22,7 @@ import {
   Btn,
   JUSTIFY_END,
 } from '@opentrons/components'
-import { getPipetteSpecsV2 } from '@opentrons/shared-data'
+import { OT2_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
@@ -204,7 +204,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
       <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
         {defaultTiprackOptions.map(o => (
           <EquipmentOption
-            robotType={fields.robotType}
+            robotType={fields.robotType ?? OT2_ROBOT_TYPE}
             key={o.name}
             isSelected={selectedValues.includes(o.value)}
             text={o.name}
@@ -275,7 +275,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
             >
               {customTiprackOptions.map(o => (
                 <EquipmentOption
-                  robotType={fields.robotType}
+                  robotType={fields.robotType ?? OT2_ROBOT_TYPE}
                   key={o.name}
                   isSelected={selectedValues.includes(o.value)}
                   text={o.name}

@@ -51,9 +51,13 @@ export const mockPickUpTipLabware: LoadedLabware = {
   displayName: 'MOCK_PickUpTipLabware_NAME',
 }
 
-// TOME: Add the mock labware and pipette, etc. as you end up using it elsewhere to here.
+// TODO: jh(08-07-24): update the "byAnalysis" mockFailedCommand.
 export const mockRecoveryContentProps: RecoveryContentProps = {
-  failedCommand: mockFailedCommand,
+  failedCommandByRunRecord: mockFailedCommand,
+  failedCommand: {
+    byRunRecord: mockFailedCommand,
+    byAnalysis: mockFailedCommand,
+  },
   errorKind: 'GENERAL_ERROR',
   robotType: FLEX_ROBOT_TYPE,
   runId: 'MOCK_RUN_ID',
@@ -73,7 +77,7 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
   deckMapUtils: { setSelectedLocation: () => {} } as any,
   stepCounts: {} as any,
   protocolAnalysis: mockRobotSideAnalysis,
-  trackExternalMap: () => null,
+  subMapUtils: { subMap: null, updateSubMap: () => null } as any,
   hasLaunchedRecovery: true,
   getRecoveryOptionCopy: () => 'MOCK_COPY',
   commandsAfterFailedCommand: [
@@ -86,7 +90,6 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
     reportErrorEvent: () => {},
     reportViewErrorDetailsEvent: () => {},
     reportActionSelectedEvent: () => {},
-    reportInitialActionEvent: () => {},
     reportActionSelectedResult: () => {},
   },
 }

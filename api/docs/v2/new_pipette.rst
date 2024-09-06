@@ -18,11 +18,7 @@ Pages in this section of the documentation cover:
 
     - :ref:`Loading pipettes <loading-pipettes>` into your protocol.
     - :ref:`Pipette characteristics <pipette-characteristics>`, such as how fast they can move liquid and how they move around the deck.
-    - The :ref:`partial tip pickup <partial-tip-pickup>` configuration for the Flex 96-Channel Pipette, which uses only 8 channels for pipetting. Full and partial tip pickup can be combined in a single protocol.
+    - :ref:`Partial tip pickup <partial-tip-pickup>` configurations for multi-channel pipettes. Full and partial tip pickup configurations can be combined in a single protocol.
     - The :ref:`volume modes <pipette-volume-modes>` of Flex 50 µL pipettes, which must operate in low-volume mode to accurately dispense very small volumes of liquid. 
 
 For information about liquid handling, see :ref:`v2-atomic-commands` and :ref:`v2-complex-commands`.
-
-
-
-

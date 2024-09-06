@@ -4,14 +4,14 @@ import { css } from 'styled-components'
 import {
   FormGroup,
   Text,
-  Tooltip,
+  LegacyTooltip,
   useHoverTooltip,
   FONT_WEIGHT_SEMIBOLD,
   FONT_SIZE_BODY_1,
   C_LIGHT_GRAY,
 } from '@opentrons/components'
 import cx from 'classnames'
-import ZIG_ZAG_IMAGE from '../../../../images/zig_zag_icon.svg'
+import ZIG_ZAG_IMAGE from '../../../../assets/images/zig_zag_icon.svg'
 import { WellOrderModal } from './WellOrderModal'
 import stepEditStyles from '../../StepEditForm.module.css'
 import styles from './WellOrderInput.module.css'
@@ -85,9 +85,9 @@ export const WellOrderField = (props: WellOrderFieldProps): JSX.Element => {
 
   return (
     <>
-      <Tooltip {...tooltipProps}>
+      <LegacyTooltip {...tooltipProps}>
         {t('step_edit_form.field.well_order.label')}
-      </Tooltip>
+      </LegacyTooltip>
       <div {...targetProps}>
         <FormGroup label={props.label} className={className}>
           {firstValue != null && secondValue != null ? (

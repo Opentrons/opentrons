@@ -78,7 +78,8 @@ describe('RunPausedSplash', () => {
   beforeEach(() => {
     props = {
       ...mockRecoveryContentProps,
-      toggleERWiz: mockToggleERWiz,
+      robotName: 'testRobot',
+      toggleERWizAsActiveUser: mockToggleERWiz,
       routeUpdateActions: mockRouteUpdateActions,
     }
 
@@ -91,7 +92,7 @@ describe('RunPausedSplash', () => {
 
   it('should render a generic paused screen if there is no handled errorType', () => {
     render(props)
-    screen.getByText('Error')
+    screen.getByText('Tip not detected')
     screen.getByText('MOCK STEP INFO')
   })
 
@@ -99,9 +100,11 @@ describe('RunPausedSplash', () => {
     props = {
       ...props,
       failedCommand: {
-        ...props.failedCommand,
-        commandType: 'aspirate',
-        error: { isDefined: true, errorType: 'overpressure' },
+        byRunRecord: {
+          ...props.failedCommand?.byRunRecord,
+          commandType: 'aspirate',
+          error: { isDefined: true, errorType: 'overpressure' },
+        },
       } as any,
     }
     render(props)
@@ -126,7 +129,7 @@ describe('RunPausedSplash', () => {
       expect(mockToggleERWiz).toHaveBeenCalledTimes(1)
     })
     await waitFor(() => {
-      expect(mockToggleERWiz).toHaveBeenCalledWith(false)
+      expect(mockToggleERWiz).toHaveBeenCalledWith(true, false)
     })
     await waitFor(() => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledTimes(1)
@@ -141,7 +144,7 @@ describe('RunPausedSplash', () => {
       expect(mockToggleERWiz).toHaveBeenCalledTimes(2)
     })
     await waitFor(() => {
-      expect(mockToggleERWiz).toHaveBeenCalledWith(true)
+      expect(mockToggleERWiz).toHaveBeenCalledWith(true, true)
     })
   })
 })

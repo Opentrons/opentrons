@@ -7,7 +7,7 @@ import { i18n } from '../../../../i18n'
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { InlineNotification } from '../../../../atoms/InlineNotification'
 import { StepInfo } from '../StepInfo'
-import { Modal } from '../../../../molecules/Modal'
+import { OddModal } from '../../../../molecules/OddModal'
 import {
   useErrorDetailsModal,
   ErrorDetailsModal,
@@ -18,8 +18,8 @@ vi.mock('react-dom', () => ({
   ...vi.importActual('react-dom'),
   createPortal: vi.fn((element, container) => element),
 }))
-vi.mock('../../../../molecules/Modal', () => ({
-  Modal: vi.fn(({ children }) => <div>{children}</div>),
+vi.mock('../../../../molecules/OddModal', () => ({
+  OddModal: vi.fn(({ children }) => <div>{children}</div>),
 }))
 
 vi.mock('../../../../atoms/InlineNotification')
@@ -71,10 +71,10 @@ describe('ErrorDetailsModal', () => {
 
   it('renders the ODD modal with the correct content', () => {
     render(props)
-    expect(vi.mocked(Modal)).toHaveBeenCalledWith(
+    expect(vi.mocked(OddModal)).toHaveBeenCalledWith(
       expect.objectContaining({
         header: {
-          title: 'Error',
+          title: 'Tip not detected',
           hasExitIcon: true,
         },
         onOutsideClick: props.toggleModal,
@@ -95,8 +95,11 @@ describe('ErrorDetailsModal', () => {
     it('renders the OverpressureBanner when the error kind is an overpressure error', () => {
       props.failedCommand = {
         ...props.failedCommand,
-        commandType: 'aspirate',
-        error: { isDefined: true, errorType: 'overpressure' },
+        byRunRecord: {
+          ...props.failedCommand?.byRunRecord,
+          commandType: 'aspirate',
+          error: { isDefined: true, errorType: 'overpressure' },
+        },
       } as any
       render({ ...props, isOnDevice })
 
@@ -126,7 +129,9 @@ describe('OverpressureBanner', () => {
       expect.objectContaining({
         type: 'alert',
         heading:
-          'Overpressure is usually caused by a tip contacting labware, a clog, or moving viscous liquid too quickly. If the issue persists, cancel the run and make the necessary changes to the protocol.',
+          'Overpressure is usually caused by a tip contacting labware, a clog, or moving viscous liquid too quickly',
+        message:
+          ' If the issue persists, cancel the run and make the necessary changes to the protocol',
       }),
       {}
     )

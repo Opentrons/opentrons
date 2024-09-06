@@ -10,15 +10,20 @@ import {
   LegacyStyledText,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
+import { getAllDefinitions } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../App/portal'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { useToaster } from '../../organisms/ToasterOven'
 import { WellSelection } from '../../organisms/WellSelection'
+import {
+  CIRCULAR_WELL_96_PLATE_DEFINITION_URI,
+  RECTANGULAR_WELL_96_PLATE_DEFINITION_URI,
+} from './SelectSourceWells'
 
 import type { SmallButton } from '../../atoms/buttons'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 import type {
   QuickTransferWizardState,
   QuickTransferWizardAction,
@@ -102,14 +107,23 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
   const resetButtonProps: React.ComponentProps<typeof SmallButton> = {
     buttonType: 'tertiaryLowLight',
     buttonText: t('shared:reset'),
-    onClick: () => {
+    onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
       setIsNumberWellsSelectedError(false)
       setSelectedWells({})
+      e.currentTarget.blur?.()
     },
   }
-  const labwareDefinition =
+  let labwareDefinition =
     state.destination === 'source' ? state.source : state.destination
-
+  if (labwareDefinition?.parameters.format === '96Standard') {
+    const allDefinitions = getAllDefinitions()
+    if (Object.values(labwareDefinition.wells)[0].shape === 'circular') {
+      labwareDefinition = allDefinitions[CIRCULAR_WELL_96_PLATE_DEFINITION_URI]
+    } else {
+      labwareDefinition =
+        allDefinitions[RECTANGULAR_WELL_96_PLATE_DEFINITION_URI]
+    }
+  }
   return (
     <>
       {createPortal(
@@ -137,13 +151,14 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
       <Flex
         justifyContent={JUSTIFY_CENTER}
         marginTop={SPACING.spacing120}
-        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
+        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing8} ${SPACING.spacing32}`}
         position={POSITION_FIXED}
         top="0"
         left="0"
+        height="80%"
         width="100%"
       >
-        {state.destination != null && state.source != null ? (
+        {labwareDefinition != null ? (
           <Flex
             width={
               labwareDefinition?.parameters.format === '384Standard'
@@ -152,12 +167,9 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
             }
           >
             <WellSelection
-              definition={
-                state.destination === 'source'
-                  ? state.source
-                  : state.destination
-              }
+              definition={labwareDefinition}
               deselectWells={(wells: string[]) => {
+                setIsNumberWellsSelectedError(false)
                 setSelectedWells(prevWells =>
                   without(Object.keys(prevWells), ...wells).reduce(
                     (acc, well) => {
@@ -200,7 +212,7 @@ function NumberWellsSelectedErrorModal({
   selectionUnits: string
 }): JSX.Element {
   const { t } = useTranslation('quick_transfer')
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('well_selection'),
     iconName: 'information',
     iconColor: COLORS.black90,
@@ -211,7 +223,7 @@ function NumberWellsSelectedErrorModal({
   }
 
   return (
-    <Modal
+    <OddModal
       header={modalHeader}
       onOutsideClick={() => {
         setShowNumberWellsSelectedErrorModal(false)
@@ -224,6 +236,6 @@ function NumberWellsSelectedErrorModal({
           selectionUnits,
         })}
       </LegacyStyledText>
-    </Modal>
+    </OddModal>
   )
 }

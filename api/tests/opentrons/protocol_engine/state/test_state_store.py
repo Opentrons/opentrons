@@ -1,5 +1,5 @@
 """Tests for the top-level StateStore/StateView."""
-from typing import Callable, Union
+from typing import Any, Callable, Union
 from datetime import datetime
 
 import pytest
@@ -9,7 +9,8 @@ from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons.util.change_notifier import ChangeNotifier
 
 from opentrons.protocol_engine.actions import PlayAction
-from opentrons.protocol_engine.state import State, StateStore, Config
+from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine.state.state import State, StateStore
 from opentrons.protocol_engine.types import DeckType
 
 
@@ -36,6 +37,10 @@ def subject(
     engine_config: Config,
 ) -> StateStore:
     """Get a StateStore test subject."""
+
+    def placeholder_error_recovery_policy(*args: object, **kwargs: object) -> Any:
+        raise NotImplementedError()
+
     return StateStore(
         config=engine_config,
         deck_definition=ot2_standard_deck_def,
@@ -44,11 +49,18 @@ def subject(
             "robotType": "OT-2 Standard",
             "models": ["OT-2 Standard", "OT-2 Refresh"],
             "extents": [446.75, 347.5, 0.0],
+            "paddingOffsets": {
+                "rear": -35.91,
+                "front": 31.89,
+                "leftSide": 0,
+                "rightSide": 0,
+            },
             "mountOffsets": {"left": [-34.0, 0.0, 0.0], "right": [0.0, 0.0, 0.0]},
         },
         deck_fixed_labware=[],
         change_notifier=change_notifier,
         is_door_open=False,
+        error_recovery_policy=placeholder_error_recovery_policy,
     )
 
 

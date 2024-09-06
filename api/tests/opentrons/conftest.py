@@ -316,6 +316,7 @@ def _make_ot3_pe_ctx(
             use_simulated_deck_config=True,
             block_on_door_open=False,
         ),
+        deck_configuration=None,
         error_recovery_policy=error_recovery_policy.never_recover,
         drop_tips_after_run=False,
         post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,

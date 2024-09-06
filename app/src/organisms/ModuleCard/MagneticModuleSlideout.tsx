@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   BORDERS,
@@ -7,10 +8,11 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  InputField,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -24,7 +26,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { Slideout } from '../../atoms/Slideout'
-import { InputField } from '../../atoms/InputField'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
 
 import type { MagneticModule } from '../../redux/modules/types'

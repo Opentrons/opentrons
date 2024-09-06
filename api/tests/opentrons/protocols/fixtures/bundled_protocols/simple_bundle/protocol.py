@@ -1,7 +1,10 @@
+from opentrons.protocol_api.protocol_context import ProtocolContext
+
+
 metadata = {"author": "MISTER FIXTURE", "apiLevel": "2.0"}
 
 
-def run(protocol_context):
+def run(protocol_context: ProtocolContext) -> None:
     tip_rack = protocol_context.load_labware("opentrons_96_tiprack_10ul", "3")
     plate = protocol_context.load_labware(
         "custom_labware", "1", namespace="custom_beta"

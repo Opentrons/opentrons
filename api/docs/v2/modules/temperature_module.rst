@@ -39,6 +39,8 @@ You can use these standalone adapter definitions to load Opentrons verified or c
      - ``opentrons_aluminum_flat_bottom_plate``
    * - Opentrons 96 Well Aluminum Block
      - ``opentrons_96_well_aluminum_block``
+   * - Opentrons 96 Deep Well Temperature Module Adapter
+     - ``opentrons_96_deep_well_temp_mod_adapter``
      
 For example, these commands load a PCR plate on top of the 96-well block::
 

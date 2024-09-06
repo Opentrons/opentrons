@@ -12,15 +12,15 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
   SPACING,
-  LegacyStyledText,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
-import { Tooltip } from '../../atoms/Tooltip'
 
 import type { SubTaskProps, TaskListProps, TaskProps } from './types'
 

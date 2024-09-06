@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { LegacyStyledText } from '@opentrons/components'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { SimpleWizardInProgressBody } from '../../molecules/SimpleWizardBody'
 import { BODY_STYLE, SECTIONS } from './constants'
 import { getPipetteAnimations } from './utils'
 import type { PipetteWizardStepProps } from './types'
@@ -25,7 +25,8 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element => {
   const pipetteWizardStep = { mount, flowType, section: SECTIONS.DETACH_PROBE }
   const channel = attachedPipettes[mount]?.data.channels
 
-  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
+  if (isRobotMoving)
+    return <SimpleWizardInProgressBody description={t('stand_back')} />
   return (
     <GenericWizardTile
       header={i18n.format(t('remove_cal_probe'), 'capitalize')}

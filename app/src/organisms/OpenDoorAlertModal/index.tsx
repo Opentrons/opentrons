@@ -14,12 +14,12 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../App/portal'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 
 export function OpenDoorAlertModal(): JSX.Element {
   const { t } = useTranslation('run_details')
   return createPortal(
-    <Modal>
+    <OddModal>
       <Flex
         backgroundColor={COLORS.grey35}
         borderRadius={BORDERS.borderRadius12}
@@ -49,7 +49,7 @@ export function OpenDoorAlertModal(): JSX.Element {
           </LegacyStyledText>
         </Flex>
       </Flex>
-    </Modal>,
+    </OddModal>,
     getTopPortalEl()
   )
 }

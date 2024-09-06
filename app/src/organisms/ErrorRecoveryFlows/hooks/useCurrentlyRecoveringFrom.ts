@@ -12,6 +12,13 @@ import type { FailedCommand } from '../types'
 
 const ALL_COMMANDS_POLL_MS = 5000
 
+// TODO(jh, 08-06-24): See EXEC-656.
+const VALID_RECOVERY_FETCH_STATUSES = [
+  RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+] as Array<RunStatus | null>
+
 // Return the `currentlyRecoveringFrom` command returned by the server, if any.
 // Otherwise, returns null.
 export function useCurrentlyRecoveringFrom(
@@ -20,11 +27,7 @@ export function useCurrentlyRecoveringFrom(
 ): FailedCommand | null {
   // There can only be a currentlyRecoveringFrom command when the run is in recovery mode.
   // In case we're falling back to polling, only enable queries when that is the case.
-  const isRunInRecoveryMode = ([
-    RUN_STATUS_AWAITING_RECOVERY,
-    RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
-    RUN_STATUS_AWAITING_RECOVERY_PAUSED,
-  ] as Array<RunStatus | null>).includes(runStatus)
+  const isRunInRecoveryMode = VALID_RECOVERY_FETCH_STATUSES.includes(runStatus)
 
   const { data: allCommandsQueryData } = useNotifyAllCommandsQuery(
     runId,

@@ -23,6 +23,7 @@ import {
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
+  ModalShell,
 } from '@opentrons/components'
 import {
   EIGHT_CHANNEL,
@@ -35,7 +36,6 @@ import { i18n } from '../../i18n'
 import { getIsOnDevice } from '../../redux/config'
 import { getTopPortalEl } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { ModalContentOneColSimpleButtons } from '../../molecules/InterventionModal'
 import singleChannelAndEightChannel from '../../assets/images/change-pip/1_and_8_channel.png'
@@ -151,7 +151,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   )
   return createPortal(
     isOnDevice ? (
-      <LegacyModalShell height="100%" header={wizardHeader}>
+      <ModalShell height="100%" header={wizardHeader}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           width="100%"
@@ -200,13 +200,9 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             </Flex>
           )}
         </Flex>
-      </LegacyModalShell>
+      </ModalShell>
     ) : (
-      <LegacyModalShell
-        width="47rem"
-        height="min-content"
-        header={wizardHeader}
-      >
+      <ModalShell width="47rem" height="min-content" header={wizardHeader}>
         {showExitConfirmation ? (
           <ExitModal
             goBack={() => {
@@ -275,7 +271,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             </PrimaryButton>
           </Flex>
         )}
-      </LegacyModalShell>
+      </ModalShell>
     ),
     getTopPortalEl()
   )

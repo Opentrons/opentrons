@@ -7,7 +7,10 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import ThermocyclerLidStatus, Temperature, PlateTemperature
 from opentrons.hardware_control.modules.lid_temp_status import LidTemperatureStatus
 from opentrons.hardware_control.modules.plate_temp_status import PlateTemperatureStatus
-from opentrons.hardware_control.modules.types import TemperatureStatus
+from opentrons.hardware_control.modules.types import (
+    ModuleDisconnectedCallback,
+    TemperatureStatus,
+)
 from opentrons.hardware_control.poller import Reader, Poller
 
 from ..execution_manager import ExecutionManager
@@ -64,6 +67,7 @@ class Thermocycler(mod_abc.AbstractModule):
         simulating: bool = False,
         sim_model: Optional[str] = None,
         sim_serial_number: Optional[str] = None,
+        disconnected_callback: ModuleDisconnectedCallback = None,
     ) -> "Thermocycler":
         """
         Build and connect to a Thermocycler
@@ -77,6 +81,7 @@ class Thermocycler(mod_abc.AbstractModule):
             simulating: whether to build a simulating driver
             loop: Loop
             sim_model: The model name used by simulator
+            disconnected_callback: Callback to inform the module controller that the device was disconnected
 
         Returns:
             Thermocycler instance.
@@ -102,6 +107,7 @@ class Thermocycler(mod_abc.AbstractModule):
             device_info=await driver.get_device_info(),
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
+            disconnected_callback=disconnected_callback,
         )
 
         try:
@@ -121,6 +127,7 @@ class Thermocycler(mod_abc.AbstractModule):
         poller: Poller,
         device_info: Dict[str, str],
         hw_control_loop: asyncio.AbstractEventLoop,
+        disconnected_callback: ModuleDisconnectedCallback = None,
     ) -> None:
         """
         Constructor
@@ -134,6 +141,7 @@ class Thermocycler(mod_abc.AbstractModule):
             poller: A poll controller for reads.
             device_info: The thermocycler device info.
             hw_control_loop: The event loop running in the hardware control thread.
+            disconnected_callback: Callback to inform the module controller that the device was disconnected
         """
         self._driver = driver
         super().__init__(
@@ -141,6 +149,7 @@ class Thermocycler(mod_abc.AbstractModule):
             usb_port=usb_port,
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
+            disconnected_callback=disconnected_callback,
         )
         self._device_info = device_info
         self._reader = reader

@@ -14,13 +14,12 @@ export function FileUploadMessageModal(): JSX.Element | null {
   const message = useSelector(loadFileSelectors.getFileUploadMessages)
   const dispatch = useDispatch()
   const { t } = useTranslation(['modal', 'button'])
-
-  const dismissModal = (): void => {
-    dispatch(loadFileActions.dismissFileUploadMessage())
-  }
   const modalContents = useModalContents({
     uploadResponse: message,
   })
+  const dismissModal = (): void => {
+    dispatch(loadFileActions.dismissFileUploadMessage())
+  }
 
   if (modalContents == null) return null
 

@@ -9,7 +9,7 @@ import * as DiscoveryClientFixtures from '../../../../../discovery-client/src/fi
 import { useAuthorization } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../../resources/runs'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import { getConfig, useFeatureFlag } from '../../../redux/config'
@@ -44,6 +44,10 @@ import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusHeader } from '../RobotStatusHeader'
 import { RobotOverview } from '../RobotOverview'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
+import {
+  ErrorRecoveryBanner,
+  useErrorRecoveryBanner,
+} from '../../ErrorRecoveryBanner'
 
 import type { Config } from '../../../redux/config/types'
 import type { DiscoveryClientRobotAddress } from '../../../redux/discovery/types'
@@ -61,11 +65,12 @@ vi.mock('../../../redux/robot-controls')
 vi.mock('../../../redux/robot-update/selectors')
 vi.mock('../../../redux/config')
 vi.mock('../../../redux/discovery/selectors')
-vi.mock('../../ProtocolUpload/hooks')
+vi.mock('../../../resources/runs')
 vi.mock('../hooks')
 vi.mock('../RobotStatusHeader')
 vi.mock('../../UpdateRobotBanner')
 vi.mock('../RobotOverviewOverflowMenu')
+vi.mock('../../ErrorRecoveryBanner')
 
 const OT2_PNG_FILE_NAME = '/app/src/assets/images/OT2-R_HERO.png'
 const FLEX_PNG_FILE_NAME = '/app/src/assets/images/FLEX.png'
@@ -164,6 +169,13 @@ describe('RobotOverview', () => {
         registrationToken: { token: 'my.registration.jwt' },
       })
     vi.mocked(useIsRobotViewable).mockReturnValue(true)
+    vi.mocked(ErrorRecoveryBanner).mockReturnValue(
+      <div>MOCK_RECOVERY_BANNER</div>
+    )
+    vi.mocked(useErrorRecoveryBanner).mockReturnValue({
+      showRecoveryBanner: false,
+      recoveryIntent: 'recovering',
+    })
   })
 
   it('renders an OT-2 image', () => {
@@ -366,5 +378,16 @@ describe('RobotOverview', () => {
       agent: 'com.opentrons.app.usb',
       agentId: 'opentrons-robot-user',
     })
+  })
+
+  it('renders the error recovery banner when another user is performing error recovery', () => {
+    vi.mocked(useErrorRecoveryBanner).mockReturnValue({
+      showRecoveryBanner: true,
+      recoveryIntent: 'recovering',
+    })
+
+    render(props)
+
+    screen.getByText('MOCK_RECOVERY_BANNER')
   })
 })

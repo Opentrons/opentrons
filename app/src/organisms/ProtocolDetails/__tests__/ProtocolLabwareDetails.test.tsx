@@ -1,18 +1,18 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi } from 'vitest'
-import { InfoScreen } from '@opentrons/components'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ProtocolLabwareDetails } from '../ProtocolLabwareDetails'
 
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
+import type { InfoScreen } from '@opentrons/components'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof InfoScreen>()
   return {
     ...actual,
-    InfoScreen: vi.fn(),
+    InfoScreen: () => <div>mock InfoScreen</div>,
   }
 })
 
@@ -79,7 +79,6 @@ describe('ProtocolLabwareDetails', () => {
     props = {
       requiredLabwareDetails: mockRequiredLabwareDetails,
     }
-    vi.mocked(InfoScreen).mockReturnValue(<div>mock InfoScreen</div>)
   })
 
   it('should render an opentrons labware', () => {

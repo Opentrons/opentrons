@@ -77,6 +77,11 @@ class _GripperMoveType(enum.Enum):
 class _AbsoluteRobotExtents:
     front_left: Dict[MountType, Point]
     back_right: Dict[MountType, Point]
+    deck_extents: Point
+    padding_rear: float
+    padding_front: float
+    padding_left_side: float
+    padding_right_side: float
 
 
 _LabwareLocation = TypeVar("_LabwareLocation", bound=LabwareLocation)
@@ -118,7 +123,13 @@ class GeometryView:
             MountType.RIGHT: self._addressable_areas.deck_extents + right_offset,
         }
         return _AbsoluteRobotExtents(
-            front_left=front_left_abs, back_right=back_right_abs
+            front_left=front_left_abs,
+            back_right=back_right_abs,
+            deck_extents=self._addressable_areas.deck_extents,
+            padding_rear=self._addressable_areas.padding_offsets["rear"],
+            padding_front=self._addressable_areas.padding_offsets["front"],
+            padding_left_side=self._addressable_areas.padding_offsets["left_side"],
+            padding_right_side=self._addressable_areas.padding_offsets["right_side"],
         )
 
     def get_labware_highest_z(self, labware_id: str) -> float:
@@ -241,11 +252,16 @@ class GeometryView:
     def get_labware_parent_nominal_position(self, labware_id: str) -> Point:
         """Get the position of the labware's uncalibrated parent slot (deck, module, or another labware)."""
         try:
-            slot_name = self.get_ancestor_slot_name(labware_id).id
+            addressable_area_name = self.get_ancestor_slot_name(labware_id).id
         except errors.LocationIsStagingSlotError:
-            slot_name = self._get_staging_slot_name(labware_id)
-        slot_pos = self._addressable_areas.get_addressable_area_position(slot_name)
+            addressable_area_name = self._get_staging_slot_name(labware_id)
+        except errors.LocationIsLidDockSlotError:
+            addressable_area_name = self._get_lid_dock_slot_name(labware_id)
+        slot_pos = self._addressable_areas.get_addressable_area_position(
+            addressable_area_name
+        )
         labware_data = self._labware.get(labware_id)
+
         offset = self._get_labware_position_offset(labware_id, labware_data.location)
 
         return Point(
@@ -585,6 +601,12 @@ class GeometryView:
                 "Cannot get staging slot name for labware not on staging slot."
             )
 
+    def _get_lid_dock_slot_name(self, labware_id: str) -> str:
+        """Get the staging slot name that the labware is on."""
+        labware_location = self._labware.get(labware_id).location
+        assert isinstance(labware_location, AddressableAreaLocation)
+        return labware_location.addressableAreaName
+
     def get_ancestor_slot_name(self, labware_id: str) -> DeckSlotName:
         """Get the slot name of the labware or the module that the labware is on."""
         labware = self._labware.get(labware_id)
@@ -602,10 +624,15 @@ class GeometryView:
             area_name = labware.location.addressableAreaName
             # TODO we might want to eventually return some sort of staging slot name when we're ready to work through
             #   the linting nightmare it will create
+            if self._labware.is_absorbance_reader_lid(labware_id):
+                raise errors.LocationIsLidDockSlotError(
+                    "Cannot get ancestor slot name for labware on lid dock slot."
+                )
             if fixture_validation.is_staging_slot(area_name):
                 raise errors.LocationIsStagingSlotError(
                     "Cannot get ancestor slot name for labware on staging slot."
                 )
+                raise errors.LocationIs
             slot_name = DeckSlotName.from_primitive(area_name)
         elif labware.location == OFF_DECK_LOCATION:
             raise errors.LabwareNotOnDeckError(

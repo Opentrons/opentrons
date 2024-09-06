@@ -9,7 +9,7 @@ from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import OT3Mount
 from opentrons.types import PipetteNotAttachedError as HwPipetteNotAttachedError
 
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.execution import (
     MovementHandler,
     TipHandler,

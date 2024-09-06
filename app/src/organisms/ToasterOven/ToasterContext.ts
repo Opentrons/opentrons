@@ -1,7 +1,10 @@
 import * as React from 'react'
 
-import type { ToastProps, ToastType } from '../../atoms/Toast'
-import type { SnackbarProps } from '../../atoms/Snackbar'
+import type {
+  ToastProps,
+  ToastType,
+  SnackbarProps,
+} from '@opentrons/components'
 
 export type MakeToastOptions = Omit<
   ToastProps,

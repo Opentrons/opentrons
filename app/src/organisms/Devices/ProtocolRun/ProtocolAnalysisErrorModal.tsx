@@ -9,11 +9,11 @@ import {
   PrimaryButton,
   SPACING,
   LegacyStyledText,
+  Modal,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../App/portal'
-import { LegacyModal } from '../../../molecules/LegacyModal'
 
 import type { AnalysisError } from '@opentrons/shared-data'
 
@@ -33,7 +33,7 @@ export function ProtocolAnalysisErrorModal({
   const { t } = useTranslation(['run_details', 'shared'])
 
   return createPortal(
-    <LegacyModal
+    <Modal
       data-testid="ProtocolRunDetails_analysisErrorModal"
       type="error"
       title="Protocol analysis failure"
@@ -66,7 +66,7 @@ export function ProtocolAnalysisErrorModal({
           </LegacyStyledText>
         </PrimaryButton>
       </Flex>
-    </LegacyModal>,
+    </Modal>,
     getTopPortalEl()
   )
 }

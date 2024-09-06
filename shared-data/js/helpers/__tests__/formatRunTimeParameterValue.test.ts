@@ -144,7 +144,7 @@ describe('utils-formatRunTimeParameterDefaultValue', () => {
 
   it('should return value when type is csv', () => {
     const mockData = {
-      file: { id: 'test', file: { name: 'mock.csv' } as File },
+      file: { id: 'test', name: 'mock.csv' },
       displayName: 'My CSV File',
       variableName: 'CSVFILE',
       description: 'CSV File for a protocol',

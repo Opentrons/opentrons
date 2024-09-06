@@ -17,15 +17,13 @@ import type {
 export interface GetPipettesWithTipAttached {
   host: HostConfig | null
   runId: string
-  isFlex: boolean
-  attachedInstruments?: Instruments
-  runRecord?: Run
+  attachedInstruments: Instruments | null
+  runRecord: Run | null
 }
 
 export function getPipettesWithTipAttached({
   host,
   runId,
-  isFlex,
   attachedInstruments,
   runRecord,
 }: GetPipettesWithTipAttached): Promise<PipetteData[]> {
@@ -39,7 +37,6 @@ export function getPipettesWithTipAttached({
   ).then(executedCmdData =>
     checkPipettesForAttachedTips(
       executedCmdData.data,
-      isFlex,
       runRecord.data.pipettes,
       attachedInstruments.data as PipetteData[]
     )
@@ -62,34 +59,15 @@ function getCommandsExecutedDuringRun(
   })
 }
 
+const TIP_EXCHANGE_COMMAND_TYPES = ['dropTip', 'dropTipInPlace', 'pickUpTip']
+
 function checkPipettesForAttachedTips(
   commands: RunCommandSummary[],
-  isFlex: boolean,
   pipettesUsedInRun: LoadedPipette[],
   attachedPipettes: PipetteData[]
 ): PipetteData[] {
   let pipettesWithUnknownTipStatus = pipettesUsedInRun
-  let mountsWithTipAttached: Array<PipetteData['mount']> = []
-
-  // Check if the Flex detects a tip attached.
-  if (isFlex) {
-    mountsWithTipAttached = pipettesWithUnknownTipStatus
-      .filter(pipetteWithUnknownTipStatus =>
-        attachedPipettes.some(
-          attachedInstrument =>
-            attachedInstrument.mount === pipetteWithUnknownTipStatus.mount &&
-            attachedInstrument.state?.tipDetected
-        )
-      )
-      .map(pipetteWithTipDetected => pipetteWithTipDetected.mount)
-
-    pipettesWithUnknownTipStatus = pipettesWithUnknownTipStatus.filter(
-      pipetteWithUnkownStatus =>
-        !mountsWithTipAttached.includes(pipetteWithUnkownStatus.mount)
-    )
-  }
-
-  const TIP_EXCHANGE_COMMAND_TYPES = ['dropTip', 'dropTipInPlace', 'pickUpTip']
+  const mountsWithTipAttached: Array<PipetteData['mount']> = []
 
   // Iterate backwards through commands, finding first tip exchange command for each pipette.
   // If there's a chance the tip is still attached, flag the pipette.

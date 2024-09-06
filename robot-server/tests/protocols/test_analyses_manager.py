@@ -83,7 +83,7 @@ async def test_initialize_analyzer(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
     analyzer = decoy.mock(cls=protocol_analyzer.ProtocolAnalyzer)
     decoy.when(
@@ -97,12 +97,12 @@ async def test_initialize_analyzer(
         analysis_id="analysis-id",
         protocol_resource=protocol_resource,
         run_time_param_values={"sample_count": 123},
-        run_time_param_files={"my_file": "file-id"},
+        run_time_param_paths={"my_file": Path("file-path")},
     )
     decoy.verify(
         await analyzer.load_orchestrator(
             run_time_param_values={"sample_count": 123},
-            run_time_param_files={"my_file": "file-id"},
+            run_time_param_paths={"my_file": Path("file-path")},
         )
     )
 
@@ -128,7 +128,7 @@ async def test_raises_error_and_saves_result_if_initialization_errors(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
     raised_exception = Exception("Oh noooo!")
     enumerated_error = EnumeratedError(
@@ -145,7 +145,7 @@ async def test_raises_error_and_saves_result_if_initialization_errors(
     decoy.when(
         await analyzer.load_orchestrator(
             run_time_param_values={"sample_count": 123},
-            run_time_param_files={},
+            run_time_param_paths={},
         )
     ).then_raise(raised_exception)
     decoy.when(analyzer.get_verified_run_time_parameters()).then_return([])
@@ -157,7 +157,7 @@ async def test_raises_error_and_saves_result_if_initialization_errors(
             analysis_id="analysis-id",
             protocol_resource=protocol_resource,
             run_time_param_values={"sample_count": 123},
-            run_time_param_files={},
+            run_time_param_paths={},
         )
     decoy.verify(
         await analysis_store.save_initialization_failed_analysis(
@@ -197,7 +197,7 @@ async def test_start_analysis(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
-        protocol_kind=ProtocolKind.STANDARD.value,
+        protocol_kind=ProtocolKind.STANDARD,
     )
     bool_parameter = BooleanParameter(
         displayName="Foo", variableName="Bar", default=True, value=False

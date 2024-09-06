@@ -1,20 +1,10 @@
 """v5 of our SQLite schema."""
-import enum
+
 import sqlalchemy
 
 from robot_server.persistence._utc_datetime import UTCDateTime
 
 metadata = sqlalchemy.MetaData()
-
-
-class PrimitiveParamSQLEnum(enum.Enum):
-    """Enum type to store primitive param type."""
-
-    INT = "int"
-    FLOAT = "float"
-    BOOL = "bool"
-    STR = "str"
-
 
 protocol_table = sqlalchemy.Table(
     "protocol",
@@ -59,63 +49,10 @@ analysis_table = sqlalchemy.Table(
         sqlalchemy.String,
         nullable=False,
     ),
-)
-
-analysis_primitive_type_rtp_table = sqlalchemy.Table(
-    "analysis_primitive_rtp_table",
-    metadata,
+    # column added in schema v4
     sqlalchemy.Column(
-        "row_id",
-        sqlalchemy.Integer,
-        primary_key=True,
-    ),
-    sqlalchemy.Column(
-        "analysis_id",
-        sqlalchemy.ForeignKey("analysis.id"),
-        nullable=False,
-    ),
-    sqlalchemy.Column(
-        "parameter_variable_name",
+        "run_time_parameter_values_and_defaults",
         sqlalchemy.String,
-        nullable=False,
-    ),
-    sqlalchemy.Column(
-        "parameter_type",
-        sqlalchemy.Enum(
-            PrimitiveParamSQLEnum,
-            values_callable=lambda obj: [e.value for e in obj],
-            create_constraint=True,
-        ),
-        nullable=False,
-    ),
-    sqlalchemy.Column(
-        "parameter_value",
-        sqlalchemy.String,
-        nullable=False,
-    ),
-)
-
-analysis_csv_rtp_table = sqlalchemy.Table(
-    "analysis_csv_rtp_table",
-    metadata,
-    sqlalchemy.Column(
-        "row_id",
-        sqlalchemy.Integer,
-        primary_key=True,
-    ),
-    sqlalchemy.Column(
-        "analysis_id",
-        sqlalchemy.ForeignKey("analysis.id"),
-        nullable=False,
-    ),
-    sqlalchemy.Column(
-        "parameter_variable_name",
-        sqlalchemy.String,
-        nullable=False,
-    ),
-    sqlalchemy.Column(
-        "file_id",
-        sqlalchemy.ForeignKey("data_files.id"),
         nullable=True,
     ),
 )

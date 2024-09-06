@@ -19,10 +19,10 @@ from opentrons.protocol_engine.types import (
     MotorAxis,
     AddressableOffsetVector,
 )
-from opentrons.protocol_engine.state import (
+from opentrons.protocol_engine.state.state import (
     StateStore,
-    PipetteLocationData,
 )
+from opentrons.protocol_engine.state.motion import PipetteLocationData
 from opentrons.protocol_engine.execution.movement import MovementHandler
 from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
     ThermocyclerMovementFlagger,

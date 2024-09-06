@@ -1,7 +1,7 @@
 """SQL database schemas."""
 
 # Re-export the latest schema.
-from .schema_5 import (
+from .schema_6 import (
     metadata,
     protocol_table,
     analysis_table,
@@ -10,8 +10,10 @@ from .schema_5 import (
     run_table,
     run_command_table,
     action_table,
+    run_csv_rtp_table,
     data_files_table,
     PrimitiveParamSQLEnum,
+    ProtocolKindSQLEnum,
 )
 
 
@@ -24,6 +26,8 @@ __all__ = [
     "run_table",
     "run_command_table",
     "action_table",
+    "run_csv_rtp_table",
     "data_files_table",
     "PrimitiveParamSQLEnum",
+    "ProtocolKindSQLEnum",
 ]

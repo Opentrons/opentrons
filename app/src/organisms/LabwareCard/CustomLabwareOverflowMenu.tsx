@@ -16,19 +16,19 @@ import {
   Flex,
   Icon,
   JUSTIFY_FLEX_END,
+  LegacyStyledText,
+  MenuItem,
+  Modal,
+  OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
   useOnClickOutside,
 } from '@opentrons/components'
 
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Divider } from '../../atoms/structure'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 import {
   deleteCustomLabwareFile,
@@ -139,7 +139,7 @@ export function CustomLabwareOverflowMenu(
       )}
       {showDeleteConfirmation &&
         createPortal(
-          <LegacyModal
+          <Modal
             type="warning"
             title={t('delete_this_labware')}
             onClose={handleCancelModal}
@@ -169,7 +169,7 @@ export function CustomLabwareOverflowMenu(
                 </AlertPrimaryButton>
               </Flex>
             </Flex>
-          </LegacyModal>,
+          </Modal>,
           getTopPortalEl()
         )}
     </Flex>

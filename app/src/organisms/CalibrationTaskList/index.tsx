@@ -14,10 +14,10 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  Modal,
 } from '@opentrons/components'
 
 import { StatusLabel } from '../../atoms/StatusLabel'
-import { LegacyModal } from '../../molecules/LegacyModal'
 import { TaskList } from '../TaskList'
 
 import {
@@ -25,7 +25,7 @@ import {
   useCalibrationTaskList,
   useRunHasStarted,
 } from '../Devices/hooks'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../resources/runs'
 
 import type { DashboardCalOffsetInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
 import type { DashboardCalTipLengthInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
@@ -108,7 +108,7 @@ export function CalibrationTaskList({
   }
 
   return (
-    <LegacyModal
+    <Modal
       title={`${robotName} ${t('calibration_dashboard')}`}
       onClose={() => {
         navigate(`/devices/${robotName}/robot-settings/calibration`)
@@ -120,6 +120,7 @@ export function CalibrationTaskList({
         width: 50rem;
         height: 47.5rem;
       `}
+      marginLeft="0"
     >
       {showCompletionScreen ? (
         <Flex
@@ -183,6 +184,6 @@ export function CalibrationTaskList({
           />
         </>
       )}
-    </LegacyModal>
+    </Modal>
   )
 }

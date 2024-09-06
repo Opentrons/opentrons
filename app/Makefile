@@ -74,6 +74,11 @@ dev-server: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
 dev-server:
 	vite serve
 
+.PHONY: dev-dist
+dev-dist: export NODE_ENV := development
+dev-dist:
+	$(MAKE) -C $(shell_dir) dev-dist OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)
+
 .PHONY: dev-shell
 dev-shell:
 	$(MAKE) -C $(shell_dir) dev OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)

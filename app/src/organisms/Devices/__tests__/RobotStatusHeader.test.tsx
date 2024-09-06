@@ -9,7 +9,6 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { useProtocolQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
-import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import {
   getRobotAddressesByName,
@@ -19,14 +18,13 @@ import {
 import { getNetworkInterfaces } from '../../../redux/networking'
 import { useIsFlex } from '../hooks'
 import { RobotStatusHeader } from '../RobotStatusHeader'
-import { useNotifyRunQuery } from '../../../resources/runs'
+import { useNotifyRunQuery, useCurrentRunId } from '../../../resources/runs'
 
 import type { DiscoveryClientRobotAddress } from '../../../redux/discovery/types'
 import type { SimpleInterfaceStatus } from '../../../redux/networking/types'
 import type { State } from '../../../redux/types'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../organisms/ProtocolUpload/hooks')
 vi.mock('../../../organisms/RunTimeControl/hooks')
 vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/networking')

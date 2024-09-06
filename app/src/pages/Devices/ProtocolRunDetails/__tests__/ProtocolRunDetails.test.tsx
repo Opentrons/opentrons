@@ -2,6 +2,7 @@ import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
+import { when } from 'vitest-when'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
@@ -11,6 +12,7 @@ import {
   useRobot,
   useRunStatuses,
   useSyncRobotClock,
+  useRunHasStarted,
 } from '../../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolRunHeader } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
@@ -18,9 +20,8 @@ import { ProtocolRunModuleControls } from '../../../../organisms/Devices/Protoco
 import { ProtocolRunSetup } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { RunPreviewComponent } from '../../../../organisms/RunPreview'
 import { ProtocolRunRuntimeParameters } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
-import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../../../resources/runs'
 import { mockRobotSideAnalysis } from '../../../../molecules/Command/__fixtures__'
-import { useFeatureFlag } from '../../../../redux/config'
 import { ProtocolRunDetails } from '..'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
@@ -33,7 +34,7 @@ vi.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader')
 vi.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup')
 vi.mock('../../../../organisms/RunPreview')
 vi.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls')
-vi.mock('../../../../organisms/ProtocolUpload/hooks')
+vi.mock('../../../../resources/runs')
 vi.mock(
   '../../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 )
@@ -78,7 +79,6 @@ const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
 
 describe('ProtocolRunDetails', () => {
   beforeEach(() => {
-    vi.mocked(useFeatureFlag).mockReturnValue(false)
     vi.mocked(useRobot).mockReturnValue(mockConnectableRobot)
     vi.mocked(useRunStatuses).mockReturnValue({
       isRunRunning: false,
@@ -116,6 +116,7 @@ describe('ProtocolRunDetails', () => {
     vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue(
       mockRobotSideAnalysis
     )
+    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -219,8 +220,8 @@ describe('ProtocolRunDetails', () => {
     expect(screen.queryByText('Mock RunPreview')).toBeFalsy()
   })
 
-  it('redirects to the run  tab when the run is not current', () => {
-    vi.mocked(useCurrentRunId).mockReturnValue(null)
+  it('redirects to the run tab when the run is started by ODD or another Desktop app', () => {
+    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
     render(`/devices/otie/protocol-runs/${RUN_ID}/setup`)
 
     screen.getByText('Mock RunPreview')
@@ -228,7 +229,6 @@ describe('ProtocolRunDetails', () => {
   })
 
   it('renders Parameters tab when runtime parameters ff is on', () => {
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
     render(`/devices/otie/protocol-runs/${RUN_ID}/setup`)
 
     screen.getByText('Setup')
@@ -238,7 +238,6 @@ describe('ProtocolRunDetails', () => {
   })
 
   it('renders protocol run parameters when the parameters tab is clicked', () => {
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
     render(`/devices/otie/protocol-runs/${RUN_ID}`)
 
     const parametersTab = screen.getByText('Parameters')

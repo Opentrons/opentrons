@@ -12,17 +12,15 @@ from opentrons.hardware_control.nozzle_manager import (
     NozzleMap,
 )
 from opentrons.protocol_engine.actions.actions import FailCommandAction
-from opentrons.protocol_engine.commands.aspirate import Aspirate
-from opentrons.protocol_engine.commands.dispense import Dispense
-from opentrons.protocol_engine.commands.aspirate_in_place import AspirateInPlace
-from opentrons.protocol_engine.commands.dispense_in_place import DispenseInPlace
 from opentrons.protocol_engine.commands.command import DefinedErrorData
 from opentrons.protocol_engine.commands.pipetting_common import (
+    LiquidNotFoundError,
     OverpressureError,
     OverpressureErrorInternalData,
 )
 from opentrons.types import MountType, Mount as HwMount, Point
 
+from .. import commands
 from .. import errors
 from ..types import (
     LoadedPipette,
@@ -34,30 +32,6 @@ from ..types import (
     CurrentPipetteLocation,
     TipGeometry,
 )
-from ..commands import (
-    LoadPipetteResult,
-    AspirateResult,
-    AspirateInPlaceResult,
-    DispenseResult,
-    DispenseInPlaceResult,
-    MoveLabwareResult,
-    MoveToCoordinatesResult,
-    MoveToWellResult,
-    MoveRelativeResult,
-    MoveToAddressableAreaResult,
-    MoveToAddressableAreaForDropTipResult,
-    PickUpTipResult,
-    DropTipResult,
-    DropTipInPlaceResult,
-    HomeResult,
-    RetractAxisResult,
-    BlowOutResult,
-    BlowOutInPlaceResult,
-    TouchTipResult,
-    thermocycler,
-    heater_shaker,
-    PrepareToAspirateResult,
-)
 from ..commands.configuring_common import (
     PipetteConfigUpdateResultMixin,
     PipetteNozzleLayoutResultMixin,
@@ -67,7 +41,7 @@ from ..actions import (
     SetPipetteMovementSpeedAction,
     SucceedCommandAction,
 )
-from .abstract_store import HasState, HandlesActions
+from ._abstract_store import HasState, HandlesActions
 
 
 @dataclass(frozen=True)
@@ -226,7 +200,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 private_result.pipette_id
             ] = private_result.nozzle_map
 
-        if isinstance(command.result, LoadPipetteResult):
+        if isinstance(command.result, commands.LoadPipetteResult):
             pipette_id = command.result.pipetteId
 
             self._state.pipettes_by_id[pipette_id] = LoadedPipette(
@@ -246,7 +220,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     pipette_id
                 ] = static_config.default_nozzle_map
 
-        elif isinstance(command.result, PickUpTipResult):
+        elif isinstance(command.result, commands.PickUpTipResult):
             pipette_id = command.params.pipetteId
             attached_tip = TipGeometry(
                 length=command.result.tipLength,
@@ -278,7 +252,14 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
                 )
 
-        elif isinstance(command.result, (DropTipResult, DropTipInPlaceResult)):
+        elif isinstance(
+            command.result,
+            (
+                commands.DropTipResult,
+                commands.DropTipInPlaceResult,
+                commands.unsafe.UnsafeDropTipInPlaceResult,
+            ),
+        ):
             pipette_id = command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
@@ -303,13 +284,15 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         if isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
-                MoveToWellResult,
-                PickUpTipResult,
-                DropTipResult,
-                AspirateResult,
-                DispenseResult,
-                BlowOutResult,
-                TouchTipResult,
+                commands.MoveToWellResult,
+                commands.PickUpTipResult,
+                commands.DropTipResult,
+                commands.AspirateResult,
+                commands.DispenseResult,
+                commands.BlowOutResult,
+                commands.TouchTipResult,
+                commands.LiquidProbeResult,
+                commands.TryLiquidProbeResult,
             ),
         ):
             self._state.current_location = CurrentWell(
@@ -317,11 +300,20 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 labware_id=action.command.params.labwareId,
                 well_name=action.command.params.wellName,
             )
-        elif (
-            isinstance(action, FailCommandAction)
-            and isinstance(action.running_command, (Aspirate, Dispense))
-            and isinstance(action.error, DefinedErrorData)
-            and isinstance(action.error.public, OverpressureError)
+        elif isinstance(action, FailCommandAction) and (
+            isinstance(action.error, DefinedErrorData)
+            and (
+                (
+                    isinstance(
+                        action.running_command, (commands.Aspirate, commands.Dispense)
+                    )
+                    and isinstance(action.error.public, OverpressureError)
+                )
+                or (
+                    isinstance(action.running_command, commands.LiquidProbe)
+                    and isinstance(action.error.public, LiquidNotFoundError)
+                )
+            )
         ):
             self._state.current_location = CurrentWell(
                 pipette_id=action.running_command.params.pipetteId,
@@ -330,7 +322,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             )
         elif isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
-            (MoveToAddressableAreaResult, MoveToAddressableAreaForDropTipResult),
+            (
+                commands.MoveToAddressableAreaResult,
+                commands.MoveToAddressableAreaForDropTipResult,
+            ),
         ):
             self._state.current_location = CurrentAddressableArea(
                 pipette_id=action.command.params.pipetteId,
@@ -345,11 +340,11 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
-                HomeResult,
-                RetractAxisResult,
-                MoveToCoordinatesResult,
-                thermocycler.OpenLidResult,
-                thermocycler.CloseLidResult,
+                commands.HomeResult,
+                commands.RetractAxisResult,
+                commands.MoveToCoordinatesResult,
+                commands.thermocycler.OpenLidResult,
+                commands.thermocycler.CloseLidResult,
             ),
         ):
             self._state.current_location = None
@@ -359,8 +354,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
-                heater_shaker.SetAndWaitForShakeSpeedResult,
-                heater_shaker.OpenLabwareLatchResult,
+                commands.heater_shaker.SetAndWaitForShakeSpeedResult,
+                commands.heater_shaker.OpenLabwareLatchResult,
             ),
         ):
             if action.command.result.pipetteRetracted:
@@ -373,7 +368,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         # This is necessary for safe motion planning in case the next movement
         # goes to the same labware (now in a new place).
         elif isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result, MoveLabwareResult
+            action.command.result, commands.MoveLabwareResult
         ):
             moved_labware_id = action.command.params.labwareId
             if action.command.params.strategy == "usingGripper":
@@ -394,17 +389,17 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         if isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
-                MoveToWellResult,
-                MoveToCoordinatesResult,
-                MoveRelativeResult,
-                MoveToAddressableAreaResult,
-                MoveToAddressableAreaForDropTipResult,
-                PickUpTipResult,
-                DropTipResult,
-                AspirateResult,
-                DispenseResult,
-                BlowOutResult,
-                TouchTipResult,
+                commands.MoveToWellResult,
+                commands.MoveToCoordinatesResult,
+                commands.MoveRelativeResult,
+                commands.MoveToAddressableAreaResult,
+                commands.MoveToAddressableAreaForDropTipResult,
+                commands.PickUpTipResult,
+                commands.DropTipResult,
+                commands.AspirateResult,
+                commands.DispenseResult,
+                commands.BlowOutResult,
+                commands.TouchTipResult,
             ),
         ):
             pipette_id = action.command.params.pipetteId
@@ -417,7 +412,12 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             isinstance(action, FailCommandAction)
             and isinstance(
                 action.running_command,
-                (Aspirate, Dispense, AspirateInPlace, DispenseInPlace),
+                (
+                    commands.Aspirate,
+                    commands.Dispense,
+                    commands.AspirateInPlace,
+                    commands.DispenseInPlace,
+                ),
             )
             and isinstance(action.error, DefinedErrorData)
             and isinstance(action.error.public, OverpressureError)
@@ -433,10 +433,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
-                HomeResult,
-                RetractAxisResult,
-                thermocycler.OpenLidResult,
-                thermocycler.CloseLidResult,
+                commands.HomeResult,
+                commands.RetractAxisResult,
+                commands.thermocycler.OpenLidResult,
+                commands.thermocycler.CloseLidResult,
             ),
         ):
             self._clear_deck_point()
@@ -444,15 +444,15 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
-                heater_shaker.SetAndWaitForShakeSpeedResult,
-                heater_shaker.OpenLabwareLatchResult,
+                commands.heater_shaker.SetAndWaitForShakeSpeedResult,
+                commands.heater_shaker.OpenLabwareLatchResult,
             ),
         ):
             if action.command.result.pipetteRetracted:
                 self._clear_deck_point()
 
         elif isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result, MoveLabwareResult
+            action.command.result, commands.MoveLabwareResult
         ):
             if action.command.params.strategy == "usingGripper":
                 # All mounts will have been retracted.
@@ -462,7 +462,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         self, action: Union[SucceedCommandAction, FailCommandAction]
     ) -> None:
         if isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result, (AspirateResult, AspirateInPlaceResult)
+            action.command.result,
+            (commands.AspirateResult, commands.AspirateInPlaceResult),
         ):
             pipette_id = action.command.params.pipetteId
             previous_volume = self._state.aspirated_volume_by_id[pipette_id] or 0
@@ -473,7 +474,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.aspirated_volume_by_id[pipette_id] = next_volume
 
         elif isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result, (DispenseResult, DispenseInPlaceResult)
+            action.command.result,
+            (commands.DispenseResult, commands.DispenseInPlaceResult),
         ):
             pipette_id = action.command.params.pipetteId
             previous_volume = self._state.aspirated_volume_by_id[pipette_id] or 0
@@ -483,13 +485,18 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.aspirated_volume_by_id[pipette_id] = next_volume
 
         elif isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result, (BlowOutResult, BlowOutInPlaceResult)
+            action.command.result,
+            (
+                commands.BlowOutResult,
+                commands.BlowOutInPlaceResult,
+                commands.unsafe.UnsafeBlowOutInPlaceResult,
+            ),
         ):
             pipette_id = action.command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None
 
         elif isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result, PrepareToAspirateResult
+            action.command.result, commands.PrepareToAspirateResult
         ):
             pipette_id = action.command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = 0
@@ -838,8 +845,6 @@ class PipetteView(HasState[PipetteState]):
             - primary_nozzle_offset
             + pipette_bounds_offsets.front_right_corner
         )
-        # TODO (spp, 2024-02-27): remove back right & front left;
-        #  return only back left and front right points.
         pip_back_right_bound = Point(
             pip_front_right_bound.x, pip_back_left_bound.y, pip_front_right_bound.z
         )

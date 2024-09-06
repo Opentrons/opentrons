@@ -10,10 +10,11 @@ import type {
   RobotMovingRoute,
   RouteStep,
 } from '../types'
+import type { UseRecoveryTakeoverResult } from './useRecoveryTakeover'
 
 export interface GetRouteUpdateActionsParams {
   hasLaunchedRecovery: boolean
-  toggleERWizard: (launchER: boolean) => Promise<void>
+  toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
   recoveryMap: IRecoveryMap
   setRecoveryMap: (recoveryMap: IRecoveryMap) => void
 }
@@ -165,7 +166,7 @@ export function getRecoveryRouteNavigation(
   return { getNextStep, getPrevStep }
 }
 
-interface DetermineRecoveryRoutingParams extends GetRouteUpdateActionsParams {
+type DetermineRecoveryRoutingParams = GetRouteUpdateActionsParams & {
   updatedStep: string
   currentRoute: RecoveryRoute
 }
@@ -175,7 +176,7 @@ interface DetermineRecoveryRoutingParams extends GetRouteUpdateActionsParams {
 // is the fallback route as opposed to SelectRecoveryOption (ex, accessed by pressing "go back" enough times).
 function determineRecoveryRouting({
   hasLaunchedRecovery,
-  toggleERWizard,
+  toggleERWizAsActiveUser,
   setRecoveryMap,
   updatedStep,
   currentRoute,
@@ -189,7 +190,7 @@ function determineRecoveryRouting({
     })
 
     if (!hasLaunchedRecovery) {
-      void toggleERWizard(false)
+      void toggleERWizAsActiveUser(false, false)
     }
   } else {
     setRecoveryMap({ route: currentRoute, step: updatedStep })

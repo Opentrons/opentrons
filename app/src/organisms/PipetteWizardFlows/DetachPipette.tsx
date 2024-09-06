@@ -19,10 +19,12 @@ import {
 } from '@opentrons/components'
 import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '../../molecules/SimpleWizardBody'
 import { Skeleton } from '../../atoms/Skeleton'
 import { SmallButton } from '../../atoms/buttons'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { BODY_STYLE, SECTIONS } from './constants'
 import { getPipetteAnimations, getPipetteAnimations96 } from './utils'
 import type { PipetteWizardStepProps } from './types'
@@ -175,7 +177,8 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     )
   }
 
-  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
+  if (isRobotMoving)
+    return <SimpleWizardInProgressBody description={t('stand_back')} />
   if (showPipetteStillAttached) {
     return (
       <SimpleWizardBody

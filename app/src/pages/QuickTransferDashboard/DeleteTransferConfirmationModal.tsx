@@ -1,29 +1,25 @@
 import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from 'react-query'
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import { Trans, useTranslation } from 'react-i18next'
 
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
-  Box,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  OVERFLOW_HIDDEN,
-  OVERFLOW_WRAP_ANYWHERE,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '../../molecules/OddModal'
 import { useToaster } from '../../organisms/ToasterOven'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface DeleteTransferConfirmationModalProps {
   transferId: string
@@ -38,7 +34,7 @@ export function DeleteTransferConfirmationModal({
   const navigate = useNavigate()
   const { makeSnackbar } = useToaster()
   const [showIcon, setShowIcon] = React.useState<boolean>(false)
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('delete_this_transfer'),
     iconName: 'ot-alert',
     iconColor: COLORS.yellow50,
@@ -91,16 +87,23 @@ export function DeleteTransferConfirmationModal({
     }
   }
   return (
-    <Modal header={modalHeader}>
+    <OddModal header={modalHeader}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
         width="100%"
       >
-        <Box width="100%">
-          <TransferNameText>{transferName}</TransferNameText>
-          <AdditionalText>{t('will_be_deleted')}</AdditionalText>
-        </Box>
+        <Flex width="100%">
+          <StyledText oddStyle="bodyTextRegular">
+            <Trans
+              t={t}
+              i18nKey="will_be_deleted"
+              values={{
+                transferName,
+              }}
+            />
+          </StyledText>
+        </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}
           gridGap={SPACING.spacing8}
@@ -121,24 +124,6 @@ export function DeleteTransferConfirmationModal({
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }
-
-const TransferNameText = styled.span`
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  overflow: ${OVERFLOW_HIDDEN};
-  overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
-  font-weight: ${TYPOGRAPHY.fontWeightBold};
-  font-size: ${TYPOGRAPHY.fontSize22};
-  line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${COLORS.grey60};
-`
-const AdditionalText = styled.span`
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  font-size: ${TYPOGRAPHY.fontSize22};
-  line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${COLORS.grey60};
-`

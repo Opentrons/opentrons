@@ -14,7 +14,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.types import RunTimeParameter, BooleanParameter
 from opentrons.protocol_runner import RunResult
 
-from robot_server.service.notifications import RunsPublisher
+from robot_server.service.notifications import RunsPublisher, MaintenanceRunsPublisher
 from robot_server.service.task_runner import TaskRunner
 from robot_server.runs.action_models import RunAction, RunActionType
 from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
@@ -48,6 +48,12 @@ def mock_runs_publisher(decoy: Decoy) -> RunsPublisher:
     return decoy.mock(cls=RunsPublisher)
 
 
+@pytest.fixture()
+def mock_maintenance_runs_publisher(decoy: Decoy) -> MaintenanceRunsPublisher:
+    """Get a mock RunsPublisher."""
+    return decoy.mock(cls=MaintenanceRunsPublisher)
+
+
 @pytest.fixture
 def run_id() -> str:
     """A run identifier value."""
@@ -66,6 +72,7 @@ def engine_state_summary() -> StateSummary:
         modules=[],
         liquids=[],
         wells=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
 
@@ -99,6 +106,7 @@ def subject(
     mock_run_store: RunStore,
     mock_task_runner: TaskRunner,
     mock_runs_publisher: RunsPublisher,
+    mock_maintenance_runs_publisher: MaintenanceRunsPublisher,
 ) -> RunController:
     """Get a RunController test subject."""
     return RunController(
@@ -107,6 +115,7 @@ def subject(
         run_store=mock_run_store,
         task_runner=mock_task_runner,
         runs_publisher=mock_runs_publisher,
+        maintenance_runs_publisher=mock_maintenance_runs_publisher,
     )
 
 
@@ -144,6 +153,7 @@ async def test_create_play_action_to_start(
     mock_run_store: RunStore,
     mock_task_runner: TaskRunner,
     mock_runs_publisher: RunsPublisher,
+    mock_maintenance_runs_publisher: MaintenanceRunsPublisher,
     engine_state_summary: StateSummary,
     run_time_parameters: List[RunTimeParameter],
     protocol_commands: List[pe_commands.Command],
@@ -190,7 +200,31 @@ async def test_create_play_action_to_start(
             commands=protocol_commands,
             run_time_parameters=run_time_parameters,
         ),
-        await mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
+        mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
+        times=1,
+    )
+
+    # Verify maintenance run publication after background task execution
+    decoy.verify(
+        mock_maintenance_runs_publisher.publish_current_maintenance_run(),
+        times=1,
+    )
+
+    # Verify maintenance run publication after background task execution
+    decoy.verify(
+        mock_maintenance_runs_publisher.publish_current_maintenance_run(),
+        times=1,
+    )
+
+    # Verify maintenance run publication after background task execution
+    decoy.verify(
+        mock_maintenance_runs_publisher.publish_current_maintenance_run(),
+        times=1,
+    )
+
+    # Verify maintenance run publication after background task execution
+    decoy.verify(
+        mock_maintenance_runs_publisher.publish_current_maintenance_run(),
         times=1,
     )
 

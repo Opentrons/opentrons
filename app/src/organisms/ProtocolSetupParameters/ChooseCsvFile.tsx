@@ -12,11 +12,12 @@ import {
   Flex,
   LegacyStyledText,
   SPACING,
+  RadioButton,
+  truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 
-import { RadioButton } from '../../atoms/buttons'
 import { getShellUpdateDataFiles } from '../../redux/shell'
 import { ChildNavigation } from '../ChildNavigation'
 import { EmptyFile } from './EmptyFile'
@@ -27,6 +28,8 @@ import type {
 } from '@opentrons/shared-data'
 import type { CsvFileData } from '@opentrons/api-client'
 
+const MAX_CHARS = 52
+const CSV_FILENAME_BREAK_POINT = 42
 interface ChooseCsvFileProps {
   protocolId: string
   handleGoBack: () => void
@@ -46,7 +49,8 @@ export function ChooseCsvFile({
   const { t } = useTranslation('protocol_setup')
 
   const csvFilesOnUSB = useSelector(getShellUpdateDataFiles) ?? []
-  const csvFilesOnRobot = useAllCsvFilesQuery(protocolId).data?.data.files ?? []
+  const csvFilesOnRobot = (useAllCsvFilesQuery(protocolId).data?.data ??
+    []) as CsvFileData[]
   const sortedCsvFilesOnUSB = csvFilesOnUSB.sort((a, b) => {
     const regex = /^(.*\/)?(.+?)(\d*)\.csv$/
     const aMatch = a.match(regex)
@@ -115,16 +119,22 @@ export function ChooseCsvFile({
             <Flex css={LIST_CONTAINER_STYLE}>
               {csvFilesOnRobot.length !== 0 ? (
                 csvFilesOnRobot.map((csv: CsvFileData) => (
-                  <RadioButton
-                    key={csv.id}
-                    data-testid={csv.id}
-                    buttonLabel={csv.name}
-                    buttonValue={`${csv.id}`}
-                    onChange={() => {
-                      setCsvFileSelected({ id: csv.id, fileName: csv.name })
-                    }}
-                    isSelected={csvFileSelected?.id === csv.id}
-                  />
+                  <React.Fragment key={csv.id}>
+                    <RadioButton
+                      buttonLabel={truncateString(
+                        csv.name,
+                        MAX_CHARS,
+                        CSV_FILENAME_BREAK_POINT
+                      )}
+                      buttonValue={csv.id}
+                      onChange={() => {
+                        setCsvFileSelected({ id: csv.id, fileName: csv.name })
+                      }}
+                      id={`${csv.id}-on-robot`}
+                      isSelected={csvFileSelected?.id === csv.id}
+                      maxLines={3}
+                    />
+                  </React.Fragment>
                 ))
               ) : (
                 <EmptyFile />
@@ -143,8 +153,11 @@ export function ChooseCsvFile({
                     <React.Fragment key={fileName}>
                       {csvFilePath.length !== 0 && fileName !== undefined ? (
                         <RadioButton
-                          data-testid={fileName}
-                          buttonLabel={fileName ?? 'default'}
+                          buttonLabel={truncateString(
+                            fileName,
+                            MAX_CHARS,
+                            CSV_FILENAME_BREAK_POINT
+                          )}
                           buttonValue={csvFilePath}
                           onChange={() => {
                             setCsvFileSelected({
@@ -152,7 +165,9 @@ export function ChooseCsvFile({
                               fileName,
                             })
                           }}
+                          id={`${csvFilePath.replace('/', '-')}}-on-usb`}
                           isSelected={csvFileSelected?.filePath === csvFilePath}
+                          maxLines={3}
                         />
                       ) : null}
                     </React.Fragment>
@@ -178,7 +193,7 @@ const HEADER_TEXT_STYLE = css`
 const CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing16};
-  flex: 1;
+  width: 28rem;
 `
 
 const LIST_CONTAINER_STYLE = css`

@@ -1,13 +1,15 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+
 import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  POSITION_FIXED,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  InputField,
+  POSITION_FIXED,
+  SPACING,
 } from '@opentrons/components'
 import {
   LOW_VOLUME_PIPETTES,
@@ -16,10 +18,9 @@ import {
 
 import { getTopPortalEl } from '../../../App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
-import { InputField } from '../../../atoms/InputField'
 import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
-
 import { ACTIONS } from '../constants'
+
 import type { SupportedTip } from '@opentrons/shared-data'
 import type {
   QuickTransferSummaryState,
@@ -141,6 +142,7 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
         >
           <NumericalKeyboard
             keyboardRef={keyboardRef}
+            initialValue={String(flowRate)}
             onChange={e => {
               setFlowRate(Number(e))
             }}

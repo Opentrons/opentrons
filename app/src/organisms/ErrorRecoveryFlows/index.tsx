@@ -14,14 +14,17 @@ import {
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { useHost } from '@opentrons/react-api-client'
 
 import { getIsOnDevice } from '../../redux/config'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
 import { RunPausedSplash, useRunPausedSplash } from './RunPausedSplash'
+import { RecoveryTakeover } from './RecoveryTakeover'
 import {
   useCurrentlyRecoveringFrom,
   useERUtils,
-  useRecoveryAnalytics,
+  useRecoveryTakeover,
+  useRetainedFailedCommandBySource,
   useShowDoorInfo,
 } from './hooks'
 
@@ -106,47 +109,62 @@ export function useErrorRecoveryFlows(
 export interface ErrorRecoveryFlowsProps {
   runId: string
   runStatus: RunStatus | null
-  failedCommand: FailedCommand | null
+  failedCommandByRunRecord: FailedCommand | null
   protocolAnalysis: CompletedProtocolAnalysis | null
 }
 
 export function ErrorRecoveryFlows(
   props: ErrorRecoveryFlowsProps
 ): JSX.Element | null {
-  const { protocolAnalysis, runStatus, failedCommand } = props
+  const { protocolAnalysis, runStatus, failedCommandByRunRecord } = props
+
+  const failedCommandBySource = useRetainedFailedCommandBySource(
+    failedCommandByRunRecord,
+    protocolAnalysis
+  )
 
   const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
-
   const isOnDevice = useSelector(getIsOnDevice)
   const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
-  const showSplash = useRunPausedSplash(isOnDevice, showERWizard)
-  const analytics = useRecoveryAnalytics()
-
-  React.useEffect(() => {
-    analytics.reportErrorEvent(failedCommand)
-  }, [failedCommand])
+  const robotName = useHost()?.robotName ?? 'robot'
 
   const isDoorOpen = useShowDoorInfo(runStatus)
+  const {
+    showTakeover,
+    isActiveUser,
+    intent,
+    toggleERWizAsActiveUser,
+  } = useRecoveryTakeover(toggleERWizard)
+  const renderWizard = isActiveUser && (showERWizard || isDoorOpen)
+  const showSplash = useRunPausedSplash(isOnDevice, renderWizard)
 
   const recoveryUtils = useERUtils({
     ...props,
     hasLaunchedRecovery,
-    toggleERWizard,
+    toggleERWizAsActiveUser,
     isOnDevice,
     robotType,
-    analytics,
+    failedCommand: failedCommandBySource,
   })
 
   return (
     <>
-      {showERWizard || isDoorOpen ? (
+      {showTakeover ? (
+        <RecoveryTakeover
+          intent={intent}
+          robotName={robotName}
+          isOnDevice={isOnDevice}
+          runStatus={runStatus}
+        />
+      ) : null}
+      {renderWizard ? (
         <ErrorRecoveryWizard
           {...props}
           {...recoveryUtils}
           robotType={robotType}
           isOnDevice={isOnDevice}
           isDoorOpen={isDoorOpen}
-          analytics={analytics}
+          failedCommand={failedCommandBySource}
         />
       ) : null}
       {showSplash ? (
@@ -154,9 +172,10 @@ export function ErrorRecoveryFlows(
           {...props}
           {...recoveryUtils}
           robotType={robotType}
+          robotName={robotName}
           isOnDevice={isOnDevice}
-          toggleERWiz={toggleERWizard}
-          analytics={analytics}
+          toggleERWizAsActiveUser={toggleERWizAsActiveUser}
+          failedCommand={failedCommandBySource}
         />
       ) : null}
     </>

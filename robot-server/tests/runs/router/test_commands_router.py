@@ -128,11 +128,13 @@ async def test_create_run_command(
     ).then_do(_stub_queued_command_state)
 
     result = await create_run_command(
+        run_id="run-id",
         request_body=RequestModelWithCommandCreate(data=command_request),
         waitUntilComplete=False,
         run_orchestrator_store=mock_run_orchestrator_store,
         failedCommandId=None,
         timeout=12,
+        check_estop=True,
     )
 
     assert result.content.data == command_once_added
@@ -147,22 +149,24 @@ async def test_create_command_with_failed_command_raises(
     command_create = pe_commands.HomeCreate(params=pe_commands.HomeParams())
 
     decoy.when(
-        mock_run_orchestrator_store.add_command_and_wait_for_interval(
+        await mock_run_orchestrator_store.add_command_and_wait_for_interval(
             pe_commands.HomeCreate(
                 params=pe_commands.HomeParams(),
                 intent=pe_commands.CommandIntent.SETUP,
             ),
             failed_command_id="123",
+            wait_until_complete=False,
+            timeout=None,
         )
     ).then_raise(pe_errors.CommandNotAllowedError())
 
     with pytest.raises(ApiError):
         await create_run_command(
-            RequestModelWithCommandCreate(data=command_create),
-            waitUntilComplete=False,
-            timeout=42,
+            run_id="run-id",
+            request_body=RequestModelWithCommandCreate(data=command_create),
             run_orchestrator_store=mock_run_orchestrator_store,
             failedCommandId="123",
+            check_estop=True,
         )
 
 
@@ -199,14 +203,15 @@ async def test_create_run_command_blocking_completion(
     )
 
     result = await create_run_command(
+        run_id="run-id",
         request_body=RequestModelWithCommandCreate(data=command_request),
         waitUntilComplete=True,
         timeout=999,
         run_orchestrator_store=mock_run_orchestrator_store,
         failedCommandId=None,
+        check_estop=True,
     )
 
-    print(result.content.data)
     assert result.content.data == command_once_completed
     assert result.status_code == 201
 
@@ -222,17 +227,21 @@ async def test_add_conflicting_setup_command(
     )
 
     decoy.when(
-        mock_run_orchestrator_store.add_command_and_wait_for_interval(
-            request=command_request, failed_command_id=None
+        await mock_run_orchestrator_store.add_command_and_wait_for_interval(
+            request=command_request,
+            failed_command_id=None,
+            wait_until_complete=False,
+            timeout=None,
         )
     ).then_raise(pe_errors.SetupCommandNotAllowedError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
         await create_run_command(
+            run_id="run-id",
             request_body=RequestModelWithCommandCreate(data=command_request),
-            waitUntilComplete=False,
             run_orchestrator_store=mock_run_orchestrator_store,
             failedCommandId=None,
+            check_estop=True,
         )
 
     assert exc_info.value.status_code == 409
@@ -253,17 +262,21 @@ async def test_add_command_to_stopped_engine(
     )
 
     decoy.when(
-        mock_run_orchestrator_store.add_command_and_wait_for_interval(
-            request=command_request, failed_command_id=None
+        await mock_run_orchestrator_store.add_command_and_wait_for_interval(
+            request=command_request,
+            failed_command_id=None,
+            wait_until_complete=False,
+            timeout=None,
         )
     ).then_raise(pe_errors.RunStoppedError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
         await create_run_command(
+            run_id="run-id",
             request_body=RequestModelWithCommandCreate(data=command_request),
-            waitUntilComplete=False,
             run_orchestrator_store=mock_run_orchestrator_store,
             failedCommandId=None,
+            check_estop=True,
         )
 
     assert exc_info.value.status_code == 409

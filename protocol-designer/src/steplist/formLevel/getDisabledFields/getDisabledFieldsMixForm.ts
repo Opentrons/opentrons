@@ -7,6 +7,11 @@ export function getDisabledFieldsMixForm(
 ): Set<string> {
   const disabled: Set<string> = new Set()
 
+  if (hydratedForm.wells.length === 0 || hydratedForm.pipette == null) {
+    disabled.add('pickUpTip_location')
+    disabled.add('dropTip_location')
+  }
+
   if (!hydratedForm.pipette || !hydratedForm.labware) {
     disabled.add('mix_touchTip_checkbox')
     disabled.add('mix_mmFromBottom')

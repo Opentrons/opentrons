@@ -71,7 +71,7 @@ class ErrorRecoveryRule(BaseModel):
     )
 
 
-class ErrorRecoveryPolicies(BaseModel):
+class ErrorRecoveryPolicy(BaseModel):
     """Request/Response model for new error recovery policy rules creation."""
 
     policyRules: List[ErrorRecoveryRule] = Field(

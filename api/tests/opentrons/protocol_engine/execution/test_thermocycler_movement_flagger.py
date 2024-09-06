@@ -8,7 +8,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons.types import DeckSlotName
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.state.module_substates.thermocycler_module_substate import (
     ThermocyclerModuleId,
     ThermocyclerModuleSubState,

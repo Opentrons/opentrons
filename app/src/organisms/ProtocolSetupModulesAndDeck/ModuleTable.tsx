@@ -7,9 +7,9 @@ import {
   BORDERS,
   COLORS,
   Chip,
+  DeckInfoLabel,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LocationIcon,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
@@ -281,8 +281,8 @@ function ModuleTableItem({
           </LegacyStyledText>
         </Flex>
         <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
-          <LocationIcon
-            slotName={
+          <DeckInfoLabel
+            deckLabel={
               getModuleType(module.moduleDef.model) === THERMOCYCLER_MODULE_TYPE
                 ? TC_MODULE_LOCATION_OT3
                 : module.slotName

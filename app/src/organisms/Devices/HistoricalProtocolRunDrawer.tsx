@@ -9,14 +9,12 @@ import {
   BORDERS,
   Box,
   COLORS,
+  DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
-  Icon,
   InfoScreen,
   JUSTIFY_FLEX_START,
   LegacyStyledText,
-  Link,
-  LocationIcon,
   OVERFLOW_HIDDEN,
   SPACING,
   TYPOGRAPHY,
@@ -27,8 +25,8 @@ import {
   getLoadedLabwareDefinitionsByUri,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
-import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
-import { useFeatureFlag } from '../../redux/config'
+import { useCsvFileQuery } from '@opentrons/react-api-client'
+import { DownloadCsvFileLink } from './DownloadCsvFileLink'
 import { Banner } from '../../atoms/Banner'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useDeckCalibrationData } from './hooks'
@@ -48,8 +46,17 @@ export function HistoricalProtocolRunDrawer(
   const allLabwareOffsets = run.labwareOffsets?.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )
-  const { data } = useAllCsvFilesQuery(run.protocolId ?? '')
-  const allProtocolDataFiles = data != null ? data.data.files : []
+  const runDataFileIds =
+    'runTimeParameters' in run
+      ? run.runTimeParameters.reduce<string[]>((acc, parameter) => {
+          if (parameter.type === 'csv_file') {
+            return parameter.file?.id != null
+              ? [...acc, parameter.file?.id]
+              : acc
+          }
+          return acc
+        }, [])
+      : []
   const uniqueLabwareOffsets = allLabwareOffsets?.filter(
     (offset, index, array) => {
       return (
@@ -69,7 +76,6 @@ export function HistoricalProtocolRunDrawer(
       ? deckCalibrationData.lastModified
       : null
   const protocolDetails = useMostRecentCompletedAnalysis(run.id)
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   const isOutOfDate =
     typeof lastModifiedDeckCal === 'string' &&
@@ -97,8 +103,8 @@ export function HistoricalProtocolRunDrawer(
   ) : null
 
   const protocolFilesData =
-    allProtocolDataFiles.length === 0 ? (
-      <InfoScreen contentType="noFiles" t={t} backgroundColor={COLORS.grey35} />
+    runDataFileIds.length === 0 ? (
+      <InfoScreen content={t('no_files_included')} />
     ) : (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <LegacyStyledText>{t('protocol_files')}</LegacyStyledText>
@@ -136,58 +142,8 @@ export function HistoricalProtocolRunDrawer(
           </Box>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          {allProtocolDataFiles.map((fileData, index) => {
-            const { createdAt, name } = fileData
-            return (
-              <Flex
-                key={`csv_file_${index}`}
-                justifyContent={JUSTIFY_FLEX_START}
-                alignItems={ALIGN_CENTER}
-                padding={SPACING.spacing12}
-                backgroundColor={COLORS.white}
-                borderRadius={BORDERS.borderRadius4}
-                gridGap={SPACING.spacing24}
-              >
-                <Flex
-                  width="33%"
-                  gridGap={SPACING.spacing4}
-                  alignItems={ALIGN_CENTER}
-                >
-                  <LegacyStyledText
-                    as="p"
-                    css={css`
-                      overflow: ${OVERFLOW_HIDDEN};
-                      text-overflow: ellipsis;
-                    `}
-                  >
-                    {name}
-                  </LegacyStyledText>
-                </Flex>
-                <Box width="33%">
-                  <LegacyStyledText as="p">
-                    {format(new Date(createdAt), 'M/d/yy HH:mm:ss')}
-                  </LegacyStyledText>
-                </Box>
-                <Box width="34%">
-                  <Link
-                    role="button"
-                    css={TYPOGRAPHY.linkPSemiBold}
-                    onClick={() => {}} // TODO (nd: 06/18/2024) get file and download
-                  >
-                    <Flex alignItems={ALIGN_CENTER}>
-                      <LegacyStyledText as="p">
-                        {t('download')}
-                      </LegacyStyledText>
-                      <Icon
-                        name="download"
-                        size="1rem"
-                        marginLeft="0.4375rem"
-                      />
-                    </Flex>
-                  </Link>
-                </Box>
-              </Flex>
-            )
+          {runDataFileIds.map((fileId, index) => {
+            return <CsvFileDataRow key={`csv_file_${index}`} fileId={fileId} />
           })}
         </Flex>
       </Flex>
@@ -195,13 +151,8 @@ export function HistoricalProtocolRunDrawer(
 
   const labwareOffsets =
     uniqueLabwareOffsets == null || uniqueLabwareOffsets.length === 0 ? (
-      <InfoScreen
-        contentType="noLabwareOffsetData"
-        t={t}
-        backgroundColor={COLORS.grey35}
-      />
+      <InfoScreen content={t('no_offsets_available')} />
     ) : (
-      // <InfoScreen contentType="noLabwareOffsetData" />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         {outOfDateBanner}
         <LegacyStyledText>
@@ -272,7 +223,7 @@ export function HistoricalProtocolRunDrawer(
                   gridGap={SPACING.spacing4}
                   alignItems={ALIGN_CENTER}
                 >
-                  <LocationIcon slotName={offset.location.slotName} />
+                  <DeckInfoLabel deckLabel={offset.location.slotName} />
                   <LegacyStyledText as="p">
                     {offset.location.moduleModel != null
                       ? getModuleDisplayName(offset.location.moduleModel)
@@ -306,8 +257,52 @@ export function HistoricalProtocolRunDrawer(
       width="100%"
       padding={SPACING.spacing16}
     >
-      {enableCsvFile ? protocolFilesData : null}
+      {protocolFilesData}
       {labwareOffsets}
+    </Flex>
+  )
+}
+
+interface CsvFileDataRowProps {
+  fileId: string
+}
+
+function CsvFileDataRow(props: CsvFileDataRowProps): JSX.Element | null {
+  const { fileId } = props
+
+  const { data: fileData } = useCsvFileQuery(fileId)
+  if (fileData == null) {
+    return null
+  }
+  const { name, createdAt } = fileData.data
+  return (
+    <Flex
+      justifyContent={JUSTIFY_FLEX_START}
+      alignItems={ALIGN_CENTER}
+      padding={SPACING.spacing12}
+      backgroundColor={COLORS.white}
+      borderRadius={BORDERS.borderRadius4}
+      gridGap={SPACING.spacing24}
+    >
+      <Flex width="33%" gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
+        <LegacyStyledText
+          as="p"
+          css={css`
+            overflow: ${OVERFLOW_HIDDEN};
+            text-overflow: ellipsis;
+          `}
+        >
+          {name}
+        </LegacyStyledText>
+      </Flex>
+      <Box width="33%">
+        <LegacyStyledText as="p">
+          {format(new Date(createdAt), 'M/d/yy HH:mm:ss')}
+        </LegacyStyledText>
+      </Box>
+      <Box width="34%">
+        <DownloadCsvFileLink fileId={fileId} fileName={name} />
+      </Box>
     </Flex>
   )
 }

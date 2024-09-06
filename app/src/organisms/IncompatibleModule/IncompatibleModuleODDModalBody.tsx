@@ -4,16 +4,16 @@ import capitalize from 'lodash/capitalize'
 import {
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
-  TYPOGRAPHY,
+  ListItem,
   OVERFLOW_SCROLL,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
+import { OddModal } from '../../molecules/OddModal'
 import type { AttachedModule } from '@opentrons/api-client'
-import { Modal } from '../../molecules/Modal'
-import { ListItem } from '../../atoms/ListItem'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 export interface IncompatibleModuleODDModalBodyProps {
   modules: AttachedModule[]
 }
@@ -22,11 +22,11 @@ export function IncompatibleModuleODDModalBody({
   modules,
 }: IncompatibleModuleODDModalBodyProps): JSX.Element {
   const { t } = useTranslation('incompatible_modules')
-  const incompatibleModuleHeader: ModalHeaderBaseProps = {
+  const incompatibleModuleHeader: OddModalHeaderBaseProps = {
     title: capitalize(t('incompatible_modules_attached') as string),
   }
   return (
-    <Modal header={incompatibleModuleHeader}>
+    <OddModal header={incompatibleModuleHeader}>
       <Flex flexDirection={DIRECTION_COLUMN} width="100%">
         <LegacyStyledText as="p" marginBottom={SPACING.spacing32}>
           <Trans t={t} i18nKey="remove_before_running_protocol" />
@@ -50,6 +50,6 @@ export function IncompatibleModuleODDModalBody({
           ))}
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

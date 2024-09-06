@@ -7,7 +7,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from .. import commands
 from ..commands.command_unions import CREATE_TYPES_BY_PARAMS_TYPE
-from ..state import StateView
+from ..state.state import StateView
 from ..types import (
     Liquid,
     LabwareOffsetCreate,
@@ -117,6 +117,12 @@ class SyncClient:
         """Add an addressable area to the engine's state."""
         self._transport.call_method(
             "add_addressable_area", addressable_area_name=addressable_area_name
+        )
+
+    def add_absorbance_reader_lid(self, module_id: str, lid_id: str) -> None:
+        """Add an absorbance reader lid to the module state."""
+        self._transport.call_method(
+            "add_absorbance_reader_lid", module_id=module_id, lid_id=lid_id
         )
 
     def add_liquid(

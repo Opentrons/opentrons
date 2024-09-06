@@ -3,8 +3,8 @@ import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   FormGroup,
-  InputField,
-  Modal,
+  LegacyInputField,
+  LegacyModal,
   OutlineButton,
 } from '@opentrons/components'
 import { actions as steplistActions } from '../../steplist'
@@ -44,7 +44,7 @@ export function MoreOptionsModal(props: Props): JSX.Element {
   }
 
   return (
-    <Modal
+    <LegacyModal
       heading={t('step_notes.title')}
       className={modalStyles.modal}
       contentsClassName={styles.modal_contents}
@@ -54,7 +54,7 @@ export function MoreOptionsModal(props: Props): JSX.Element {
           label={t('form:step_edit_form.field.step_name.label')}
           className={styles.form_group}
         >
-          <InputField
+          <LegacyInputField
             onChange={makeHandleChange('stepName')}
             value={String(formData.stepName)}
           />
@@ -77,6 +77,6 @@ export function MoreOptionsModal(props: Props): JSX.Element {
           <OutlineButton onClick={handleSave}>{t('button:save')}</OutlineButton>
         </div>
       </div>
-    </Modal>
+    </LegacyModal>
   )
 }

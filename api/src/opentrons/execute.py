@@ -142,23 +142,23 @@ def get_protocol_api(
     When this function is called, modules and instruments will be recached.
 
     :param version: The API version to use. This must be lower than
-                    ``opentrons.protocol_api.MAX_SUPPORTED_VERSION``.
-                    It may be specified either as a string (``'2.0'``) or
-                    as a ``protocols.types.APIVersion``
-                    (``APIVersion(2, 0)``).
+        ``opentrons.protocol_api.MAX_SUPPORTED_VERSION``.
+        It may be specified either as a string (``'2.0'``) or
+        as a ``protocols.types.APIVersion``
+        (``APIVersion(2, 0)``).
     :param bundled_labware: If specified, a mapping from labware names to
-                            labware definitions for labware to consider in the
-                            protocol. Note that if you specify this, _only_
-                            labware in this argument will be allowed in the
-                            protocol. This is preparation for a beta feature
-                            and is best not used.
+        labware definitions for labware to consider in the
+        protocol. Note that if you specify this, *only*
+        labware in this argument will be allowed in the
+        protocol. This is preparation for a beta feature
+        and is best not used.
     :param bundled_data: If specified, a mapping from filenames to contents
-                         for data to be available in the protocol from
-                         :py:obj:`opentrons.protocol_api.ProtocolContext.bundled_data`.
+        for data to be available in the protocol from
+        :py:obj:`opentrons.protocol_api.ProtocolContext.bundled_data`.
     :param extra_labware: A mapping from labware load names to custom labware definitions.
-                          If this is ``None`` (the default), and this function is called on a robot,
-                          it will look for labware in the ``labware`` subdirectory of the Jupyter
-                          data directory.
+        If this is ``None`` (the default), and this function is called on a robot,
+        it will look for labware in the ``labware`` subdirectory of the Jupyter
+        data directory.
     :return: The protocol context.
     """
     if isinstance(version, str):
@@ -313,18 +313,18 @@ def execute(
 
     :param protocol_file: The protocol file to execute
     :param protocol_name: The name of the protocol file. This is required
-                          internally, but it may not be a thing we can get
-                          from the protocol_file argument.
+        internally, but it may not be a thing we can get
+        from the ``protocol_file`` argument.
     :param propagate_logs: Whether this function should allow logs from the
-                           Opentrons stack to propagate up to the root handler.
-                           This can be useful if you're integrating this
-                           function in a larger application, but most logs that
-                           occur during protocol simulation are best associated
-                           with the actions in the protocol that cause them.
-                           Default: ``False``
+        Opentrons stack to propagate up to the root handler.
+        This can be useful if you're integrating this
+        function in a larger application, but most logs that
+        occur during protocol simulation are best associated
+        with the actions in the protocol that cause them.
+        Default: ``False``
     :param log_level: The level of logs to emit on the command line:
-                      ``"debug"``, ``"info"``, ``"warning"``, or ``"error"``.
-                      Defaults to ``"warning"``.
+        ``"debug"``, ``"info"``, ``"warning"``, or ``"error"``.
+        Defaults to ``"warning"``.
     :param emit_runlog: A callback for printing the run log. If specified, this
         will be called whenever a command adds an entry to the
         run log, which can be used for display and progress
@@ -353,17 +353,17 @@ def execute(
           ``KeyError``.
 
     :param custom_labware_paths: A list of directories to search for custom labware.
-                                 Loads valid labware from these paths and makes them available
-                                 to the protocol context. If this is ``None`` (the default), and
-                                 this function is called on a robot, it will look in the ``labware``
-                                 subdirectory of the Jupyter data directory.
+        Loads valid labware from these paths and makes them available
+        to the protocol context. If this is ``None`` (the default), and
+        this function is called on a robot, it will look in the ``labware``
+        subdirectory of the Jupyter data directory.
     :param custom_data_paths: A list of directories or files to load custom
-                              data files from. Ignored if the apiv2 feature
-                              flag if not set. Entries may be either files or
-                              directories. Specified files and the
-                              non-recursive contents of specified directories
-                              are presented by the protocol context in
-                              ``ProtocolContext.bundled_data``.
+        data files from. Ignored if the apiv2 feature
+        flag if not set. Entries may be either files or
+        directories. Specified files and the
+        non-recursive contents of specified directories
+        are presented by the protocol context in
+        ``ProtocolContext.bundled_data``.
     """
     stack_logger = logging.getLogger("opentrons")
     stack_logger.propagate = propagate_logs
@@ -457,10 +457,10 @@ def main() -> int:
     """Handler for command line invocation to run a protocol.
 
     :param argv: The arguments the program was invoked with; this is usually
-                 :py:obj:`sys.argv` but if you want to override that you can.
+        :py:obj:`sys.argv` but if you want to override that you can.
     :returns int: A success or failure value suitable for use as a shell
-                  return code passed to :py:obj:`sys.exit` (0 means success,
-                  anything else is a kind of failure).
+        return code passed to :py:obj:`sys.exit` (0 means success,
+        anything else is a kind of failure).
     """
     parser = argparse.ArgumentParser(
         prog="opentrons_execute", description="Run an OT-2 protocol"
@@ -545,6 +545,7 @@ def _create_live_context_pe(
         create_protocol_engine_in_thread(
             hardware_api=hardware_api_wrapped,
             config=_get_protocol_engine_config(),
+            deck_configuration=entrypoint_util.get_deck_configuration(),
             error_recovery_policy=error_recovery_policy.never_recover,
             drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
@@ -689,8 +690,6 @@ def _get_protocol_engine_config() -> Config:
         # We deliberately omit ignore_pause=True because, in the current implementation of
         # opentrons.protocol_api.core.engine, that would incorrectly make
         # ProtocolContext.is_simulating() return True.
-        use_simulated_deck_config=True,
-        # TODO the above is not correct for this and it should use the robot's actual config
     )
 
 

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
+
 import {
   RUN_ACTION_TYPE_PLAY,
   RUN_STATUS_STOPPED,
@@ -21,15 +22,16 @@ import {
   Flex,
   Icon,
   InfoScreen,
-  SPACING,
   LegacyStyledText,
+  OVERFLOW_AUTO,
+  SPACING,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
 
 import { Banner } from '../../../atoms/Banner'
 import { Divider } from '../../../atoms/structure'
-import { Tooltip } from '../../../atoms/Tooltip'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { useNotifyRunQuery } from '../../../resources/runs'
@@ -54,10 +56,15 @@ export function ProtocolRunRuntimeParameters({
   // because the most recent analysis may not reflect the selected run (e.g. cloning a run
   // from a historical protocol run from the device details page)
   const run = useNotifyRunQuery(runId).data
-  const runTimeParameters =
-    (isRunTerminal
+  const runTimeParametersFromRun =
+    run?.data != null && 'runTimeParameters' in run?.data
       ? run?.data?.runTimeParameters
-      : mostRecentAnalysis?.runTimeParameters) ?? []
+      : []
+  const runTimeParametersFromAnalysis =
+    mostRecentAnalysis?.runTimeParameters ?? []
+  const runTimeParameters = isRunTerminal
+    ? runTimeParametersFromRun
+    : runTimeParametersFromAnalysis
   const hasRunTimeParameters = runTimeParameters.length > 0
   const hasCustomRunTimeParameterValues = runTimeParameters.some(parameter =>
     parameter.type !== 'csv_file' ? parameter.value !== parameter.default : true
@@ -101,38 +108,28 @@ export function ProtocolRunRuntimeParameters({
           ) : null}
         </Flex>
         {hasRunTimeParameters ? (
-          <Banner
-            type="informing"
-            width="100%"
-            iconMarginLeft={SPACING.spacing4}
-          >
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText
-                as="p"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              >
-                {t('values_are_view_only')}
-              </LegacyStyledText>
-              <LegacyStyledText as="p">
-                {t('cancel_and_restart_to_edit')}
-              </LegacyStyledText>
-            </Flex>
-          </Banner>
+          <RunTimeParametersBanner isRunTerminal={isRunTerminal} />
         ) : null}
       </Flex>
       {!hasRunTimeParameters ? (
         <Flex padding={SPACING.spacing16}>
           <InfoScreen
-            contentType={
-              isRunCancelledWithoutStarting ? 'runNotStarted' : 'parameters'
+            content={
+              isRunCancelledWithoutStarting
+                ? t('run_never_started')
+                : t('no_parameters_specified_in_protocol')
             }
-            t={t}
           />
         </Flex>
       ) : (
         <>
           <Divider width="100%" />
-          <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            padding={SPACING.spacing16}
+            height="28rem"
+            overflowY={OVERFLOW_AUTO}
+          >
             <StyledTable>
               <StyledTableHeaderContainer>
                 <StyledTableHeader>{t('name')}</StyledTableHeader>
@@ -156,6 +153,31 @@ export function ProtocolRunRuntimeParameters({
         </>
       )}
     </>
+  )
+}
+
+interface RunTimeParametersBannerProps {
+  isRunTerminal: boolean
+}
+
+function RunTimeParametersBanner({
+  isRunTerminal,
+}: RunTimeParametersBannerProps): JSX.Element {
+  const { t } = useTranslation('protocol_setup')
+
+  return (
+    <Banner type="informing" width="100%" iconMarginLeft={SPACING.spacing4}>
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {isRunTerminal ? t('download_files') : t('values_are_view_only')}
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
+          {isRunTerminal
+            ? t('all_files_associated')
+            : t('cancel_and_restart_to_edit')}
+        </LegacyStyledText>
+      </Flex>
+    </Banner>
   )
 }
 
@@ -206,11 +228,14 @@ const StyledTableRowComponent = (
         ) : null}
       </StyledTableCell>
       <StyledTableCell>
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
-          <LegacyStyledText as="p">
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          gridGap={SPACING.spacing16}
+          alignItems={ALIGN_CENTER}
+        >
+          <LegacyStyledText as="p" css={PARAMETER_VALUE_TEXT_STYLE}>
             {parameter.type === 'csv_file'
-              ? // TODO (nd, 07/17/2024): retrieve filename from parameter once backend is wired up
-                parameter.file?.file?.name ?? ''
+              ? parameter.file?.name ?? ''
               : formatRunTimeParameterValue(parameter, t)}
           </LegacyStyledText>
           {parameter.type === 'csv_file' ||
@@ -267,4 +292,13 @@ const StyledTableCell = styled.td<StyledTableCellProps>`
   padding: ${SPACING.spacing8} 0;
   padding-right: ${props =>
     props.paddingRight != null ? props.paddingRight : SPACING.spacing16};
+`
+
+const PARAMETER_VALUE_TEXT_STYLE = css`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 `

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
@@ -12,39 +13,40 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
+  InputField,
+  LegacyStyledText,
   Link,
   PrimaryButton,
   SIZE_AUTO,
   SPACING,
-  LegacyStyledText,
+  Tooltip,
   TYPOGRAPHY,
   useConditionalConfirm,
   useHoverTooltip,
 } from '@opentrons/components'
-import { getIsHeaterShakerAttached } from '../../redux/config'
 import {
   getModuleDisplayName,
   HS_RPM_MAX,
   HS_RPM_MIN,
   RPM,
 } from '@opentrons/shared-data'
+
+import { getIsHeaterShakerAttached } from '../../redux/config'
 import { getTopPortalEl } from '../../App/portal'
 import { Slideout } from '../../atoms/Slideout'
 import { TertiaryButton } from '../../atoms/buttons'
 import { Divider } from '../../atoms/structure'
-import { InputField } from '../../atoms/InputField'
-import { Tooltip } from '../../atoms/Tooltip'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 import { useLatchControls } from './hooks'
 import { ModuleSetupModal } from './ModuleSetupModal'
 
-import type { HeaterShakerModule, LatchStatus } from '../../redux/modules/types'
 import type {
   CreateCommand,
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
 } from '@opentrons/shared-data'
+import type { HeaterShakerModule, LatchStatus } from '../../redux/modules/types'
 
 interface TestShakeSlideoutProps {
   module: HeaterShakerModule

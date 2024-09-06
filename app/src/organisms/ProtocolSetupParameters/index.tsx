@@ -28,7 +28,6 @@ import { ResetValuesModal } from './ResetValuesModal'
 import { ChooseEnum } from './ChooseEnum'
 import { ChooseNumber } from './ChooseNumber'
 import { ChooseCsvFile } from './ChooseCsvFile'
-import { useFeatureFlag } from '../../redux/config'
 import { useToaster } from '../ToasterOven'
 import { ProtocolSetupStep } from '../../pages/ProtocolSetup'
 import type {
@@ -57,7 +56,6 @@ export function ProtocolSetupParameters({
   mostRecentAnalysis,
 }: ProtocolSetupParametersProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
   const navigate = useNavigate()
   const host = useHost()
   const queryClient = useQueryClient()
@@ -154,17 +152,14 @@ export function ProtocolSetupParameters({
     }
   }
 
-  const runTimeParameterValues = getRunTimeParameterValuesForRun(
-    runTimeParametersOverrides
-  )
-  const { createProtocolAnalysis } = useCreateProtocolAnalysisMutation(
-    protocolId,
-    host
-  )
+  const {
+    createProtocolAnalysis,
+    isLoading: isAnalysisLoading,
+  } = useCreateProtocolAnalysisMutation(protocolId, host)
 
   const { uploadCsvFile } = useUploadCsvFileMutation({}, host)
 
-  const { createRun, isLoading } = useCreateRunMutation({
+  const { createRun, isLoading: isRunLoading } = useCreateRunMutation({
     onSuccess: data => {
       queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
         console.error(`could not invalidate runs cache: ${e.message}`)
@@ -172,73 +167,65 @@ export function ProtocolSetupParameters({
     },
   })
   const handleConfirmValues = (): void => {
-    if (enableCsvFile) {
-      if (hasMissingFileParam) {
-        makeSnackbar(t('protocol_requires_csv') as string)
-      } else {
-        const dataFilesForProtocolMap = runTimeParametersOverrides.reduce<
-          Record<string, FileData>
-        >((acc, parameter) => {
-          // create {variableName: FileData} map for sending to /dataFiles endpoint
-          if (
-            parameter.type === 'csv_file' &&
-            parameter.file?.id == null &&
-            parameter.file?.file != null
-          ) {
-            return { [parameter.variableName]: parameter.file.file }
-          } else if (
-            parameter.type === 'csv_file' &&
-            parameter.file?.id == null &&
-            parameter.file?.filePath != null
-          ) {
-            return { [parameter.variableName]: parameter.file.filePath }
-          }
-          return acc
+    if (hasMissingFileParam) {
+      makeSnackbar(t('protocol_requires_csv') as string)
+    } else {
+      const dataFilesForProtocolMap = runTimeParametersOverrides.reduce<
+        Record<string, FileData>
+      >((acc, parameter) => {
+        // create {variableName: FileData} map for sending to /dataFiles endpoint
+        if (
+          parameter.type === 'csv_file' &&
+          parameter.file?.id == null &&
+          parameter.file?.file != null
+        ) {
+          return { [parameter.variableName]: parameter.file.file }
+        } else if (
+          parameter.type === 'csv_file' &&
+          parameter.file?.id == null &&
+          parameter.file?.filePath != null
+        ) {
+          return { [parameter.variableName]: parameter.file.filePath }
+        }
+        return acc
+      }, {})
+      void Promise.all(
+        Object.entries(dataFilesForProtocolMap).map(([key, fileData]) => {
+          const fileResponse = uploadCsvFile(fileData)
+          const varName = Promise.resolve(key)
+          return Promise.all([fileResponse, varName])
+        })
+      ).then(responseTuples => {
+        const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
+          Record<string, string>
+        >((acc, [uploadedFileResponse, variableName]) => {
+          return { ...acc, [variableName]: uploadedFileResponse.data.id }
         }, {})
-        void Promise.all(
-          Object.entries(dataFilesForProtocolMap).map(([key, fileData]) => {
-            const fileResponse = uploadCsvFile(fileData)
-            const varName = Promise.resolve(key)
-            return Promise.all([fileResponse, varName])
-          })
-        ).then(responseTuples => {
-          const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
-            Record<string, string>
-          >((acc, [uploadedFileResponse, variableName]) => {
-            return { ...acc, [variableName]: uploadedFileResponse.data.id }
-          }, {})
-          const runTimeParameterValues = getRunTimeParameterValuesForRun(
-            runTimeParametersOverrides
-          )
-          const runTimeParameterFiles = getRunTimeParameterFilesForRun(
-            runTimeParametersOverrides,
-            mappedResolvedCsvVariableToFileId
-          )
-          createProtocolAnalysis({
+        const runTimeParameterValues = getRunTimeParameterValuesForRun(
+          runTimeParametersOverrides
+        )
+        const runTimeParameterFiles = getRunTimeParameterFilesForRun(
+          runTimeParametersOverrides,
+          mappedResolvedCsvVariableToFileId
+        )
+        setStartSetup(true)
+        createProtocolAnalysis(
+          {
             protocolKey: protocolId,
             runTimeParameterValues,
             runTimeParameterFiles,
-          })
-          createRun({
-            protocolId,
-            labwareOffsets,
-            runTimeParameterValues,
-            runTimeParameterFiles,
-          })
-        })
-      }
-    } else {
-      setStartSetup(true)
-      createProtocolAnalysis({
-        protocolKey: protocolId,
-        runTimeParameterValues: runTimeParameterValues,
-      })
-      createRun({
-        protocolId,
-        labwareOffsets,
-        runTimeParameterValues: getRunTimeParameterValuesForRun(
-          runTimeParametersOverrides
-        ),
+          },
+          {
+            onSuccess: () => {
+              createRun({
+                protocolId,
+                labwareOffsets,
+                runTimeParameterValues,
+                runTimeParameterFiles,
+              })
+            },
+          }
+        )
       })
     }
   }
@@ -267,14 +254,18 @@ export function ProtocolSetupParameters({
         }}
         onClickButton={handleConfirmValues}
         buttonText={t('confirm_values')}
-        ariaDisabled={enableCsvFile && hasMissingFileParam}
-        buttonIsDisabled={enableCsvFile && hasMissingFileParam}
-        iconName={isLoading || startSetup ? 'ot-spinner' : undefined}
+        ariaDisabled={hasMissingFileParam}
+        buttonIsDisabled={hasMissingFileParam}
+        iconName={
+          isRunLoading || isAnalysisLoading || startSetup
+            ? 'ot-spinner'
+            : undefined
+        }
         iconPlacement="startIcon"
         secondaryButtonProps={{
           buttonType: 'tertiaryLowLight',
           buttonText: t('restore_defaults'),
-          disabled: isLoading || startSetup,
+          disabled: isRunLoading || isAnalysisLoading || startSetup,
           onClick: () => {
             showResetValuesModal(true)
           },
@@ -292,7 +283,7 @@ export function ProtocolSetupParameters({
           (parameter, index) => {
             let detail: string = ''
             let setupStatus: ProtocolSetupStepStatus
-            if (enableCsvFile && parameter.type === 'csv_file') {
+            if (parameter.type === 'csv_file') {
               if (parameter.file?.fileName == null) {
                 detail = t('required')
                 setupStatus = 'not ready'
@@ -334,7 +325,7 @@ export function ProtocolSetupParameters({
   )
 
   // ToDo (kk:06/18/2024) ff will be removed when we freeze the code
-  if (enableCsvFile && chooseCsvFileScreen != null) {
+  if (chooseCsvFileScreen != null) {
     children = (
       <ChooseCsvFile
         protocolId={protocolId}

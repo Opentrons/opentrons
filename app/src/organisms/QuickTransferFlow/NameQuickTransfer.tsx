@@ -1,18 +1,21 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+
 import {
-  Flex,
-  LegacyStyledText,
-  SPACING,
-  DIRECTION_COLUMN,
-  POSITION_FIXED,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  InputField,
+  JUSTIFY_CENTER,
+  LegacyStyledText,
+  POSITION_FIXED,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { getTopPortalEl } from '../../App/portal'
-import { AlphanumericKeyboard } from '../../atoms/SoftwareKeyboard'
-import { InputField } from '../../atoms/InputField'
+import { FullKeyboard } from '../../atoms/SoftwareKeyboard'
 import { ChildNavigation } from '../ChildNavigation'
 
 interface NameQuickTransferProps {
@@ -42,41 +45,52 @@ export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
         buttonIsDisabled={name === '' || error != null}
       />
       <Flex
+        // height of ChildNavigation
         marginTop={SPACING.spacing120}
+        // height of keyboard
+        marginBottom="13.75rem"
+        // remainder of screen height
+        height="16.25rem"
         flexDirection={DIRECTION_COLUMN}
-        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-        gridGap={SPACING.spacing4}
+        justifyContent={JUSTIFY_CENTER}
+        padding={`0 ${SPACING.spacing60}`}
         width="100%"
       >
-        <InputField
-          type="text"
-          value={name}
-          textAlign={TYPOGRAPHY.textAlignCenter}
-        />
-        <LegacyStyledText
-          as="p"
-          color={COLORS.grey60}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          textAlign={TYPOGRAPHY.textAlignCenter}
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing4}
+          width="100%"
         >
-          {t('enter_characters')}
-        </LegacyStyledText>
-        <LegacyStyledText
-          as="p"
-          color={COLORS.red50}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          textAlign={TYPOGRAPHY.textAlignCenter}
-        >
-          {error}
-        </LegacyStyledText>
-        <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
-          <AlphanumericKeyboard
-            onChange={(input: string) => {
-              setName(input)
-            }}
-            keyboardRef={keyboardRef}
+          <InputField
+            type="text"
+            value={name}
+            textAlign={TYPOGRAPHY.textAlignCenter}
           />
+          <LegacyStyledText
+            as="p"
+            color={COLORS.grey60}
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
+            textAlign={TYPOGRAPHY.textAlignCenter}
+          >
+            {t('enter_characters')}
+          </LegacyStyledText>
+          <LegacyStyledText
+            as="p"
+            color={COLORS.red50}
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
+            textAlign={TYPOGRAPHY.textAlignCenter}
+          >
+            {error}
+          </LegacyStyledText>
         </Flex>
+      </Flex>
+      <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
+        <FullKeyboard
+          onChange={(input: string) => {
+            setName(input)
+          }}
+          keyboardRef={keyboardRef}
+        />
       </Flex>
     </Flex>,
     getTopPortalEl()

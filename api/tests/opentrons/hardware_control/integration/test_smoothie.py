@@ -1,5 +1,5 @@
 import pytest
-from typing import Iterator
+from typing import AsyncGenerator
 from mock import MagicMock
 from opentrons.drivers.types import MoveSplit
 from opentrons.hardware_control.emulation.settings import Settings
@@ -13,9 +13,7 @@ from opentrons.drivers.smoothie_drivers import SmoothieDriver
 
 
 @pytest.fixture
-async def subject(
-    emulation_app: Iterator[None], emulator_settings: Settings
-) -> SmoothieDriver:
+async def subject(emulator_settings: Settings) -> AsyncGenerator[SmoothieDriver, None]:
     """Smoothie driver connected to emulator."""
     d = await SmoothieDriver.build(
         port=f"socket://127.0.0.1:{emulator_settings.smoothie.port}",
@@ -28,12 +26,13 @@ async def subject(
 @pytest.fixture
 def spy(subject: SmoothieDriver) -> MagicMock:
     """Attach a spy to gcode sender."""
+    assert subject._connection is not None
     spy = MagicMock(wraps=subject._connection.send_data)
-    subject._connection.send_data = spy
+    subject._connection.send_data = spy  # type: ignore[method-assign]
     return spy
 
 
-async def test_dwell_and_activate_axes(subject: SmoothieDriver, spy: MagicMock):
+async def test_dwell_and_activate_axes(subject: SmoothieDriver, spy: MagicMock) -> None:
     subject.activate_axes("X")
     await subject._set_saved_current()
     subject.dwell_axes("X")
@@ -61,7 +60,7 @@ async def test_dwell_and_activate_axes(subject: SmoothieDriver, spy: MagicMock):
     assert command_log == expected
 
 
-async def test_disable_motor(subject: SmoothieDriver, spy: MagicMock):
+async def test_disable_motor(subject: SmoothieDriver, spy: MagicMock) -> None:
     await subject.disengage_axis("X")
     await subject.disengage_axis("XYZ")
     await subject.disengage_axis("ABCD")
@@ -77,7 +76,7 @@ async def test_disable_motor(subject: SmoothieDriver, spy: MagicMock):
     assert command_log == expected
 
 
-async def test_plunger_commands(subject: SmoothieDriver, spy: MagicMock):
+async def test_plunger_commands(subject: SmoothieDriver, spy: MagicMock) -> None:
     await subject.home()
     expected = [
         "M907 A0.8 B0.05 C0.05 X0.3 Y0.3 Z0.8 G4 P0.005 G28.2 ABCZ",
@@ -158,7 +157,7 @@ async def test_plunger_commands(subject: SmoothieDriver, spy: MagicMock):
     assert command_log == expected
 
 
-async def test_move_with_split(subject: SmoothieDriver, spy: MagicMock):
+async def test_move_with_split(subject: SmoothieDriver, spy: MagicMock) -> None:
     await subject.home()
     spy.reset_mock()
 
@@ -219,7 +218,7 @@ async def test_move_with_split(subject: SmoothieDriver, spy: MagicMock):
     assert command_log == expected
 
 
-async def test_set_active_current(subject: SmoothieDriver, spy: MagicMock):
+async def test_set_active_current(subject: SmoothieDriver, spy: MagicMock) -> None:
     await subject.home()
     spy.reset_mock()
 
@@ -252,7 +251,7 @@ async def test_set_active_current(subject: SmoothieDriver, spy: MagicMock):
     assert command_log == expected
 
 
-async def test_steps_per_mm(subject: SmoothieDriver, spy: MagicMock):
+async def test_steps_per_mm(subject: SmoothieDriver, spy: MagicMock) -> None:
     expected = {
         **DEFAULT_GANTRY_STEPS_PER_MM,
         "B": DEFAULT_PIPETTE_CONFIGS["stepsPerMM"],
@@ -267,7 +266,7 @@ async def test_steps_per_mm(subject: SmoothieDriver, spy: MagicMock):
     assert command_log == ["M92 Z450", "M400"]
 
 
-async def test_pipette_configs(subject: SmoothieDriver, spy: MagicMock):
+async def test_pipette_configs(subject: SmoothieDriver, spy: MagicMock) -> None:
     res = await subject.update_pipette_config(
         "Z", {"home": 175, "debounce": 12, "max_travel": 13, "retract": 14}
     )
@@ -289,7 +288,7 @@ async def test_pipette_configs(subject: SmoothieDriver, spy: MagicMock):
     ]
 
 
-async def test_set_acceleration(subject: SmoothieDriver, spy: MagicMock):
+async def test_set_acceleration(subject: SmoothieDriver, spy: MagicMock) -> None:
     await subject.set_acceleration({"X": 1, "Y": 2, "Z": 3, "A": 4, "B": 5, "C": 6})
     subject.push_acceleration()
     await subject.pop_acceleration()
@@ -312,7 +311,7 @@ async def test_set_acceleration(subject: SmoothieDriver, spy: MagicMock):
     assert command_log == expected
 
 
-async def test_read_and_write_pipettes(subject: SmoothieDriver, spy: MagicMock):
+async def test_read_and_write_pipettes(subject: SmoothieDriver) -> None:
     test_id = "TestsRock!!"
     test_model = "TestPipette"
     await subject.write_pipette_id("left", test_id)
@@ -324,7 +323,7 @@ async def test_read_and_write_pipettes(subject: SmoothieDriver, spy: MagicMock):
     assert read_model == test_model + "_v1"
 
 
-async def test_fast_home(subject: SmoothieDriver, spy: MagicMock):
+async def test_fast_home(subject: SmoothieDriver, spy: MagicMock) -> None:
     await subject.fast_home(axis="X", safety_margin=12)
 
     command_log = [x.kwargs["data"].strip() for x in spy.call_args_list]
@@ -350,7 +349,7 @@ async def test_fast_home(subject: SmoothieDriver, spy: MagicMock):
 
 async def test_fast_home_two_axes_plus_two_invalid_axes(
     subject: SmoothieDriver, spy: MagicMock
-):
+) -> None:
     await subject.fast_home(axis="XYJK", safety_margin=12)
 
     command_log = [x.kwargs["data"].strip() for x in spy.call_args_list]
@@ -390,13 +389,13 @@ async def test_fast_home_two_axes_plus_two_invalid_axes(
     ]
 
 
-async def test_update_homing_flags(subject: SmoothieDriver, spy: MagicMock):
+async def test_update_homing_flags(subject: SmoothieDriver, spy: MagicMock) -> None:
     await subject.update_homed_flags()
     command_log = [x.kwargs["data"].strip() for x in spy.call_args_list]
     assert command_log == ["G28.6", "M400"]
 
 
-async def test_update_pipette_config(subject: SmoothieDriver, spy: MagicMock):
+async def test_update_pipette_config(subject: SmoothieDriver, spy: MagicMock) -> None:
     await subject.update_pipette_config(
         "X", {"retract": 2, "debounce": 3, "max_travel": 4, "home": 5}
     )
@@ -415,7 +414,7 @@ async def test_update_pipette_config(subject: SmoothieDriver, spy: MagicMock):
 
 async def test_do_relative_splits_during_home_for(
     subject: SmoothieDriver, spy: MagicMock
-):
+) -> None:
     """Test command structure when a split configuration is present."""
     subject.configure_splits_for(
         {

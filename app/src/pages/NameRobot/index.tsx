@@ -12,13 +12,14 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
+  InputField,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   POSITION_ABSOLUTE,
   POSITION_FIXED,
   POSITION_RELATIVE,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
@@ -31,12 +32,12 @@ import {
   getLocalRobot,
 } from '../../redux/discovery'
 import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '../../redux/analytics'
-import { InputField } from '../../atoms/InputField'
 import { AlphanumericKeyboard } from '../../atoms/SoftwareKeyboard'
 import { SmallButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
 import { useIsUnboxingFlowOngoing } from '../../organisms/RobotSettingsDashboard/NetworkSettings/hooks'
 import { ConfirmRobotName } from '../../organisms/OnDeviceDisplay/NameRobot/ConfirmRobotName'
+
 import type { FieldError, Resolver } from 'react-hook-form'
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../redux/types'

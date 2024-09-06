@@ -10,7 +10,7 @@ from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
 from opentrons.motion_planning import Waypoint
 
-from ..state import StateView
+from ..state.state import StateView
 from ..types import MotorAxis, CurrentWell
 from ..errors import MustHomeError, InvalidAxisForRobotType
 
@@ -81,6 +81,10 @@ class GantryMover(TypingProtocol):
         """Retract the 'idle' mount if necessary."""
         ...
 
+    def motor_axis_to_hardware_axis(self, motor_axis: MotorAxis) -> HardwareAxis:
+        """Transform an engine motor axis into a hardware axis."""
+        ...
+
 
 class HardwareGantryMover(GantryMover):
     """Hardware API based gantry movement handler."""
@@ -88,6 +92,10 @@ class HardwareGantryMover(GantryMover):
     def __init__(self, hardware_api: HardwareControlAPI, state_view: StateView) -> None:
         self._hardware_api = hardware_api
         self._state_view = state_view
+
+    def motor_axis_to_hardware_axis(self, motor_axis: MotorAxis) -> HardwareAxis:
+        """Transform an engine motor axis into a hardware axis."""
+        return _MOTOR_AXIS_TO_HARDWARE_AXIS[motor_axis]
 
     async def get_position(
         self,
@@ -226,6 +234,10 @@ class VirtualGantryMover(GantryMover):
 
     def __init__(self, state_view: StateView) -> None:
         self._state_view = state_view
+
+    def motor_axis_to_hardware_axis(self, motor_axis: MotorAxis) -> HardwareAxis:
+        """Transform an engine motor axis into a hardware axis."""
+        return _MOTOR_AXIS_TO_HARDWARE_AXIS[motor_axis]
 
     async def get_position(
         self,

@@ -6,7 +6,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.types import PipetteNotAttachedError as HwPipetteNotAttachedError
 
 from ..resources.ot3_validation import ensure_ot3_hardware
-from ..state import StateStore
+from ..state.state import StateStore
 from ..types import MotorAxis, PostRunHardwareState
 from ..errors import HardwareNotSupportedError
 

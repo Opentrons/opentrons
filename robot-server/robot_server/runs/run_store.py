@@ -25,6 +25,7 @@ from robot_server.persistence.tables import (
     run_table,
     run_command_table,
     action_table,
+    run_csv_rtp_table,
 )
 from robot_server.persistence.pydantic import (
     json_to_pydantic,
@@ -83,6 +84,15 @@ class BadStateSummary:
     """A representation for a state summary that could not be loaded."""
 
     dataError: EnumeratedError
+
+
+@dataclass
+class CSVParameterRunResource:
+    """A CSV runtime parameter from a completed run, storable in a SQL database."""
+
+    run_id: str
+    parameter_variable_name: str
+    file_id: Optional[str]
 
 
 class CommandNotFoundError(ValueError):
@@ -197,6 +207,39 @@ class RunStore:
             transaction.execute(insert)
 
         self._clear_caches()
+
+    def get_all_csv_rtp(self) -> List[CSVParameterRunResource]:
+        """Get all of the csv rtp from the run_csv_rtp_table."""
+        select_all_csv_rtp = sqlalchemy.select(run_csv_rtp_table).order_by(
+            sqlite_rowid.asc()
+        )
+
+        with self._sql_engine.begin() as transaction:
+            csv_rtps = transaction.execute(select_all_csv_rtp).all()
+
+        return [_convert_row_to_csv_rtp(row) for row in csv_rtps]
+
+    def insert_csv_rtp(
+        self, run_id: str, run_time_parameters: List[RunTimeParameter]
+    ) -> None:
+        """Save csv rtp to the run_csv_rtp_table."""
+        insert_csv_rtp = sqlalchemy.insert(run_csv_rtp_table)
+
+        with self._sql_engine.begin() as transaction:
+            if not self._run_exists(run_id, transaction):
+                raise RunNotFoundError(run_id=run_id)
+            for run_time_param in run_time_parameters:
+                if run_time_param.type == "csv_file":
+                    transaction.execute(
+                        insert_csv_rtp,
+                        {
+                            "run_id": run_id,
+                            "parameter_variable_name": run_time_param.variableName,
+                            "file_id": run_time_param.file.id
+                            if run_time_param.file
+                            else None,
+                        },
+                    )
 
     def insert(
         self,
@@ -500,9 +543,13 @@ class RunStore:
         delete_commands = sqlalchemy.delete(run_command_table).where(
             run_command_table.c.run_id == run_id
         )
+        delete_csv_rtps = sqlalchemy.delete(run_csv_rtp_table).where(
+            run_csv_rtp_table.c.run_id == run_id
+        )
         with self._sql_engine.begin() as transaction:
             transaction.execute(delete_actions)
             transaction.execute(delete_commands)
+            transaction.execute(delete_csv_rtps)
             result = transaction.execute(delete_run)
 
         if result.rowcount < 1:
@@ -529,6 +576,22 @@ class RunStore:
 
 # The columns that must be present in a row passed to _convert_row_to_run().
 _run_columns = [run_table.c.id, run_table.c.protocol_id, run_table.c.created_at]
+
+
+def _convert_row_to_csv_rtp(
+    row: sqlalchemy.engine.Row,
+) -> CSVParameterRunResource:
+    run_id = row.run_id
+    parameter_variable_name = row.parameter_variable_name
+    file_id = row.file_id
+
+    assert isinstance(run_id, str)
+    assert isinstance(parameter_variable_name, str)
+    assert isinstance(file_id, str) or file_id is None
+
+    return CSVParameterRunResource(
+        run_id=run_id, parameter_variable_name=parameter_variable_name, file_id=file_id
+    )
 
 
 def _convert_row_to_run(

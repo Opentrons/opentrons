@@ -16,14 +16,14 @@ import {
   useIsLegacySessionInProgress,
   useIsFlex,
 } from '../../Devices/hooks'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../../resources/runs'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 
 import type { TemperatureStatus } from '@opentrons/api-client'
 
 vi.mock('../../Devices/hooks')
 vi.mock('../../RunTimeControl/hooks')
-vi.mock('../../ProtocolUpload/hooks')
+vi.mock('../../../resources/runs')
 
 const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {
   return renderWithProviders(<ModuleOverflowMenu {...props} />, {

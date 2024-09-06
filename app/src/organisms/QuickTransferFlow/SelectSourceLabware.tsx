@@ -9,9 +9,8 @@ import {
   POSITION_FIXED,
   ALIGN_CENTER,
   Tabs,
+  RadioButton,
 } from '@opentrons/components'
-
-import { RadioButton } from '../../atoms/buttons'
 
 import { ChildNavigation } from '../ChildNavigation'
 import { getCompatibleLabwareByCategory } from './utils'

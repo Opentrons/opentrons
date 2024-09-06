@@ -65,9 +65,11 @@ from .exceptions import (
     LocationIsOccupiedError,
     LocationNotAccessibleByPipetteError,
     LocationIsStagingSlotError,
+    LocationIsLidDockSlotError,
     InvalidAxisForRobotType,
     NotSupportedOnRobotType,
     CommandNotAllowedError,
+    InvalidLiquidHeightFound,
 )
 
 from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
@@ -139,9 +141,11 @@ __all__ = [
     "LocationIsOccupiedError",
     "LocationNotAccessibleByPipetteError",
     "LocationIsStagingSlotError",
+    "LocationIsLidDockSlotError",
     "InvalidAxisForRobotType",
     "NotSupportedOnRobotType",
     # error occurrence models
     "ErrorOccurrence",
     "CommandNotAllowedError",
+    "InvalidLiquidHeightFound",
 ]

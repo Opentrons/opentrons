@@ -4,7 +4,6 @@ import {
   ANALYTICS_RECOVERY_ACTION_RESULT,
   ANALYTICS_RECOVERY_ACTION_SELECTED,
   ANALYTICS_RECOVERY_ERROR_EVENT,
-  ANALYTICS_RECOVERY_INITIAL_ACTION,
   ANALYTICS_RECOVERY_RUN_RESULT,
   ANALYTICS_RECOVERY_VIEW_ERROR_DETAILS,
   useTrackEvent,
@@ -18,9 +17,10 @@ type CommandResult = 'succeeded' | 'failed'
 
 export interface UseRecoveryAnalyticsResult {
   /* Report the error which occurs error recovery is currently handling. */
-  reportErrorEvent: (failedCommand: FailedCommand | null) => void
-  /* Report which action the user selected on the recovery splash screen. */
-  reportInitialActionEvent: (initialAction: InitialActionType) => void
+  reportErrorEvent: (
+    failedCommand: FailedCommand | null,
+    initialAction: InitialActionType
+  ) => void
   /* Report which recovery option the user selected. */
   reportActionSelectedEvent: (selectedRecoveryOption: RecoveryRoute) => void
   /* Report when the user views the error details and where they currently are in Error Recovery. */
@@ -40,25 +40,20 @@ export interface UseRecoveryAnalyticsResult {
 export function useRecoveryAnalytics(): UseRecoveryAnalyticsResult {
   const doTrackEvent = useTrackEvent()
 
-  const reportErrorEvent = (failedCommand: FailedCommand | null): void => {
+  const reportErrorEvent = (
+    failedCommand: FailedCommand | null,
+    initialAction: InitialActionType
+  ): void => {
     if (failedCommand != null) {
       doTrackEvent({
         name: ANALYTICS_RECOVERY_ERROR_EVENT,
         properties: {
           errorEvent: failedCommand.commandType,
           errorString: failedCommand.error?.detail,
+          initialAction,
         },
       })
     }
-  }
-
-  const reportInitialActionEvent = (initialAction: InitialActionType): void => {
-    doTrackEvent({
-      name: ANALYTICS_RECOVERY_INITIAL_ACTION,
-      properties: {
-        initialAction,
-      },
-    })
   }
 
   const reportActionSelectedEvent = (
@@ -120,7 +115,6 @@ export function useRecoveryAnalytics(): UseRecoveryAnalyticsResult {
     reportActionSelectedEvent,
     reportActionSelectedResult,
     reportErrorEvent,
-    reportInitialActionEvent,
     reportViewErrorDetailsEvent,
     reportRecoveredRunResult,
   }

@@ -1,11 +1,13 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, renderHook, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { getLabwareDefURI } from '@opentrons/shared-data'
-import { renderWithProviders } from '../../../__testing-utils__'
 
+import { RUN_STATUS_RUNNING, RUN_STATUS_STOPPED } from '@opentrons/api-client'
+import { getLabwareDefURI } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../__testing-utils__'
+import { mockTipRackDefinition } from '../../../redux/custom-labware/__fixtures__'
 import { i18n } from '../../../i18n'
-import { InterventionModal } from '..'
 import {
   mockPauseCommandWithoutStartTime,
   mockPauseCommandWithStartTime,
@@ -13,15 +15,72 @@ import {
   mockMoveLabwareCommandFromModule,
   truncatedCommandMessage,
 } from '../__fixtures__'
-import { mockTipRackDefinition } from '../../../redux/custom-labware/__fixtures__'
+import { InterventionModal, useInterventionModal } from '..'
 import { useIsFlex } from '../../Devices/hooks'
+
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type { RunData } from '@opentrons/api-client'
 
 const ROBOT_NAME = 'Otie'
 
 const mockOnResumeHandler = vi.fn()
 
 vi.mock('../../Devices/hooks')
+
+describe('useInterventionModal', () => {
+  const defaultProps = {
+    runData: { id: 'run1' } as RunData,
+    lastRunCommand: mockPauseCommandWithStartTime,
+    runStatus: RUN_STATUS_RUNNING,
+    robotName: 'TestRobot',
+    analysis: null,
+  }
+
+  it('should return showModal true when conditions are met', () => {
+    const { result } = renderHook(() => useInterventionModal(defaultProps))
+
+    expect(result.current.showModal).toBe(true)
+    expect(result.current.modalProps).not.toBeNull()
+  })
+
+  it('should return showModal false when runStatus is terminal', () => {
+    const props = { ...defaultProps, runStatus: RUN_STATUS_STOPPED }
+
+    const { result } = renderHook(() => useInterventionModal(props))
+
+    expect(result.current.showModal).toBe(false)
+    expect(result.current.modalProps).toBeNull()
+  })
+
+  it('should return showModal false when lastRunCommand is null', () => {
+    const props = { ...defaultProps, lastRunCommand: null }
+
+    const { result } = renderHook(() => useInterventionModal(props))
+
+    expect(result.current.showModal).toBe(false)
+    expect(result.current.modalProps).toBeNull()
+  })
+
+  it('should return showModal false when robotName is null', () => {
+    const props = { ...defaultProps, robotName: null }
+
+    const { result } = renderHook(() => useInterventionModal(props))
+
+    expect(result.current.showModal).toBe(false)
+    expect(result.current.modalProps).toBeNull()
+  })
+
+  it('should return correct modalProps when showModal is true', () => {
+    const { result } = renderHook(() => useInterventionModal(defaultProps))
+
+    expect(result.current.modalProps).toEqual({
+      command: mockPauseCommandWithStartTime,
+      run: defaultProps.runData,
+      robotName: 'TestRobot',
+      analysis: null,
+    })
+  })
+})
 
 const render = (props: React.ComponentProps<typeof InterventionModal>) => {
   return renderWithProviders(<InterventionModal {...props} />, {

@@ -21,8 +21,9 @@ import {
 import {
   useModulesQuery,
   useDoorQuery,
+  useDeleteRunMutation,
   useHost,
-  useInstrumentsQuery,
+  useRunCommandErrors,
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
@@ -37,12 +38,13 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link as LinkButton,
   PrimaryButton,
   SecondaryButton,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
+  Tooltip,
   TYPOGRAPHY,
   useConditionalConfirm,
   useHoverTooltip,
@@ -52,7 +54,6 @@ import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import { getRobotSettings } from '../../../redux/robot-settings'
 import { getRobotSerialNumber } from '../../../redux/discovery'
 import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
-import { ProtocolDropTipBanner } from './ProtocolDropTipBanner'
 import {
   DropTipWizardFlows,
   useDropTipWizardFlows,
@@ -66,12 +67,9 @@ import {
   ANALYTICS_PROTOCOL_RUN_ACTION,
 } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
-import { Tooltip } from '../../../atoms/Tooltip'
-import {
-  useCloseCurrentRun,
-  useCurrentRunId,
-} from '../../../organisms/ProtocolUpload/hooks'
-import { ConfirmCancelModal } from '../../../organisms/RunDetails/ConfirmCancelModal'
+import { getStoredProtocol } from '../../../redux/protocol-storage'
+import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
+import { ConfirmCancelModal } from '../../RunDetails/ConfirmCancelModal'
 import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
 import {
   useRunControls,
@@ -80,6 +78,7 @@ import {
 } from '../../../organisms/RunTimeControl/hooks'
 import { useIsHeaterShakerInProtocol } from '../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../ModuleCard/ConfirmAttachmentModal'
+import { ConfirmMissingStepsModal } from './ConfirmMissingStepsModal'
 import {
   useProtocolDetailsForRun,
   useProtocolAnalysisErrors,
@@ -103,19 +102,29 @@ import { getIsFixtureMismatch } from '../../../resources/deck_configuration/util
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useMostRecentRunId } from '../../ProtocolUpload/hooks/useMostRecentRunId'
-import { useNotifyRunQuery } from '../../../resources/runs'
+import { useNotifyRunQuery, useCurrentRunId } from '../../../resources/runs'
 import {
   useErrorRecoveryFlows,
   ErrorRecoveryFlows,
 } from '../../ErrorRecoveryFlows'
 import { useRecoveryAnalytics } from '../../ErrorRecoveryFlows/hooks'
+import {
+  useProtocolDropTipModal,
+  ProtocolDropTipModal,
+} from './ProtocolDropTipModal'
 
-import type { Run, RunError, RunStatus } from '@opentrons/api-client'
+import type {
+  Run,
+  RunCommandErrors,
+  RunError,
+  RunStatus,
+} from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 
 const EQUIPMENT_POLL_MS = 5000
+const CURRENT_RUN_POLL_MS = 5000
 const CANCELLABLE_STATUSES = [
   RUN_STATUS_RUNNING,
   RUN_STATUS_PAUSED,
@@ -131,6 +140,7 @@ interface ProtocolRunHeaderProps {
   robotName: string
   runId: string
   makeHandleJumpToStep: (index: number) => () => void
+  missingSetupSteps: string[]
 }
 
 export function ProtocolRunHeader({
@@ -138,6 +148,7 @@ export function ProtocolRunHeader({
   robotName,
   runId,
   makeHandleJumpToStep,
+  missingSetupSteps,
 }: ProtocolRunHeaderProps): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
   const navigate = useNavigate()
@@ -148,22 +159,39 @@ export function ProtocolRunHeader({
     displayName,
     protocolKey,
     isProtocolAnalyzing,
+    isQuickTransfer,
   } = useProtocolDetailsForRun(runId)
+  const storedProtocol = useSelector((state: State) =>
+    getStoredProtocol(state, protocolKey)
+  )
   const { reportRecoveredRunResult } = useRecoveryAnalytics()
 
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = useRunStatus(runId)
+  const { deleteRun } = useDeleteRunMutation()
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
-  const { data: attachedInstruments } = useInstrumentsQuery()
-  const isRunCurrent = Boolean(useNotifyRunQuery(runId)?.data?.data?.current)
+  const isRunCurrent = Boolean(
+    useNotifyRunQuery(runId, { refetchInterval: CURRENT_RUN_POLL_MS })?.data
+      ?.data?.current
+  )
   const mostRecentRunId = useMostRecentRunId()
+  const isMostRecentRun = mostRecentRunId === runId
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
-  const [showDropTipBanner, setShowDropTipBanner] = React.useState(true)
-  const [enteredER, setEnteredER] = React.useState(false)
+  const { data: commandErrorList } = useRunCommandErrors(
+    runId,
+    { cursor: 0, pageLength: 100 },
+    {
+      enabled:
+        runStatus != null &&
+        // @ts-expect-error runStatus expected to possibly not be terminal
+        RUN_STATUSES_TERMINAL.includes(runStatus) &&
+        isMostRecentRun,
+    }
+  )
   const isResetRunLoadingRef = React.useRef(false)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const highestPriorityError =
@@ -205,24 +233,51 @@ export function ProtocolRunHeader({
     determineTipStatus,
     resetTipStatus,
     setTipStatusResolved,
-    pipettesWithTip,
+    aPipetteWithTip,
+    initialPipettesWithTipsCount,
   } = useTipAttachmentStatus({
     runId,
-    runRecord,
-    attachedInstruments,
+    runRecord: runRecord ?? null,
     host,
-    isFlex,
   })
+  const {
+    showDTModal,
+    onDTModalSkip,
+    onDTModalRemoval,
+    isDisabled: areDTModalBtnsDisabled,
+  } = useProtocolDropTipModal({
+    areTipsAttached,
+    toggleDTWiz,
+    isRunCurrent,
+    currentRunId: runId,
+    instrumentModelSpecs: aPipetteWithTip?.specs,
+    mount: aPipetteWithTip?.mount,
+    robotType,
+    onSkipAndHome: () => {
+      closeCurrentRun({
+        onSettled: () => {
+          if (isQuickTransfer) {
+            deleteRun(runId)
+            navigate(`/devices/${robotName}`)
+          }
+        },
+      })
+    },
+  })
+
+  const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
+  const cancelledWithoutRecovery =
+    !enteredER && runStatus === RUN_STATUS_STOPPED
 
   React.useEffect(() => {
     if (isFlex) {
       if (runStatus === RUN_STATUS_IDLE) {
-        setShowDropTipBanner(true)
         resetTipStatus()
       } else if (
         runStatus != null &&
         // @ts-expect-error runStatus expected to possibly not be terminal
-        RUN_STATUSES_TERMINAL.includes(runStatus)
+        RUN_STATUSES_TERMINAL.includes(runStatus) &&
+        enteredER === false
       ) {
         void determineTipStatus()
       }
@@ -235,10 +290,14 @@ export function ProtocolRunHeader({
     }
   }, [protocolData, isRobotViewable, navigate])
 
+  React.useEffect(() => {
+    if (isRunCurrent && typeof enteredER === 'boolean') {
+      reportRecoveredRunResult(runStatus, enteredER)
+    }
+  }, [isRunCurrent, enteredER])
+
   // Side effects dependent on the current run state.
   React.useEffect(() => {
-    reportRecoveredRunResult(runStatus, enteredER)
-    // After a user-initiated stopped run, close the run current run automatically.
     if (runStatus === RUN_STATUS_STOPPED && isRunCurrent && runId != null) {
       trackProtocolRunEvent({
         name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
@@ -246,12 +305,24 @@ export function ProtocolRunHeader({
           ...robotAnalyticsData,
         },
       })
-      closeCurrentRun()
+
+      // TODO(jh, 08-15-24): The enteredER condition is a hack, because errorCommands are only returned when a run is current.
+      // Ideally the run should not need to be current to view errorCommands.
+
+      // Close the run if no tips are attached after running tip check at least once. Post-run tip checks only occur on the Flex.
+      // This marks the robot as "not busy" as soon as a run is cancelled if drop tip CTAs are unnecessary.
+      if ((initialPipettesWithTipsCount === 0 || !isFlex) && !enteredER) {
+        closeCurrentRun({
+          onSettled: () => {
+            if (isQuickTransfer) {
+              deleteRun(runId)
+              navigate(`/devices/${robotName}`)
+            }
+          },
+        })
+      }
     }
-    if (runStatus === RUN_STATUS_AWAITING_RECOVERY) {
-      setEnteredER(true)
-    }
-  }, [runStatus, isRunCurrent, runId, closeCurrentRun])
+  }, [runStatus, isRunCurrent, runId, enteredER, initialPipettesWithTipsCount])
 
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : EMPTY_TIMESTAMP
@@ -297,7 +368,14 @@ export function ProtocolRunHeader({
       name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
       properties: robotAnalyticsData ?? undefined,
     })
-    closeCurrentRun()
+    closeCurrentRun({
+      onSettled: () => {
+        if (isQuickTransfer) {
+          deleteRun(runId)
+          navigate(`/devices/${robotName}`)
+        }
+      },
+    })
   }
 
   return (
@@ -306,7 +384,7 @@ export function ProtocolRunHeader({
         <ErrorRecoveryFlows
           runStatus={runStatus}
           runId={runId}
-          failedCommand={failedCommand}
+          failedCommandByRunRecord={failedCommand}
           protocolAnalysis={robotProtocolAnalysis}
         />
       ) : null}
@@ -316,6 +394,8 @@ export function ProtocolRunHeader({
           runId={runId}
           setShowRunFailedModal={setShowRunFailedModal}
           highestPriorityError={highestPriorityError}
+          commandErrorList={commandErrorList}
+          runStatus={runStatus}
         />
       ) : null}
       <Flex
@@ -338,7 +418,7 @@ export function ProtocolRunHeader({
             />
           )}
         <Flex>
-          {protocolKey != null ? (
+          {storedProtocol != null ? (
             <Link to={`/protocols/${protocolKey}`}>
               <LegacyStyledText
                 as="h2"
@@ -365,7 +445,7 @@ export function ProtocolRunHeader({
             {t('close_door_to_resume')}
           </Banner>
         ) : null}
-        {runStatus === RUN_STATUS_STOPPED ? (
+        {runStatus === RUN_STATUS_STOPPED && !enteredER ? (
           <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
             {t('run_canceled')}
           </Banner>
@@ -380,27 +460,27 @@ export function ProtocolRunHeader({
             {t('shared:close_robot_door')}
           </Banner>
         ) : null}
-        {mostRecentRunId === runId ? (
+        {isMostRecentRun ? (
           <TerminalRunBanner
             {...{
               runStatus,
               handleClearClick,
               isClosingCurrentRun,
               setShowRunFailedModal,
+              commandErrorList,
               highestPriorityError,
+              cancelledWithoutRecovery,
             }}
             isResetRunLoading={isResetRunLoadingRef.current}
             isRunCurrent={isRunCurrent}
           />
         ) : null}
-        {mostRecentRunId === runId && showDropTipBanner && areTipsAttached ? (
-          <ProtocolDropTipBanner
-            onLaunchWizardClick={toggleDTWiz}
-            onCloseClick={() => {
-              resetTipStatus()
-              setShowDropTipBanner(false)
-              closeCurrentRun()
-            }}
+        {showDTModal ? (
+          <ProtocolDropTipModal
+            onSkip={onDTModalSkip}
+            onBeginRemoval={onDTModalRemoval}
+            mount={aPipetteWithTip?.mount}
+            isDisabled={areDTModalBtnsDisabled}
           />
         ) : null}
         <Box display="grid" gridTemplateColumns="4fr 3fr 3fr 4fr">
@@ -426,6 +506,7 @@ export function ProtocolRunHeader({
               isDoorOpen={isDoorOpen}
               isFixtureMismatch={isFixtureMismatch}
               isResetRunLoadingRef={isResetRunLoadingRef}
+              missingSetupSteps={missingSetupSteps}
             />
           </Flex>
         </Box>
@@ -475,12 +556,28 @@ export function ProtocolRunHeader({
             robotName={robotName}
           />
         ) : null}
-        {showDTWiz && mostRecentRunId === runId ? (
+        {showDTWiz && aPipetteWithTip != null ? (
           <DropTipWizardFlows
             robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
-            mount={pipettesWithTip[0].mount}
-            instrumentModelSpecs={pipettesWithTip[0].specs}
-            closeFlow={() => setTipStatusResolved().then(toggleDTWiz)}
+            mount={aPipetteWithTip.mount}
+            instrumentModelSpecs={aPipetteWithTip.specs}
+            closeFlow={isTakeover => {
+              if (isTakeover) {
+                toggleDTWiz()
+              } else {
+                void setTipStatusResolved(() => {
+                  toggleDTWiz()
+                  closeCurrentRun({
+                    onSettled: () => {
+                      if (isQuickTransfer) {
+                        deleteRun(runId)
+                        navigate(`/devices/${robotName}`)
+                      }
+                    },
+                  })
+                }, toggleDTWiz)
+              }
+            }}
           />
         ) : null}
       </Flex>
@@ -570,6 +667,7 @@ interface ActionButtonProps {
   isDoorOpen: boolean
   isFixtureMismatch: boolean
   isResetRunLoadingRef: React.MutableRefObject<boolean>
+  missingSetupSteps: string[]
 }
 
 // TODO(jh, 04-22-2024): Refactor switch cases into separate factories to increase readability and testability.
@@ -582,6 +680,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isDoorOpen,
     isFixtureMismatch,
     isResetRunLoadingRef,
+    missingSetupSteps,
   } = props
   const navigate = useNavigate()
   const { t } = useTranslation(['run_details', 'shared'])
@@ -599,7 +698,6 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     reset,
     isPlayRunActionLoading,
     isPauseRunActionLoading,
-    isResetRunLoading,
   } = useRunControls(runId, (createRunResponse: Run): void =>
     // redirect to new run after successful reset
     {
@@ -608,7 +706,10 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       )
     }
   )
-  isResetRunLoadingRef.current = isResetRunLoading
+  const isResetRunLoading = isResetRunLoadingRef.current
+  if (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_RUNNING) {
+    isResetRunLoadingRef.current = false
+  }
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
   const { complete: isCalibrationComplete } = useRunCalibrationStatus(
     robotName,
@@ -661,11 +762,19 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   )
   const {
     confirm: confirmAttachment,
-    showConfirmation: showConfirmationModal,
-    cancel: cancelExit,
+    showConfirmation: showHSConfirmationModal,
+    cancel: cancelExitHSConfirmation,
   } = useConditionalConfirm(
     handleProceedToRunClick,
     !configBypassHeaterShakerAttachmentConfirmation
+  )
+  const {
+    confirm: confirmMissingSteps,
+    showConfirmation: showMissingStepsConfirmationModal,
+    cancel: cancelExitMissingStepsConfirmation,
+  } = useConditionalConfirm(
+    handleProceedToRunClick,
+    missingSetupSteps.length !== 0
   )
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
 
@@ -681,15 +790,21 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       return module.moduleType === 'heaterShakerModuleType'
     })
     .some(module => module?.data != null && module.data.speedStatus !== 'idle')
+  const isValidRunAgain =
+    runStatus != null && RUN_AGAIN_STATUSES.includes(runStatus)
 
   let buttonText: string = ''
   let handleButtonClick = (): void => {}
   let buttonIconName: IconName | null = null
   let disableReason = null
 
-  if (currentRunId === runId && (!isSetupComplete || isFixtureMismatch)) {
+  if (
+    currentRunId === runId &&
+    (!isSetupComplete || isFixtureMismatch) &&
+    !isValidRunAgain
+  ) {
     disableReason = t('setup_incomplete')
-  } else if (isOtherRunCurrent) {
+  } else if (isOtherRunCurrent && !isResetRunLoading) {
     disableReason = t('shared:robot_is_busy')
   } else if (isRobotOnWrongVersionOfSoftware) {
     disableReason = t('shared:a_software_update_is_available')
@@ -700,6 +815,11 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   ) {
     disableReason = t('close_door')
   }
+
+  const shouldShowHSConfirm =
+    isHeaterShakerInProtocol &&
+    !isHeaterShakerShaking &&
+    (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
 
   if (isProtocolAnalyzing) {
     buttonIconName = 'ot-spinner'
@@ -725,10 +845,11 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       if (isHeaterShakerShaking && isHeaterShakerInProtocol) {
         setShowIsShakingModal(true)
       } else if (
-        isHeaterShakerInProtocol &&
-        !isHeaterShakerShaking &&
+        missingSetupSteps.length !== 0 &&
         (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
       ) {
+        confirmMissingSteps()
+      } else if (shouldShowHSConfirm) {
         confirmAttachment()
       } else {
         play()
@@ -745,10 +866,11 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         })
       }
     }
-  } else if (runStatus != null && RUN_AGAIN_STATUSES.includes(runStatus)) {
-    buttonIconName = 'play'
+  } else if (isValidRunAgain) {
+    buttonIconName = isResetRunLoading ? 'ot-spinner' : 'play'
     buttonText = t('run_again')
     handleButtonClick = () => {
+      isResetRunLoadingRef.current = true
       reset()
       trackEvent({
         name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -779,7 +901,9 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
             size={SIZE_1}
             marginRight={SPACING.spacing8}
             spin={
-              isProtocolAnalyzing || runStatus === RUN_STATUS_STOP_REQUESTED
+              isProtocolAnalyzing ||
+              runStatus === RUN_STATUS_STOP_REQUESTED ||
+              isResetRunLoading
             }
           />
         ) : null}
@@ -804,13 +928,25 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
             startRun={play}
           />
         )}
-      {showConfirmationModal && (
+      {showHSConfirmationModal && (
         <ConfirmAttachmentModal
-          onCloseClick={cancelExit}
+          onCloseClick={cancelExitHSConfirmation}
           isProceedToRunModal={true}
           onConfirmClick={handleProceedToRunClick}
         />
       )}
+      {showMissingStepsConfirmationModal && (
+        <ConfirmMissingStepsModal
+          onCloseClick={cancelExitMissingStepsConfirmation}
+          onConfirmClick={() => {
+            shouldShowHSConfirm
+              ? confirmAttachment()
+              : handleProceedToRunClick()
+          }}
+          missingSteps={missingSetupSteps}
+        />
+      )}
+      {}
     </>
   )
 }
@@ -821,8 +957,10 @@ interface TerminalRunProps {
   handleClearClick: () => void
   isClosingCurrentRun: boolean
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
+  commandErrorList?: RunCommandErrors
   isResetRunLoading: boolean
   isRunCurrent: boolean
+  cancelledWithoutRecovery: boolean
   highestPriorityError?: RunError | null
 }
 function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
@@ -831,18 +969,25 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     handleClearClick,
     isClosingCurrentRun,
     setShowRunFailedModal,
+    commandErrorList,
     highestPriorityError,
     isResetRunLoading,
     isRunCurrent,
+    cancelledWithoutRecovery,
   } = props
   const { t } = useTranslation('run_details')
+  const completedWithErrors =
+    commandErrorList?.data != null && commandErrorList.data.length > 0
 
   const handleRunSuccessClick = (): void => {
     handleClearClick()
   }
 
   const handleFailedRunClick = (): void => {
-    handleClearClick()
+    // TODO(jh, 08-15-24): See TODO related to commandErrorList above.
+    if (commandErrorList == null) {
+      handleClearClick()
+    }
     setShowRunFailedModal(true)
   }
 
@@ -863,20 +1008,31 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
 
   const buildErrorBanner = (): JSX.Element => {
     return (
-      <Banner type="error" iconMarginLeft={SPACING.spacing4}>
+      <Banner
+        type={runStatus === RUN_STATUS_SUCCEEDED ? 'warning' : 'error'}
+        iconMarginLeft={SPACING.spacing4}
+      >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
           <LegacyStyledText>
-            {t('error_info', {
-              errorType: highestPriorityError?.errorType,
-              errorCode: highestPriorityError?.errorCode,
-            })}
+            {highestPriorityError != null
+              ? t('error_info', {
+                  errorType: highestPriorityError?.errorType,
+                  errorCode: highestPriorityError?.errorCode,
+                })
+              : `${
+                  runStatus === RUN_STATUS_SUCCEEDED
+                    ? t('run_completed_with_warnings')
+                    : t('run_canceled_with_errors')
+                }`}
           </LegacyStyledText>
 
           <LinkButton
             onClick={handleFailedRunClick}
             textDecoration={TYPOGRAPHY.textDecorationUnderline}
           >
-            {t('view_error')}
+            {runStatus === RUN_STATUS_SUCCEEDED
+              ? t('view_warning_details')
+              : t('view_error_details')}
           </LinkButton>
         </Flex>
       </Banner>
@@ -886,10 +1042,17 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
   if (
     runStatus === RUN_STATUS_SUCCEEDED &&
     isRunCurrent &&
-    !isResetRunLoading
+    !isResetRunLoading &&
+    !completedWithErrors
   ) {
     return buildSuccessBanner()
-  } else if (runStatus === RUN_STATUS_FAILED && !isResetRunLoading) {
+  }
+  // TODO(jh, 08-14-24): Ideally, the backend never returns the "user cancelled a run" error and cancelledWithoutRecovery becomes unnecessary.
+  else if (
+    !cancelledWithoutRecovery &&
+    !isResetRunLoading &&
+    (highestPriorityError != null || completedWithErrors)
+  ) {
     return buildErrorBanner()
   } else {
     return null

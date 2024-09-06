@@ -5,13 +5,13 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InputField,
+  LegacyStyledText,
   POSITION_FIXED,
   SPACING,
   TYPOGRAPHY,
-  LegacyStyledText,
 } from '@opentrons/components'
 
-import { InputField } from '../../atoms/InputField'
 import { FullKeyboard } from '../../atoms/SoftwareKeyboard'
 import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
 

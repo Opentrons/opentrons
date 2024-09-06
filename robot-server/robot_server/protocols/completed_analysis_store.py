@@ -280,10 +280,13 @@ class CompletedAnalysisStore:
         with self._sql_engine.begin() as transaction:
             results = transaction.execute(statement).all()
 
-        rtps: Dict[str, PrimitiveAllowedTypes] = {}
-        for row in results:
-            param = PrimitiveParameterResource.from_sql_row(row)
-            rtps.update({param.parameter_variable_name: param.parameter_value})
+        param_resources = [
+            PrimitiveParameterResource.from_sql_row(row) for row in results
+        ]
+        rtps = {
+            param.parameter_variable_name: param.parameter_value
+            for param in param_resources
+        }
         return rtps
 
     def get_csv_rtps_by_analysis_id(

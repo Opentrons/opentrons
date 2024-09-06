@@ -14,12 +14,12 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  ModalShell,
 } from '@opentrons/components'
 import { useDispatch } from 'react-redux'
 
 import styles from './styles.module.css'
 import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { getTopPortalEl } from '../../App/portal'
 import { setUseTrashSurfaceForTipCal } from '../../redux/calibration'
@@ -54,7 +54,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
   }
 
   return createPortal(
-    <LegacyModalShell
+    <ModalShell
       width="47rem"
       header={
         <WizardHeader
@@ -127,7 +127,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
           </Flex>
         </Flex>
       </Flex>
-    </LegacyModalShell>,
+    </ModalShell>,
     getTopPortalEl()
   )
 }

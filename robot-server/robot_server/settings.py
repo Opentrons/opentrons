@@ -103,5 +103,13 @@ class RobotServerSettings(BaseSettings):
         ),
     )
 
+    maximum_data_files: int = Field(
+        default=50,
+        gt=0,
+        description=(
+            "The maximum number of data files to allow before auto-deleting old ones."
+        ),
+    )
+
     class Config:
         env_prefix = "OT_ROBOT_SERVER_"

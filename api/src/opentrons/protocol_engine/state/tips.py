@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, Optional, List, Union
 
-from .abstract_store import HasState, HandlesActions
+from ._abstract_store import HasState, HandlesActions
 from ..actions import (
     Action,
     SucceedCommandAction,
@@ -17,6 +17,7 @@ from ..commands import (
     PickUpTipResult,
     DropTipResult,
     DropTipInPlaceResult,
+    unsafe,
 )
 from ..commands.configuring_common import (
     PipetteConfigUpdateResultMixin,
@@ -126,7 +127,10 @@ class TipStore(HasState[TipState], HandlesActions):
             )
             self._state.length_by_pipette_id[pipette_id] = length
 
-        elif isinstance(command.result, (DropTipResult, DropTipInPlaceResult)):
+        elif isinstance(
+            command.result,
+            (DropTipResult, DropTipInPlaceResult, unsafe.UnsafeDropTipInPlaceResult),
+        ):
             pipette_id = command.params.pipetteId
             self._state.length_by_pipette_id.pop(pipette_id, None)
 

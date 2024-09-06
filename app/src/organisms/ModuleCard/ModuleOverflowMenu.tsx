@@ -1,7 +1,14 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Flex, POSITION_RELATIVE, useHoverTooltip } from '@opentrons/components'
+import {
+  Flex,
+  MenuItem,
+  MenuList,
+  POSITION_RELATIVE,
+  Tooltip,
+  useHoverTooltip,
+} from '@opentrons/components'
 
 import {
   HEATERSHAKER_MODULE_TYPE,
@@ -9,10 +16,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { MenuList } from '../../atoms/MenuList'
-import { Tooltip } from '../../atoms/Tooltip'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../resources/runs'
 import {
   useIsFlex,
   useRunStatuses,

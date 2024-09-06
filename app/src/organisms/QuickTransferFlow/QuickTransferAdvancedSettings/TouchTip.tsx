@@ -1,27 +1,29 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+
 import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
-  POSITION_FIXED,
-  COLORS,
   ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  InputField,
+  RadioButton,
+  POSITION_FIXED,
+  SPACING,
 } from '@opentrons/components'
+
 import { getTopPortalEl } from '../../../App/portal'
-import { LargeButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
-import { InputField } from '../../../atoms/InputField'
 import { ACTIONS } from '../constants'
+import { i18n } from '../../../i18n'
+import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
 
 import type {
   QuickTransferSummaryState,
   QuickTransferSummaryAction,
   FlowRateKind,
 } from '../types'
-import { i18n } from '../../../i18n'
-import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
 
 interface TouchTipProps {
   onBack: () => void
@@ -150,15 +152,13 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
           width="100%"
         >
           {enableTouchTipDisplayItems.map(displayItem => (
-            <LargeButton
+            <RadioButton
               key={displayItem.description}
-              buttonType={
-                touchTipIsEnabled === displayItem.option
-                  ? 'primary'
-                  : 'secondary'
-              }
-              onClick={displayItem.onClick}
-              buttonText={displayItem.description}
+              isSelected={touchTipIsEnabled === displayItem.option}
+              onChange={displayItem.onClick}
+              buttonValue={displayItem.description}
+              buttonLabel={displayItem.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>
@@ -183,7 +183,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
             <InputField
               type="number"
               value={position}
-              title={t('delay_position_mm')}
+              title={t('touch_tip_position_mm')}
               error={positionError}
               readOnly
             />
@@ -196,6 +196,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              initialValue={String(position)}
               onChange={e => {
                 setPosition(Number(e))
               }}

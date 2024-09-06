@@ -47,7 +47,11 @@ async def create_simulating_orchestrator(
         robot_type=robot_type
     )
 
-    # TODO(mc, 2021-08-25): move initial home to protocol engine
+    # TODO(mm, 2024-08-06): This home has theoretically been replaced by Protocol Engine
+    # `home` commands within the `RunOrchestrator` or `ProtocolRunner`. However, it turns
+    # out that this `HardwareControlAPI`-level home is accidentally load-bearing,
+    # working around Protocol Engine bugs where *both* layers need to be homed for
+    # certain commands to work. https://opentrons.atlassian.net/browse/EXEC-646
     await simulating_hardware_api.home()
 
     protocol_engine = await create_protocol_engine(

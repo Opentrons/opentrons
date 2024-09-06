@@ -15,9 +15,11 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { Banner } from '../../atoms/Banner'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
 import { usePipetteNameSpecs } from '../../resources/instruments/hooks'
 import {
@@ -231,7 +233,8 @@ export const BeforeBeginning = (
       })
   }
 
-  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
+  if (isRobotMoving)
+    return <SimpleWizardInProgressBody description={t('stand_back')} />
 
   return errorMessage != null ? (
     <SimpleWizardBody

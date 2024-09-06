@@ -27,7 +27,7 @@ import {
   THERMOCYCLER_V2_FRONT_FIXTURE,
 } from '@opentrons/shared-data'
 
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { SimpleWizardInProgressBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { LEFT_SLOTS } from './constants'
 
@@ -222,7 +222,7 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )

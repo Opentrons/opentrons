@@ -5,11 +5,11 @@ import {
   DIRECTION_COLUMN,
   Flex,
   FormGroup,
-  SPACING,
+  InputField,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { InputField } from '../../atoms/InputField'
 import styles from './styles.module.css'
 
 import type { Control } from 'react-hook-form'

@@ -20,7 +20,6 @@ import {
   useRunTimeParameters,
 } from '../../Protocols/hooks'
 import { ProtocolSetupParameters } from '../../../organisms/ProtocolSetupParameters'
-import { useFeatureFlag } from '../../../redux/config'
 import { formatTimeWithUtcLabel } from '../../../resources/runs'
 import { ProtocolDetails } from '..'
 import { Deck } from '../Deck'
@@ -94,9 +93,6 @@ const render = (path = '/protocols/fakeProtocolId') => {
 describe('ODDProtocolDetails', () => {
   beforeEach(() => {
     when(useRunTimeParameters).calledWith('fakeProtocolId').thenReturn([])
-    when(vi.mocked(useFeatureFlag))
-      .calledWith('enableCsvFile')
-      .thenReturn(false)
     vi.mocked(useCreateRunMutation).mockReturnValue({
       createRun: mockCreateRun,
     } as any)
@@ -248,7 +244,6 @@ describe('ODDProtocolDetails', () => {
   })
 
   it('render requires csv text when a csv file is required', () => {
-    when(vi.mocked(useFeatureFlag)).calledWith('enableCsvFile').thenReturn(true)
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: {
         id: 'mockAnalysisId',

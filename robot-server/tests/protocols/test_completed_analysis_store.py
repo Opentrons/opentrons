@@ -29,6 +29,7 @@ from robot_server.protocols.analysis_models import (
     AnalysisStatus,
     RunTimeParameterAnalysisData,
 )
+from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,
@@ -66,14 +67,16 @@ def protocol_store(sql_engine: Engine) -> ProtocolStore:
 
 
 @pytest.fixture
-def data_files_store(sql_engine: Engine) -> DataFilesStore:
+def data_files_store(sql_engine: Engine, tmp_path: Path) -> DataFilesStore:
     """Return a `DataFilesStore` linked to the same database as the subject under test.
 
     `DataFilesStore` is tested elsewhere.
     We only need it here to prepare the database for the analysis store tests.
     The CSV parameters table always needs a data file to link to.
     """
-    return DataFilesStore(sql_engine=sql_engine)
+    data_files_dir = tmp_path / "data_files"
+    data_files_dir.mkdir()
+    return DataFilesStore(sql_engine=sql_engine, data_files_directory=data_files_dir)
 
 
 def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
@@ -95,7 +98,7 @@ def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
             content_hash="abc123",
         ),
         protocol_key=None,
-        protocol_kind="standard",
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
 
