@@ -44,6 +44,7 @@ const pdRoutes: RouteProps[] = [
 ]
 
 export function ProtocolRoutes(): JSX.Element {
+  console.log('in protocol routes')
   const landingPage: RouteProps = {
     Component: Landing,
     name: 'Landing',
