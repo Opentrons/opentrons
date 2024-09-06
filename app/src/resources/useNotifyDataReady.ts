@@ -74,7 +74,7 @@ export function useNotifyDataReady<TData, TError = Error>({
       setRefetch('once')
       appShellListener({
         hostname,
-        topic,
+        notifyTopic: topic,
         callback: onDataEvent,
       })
       dispatch(notifySubscribeAction(hostname, topic))
@@ -87,7 +87,7 @@ export function useNotifyDataReady<TData, TError = Error>({
       if (seenHostname.current != null) {
         appShellListener({
           hostname: seenHostname.current,
-          topic,
+          notifyTopic: topic,
           callback: onDataEvent,
           isDismounting: true,
         })
