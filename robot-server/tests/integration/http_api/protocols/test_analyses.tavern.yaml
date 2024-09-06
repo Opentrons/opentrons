@@ -96,6 +96,9 @@ stages:
         data:
           forceReAnalyze: true
     response:
+      save:
+        json:
+          analysis_id2: data[1].id
       strict:
         - json:off
       status_code: 201
@@ -106,6 +109,20 @@ stages:
           - id: !anystr
             status: pending
             runTimeParameters: []
+
+
+  - name: Retry until analysis is completed
+    max_retries: 5
+    delay_after: 1
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id2}'
+    response:
+      strict:
+        - json:off
+      json:
+        data:
+          id: '{analysis_id2}'
+          status: completed
 
 
   - name: Check that a new analysis is NOT started for the same protocol
@@ -123,5 +140,5 @@ stages:
         data:
           - id: '{analysis_id}'
             status: completed
-          - id: !anystr
+          - id: '{analysis_id2}'
             status: completed
