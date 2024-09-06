@@ -1025,6 +1025,11 @@
       "y": 0,
       "z": 15.41
     },
+    "biorad_96_wellplate_200ul_pcr": {
+      "x": 0,
+      "y": 0,
+      "z": 10.14
+    },
     "opentrons_96_pcr_adapter": {
       "x": 0,
       "y": 0,
