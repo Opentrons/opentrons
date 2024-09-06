@@ -205,7 +205,7 @@ export function AirGap(props: AirGapProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={String(volume)}
+              initialValue={String(volume ?? '')}
               onChange={e => {
                 setVolume(Number(e))
               }}

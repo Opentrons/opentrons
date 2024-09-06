@@ -200,7 +200,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={String(disposalVolume)}
+              initialValue={String(disposalVolume ?? '')}
               onChange={e => {
                 setDisposalVolume(Number(e))
               }}

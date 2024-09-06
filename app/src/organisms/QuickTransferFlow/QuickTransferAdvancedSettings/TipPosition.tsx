@@ -132,7 +132,7 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
         >
           <NumericalKeyboard
             keyboardRef={keyboardRef}
-            initialValue={String(tipPosition)}
+            initialValue={String(tipPosition ?? '')}
             onChange={e => {
               setTipPosition(Number(e))
             }}
