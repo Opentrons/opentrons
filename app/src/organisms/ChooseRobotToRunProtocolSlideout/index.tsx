@@ -100,7 +100,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     null
   )
 
-  const { uploadCsvFile } = useUploadCsvFileMutation({}, {})
+  const { uploadCsvFile } = useUploadCsvFileMutation()
 
   const {
     createRunFromProtocolSource,
