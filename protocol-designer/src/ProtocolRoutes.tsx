@@ -15,7 +15,6 @@ import {
 
 import type { RouteProps } from './types'
 
-const LANDING_ROUTE = '/'
 const pdRoutes: RouteProps[] = [
   {
     Component: ProtocolOverview,
