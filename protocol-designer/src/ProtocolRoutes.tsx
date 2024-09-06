@@ -68,7 +68,7 @@ export function ProtocolRoutes(): JSX.Element {
             })}
             <Route
               path="*"
-              element={<Navigate to={`${location.pathname}`} />}
+              element={<Navigate to={"/"} />}
             />
           </Routes>
         </Box>
