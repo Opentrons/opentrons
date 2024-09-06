@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Route, Navigate, Routes } from 'react-router-dom'
+import { Route, Navigate, Routes, useLocation } from 'react-router-dom'
 import { Box } from '@opentrons/components'
 import { Landing } from './pages/Landing'
 import { ProtocolOverview } from './pages/ProtocolOverview'
@@ -15,7 +15,7 @@ import {
 
 import type { RouteProps } from './types'
 
-const LANDING_ROUTE = './'
+const LANDING_ROUTE = '/'
 const pdRoutes: RouteProps[] = [
   {
     Component: ProtocolOverview,
@@ -51,6 +51,9 @@ export function ProtocolRoutes(): JSX.Element {
     path: '/',
   }
   const allRoutes: RouteProps[] = [...pdRoutes, landingPage]
+  const { pathname } = useLocation()
+  console.log({ pathname })
+  console.log({ rootPath: `/${location.pathname}/${LANDING_ROUTE}` })
 
   return (
     <>
@@ -63,7 +66,12 @@ export function ProtocolRoutes(): JSX.Element {
             {allRoutes.map(({ Component, path }: RouteProps) => {
               return <Route key={path} path={path} element={<Component />} />
             })}
-            <Route path="*" element={<Navigate to={LANDING_ROUTE} />} />
+            <Route
+              path="*"
+              element={
+                <Navigate to={`/${location.pathname}/${LANDING_ROUTE}`} />
+              }
+            />
           </Routes>
         </Box>
       </Kitchen>
