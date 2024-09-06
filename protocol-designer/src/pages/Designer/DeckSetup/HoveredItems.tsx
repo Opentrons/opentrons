@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { FixtureRender } from './FixtureRender'
-import { DeckLabelProps, LabwareRender, Module } from '@opentrons/components'
+import { LabwareRender, Module } from '@opentrons/components'
 import {
   getModuleDef2,
   inferModuleOrientationFromXCoordinate,
@@ -11,6 +10,9 @@ import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { ModuleLabel } from './ModuleLabel'
 import { LabwareLabel } from '../LabwareLabel'
+import { getLabwareCompatibleWithAdapter } from './utils'
+import { FixtureRender } from './FixtureRender'
+import type { DeckLabelProps } from '@opentrons/components'
 import type {
   CoordinateTuple,
   DeckDefinition,
@@ -63,8 +65,18 @@ export const HoveredItems = (
       ? inferModuleOrientationFromXCoordinate(hoveredSlotPosition[0])
       : null
 
+  //   see if hovered labware is a nested labware above an adapter
+  const isHoveredNested =
+    hoveredLabware != null
+      ? getLabwareCompatibleWithAdapter(
+          defs[hoveredLabware].parameters.loadName
+        ).length > 0
+      : false
+
   const nestedInfo: DeckLabelProps[] =
-    selectedLabwareDefUri != null && hoveredLabware !== selectedLabwareDefUri
+    selectedLabwareDefUri != null &&
+    !isHoveredNested &&
+    (hoveredLabware == null || hoveredLabware !== selectedLabwareDefUri)
       ? [
           {
             text: defs[selectedLabwareDefUri].metadata.displayName,

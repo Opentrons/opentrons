@@ -10,6 +10,7 @@ import {
   Flex,
   JUSTIFY_CENTER,
   LabwareRender,
+  RobotCoordsForeignDiv,
   RobotWorkSpace,
   SPACING,
   StyledText,
@@ -21,6 +22,9 @@ import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { DeckSetupTools } from '../DeckSetup/DeckSetupTools'
 import { LabwareLabel } from '../LabwareLabel'
 import { OffDeckDetails } from './OffDeckDetails'
+
+const STANDARD_X_WIDTH = '127.76px'
+const STANDARD_Y_HEIGHT = '85.48px'
 
 export function OffDeck(): JSX.Element {
   const { t, i18n } = useTranslation('starting_deck_state')
@@ -43,32 +47,39 @@ export function OffDeck(): JSX.Element {
     selectedLabwareDefUri != null ? defs[selectedLabwareDefUri] ?? null : null
 
   let labware = (
-    <Box
-      backgroundColor={COLORS.grey40}
-      width="510.84px"
-      height="342px"
-      borderRadius="25.15px"
-    />
+    <RobotWorkSpace
+      key="emptyState"
+      viewBox={`-25 -32 182.5142857143 122.1142857143`}
+    >
+      {() => (
+        <RobotCoordsForeignDiv>
+          <Box
+            backgroundColor={COLORS.grey40}
+            borderRadius={BORDERS.borderRadius8}
+            width={STANDARD_X_WIDTH}
+            height={STANDARD_Y_HEIGHT}
+          />
+        </RobotCoordsForeignDiv>
+      )}
+    </RobotWorkSpace>
   )
   if (hoveredLabwareDef != null && hoveredLabwareDef !== offDeckLabware) {
     labware = (
       <RobotWorkSpace
         key={hoveredLabwareDef.parameters.loadName}
-        viewBox={`0 -10 ${hoveredLabwareDef.dimensions.xDimension} ${hoveredLabwareDef.dimensions.yDimension}`}
-        width="510.84px"
-        height="342px"
+        viewBox={`-25 -32 ${hoveredLabwareDef.dimensions.xDimension / 0.7} ${
+          hoveredLabwareDef.dimensions.yDimension / 0.7
+        }`}
       >
         {() => (
           <>
-            <g transform="scale(0.8)">
-              <LabwareRender definition={hoveredLabwareDef} />
-              <LabwareLabel
-                isLast={true}
-                isSelected={false}
-                labwareDef={hoveredLabwareDef}
-                position={[0, 0, 0]}
-              />
-            </g>
+            <LabwareRender definition={hoveredLabwareDef} />
+            <LabwareLabel
+              isLast={true}
+              isSelected={false}
+              labwareDef={hoveredLabwareDef}
+              position={[0, 0, 0]}
+            />
           </>
         )}
       </RobotWorkSpace>
@@ -78,22 +89,20 @@ export function OffDeck(): JSX.Element {
     labware = (
       <RobotWorkSpace
         key={def.parameters.loadName}
-        viewBox={`0 -10 ${def.dimensions.xDimension} ${def.dimensions.yDimension}`}
-        width="510.84px"
-        height="352px"
+        viewBox={`-25 -32 ${def.dimensions.xDimension / 0.7} ${
+          def.dimensions.yDimension / 0.7
+        }`}
       >
         {() => (
           <>
-            <g transform=" scale(0.8)">
-              <LabwareRender definition={def} />
+            <LabwareRender definition={def} />
 
-              <LabwareLabel
-                isLast={true}
-                isSelected={true}
-                labwareDef={def}
-                position={[0, 0, 0]}
-              />
-            </g>
+            <LabwareLabel
+              isLast={true}
+              isSelected={true}
+              labwareDef={def}
+              position={[0, 0, 0]}
+            />
           </>
         )}
       </RobotWorkSpace>
@@ -129,7 +138,14 @@ export function OffDeck(): JSX.Element {
                     {i18n.format(t('off_deck_labware'), 'upperCase')}
                   </StyledText>
                 </Flex>
-                {labware}
+                <Flex
+                  width="510.84px"
+                  height="342px"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  {labware}
+                </Flex>
               </Flex>
             </Flex>
           </Flex>

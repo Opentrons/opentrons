@@ -21,22 +21,30 @@ export const LabwareLabel = (props: ModuleLabelProps): JSX.Element => {
     isLast,
     nestedLabwareInfo = [],
   } = props
-  let tagHeight = 12
-  if (nestedLabwareInfo.length === 1) {
-    tagHeight = 24
-  }
+  const labelContainerRef = React.useRef<HTMLDivElement>(null)
+  const [labelContainerHeight, setLabelContainerHeight] = React.useState(0)
+
+  const deckLabels = [
+    ...nestedLabwareInfo,
+    {
+      text: labwareDef.metadata.displayName,
+      isSelected: isSelected,
+      isLast: isLast,
+    },
+  ]
+
+  React.useEffect(() => {
+    if (labelContainerRef.current) {
+      setLabelContainerHeight(labelContainerRef.current.offsetHeight)
+    }
+  }, [nestedLabwareInfo])
+
   return (
     <DeckLabelSet
-      deckLabels={[
-        {
-          text: labwareDef.metadata.displayName,
-          isSelected: isSelected,
-          isLast: isLast,
-        },
-        ...nestedLabwareInfo,
-      ]}
+      ref={labelContainerRef}
+      deckLabels={deckLabels}
       x={position[0] - labwareDef.cornerOffsetFromSlot.x}
-      y={position[1] + labwareDef.cornerOffsetFromSlot.y - tagHeight}
+      y={position[1] + labwareDef.cornerOffsetFromSlot.y - labelContainerHeight}
       width={labwareDef.dimensions.xDimension}
       height={labwareDef.dimensions.yDimension}
     />

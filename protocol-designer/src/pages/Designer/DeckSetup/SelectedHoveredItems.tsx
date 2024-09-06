@@ -11,6 +11,7 @@ import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { ModuleLabel } from './ModuleLabel'
 import { LabwareLabel } from '../LabwareLabel'
+import { getLabwareCompatibleWithAdapter } from './utils'
 import type {
   CoordinateTuple,
   DeckDefinition,
@@ -60,9 +61,18 @@ export const SelectedHoveredItems = (
       : null
 
   const labwareInfos: DeckLabelProps[] = []
+  //   see if hovered labware is a nested labware above an adapter
+  const isHoveredNested =
+    hoveredLabware != null
+      ? getLabwareCompatibleWithAdapter(
+          defs[hoveredLabware].parameters.loadName
+        ).length > 0
+      : false
+
   if (
     selectedLabwareDefUri != null &&
-    hoveredLabware !== selectedLabwareDefUri
+    !isHoveredNested &&
+    (hoveredLabware == null || hoveredLabware !== selectedLabwareDefUri)
   ) {
     const def = defs[selectedLabwareDefUri]
     const selectedLabwareLabel = {
@@ -72,10 +82,7 @@ export const SelectedHoveredItems = (
     }
     labwareInfos.push(selectedLabwareLabel)
   }
-  if (
-    selectedNestedLabwareDefUri != null &&
-    hoveredLabware !== selectedNestedLabwareDefUri
-  ) {
+  if (selectedNestedLabwareDefUri != null && hoveredLabware == null) {
     const def = defs[selectedNestedLabwareDefUri]
     const selectedNestedLabwareLabel = {
       text: def.metadata.displayName,

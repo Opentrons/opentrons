@@ -2,6 +2,7 @@ import * as React from 'react'
 import { DeckLabelSet } from '@opentrons/components'
 import {
   HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   getModuleDef2,
 } from '@opentrons/shared-data'
@@ -25,32 +26,39 @@ export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
     isLast,
     labwareInfos = [],
   } = props
+  const labelContainerRef = React.useRef<HTMLDivElement>(null)
+  const [labelContainerHeight, setLabelContainerHeight] = React.useState(12)
+
+  React.useEffect(() => {
+    if (labelContainerRef.current) {
+      setLabelContainerHeight(labelContainerRef.current.offsetHeight)
+    }
+  }, [labwareInfos])
+
   const def = getModuleDef2(moduleModel)
   const overhang =
     def != null && def?.dimensions.labwareInterfaceXDimension != null
       ? def.dimensions.xDimension - def?.dimensions.labwareInterfaceXDimension
       : 0
+  //  TODO(ja 9/6/24): definitely need to refine these overhang values
   let leftOverhang = overhang
   if (def?.moduleType === TEMPERATURE_MODULE_TYPE) {
     leftOverhang = overhang * 2
   } else if (def?.moduleType === HEATERSHAKER_MODULE_TYPE) {
-    leftOverhang = overhang * 1.5
+    leftOverhang = overhang + 14
+  } else if (def?.moduleType === MAGNETIC_MODULE_TYPE) {
+    leftOverhang = overhang + 8
   }
-  let tagHeight = 12
-  if (labwareInfos.length === 1) {
-    tagHeight = 24
-  } else if (labwareInfos.length === 2) {
-    tagHeight = 36
-  } else if (labwareInfos.length === 3) {
-    tagHeight = 40
-  }
+
   return (
     <DeckLabelSet
+      ref={labelContainerRef}
       deckLabels={[
         {
           text: def.displayName,
           isSelected: isSelected,
           isLast: isLast,
+          moduleModel: def.model,
         },
         ...labwareInfos,
       ]}
@@ -59,7 +67,7 @@ export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
           ? position[0] - overhang
           : position[0] - leftOverhang) - def.cornerOffsetFromSlot.x
       }
-      y={position[1] + def.cornerOffsetFromSlot.y - tagHeight}
+      y={position[1] + def.cornerOffsetFromSlot.y - labelContainerHeight}
       width={def.dimensions.xDimension + 2}
       height={def.dimensions.yDimension + 2}
     />
