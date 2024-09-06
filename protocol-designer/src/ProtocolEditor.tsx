@@ -39,6 +39,7 @@ const routerBaseName =
     ? null
     : `/${window.location.pathname.split('/')[1]}`
 
+console.log('in protocol editor')
 console.log({ routerBaseName })
 
 function ProtocolEditorComponent(): JSX.Element {
