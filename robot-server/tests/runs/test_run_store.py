@@ -83,6 +83,15 @@ def protocol_commands() -> List[pe_commands.Command]:
             params=pe_commands.WaitForResumeParams(message="sup world"),
             result=pe_commands.WaitForResumeResult(),
         ),
+        pe_commands.WaitForResume(
+            id="fixit-pause-1",
+            key="command-key",
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=datetime(year=2021, month=1, day=1),
+            params=pe_commands.WaitForResumeParams(message="hello world"),
+            result=pe_commands.WaitForResumeResult(),
+            intent=pe_commands.CommandIntent.FIXIT,
+        ),
     ]
 
 
@@ -749,15 +758,15 @@ def test_get_command_slice(
     ("input_cursor", "input_length", "expected_cursor", "expected_command_ids"),
     [
         (0, 0, 0, []),
-        (None, 0, 2, []),
+        (None, 0, 3, []),
         (0, 3, 0, ["pause-1", "pause-2", "pause-3"]),
         (0, 1, 0, ["pause-1"]),
         (1, 2, 1, ["pause-2", "pause-3"]),
-        (0, 999, 0, ["pause-1", "pause-2", "pause-3"]),
-        (1, 999, 1, ["pause-2", "pause-3"]),
-        (None, 3, 0, ["pause-1", "pause-2", "pause-3"]),
-        (None, 2, 1, ["pause-2", "pause-3"]),
-        (999, 2, 2, ["pause-3"]),
+        (0, 999, 0, ["pause-1", "pause-2", "pause-3", "fixit-pause-1"]),
+        (1, 999, 1, ["pause-2", "pause-3", "fixit-pause-1"]),
+        (None, 3, 1, ["pause-2", "pause-3", "fixit-pause-1"]),
+        (None, 2, 2, ["pause-3", "fixit-pause-1"]),
+        (999, 2, 3, ["fixit-pause-1"]),
     ],
 )
 def test_get_commands_slice_clamping(
@@ -818,6 +827,39 @@ def test_get_commands_slice_run_not_found(subject: RunStore) -> None:
         subject.get_commands_slice(
             run_id="not-run-id", cursor=1, length=3, include_fixit_commands=True
         )
+
+
+def test_get_commands_slice_no_fixit_commands(
+    subject: RunStore,
+    protocol_commands: List[pe_commands.Command],
+    state_summary: StateSummary,
+) -> None:
+    """Should raise an error RunNotFoundError."""
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+    subject.update_run_state(
+        run_id="run-id",
+        summary=state_summary,
+        commands=protocol_commands,
+        run_time_parameters=[],
+    )
+    result = subject.get_commands_slice(
+        run_id="run-id",
+        cursor=0,
+        length=5,
+        include_fixit_commands=False,
+    )
+
+    assert result.cursor == 0
+    assert result.total_length == 3
+    assert [result_command.id for result_command in result.commands] == [
+        "pause-1",
+        "pause-2",
+        "pause-3",
+    ]
 
 
 def test_get_all_commands_as_preserialized_list(

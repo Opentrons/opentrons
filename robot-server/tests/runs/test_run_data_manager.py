@@ -1055,7 +1055,7 @@ def test_get_all_commands_as_preserialized_list(
     decoy.when(
         mock_run_store.get_all_commands_as_preserialized_list("run-id", True)
     ).then_return(['{"id": command-1}', '{"id": command-2}'])
-    assert subject.get_all_commands_as_preserialized_list("run-id") == [
+    assert subject.get_all_commands_as_preserialized_list("run-id", True) == [
         '{"id": command-1}',
         '{"id": command-2}',
     ]
@@ -1071,7 +1071,7 @@ def test_get_all_commands_as_preserialized_list_errors_for_active_runs(
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("current-run-id")
     decoy.when(mock_run_orchestrator_store.get_is_run_terminal()).then_return(False)
     with pytest.raises(PreSerializedCommandsNotAvailableError):
-        subject.get_all_commands_as_preserialized_list("current-run-id")
+        subject.get_all_commands_as_preserialized_list("current-run-id", True)
 
 
 async def test_get_current_run_labware_definition(
