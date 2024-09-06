@@ -206,7 +206,6 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
       const foundLiquid = Object.values(liquids).find(
         id => id.ingredientId === liquid
       )
-      // TODO (nd: 09/05/2024): add description
       return {
         liquidIndex: liquid,
         name: foundLiquid?.name ?? '',
