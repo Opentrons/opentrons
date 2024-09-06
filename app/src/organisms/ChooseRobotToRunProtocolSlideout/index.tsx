@@ -16,7 +16,10 @@ import {
   SPACING,
   useHoverTooltip,
 } from '@opentrons/components'
-import { useUploadCsvFileMutation } from '@opentrons/react-api-client'
+import {
+  useUploadCsvFileMutation,
+  ApiHostProvider,
+} from '@opentrons/react-api-client'
 
 import { Tooltip } from '../../atoms/Tooltip'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
@@ -46,11 +49,23 @@ interface ChooseRobotToRunProtocolSlideoutProps extends StyleProps {
   showSlideout: boolean
 }
 
+interface ChooseRobotToRunProtocolSlideoutComponentProps
+  extends ChooseRobotToRunProtocolSlideoutProps {
+  selectedRobot: Robot | null
+  setSelectedRobot: (robot: Robot | null) => void
+}
+
 export function ChooseRobotToRunProtocolSlideoutComponent(
-  props: ChooseRobotToRunProtocolSlideoutProps
+  props: ChooseRobotToRunProtocolSlideoutComponentProps
 ): JSX.Element | null {
   const { t } = useTranslation(['protocol_details', 'shared', 'app_settings'])
-  const { storedProtocolData, showSlideout, onCloseClick } = props
+  const {
+    storedProtocolData,
+    showSlideout,
+    onCloseClick,
+    selectedRobot,
+    setSelectedRobot,
+  } = props
   const navigate = useNavigate()
   const [shouldApplyOffsets, setShouldApplyOffsets] = React.useState<boolean>(
     true
@@ -62,7 +77,6 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     mostRecentAnalysis,
   } = storedProtocolData
   const [currentPage, setCurrentPage] = React.useState<number>(1)
-  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
   const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
     storedProtocolData,
     selectedRobot?.name ?? ''
@@ -83,19 +97,10 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
 
   const offsetCandidates = useOffsetCandidatesForAnalysis(
     mostRecentAnalysis,
-    selectedRobot?.ip ?? null
+    null
   )
 
-  const { uploadCsvFile } = useUploadCsvFileMutation(
-    {},
-    selectedRobot != null
-      ? {
-          hostname: selectedRobot.ip,
-          requestor:
-            selectedRobot?.ip === OPENTRONS_USB ? appShellRequestor : undefined,
-        }
-      : null
-  )
+  const { uploadCsvFile } = useUploadCsvFileMutation()
 
   const {
     createRunFromProtocolSource,
@@ -121,13 +126,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
         })
       },
     },
-    selectedRobot != null
-      ? {
-          hostname: selectedRobot.ip,
-          requestor:
-            selectedRobot?.ip === OPENTRONS_USB ? appShellRequestor : undefined,
-        }
-      : null,
+    null,
     shouldApplyOffsets
       ? offsetCandidates.map(({ vector, location, definitionUri }) => ({
           vector,
@@ -360,5 +359,18 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
 export function ChooseRobotToRunProtocolSlideout(
   props: ChooseRobotToRunProtocolSlideoutProps
 ): JSX.Element | null {
-  return <ChooseRobotToRunProtocolSlideoutComponent {...props} />
+  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
+  return (
+    <ApiHostProvider
+      hostname={selectedRobot?.ip ?? null}
+      port={selectedRobot?.port ?? null}
+      requestor={
+        selectedRobot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
+      }
+    >
+      <ChooseRobotToRunProtocolSlideoutComponent
+        {...{ ...props, selectedRobot, setSelectedRobot }}
+      />
+    </ApiHostProvider>
+  )
 }
