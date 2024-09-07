@@ -6,8 +6,9 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
+  JUSTIFY_CENTER,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -136,11 +137,13 @@ export function ProtocolSetupModulesAndDeck({
         marginBottom={SPACING.spacing80}
       >
         {showMapView ? (
-          <ModulesAndDeckMapView
-            attachedProtocolModuleMatches={attachedProtocolModuleMatches}
-            runId={runId}
-            protocolAnalysis={mostRecentAnalysis}
-          />
+          <Flex height="55vh" justifyContent={JUSTIFY_CENTER}>
+            <ModulesAndDeckMapView
+              attachedProtocolModuleMatches={attachedProtocolModuleMatches}
+              runId={runId}
+              protocolAnalysis={mostRecentAnalysis}
+            />
+          </Flex>
         ) : (
           <>
             {isModuleMismatch && !clearModuleMismatchBanner ? (
