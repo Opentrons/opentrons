@@ -137,7 +137,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                     zIndex={3}
                   >
                     <SlotOverflowMenu
-                      slot={menuListId}
+                      location={menuListId}
                       addEquipment={addLabware}
                       setShowMenuList={() => {
                         setShowMenuListForId(null)
