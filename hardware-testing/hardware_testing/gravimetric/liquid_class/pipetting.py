@@ -13,8 +13,8 @@ from hardware_testing.gravimetric.liquid_height.height import LiquidTracker
 from hardware_testing.opentrons_api.types import OT3Mount, Point
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
-from .definition import LiquidClassSettings
-from .defaults import get_liquid_class
+from .liquid_class_settings import LiquidClassSettings
+from .definitions import get_liquid_class
 
 
 @dataclass
@@ -211,11 +211,9 @@ def _pipette_with_liquid_settings(  # noqa: C901
     if aspirate or mix:
         submerge_speed = config.TIP_SPEED_WHILE_SUBMERGING_ASPIRATE
         retract_speed = config.TIP_SPEED_WHILE_RETRACTING_ASPIRATE
-        _z_disc = liquid_class.aspirate.z_retract_discontinuity
     else:
         submerge_speed = config.TIP_SPEED_WHILE_SUBMERGING_DISPENSE
         retract_speed = config.TIP_SPEED_WHILE_RETRACTING_DISPENSE
-        _z_disc = liquid_class.dispense.z_retract_discontinuity
 
     # CREATE CALLBACKS FOR EACH PHASE
     def _aspirate_on_approach() -> None:
@@ -235,8 +233,6 @@ def _pipette_with_liquid_settings(  # noqa: C901
         if clear_accuracy_function:
             clear_pipette_ul_per_mm(hw_api, hw_mount)  # type: ignore[arg-type]
         pipette.prepare_to_aspirate()
-        if liquid_class.aspirate.leading_air_gap > 0:
-            pipette.aspirate(liquid_class.aspirate.leading_air_gap)
 
     def _aspirate_on_mix() -> None:
         _num_mixes = 5
@@ -245,18 +241,14 @@ def _pipette_with_liquid_settings(  # noqa: C901
             ctx.delay(liquid_class.aspirate.delay)
             if added_blow_out and i == _num_mixes - 1:
                 # the LAST dispense pushes out air, to dispense all liquid from tip
-                push_out = min(
-                    liquid_class.dispense.blow_out_submerged, _get_max_blow_out_ul()
-                )
+                push_out = min(liquid_class.dispense.push_out, _get_max_blow_out_ul())
             else:
                 push_out = 0
             pipette.dispense(dispense, push_out=push_out)
             ctx.delay(liquid_class.dispense.delay)
         if added_blow_out:
             # don't go all the way up to retract position, but instead just above liquid
-            _retract(
-                ctx, pipette, well, channel_offset, approach_mm, retract_speed, _z_disc
-            )
+            _retract(ctx, pipette, well, channel_offset, approach_mm, retract_speed)
             pipette.blow_out()
             pipette.prepare_to_aspirate()
             _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
@@ -276,19 +268,17 @@ def _pipette_with_liquid_settings(  # noqa: C901
     def _aspirate_on_retract() -> None:
         # add trailing-air-gap
         if not blank:
-            pipette.air_gap(liquid_class.aspirate.trailing_air_gap, height=0)
+            pipette.air_gap(liquid_class.aspirate.air_gap, height=0)
 
     def _dispense_on_approach() -> None:
         # remove trailing-air-gap
         if not blank:
-            pipette.dispense(liquid_class.aspirate.trailing_air_gap)
+            pipette.dispense(liquid_class.aspirate.air_gap)
 
     def _dispense_on_submerge() -> None:
         push_out = None
         if added_blow_out:
-            push_out = min(
-                liquid_class.dispense.blow_out_submerged, _get_max_blow_out_ul()
-            )
+            push_out = min(liquid_class.dispense.push_out, _get_max_blow_out_ul())
         pipette.dispense(dispense, push_out=push_out)
         # update liquid-height tracker
         liquid_tracker.update_affected_wells(
@@ -307,7 +297,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
             pipette.touch_tip(speed=config.TOUCH_TIP_SPEED)
         # NOTE: always do a trailing-air-gap, regardless of if tip is empty or not
         #       to avoid droplets from forming and falling off the tip
-        pipette.air_gap(liquid_class.aspirate.trailing_air_gap, height=0)
+        pipette.air_gap(liquid_class.aspirate.air_gap, height=0)
 
     # PHASE 1: APPROACH
     pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
@@ -333,7 +323,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
 
     # PHASE 3: RETRACT
     callbacks.on_retracting()
-    _retract(ctx, pipette, well, channel_offset, retract_mm, retract_speed, _z_disc)
+    _retract(ctx, pipette, well, channel_offset, retract_mm, retract_speed)
     _aspirate_on_retract() if aspirate else _dispense_on_retract()
 
     # EXIT

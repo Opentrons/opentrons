@@ -226,7 +226,7 @@ def _reduce_volumes_to_not_exceed_software_limit(
 ) -> List[float]:
     for i, v in enumerate(test_volumes):
         liq_cls = get_liquid_class(pipette_volume, pipette_channels, tip_volume, int(v))
-        max_vol = tip_volume - liq_cls.aspirate.trailing_air_gap
+        max_vol = tip_volume - liq_cls.aspirate.air_gap
         test_volumes[i] = min(v, max_vol - 0.1)
     return test_volumes
 
