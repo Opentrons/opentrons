@@ -1,4 +1,4 @@
-from ... liquid_class_settings import *
+from ...liquid_class_settings import *
 from .. import default as _default
 from . import t50, t200, t1000
 
@@ -76,7 +76,7 @@ default = Liquid(
             enabled=_default.aspirate.distribute.enabled,
             conditioning_volume=_default.aspirate.distribute.conditioning_volume,
             disposal_volume=_default.aspirate.distribute.disposal_volume,
-        )
+        ),
     ),
     dispense=Dispense(
         order=_default.dispense.order,

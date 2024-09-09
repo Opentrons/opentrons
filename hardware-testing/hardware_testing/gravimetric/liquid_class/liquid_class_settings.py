@@ -2,9 +2,12 @@
 from copy import deepcopy
 from enum import Enum, auto
 from dataclasses import dataclass, fields
-from typing import List
+from typing import List, Any
 
 from opentrons.types import Point
+
+
+CSV_SEPARATOR = "\t"
 
 
 class PositionRef(Enum):
@@ -16,6 +19,32 @@ class PositionRef(Enum):
 
 @dataclass
 class _Interpolate:
+    def csv_header(self) -> List[str]:
+        """Get the CSV header for these settings."""
+        names: List[str] = []
+        for f in fields(self):
+            if issubclass(f.type, Point):
+                names += ["offset-x", "offset-y", "offset-z"]
+            elif issubclass(f.type, _Interpolate):
+                settings = getattr(self, f.name)
+                names += settings.csv_header()
+            else:
+                names.append(f.name)
+        return names
+
+    def csv_data(self) -> List[str]:
+        """Get the CSV data for these settings."""
+        values: List[str] = []
+        for f in fields(self):
+            val = getattr(self, f.name)
+            if issubclass(f.type, Point):
+                values += [str(val.x), str(val.y), str(val.z)]
+            elif issubclass(f.type, _Interpolate):
+                values += val.csv_header()
+            else:
+                values.append(str(val))
+        return values
+
     @classmethod
     def interpolate(
         cls,
@@ -62,8 +91,8 @@ class _Interpolate:
 class Position(_Interpolate):
     """Position Settings."""
 
-    offset: Point
     ref: PositionRef
+    offset: Point
 
 
 @dataclass
@@ -95,8 +124,8 @@ class TouchTip(_Interpolate):
 
     enabled: bool
     position: Position
-    speed: float
     mm_to_edge: float
+    speed: float
 
 
 @dataclass
