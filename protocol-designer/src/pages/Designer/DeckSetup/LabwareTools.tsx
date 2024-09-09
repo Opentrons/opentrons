@@ -4,7 +4,9 @@ import reduce from 'lodash/reduce'
 import styled from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
 import {
+  ALIGN_CENTER,
   COLORS,
+  CheckboxField,
   DIRECTION_COLUMN,
   DISPLAY_INLINE_BLOCK,
   Flex,
@@ -94,19 +96,18 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
   const initialModules: ModuleOnDeck[] = Object.keys(modulesById).map(
     moduleId => modulesById[moduleId]
   )
-
-  // TODO(ja, 8/16/24): We are never filtering recommended labware, check with designs
-  // where to add the filter checkbox/button
-  const filterRecommended =
-    robotType === OT2_ROBOT_TYPE ? moduleType != null : false
+  const [filterRecommended, setFilterRecommended] = React.useState<boolean>(
+    moduleType != null
+  )
   //    for OT-2 usage only due to H-S collisions
   const isNextToHeaterShaker = initialModules.some(
     hardwareModule =>
       hardwareModule.type === HEATERSHAKER_MODULE_TYPE &&
       getAreSlotsHorizontallyAdjacent(hardwareModule.slot, slot)
   )
-  const filterHeight =
+  const [filterHeight, setFilterHeight] = React.useState<boolean>(
     robotType === OT2_ROBOT_TYPE ? isNextToHeaterShaker : false
+  )
 
   const getLabwareCompatible = React.useCallback(
     (def: LabwareDefinition2) => {
@@ -225,6 +226,26 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
             setSearchTerm('')
           }}
         />
+        {moduleType != null ||
+        (isNextToHeaterShaker && robotType === OT2_ROBOT_TYPE) ? (
+          <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+            <CheckboxField
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                isNextToHeaterShaker
+                  ? setFilterHeight(e.currentTarget.checked)
+                  : setFilterRecommended(e.currentTarget.checked)
+              }}
+              value={
+                isNextToHeaterShaker && robotType === OT2_ROBOT_TYPE
+                  ? filterHeight
+                  : filterRecommended
+              }
+            />
+            <StyledText desktopStyle="captionRegular">
+              {t('only_display_rec')}
+            </StyledText>
+          </Flex>
+        ) : null}
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         {customLabwareURIs.length === 0 ? null : (

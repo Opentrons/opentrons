@@ -4,6 +4,7 @@ import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import {
   FLEX_ROBOT_TYPE,
+  THERMOCYCLER_MODULE_V1,
   fixtureP1000SingleV2Specs,
   fixtureTiprack1000ul,
 } from '@opentrons/shared-data'
@@ -125,5 +126,18 @@ describe('LabwareTools', () => {
     screen.getByText('Add custom labware')
     fireEvent.change(screen.getByTestId('customLabwareInput'))
     expect(vi.mocked(createCustomLabwareDef)).toHaveBeenCalled()
+  })
+
+  it('renders the filter checkbox if there is a module on the slot and is checked by default', () => {
+    vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
+      selectedLabwareDefUri: null,
+      selectedNestedLabwareDefUri: null,
+      selectedFixture: null,
+      selectedModuleModel: THERMOCYCLER_MODULE_V1,
+      selectedSlot: { slot: 'B1', cutout: 'cutoutB1' },
+    })
+    render(props)
+    screen.getByText('Only display recommended labware')
+    expect(screen.getByRole('checkbox')).toBeChecked()
   })
 })
