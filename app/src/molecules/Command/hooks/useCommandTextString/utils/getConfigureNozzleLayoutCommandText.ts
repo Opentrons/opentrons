@@ -13,8 +13,16 @@ export function getConfigureNozzleLayoutCommandText({
     pip => pip.id === pipetteId
   )?.pipetteName
 
+  const ConfigAmount = {
+    SINGLE: '1',
+    COLUMN: '8',
+    ROW: '12',
+    QUADRANT: 'partial',
+    ALL: 'all',
+  }
+
   return t('configure_nozzle_layout', {
-    amount: configurationParams.style === 'SINGLE' || 'ROW' || 'COLUMN' || 'PARTIAL_COLUMN' ? '8' : 'all',
+    amount: ConfigAmount[configurationParams.style],
     pipette:
       pipetteName != null ? getPipetteSpecsV2(pipetteName)?.displayName : '',
   })
