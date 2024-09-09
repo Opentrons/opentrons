@@ -1,20 +1,8 @@
-"""Migrate the persistence directory from schema 5 to 6.
+"""Migrate the persistence directory from schema 6 to 7.
 
-Summary of changes from schema 5:
+Summary of changes from schema 6:
 
-- Removes the "run_time_parameter_values_and_defaults" column of analysis_table
-- Adds a separate analysis_primitive_type_rtp_table to store fully validated primitive
-  run time parameters.
-  - NOTE: V5 to V6 migration does not port the data from run_time_parameter_values_and_defaults
-          into analysis_primitive_type_rtp_table. The consequence of which is that
-          any checks for previous matching analysis (for protocols with RTPs only)
-          will fail and a new analysis will be triggered. This new analysis will then
-          save its RTP data to the new table. RTP data belonging to previous analyses
-          will still be available as part of the completed analysis blob.
-- Adds a new analysis_csv_rtp_table to store the CSV parameters' file IDs used in analysis
-- Adds a new run_csv_rtp_table to store the CSV parameters' file IDs used in runs
-- Converts protocol.protocol_kind to a constrained string (a SQL "enum"), makes it
-  non-nullable (NULL was semantically equivalent to "standard"), and adds an index.
+- Adds a new command_intent to store the commands intent in the commands table
 """
 
 from pathlib import Path
@@ -23,7 +11,7 @@ from contextlib import ExitStack
 import sqlalchemy
 
 from ..database import sql_engine_ctx, sqlite_rowid
-from ..tables import schema_5, schema_6
+from ..tables import schema_6, schema_7
 from .._folder_migrator import Migration
 
 from ._util import copy_rows_unmodified, copy_if_exists, copytree_if_exists
@@ -35,7 +23,7 @@ from ..file_and_directory_names import (
 )
 
 
-class Migration5to6(Migration):  # noqa: D101
+class Migration6to7(Migration):  # noqa: D101
     def migrate(self, source_dir: Path, dest_dir: Path) -> None:
         """Migrate the persistence directory from schema 5 to 6."""
         # Copy over unmodified directories and files to new version
@@ -70,83 +58,60 @@ def _migrate_db_with_changes(
     dest_transaction: sqlalchemy.engine.Connection,
 ) -> None:
     copy_rows_unmodified(
-        schema_5.data_files_table,
         schema_6.data_files_table,
+        schema_7.data_files_table,
         source_transaction,
         dest_transaction,
         order_by_rowid=True,
     )
-    _migrate_protocol_table_with_new_protocol_kind_col(
-        source_transaction,
-        dest_transaction,
-    )
-    _migrate_analysis_table_excluding_rtp_defaults_and_vals(
+    _migrate_command_table_with_new_command_intent_col(
         source_transaction,
         dest_transaction,
     )
     copy_rows_unmodified(
-        schema_5.run_table,
         schema_6.run_table,
+        schema_7.run_table,
         source_transaction,
         dest_transaction,
         order_by_rowid=True,
     )
     copy_rows_unmodified(
-        schema_5.action_table,
         schema_6.action_table,
+        schema_7.action_table,
         source_transaction,
         dest_transaction,
         order_by_rowid=True,
     )
     copy_rows_unmodified(
-        schema_5.run_command_table,
         schema_6.run_command_table,
+        schema_7.run_command_table,
         source_transaction,
         dest_transaction,
         order_by_rowid=True,
     )
 
 
-def _migrate_protocol_table_with_new_protocol_kind_col(
+def _migrate_command_table_with_new_command_intent_col(
     source_transaction: sqlalchemy.engine.Connection,
     dest_transaction: sqlalchemy.engine.Connection,
 ) -> None:
-    """Add a new 'protocol_kind' column to protocols table."""
-    select_old_protocols = sqlalchemy.select(schema_5.protocol_table).order_by(
+    """Add a new 'command_intent' column to run_command_table table."""
+    select_old_commands = sqlalchemy.select(schema_6.run_command_table).order_by(
         sqlite_rowid
     )
-    insert_new_protocol = sqlalchemy.insert(schema_6.protocol_table)
-    for old_row in source_transaction.execute(select_old_protocols).all():
-        new_protocol_kind = (
-            # Account for old_row.protocol_kind being NULL.
-            schema_6.ProtocolKindSQLEnum.QUICK_TRANSFER
-            if old_row.protocol_kind == "quick-transfer"
-            else schema_6.ProtocolKindSQLEnum.STANDARD
+    insert_new_command = sqlalchemy.insert(schema_6.run_command_table)
+    for old_row in source_transaction.execute(select_old_commands).all():
+        new_command_intent = (
+            # Account for old_row.command["intent"] being NULL.
+            "protocol"
+            if old_row.command["intent"] == None  # noqa: E711
+            else old_row.command["intent"]
         )
         dest_transaction.execute(
-            insert_new_protocol,
-            id=old_row.id,
-            created_at=old_row.created_at,
-            protocol_key=old_row.protocol_key,
-            protocol_kind=new_protocol_kind,
-        )
-
-
-def _migrate_analysis_table_excluding_rtp_defaults_and_vals(
-    source_transaction: sqlalchemy.engine.Connection,
-    dest_transaction: sqlalchemy.engine.Connection,
-) -> None:
-    """Remove run_time_parameter_values_and_defaults column from analysis_table."""
-    select_old_analyses = sqlalchemy.select(schema_5.analysis_table).order_by(
-        sqlite_rowid
-    )
-    insert_new_analyses = sqlalchemy.insert(schema_6.analysis_table)
-    for old_row in source_transaction.execute(select_old_analyses).all():
-        dest_transaction.execute(
-            insert_new_analyses,
-            id=old_row.id,
-            protocol_id=old_row.protocol_id,
-            analyzer_version=old_row.analyzer_version,
-            completed_analysis=old_row.completed_analysis,
-            # run_time_parameter_values_and_defaults column is omitted
+            insert_new_command,
+            run_id=old_row.run_id,
+            index_in_run=old_row.index_in_run,
+            command_id=old_row.command_id,
+            command=old_row.command,
+            command_intent=new_command_intent,
         )
