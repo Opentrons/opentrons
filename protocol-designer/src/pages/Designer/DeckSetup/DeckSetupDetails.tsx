@@ -129,25 +129,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
   const menuListSlotPosition = getPositionFromSlotId(menuListId ?? '', deckDef)
 
   const multichannelWarningSlotIds: AddressableAreaName[] = showGen1MultichannelCollisionWarnings
-    ? deckDef.locations.addressableAreas.reduce(
-        (acc: AddressableAreaName[], aa: AddressableArea) => {
-          const modulesWithCollisionsOnDeck = allModules.filter(module =>
-            MODULES_WITH_COLLISION_ISSUES.includes(module.model)
-          )
-          if (modulesWithCollisionsOnDeck.length === 0) {
-            return acc
-          }
-
-          const hasCollision = modulesWithCollisionsOnDeck.some(module =>
-            getAreSlotsVerticallyAdjacent(module.slot, aa.id)
-          )
-          if (hasCollision) {
-            acc.push(aa.id)
-          }
-          return acc
-        },
-        []
-      )
+    ? getSlotsWithCollisions(deckDef, allModules)
     : []
 
   return (
@@ -442,5 +424,30 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
         />
       ) : null}
     </>
+  )
+}
+
+const getSlotsWithCollisions = (
+  deckDef: DeckDefinition,
+  allModules: ModuleOnDeck[]
+): AddressableAreaName[] => {
+  return deckDef.locations.addressableAreas.reduce(
+    (acc: AddressableAreaName[], aa: AddressableArea) => {
+      const modulesWithCollisionsOnDeck = allModules.filter(module =>
+        MODULES_WITH_COLLISION_ISSUES.includes(module.model)
+      )
+      if (modulesWithCollisionsOnDeck.length === 0) {
+        return acc
+      }
+
+      const hasCollision = modulesWithCollisionsOnDeck.some(module =>
+        getAreSlotsVerticallyAdjacent(module.slot, aa.id)
+      )
+      if (hasCollision) {
+        return [...acc, aa.id]
+      }
+      return acc
+    },
+    []
   )
 }
