@@ -11,6 +11,7 @@ class PositionRef(Enum):
     WELL_BOTTOM = auto()
     WELL_TOP = auto()
     MENISCUS = auto()
+    TRASH = auto()
 
 
 @dataclass
