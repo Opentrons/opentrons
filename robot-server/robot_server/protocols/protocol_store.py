@@ -584,9 +584,9 @@ def _convert_dataclass_to_sql_values(
 def _http_protocol_kind_to_sql(http_enum: ProtocolKind) -> ProtocolKindSQLEnum:
     match http_enum:
         case ProtocolKind.STANDARD:
-            return ProtocolKindSQLEnum.STANDARD
+            return ProtocolKindSQLEnum.STANDARD.value
         case ProtocolKind.QUICK_TRANSFER:
-            return ProtocolKindSQLEnum.QUICK_TRANSFER
+            return ProtocolKindSQLEnum.QUICK_TRANSFER.value
 
 
 def _sql_protocol_kind_to_http(sql_enum: ProtocolKindSQLEnum) -> ProtocolKind:

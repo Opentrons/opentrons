@@ -25,7 +25,7 @@ from ..file_and_directory_names import (
 
 class Migration6to7(Migration):  # noqa: D101
     def migrate(self, source_dir: Path, dest_dir: Path) -> None:
-        """Migrate the persistence directory from schema 5 to 6."""
+        """Migrate the persistence directory from schema 6 to 7."""
         # Copy over unmodified directories and files to new version
         copy_if_exists(
             source_dir / DECK_CONFIGURATION_FILE, dest_dir / DECK_CONFIGURATION_FILE
@@ -45,7 +45,7 @@ class Migration6to7(Migration):  # noqa: D101
             source_engine = exit_stack.enter_context(sql_engine_ctx(source_db_file))
 
             dest_engine = exit_stack.enter_context(sql_engine_ctx(dest_db_file))
-            schema_6.metadata.create_all(dest_engine)
+            schema_7.metadata.create_all(dest_engine)
 
             source_transaction = exit_stack.enter_context(source_engine.begin())
             dest_transaction = exit_stack.enter_context(dest_engine.begin())
@@ -64,7 +64,7 @@ def _migrate_db_with_changes(
         dest_transaction,
         order_by_rowid=True,
     )
-    _migrate_command_table_with_new_command_intent_col(
+    _migrate_protocol_table_with_wrong_kind(
         source_transaction,
         dest_transaction,
     )
@@ -83,12 +83,41 @@ def _migrate_db_with_changes(
         order_by_rowid=True,
     )
     copy_rows_unmodified(
-        schema_6.run_command_table,
-        schema_7.run_command_table,
+        schema_6.analysis_table,
+        schema_7.analysis_table,
         source_transaction,
         dest_transaction,
         order_by_rowid=True,
     )
+    _migrate_command_table_with_new_command_intent_col(
+        source_transaction,
+        dest_transaction,
+    )
+
+
+def _migrate_protocol_table_with_wrong_kind(
+    source_transaction: sqlalchemy.engine.Connection,
+    dest_transaction: sqlalchemy.engine.Connection,
+) -> None:
+    """Add a new 'command_intent' column to run_command_table table."""
+    select_old_protocols = sqlalchemy.select(schema_6.protocol_table).order_by(
+        sqlite_rowid
+    )
+    insert_new_protocols = sqlalchemy.insert(schema_7.protocol_table)
+    for old_row in source_transaction.execute(select_old_protocols).all():
+        new_protocol_kind = (
+            schema_6.ProtocolKindSQLEnum.STANDARD.value
+            if old_row.protocol_kind
+            == "<ProtocolKindSQLEnum.STANDARD: 'standard'>"  # noqa: E711
+            else schema_6.ProtocolKindSQLEnum.QUICK_TRANSFER.value
+        )
+        dest_transaction.execute(
+            insert_new_protocols,
+            id=old_row.id,
+            created_at=old_row.created_at,
+            protocol_key=old_row.protocol_key,
+            protocol_kind=new_protocol_kind,
+        )
 
 
 def _migrate_command_table_with_new_command_intent_col(
@@ -99,12 +128,14 @@ def _migrate_command_table_with_new_command_intent_col(
     select_old_commands = sqlalchemy.select(schema_6.run_command_table).order_by(
         sqlite_rowid
     )
-    insert_new_command = sqlalchemy.insert(schema_6.run_command_table)
+    insert_new_command = sqlalchemy.insert(schema_7.run_command_table)
     for old_row in source_transaction.execute(select_old_commands).all():
+        print(f"old command location: {old_row.command}")
         new_command_intent = (
             # Account for old_row.command["intent"] being NULL.
             "protocol"
-            if old_row.command["intent"] == None  # noqa: E711
+            if "intent" not in old_row.command
+            or old_row.command["intent"] == None  # noqa: E711
             else old_row.command["intent"]
         )
         dest_transaction.execute(
