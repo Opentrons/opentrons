@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom'
+
 import {
   useConfirmCancelModal,
   useHeaterShakerIsRunningModal,
@@ -36,12 +38,14 @@ import type {
 } from './modals'
 import type { ProtocolRunHeaderProps } from '..'
 import type { RunControls } from '../../../../RunTimeControl/hooks'
+import type { UseRunErrorsResult } from '../hooks'
 
 interface UseRunHeaderModalContainerProps extends ProtocolRunHeaderProps {
   attachedModules: AttachedModule[]
   protocolRunControls: RunControls
   runStatus: RunStatus | null
   runRecord: Run | null
+  runErrors: UseRunErrorsResult
 }
 
 export interface UseRunHeaderModalContainerResult {
@@ -63,7 +67,10 @@ export function useRunHeaderModalContainer({
   attachedModules,
   missingSetupSteps,
   protocolRunControls,
+  runErrors,
 }: UseRunHeaderModalContainerProps): UseRunHeaderModalContainerResult {
+  const navigate = useNavigate()
+
   const { displayName } = useProtocolDetailsForRun(runId)
   const robot = useRobot(robotName)
   const robotSerialNumber = getFallbackRobotSerialNumber(robot)
@@ -71,6 +78,7 @@ export function useRunHeaderModalContainer({
   const robotType = useRobotType(robotName)
 
   function handleProceedToRunClick(): void {
+    navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
     trackEvent({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: { robotSerialNumber },
@@ -80,7 +88,7 @@ export function useRunHeaderModalContainer({
 
   const confirmCancelModalUtils = useConfirmCancelModal()
 
-  const runFailedModalUtils = useRunFailedModal()
+  const runFailedModalUtils = useRunFailedModal(runErrors)
 
   const analysisErrorModalUtils = useProtocolAnalysisErrorsModal({
     robotName,

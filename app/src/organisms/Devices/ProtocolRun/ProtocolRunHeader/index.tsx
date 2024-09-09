@@ -64,6 +64,7 @@ export function ProtocolRunHeader(
     runStatus,
     protocolRunControls,
     runRecord: runRecord ?? null,
+    runErrors,
   })
 
   React.useEffect(() => {

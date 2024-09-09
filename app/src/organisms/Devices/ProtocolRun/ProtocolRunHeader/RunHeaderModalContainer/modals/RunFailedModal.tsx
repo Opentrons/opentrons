@@ -25,23 +25,11 @@ import {
 import { useDownloadRunLog } from '../../../../hooks'
 import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 
-import type {
-  RunError,
-  RunCommandErrors,
-  RunStatus,
-} from '@opentrons/api-client'
+import type { RunStatus } from '@opentrons/api-client'
 import type { ModalProps } from '@opentrons/components'
 import type { RunCommandError } from '@opentrons/shared-data'
+import type { UseRunErrorsResult } from '../../hooks'
 
-/**
- * This modal is for Desktop app
- * @param robotName - Robot name
- * @param runId - Run protocol id
- * @param setShowRunFailedModal - For closing modal
- * @param highestPriorityError - Run error information
- *
- * @returns JSX.Element | null
- */
 // Note(kk:08/07/2023)
 // This modal and run failed modal for Touchscreen app will be merged into one component like EstopModals.
 
@@ -50,38 +38,46 @@ export interface UseRunFailedModalResult {
   toggleModal: () => void
 }
 
-export function useRunFailedModal(): UseRunFailedModalResult {
+export function useRunFailedModal(
+  runErrors: UseRunErrorsResult
+): UseRunFailedModalResult {
   const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
 
   const toggleModal = (): void => {
     setShowRunFailedModal(!showRunFailedModal)
   }
 
-  return { showRunFailedModal, toggleModal }
+  const showModal =
+    showRunFailedModal &&
+    (runErrors.commandErrorList != null ||
+      runErrors.highestPriorityError != null)
+
+  return { showRunFailedModal: showModal, toggleModal }
 }
 
 interface RunFailedModalProps {
   robotName: string
   runId: string
   toggleModal: () => void
-  highestPriorityError?: RunError | null
-  commandErrorList?: RunCommandErrors | null
   runStatus: RunStatus | null
+  runErrors: UseRunErrorsResult
 }
 
+// TODO(jh, 09-09-24): Consider cleaning up component after the server-side commandErrorList changes are completed.
 export function RunFailedModal({
   robotName,
   runId,
   toggleModal,
-  highestPriorityError,
-  commandErrorList,
   runStatus,
+  runErrors,
 }: RunFailedModalProps): JSX.Element | null {
+  const { commandErrorList, highestPriorityError } = runErrors
+
   const { i18n, t } = useTranslation(['run_details', 'shared', 'branded'])
   const modalProps: ModalProps = {
     type: runStatus === RUN_STATUS_SUCCEEDED ? 'warning' : 'error',
     title:
-      commandErrorList == null || commandErrorList?.data.length === 0
+      commandErrorList == null || commandErrorList?.length === 0
         ? t('run_failed_modal_title')
         : runStatus === RUN_STATUS_SUCCEEDED
         ? t('warning_details')
@@ -94,8 +90,6 @@ export function RunFailedModal({
     width: '31.25rem',
   }
   const { downloadRunLog } = useDownloadRunLog(robotName, runId)
-
-  if (highestPriorityError == null && commandErrorList == null) return null
 
   const handleClick = (): void => {
     toggleModal()
@@ -155,10 +149,10 @@ export function RunFailedModal({
       <Flex flexDirection={DIRECTION_COLUMN}>
         <ErrorContent
           errors={
-            highestPriorityError
+            highestPriorityError != null
               ? [highestPriorityError]
-              : commandErrorList?.data && commandErrorList?.data.length > 0
-              ? commandErrorList?.data
+              : commandErrorList != null && commandErrorList.length > 0
+              ? commandErrorList
               : []
           }
           isSingleError={!!highestPriorityError}

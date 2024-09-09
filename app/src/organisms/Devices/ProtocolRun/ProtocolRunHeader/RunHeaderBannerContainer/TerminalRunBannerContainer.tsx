@@ -8,6 +8,7 @@ import {
   Flex,
   StyledText,
   Link,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { RUN_STATUS_STOPPED, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 
@@ -131,7 +132,11 @@ function ProtocolRunErrorBanner({
       type={runStatus === RUN_STATUS_SUCCEEDED ? 'warning' : 'error'}
       iconMarginLeft={SPACING.spacing4}
     >
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+      <Flex
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_CENTER}
+        width="100%"
+      >
         <StyledText desktopStyle="bodyDefaultRegular">
           {highestPriorityError != null
             ? t('error_info', {
@@ -144,7 +149,6 @@ function ProtocolRunErrorBanner({
                   : t('run_canceled_with_errors')
               }`}
         </StyledText>
-
         <Link
           onClick={handleFailedRunClick}
           textDecoration={TYPOGRAPHY.textDecorationUnderline}

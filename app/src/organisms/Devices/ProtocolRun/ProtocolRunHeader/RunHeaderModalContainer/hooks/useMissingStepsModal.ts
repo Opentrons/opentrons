@@ -48,10 +48,11 @@ export function useMissingStepsModal({
 
   const modalProps: ConfirmMissingStepsModalProps = {
     onCloseClick: conditionalConfirmUtils.cancel,
-    onConfirmClick: () =>
+    onConfirmClick: () => {
       shouldShowHSConfirm
-        ? conditionalConfirmUtils.confirm
-        : handleProceedToRunClick,
+        ? conditionalConfirmUtils.confirm()
+        : handleProceedToRunClick()
+    },
     missingSteps: missingSetupSteps,
   }
 
