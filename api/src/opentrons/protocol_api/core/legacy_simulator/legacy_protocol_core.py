@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class LegacyProtocolCoreSimulator(
     LegacyProtocolCore,
     AbstractProtocol[
-        LegacyInstrumentCoreSimulator, LegacyLabwareCore, LegacyModuleCore
+        LegacyInstrumentCoreSimulator, LegacyLabwareCore, LegacyModuleCore, None
     ],
 ):
     _instruments: Dict[Mount, Optional[LegacyInstrumentCoreSimulator]]  # type: ignore[assignment]

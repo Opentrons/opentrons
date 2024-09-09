@@ -18,6 +18,7 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
+from .robot import RobotCoreType
 from .._liquid import Liquid
 from .._types import OffDeckType
 from ..disposal_locations import TrashBin, WasteChute
@@ -27,7 +28,7 @@ if TYPE_CHECKING:
 
 
 class AbstractProtocol(
-    ABC, Generic[InstrumentCoreType, LabwareCoreType, ModuleCoreType]
+    ABC, Generic[InstrumentCoreType, LabwareCoreType, ModuleCoreType, RobotCoreType]
 ):
     @property
     @abstractmethod
@@ -253,3 +254,7 @@ class AbstractProtocol(
         self, labware_core: LabwareCoreType
     ) -> Union[str, LabwareCoreType, ModuleCoreType, OffDeckType]:
         """Get labware parent location."""
+
+    @abstractmethod
+    def load_robot(self) -> RobotCoreType:
+        """Load a Robot Core context into a protocol"""

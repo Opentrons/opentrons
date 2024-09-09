@@ -37,6 +37,7 @@ class LegacyProtocolCore(
         LegacyInstrumentCore,
         LegacyLabwareCore,
         legacy_module_core.LegacyModuleCore,
+        None,
     ]
 ):
     def __init__(
@@ -266,6 +267,10 @@ class LegacyProtocolCore(
     ) -> LegacyLabwareCore:
         """Load an adapter using its identifying parameters"""
         raise APIVersionError(api_element="Loading adapter")
+    
+    def load_robot(self) -> None:
+        """Load an adapter using its identifying parameters"""
+        raise APIVersionError(api_element="Loading robot")
 
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(

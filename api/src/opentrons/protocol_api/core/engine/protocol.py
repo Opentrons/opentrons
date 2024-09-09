@@ -57,6 +57,7 @@ from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
 from .instrument import InstrumentCore
+from .robot import RobotCore
 from .module_core import (
     ModuleCore,
     TemperatureModuleCore,
@@ -76,7 +77,10 @@ if TYPE_CHECKING:
 
 class ProtocolCore(
     AbstractProtocol[
-        InstrumentCore, LabwareCore, Union[ModuleCore, NonConnectedModuleCore]
+        InstrumentCore,
+        LabwareCore,
+        Union[ModuleCore, NonConnectedModuleCore],
+        RobotCore,
     ]
 ):
     """Protocol API core using a ProtocolEngine.
@@ -519,6 +523,13 @@ class ProtocolCore(
             return self._create_module_core(
                 load_module_result=load_module_result, model=model
             )
+
+    def load_robot(self) -> RobotCore:
+        """Load a robot core into the RobotContext.
+        """
+        return RobotCore(
+            engine_client=self._engine_client, sync_hardware_api=self._sync_hardware
+        )
 
     def load_instrument(
         self,
