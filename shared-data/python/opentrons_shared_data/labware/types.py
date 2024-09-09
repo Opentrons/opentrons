@@ -142,6 +142,7 @@ TopCrossSection = Union[CircularCrossSection, RectangularCrossSection]
 BottomShape = Union[CircularCrossSection, RectangularCrossSection, SphericalSegment]
 
 
+# todo(cm): break out BoundedSection into CircularBoundedSection and RectangularBoundedSection
 class BoundedSection(TypedDict):
     geometry: TopCrossSection
     topHeight: float

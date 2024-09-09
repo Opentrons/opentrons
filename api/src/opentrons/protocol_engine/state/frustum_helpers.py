@@ -177,6 +177,7 @@ def height_from_volume_spherical(
 
 
 def spherical_cross_section_radius(volume: float, depth: float) -> float:
+    """Find the radius of a spherical section given the volume and depth."""
     cross_section_radius = float(
         sqrt((6 * volume - pi * (depth**3)) / (3 * pi * depth))
     )

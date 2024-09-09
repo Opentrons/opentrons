@@ -238,12 +238,12 @@ class RectangularCrossSection(BaseModel):
     shape: Literal["rectangular"] = Field(
         ..., description="Denote shape as rectangular"
     )
-    xDimension: Optional[_NonNegativeNumber] = Field(
-        None,
+    xDimension: _NonNegativeNumber = Field(
+        ...,
         description="x dimension of a subsection of wells",
     )
-    yDimension: Optional[_NonNegativeNumber] = Field(
-        None,
+    yDimension: _NonNegativeNumber = Field(
+        ...,
         description="y dimension of a subsection of wells",
     )
 

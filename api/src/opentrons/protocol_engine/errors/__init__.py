@@ -149,4 +149,5 @@ __all__ = [
     "ErrorOccurrence",
     "CommandNotAllowedError",
     "InvalidLiquidHeightFound",
+    "InvalidWellDefinitionError",
 ]
