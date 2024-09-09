@@ -1,11 +1,22 @@
-from typing import NamedTuple, Union, Dict, Optional
+from typing import NamedTuple, Union, Optional
 
-from opentrons.types import Mount, DeckLocation, Point
+from opentrons.types import (
+    Mount,
+    DeckLocation,
+    Location,
+    Point,
+    AxisMapType,
+    AxisType,
+    StringAxisMap,
+)
 from opentrons.legacy_commands import publisher
-from opentrons.hardware_control import SyncHardwareAPI, types as hw_types
+from opentrons.hardware_control import SyncHardwareAPI
+from opentrons.protocols.api_support.util import requires_version
+from opentrons.protocols.api_support.types import APIVersion
 
-from ._types import OffDeckType
-from .core.common import ProtocolCore
+from . import validation
+from .core.common import ProtocolCore, RobotCore
+from .module_contexts import ModuleContext
 
 
 class HardwareManager(NamedTuple):
@@ -34,33 +45,99 @@ class RobotContext(publisher.CommandPublisher):
 
     """
 
-    def __init__(self, core: ProtocolCore) -> None:
-        self._hardware = HardwareManager(hardware=core.get_hardware())
+    def __init__(self, core: RobotCore, protocol_core: ProtocolCore, api_version: APIVersion) -> None:
+        self._hardware = HardwareManager(hardware=protocol_core.get_hardware())
+        self._core = core
+        self._protocol_core = protocol_core
+        self._api_version = api_version
+
+    @property
+    @requires_version(2, 20)
+    def api_version(self) -> APIVersion:
+        return self._api_version
 
     @property
     def hardware(self) -> HardwareManager:
+        # TODO this hardware attribute should be deprecated
+        # in version 3.0+ as we will only support exposed robot
+        # context commands.
         return self._hardware
 
+    @requires_version(2, 20)
     def move_to(
         self,
         mount: Union[Mount, str],
-        destination: Point,
-        velocity: float,
+        destination: Location,
+        speed: Optional[float] = None,
     ) -> None:
-        raise NotImplementedError()
+        """
+        Move a specified mount to a destination location on the deck.
 
+        :param mount: The mount of the instrument you wish to move.
+                      This can either be an instance of :py:class:`.types.Mount` or one
+                      of the strings ``"left"``, ``"right"``, ``"extension"``, ``"gripper"``. Note
+                      that the gripper mount can be referred to either as ``"extension"`` or ``"gripper"``.
+        :type mount: types.Mount or str
+        :param Location destination:
+        :param speed:
+        """
+        mount = validation.ensure_instrument_mount(mount)
+        self._core.move_to(mount, destination, speed)
+
+    @requires_version(2, 20)
     def move_axes_to(
         self,
-        abs_axis_map: Dict[hw_types.Axis, hw_types.AxisMapValue],
-        velocity: float,
-        critical_point: Optional[hw_types.CriticalPoint],
+        axis_map: Union[AxisMapType, StringAxisMap],
+        critical_point: AxisMapType,
+        speed: Optional[float] = None,
     ) -> None:
-        raise NotImplementedError()
+        """
+        Move a set of axes to an absolute position on the deck.
 
+        :param axis_map: A dictionary mapping axes to an absolute position on the deck in mm.
+        :param critical_point: The critical point to move the axes with. It should only
+        specify the gantry axes (i.e. `x`, `y`, `z`).
+        :param float speed: The maximum speed with which you want to move all the axes
+        in the axis map.
+        """
+        instrument_on_left = self._protocol_core.loaded_instruments.get("left")
+        is_96_channel = (
+            instrument_on_left.channels == 96 if instrument_on_left else False
+        )
+        axis_map = validation.ensure_axis_map_type(
+            axis_map, self._protocol_core.robot_type, is_96_channel
+        )
+        critical_point = validation.ensure_axis_map_type(
+            critical_point, self._protocol_core.robot_type, is_96_channel
+        )
+        validation.ensure_only_gantry_axis_map_type(
+            critical_point, self._protocol_core.robot_type
+        )
+        self._core.move_axes_to(axis_map, critical_point, speed)
+
+    @requires_version(2, 20)
     def move_axes_relative(
-        self, rel_axis_map: Dict[hw_types.Axis, hw_types.AxisMapValue], velocity: float
+        self,
+        axis_map: Union[AxisMapType, StringAxisMap],
+        speed: Optional[float] = None,
     ) -> None:
-        raise NotImplementedError()
+        """
+        Move a set of axes to a relative position on the deck.
+
+        :param axis_map: A dictionary mapping axes to relative movements in mm.
+        :type mount: types.Mount or str
+
+        :param float speed: The maximum speed with which you want to move all the axes
+        in the axis map.
+        """
+        instrument_on_left = self._protocol_core.loaded_instruments.get("left")
+        is_96_channel = (
+            instrument_on_left.channels == 96 if instrument_on_left else False
+        )
+        axis_map = validation.ensure_axis_map_type(
+            axis_map, self._protocol_core.robot_type, is_96_channel
+        )
+        self._core.move_axes_relative(axis_map, speed)
 
     def close_gripper_jaw(self, force: float) -> None:
         raise NotImplementedError()
@@ -69,9 +146,49 @@ class RobotContext(publisher.CommandPublisher):
         raise NotImplementedError()
 
     def axis_coordinates_for(
-        self, mount: Union[Mount, str], location: Union[DeckLocation, OffDeckType]
-    ) -> None:
-        raise NotImplementedError()
+        self,
+        mount: Union[Mount, str],
+        location: Union[Location, ModuleContext, DeckLocation],
+    ) -> AxisMapType:
+        """
+        Build a :py:class:`.types.AxisMapType` from a location to be compatible with
+        either :py:meth:`.RobotContext.move_axes_to` or :py:meth:`.RobotContext.move_axes_relative`.
+        You must provide only one of `location`, `slot`, or `module` to build
+        the axis map.
+
+        :param mount: The mount of the instrument you wish create an axis map for.
+                      This can either be an instance of :py:class:`.types.Mount` or one
+                      of the strings ``"left"``, ``"right"``, ``"extension"``, ``"gripper"``. Note
+                      that the gripper mount can be referred to either as ``"extension"`` or ``"gripper"``.
+        :type mount: types.Mount or str
+        :param location: The location to format an axis map for.
+        :type location: `Well`, `ModuleContext`, `DeckLocation` or `OffDeckType`
+        """
+        mount = validation.ensure_instrument_mount(mount)
+
+        mount_axis = AxisType.axis_for_mount(mount)
+        if location:
+            loc: Point
+            if isinstance(location, ModuleContext):
+                loc = location.labware
+                if not loc:
+                    raise ValueError(f"There must be a labware on {location}")
+                top_of_labware = loc.wells()[0].top()
+                loc = top_of_labware.point
+                return {mount_axis: loc.z, AxisType.X: loc.x, AxisType.Y: loc.y}
+            elif isinstance(location, DeckLocation):
+                slot_name = validation.ensure_and_convert_deck_slot(
+                    location,
+                    api_version=self._api_version,
+                    robot_type=self._protocol_core.robot_type,
+                )
+                loc = self._protocol_core.deck.get_slot_center(slot_name)
+                return {mount_axis: loc.z, AxisType.X: loc.x, AxisType.Y: loc.y}
+            else:
+                loc = location.point
+                return {mount_axis: loc.z, AxisType.X: loc.x, AxisType.Y: loc.y}
+        else:
+            raise TypeError("You must specify a location to move to.")
 
     def plunger_coordinates_for_volume(
         self, mount: Union[Mount, str], volume: float
@@ -83,7 +200,22 @@ class RobotContext(publisher.CommandPublisher):
     ) -> None:
         raise NotImplementedError()
 
-    def build_axis_map(
-        self, axis_map: Dict[hw_types.Axis, hw_types.AxisMapValue]
-    ) -> None:
-        raise NotImplementedError()
+    def build_axis_map(self, axis_map: StringAxisMap) -> AxisMapType:
+        """Take in a :py:class:`.types.StringAxisMap` and output a :py:class:`.types.AxisMapType`.
+        A :py:class:`.types.StringAxisMap` is allowed to contain any of the following strings:
+        ``"x"``, ``"y"``, "``z_l"``, "``z_r"``, "``z_g"``, ``"q"``.
+
+        An example of a valid axis map could be:
+
+        {"x": 1, "y": 2} or {"Z_L": 100}
+
+        Note that capitalization does not matter.
+
+        """
+        instrument_on_left = self._protocol_core.loaded_instruments.get("left")
+        is_96_channel = (
+            instrument_on_left.channels == 96 if instrument_on_left else False
+        )
+        return validation.ensure_axis_map_type(
+            axis_map, self._protocol_core.robot_type, is_96_channel
+        )
