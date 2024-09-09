@@ -1,3 +1,4 @@
 export * from './useIsDoorOpen'
 export * from './useRunAnalytics'
-export * from './useRunHeaderDropTip'
+export * from './useRunHeaderRunControls'
+export * from './useRunErrors'

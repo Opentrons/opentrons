@@ -15,8 +15,8 @@ import {
   Modal,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../../App/portal'
-import { Banner } from '../../../atoms/Banner'
+import { getTopPortalEl } from '../../../../../App/portal'
+import { Banner } from '../../../../../atoms/Banner'
 
 import type { AnalysisError } from '@opentrons/shared-data'
 

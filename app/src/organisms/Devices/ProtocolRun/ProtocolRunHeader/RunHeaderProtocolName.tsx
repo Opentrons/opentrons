@@ -1,0 +1,41 @@
+import * as React from 'react'
+import { Link } from 'react-router-dom'
+
+import {
+  COLORS,
+  Flex,
+  LegacyStyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+
+import { useProtocolDetailsForRun } from '../../hooks'
+
+interface RunHeaderProtocolNameProps {
+  runId: string
+}
+
+export function RunHeaderProtocolName({
+  runId,
+}: RunHeaderProtocolNameProps): JSX.Element {
+  const { protocolKey, displayName } = useProtocolDetailsForRun(runId)
+
+  return (
+    <Flex>
+      {protocolKey != null ? (
+        <Link to={`/protocols/${protocolKey}`}>
+          <LegacyStyledText
+            as="h2"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            color={COLORS.blue50}
+          >
+            {displayName}
+          </LegacyStyledText>
+        </Link>
+      ) : (
+        <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {displayName}
+        </LegacyStyledText>
+      )}
+    </Flex>
+  )
+}

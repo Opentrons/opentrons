@@ -10,15 +10,13 @@ import {
 } from '@opentrons/api-client'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../i18n'
-import {
-  useIsFlex,
-  useTrackProtocolRunEvent,
-} from '../../../organisms/Devices/hooks'
-import { useTrackEvent } from '../../../redux/analytics'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { ConfirmCancelModal } from '../../../organisms/RunDetails/ConfirmCancelModal'
-import { useRunStatus } from '../../RunTimeControl/hooks'
+import { i18n } from '../../../../../../i18n'
+import { renderWithProviders } from '../../../../../../__testing-utils__'
+import { useIsFlex, useTrackProtocolRunEvent } from '../../../../hooks'
+import { useTrackEvent } from '../../../../../../redux/analytics'
+import { ConfirmCancelModal } from '../ConfirmCancelModal'
+import { useRunStatus } from '../../../../../RunTimeControl/hooks'
+
 import type * as ApiClient from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
@@ -28,10 +26,9 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     useStopRunMutation: vi.fn(),
   }
 })
-vi.mock('../../RunTimeControl/hooks')
-vi.mock('../../../organisms/Devices/hooks')
-vi.mock('../../../redux/analytics')
-vi.mock('../../../redux/config')
+vi.mock('.../../../../../RunTimeControl/hooks')
+vi.mock('../../../../hooks')
+vi.mock('../../../../../../redux/analytics')
 
 const render = (props: React.ComponentProps<typeof ConfirmCancelModal>) => {
   return renderWithProviders(<ConfirmCancelModal {...props} />, {
@@ -61,7 +58,12 @@ describe('ConfirmCancelModal', () => {
     })
     vi.mocked(useIsFlex).mockReturnValue(true)
 
-    props = { onClose: vi.fn(), runId: RUN_ID, robotName: ROBOT_NAME }
+    props = {
+      onClose: vi.fn(),
+      runId: RUN_ID,
+      robotName: ROBOT_NAME,
+      runStatus: RUN_STATUS_RUNNING,
+    }
   })
 
   afterEach(() => {

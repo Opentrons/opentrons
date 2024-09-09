@@ -1,0 +1,109 @@
+import { useTranslation } from 'react-i18next'
+
+import { RUN_STATUS_BLOCKED_BY_OPEN_DOOR } from '@opentrons/api-client'
+
+import {
+  CANCELLABLE_STATUSES,
+  DISABLED_STATUSES,
+  START_RUN_STATUSES,
+} from '../../../constants'
+import { useIsDoorOpen } from '../../../hooks'
+import { useIsFixtureMismatch } from './useIsFixtureMismatch'
+
+import type { BaseActionButtonProps } from '..'
+
+interface UseActionButtonDisabledUtilsProps extends BaseActionButtonProps {
+  isCurrentRun: boolean
+  isValidRunAgain: boolean
+  isSetupComplete: boolean
+  isOtherRunCurrent: boolean
+  isProtocolNotReady: boolean
+  isRobotOnWrongVersionOfSoftware: boolean
+}
+
+type UseActionButtonDisabledUtilsResult =
+  | { isDisabled: true; disabledReason: string }
+  | { isDisabled: false; disabledReason: null }
+
+export function useActionBtnDisabledUtils(
+  props: UseActionButtonDisabledUtilsProps
+): UseActionButtonDisabledUtilsResult {
+  const {
+    isCurrentRun,
+    isSetupComplete,
+    isOtherRunCurrent,
+    isProtocolNotReady,
+    runStatus,
+    isRobotOnWrongVersionOfSoftware,
+    protocolRunControls,
+    robotName,
+    runId,
+  } = props
+
+  const { t } = useTranslation('shared')
+  const {
+    isPlayRunActionLoading,
+    isPauseRunActionLoading,
+    isResetRunLoading,
+  } = protocolRunControls
+  const isDoorOpen = useIsDoorOpen(robotName)
+  const isFixtureMismatch = useIsFixtureMismatch(runId, robotName)
+
+  const isDisabled =
+    (isCurrentRun && !isSetupComplete) ||
+    isPlayRunActionLoading ||
+    isPauseRunActionLoading ||
+    isResetRunLoading ||
+    isOtherRunCurrent ||
+    isProtocolNotReady ||
+    isFixtureMismatch ||
+    DISABLED_STATUSES.includes(runStatus) ||
+    isRobotOnWrongVersionOfSoftware ||
+    (isDoorOpen &&
+      runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
+      CANCELLABLE_STATUSES.includes(runStatus))
+
+  const disabledReason = useDisabledReason({
+    ...props,
+    isDoorOpen,
+    isFixtureMismatch,
+  })
+
+  return isDisabled
+    ? { isDisabled: true, disabledReason: disabledReason ?? t('robot_is_busy') }
+    : { isDisabled: false, disabledReason: null }
+}
+
+type UseDisabledReasonProps = UseActionButtonDisabledUtilsProps & {
+  isDoorOpen: boolean
+  isFixtureMismatch: boolean
+}
+
+function useDisabledReason({
+  isCurrentRun,
+  isSetupComplete,
+  isFixtureMismatch,
+  isValidRunAgain,
+  isOtherRunCurrent,
+  isRobotOnWrongVersionOfSoftware,
+  isDoorOpen,
+  runStatus,
+}: UseDisabledReasonProps): string | null {
+  const { t } = useTranslation(['run_details', 'shared'])
+
+  if (
+    isCurrentRun &&
+    (!isSetupComplete || isFixtureMismatch) &&
+    !isValidRunAgain
+  ) {
+    return t('setup_incomplete')
+  } else if (isOtherRunCurrent) {
+    return t('shared:robot_is_busy')
+  } else if (isRobotOnWrongVersionOfSoftware) {
+    return t('shared:a_software_update_is_available')
+  } else if (isDoorOpen && START_RUN_STATUSES.includes(runStatus)) {
+    return t('close_door')
+  } else {
+    return null
+  }
+}

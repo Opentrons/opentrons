@@ -15,13 +15,13 @@ import {
   ModalShell,
 } from '@opentrons/components'
 
-import { TextOnlyButton } from '../../../../atoms/buttons'
-import { useHomePipettes } from '../../../DropTipWizardFlows/hooks'
+import { TextOnlyButton } from '../../../../../atoms/buttons'
+import { useHomePipettes } from '../../../../DropTipWizardFlows/hooks'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
-import type { UseHomePipettesProps } from '../../../DropTipWizardFlows/hooks'
-import type { TipAttachmentStatusResult } from '../../../DropTipWizardFlows'
+import type { UseHomePipettesProps } from '../../../../DropTipWizardFlows/hooks'
+import type { TipAttachmentStatusResult } from '../../../../DropTipWizardFlows'
 
 type UseProtocolDropTipModalProps = Pick<
   UseHomePipettesProps,

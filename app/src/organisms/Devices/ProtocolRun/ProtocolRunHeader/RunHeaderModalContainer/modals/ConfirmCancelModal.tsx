@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+
 import {
   AlertPrimaryButton,
   ALIGN_CENTER,
@@ -21,10 +22,11 @@ import {
 } from '@opentrons/api-client'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
-import { getTopPortalEl } from '../../App/portal'
-import { useTrackProtocolRunEvent, useIsFlex } from '../Devices/hooks'
-import { useRunStatus } from '../RunTimeControl/hooks'
-import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../redux/analytics'
+import { getTopPortalEl } from '../../../../../../App/portal'
+import { useTrackProtocolRunEvent, useIsFlex } from '../../../../hooks'
+import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../../../../redux/analytics'
+
+import type { RunStatus } from '@opentrons/api-client'
 
 export interface UseConfirmCancelModalResult {
   showModal: boolean
@@ -45,17 +47,17 @@ export interface ConfirmCancelModalProps {
   onClose: () => unknown
   runId: string
   robotName: string
+  runStatus: RunStatus | null
 }
 
 export function ConfirmCancelModal(
   props: ConfirmCancelModalProps
 ): JSX.Element {
-  const { onClose, runId, robotName } = props
+  const { onClose, runId, robotName, runStatus } = props
   const { stopRun } = useStopRunMutation()
-  const [isCanceling, setIsCanceling] = React.useState(false)
-  const runStatus = useRunStatus(runId)
   const isFlex = useIsFlex(robotName)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
+  const [isCanceling, setIsCanceling] = React.useState(false)
   const { t } = useTranslation('run_details')
 
   const cancelRunAlertInfo = isFlex

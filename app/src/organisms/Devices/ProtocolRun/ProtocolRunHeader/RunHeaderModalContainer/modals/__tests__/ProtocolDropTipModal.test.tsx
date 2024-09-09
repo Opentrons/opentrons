@@ -8,14 +8,14 @@ import {
   useProtocolDropTipModal,
   ProtocolDropTipModal,
 } from '../ProtocolDropTipModal'
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
-import { mockLeftSpecs } from '../../../../../redux/pipettes/__fixtures__'
-import { useHomePipettes } from '../../../../DropTipWizardFlows/hooks'
+import { renderWithProviders } from '../../../../../../__testing-utils__'
+import { i18n } from '../../../../../../i18n'
+import { mockLeftSpecs } from '../../../../../../redux/pipettes/__fixtures__'
+import { useHomePipettes } from '../../../../../DropTipWizardFlows/hooks'
 
 import type { Mock } from 'vitest'
 
-vi.mock('../../../DropTipWizardFlows/hooks')
+vi.mock('../../../../../DropTipWizardFlows/hooks')
 
 describe('useProtocolDropTipModal', () => {
   let props: Parameters<typeof useProtocolDropTipModal>[0]
@@ -56,26 +56,26 @@ describe('useProtocolDropTipModal', () => {
       useProtocolDropTipModal(props)
     )
 
-    expect(result.current.showDTModal).toBe(true)
+    expect(result.current.showModal).toBe(true)
 
     props.areTipsAttached = false
     rerender()
 
-    expect(result.current.showDTModal).toBe(false)
+    expect(result.current.showModal).toBe(false)
   })
 
   it('should not show modal when isRunCurrent is false', () => {
     props.isRunCurrent = false
     const { result } = renderHook(() => useProtocolDropTipModal(props))
 
-    expect(result.current.showDTModal).toBe(false)
+    expect(result.current.showModal).toBe(false)
   })
 
   it('should call homePipettes when onDTModalSkip is called', () => {
     const { result } = renderHook(() => useProtocolDropTipModal(props))
 
     act(() => {
-      result.current.onDTModalSkip()
+      result.current.modalProps?.onSkip()
     })
 
     expect(mockHomePipettes).toHaveBeenCalled()
@@ -85,7 +85,7 @@ describe('useProtocolDropTipModal', () => {
     const { result } = renderHook(() => useProtocolDropTipModal(props))
 
     act(() => {
-      result.current.onDTModalRemoval()
+      result.current.modalProps?.onBeginRemoval()
     })
 
     expect(props.toggleDTWiz).toHaveBeenCalled()
@@ -99,7 +99,7 @@ describe('useProtocolDropTipModal', () => {
 
     const { result } = renderHook(() => useProtocolDropTipModal(props))
 
-    expect(result.current.isDisabled).toBe(true)
+    expect(result.current.modalProps?.isDisabled).toBe(true)
   })
 })
 

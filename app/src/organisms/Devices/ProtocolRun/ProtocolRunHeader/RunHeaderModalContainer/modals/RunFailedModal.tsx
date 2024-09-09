@@ -22,7 +22,7 @@ import {
   DISPLAY_FLEX,
 } from '@opentrons/components'
 
-import { useDownloadRunLog } from '../../hooks'
+import { useDownloadRunLog } from '../../../hooks'
 import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 
 import type {
@@ -45,7 +45,7 @@ import type { RunCommandError } from '@opentrons/shared-data'
 // Note(kk:08/07/2023)
 // This modal and run failed modal for Touchscreen app will be merged into one component like EstopModals.
 
-interface UseRunFailedModalResult {
+export interface UseRunFailedModalResult {
   showRunFailedModal: boolean
   toggleModal: () => void
 }

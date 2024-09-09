@@ -9,45 +9,44 @@ import {
   StyledText,
   Link,
 } from '@opentrons/components'
-import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
+import { RUN_STATUS_STOPPED, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 
-import { Banner } from '../../../../atoms/Banner'
-import { useCloseCurrentRun } from '../../../ProtocolUpload/hooks'
+import { Banner } from '../../../../../atoms/Banner'
+import { useCloseCurrentRun } from '../../../../ProtocolUpload/hooks'
+import { useIsRunCurrent } from '../../../../../resources/runs'
 
-import type {
-  RunStatus,
-  RunCommandErrors,
-  RunError,
-} from '@opentrons/api-client'
-import { useIsRunCurrent } from '../../../../resources/runs'
+import type { RunStatus } from '@opentrons/api-client'
+import type { UseRunErrorsResult } from '../hooks'
 
 interface TerminalRunProps {
   runStatus: RunStatus | null
   runId: string | null
   toggleRunFailedModal: () => void
-  commandErrorList?: RunCommandErrors
   isResetRunLoading: boolean
-  cancelledWithoutRecovery: boolean
-  highestPriorityError?: RunError | null
+  enteredER: boolean
+  runErrors: UseRunErrorsResult
 }
 
 // TODO(jh 04-24-2024): Split TerminalRunBanner into a RunSuccessBanner and RunFailedBanner.
 export function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
   const {
     runStatus,
+    enteredER,
     toggleRunFailedModal,
-    commandErrorList,
-    highestPriorityError,
+    runErrors,
     isResetRunLoading,
-    cancelledWithoutRecovery,
     runId,
   } = props
+  const { highestPriorityError, commandErrorList } = runErrors
+
   const { t } = useTranslation('run_details')
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const isRunCurrent = useIsRunCurrent(runId)
 
+  const cancelledWithoutRecovery =
+    !enteredER && runStatus === RUN_STATUS_STOPPED
   const completedWithErrors =
-    commandErrorList?.data != null && commandErrorList.data.length > 0
+    commandErrorList != null && commandErrorList.length > 0
 
   const handleRunSuccessClick = (): void => {
     closeCurrentRun()

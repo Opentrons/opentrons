@@ -28,7 +28,7 @@ export function setHeaterShakerAttached(
     heaterShakerAttached
   )
 }
-interface ConfirmAttachmentModalProps {
+export interface ConfirmAttachmentModalProps {
   onCloseClick: () => void
   isProceedToRunModal: boolean
   onConfirmClick: () => void

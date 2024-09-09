@@ -7,15 +7,15 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   useDropTipWizardFlows,
   useTipAttachmentStatus,
-} from '../../../../DropTipWizardFlows'
+} from '../../../../../DropTipWizardFlows'
 import { useProtocolDropTipModal } from '../ProtocolDropTipModal'
-import { useCloseCurrentRun } from '../../../../ProtocolUpload/hooks'
-import { useIsRunCurrent } from '../../../../../resources/runs'
-import { TERMINAL_STATUSES } from '../constants'
+import { useCloseCurrentRun } from '../../../../../ProtocolUpload/hooks'
+import { useIsRunCurrent } from '../../../../../../resources/runs'
+import { TERMINAL_STATUSES } from '../../constants'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { Run, RunStatus } from '@opentrons/api-client'
-import type { DropTipWizardFlowsProps } from '../../../../DropTipWizardFlows'
+import type { DropTipWizardFlowsProps } from '../../../../../DropTipWizardFlows'
 import type { UseProtocolDropTipModalResult } from '../ProtocolDropTipModal'
 
 export type RunHeaderDropTipWizProps =

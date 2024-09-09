@@ -14,7 +14,7 @@ import {
   Modal,
 } from '@opentrons/components'
 
-interface ConfirmMissingStepsModalProps {
+export interface ConfirmMissingStepsModalProps {
   onCloseClick: () => void
   onConfirmClick: () => void
   missingSteps: string[]
