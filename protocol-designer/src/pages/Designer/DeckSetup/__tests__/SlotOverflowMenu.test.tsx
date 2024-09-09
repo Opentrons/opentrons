@@ -45,7 +45,7 @@ describe('SlotOverflowMenu', () => {
 
   beforeEach(() => {
     props = {
-      slot: 'D3',
+      location: 'D3',
       setShowMenuList: vi.fn(),
       addEquipment: vi.fn(),
     }
@@ -105,7 +105,7 @@ describe('SlotOverflowMenu', () => {
     expect(props.setShowMenuList).toHaveBeenCalled()
   })
   it('renders 2 buttons when there is nothing on the slot', () => {
-    props.slot = 'A1'
+    props.location = 'A1'
     render(props)
     fireEvent.click(
       screen.getByRole('button', { name: 'Add hardware/labware' })

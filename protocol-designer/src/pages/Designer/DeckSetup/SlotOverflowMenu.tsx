@@ -49,7 +49,8 @@ const TOP_SLOT_Y_POSITION_ALL_BUTTONS = 110
 const TOP_SLOT_Y_POSITION_2_BUTTONS = 35
 
 interface SlotOverflowMenuProps {
-  slot: DeckSlotId
+  //   can be off-deck id or deck slot
+  location: DeckSlotId | string
   setShowMenuList: (value: React.SetStateAction<boolean>) => void
   addEquipment: (slotId: string) => void
   menuListSlotPosition?: CoordinateTuple
@@ -57,7 +58,12 @@ interface SlotOverflowMenuProps {
 export function SlotOverflowMenu(
   props: SlotOverflowMenuProps
 ): JSX.Element | null {
-  const { slot, setShowMenuList, addEquipment, menuListSlotPosition } = props
+  const {
+    location,
+    setShowMenuList,
+    addEquipment,
+    menuListSlotPosition,
+  } = props
   const { t } = useTranslation('starting_deck_state')
   const navigate = useNavigate()
   const dispatch = useDispatch<ThunkDispatch<any>>()
@@ -77,12 +83,15 @@ export function SlotOverflowMenu(
     modules: deckSetupModules,
     additionalEquipmentOnDeck,
   } = deckSetup
+  const isOffDeckLocation = deckSetupLabware[location] != null
 
   const moduleOnSlot = Object.values(deckSetupModules).find(
-    module => module.slot === slot
+    module => module.slot === location
   )
-  const labwareOnSlot = Object.values(deckSetupLabware).find(
-    lw => lw.slot === slot || lw.slot === moduleOnSlot?.id
+  const labwareOnSlot = Object.values(deckSetupLabware).find(lw =>
+    isOffDeckLocation
+      ? lw.id === location
+      : lw.slot === location || lw.slot === moduleOnSlot?.id
   )
   const isLabwareTiprack = labwareOnSlot?.def.parameters.isTiprack ?? false
   const isLabwareAnAdapter =
@@ -91,7 +100,7 @@ export function SlotOverflowMenu(
     lw => lw.slot === labwareOnSlot?.id
   )
   const fixturesOnSlot = Object.values(additionalEquipmentOnDeck).filter(
-    ae => ae.location?.split('cutout')[1] === slot
+    ae => ae.location?.split('cutout')[1] === location
   )
 
   const hasNoItems =
@@ -130,25 +139,27 @@ export function SlotOverflowMenu(
       nestedLabwareOnSlot == null) ||
     nestedLabwareOnSlot != null
 
-  let position = ROBOT_BOTTOM_HALF_SLOTS.includes(slot)
+  let position = ROBOT_BOTTOM_HALF_SLOTS.includes(location)
     ? BOTTOM_SLOT_Y_POSITION
     : TOP_SLOT_Y_POSITION
 
-  if (showDuplicateBtn && !ROBOT_BOTTOM_HALF_SLOTS.includes(slot)) {
+  if (showDuplicateBtn && !ROBOT_BOTTOM_HALF_SLOTS.includes(location)) {
     position += showEditAndLiquidsBtns
       ? TOP_SLOT_Y_POSITION_ALL_BUTTONS
       : TOP_SLOT_Y_POSITION_2_BUTTONS
   }
 
+  let nickNameId = labwareOnSlot?.id
+  if (nestedLabwareOnSlot != null) {
+    nickNameId = nestedLabwareOnSlot.id
+  } else if (isOffDeckLocation) {
+    nickNameId = location
+  }
   const slotOverflowBody = (
     <>
-      {showNickNameModal && labwareOnSlot != null ? (
+      {showNickNameModal && nickNameId != null ? (
         <EditNickNameModal
-          labwareId={
-            nestedLabwareOnSlot != null
-              ? nestedLabwareOnSlot.id
-              : labwareOnSlot.id
-          }
+          labwareId={nickNameId}
           onClose={() => {
             setShowNickNameModal(false)
             setShowMenuList(false)
@@ -169,14 +180,14 @@ export function SlotOverflowMenu(
       >
         <MenuButton
           onClick={() => {
-            addEquipment(slot)
+            addEquipment(location)
             setShowMenuList(false)
           }}
         >
           <StyledText desktopStyle="bodyDefaultRegular">
             {hasNoItems
-              ? t(slot === 'offDeck' ? 'add_labware' : 'add_hw_lw')
-              : t(slot === 'offDeck' ? 'edit_labware' : 'edit_hw_lw')}
+              ? t(isOffDeckLocation ? 'add_labware' : 'add_hw_lw')
+              : t(isOffDeckLocation ? 'edit_labware' : 'edit_hw_lw')}
           </StyledText>
         </MenuButton>
         {showEditAndLiquidsBtns ? (
@@ -234,7 +245,7 @@ export function SlotOverflowMenu(
           }}
         >
           <StyledText desktopStyle="bodyDefaultRegular">
-            {t(slot === 'offDeck' ? 'clear_labware' : 'clear_slot')}
+            {t(isOffDeckLocation ? 'clear_labware' : 'clear_slot')}
           </StyledText>
         </MenuButton>
       </Flex>
