@@ -83,7 +83,7 @@ class FlexStacker():
         self.home_acceleration = HOME_ACCELERATION
         self.move_acceleration_x = MOVE_ACCELERATION_X
         self.move_acceleration_z = MOVE_ACCELERATION_Z
-        self.current_position = {'X': None, 'Z': None}
+        self.current_position = {'X': None, 'Z': None, 'L': None}
         # self.__class__.__name__ == 'FlexStacker'
 
     @classmethod
@@ -274,7 +274,10 @@ class FlexStacker():
             self.current_position.update({'Z': self.current_position['Z'] + distance})
         elif direction == DIR.NEGATIVE and axis == AXIS.Z:
             self.current_position.update({'Z': self.current_position['Z'] - distance})
-        else:
+        elif direction == DIR.POSITIVE and axis == AXIS.L:
+            self.current_position.update({'L': self.current_position['L'] + distance})
+        elif direction == DIR.NEGATIVE and axis == AXIS.L:
+            self.current_position.update({'L': self.current_position['L'] - distance})
             raise(f"Not recognized {axis} and {direction}")
         print(self.current_position)
 
@@ -307,6 +310,8 @@ class FlexStacker():
             self.current_position.update({'Z': TOTAL_TRAVEL_Z})
         elif direction == DIR.NEGATIVE_HOME and axis == AXIS.Z:
             self.current_position.update({'Z': 0})
+        elif direction == DIR.NEGATIVE_HOME and axis == AXIS.L:
+            self.current_position.update({'L': 0})
         else:
             raise(f"Not recognized {axis} and {direction}")
         print(self.current_position)
@@ -374,6 +379,7 @@ class FlexStacker():
         # ----------------Set up the Stacker------------------------
         self.home(AXIS.X, DIR.POSITIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
         self.home(AXIS.Z, DIR.NEGATIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
+        self.close_latch()
         self.move(AXIS.X, TOTAL_TRAVEL_X-5, DIR.NEGATIVE, self.move_speed_x, self.move_acceleration_x)
         self.home(AXIS.X, DIR.NEGATIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
         self.move(AXIS.Z, TOTAL_TRAVEL_Z-labware_clearance, DIR.POSITIVE, self.move_speed_up_z, self.move_acceleration_z)
@@ -391,6 +397,7 @@ class FlexStacker():
         # ----------------Set up the Stacker------------------------
         self.home(AXIS.X, DIR.POSITIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
         self.home(AXIS.Z, DIR.NEGATIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
+        self.close_latch()
         self.move(AXIS.X, TOTAL_TRAVEL_X-5, DIR.NEGATIVE, self.move_speed_x, self.move_acceleration_x)
         self.home(AXIS.X, DIR.NEGATIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
         self.move(AXIS.Z, TOTAL_TRAVEL_Z-5, DIR.POSITIVE, self.move_speed_up_z, self.move_acceleration_z)
