@@ -48,9 +48,9 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
     BlowOutLocation | undefined
   >(state.blowOut)
 
-  const [disposalVolume, setDisposalVolume] = React.useState<number>(
-    state.volume
-  )
+  const [disposalVolume, setDisposalVolume] = React.useState<
+    number | undefined
+  >(state?.disposalVolume)
   const maxPipetteVolume = Object.values(state.pipette.liquids)[0].maxVolume
   const tipVolume = Object.values(state.tipRack.wells)[0].totalLiquidVolume
 
@@ -136,7 +136,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
   const volumeRange = { min: 1, max: maxDisposalCapacity }
 
   const volumeError =
-    disposalVolume !== null &&
+    disposalVolume != null &&
     (disposalVolume < volumeRange.min || disposalVolume > volumeRange.max)
       ? t(`value_out_of_range`, {
           min: volumeRange.min,
