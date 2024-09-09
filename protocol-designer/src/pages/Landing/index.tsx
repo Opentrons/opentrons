@@ -24,8 +24,6 @@ export function Landing(): JSX.Element {
   const metadata = useSelector(getFileMetadata)
   const navigate = useNavigate()
 
-  console.log('in landing')
-
   React.useEffect(() => {
     if (metadata?.created != null) {
       console.warn('protocol already exists, navigating to overview')
