@@ -1,72 +1,99 @@
 from typing import Dict
-from opentrons.types import Point
-from .. import liquid_class_settings as lcs
+from ..liquid_class_settings import *
 from . import water
 
 
-default = lcs.LiquidClassSettings(
-    submerge=lcs.SubmergeSettings(
-        position=lcs.PositionSettings(
-            offset=Point(x=0, y=0, z=2),
-            ref="well-top",
+default = Liquid(
+    submerge=Submerge(
+        position=Position(
+            offset=Point(
+                x=0.0,
+                y=0.0,
+                z=2.0
+            ),
+            ref=PositionRef.MENISCUS,
         ),
-        speed=30.0,
+        speed=50.0,
         delay=0.0,
-        lld_enabled=False,
+        lld=False,
     ),
-    retract=lcs.RetractSettings(
-        position=lcs.PositionSettings(
-            offset=Point(x=0, y=0, z=-1.5),
-            ref="meniscus",
+    retract=Retract(
+        position=Position(
+            offset=Point(
+                x=0.0,
+                y=0.0,
+                z=5.0
+            ),
+            ref=PositionRef.MENISCUS,
         ),
-        speed=50,
-        delay=1.0,
+        speed=50.0,
+        delay=0.0,
         air_gap=0.1,
-        blow_out=lcs.BlowOutSettings(
+        blow_out=BlowOut(
             enabled=True,
-            position=lcs.PositionSettings(
-                offset=Point(x=0, y=0, z=5.0),
-                ref="meniscus",
+            position=Position(
+                offset=Point(
+                    x=0.0,
+                    y=0.0,
+                    z=2.0
+                ),
+                ref=PositionRef.MENISCUS,
             ),
+            volume=1.0,
         ),
-        touch_tip=lcs.TouchTipSettings(
+        touch_tip=TouchTip(
             enabled=False,
-            position=lcs.PositionSettings(
-                offset=Point(x=0, y=0, z=-2.0),
-                ref="well-top",
+            position=Position(
+                offset=Point(
+                    x=0.0,
+                    y=0.0,
+                    z=-1.0
+                ),
+                ref=PositionRef.WELL_TOP,
             ),
-            speed=30,
+            speed=30.0,
             mm_to_edge=1.0,
         ),
     ),
-    aspirate=lcs.AspirateSettings(
+    aspirate=Aspirate(
         order=[],
-        position=lcs.PositionSettings(
-            offset=Point(x=0, y=0, z=-1.5),
-            ref="meniscus",
+        position=Position(
+            offset=Point(
+                x=0.0,
+                y=0.0,
+                z=-1.5
+            ),
+            ref=PositionRef.MENISCUS,
         ),
         flow_rate=30.0,
         delay=0.5,
-        mix=lcs.MixSettings(
+        mix=Mix(
             enabled=False,
             count=0,
-            volume=None,
+            volume=0.0,
         ),
-        conditioning_volume=0.0,
-        disposal_volume=0.0,
+        distribute=Distribute(
+            enabled=False,
+            conditioning_volume=0.0,
+            disposal_volume=0.0,
+        )
     ),
-    dispense=lcs.DispenseSettings(
+    dispense=Dispense(
         order=[],
-        position=lcs.PositionSettings(
-            offset=Point(x=0, y=0, z=-1.5),
-            ref="meniscus",
+        position=Position(
+            offset=Point(
+                x=0.0,
+                y=0.0,
+                z=-1.5
+            ),
+            ref=PositionRef.MENISCUS,
         ),
         flow_rate=30.0,
         delay=1.0,
-        mix=lcs.MixSettings(
+        mix=Mix(
             enabled=False,
             count=0,
-            volume=None,
+            volume=0.0,
         ),
         push_out=7.0,
     ),
@@ -74,7 +101,7 @@ default = lcs.LiquidClassSettings(
 
 
 _all_classes: Dict[
-    str, Dict[str, Dict[str, Dict[str, Dict[int, lcs.LiquidClassSettings]]]]
+    str, Dict[str, Dict[str, Dict[str, Dict[int, Liquid]]]]
 ] = {
     "water": {
         "t50": {
@@ -94,7 +121,7 @@ _all_classes: Dict[
 
 def get_liquid_class(
     liquid: str, dilution: float, pipette: int, channels: int, tip: int, volume: int
-) -> lcs.LiquidClassSettings:
+) -> Liquid:
     """Get liquid class."""
     dil_str = "" if not dilution or dilution == 1.0 else f"-{int(dilution * 100)}"
     cls_per_volume = _all_classes[f"{liquid}{dil_str}"][f"t{tip}"][f"p{pipette}"][
@@ -104,10 +131,10 @@ def get_liquid_class(
     defined_volumes.sort()
     assert len(defined_volumes) == 3
 
-    def _get_interp_liq_class(lower_ul: int, upper_ul: int) -> lcs.LiquidClassSettings:
+    def _get_interp_liq_class(lower_ul: int, upper_ul: int) -> Liquid:
         lower_cls = cls_per_volume[lower_ul]
         upper_cls = cls_per_volume[upper_ul]
-        return lcs.LiquidClassSettings.interpolate(
+        return Liquid.interpolate(
             volume, lower_ul, upper_ul, lower_cls, upper_cls
         )
 
