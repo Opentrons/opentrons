@@ -13,6 +13,7 @@ import {
   FLEX_MAX_CONTENT,
 } from '../..'
 import type { IconName } from '../..'
+import { css } from 'styled-components'
 
 interface EmptySelectorButtonProps {
   onClick: () => void
@@ -38,7 +39,18 @@ export function EmptySelectorButton(
   const buttonSizing = size === 'large' ? '100%' : FLEX_MAX_CONTENT
 
   return (
-    <Btn onClick={onClick} width={buttonSizing} height={buttonSizing}>
+    <Btn
+      onClick={onClick}
+      width={buttonSizing}
+      height={buttonSizing}
+      css={css`
+        &:focus-visible {
+          outline: 2px solid ${COLORS.white};
+          box-shadow: 0 0 0 4px ${COLORS.blue50};
+          border-radius: ${BORDERS.borderRadius8};
+        }
+      `}
+    >
       <Flex
         gridGap={SPACING.spacing4}
         padding={SPACING.spacing12}

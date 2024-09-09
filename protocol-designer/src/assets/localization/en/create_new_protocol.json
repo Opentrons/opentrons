@@ -22,7 +22,6 @@
   "pip_vol": "Pipette volume",
   "pip": "{{mount}} pipette",
   "quantity": "Quantity",
-  "questions": "We’re going to ask a few questions to help you get started building your protocol.",
   "remove": "Remove",
   "rename_labware": "Rename labware",
   "robot_pips": "Robot pipettes",
