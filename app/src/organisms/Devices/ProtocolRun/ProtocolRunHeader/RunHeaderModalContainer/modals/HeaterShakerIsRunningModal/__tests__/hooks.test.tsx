@@ -1,19 +1,21 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
-import '@testing-library/jest-dom/vitest'
 import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
+
 import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+
+import { RUN_ID_1 } from '../../../../../../../RunTimeControl/__fixtures__'
+import { useMostRecentCompletedAnalysis } from '../../../../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useHeaterShakerModuleIdsFromRun } from '../hooks'
-import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
 
 import type { Store } from 'redux'
-import type { State } from '../../../../redux/types'
+import type { State } from '../../../../../../../../redux/types'
 
-vi.mock('../../hooks')
-vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock(
+  '../../../../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+)
 
 describe('useHeaterShakerModuleIdsFromRun', () => {
   const store: Store<State> = createStore(vi.fn(), {})

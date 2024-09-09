@@ -1,16 +1,19 @@
 import * as React from 'react'
-import { i18n } from '../../../i18n'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
-import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
+
+import { i18n } from '../../../../../../../../i18n'
+import { renderWithProviders } from '../../../../../../../../__testing-utils__'
+import { mockHeaterShaker } from '../../../../../../../../redux/modules/__fixtures__'
 import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
-import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useAttachedModules } from '../hooks'
+import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
+import { useAttachedModules } from '../../../../../../hooks'
+import { useMostRecentCompletedAnalysis } from '../../../../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+
 import type * as ReactApiClient from '@opentrons/react-api-client'
+
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ReactApiClient>()
   return {
@@ -18,9 +21,11 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     useCreateLiveCommandMutation: vi.fn(),
   }
 })
-vi.mock('../hooks')
-vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../HeaterShakerWizard/HeaterShakerModuleCard')
+vi.mock('../../../../../../hooks')
+vi.mock(
+  '../../../../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+)
+vi.mock('../HeaterShakerModuleCard')
 
 const mockMovingHeaterShakerOne = {
   id: 'heatershaker_id_1',

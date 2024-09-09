@@ -8,7 +8,7 @@ import {
   useDropTipWizardFlows,
   useTipAttachmentStatus,
 } from '../../../../../DropTipWizardFlows'
-import { useProtocolDropTipModal } from '../ProtocolDropTipModal'
+import { useProtocolDropTipModal } from '../modals'
 import { useCloseCurrentRun } from '../../../../../ProtocolUpload/hooks'
 import { useIsRunCurrent } from '../../../../../../resources/runs'
 import { TERMINAL_STATUSES } from '../../constants'
@@ -16,7 +16,7 @@ import { TERMINAL_STATUSES } from '../../constants'
 import type { RobotType } from '@opentrons/shared-data'
 import type { Run, RunStatus } from '@opentrons/api-client'
 import type { DropTipWizardFlowsProps } from '../../../../../DropTipWizardFlows'
-import type { UseProtocolDropTipModalResult } from '../ProtocolDropTipModal'
+import type { UseProtocolDropTipModalResult } from '../modals'
 
 export type RunHeaderDropTipWizProps =
   | { showDTWiz: true; dtWizProps: DropTipWizardFlowsProps }

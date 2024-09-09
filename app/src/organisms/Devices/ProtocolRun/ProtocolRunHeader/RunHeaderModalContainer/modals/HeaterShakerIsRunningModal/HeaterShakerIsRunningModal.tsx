@@ -18,14 +18,14 @@ import {
 } from '@opentrons/components'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
-import { useAttachedModules } from '../../../../hooks'
-import { HeaterShakerModuleCard } from '../../../../HeaterShakerWizard/HeaterShakerModuleCard'
+import { useAttachedModules } from '../../../../../hooks'
+import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 import { getActiveHeaterShaker } from './utils'
-import { useIsHeaterShakerInProtocol } from '../../../../../ModuleCard/hooks'
+import { useIsHeaterShakerInProtocol } from '../../../../../../ModuleCard/hooks'
 
 import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data'
 import type { AttachedModule } from '@opentrons/api-client'
-import type { HeaterShakerModule } from '../../../../../../redux/modules/types'
+import type { HeaterShakerModule } from '../../../../../../../redux/modules/types'
 
 export type UseHeaterShakerIsRunningModalResult =
   | { showModal: true; module: HeaterShakerModule; toggleModal: () => void }

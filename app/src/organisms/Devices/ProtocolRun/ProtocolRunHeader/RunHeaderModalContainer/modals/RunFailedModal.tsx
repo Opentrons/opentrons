@@ -22,7 +22,7 @@ import {
   DISPLAY_FLEX,
 } from '@opentrons/components'
 
-import { useDownloadRunLog } from '../../../hooks'
+import { useDownloadRunLog } from '../../../../hooks'
 import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 
 import type {

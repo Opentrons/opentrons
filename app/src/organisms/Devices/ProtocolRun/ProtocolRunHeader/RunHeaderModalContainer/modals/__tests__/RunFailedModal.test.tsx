@@ -1,16 +1,16 @@
 import * as React from 'react'
 import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
 
-import { renderWithProviders } from '../../../../../../__testing-utils__'
-import { i18n } from '../../../../../../i18n'
-import { useDownloadRunLog } from '../../../../hooks'
+import { renderWithProviders } from '../../../../../../../__testing-utils__'
+import { i18n } from '../../../../../../../i18n'
+import { useDownloadRunLog } from '../../../../../hooks'
 import { RunFailedModal } from '../RunFailedModal'
 
 import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import type { RunError } from '@opentrons/api-client'
 import { fireEvent, screen } from '@testing-library/react'
 
-vi.mock('../../../../hooks')
+vi.mock('../../../../../hooks')
 
 const RUN_ID = '1'
 const ROBOT_NAME = 'mockRobotName'

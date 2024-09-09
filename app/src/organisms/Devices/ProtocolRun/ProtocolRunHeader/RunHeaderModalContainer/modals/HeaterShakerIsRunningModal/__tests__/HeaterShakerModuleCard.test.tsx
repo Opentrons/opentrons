@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach } from 'vitest'
-import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
-import { HeaterShakerModuleData } from '../../../ModuleCard/HeaterShakerModuleData'
-import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 
-vi.mock('../../../ModuleCard/HeaterShakerModuleData')
+import { renderWithProviders } from '../../../../../../../../__testing-utils__'
+import { mockHeaterShaker } from '../../../../../../../../redux/modules/__fixtures__'
+import { i18n } from '../../../../../../../../i18n'
+import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
+import { HeaterShakerModuleData } from '../../../../../../../ModuleCard/HeaterShakerModuleData'
+
+vi.mock('../../../../../../../ModuleCard/HeaterShakerModuleData')
 
 const render = (props: React.ComponentProps<typeof HeaterShakerModuleCard>) => {
   return renderWithProviders(<HeaterShakerModuleCard {...props} />, {

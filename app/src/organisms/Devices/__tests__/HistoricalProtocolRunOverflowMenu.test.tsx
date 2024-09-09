@@ -7,7 +7,7 @@ import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 import { useDeleteRunMutation } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
-import runRecord from '../../../organisms/RunDetails/__fixtures__/runRecord.json'
+import runRecord from '../ProtocolRun/ProtocolRunHeader/RunHeaderModalContainer/modals/__fixtures__/runRecord.json'
 import { useDownloadRunLog, useTrackProtocolRunEvent, useRobot } from '../hooks'
 import { useRunControls } from '../../RunTimeControl/hooks'
 import {

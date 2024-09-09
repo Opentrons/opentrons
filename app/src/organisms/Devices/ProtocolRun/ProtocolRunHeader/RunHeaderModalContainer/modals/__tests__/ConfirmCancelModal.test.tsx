@@ -10,12 +10,11 @@ import {
 } from '@opentrons/api-client'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../../../../i18n'
-import { renderWithProviders } from '../../../../../../__testing-utils__'
-import { useIsFlex, useTrackProtocolRunEvent } from '../../../../hooks'
-import { useTrackEvent } from '../../../../../../redux/analytics'
+import { i18n } from '../../../../../../../i18n'
+import { renderWithProviders } from '../../../../../../../__testing-utils__'
+import { useIsFlex, useTrackProtocolRunEvent } from '../../../../../hooks'
+import { useTrackEvent } from '../../../../../../../redux/analytics'
 import { ConfirmCancelModal } from '../ConfirmCancelModal'
-import { useRunStatus } from '../../../../../RunTimeControl/hooks'
 
 import type * as ApiClient from '@opentrons/react-api-client'
 
@@ -26,9 +25,8 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     useStopRunMutation: vi.fn(),
   }
 })
-vi.mock('.../../../../../RunTimeControl/hooks')
-vi.mock('../../../../hooks')
-vi.mock('../../../../../../redux/analytics')
+vi.mock('../../../../../hooks')
+vi.mock('../../../../../../../redux/analytics')
 
 const render = (props: React.ComponentProps<typeof ConfirmCancelModal>) => {
   return renderWithProviders(<ConfirmCancelModal {...props} />, {
@@ -51,7 +49,6 @@ describe('ConfirmCancelModal', () => {
     vi.mocked(useStopRunMutation).mockReturnValue({
       stopRun: mockStopRun,
     } as any)
-    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_RUNNING)
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
@@ -103,13 +100,11 @@ describe('ConfirmCancelModal', () => {
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
   })
   it('should close modal if run status becomes stop-requested', () => {
-    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_STOP_REQUESTED)
-    render(props)
+    render({ ...props, runStatus: RUN_STATUS_STOP_REQUESTED })
     expect(props.onClose).toHaveBeenCalled()
   })
   it('should close modal if run status becomes stopped', () => {
-    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_STOPPED)
-    render(props)
+    render({ ...props, runStatus: RUN_STATUS_STOPPED })
     expect(props.onClose).toHaveBeenCalled()
   })
   it('should call No go back button', () => {

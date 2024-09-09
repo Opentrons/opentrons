@@ -1,4 +1,4 @@
-import { useMostRecentCompletedAnalysis } from '../../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from '../../../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 export interface ModuleIdsFromRun {
   moduleIdsFromRun: string[]

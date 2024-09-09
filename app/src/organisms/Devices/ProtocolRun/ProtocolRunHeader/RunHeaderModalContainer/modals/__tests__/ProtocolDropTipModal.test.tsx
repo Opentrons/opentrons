@@ -4,18 +4,18 @@ import { renderHook, act, screen, fireEvent } from '@testing-library/react'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { renderWithProviders } from '../../../../../../../__testing-utils__'
+import { i18n } from '../../../../../../../i18n'
+import { mockLeftSpecs } from '../../../../../../../redux/pipettes/__fixtures__'
+import { useHomePipettes } from '../../../../../../DropTipWizardFlows/hooks'
 import {
   useProtocolDropTipModal,
   ProtocolDropTipModal,
 } from '../ProtocolDropTipModal'
-import { renderWithProviders } from '../../../../../../__testing-utils__'
-import { i18n } from '../../../../../../i18n'
-import { mockLeftSpecs } from '../../../../../../redux/pipettes/__fixtures__'
-import { useHomePipettes } from '../../../../../DropTipWizardFlows/hooks'
 
 import type { Mock } from 'vitest'
 
-vi.mock('../../../../../DropTipWizardFlows/hooks')
+vi.mock('../../../../../../DropTipWizardFlows/hooks')
 
 describe('useProtocolDropTipModal', () => {
   let props: Parameters<typeof useProtocolDropTipModal>[0]
@@ -44,10 +44,12 @@ describe('useProtocolDropTipModal', () => {
     const { result } = renderHook(() => useProtocolDropTipModal(props))
 
     expect(result.current).toEqual({
-      showDTModal: true,
-      onDTModalSkip: expect.any(Function),
-      onDTModalRemoval: expect.any(Function),
-      isDisabled: false,
+      showModal: true,
+      modalProps: {
+        onSkip: expect.any(Function),
+        onBeginRemoval: expect.any(Function),
+        isDisabled: false,
+      },
     })
   })
 

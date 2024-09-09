@@ -1,12 +1,13 @@
-import type { IconName } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
+
 import {
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
+
 import {
   RECOVERY_STATUSES,
   RUN_AGAIN_STATUSES,
@@ -17,10 +18,12 @@ import {
   ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
 } from '../../../../../../../redux/analytics'
-import type { BaseActionButtonProps } from '..'
 import { useTrackProtocolRunEvent } from '../../../../../hooks'
 import { useIsHeaterShakerInProtocol } from '../../../../../../ModuleCard/hooks'
-import { isAnyHeaterShakerShaking } from '../../../RunHeaderModalContainer/HeaterShakerIsRunningModal'
+import { isAnyHeaterShakerShaking } from '../../../RunHeaderModalContainer/modals'
+
+import type { IconName } from '@opentrons/components'
+import type { BaseActionButtonProps } from '..'
 
 interface UseButtonPropertiesProps extends BaseActionButtonProps {
   isProtocolNotReady: boolean
