@@ -202,10 +202,9 @@ export function createQuickTransferFile(
       subcategory: null,
       tags: [],
     },
-    // TODO: formalize designer application data type
     designerApplication: {
-      name: 'Quick Transfer',
-      version: '0.0',
+      name: 'opentrons/quick-transfer',
+      version: '1.0.0',
       data: quickTransferState,
     },
   }
