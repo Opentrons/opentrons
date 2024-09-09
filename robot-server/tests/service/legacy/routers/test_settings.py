@@ -598,7 +598,7 @@ def test_reset_invalid_option(
     assert resp.status_code == 422
     body = resp.json()
     assert "message" in body
-    assert "not a valid enumeration member" in body["message"]
+    assert "Input should be" in body["message"]
 
 
 @pytest.fixture()

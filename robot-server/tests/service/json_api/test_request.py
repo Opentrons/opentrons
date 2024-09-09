@@ -30,17 +30,23 @@ def test_attributes_as_item_model_empty_dict():
         {
             "loc": ("data", "name"),
             "msg": "Field required",
-            "type": "value_error.missing",
+            "type": "missing",
+            "input": {},
+            "url": "https://errors.pydantic.dev/2.9/v/missing",
         },
         {
             "loc": ("data", "quantity"),
             "msg": "Field required",
-            "type": "value_error.missing",
+            "type": "missing",
+            "input": {},
+            "url": "https://errors.pydantic.dev/2.9/v/missing",
         },
         {
             "loc": ("data", "price"),
             "msg": "Field required",
-            "type": "value_error.missing",
+            "type": "missing",
+            "input": {},
+            "url": "https://errors.pydantic.dev/2.9/v/missing",
         },
     ]
 
@@ -54,8 +60,10 @@ def test_attributes_required():
     assert e.value.errors() == [
         {
             "loc": ("data",),
-            "msg": "none is not an allowed value",
-            "type": "type_error.none.not_allowed",
+            "msg": "Input should be a valid dictionary",
+            "input": None,
+            "url": "https://errors.pydantic.dev/2.9/v/dict_type",
+            "type": "dict_type",
         },
     ]
 
@@ -69,8 +77,10 @@ def test_data_required():
     assert e.value.errors() == [
         {
             "loc": ("data",),
-            "msg": "none is not an allowed value",
-            "type": "type_error.none.not_allowed",
+            "msg": "Input should be a valid dictionary",
+            "input": None,
+            "url": "https://errors.pydantic.dev/2.9/v/dict_type",
+            "type": "dict_type",
         },
     ]
 
