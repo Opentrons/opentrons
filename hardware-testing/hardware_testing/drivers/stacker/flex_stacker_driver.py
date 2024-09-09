@@ -83,6 +83,7 @@ class FlexStacker():
         self.home_acceleration = HOME_ACCELERATION
         self.move_acceleration_x = MOVE_ACCELERATION_X
         self.move_acceleration_z = MOVE_ACCELERATION_Z
+        self.current_position = {'X': None, 'Z': None}
         # self._name_ == 'FlexStacker'
 
     @classmethod
@@ -218,7 +219,7 @@ class FlexStacker():
 
         Example: 2024-09-03 14:58:03.135606 Rx <== M119 XE:0 XR:0 ZE:0 ZR:0 LR:0 LH:1 OK
         """
-        states = {}
+
         punctuation = [':']
         i_tracker = 0
         switch_state = []
@@ -231,14 +232,14 @@ class FlexStacker():
                 final.append(lsw)
                 switch_state = []
             i_tracker += 1
-        print(final)
+        # print(final)
         final = self._parse_lsw(final)
         return final
 
     def _parse_lsw(self, parse_data):
         """LSW->X+:0,X-:0,Z+:0,Z-:1,PR:1,PH:1PS->X+1,X-:0"""
         "2024-09-03 14:58:03.135606 Rx <== M119 XE:0 XR:0 ZE:0 ZR:0 LR:0 LH:1 OK"
-
+        states = {}
         states.update({"XE": parse_data[0],
                         "XR": parse_data[1],
                         "ZE": parse_data[2],
@@ -263,7 +264,17 @@ class FlexStacker():
 
         print(c)
         self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
-
+        if direction == DIR.POSITIVE and axis == AXIS.X:
+            self.current_position.update({'X': self.current_position['X'] + distance})
+        elif direction == DIR.NEGATIVE and axis == AXIS.X:
+            self.current_position.update({'X': self.current_position['X'] - distance})
+        elif direction == DIR.POSITIVE and axis == AXIS.Z:
+            self.current_position.update({'Z': self.current_position['Z'] + distance})
+        elif direction == DIR.NEGATIVE and axis == AXIS.Z:
+            self.current_position.update({'Z': self.current_position['Z'] - distance})
+        else:
+            raise(f"Not recognized {axis} and {direction}")
+        print(self.current_position)
 
 
     def microstepping_move(self, axis: AXIS, distance: float, direction: DIR, speed: float, acceleration: float):
@@ -286,7 +297,17 @@ class FlexStacker():
                                                             )
         # print(c)
         self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
-
+        if direction == DIR.POSITIVE_HOME and axis == AXIS.X:
+            self.current_position.update({'X': TOTAL_TRAVEL_X})
+        elif direction == DIR.NEGATIVE_HOME and axis == AXIS.X:
+            self.current_position.update({'X': 0})
+        elif direction == DIR.POSITIVE_HOME and axis == AXIS.Z:
+            self.current_position.update({'Z': TOTAL_TRAVEL_Z})
+        elif direction == DIR.NEGATIVE_HOME and axis == AXIS.Z:
+            self.current_position.update({'Z': 0})
+        else:
+            raise(f"Not recognized {axis} and {direction}")
+        print(self.current_position)
 
     def convert_current_to_binary(self, current: float) -> bin:
         # fixed_point_constant = 1398894
