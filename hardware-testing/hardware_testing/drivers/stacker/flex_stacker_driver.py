@@ -11,18 +11,6 @@ import math
 from typing import List, Optional, Iterator
 
 class GCODE(str, Enum):
-    READ_SENSORS = "nnn",
-    READ_SET_SETTINGS = "rrr",
-    CLOSE_LATCH = "pcc",
-    OPEN_LATCH = "poo",
-    MOVE_IGNORE_LIMIT = "g",
-    MOVE_WITH_LIMIT = "m",
-    MOVE_FIXED_LIMIT = "b",
-    HOME = "h",
-    SET_TICKS = "st",
-    SET_SPEED = "ss",
-    SET_IHOLD_CURRENT = "sh",
-    SET_IRUN_CURRENT = "sr",
     CR = '\r\n',
     MOVE_DIST = 'G0',
     MOVE_MIRCROSTEP = 'G0.S',
@@ -30,8 +18,6 @@ class GCODE(str, Enum):
     LIMITSWITCH_STATUS = 'M119'
     ENABLE_MOTOR = 'M17'
     DISABLE_MOTOR = 'M18'
-
-
 
 class DIR(str, Enum):
     POSITIVE = '',
@@ -73,7 +59,7 @@ HOME_SPEED = 20
 RETRACT_SPEED_X = 10
 RETRACT_SPEED_Z = 10
 HOME_ACCELERATION = 10
-MOVE_ACCELERATION = 150
+MOVE_ACCELERATION_X = 150
 MOVE_ACCELERATION_Z = 20
 MOVE_SPEED_X = 300
 MOVE_SPEED_UPZ = 100
@@ -91,15 +77,12 @@ class FlexStacker():
         """
         self._stacker_connection = connection
         self._ack = FS_ACK.encode()
-        self.x_home_travel = 202
-        self.x_home_speed = 70
-        self.backoff_distance = 25.4
-        self.backoff_speed = 70
-        self.z_home_travel = 113.75
-        self.z_home_speed = 70
-        self.back_off_time_delay = self.backoff_distance/self.backoff_speed
-        self.x_home_time_delay = self.x_home_travel /self.x_home_speed
-        self.z_home_time_delay = self.z_home_travel/self.z_home_speed
+        self.move_speed_x = MOVE_SPEED_X
+        self.move_speed_up_z = MOVE_SPEED_UPZ
+        self.move_speed_down_z = MOVE_SPEED_DOWNZ
+        self.home_acceleration = HOME_ACCELERATION
+        self.move_acceleration_x = MOVE_ACCELERATION_X
+        self.move_acceleration_z = MOVE_ACCELERATION_Z
         # self._name_ == 'FlexStacker'
 
     @classmethod
@@ -141,20 +124,20 @@ class FlexStacker():
         """
         x = data.split(" ")
         x = x[0]
-        print(x)
+        # print(x)
         data_encode = data.encode()
-        print(f'data encode: {data_encode}')
+        # print(f'data encode: {data_encode}')
         self._stacker_connection.write(data=data_encode)
         while True:
             response = self._stacker_connection.read_until(expected = f'{x} OK\n')
-            print(response)
+            # print(response)
             if (self._ack in response):
                 # Remove ack from response
                 response = response.replace(self._ack, b"OK\n")
                 str_response = self.process_raw_response(
                     command=data, response=response.decode()
                 )
-                print(str_response)
+                # print(str_response)
                 return str_response
 
         self.on_retry()
@@ -284,33 +267,10 @@ class FlexStacker():
 
 
     def microstepping_move(self, axis: AXIS, distance: float, direction: DIR, speed: float, acceleration: float):
-        #belt_pitch = 1 # gear ratio
-        #pulley_num_teeth = 1
-        #steps_per_revolution = 200
-        #mircostep = 16
-        #steps_per_mm = (steps_per_revolution * mircostep) / (belt_pitch * pulley_num_teeth)
-        # v  = distance/time -> time = distance/v
-        # steps_per_mm = 20.50524934
-        # steps_per_mm = 328.1176301704
-        # ticks = int((distance/(speed))*ms)
-        # ticks = int((steps_per_mm*distance))
-        # print(f'ticks: {ticks}')
-        # self.set_speed(axis, speed)
-        # self.set_ticks(axis, ticks)
-        # time_ticks = distance/speed
         c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_element(
                             axis.upper()).add_element(f'{direction}').add_gcode(
             gcode=GCODE.MOVE_IGNORE_LIMIT
         )
-        # print(c)
-        self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
-
-    def back_off_limit(self, axis: AXIS, direction: DIR):
-        c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_element(
-                                axis.upper()).add_element(f'{direction}').add_gcode(
-            gcode=GCODE.MOVE_FIXED_LIMIT
-        )
-        # print(c)
         self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
 
     def home(self, axis: AXIS, direction: DIR, velocity: int, acceleration: int):
@@ -391,31 +351,31 @@ class FlexStacker():
         # ----------------Set up the Stacker------------------------
         self.home(AXIS.X, DIR.POSITIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
         self.home(AXIS.Z, DIR.NEGATIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
-        self.move(AXIS.X, TOTAL_TRAVEL_X-5, DIR.NEGATIVE, MOVE_SPEED_X, MOVE_ACCELERATION)
+        self.move(AXIS.X, TOTAL_TRAVEL_X-5, DIR.NEGATIVE, self.move_speed_x, self.move_acceleration_x)
         self.home(AXIS.X, DIR.NEGATIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
-        self.move(AXIS.Z, TOTAL_TRAVEL_Z-labware_clearance, DIR.POSITIVE, MOVE_SPEED_UPZ, MOVE_ACCELERATION_Z)
+        self.move(AXIS.Z, TOTAL_TRAVEL_Z-labware_clearance, DIR.POSITIVE, self.move_speed_up_z, self.move_acceleration_z)
         # #------------------- transfer -----------------------------
         self.open_latch()
         self.home(AXIS.Z, DIR.POSITIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
         self.close_latch()
-        self.move(AXIS.Z, TOTAL_TRAVEL_Z-20, DIR.NEGATIVE, MOVE_SPEED_DOWNZ, MOVE_ACCELERATION_Z)
+        self.move(AXIS.Z, TOTAL_TRAVEL_Z-20, DIR.NEGATIVE, self.move_speed_down_z, self.move_acceleration_z)
         self.home(AXIS.Z, DIR.NEGATIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
-        self.move(AXIS.X, TOTAL_TRAVEL_X-5, DIR.POSITIVE, MOVE_SPEED_X, MOVE_ACCELERATION)
+        self.move(AXIS.X, TOTAL_TRAVEL_X-5, DIR.POSITIVE, self.move_speed_x, self.move_acceleration_x)
 
-    def unload_labware(self, x_speed):
+    def unload_labware(self):
         labware_clearance = 9
         labware_retract_speed= 50
         # ----------------Set up the Stacker------------------------
         self.home(AXIS.X, DIR.POSITIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
         self.home(AXIS.Z, DIR.NEGATIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
-        self.move(AXIS.X, TOTAL_TRAVEL_X-5, DIR.NEGATIVE, MOVE_SPEED_X, MOVE_ACCELERATION)
+        self.move(AXIS.X, TOTAL_TRAVEL_X-5, DIR.NEGATIVE, self.move_speed_x, self.move_acceleration_x)
         self.home(AXIS.X, DIR.NEGATIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
-        self.move(AXIS.Z, TOTAL_TRAVEL_Z-5, DIR.POSITIVE, MOVE_SPEED_UPZ, MOVE_ACCELERATION_Z)
+        self.move(AXIS.Z, TOTAL_TRAVEL_Z-5, DIR.POSITIVE, self.move_speed_up_z, self.move_acceleration_z)
         self.home(AXIS.Z, DIR.POSITIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
         # #------------------- transfer -----------------------------
         self.open_latch()
         self.move(AXIS.Z, labware_clearance, DIR.NEGATIVE, labware_retract_speed, HOME_ACCELERATION)
         self.close_latch()
-        self.move(AXIS.Z, TOTAL_TRAVEL_Z-20, DIR.NEGATIVE, MOVE_SPEED_DOWNZ, MOVE_ACCELERATION_Z)
+        self.move(AXIS.Z, TOTAL_TRAVEL_Z-20, DIR.NEGATIVE, self.move_speed_down_z, self.move_acceleration_z)
         self.home(AXIS.Z, DIR.NEGATIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
-        self.move(AXIS.X, TOTAL_TRAVEL_X-5, DIR.POSITIVE, MOVE_SPEED_X, MOVE_ACCELERATION)
+        self.move(AXIS.X, TOTAL_TRAVEL_X-5, DIR.POSITIVE, self.move_speed_x, self.move_acceleration_x)
