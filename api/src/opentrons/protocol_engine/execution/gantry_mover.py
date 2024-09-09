@@ -24,6 +24,7 @@ _MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
     MotorAxis.RIGHT_PLUNGER: HardwareAxis.C,
     MotorAxis.EXTENSION_Z: HardwareAxis.Z_G,
     MotorAxis.EXTENSION_JAW: HardwareAxis.G,
+    MotorAxis.CLAMP_JAW_96_CHANNEL: HardwareAxis.Q,
 }
 
 # The height of the bottom of the pipette nozzle at home position without any tips.
@@ -150,6 +151,23 @@ class HardwareGantryMover(GantryMover):
 
         return waypoints[-1].position
 
+    async def move_to_with_mount(
+        self, mount, waypoints: List[Waypoint], speed: Optional[float]
+    ) -> Point:
+        assert len(waypoints) > 0, "Must have at least one waypoint"
+
+        # hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
+
+        for waypoint in waypoints:
+            await self._hardware_api.move_to(
+                mount=hw_mount,
+                abs_position=waypoint.position,
+                critical_point=waypoint.critical_point,
+                speed=speed,
+            )
+
+        return waypoints[-1].position
+
     async def move_relative(
         self,
         pipette_id: str,
@@ -168,6 +186,26 @@ class HardwareGantryMover(GantryMover):
         )
         critical_point = pipette_location.critical_point
         hw_mount = pipette_location.mount.to_hw_mount()
+        try:
+            await self._hardware_api.move_rel(
+                mount=hw_mount,
+                delta=delta,
+                fail_on_not_homed=True,
+                speed=speed,
+            )
+            point = await self._hardware_api.gantry_position(
+                mount=hw_mount,
+                critical_point=critical_point,
+                fail_on_not_homed=True,
+            )
+        except PositionUnknownError as e:
+            raise MustHomeError(message=str(e), wrapping=[e])
+
+        return point
+
+    async def move_relative_with_mount(
+        self, mount, waypoints: List[Waypoint], speed: Optional[float]
+    ) -> Point:
         try:
             await self._hardware_api.move_rel(
                 mount=hw_mount,

@@ -21,6 +21,7 @@ from . import thermocycler
 
 from . import calibration
 from . import unsafe
+from . import robot
 
 from .set_rail_lights import (
     SetRailLights,
@@ -392,6 +393,9 @@ Command = Annotated[
         unsafe.UnsafeDropTipInPlace,
         unsafe.UpdatePositionEstimators,
         unsafe.UnsafeEngageAxes,
+        robot.MoveTo,
+        robot.MoveAxesRelative,
+        robot.MoveAxesTo,
     ],
     Field(discriminator="commandType"),
 ]
@@ -467,6 +471,9 @@ CommandParams = Union[
     unsafe.UnsafeDropTipInPlaceParams,
     unsafe.UpdatePositionEstimatorsParams,
     unsafe.UnsafeEngageAxesParams,
+    robot.MoveAxesRelativeParams,
+    robot.MoveAxesToParams,
+    robot.MoveToParams,
 ]
 
 CommandType = Union[
@@ -540,6 +547,9 @@ CommandType = Union[
     unsafe.UnsafeDropTipInPlaceCommandType,
     unsafe.UpdatePositionEstimatorsCommandType,
     unsafe.UnsafeEngageAxesCommandType,
+    robot.MoveAxesRelativeCommandType,
+    robot.MoveAxesToCommandType,
+    robot.MoveToCommandType
 ]
 
 CommandCreate = Annotated[
@@ -614,6 +624,9 @@ CommandCreate = Annotated[
         unsafe.UnsafeDropTipInPlaceCreate,
         unsafe.UpdatePositionEstimatorsCreate,
         unsafe.UnsafeEngageAxesCreate,
+        robot.MoveAxesRelativeCreate,
+        robot.MoveAxesToCreate,
+        robot.MoveToCreate,
     ],
     Field(discriminator="commandType"),
 ]
@@ -689,6 +702,9 @@ CommandResult = Union[
     unsafe.UnsafeDropTipInPlaceResult,
     unsafe.UpdatePositionEstimatorsResult,
     unsafe.UnsafeEngageAxesResult,
+    robot.MoveAxesRelativeResult,
+    robot.MoveAxesToResult,
+    robot.MoveToResult,
 ]
 
 # todo(mm, 2024-06-12): Ideally, command return types would have specific
