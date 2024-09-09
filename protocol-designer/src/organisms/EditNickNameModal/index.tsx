@@ -59,13 +59,18 @@ export function EditNickNameModal(props: EditNickNameModalProps): JSX.Element {
         </Flex>
       }
     >
-      <Flex flexDirection={DIRECTION_COLUMN} girGap={SPACING.spacing4}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        girGap={SPACING.spacing12}
+        height="3.75rem"
+      >
         <Flex color={COLORS.grey60}>
           <StyledText desktopStyle="bodyDefaultRegular">
             {t('labware_name')}
           </StyledText>
         </Flex>
         <InputField
+          error={nickName.length >= 115 ? t('rename_error') : null}
           data-testid="renameLabware_inputField"
           name="renameLabware"
           onChange={e => {
