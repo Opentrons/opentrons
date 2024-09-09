@@ -138,7 +138,7 @@ class SphericalSegment(TypedDict):
 
 
 TopCrossSection = Union[CircularCrossSection, RectangularCrossSection]
-# todo(cm): make bottom section always a cross section + an optional spherical segment
+# todo(cm): make bottomShape just an option spherical segment
 BottomShape = Union[CircularCrossSection, RectangularCrossSection, SphericalSegment]
 
 
