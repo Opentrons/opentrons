@@ -66,7 +66,7 @@ from ..actions import (
     AddModuleAction,
     AddAbsorbanceReaderLidAction,
 )
-from .abstract_store import HasState, HandlesActions
+from ._abstract_store import HasState, HandlesActions
 from .module_substates import (
     MagneticModuleSubState,
     HeaterShakerModuleSubState,

@@ -35,7 +35,8 @@ from ..resources import (
     ModelUtils,
     pipette_data_provider,
 )
-from ..state import StateStore, HardwareModule
+from ..state.state import StateStore
+from ..state.modules import HardwareModule
 from ..types import (
     LabwareLocation,
     DeckSlotLocation,

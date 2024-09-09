@@ -5,11 +5,13 @@ export type UnsafeRunTimeCommand =
   | UnsafeBlowoutInPlaceRunTimeCommand
   | UnsafeDropTipInPlaceRunTimeCommand
   | UnsafeUpdatePositionEstimatorsRunTimeCommand
+  | UnsafeEngageAxesRunTimeCommand
 
 export type UnsafeCreateCommand =
   | UnsafeBlowoutInPlaceCreateCommand
   | UnsafeDropTipInPlaceCreateCommand
   | UnsafeUpdatePositionEstimatorsCreateCommand
+  | UnsafeEngageAxesCreateCommand
 
 export interface UnsafeBlowoutInPlaceParams {
   pipetteId: string
@@ -54,5 +56,19 @@ export interface UnsafeUpdatePositionEstimatorsCreateCommand
 export interface UnsafeUpdatePositionEstimatorsRunTimeCommand
   extends CommonCommandRunTimeInfo,
     UnsafeUpdatePositionEstimatorsCreateCommand {
+  result?: any
+}
+
+export interface UnsafeEngageAxesParams {
+  axes: MotorAxes
+}
+
+export interface UnsafeEngageAxesCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'unsafe/engageAxes'
+  params: UnsafeUpdatePositionEstimatorsParams
+}
+export interface UnsafeEngageAxesRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    UnsafeEngageAxesCreateCommand {
   result?: any
 }

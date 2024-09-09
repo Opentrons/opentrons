@@ -10,7 +10,7 @@ from opentrons.motion_planning.adjacent_slots_getters import (
 )
 from opentrons import motion_planning
 
-from . import move_types
+from . import _move_types
 from .. import errors
 from ..types import (
     MotorAxis,
@@ -112,7 +112,7 @@ class MotionView:
             well_location,
         )
 
-        move_type = move_types.get_move_type_to_well(
+        move_type = _move_types.get_move_type_to_well(
             pipette_id, labware_id, well_name, location, force_direct
         )
         min_travel_z = self._geometry.get_min_travel_z(
@@ -326,7 +326,7 @@ class MotionView:
             labware_id, well_name, radius
         )
 
-        positions = move_types.get_edge_point_list(
+        positions = _move_types.get_edge_point_list(
             center_point, x_offset, y_offset, edge_path_type
         )
         critical_point: Optional[CriticalPoint] = None

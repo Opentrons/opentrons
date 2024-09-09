@@ -1,11 +1,12 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700');
+@import url('https://fonts.googleapis.com/css?family=Public+Sans:300,400,400i,600,700');
+@import url('https://fonts.googleapis.com/css2?family=Reddit+Mono:wght@200..900&display=swap');
 
 /* OT NAV */
 
 body {
     padding: 0;
     margin: 0;
-    font-family: "Open Sans", "sans-serif";
+    font-family: "Public Sans", "sans-serif";
 }
 
 .highlight-none, .mi, .literal {
@@ -35,7 +36,18 @@ div.document [id] {
 
 div.body p {
     line-height: 20pt;
-    font-family: "Open Sans", "sans-serif";
+    font-family: "Public Sans", "sans-serif";
+}
+
+pre, tt, code {
+    font-size: 0.9em;
+    font-family: "Reddit Mono", "Consolas", "Lucida Console", monospace;
+}
+
+/* classes for API Reference docstring signatures */
+.sig, .sig-name, code.descname, .sig-prename, .optional, .sig-paren {
+    font-size: 1em;
+    font-family: "Reddit Mono", "Consolas", "Lucida Console", monospace;
 }
 
 div.body h1 {
@@ -90,7 +102,13 @@ div.body h2,
 div.body h3,
 div.body h4,
 div.body h5 {
-    font-family: "Open Sans", "sans-serif";
+    font-family: "Public Sans", "sans-serif";
+}
+
+/* Links need an extra two pixels of padding to compensate between body font height 
+being 1em and code font height being 0.9em */
+a.reference {
+    padding-bottom: 2px;
 }
 
 /* Suppressing the display of the toctrees rendered in the doc body means we
@@ -193,13 +211,13 @@ div.body p.caption {
 
 ul {
     /* margin-left: 0; */
-    font-family: "Open Sans", "sans-serif";
+    font-family: "Public Sans", "sans-serif";
 }
 
 ul ul {
     list-style-type: circle;
     margin-left: 30px;
-    font-family: "Open Sans", "sans-serif";
+    font-family: "Public Sans", "sans-serif";
 }
 
 @media screen and (min-device-width: 320px)and (max-device-width: 640px) {

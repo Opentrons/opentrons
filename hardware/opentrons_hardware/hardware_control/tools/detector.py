@@ -82,6 +82,8 @@ async def _await_responses(
                 node = await _handle_hepa_uv_info(
                     response_queue, response, arbitration_id
                 )
+                seen.add(node)
+                break
             elif isinstance(response, message_definitions.ErrorMessage):
                 log.error(f"Received error message {str(response)}")
 
@@ -215,7 +217,6 @@ async def _resolve_with_stimulus_retries(
         should_respond
     )
     expected_gripper = {NodeId.gripper}.intersection(should_respond)
-    expected_hepa_uv = {NodeId.hepa_uv}.intersection(should_respond)
 
     while True:
         pipettes, gripper, hepa_uv = await _do_tool_resolve(
@@ -224,12 +225,10 @@ async def _resolve_with_stimulus_retries(
         output_queue.put_nowait((pipettes, gripper, hepa_uv))
         seen_pipettes = set([k.application_for() for k in pipettes.keys()])
         seen_gripper = set([k.application_for() for k in gripper.keys()])
-        seen_hepa_uv = set([k.application_for() for k in hepa_uv.keys()])
         if all(
             [
                 seen_pipettes == expected_pipettes,
                 seen_gripper == expected_gripper,
-                seen_hepa_uv == expected_hepa_uv,
             ]
         ):
             return

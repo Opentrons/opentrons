@@ -30,7 +30,6 @@ from opentrons.hardware_control.nozzle_manager import NozzleMap
 # remove when their usage is no longer needed
 from opentrons.protocols.labware import (  # noqa: F401
     get_labware_definition as get_labware_definition,
-    get_all_labware_definitions as get_all_labware_definitions,
     verify_definition as verify_definition,
     save_definition as save_definition,
 )

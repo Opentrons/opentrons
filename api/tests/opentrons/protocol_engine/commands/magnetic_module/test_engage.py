@@ -3,7 +3,7 @@
 from decoy import Decoy
 
 from opentrons.hardware_control.modules import MagDeck
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.module_substates import (
     MagneticModuleId,
     MagneticModuleSubState,

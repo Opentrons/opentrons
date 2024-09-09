@@ -9,7 +9,8 @@ from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons.util.change_notifier import ChangeNotifier
 
 from opentrons.protocol_engine.actions import PlayAction
-from opentrons.protocol_engine.state import State, StateStore, Config
+from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine.state.state import State, StateStore
 from opentrons.protocol_engine.types import DeckType
 
 
@@ -48,6 +49,12 @@ def subject(
             "robotType": "OT-2 Standard",
             "models": ["OT-2 Standard", "OT-2 Refresh"],
             "extents": [446.75, 347.5, 0.0],
+            "paddingOffsets": {
+                "rear": -35.91,
+                "front": 31.89,
+                "leftSide": 0,
+                "rightSide": 0,
+            },
             "mountOffsets": {"left": [-34.0, 0.0, 0.0], "right": [0.0, 0.0, 0.0]},
         },
         deck_fixed_labware=[],

@@ -2152,7 +2152,7 @@ class InstrumentContext(publisher.CommandPublisher):
         ):
             height = self.measure_liquid_height(well=well) # ensure there's a test for LiquidPresenceNotDetected error
             move_to_location = well.bottom(z=height + offset_from_meniscus_mm) #confirm math (all things are relative to the same reference frame)
-            self.prepare_to_aspirate()
+            # self.prepare_to_aspirate() # why deleted?
             return move_to_location
         elif ( # don't have to if meniscus_relative == True
             self.api_version >= APIVersion(2, 20)
@@ -2161,7 +2161,9 @@ class InstrumentContext(publisher.CommandPublisher):
             and self._96_tip_config_valid()
         ):
             self.require_liquid_presence(well=well)
-            self.prepare_to_aspirate()
+            # self.prepare_to_aspirate() # why deleted?
+            return None
+        else:
             return None
 
     @requires_version(2, 20)

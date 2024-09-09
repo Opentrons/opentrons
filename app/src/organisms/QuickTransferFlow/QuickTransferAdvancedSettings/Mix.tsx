@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InputField,
-  LargeButton,
+  RadioButton,
   POSITION_FIXED,
   SPACING,
 } from '@opentrons/components'
@@ -160,13 +160,13 @@ export function Mix(props: MixProps): JSX.Element {
           width="100%"
         >
           {enableMixDisplayItems.map(displayItem => (
-            <LargeButton
+            <RadioButton
               key={displayItem.description}
-              buttonType={
-                mixIsEnabled === displayItem.option ? 'primary' : 'secondary'
-              }
-              onClick={displayItem.onClick}
-              buttonText={displayItem.description}
+              isSelected={mixIsEnabled === displayItem.option}
+              onChange={displayItem.onClick}
+              buttonValue={displayItem.description}
+              buttonLabel={displayItem.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>
@@ -204,6 +204,7 @@ export function Mix(props: MixProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              initialValue={String(mixVolume)}
               onChange={e => {
                 setMixVolume(Number(e))
               }}

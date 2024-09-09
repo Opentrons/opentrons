@@ -20,13 +20,21 @@ interface EmptySelectorButtonProps {
   textAlignment: 'left' | 'middle'
   iconName?: IconName
   size?: 'large' | 'small'
+  disabled?: boolean
 }
 
 //  used for helix and Opentrons Ai
 export function EmptySelectorButton(
   props: EmptySelectorButtonProps
 ): JSX.Element {
-  const { onClick, text, iconName, size = 'large', textAlignment } = props
+  const {
+    onClick,
+    text,
+    iconName,
+    size = 'large',
+    textAlignment,
+    disabled = false,
+  } = props
   const buttonSizing = size === 'large' ? '100%' : FLEX_MAX_CONTENT
 
   return (
@@ -34,9 +42,10 @@ export function EmptySelectorButton(
       <Flex
         gridGap={SPACING.spacing4}
         padding={SPACING.spacing12}
-        backgroundColor={COLORS.blue30}
+        backgroundColor={disabled ? COLORS.grey30 : COLORS.blue30}
+        color={disabled ? COLORS.grey40 : COLORS.black90}
         borderRadius={BORDERS.borderRadius8}
-        border={`2px dashed ${COLORS.blue50}`}
+        border={`2px dashed ${disabled ? COLORS.grey40 : COLORS.blue50}`}
         width="100%"
         height="100%"
         alignItems={ALIGN_CENTER}

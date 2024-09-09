@@ -58,8 +58,8 @@ from ..actions import (
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
 )
-from .abstract_store import HasState, HandlesActions
-from .move_types import EdgePathType
+from ._abstract_store import HasState, HandlesActions
+from ._move_types import EdgePathType
 
 
 # URIs of labware whose definitions accidentally specify an engage height

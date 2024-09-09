@@ -320,7 +320,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       runCreatedAt: '2022-05-11T13:33:51.012179+00:00',
     }
     when(vi.mocked(useOffsetCandidatesForAnalysis))
-      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, '127.0.0.1')
+      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, null)
       .thenReturn([mockOffsetCandidate])
     vi.mocked(getConnectableRobots).mockReturnValue([
       mockConnectableRobot,
@@ -333,7 +333,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     })
     expect(vi.mocked(useCreateRunFromProtocol)).toHaveBeenCalledWith(
       expect.any(Object),
-      { hostname: '127.0.0.1' },
+      null,
       [
         {
           vector: mockOffsetCandidate.vector,
@@ -369,11 +369,8 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       runCreatedAt: '2022-05-11T13:33:51.012179+00:00',
     }
     when(vi.mocked(useOffsetCandidatesForAnalysis))
-      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, '127.0.0.1')
+      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, null)
       .thenReturn([mockOffsetCandidate])
-    when(vi.mocked(useOffsetCandidatesForAnalysis))
-      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, 'otherIp')
-      .thenReturn([])
     vi.mocked(getConnectableRobots).mockReturnValue([
       mockConnectableRobot,
       { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
@@ -393,10 +390,9 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     })
     fireEvent.click(proceedButton)
     fireEvent.click(screen.getByRole('button', { name: 'Confirm values' }))
-    expect(vi.mocked(useCreateRunFromProtocol)).nthCalledWith(
-      3,
+    expect(vi.mocked(useCreateRunFromProtocol)).toHaveBeenLastCalledWith(
       expect.any(Object),
-      { hostname: '127.0.0.1' },
+      null,
       [
         {
           vector: mockOffsetCandidate.vector,
@@ -404,11 +400,6 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
           definitionUri: mockOffsetCandidate.definitionUri,
         },
       ]
-    )
-    expect(vi.mocked(useCreateRunFromProtocol)).toHaveBeenLastCalledWith(
-      expect.any(Object),
-      { hostname: 'otherIp' },
-      []
     )
   })
 

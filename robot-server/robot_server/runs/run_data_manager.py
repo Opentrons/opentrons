@@ -71,6 +71,7 @@ def _build_run(
             pipettes=[],
             modules=[],
             liquids=[],
+            wells=[],
             hasEverEnteredErrorRecovery=False,
         )
         errors.append(state_summary.dataError)

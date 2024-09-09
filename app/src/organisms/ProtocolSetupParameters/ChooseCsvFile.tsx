@@ -29,7 +29,7 @@ import type {
 import type { CsvFileData } from '@opentrons/api-client'
 
 const MAX_CHARS = 52
-const CSV_FILENAME_BREAK_POINT = 46
+const CSV_FILENAME_BREAK_POINT = 42
 interface ChooseCsvFileProps {
   protocolId: string
   handleGoBack: () => void
