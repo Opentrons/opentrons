@@ -48,6 +48,7 @@ import { MaterialsListModal } from '../../organisms/MaterialsListModal'
 import {
   EditProtocolMetadataModal,
   EditInstrumentsModal,
+  SlotDetailsContainer,
 } from '../../organisms'
 import { DeckThumbnail } from './DeckThumbnail'
 import { OffDeckThumbnail } from './OffdeckThumbnail'
@@ -96,8 +97,7 @@ export function ProtocolOverview(): JSX.Element {
     labwareIngredSelectors.allIngredientGroupFields
   )
   const dispatch: ThunkDispatch<any> = useDispatch()
-  const [hoverSlot, setHoverSlot] = React.useState<DeckSlot | null>(null)
-  // TODO: wire up the slot information from hoverSlot
+  const [hover, setHover] = React.useState<DeckSlot | string | null>(null)
   const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
   const [
     showMaterialsListModal,
@@ -122,6 +122,7 @@ export function ProtocolOverview(): JSX.Element {
     additionalEquipmentOnDeck,
     pipettes,
   } = initialDeckSetup
+  const isOffDeckHover = hover != null && labwaresOnDeck[hover] != null
 
   const nonLoadCommands =
     fileData?.commands.filter(
@@ -512,17 +513,19 @@ export function ProtocolOverview(): JSX.Element {
             </Flex>
             <Flex
               flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing4}
+              gridGap={SPACING.spacing32}
               alignItems={ALIGN_CENTER}
             >
               {deckView === leftString ? (
-                <DeckThumbnail
-                  hoverSlot={hoverSlot}
-                  setHoverSlot={setHoverSlot}
-                />
+                <DeckThumbnail hoverSlot={hover} setHoverSlot={setHover} />
               ) : (
-                <OffDeckThumbnail hover={hoverSlot} setHover={setHoverSlot} />
+                <OffDeckThumbnail hover={hover} setHover={setHover} />
               )}
+              <SlotDetailsContainer
+                robotType={robotType}
+                slot={isOffDeckHover ? 'offDeck' : hover}
+                offDeckLabwareId={hover ?? undefined}
+              />
             </Flex>
           </Flex>
         </Flex>
