@@ -73,7 +73,7 @@ class FlexStacker():
         Constructor
 
         Args:
-            connection: SerialConnection to the heater-shaker
+            connection: SerialConnection to the plate stacker
         """
         self._stacker_connection = connection
         self._ack = FS_ACK.encode()
@@ -84,7 +84,7 @@ class FlexStacker():
         self.move_acceleration_x = MOVE_ACCELERATION_X
         self.move_acceleration_z = MOVE_ACCELERATION_Z
         self.current_position = {'X': None, 'Z': None}
-        # self._name_ == 'FlexStacker'
+        # self.__class__.__name__ == 'FlexStacker'
 
     @classmethod
     def create(cls, port: str, baudrate: int = 115200, timeout: float = 1.0) ->"FlexStacker":
@@ -251,6 +251,8 @@ class FlexStacker():
 
     def move(self, axis: AXIS, distance: float, direction: DIR, velocity: float, acceleration: float):
         # max_speed_discontinuity = 10
+        if self.current_position['X'] == None or self.current_position['Z'] == None:
+            raise(f"Motor must be Home{axis}")
         c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
                                                 gcode=GCODE.MOVE_DIST).add_element(
                                                 axis.upper() +
