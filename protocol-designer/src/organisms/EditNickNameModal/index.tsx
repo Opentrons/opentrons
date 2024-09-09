@@ -53,7 +53,10 @@ export function EditNickNameModal(props: EditNickNameModalProps): JSX.Element {
           >
             {t('shared:cancel')}
           </SecondaryButton>
-          <PrimaryButton onClick={saveNickname}>
+          <PrimaryButton
+            onClick={saveNickname}
+            disabled={nickName.length >= 115}
+          >
             {t('shared:save')}
           </PrimaryButton>
         </Flex>
