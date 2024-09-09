@@ -86,7 +86,7 @@ describe('SlotOverflowMenu', () => {
   it('should renders all buttons as enabled and clicking on them calls ctas', () => {
     render(props)
     fireEvent.click(
-      screen.getByRole('button', { name: 'Add hardware/labware' })
+      screen.getByRole('button', { name: 'Edit hardware/labware' })
     )
     expect(props.addEquipment).toHaveBeenCalled()
     expect(props.setShowMenuList).toHaveBeenCalled()
@@ -95,7 +95,7 @@ describe('SlotOverflowMenu', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add liquid' }))
     expect(mockNavigate).toHaveBeenCalled()
     expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button', { name: 'Duplicate' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Duplicate labware' }))
     expect(vi.mocked(duplicateLabware)).toHaveBeenCalled()
     expect(props.setShowMenuList).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Clear slot' }))
@@ -103,5 +103,15 @@ describe('SlotOverflowMenu', () => {
     expect(vi.mocked(deleteModule)).toHaveBeenCalled()
     expect(vi.mocked(deleteDeckFixture)).toHaveBeenCalled()
     expect(props.setShowMenuList).toHaveBeenCalled()
+  })
+  it('renders 2 buttons when there is nothing on the slot', () => {
+    props.slot = 'A1'
+    render(props)
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Add hardware/labware' })
+    )
+    expect(props.addEquipment).toHaveBeenCalled()
+    expect(props.setShowMenuList).toHaveBeenCalled()
+    expect(screen.getAllByRole('button')).toHaveLength(2)
   })
 })

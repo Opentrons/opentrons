@@ -26,7 +26,7 @@ const LISTITEM_PROPS_BY_TYPE: Record<
     backgroundColor: COLORS.red35,
   },
   noActive: {
-    backgroundColor: COLORS.grey35,
+    backgroundColor: COLORS.grey30,
   },
   success: {
     backgroundColor: COLORS.green35,

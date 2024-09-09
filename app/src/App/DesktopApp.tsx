@@ -36,7 +36,7 @@ import { ProtocolTimeline } from '../pages/Protocols/ProtocolDetails/ProtocolTim
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { DesktopAppFallback } from './DesktopAppFallback'
 
-import type { RouteProps, DesktopRouteParams } from './types'
+import type { RouteProps } from './types'
 
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
@@ -158,11 +158,10 @@ export const DesktopApp = (): JSX.Element => {
 }
 
 function RobotControlTakeover(): JSX.Element | null {
-  const deviceRouteMatch = useMatch('/devices/:robotName')
-  const params = deviceRouteMatch?.params as DesktopRouteParams
-  const robotName = params?.robotName
+  const deviceRouteMatch = useMatch('/devices/:robotName/*')
+  const params = deviceRouteMatch?.params
+  const robotName = params?.robotName ?? null
   const robot = useRobot(robotName)
-
   if (deviceRouteMatch == null || robot == null || robotName == null)
     return null
 

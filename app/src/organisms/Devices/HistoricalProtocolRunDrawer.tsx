@@ -104,7 +104,7 @@ export function HistoricalProtocolRunDrawer(
 
   const protocolFilesData =
     runDataFileIds.length === 0 ? (
-      <InfoScreen contentType="noFiles" t={t} backgroundColor={COLORS.grey35} />
+      <InfoScreen content={t('no_files_included')} />
     ) : (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <LegacyStyledText>{t('protocol_files')}</LegacyStyledText>
@@ -151,13 +151,8 @@ export function HistoricalProtocolRunDrawer(
 
   const labwareOffsets =
     uniqueLabwareOffsets == null || uniqueLabwareOffsets.length === 0 ? (
-      <InfoScreen
-        contentType="noLabwareOffsetData"
-        t={t}
-        backgroundColor={COLORS.grey35}
-      />
+      <InfoScreen content={t('no_offsets_available')} />
     ) : (
-      // <InfoScreen contentType="noLabwareOffsetData" />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         {outOfDateBanner}
         <LegacyStyledText>

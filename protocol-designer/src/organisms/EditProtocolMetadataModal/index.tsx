@@ -122,6 +122,6 @@ const DescriptionField = styled.textarea`
   border: ${BORDERS.lineBorder};
   border-radius: ${BORDERS.borderRadius4};
   padding: ${SPACING.spacing8};
-  font-size: ${TYPOGRAPHY.fontSizeP};
+  font-size: ${TYPOGRAPHY.fontSizeH3};
   resize: none;
 `

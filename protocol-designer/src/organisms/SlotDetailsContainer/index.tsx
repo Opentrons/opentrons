@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { FLEX_ROBOT_TYPE, getModuleDisplayName } from '@opentrons/shared-data'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 import { RobotCoordsForeignObject } from '@opentrons/components'
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import { selectors } from '../../labware-ingred/selectors'
@@ -54,8 +54,8 @@ export function SlotDetailsContainer(
   const labwareOnSlot = Object.values(deckSetupLabwares).find(
     lw => lw.slot === slot || lw.slot === moduleOnSlot?.id
   )
-  const nestedLabwareOnSlot = Object.values(deckSetupLabwares).find(lw =>
-    Object.keys(deckSetupLabwares).includes(lw.slot)
+  const nestedLabwareOnSlot = Object.values(deckSetupLabwares).find(
+    lw => lw.slot === labwareOnSlot?.id
   )
   const fixturesOnSlot = Object.values(additionalEquipmentOnDeck).filter(
     ae => ae.location?.split('cutout')[1] === slot
@@ -108,7 +108,7 @@ export function SlotDetailsContainer(
     <RobotCoordsForeignObject
       width="15.8125rem"
       height="26.75rem"
-      x={robotType === FLEX_ROBOT_TYPE ? '-400' : '-300'}
+      x="-400"
       y={getYPosition({ robotType, slot })}
     >
       <SlotInformation

@@ -139,6 +139,7 @@
   "recalibrate_pipette": "Recalibrate pipette",
   "recent_protocol_runs": "Recent Protocol Runs",
   "rerun_now": "Rerun protocol now",
+  "rerun_loading": "Protocol re-run is disabled until data connection fully loads",
   "reset_all": "Reset all",
   "reset_estop": "Reset E-stop",
   "resume_operation": "Resume operation",

@@ -1,10 +1,10 @@
 """Test state getters for retrieving geometry views of state."""
 import inspect
-
 import json
 import pytest
+from math import isclose
 from decoy import Decoy
-from typing import cast, List, Tuple, Optional, NamedTuple
+from typing import cast, List, Tuple, Optional, NamedTuple, Dict
 from datetime import datetime
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5
@@ -77,7 +77,15 @@ from opentrons.protocol_engine.state.addressable_areas import (
     AddressableAreaStore,
 )
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
+from opentrons.protocol_engine.state.frustum_helpers import (
+    height_from_volume_circular,
+    height_from_volume_rectangular,
+    volume_from_height_circular,
+    volume_from_height_rectangular,
+)
 from ..pipette_fixtures import get_default_nozzle_map
+from ..mock_circular_frusta import TEST_EXAMPLES as CIRCULAR_TEST_EXAMPLES
+from ..mock_rectangular_frusta import TEST_EXAMPLES as RECTANGULAR_TEST_EXAMPLES
 
 
 @pytest.fixture
@@ -2624,3 +2632,79 @@ def test_get_offset_fails_with_off_deck_labware(
     labware_store.handle_action(action)
     offset_location = subject.get_offset_location("labware-id-1")
     assert offset_location is None
+
+
+@pytest.mark.parametrize("frustum", RECTANGULAR_TEST_EXAMPLES)
+def test_rectangular_frustum_math_helpers(
+    decoy: Decoy,
+    frustum: Dict[str, List[float]],
+    subject: GeometryView,
+) -> None:
+    """Test both height and volume calculation within a given rectangular frustum."""
+    total_frustum_height = frustum["height"][0]
+    bottom_length = frustum["length"][-1]
+    bottom_width = frustum["width"][-1]
+
+    def _find_volume_from_height_(index: int) -> None:
+        nonlocal total_frustum_height, bottom_width, bottom_length
+        top_length = frustum["length"][index]
+        top_width = frustum["width"][index]
+        target_height = frustum["height"][index]
+
+        found_volume = volume_from_height_rectangular(
+            target_height=target_height,
+            total_frustum_height=total_frustum_height,
+            top_length=top_length,
+            bottom_length=bottom_length,
+            top_width=top_width,
+            bottom_width=bottom_width,
+        )
+
+        found_height = height_from_volume_rectangular(
+            volume=found_volume,
+            total_frustum_height=total_frustum_height,
+            top_length=top_length,
+            bottom_length=bottom_length,
+            top_width=top_width,
+            bottom_width=bottom_width,
+        )
+
+        assert isclose(found_height, frustum["height"][index])
+
+    for i in range(len(frustum["height"])):
+        _find_volume_from_height_(i)
+
+
+@pytest.mark.parametrize("frustum", CIRCULAR_TEST_EXAMPLES)
+def test_circular_frustum_math_helpers(
+    decoy: Decoy,
+    frustum: Dict[str, List[float]],
+    subject: GeometryView,
+) -> None:
+    """Test both height and volume calculation within a given circular frustum."""
+    total_frustum_height = frustum["height"][0]
+    bottom_radius = frustum["radius"][-1]
+
+    def _find_volume_from_height_(index: int) -> None:
+        nonlocal total_frustum_height, bottom_radius
+        top_radius = frustum["radius"][index]
+        target_height = frustum["height"][index]
+
+        found_volume = volume_from_height_circular(
+            target_height=target_height,
+            total_frustum_height=total_frustum_height,
+            top_radius=top_radius,
+            bottom_radius=bottom_radius,
+        )
+
+        found_height = height_from_volume_circular(
+            volume=found_volume,
+            total_frustum_height=total_frustum_height,
+            top_radius=top_radius,
+            bottom_radius=bottom_radius,
+        )
+
+        assert isclose(found_height, frustum["height"][index])
+
+    for i in range(len(frustum["height"])):
+        _find_volume_from_height_(i)

@@ -7,8 +7,14 @@ import { EditProtocolMetadataModal } from '../../../organisms'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 import { getFileMetadata, getRobotType } from '../../../file-data/selectors'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
+import {
+  getAdditionalEquipmentEntities,
+  getInitialDeckSetup,
+  getSavedStepForms,
+} from '../../../step-forms/selectors'
 import { useBlockingHint } from '../../../components/Hints/useBlockingHint'
+import { MaterialsListModal } from '../../../organisms/MaterialsListModal'
+import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { ProtocolOverview } from '../index'
 
 import type { NavigateFunction } from 'react-router-dom'
@@ -16,8 +22,10 @@ import type { NavigateFunction } from 'react-router-dom'
 vi.mock('../../../step-forms/selectors')
 vi.mock('../../../file-data/selectors')
 vi.mock('../../../components/Hints/useBlockingHint')
+vi.mock('../../../organisms/MaterialsListModal')
+vi.mock('../../../labware-ingred/selectors')
 vi.mock('../../../organisms')
-
+vi.mock('../../../labware-ingred/selectors')
 const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
@@ -36,6 +44,13 @@ const render = () => {
 
 describe('ProtocolOverview', () => {
   beforeEach(() => {
+    vi.mocked(getAdditionalEquipmentEntities).mockReturnValue({})
+    vi.mocked(getSavedStepForms).mockReturnValue({
+      __INITIAL_DECK_SETUP_STEP__: {} as any,
+    })
+    vi.mocked(labwareIngredSelectors.allIngredientGroupFields).mockReturnValue(
+      {}
+    )
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       pipettes: {},
@@ -49,16 +64,21 @@ describe('ProtocolOverview', () => {
       description: 'mockDescription',
     })
     vi.mocked(useBlockingHint).mockReturnValue(null)
+    vi.mocked(MaterialsListModal).mockReturnValue(
+      <div>mock MaterialsListModal</div>
+    )
   })
+
   it('renders each section with text', () => {
     render()
     // buttons
     screen.getByRole('button', { name: 'Edit protocol' })
     screen.getByRole('button', { name: 'Export protocol' })
+    screen.getByText('Materials list')
 
     //  metadata
     screen.getByText('mockName')
-    screen.getByText('Protocol metadata')
+    screen.getByText('Protocol Metadata')
     screen.getAllByText('Edit')
     screen.getByText('Description')
     screen.getByText('mockDescription')
@@ -74,7 +94,7 @@ describe('ProtocolOverview', () => {
     screen.getByText('Right pipette')
     screen.getByText('Extension mount')
     //   liquids
-    screen.getByText('Liquids')
+    screen.getByText('Liquid Definitions')
     //  steps
     screen.getByText('Protocol steps')
   })
@@ -106,6 +126,12 @@ describe('ProtocolOverview', () => {
     screen.getByText('mock blocking hint')
   })
 
+  it('render mock materials list modal when clicking materials list', () => {
+    render()
+    fireEvent.click(screen.getByText('Materials list'))
+    screen.getByText('mock MaterialsListModal')
+  })
+
   it('renders the edit protocol metadata modal', () => {
     vi.mocked(EditProtocolMetadataModal).mockReturnValue(
       <div>mock EditProtocolMetadataModal</div>
@@ -114,5 +140,6 @@ describe('ProtocolOverview', () => {
     fireEvent.click(screen.getByTestId('ProtocolOverview_MetadataEditButton'))
     screen.getByText('mock EditProtocolMetadataModal')
   })
+
   it.todo('warning modal tests')
 })

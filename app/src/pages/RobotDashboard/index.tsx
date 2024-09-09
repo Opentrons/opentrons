@@ -10,6 +10,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
 import { Navigation } from '../../organisms/Navigation'
 import {
@@ -30,6 +31,7 @@ export function RobotDashboard(): JSX.Element {
     data: allRunsQueryData,
     error: allRunsQueryError,
   } = useNotifyAllRunsQuery()
+  const protocols = useAllProtocolsQuery()
 
   const { unfinishedUnboxingFlowRoute } = useSelector(
     getOnDeviceDisplaySettings
@@ -43,6 +45,11 @@ export function RobotDashboard(): JSX.Element {
     .reduce<RunData[]>((acc, run) => {
       if (
         acc.some(collectedRun => collectedRun.protocolId === run.protocolId)
+      ) {
+        return acc
+      } else if (
+        protocols?.data?.data.find(protocol => protocol.id === run.protocolId)
+          ?.protocolKind === 'quick-transfer'
       ) {
         return acc
       } else {

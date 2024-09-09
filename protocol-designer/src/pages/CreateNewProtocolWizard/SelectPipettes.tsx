@@ -31,7 +31,7 @@ import { setFeatureFlags } from '../../feature-flags/actions'
 import { createCustomTiprackDef } from '../../labware-defs/actions'
 import { useKitchen } from '../../organisms/Kitchen/hooks'
 import { IncompatibleTipsModal } from '../../organisms'
-import { PipetteInfoItem } from './PipetteInfoItem'
+import { PipetteInfoItem } from '../../organisms/'
 import { WizardBody } from './WizardBody'
 import { PIPETTE_GENS, PIPETTE_TYPES, PIPETTE_VOLUMES } from './constants'
 import { getTiprackOptions } from './utils'
@@ -409,7 +409,8 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                 {pipettesByMount.left.pipetteName != null &&
                 pipettesByMount.left.tiprackDefURI != null ? (
                   <PipetteInfoItem
-                    mount={'left'}
+                    mount="left"
+                    formPipettesByMount={pipettesByMount}
                     pipetteName={
                       pipettesByMount.left.pipetteName as PipetteName
                     }
@@ -418,9 +419,12 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                       setPage('add')
                       setMount('left')
                     }}
-                    setValue={setValue}
-                    cleanForm={resetFields}
-                    watch={watch}
+                    cleanForm={() => {
+                      setValue(`pipettesByMount.left.pipetteName`, undefined)
+                      setValue(`pipettesByMount.left.tiprackDefURI`, undefined)
+
+                      resetFields()
+                    }}
                   />
                 ) : (
                   <EmptySelectorButton
@@ -439,7 +443,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                 pipettesByMount.right.tiprackDefURI != null ? (
                   <PipetteInfoItem
                     mount="right"
-                    watch={watch}
+                    formPipettesByMount={pipettesByMount}
                     pipetteName={
                       pipettesByMount.right.pipetteName as PipetteName
                     }
@@ -448,8 +452,11 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                       setPage('add')
                       setMount('right')
                     }}
-                    setValue={setValue}
-                    cleanForm={resetFields}
+                    cleanForm={() => {
+                      setValue(`pipettesByMount.right.pipetteName`, undefined)
+                      setValue(`pipettesByMount.right.tiprackDefURI`, undefined)
+                      resetFields()
+                    }}
                   />
                 ) : has96Channel ? null : (
                   <EmptySelectorButton
