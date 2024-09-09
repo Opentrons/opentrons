@@ -81,7 +81,6 @@ export function AssignLiquidsModal(): JSX.Element | null {
               {t('click_and_drag')}
             </StyledText>
           </Flex>
-          {/* TODO(ja, 8/29/24): update this styling to match designs */}
           <SelectableLabware
             labwareProps={{
               wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,

@@ -2,7 +2,7 @@
   "add_liquid": "Add liquid",
   "add": "Add",
   "clear_wells": "Clear wells",
-  "click_and_drag": "Click and drag to select wells, hold shift and click to deselect",
+  "click_and_drag": "Click and drag to select wells",
   "define_liquid": "Define a liquid",
   "delete_liquid": "Delete liquid",
   "description": "Description",

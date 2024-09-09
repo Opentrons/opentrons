@@ -70,7 +70,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
   const { isTiprack } = definition.parameters
   return (
     <g onClick={onLabwareClick}>
-      <LabwareDetailGroup>
+      {/* <LabwareDetailGroup>
         <LabwareOutline
           definition={definition}
           highlight={highlight}
@@ -78,7 +78,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
           fill={fill}
           showRadius={showRadius}
         />
-      </LabwareDetailGroup>
+      </LabwareDetailGroup> */}
       <g>
         {flatMap(
           definition.ordering,

@@ -98,7 +98,6 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
       </g>
     )
   }
-  console.log('wellStroke', props.wellStroke)
   return (
     <g
       transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
@@ -109,8 +108,8 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         onMouseEnterWell={props.onMouseEnterWell}
         onMouseLeaveWell={props.onMouseLeaveWell}
         onLabwareClick={props.onLabwareClick}
-        // highlight={props.highlight}
-        highlightShadow={props.highlightShadow}
+        highlight={props.highlight}
+        // highlightShadow={props.highlightShadow}
         wellStroke={props.wellStroke}
       />
       {props.wellStroke != null ? (
