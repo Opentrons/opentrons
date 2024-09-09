@@ -130,7 +130,11 @@ export const SelectableLabware = (props: Props): JSX.Element => {
     rect
   ) => {
     const wells = _wellsFromSelected(_getWellsFromRect(rect))
-    if (e.shiftKey) {
+    const areWellsAlreadySelected = Object.keys(wells).every(
+      well => well in selectedPrimaryWells
+    )
+
+    if (areWellsAlreadySelected) {
       deselectWells(wells)
     } else {
       selectWells(wells)
