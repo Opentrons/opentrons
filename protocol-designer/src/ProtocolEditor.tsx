@@ -44,7 +44,11 @@ function ProtocolEditorComponent(): JSX.Element {
   const enableRedesign = useSelector(getEnableRedesign)
 
   const prereleaseModeEnabled = flags.PRERELEASE_MODE === true
+
+  const browserRouterProps =
+    routerBaseName != null ? { baseName: routerBaseName } : {}
   console.log({ routerBaseName })
+  console.log({ browserRouterProps })
 
   return (
     <div id="protocol-editor">
@@ -52,9 +56,7 @@ function ProtocolEditorComponent(): JSX.Element {
       {enableRedesign ? (
         <Flex flexDirection={DIRECTION_COLUMN}>
           {prereleaseModeEnabled ? <Bouncing /> : null}
-          <BrowserRouter
-            {...(routerBaseName != null ? { baseName: routerBaseName } : {})}
-          >
+          <BrowserRouter {...browserRouterProps}>
             <ProtocolRoutes />
           </BrowserRouter>
         </Flex>
