@@ -70,6 +70,7 @@ from .exceptions import (
     NotSupportedOnRobotType,
     CommandNotAllowedError,
     InvalidLiquidHeightFound,
+    InvalidWellDefinitionError,
 )
 
 from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
