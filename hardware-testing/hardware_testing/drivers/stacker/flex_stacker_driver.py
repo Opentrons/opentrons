@@ -62,8 +62,8 @@ HOME_ACCELERATION = 10
 MOVE_ACCELERATION_X = 150
 MOVE_ACCELERATION_Z = 5
 MOVE_SPEED_X = 300
-MOVE_SPEED_UPZ = 50
-MOVE_SPEED_DOWNZ = 100
+MOVE_SPEED_UPZ = 200
+MOVE_SPEED_DOWNZ = 200
 
 class FlexStacker():
     """Flex Stacker Driver."""
@@ -248,7 +248,7 @@ class FlexStacker():
                         })
         return states
 
-    def move(self, axis: AXIS, distance: float, direction: DIR, velocity: float, acceleration: float):
+    def move(self, axis: AXIS, distance: float, direction: DIR, velocity: int, acceleration: int):
         # max_speed_discontinuity = 10
         if self.current_position['X'] == None or self.current_position['Z'] == None:
             raise(f"Motor must be Home{axis}")
