@@ -52,6 +52,8 @@ export function ProtocolRoutes(): JSX.Element {
   }
   const allRoutes: RouteProps[] = [...pdRoutes, landingPage]
 
+  console.log('default route backtick slash')
+
   return (
     <>
       <NavigationBar />
@@ -63,7 +65,7 @@ export function ProtocolRoutes(): JSX.Element {
             {allRoutes.map(({ Component, path }: RouteProps) => {
               return <Route key={path} path={path} element={<Component />} />
             })}
-            <Route path="*" element={<Navigate to={landingPage.path} />} />
+            <Route path="*" element={<Navigate to={`/`} />} />
           </Routes>
         </Box>
       </Kitchen>
