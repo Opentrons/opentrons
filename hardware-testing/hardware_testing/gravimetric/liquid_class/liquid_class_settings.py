@@ -1,9 +1,16 @@
 """Liquid Class Settings."""
 from copy import deepcopy
+from enum import Enum, auto
 from dataclasses import dataclass, fields
-from typing import List, Optional
+from typing import List
 
 from opentrons.types import Point
+
+
+class PositionRef(Enum):
+    WELL_BOTTOM = auto()
+    WELL_TOP = auto()
+    MENISCUS = auto()
 
 
 @dataclass
@@ -17,6 +24,8 @@ class _Interpolate:
         a: "_Interpolate",
         b: "_Interpolate",
     ) -> "_Interpolate":
+        """Interpolate between liquid class settings."""
+
         # scale assumes 1.0 means all of "A", and 0.0 means all of "B"
         scale = abs((target_vol - b_vol) / (a_vol - b_vol))
         assert 0.0 <= scale <= 1.0, f"{scale} ({target_vol}, {a_vol}, {b_vol})"
@@ -33,7 +42,7 @@ class _Interpolate:
                 if t == int:
                     assert isinstance(new_val, float)
                     new_val = int(new_val)
-            elif t == bool or t == str or t == list:
+            elif t == bool or t == str or t == list or isinstance(val_a, PositionRef):
                 # no interpolation, but confirm values are identical
                 assert (
                     val_a == val_b
@@ -49,88 +58,101 @@ class _Interpolate:
 
 
 @dataclass
-class PositionSettings(_Interpolate):
+class Position(_Interpolate):
+    """Position Settings."""
+
     offset: Point
-    ref: str
+    ref: PositionRef
 
 
 @dataclass
 class _ZMoves(_Interpolate):
-    position: PositionSettings
+    position: Position
     speed: float
     delay: float
 
 
 @dataclass
-class SubmergeSettings(_ZMoves):
+class Submerge(_ZMoves):
     """Submerge Settings."""
 
-    lld_enabled: bool
+    lld: bool
 
 
 @dataclass
-class BlowOutSettings(_Interpolate):
+class BlowOut(_Interpolate):
     """Blow-Out Settings."""
 
     enabled: bool
-    position: PositionSettings
+    position: Position
+    volume: float
 
 
 @dataclass
-class TouchTipSettings(_Interpolate):
+class TouchTip(_Interpolate):
     """Touch-Tip Settings."""
 
     enabled: bool
-    position: PositionSettings
+    position: Position
     speed: float
     mm_to_edge: float
 
 
 @dataclass
-class RetractSettings(_ZMoves):
+class Retract(_ZMoves):
     """Retract Settings."""
 
     air_gap: float
-    blow_out: BlowOutSettings
-    touch_tip: TouchTipSettings
+    blow_out: BlowOut
+    touch_tip: TouchTip
 
 
 @dataclass
-class MixSettings(_Interpolate):
+class Mix(_Interpolate):
+    """Mix Settings."""
+
     enabled: bool
     count: int
-    volume: Optional[float]
+    volume: float
 
 
 @dataclass
 class _PlungerMoves(_Interpolate):
     order: List[str]
-    position: PositionSettings
+    position: Position
     flow_rate: float
     delay: float
-    mix: MixSettings
+    mix: Mix
 
 
 @dataclass
-class AspirateSettings(_PlungerMoves):
-    """Aspirate Settings."""
+class Distribute(_Interpolate):
+    """Distribute Settings."""
 
+    enabled: bool
     conditioning_volume: float
     disposal_volume: float
 
 
 @dataclass
-class DispenseSettings(_PlungerMoves):
+class Aspirate(_PlungerMoves):
+    """Aspirate Settings."""
+
+    distribute: Distribute
+
+
+@dataclass
+class Dispense(_PlungerMoves):
     """Dispense Settings."""
 
     push_out: float
 
 
 @dataclass
-class LiquidClassSettings(_Interpolate):
+class Liquid(_Interpolate):
     """Liquid Class Settings."""
 
-    submerge: SubmergeSettings
-    retract: RetractSettings
-    aspirate: AspirateSettings
-    dispense: DispenseSettings
+    submerge: Submerge
+    retract: Retract
+    aspirate: Aspirate
+    dispense: Dispense

@@ -1,12 +1,11 @@
-from opentrons.types import Point
-from ... import liquid_class_settings as lcs
+from ... liquid_class_settings import *
 from .. import default as _default
 from . import t50, t200, t1000
 
 
-default = lcs.LiquidClassSettings(
-    submerge=lcs.SubmergeSettings(
-        position=lcs.PositionSettings(
+default = Liquid(
+    submerge=Submerge(
+        position=Position(
             offset=Point(
                 x=_default.submerge.position.offset.x,
                 y=_default.submerge.position.offset.y,
@@ -16,10 +15,10 @@ default = lcs.LiquidClassSettings(
         ),
         speed=_default.submerge.speed,
         delay=_default.submerge.delay,
-        lld_enabled=_default.submerge.lld_enabled,
+        lld=_default.submerge.lld,
     ),
-    retract=lcs.RetractSettings(
-        position=lcs.PositionSettings(
+    retract=Retract(
+        position=Position(
             offset=Point(
                 x=_default.retract.position.offset.x,
                 y=_default.retract.position.offset.y,
@@ -30,9 +29,9 @@ default = lcs.LiquidClassSettings(
         speed=_default.retract.speed,
         delay=_default.retract.delay,
         air_gap=_default.retract.air_gap,
-        blow_out=lcs.BlowOutSettings(
+        blow_out=BlowOut(
             enabled=_default.retract.blow_out.enabled,
-            position=lcs.PositionSettings(
+            position=Position(
                 offset=Point(
                     x=_default.retract.blow_out.position.offset.x,
                     y=_default.retract.blow_out.position.offset.y,
@@ -40,10 +39,11 @@ default = lcs.LiquidClassSettings(
                 ),
                 ref=_default.retract.blow_out.position.ref,
             ),
+            volume=_default.retract.blow_out.volume,
         ),
-        touch_tip=lcs.TouchTipSettings(
+        touch_tip=TouchTip(
             enabled=_default.retract.touch_tip.enabled,
-            position=lcs.PositionSettings(
+            position=Position(
                 offset=Point(
                     x=_default.retract.touch_tip.position.offset.x,
                     y=_default.retract.touch_tip.position.offset.y,
@@ -55,9 +55,9 @@ default = lcs.LiquidClassSettings(
             mm_to_edge=_default.retract.touch_tip.mm_to_edge,
         ),
     ),
-    aspirate=lcs.AspirateSettings(
+    aspirate=Aspirate(
         order=_default.aspirate.order,
-        position=lcs.PositionSettings(
+        position=Position(
             offset=Point(
                 x=_default.aspirate.position.offset.x,
                 y=_default.aspirate.position.offset.y,
@@ -67,17 +67,20 @@ default = lcs.LiquidClassSettings(
         ),
         flow_rate=_default.aspirate.flow_rate,
         delay=_default.aspirate.delay,
-        mix=lcs.MixSettings(
+        mix=Mix(
             enabled=_default.aspirate.mix.enabled,
             count=_default.aspirate.mix.count,
             volume=_default.aspirate.mix.volume,
         ),
-        conditioning_volume=_default.aspirate.conditioning_volume,
-        disposal_volume=_default.aspirate.disposal_volume,
+        distribute=Distribute(
+            enabled=_default.aspirate.distribute.enabled,
+            conditioning_volume=_default.aspirate.distribute.conditioning_volume,
+            disposal_volume=_default.aspirate.distribute.disposal_volume,
+        )
     ),
-    dispense=lcs.DispenseSettings(
+    dispense=Dispense(
         order=_default.dispense.order,
-        position=lcs.PositionSettings(
+        position=Position(
             offset=Point(
                 x=_default.dispense.position.offset.x,
                 y=_default.dispense.position.offset.y,
@@ -87,7 +90,7 @@ default = lcs.LiquidClassSettings(
         ),
         flow_rate=_default.dispense.flow_rate,
         delay=_default.dispense.delay,
-        mix=lcs.MixSettings(
+        mix=Mix(
             enabled=_default.dispense.mix.enabled,
             count=_default.dispense.mix.count,
             volume=_default.dispense.mix.volume,
