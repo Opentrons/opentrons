@@ -60,7 +60,6 @@ from .frustum_helpers import (
     volume_from_height_rectangular,
     volume_from_height_circular,
     volume_from_height_spherical,
-    spherical_cross_section_radius,
 )
 
 
@@ -1201,87 +1200,6 @@ class GeometryView:
 
         return None
 
-    def get_well_bottom_volumetric_capacity(
-        self, labware_id: str, well_id: str
-    ) -> Dict[Tuple[float, float], float]:
-        """Get volumetric capacity in a well up until the topHeight of the lowest element in the 'frusta' list."""
-        well_volume = {}
-        labware_def = self._labware.get_definition(labware_id)
-        if labware_def.innerLabwareGeometry is None:
-            raise InvalidWellDefinitionError(message="No InnerLabwareGeometry found.")
-        well_geometry = labware_def.innerLabwareGeometry.get(well_id)
-        if well_geometry is None:
-            raise InvalidWellDefinitionError(
-                message=f"No InnerWellGeometry found for well id: {well_id}"
-            )
-
-        # get volume from bottom of the well up to sorted_frusta[0]
-        if well_geometry.bottomShape.shape == "spherical":
-            bottom_spherical_section_depth = well_geometry.bottomShape.depth
-            bottom_sphere_volume = volume_from_height_spherical(
-                radius_of_curvature=well_geometry.bottomShape.radius_of_curvature,
-                target_height=bottom_spherical_section_depth,
-            )
-            bottom_cross_section_radius = spherical_cross_section_radius(
-                volume=bottom_sphere_volume, depth=bottom_spherical_section_depth
-            )
-            well_volume[0.0, bottom_spherical_section_depth] = bottom_sphere_volume
-
-            # TODO(cm): account for u-bottom well with rectangular border
-            if well_geometry.frusta[0].geometry.shape == "circular":
-                top_cross_section_radius = well_geometry.frusta[0].geometry.diameter / 2
-                lowest_cross_section_height = well_geometry.frusta[0].topHeight
-                bottom_frustum_height = (
-                    lowest_cross_section_height - bottom_spherical_section_depth
-                )
-                bottom_frustum_volume = volume_from_height_circular(
-                    target_height=bottom_frustum_height,
-                    total_frustum_height=bottom_frustum_height,
-                    bottom_radius=bottom_cross_section_radius,
-                    top_radius=top_cross_section_radius,
-                )
-                well_volume[
-                    bottom_spherical_section_depth, lowest_cross_section_height
-                ] = bottom_frustum_volume
-
-        elif (
-            well_geometry.bottomShape.shape
-            == well_geometry.frusta[0].geometry.shape
-            == "circular"
-        ):
-            bottom_cross_section_radius = well_geometry.bottomShape.diameter / 2
-            top_cross_section_radius = well_geometry.frusta[0].geometry.diameter / 2
-            bottom_frustum_height = well_geometry.frusta[0].topHeight
-            bottom_frustum_volume = volume_from_height_circular(
-                target_height=bottom_frustum_height,
-                total_frustum_height=bottom_frustum_height,
-                bottom_radius=bottom_cross_section_radius,
-                top_radius=top_cross_section_radius,
-            )
-            well_volume[0.0, bottom_frustum_height] = bottom_frustum_volume
-        elif (
-            well_geometry.bottomShape.shape
-            == well_geometry.frusta[0].geometry.shape
-            == "rectangular"
-        ):
-            bottom_cross_section_width = well_geometry.bottomShape.xDimension
-            bottom_cross_section_length = well_geometry.bottomShape.yDimension
-            top_cross_section_length = well_geometry.frusta[0].geometry.yDimension
-            top_cross_section_width = well_geometry.frusta[0].geometry.xDimension
-
-            bottom_frustum_height = well_geometry.frusta[0].topHeight
-            bottom_frustum_volume = volume_from_height_rectangular(
-                target_height=bottom_frustum_height,
-                total_frustum_height=bottom_frustum_height,
-                bottom_length=bottom_cross_section_length,
-                bottom_width=bottom_cross_section_width,
-                top_length=top_cross_section_length,
-                top_width=top_cross_section_width,
-            )
-            well_volume[0.0, bottom_frustum_height] = bottom_frustum_volume
-
-        return well_volume
-
     def get_well_volumetric_capacity(
         self, labware_id: str, well_id: str
     ) -> Dict[Tuple[float, float], float]:
@@ -1297,9 +1215,14 @@ class GeometryView:
                 message=f"No InnerWellGeometry found for well id: {well_id}"
             )
 
-        well_volume = self.get_well_bottom_volumetric_capacity(
-            labware_id=labware_id, well_id=well_id
-        )
+        if well_geometry.bottomShape.shape == "spherical":
+            well_volume = {}
+            bottom_spherical_section_depth = well_geometry.bottomShape.depth
+            bottom_sphere_volume = volume_from_height_spherical(
+                radius_of_curvature=well_geometry.bottomShape.radius_of_curvature,
+                target_height=bottom_spherical_section_depth,
+            )
+            well_volume[0.0, bottom_spherical_section_depth] = bottom_sphere_volume
 
         # get the volume of remaining frusta sorted in ascending order
         sorted_frusta = sorted(

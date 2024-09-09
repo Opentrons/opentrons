@@ -1,6 +1,6 @@
 """Helper functions for liquid-level related calculations inside a given frustum."""
 from typing import List, Tuple
-from numpy import pi, iscomplex, roots, real, sqrt
+from numpy import pi, iscomplex, roots, real
 
 from ..errors.exceptions import InvalidLiquidHeightFound
 
@@ -174,11 +174,3 @@ def height_from_volume_spherical(
         max_height=total_frustum_height,
     )
     return height
-
-
-def spherical_cross_section_radius(volume: float, depth: float) -> float:
-    """Find the radius of a spherical section given the volume and depth."""
-    cross_section_radius = float(
-        sqrt((6 * volume - pi * (depth**3)) / (3 * pi * depth))
-    )
-    return cross_section_radius
