@@ -62,7 +62,7 @@ HOME_ACCELERATION = 10
 MOVE_ACCELERATION_X = 150
 MOVE_ACCELERATION_Z = 5
 MOVE_SPEED_X = 300
-MOVE_SPEED_UPZ = 100
+MOVE_SPEED_UPZ = 50
 MOVE_SPEED_DOWNZ = 100
 
 class FlexStacker():
@@ -81,13 +81,14 @@ class FlexStacker():
         self.move_speed_up_z = MOVE_SPEED_UPZ
         self.move_speed_down_z = MOVE_SPEED_DOWNZ
         self.home_acceleration = HOME_ACCELERATION
+        self.home_speed = HOME_SPEED
         self.move_acceleration_x = MOVE_ACCELERATION_X
         self.move_acceleration_z = MOVE_ACCELERATION_Z
         self.current_position = {'X': None, 'Z': None, 'L': None}
         # self.__class__.__name__ == 'FlexStacker'
 
     @classmethod
-    def create(cls, port: str, baudrate: int = 115200, timeout: float = 1.0) ->"FlexStacker":
+    def create(cls, port: str, baudrate: int = 115200, timeout: float = 1.0) -> "FlexStacker":
         """Flex Stacker Driver"""
         conn = Serial(port = port, baudrate = baudrate, timeout = timeout)
         return cls(connection = conn)
@@ -108,7 +109,7 @@ class FlexStacker():
         Raises: SerialException
         """
         return self._send_data(
-            data=command.build(), retries=retries, timeout=self._stacker_connection.timeout
+            data=command.build(), retries=retries, timeout=DEFAULT_FS_TIMEOUT
         )
 
     def _send_data(self, data: str, retries: int = 0, timeout: Optional[float] = None) -> str:
@@ -189,7 +190,6 @@ class FlexStacker():
             gcode=GCODE.ENABLE_MOTOR
         ).add_element(axis.upper())
         print(c)
-        """LSW->X+:0,X-:0,Z+:0,Z-:1,PR:1,PH:1PS->X+1,X-:0"""
         response = self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES).strip('OK')
 
     def get_sensor_states(self):
@@ -198,7 +198,6 @@ class FlexStacker():
             gcode=GCODE.LIMITSWITCH_STATUS
         )
         print(c)
-        """LSW->X+:0,X-:0,Z+:0,Z-:1,PR:1,PH:1PS->X+1,X-:0"""
         response = self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES).strip('OK')
 
         return self.sensor_parse(response)
