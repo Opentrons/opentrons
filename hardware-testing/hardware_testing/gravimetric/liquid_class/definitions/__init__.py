@@ -19,11 +19,7 @@ default = Liquid(
     ),
     retract=Retract(
         position=Position(
-            offset=Point(
-                x=0.0,
-                y=0.0,
-                z=5.0
-            ),
+            offset=Point(x=0.0, y=0.0, z=5.0),
             ref=PositionRef.MENISCUS,
         ),
         speed=50.0,
@@ -76,7 +72,7 @@ default = Liquid(
             enabled=False,
             conditioning_volume=0.0,
             disposal_volume=0.0,
-        )
+        ),
     ),
     dispense=Dispense(
         order=[],
@@ -101,9 +97,7 @@ default = Liquid(
 
 
 # FIXME: add glycerol, ethanol (at appropriate dilutions)
-_all_classes: Dict[
-    str, Dict[str, Dict[str, Dict[str, Dict[int, Liquid]]]]
-] = {
+_all_classes: Dict[str, Dict[str, Dict[str, Dict[str, Dict[int, Liquid]]]]] = {
     "water": {
         "t50": {
             "p50": {
@@ -135,9 +129,7 @@ def get_liquid_class(
     def _get_interp_liq_class(lower_ul: int, upper_ul: int) -> Liquid:
         lower_cls = cls_per_volume[lower_ul]
         upper_cls = cls_per_volume[upper_ul]
-        return Liquid.interpolate(
-            volume, lower_ul, upper_ul, lower_cls, upper_cls
-        )
+        return Liquid.interpolate(volume, lower_ul, upper_ul, lower_cls, upper_cls)
 
     # FIXME: this assumes there is 3x volumes defined for every class
     #        if we have more or less, this will break
@@ -153,6 +145,29 @@ def get_liquid_class(
         return cls_per_volume[defined_volumes[2]]
 
 
+def get_csv_str() -> str:
+    combos_header = "liquid,tip,pipette,channels,volume"
+    full_data = ""
+    for liq, liq_cls_per_tip in _all_classes.items():
+        for tip, liq_cls_per_pipette in liq_cls_per_tip.items():
+            for pip, liq_cls_per_channel in liq_cls_per_pipette.items():
+                for channel, liq_cls_per_volume in liq_cls_per_channel.items():
+                    for volume, liq_cls in liq_cls_per_volume.items():
+                        if not full_data:
+                            # first add a header
+                            params_header = CSV_SEPARATOR.join(liq_cls.csv_header())
+                            full_data += (
+                                f"{combos_header}{CSV_SEPARATOR}{params_header}\n"
+                            )
+                        combos_data = CSV_SEPARATOR.join(
+                            [liq, tip, pip, channel, str(volume)]
+                        )
+                        csv_data = CSV_SEPARATOR.join(liq_cls.csv_data())
+                        full_data += f"{combos_data}{CSV_SEPARATOR}{csv_data}\n"
+    return full_data
+
+
 __all__ = [
     "get_liquid_class",
+    "get_csv_str",
 ]

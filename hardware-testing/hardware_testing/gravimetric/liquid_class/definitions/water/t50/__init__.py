@@ -76,7 +76,7 @@ default = Liquid(
             enabled=_default.aspirate.distribute.enabled,
             conditioning_volume=_default.aspirate.distribute.conditioning_volume,
             disposal_volume=_default.aspirate.distribute.disposal_volume,
-        )
+        ),
     ),
     dispense=Dispense(
         order=_default.dispense.order,
