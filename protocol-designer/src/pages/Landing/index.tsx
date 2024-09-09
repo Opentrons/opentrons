@@ -28,9 +28,8 @@ export function Landing(): JSX.Element {
 
   React.useEffect(() => {
     if (metadata?.created != null) {
-      console.log('would notmally navigate to /overview')
-    } else {
-      console.log('would notmally navigate to /')
+      console.warn('protocol already exists, navigating to overview')
+      navigate('/overview')
     }
   }, [metadata, navigate])
 

@@ -47,8 +47,6 @@ function ProtocolEditorComponent(): JSX.Element {
 
   const browserRouterProps =
     routerBaseName != null ? { baseName: routerBaseName } : {}
-  console.log({ routerBaseName })
-  console.log({ browserRouterProps })
 
   return (
     <div id="protocol-editor">
