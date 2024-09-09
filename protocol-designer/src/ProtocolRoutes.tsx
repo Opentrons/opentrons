@@ -52,7 +52,8 @@ export function ProtocolRoutes(): JSX.Element {
   }
   const allRoutes: RouteProps[] = [...pdRoutes, landingPage]
 
-  console.log('default route backtick slash')
+  console.log('default route location.pathname')
+  console.log({ location: location.pathname })
 
   return (
     <>
@@ -65,7 +66,10 @@ export function ProtocolRoutes(): JSX.Element {
             {allRoutes.map(({ Component, path }: RouteProps) => {
               return <Route key={path} path={path} element={<Component />} />
             })}
-            <Route path="*" element={<Navigate to={`/`} />} />
+            <Route
+              path="*"
+              element={<Navigate to={`${location.pathname}`} />}
+            />
           </Routes>
         </Box>
       </Kitchen>
