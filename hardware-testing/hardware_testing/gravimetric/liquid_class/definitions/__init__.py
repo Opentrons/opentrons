@@ -9,7 +9,7 @@ default = Liquid(
             offset=Point(
                 x=0.0,
                 y=0.0,
-                z=2.0
+                z=2.0,
             ),
             ref=PositionRef.MENISCUS,
         ),
@@ -35,11 +35,11 @@ default = Liquid(
                 offset=Point(
                     x=0.0,
                     y=0.0,
-                    z=2.0
+                    z=2.0,
                 ),
                 ref=PositionRef.MENISCUS,
             ),
-            volume=1.0,
+            volume=20.0,
         ),
         touch_tip=TouchTip(
             enabled=False,
@@ -47,7 +47,7 @@ default = Liquid(
                 offset=Point(
                     x=0.0,
                     y=0.0,
-                    z=-1.0
+                    z=-1.0,
                 ),
                 ref=PositionRef.WELL_TOP,
             ),
@@ -61,7 +61,7 @@ default = Liquid(
             offset=Point(
                 x=0.0,
                 y=0.0,
-                z=-1.5
+                z=-1.5,
             ),
             ref=PositionRef.MENISCUS,
         ),
@@ -84,7 +84,7 @@ default = Liquid(
             offset=Point(
                 x=0.0,
                 y=0.0,
-                z=-1.5
+                z=-1.5,
             ),
             ref=PositionRef.MENISCUS,
         ),
@@ -100,6 +100,7 @@ default = Liquid(
 )
 
 
+# FIXME: add glycerol, ethanol (at appropriate dilutions)
 _all_classes: Dict[
     str, Dict[str, Dict[str, Dict[str, Dict[int, Liquid]]]]
 ] = {
