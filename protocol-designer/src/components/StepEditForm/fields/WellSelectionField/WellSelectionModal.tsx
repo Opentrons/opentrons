@@ -95,6 +95,7 @@ const WellSelectionModalComponent = (
 
       {labwareDef != null ? (
         <SelectableLabware
+          showBorder
           labwareProps={{
             wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
             definition: labwareDef,

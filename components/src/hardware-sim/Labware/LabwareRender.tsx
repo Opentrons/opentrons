@@ -59,6 +59,8 @@ export interface LabwareRenderProps {
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
   gRef?: React.RefObject<SVGGElement>
   onLabwareClick?: () => void
+  showBorder?: boolean
+  strokeColor?: string
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
@@ -104,12 +106,13 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
       ref={gRef}
     >
       <StaticLabware
+        showBorder={props.showBorder}
         definition={props.definition}
         onMouseEnterWell={props.onMouseEnterWell}
         onMouseLeaveWell={props.onMouseLeaveWell}
         onLabwareClick={props.onLabwareClick}
         highlight={props.highlight}
-        // highlightShadow={props.highlightShadow}
+        highlightShadow={props.highlightShadow}
         wellStroke={props.wellStroke}
       />
       {props.wellStroke != null ? (
@@ -122,7 +125,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         <FilledWells
           definition={props.definition}
           fillByWell={props.wellFill}
-          strokeColor={'transparent'}
+          strokeColor={props.strokeColor}
         />
       ) : null}
       {props.disabledWells != null

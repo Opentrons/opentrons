@@ -82,6 +82,7 @@ export function AssignLiquidsModal(): JSX.Element | null {
             </StyledText>
           </Flex>
           <SelectableLabware
+            showBorder={false}
             labwareProps={{
               wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
               definition: labwareDef,

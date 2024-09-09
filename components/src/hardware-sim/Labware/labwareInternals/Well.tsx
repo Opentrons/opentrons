@@ -59,23 +59,13 @@ export function WellComponent(props: WellProps): JSX.Element {
 
   const { xDimension, yDimension } = well
   return (
-    <>
-      <rect
-        {...commonProps}
-        x={x - xDimension / 2}
-        y={y - yDimension / 2}
-        width={xDimension}
-        height={yDimension}
-      />
-      <rect
-        strokeWidth={5}
-        stroke={COLORS.yellow20}
-        x={x - xDimension / 2 + 10}
-        y={y - yDimension / 2 + 10}
-        width={xDimension + 10}
-        height={yDimension + 10}
-      />
-    </>
+    <rect
+      {...commonProps}
+      x={x - xDimension / 2}
+      y={y - yDimension / 2}
+      width={xDimension}
+      height={yDimension}
+    />
   )
 }
 

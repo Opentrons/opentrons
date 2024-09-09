@@ -28,6 +28,8 @@ export interface StaticLabwareProps {
   fill?: CSSProperties['fill']
   showRadius?: boolean
   wellStroke?: WellStroke
+  /** optional show of labware border, defaulted to true */
+  showBorder?: boolean
 }
 
 const TipDecoration = React.memo(function TipDecoration(props: {
@@ -65,20 +67,23 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
     fill,
     showRadius = true,
     wellStroke = {},
+    showBorder = true,
   } = props
 
   const { isTiprack } = definition.parameters
   return (
     <g onClick={onLabwareClick}>
-      {/* <LabwareDetailGroup>
-        <LabwareOutline
-          definition={definition}
-          highlight={highlight}
-          highlightShadow={highlightShadow}
-          fill={fill}
-          showRadius={showRadius}
-        />
-      </LabwareDetailGroup> */}
+      {!showBorder ? null : (
+        <LabwareDetailGroup>
+          <LabwareOutline
+            definition={definition}
+            highlight={highlight}
+            highlightShadow={highlightShadow}
+            fill={fill}
+            showRadius={showRadius}
+          />
+        </LabwareDetailGroup>
+      )}
       <g>
         {flatMap(
           definition.ordering,

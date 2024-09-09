@@ -26,7 +26,7 @@ export const STYLE_BY_WELL_CONTENTS: {
 } = {
   highlightedWell: {
     stroke: COLORS.blue50,
-    fill: `transparent`, // 20% opacity
+    fill: COLORS.transparent,
     strokeWidth: 0.5,
   },
   disabledWell: {
@@ -51,7 +51,7 @@ export const STYLE_BY_WELL_CONTENTS: {
   },
   defaultWell: {
     fill: COLORS.white,
-    stroke: 'transparent',
+    stroke: COLORS.black90,
     strokeWidth: 0.6,
   },
 }

@@ -55,6 +55,7 @@ export function LiquidPlacementModal(): JSX.Element | null {
       {labwareDef && (
         <div className={styles.labware}>
           <SelectableLabware
+            showBorder
             labwareProps={{
               wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
               definition: labwareDef,

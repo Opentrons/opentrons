@@ -37,6 +37,7 @@ export interface Props {
   nozzleType: NozzleType | null
   ingredNames: WellIngredientNames
   wellContents: ContentsByWell
+  showBorder: boolean
 }
 
 type ChannelType = 8 | 96
@@ -59,6 +60,7 @@ export const SelectableLabware = (props: Props): JSX.Element => {
     nozzleType,
     ingredNames,
     wellContents,
+    showBorder,
   } = props
   const labwareDef = labwareProps.definition
 
@@ -203,6 +205,8 @@ export const SelectableLabware = (props: Props): JSX.Element => {
         }) => (
           <SingleLabware
             {...labwareProps}
+            showBorder={showBorder}
+            strokeColor={COLORS.transparent}
             wellStroke={wellStroke}
             wellFill={wellFillWithLiq}
             selectedWells={allSelectedWells}
