@@ -5,10 +5,12 @@ import { SPACING } from '@opentrons/components'
 
 import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
 import { Banner } from '../../../../../atoms/Banner'
-import { TerminalRunBanner } from './TerminalRunBanner'
+import {
+  TerminalRunBannerContainer,
+  useTerminalRunBannerContainer,
+} from './TerminalRunBannerContainer'
 import { getShowGenericRunHeaderBanners } from './getShowGenericRunHeaderBanners'
 import { useIsDoorOpen } from '../hooks'
-import { useMostRecentRunId } from '../../../../ProtocolUpload/hooks/useMostRecentRunId'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { ProtocolRunHeaderProps } from '..'
@@ -27,16 +29,11 @@ export type RunHeaderBannerContainerProps = ProtocolRunHeaderProps & {
 export function RunHeaderBannerContainer(
   props: RunHeaderBannerContainerProps
 ): JSX.Element | null {
-  const { runStatus, enteredER, runId, runHeaderModalContainerUtils } = props
-  const {
-    analysisErrorModalUtils,
-    runFailedModalUtils,
-  } = runHeaderModalContainerUtils
+  const { runStatus, enteredER, runHeaderModalContainerUtils } = props
+  const { analysisErrorModalUtils } = runHeaderModalContainerUtils
 
   const { t } = useTranslation(['run_details', 'shared'])
   const isDoorOpen = useIsDoorOpen(props.robotName)
-  const mostRecentRunId = useMostRecentRunId()
-  const isMostRecentRun = mostRecentRunId === runId
 
   const {
     showRunCanceledBanner,
@@ -47,6 +44,8 @@ export function RunHeaderBannerContainer(
     isDoorOpen,
     enteredER,
   })
+
+  const terminalBannerType = useTerminalRunBannerContainer(props)
 
   return (
     <>
@@ -70,10 +69,10 @@ export function RunHeaderBannerContainer(
           {t('close_door_to_resume')}
         </Banner>
       ) : null}
-      {isMostRecentRun ? (
-        <TerminalRunBanner
+      {terminalBannerType != null ? (
+        <TerminalRunBannerContainer
+          bannerType={terminalBannerType}
           {...props}
-          toggleRunFailedModal={runFailedModalUtils.toggleModal}
         />
       ) : null}
     </>
