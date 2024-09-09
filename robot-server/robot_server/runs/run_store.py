@@ -7,6 +7,7 @@ from functools import lru_cache
 from typing import Dict, List, Optional, Literal, Union
 
 import sqlalchemy
+from sqlalchemy import and_, or_
 from pydantic import ValidationError
 
 from opentrons.util.helpers import utc_now
@@ -463,26 +464,47 @@ class RunStore:
                 )
             else:
                 select_count = sqlalchemy.select(sqlalchemy.func.count()).where(
-                    run_command_table.c.run_id == run_id
-                    and run_command_table.c.command_intent != "fixit"
+                    and_(
+                        run_command_table.c.run_id == run_id,
+                        or_(
+                            run_command_table.c.command_intent != "fixit",
+                            run_command_table.c.command_intent == None,  # noqa: E711
+                        ),
+                    )
                 )
             count_result: int = transaction.execute(select_count).scalar_one()
 
             actual_cursor = cursor if cursor is not None else count_result - length
             # Clamp to [0, count_result).
             actual_cursor = max(0, min(actual_cursor, count_result - 1))
-
-            select_slice = (
-                sqlalchemy.select(
-                    run_command_table.c.index_in_run, run_command_table.c.command
+            if include_fixit_commands:
+                select_slice = (
+                    sqlalchemy.select(
+                        run_command_table.c.index_in_run, run_command_table.c.command
+                    )
+                    .where(
+                        run_command_table.c.run_id == run_id,
+                        run_command_table.c.index_in_run >= actual_cursor,
+                        run_command_table.c.index_in_run < actual_cursor + length,
+                    )
+                    .order_by(run_command_table.c.index_in_run)
                 )
-                .where(
-                    run_command_table.c.run_id == run_id,
-                    run_command_table.c.index_in_run >= actual_cursor,
-                    run_command_table.c.index_in_run < actual_cursor + length,
+            else:
+                select_slice = (
+                    sqlalchemy.select(
+                        run_command_table.c.index_in_run, run_command_table.c.command
+                    )
+                    .where(
+                        run_command_table.c.run_id == run_id,
+                        run_command_table.c.index_in_run >= actual_cursor,
+                        run_command_table.c.index_in_run < actual_cursor + length,
+                        or_(
+                            run_command_table.c.command_intent != "fixit",
+                            run_command_table.c.command_intent == None,  # noqa: E711
+                        ),
+                    )
+                    .order_by(run_command_table.c.index_in_run)
                 )
-                .order_by(run_command_table.c.index_in_run)
-            )
             slice_result = transaction.execute(select_slice).all()
 
         sliced_commands: List[Command] = [
@@ -511,18 +533,14 @@ class RunStore:
                     .order_by(run_command_table.c.index_in_run)
                 )
             else:
-                all_commands = (
-                    sqlalchemy.select(run_command_table.c.command)
-                    .where(
-                        run_command_table.c.run_id == run_id
-                    )
-                    .order_by(run_command_table.c.index_in_run))
-                all_commands_result = transaction.scalars(all_commands).all()
                 select_commands = (
                     sqlalchemy.select(run_command_table.c.command)
                     .where(
-                        run_command_table.c.run_id == run_id
-                        and run_command_table.c.command_intent != "fixit"
+                        and_(run_command_table.c.run_id == run_id),
+                        or_(
+                            run_command_table.c.command_intent != "fixit",
+                            run_command_table.c.command_intent == None,  # noqa: E711
+                        ),
                     )
                     .order_by(run_command_table.c.index_in_run)
                 )
