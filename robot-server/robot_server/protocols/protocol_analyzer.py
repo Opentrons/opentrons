@@ -145,10 +145,16 @@ class ProtocolAnalyzer:
         or was not required, stop the orchestrator so that all its background tasks
         are stopped timely and do not block server shutdown.
         """
-        if self._orchestrator is not None and self._orchestrator.get_is_okay_to_clear():
-            asyncio.run_coroutine_threadsafe(
-                self._orchestrator.stop(), asyncio.get_running_loop()
-            )
+        # if self._orchestrator is not None:
+        #     if self._orchestrator.get_is_okay_to_clear():
+        #         asyncio.run_coroutine_threadsafe(
+        #             self._orchestrator.stop(), asyncio.get_running_loop()
+        #         )
+        #     else:
+        #         log.warning(
+        #             "Analyzer is no longer in use but orchestrator is busy. "
+        #             "Cannot stop the orchestrator currently."
+        #         )
 
 
 def create_protocol_analyzer(

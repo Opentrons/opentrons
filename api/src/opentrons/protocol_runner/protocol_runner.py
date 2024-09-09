@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 import anyio
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons import protocol_reader
+from opentrons import protocol_reader, APIVersion
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import ParameterContext
 from opentrons.protocol_api.core.legacy.load_info import LoadInfo
@@ -173,6 +173,8 @@ class PythonAndLegacyRunner(AbstractRunner):
             post_run_hardware_state=post_run_hardware_state,
         )
         self._parameter_context: Optional[ParameterContext] = None
+        self._protocol_api_level: Optional[APIVersion] = None
+        self._equipment_broker: Optional[Broker[LoadInfo]] = None
 
     @property
     def run_time_parameters(self) -> List[RunTimeParameter]:
@@ -214,15 +216,15 @@ class PythonAndLegacyRunner(AbstractRunner):
             )
         else:
             run_time_parameters_with_overrides = None
-        equipment_broker = None
-
-        if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
-            equipment_broker = Broker[LoadInfo]()
-            self._protocol_engine.add_plugin(
-                LegacyContextPlugin(
-                    broker=self._broker, equipment_broker=equipment_broker
-                )
-            )
+        # equipment_broker = None
+        self._protocol_api_level = protocol.api_level
+        if self._protocol_api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
+            self._equipment_broker = Broker[LoadInfo]()
+            # self._protocol_engine.add_plugin(
+            #     LegacyContextPlugin(
+            #         broker=self._broker, equipment_broker=equipment_broker
+            #     )
+            # )
             self._hardware_api.should_taskify_movement_execution(taskify=True)
         else:
             self._hardware_api.should_taskify_movement_execution(taskify=False)
@@ -230,7 +232,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         context = self._protocol_context_creator.create(
             protocol=protocol,
             broker=self._broker,
-            equipment_broker=equipment_broker,
+            equipment_broker=self._equipment_broker,
         )
         initial_home_command = pe_commands.HomeCreate(
             # this command homes all axes, including pipette plunger and gripper jaw
@@ -266,7 +268,12 @@ class PythonAndLegacyRunner(AbstractRunner):
                 run_time_param_values=run_time_param_values,
                 run_time_param_paths=run_time_param_paths,
             )
-
+        if self._protocol_api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
+            self._protocol_engine.add_plugin(
+                LegacyContextPlugin(
+                    broker=self._broker, equipment_broker=self._equipment_broker
+                )
+            )
         self.play(deck_configuration=deck_configuration)
         self._task_queue.start()
         await self._task_queue.join()
