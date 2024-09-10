@@ -5,6 +5,7 @@ Summary of changes from schema 6:
 - Adds a new command_intent to store the commands intent in the commands table
 """
 
+import json
 from pathlib import Path
 from contextlib import ExitStack
 
@@ -129,12 +130,13 @@ def _migrate_command_table_with_new_command_intent_col(
     )
     insert_new_command = sqlalchemy.insert(schema_7.run_command_table)
     for old_row in source_transaction.execute(select_old_commands).all():
+        data = json.loads(old_row.command)
         new_command_intent = (
             # Account for old_row.command["intent"] being NULL.
             "protocol"
             if "intent" not in old_row.command
-            or old_row.command["intent"] == None  # noqa: E711
-            else old_row.command["intent"]
+            or data["intent"] == None  # noqa: E711
+            else data["intent"]
         )
         dest_transaction.execute(
             insert_new_command,
