@@ -162,6 +162,15 @@ class FlowRate(BaseModel):
     )
 
 
+class MeniscusRelativeParams(BaseModel):
+    meniscusRelative: bool = Field(
+        ..., description="Enable meniscus-relative liquid actions"
+    )
+    offsetFromMeniscusMm: float = Field(
+        ..., description="Millimeters from meniscus to do liquid acions"
+    )
+
+
 class Params2(PipetteAccessParams, OffsetFromBottomMm):
     pass
 
@@ -170,7 +179,7 @@ class Params1(Params2, FlowRate):
     pass
 
 
-class Params(Params1, Params2, VolumeParams):
+class Params(Params1, Params2, VolumeParams, MeniscusRelativeParams):
     pass
 
 

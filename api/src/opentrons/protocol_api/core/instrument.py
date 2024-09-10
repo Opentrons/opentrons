@@ -10,12 +10,18 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import FlowRates
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons_shared_data.robot.types import RobotType
 
 from ..disposal_locations import TrashBin, WasteChute
 from .well import WellCoreType
 
 
 class AbstractInstrument(ABC, Generic[WellCoreType]):
+    @property
+    @abstractmethod
+    def robot_type(self) -> RobotType:
+        ...
+
     @abstractmethod
     def get_default_speed(self) -> float:
         ...
@@ -303,6 +309,12 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     @abstractmethod
     def retract(self) -> None:
         """Retract this instrument to the top of the gantry."""
+        ...
+
+    @abstractmethod
+    def get_last_measured_liquid_height(
+        self, well_core: WellCoreType
+    ) -> Optional[float]:
         ...
 
     @abstractmethod

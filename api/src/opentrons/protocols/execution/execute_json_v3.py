@@ -153,12 +153,17 @@ def _aspirate(
 ) -> None:
     pipette_id = params["pipette"]
     pipette = instruments[pipette_id]
-    location = _get_location_with_offset(loaded_labware, params) # location is well bottom plus offsetFromBottomMm param
+    location = _get_location_with_offset(loaded_labware, params)
     volume = params["volume"]
     _set_flow_rate(pipette, params)
     meniscus_relative = params["meniscusRelative"]
     offset_from_meniscus_mm = params["offsetFromMeniscusMm"]
-    pipette.aspirate(volume, location, meniscus_relative, offset_from_meniscus_mm)
+    pipette.aspirate(
+        volume=volume,
+        location=location,
+        meniscus_relative=meniscus_relative,
+        offset_from_meniscus_mm=offset_from_meniscus_mm,
+    )
 
 
 def _dispense(

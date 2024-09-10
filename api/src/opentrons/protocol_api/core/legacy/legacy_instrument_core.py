@@ -20,6 +20,7 @@ from opentrons.protocols.api_support.util import (
 from opentrons.protocols.geometry import planning
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons_shared_data.robot.types import RobotType
 
 from ...disposal_locations import TrashBin, WasteChute
 from ..instrument import AbstractInstrument
@@ -63,6 +64,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             api_level=self._api_version,
         )
         self._liquid_presence_detection = False
+
+    @property
+    def robot_type(self) -> RobotType:
+        return "OT-2 Standard"
 
     def get_default_speed(self) -> float:
         """Gets the speed at which the robot's gantry moves."""
@@ -565,6 +570,12 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
     def retract(self) -> None:
         """Retract this instrument to the top of the gantry."""
         self._protocol_interface.get_hardware.retract(self._mount)  # type: ignore [attr-defined]
+
+    def get_last_measured_liquid_height(self, well_core: WellCore) -> Optional[float]:
+        """This will never be called because it was added in API 2.21."""  # confirm
+        assert (
+            False
+        ), "get_last_measured_liquid_height only supported in API 2.21 & later"  # confirm
 
     def detect_liquid_presence(self, well_core: WellCore, loc: types.Location) -> bool:
         """This will never be called because it was added in API 2.20."""

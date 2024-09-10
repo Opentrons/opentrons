@@ -27,6 +27,7 @@ from opentrons.protocols.api_support.util import (
     requires_version,
     APIVersionError,
     UnsupportedAPIError,
+    RobotTypeError,
 )
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 
@@ -159,10 +160,8 @@ class InstrumentContext(publisher.CommandPublisher):
     def default_speed(self, speed: float) -> None:
         self._core.set_default_speed(speed)
 
-    # look at Aaron well-tracking PR, Caila doc
-    # find well volume (from height) if not already found, update well volume. Utilize existing well volume checking?
-    # error if not enough liquid to probe (aspirate (meniscus-relative) too?), error recovery option
-    # update old_well/new_well volumes after successful aspirate (using aspirated volume)
+    # update old_well/new_well heights/volumes after (successful) liquid handling actions (using handled volume)
+    # (initially) populate well heights/volumes via user input?! Error (and recovery) if not enough volume to liquid probe?
     @requires_version(2, 0)
     def aspirate(
         self,
@@ -223,48 +222,22 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         )
 
-        well: Optional[labware.Well] = None
-        move_to_location: types.Location
-        last_location = self._get_last_location_by_api_version()
-        try:
-            target = validation.validate_location(
-                location=location, last_location=last_location
-            )
-        except validation.NoLocationError as e:
-            raise RuntimeError(
-                "If aspirate is called without an explicit location, another"
-                " method that moves to a location (such as move_to or "
-                "dispense) must previously have been called so the robot "
-                "knows where it is."
-            ) from e
-
-        if isinstance(target, validation.WellTarget):
-            move_to_location = target.location or target.well.bottom(
-                z=self._well_bottom_clearances.aspirate
-            )
-            well = target.well
-        if isinstance(target, validation.PointTarget):
-            move_to_location = target.location
-        if isinstance(target, (TrashBin, WasteChute)):
-            raise ValueError(
-                "Trash Bin and Waste Chute are not acceptable location parameters for Aspirate commands."
-            )
-        if self.api_version >= APIVersion(2, 11):
-            instrument.validate_takes_liquid(
-                location=move_to_location,
-                reject_module=self.api_version >= APIVersion(2, 13),
-                reject_adapter=self.api_version >= APIVersion(2, 15),
-            )
-
         if self.api_version >= APIVersion(2, 16):
             c_vol = self._core.get_available_volume() if volume is None else volume
         else:
             c_vol = self._core.get_available_volume() if not volume else volume
         flow_rate = self._core.get_aspirate_flow_rate(rate)
 
-        updated_position = self.liquid_probe_before_aspirate(well=well, meniscus_relative=meniscus_relative, offset_from_meniscus_mm=offset_from_meniscus_mm)
-        if updated_position is not None:
-            move_to_location = updated_position # better way to do this?
+        target, move_to_location, well = self.determine_aspirate_move_to_location(
+            location=location,
+            volume=c_vol,
+            meniscus_relative=meniscus_relative,
+            offset_from_meniscus_mm=offset_from_meniscus_mm,
+        )
+        if isinstance(target, (TrashBin, WasteChute)):
+            raise ValueError(
+                "Trash Bin and Waste Chute are not acceptable location parameters for Aspirate commands."
+            )
 
         with publisher.publish_context(
             broker=self.broker,
@@ -2135,33 +2108,101 @@ class InstrumentContext(publisher.CommandPublisher):
         )
         self._tip_racks = tip_racks or []
 
-    # ensure we have a Flex?!
-    @requires_version(2, 20)
+    def determine_aspirate_move_to_location(
+        self,
+        location: Optional[Union[types.Location, labware.Well]],
+        volume: float,
+        meniscus_relative: bool,
+        offset_from_meniscus_mm: float,
+    ) -> tuple[validation.ValidTarget, types.Location, Optional[labware.Well]]:
+        well: Optional[labware.Well] = None
+        move_to_location: types.Location
+        last_location = self._get_last_location_by_api_version()
+        try:
+            target = validation.validate_location(
+                location=location, last_location=last_location
+            )
+        except validation.NoLocationError as e:
+            raise RuntimeError(
+                "If aspirate is called without an explicit location, another"
+                " method that moves to a location (such as move_to or "
+                "dispense) must previously have been called so the robot "
+                "knows where it is."
+            ) from e
+
+        if isinstance(target, validation.WellTarget):
+            move_to_location = target.location or target.well.bottom(
+                z=self._well_bottom_clearances.aspirate
+            )
+            well = target.well
+            if self.api_version >= APIVersion(2, 20):
+                updated_position = self.liquid_probe_before_aspirate(
+                    well=well,
+                    meniscus_relative=meniscus_relative,
+                    offset_from_meniscus_mm=offset_from_meniscus_mm,
+                    volume=volume,
+                )
+                if updated_position is not None:
+                    move_to_location = updated_position
+        if isinstance(target, validation.PointTarget):
+            move_to_location = target.location
+        if self.api_version >= APIVersion(2, 11):
+            instrument.validate_takes_liquid(
+                location=move_to_location,
+                reject_module=self.api_version >= APIVersion(2, 13),
+                reject_adapter=self.api_version >= APIVersion(2, 15),
+            )
+        return target, move_to_location, well
+
+    # confirm release version 2.21, update where needed
     def liquid_probe_before_aspirate(
         self,
         well: labware.Well,
         meniscus_relative: bool,
         offset_from_meniscus_mm: float,
+        volume: float,
     ) -> Optional[types.Location]:
+        if self.api_version < APIVersion(2, 20) and self.liquid_presence_detection:
+            raise APIVersionError(
+                api_element="Liquid presence detection",
+                until_version="2.20",
+                current_version=f"{self.api_version}",
+            )
+        elif self.api_version < APIVersion(2, 21) and meniscus_relative:
+            raise APIVersionError(
+                api_element="Meniscus-relative aspiration",
+                until_version="2.21",
+                current_version=f"{self.api_version}",
+            )
+        elif (
+            self._core.robot_type != "OT-3 Standard"
+            and self.liquid_presence_detection
+            or meniscus_relative
+        ):
+            raise RobotTypeError(
+                "Liquid presence detection only available on Flex robot."
+            )
         if (
-            self.api_version >= APIVersion(2, 21) # correct?
+            self.api_version >= APIVersion(2, 21)
             and well is not None
-            and self.liquid_presence_detection # need?
+            and self.liquid_presence_detection
             and meniscus_relative
             and self._96_tip_config_valid()
         ):
-            height = self.measure_liquid_height(well=well) # ensure there's a test for LiquidPresenceNotDetected error
-            move_to_location = well.bottom(z=height + offset_from_meniscus_mm) #confirm math (all things are relative to the same reference frame)
-            # self.prepare_to_aspirate() # why deleted?
+            height = self._core.get_last_measured_liquid_height(well_core=well._core)
+            if height is None:
+                height = self.measure_liquid_height(well=well)
+            # convert height to volume, subtract `volume`, convert volume to height, use as offset below
+            # raise error if not enough liquid present to aspirate desired volume. Error Recovery option
+            move_to_location = well.bottom(z=height + offset_from_meniscus_mm)
             return move_to_location
-        elif ( # don't have to if meniscus_relative == True
+        elif (
             self.api_version >= APIVersion(2, 20)
             and well is not None
             and self.liquid_presence_detection
             and self._96_tip_config_valid()
         ):
             self.require_liquid_presence(well=well)
-            # self.prepare_to_aspirate() # why deleted?
             return None
         else:
             return None
@@ -2205,7 +2246,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
         loc = well.top()
         self._96_tip_config_valid()
-        height = self._core.liquid_probe_without_recovery(well._core, loc) # can we make this with recovery?
+        # can we make this with recovery?
+        # ensure this raises LiquidPresenceNotDetectedError
+        height = self._core.liquid_probe_without_recovery(well._core, loc)
         return height
 
     def _raise_if_configuration_not_supported_by_pipette(

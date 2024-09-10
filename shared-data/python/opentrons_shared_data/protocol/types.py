@@ -108,12 +108,12 @@ class FlowRateParams(TypedDict):
 
 class PipetteAccessWithOffsetParams(PipetteAccessParams):
     offsetFromBottomMm: float
-    meniscusRelative: bool
-    offsetFromMeniscusMm: float
 
 
 class StandardLiquidHandlingParams(PipetteAccessWithOffsetParams, FlowRateParams):
     volume: float
+    meniscusRelative: bool
+    offsetFromMeniscusMm: float
 
 
 class AspirateCommand(TypedDict):

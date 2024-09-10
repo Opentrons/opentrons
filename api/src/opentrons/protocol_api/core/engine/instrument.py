@@ -31,6 +31,7 @@ from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.robot.types import RobotType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.hardware_control.nozzle_manager import NozzleMap
@@ -91,6 +92,10 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def pipette_id(self) -> str:
         """The instrument's unique ProtocolEngine ID."""
         return self._pipette_id
+
+    @property
+    def robot_type(self) -> RobotType:
+        return self._engine_client.state.config.robot_type
 
     def get_default_speed(self) -> float:
         speed = self._engine_client.state.pipettes.get_movement_speed(
@@ -842,6 +847,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         """Retract this instrument to the top of the gantry."""
         z_axis = self._engine_client.state.pipettes.get_z_axis(self._pipette_id)
         self._engine_client.execute_command(cmd.HomeParams(axes=[z_axis]))
+
+    def get_last_measured_liquid_height(self, well_core: WellCore) -> Optional[float]:
+        well_name = well_core.get_name()
+        labware_id = well_core.labware_id
+        return self._engine_client.state.wells.get_last_measured_liquid_height(
+            labware_id=labware_id, well_name=well_name
+        )
 
     def detect_liquid_presence(self, well_core: WellCore, loc: Location) -> bool:
         labware_id = well_core.labware_id

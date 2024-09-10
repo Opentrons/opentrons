@@ -428,6 +428,9 @@ class PointTarget(NamedTuple):
     in_place: bool
 
 
+ValidTarget = Union[WellTarget, PointTarget, TrashBin, WasteChute]
+
+
 class NoLocationError(ValueError):
     """Error representing that no location was supplied."""
 
@@ -439,7 +442,7 @@ class LocationTypeError(TypeError):
 def validate_location(
     location: Union[Location, Well, TrashBin, WasteChute, None],
     last_location: Optional[Location],
-) -> Union[WellTarget, PointTarget, TrashBin, WasteChute]:
+) -> ValidTarget:
     """Validate a given location for a liquid handling command.
 
     Args:

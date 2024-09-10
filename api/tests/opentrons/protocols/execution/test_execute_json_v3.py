@@ -269,6 +269,8 @@ def test_air_gap(minimal_labware_def2: LabwareDefinition) -> None:
         "well": well_name,
         "offsetFromBottomMm": 12,
         "flowRate": 0,
+        "meniscusRelative": False,
+        "offsetFromMeniscusMm": 0.0,
     }
 
     instruments = {"somePipetteId": m.pipette_mock}
@@ -307,6 +309,8 @@ def test_aspirate() -> None:
         "well": "someWell",
         "flowRate": 0,
         "offsetFromBottomMm": 0,
+        "meniscusRelative": False,
+        "offsetFromMeniscusMm": 0.0,
     }
     instruments = {"somePipetteId": m.pipette_mock}
 
@@ -342,6 +346,8 @@ def test_dispense() -> None:
         "well": "someWell",
         "flowRate": 0,
         "offsetFromBottomMm": 0,
+        "meniscusRelative": False,
+        "offsetFromMeniscusMm": 0.0,
     }
     instruments = {"somePipetteId": m.pipette_mock}
 
