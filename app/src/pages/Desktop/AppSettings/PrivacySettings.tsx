@@ -15,10 +15,10 @@ import {
 import {
   toggleAnalyticsOptedIn,
   getAnalyticsOptedIn,
-} from '../../redux/analytics'
-import { ToggleButton } from '../../atoms/buttons'
+} from '../../../redux/analytics'
+import { ToggleButton } from '../../../atoms/buttons'
 
-import type { Dispatch, State } from '../../redux/types'
+import type { Dispatch, State } from '../../../redux/types'
 
 export function PrivacySettings(): JSX.Element {
   const { t } = useTranslation('branded')

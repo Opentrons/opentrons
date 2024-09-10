@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Box, SPACING } from '@opentrons/components'
-import { Divider } from '../../atoms/structure'
+import { Divider } from '../../../atoms/structure'
 import {
   ClearUnavailableRobots,
   EnableDevTools,
@@ -12,7 +12,7 @@ import {
   U2EInformation,
   UpdatedChannel,
   AdditionalCustomLabwareSourceFolder,
-} from '../../organisms/AdvancedSettings'
+} from '../../../organisms/AdvancedSettings'
 
 export function AdvancedSettings(): JSX.Element {
   return (

@@ -3,17 +3,17 @@ import { MemoryRouter } from 'react-router-dom'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '../../../../__testing-utils__'
 
-import { i18n } from '../../../i18n'
-import { getAlertIsPermanentlyIgnored } from '../../../redux/alerts'
-import * as Shell from '../../../redux/shell'
+import { i18n } from '../../../../i18n'
+import { getAlertIsPermanentlyIgnored } from '../../../../redux/alerts'
+import * as Shell from '../../../../redux/shell'
 import { GeneralSettings } from '../GeneralSettings'
 
-vi.mock('../../../redux/config')
-vi.mock('../../../redux/shell')
-vi.mock('../../../redux/analytics')
-vi.mock('../../../redux/alerts')
+vi.mock('../../../../redux/config')
+vi.mock('../../../../redux/shell')
+vi.mock('../../../../redux/analytics')
+vi.mock('../../../../redux/alerts')
 
 const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(

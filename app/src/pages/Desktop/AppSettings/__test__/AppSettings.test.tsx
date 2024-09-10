@@ -3,21 +3,21 @@ import { vi, describe, beforeEach, it, expect, afterEach } from 'vitest'
 import { Route } from 'react-router'
 import { MemoryRouter, Routes } from 'react-router-dom'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '../../../../__testing-utils__'
 
-import { i18n } from '../../../i18n'
-import * as Config from '../../../redux/config'
+import { i18n } from '../../../../i18n'
+import * as Config from '../../../../redux/config'
 import { GeneralSettings } from '../GeneralSettings'
 import { PrivacySettings } from '../PrivacySettings'
 import { AdvancedSettings } from '../AdvancedSettings'
-import { FeatureFlags } from '../../../organisms/AppSettings/FeatureFlags'
+import { FeatureFlags } from '../../../../organisms/AppSettings/FeatureFlags'
 import { AppSettings } from '..'
 
-vi.mock('../../../redux/config')
+vi.mock('../../../../redux/config')
 vi.mock('../GeneralSettings')
 vi.mock('../PrivacySettings')
 vi.mock('../AdvancedSettings')
-vi.mock('../../../organisms/AppSettings/FeatureFlags')
+vi.mock('../../../../organisms/AppSettings/FeatureFlags')
 
 const render = (path = '/'): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(

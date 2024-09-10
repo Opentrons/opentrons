@@ -21,31 +21,31 @@ import {
   useMountEffect,
 } from '@opentrons/components'
 
-import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
-import { ExternalLink } from '../../atoms/Link/ExternalLink'
-import { Divider } from '../../atoms/structure'
-import { Banner } from '../../atoms/Banner'
+import { TertiaryButton, ToggleButton } from '../../../atoms/buttons'
+import { ExternalLink } from '../../../atoms/Link/ExternalLink'
+import { Divider } from '../../../atoms/structure'
+import { Banner } from '../../../atoms/Banner'
 import {
   CURRENT_VERSION,
   getAvailableShellUpdate,
   checkShellUpdate,
-} from '../../redux/shell'
+} from '../../../redux/shell'
 import {
   ALERT_APP_UPDATE_AVAILABLE,
   getAlertIsPermanentlyIgnored,
   alertPermanentlyIgnored,
   alertUnignored,
-} from '../../redux/alerts'
+} from '../../../redux/alerts'
 import {
   useTrackEvent,
   ANALYTICS_APP_UPDATE_NOTIFICATIONS_TOGGLED,
-} from '../../redux/analytics'
-import { UpdateAppModal } from '../../organisms/UpdateAppModal'
-import { PreviousVersionModal } from '../../organisms/AppSettings/PreviousVersionModal'
-import { ConnectRobotSlideout } from '../../organisms/AppSettings/ConnectRobotSlideout'
-import { getTopPortalEl } from '../../App/portal'
+} from '../../../redux/analytics'
+import { UpdateAppModal } from '../../../organisms/UpdateAppModal'
+import { PreviousVersionModal } from '../../../organisms/AppSettings/PreviousVersionModal'
+import { ConnectRobotSlideout } from '../../../organisms/AppSettings/ConnectRobotSlideout'
+import { getTopPortalEl } from '../../../App/portal'
 
-import type { Dispatch, State } from '../../redux/types'
+import type { Dispatch, State } from '../../../redux/types'
 
 const SOFTWARE_SYNC_URL = 'https://support.opentrons.com/s/'
 const GITHUB_LINK =

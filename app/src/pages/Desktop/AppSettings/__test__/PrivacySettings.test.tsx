@@ -2,13 +2,13 @@ import * as React from 'react'
 import { vi, it, describe } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '../../../../__testing-utils__'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '../../../../i18n'
 import { PrivacySettings } from '../PrivacySettings'
 
-vi.mock('../../../redux/analytics')
-vi.mock('../../../redux/config')
+vi.mock('../../../../redux/analytics')
+vi.mock('../../../../redux/config')
 
 const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(

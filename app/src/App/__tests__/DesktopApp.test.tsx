@@ -13,7 +13,7 @@ import { DevicesLanding } from '../../pages/Desktop/Devices/DevicesLanding'
 import { ProtocolsLanding } from '../../pages/Desktop/Protocols/ProtocolsLanding'
 import { ProtocolRunDetails } from '../../pages/Desktop/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../../pages/Desktop/Devices/RobotSettings'
-import { GeneralSettings } from '../../pages/AppSettings/GeneralSettings'
+import { GeneralSettings } from '../../pages/Desktop/AppSettings/GeneralSettings'
 import { AlertsModal } from '../../organisms/Alerts/AlertsModal'
 import { useFeatureFlag } from '../../redux/config'
 import { useIsFlex } from '../../organisms/Devices/hooks'
@@ -23,7 +23,7 @@ import { DesktopApp } from '../DesktopApp'
 
 vi.mock('../../organisms/Breadcrumbs')
 vi.mock('../../organisms/Devices/hooks')
-vi.mock('../../pages/AppSettings/GeneralSettings')
+vi.mock('../../pages/Desktop/AppSettings/GeneralSettings')
 vi.mock('../../pages/Desktop/Devices/CalibrationDashboard')
 vi.mock('../../pages/Desktop/Devices/DeviceDetails')
 vi.mock('../../pages/Desktop/Devices/DevicesLanding')
