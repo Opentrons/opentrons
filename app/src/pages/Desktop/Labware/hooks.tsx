@@ -6,9 +6,9 @@ import {
   getAddNewLabwareName,
   clearNewLabwareName,
   getValidCustomLabware,
-} from '../../redux/custom-labware'
+} from '../../../redux/custom-labware'
 import { getAllDefinitions } from './helpers/definitions'
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '../../../redux/types'
 
 import type { LabwareDefinition2 as LabwareDefinition } from '@opentrons/shared-data'
 import type { LabwareFilter, LabwareSort } from './types'
