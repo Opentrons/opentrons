@@ -114,7 +114,6 @@ class RunStore:
         """Initialize a RunStore with sql engine and notification client."""
         self._sql_engine = sql_engine
 
-    # TODO (tz, 8-21-24): write tests without fixit
     def update_run_state(
         self,
         run_id: str,
