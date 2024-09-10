@@ -7,31 +7,31 @@ import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 import { renderWithProviders } from '../../__testing-utils__'
 import { i18n } from '../../i18n'
 import { Breadcrumbs } from '../../organisms/Breadcrumbs'
-import { CalibrationDashboard } from '../../pages/Devices/CalibrationDashboard'
-import { DeviceDetails } from '../../pages/Devices/DeviceDetails'
-import { DevicesLanding } from '../../pages/Devices/DevicesLanding'
-import { ProtocolsLanding } from '../../pages/Protocols/ProtocolsLanding'
-import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
-import { RobotSettings } from '../../pages/Devices/RobotSettings'
-import { GeneralSettings } from '../../pages/AppSettings/GeneralSettings'
+import { CalibrationDashboard } from '../../pages/Desktop/Devices/CalibrationDashboard'
+import { DeviceDetails } from '../../pages/Desktop/Devices/DeviceDetails'
+import { DevicesLanding } from '../../pages/Desktop/Devices/DevicesLanding'
+import { ProtocolsLanding } from '../../pages/Desktop/Protocols/ProtocolsLanding'
+import { ProtocolRunDetails } from '../../pages/Desktop/Devices/ProtocolRunDetails'
+import { RobotSettings } from '../../pages/Desktop/Devices/RobotSettings'
+import { GeneralSettings } from '../../pages/Desktop/AppSettings/GeneralSettings'
 import { AlertsModal } from '../../organisms/Alerts/AlertsModal'
 import { useFeatureFlag } from '../../redux/config'
 import { useIsFlex } from '../../organisms/Devices/hooks'
-import { ProtocolTimeline } from '../../pages/Protocols/ProtocolDetails/ProtocolTimeline'
+import { ProtocolTimeline } from '../../pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline'
 import { useSoftwareUpdatePoll } from '../hooks'
 import { DesktopApp } from '../DesktopApp'
 
 vi.mock('../../organisms/Breadcrumbs')
 vi.mock('../../organisms/Devices/hooks')
-vi.mock('../../pages/AppSettings/GeneralSettings')
-vi.mock('../../pages/Devices/CalibrationDashboard')
-vi.mock('../../pages/Devices/DeviceDetails')
-vi.mock('../../pages/Devices/DevicesLanding')
-vi.mock('../../pages/Protocols/ProtocolsLanding')
-vi.mock('../../pages/Devices/ProtocolRunDetails')
-vi.mock('../../pages/Devices/RobotSettings')
+vi.mock('../../pages/Desktop/AppSettings/GeneralSettings')
+vi.mock('../../pages/Desktop/Devices/CalibrationDashboard')
+vi.mock('../../pages/Desktop/Devices/DeviceDetails')
+vi.mock('../../pages/Desktop/Devices/DevicesLanding')
+vi.mock('../../pages/Desktop/Protocols/ProtocolsLanding')
+vi.mock('../../pages/Desktop/Devices/ProtocolRunDetails')
+vi.mock('../../pages/Desktop/Devices/RobotSettings')
 vi.mock('../../organisms/Alerts/AlertsModal')
-vi.mock('../../pages/Protocols/ProtocolDetails/ProtocolTimeline')
+vi.mock('../../pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline')
 vi.mock('../../redux/config')
 vi.mock('../hooks')
 

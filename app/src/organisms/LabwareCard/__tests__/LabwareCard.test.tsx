@@ -6,14 +6,14 @@ import {
   nestedTextMatcher,
 } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { useAllLabware } from '../../../pages/Labware/hooks'
+import { useAllLabware } from '../../../pages/Desktop/Labware/hooks'
 import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
 import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
 import { LabwareCard } from '..'
 
 import type * as OpentronsComponents from '@opentrons/components'
 
-vi.mock('../../../pages/Labware/hooks')
+vi.mock('../../../pages/Desktop/Labware/hooks')
 vi.mock('../CustomLabwareOverflowMenu')
 
 vi.mock('@opentrons/components', async importOriginal => {
