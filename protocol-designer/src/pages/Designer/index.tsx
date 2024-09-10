@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -30,6 +30,7 @@ import { LiquidsOverflowMenu } from './LiquidsOverflowMenu'
 
 import type { CutoutId } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
+import { selectTerminalItem } from '../../ui/steps/actions/actions'
 
 export interface OpenSlot {
   cutoutId: CutoutId
@@ -44,6 +45,7 @@ export function Designer(): JSX.Element {
   ])
   const { bakeToast } = useKitchen()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const zoomIn = useSelector(selectors.getZoomedInSlot)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const metadata = useSelector(getFileMetadata)
@@ -152,6 +154,7 @@ export function Designer(): JSX.Element {
             <SecondaryButton
               onClick={() => {
                 navigate('/overview')
+                dispatch(selectTerminalItem('__initial_setup__'))
               }}
             >
               {t('shared:done')}

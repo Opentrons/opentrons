@@ -1,14 +1,13 @@
 import * as React from 'react'
-import '@testing-library/jest-dom/vitest'
-import { fireEvent, screen, cleanup } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { getLocalStorageItem, setLocalStorageItem } from '../../../../persist'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../assets/localization'
+import { getLocalStorageItem, setLocalStorageItem } from '../../../persist'
 import { useAnnouncements } from '../announcements'
 import { AnnouncementModal } from '../index'
 
-vi.mock('../../../../persist')
+vi.mock('../../../persist')
 vi.mock('../announcements')
 
 const render = () => {
@@ -26,9 +25,6 @@ describe('AnnouncementModal', () => {
         image: <div>mockImage</div>,
       },
     ])
-  })
-  afterEach(() => {
-    cleanup()
   })
   it('renders an announcement modal that has not been seen', () => {
     render()

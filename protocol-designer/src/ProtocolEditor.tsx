@@ -22,7 +22,7 @@ import { FileUploadMessageModal } from './components/modals/FileUploadMessageMod
 import { LabwareUploadMessageModal } from './components/modals/LabwareUploadMessageModal/LabwareUploadMessageModal'
 import { GateModal } from './components/modals/GateModal'
 import { CreateFileWizard } from './components/modals/CreateFileWizard'
-import { AnnouncementModal } from './components/modals/AnnouncementModal'
+import { AnnouncementModal } from './organisms/'
 import { ProtocolRoutes } from './ProtocolRoutes'
 import { Bouncing } from './Bouncing'
 

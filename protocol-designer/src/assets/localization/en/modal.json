@@ -50,6 +50,10 @@
       "body4": "Assign up to three types of tip racks to a single pipette.",
       "body5": "Add multiple Temperature Modules to the deck (Flex only).",
       "body6": "All protocols require {{app}} version <strong>7.3.0 or later</strong> to run."
+    },
+    "redesign": {
+      "body1": "Introducing Protocol Designer 9.0.0, a complete redesign!",
+      "body2": "All protocols now require Opentrons App version <strong>8.0.0+ </strong> to run."
     }
   },
   "labware_selection": {

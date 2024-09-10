@@ -1,3 +1,4 @@
+export * from './AnnouncementModal'
 export * from './AssignLiquidsModal'
 export * from './DefineLiquidsModal'
 export * from './EditInstrumentsModal'

@@ -1,15 +1,20 @@
 import * as React from 'react'
-import cx from 'classnames'
 import { useTranslation } from 'react-i18next'
-import { LegacyModal, OutlineButton } from '@opentrons/components'
+import {
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_END,
+  Modal,
+  PrimaryButton,
+  SPACING,
+} from '@opentrons/components'
 import {
   setLocalStorageItem,
   getLocalStorageItem,
   localStorageAnnouncementKey,
-} from '../../../persist'
+} from '../../persist'
 import { useAnnouncements } from './announcements'
-import modalStyles from '../modal.module.css'
-import styles from './AnnouncementModal.module.css'
 
 export const AnnouncementModal = (): JSX.Element => {
   const { t } = useTranslation(['modal', 'button'])
@@ -35,29 +40,27 @@ export const AnnouncementModal = (): JSX.Element => {
   return (
     <>
       {showAnnouncementModal && (
-        <LegacyModal
-          className={cx(modalStyles.modal, styles.announcement_modal)}
-          contentsClassName={styles.modal_contents}
-          onCloseClick={handleClick}
-        >
-          {image && (
-            <>
-              {image}
-              <hr className={styles.separator} />
-            </>
-          )}
-
-          <div className={styles.announcement_body}>
-            <h3 className={styles.announcement_heading}>{heading}</h3>
-            <div className={styles.announcement_message}>{message}</div>
-
-            <div className={modalStyles.button_row}>
-              <OutlineButton onClick={handleClick}>
+        <Modal
+          title={heading}
+          type="info"
+          onClose={handleClick}
+          footer={
+            <Flex justifyContent={JUSTIFY_END} padding={SPACING.spacing24}>
+              <PrimaryButton onClick={handleClick}>
                 {t('button:got_it')}
-              </OutlineButton>
-            </div>
-          </div>
-        </LegacyModal>
+              </PrimaryButton>
+            </Flex>
+          }
+        >
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
+            gridGap={SPACING.spacing12}
+          >
+            {image && image}
+            {message}
+          </Flex>
+        </Modal>
       )}
     </>
   )
