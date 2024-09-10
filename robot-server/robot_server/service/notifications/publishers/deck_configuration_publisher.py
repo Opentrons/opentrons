@@ -18,11 +18,11 @@ class DeckConfigurationPublisher:
         """Returns a configured Deck Configuration Publisher."""
         self._client = client
 
-    async def publish_deck_configuration(
+    def publish_deck_configuration(
         self,
     ) -> None:
         """Publishes the equivalent of GET /deck_configuration"""
-        await self._client.publish_advise_refetch_async(topic=topics.DECK_CONFIGURATION)
+        self._client.publish_advise_refetch(topic=topics.DECK_CONFIGURATION)
 
 
 _deck_configuration_publisher_accessor: AppStateAccessor[

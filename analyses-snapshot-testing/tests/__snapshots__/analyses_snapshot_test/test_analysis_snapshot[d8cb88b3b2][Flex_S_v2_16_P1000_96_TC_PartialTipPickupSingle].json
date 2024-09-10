@@ -3535,7 +3535,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "APIVersionError [line 16]: Error 4011 INCORRECT_API_VERSION (APIVersionError): Nozzle layout configuration of style SINGLE is unsupported in API Versions lower than 2.20. is not yet available in the API version in use.",
+      "detail": "APIVersionError [line 16]: Error 4011 INCORRECT_API_VERSION (APIVersionError): Nozzle layout configuration of style SINGLE is not available until API version 2.20. You are currently using API version 2.16.",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -3544,12 +3544,12 @@
       "wrappedErrors": [
         {
           "createdAt": "TIMESTAMP",
-          "detail": "Nozzle layout configuration of style SINGLE is unsupported in API Versions lower than 2.20. is not yet available in the API version in use.",
+          "detail": "Nozzle layout configuration of style SINGLE is not available until API version 2.20. You are currently using API version 2.16.",
           "errorCode": "4011",
           "errorInfo": {
-            "current_version": null,
-            "identifier": "Nozzle layout configuration of style SINGLE is unsupported in API Versions lower than 2.20.",
-            "until_version": null
+            "current_version": "2.16",
+            "identifier": "Nozzle layout configuration of style SINGLE",
+            "until_version": "2.20"
           },
           "errorType": "APIVersionError",
           "id": "UUID",

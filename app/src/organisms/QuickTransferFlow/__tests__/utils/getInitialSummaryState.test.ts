@@ -1,8 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { getInitialSummaryState } from '../../utils'
-import { getVolumeRange } from '../../utils/getVolumeRange'
-
-vi.mock('../../utils/getVolumeRange')
 
 describe('getInitialSummaryState', () => {
   const props = {
@@ -11,6 +8,7 @@ describe('getInitialSummaryState', () => {
         channels: 1,
         liquids: {
           default: {
+            maxVolume: 100,
             supportedTips: {
               t50: {
                 defaultAspirateFlowRate: {
@@ -46,9 +44,6 @@ describe('getInitialSummaryState', () => {
       },
     ],
   } as any
-  beforeEach(() => {
-    vi.mocked(getVolumeRange).mockReturnValue({ min: 5, max: 100 })
-  })
   afterEach(() => {
     vi.resetAllMocks()
   })
@@ -125,11 +120,13 @@ describe('getInitialSummaryState', () => {
       ...props,
       state: {
         ...props.state,
+        volume: 10,
         transferType: 'distribute',
       },
     })
     expect(initialSummaryState).toEqual({
       ...props.state,
+      volume: 10,
       transferType: 'distribute',
       aspirateFlowRate: 50,
       dispenseFlowRate: 75,
@@ -142,7 +139,7 @@ describe('getInitialSummaryState', () => {
         cutoutId: 'cutoutA3',
         cutoutFixtureId: 'trashBinAdapter',
       },
-      disposalVolume: props.state.volume,
+      disposalVolume: 10,
       blowOut: { cutoutId: 'cutoutA3', cutoutFixtureId: 'trashBinAdapter' },
     })
   })

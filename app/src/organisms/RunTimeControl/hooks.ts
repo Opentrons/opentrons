@@ -34,6 +34,7 @@ export interface RunControls {
   isStopRunActionLoading: boolean
   isResumeRunFromRecoveryActionLoading: boolean
   isResetRunLoading: boolean
+  isRunControlLoading: boolean
 }
 
 export function useRunControls(
@@ -51,11 +52,11 @@ export function useRunControls(
     isResumeRunFromRecoveryActionLoading,
   } = useRunActionMutations(runId as string)
 
-  const { cloneRun, isLoading: isResetRunLoading } = useCloneRun(
-    runId ?? null,
-    onCloneRunSuccess,
-    true
-  )
+  const {
+    cloneRun,
+    isLoadingRun: isRunControlLoading,
+    isCloning: isResetRunLoading,
+  } = useCloneRun(runId ?? null, onCloneRunSuccess, true)
 
   return {
     play: playRun,
@@ -67,6 +68,7 @@ export function useRunControls(
     isPauseRunActionLoading,
     isStopRunActionLoading,
     isResumeRunFromRecoveryActionLoading,
+    isRunControlLoading,
     isResetRunLoading,
   }
 }

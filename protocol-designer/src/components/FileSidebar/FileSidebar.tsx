@@ -278,9 +278,9 @@ export function v8WarningContent(t: any): JSX.Element {
   return (
     <div>
       <p>
-        {t(`hint.export_v8_1_protocol_7_3.body1`)}{' '}
-        <strong>{t(`hint.export_v8_1_protocol_7_3.body2`)}</strong>
-        {t(`hint.export_v8_1_protocol_7_3.body3`)}
+        {t(`alert:hint.export_v8_1_protocol_7_3.body1`)}{' '}
+        <strong>{t(`alert:hint.export_v8_1_protocol_7_3.body2`)}</strong>
+        {t(`alert:hint.export_v8_1_protocol_7_3.body3`)}
       </p>
     </div>
   )

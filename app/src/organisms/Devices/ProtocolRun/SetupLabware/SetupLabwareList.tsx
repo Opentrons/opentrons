@@ -7,14 +7,14 @@ import {
   StyledText,
   COLORS,
 } from '@opentrons/components'
-import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
+import { getLabwareSetupItemGroups } from '../../../../pages/Desktop/Protocols/utils'
 import { LabwareListItem } from './LabwareListItem'
 import { getNestedLabwareInfo } from './getNestedLabwareInfo'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
-import type { LabwareSetupItem } from '../../../../pages/Protocols/utils'
+import type { LabwareSetupItem } from '../../../../pages/Desktop/Protocols/utils'
 
 interface SetupLabwareListProps {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }

@@ -138,15 +138,7 @@ describe('ConfirmCancelRunModal', () => {
     expect(mockStopRun).toHaveBeenCalled()
   })
 
-  it('when run is stopped, the run is dismissed and the modal closes', () => {
-    when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_STOPPED)
-    render(props)
-
-    expect(mockDismissCurrentRun).toHaveBeenCalled()
-    expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
-  })
-
-  it('when run is stopped, the run is dismissed and the modal closes - in prepare to run', () => {
+  it('when run is stopped, the run is dismissed and the modal closes if the run is not yet active', () => {
     props = {
       ...props,
       isActiveRun: false,
@@ -156,9 +148,9 @@ describe('ConfirmCancelRunModal', () => {
 
     expect(mockDismissCurrentRun).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
-    expect(mockNavigate).toHaveBeenCalledWith('/protocols')
   })
-  it('when quick transfer run is stopped, the run is dismissed and you return to quick transfer', () => {
+
+  it('when quick transfer run is stopped, the run is dismissed and the modal closes if the run is not yet active', () => {
     props = {
       ...props,
       isActiveRun: false,
@@ -168,6 +160,15 @@ describe('ConfirmCancelRunModal', () => {
     render(props)
 
     expect(mockDismissCurrentRun).toHaveBeenCalled()
+    expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith('/quick-transfer')
+  })
+
+  it('when run is stopped, the run is not dismissed if the run is active', () => {
+    when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_STOPPED)
+    render(props)
+
+    expect(mockDismissCurrentRun).not.toHaveBeenCalled()
+    expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
   })
 })

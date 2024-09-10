@@ -15,7 +15,8 @@ from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
 from opentrons.motion_planning import Waypoint
 
-from opentrons.protocol_engine.state import StateView, PipetteLocationData
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.state.motion import PipetteLocationData
 from opentrons.protocol_engine.types import MotorAxis, DeckPoint, CurrentWell
 from opentrons.protocol_engine.errors import MustHomeError, InvalidAxisForRobotType
 

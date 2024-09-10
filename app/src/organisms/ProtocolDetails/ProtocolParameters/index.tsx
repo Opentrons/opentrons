@@ -47,7 +47,7 @@ export function ProtocolParameters({
           <ParametersTable runTimeParameters={runTimeParameters} t={t} />
         </Flex>
       ) : (
-        <InfoScreen contentType="parameters" />
+        <InfoScreen content={t('no_parameters_specified_in_protocol')} />
       )}
     </Flex>
   )

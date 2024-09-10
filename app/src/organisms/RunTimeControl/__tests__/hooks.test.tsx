@@ -59,9 +59,11 @@ describe('useRunControls hook', () => {
       isStopRunActionLoading: false,
       isResumeRunFromRecoveryActionLoading: false,
     })
-    when(useCloneRun)
-      .calledWith(mockPausedRun.id, undefined, true)
-      .thenReturn({ cloneRun: mockCloneRun, isLoading: false })
+    when(useCloneRun).calledWith(mockPausedRun.id, undefined, true).thenReturn({
+      cloneRun: mockCloneRun,
+      isCloning: false,
+      isLoadingRun: false,
+    })
 
     const { result } = renderHook(() => useRunControls(mockPausedRun.id))
 

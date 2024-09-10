@@ -69,6 +69,7 @@ from .exceptions import (
     InvalidAxisForRobotType,
     NotSupportedOnRobotType,
     CommandNotAllowedError,
+    InvalidLiquidHeightFound,
 )
 
 from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
@@ -146,4 +147,5 @@ __all__ = [
     # error occurrence models
     "ErrorOccurrence",
     "CommandNotAllowedError",
+    "InvalidLiquidHeightFound",
 ]

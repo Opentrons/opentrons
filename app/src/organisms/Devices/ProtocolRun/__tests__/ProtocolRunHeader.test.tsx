@@ -20,6 +20,7 @@ import {
   useModulesQuery,
   usePipettesQuery,
   useDismissCurrentRunMutation,
+  useDeleteRunMutation,
   useEstopQuery,
   useDoorQuery,
   useInstrumentsQuery,
@@ -60,6 +61,8 @@ import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
 import { getIsHeaterShakerAttached } from '../../../../redux/config'
 import { getRobotSettings } from '../../../../redux/robot-settings'
+import { getStoredProtocol } from '../../../../redux/protocol-storage'
+import { storedProtocolData as storedProtocolDataFixture } from '../../../../redux/protocol-storage/__fixtures__'
 import {
   useProtocolDetailsForRun,
   useProtocolAnalysisErrors,
@@ -107,6 +110,7 @@ import type { Mock } from 'vitest'
 import type * as OpentronsSharedData from '@opentrons/shared-data'
 import type * as OpentronsComponents from '@opentrons/components'
 import type * as OpentronsApiClient from '@opentrons/api-client'
+import type { State } from '../../../../redux/types'
 
 const mockNavigate = vi.fn()
 
@@ -145,6 +149,7 @@ vi.mock('../../../ModuleCard/hooks')
 vi.mock('../../../RunProgressMeter')
 vi.mock('../../../../redux/analytics')
 vi.mock('../../../../redux/config')
+vi.mock('../../../../redux/protocol-storage')
 vi.mock('../RunFailedModal')
 vi.mock('../../../../redux/robot-update/selectors')
 vi.mock('../../../../redux/robot-settings/selectors')
@@ -164,6 +169,7 @@ const CREATED_AT = '03/03/2022 19:08:49'
 const STARTED_AT = '2022-03-03T19:09:40.620530+00:00'
 const COMPLETED_AT = '2022-03-03T19:39:53.620530+00:00'
 const PROTOCOL_NAME = 'A Protocol for Otie'
+const PROTOCOL_KEY = 'fakeProtocolKey'
 const mockSettings = {
   id: 'enableDoorSafetySwitch',
   title: 'Enable Door Safety Switch',
@@ -179,9 +185,10 @@ const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as OpentronsShar
 const PROTOCOL_DETAILS = {
   displayName: PROTOCOL_NAME,
   protocolData: simpleV6Protocol,
-  protocolKey: 'fakeProtocolKey',
+  protocolKey: PROTOCOL_KEY,
   isProtocolAnalyzing: false,
   robotType: 'OT-2 Standard' as const,
+  isQuickTransfer: false,
 }
 
 const RUN_COMMAND_ERRORS = {
@@ -279,6 +286,9 @@ describe('ProtocolRunHeader', () => {
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [] },
     } as any)
+    vi.mocked(useDeleteRunMutation).mockReturnValue({
+      deleteRun: vi.fn(),
+    } as any)
     vi.mocked(usePipettesQuery).mockReturnValue({
       data: {
         data: {
@@ -322,6 +332,7 @@ describe('ProtocolRunHeader', () => {
         isStopRunActionLoading: false,
         isResetRunLoading: false,
         isResumeRunFromRecoveryActionLoading: false,
+        isRunControlLoading: false,
       })
     when(vi.mocked(useRunStatus)).calledWith(RUN_ID).thenReturn(RUN_STATUS_IDLE)
     when(vi.mocked(useRunTimestamps)).calledWith(RUN_ID).thenReturn({
@@ -414,6 +425,9 @@ describe('ProtocolRunHeader', () => {
     vi.mocked(DropTipWizardFlows).mockReturnValue(
       <div>MOCK_DROP_TIP_WIZARD_FLOWS</div>
     )
+    when(getStoredProtocol)
+      .calledWith({} as State, PROTOCOL_KEY)
+      .thenReturn(storedProtocolDataFixture)
   })
 
   afterEach(() => {
@@ -453,6 +467,15 @@ describe('ProtocolRunHeader', () => {
     ).toBeNull()
   })
 
+  it('does not render link to protocol detail page if stored protocol is absent', () => {
+    vi.mocked(getStoredProtocol).mockReturnValue(null)
+    render()
+
+    expect(
+      screen.queryByRole('link', { name: 'A Protocol for Otie' })
+    ).toBeNull()
+  })
+
   it('renders a disabled "Analyzing on robot" button if robot-side analysis is not complete', () => {
     when(vi.mocked(useProtocolDetailsForRun)).calledWith(RUN_ID).thenReturn({
       displayName: null,
@@ -460,6 +483,7 @@ describe('ProtocolRunHeader', () => {
       protocolKey: null,
       isProtocolAnalyzing: true,
       robotType: 'OT-2 Standard',
+      isQuickTransfer: false,
     })
 
     render()
@@ -825,6 +849,7 @@ describe('ProtocolRunHeader', () => {
         isStopRunActionLoading: false,
         isResetRunLoading: true,
         isResumeRunFromRecoveryActionLoading: false,
+        isRunControlLoading: false,
       })
     render()
 

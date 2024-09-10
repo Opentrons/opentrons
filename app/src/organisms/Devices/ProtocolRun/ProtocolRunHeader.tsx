@@ -21,6 +21,7 @@ import {
 import {
   useModulesQuery,
   useDoorQuery,
+  useDeleteRunMutation,
   useHost,
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
@@ -66,6 +67,7 @@ import {
   ANALYTICS_PROTOCOL_RUN_ACTION,
 } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
+import { getStoredProtocol } from '../../../redux/protocol-storage'
 import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
 import { ConfirmCancelModal } from '../../RunDetails/ConfirmCancelModal'
 import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
@@ -157,13 +159,18 @@ export function ProtocolRunHeader({
     displayName,
     protocolKey,
     isProtocolAnalyzing,
+    isQuickTransfer,
   } = useProtocolDetailsForRun(runId)
+  const storedProtocol = useSelector((state: State) =>
+    getStoredProtocol(state, protocolKey)
+  )
   const { reportRecoveredRunResult } = useRecoveryAnalytics()
 
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = useRunStatus(runId)
+  const { deleteRun } = useDeleteRunMutation()
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const isRunCurrent = Boolean(
     useNotifyRunQuery(runId, { refetchInterval: CURRENT_RUN_POLL_MS })?.data
@@ -247,7 +254,14 @@ export function ProtocolRunHeader({
     mount: aPipetteWithTip?.mount,
     robotType,
     onSkipAndHome: () => {
-      closeCurrentRun()
+      closeCurrentRun({
+        onSettled: () => {
+          if (isQuickTransfer) {
+            deleteRun(runId)
+            navigate(`/devices/${robotName}`)
+          }
+        },
+      })
     },
   })
 
@@ -295,13 +309,20 @@ export function ProtocolRunHeader({
       // TODO(jh, 08-15-24): The enteredER condition is a hack, because errorCommands are only returned when a run is current.
       // Ideally the run should not need to be current to view errorCommands.
 
-      // Close the run if no tips are attached after running tip check at least once.
+      // Close the run if no tips are attached after running tip check at least once. Post-run tip checks only occur on the Flex.
       // This marks the robot as "not busy" as soon as a run is cancelled if drop tip CTAs are unnecessary.
-      if (initialPipettesWithTipsCount === 0 && !enteredER) {
-        closeCurrentRun()
+      if ((initialPipettesWithTipsCount === 0 || !isFlex) && !enteredER) {
+        closeCurrentRun({
+          onSettled: () => {
+            if (isQuickTransfer) {
+              deleteRun(runId)
+              navigate(`/devices/${robotName}`)
+            }
+          },
+        })
       }
     }
-  }, [runStatus, isRunCurrent, runId, enteredER])
+  }, [runStatus, isRunCurrent, runId, enteredER, initialPipettesWithTipsCount])
 
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : EMPTY_TIMESTAMP
@@ -347,7 +368,14 @@ export function ProtocolRunHeader({
       name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
       properties: robotAnalyticsData ?? undefined,
     })
-    closeCurrentRun()
+    closeCurrentRun({
+      onSettled: () => {
+        if (isQuickTransfer) {
+          deleteRun(runId)
+          navigate(`/devices/${robotName}`)
+        }
+      },
+    })
   }
 
   return (
@@ -390,7 +418,7 @@ export function ProtocolRunHeader({
             />
           )}
         <Flex>
-          {protocolKey != null ? (
+          {storedProtocol != null ? (
             <Link to={`/protocols/${protocolKey}`}>
               <LegacyStyledText
                 as="h2"
@@ -539,7 +567,14 @@ export function ProtocolRunHeader({
               } else {
                 void setTipStatusResolved(() => {
                   toggleDTWiz()
-                  closeCurrentRun()
+                  closeCurrentRun({
+                    onSettled: () => {
+                      if (isQuickTransfer) {
+                        deleteRun(runId)
+                        navigate(`/devices/${robotName}`)
+                      }
+                    },
+                  })
                 }, toggleDTWiz)
               }
             }}
@@ -663,7 +698,6 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     reset,
     isPlayRunActionLoading,
     isPauseRunActionLoading,
-    isResetRunLoading,
   } = useRunControls(runId, (createRunResponse: Run): void =>
     // redirect to new run after successful reset
     {
@@ -672,7 +706,10 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       )
     }
   )
-  isResetRunLoadingRef.current = isResetRunLoading
+  const isResetRunLoading = isResetRunLoadingRef.current
+  if (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_RUNNING) {
+    isResetRunLoadingRef.current = false
+  }
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
   const { complete: isCalibrationComplete } = useRunCalibrationStatus(
     robotName,
@@ -755,8 +792,6 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     .some(module => module?.data != null && module.data.speedStatus !== 'idle')
   const isValidRunAgain =
     runStatus != null && RUN_AGAIN_STATUSES.includes(runStatus)
-  const validRunAgainButRequiresSetup = isValidRunAgain && !isSetupComplete
-  const runAgainWithSpinner = validRunAgainButRequiresSetup && isResetRunLoading
 
   let buttonText: string = ''
   let handleButtonClick = (): void => {}
@@ -769,7 +804,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     !isValidRunAgain
   ) {
     disableReason = t('setup_incomplete')
-  } else if (isOtherRunCurrent) {
+  } else if (isOtherRunCurrent && !isResetRunLoading) {
     disableReason = t('shared:robot_is_busy')
   } else if (isRobotOnWrongVersionOfSoftware) {
     disableReason = t('shared:a_software_update_is_available')
@@ -831,10 +866,11 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         })
       }
     }
-  } else if (runStatus != null && RUN_AGAIN_STATUSES.includes(runStatus)) {
-    buttonIconName = runAgainWithSpinner ? 'ot-spinner' : 'play'
+  } else if (isValidRunAgain) {
+    buttonIconName = isResetRunLoading ? 'ot-spinner' : 'play'
     buttonText = t('run_again')
     handleButtonClick = () => {
+      isResetRunLoadingRef.current = true
       reset()
       trackEvent({
         name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -854,7 +890,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         boxShadow="none"
         display={DISPLAY_FLEX}
         padding={`${SPACING.spacing12} ${SPACING.spacing16}`}
-        disabled={isRunControlButtonDisabled && !validRunAgainButRequiresSetup}
+        disabled={isRunControlButtonDisabled}
         onClick={handleButtonClick}
         id="ProtocolRunHeader_runControlButton"
         {...targetProps}
@@ -867,7 +903,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
             spin={
               isProtocolAnalyzing ||
               runStatus === RUN_STATUS_STOP_REQUESTED ||
-              runAgainWithSpinner
+              isResetRunLoading
             }
           />
         ) : null}

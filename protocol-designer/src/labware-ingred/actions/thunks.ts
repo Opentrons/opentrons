@@ -5,12 +5,25 @@ import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
 import { getRobotType } from '../../file-data/selectors'
+import {
+  selectNestedLabware,
+  selectLabware,
+  selectModule,
+  selectFixture,
+} from './actions'
+import type { LabwareOnDeck, ModuleOnDeck } from '../../step-forms'
 import type {
   CreateContainerArgs,
   CreateContainerAction,
   DuplicateLabwareAction,
+  SelectNestedLabwareAction,
+  SelectLabwareAction,
+  SelectModuleAction,
+  SelectFixtureAction,
 } from './actions'
 import type { ThunkAction } from '../../types'
+import type { Fixture } from '../types'
+
 export interface RenameLabwareAction {
   type: 'RENAME_LABWARE'
   payload: {
@@ -166,4 +179,40 @@ export const duplicateLabware: (
       },
     })
   }
+}
+
+interface EditSlotInfo {
+  createdModuleForSlot?: ModuleOnDeck | null
+  createdLabwareForSlot?: LabwareOnDeck | null
+  createdNestedLabwareForSlot?: LabwareOnDeck | null
+  preSelectedFixture?: Fixture | null
+}
+
+export const editSlotInfo: (
+  args: EditSlotInfo
+) => ThunkAction<
+  | SelectNestedLabwareAction
+  | SelectLabwareAction
+  | SelectModuleAction
+  | SelectFixtureAction
+> = args => dispatch => {
+  const {
+    createdModuleForSlot,
+    createdLabwareForSlot,
+    createdNestedLabwareForSlot,
+    preSelectedFixture,
+  } = args
+
+  dispatch(
+    selectNestedLabware({
+      nestedLabwareDefUri: createdNestedLabwareForSlot?.labwareDefURI ?? null,
+    })
+  )
+  dispatch(
+    selectLabware({
+      labwareDefUri: createdLabwareForSlot?.labwareDefURI ?? null,
+    })
+  )
+  dispatch(selectModule({ moduleModel: createdModuleForSlot?.model ?? null }))
+  dispatch(selectFixture({ fixture: preSelectedFixture ?? null }))
 }

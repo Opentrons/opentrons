@@ -90,3 +90,12 @@ export const AlertAlt: Story = {
     iconName: 'ot-check',
   },
 }
+
+export const Stroke: Story = {
+  args: {
+    buttonType: 'stroke',
+    buttonText: 'Button text',
+    disabled: false,
+    iconName: 'ot-check',
+  },
+}

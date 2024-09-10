@@ -108,32 +108,17 @@ export function ProtocolRunRuntimeParameters({
           ) : null}
         </Flex>
         {hasRunTimeParameters ? (
-          <Banner
-            type="informing"
-            width="100%"
-            iconMarginLeft={SPACING.spacing4}
-          >
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText
-                as="p"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              >
-                {t('values_are_view_only')}
-              </LegacyStyledText>
-              <LegacyStyledText as="p">
-                {t('cancel_and_restart_to_edit')}
-              </LegacyStyledText>
-            </Flex>
-          </Banner>
+          <RunTimeParametersBanner isRunTerminal={isRunTerminal} />
         ) : null}
       </Flex>
       {!hasRunTimeParameters ? (
         <Flex padding={SPACING.spacing16}>
           <InfoScreen
-            contentType={
-              isRunCancelledWithoutStarting ? 'runNotStarted' : 'parameters'
+            content={
+              isRunCancelledWithoutStarting
+                ? t('run_never_started')
+                : t('no_parameters_specified_in_protocol')
             }
-            t={t}
           />
         </Flex>
       ) : (
@@ -168,6 +153,31 @@ export function ProtocolRunRuntimeParameters({
         </>
       )}
     </>
+  )
+}
+
+interface RunTimeParametersBannerProps {
+  isRunTerminal: boolean
+}
+
+function RunTimeParametersBanner({
+  isRunTerminal,
+}: RunTimeParametersBannerProps): JSX.Element {
+  const { t } = useTranslation('protocol_setup')
+
+  return (
+    <Banner type="informing" width="100%" iconMarginLeft={SPACING.spacing4}>
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {isRunTerminal ? t('download_files') : t('values_are_view_only')}
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
+          {isRunTerminal
+            ? t('all_files_associated')
+            : t('cancel_and_restart_to_edit')}
+        </LegacyStyledText>
+      </Flex>
+    </Banner>
   )
 }
 
@@ -218,8 +228,12 @@ const StyledTableRowComponent = (
         ) : null}
       </StyledTableCell>
       <StyledTableCell>
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
-          <LegacyStyledText as="p">
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          gridGap={SPACING.spacing16}
+          alignItems={ALIGN_CENTER}
+        >
+          <LegacyStyledText as="p" css={PARAMETER_VALUE_TEXT_STYLE}>
             {parameter.type === 'csv_file'
               ? parameter.file?.name ?? ''
               : formatRunTimeParameterValue(parameter, t)}
@@ -278,4 +292,13 @@ const StyledTableCell = styled.td<StyledTableCellProps>`
   padding: ${SPACING.spacing8} 0;
   padding-right: ${props =>
     props.paddingRight != null ? props.paddingRight : SPACING.spacing16};
+`
+
+const PARAMETER_VALUE_TEXT_STYLE = css`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 `

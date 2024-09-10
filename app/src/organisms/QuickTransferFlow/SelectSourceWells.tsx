@@ -52,8 +52,9 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
   const resetButtonProps: React.ComponentProps<typeof SmallButton> = {
     buttonType: 'tertiaryLowLight',
     buttonText: t('shared:reset'),
-    onClick: () => {
+    onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
       setSelectedWells({})
+      e.currentTarget.blur?.()
     },
   }
   let displayLabwareDefinition = state.source
@@ -82,10 +83,11 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
       <Flex
         justifyContent={JUSTIFY_CENTER}
         marginTop={SPACING.spacing120}
-        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
+        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing8} ${SPACING.spacing32}`}
         position={POSITION_FIXED}
         top="0"
         left="0"
+        height="80%"
         width="100%"
       >
         {state.source != null && displayLabwareDefinition != null ? (

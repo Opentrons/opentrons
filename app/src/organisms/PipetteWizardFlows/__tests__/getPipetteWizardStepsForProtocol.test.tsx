@@ -17,6 +17,9 @@ const mockPipetteInfo = [
 const mockPipettesInProtocolNotEmpty = [
   { id: '123', pipetteName: 'p1000_single_flex', mount: 'left' },
 ]
+const mockPipettesInProtocolOnRight = [
+  { id: '123', pipetteName: 'p1000_single_flex', mount: 'right' },
+]
 const mockPipettesInProtocolMulti = [
   { id: '123', pipetteName: 'p1000_multi_flex', mount: 'left' },
 ]
@@ -113,7 +116,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
     ).toStrictEqual(mockFlowSteps)
   })
 
-  it('returns the correct array of info when the attached 96-channel pipette needs to be switched out for single mount', () => {
+  it('returns the correct array of info when the attached 96-channel pipette needs to be switched out for single mount on left', () => {
     const mockFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -173,6 +176,69 @@ describe('getPipetteWizardStepsForProtocol', () => {
         { left: mock96ChannelAttachedPipetteInformation, right: null },
         mockPipettesInProtocolNotEmpty as any,
         LEFT
+      )
+    ).toStrictEqual(mockFlowSteps)
+  })
+  it('returns the correct array of info when the attached 96-channel pipette needs to be switched out for single mount on right', () => {
+    const mockFlowSteps = [
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.DETACH_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.MOUNTING_PLATE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.CARRIAGE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+        nextMount: RIGHT,
+      },
+      {
+        section: SECTIONS.MOUNT_PIPETTE,
+        mount: RIGHT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
+        mount: RIGHT,
+        flowType: FLOWS.ATTACH,
+      },
+      { section: SECTIONS.RESULTS, mount: RIGHT, flowType: FLOWS.ATTACH },
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: RIGHT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.DETACH_PROBE,
+        mount: RIGHT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: RIGHT,
+        flowType: FLOWS.CALIBRATE,
+      },
+    ] as PipetteWizardStep[]
+    expect(
+      getPipetteWizardStepsForProtocol(
+        { left: mock96ChannelAttachedPipetteInformation, right: null },
+        mockPipettesInProtocolOnRight as any,
+        RIGHT
       )
     ).toStrictEqual(mockFlowSteps)
   })

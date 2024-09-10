@@ -61,13 +61,6 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
     ):
         instrument.pick_up_tip(badly_placed_tiprack.wells_by_name()["A1"])
 
-    with pytest.raises(
-        PartialTipMovementNotAllowedError, match="outside of robot bounds"
-    ):
-        # Picking up from A1 in an east-most slot using a configuration with column 12 would
-        # result in a collision with the side of the robot.
-        instrument.pick_up_tip(well_placed_tiprack.wells_by_name()["A1"])
-
     instrument.pick_up_tip(well_placed_tiprack.wells_by_name()["A12"])
     instrument.aspirate(50, well_placed_labware.wells_by_name()["A4"])
 

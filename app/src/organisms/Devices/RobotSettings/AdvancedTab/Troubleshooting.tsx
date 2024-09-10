@@ -7,10 +7,13 @@ import last from 'lodash/last'
 import { GET, request } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
+  ALIGN_END,
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING_AUTO,
+  ERROR_TOAST,
+  INFO_TOAST,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
@@ -18,7 +21,6 @@ import {
 import { useHost } from '@opentrons/react-api-client'
 
 import { TertiaryButton } from '../../../../atoms/buttons'
-import { ERROR_TOAST, INFO_TOAST } from '../../../../atoms/Toast'
 import { useToaster } from '../../../../organisms/ToasterOven'
 import { CONNECTABLE } from '../../../../redux/discovery'
 import { useRobot } from '../../hooks'
@@ -130,6 +132,7 @@ export function Troubleshooting({
         marginLeft={SPACING_AUTO}
         onClick={handleClick}
         id="AdvancedSettings_downloadLogsButton"
+        alignSelf={ALIGN_END}
       >
         {t('download_logs')}
       </TertiaryButton>

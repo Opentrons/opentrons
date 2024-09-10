@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InputField,
-  LargeButton,
+  RadioButton,
   POSITION_FIXED,
   SPACING,
 } from '@opentrons/components'
@@ -122,13 +122,18 @@ export function AirGap(props: AirGapProps): JSX.Element {
   }
 
   const volumeRange = { min: 1, max: Math.floor(maxAvailableCapacity) }
-  const volumeError =
-    volume !== null && (volume < volumeRange.min || volume > volumeRange.max)
-      ? t(`value_out_of_range`, {
-          min: volumeRange.min,
-          max: volumeRange.max,
-        })
-      : null
+  let volumeError = null
+  if (volumeRange.min > volumeRange.max) {
+    volumeError = t('air_gap_capacity_error')
+  } else if (
+    volume !== null &&
+    (volume < volumeRange.min || volume > volumeRange.max)
+  ) {
+    volumeError = t(`value_out_of_range`, {
+      min: volumeRange.min,
+      max: volumeRange.max,
+    })
+  }
 
   let buttonIsDisabled = false
   if (currentStep === 2) {
@@ -158,13 +163,13 @@ export function AirGap(props: AirGapProps): JSX.Element {
           width="100%"
         >
           {enableAirGapDisplayItems.map(displayItem => (
-            <LargeButton
+            <RadioButton
               key={displayItem.description}
-              buttonType={
-                airGapEnabled === displayItem.option ? 'primary' : 'secondary'
-              }
-              onClick={displayItem.onClick}
-              buttonText={displayItem.description}
+              isSelected={airGapEnabled === displayItem.option}
+              onChange={displayItem.onClick}
+              buttonValue={displayItem.description}
+              buttonLabel={displayItem.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>
@@ -202,6 +207,7 @@ export function AirGap(props: AirGapProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              initialValue={String(volume)}
               onChange={e => {
                 setVolume(Number(e))
               }}

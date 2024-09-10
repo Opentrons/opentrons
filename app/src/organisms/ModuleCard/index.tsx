@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_START,
@@ -19,6 +18,7 @@ import {
   Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
+  SUCCESS_TOAST,
   useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
@@ -43,7 +43,6 @@ import {
 } from '../../redux/robot-api'
 import { Banner } from '../../atoms/Banner'
 import { UpdateBanner } from '../../molecules/UpdateBanner'
-import { SUCCESS_TOAST } from '../../atoms/Toast'
 import { useChainLiveCommands } from '../../resources/runs'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { useIsFlex } from '../../organisms/Devices/hooks'
@@ -126,14 +125,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showCalModal, setShowCalModal] = React.useState(false)
 
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const navigate = useNavigate()
-  const runStatus = useCurrentRunStatus({
-    onSettled: data => {
-      if (data == null) {
-        navigate('/upload')
-      }
-    },
-  })
+
+  const runStatus = useCurrentRunStatus()
   const isFlex = useIsFlex(robotName)
   const requireModuleCalibration =
     isFlex &&
@@ -272,6 +265,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           closeFlow={() => {
             setShowCalModal(false)
           }}
+          isLoadedInRun={isLoadedInRun}
           isPrepCommandLoading={isCommandMutationLoading}
           prepCommandErrorMessage={
             prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage

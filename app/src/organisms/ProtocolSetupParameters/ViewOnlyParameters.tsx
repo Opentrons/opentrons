@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
 import {
   formatRunTimeParameterValue,
   sortRuntimeParameters,
@@ -20,7 +22,7 @@ import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostR
 import { ChildNavigation } from '../ChildNavigation'
 import { useToaster } from '../ToasterOven'
 
-import type { SetupScreens } from '../../pages/ProtocolSetup'
+import type { SetupScreens } from '../../pages/ODD/ProtocolSetup'
 
 export interface ViewOnlyParametersProps {
   runId: string
@@ -93,7 +95,7 @@ export function ViewOnlyParameters({
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing8}
               >
-                <LegacyStyledText as="p" color={COLORS.grey60}>
+                <LegacyStyledText as="p" css={PARAMETER_VALUE_STYLE}>
                   {formatRunTimeParameterValue(parameter, t)}
                 </LegacyStyledText>
                 {parameter.type === 'csv_file' ||
@@ -114,3 +116,14 @@ export function ViewOnlyParameters({
     </>
   )
 }
+
+const PARAMETER_VALUE_STYLE = css`
+  color: ${COLORS.grey60};
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  -webkit-line-clamp: 1;
+  max-width: 15rem;
+`
