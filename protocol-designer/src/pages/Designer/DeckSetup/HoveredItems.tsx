@@ -10,7 +10,6 @@ import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { ModuleLabel } from './ModuleLabel'
 import { LabwareLabel } from '../LabwareLabel'
-import { getLabwareCompatibleWithAdapter } from './utils'
 import { FixtureRender } from './FixtureRender'
 import type { DeckLabelProps } from '@opentrons/components'
 import type {
