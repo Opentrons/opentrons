@@ -3,26 +3,26 @@ import { vi, describe, it, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '../../../../../__testing-utils__'
+import { i18n } from '../../../../../i18n'
 import { CalibrationDashboard } from '..'
 
 import {
   useCalibrationTaskList,
   useAttachedPipettes,
-} from '../../../../organisms/Devices/hooks'
+} from '../../../../../organisms/Devices/hooks'
 import { useDashboardCalibratePipOffset } from '../hooks/useDashboardCalibratePipOffset'
 import { useDashboardCalibrateTipLength } from '../hooks/useDashboardCalibrateTipLength'
 import { useDashboardCalibrateDeck } from '../hooks/useDashboardCalibrateDeck'
-import { expectedTaskList } from '../../../../organisms/Devices/hooks/__fixtures__/taskListFixtures'
-import { mockLeftProtoPipette } from '../../../../redux/pipettes/__fixtures__'
-import { useNotifyAllRunsQuery } from '../../../../resources/runs'
+import { expectedTaskList } from '../../../../../organisms/Devices/hooks/__fixtures__/taskListFixtures'
+import { mockLeftProtoPipette } from '../../../../../redux/pipettes/__fixtures__'
+import { useNotifyAllRunsQuery } from '../../../../../resources/runs'
 
-vi.mock('../../../../organisms/Devices/hooks')
+vi.mock('../../../../../organisms/Devices/hooks')
 vi.mock('../hooks/useDashboardCalibratePipOffset')
 vi.mock('../hooks/useDashboardCalibrateTipLength')
 vi.mock('../hooks/useDashboardCalibrateDeck')
-vi.mock('../../../../resources/runs')
+vi.mock('../../../../../resources/runs')
 
 const render = (path = '/') => {
   return renderWithProviders(

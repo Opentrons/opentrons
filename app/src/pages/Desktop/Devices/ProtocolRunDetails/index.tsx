@@ -29,28 +29,28 @@ import {
   useRunHasStarted,
   useRunStatuses,
   useSyncRobotClock,
-} from '../../../organisms/Devices/hooks'
-import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
-import { RunPreview } from '../../../organisms/RunPreview'
+} from '../../../../organisms/Devices/hooks'
+import { ProtocolRunHeader } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
+import { RunPreview } from '../../../../organisms/RunPreview'
 import {
   ProtocolRunSetup,
   initialMissingSteps,
-} from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
-import { BackToTopButton } from '../../../organisms/Devices/ProtocolRun/BackToTopButton'
-import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
-import { ProtocolRunRuntimeParameters } from '../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
-import { useCurrentRunId } from '../../../resources/runs'
-import { OPENTRONS_USB } from '../../../redux/discovery'
-import { fetchProtocols } from '../../../redux/protocol-storage'
-import { appShellRequestor } from '../../../redux/shell/remote'
-import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+} from '../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
+import { BackToTopButton } from '../../../../organisms/Devices/ProtocolRun/BackToTopButton'
+import { ProtocolRunModuleControls } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
+import { ProtocolRunRuntimeParameters } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
+import { useCurrentRunId } from '../../../../resources/runs'
+import { OPENTRONS_USB } from '../../../../redux/discovery'
+import { fetchProtocols } from '../../../../redux/protocol-storage'
+import { appShellRequestor } from '../../../../redux/shell/remote'
+import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import type { ViewportListRef } from 'react-viewport-list'
 import type {
   DesktopRouteParams,
   ProtocolRunDetailsTab,
-} from '../../../App/types'
-import type { Dispatch } from '../../../redux/types'
+} from '../../../../App/types'
+import type { Dispatch } from '../../../../redux/types'
 
 const baseRoundTabStyling = css`
   ${TYPOGRAPHY.pSemiBold}

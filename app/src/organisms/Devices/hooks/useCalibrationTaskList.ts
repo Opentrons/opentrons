@@ -19,9 +19,9 @@ import type {
   TaskProps,
 } from '../../TaskList/types'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
-import type { DashboardCalOffsetInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
-import type { DashboardCalTipLengthInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
-import type { DashboardCalDeckInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
+import type { DashboardCalOffsetInvoker } from '../../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
+import type { DashboardCalTipLengthInvoker } from '../../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
+import type { DashboardCalDeckInvoker } from '../../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
 
 const CALIBRATION_DATA_POLL_MS = 5000
 

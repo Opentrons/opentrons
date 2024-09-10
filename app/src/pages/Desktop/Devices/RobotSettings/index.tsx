@@ -21,21 +21,24 @@ import {
   UNREACHABLE,
   REACHABLE,
   OPENTRONS_USB,
-} from '../../../redux/discovery'
-import { appShellRequestor } from '../../../redux/shell/remote'
-import { getRobotUpdateSession } from '../../../redux/robot-update'
-import { getDevtoolsEnabled } from '../../../redux/config'
-import { Banner } from '../../../atoms/Banner'
-import { useRobot } from '../../../organisms/Devices/hooks'
-import { Line } from '../../../atoms/structure'
-import { NavTab } from '../../../molecules/NavTab'
-import { RobotSettingsCalibration } from '../../../organisms/RobotSettingsCalibration'
-import { RobotSettingsAdvanced } from '../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
-import { RobotSettingsNetworking } from '../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
-import { RobotSettingsFeatureFlags } from '../../../organisms/Devices/RobotSettings/RobotSettingsFeatureFlags'
-import { ReachableBanner } from '../../../organisms/Devices/ReachableBanner'
+} from '../../../../redux/discovery'
+import { appShellRequestor } from '../../../../redux/shell/remote'
+import { getRobotUpdateSession } from '../../../../redux/robot-update'
+import { getDevtoolsEnabled } from '../../../../redux/config'
+import { Banner } from '../../../../atoms/Banner'
+import { useRobot } from '../../../../organisms/Devices/hooks'
+import { Line } from '../../../../atoms/structure'
+import { NavTab } from '../../../../molecules/NavTab'
+import { RobotSettingsCalibration } from '../../../../organisms/RobotSettingsCalibration'
+import { RobotSettingsAdvanced } from '../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
+import { RobotSettingsNetworking } from '../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
+import { RobotSettingsFeatureFlags } from '../../../../organisms/Devices/RobotSettings/RobotSettingsFeatureFlags'
+import { ReachableBanner } from '../../../../organisms/Devices/ReachableBanner'
 
-import type { DesktopRouteParams, RobotSettingsTab } from '../../../App/types'
+import type {
+  DesktopRouteParams,
+  RobotSettingsTab,
+} from '../../../../App/types'
 
 export function RobotSettings(): JSX.Element | null {
   const { t } = useTranslation('device_settings')

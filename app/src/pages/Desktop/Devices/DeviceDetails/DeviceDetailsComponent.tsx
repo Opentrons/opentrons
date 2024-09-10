@@ -10,13 +10,16 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { DeviceDetailsDeckConfiguration } from '../../../organisms/DeviceDetailsDeckConfiguration'
-import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
-import { InstrumentsAndModules } from '../../../organisms/Devices/InstrumentsAndModules'
-import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
-import { EstopBanner } from '../../../organisms/Devices/EstopBanner'
-import { DISENGAGED, useEstopContext } from '../../../organisms/EmergencyStop'
-import { useIsFlex } from '../../../organisms/Devices/hooks'
+import { DeviceDetailsDeckConfiguration } from '../../../../organisms/DeviceDetailsDeckConfiguration'
+import { RobotOverview } from '../../../../organisms/Devices/RobotOverview'
+import { InstrumentsAndModules } from '../../../../organisms/Devices/InstrumentsAndModules'
+import { RecentProtocolRuns } from '../../../../organisms/Devices/RecentProtocolRuns'
+import { EstopBanner } from '../../../../organisms/Devices/EstopBanner'
+import {
+  DISENGAGED,
+  useEstopContext,
+} from '../../../../organisms/EmergencyStop'
+import { useIsFlex } from '../../../../organisms/Devices/hooks'
 
 interface DeviceDetailsComponentProps {
   robotName: string

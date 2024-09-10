@@ -4,27 +4,27 @@ import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 
-import { i18n } from '../../../../i18n'
+import { i18n } from '../../../../../i18n'
 import {
   useRobot,
   useSyncRobotClock,
-} from '../../../../organisms/Devices/hooks'
-import { InstrumentsAndModules } from '../../../../organisms/Devices/InstrumentsAndModules'
-import { RecentProtocolRuns } from '../../../../organisms/Devices/RecentProtocolRuns'
-import { RobotOverview } from '../../../../organisms/Devices/RobotOverview'
-import { getScanning } from '../../../../redux/discovery'
-import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
+} from '../../../../../organisms/Devices/hooks'
+import { InstrumentsAndModules } from '../../../../../organisms/Devices/InstrumentsAndModules'
+import { RecentProtocolRuns } from '../../../../../organisms/Devices/RecentProtocolRuns'
+import { RobotOverview } from '../../../../../organisms/Devices/RobotOverview'
+import { getScanning } from '../../../../../redux/discovery'
+import { mockConnectableRobot } from '../../../../../redux/discovery/__fixtures__'
 import { DeviceDetails } from '..'
 
-import type { State } from '../../../../redux/types'
+import type { State } from '../../../../../redux/types'
 
-vi.mock('../../../../organisms/Devices/hooks')
-vi.mock('../../../../organisms/Devices/InstrumentsAndModules')
-vi.mock('../../../../organisms/Devices/RecentProtocolRuns')
-vi.mock('../../../../organisms/Devices/RobotOverview')
-vi.mock('../../../../redux/discovery')
+vi.mock('../../../../../organisms/Devices/hooks')
+vi.mock('../../../../../organisms/Devices/InstrumentsAndModules')
+vi.mock('../../../../../organisms/Devices/RecentProtocolRuns')
+vi.mock('../../../../../organisms/Devices/RobotOverview')
+vi.mock('../../../../../redux/discovery')
 
 const render = (path = '/') => {
   return renderWithProviders(

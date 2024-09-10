@@ -14,8 +14,8 @@ import {
   Modal,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../../App/portal'
-import { ExternalLink } from '../../../atoms/Link/ExternalLink'
+import { getTopPortalEl } from '../../../../App/portal'
+import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 
 const NEW_FLEX_SETUP_SUPPORT_ARTICLE_HREF =
   'https://insights.opentrons.com/hubfs/Products/Flex/Opentrons%20Flex%20Quickstart%20Guide.pdf'

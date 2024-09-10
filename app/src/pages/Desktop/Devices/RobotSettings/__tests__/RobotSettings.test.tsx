@@ -3,27 +3,29 @@ import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { Route, MemoryRouter, Routes } from 'react-router-dom'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-import { RobotSettingsCalibration } from '../../../../organisms/RobotSettingsCalibration'
-import { RobotSettingsNetworking } from '../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
-import { RobotSettingsAdvanced } from '../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
-import { useRobot } from '../../../../organisms/Devices/hooks'
+import { renderWithProviders } from '../../../../../__testing-utils__'
+import { i18n } from '../../../../../i18n'
+import { RobotSettingsCalibration } from '../../../../../organisms/RobotSettingsCalibration'
+import { RobotSettingsNetworking } from '../../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
+import { RobotSettingsAdvanced } from '../../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
+import { useRobot } from '../../../../../organisms/Devices/hooks'
 import { RobotSettings } from '..'
 import { when } from 'vitest-when'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
-} from '../../../../redux/discovery/__fixtures__'
-import { getRobotUpdateSession } from '../../../../redux/robot-update'
+} from '../../../../../redux/discovery/__fixtures__'
+import { getRobotUpdateSession } from '../../../../../redux/robot-update'
 
-vi.mock('../../../../organisms/RobotSettingsCalibration')
-vi.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking')
-vi.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced')
-vi.mock('../../../../organisms/Devices/hooks')
-vi.mock('../../../../redux/discovery/selectors')
-vi.mock('../../../../redux/robot-update')
+vi.mock('../../../../../organisms/RobotSettingsCalibration')
+vi.mock(
+  '../../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
+)
+vi.mock('../../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced')
+vi.mock('../../../../../organisms/Devices/hooks')
+vi.mock('../../../../../redux/discovery/selectors')
+vi.mock('../../../../../redux/robot-update')
 
 const render = (path = '/') => {
   return renderWithProviders(

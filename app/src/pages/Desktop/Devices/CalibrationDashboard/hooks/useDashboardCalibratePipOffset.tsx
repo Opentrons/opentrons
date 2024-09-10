@@ -4,22 +4,22 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { ModalShell } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../../../App/portal'
-import { WizardHeader } from '../../../../molecules/WizardHeader'
-import { CalibratePipetteOffset } from '../../../../organisms/CalibratePipetteOffset'
-import { LoadingState } from '../../../../organisms/CalibrationPanels'
-import * as RobotApi from '../../../../redux/robot-api'
-import * as Sessions from '../../../../redux/sessions'
-import { getPipetteOffsetCalibrationSession } from '../../../../redux/sessions/pipette-offset-calibration/selectors'
-import { pipetteOffsetCalibrationStarted } from '../../../../redux/analytics'
+import { getTopPortalEl } from '../../../../../App/portal'
+import { WizardHeader } from '../../../../../molecules/WizardHeader'
+import { CalibratePipetteOffset } from '../../../../../organisms/CalibratePipetteOffset'
+import { LoadingState } from '../../../../../organisms/CalibrationPanels'
+import * as RobotApi from '../../../../../redux/robot-api'
+import * as Sessions from '../../../../../redux/sessions'
+import { getPipetteOffsetCalibrationSession } from '../../../../../redux/sessions/pipette-offset-calibration/selectors'
+import { pipetteOffsetCalibrationStarted } from '../../../../../redux/analytics'
 
-import type { State } from '../../../../redux/types'
+import type { State } from '../../../../../redux/types'
 import type {
   SessionCommandString,
   PipetteOffsetCalibrationSession,
   PipetteOffsetCalibrationSessionParams,
-} from '../../../../redux/sessions/types'
-import type { RequestState } from '../../../../redux/robot-api/types'
+} from '../../../../../redux/sessions/types'
+import type { RequestState } from '../../../../../redux/robot-api/types'
 
 // pipette calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: SessionCommandString[] = [
