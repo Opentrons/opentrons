@@ -64,6 +64,7 @@ import { getLocalRobot } from '../../../redux/discovery'
 import { RunFailedModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
   formatTimeWithUtcLabel,
+  useIsRunCurrent,
   useNotifyRunQuery,
 } from '../../../resources/runs'
 import { handleTipsAttachedModal } from '../../../organisms/DropTipWizardFlows/TipsAttachedModal'
@@ -73,8 +74,6 @@ import { useRecoveryAnalytics } from '../../../organisms/ErrorRecoveryFlows/hook
 import type { IconName } from '@opentrons/components'
 import type { OnDeviceRouteParams } from '../../../App/types'
 import type { PipetteWithTip } from '../../../organisms/DropTipWizardFlows'
-
-const CURRENT_RUN_POLL_MS = 5000
 
 export function RunSummary(): JSX.Element {
   const { runId } = useParams<
@@ -90,10 +89,7 @@ export function RunSummary(): JSX.Element {
       navigate('/dashboard')
     },
   })
-  const isRunCurrent = Boolean(
-    useNotifyRunQuery(runId, { refetchInterval: CURRENT_RUN_POLL_MS })?.data
-      ?.data?.current
-  )
+  const isRunCurrent = useIsRunCurrent(runId)
   const { deleteRun } = useDeleteRunMutation()
   const runStatus = runRecord?.data.status ?? null
   const didRunSucceed = runStatus === RUN_STATUS_SUCCEEDED
