@@ -1012,7 +1012,7 @@
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": true,
-    "loadName": "thermoscientific_96_wellplate_v_450"
+    "loadName": "thermoscientific_96_wellplate_v_450ul"
   },
   "namespace": "opentrons",
   "version": 1,
@@ -1021,5 +1021,8 @@
     "x": 0,
     "y": 0,
     "z": 0
+  },
+  "stackingOffsetWithModule": {
+    "magneticBlockV1": { "x": 0, "y": 0, "z": 3.94 }
   }
 }
