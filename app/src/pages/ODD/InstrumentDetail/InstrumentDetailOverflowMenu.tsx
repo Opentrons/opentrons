@@ -20,14 +20,14 @@ import {
 } from '@opentrons/shared-data'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
-import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
-import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
+import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
+import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
 import {
   DropTipWizardFlows,
   useDropTipWizardFlows,
-} from '../../organisms/DropTipWizardFlows'
-import { FLOWS } from '../../organisms/PipetteWizardFlows/constants'
-import { GRIPPER_FLOW_TYPES } from '../../organisms/GripperWizardFlows/constants'
+} from '../../../organisms/DropTipWizardFlows'
+import { FLOWS } from '../../../organisms/PipetteWizardFlows/constants'
+import { GRIPPER_FLOW_TYPES } from '../../../organisms/GripperWizardFlows/constants'
 
 import type {
   PipetteData,

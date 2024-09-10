@@ -3,15 +3,15 @@ import NiceModal from '@ebay/nice-modal-react'
 import { fireEvent, screen } from '@testing-library/react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '../../../../i18n'
 import { handleInstrumentDetailOverflowMenu } from '../InstrumentDetailOverflowMenu'
-import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
-import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
-import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
-import { useDropTipWizardFlows } from '../../../organisms/DropTipWizardFlows'
+import { useNotifyCurrentMaintenanceRun } from '../../../../resources/maintenance_runs'
+import { PipetteWizardFlows } from '../../../../organisms/PipetteWizardFlows'
+import { GripperWizardFlows } from '../../../../organisms/GripperWizardFlows'
+import { useDropTipWizardFlows } from '../../../../organisms/DropTipWizardFlows'
 
 import type { Mock } from 'vitest'
 import type {
@@ -28,10 +28,10 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     getPipetteModelSpecs: vi.fn(),
   }
 })
-vi.mock('../../../resources/maintenance_runs')
-vi.mock('../../../organisms/PipetteWizardFlows')
-vi.mock('../../../organisms/GripperWizardFlows')
-vi.mock('../../../organisms/DropTipWizardFlows')
+vi.mock('../../../../resources/maintenance_runs')
+vi.mock('../../../../organisms/PipetteWizardFlows')
+vi.mock('../../../../organisms/GripperWizardFlows')
+vi.mock('../../../../organisms/DropTipWizardFlows')
 
 const MOCK_PIPETTE = {
   mount: 'left',

@@ -1,16 +1,16 @@
 import * as React from 'react'
 import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { vi, describe, it, afterEach, beforeEach, expect } from 'vitest'
 
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { i18n } from '../../../i18n'
-import { ChoosePipette } from '../../../organisms/PipetteWizardFlows/ChoosePipette'
-import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
+import { i18n } from '../../../../i18n'
+import { ChoosePipette } from '../../../../organisms/PipetteWizardFlows/ChoosePipette'
+import { GripperWizardFlows } from '../../../../organisms/GripperWizardFlows'
 import { InstrumentsDashboard } from '..'
-import { formatTimeWithUtcLabel } from '../../../resources/runs'
-import { InstrumentDetail } from '../../../pages/InstrumentDetail'
+import { formatTimeWithUtcLabel } from '../../../../resources/runs'
+import { InstrumentDetail } from '../../InstrumentDetail'
 import type * as ReactApiClient from '@opentrons/react-api-client'
 
 const mockGripperData = {
@@ -88,10 +88,10 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     ),
   }
 })
-vi.mock('../../../organisms/GripperWizardFlows')
-vi.mock('../../../organisms/PipetteWizardFlows')
-vi.mock('../../../organisms/PipetteWizardFlows/ChoosePipette')
-vi.mock('../../../organisms/Navigation')
+vi.mock('../../../../organisms/GripperWizardFlows')
+vi.mock('../../../../organisms/PipetteWizardFlows')
+vi.mock('../../../../organisms/PipetteWizardFlows/ChoosePipette')
+vi.mock('../../../../organisms/Navigation')
 
 const render = (path = '/') => {
   return renderWithProviders(

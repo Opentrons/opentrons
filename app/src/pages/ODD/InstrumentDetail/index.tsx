@@ -14,14 +14,14 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
-import { BackButton } from '../../atoms/buttons/BackButton'
-import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
-import { InstrumentInfo } from '../../organisms/InstrumentInfo'
-import { handleInstrumentDetailOverflowMenu } from '../../pages/InstrumentDetail/InstrumentDetailOverflowMenu'
+import { BackButton } from '../../../atoms/buttons/BackButton'
+import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
+import { InstrumentInfo } from '../../../organisms/InstrumentInfo'
+import { handleInstrumentDetailOverflowMenu } from './InstrumentDetailOverflowMenu'
 import {
   useGripperDisplayName,
   usePipetteModelSpecs,
-} from '../../resources/instruments/hooks'
+} from '../../../resources/instruments/hooks'
 
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel, PipetteModel } from '@opentrons/shared-data'
