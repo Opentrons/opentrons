@@ -59,7 +59,7 @@ import { ProtocolSetup } from '../../../pages/ProtocolSetup'
 import { useNotifyRunQuery } from '../../../resources/runs'
 import { ViewOnlyParameters } from '../../../organisms/ProtocolSetupParameters/ViewOnlyParameters'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { mockRunTimeParameterData } from '../../ProtocolDetails/fixtures'
+import { mockRunTimeParameterData } from '../../../pages/ODD/ProtocolDetails/fixtures'
 import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'

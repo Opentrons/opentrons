@@ -28,12 +28,15 @@ import {
 import {
   useGripperDisplayName,
   usePipetteNameSpecs,
-} from '../../resources/instruments/hooks'
-import { useRequiredProtocolHardware } from '../Protocols/hooks'
+} from '../../../resources/instruments/hooks'
+import { useRequiredProtocolHardware } from '../../../pages/Desktop/Protocols/hooks'
 import { EmptySection } from './EmptySection'
 
 import type { TFunction } from 'i18next'
-import type { ProtocolHardware, ProtocolPipette } from '../Protocols/hooks'
+import type {
+  ProtocolHardware,
+  ProtocolPipette,
+} from '../../../pages/Desktop/Protocols/hooks'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}

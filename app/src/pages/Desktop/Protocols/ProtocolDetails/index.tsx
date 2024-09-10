@@ -5,11 +5,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   fetchProtocols,
   getStoredProtocol,
-} from '../../../redux/protocol-storage'
-import { ProtocolDetails as ProtocolDetailsContents } from '../../../organisms/ProtocolDetails'
+} from '../../../../redux/protocol-storage'
+import { ProtocolDetails as ProtocolDetailsContents } from '../../../../organisms/ProtocolDetails'
 
-import type { Dispatch, State } from '../../../redux/types'
-import type { DesktopRouteParams } from '../../../App/types'
+import type { Dispatch, State } from '../../../../redux/types'
+import type { DesktopRouteParams } from '../../../../App/types'
 
 export function ProtocolDetails(): JSX.Element {
   const { protocolKey } = useParams<

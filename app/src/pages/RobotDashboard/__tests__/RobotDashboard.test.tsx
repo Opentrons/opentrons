@@ -12,7 +12,7 @@ import {
   EmptyRecentRun,
 } from '../../../organisms/OnDeviceDisplay/RobotDashboard'
 import { Navigation } from '../../../organisms/Navigation'
-import { useMissingProtocolHardware } from '../../Protocols/hooks'
+import { useMissingProtocolHardware } from '../../../pages/Desktop/Protocols/hooks'
 import { getOnDeviceDisplaySettings } from '../../../redux/config'
 import { WelcomeModal } from '../WelcomeModal'
 import { RobotDashboard } from '..'
@@ -36,7 +36,7 @@ vi.mock(
   '../../../organisms/OnDeviceDisplay/RobotDashboard/RecentRunProtocolCarousel'
 )
 vi.mock('../../../organisms/Navigation')
-vi.mock('../../Protocols/hooks')
+vi.mock('../../../pages/Desktop/Protocols/hooks')
 vi.mock('../../../redux/config')
 vi.mock('../WelcomeModal')
 vi.mock('../../../resources/runs')

@@ -15,7 +15,7 @@ import {
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
-import { useRequiredProtocolLabware } from '../Protocols/hooks'
+import { useRequiredProtocolLabware } from '../../../pages/Desktop/Protocols/hooks'
 import { EmptySection } from './EmptySection'
 
 const Table = styled('table')`

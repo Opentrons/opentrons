@@ -3,7 +3,7 @@ import { vi, it, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { useRequiredProtocolLabware } from '../../Protocols/hooks'
+import { useRequiredProtocolLabware } from '../../../pages/Desktop/Protocols/hooks'
 import { Labware } from '../Labware'
 
 import {
@@ -15,7 +15,7 @@ import {
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { screen } from '@testing-library/react'
 
-vi.mock('../../Protocols/hooks')
+vi.mock('../../../pages/Desktop/Protocols/hooks')
 
 const MOCK_PROTOCOL_ID = 'mock_protocol_id'
 

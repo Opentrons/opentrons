@@ -55,7 +55,7 @@ import {
 import {
   useRequiredProtocolHardwareFromAnalysis,
   useMissingProtocolHardwareFromAnalysis,
-} from '../Protocols/hooks'
+} from '../../pages/Desktop/Protocols/hooks'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
 import { ProtocolSetupModulesAndDeck } from '../../organisms/ProtocolSetupModulesAndDeck'
@@ -77,7 +77,7 @@ import {
 } from '../../organisms/RunTimeControl/hooks'
 import { useToaster } from '../../organisms/ToasterOven'
 import { useIsHeaterShakerInProtocol } from '../../organisms/ModuleCard/hooks'
-import { getLabwareSetupItemGroups } from '../Protocols/utils'
+import { getLabwareSetupItemGroups } from '../../pages/Desktop/Protocols/utils'
 import { getLocalRobot, getRobotSerialNumber } from '../../redux/discovery'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -100,7 +100,7 @@ import type { OnDeviceRouteParams } from '../../App/types'
 import type {
   ProtocolHardware,
   ProtocolFixture,
-} from '../../pages/Protocols/hooks'
+} from '../../pages/Desktop/Protocols/hooks'
 import type { ProtocolModuleInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 const FETCH_DURATION_MS = 5000

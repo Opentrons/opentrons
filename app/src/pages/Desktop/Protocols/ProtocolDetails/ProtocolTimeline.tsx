@@ -5,11 +5,11 @@ import { Icon, Box, SPACING } from '@opentrons/components'
 import {
   fetchProtocols,
   getStoredProtocol,
-} from '../../../redux/protocol-storage'
-import { ProtocolTimelineScrubber } from '../../../organisms/ProtocolTimelineScrubber'
+} from '../../../../redux/protocol-storage'
+import { ProtocolTimelineScrubber } from '../../../../organisms/ProtocolTimelineScrubber'
 
-import type { Dispatch, State } from '../../../redux/types'
-import type { DesktopRouteParams } from '../../../App/types'
+import type { Dispatch, State } from '../../../../redux/types'
+import type { DesktopRouteParams } from '../../../../App/types'
 
 export function ProtocolTimeline(): JSX.Element {
   const { protocolKey } = useParams<

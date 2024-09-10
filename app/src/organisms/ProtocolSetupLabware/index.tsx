@@ -37,7 +37,7 @@ import {
 
 import { FloatingActionButton, SmallButton } from '../../atoms/buttons'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
-import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
+import { getLabwareSetupItemGroups } from '../../pages/Desktop/Protocols/utils'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { getNestedLabwareInfo } from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
@@ -57,7 +57,7 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
-import type { LabwareSetupItem } from '../../pages/Protocols/utils'
+import type { LabwareSetupItem } from '../../pages/Desktop/Protocols/utils'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
 import type { NestedLabwareInfo } from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'

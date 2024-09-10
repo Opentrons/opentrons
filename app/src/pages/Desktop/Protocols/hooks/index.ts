@@ -18,9 +18,9 @@ import {
   MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 import { getLabwareSetupItemGroups } from '../utils'
-import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
-import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
-import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import { getProtocolUsesGripper } from '../../../../organisms/ProtocolSetupInstruments/utils'
+import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
+import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
 
 import type {
   CompletedProtocolAnalysis,

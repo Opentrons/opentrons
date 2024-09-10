@@ -9,10 +9,10 @@ import {
 } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { useRequiredProtocolHardware } from '../../Protocols/hooks'
+import { useRequiredProtocolHardware } from '../../../pages/Desktop/Protocols/hooks'
 import { Hardware } from '../Hardware'
 
-vi.mock('../../Protocols/hooks')
+vi.mock('../../../pages/Desktop/Protocols/hooks')
 vi.mock('../../../redux/config')
 
 const MOCK_PROTOCOL_ID = 'mock_protocol_id'

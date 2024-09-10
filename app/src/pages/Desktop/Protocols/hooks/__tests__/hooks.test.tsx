@@ -19,8 +19,8 @@ import {
   useRequiredProtocolLabware,
   useRunTimeParameters,
 } from '../index'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration/useNotifyDeckConfigurationQuery'
-import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
+import { useNotifyDeckConfigurationQuery } from '../../../../../resources/deck_configuration/useNotifyDeckConfigurationQuery'
+import { mockHeaterShaker } from '../../../../../redux/modules/__fixtures__'
 
 import type { UseQueryResult } from 'react-query'
 import type {
@@ -31,10 +31,10 @@ import type {
 import type { Protocol } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../organisms/Devices/hooks')
-vi.mock('../../../../redux/config')
+vi.mock('../../../../../organisms/Devices/hooks')
+vi.mock('../../../../../redux/config')
 vi.mock(
-  '../../../../resources/deck_configuration/useNotifyDeckConfigurationQuery'
+  '../../../../../resources/deck_configuration/useNotifyDeckConfigurationQuery'
 )
 
 const PROTOCOL_ID = 'fake_protocol_id'

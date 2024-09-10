@@ -31,38 +31,38 @@ import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import { MAXIMUM_PINNED_PROTOCOLS } from '../../App/constants'
-import { MediumButton, SmallButton } from '../../atoms/buttons'
+import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
+import { MediumButton, SmallButton } from '../../../atoms/buttons'
 import {
   ProtocolDetailsHeaderChipSkeleton,
   ProcotolDetailsHeaderTitleSkeleton,
   ProtocolDetailsSectionContentSkeleton,
-} from '../../organisms/OnDeviceDisplay/ProtocolDetails'
-import { useHardwareStatusText } from '../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
-import { OddModal, SmallModalChildren } from '../../molecules/OddModal'
-import { useToaster } from '../../organisms/ToasterOven'
+} from '../../../organisms/OnDeviceDisplay/ProtocolDetails'
+import { useHardwareStatusText } from '../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
+import { OddModal, SmallModalChildren } from '../../../molecules/OddModal'
+import { useToaster } from '../../../organisms/ToasterOven'
 import {
   getApplyHistoricOffsets,
   getPinnedProtocolIds,
   updateConfigValue,
-} from '../../redux/config'
-import { useOffsetCandidatesForAnalysis } from '../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+} from '../../../redux/config'
+import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import {
   useMissingProtocolHardware,
   useRunTimeParameters,
-} from '../Protocols/hooks'
-import { ProtocolSetupParameters } from '../../organisms/ProtocolSetupParameters'
+} from '../../../pages/Desktop/Protocols/hooks'
+import { ProtocolSetupParameters } from '../../../organisms/ProtocolSetupParameters'
 import { Parameters } from './Parameters'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 import { Liquids } from './Liquids'
-import { formatTimeWithUtcLabel } from '../../resources/runs'
+import { formatTimeWithUtcLabel } from '../../../resources/runs'
 
 import type { Protocol } from '@opentrons/api-client'
-import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
-import type { Dispatch } from '../../redux/types'
-import type { OnDeviceRouteParams } from '../../App/types'
+import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
+import type { Dispatch } from '../../../redux/types'
+import type { OnDeviceRouteParams } from '../../../App/types'
 
 interface ProtocolHeaderProps {
   title?: string | null

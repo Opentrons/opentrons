@@ -27,9 +27,12 @@ import {
   useGripperDisplayName,
   usePipetteNameSpecs,
 } from '../../resources/instruments/hooks'
-import { useRequiredProtocolHardware } from '../Protocols/hooks'
+import { useRequiredProtocolHardware } from '../../pages/Desktop/Protocols/hooks'
 
-import type { ProtocolHardware, ProtocolPipette } from '../Protocols/hooks'
+import type {
+  ProtocolHardware,
+  ProtocolPipette,
+} from '../../pages/Desktop/Protocols/hooks'
 import type { TFunction } from 'i18next'
 
 const Table = styled('table')`

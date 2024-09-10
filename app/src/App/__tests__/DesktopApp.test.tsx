@@ -10,14 +10,14 @@ import { Breadcrumbs } from '../../organisms/Breadcrumbs'
 import { CalibrationDashboard } from '../../pages/Devices/CalibrationDashboard'
 import { DeviceDetails } from '../../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../../pages/Devices/DevicesLanding'
-import { ProtocolsLanding } from '../../pages/Protocols/ProtocolsLanding'
+import { ProtocolsLanding } from '../../pages/Desktop/Protocols/ProtocolsLanding'
 import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../../pages/Devices/RobotSettings'
 import { GeneralSettings } from '../../pages/AppSettings/GeneralSettings'
 import { AlertsModal } from '../../organisms/Alerts/AlertsModal'
 import { useFeatureFlag } from '../../redux/config'
 import { useIsFlex } from '../../organisms/Devices/hooks'
-import { ProtocolTimeline } from '../../pages/Protocols/ProtocolDetails/ProtocolTimeline'
+import { ProtocolTimeline } from '../../pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline'
 import { useSoftwareUpdatePoll } from '../hooks'
 import { DesktopApp } from '../DesktopApp'
 
@@ -27,11 +27,11 @@ vi.mock('../../pages/AppSettings/GeneralSettings')
 vi.mock('../../pages/Devices/CalibrationDashboard')
 vi.mock('../../pages/Devices/DeviceDetails')
 vi.mock('../../pages/Devices/DevicesLanding')
-vi.mock('../../pages/Protocols/ProtocolsLanding')
+vi.mock('../../pages/Desktop/Protocols/ProtocolsLanding')
 vi.mock('../../pages/Devices/ProtocolRunDetails')
 vi.mock('../../pages/Devices/RobotSettings')
 vi.mock('../../organisms/Alerts/AlertsModal')
-vi.mock('../../pages/Protocols/ProtocolDetails/ProtocolTimeline')
+vi.mock('../../pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline')
 vi.mock('../../redux/config')
 vi.mock('../hooks')
 

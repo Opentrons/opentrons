@@ -15,7 +15,7 @@ import { RobotDashboard } from '../../pages/RobotDashboard'
 import { RobotSettingsDashboard } from '../../pages/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../../pages/ProtocolDashboard'
 import { ProtocolSetup } from '../../pages/ProtocolSetup'
-import { ProtocolDetails } from '../../pages/ProtocolDetails'
+import { ProtocolDetails } from '../../pages/ODD/ProtocolDetails'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 import { RunningProtocol } from '../../pages/RunningProtocol'
 import { RunSummary } from '../../pages/RunSummary'
@@ -56,7 +56,7 @@ vi.mock('../../pages/RobotDashboard')
 vi.mock('../../pages/RobotSettingsDashboard')
 vi.mock('../../pages/ProtocolDashboard')
 vi.mock('../../pages/ProtocolSetup')
-vi.mock('../../pages/ProtocolDetails')
+vi.mock('../../pages/ODD/ProtocolDetails')
 vi.mock('../../pages/InstrumentsDashboard')
 vi.mock('../../pages/RunningProtocol')
 vi.mock('../../pages/RunSummary')

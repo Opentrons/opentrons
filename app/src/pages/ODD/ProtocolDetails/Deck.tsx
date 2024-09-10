@@ -8,9 +8,9 @@ import {
 } from '@opentrons/react-api-client'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
-import { LabwareStackModal } from '../../organisms/Devices/ProtocolRun/SetupLabware/LabwareStackModal'
-import { SingleLabwareModal } from '../../organisms/ProtocolSetupLabware/SingleLabwareModal'
-import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
+import { LabwareStackModal } from '../../../organisms/Devices/ProtocolRun/SetupLabware/LabwareStackModal'
+import { SingleLabwareModal } from '../../../organisms/ProtocolSetupLabware/SingleLabwareModal'
+import { getLabwareSetupItemGroups } from '../../../pages/Desktop/Protocols/utils'
 
 import type {
   LabwareDefinition2,
