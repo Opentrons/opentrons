@@ -61,17 +61,9 @@ export const SelectedHoveredItems = (
       : null
 
   const labwareInfos: DeckLabelProps[] = []
-  //   see if hovered labware is a nested labware above an adapter
-  const isHoveredNested =
-    hoveredLabware != null
-      ? getLabwareCompatibleWithAdapter(
-          defs[hoveredLabware].parameters.loadName
-        ).length > 0
-      : false
 
   if (
     selectedLabwareDefUri != null &&
-    !isHoveredNested &&
     (hoveredLabware == null || hoveredLabware !== selectedLabwareDefUri)
   ) {
     const def = defs[selectedLabwareDefUri]

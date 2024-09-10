@@ -65,17 +65,8 @@ export const HoveredItems = (
       ? inferModuleOrientationFromXCoordinate(hoveredSlotPosition[0])
       : null
 
-  //   see if hovered labware is a nested labware above an adapter
-  const isHoveredNested =
-    hoveredLabware != null
-      ? getLabwareCompatibleWithAdapter(
-          defs[hoveredLabware].parameters.loadName
-        ).length > 0
-      : false
-
   const nestedInfo: DeckLabelProps[] =
     selectedLabwareDefUri != null &&
-    !isHoveredNested &&
     (hoveredLabware == null || hoveredLabware !== selectedLabwareDefUri)
       ? [
           {
