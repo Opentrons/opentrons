@@ -52,8 +52,7 @@ export function ProtocolRoutes(): JSX.Element {
   }
   const allRoutes: RouteProps[] = [...pdRoutes, landingPage]
 
-  console.log('default route location.pathname')
-  console.log({ location: location.pathname })
+  console.log('default navigation to root with basename fix')
 
   return (
     <>
@@ -68,7 +67,7 @@ export function ProtocolRoutes(): JSX.Element {
             })}
             <Route
               path="*"
-              element={<Navigate to={`${location.pathname}`} />}
+              element={<Navigate to={`/`} />}
             />
           </Routes>
         </Box>
