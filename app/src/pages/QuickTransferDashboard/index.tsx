@@ -245,6 +245,7 @@ export function QuickTransferDashboard(): JSX.Element {
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 backgroundColor={COLORS.white}
                 flexDirection={DIRECTION_ROW}
+                paddingTop={SPACING.spacing16}
                 paddingBottom={SPACING.spacing16}
                 position={
                   navMenuIsOpened || longPressModalIsOpened
@@ -252,7 +253,7 @@ export function QuickTransferDashboard(): JSX.Element {
                     : POSITION_STICKY
                 }
                 top="7.75rem"
-                zIndex={navMenuIsOpened || longPressModalIsOpened ? 0 : 3}
+                zIndex={navMenuIsOpened || longPressModalIsOpened ? 0 : 2.5}
                 width="100%"
               >
                 <Flex width="32.3125rem">
