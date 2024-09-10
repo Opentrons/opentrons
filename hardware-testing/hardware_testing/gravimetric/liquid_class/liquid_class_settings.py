@@ -1,8 +1,8 @@
 """Liquid Class Settings."""
 from copy import deepcopy
-from enum import Enum, auto
+from enum import Enum
 from dataclasses import dataclass, fields
-from typing import List, Any
+from typing import List
 
 from opentrons.types import Point
 
@@ -10,11 +10,11 @@ from opentrons.types import Point
 CSV_SEPARATOR = "\t"
 
 
-class PositionRef(Enum):
-    WELL_BOTTOM = auto()
-    WELL_TOP = auto()
-    MENISCUS = auto()
-    TRASH = auto()
+class PositionRef(str, Enum):
+    WELL_BOTTOM = "WELL_BOTTOM"
+    WELL_TOP = "WELL_TOP"
+    MENISCUS = "MENISCUS"
+    TRASH = "TRASH"
 
 
 @dataclass

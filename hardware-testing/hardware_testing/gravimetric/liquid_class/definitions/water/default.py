@@ -1,7 +1,5 @@
-from ....liquid_class_settings import *
-from .. import default as _default
-from . import p1000, p50
-
+from ...liquid_class_settings import *
+from ..default import default as _default
 
 default = Liquid(
     submerge=Submerge(
@@ -98,9 +96,3 @@ default = Liquid(
         push_out=_default.dispense.push_out,
     ),
 )
-
-__all__ = [
-    "default",
-    "p1000",
-    "p50",
-]
