@@ -282,3 +282,16 @@ export const selectZoomedIntoSlot: (
   type: 'ZOOMED_INTO_SLOT',
   payload,
 })
+
+export interface GenerateNewProtocolAction {
+  type: 'GENERATE_NEW_PROTOCOL'
+  payload: {
+    isNewProtocol: boolean
+  }
+}
+export const generateNewProtocol: (
+  payload: GenerateNewProtocolAction['payload']
+) => GenerateNewProtocolAction = payload => ({
+  type: 'GENERATE_NEW_PROTOCOL',
+  payload,
+})
