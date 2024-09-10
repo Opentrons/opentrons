@@ -43,7 +43,6 @@ export const AnnouncementModal = (): JSX.Element => {
         <Modal
           title={heading}
           type="info"
-          onClose={handleClick}
           footer={
             <Flex justifyContent={JUSTIFY_END} padding={SPACING.spacing24}>
               <PrimaryButton onClick={handleClick}>
