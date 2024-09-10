@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { css } from 'styled-components'
 import { ErrorBoundary } from 'react-error-boundary'
 
@@ -225,6 +225,14 @@ export function OnDeviceDisplayAppRoutes(): JSX.Element {
     setCurrentNode(node)
   }, [])
   const isScrolling = useScrolling(currentNode)
+  const location = useLocation()
+  React.useEffect(() => {
+    currentNode?.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto',
+    })
+  }, [location.pathname])
 
   const { unfinishedUnboxingFlowRoute } = useSelector(
     getOnDeviceDisplaySettings
