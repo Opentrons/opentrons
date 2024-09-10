@@ -71,14 +71,9 @@ export function SlotDetailsContainer(
   let wellContents: ContentsByWell | null = null
   if (offDeckLabwareId != null && allWellContentsForActiveItem != null) {
     wellContents = allWellContentsForActiveItem[offDeckLabwareId]
-  } else if (
-    offDeckLabwareId == null &&
-    allWellContentsForActiveItem != null &&
-    liquidsLabware != null
-  ) {
+  } else if (allWellContentsForActiveItem != null && liquidsLabware != null) {
     wellContents = allWellContentsForActiveItem[liquidsLabware.id]
   }
-  console.log('well contents', liquidsLabware, wellContents)
   const liquids =
     wellContents != null
       ? Object.values(wellContents).flatMap(content => content.groupIds)
