@@ -19,6 +19,7 @@ import { getTopPortalEl } from '../../components/portals/TopPortal'
 import { renameLabware } from '../../labware-ingred/actions'
 import type { ThunkDispatch } from '../../types'
 
+const MAX_NICK_NAME_LENGTH = 115
 interface EditNickNameModalProps {
   labwareId: string
   onClose: () => void
@@ -55,7 +56,7 @@ export function EditNickNameModal(props: EditNickNameModalProps): JSX.Element {
           </SecondaryButton>
           <PrimaryButton
             onClick={saveNickname}
-            disabled={nickName.length >= 115}
+            disabled={nickName.length >= MAX_NICK_NAME_LENGTH}
           >
             {t('shared:save')}
           </PrimaryButton>
@@ -73,7 +74,9 @@ export function EditNickNameModal(props: EditNickNameModalProps): JSX.Element {
           </StyledText>
         </Flex>
         <InputField
-          error={nickName.length >= 115 ? t('rename_error') : null}
+          error={
+            nickName.length >= MAX_NICK_NAME_LENGTH ? t('rename_error') : null
+          }
           data-testid="renameLabware_inputField"
           name="renameLabware"
           onChange={e => {
