@@ -1,5 +1,5 @@
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { LabwareWellGroupProperties } from '../../../pages/Labware/types'
+import type { LabwareWellGroupProperties } from '../../../pages/Desktop/Labware/types'
 import type * as Types from '../types'
 
 export const mockDefinition: LabwareDefinition2 = {

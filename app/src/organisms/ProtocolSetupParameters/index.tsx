@@ -29,7 +29,7 @@ import { ChooseEnum } from './ChooseEnum'
 import { ChooseNumber } from './ChooseNumber'
 import { ChooseCsvFile } from './ChooseCsvFile'
 import { useToaster } from '../ToasterOven'
-import { ProtocolSetupStep } from '../../pages/ProtocolSetup'
+import { ProtocolSetupStep } from '../../pages/ODD/ProtocolSetup'
 import type {
   CompletedProtocolAnalysis,
   ChoiceParameter,
@@ -39,7 +39,7 @@ import type {
   ValueRunTimeParameter,
   CsvFileParameterFileData,
 } from '@opentrons/shared-data'
-import type { ProtocolSetupStepStatus } from '../../pages/ProtocolSetup'
+import type { ProtocolSetupStepStatus } from '../../pages/ODD/ProtocolSetup'
 import type { FileData, LabwareOffsetCreateData } from '@opentrons/api-client'
 
 interface ProtocolSetupParametersProps {

@@ -34,7 +34,7 @@ import type {
   DeckDefinition,
   RobotType,
 } from '@opentrons/shared-data'
-import type { SetupScreens } from '../../pages/ProtocolSetup'
+import type { SetupScreens } from '../../pages/ODD/ProtocolSetup'
 import type { CutoutConfigAndCompatibility } from '../../resources/deck_configuration/hooks'
 import { useSelector } from 'react-redux'
 import { getLocalRobot } from '../../redux/discovery'

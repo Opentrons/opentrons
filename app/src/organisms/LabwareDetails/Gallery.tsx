@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 import { labwareImages } from './labware-images'
 
-import type { LabwareDefinition } from '../../pages/Labware/types'
+import type { LabwareDefinition } from '../../pages/Desktop/Labware/types'
 
 export const UNIVERSAL_FLAT_ADAPTER_X_DIMENSION = 127.4
 

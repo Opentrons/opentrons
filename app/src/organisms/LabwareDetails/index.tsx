@@ -35,7 +35,7 @@ import { ManufacturerDetails } from './ManufacturerDetails'
 import { InsertDetails } from './InsertDetails'
 import { Gallery } from './Gallery'
 import { CustomLabwareOverflowMenu } from '../LabwareCard/CustomLabwareOverflowMenu'
-import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
+import type { LabwareDefAndDate } from '../../pages/Desktop/Labware/hooks'
 
 const CLOSE_ICON_STYLE = css`
   border-radius: 50%;

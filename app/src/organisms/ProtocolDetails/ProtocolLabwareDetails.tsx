@@ -23,7 +23,7 @@ import { getTopPortalEl } from '../../App/portal'
 import { LabwareDetails } from '../LabwareDetails'
 
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
-import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
+import type { LabwareDefAndDate } from '../../pages/Desktop/Labware/hooks'
 
 interface ProtocolLabwareDetailsProps {
   requiredLabwareDetails: LoadLabwareRunTimeCommand[] | null

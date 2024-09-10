@@ -27,9 +27,9 @@ import {
 } from '../Devices/hooks'
 import { useCurrentRunId } from '../../resources/runs'
 
-import type { DashboardCalOffsetInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
-import type { DashboardCalTipLengthInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
-import type { DashboardCalDeckInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
+import type { DashboardCalOffsetInvoker } from '../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
+import type { DashboardCalTipLengthInvoker } from '../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
+import type { DashboardCalDeckInvoker } from '../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
 
 interface CalibrationTaskListProps {
   robotName: string

@@ -23,7 +23,7 @@ import {
 } from '../../redux/config'
 
 import type { Dispatch } from '../../redux/types'
-import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../pages/ODD/RobotSettingsDashboard'
 import { IconButton } from '../../atoms/buttons/IconButton'
 
 interface BrightnessTileProps {
