@@ -6,7 +6,7 @@ import { isAnyHeaterShakerShaking } from '../modals'
 
 import type { UseConditionalConfirmResult } from '@opentrons/components'
 import type { RunStatus, AttachedModule } from '@opentrons/api-client'
-import type { ConfirmMissingStepsModalProps } from '../../../ConfirmMissingStepsModal'
+import type { ConfirmMissingStepsModalProps } from '../modals'
 
 interface UseMissingStepsModalProps {
   runStatus: RunStatus | null

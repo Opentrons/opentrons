@@ -9,9 +9,9 @@ import {
   ProtocolAnalysisErrorModal,
   ProtocolDropTipModal,
   RunFailedModal,
+  ConfirmMissingStepsModal,
 } from './modals'
 import { ConfirmAttachmentModal } from '../../../../ModuleCard/ConfirmAttachmentModal'
-import { ConfirmMissingStepsModal } from '../../ConfirmMissingStepsModal'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { RunControls } from '../../../../RunTimeControl/hooks'
