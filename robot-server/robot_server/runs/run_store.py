@@ -11,7 +11,7 @@ from sqlalchemy import and_, or_
 from pydantic import ValidationError
 
 from opentrons.util.helpers import utc_now
-from opentrons.protocol_engine import StateSummary, CommandSlice
+from opentrons.protocol_engine import StateSummary, CommandSlice, CommandIntent
 from opentrons.protocol_engine.commands import Command
 from opentrons.protocol_engine.types import RunTimeParameter
 
@@ -179,7 +179,7 @@ class RunStore:
                         "command": pydantic_to_json(command),
                         "command_intent": str(command.intent.value)
                         if command.intent
-                        else None,
+                        else CommandIntent.PROTOCOL,
                     },
                 )
 
@@ -466,10 +466,7 @@ class RunStore:
                 select_count = sqlalchemy.select(sqlalchemy.func.count()).where(
                     and_(
                         run_command_table.c.run_id == run_id,
-                        or_(
-                            run_command_table.c.command_intent != "fixit",
-                            run_command_table.c.command_intent == None,  # noqa: E711
-                        ),
+                        run_command_table.c.command_intent != "fixit",
                     )
                 )
             count_result: int = transaction.execute(select_count).scalar_one()
@@ -498,10 +495,7 @@ class RunStore:
                         run_command_table.c.run_id == run_id,
                         run_command_table.c.index_in_run >= actual_cursor,
                         run_command_table.c.index_in_run < actual_cursor + length,
-                        or_(
-                            run_command_table.c.command_intent != "fixit",
-                            run_command_table.c.command_intent == None,  # noqa: E711
-                        ),
+                        run_command_table.c.command_intent != "fixit",
                     )
                     .order_by(run_command_table.c.index_in_run)
                 )
