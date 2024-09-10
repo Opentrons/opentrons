@@ -7,13 +7,13 @@ import {
   ConnectingNetwork,
   FailedToConnect,
   WifiConnectionDetails,
-} from '../../organisms/NetworkSettings'
-import { RobotSetupHeader } from '../../organisms/RobotSetupHeader'
-import * as RobotApi from '../../redux/robot-api'
+} from '../../../organisms/NetworkSettings'
+import { RobotSetupHeader } from '../../../organisms/RobotSetupHeader'
+import * as RobotApi from '../../../redux/robot-api'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { RequestState } from '../../redux/robot-api/types'
-import type { WifiScreenOption } from '../../pages/ConnectViaWifi'
+import type { RequestState } from '../../../redux/robot-api/types'
+import type { WifiScreenOption } from './'
 
 interface WifiConnectStatusProps {
   handleConnect: () => void

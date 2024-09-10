@@ -6,9 +6,9 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '../../__testing-utils__'
 import { i18n } from '../../i18n'
 import { OnDeviceLocalizationProvider } from '../../LocalizationProvider'
-import { ConnectViaEthernet } from '../../pages/ConnectViaEthernet'
-import { ConnectViaUSB } from '../../pages/ConnectViaUSB'
-import { ConnectViaWifi } from '../../pages/ConnectViaWifi'
+import { ConnectViaEthernet } from '../../pages/ODD/ConnectViaEthernet'
+import { ConnectViaUSB } from '../../pages/ODD/ConnectViaUSB'
+import { ConnectViaWifi } from '../../pages/ODD/ConnectViaWifi'
 import { NetworkSetupMenu } from '../../pages/NetworkSetupMenu'
 import { InstrumentsDashboard } from '../../pages/ODD/InstrumentsDashboard'
 import { RobotDashboard } from '../../pages/ODD/RobotDashboard'
@@ -49,9 +49,9 @@ vi.mock('@opentrons/react-api-client', async () => {
 vi.mock('../../LocalizationProvider')
 vi.mock('../../pages/Welcome')
 vi.mock('../../pages/NetworkSetupMenu')
-vi.mock('../../pages/ConnectViaEthernet')
-vi.mock('../../pages/ConnectViaUSB')
-vi.mock('../../pages/ConnectViaWifi')
+vi.mock('../../pages/ODD/ConnectViaEthernet')
+vi.mock('../../pages/ODD/ConnectViaUSB')
+vi.mock('../../pages/ODD/ConnectViaWifi')
 vi.mock('../../pages/ODD/RobotDashboard')
 vi.mock('../../pages/ODD/RobotSettingsDashboard')
 vi.mock('../../pages/ODD/ProtocolDashboard')

@@ -2,16 +2,16 @@ import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { vi, it, describe, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '../../../../__testing-utils__'
 
-import { i18n } from '../../../i18n'
-import * as Networking from '../../../redux/networking'
-import { TitleHeader } from '../../../pages/ConnectViaEthernet/TitleHeader'
-import { DisplayConnectionStatus } from '../../../pages/ConnectViaEthernet/DisplayConnectionStatus'
-import { ConnectViaEthernet } from '../../../pages/ConnectViaEthernet'
+import { i18n } from '../../../../i18n'
+import * as Networking from '../../../../redux/networking'
+import { TitleHeader } from '../TitleHeader'
+import { DisplayConnectionStatus } from '../DisplayConnectionStatus'
+import { ConnectViaEthernet } from '../'
 
-vi.mock('../../../redux/networking')
-vi.mock('../../../redux/discovery')
+vi.mock('../../../../redux/networking')
+vi.mock('../../../../redux/discovery')
 vi.mock('../TitleHeader')
 vi.mock('../DisplayConnectionStatus')
 

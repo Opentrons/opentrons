@@ -18,8 +18,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useConnectionsQuery } from '@opentrons/react-api-client'
-import { StepMeter } from '../../atoms/StepMeter'
-import { MediumButton } from '../../atoms/buttons'
+import { StepMeter } from '../../../atoms/StepMeter'
+import { MediumButton } from '../../../atoms/buttons'
 
 export function ConnectViaUSB(): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared', 'branded'])

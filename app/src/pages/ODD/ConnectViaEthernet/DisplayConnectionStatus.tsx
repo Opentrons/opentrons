@@ -16,7 +16,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { MediumButton } from '../../atoms/buttons'
+import { MediumButton } from '../../../atoms/buttons'
 
 interface DisplayConnectionStatusProps {
   isConnected: boolean

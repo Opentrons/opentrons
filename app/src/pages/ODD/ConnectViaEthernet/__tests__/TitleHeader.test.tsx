@@ -2,8 +2,8 @@ import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { TitleHeader } from '../../../pages/ConnectViaEthernet/TitleHeader'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { TitleHeader } from '../TitleHeader'
 
 import type { NavigateFunction } from 'react-router-dom'
 
