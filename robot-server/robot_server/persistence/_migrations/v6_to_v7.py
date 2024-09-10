@@ -40,7 +40,7 @@ class Migration6to7(Migration):  # noqa: D101
         source_db_file = source_dir / DB_FILE
         dest_db_file = dest_dir / DB_FILE
 
-        # Append the new column to existing protocols in v4 database
+        # Append the new column to existing protocols in v6 database
         with ExitStack() as exit_stack:
             source_engine = exit_stack.enter_context(sql_engine_ctx(source_db_file))
 
