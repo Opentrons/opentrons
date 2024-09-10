@@ -7,7 +7,7 @@ from functools import lru_cache
 from typing import Dict, List, Optional, Literal, Union
 
 import sqlalchemy
-from sqlalchemy import and_, or_
+from sqlalchemy import and_
 from pydantic import ValidationError
 
 from opentrons.util.helpers import utc_now
@@ -531,10 +531,7 @@ class RunStore:
                     sqlalchemy.select(run_command_table.c.command)
                     .where(
                         and_(run_command_table.c.run_id == run_id),
-                        or_(
-                            run_command_table.c.command_intent != "fixit",
-                            run_command_table.c.command_intent == None,  # noqa: E711
-                        ),
+                        run_command_table.c.command_intent != "fixit",
                     )
                     .order_by(run_command_table.c.index_in_run)
                 )
