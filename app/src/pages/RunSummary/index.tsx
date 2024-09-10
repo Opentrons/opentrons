@@ -147,7 +147,7 @@ export function RunSummary(): JSX.Element {
   const trackEvent = useTrackEvent()
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
-  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
+  const { closeCurrentRun } = useCloseCurrentRun()
   // Close the current run only if it's active and then execute the onSuccess callback. Prefer this wrapper over
   // closeCurrentRun directly, since the callback is swallowed if currentRun is null.
   const closeCurrentRunIfValid = (onSuccess?: () => void): void => {
@@ -386,7 +386,6 @@ export function RunSummary(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
       overflow={OVERFLOW_HIDDEN}
-      disabled={isClosingCurrentRun}
       onClick={handleClickSplash}
     >
       {showSplash ? (
