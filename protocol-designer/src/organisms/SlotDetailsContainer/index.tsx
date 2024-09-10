@@ -52,7 +52,6 @@ export function SlotDetailsContainer(
   const labwareOnSlot = Object.values(deckSetupLabwares).find(
     lw => lw.slot === slot || lw.slot === moduleOnSlot?.id
   )
-  console.log('labwareOnSlot', labwareOnSlot)
   const nestedLabwareOnSlot = Object.values(deckSetupLabwares).find(
     lw => lw.slot === labwareOnSlot?.id
   )
@@ -74,6 +73,7 @@ export function SlotDetailsContainer(
   } else if (allWellContentsForActiveItem != null && liquidsLabware != null) {
     wellContents = allWellContentsForActiveItem[liquidsLabware.id]
   }
+
   const liquids =
     wellContents != null
       ? Object.values(wellContents).flatMap(content => content.groupIds)
