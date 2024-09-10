@@ -120,6 +120,9 @@ EXPECTED_STATEMENTS_LATEST = [
     CREATE INDEX ix_protocol_protocol_kind ON protocol (protocol_kind)
     """,
     """
+    CREATE INDEX ix_run_command_command_intent ON run_command (command_intent)
+    """,
+    """
     CREATE TABLE data_files (
         id VARCHAR NOT NULL,
         name VARCHAR NOT NULL,
