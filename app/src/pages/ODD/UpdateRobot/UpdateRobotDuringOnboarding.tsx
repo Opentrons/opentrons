@@ -5,27 +5,27 @@ import { useTranslation } from 'react-i18next'
 
 import { Flex, SPACING, DIRECTION_ROW } from '@opentrons/components'
 
-import { useDispatchStartRobotUpdate } from '../../redux/robot-update/hooks'
+import { useDispatchStartRobotUpdate } from '../../../redux/robot-update/hooks'
 
-import { getLocalRobot } from '../../redux/discovery'
+import { getLocalRobot } from '../../../redux/discovery'
 import {
   getRobotUpdateAvailable,
   clearRobotUpdateSession,
-} from '../../redux/robot-update'
-import { UNREACHABLE } from '../../redux/discovery/constants'
+} from '../../../redux/robot-update'
+import { UNREACHABLE } from '../../../redux/discovery/constants'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
-} from '../../redux/config'
-import { MediumButton } from '../../atoms/buttons'
+} from '../../../redux/config'
+import { MediumButton } from '../../../atoms/buttons'
 import {
   UpdateRobotSoftware,
   CheckUpdates,
   NoUpdateFound,
   ErrorUpdateSoftware,
-} from '../../organisms/UpdateRobotSoftware'
+} from '../../../organisms/UpdateRobotSoftware'
 
-import type { Dispatch, State } from '../../redux/types'
+import type { Dispatch, State } from '../../../redux/types'
 
 const CHECK_UPDATES_DURATION = 10000 // Note: kj 1/10/2023 Currently set 10 sec later we may use a status from state
 
