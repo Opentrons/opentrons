@@ -26,7 +26,7 @@ import { useCurrentRunId } from '../../../../../../resources/runs'
 import { RUN_AGAIN_STATUSES } from '../../constants'
 import {
   useActionBtnDisabledUtils,
-  useButtonProperties,
+  useActionButtonProperties,
   useIsRobotOnWrongVersionOfSoftware,
 } from './hooks'
 import { getFallbackRobotSerialNumber } from '../../utils'
@@ -92,22 +92,22 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
 
   const validRunAgainButRequiresSetup = isValidRunAgain && !isSetupComplete
 
-  const { buttonText, handleButtonClick, buttonIconName } = useButtonProperties(
-    {
-      isProtocolNotReady,
-      confirmMissingSteps:
-        missingStepsModalUtils.conditionalConfirmUtils.confirm,
-      confirmAttachment:
-        HSConfirmationModalUtils.conditionalConfirmUtils.confirm,
-      robotAnalyticsData,
-      robotSerialNumber,
-      currentRunId,
-      isValidRunAgain,
-      isOtherRunCurrent,
-      isRobotOnWrongVersionOfSoftware,
-      ...props,
-    }
-  )
+  const {
+    buttonText,
+    handleButtonClick,
+    buttonIconName,
+  } = useActionButtonProperties({
+    isProtocolNotReady,
+    confirmMissingSteps: missingStepsModalUtils.conditionalConfirmUtils.confirm,
+    confirmAttachment: HSConfirmationModalUtils.conditionalConfirmUtils.confirm,
+    robotAnalyticsData,
+    robotSerialNumber,
+    currentRunId,
+    isValidRunAgain,
+    isOtherRunCurrent,
+    isRobotOnWrongVersionOfSoftware,
+    ...props,
+  })
 
   return (
     <>

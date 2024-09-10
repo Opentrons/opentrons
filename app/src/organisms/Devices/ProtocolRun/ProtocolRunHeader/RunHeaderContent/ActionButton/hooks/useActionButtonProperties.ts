@@ -38,7 +38,7 @@ interface UseButtonPropertiesProps extends BaseActionButtonProps {
 }
 
 // Returns ActionButton properties.
-export function useButtonProperties({
+export function useActionButtonProperties({
   isProtocolNotReady,
   runStatus,
   missingSetupSteps,
