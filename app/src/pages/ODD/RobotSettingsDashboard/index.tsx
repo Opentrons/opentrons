@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import last from 'lodash/last'
 
-import { EthernetConnectionDetails } from '../../organisms/RobotSettingsDashboard/NetworkSettings/EthernetConnectionDetails'
+import { EthernetConnectionDetails } from '../../../organisms/RobotSettingsDashboard/NetworkSettings/EthernetConnectionDetails'
 import {
   DeviceReset,
   TouchscreenBrightness,
@@ -18,24 +18,24 @@ import {
   RobotSettingsWifiConnect,
   RobotSystemVersion,
   UpdateChannel,
-} from '../../organisms/RobotSettingsDashboard'
+} from '../../../organisms/RobotSettingsDashboard'
 import {
   getRobotUpdateAvailable,
   getRobotUpdateInfoForRobot,
-} from '../../redux/robot-update'
+} from '../../../redux/robot-update'
 import {
   getLocalRobot,
   getRobotApiVersion,
   UNREACHABLE,
-} from '../../redux/discovery'
-import { fetchStatus, postWifiConfigure } from '../../redux/networking'
-import { getRequestById, useDispatchApiRequest } from '../../redux/robot-api'
-import { useWifiList } from '../../resources/networking/hooks'
-import { useNetworkConnection } from '../../resources/networking/hooks/useNetworkConnection'
-import { RobotSettingsList } from '../../pages/RobotSettingsDashboard/RobotSettingsList'
+} from '../../../redux/discovery'
+import { fetchStatus, postWifiConfigure } from '../../../redux/networking'
+import { getRequestById, useDispatchApiRequest } from '../../../redux/robot-api'
+import { useWifiList } from '../../../resources/networking/hooks'
+import { useNetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
+import { RobotSettingsList } from './RobotSettingsList'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { Dispatch, State } from '../../redux/types'
+import type { Dispatch, State } from '../../../redux/types'
 
 /**
  * a set of screen options for the robot settings dashboard page

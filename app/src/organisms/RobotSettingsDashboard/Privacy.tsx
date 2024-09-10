@@ -11,15 +11,15 @@ import {
 } from '@opentrons/components'
 
 import { ChildNavigation } from '../../organisms/ChildNavigation'
-import { RobotSettingButton } from '../../pages/RobotSettingsDashboard/RobotSettingButton'
-import { OnOffToggle } from '../../pages/RobotSettingsDashboard/RobotSettingsList'
+import { RobotSettingButton } from '../../pages/ODD/RobotSettingsDashboard/RobotSettingButton'
+import { OnOffToggle } from '../../pages/ODD/RobotSettingsDashboard/RobotSettingsList'
 import {
   getAnalyticsOptedIn,
   toggleAnalyticsOptedIn,
 } from '../../redux/analytics'
 
 import type { Dispatch } from '../../redux/types'
-import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../pages/ODD/RobotSettingsDashboard'
 
 interface PrivacyProps {
   robotName: string
