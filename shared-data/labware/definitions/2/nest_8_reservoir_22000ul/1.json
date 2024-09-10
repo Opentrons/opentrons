@@ -106,7 +106,7 @@
     }
   ],
   "parameters": {
-    "format": "Trough",
+    "format": "trough",
     "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
