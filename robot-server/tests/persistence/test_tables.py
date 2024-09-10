@@ -105,7 +105,7 @@ EXPECTED_STATEMENTS_LATEST = [
         index_in_run INTEGER NOT NULL,
         command_id VARCHAR NOT NULL,
         command VARCHAR NOT NULL,
-        command_intent VARCHAR,
+        command_intent VARCHAR NOT NULL,
         PRIMARY KEY (row_id),
         FOREIGN KEY(run_id) REFERENCES run (id)
     )

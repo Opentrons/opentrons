@@ -107,8 +107,7 @@ def _migrate_protocol_table_with_wrong_kind(
     for old_row in source_transaction.execute(select_old_protocols).all():
         new_protocol_kind = (
             schema_6.ProtocolKindSQLEnum.STANDARD.value
-            if old_row.protocol_kind
-            == "<ProtocolKindSQLEnum.STANDARD: 'standard'>"  # noqa: E711
+            if old_row.protocol_kind == "<ProtocolKindSQLEnum.STANDARD: 'standard'>"
             else schema_6.ProtocolKindSQLEnum.QUICK_TRANSFER.value
         )
         dest_transaction.execute(
@@ -130,7 +129,6 @@ def _migrate_command_table_with_new_command_intent_col(
     )
     insert_new_command = sqlalchemy.insert(schema_7.run_command_table)
     for old_row in source_transaction.execute(select_old_commands).all():
-        print(f"old command location: {old_row.command}")
         new_command_intent = (
             # Account for old_row.command["intent"] being NULL.
             "protocol"
