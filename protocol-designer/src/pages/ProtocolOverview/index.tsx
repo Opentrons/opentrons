@@ -21,6 +21,7 @@ import {
   SPACING,
   StyledText,
   TYPOGRAPHY,
+  ToggleGroup,
 } from '@opentrons/components'
 import {
   getPipetteSpecsV2,
@@ -47,8 +48,10 @@ import { MaterialsListModal } from '../../organisms/MaterialsListModal'
 import {
   EditProtocolMetadataModal,
   EditInstrumentsModal,
+  SlotDetailsContainer,
 } from '../../organisms'
 import { DeckThumbnail } from './DeckThumbnail'
+import { OffDeckThumbnail } from './OffdeckThumbnail'
 
 import type { CreateCommand, PipetteName } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
@@ -72,7 +75,12 @@ interface Fixture {
 }
 
 export function ProtocolOverview(): JSX.Element {
-  const { t } = useTranslation(['protocol_overview', 'alert', 'shared'])
+  const { t } = useTranslation([
+    'protocol_overview',
+    'alert',
+    'shared',
+    'starting_deck_State',
+  ])
   const navigate = useNavigate()
   const [
     showEditInstrumentsModal,
@@ -89,8 +97,7 @@ export function ProtocolOverview(): JSX.Element {
     labwareIngredSelectors.allIngredientGroupFields
   )
   const dispatch: ThunkDispatch<any> = useDispatch()
-  const [hoverSlot, setHoverSlot] = React.useState<DeckSlot | null>(null)
-  // TODO: wire up the slot information from hoverSlot
+  const [hover, setHover] = React.useState<DeckSlot | string | null>(null)
   const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
   const [
     showMaterialsListModal,
@@ -102,12 +109,20 @@ export function ProtocolOverview(): JSX.Element {
   const liquidsOnDeck = useSelector(
     labwareIngredSelectors.allIngredientNamesIds
   )
+  const leftString = t('starting_deck_state:onDeck')
+  const rightString = t('starting_deck_state:offDeck')
+
+  const [deckView, setDeckView] = React.useState<
+    typeof leftString | typeof rightString
+  >(leftString)
+
   const {
     modules: modulesOnDeck,
     labware: labwaresOnDeck,
     additionalEquipmentOnDeck,
     pipettes,
   } = initialDeckSetup
+  const isOffDeckHover = hover != null && labwaresOnDeck[hover] != null
 
   const nonLoadCommands =
     fileData?.commands.filter(
@@ -466,30 +481,50 @@ export function ProtocolOverview(): JSX.Element {
             <Flex
               marginBottom={SPACING.spacing12}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
+              alignItems={ALIGN_CENTER}
             >
-              <StyledText desktopStyle="headingSmallBold">
-                {t('starting_deck')}
-              </StyledText>
-              <Btn
-                data-testid="Materials_list"
-                textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                onClick={() => {
-                  setShowMaterialsListModal(true)
-                }}
-              >
-                <StyledText desktopStyle="bodyDefaultRegular">
-                  {t('materials_list')}
+              <Flex gridGap="30px" alignItems={ALIGN_CENTER}>
+                <StyledText desktopStyle="headingSmallBold">
+                  {t('starting_deck')}
                 </StyledText>
-              </Btn>
+                <Btn
+                  data-testid="Materials_list"
+                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                  onClick={() => {
+                    setShowMaterialsListModal(true)
+                  }}
+                >
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('materials_list')}
+                  </StyledText>
+                </Btn>
+              </Flex>
+              <ToggleGroup
+                selectedValue={deckView}
+                leftText={leftString}
+                rightText={rightString}
+                leftClick={() => {
+                  setDeckView(leftString)
+                }}
+                rightClick={() => {
+                  setDeckView(rightString)
+                }}
+              />
             </Flex>
             <Flex
               flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing4}
+              gridGap={SPACING.spacing32}
               alignItems={ALIGN_CENTER}
             >
-              <DeckThumbnail
-                hoverSlot={hoverSlot}
-                setHoverSlot={setHoverSlot}
+              {deckView === leftString ? (
+                <DeckThumbnail hoverSlot={hover} setHoverSlot={setHover} />
+              ) : (
+                <OffDeckThumbnail hover={hover} setHover={setHover} />
+              )}
+              <SlotDetailsContainer
+                robotType={robotType}
+                slot={isOffDeckHover ? 'offDeck' : hover}
+                offDeckLabwareId={hover ?? undefined}
               />
             </Flex>
           </Flex>

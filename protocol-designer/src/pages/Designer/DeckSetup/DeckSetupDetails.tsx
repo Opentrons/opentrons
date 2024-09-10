@@ -416,7 +416,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
       {menuListSlotPosition != null && menuListId != null ? (
         <SlotOverflowMenu
           menuListSlotPosition={menuListSlotPosition}
-          slot={menuListId}
+          location={menuListId}
           addEquipment={addEquipment}
           setShowMenuList={() => {
             setShowMenuListForId(null)

@@ -43,10 +43,8 @@ export function SlotDetailsContainer(
     additionalEquipmentOnDeck,
   } = deckSetup
 
-  const offDeckLabwareDisplayName =
-    offDeckLabwareId != null
-      ? deckSetupLabwares[offDeckLabwareId].def.metadata.displayName
-      : null
+  const offDeckLabwareNickName =
+    offDeckLabwareId != null ? nickNames[offDeckLabwareId] : null
 
   const moduleOnSlot = Object.values(deckSetupModules).find(
     module => module.slot === slot
@@ -93,8 +91,8 @@ export function SlotDetailsContainer(
     .filter(Boolean)
 
   const labwares: string[] = []
-  if (offDeckLabwareDisplayName != null) {
-    labwares.push(offDeckLabwareDisplayName)
+  if (offDeckLabwareNickName != null) {
+    labwares.push(offDeckLabwareNickName)
   } else {
     if (labwareOnSlot != null) {
       labwares.push(nickNames[labwareOnSlot.id])
