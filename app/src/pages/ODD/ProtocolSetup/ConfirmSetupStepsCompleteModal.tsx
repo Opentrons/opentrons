@@ -8,29 +8,29 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../atoms/buttons'
-import { OddModal } from '../../molecules/OddModal'
+import { SmallButton } from '../../../atoms/buttons'
+import { OddModal } from '../../../molecules/OddModal'
 
-import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
 
-interface ConfirmAttachedModalProps {
+interface ConfirmSetupStepsCompleteModalProps {
   onCloseClick: () => void
-  isProceedToRunModal: boolean
   onConfirmClick: () => void
+  missingSteps: string[]
 }
 
-export function ConfirmAttachedModal({
+export function ConfirmSetupStepsCompleteModal({
   onCloseClick,
-  isProceedToRunModal,
+  missingSteps,
   onConfirmClick,
-}: ConfirmAttachedModalProps): JSX.Element {
+}: ConfirmSetupStepsCompleteModalProps): JSX.Element {
   const { i18n, t } = useTranslation(['protocol_setup', 'shared'])
   const modalHeader: OddModalHeaderBaseProps = {
-    title: t('confirm_heater_shaker_module_modal_title'),
+    title: t('are_you_sure_you_want_to_proceed'),
     hasExitIcon: true,
   }
 
-  const handleProceedToRun = (): void => {
+  const handleStartRun = (): void => {
     onConfirmClick()
     onCloseClick()
   }
@@ -39,13 +39,18 @@ export function ConfirmAttachedModal({
     <OddModal header={modalHeader} onOutsideClick={onCloseClick}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <LegacyStyledText as="p">
-          {t('confirm_heater_shaker_module_modal_description')}
+          {t('you_havent_confirmed', {
+            missingSteps: new Intl.ListFormat('en', {
+              style: 'short',
+              type: 'conjunction',
+            }).format(missingSteps),
+          })}
         </LegacyStyledText>
         <Flex gridGap={SPACING.spacing8}>
           <SmallButton
             flex="1"
             buttonType="secondary"
-            buttonText={i18n.format(t('shared:cancel'), 'capitalize')}
+            buttonText={i18n.format(t('shared:go_back'), 'capitalize')}
             onClick={() => {
               onCloseClick()
             }}
@@ -53,8 +58,8 @@ export function ConfirmAttachedModal({
           <SmallButton
             flex="1"
             buttonType="primary"
-            buttonText={t('proceed_to_run')}
-            onClick={handleProceedToRun}
+            buttonText={t('start_run')}
+            onClick={handleStartRun}
           />
         </Flex>
       </Flex>

@@ -42,7 +42,7 @@ import {
 import {
   ProtocolSetupTitleSkeleton,
   ProtocolSetupStepSkeleton,
-} from '../../organisms/OnDeviceDisplay/ProtocolSetup'
+} from '../../../organisms/OnDeviceDisplay/ProtocolSetup'
 import {
   useAttachedModules,
   useLPCDisabledReason,
@@ -51,57 +51,57 @@ import {
   useRobotAnalyticsData,
   useRobotType,
   useTrackProtocolRunEvent,
-} from '../../organisms/Devices/hooks'
+} from '../../../organisms/Devices/hooks'
 import {
   useRequiredProtocolHardwareFromAnalysis,
   useMissingProtocolHardwareFromAnalysis,
-} from '../../pages/Desktop/Protocols/hooks'
-import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
-import { ProtocolSetupModulesAndDeck } from '../../organisms/ProtocolSetupModulesAndDeck'
-import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
-import { ProtocolSetupOffsets } from '../../organisms/ProtocolSetupOffsets'
-import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
-import { ProtocolSetupDeckConfiguration } from '../../organisms/ProtocolSetupDeckConfiguration'
-import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
-import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModulesAndDeck/utils'
-import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
-import { AnalysisFailedModal } from '../../organisms/ProtocolSetupParameters/AnalysisFailedModal'
+} from '../../../pages/Desktop/Protocols/hooks'
+import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { ProtocolSetupLabware } from '../../../organisms/ProtocolSetupLabware'
+import { ProtocolSetupModulesAndDeck } from '../../../organisms/ProtocolSetupModulesAndDeck'
+import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
+import { ProtocolSetupOffsets } from '../../../organisms/ProtocolSetupOffsets'
+import { ProtocolSetupInstruments } from '../../../organisms/ProtocolSetupInstruments'
+import { ProtocolSetupDeckConfiguration } from '../../../organisms/ProtocolSetupDeckConfiguration'
+import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchLPC'
+import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModulesAndDeck/utils'
+import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
+import { AnalysisFailedModal } from '../../../organisms/ProtocolSetupParameters/AnalysisFailedModal'
 import {
   getIncompleteInstrumentCount,
   getProtocolUsesGripper,
-} from '../../organisms/ProtocolSetupInstruments/utils'
+} from '../../../organisms/ProtocolSetupInstruments/utils'
 import {
   useRunControls,
   useRunStatus,
-} from '../../organisms/RunTimeControl/hooks'
-import { useToaster } from '../../organisms/ToasterOven'
-import { useIsHeaterShakerInProtocol } from '../../organisms/ModuleCard/hooks'
-import { getLabwareSetupItemGroups } from '../../pages/Desktop/Protocols/utils'
-import { getLocalRobot, getRobotSerialNumber } from '../../redux/discovery'
+} from '../../../organisms/RunTimeControl/hooks'
+import { useToaster } from '../../../organisms/ToasterOven'
+import { useIsHeaterShakerInProtocol } from '../../../organisms/ModuleCard/hooks'
+import { getLabwareSetupItemGroups } from '../../../pages/Desktop/Protocols/utils'
+import { getLocalRobot, getRobotSerialNumber } from '../../../redux/discovery'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
-} from '../../redux/analytics'
-import { getIsHeaterShakerAttached } from '../../redux/config'
+} from '../../../redux/analytics'
+import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal'
-import { getLatestCurrentOffsets } from '../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
+import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 import { CloseButton, PlayButton } from './Buttons'
-import { useDeckConfigurationCompatibility } from '../../resources/deck_configuration/hooks'
-import { getRequiredDeckConfig } from '../../resources/deck_configuration/utils'
-import { useNotifyRunQuery } from '../../resources/runs'
-import { ViewOnlyParameters } from '../../organisms/ProtocolSetupParameters/ViewOnlyParameters'
+import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
+import { getRequiredDeckConfig } from '../../../resources/deck_configuration/utils'
+import { useNotifyRunQuery } from '../../../resources/runs'
+import { ViewOnlyParameters } from '../../../organisms/ProtocolSetupParameters/ViewOnlyParameters'
 
 import type { Run } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
-import type { OnDeviceRouteParams } from '../../App/types'
+import type { OnDeviceRouteParams } from '../../../App/types'
 import type {
   ProtocolHardware,
   ProtocolFixture,
-} from '../../pages/Desktop/Protocols/hooks'
-import type { ProtocolModuleInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+} from '../../../pages/Desktop/Protocols/hooks'
+import type { ProtocolModuleInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 const FETCH_DURATION_MS = 5000
 

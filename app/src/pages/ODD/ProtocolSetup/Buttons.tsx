@@ -11,7 +11,7 @@ import {
   Icon,
 } from '@opentrons/components'
 
-import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 

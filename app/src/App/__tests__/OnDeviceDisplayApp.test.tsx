@@ -13,8 +13,8 @@ import { NetworkSetupMenu } from '../../pages/NetworkSetupMenu'
 import { InstrumentsDashboard } from '../../pages/ODD/InstrumentsDashboard'
 import { RobotDashboard } from '../../pages/RobotDashboard'
 import { RobotSettingsDashboard } from '../../pages/RobotSettingsDashboard'
-import { ProtocolDashboard } from '../../pages/ProtocolDashboard'
-import { ProtocolSetup } from '../../pages/ProtocolSetup'
+import { ProtocolDashboard } from '../../pages/ODD/ProtocolDashboard'
+import { ProtocolSetup } from '../../pages/ODD/ProtocolSetup'
 import { ProtocolDetails } from '../../pages/ODD/ProtocolDetails'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 import { RunningProtocol } from '../../pages/RunningProtocol'
@@ -54,8 +54,8 @@ vi.mock('../../pages/ConnectViaUSB')
 vi.mock('../../pages/ConnectViaWifi')
 vi.mock('../../pages/RobotDashboard')
 vi.mock('../../pages/RobotSettingsDashboard')
-vi.mock('../../pages/ProtocolDashboard')
-vi.mock('../../pages/ProtocolSetup')
+vi.mock('../../pages/ODD/ProtocolDashboard')
+vi.mock('../../pages/ODD/ProtocolSetup')
 vi.mock('../../pages/ODD/ProtocolDetails')
 vi.mock('../../pages/ODD/InstrumentsDashboard')
 vi.mock('../../pages/RunningProtocol')
