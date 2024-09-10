@@ -1231,7 +1231,7 @@ class GeometryView:
         if all([f.geometry.shape == "circular" for f in sorted_frusta]):
             # get height from 0 to 1, 1 to 2, ...
             # assuming that from this point on, well cross-sections won't change between
-            # circular and rectangular or vise versa
+            # circular and rectangular or vice versa
             for i in range(len(sorted_frusta) - 1):
                 top_circular_cs = cast(
                     CircularCrossSection, sorted_frusta[i + 1].geometry
