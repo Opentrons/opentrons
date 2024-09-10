@@ -93,7 +93,9 @@ export const labwareImages: Record<string, string[]> = {
   eppendorf_96_wellplate_150ul: [eppendorf_96_wellplate_150ul_photo],
   eppendorf_96_wellplate_1000ul: [eppendorf_96_wellplate_1000ul_photo],
   eppendorf_96_wellplate_2000ul_photo: [eppendorf_96_wellplate_2000ul_photo],
-  eppendorf_twintec_384_wellplate_45ul: [eppendorf_twintec_384_wellplate_45ul_photo],
+  eppendorf_twintec_384_wellplate_45ul: [
+    eppendorf_twintec_384_wellplate_45ul_photo,
+  ],
   geb_96_tiprack_1000ul: [
     geb_96_tiprack_1000ul_side_view,
     geb_1000ul_tip_side_view,
