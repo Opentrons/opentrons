@@ -46,9 +46,7 @@ function ProtocolEditorComponent(): JSX.Element {
   const prereleaseModeEnabled = flags.PRERELEASE_MODE === true
 
   const browserRouterProps =
-    routerBaseName != null ? { basename: routerBaseName } : {}
-  console.log({ routerBaseName })
-  console.log({ browserRouterProps })
+    routerBaseName != null ? { basdename: routerBaseName } : {}
 
   return (
     <div id="protocol-editor">

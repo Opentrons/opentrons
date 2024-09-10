@@ -52,8 +52,6 @@ export function ProtocolRoutes(): JSX.Element {
   }
   const allRoutes: RouteProps[] = [...pdRoutes, landingPage]
 
-  console.log('default navigation to root with basename fix')
-
   return (
     <>
       <NavigationBar />
