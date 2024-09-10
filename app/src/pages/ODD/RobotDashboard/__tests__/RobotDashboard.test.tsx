@@ -3,20 +3,20 @@ import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '../../../../i18n'
 import {
   RecentRunProtocolCarousel,
   EmptyRecentRun,
-} from '../../../organisms/OnDeviceDisplay/RobotDashboard'
-import { Navigation } from '../../../organisms/Navigation'
-import { useMissingProtocolHardware } from '../../../pages/Desktop/Protocols/hooks'
-import { getOnDeviceDisplaySettings } from '../../../redux/config'
+} from '../../../../organisms/OnDeviceDisplay/RobotDashboard'
+import { Navigation } from '../../../../organisms/Navigation'
+import { useMissingProtocolHardware } from '../../../../pages/Desktop/Protocols/hooks'
+import { getOnDeviceDisplaySettings } from '../../../../redux/config'
 import { WelcomeModal } from '../WelcomeModal'
 import { RobotDashboard } from '..'
-import { useNotifyAllRunsQuery } from '../../../resources/runs'
+import { useNotifyAllRunsQuery } from '../../../../resources/runs'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type { NavigateFunction } from 'react-router-dom'
@@ -31,15 +31,15 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun')
+vi.mock('../../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun')
 vi.mock(
-  '../../../organisms/OnDeviceDisplay/RobotDashboard/RecentRunProtocolCarousel'
+  '../../../../organisms/OnDeviceDisplay/RobotDashboard/RecentRunProtocolCarousel'
 )
-vi.mock('../../../organisms/Navigation')
-vi.mock('../../../pages/Desktop/Protocols/hooks')
-vi.mock('../../../redux/config')
+vi.mock('../../../../organisms/Navigation')
+vi.mock('../../../../pages/Desktop/Protocols/hooks')
+vi.mock('../../../../redux/config')
 vi.mock('../WelcomeModal')
-vi.mock('../../../resources/runs')
+vi.mock('../../../../resources/runs')
 
 const render = () => {
   return renderWithProviders(

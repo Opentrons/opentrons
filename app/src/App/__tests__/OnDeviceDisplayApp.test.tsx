@@ -11,7 +11,7 @@ import { ConnectViaUSB } from '../../pages/ConnectViaUSB'
 import { ConnectViaWifi } from '../../pages/ConnectViaWifi'
 import { NetworkSetupMenu } from '../../pages/NetworkSetupMenu'
 import { InstrumentsDashboard } from '../../pages/ODD/InstrumentsDashboard'
-import { RobotDashboard } from '../../pages/RobotDashboard'
+import { RobotDashboard } from '../../pages/ODD/RobotDashboard'
 import { RobotSettingsDashboard } from '../../pages/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../../pages/ODD/ProtocolDashboard'
 import { ProtocolSetup } from '../../pages/ODD/ProtocolSetup'
@@ -52,7 +52,7 @@ vi.mock('../../pages/NetworkSetupMenu')
 vi.mock('../../pages/ConnectViaEthernet')
 vi.mock('../../pages/ConnectViaUSB')
 vi.mock('../../pages/ConnectViaWifi')
-vi.mock('../../pages/RobotDashboard')
+vi.mock('../../pages/ODD/RobotDashboard')
 vi.mock('../../pages/RobotSettingsDashboard')
 vi.mock('../../pages/ODD/ProtocolDashboard')
 vi.mock('../../pages/ODD/ProtocolSetup')
