@@ -14,15 +14,15 @@ export function getConfigureNozzleLayoutCommandText({
   )?.pipetteName
 
   const ConfigAmount = {
-    SINGLE: '1',
-    COLUMN: '8',
-    ROW: '12',
-    QUADRANT: 'partial',
-    ALL: 'all',
+    SINGLE: 'single nozzle layout',
+    COLUMN: 'column layout',
+    ROW: 'row layout',
+    QUADRANT: 'partial layout',
+    ALL: 'all nozzles',
   }
 
   return t('configure_nozzle_layout', {
-    amount: ConfigAmount[configurationParams.style],
+    layout: ConfigAmount[configurationParams.style],
     pipette:
       pipetteName != null ? getPipetteSpecsV2(pipetteName)?.displayName : '',
   })
