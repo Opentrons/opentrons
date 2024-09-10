@@ -44,7 +44,6 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     robotName,
     runStatus,
     isResetRunLoadingRef,
-    protocolRunControls,
     runHeaderModalContainerUtils,
   } = props
   const {
@@ -53,11 +52,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   } = runHeaderModalContainerUtils
 
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { isResetRunLoading } = protocolRunControls
-
   const { isProtocolAnalyzing, protocolData } = useProtocolDetailsForRun(runId)
-  isResetRunLoadingRef.current = isResetRunLoading
-
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
   const { complete: isCalibrationComplete } = useRunCalibrationStatus(
     robotName,
@@ -67,16 +62,15 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     robotName,
     runId
   )
+  const isRobotOnWrongVersionOfSoftware = useIsRobotOnWrongVersionOfSoftware(
+    robotName
+  )
+  const currentRunId = useCurrentRunId()
 
   const isSetupComplete =
     isCalibrationComplete &&
     isModuleCalibrationComplete &&
     missingModuleIds.length === 0
-  const isRobotOnWrongVersionOfSoftware = useIsRobotOnWrongVersionOfSoftware(
-    robotName
-  )
-
-  const currentRunId = useCurrentRunId()
   const isCurrentRun = currentRunId === runId
   const isOtherRunCurrent = currentRunId != null && currentRunId !== runId
   const isProtocolNotReady = protocolData == null || !!isProtocolAnalyzing
@@ -97,12 +91,10 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
 
   const validRunAgainButRequiresSetup = isValidRunAgain && !isSetupComplete
-  const runAgainWithSpinner = validRunAgainButRequiresSetup && isResetRunLoading
 
   const { buttonText, handleButtonClick, buttonIconName } = useButtonProperties(
     {
       isProtocolNotReady,
-      runAgainWithSpinner,
       confirmMissingSteps:
         missingStepsModalUtils.conditionalConfirmUtils.confirm,
       confirmAttachment:
@@ -130,7 +122,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
         id="ProtocolRunHeader_runControlButton"
         {...targetProps}
       >
-        {buttonIconName && (
+        {buttonIconName != null ? (
           <Icon
             name={buttonIconName}
             size={SIZE_1}
@@ -138,10 +130,10 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
             spin={
               isProtocolNotReady ||
               runStatus === RUN_STATUS_STOP_REQUESTED ||
-              runAgainWithSpinner
+              isResetRunLoadingRef.current
             }
           />
-        )}
+        ) : null}
         <StyledText as="pSemiBold">{buttonText}</StyledText>
       </PrimaryButton>
       {disabledReason && (

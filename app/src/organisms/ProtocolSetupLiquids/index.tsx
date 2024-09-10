@@ -65,7 +65,6 @@ export function ProtocolSetupLiquids({
             iconName="ot-check"
             text={t('liquids_confirmed')}
             type="success"
-            chipSize="small"
           />
         ) : (
           <SmallButton
@@ -74,6 +73,7 @@ export function ProtocolSetupLiquids({
               setIsConfirmed(true)
               setSetupScreen('prepare to run')
             }}
+            buttonCategory="rounded"
           />
         )}
       </Flex>

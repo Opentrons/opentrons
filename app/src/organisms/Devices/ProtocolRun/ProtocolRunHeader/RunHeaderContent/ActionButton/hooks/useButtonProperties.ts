@@ -27,7 +27,6 @@ import type { BaseActionButtonProps } from '..'
 
 interface UseButtonPropertiesProps extends BaseActionButtonProps {
   isProtocolNotReady: boolean
-  runAgainWithSpinner: boolean
   confirmMissingSteps: () => void
   confirmAttachment: () => void
   robotAnalyticsData: any
@@ -40,7 +39,6 @@ interface UseButtonPropertiesProps extends BaseActionButtonProps {
 
 export function useButtonProperties({
   isProtocolNotReady,
-  runAgainWithSpinner,
   runStatus,
   missingSetupSteps,
   robotName,
@@ -52,6 +50,7 @@ export function useButtonProperties({
   protocolRunControls,
   attachedModules,
   runHeaderModalContainerUtils,
+  isResetRunLoadingRef,
 }: UseButtonPropertiesProps): {
   buttonText: string
   handleButtonClick: () => void
@@ -119,9 +118,10 @@ export function useButtonProperties({
       }
     }
   } else if (RUN_AGAIN_STATUSES.includes(runStatus)) {
-    buttonIconName = runAgainWithSpinner ? 'ot-spinner' : 'play'
+    buttonIconName = isResetRunLoadingRef.current ? 'ot-spinner' : 'play'
     buttonText = t('run_again')
     handleButtonClick = () => {
+      isResetRunLoadingRef.current = true
       reset()
       trackEvent({
         name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,

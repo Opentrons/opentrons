@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { useHost } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import {
   useDropTipWizardFlows,
@@ -124,7 +124,7 @@ export function useRunHeaderDropTip({
     if (
       runStatus === RUN_STATUS_STOPPED &&
       isRunCurrent &&
-      initialPipettesWithTipsCount === 0 &&
+      (initialPipettesWithTipsCount === 0 || robotType === OT2_ROBOT_TYPE) &&
       !enteredER
     ) {
       closeCurrentRun()

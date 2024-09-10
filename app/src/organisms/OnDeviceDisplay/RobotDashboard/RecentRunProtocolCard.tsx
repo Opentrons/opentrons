@@ -38,7 +38,7 @@ import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
 import { useRerunnableStatusText } from './hooks'
 
-import type { Run, RunData, RunStatus } from '@opentrons/api-client'
+import type { RunData, RunStatus } from '@opentrons/api-client'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
 interface RecentRunProtocolCardProps {
@@ -51,7 +51,8 @@ export function RecentRunProtocolCard({
   const { data, isLoading } = useProtocolQuery(runData.protocolId ?? null)
   const protocolData = data?.data ?? null
   const isProtocolFetching = isLoading
-  return protocolData == null ? null : (
+  return protocolData == null ||
+    protocolData.protocolKind === 'quick-transfer' ? null : (
     <ProtocolWithLastRun
       protocolData={protocolData}
       runData={runData}
@@ -88,10 +89,7 @@ export function ProtocolWithLastRun({
   const trackEvent = useTrackEvent()
   // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
   // const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runData.id)
-  const onResetSuccess = (createRunResponse: Run): void => {
-    navigate(`runs/${createRunResponse.data.id}/setup`)
-  }
-  const { cloneRun } = useCloneRun(runData.id, onResetSuccess)
+  const { cloneRun } = useCloneRun(runData.id)
   const [showSpinner, setShowSpinner] = React.useState<boolean>(false)
 
   const protocolName =
@@ -143,6 +141,9 @@ export function ProtocolWithLastRun({
       navigate(`/protocols/${protocolId}`)
     } else {
       cloneRun()
+      // Navigate to a dummy setup skeleton until TopLevelRedirects routes to the proper setup page. Doing so prevents
+      // needing to manage complex UI state updates for protocol cards, overzealous dashboard rendering, and potential navigation pitfalls.
+      navigate('/runs/1234/setup')
       trackEvent({
         name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
         properties: { sourceLocation: 'RecentRunProtocolCard' },

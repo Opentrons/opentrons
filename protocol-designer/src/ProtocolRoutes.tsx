@@ -4,10 +4,14 @@ import { Box } from '@opentrons/components'
 import { Landing } from './pages/Landing'
 import { ProtocolOverview } from './pages/ProtocolOverview'
 import { Liquids } from './pages/Liquids'
-import { StartingDeckState } from './pages/StartingDeckState'
-import { ProtocolSteps } from './pages/ProtocolSteps'
+import { Designer } from './pages/Designer'
 import { CreateNewProtocolWizard } from './pages/CreateNewProtocolWizard'
 import { NavigationBar } from './NavigationBar'
+import {
+  Kitchen,
+  FileUploadMessagesModal,
+  LabwareUploadModal,
+} from './organisms'
 
 import type { RouteProps } from './types'
 
@@ -26,16 +30,10 @@ const pdRoutes: RouteProps[] = [
     path: '/liquids',
   },
   {
-    Component: StartingDeckState,
-    name: 'Starting deck state',
-    navLinkTo: '/startingDeckState',
-    path: '/startingDeckState',
-  },
-  {
-    Component: ProtocolSteps,
-    name: 'Protocol steps',
-    navLinkTo: '/steps',
-    path: '/steps',
+    Component: Designer,
+    name: 'Edit protocol',
+    navLinkTo: '/designer',
+    path: '/designer',
   },
   {
     Component: CreateNewProtocolWizard,
@@ -56,15 +54,19 @@ export function ProtocolRoutes(): JSX.Element {
 
   return (
     <>
-      <NavigationBar routes={pdRoutes} />
-      <Box width="100%">
-        <Routes>
-          {allRoutes.map(({ Component, path }: RouteProps) => {
-            return <Route key={path} path={path} element={<Component />} />
-          })}
-          <Route path="*" element={<Navigate to={LANDING_ROUTE} />} />
-        </Routes>
-      </Box>
+      <NavigationBar />
+      <Kitchen>
+        <Box width="100%">
+          <LabwareUploadModal />
+          <FileUploadMessagesModal />
+          <Routes>
+            {allRoutes.map(({ Component, path }: RouteProps) => {
+              return <Route key={path} path={path} element={<Component />} />
+            })}
+            <Route path="*" element={<Navigate to={LANDING_ROUTE} />} />
+          </Routes>
+        </Box>
+      </Kitchen>
     </>
   )
 }

@@ -47,7 +47,9 @@ describe('SelectGripper', () => {
     render(props)
     screen.getByText('Step 3')
     screen.getByText('Add a gripper')
-    screen.getByText('Does your protocol need a Flex Gripper?')
+    screen.getByText(
+      'Do you want to move labware automatically with the gripper?'
+    )
     fireEvent.click(screen.getByRole('label', { name: 'Yes' }))
     expect(props.setValue).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('label', { name: 'No' }))

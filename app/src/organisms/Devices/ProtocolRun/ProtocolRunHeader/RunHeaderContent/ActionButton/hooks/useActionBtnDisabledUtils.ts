@@ -38,16 +38,17 @@ export function useActionBtnDisabledUtils(
     protocolRunControls,
     robotName,
     runId,
+    isResetRunLoadingRef,
   } = props
 
   const { t } = useTranslation('shared')
   const {
     isPlayRunActionLoading,
     isPauseRunActionLoading,
-    isResetRunLoading,
   } = protocolRunControls
   const isDoorOpen = useIsDoorOpen(robotName)
   const isFixtureMismatch = useIsFixtureMismatch(runId, robotName)
+  const isResetRunLoading = isResetRunLoadingRef.current
 
   const isDisabled =
     (isCurrentRun && !isSetupComplete) ||
@@ -67,6 +68,7 @@ export function useActionBtnDisabledUtils(
     ...props,
     isDoorOpen,
     isFixtureMismatch,
+    isResetRunLoading,
   })
 
   return isDisabled
@@ -77,6 +79,7 @@ export function useActionBtnDisabledUtils(
 type UseDisabledReasonProps = UseActionButtonDisabledUtilsProps & {
   isDoorOpen: boolean
   isFixtureMismatch: boolean
+  isResetRunLoading: boolean
 }
 
 function useDisabledReason({
@@ -88,6 +91,7 @@ function useDisabledReason({
   isRobotOnWrongVersionOfSoftware,
   isDoorOpen,
   runStatus,
+  isResetRunLoading,
 }: UseDisabledReasonProps): string | null {
   const { t } = useTranslation(['run_details', 'shared'])
 
@@ -97,7 +101,7 @@ function useDisabledReason({
     !isValidRunAgain
   ) {
     return t('setup_incomplete')
-  } else if (isOtherRunCurrent) {
+  } else if (isOtherRunCurrent && !isResetRunLoading) {
     return t('shared:robot_is_busy')
   } else if (isRobotOnWrongVersionOfSoftware) {
     return t('shared:a_software_update_is_available')

@@ -17,7 +17,7 @@ from opentrons.protocol_engine.actions import (
     SucceedCommandAction,
     AddAddressableAreaAction,
 )
-from opentrons.protocol_engine.state import Config
+from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.addressable_areas import (
     AddressableAreaStore,
     AddressableAreaState,
@@ -74,6 +74,12 @@ def simulated_subject(
             "robotType": "OT-3 Standard",
             "models": ["OT-3 Standard"],
             "extents": [477.2, 493.8, 0.0],
+            "paddingOffsets": {
+                "rear": -177.42,
+                "front": 51.8,
+                "leftSide": 31.88,
+                "rightSide": -80.32,
+            },
             "mountOffsets": {
                 "left": [-13.5, -60.5, 255.675],
                 "right": [40.5, -60.5, 255.675],
@@ -101,6 +107,12 @@ def subject(
             "robotType": "OT-3 Standard",
             "models": ["OT-3 Standard"],
             "extents": [477.2, 493.8, 0.0],
+            "paddingOffsets": {
+                "rear": -177.42,
+                "front": 51.8,
+                "leftSide": 31.88,
+                "rightSide": -80.32,
+            },
             "mountOffsets": {
                 "left": [-13.5, -60.5, 255.675],
                 "right": [40.5, -60.5, 255.675],
@@ -127,6 +139,12 @@ def test_initial_state_simulated(
             "robotType": "OT-3 Standard",
             "models": ["OT-3 Standard"],
             "extents": [477.2, 493.8, 0.0],
+            "paddingOffsets": {
+                "rear": -177.42,
+                "front": 51.8,
+                "leftSide": 31.88,
+                "rightSide": -80.32,
+            },
             "mountOffsets": {
                 "left": [-13.5, -60.5, 255.675],
                 "right": [40.5, -60.5, 255.675],

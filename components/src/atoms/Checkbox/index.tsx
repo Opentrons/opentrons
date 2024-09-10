@@ -11,6 +11,7 @@ import {
 } from '../../styles'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 import { StyledText } from '../StyledText'
+import { truncateString } from '../../utils'
 
 export interface CheckboxProps {
   /** checkbox is checked if value is true */
@@ -32,10 +33,12 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
     tabIndex = 0,
     disabled = false,
   } = props
+  const truncatedLabel = truncateString(labelText, 25)
 
   const CHECKBOX_STYLE = css`
     width: ${FLEX_MAX_CONTENT};
     grid-gap: ${SPACING.spacing12};
+    border: none;
     align-items: ${ALIGN_CENTER};
     flex-direction: ${DIRECTION_ROW};
     color: ${isChecked ? COLORS.white : COLORS.black90};
@@ -75,11 +78,8 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
       disabled={disabled}
       css={CHECKBOX_STYLE}
     >
-      <StyledText
-        desktopStyle="bodyDefaultSemiBold"
-        oddStyle="bodyTextSemiBold"
-      >
-        {labelText}
+      <StyledText desktopStyle="bodyDefaultRegular" oddStyle="bodyTextSemiBold">
+        {truncatedLabel}
       </StyledText>
       <Check isChecked={isChecked} />
     </Flex>

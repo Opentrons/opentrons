@@ -21,6 +21,7 @@ export * from './primitives'
 export * from './slotmap'
 export * from './structure'
 export * from './tooltips'
+export * from './organisms'
 
 // styles
 export * from './styles'

@@ -6,6 +6,8 @@ import { BORDERS, COLORS } from '../../helix-design-system'
 import { FLEX_MAX_CONTENT } from '../../styles'
 import type { StyleProps } from '../../primitives'
 
+export * from './ListItemChildren'
+
 export type ListItemType = 'error' | 'noActive' | 'success' | 'warning'
 
 interface ListItemProps extends StyleProps {
@@ -24,7 +26,7 @@ const LISTITEM_PROPS_BY_TYPE: Record<
     backgroundColor: COLORS.red35,
   },
   noActive: {
-    backgroundColor: COLORS.grey35,
+    backgroundColor: COLORS.grey30,
   },
   success: {
     backgroundColor: COLORS.green35,

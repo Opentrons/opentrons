@@ -10,6 +10,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
+import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { useRunStatus } from '../../../RunTimeControl/hooks'
 import { useIsRobotViewable, useProtocolDetailsForRun } from '../../hooks'
@@ -56,7 +57,6 @@ export function ProtocolRunHeader(
   })
 
   const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
-  const isResetRunLoadingRef = React.useRef(false)
   const protocolRunControls = useRunHeaderRunControls(runId, robotName)
   const runHeaderModalContainerUtils = useRunHeaderModalContainer({
     ...props,
@@ -72,6 +72,11 @@ export function ProtocolRunHeader(
       navigate('/devices')
     }
   }, [protocolData, isRobotViewable, navigate])
+
+  const isResetRunLoadingRef = React.useRef(false)
+  if (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_RUNNING) {
+    isResetRunLoadingRef.current = false
+  }
 
   useRunAnalytics({ runId, robotName, enteredER })
 

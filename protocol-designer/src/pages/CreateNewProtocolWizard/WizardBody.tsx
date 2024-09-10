@@ -21,7 +21,7 @@ interface WizardBodyProps {
   header: string
   children: React.ReactNode
   proceed: () => void
-  disabled: boolean
+  disabled?: boolean
   goBack?: () => void
   subHeader?: string
   imgSrc?: string
@@ -34,13 +34,17 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
     goBack,
     subHeader,
     proceed,
-    disabled,
+    disabled = false,
     imgSrc,
   } = props
   const { t } = useTranslation('shared')
 
   return (
-    <Flex padding={SPACING.spacing16} gridGap={SPACING.spacing16}>
+    <Flex
+      padding={SPACING.spacing16}
+      gridGap={SPACING.spacing16}
+      height="calc(100vh - 48px)"
+    >
       <Flex
         width="60%"
         padding={SPACING.spacing80}
@@ -67,7 +71,6 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
           {subHeader != null ? (
             <StyledText
               desktopStyle="headingLargeRegular"
-              marginBottom={SPACING.spacing60}
               color={COLORS.grey60}
             >
               {subHeader}
@@ -90,7 +93,7 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
             </Btn>
           ) : null}
           <LargeButton
-            disabled={disabled}
+            ariaDisabled={disabled}
             onClick={proceed}
             iconName="arrow-right"
             buttonText={t('shared:confirm')}

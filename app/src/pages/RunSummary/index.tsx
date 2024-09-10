@@ -82,7 +82,13 @@ export function RunSummary(): JSX.Element {
   const { t } = useTranslation('run_details')
   const navigate = useNavigate()
   const host = useHost()
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    staleTime: Infinity,
+    onError: () => {
+      // in case the run is remotely deleted by a desktop app, navigate to the dash
+      navigate('/dashboard')
+    },
+  })
   const isRunCurrent = useIsRunCurrent(runId)
   const { deleteRun } = useDeleteRunMutation()
   const runStatus = runRecord?.data.status ?? null
@@ -137,6 +143,19 @@ export function RunSummary(): JSX.Element {
   const { reset, isResetRunLoading } = useRunControls(runId, onCloneRunSuccess)
   const trackEvent = useTrackEvent()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
+  // Close the current run only if it's active and then execute the onSuccess callback. Prefer this wrapper over
+  // closeCurrentRun directly, since the callback is swallowed if currentRun is null.
+  const closeCurrentRunIfValid = (onSuccess?: () => void): void => {
+    if (isRunCurrent) {
+      closeCurrentRun({
+        onSuccess: () => {
+          onSuccess?.()
+        },
+      })
+    } else {
+      onSuccess?.()
+    }
+  }
   const [showRunFailedModal, setShowRunFailedModal] = React.useState<boolean>(
     false
   )
@@ -164,10 +183,12 @@ export function RunSummary(): JSX.Element {
     }
   )
   // TODO(jh, 08-14-24): The backend never returns the "user cancelled a run" error and cancelledWithoutRecovery becomes unnecessary.
+  const cancelledWithoutRecovery =
+    !enteredER && runStatus === RUN_STATUS_STOPPED
   const hasCommandErrors =
     commandErrorList != null && commandErrorList.data.length > 0
   const disableErrorDetailsBtn = !(
-    hasCommandErrors ||
+    (hasCommandErrors && !cancelledWithoutRecovery) ||
     (runRecord?.data.errors != null && runRecord?.data.errors.length > 0)
   )
 
@@ -228,16 +249,10 @@ export function RunSummary(): JSX.Element {
   }, [isRunCurrent, enteredER])
 
   const returnToQuickTransfer = (): void => {
-    if (!isRunCurrent) {
+    closeCurrentRunIfValid(() => {
       deleteRun(runId)
-    } else {
-      closeCurrentRun({
-        onSuccess: () => {
-          deleteRun(runId)
-        },
-      })
-    }
-    navigate('/quick-transfer')
+      navigate('/quick-transfer')
+    })
   }
 
   // TODO(jh, 05-30-24): EXEC-487. Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
@@ -273,20 +288,16 @@ export function RunSummary(): JSX.Element {
         robotType: FLEX_ROBOT_TYPE,
         isRunCurrent,
         onSkipAndHome: () => {
-          closeCurrentRun({
-            onSettled: () => {
-              navigate('/')
-            },
+          closeCurrentRunIfValid(() => {
+            navigate('/dashboard')
           })
         },
       })
     } else if (isQuickTransfer) {
       returnToQuickTransfer()
     } else {
-      closeCurrentRun({
-        onSettled: () => {
-          navigate('/')
-        },
+      closeCurrentRunIfValid(() => {
+        navigate('/dashboard')
       })
     }
   }

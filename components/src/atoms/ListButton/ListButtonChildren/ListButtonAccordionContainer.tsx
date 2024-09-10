@@ -16,13 +16,7 @@ export function ListButtonAccordionContainer(
   const { id, children } = props
 
   return (
-    <Flex
-      key={id}
-      flexDirection={DIRECTION_COLUMN}
-      onClick={(e: React.MouseEvent) => {
-        e.stopPropagation()
-      }}
-    >
+    <Flex key={id} flexDirection={DIRECTION_COLUMN}>
       {children}
     </Flex>
   )

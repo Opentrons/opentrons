@@ -447,6 +447,10 @@ def _run_trial(
         sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
         output_option=OutputOptions.sync_buffer_to_csv,
         aspirate_while_sensing=run_args.aspirate,
+        z_overlap_between_passes_mm=0.1,
+        plunger_reset_offset=2.0,
+        samples_for_baselining=20,
+        sample_time_sec=0.004,
         data_files=data_files,
     )
 

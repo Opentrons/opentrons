@@ -383,8 +383,11 @@ def get_run_error_info_from_robot(
                 errored_labware_dict["Slot"] = labware["location"].get("slotName", "")
                 errored_labware_dict["Labware Type"] = labware.get("definitionUri", "")
                 offset_id = labware.get("offsetId", "")
-                if offset_id == "":
-                    labware_slot = errored_labware_dict["Slot"]
+                labware_slot = errored_labware_dict["Slot"]
+                if str(labware_slot) == "":
+                    lpc_message = "No labware slot was associated with this error. \
+Please manually check LPC data."
+                elif offset_id == "":
                     lpc_message = f"The current LPC coords found at {labware_slot} are (0, 0, 0). \
 Please confirm with the ABR-LPC sheet and re-LPC."
                 else:

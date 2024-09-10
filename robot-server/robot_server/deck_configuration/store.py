@@ -70,7 +70,7 @@ class DeckConfigurationStore:  # noqa: D101
             await _write(
                 path=self._path, storable_deck_configuration=storable_deck_configuration
             )
-            await self._deck_configuration_publisher.publish_deck_configuration()
+            self._deck_configuration_publisher.publish_deck_configuration()
 
             return await self._get_assuming_locked()
 
@@ -92,7 +92,7 @@ class DeckConfigurationStore:  # noqa: D101
         """Delete the robot's current deck configuration, resetting it to the default."""
         async with self._lock:
             await self._path.unlink(missing_ok=True)
-            await self._deck_configuration_publisher.publish_deck_configuration()
+            self._deck_configuration_publisher.publish_deck_configuration()
 
     async def _get_assuming_locked(self) -> models.DeckConfigurationResponse:
         from_storage = await _read(self._path)

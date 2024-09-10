@@ -20,5 +20,6 @@ export const Toolbox: Story = {
     onCloseClick: () => {},
     titleIconName: 'swap-horizontal',
     closeButtonText: 'Text link',
+    onConfirmClick: () => {},
   },
 }

@@ -88,7 +88,7 @@ export const ProtocolLabwareDetails = (
           ))}
         </Flex>
       ) : (
-        <InfoScreen contentType="labware" />
+        <InfoScreen content={t('no_labware_specified')} />
       )}
     </>
   )

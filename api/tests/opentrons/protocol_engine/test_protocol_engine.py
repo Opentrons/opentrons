@@ -39,7 +39,8 @@ from opentrons.protocol_engine.execution import (
     DoorWatcher,
 )
 from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
-from opentrons.protocol_engine.state import Config, StateStore
+from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
 from opentrons.protocol_engine.errors import ProtocolCommandFailedError, ErrorOccurrence
 

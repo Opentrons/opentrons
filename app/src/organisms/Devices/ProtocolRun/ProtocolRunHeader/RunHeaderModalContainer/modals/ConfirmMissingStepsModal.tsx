@@ -48,7 +48,7 @@ export const ConfirmMissingStepsModal = (
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
-        paddingTop={SPACING.spacing32}
+        paddingTop={SPACING.spacing24}
         justifyContent={JUSTIFY_FLEX_END}
         alignItems={ALIGN_CENTER}
         gap={SPACING.spacing8}

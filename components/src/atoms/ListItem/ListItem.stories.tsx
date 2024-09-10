@@ -5,9 +5,10 @@ import { DIRECTION_COLUMN } from '../../styles'
 import { Flex } from '../../primitives'
 import { LegacyStyledText } from '../StyledText'
 import { ListItemDescriptor } from './ListItemChildren/ListItemDescriptor'
-import { ListItem as ListItemComponent } from '.'
-
+import { ListItem as ListItemComponent, ListItemCustomize } from '.'
+import exampleImage from '../../images/labware/measurement-guide/images/spacing/spacing-well-rectangular@3x.png'
 import type { Meta, StoryObj } from '@storybook/react'
+import type { DropdownMenuProps } from '../../molecules'
 
 const meta: Meta<typeof ListItemComponent> = {
   title: 'Library/Atoms/ListItem',
@@ -67,6 +68,30 @@ export const ListItemDescriptorMini: Story = {
         type="mini"
         content={<div>mock content</div>}
         description={<div>mock description</div>}
+      />
+    ),
+  },
+}
+const dropdownProps: DropdownMenuProps = {
+  filterOptions: [
+    { name: '1', value: '1' },
+    { name: '2', value: '2' },
+  ],
+  onClick: () => {},
+  currentOption: { name: '1', value: '1' },
+  dropdownType: 'neutral',
+}
+export const ListItemCustomizeImage: Story = {
+  args: {
+    type: 'noActive',
+    children: (
+      <ListItemCustomize
+        header="Header"
+        leftHeaderItem={<img width="60px" height="60px" src={exampleImage} />}
+        linkText="Link text"
+        label="Label"
+        dropdown={dropdownProps}
+        onClick={() => {}}
       />
     ),
   },

@@ -32,6 +32,7 @@ def _build_run(
         pipettes=[],
         modules=[],
         liquids=[],
+        wells=[],
         hasEverEnteredErrorRecovery=False,
     )
     return MaintenanceRun.construct(
@@ -115,7 +116,9 @@ class MaintenanceRunDataManager:
             state_summary=state_summary,
         )
 
-        await self._maintenance_runs_publisher.publish_current_maintenance_run_async()
+        await self._maintenance_runs_publisher.start_publishing_for_maintenance_run(
+            run_id=run_id, get_state_summary=self._get_state_summary
+        )
 
         return maintenance_run_data
 
@@ -156,7 +159,6 @@ class MaintenanceRunDataManager:
         """
         if run_id == self._run_orchestrator_store.current_run_id:
             await self._run_orchestrator_store.clear()
-
             await self._maintenance_runs_publisher.publish_current_maintenance_run_async()
 
         else:

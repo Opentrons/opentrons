@@ -14,7 +14,7 @@ from opentrons.protocol_engine.commands.calibration.move_to_maintenance_position
 )
 from opentrons.protocol_engine.commands.command import SuccessData
 
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.types import MountType, Mount, Point
 from opentrons.hardware_control.types import Axis, CriticalPoint
 
@@ -35,7 +35,7 @@ def subject(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize("mount_type", [MountType.LEFT, MountType.RIGHT])
-async def test_calibration_move_to_location_implementatio_for_attach_instrument(
+async def test_calibration_move_to_location_implementation_for_attach_instrument(
     decoy: Decoy,
     subject: MoveToMaintenancePositionImplementation,
     state_view: StateView,
@@ -79,7 +79,7 @@ async def test_calibration_move_to_location_implementatio_for_attach_instrument(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize("mount_type", [MountType.LEFT, MountType.RIGHT])
-async def test_calibration_move_to_location_implementatio_for_attach_plate(
+async def test_calibration_move_to_location_implementation_for_attach_plate(
     decoy: Decoy,
     subject: MoveToMaintenancePositionImplementation,
     state_view: StateView,
@@ -113,11 +113,18 @@ async def test_calibration_move_to_location_implementatio_for_attach_plate(
         await ot3_hardware_api.move_axes(
             position={
                 Axis.Z_L: 90,
+            }
+        ),
+        await ot3_hardware_api.disengage_axes(
+            [Axis.Z_L],
+        ),
+        await ot3_hardware_api.move_axes(
+            position={
                 Axis.Z_R: 105,
             }
         ),
         await ot3_hardware_api.disengage_axes(
-            [Axis.Z_L, Axis.Z_R],
+            [Axis.Z_R],
         ),
     )
 
