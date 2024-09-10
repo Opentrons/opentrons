@@ -2,13 +2,13 @@ import { useTranslation } from 'react-i18next'
 
 import { RUN_STATUS_BLOCKED_BY_OPEN_DOOR } from '@opentrons/api-client'
 
-import {
-  CANCELLABLE_STATUSES,
-  DISABLED_STATUSES,
-  START_RUN_STATUSES,
-} from '../../../constants'
 import { useIsDoorOpen } from '../../../hooks'
 import { useIsFixtureMismatch } from './useIsFixtureMismatch'
+import {
+  isCancellableStatus,
+  isDisabledStatus,
+  isStartRunStatus,
+} from '../../../utils'
 
 import type { BaseActionButtonProps } from '..'
 
@@ -60,11 +60,11 @@ export function useActionBtnDisabledUtils(
     isOtherRunCurrent ||
     isProtocolNotReady ||
     isFixtureMismatch ||
-    DISABLED_STATUSES.includes(runStatus) ||
+    isDisabledStatus(runStatus) ||
     isRobotOnWrongVersionOfSoftware ||
     (isDoorOpen &&
       runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
-      CANCELLABLE_STATUSES.includes(runStatus))
+      isCancellableStatus(runStatus))
 
   const disabledReason = useDisabledReason({
     ...props,
@@ -108,7 +108,7 @@ function useDisabledReason({
     return t('shared:robot_is_busy')
   } else if (isRobotOnWrongVersionOfSoftware) {
     return t('shared:a_software_update_is_available')
-  } else if (isDoorOpen && START_RUN_STATUSES.includes(runStatus)) {
+  } else if (isDoorOpen && isStartRunStatus(runStatus)) {
     return t('close_door')
   } else {
     return null

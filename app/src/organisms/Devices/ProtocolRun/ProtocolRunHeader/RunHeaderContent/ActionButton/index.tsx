@@ -23,13 +23,10 @@ import {
   useUnmatchedModulesForProtocol,
 } from '../../../../hooks'
 import { useCurrentRunId } from '../../../../../../resources/runs'
-import { RUN_AGAIN_STATUSES } from '../../constants'
-import {
-  useActionBtnDisabledUtils,
-  useActionButtonProperties,
-  useIsRobotOnWrongVersionOfSoftware,
-} from './hooks'
-import { getFallbackRobotSerialNumber } from '../../utils'
+import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
+import { getFallbackRobotSerialNumber, isRunAgainStatus } from '../../utils'
+import { useIsRobotOnWrongVersionOfSoftware } from '../../../../../../redux/robot-update'
+
 import type { RunHeaderContentProps } from '..'
 
 export type BaseActionButtonProps = RunHeaderContentProps
@@ -74,7 +71,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   const isCurrentRun = currentRunId === runId
   const isOtherRunCurrent = currentRunId != null && currentRunId !== runId
   const isProtocolNotReady = protocolData == null || !!isProtocolAnalyzing
-  const isValidRunAgain = RUN_AGAIN_STATUSES.includes(runStatus)
+  const isValidRunAgain = isRunAgainStatus(runStatus)
 
   const { isDisabled, disabledReason } = useActionBtnDisabledUtils({
     isCurrentRun,

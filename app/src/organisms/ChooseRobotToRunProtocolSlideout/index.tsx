@@ -1,7 +1,6 @@
 import * as React from 'react'
 import first from 'lodash/first'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -22,7 +21,7 @@ import {
   ApiHostProvider,
 } from '@opentrons/react-api-client'
 
-import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
+import { useIsRobotOnWrongVersionOfSoftware } from '../../redux/robot-update'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { appShellRequestor } from '../../redux/shell/remote'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
@@ -36,7 +35,6 @@ import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
 import type { StyleProps } from '@opentrons/components'
 import type { RunTimeParameter } from '@opentrons/shared-data'
-import type { State } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 
@@ -174,14 +172,9 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     })
   }
 
-  const { autoUpdateAction } = useSelector((state: State) =>
-    getRobotUpdateDisplayInfo(state, selectedRobot?.name ?? '')
+  const isSelectedRobotOnDifferentSoftwareVersion = useIsRobotOnWrongVersionOfSoftware(
+    selectedRobot?.name ?? ''
   )
-
-  const isSelectedRobotOnDifferentSoftwareVersion = [
-    'upgrade',
-    'downgrade',
-  ].includes(autoUpdateAction)
 
   const hasRunTimeParameters = runTimeParameters.length > 0
 

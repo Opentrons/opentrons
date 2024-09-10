@@ -5,7 +5,7 @@ import { useIsRunCurrent } from '../../../../../resources/runs'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../../../redux/analytics'
 
 import { useRecoveryAnalytics } from '../../../../ErrorRecoveryFlows/hooks'
-import { TERMINAL_STATUSES } from '../constants'
+import { isTerminalRunStatus } from '../utils'
 
 interface UseRunAnalyticsProps {
   runId: string | null
@@ -29,7 +29,7 @@ export function useRunAnalytics({
       isRunCurrent &&
       runId != null &&
       robotAnalyticsData != null &&
-      TERMINAL_STATUSES.includes(runStatus)
+      isTerminalRunStatus(runStatus)
 
     if (areReportConditionsValid) {
       trackProtocolRunEvent({
@@ -37,7 +37,7 @@ export function useRunAnalytics({
         properties: robotAnalyticsData,
       })
     }
-  }, [runStatus, isRunCurrent, runId, robotAnalyticsData?.robotLeftPipette])
+  }, [runStatus, isRunCurrent, runId, robotAnalyticsData])
 
   const { reportRecoveredRunResult } = useRecoveryAnalytics()
   React.useEffect(() => {

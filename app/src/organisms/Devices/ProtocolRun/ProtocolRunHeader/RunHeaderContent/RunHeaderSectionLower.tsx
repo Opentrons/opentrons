@@ -13,7 +13,6 @@ import {
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
-import { CANCELLABLE_STATUSES } from '../constants'
 import { formatTimestamp } from '../../../utils'
 import { EMPTY_TIMESTAMP } from '../../../constants'
 import {
@@ -22,6 +21,7 @@ import {
 } from '../../../../RunTimeControl/hooks'
 import { useCloseCurrentRun } from '../../../../ProtocolUpload/hooks'
 import { LabeledValue } from './LabeledValue'
+import { isCancellableStatus } from '../utils'
 
 import type { RunHeaderContentProps } from '.'
 
@@ -54,7 +54,7 @@ export function RunHeaderSectionLower({
       <LabeledValue label={t('protocol_start')} value={startedAtTimestamp} />
       <LabeledValue label={t('protocol_end')} value={completedAtTimestamp} />
       <Flex justifyContent={JUSTIFY_FLEX_END}>
-        {CANCELLABLE_STATUSES.includes(runStatus) && (
+        {isCancellableStatus(runStatus) && (
           <SecondaryButton
             isDangerous
             onClick={handleCancelRunClick}

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { SPACING } from '@opentrons/components'
+import { Box, SPACING } from '@opentrons/components'
 
 import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
 import { Banner } from '../../../../../atoms/Banner'
@@ -48,7 +48,7 @@ export function RunHeaderBannerContainer(
   const terminalBannerType = useTerminalRunBannerContainer(props)
 
   return (
-    <>
+    <Box>
       {analysisErrorModalUtils.showModal ? (
         <ProtocolAnalysisErrorBanner
           errors={analysisErrorModalUtils.modalProps.errors}
@@ -75,6 +75,6 @@ export function RunHeaderBannerContainer(
           {...props}
         />
       ) : null}
-    </>
+    </Box>
   )
 }

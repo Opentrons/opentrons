@@ -11,7 +11,7 @@ import {
 import { useProtocolDropTipModal } from '../modals'
 import { useCloseCurrentRun } from '../../../../../ProtocolUpload/hooks'
 import { useIsRunCurrent } from '../../../../../../resources/runs'
-import { TERMINAL_STATUSES } from '../../constants'
+import { isTerminalRunStatus } from '../../utils'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { Run, RunStatus } from '@opentrons/api-client'
@@ -109,7 +109,7 @@ export function useRunHeaderDropTip({
       }
       // Only determine tip status when necessary as this can be an expensive operation. Error Recovery handles tips, so don't
       // have to do it here if done during Error Recovery.
-      else if (TERMINAL_STATUSES.includes(runStatus) && !enteredER) {
+      else if (isTerminalRunStatus(runStatus) && !enteredER) {
         void determineTipStatus()
       }
     }

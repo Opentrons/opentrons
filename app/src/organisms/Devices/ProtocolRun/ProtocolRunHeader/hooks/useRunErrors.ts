@@ -1,6 +1,6 @@
 import { useRunCommandErrors } from '@opentrons/react-api-client'
 
-import { TERMINAL_STATUSES } from '../constants'
+import { isTerminalRunStatus } from '../utils'
 import { useMostRecentRunId } from '../../../../ProtocolUpload/hooks/useMostRecentRunId'
 import { getHighestPriorityError } from '../../../../OnDeviceDisplay/RunningProtocol'
 
@@ -34,7 +34,7 @@ export function useRunErrors({
     runId,
     { cursor: 0, pageLength: ALL_COMMANDS_PAGE_LENGTH },
     {
-      enabled: TERMINAL_STATUSES.includes(runStatus) && isMostRecentRun,
+      enabled: isTerminalRunStatus(runStatus) && isMostRecentRun,
     }
   )
 

@@ -9,11 +9,6 @@ import {
 } from '@opentrons/api-client'
 
 import {
-  RECOVERY_STATUSES,
-  RUN_AGAIN_STATUSES,
-  START_RUN_STATUSES,
-} from '../../../constants'
-import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
@@ -21,6 +16,11 @@ import {
 import { useTrackProtocolRunEvent } from '../../../../../hooks'
 import { useIsHeaterShakerInProtocol } from '../../../../../../ModuleCard/hooks'
 import { isAnyHeaterShakerShaking } from '../../../RunHeaderModalContainer/modals'
+import {
+  isRecoveryStatus,
+  isRunAgainStatus,
+  isStartRunStatus,
+} from '../../../utils'
 
 import type { IconName } from '@opentrons/components'
 import type { BaseActionButtonProps } from '..'
@@ -72,10 +72,7 @@ export function useActionButtonProperties({
   if (isProtocolNotReady) {
     buttonIconName = 'ot-spinner'
     buttonText = t('analyzing_on_robot')
-  } else if (
-    runStatus === RUN_STATUS_RUNNING ||
-    RECOVERY_STATUSES.includes(runStatus)
-  ) {
+  } else if (runStatus === RUN_STATUS_RUNNING || isRecoveryStatus(runStatus)) {
     buttonIconName = 'pause'
     buttonText = t('pause_run')
     handleButtonClick = () => {
@@ -85,7 +82,7 @@ export function useActionButtonProperties({
   } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
     buttonIconName = 'ot-spinner'
     buttonText = t('canceling_run')
-  } else if (START_RUN_STATUSES.includes(runStatus)) {
+  } else if (isStartRunStatus(runStatus)) {
     buttonIconName = 'play'
     buttonText =
       runStatus === RUN_STATUS_IDLE ? t('start_run') : t('resume_run')
@@ -118,7 +115,7 @@ export function useActionButtonProperties({
         })
       }
     }
-  } else if (RUN_AGAIN_STATUSES.includes(runStatus)) {
+  } else if (isRunAgainStatus(runStatus)) {
     buttonIconName = isResetRunLoadingRef.current ? 'ot-spinner' : 'play'
     buttonText = t('run_again')
     handleButtonClick = () => {

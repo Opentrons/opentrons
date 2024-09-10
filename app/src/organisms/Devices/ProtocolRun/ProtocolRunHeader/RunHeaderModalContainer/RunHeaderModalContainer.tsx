@@ -46,6 +46,7 @@ export function RunHeaderModalContainer(
   } = runHeaderModalContainerUtils
   const { dropTipModalUtils, dropTipWizardUtils } = dropTipUtils
 
+  // TODO(jh, 09-10-24): Instead of having each modal be responsible for its own portal, do all the portaling here.
   return (
     <>
       {recoveryModalUtils.isERActive ? (

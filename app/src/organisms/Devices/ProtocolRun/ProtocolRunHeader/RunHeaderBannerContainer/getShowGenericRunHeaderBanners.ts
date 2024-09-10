@@ -4,7 +4,7 @@ import {
   RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
 
-import { CANCELLABLE_STATUSES } from '../constants'
+import { isCancellableStatus } from '../utils'
 
 import type { RunHeaderBannerContainerProps } from '.'
 
@@ -32,7 +32,7 @@ export function getShowGenericRunHeaderBanners({
     isDoorOpen &&
     runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
     runStatus !== RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR &&
-    CANCELLABLE_STATUSES.includes(runStatus)
+    isCancellableStatus(runStatus)
 
   const showDoorOpenDuringRunBanner =
     runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR

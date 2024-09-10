@@ -24,7 +24,8 @@ import {
 import { RunHeaderBannerContainer } from './RunHeaderBannerContainer'
 import { useRunAnalytics, useRunErrors, useRunHeaderRunControls } from './hooks'
 import { RunHeaderContent } from './RunHeaderContent'
-import { EQUIPMENT_POLL_MS, START_RUN_STATUSES } from './constants'
+import { EQUIPMENT_POLL_MS } from './constants'
+import { isCancellableStatus } from './utils'
 
 export interface ProtocolRunHeaderProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
@@ -48,7 +49,7 @@ export function ProtocolRunHeader(
   const attachedModules =
     useModulesQuery({
       refetchInterval: EQUIPMENT_POLL_MS,
-      enabled: START_RUN_STATUSES.includes(runStatus),
+      enabled: isCancellableStatus(runStatus),
     })?.data?.data ?? []
   const runErrors = useRunErrors({
     runRecord: runRecord ?? null,
