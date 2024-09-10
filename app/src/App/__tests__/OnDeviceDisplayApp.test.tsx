@@ -17,8 +17,8 @@ import { ProtocolDashboard } from '../../pages/ODD/ProtocolDashboard'
 import { ProtocolSetup } from '../../pages/ODD/ProtocolSetup'
 import { ProtocolDetails } from '../../pages/ODD/ProtocolDetails'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
-import { RunningProtocol } from '../../pages/RunningProtocol'
-import { RunSummary } from '../../pages/RunSummary'
+import { RunningProtocol } from '../../pages/ODD/RunningProtocol'
+import { RunSummary } from '../../pages/ODD/RunSummary'
 import { Welcome } from '../../pages/Welcome'
 import { NameRobot } from '../../pages/NameRobot'
 import { EmergencyStop } from '../../pages/EmergencyStop'
@@ -58,8 +58,8 @@ vi.mock('../../pages/ODD/ProtocolDashboard')
 vi.mock('../../pages/ODD/ProtocolSetup')
 vi.mock('../../pages/ODD/ProtocolDetails')
 vi.mock('../../pages/ODD/InstrumentsDashboard')
-vi.mock('../../pages/RunningProtocol')
-vi.mock('../../pages/RunSummary')
+vi.mock('../../pages/ODD/RunningProtocol')
+vi.mock('../../pages/ODD/RunSummary')
 vi.mock('../../pages/NameRobot')
 vi.mock('../../pages/EmergencyStop')
 vi.mock('../../pages/DeckConfiguration')

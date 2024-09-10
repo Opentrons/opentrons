@@ -17,58 +17,60 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { mockRobotSideAnalysis } from '../../../molecules/Command/__fixtures__'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { mockRobotSideAnalysis } from '../../../../molecules/Command/__fixtures__'
 import {
   CurrentRunningProtocolCommand,
   RunningProtocolSkeleton,
-} from '../../../organisms/OnDeviceDisplay/RunningProtocol'
-import { mockUseAllCommandsResponseNonDeterministic } from '../../../organisms/RunProgressMeter/__fixtures__'
+} from '../../../../organisms/OnDeviceDisplay/RunningProtocol'
+import { mockUseAllCommandsResponseNonDeterministic } from '../../../../organisms/RunProgressMeter/__fixtures__'
 import {
   useRunStatus,
   useRunTimestamps,
-} from '../../../organisms/RunTimeControl/hooks'
-import { getLocalRobot } from '../../../redux/discovery'
-import { CancelingRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
-import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { OpenDoorAlertModal } from '../../../organisms/OpenDoorAlertModal'
+} from '../../../../organisms/RunTimeControl/hooks'
+import { getLocalRobot } from '../../../../redux/discovery'
+import { CancelingRunModal } from '../../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
+import { useTrackProtocolRunEvent } from '../../../../organisms/Devices/hooks'
+import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { OpenDoorAlertModal } from '../../../../organisms/OpenDoorAlertModal'
 import { RunningProtocol } from '..'
 import {
   useNotifyRunQuery,
   useNotifyAllCommandsQuery,
-} from '../../../resources/runs'
-import { useFeatureFlag } from '../../../redux/config'
+} from '../../../../resources/runs'
+import { useFeatureFlag } from '../../../../redux/config'
 import {
   ErrorRecoveryFlows,
   useErrorRecoveryFlows,
-} from '../../../organisms/ErrorRecoveryFlows'
-import { useLastRunCommand } from '../../../organisms/Devices/hooks/useLastRunCommand'
+} from '../../../../organisms/ErrorRecoveryFlows'
+import { useLastRunCommand } from '../../../../organisms/Devices/hooks/useLastRunCommand'
 import {
   useInterventionModal,
   InterventionModal,
-} from '../../../organisms/InterventionModal'
+} from '../../../../organisms/InterventionModal'
 
 import type { UseQueryResult } from 'react-query'
 import type { ProtocolAnalyses, RunCommandSummary } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../organisms/Devices/hooks')
-vi.mock('../../../organisms/Devices/hooks/useLastRunCommandKey')
-vi.mock('../../../organisms/RunTimeControl/hooks')
+vi.mock('../../../../organisms/Devices/hooks')
+vi.mock('../../../../organisms/Devices/hooks/useLastRunCommandKey')
+vi.mock('../../../../organisms/RunTimeControl/hooks')
 vi.mock(
-  '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+  '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
-vi.mock('../../../organisms/RunTimeControl/hooks')
-vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol')
-vi.mock('../../../redux/discovery')
-vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal')
-vi.mock('../../../organisms/OpenDoorAlertModal')
-vi.mock('../../../resources/runs')
-vi.mock('../../../redux/config')
-vi.mock('../../../organisms/ErrorRecoveryFlows')
-vi.mock('../../../organisms/Devices/hooks/useLastRunCommand')
-vi.mock('../../../organisms/InterventionModal')
+vi.mock('../../../../organisms/RunTimeControl/hooks')
+vi.mock('../../../../organisms/OnDeviceDisplay/RunningProtocol')
+vi.mock('../../../../redux/discovery')
+vi.mock(
+  '../../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
+)
+vi.mock('../../../../organisms/OpenDoorAlertModal')
+vi.mock('../../../../resources/runs')
+vi.mock('../../../../redux/config')
+vi.mock('../../../../organisms/ErrorRecoveryFlows')
+vi.mock('../../../../organisms/Devices/hooks/useLastRunCommand')
+vi.mock('../../../../organisms/InterventionModal')
 
 const RUN_ID = 'run_id'
 const ROBOT_NAME = 'otie'

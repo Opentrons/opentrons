@@ -26,38 +26,38 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 
-import { StepMeter } from '../../atoms/StepMeter'
-import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useNotifyRunQuery } from '../../resources/runs'
+import { StepMeter } from '../../../atoms/StepMeter'
+import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useNotifyRunQuery } from '../../../resources/runs'
 import {
   InterventionModal,
   useInterventionModal,
-} from '../../organisms/InterventionModal'
+} from '../../../organisms/InterventionModal'
 import {
   useRunStatus,
   useRunTimestamps,
-} from '../../organisms/RunTimeControl/hooks'
+} from '../../../organisms/RunTimeControl/hooks'
 import {
   CurrentRunningProtocolCommand,
   RunningProtocolCommandList,
   RunningProtocolSkeleton,
-} from '../../organisms/OnDeviceDisplay/RunningProtocol'
+} from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
   useRobotType,
-} from '../../organisms/Devices/hooks'
-import { CancelingRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
-import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
-import { getLocalRobot } from '../../redux/discovery'
-import { OpenDoorAlertModal } from '../../organisms/OpenDoorAlertModal'
+} from '../../../organisms/Devices/hooks'
+import { CancelingRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
+import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
+import { getLocalRobot } from '../../../redux/discovery'
+import { OpenDoorAlertModal } from '../../../organisms/OpenDoorAlertModal'
 import {
   useErrorRecoveryFlows,
   ErrorRecoveryFlows,
-} from '../../organisms/ErrorRecoveryFlows'
-import { useLastRunCommand } from '../../organisms/Devices/hooks/useLastRunCommand'
+} from '../../../organisms/ErrorRecoveryFlows'
+import { useLastRunCommand } from '../../../organisms/Devices/hooks/useLastRunCommand'
 
-import type { OnDeviceRouteParams } from '../../App/types'
+import type { OnDeviceRouteParams } from '../../../App/types'
 
 const RUN_STATUS_REFETCH_INTERVAL = 5000
 const LIVE_RUN_COMMANDS_POLL_MS = 3000

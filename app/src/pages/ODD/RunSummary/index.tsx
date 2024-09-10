@@ -45,31 +45,34 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   useRunTimestamps,
   useRunControls,
-} from '../../organisms/RunTimeControl/hooks'
+} from '../../../organisms/RunTimeControl/hooks'
 import {
   useRunCreatedAtTimestamp,
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
-} from '../../organisms/Devices/hooks'
-import { useCloseCurrentRun } from '../../organisms/ProtocolUpload/hooks'
-import { onDeviceDisplayFormatTimestamp } from '../../organisms/Devices/utils'
-import { EMPTY_TIMESTAMP } from '../../organisms/Devices/constants'
-import { RunTimer } from '../../organisms/Devices/ProtocolRun/RunTimer'
+} from '../../../organisms/Devices/hooks'
+import { useCloseCurrentRun } from '../../../organisms/ProtocolUpload/hooks'
+import { onDeviceDisplayFormatTimestamp } from '../../../organisms/Devices/utils'
+import { EMPTY_TIMESTAMP } from '../../../organisms/Devices/constants'
+import { RunTimer } from '../../../organisms/Devices/ProtocolRun/RunTimer'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_RUN_ACTION,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '../../redux/analytics'
-import { getLocalRobot } from '../../redux/discovery'
-import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
-import { formatTimeWithUtcLabel, useNotifyRunQuery } from '../../resources/runs'
-import { handleTipsAttachedModal } from '../../organisms/DropTipWizardFlows/TipsAttachedModal'
-import { useTipAttachmentStatus } from '../../organisms/DropTipWizardFlows'
-import { useRecoveryAnalytics } from '../../organisms/ErrorRecoveryFlows/hooks'
+} from '../../../redux/analytics'
+import { getLocalRobot } from '../../../redux/discovery'
+import { RunFailedModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
+import {
+  formatTimeWithUtcLabel,
+  useNotifyRunQuery,
+} from '../../../resources/runs'
+import { handleTipsAttachedModal } from '../../../organisms/DropTipWizardFlows/TipsAttachedModal'
+import { useTipAttachmentStatus } from '../../../organisms/DropTipWizardFlows'
+import { useRecoveryAnalytics } from '../../../organisms/ErrorRecoveryFlows/hooks'
 
 import type { IconName } from '@opentrons/components'
-import type { OnDeviceRouteParams } from '../../App/types'
-import type { PipetteWithTip } from '../../organisms/DropTipWizardFlows'
+import type { OnDeviceRouteParams } from '../../../App/types'
+import type { PipetteWithTip } from '../../../organisms/DropTipWizardFlows'
 
 const CURRENT_RUN_POLL_MS = 5000
 
