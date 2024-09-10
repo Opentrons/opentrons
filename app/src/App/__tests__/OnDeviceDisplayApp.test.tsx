@@ -9,7 +9,7 @@ import { OnDeviceLocalizationProvider } from '../../LocalizationProvider'
 import { ConnectViaEthernet } from '../../pages/ODD/ConnectViaEthernet'
 import { ConnectViaUSB } from '../../pages/ODD/ConnectViaUSB'
 import { ConnectViaWifi } from '../../pages/ODD/ConnectViaWifi'
-import { NetworkSetupMenu } from '../../pages/NetworkSetupMenu'
+import { NetworkSetupMenu } from '../../pages/ODD/NetworkSetupMenu'
 import { InstrumentsDashboard } from '../../pages/ODD/InstrumentsDashboard'
 import { RobotDashboard } from '../../pages/ODD/RobotDashboard'
 import { RobotSettingsDashboard } from '../../pages/ODD/RobotSettingsDashboard'
@@ -19,10 +19,10 @@ import { ProtocolDetails } from '../../pages/ODD/ProtocolDetails'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 import { RunningProtocol } from '../../pages/ODD/RunningProtocol'
 import { RunSummary } from '../../pages/ODD/RunSummary'
-import { Welcome } from '../../pages/Welcome'
-import { NameRobot } from '../../pages/NameRobot'
-import { EmergencyStop } from '../../pages/EmergencyStop'
-import { DeckConfigurationEditor } from '../../pages/DeckConfiguration'
+import { Welcome } from '../../pages/ODD/Welcome'
+import { NameRobot } from '../../pages/ODD/NameRobot'
+import { EmergencyStop } from '../../pages/ODD/EmergencyStop'
+import { DeckConfigurationEditor } from '../../pages/ODD/DeckConfiguration'
 import { getOnDeviceDisplaySettings } from '../../redux/config'
 import { getIsShellReady } from '../../redux/shell'
 import { getLocalRobot } from '../../redux/discovery'
@@ -47,8 +47,8 @@ vi.mock('@opentrons/react-api-client', async () => {
   }
 })
 vi.mock('../../LocalizationProvider')
-vi.mock('../../pages/Welcome')
-vi.mock('../../pages/NetworkSetupMenu')
+vi.mock('../../pages/ODD/Welcome')
+vi.mock('../../pages/ODD/NetworkSetupMenu')
 vi.mock('../../pages/ODD/ConnectViaEthernet')
 vi.mock('../../pages/ODD/ConnectViaUSB')
 vi.mock('../../pages/ODD/ConnectViaWifi')
@@ -60,9 +60,9 @@ vi.mock('../../pages/ODD/ProtocolDetails')
 vi.mock('../../pages/ODD/InstrumentsDashboard')
 vi.mock('../../pages/ODD/RunningProtocol')
 vi.mock('../../pages/ODD/RunSummary')
-vi.mock('../../pages/NameRobot')
-vi.mock('../../pages/EmergencyStop')
-vi.mock('../../pages/DeckConfiguration')
+vi.mock('../../pages/ODD/NameRobot')
+vi.mock('../../pages/ODD/EmergencyStop')
+vi.mock('../../pages/ODD/DeckConfiguration')
 vi.mock('../../redux/config')
 vi.mock('../../redux/shell')
 vi.mock('../../redux/discovery')

@@ -30,17 +30,17 @@ import {
   getReachableRobots,
   getUnreachableRobots,
   getLocalRobot,
-} from '../../redux/discovery'
-import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '../../redux/analytics'
-import { AlphanumericKeyboard } from '../../atoms/SoftwareKeyboard'
-import { SmallButton } from '../../atoms/buttons'
-import { StepMeter } from '../../atoms/StepMeter'
-import { useIsUnboxingFlowOngoing } from '../../organisms/RobotSettingsDashboard/NetworkSettings/hooks'
-import { ConfirmRobotName } from '../../organisms/OnDeviceDisplay/NameRobot/ConfirmRobotName'
+} from '../../../redux/discovery'
+import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '../../../redux/analytics'
+import { AlphanumericKeyboard } from '../../../atoms/SoftwareKeyboard'
+import { SmallButton } from '../../../atoms/buttons'
+import { StepMeter } from '../../../atoms/StepMeter'
+import { useIsUnboxingFlowOngoing } from '../../../organisms/RobotSettingsDashboard/NetworkSettings/hooks'
+import { ConfirmRobotName } from '../../../organisms/OnDeviceDisplay/NameRobot/ConfirmRobotName'
 
 import type { FieldError, Resolver } from 'react-hook-form'
 import type { UpdatedRobotName } from '@opentrons/api-client'
-import type { State, Dispatch } from '../../redux/types'
+import type { State, Dispatch } from '../../../redux/types'
 
 interface FormValues {
   newRobotName: string

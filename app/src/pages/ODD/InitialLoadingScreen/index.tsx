@@ -10,7 +10,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { useRobotSettingsQuery } from '@opentrons/react-api-client'
-import { getIsShellReady } from '../../redux/shell'
+import { getIsShellReady } from '../../../redux/shell'
 
 export function InitialLoadingScreen({
   children,

@@ -11,16 +11,16 @@ import {
   JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '../../organisms/ChildNavigation'
-import { DeckFixtureSetupInstructionsModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
-import { DeckConfigurationDiscardChangesModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
-import { getTopPortalEl } from '../../App/portal'
+import { ChildNavigation } from '../../../organisms/ChildNavigation'
+import { DeckFixtureSetupInstructionsModal } from '../../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
+import { DeckConfigurationDiscardChangesModal } from '../../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
+import { getTopPortalEl } from '../../../App/portal'
 import {
   useDeckConfigurationEditingTools,
   useNotifyDeckConfigurationQuery,
-} from '../../resources/deck_configuration'
+} from '../../../resources/deck_configuration'
 
-import type { SmallButton } from '../../atoms/buttons'
+import type { SmallButton } from '../../../atoms/buttons'
 
 export function DeckConfigurationEditor(): JSX.Element {
   const { t, i18n } = useTranslation([

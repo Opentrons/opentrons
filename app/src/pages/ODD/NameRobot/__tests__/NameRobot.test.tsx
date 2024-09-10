@@ -3,28 +3,28 @@ import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 
-import { i18n } from '../../../i18n'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { useTrackEvent } from '../../../redux/analytics'
+import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { useTrackEvent } from '../../../../redux/analytics'
 import {
   getConnectableRobots,
   getReachableRobots,
   getUnreachableRobots,
-} from '../../../redux/discovery'
-import { useIsUnboxingFlowOngoing } from '../../../organisms/RobotSettingsDashboard/NetworkSettings/hooks'
+} from '../../../../redux/discovery'
+import { useIsUnboxingFlowOngoing } from '../../../../organisms/RobotSettingsDashboard/NetworkSettings/hooks'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
-} from '../../../redux/discovery/__fixtures__'
+} from '../../../../redux/discovery/__fixtures__'
 
 import { NameRobot } from '..'
 import type { NavigateFunction } from 'react-router-dom'
 
-vi.mock('../../../redux/discovery/selectors')
-vi.mock('../../../redux/config')
-vi.mock('../../../redux/analytics')
-vi.mock('../../../organisms/RobotSettingsDashboard/NetworkSettings/hooks')
+vi.mock('../../../../redux/discovery/selectors')
+vi.mock('../../../../redux/config')
+vi.mock('../../../../redux/analytics')
+vi.mock('../../../../organisms/RobotSettingsDashboard/NetworkSettings/hooks')
 
 const mockNavigate = vi.fn()
 
