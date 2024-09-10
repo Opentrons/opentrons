@@ -42,6 +42,7 @@ protocol_table = sqlalchemy.Table(
         sqlalchemy.Enum(
             ProtocolKindSQLEnum,
             values_callable=lambda obj: [e.value for e in obj],
+            validate_strings=True,
             create_constraint=True,
         ),
         index=True,
