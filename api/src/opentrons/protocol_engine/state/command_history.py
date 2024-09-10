@@ -102,6 +102,7 @@ class CommandHistory:
         ]
 
     def get_filtered_command_ids(self, include_fixit_commands: bool) -> List[str]:
+        """Get all fixit command IDs."""
         if include_fixit_commands:
             return self._all_command_ids
         else:
