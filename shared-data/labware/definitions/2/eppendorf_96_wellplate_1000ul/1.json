@@ -1029,10 +1029,6 @@
     "z": 0
   },
   "stackingOffsetWithModule": {
-    "magneticBlockV1": {
-      "x": 0,
-      "y": 0,
-      "z": 3.11
-    }
+    "magneticBlockV1": { "x": 0, "y": 0, "z": 3.21 }
   }
 }

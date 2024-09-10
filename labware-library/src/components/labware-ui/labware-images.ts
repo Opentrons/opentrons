@@ -80,6 +80,12 @@ export const labwareImages: Record<string, string[]> = {
       import.meta.url
     ).href,
   ],
+  eppendorf_96_wellplate_2000ul: [
+    new URL(
+      '../../images/eppendorf_96_wellplate_2000ul_photo.jpg',
+      import.meta.url
+    ).href,
+  ],
   eppendorf_twintec_384_wellplate_45ul: [
     new URL(
       '../../images/eppendorf_twintec_384_wellplate_45ul_photo.jpg',

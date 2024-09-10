@@ -1028,27 +1028,11 @@
     "z": 0
   },
   "stackingOffsetWithLabware": {
-    "opentrons_96_well_aluminum_block": {
-      "x": 0,
-      "y": 0,
-      "z": 11.63
-    },
-    "opentrons_96_pcr_adapter": {
-      "x": 0,
-      "y": 0,
-      "z": 10.21
-    }
+    "opentrons_96_well_aluminum_block": { "x": 0, "y": 0, "z": 11.5 },
+    "opentrons_96_pcr_adapter": { "x": 0, "y": 0, "z": 9.88 }
   },
   "stackingOffsetWithModule": {
-    "thermocyclerModuleV2": {
-      "x": 0,
-      "y": 0,
-      "z": 10.11
-    },
-    "magneticBlockV1": {
-      "x": 0,
-      "y": 0,
-      "z": 2.66
-    }
+    "thermocyclerModuleV2": { "x": 0, "y": 0, "z": 9.86 },
+    "magneticBlockV1": { "x": 0, "y": 0, "z": 2.71 }
   }
 }
