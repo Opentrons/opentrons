@@ -21,6 +21,7 @@ export interface UseRunErrorsResult {
   highestPriorityError: RunCommandError | null
 }
 
+// During a run, a single error or multiple errors may occur, and currently, these are managed under separate endpoints.
 export function useRunErrors({
   runId,
   runRecord,

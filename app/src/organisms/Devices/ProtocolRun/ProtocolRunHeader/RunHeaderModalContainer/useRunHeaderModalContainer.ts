@@ -59,6 +59,7 @@ export interface UseRunHeaderModalContainerResult {
   recoveryModalUtils: UseErrorRecoveryResult
 }
 
+// Provides all the utilities used by the various modals that render in ProtocolRunHeader.
 export function useRunHeaderModalContainer({
   runId,
   robotName,

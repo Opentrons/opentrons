@@ -25,6 +25,8 @@ type UseActionButtonDisabledUtilsResult =
   | { isDisabled: true; disabledReason: string }
   | { isDisabled: false; disabledReason: null }
 
+// Manages the various reasons the ActionButton may be disabled, returning the disabled state and user-facing disabled
+// reason copy if applicable.
 export function useActionBtnDisabledUtils(
   props: UseActionButtonDisabledUtilsProps
 ): UseActionButtonDisabledUtilsResult {
@@ -82,6 +84,7 @@ type UseDisabledReasonProps = UseActionButtonDisabledUtilsProps & {
   isResetRunLoading: boolean
 }
 
+// The user-facing disabled explanation for why the ActionButton is disabled, if any.
 function useDisabledReason({
   isCurrentRun,
   isSetupComplete,

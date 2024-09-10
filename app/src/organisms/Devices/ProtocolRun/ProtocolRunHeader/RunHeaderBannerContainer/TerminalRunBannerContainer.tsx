@@ -21,6 +21,7 @@ import type { RunHeaderBannerContainerProps } from '.'
 
 type TerminalBannerType = 'success' | 'error' | null
 
+// Determine which terminal banner to render, if any.
 export function useTerminalRunBannerContainer({
   runId,
   runStatus,
@@ -68,6 +69,7 @@ interface TerminalRunBannerContainerProps
   bannerType: TerminalBannerType
 }
 
+// Contains all possible banners that render after the run reaches a terminal run status.
 export function TerminalRunBannerContainer(
   props: TerminalRunBannerContainerProps
 ): JSX.Element {

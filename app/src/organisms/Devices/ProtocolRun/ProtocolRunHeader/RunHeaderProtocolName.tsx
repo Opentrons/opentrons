@@ -14,6 +14,7 @@ interface RunHeaderProtocolNameProps {
   runId: string
 }
 
+// Styles the protocol name copy.
 export function RunHeaderProtocolName({
   runId,
 }: RunHeaderProtocolNameProps): JSX.Element {

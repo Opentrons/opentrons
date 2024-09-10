@@ -27,7 +27,7 @@ export interface RunHeaderModalContainerProps {
   runErrors: UseRunErrorsResult
 }
 
-// Holds all the various modals that render in ProtocolRunHeader.
+// Contains all the various modals that render in ProtocolRunHeader.
 export function RunHeaderModalContainer(
   props: RunHeaderModalContainerProps
 ): JSX.Element | null {

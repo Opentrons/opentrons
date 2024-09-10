@@ -17,6 +17,7 @@ interface DisplayRunStatusProps {
   runStatus: RunStatus | null
 }
 
+// Styles the run status copy.
 export function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
   const { t } = useTranslation('run_details')
   return (

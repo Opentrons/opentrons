@@ -73,6 +73,8 @@ export function ProtocolRunHeader(
     }
   }, [protocolData, isRobotViewable, navigate])
 
+  // To persist "run again" loading conditions into a new run, we need a scalar that persists longer than
+  // the runControl isResetRunLoading, which completes before we want to change user-facing copy/CTAs.
   const isResetRunLoadingRef = React.useRef(false)
   if (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_RUNNING) {
     isResetRunLoadingRef.current = false

@@ -37,6 +37,7 @@ interface UseButtonPropertiesProps extends BaseActionButtonProps {
   isRobotOnWrongVersionOfSoftware: boolean
 }
 
+// Returns ActionButton properties.
 export function useButtonProperties({
   isProtocolNotReady,
   runStatus,

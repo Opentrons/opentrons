@@ -39,8 +39,8 @@ describe('RunFailedModal - DesktopApp', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       toggleModal: vi.fn(),
-      highestPriorityError: mockError,
       runStatus: RUN_STATUS_FAILED,
+      runErrors: { highestPriorityError: mockError, commandErrorList: null },
     }
     vi.mocked(useDownloadRunLog).mockReturnValue({
       downloadRunLog: vi.fn(),
