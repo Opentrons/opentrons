@@ -9,22 +9,21 @@ import {
 } from '@opentrons/react-api-client'
 
 import {
-  chainRunCommandsRecursive,
-  chainMaintenanceCommandsRecursive,
   chainLiveCommandsRecursive,
+  chainRunCommandsRecursive,
   setCommandIntent,
 } from './utils'
 import { getIsOnDevice } from '../../redux/config'
 import { useMaintenanceRunTakeover } from '../../organisms/TakeoverModal'
 
-import type {
-  UseCreateMaintenanceRunMutationOptions,
-  UseCreateMaintenanceRunMutationResult,
-  CreateMaintenanceRunType,
-} from '@opentrons/react-api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { HostConfig } from '@opentrons/api-client'
 import type { ModulePrepCommandsType } from '../../organisms/Devices/getModulePrepCommands'
+import type {
+  CreateMaintenanceRunType,
+  UseCreateMaintenanceRunMutationOptions,
+  UseCreateMaintenanceRunMutationResult,
+} from '@opentrons/react-api-client'
 
 export type CreateCommandMutate = ReturnType<
   typeof useCreateCommandMutation
@@ -87,33 +86,6 @@ export function useChainRunCommands(
       chainRunCommandsRecursive(
         commands,
         createRunCommand,
-        continuePastCommandFailure,
-        setIsLoading
-      ),
-    isCommandMutationLoading: isLoading,
-  }
-}
-
-export function useChainMaintenanceCommands(): {
-  chainRunCommands: (
-    maintenanceRunId: string,
-    commands: CreateCommand[],
-    continuePastCommandFailure: boolean
-  ) => ReturnType<typeof chainMaintenanceCommandsRecursive>
-  isCommandMutationLoading: boolean
-} {
-  const [isLoading, setIsLoading] = React.useState(false)
-  const { createMaintenanceCommand } = useCreateMaintenanceCommandMutation()
-  return {
-    chainRunCommands: (
-      maintenanceRunId,
-      commands: CreateCommand[],
-      continuePastCommandFailure: boolean
-    ) =>
-      chainMaintenanceCommandsRecursive(
-        maintenanceRunId,
-        commands,
-        createMaintenanceCommand,
         continuePastCommandFailure,
         setIsLoading
       ),

@@ -1,10 +1,10 @@
 import * as React from 'react'
 
-import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
 import {
-  useCreateTargetedMaintenanceRunMutation,
   useChainMaintenanceCommands,
-} from '../../../resources/runs'
+  useNotifyCurrentMaintenanceRun,
+} from '../../../resources/maintenance_runs'
+import { useCreateTargetedMaintenanceRunMutation } from '../../../resources/runs'
 import { buildLoadPipetteCommand } from './useDropTipCommands'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'

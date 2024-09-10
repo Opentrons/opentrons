@@ -23,10 +23,12 @@ import { DetachProbe } from './DetachProbe'
 import { PickUpTip } from './PickUpTip'
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
-import { useChainMaintenanceCommands } from '../../resources/runs'
 import { FatalError } from './FatalErrorModal'
 import { RobotMotionLoader } from './RobotMotionLoader'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
+import {
+  useChainMaintenanceCommands,
+  useNotifyCurrentMaintenanceRun,
+} from '../../resources/maintenance_runs'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 
 import type {
