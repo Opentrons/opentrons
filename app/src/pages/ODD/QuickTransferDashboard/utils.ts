@@ -1,5 +1,5 @@
 import type { ProtocolResource } from '@opentrons/shared-data'
-import type { ProtocolsOnDeviceSortKey } from '../../redux/config/types'
+import type { ProtocolsOnDeviceSortKey } from '../../../redux/config/types'
 
 export function sortQuickTransfers(
   sortBy: ProtocolsOnDeviceSortKey,

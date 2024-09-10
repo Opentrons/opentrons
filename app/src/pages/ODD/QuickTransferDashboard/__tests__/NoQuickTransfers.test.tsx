@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { describe, it, expect } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../i18n'
 
 import { NoQuickTransfers } from '../NoQuickTransfers'
 import { screen } from '@testing-library/react'

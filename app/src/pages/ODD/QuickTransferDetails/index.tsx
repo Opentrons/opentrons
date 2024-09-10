@@ -30,32 +30,32 @@ import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import { MAXIMUM_PINNED_PROTOCOLS } from '../../App/constants'
-import { MediumButton, SmallButton } from '../../atoms/buttons'
+import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
+import { MediumButton, SmallButton } from '../../../atoms/buttons'
 import {
   ProtocolDetailsHeaderChipSkeleton,
   ProcotolDetailsHeaderTitleSkeleton,
   ProtocolDetailsSectionContentSkeleton,
-} from '../../organisms/OnDeviceDisplay/ProtocolDetails'
-import { useHardwareStatusText } from '../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
-import { SmallModalChildren } from '../../molecules/OddModal'
-import { useToaster } from '../../organisms/ToasterOven'
+} from '../../../organisms/OnDeviceDisplay/ProtocolDetails'
+import { useHardwareStatusText } from '../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
+import { SmallModalChildren } from '../../../molecules/OddModal'
+import { useToaster } from '../../../organisms/ToasterOven'
 import {
   getApplyHistoricOffsets,
   getPinnedQuickTransferIds,
   updateConfigValue,
-} from '../../redux/config'
-import { useOffsetCandidatesForAnalysis } from '../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { useMissingProtocolHardware } from '../../pages/Desktop/Protocols/hooks'
+} from '../../../redux/config'
+import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { useMissingProtocolHardware } from '../../../pages/Desktop/Protocols/hooks'
 import { DeleteTransferConfirmationModal } from '../QuickTransferDashboard/DeleteTransferConfirmationModal'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
-import { formatTimeWithUtcLabel } from '../../resources/runs'
+import { formatTimeWithUtcLabel } from '../../../resources/runs'
 
 import type { Protocol } from '@opentrons/api-client'
-import type { Dispatch } from '../../redux/types'
-import type { OnDeviceRouteParams } from '../../App/types'
+import type { Dispatch } from '../../../redux/types'
+import type { OnDeviceRouteParams } from '../../../App/types'
 
 interface QuickTransferHeaderProps {
   title?: string | null

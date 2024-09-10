@@ -8,8 +8,8 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { OddModal } from '../../molecules/OddModal'
-import { SmallButton } from '../../atoms/buttons'
+import { OddModal } from '../../../molecules/OddModal'
+import { SmallButton } from '../../../atoms/buttons'
 
 interface PipetteNotAttachedErrorModalProps {
   onExit: () => void

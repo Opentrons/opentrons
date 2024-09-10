@@ -4,11 +4,11 @@ import { when } from 'vitest-when'
 import { act, fireEvent, screen } from '@testing-library/react'
 
 import { getProtocol, deleteProtocol, deleteRun } from '@opentrons/api-client'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../i18n'
-import { useToaster } from '../../../organisms/ToasterOven'
+import { i18n } from '../../../../i18n'
+import { useToaster } from '../../../../organisms/ToasterOven'
 import { DeleteTransferConfirmationModal } from '../DeleteTransferConfirmationModal'
 
 import type { NavigateFunction } from 'react-router-dom'
@@ -18,7 +18,7 @@ const mockNavigate = vi.fn()
 
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../organisms/ToasterOven')
+vi.mock('../../../../organisms/ToasterOven')
 vi.mock('react-router-dom', async importOriginal => {
   const reactRouterDom = await importOriginal<NavigateFunction>()
   return {

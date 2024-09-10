@@ -7,13 +7,13 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { useRequiredProtocolHardware } from '../../../pages/Desktop/Protocols/hooks'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../i18n'
+import { useRequiredProtocolHardware } from '../../../../pages/Desktop/Protocols/hooks'
 import { Hardware } from '../Hardware'
 
-vi.mock('../../../pages/Desktop/Protocols/hooks')
-vi.mock('../../../redux/config')
+vi.mock('../../../../pages/Desktop/Protocols/hooks')
+vi.mock('../../../../redux/config')
 
 const MOCK_PROTOCOL_ID = 'mock_protocol_id'
 

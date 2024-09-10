@@ -18,7 +18,7 @@ import {
 } from '@opentrons/components'
 
 import { LongPressModal } from './LongPressModal'
-import { formatTimeWithUtcLabel } from '../../resources/runs'
+import { formatTimeWithUtcLabel } from '../../../resources/runs'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'

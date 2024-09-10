@@ -15,7 +15,7 @@ import {
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
-import { useRequiredProtocolLabware } from '../../pages/Desktop/Protocols/hooks'
+import { useRequiredProtocolLabware } from '../../../pages/Desktop/Protocols/hooks'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}

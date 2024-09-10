@@ -3,8 +3,8 @@ import { vi, it, describe, expect } from 'vitest'
 import { act, fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../i18n'
 import { PinnedTransfer } from '../PinnedTransfer'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
