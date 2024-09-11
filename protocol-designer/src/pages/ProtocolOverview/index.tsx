@@ -524,7 +524,7 @@ export function ProtocolOverview(): JSX.Element {
               <SlotDetailsContainer
                 robotType={robotType}
                 slot={isOffDeckHover ? 'offDeck' : hover}
-                offDeckLabwareId={hover ?? undefined}
+                offDeckLabwareId={isOffDeckHover ? hover : null}
               />
             </Flex>
           </Flex>
