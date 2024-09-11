@@ -362,21 +362,34 @@ def create_abr_data_sheet(
     return sheet_location
 
 
-def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, str]:
+def get_error_info(file_results: Dict[str, Any]) -> Dict[str, Any]:
     """Determines if errors exist in run log and documents them."""
     error_levels = []
     error_level = ""
+    error_type = ""
+    error_code = ""
+    error_instrument = ""
+    recoverable_errors: Dict[str, int] = dict()
+    total_recoverable_errors = 0
     # Read error levels file
     with open(ERROR_LEVELS_PATH, "r") as error_file:
         error_levels = list(csv.reader(error_file))
-    num_of_errors = len(file_results["errors"])
-    if num_of_errors == 0:
-        error_type = ""
-        error_code = ""
-        error_instrument = ""
-        error_level = ""
-        return 0, error_type, error_code, error_instrument, error_level
+    end_run_errors = len(file_results["errors"])
     commands_of_run: List[Dict[str, Any]] = file_results.get("commands", [])
+    # Count amount and type of recoverable errors
+    error_recovery = file_results.get("hasEverEnteredErrorRecovery", False)
+    if error_recovery:
+        print("inside loop")
+        for command in commands_of_run:
+            error_in_command = command.get("error", "")
+            if len(error_in_command) > 0:
+                recoverable_error = command["error"].get("isDefined", "")
+                if recoverable_error:
+                    total_recoverable_errors += 1
+                    error_type = command["error"].get("errorType", "")
+                    if error_type not in recoverable_errors:
+                        recoverable_errors[error_type] = 0
+                    recoverable_errors[error_type] += 1
     try:
         run_command_error: Dict[str, Any] = commands_of_run[-1]
         error_str: int = len(run_command_error.get("error", ""))
@@ -395,17 +408,27 @@ def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, st
             # Module
             error_instrument = run_command_error["error"]["errorInfo"].get("port", "")
     else:
-        error_type = file_results["errors"][0]["errorType"]
-        error_code = file_results["errors"][0]["errorCode"]
-        error_instrument = file_results["errors"][0]["detail"]
+        error_details = file_results["errors"]
+        if len(error_details) > 0:
+            error_type = file_results["errors"][0].get("errorType", "")
+            error_code = file_results["errors"][0].get("errorCode", "")
+            error_instrument = file_results["errors"][0].get("detail", "")
     for error in error_levels:
         code_error = error[1]
         if code_error == error_code:
             error_level = error[4]
     if len(error_level) < 1:
         error_level = str(4)
-
-    return num_of_errors, error_type, error_code, error_instrument, error_level
+    error_dict = {
+        "Total Recoverable Error(s)": total_recoverable_errors,
+        "Recoverable Error(s) Description": recoverable_errors,
+        "Run Ending Error": end_run_errors,
+        "Error_Code": error_code,
+        "Error_Type": error_type,
+        "Error_Instrument": error_instrument,
+        "Error_Level": error_level,
+    }
+    return error_dict
 
 
 def write_to_local_and_google_sheet(

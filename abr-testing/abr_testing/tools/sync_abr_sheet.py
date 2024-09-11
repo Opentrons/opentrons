@@ -129,9 +129,9 @@ def compare_run_to_temp_data(
                 avg_humidity = mean(rel_hums)
                 row_num = google_sheet.get_row_index_with_value(run_id, 2)
                 # Write average temperature
-                google_sheet.update_cell("Sheet1", row_num, 46, avg_temps)
+                google_sheet.update_cell("Sheet1", row_num, 48, avg_temps)
                 # Write average humidity
-                google_sheet.update_cell("Sheet1", row_num, 47, avg_humidity)
+                google_sheet.update_cell("Sheet1", row_num, 49, avg_humidity)
                 row_update += 1
                 # TODO: Write averages to google sheet
                 print(f"Updated row {row_num}.")
