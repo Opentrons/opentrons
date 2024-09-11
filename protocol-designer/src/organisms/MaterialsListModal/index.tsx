@@ -23,12 +23,13 @@ import {
   Tag,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   getModuleDisplayName,
-  OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { getRobotType } from '../../file-data/selectors'
+import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { getTopPortalEl } from '../../components/portals/TopPortal'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 
@@ -62,9 +63,13 @@ export function MaterialsListModal({
 }: MaterialsListModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_overview', 'shared'])
   const robotType = useSelector(getRobotType)
+  const deckSetup = useSelector(getInitialDeckSetup)
+  const { modules: modulesOnDeck, labware: labwareOnDeck } = deckSetup
   const allLabwareWellContents = useSelector(
     labwareIngredSelectors.getLiquidsByLabwareId
   )
+  const tCSlot = robotType === FLEX_ROBOT_TYPE ? 'A1, B1' : '7,8,10,11'
+
   return createPortal(
     <Modal
       onClose={() => {
@@ -112,11 +117,8 @@ export function MaterialsListModal({
             {hardware.length > 0 ? (
               hardware.map((hw, id) => {
                 const formatLocation = (slot: string): string => {
-                  if (
-                    robotType === OT2_ROBOT_TYPE &&
-                    hw.type === THERMOCYCLER_MODULE_TYPE
-                  ) {
-                    return '7,8,10,11'
+                  if (hw.type === THERMOCYCLER_MODULE_TYPE) {
+                    return tCSlot
                   }
                   return slot.replace('cutout', '')
                 }
@@ -154,12 +156,36 @@ export function MaterialsListModal({
           </StyledText>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             {labware.length > 0 ? (
-              labware.map((lw, id) => {
+              labware.map(lw => {
+                const labwareOnModuleEntity = Object.values(modulesOnDeck).find(
+                  mod => mod.id === lw.slot
+                )
+                const labwareOnLabwareEntity = Object.values(
+                  labwareOnDeck
+                ).find(labware => labware.id === lw.slot)
+                const labwareOnLabwareOnModuleSlot = Object.values(
+                  modulesOnDeck
+                ).find(mod => mod.id === labwareOnLabwareEntity?.slot)?.slot
+                const labwareOnLabwareOnSlot = labwareOnLabwareEntity?.slot
+
+                let deckLabelSlot = lw.slot
+                if (labwareOnModuleEntity != null) {
+                  deckLabelSlot =
+                    labwareOnModuleEntity.type === THERMOCYCLER_MODULE_TYPE
+                      ? tCSlot
+                      : labwareOnModuleEntity.slot
+                } else if (labwareOnLabwareOnModuleSlot != null) {
+                  deckLabelSlot = labwareOnLabwareOnModuleSlot
+                } else if (labwareOnLabwareOnSlot != null) {
+                  deckLabelSlot = labwareOnLabwareOnSlot
+                } else if (deckLabelSlot === 'offDeck') {
+                  deckLabelSlot = 'Off-deck'
+                }
                 return (
-                  <ListItem type="noActive" key={`labware_${id}`}>
+                  <ListItem type="noActive" key={`labware_${lw.id}`}>
                     <ListItemDescriptor
                       type="default"
-                      description={<DeckInfoLabel deckLabel={lw.slot} />}
+                      description={<DeckInfoLabel deckLabel={deckLabelSlot} />}
                       content={lw.def.metadata.displayName}
                     />
                   </ListItem>
