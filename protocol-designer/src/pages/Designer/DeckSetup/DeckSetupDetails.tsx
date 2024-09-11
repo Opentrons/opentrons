@@ -366,10 +366,13 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
           yDimension: labware.def.dimensions.yDimension,
           zDimension: labware.def.dimensions.zDimension,
         }
+        const moduleParent = allModules.find(
+          module => module.id === slotForOnTheDeck
+        )
         const slotOnDeck =
-          slotForOnTheDeck != null
-            ? allModules.find(module => module.id === slotForOnTheDeck)?.slot
-            : null
+          moduleParent == null
+            ? slotForOnTheDeck
+            : allModules.find(module => module.id === slotForOnTheDeck)?.slot
         return (
           <React.Fragment key={labware.id}>
             <LabwareOnDeck

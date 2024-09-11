@@ -203,7 +203,9 @@ export function SlotOverflowMenu(
             </MenuButton>
             <MenuButton
               onClick={() => {
-                if (labwareOnSlot != null) {
+                if (nestedLabwareOnSlot != null) {
+                  dispatch(openIngredientSelector(nestedLabwareOnSlot.id))
+                } else if (labwareOnSlot != null) {
                   dispatch(openIngredientSelector(labwareOnSlot.id))
                 }
                 navigate('/liquids')

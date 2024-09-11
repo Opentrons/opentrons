@@ -20,6 +20,7 @@ interface SlotInformationProps {
   robotType: RobotType
   liquids?: string[]
   labwares?: string[]
+  adapters?: string[]
   modules?: string[]
   fixtures?: string[]
 }
@@ -29,6 +30,7 @@ export const SlotInformation: React.FC<SlotInformationProps> = ({
   robotType,
   liquids = [],
   labwares = [],
+  adapters = [],
   modules = [],
   fixtures = [],
 }) => {
@@ -59,6 +61,9 @@ export const SlotInformation: React.FC<SlotInformationProps> = ({
           <StackInfoList title={t('liquid')} items={liquids} />
         )}
         <StackInfoList title={t('labware')} items={labwares} />
+        {adapters.length > 0 ? (
+          <StackInfoList title={t('labware')} items={adapters} />
+        ) : null}
         {isOffDeck ? null : (
           <StackInfoList title={t('module')} items={modules} />
         )}
