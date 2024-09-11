@@ -426,7 +426,10 @@ def get_error_info(file_results: Dict[str, Any]) -> Dict[str, Any]:
             "node", run_command_error.get("errorInfo", {}).get("port", "")
         )
     except (IndexError, KeyError):
-        error_details = file_results.get("errors", [{}])[0]
+        try:
+            error_details = file_results.get("errors", [{}])[0]
+        except IndexError:
+            error_details = {}
         error_type = error_details.get("errorType", "")
         error_code = error_details.get("errorCode", "")
         error_instrument = error_details.get("detail", "")
