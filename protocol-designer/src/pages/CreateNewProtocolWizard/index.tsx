@@ -38,6 +38,7 @@ import {
   createDeckFixture,
   toggleIsGripperRequired,
 } from '../../step-forms/actions/additionalItems'
+import { getNewProtocolModal } from '../../navigation/selectors'
 import { SelectRobot } from './SelectRobot'
 import { SelectPipettes } from './SelectPipettes'
 import { SelectGripper } from './SelectGripper'
@@ -154,17 +155,24 @@ const validationSchema: any = Yup.object().shape({
 
 export function CreateNewProtocolWizard(): JSX.Element | null {
   const { t } = useTranslation(['modal', 'alert'])
+  const navigate = useNavigate()
+  const showWizard = useSelector(getNewProtocolModal)
   const hasUnsavedChanges = useSelector(loadFileSelectors.getHasUnsavedChanges)
   const customLabware = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
   )
-  const navigate = useNavigate()
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const [wizardSteps, setWizardSteps] = React.useState<WizardStep[]>(
     WIZARD_STEPS
   )
 
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
+
+  React.useEffect(() => {
+    if (!showWizard) {
+      navigate('/overview')
+    }
+  }, [showWizard])
 
   const createProtocolFile = (values: WizardFormState): void => {
     navigate('/overview')
@@ -370,7 +378,7 @@ export function CreateNewProtocolWizard(): JSX.Element | null {
     }
   }
 
-  return (
+  return showWizard ? (
     <Box backgroundColor={COLORS.grey20} height="calc(100vh - 48px)">
       <CreateFileForm
         currentWizardStep={currentWizardStep}
@@ -380,7 +388,7 @@ export function CreateNewProtocolWizard(): JSX.Element | null {
         setWizardSteps={setWizardSteps}
       />
     </Box>
-  )
+  ) : null
 }
 
 interface CreateFileFormProps {

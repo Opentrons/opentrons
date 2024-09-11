@@ -57,6 +57,7 @@ import type { CreateCommand, PipetteName } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../types'
 import type { HintKey } from '../../tutorial'
+import { BUTTON_LINK_STYLE } from '../../atoms'
 
 const DATE_ONLY_FORMAT = 'MMMM dd, yyyy'
 const DATETIME_FORMAT = 'MMMM dd, yyyy | h:mm a'
@@ -322,6 +323,7 @@ export function ProtocolOverview(): JSX.Element {
                   onClick={() => {
                     setShowEditMetadataModal(true)
                   }}
+                  css={BUTTON_LINK_STYLE}
                   data-testid="ProtocolOverview_MetadataEditButton"
                 >
                   <StyledText desktopStyle="bodyDefaultRegular">
@@ -358,6 +360,7 @@ export function ProtocolOverview(): JSX.Element {
                   onClick={() => {
                     setShowEditInstrumentsModal(true)
                   }}
+                  css={BUTTON_LINK_STYLE}
                 >
                   <StyledText desktopStyle="bodyDefaultRegular">
                     {t('edit')}
@@ -444,10 +447,7 @@ export function ProtocolOverview(): JSX.Element {
                     )
                   )
                 ) : (
-                  <InfoScreen
-                    content={t('no_liquids_defined')}
-                    backgroundColor={COLORS.grey35}
-                  />
+                  <InfoScreen content={t('no_liquids_defined')} />
                 )}
               </Flex>
             </Flex>
@@ -459,10 +459,7 @@ export function ProtocolOverview(): JSX.Element {
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
                 {Object.keys(savedStepForms).length <= 1 ? (
-                  <InfoScreen
-                    content={t('no_steps')}
-                    backgroundColor={COLORS.grey35}
-                  />
+                  <InfoScreen content={t('no_steps')} />
                 ) : (
                   <ListItem type="noActive" key="ProtocolOverview_Step">
                     <ListItemDescriptor
@@ -493,6 +490,7 @@ export function ProtocolOverview(): JSX.Element {
                   onClick={() => {
                     setShowMaterialsListModal(true)
                   }}
+                  css={BUTTON_LINK_STYLE}
                 >
                   <StyledText desktopStyle="bodyDefaultRegular">
                     {t('materials_list')}
