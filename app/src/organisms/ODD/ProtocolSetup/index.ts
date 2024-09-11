@@ -6,3 +6,5 @@ export * from './ProtocolSetupModulesAndDeck'
 export * from './ProtocolSetupOffsets'
 export * from './ProtocolSetupParameters'
 export * from './ProtocolSetupSkeleton'
+
+export type * from './types'

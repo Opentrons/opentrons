@@ -100,6 +100,7 @@ import type {
   ProtocolFixture,
 } from '../../../pages/Desktop/Protocols/hooks'
 import type { ProtocolModuleInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import type { SetupScreens } from '../../../organisms/ODD/ProtocolSetup'
 
 const FETCH_DURATION_MS = 5000
 
@@ -832,16 +833,6 @@ function PrepareToRun({
     </>
   )
 }
-
-export type SetupScreens =
-  | 'prepare to run'
-  | 'instruments'
-  | 'modules'
-  | 'offsets'
-  | 'labware'
-  | 'liquids'
-  | 'deck configuration'
-  | 'view only parameters'
 
 export function ProtocolSetup(): JSX.Element {
   const { runId } = useParams<

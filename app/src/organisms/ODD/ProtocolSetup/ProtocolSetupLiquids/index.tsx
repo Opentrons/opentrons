@@ -26,7 +26,7 @@ import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/us
 import { getTotalVolumePerLiquidId } from '../../../Devices/ProtocolRun/SetupLiquids/utils'
 import { LiquidDetails } from './LiquidDetails'
 import type { ParsedLiquid, RunTimeCommand } from '@opentrons/shared-data'
-import type { SetupScreens } from '../../../../pages/ODD/ProtocolSetup'
+import type { SetupScreens } from '../types'
 
 export interface ProtocolSetupLiquidsProps {
   runId: string

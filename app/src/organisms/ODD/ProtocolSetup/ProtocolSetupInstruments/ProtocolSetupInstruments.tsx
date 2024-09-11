@@ -19,7 +19,7 @@ import { ProtocolInstrumentMountItem } from '../../../InstrumentMountItem'
 
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
-import type { SetupScreens } from '../../../../pages/ODD/ProtocolSetup'
+import type { SetupScreens } from '../types'
 import { isGripperInCommands } from '../../../../resources/protocols/utils'
 
 export interface ProtocolSetupInstrumentsProps {

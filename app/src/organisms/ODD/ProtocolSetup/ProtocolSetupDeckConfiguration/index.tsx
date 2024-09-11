@@ -32,7 +32,7 @@ import type {
   ModuleModel,
 } from '@opentrons/shared-data'
 import type { ModuleOnDeck } from '@opentrons/components'
-import type { SetupScreens } from '../../../../pages/ODD/ProtocolSetup'
+import type { SetupScreens } from '../types'
 
 interface ProtocolSetupDeckConfigurationProps {
   cutoutId: CutoutId | null

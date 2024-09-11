@@ -22,7 +22,7 @@ import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/us
 import { ChildNavigation } from '../../../ChildNavigation'
 import { useToaster } from '../../../ToasterOven'
 
-import type { SetupScreens } from '../../../../pages/ODD/ProtocolSetup'
+import type { SetupScreens } from '../types'
 
 export interface ViewOnlyParametersProps {
   runId: string
