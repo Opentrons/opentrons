@@ -440,7 +440,7 @@ export function ProtocolOverview(): JSX.Element {
                               </StyledText>
                             </Flex>
                           }
-                          content={liquid.description ?? t('n/a')}
+                          content={liquid.description ?? t('na')}
                         />
                       </ListItem>
                     )
