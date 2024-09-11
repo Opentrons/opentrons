@@ -4,11 +4,11 @@ from . import water
 
 
 # FIXME: add glycerol, ethanol (at appropriate dilutions)
-_all_classes: Dict[str, Dict[str, Dict[str, Dict[str, Dict[int, Liquid]]]]] = {
+_all_classes: Dict[str, Dict[str, Dict[str, Dict[str, Dict[float, Liquid]]]]] = {
     "water": {
         "t1000": {
             "p1000": {
-                "1ch": water.t1000.p1000.single_channel.default,
+                "1ch": water.t1000.p1000.single_channel.VOLUMES,
             },
         },
     },
@@ -27,7 +27,7 @@ def get_liquid_class(
     defined_volumes.sort()
     assert len(defined_volumes) == 3
 
-    def _get_interp_liq_class(lower_ul: int, upper_ul: int) -> Liquid:
+    def _get_interp_liq_class(lower_ul: float, upper_ul: float) -> Liquid:
         lower_cls = cls_per_volume[lower_ul]
         upper_cls = cls_per_volume[upper_ul]
         return Liquid.interpolate(volume, lower_ul, upper_ul, lower_cls, upper_cls)

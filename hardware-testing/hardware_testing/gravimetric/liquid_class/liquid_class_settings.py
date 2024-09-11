@@ -23,6 +23,7 @@ class _Interpolate:
         """Get the CSV header for these settings."""
         names: List[str] = []
         for f in fields(self):
+            print(f.name, f.type, type(f.type))
             if issubclass(f.type, Point):
                 names += ["offset-x", "offset-y", "offset-z"]
             elif issubclass(f.type, _Interpolate):
@@ -148,7 +149,6 @@ class Mix(_Interpolate):
 
 @dataclass
 class _PlungerMoves(_Interpolate):
-    order: List[str]
     position: Position
     flow_rate: float
     delay: float
