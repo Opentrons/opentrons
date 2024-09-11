@@ -18,6 +18,8 @@ class GCODE(str, Enum):
     LIMITSWITCH_STATUS = 'M119'
     ENABLE_MOTOR = 'M17'
     DISABLE_MOTOR = 'M18'
+    WRITE_TO_REGISTER = 'M921'
+    READ_FROM_REGISTER = 'M920'
 
 class DIR(str, Enum):
     POSITIVE = '',
@@ -60,10 +62,11 @@ RETRACT_SPEED_X = 10
 RETRACT_SPEED_Z = 10
 HOME_ACCELERATION = 10
 MOVE_ACCELERATION_X = 150
-MOVE_ACCELERATION_Z = 5
+MOVE_ACCELERATION_Z = 10
 MOVE_SPEED_X = 300
-MOVE_SPEED_UPZ = 200
-MOVE_SPEED_DOWNZ = 200
+MOVE_SPEED_UPZ = 100
+MOVE_SPEED_DOWNZ = 100
+LABWARE_CLEARANCE = 9
 
 class FlexStacker():
     """Flex Stacker Driver."""
@@ -84,6 +87,7 @@ class FlexStacker():
         self.home_speed = HOME_SPEED
         self.move_acceleration_x = MOVE_ACCELERATION_X
         self.move_acceleration_z = MOVE_ACCELERATION_Z
+        self.labware_clearance = LABWARE_CLEARANCE
         self.current_position = {'X': None, 'Z': None, 'L': None}
         # self.__class__.__name__ == 'FlexStacker'
 
@@ -391,7 +395,7 @@ class FlexStacker():
         self.move(AXIS.X, TOTAL_TRAVEL_X-5, DIR.POSITIVE, self.move_speed_x, self.move_acceleration_x)
 
     def unload_labware(self):
-        labware_clearance = 9
+        labware_clearance = 20
         labware_retract_speed= 50
         # ----------------Set up the Stacker------------------------
         self.home(AXIS.X, DIR.POSITIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
@@ -408,3 +412,31 @@ class FlexStacker():
         self.move(AXIS.Z, TOTAL_TRAVEL_Z-20, DIR.NEGATIVE, self.move_speed_down_z, self.move_acceleration_z)
         self.home(AXIS.Z, DIR.NEGATIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
         self.move(AXIS.X, TOTAL_TRAVEL_X-5, DIR.POSITIVE, self.move_speed_x, self.move_acceleration_x)
+
+    def write_to_motor_drive(self, register, data):
+        """
+        Example: M921 X32528 103689
+        Write Motor Driver Register
+
+        input: the axis, the address, and the contents of the register you want to read
+        """
+        c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
+            gcode=GCODE.WRITE_TO_REGISTER
+        ).add_element(axis.upper()).add_element(register).add_element(data)
+        print(c)
+
+        response = self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES).strip('OK')
+
+    def read_from_motor_drive(self, register):
+        """
+        Example: M921 X32528 103689
+        Write Motor Driver Register
+
+        input: the axis, the address, and the contents of the register you want to read
+        """
+        c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
+            gcode=GCODE.WRITE_TO_REGISTER
+        ).add_element(axis.upper()).add_element(register)
+        print(c)
+
+        response = self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES).strip('OK')
