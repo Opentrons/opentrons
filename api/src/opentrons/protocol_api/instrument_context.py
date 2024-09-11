@@ -160,6 +160,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def default_speed(self, speed: float) -> None:
         self._core.set_default_speed(speed)
 
+    # we do volume tracking already
     # update old_well/new_well heights/volumes after (successful) liquid handling actions (using handled volume)
     # (initially) populate well heights/volumes via user input?! Error (and recovery) if not enough volume to liquid probe?
     @requires_version(2, 0)
@@ -2108,6 +2109,7 @@ class InstrumentContext(publisher.CommandPublisher):
         )
         self._tip_racks = tip_racks or []
 
+    # move these to core
     def determine_aspirate_move_to_location(
         self,
         location: Optional[Union[types.Location, labware.Well]],
@@ -2162,13 +2164,7 @@ class InstrumentContext(publisher.CommandPublisher):
         offset_from_meniscus_mm: float,
         volume: float,
     ) -> Optional[types.Location]:
-        if self.api_version < APIVersion(2, 20) and self.liquid_presence_detection:
-            raise APIVersionError(
-                api_element="Liquid presence detection",
-                until_version="2.20",
-                current_version=f"{self.api_version}",
-            )
-        elif self.api_version < APIVersion(2, 21) and meniscus_relative:
+        if self.api_version < APIVersion(2, 21) and meniscus_relative:
             raise APIVersionError(
                 api_element="Meniscus-relative aspiration",
                 until_version="2.21",
@@ -2192,6 +2188,8 @@ class InstrumentContext(publisher.CommandPublisher):
             height = self._core.get_last_measured_liquid_height(well_core=well._core)
             if height is None:
                 height = self.measure_liquid_height(well=well)
+            # new parameters fit into location param, sent to Protocol Engine command (via well.meniscus symbol)
+            # need below? well.meniscus
             # convert height to volume, subtract `volume`, convert volume to height, use as offset below
             # raise error if not enough liquid present to aspirate desired volume. Error Recovery option
             move_to_location = well.bottom(z=height + offset_from_meniscus_mm)

@@ -54,6 +54,26 @@
       }
     },
 
+    "meniscusRelative": {
+      "required": ["meniscusRelative"],
+      "properties": {
+        "meniscusRelative": {
+          "description": "Default is false. If true, meniscus-relative liquid handling will be enabled",
+          "type": "boolean"
+        }
+      }
+    },
+
+    "offsetFromMeniscusMm": {
+      "required": ["offsetFromMeniscusMm"],
+      "properties": {
+        "offsetFromMeniscusMm": {
+          "description": "Default is -2.0mm. If meniscus-relative liquid handling is enabled, this is the offset distance from the meniscus to liquid handle from",
+          "type": "number"
+        }
+      }
+    },
+
     "slot": {
       "description": "Slot on the deck of an OT-2 robot",
       "type": "string",
@@ -227,7 +247,9 @@
                   { "$ref": "#/definitions/flowRate" },
                   { "$ref": "#/definitions/pipetteAccessParams" },
                   { "$ref": "#/definitions/volumeParams" },
-                  { "$ref": "#/definitions/offsetFromBottomMm" }
+                  { "$ref": "#/definitions/offsetFromBottomMm" },
+                  { "$ref": "#/definitions/meniscusRelative" },
+                  { "$ref": "#/definitions/offsetFromMeniscusMm" }
                 ]
               }
             }

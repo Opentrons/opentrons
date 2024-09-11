@@ -1246,7 +1246,9 @@
         "well": "A1",
         "volume": 5,
         "flowRate": 3,
-        "offsetFromBottomMm": 2
+        "offsetFromBottomMm": 2,
+        "meniscusRelative": false,
+        "offsetFromMeniscusMm": 0.0
       }
     },
     {
@@ -1263,7 +1265,9 @@
         "well": "B1",
         "volume": 4.5,
         "flowRate": 2.5,
-        "offsetFromBottomMm": 1
+        "offsetFromBottomMm": 1,
+        "meniscusRelative": false,
+        "offsetFromMeniscusMm": 0.0
       }
     },
     {

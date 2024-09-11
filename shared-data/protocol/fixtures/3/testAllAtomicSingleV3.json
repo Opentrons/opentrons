@@ -2178,7 +2178,9 @@
         "labware": "wellplate1Id",
         "well": "A1",
         "offsetFromBottomMm": 0.5,
-        "flowRate": 50
+        "flowRate": 50,
+        "meniscusRelative": false,
+        "offsetFromMeniscusMm": 0.0
       }
     },
     {
@@ -2189,7 +2191,9 @@
         "labware": "wellplate1Id",
         "well": "B1",
         "offsetFromBottomMm": 10,
-        "flowRate": 10
+        "flowRate": 10,
+        "meniscusRelative": false,
+        "offsetFromMeniscusMm": 0.0
       }
     },
     {
@@ -2200,7 +2204,9 @@
         "labware": "wellplate1Id",
         "well": "H1",
         "offsetFromBottomMm": 1,
-        "flowRate": 50
+        "flowRate": 50,
+        "meniscusRelative": false,
+        "offsetFromMeniscusMm": 0.0
       }
     },
     {
@@ -2211,7 +2217,9 @@
         "labware": "wellplate1Id",
         "well": "H2",
         "offsetFromBottomMm": 20,
-        "flowRate": 10
+        "flowRate": 10,
+        "meniscusRelative": false,
+        "offsetFromMeniscusMm": 0.0
       }
     },
     {
@@ -2232,7 +2240,9 @@
         "labware": "wellplate1Id",
         "well": "A1",
         "offsetFromBottomMm": 0.5,
-        "flowRate": 50
+        "flowRate": 50,
+        "meniscusRelative": false,
+        "offsetFromMeniscusMm": 0.0
       }
     },
     {
