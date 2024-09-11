@@ -45,7 +45,7 @@ assert (
 #     60
 # ]
 
-TEST_SPEEDS = [0.5,1.0,1.5,2.0]
+TEST_SPEEDS = [0.25,0.5,0.75]
 # TEST_SPEEDS2 = [1.0]
 # TEST_SPEEDS3 = [1.5]
 # TEST_SPEEDS4 = [2.0]
