@@ -94,7 +94,6 @@ export function Landing(): JSX.Element {
 
 const StyledLabel = styled.label`
   display: inline-block;
-  color: ${COLORS.yellow20};
   cursor: pointer;
   input[type='file'] {
     display: none;
