@@ -43,7 +43,6 @@ const pdRoutes: RouteProps[] = [
 ]
 
 export function ProtocolRoutes(): JSX.Element {
-  console.log('in protocol routes')
   const landingPage: RouteProps = {
     Component: Landing,
     name: 'Landing',
@@ -63,10 +62,7 @@ export function ProtocolRoutes(): JSX.Element {
             {allRoutes.map(({ Component, path }: RouteProps) => {
               return <Route key={path} path={path} element={<Component />} />
             })}
-            <Route
-              path="*"
-              element={<Navigate to={`/`} />}
-            />
+            <Route path="*" element={<Navigate to={landingPage.path} />} />
           </Routes>
         </Box>
       </Kitchen>
