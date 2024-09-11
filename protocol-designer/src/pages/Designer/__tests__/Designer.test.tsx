@@ -50,7 +50,9 @@ describe('Designer', () => {
     vi.mocked(selectors.getIsNewProtocol).mockReturnValue(true)
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
       modules: {},
-      additionalEquipmentOnDeck: {},
+      additionalEquipmentOnDeck: {
+        trash: { name: 'trashBin', location: 'cutoutA3', id: 'mockId' },
+      },
       labware: {},
       pipettes: {},
     })
