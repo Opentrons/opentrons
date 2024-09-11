@@ -240,13 +240,14 @@ export function DefineLiquidsModal(
                 <StyledText desktopStyle="bodyDefaultRegular">
                   {t('display_color')}
                 </StyledText>
-                <Btn
+
+                <LiquidIcon
                   onClick={() => {
                     setShowColorPicker(prev => !prev)
                   }}
-                >
-                  <LiquidIcon color={color} size="medium" />
-                </Btn>
+                  color={color}
+                  size="medium"
+                />
               </Flex>
               {/* NOTE: this is for serialization if we decide to add it back */}
               {/* <Controller
