@@ -29,6 +29,8 @@ import { Bouncing } from './Bouncing'
 import styles from './components/ProtocolEditor.module.css'
 import './css/reset.module.css'
 
+import type { BrowserRouterProps } from 'react-router-dom'
+
 const showGateModal =
   process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
 
@@ -45,8 +47,8 @@ function ProtocolEditorComponent(): JSX.Element {
 
   const prereleaseModeEnabled = flags.PRERELEASE_MODE === true
 
-  const browserRouterProps =
-    routerBaseName != null ? { basdename: routerBaseName } : {}
+  const browserRouterProps: BrowserRouterProps =
+    routerBaseName != null ? { basename: routerBaseName } : {}
 
   return (
     <div id="protocol-editor">
