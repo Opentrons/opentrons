@@ -103,7 +103,15 @@ vi.mock('react-router-dom', async importOriginal => {
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../organisms/LabwarePositionCheck/useLaunchLPC')
 vi.mock('../../../../organisms/Devices/hooks')
-vi.mock('../../../../organisms/ODD/ProtocolSetup')
+vi.mock('../../../../organisms/ODD/ProtocolSetup', async importOriginal => {
+  const ACTUALS = ['ProtocolSetupStep']
+  const actual = await importOriginal<object>()
+  return Object.fromEntries(
+    Object.entries(actual).map(([k, v]) =>
+      ACTUALS.includes(k) ? [k, v] : [k, vi.fn()]
+    )
+  )
+})
 vi.mock(
   '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
