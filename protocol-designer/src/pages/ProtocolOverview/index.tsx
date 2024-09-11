@@ -8,7 +8,6 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   Btn,
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
   InfoScreen,
@@ -45,6 +44,7 @@ import { resetScrollElements } from '../../ui/steps/utils'
 import { useBlockingHint } from '../../components/Hints/useBlockingHint'
 import { v8WarningContent } from '../../components/FileSidebar/FileSidebar'
 import { MaterialsListModal } from '../../organisms/MaterialsListModal'
+import { BUTTON_LINK_STYLE } from '../../atoms'
 import {
   EditProtocolMetadataModal,
   EditInstrumentsModal,
@@ -57,7 +57,6 @@ import type { CreateCommand, PipetteName } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../types'
 import type { HintKey } from '../../tutorial'
-import { BUTTON_LINK_STYLE } from '../../atoms'
 
 const DATE_ONLY_FORMAT = 'MMMM dd, yyyy'
 const DATETIME_FORMAT = 'MMMM dd, yyyy | h:mm a'

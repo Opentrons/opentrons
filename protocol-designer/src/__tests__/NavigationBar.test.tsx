@@ -24,7 +24,7 @@ describe('NavigationBar', () => {
     screen.getByText('Opentrons')
     screen.getByText('Protocol Designer')
     screen.getByText('Version # fake_PD_version')
-    screen.getByText('Create new protocol')
+    screen.getByText('Create new')
     screen.getByText('Import')
   })
 

@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import {
   ALIGN_CENTER,
-  Box,
   DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
@@ -83,7 +82,11 @@ interface StackInfoListProps {
 function StackInfoList({ title, items }: StackInfoListProps): JSX.Element {
   const pathLocation = useLocation()
   return (
-    <Box width={pathLocation.pathname === '/designer' ? '15.8125rem' : '100%'}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      width={pathLocation.pathname === '/designer' ? '15.8125rem' : '100%'}
+      gridGap={SPACING.spacing4}
+    >
       {items.length > 0 ? (
         items.map((item, index) => (
           <StackInfo
@@ -95,7 +98,7 @@ function StackInfoList({ title, items }: StackInfoListProps): JSX.Element {
       ) : (
         <StackInfo title={title} />
       )}
-    </Box>
+    </Flex>
   )
 }
 

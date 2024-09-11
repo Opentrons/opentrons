@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -11,7 +11,6 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  SecondaryButton,
   StyledText,
 } from '@opentrons/components'
 import { toggleNewProtocolModal } from './navigation/actions'
@@ -23,7 +22,6 @@ import type { ThunkDispatch } from './types'
 export function NavigationBar(): JSX.Element | null {
   const { t, i18n } = useTranslation('shared')
   const location = useLocation()
-  const navigate = useNavigate()
   const metadata = useSelector(getFileMetadata)
   const dispatch: ThunkDispatch<any> = useDispatch()
   const loadFile = (
