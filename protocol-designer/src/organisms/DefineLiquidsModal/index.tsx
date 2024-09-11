@@ -16,6 +16,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  FLEX_MIN_CONTENT,
   InputField,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
@@ -244,6 +245,7 @@ export function DefineLiquidsModal(
                   onClick={() => {
                     setShowColorPicker(prev => !prev)
                   }}
+                  width={FLEX_MIN_CONTENT}
                 >
                   <LiquidIcon color={color} size="medium" />
                 </Btn>

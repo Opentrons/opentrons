@@ -49,9 +49,10 @@ const darkFill = COLORS.grey60
 interface DeckThumbnailProps {
   hoverSlot: DeckSlotId | null
   setHoverSlot: React.Dispatch<React.SetStateAction<string | null>>
+  width?: string
 }
 export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
-  const { hoverSlot, setHoverSlot } = props
+  const { hoverSlot, setHoverSlot, width = '32.5rem' } = props
   const initialDeckSetup = useSelector(getInitialDeckSetup)
   const robotType = useSelector(getRobotType)
   const deckDef = React.useMemo(() => getDeckDefFromRobotType(robotType), [])
@@ -98,7 +99,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   return (
     <Flex
       height="404px"
-      width="520px"
+      width={width}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       backgroundColor={COLORS.grey10}

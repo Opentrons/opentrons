@@ -22,6 +22,7 @@ import {
   StyledText,
   TYPOGRAPHY,
   ToggleGroup,
+  WRAP,
 } from '@opentrons/components'
 import {
   getPipetteSpecsV2,
@@ -303,10 +304,10 @@ export function ProtocolOverview(): JSX.Element {
             />
           </Flex>
         </Flex>
-        <Flex gridGap={SPACING.spacing80}>
+        <Flex gridGap={SPACING.spacing80} flexWrap={WRAP}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            width="50%"
+            css={COLUMN_STYLE}
             gridGap={SPACING.spacing40}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
@@ -477,7 +478,7 @@ export function ProtocolOverview(): JSX.Element {
               </Flex>
             </Flex>
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} width="50%">
+          <Flex flexDirection={DIRECTION_COLUMN} css={COLUMN_STYLE}>
             <Flex
               marginBottom={SPACING.spacing12}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -517,9 +518,17 @@ export function ProtocolOverview(): JSX.Element {
               alignItems={ALIGN_CENTER}
             >
               {deckView === leftString ? (
-                <DeckThumbnail hoverSlot={hover} setHoverSlot={setHover} />
+                <DeckThumbnail
+                  hoverSlot={hover}
+                  setHoverSlot={setHover}
+                  width="100%"
+                />
               ) : (
-                <OffDeckThumbnail hover={hover} setHover={setHover} />
+                <OffDeckThumbnail
+                  hover={hover}
+                  setHover={setHover}
+                  width="100%"
+                />
               )}
               <SlotDetailsContainer
                 robotType={robotType}
@@ -541,4 +550,12 @@ const PROTOCOL_NAME_TEXT_STYLE = css`
   text-overflow: ellipsis;
   word-wrap: break-word;
   -webkit-line-clamp: 3;
+`
+
+const MIN_OVERVIEW_WIDTH = '64rem'
+const COLUMN_GRID_GAP = '5rem'
+const COLUMN_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  min-width: calc((${MIN_OVERVIEW_WIDTH} - ${COLUMN_GRID_GAP}) * 0.5);
+  flex: 1;
 `
