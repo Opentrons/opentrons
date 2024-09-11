@@ -105,9 +105,7 @@ export function SlotOverflowMenu(
 
   const hasNoItems =
     moduleOnSlot == null && labwareOnSlot == null && fixturesOnSlot.length === 0
-  const hasTrashOnSlot = fixturesOnSlot.some(
-    fixture => fixture.name === 'trashBin'
-  )
+
   const handleClear = (): void => {
     //  clear module from slot
     if (moduleOnSlot != null) {
@@ -238,7 +236,7 @@ export function SlotOverflowMenu(
           </MenuButton>
         ) : null}
         <MenuButton
-          disabled={hasNoItems || hasTrashOnSlot}
+          disabled={hasNoItems}
           onClick={() => {
             handleClear()
             setShowMenuList(false)

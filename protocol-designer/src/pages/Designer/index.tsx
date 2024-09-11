@@ -42,7 +42,7 @@ export function Designer(): JSX.Element {
     'protocol_steps',
     'shared',
   ])
-  const { bakeToast } = useKitchen()
+  const { bakeToast, makeSnackbar } = useKitchen()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const zoomIn = useSelector(selectors.getZoomedInSlot)
@@ -65,6 +65,11 @@ export function Designer(): JSX.Element {
   >(leftString)
 
   const { modules, additionalEquipmentOnDeck } = deckSetup
+
+  const hasTrashEntity = Object.values(additionalEquipmentOnDeck).some(
+    ae => ae.name === 'trashBin' || ae.name === 'wasteChute'
+  )
+
   const startingDeckTab = {
     text: t('protocol_starting_deck'),
     isActive: tab === 'startingDeck',
@@ -76,7 +81,11 @@ export function Designer(): JSX.Element {
     text: t('protocol_steps:protocol_steps'),
     isActive: tab === 'protocolSteps',
     onClick: () => {
-      setTab('protocolSteps')
+      if (hasTrashEntity) {
+        setTab('protocolSteps')
+      } else {
+        makeSnackbar(t('trash_required') as string)
+      }
     },
   }
 
@@ -153,7 +162,11 @@ export function Designer(): JSX.Element {
 
             <SecondaryButton
               onClick={() => {
-                navigate('/overview')
+                if (hasTrashEntity) {
+                  navigate('/overview')
+                } else {
+                  makeSnackbar(t('trash_required') as string)
+                }
               }}
             >
               {t('shared:done')}
