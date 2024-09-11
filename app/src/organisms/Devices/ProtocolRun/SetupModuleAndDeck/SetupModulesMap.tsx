@@ -14,7 +14,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModulesAndDeck/utils'
+import { getAttachedProtocolModuleMatches } from '../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
 import { ModuleInfo } from '../../ModuleInfo'
 import { useAttachedModules, useStoredProtocolAnalysis } from '../../hooks'
 import { getProtocolModulesInfo } from '../utils/getProtocolModulesInfo'

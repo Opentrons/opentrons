@@ -12,7 +12,7 @@ import {
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
-import { useHardwareStatusText } from '../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
+import { useHardwareStatusText } from '../../../../organisms/ODD/RobotDashboard/hooks'
 import { useOffsetCandidatesForAnalysis } from '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useMissingProtocolHardware } from '../../../../pages/Desktop/Protocols/hooks'
 import { formatTimeWithUtcLabel } from '../../../../resources/runs'
@@ -36,10 +36,10 @@ Object.defineProperty(window, 'IntersectionObserver', {
   configurable: true,
   value: IntersectionObserver,
 })
-vi.mock('../../../../organisms/ProtocolSetupParameters')
+vi.mock('../../../../organisms/ODD/ProtocolSetup/ProtocolSetupParameters')
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks')
+vi.mock('../../../../organisms/ODD/RobotDashboard/hooks')
 vi.mock(
   '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 )

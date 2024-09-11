@@ -16,10 +16,10 @@ import { Navigation } from '../../../organisms/Navigation'
 import {
   EmptyRecentRun,
   RecentRunProtocolCarousel,
-} from '../../../organisms/OnDeviceDisplay/RobotDashboard'
+} from '../../../organisms/ODD/RobotDashboard'
 import { getOnDeviceDisplaySettings } from '../../../redux/config'
 import { WelcomeModal } from './WelcomeModal'
-import { ServerInitializing } from '../../../organisms/OnDeviceDisplay/RobotDashboard/ServerInitializing'
+import { ServerInitializing } from '../../../organisms/ODD/RobotDashboard/ServerInitializing'
 import { useNotifyAllRunsQuery } from '../../../resources/runs'
 import type { RunData } from '@opentrons/api-client'
 

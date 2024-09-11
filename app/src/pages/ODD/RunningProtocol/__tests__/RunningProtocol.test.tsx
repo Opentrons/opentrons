@@ -22,14 +22,14 @@ import { mockRobotSideAnalysis } from '../../../../molecules/Command/__fixtures_
 import {
   CurrentRunningProtocolCommand,
   RunningProtocolSkeleton,
-} from '../../../../organisms/OnDeviceDisplay/RunningProtocol'
+} from '../../../../organisms/ODD/RunningProtocol'
 import { mockUseAllCommandsResponseNonDeterministic } from '../../../../organisms/RunProgressMeter/__fixtures__'
 import {
   useRunStatus,
   useRunTimestamps,
 } from '../../../../organisms/RunTimeControl/hooks'
 import { getLocalRobot } from '../../../../redux/discovery'
-import { CancelingRunModal } from '../../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
+import { CancelingRunModal } from '../../../../organisms/ODD/RunningProtocol/CancelingRunModal'
 import { useTrackProtocolRunEvent } from '../../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { OpenDoorAlertModal } from '../../../../organisms/OpenDoorAlertModal'
@@ -60,11 +60,9 @@ vi.mock(
   '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
 vi.mock('../../../../organisms/RunTimeControl/hooks')
-vi.mock('../../../../organisms/OnDeviceDisplay/RunningProtocol')
+vi.mock('../../../../organisms/ODD/RunningProtocol')
 vi.mock('../../../../redux/discovery')
-vi.mock(
-  '../../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
-)
+vi.mock('../../../../organisms/ODD/RunningProtocol/CancelingRunModal')
 vi.mock('../../../../organisms/OpenDoorAlertModal')
 vi.mock('../../../../resources/runs')
 vi.mock('../../../../redux/config')

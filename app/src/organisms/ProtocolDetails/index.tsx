@@ -67,7 +67,7 @@ import {
   getAnalysisStatus,
   getProtocolDisplayName,
 } from '../ProtocolsLanding/utils'
-import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
+import { getProtocolUsesGripper } from '../ODD/ProtocolSetup/ProtocolSetupInstruments/utils'
 import { ProtocolOverflowMenu } from '../ProtocolsLanding/ProtocolOverflowMenu'
 import { ProtocolStats } from './ProtocolStats'
 import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'

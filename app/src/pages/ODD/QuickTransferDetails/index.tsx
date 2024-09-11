@@ -36,8 +36,8 @@ import {
   ProtocolDetailsHeaderChipSkeleton,
   ProcotolDetailsHeaderTitleSkeleton,
   ProtocolDetailsSectionContentSkeleton,
-} from '../../../organisms/OnDeviceDisplay/ProtocolDetails'
-import { useHardwareStatusText } from '../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
+} from '../../../organisms/ODD/ProtocolDetails'
+import { useHardwareStatusText } from '../../../organisms/ODD/RobotDashboard/hooks'
 import { SmallModalChildren } from '../../../molecules/OddModal'
 import { useToaster } from '../../../organisms/ToasterOven'
 import {

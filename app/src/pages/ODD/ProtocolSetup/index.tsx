@@ -40,10 +40,6 @@ import {
 } from '@opentrons/shared-data'
 
 import {
-  ProtocolSetupTitleSkeleton,
-  ProtocolSetupStepSkeleton,
-} from '../../../organisms/OnDeviceDisplay/ProtocolSetup'
-import {
   useAttachedModules,
   useLPCDisabledReason,
   useModuleCalibrationStatus,
@@ -57,20 +53,23 @@ import {
   useMissingProtocolHardwareFromAnalysis,
 } from '../../../pages/Desktop/Protocols/hooks'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { ProtocolSetupLabware } from '../../../organisms/ProtocolSetupLabware'
-import { ProtocolSetupModulesAndDeck } from '../../../organisms/ProtocolSetupModulesAndDeck'
-import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
-import { ProtocolSetupOffsets } from '../../../organisms/ProtocolSetupOffsets'
-import { ProtocolSetupInstruments } from '../../../organisms/ProtocolSetupInstruments'
-import { ProtocolSetupDeckConfiguration } from '../../../organisms/ProtocolSetupDeckConfiguration'
-import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchLPC'
-import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModulesAndDeck/utils'
-import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
-import { AnalysisFailedModal } from '../../../organisms/ProtocolSetupParameters/AnalysisFailedModal'
 import {
+  AnalysisFailedModal,
+  ProtocolSetupDeckConfiguration,
+  ProtocolSetupInstruments,
+  ProtocolSetupLabware,
+  ProtocolSetupLiquids,
+  ProtocolSetupModulesAndDeck,
+  ProtocolSetupOffsets,
+  ProtocolSetupStepSkeleton,
+  ProtocolSetupTitleSkeleton,
+  getUnmatchedModulesForProtocol,
   getIncompleteInstrumentCount,
   getProtocolUsesGripper,
-} from '../../../organisms/ProtocolSetupInstruments/utils'
+  ViewOnlyParameters,
+} from '../../../organisms/ODD/ProtocolSetup'
+import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchLPC'
+import { ConfirmCancelRunModal } from '../../../organisms/ODD/RunningProtocol'
 import {
   useRunControls,
   useRunStatus,
@@ -92,7 +91,6 @@ import { CloseButton, PlayButton } from './Buttons'
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '../../../resources/deck_configuration/utils'
 import { useNotifyRunQuery } from '../../../resources/runs'
-import { ViewOnlyParameters } from '../../../organisms/ProtocolSetupParameters/ViewOnlyParameters'
 
 import type { Run } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
