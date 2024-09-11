@@ -304,7 +304,7 @@ export const useAnnouncements = (): Announcement[] => {
     {
       announcementKey: 'redesign9.0',
       image: <Flex />,
-      heading: t('announcements.redesign.body1', { pd: PD }),
+      heading: t('announcements.redesign.body1'),
       message: (
         <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
           <StyledText desktopStyle="bodyDefaultRegular">
