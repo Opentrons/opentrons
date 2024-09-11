@@ -90,6 +90,27 @@ def _migrate_db_with_changes(
         dest_transaction,
         order_by_rowid=True,
     )
+    copy_rows_unmodified(
+        schema_6.analysis_primitive_type_rtp_table,
+        schema_7.analysis_primitive_type_rtp_table,
+        source_transaction,
+        dest_transaction,
+        order_by_rowid=True,
+    )
+    copy_rows_unmodified(
+        schema_6.analysis_csv_rtp_table,
+        schema_7.analysis_csv_rtp_table,
+        source_transaction,
+        dest_transaction,
+        order_by_rowid=True,
+    )
+    copy_rows_unmodified(
+        schema_6.run_csv_rtp_table,
+        schema_7.run_csv_rtp_table,
+        source_transaction,
+        dest_transaction,
+        order_by_rowid=True,
+    )
     _migrate_command_table_with_new_command_intent_col(
         source_transaction,
         dest_transaction,
@@ -134,8 +155,7 @@ def _migrate_command_table_with_new_command_intent_col(
         new_command_intent = (
             # Account for old_row.command["intent"] being NULL.
             "protocol"
-            if "intent" not in old_row.command
-            or data["intent"] == None  # noqa: E711
+            if "intent" not in old_row.command or data["intent"] == None  # noqa: E711
             else data["intent"]
         )
         dest_transaction.execute(
