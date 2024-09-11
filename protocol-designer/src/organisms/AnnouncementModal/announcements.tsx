@@ -2,21 +2,23 @@ import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
+  DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_AROUND,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import magTempCombined from '../../../assets/images/modules/magdeck_tempdeck_combined.png'
-import thermocycler from '../../../assets/images/modules/thermocycler.png'
-import multiSelect from '../../../assets/images/announcements/multi_select.gif'
-import batchEdit from '../../../assets/images/announcements/batch_edit.gif'
-import heaterShaker from '../../../assets/images/modules/heatershaker.png'
-import thermocyclerGen2 from '../../../assets/images/modules/thermocycler_gen2.png'
-import liquidEnhancements from '../../../assets/images/announcements/liquid-enhancements.gif'
-import opentronsFlex from '../../../assets/images/OpentronsFlex.png'
-import deckConfigutation from '../../../assets/images/deck_configuration.png'
+import magTempCombined from '../../assets/images/modules/magdeck_tempdeck_combined.png'
+import thermocycler from '../../assets/images/modules/thermocycler.png'
+import multiSelect from '../../assets/images/announcements/multi_select.gif'
+import batchEdit from '../../assets/images/announcements/batch_edit.gif'
+import heaterShaker from '../../assets/images/modules/heatershaker.png'
+import thermocyclerGen2 from '../../assets/images/modules/thermocycler_gen2.png'
+import liquidEnhancements from '../../assets/images/announcements/liquid-enhancements.gif'
+import opentronsFlex from '../../assets/images/OpentronsFlex.png'
+import deckConfigutation from '../../assets/images/deck_configuration.png'
 
 import styles from './AnnouncementModal.module.css'
 
@@ -297,6 +299,40 @@ export const useAnnouncements = (): Announcement[] => {
             />
           </p>
         </>
+      ),
+    },
+    {
+      announcementKey: 'redesign9.0',
+      image: <Flex />,
+      heading: t('announcements.redesign.body1'),
+      message: (
+        <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('announcements.redesign.body2')}
+          </StyledText>
+          <Flex marginLeft={SPACING.spacing16}>
+            <ul>
+              <li>
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {t('announcements.redesign.body3')}
+                </StyledText>
+              </li>
+
+              <li>
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {t('announcements.redesign.body4')}
+                </StyledText>
+              </li>
+            </ul>
+          </Flex>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            <Trans
+              t={t}
+              components={{ strong: <strong /> }}
+              i18nKey={'announcements.redesign.body5'}
+            />
+          </StyledText>
+        </Flex>
       ),
     },
   ]
