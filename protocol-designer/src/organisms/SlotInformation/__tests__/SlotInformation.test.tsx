@@ -10,7 +10,8 @@ import { SlotInformation } from '..'
 import type { NavigateFunction } from 'react-router-dom'
 
 const mockLiquids = ['Mastermix', 'Ethanol', 'Water']
-const mockLabwares = ['96 Well Plate', 'Adapter']
+const mockLabwares = ['96 Well Plate']
+const mockAdapters = ['Adapter']
 const mockModules = ['Thermocycler Module Gen2', 'Heater-Shaker Module']
 
 const mockLocation = vi.fn()
@@ -38,6 +39,7 @@ describe('SlotInformation', () => {
       location: 'A1',
       liquids: [],
       labwares: [],
+      adapters: [],
       modules: [],
       fixtures: [],
     }
@@ -63,11 +65,16 @@ describe('SlotInformation', () => {
       ...props,
       liquids: mockLiquids,
       labwares: mockLabwares,
+      adapters: mockAdapters,
       modules: mockModules,
     }
     render(props)
+    screen.debug()
+
     expect(screen.getAllByText('Liquid').length).toBe(1)
-    expect(screen.getAllByText('Labware').length).toBe(mockLabwares.length)
+    expect(screen.getAllByText('Labware').length).toBe(
+      mockLabwares.length + mockAdapters.length
+    )
     expect(screen.getAllByText('Module').length).toBe(mockModules.length)
     screen.getByText('Mastermix, Ethanol, Water')
     screen.getByText('96 Well Plate')

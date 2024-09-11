@@ -1,5 +1,4 @@
 {
-  "adapter": "Adapter",
   "add": "add",
   "amount": "Amount:",
   "ask_for_labware_overwrite": "Duplicate labware name",
