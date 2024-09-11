@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -21,7 +21,7 @@ import {
 } from '@opentrons/components'
 import { useKitchen } from '../../organisms/Kitchen/hooks'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
-import { getFileMetadata } from '../../file-data/selectors'
+import { generateNewProtocol } from '../../labware-ingred/actions'
 import { DefineLiquidsModal, ProtocolMetadataNav } from '../../organisms'
 import { DeckSetupContainer } from './DeckSetup'
 import { selectors } from '../../labware-ingred/selectors'
@@ -44,9 +44,10 @@ export function Designer(): JSX.Element {
   ])
   const { bakeToast } = useKitchen()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const zoomIn = useSelector(selectors.getZoomedInSlot)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
-  const metadata = useSelector(getFileMetadata)
+  const isNewProtocol = useSelector(selectors.getIsNewProtocol)
   const [liquidOverflowMenu, showLiquidOverflowMenu] = React.useState<boolean>(
     false
   )
@@ -84,13 +85,14 @@ export function Designer(): JSX.Element {
     // greater than 1 to account for the default loaded trashBin
     Object.values(additionalEquipmentOnDeck).length > 1
 
-  // only display toast if its a newly made protocol
+  // only display toast if its a newly made protocol and has hardware
   React.useEffect(() => {
-    if (hasHardware && metadata?.lastModified == null) {
+    if (hasHardware && isNewProtocol) {
       bakeToast(t('add_rest') as string, INFO_TOAST, {
         heading: t('we_added_hardware'),
         closeButton: true,
       })
+      dispatch(generateNewProtocol({ isNewProtocol: false }))
     }
   }, [])
 

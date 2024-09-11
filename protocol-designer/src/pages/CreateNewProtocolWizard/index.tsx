@@ -355,6 +355,7 @@ export function CreateNewProtocolWizard(): JSX.Element | null {
         )
       })
     }
+    dispatch(labwareIngredActions.generateNewProtocol({ isNewProtocol: true }))
   }
 
   const currentWizardStep = wizardSteps[currentStepIndex]

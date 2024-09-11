@@ -58,3 +58,7 @@ export interface ZoomedIntoSlotInfoState {
   selectedFixture: Fixture | null
   selectedSlot: { slot: DeckSlot | null; cutout: CutoutId | null }
 }
+
+export interface GenerateNewProtocolState {
+  isNewProtocol: boolean
+}
