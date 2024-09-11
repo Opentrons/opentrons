@@ -52,6 +52,7 @@ describe('NameQuickTransfer', () => {
     expect(saveBtn).toBeEnabled()
     fireEvent.click(saveBtn)
     expect(props.onSave).toHaveBeenCalled()
+    expect(saveBtn).toBeDisabled()
   })
 
   it('disables save if you enter more than 60 characters', () => {
