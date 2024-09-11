@@ -15,6 +15,7 @@ def determine_lifetime(abr_google_sheet: Any) -> None:
     """Record lifetime % of robot, pipettes, and gripper per run."""
     # Get all data
     headers = abr_google_sheet.get_row(1)
+    lifetime_index = headers.index("Robot Lifetime (%)")
     all_google_data = abr_google_sheet.get_all_data(expected_headers=headers)
     # Convert dictionary to pandas dataframe
     df_sheet_data = pd.DataFrame.from_dict(all_google_data)
@@ -92,7 +93,9 @@ def determine_lifetime(abr_google_sheet: Any) -> None:
                 [right_pipette_percent_lifetime],
                 [gripper_percent_lifetime],
             ]
-            abr_google_sheet.batch_update_cells(update_list, "AV", row_num, "0")
+            abr_google_sheet.batch_update_cells(
+                update_list, lifetime_index, row_num, "0"
+            )
             print(f"Updated row {row_num} for run: {run_id}")
 
 
@@ -101,6 +104,10 @@ def compare_run_to_temp_data(
 ) -> None:
     """Read ABR Data and compare robot and timestamp columns to temp data."""
     row_update = 0
+    # Get column number for average temp and rh
+    headers = google_sheet.get_row(1)
+    temp_index = headers.index("Average Temp (oC)") + 1
+    rh_index = headers.index("Average RH(%)") + 1
     for run in abr_data:
         run_id = run["Run_ID"]
         try:
@@ -129,9 +136,9 @@ def compare_run_to_temp_data(
                 avg_humidity = mean(rel_hums)
                 row_num = google_sheet.get_row_index_with_value(run_id, 2)
                 # Write average temperature
-                google_sheet.update_cell("Sheet1", row_num, 48, avg_temps)
+                google_sheet.update_cell("Sheet1", row_num, temp_index, avg_temps)
                 # Write average humidity
-                google_sheet.update_cell("Sheet1", row_num, 49, avg_humidity)
+                google_sheet.update_cell("Sheet1", row_num, rh_index, avg_humidity)
                 row_update += 1
                 # TODO: Write averages to google sheet
                 print(f"Updated row {row_num}.")

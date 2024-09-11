@@ -76,6 +76,31 @@ def command_time(command: Dict[str, str]) -> float:
     return start_to_complete
 
 
+def count_command_in_run_data(
+    commands: List[Dict[str, Any]], command_of_interest: str, find_avg_time: bool
+) -> Tuple[int, float]:
+    """Count number of times command occurs in a run."""
+    total_command = 0
+    total_time = 0.0
+    for command in commands:
+        command_type = command["commandType"]
+        if command_type == command_of_interest:
+            total_command += 1
+        if find_avg_time:
+            start_time = datetime.strptime(
+                command.get("startedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+            )
+            end_time = datetime.strptime(
+                command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+            )
+            total_time += (end_time - start_time).total_seconds()
+    try:
+        avg_time = total_time / total_command
+    except ZeroDivisionError:
+        avg_time = 0.0
+    return total_command, avg_time
+
+
 def instrument_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
     """Count number of pipette and gripper commands per run."""
     pipettes = file_results.get("pipettes", "")
@@ -89,6 +114,8 @@ def instrument_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
     right_pipette_id = ""
     left_pipette_id = ""
     gripper_pickups = 0.0
+    liquid_probes = 0.0
+    avg_liquid_probe_time_sec = 0.0
     # Match pipette mount to id
     for pipette in pipettes:
         if pipette["mount"] == "right":
@@ -120,6 +147,9 @@ def instrument_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
             and command["params"]["strategy"] == "usingGripper"
         ):
             gripper_pickups += 1
+    liquid_probes, avg_liquid_probe_time_sec = count_command_in_run_data(
+        commandData, "liquidProbe", True
+    )
     pipette_dict = {
         "Left Pipette Total Tip Pick Up(s)": left_tip_pick_up,
         "Left Pipette Total Aspirates": left_aspirate,
@@ -128,6 +158,8 @@ def instrument_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
         "Right Pipette Total Aspirates": right_aspirate,
         "Right Pipette Total Dispenses": right_dispense,
         "Gripper Pick Ups": gripper_pickups,
+        "Total Liquid Probes": liquid_probes,
+        "Average Liquid Probe Time (sec)": avg_liquid_probe_time_sec,
     }
     return pipette_dict
 
@@ -364,61 +396,43 @@ def create_abr_data_sheet(
 
 def get_error_info(file_results: Dict[str, Any]) -> Dict[str, Any]:
     """Determines if errors exist in run log and documents them."""
-    error_levels = []
-    error_level = ""
-    error_type = ""
-    error_code = ""
-    error_instrument = ""
-    recoverable_errors: Dict[str, int] = dict()
-    total_recoverable_errors = 0
     # Read error levels file
     with open(ERROR_LEVELS_PATH, "r") as error_file:
-        error_levels = list(csv.reader(error_file))
+        error_levels = {row[1]: row[4] for row in csv.reader(error_file)}
+    # Initialize Variables
+    recoverable_errors: Dict[str, int] = dict()
+    total_recoverable_errors = 0
     end_run_errors = len(file_results["errors"])
     commands_of_run: List[Dict[str, Any]] = file_results.get("commands", [])
-    # Count amount and type of recoverable errors
     error_recovery = file_results.get("hasEverEnteredErrorRecovery", False)
+    # Count recoverable errors
     if error_recovery:
-        print("inside loop")
         for command in commands_of_run:
-            error_in_command = command.get("error", "")
-            if len(error_in_command) > 0:
-                recoverable_error = command["error"].get("isDefined", "")
-                if recoverable_error:
-                    total_recoverable_errors += 1
-                    error_type = command["error"].get("errorType", "")
-                    if error_type not in recoverable_errors:
-                        recoverable_errors[error_type] = 0
-                    recoverable_errors[error_type] += 1
+            error_info = command.get("error", {})
+            if error_info.get("isDefined"):
+                total_recoverable_errors += 1
+                error_type = error_info.get("errorType", "")
+                recoverable_errors[error_type] = (
+                    recoverable_errors.get(error_type, 0) + 1
+                )
+    # Get run-ending error info
     try:
-        run_command_error: Dict[str, Any] = commands_of_run[-1]
-        error_str: int = len(run_command_error.get("error", ""))
-    except IndexError:
-        error_str = 0
-    if error_str > 1:
-        error_type = run_command_error["error"].get("errorType", "")
+        run_command_error = commands_of_run[-1]["error"]
+        error_type = run_command_error.get("errorType", "")
         if error_type == "PythonException":
-            # Reassign error_type to be more descriptive
-            error_type = run_command_error.get("detail", "").split(":")[0]
-        error_code = run_command_error["error"].get("errorCode", "")
-        try:
-            # Instrument Error
-            error_instrument = run_command_error["error"]["errorInfo"]["node"]
-        except KeyError:
-            # Module
-            error_instrument = run_command_error["error"]["errorInfo"].get("port", "")
-    else:
-        error_details = file_results["errors"]
-        if len(error_details) > 0:
-            error_type = file_results["errors"][0].get("errorType", "")
-            error_code = file_results["errors"][0].get("errorCode", "")
-            error_instrument = file_results["errors"][0].get("detail", "")
-    for error in error_levels:
-        code_error = error[1]
-        if code_error == error_code:
-            error_level = error[4]
-    if len(error_level) < 1:
-        error_level = str(4)
+            error_type = commands_of_run[-1].get("detail", "").split(":")[0]
+        error_code = run_command_error.get("errorCode", "")
+        error_instrument = run_command_error.get("errorInfo", {}).get(
+            "node", run_command_error.get("errorInfo", {}).get("port", "")
+        )
+    except (IndexError, KeyError):
+        error_details = file_results.get("errors", [{}])[0]
+        error_type = error_details.get("errorType", "")
+        error_code = error_details.get("errorCode", "")
+        error_instrument = error_details.get("detail", "")
+    # Determine error level
+    error_level = error_levels.get(error_code, "4")
+    # Create dictionary with all error descriptions
     error_dict = {
         "Total Recoverable Error(s)": total_recoverable_errors,
         "Recoverable Error(s) Description": recoverable_errors,
