@@ -26,7 +26,7 @@ import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostR
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
 import { LiquidDetails } from './LiquidDetails'
 import type { ParsedLiquid, RunTimeCommand } from '@opentrons/shared-data'
-import type { SetupScreens } from '../../pages/ProtocolSetup'
+import type { SetupScreens } from '../../pages/ODD/ProtocolSetup'
 
 export interface ProtocolSetupLiquidsProps {
   runId: string
@@ -65,7 +65,6 @@ export function ProtocolSetupLiquids({
             iconName="ot-check"
             text={t('liquids_confirmed')}
             type="success"
-            chipSize="small"
           />
         ) : (
           <SmallButton
@@ -74,6 +73,7 @@ export function ProtocolSetupLiquids({
               setIsConfirmed(true)
               setSetupScreen('prepare to run')
             }}
+            buttonCategory="rounded"
           />
         )}
       </Flex>

@@ -25,6 +25,7 @@
   "import_a_file": "Import a protocol to get started",
   "import_new_protocol": "Import a Protocol",
   "import": "Import",
+  "incompatible_file_type": "Incompatible file type",
   "instrument_cal_data_title": "Calibration data",
   "instrument_not_attached": "Not attached",
   "instruments_title": "Required Pipettes",

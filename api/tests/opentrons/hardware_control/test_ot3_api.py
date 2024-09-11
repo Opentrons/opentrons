@@ -117,12 +117,13 @@ def fake_settings() -> CapacitivePassSettings:
 def fake_liquid_settings() -> LiquidProbeSettings:
     return LiquidProbeSettings(
         mount_speed=5,
-        plunger_speed=20,
+        plunger_speed=15,
         plunger_impulse_time=0.2,
         sensor_threshold_pascals=15,
         output_option=OutputOptions.can_bus_only,
         aspirate_while_sensing=False,
         z_overlap_between_passes_mm=0.1,
+        plunger_reset_offset=2.0,
         samples_for_baselining=20,
         sample_time_sec=0.004,
         data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
@@ -823,26 +824,42 @@ async def test_liquid_probe(
         mock_liquid_probe.return_value = 140
         fake_settings_aspirate = LiquidProbeSettings(
             mount_speed=5,
-            plunger_speed=20,
+            plunger_speed=15,
             plunger_impulse_time=0.2,
             sensor_threshold_pascals=15,
             output_option=OutputOptions.can_bus_only,
             aspirate_while_sensing=True,
             z_overlap_between_passes_mm=0.1,
+            plunger_reset_offset=2.0,
             samples_for_baselining=20,
             sample_time_sec=0.004,
             data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
         )
         fake_max_z_dist = 10.0
+        non_responsive_z_mm = ot3_hardware.liquid_probe_non_responsive_z_distance(
+            fake_settings_aspirate.mount_speed,
+            fake_settings_aspirate.samples_for_baselining,
+            fake_settings_aspirate.sample_time_sec,
+        )
+
+        probe_pass_overlap = 0.1
+        probe_pass_z_offset_mm = non_responsive_z_mm + probe_pass_overlap
+        probe_safe_reset_mm = max(2.0, probe_pass_z_offset_mm)
+
         await ot3_hardware.liquid_probe(mount, fake_max_z_dist, fake_settings_aspirate)
         mock_move_to_plunger_bottom.call_count == 2
         mock_liquid_probe.assert_called_once_with(
             mount,
-            46,
+            (
+                (fake_max_z_dist - probe_pass_z_offset_mm + probe_safe_reset_mm)
+                / fake_settings_aspirate.mount_speed
+            )
+            * fake_settings_aspirate.plunger_speed,
             fake_settings_aspirate.mount_speed,
             (fake_settings_aspirate.plunger_speed * -1),
             fake_settings_aspirate.sensor_threshold_pascals,
             fake_settings_aspirate.plunger_impulse_time,
+            fake_settings_aspirate.samples_for_baselining,
             fake_settings_aspirate.output_option,
             fake_settings_aspirate.data_files,
             probe=InstrumentProbeType.PRIMARY,
@@ -900,7 +917,6 @@ async def test_liquid_probe_plunger_moves(
             PipetteLiquidNotFoundError,
             PipetteLiquidNotFoundError,
             PipetteLiquidNotFoundError,
-            PipetteLiquidNotFoundError,
             140,
         ]
 
@@ -919,17 +935,6 @@ async def test_liquid_probe_plunger_moves(
         probe_pass_z_offset_mm = non_responsive_z_mm + probe_pass_overlap
         probe_safe_reset_mm = max(2.0, probe_pass_z_offset_mm)
 
-        # simulate multiple passes of liquid probe
-        mock_gantry_position.side_effect = [
-            Point(x=0, y=0, z=100),
-            Point(x=0, y=0, z=100),
-            Point(x=0, y=0, z=100),
-            Point(x=0, y=0, z=82.15),
-            Point(x=0, y=0, z=64.3),
-            Point(x=0, y=0, z=46.45),
-            Point(x=0, y=0, z=28.6),
-            Point(x=0, y=0, z=25),
-        ]
         probe_start_pos = await ot3_hardware.gantry_position(mount)
         safe_plunger_pos = Point(
             probe_start_pos.x,
@@ -940,7 +945,20 @@ async def test_liquid_probe_plunger_moves(
         p_impulse_mm = config.plunger_impulse_time * config.plunger_speed
         p_total_mm = pipette.plunger_positions.bottom - pipette.plunger_positions.top
         p_working_mm = p_total_mm - (pipette.backlash_distance + p_impulse_mm)
-
+        # simulate multiple passes of liquid probe
+        z_pass = (
+            (p_total_mm - pipette.backlash_distance)
+            / config.plunger_speed
+            * config.mount_speed
+        )
+        mock_gantry_position.side_effect = [
+            Point(x=0, y=0, z=100),
+            Point(x=0, y=0, z=100),
+            Point(x=0, y=0, z=100 - z_pass),
+            Point(x=0, y=0, z=100 - 2 * z_pass),
+            Point(x=0, y=0, z=100 - 3 * z_pass),
+            Point(x=0, y=0, z=25),
+        ]
         max_z_time = (
             fake_max_z_dist - (probe_start_pos.z - safe_plunger_pos.z)
         ) / config.mount_speed
@@ -1083,6 +1101,7 @@ async def test_multi_liquid_probe(
             output_option=OutputOptions.can_bus_only,
             aspirate_while_sensing=True,
             z_overlap_between_passes_mm=0.1,
+            plunger_reset_offset=2.0,
             samples_for_baselining=20,
             sample_time_sec=0.004,
             data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
@@ -1099,6 +1118,7 @@ async def test_multi_liquid_probe(
             (fake_settings_aspirate.plunger_speed * -1),
             fake_settings_aspirate.sensor_threshold_pascals,
             fake_settings_aspirate.plunger_impulse_time,
+            fake_settings_aspirate.samples_for_baselining,
             fake_settings_aspirate.output_option,
             fake_settings_aspirate.data_files,
             probe=InstrumentProbeType.PRIMARY,
@@ -1134,6 +1154,7 @@ async def test_liquid_not_found(
         plunger_speed: float,
         threshold_pascals: float,
         plunger_impulse_time: float,
+        num_baseline_reads: int,
         output_format: OutputOptions = OutputOptions.can_bus_only,
         data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
@@ -1158,6 +1179,7 @@ async def test_liquid_not_found(
         output_option=OutputOptions.can_bus_only,
         aspirate_while_sensing=True,
         z_overlap_between_passes_mm=0.1,
+        plunger_reset_offset=2.0,
         samples_for_baselining=20,
         sample_time_sec=0.004,
         data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},

@@ -17,7 +17,7 @@ import { getCompatibleLabwareByCategory } from './utils'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { SmallButton } from '../../atoms/buttons'
-import type { LabwareFilter } from '../../pages/Labware/types'
+import type { LabwareFilter } from '../../pages/Desktop/Labware/types'
 import type {
   QuickTransferWizardState,
   QuickTransferWizardAction,

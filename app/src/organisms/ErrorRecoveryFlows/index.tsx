@@ -48,7 +48,7 @@ const INVALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_IDLE,
 ]
 
-interface UseErrorRecoveryResult {
+export interface UseErrorRecoveryResult {
   isERActive: boolean
   /* There is no FailedCommand if the run statis is not AWAITING_RECOVERY. */
   failedCommand: FailedCommand | null

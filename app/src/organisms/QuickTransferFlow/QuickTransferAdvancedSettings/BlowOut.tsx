@@ -1,4 +1,5 @@
 import * as React from 'react'
+import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 import {
@@ -6,7 +7,7 @@ import {
   SPACING,
   DIRECTION_COLUMN,
   POSITION_FIXED,
-  LargeButton,
+  RadioButton,
   COLORS,
 } from '@opentrons/components'
 import {
@@ -102,14 +103,14 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
 
   const enableBlowOutDisplayItems = [
     {
-      value: true,
+      option: true,
       description: t('option_enabled'),
       onClick: () => {
         setisBlowOutEnabled(true)
       },
     },
     {
-      value: false,
+      option: false,
       description: t('option_disabled'),
       onClick: () => {
         setisBlowOutEnabled(false)
@@ -175,15 +176,13 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
           width="100%"
         >
           {enableBlowOutDisplayItems.map(displayItem => (
-            <LargeButton
+            <RadioButton
               key={displayItem.description}
-              buttonType={
-                displayItem.value === isBlowOutEnabled ? 'primary' : 'secondary'
-              }
-              onClick={() => {
-                setisBlowOutEnabled(displayItem.value)
-              }}
-              buttonText={displayItem.description}
+              isSelected={isBlowOutEnabled === displayItem.option}
+              onChange={displayItem.onClick}
+              buttonValue={displayItem.description}
+              buttonLabel={displayItem.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>
@@ -197,19 +196,20 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
           width="100%"
         >
           {blowOutLocationItems.map(blowOutLocationItem => (
-            <LargeButton
+            <RadioButton
               key={blowOutLocationItem.description}
-              buttonType={
+              isSelected={
+                isEqual(blowOutLocation, blowOutLocationItem.location) ||
                 blowOutLocation === blowOutLocationItem.location
-                  ? 'primary'
-                  : 'secondary'
               }
-              onClick={() => {
+              onChange={() => {
                 setBlowOutLocation(
                   blowOutLocationItem.location as BlowOutLocation
                 )
               }}
-              buttonText={blowOutLocationItem.description}
+              buttonValue={blowOutLocationItem.description}
+              buttonLabel={blowOutLocationItem.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>

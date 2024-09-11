@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import { css } from 'styled-components'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import {
   Box,
-  POSITION_RELATIVE,
   COLORS,
   OVERFLOW_AUTO,
+  POSITION_RELATIVE,
   useIdle,
   useScrolling,
 } from '@opentrons/components'
@@ -22,38 +22,35 @@ import { MaintenanceRunTakeover } from '../organisms/TakeoverModal'
 import { FirmwareUpdateTakeover } from '../organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
 import { IncompatibleModuleTakeover } from '../organisms/IncompatibleModule'
 import { EstopTakeover } from '../organisms/EmergencyStop'
-import { ConnectViaEthernet } from '../pages/ConnectViaEthernet'
-import { ConnectViaUSB } from '../pages/ConnectViaUSB'
-import { ConnectViaWifi } from '../pages/ConnectViaWifi'
-import { EmergencyStop } from '../pages/EmergencyStop'
-import { NameRobot } from '../pages/NameRobot'
-import { NetworkSetupMenu } from '../pages/NetworkSetupMenu'
-import { ProtocolSetup } from '../pages/ProtocolSetup'
-import { RobotDashboard } from '../pages/RobotDashboard'
-import { RobotSettingsDashboard } from '../pages/RobotSettingsDashboard'
-import { ProtocolDashboard } from '../pages/ProtocolDashboard'
-import { ProtocolDetails } from '../pages/ProtocolDetails'
+import { ConnectViaEthernet } from '../pages/ODD/ConnectViaEthernet'
+import { ConnectViaUSB } from '../pages/ODD/ConnectViaUSB'
+import { ConnectViaWifi } from '../pages/ODD/ConnectViaWifi'
+import { EmergencyStop } from '../pages/ODD/EmergencyStop'
+import { NameRobot } from '../pages/ODD/NameRobot'
+import { NetworkSetupMenu } from '../pages/ODD/NetworkSetupMenu'
+import { ProtocolSetup } from '../pages/ODD/ProtocolSetup'
+import { RobotDashboard } from '../pages/ODD/RobotDashboard'
+import { RobotSettingsDashboard } from '../pages/ODD/RobotSettingsDashboard'
+import { ProtocolDashboard } from '../pages/ODD/ProtocolDashboard'
+import { ProtocolDetails } from '../pages/ODD/ProtocolDetails'
 import { QuickTransferFlow } from '../organisms/QuickTransferFlow'
-import { QuickTransferDashboard } from '../pages/QuickTransferDashboard'
-import { QuickTransferDetails } from '../pages/QuickTransferDetails'
-import { RunningProtocol } from '../pages/RunningProtocol'
-import { RunSummary } from '../pages/RunSummary'
-import { UpdateRobot } from '../pages/UpdateRobot/UpdateRobot'
-import { UpdateRobotDuringOnboarding } from '../pages/UpdateRobot/UpdateRobotDuringOnboarding'
-import { InstrumentsDashboard } from '../pages/InstrumentsDashboard'
-import { InstrumentDetail } from '../pages/InstrumentDetail'
-import { Welcome } from '../pages/Welcome'
-import { InitialLoadingScreen } from '../pages/InitialLoadingScreen'
-import { DeckConfigurationEditor } from '../pages/DeckConfiguration'
+import { QuickTransferDashboard } from '../pages/ODD/QuickTransferDashboard'
+import { QuickTransferDetails } from '../pages/ODD/QuickTransferDetails'
+import { RunningProtocol } from '../pages/ODD/RunningProtocol'
+import { RunSummary } from '../pages/ODD/RunSummary'
+import { UpdateRobot } from '../pages/ODD/UpdateRobot/UpdateRobot'
+import { UpdateRobotDuringOnboarding } from '../pages/ODD/UpdateRobot/UpdateRobotDuringOnboarding'
+import { InstrumentsDashboard } from '../pages/ODD/InstrumentsDashboard'
+import { InstrumentDetail } from '../pages/ODD/InstrumentDetail'
+import { Welcome } from '../pages/ODD/Welcome'
+import { InitialLoadingScreen } from '../pages/ODD/InitialLoadingScreen'
+import { DeckConfigurationEditor } from '../pages/ODD/DeckConfiguration'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
 import { updateBrightness } from '../redux/shell'
 import { SLEEP_NEVER_MS } from './constants'
-import {
-  useCurrentRunRoute,
-  useProtocolReceiptToast,
-  useSoftwareUpdatePoll,
-} from './hooks'
+import { useProtocolReceiptToast, useSoftwareUpdatePoll } from './hooks'
+import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
 
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
 
@@ -201,7 +198,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                 </>
               )}
             </Box>
-            <TopLevelRedirects />
+            <ODDTopLevelRedirects />
           </ErrorBoundary>
         </OnDeviceLocalizationProvider>
       </InitialLoadingScreen>
@@ -270,15 +267,6 @@ export function OnDeviceDisplayAppRoutes(): JSX.Element {
       )}
     </Routes>
   )
-}
-
-function TopLevelRedirects(): JSX.Element | null {
-  const currentRunRoute = useCurrentRunRoute()
-  return currentRunRoute != null ? (
-    <Routes>
-      <Route path="*" element={<Navigate to={currentRunRoute} />} />
-    </Routes>
-  ) : null
 }
 
 function ProtocolReceiptToasts(): null {

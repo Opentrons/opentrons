@@ -94,6 +94,19 @@ function reconstructFormData(ipcSafeFormData: IPCSafeFormData): FormData {
   return result
 }
 
+const cloneError = (e: any): Record<string, unknown> =>
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  Object.entries(axios.isAxiosError(e) ? e.toJSON() : e).reduce<
+    Record<string, unknown>
+  >((acc, [k, v]) => {
+    try {
+      acc[k] = structuredClone(v)
+      return acc
+    } catch (e) {
+      return acc
+    }
+  }, {})
+
 async function usbListener(
   _event: IpcMainInvokeEvent,
   config: AxiosRequestConfig
@@ -114,21 +127,24 @@ async function usbListener(
 
   const usbHttpAgent = getSerialPortHttpAgent()
   try {
+    usbLog.silly(`${config.method} ${config.url} timeout=${config.timeout}`)
     const response = await axios.request({
       httpAgent: usbHttpAgent,
       ...config,
       data,
       headers: { ...config.headers, ...formHeaders },
     })
+    usbLog.silly(`${config.method} ${config.url} resolved ok`)
     return {
-      error: false,
+      error: null,
       data: response.data,
       status: response.status,
       statusText: response.statusText,
     }
-  } catch (e) {
-    if (e instanceof Error) {
-      console.log(`axios request error ${e?.message ?? 'unknown'}`)
+  } catch (e: any) {
+    usbLog.info(`${config.method} ${config.url} failed: ${e}`)
+    return {
+      error: cloneError(e),
     }
   }
 }

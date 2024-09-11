@@ -22,6 +22,7 @@ import {
   JUSTIFY_FLEX_START,
   LegacyStyledText,
   Link as LinkComponent,
+  NO_WRAP,
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   ProtocolDeck,
@@ -587,23 +588,35 @@ export function ChooseProtocolSlideoutComponent(
         {t('shared:continue_to_param')}
       </PrimaryButton>
     ) : (
-      <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_ROW}>
+      <Flex
+        gridGap={SPACING.spacing8}
+        flexDirection={DIRECTION_ROW}
+        whiteSpace={NO_WRAP}
+      >
         <SecondaryButton
           onClick={() => {
             setCurrentPage(1)
           }}
-          width="51%"
+          width="50%"
         >
           {t('shared:change_protocol')}
         </SecondaryButton>
         <PrimaryButton
-          width="49%"
+          width="50%"
           onClick={handleProceed}
           disabled={hasParamError}
           {...targetPropsHover}
         >
           {isCreatingRun ? (
-            <Icon name="ot-spinner" spin size="1rem" />
+            <Flex
+              gridGap={SPACING.spacing4}
+              alignItems={ALIGN_CENTER}
+              whiteSpace="nowrap"
+              marginLeft={`-${SPACING.spacing4}`}
+            >
+              <Icon name="ot-spinner" spin size="1rem" />
+              {t('shared:confirm_values')}
+            </Flex>
           ) : (
             t('shared:confirm_values')
           )}

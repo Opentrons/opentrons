@@ -2636,6 +2636,7 @@ class OT3API(
             (probe_settings.plunger_speed * plunger_direction),
             probe_settings.sensor_threshold_pascals,
             probe_settings.plunger_impulse_time,
+            probe_settings.samples_for_baselining,
             probe_settings.output_option,
             probe_settings.data_files,
             probe=probe,
@@ -2686,7 +2687,6 @@ class OT3API(
             probe_settings = deepcopy(self.config.liquid_sense)
 
         # We need to significatly slow down the 96 channel liquid probe
-        # TODO: (sigler) add LLD plunger-speed to pipette definitions
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             max_plunger_speed = self.config.motion_settings.max_speed_discontinuity[
                 GantryLoad.HIGH_THROUGHPUT
@@ -2718,8 +2718,9 @@ class OT3API(
 
         # height that is considered safe to reset the plunger without disturbing liquid
         # this usually needs to at least 1-2mm from liquid, to avoid splashes from air
-        # TODO: (sigler) add this to pipette's liquid def (per tip)
-        z_offset_for_plunger_prep = max(2.0, z_offset_per_pass)
+        z_offset_for_plunger_prep = max(
+            probe_settings.plunger_reset_offset, z_offset_per_pass
+        )
 
         async def prep_plunger_for_probe_move(
             position: top_types.Point, aspirate_while_sensing: bool
@@ -2733,7 +2734,6 @@ class OT3API(
             # Prep the plunger
             await self.move_to(checked_mount, mount_pos_for_plunger_prep)
             if aspirate_while_sensing:
-                # TODO(cm, 7/8/24): remove p_prep_speed from the rate at some point
                 await self._move_to_plunger_bottom(checked_mount, rate=1)
             else:
                 await self._move_to_plunger_top_for_liquid_probe(checked_mount, rate=1)

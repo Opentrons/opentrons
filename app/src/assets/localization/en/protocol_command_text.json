@@ -57,6 +57,7 @@
   "pause_on": "Pause on {{robot_name}}",
   "pickup_tip": "Picking up tip(s) from {{well_range}} of {{labware}} in {{labware_location}}",
   "prepare_to_aspirate": "Preparing {{pipette}} to aspirate",
+  "reloading_labware": "Reloading {{labware}}",
   "return_tip": "Returning tip to {{well_name}} of {{labware}} in {{labware_location}}",
   "right": "Right",
   "save_position": "Saving position",

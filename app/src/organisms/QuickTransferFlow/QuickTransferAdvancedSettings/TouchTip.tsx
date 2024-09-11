@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InputField,
-  LargeButton,
+  RadioButton,
   POSITION_FIXED,
   SPACING,
 } from '@opentrons/components'
@@ -152,15 +152,13 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
           width="100%"
         >
           {enableTouchTipDisplayItems.map(displayItem => (
-            <LargeButton
+            <RadioButton
               key={displayItem.description}
-              buttonType={
-                touchTipIsEnabled === displayItem.option
-                  ? 'primary'
-                  : 'secondary'
-              }
-              onClick={displayItem.onClick}
-              buttonText={displayItem.description}
+              isSelected={touchTipIsEnabled === displayItem.option}
+              onChange={displayItem.onClick}
+              buttonValue={displayItem.description}
+              buttonLabel={displayItem.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>
@@ -198,6 +196,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              initialValue={String(position)}
               onChange={e => {
                 setPosition(Number(e))
               }}

@@ -5,7 +5,7 @@ from typing import List
 from typing_extensions import final
 
 from .actions import Action, ActionDispatcher, ActionHandler
-from .state import StateView
+from .state.state import StateView
 
 
 class AbstractPlugin(ActionHandler, ABC):

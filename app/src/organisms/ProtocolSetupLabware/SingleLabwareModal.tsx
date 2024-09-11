@@ -14,11 +14,11 @@ import {
   LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
-  Modal,
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../App/portal'
+import { OddModal } from '../../molecules/OddModal'
 
 import type {
   CompletedProtocolAnalysis,
@@ -70,7 +70,7 @@ export const SingleLabwareModal = (
   const selectedLabwareLocation = selectedLabware?.location
 
   return createPortal(
-    <Modal onClose={onOutsideClick}>
+    <OddModal onOutsideClick={onOutsideClick}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -103,7 +103,7 @@ export const SingleLabwareModal = (
           <LabwareRender definition={selectedLabware} />
         </LabwareThumbnail>
       </Flex>
-    </Modal>,
+    </OddModal>,
     getTopPortalEl()
   )
 }

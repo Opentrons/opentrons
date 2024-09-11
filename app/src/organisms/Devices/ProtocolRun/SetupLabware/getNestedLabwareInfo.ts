@@ -4,7 +4,7 @@ import type {
   LoadModuleRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { LabwareSetupItem } from '../../../../pages/Protocols/utils'
+import type { LabwareSetupItem } from '../../../../pages/Desktop/Protocols/utils'
 
 export interface NestedLabwareInfo {
   nestedLabwareDisplayName: string

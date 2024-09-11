@@ -16,29 +16,40 @@ import type { UseQueryOptions } from 'react-query'
 import type { HostConfig } from '@opentrons/api-client'
 import type { NotifyTopic, NotifyResponseData } from '../redux/shell/types'
 
-export type HTTPRefetchFrequency = 'once' | 'always' | null
+export type HTTPRefetchFrequency = 'once' | null
 
 export interface QueryOptionsWithPolling<TData, TError = Error>
   extends UseQueryOptions<TData, TError> {
   forceHttpPolling?: boolean
 }
 
-interface useNotifyDataReadyProps<TData, TError = Error> {
+interface UseNotifyDataReadyProps<TData, TError = Error> {
   topic: NotifyTopic
   options: QueryOptionsWithPolling<TData, TError>
   hostOverride?: HostConfig | null
 }
 
-interface useNotifyDataReadyResults {
-  notifyOnSettled: () => void
+interface UseNotifyDataReadyResults<TData, TError> {
+  /* React Query options with notification-specific logic. */
+  queryOptionsNotify: QueryOptionsWithPolling<TData, TError>
+  /* Whether notifications indicate the server has new data ready. Always returns false if notifications are disabled. */
   shouldRefetch: boolean
 }
 
+// React query hooks perform refetches when instructed by the shell via a refetch mechanism, which useNotifyDataReady manages.
+// The notification refetch states may be:
+// 'once' - The shell has received an MQTT update. Execute the HTTP refetch once.
+// null - The shell has not received an MQTT update. Don't execute an HTTP refetch.
+//
+// Eagerly assume notifications are enabled unless specified by the client via React Query options or by the shell via errors.
 export function useNotifyDataReady<TData, TError = Error>({
   topic,
   options,
   hostOverride,
-}: useNotifyDataReadyProps<TData, TError>): useNotifyDataReadyResults {
+}: UseNotifyDataReadyProps<TData, TError>): UseNotifyDataReadyResults<
+  TData,
+  TError
+> {
   const dispatch = useDispatch()
   const hostFromProvider = useHost()
   const host = hostOverride ?? hostFromProvider
@@ -47,6 +58,7 @@ export function useNotifyDataReady<TData, TError = Error>({
   const forcePollingFF = useFeatureFlag('forceHttpPolling')
   const seenHostname = React.useRef<string | null>(null)
   const [refetch, setRefetch] = React.useState<HTTPRefetchFrequency>(null)
+  const [isNotifyEnabled, setIsNotifyEnabled] = React.useState(true)
 
   const { enabled, staleTime, forceHttpPolling } = options
 
@@ -69,7 +81,7 @@ export function useNotifyDataReady<TData, TError = Error>({
       dispatch(notifySubscribeAction(hostname, topic))
       seenHostname.current = hostname
     } else {
-      setRefetch('always')
+      setIsNotifyEnabled(false)
     }
 
     return () => {
@@ -86,7 +98,7 @@ export function useNotifyDataReady<TData, TError = Error>({
 
   const onDataEvent = React.useCallback((data: NotifyResponseData): void => {
     if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
-      setRefetch('always')
+      setIsNotifyEnabled(false)
       if (data === 'ECONNREFUSED') {
         doTrackEvent({
           name: ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
@@ -98,11 +110,24 @@ export function useNotifyDataReady<TData, TError = Error>({
     }
   }, [])
 
-  const notifyOnSettled = React.useCallback(() => {
-    if (refetch === 'once') {
-      setRefetch(null)
-    }
-  }, [refetch])
+  const notifyOnSettled = React.useCallback(
+    (data: TData | undefined, error: TError | null) => {
+      if (refetch === 'once') {
+        setRefetch(null)
+      }
+      options.onSettled?.(data, error)
+    },
+    [refetch, options.onSettled]
+  )
 
-  return { notifyOnSettled, shouldRefetch: refetch != null }
+  const queryOptionsNotify = {
+    ...options,
+    onSettled: isNotifyEnabled ? notifyOnSettled : options.onSettled,
+    refetchInterval: isNotifyEnabled ? false : options.refetchInterval,
+  }
+
+  return {
+    queryOptionsNotify,
+    shouldRefetch: isNotifyEnabled && refetch != null,
+  }
 }

@@ -18,7 +18,7 @@ import {
   InterventionModal,
 } from '../../InterventionModal'
 import { ProgressBar } from '../../../atoms/ProgressBar'
-import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useRunControls, useRunStatus } from '../../RunTimeControl/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   useNotifyRunQuery,
@@ -99,12 +99,12 @@ describe('RunProgressMeter', () => {
       showModal: false,
       modalProps: {} as any,
     })
+    vi.mocked(useRunControls).mockReturnValue({ play: vi.fn() } as any)
 
     props = {
       runId: NON_DETERMINISTIC_RUN_ID,
       robotName: ROBOT_NAME,
       makeHandleJumpToStep: vi.fn(),
-      resumeRunHandler: vi.fn(),
     }
   })
 

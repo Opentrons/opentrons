@@ -2,17 +2,13 @@ import * as React from 'react'
 import cx from 'classnames'
 import { DndProvider } from 'react-dnd'
 import { BrowserRouter } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 import {
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  Flex,
-  PrimaryButton,
-  SPACING,
-} from '@opentrons/components'
-import { getEnableRedesign } from './feature-flags/selectors'
-import { setFeatureFlags } from './feature-flags/actions'
+  getEnableRedesign,
+  getFeatureFlagData,
+} from './feature-flags/selectors'
 import { ComputingSpinner } from './components/ComputingSpinner'
 import { ConnectedNav } from './containers/ConnectedNav'
 import { Sidebar } from './containers/ConnectedSidebar'
@@ -26,8 +22,9 @@ import { FileUploadMessageModal } from './components/modals/FileUploadMessageMod
 import { LabwareUploadMessageModal } from './components/modals/LabwareUploadMessageModal/LabwareUploadMessageModal'
 import { GateModal } from './components/modals/GateModal'
 import { CreateFileWizard } from './components/modals/CreateFileWizard'
-import { AnnouncementModal } from './components/modals/AnnouncementModal'
+import { AnnouncementModal } from './organisms'
 import { ProtocolRoutes } from './ProtocolRoutes'
+import { Bouncing } from './Bouncing'
 
 import styles from './components/ProtocolEditor.module.css'
 import './css/reset.module.css'
@@ -36,23 +33,17 @@ const showGateModal =
   process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
 
 function ProtocolEditorComponent(): JSX.Element {
+  const flags = useSelector(getFeatureFlagData)
   const enableRedesign = useSelector(getEnableRedesign)
-  const dispatch = useDispatch()
+
+  const prereleaseModeEnabled = flags.PRERELEASE_MODE === true
 
   return (
     <div id="protocol-editor">
       <TopPortalRoot />
       {enableRedesign ? (
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <Flex padding={SPACING.spacing12} flexDirection={DIRECTION_ROW}>
-            <PrimaryButton
-              onClick={() => {
-                dispatch(setFeatureFlags({ OT_PD_ENABLE_REDESIGN: false }))
-              }}
-            >
-              turn off redesign
-            </PrimaryButton>
-          </Flex>
+          {prereleaseModeEnabled ? <Bouncing /> : null}
           <BrowserRouter>
             <ProtocolRoutes />
           </BrowserRouter>

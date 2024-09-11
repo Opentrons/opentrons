@@ -62,7 +62,7 @@
     "redux-thunk": "2.3.0",
     "reselect": "4.0.0",
     "rxjs": "^6.5.1",
-    "semver": "5.5.0",
+    "semver": "5.7.2",
     "styled-components": "5.3.6",
     "typeface-open-sans": "0.0.75",
     "uuid": "3.2.1"

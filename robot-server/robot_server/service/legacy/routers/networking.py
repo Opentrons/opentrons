@@ -1,10 +1,10 @@
 import logging
 import os
 import subprocess
+from typing import Annotated, Optional
 
 from starlette import status
 from starlette.responses import JSONResponse
-from typing import Annotated, Optional
 from fastapi import APIRouter, HTTPException, File, Path, UploadFile, Query
 
 from opentrons_shared_data.errors import ErrorCodes
@@ -45,8 +45,20 @@ router = APIRouter()
 async def get_networking_status() -> NetworkingStatus:
     try:
         connectivity = await nmcli.is_connected()
-        # TODO(mc, 2020-09-17): interfaces should be typed
-        interfaces = {i.value: await nmcli.iface_info(i) for i in nmcli.NETWORK_IFACES}
+
+        async def _permissive_get_iface(
+            i: nmcli.NETWORK_IFACES,
+        ) -> dict[str, dict[str, str | None]]:
+            try:
+                return {i.value: await nmcli.iface_info(i)}
+            except ValueError:
+                log.warning(f"Could not get state of iface {i.value}")
+                return {}
+
+        interfaces: dict[str, dict[str, str | None]] = {}
+        for interface in nmcli.NETWORK_IFACES:
+            this_iface = await _permissive_get_iface(interface)
+            interfaces.update(this_iface)
         log.debug(f"Connectivity: {connectivity}")
         log.debug(f"Interfaces: {interfaces}")
         return NetworkingStatus(
