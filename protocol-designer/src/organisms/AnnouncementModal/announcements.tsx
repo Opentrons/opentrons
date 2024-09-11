@@ -304,17 +304,32 @@ export const useAnnouncements = (): Announcement[] => {
     {
       announcementKey: 'redesign9.0',
       image: <Flex />,
-      heading: t('announcements.header', { pd: PD }),
+      heading: t('announcements.redesign.body1', { pd: PD }),
       message: (
-        <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
+        <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
           <StyledText desktopStyle="bodyDefaultRegular">
-            {t('announcements.redesign.body1')}
+            {t('announcements.redesign.body2')}
           </StyledText>
+          <Flex marginLeft={SPACING.spacing16}>
+            <ul>
+              <li>
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {t('announcements.redesign.body3')}
+                </StyledText>
+              </li>
+
+              <li>
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {t('announcements.redesign.body4')}
+                </StyledText>
+              </li>
+            </ul>
+          </Flex>
           <StyledText desktopStyle="bodyDefaultRegular">
             <Trans
               t={t}
               components={{ strong: <strong /> }}
-              i18nKey={'announcements.redesign.body2'}
+              i18nKey={'announcements.redesign.body5'}
             />
           </StyledText>
         </Flex>
