@@ -25,6 +25,7 @@ export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
   const { t } = useTranslation('quick_transfer')
   const [name, setName] = React.useState('')
   const keyboardRef = React.useRef(null)
+  const [isSaving, setIsSaving] = React.useState<boolean>(false)
 
   let error: string | null = null
   if (name.length > 60) {
@@ -38,9 +39,10 @@ export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
         header={t('name_your_transfer')}
         buttonText={t('save')}
         onClickButton={() => {
+          setIsSaving(true)
           onSave(name)
         }}
-        buttonIsDisabled={name === '' || error != null}
+        buttonIsDisabled={name === '' || error != null || isSaving}
       />
       <Flex
         // height of ChildNavigation
