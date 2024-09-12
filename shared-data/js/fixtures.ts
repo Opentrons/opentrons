@@ -239,6 +239,7 @@ export function getAddressableAreaNamesFromLoadedModule(
   }, [])
 }
 
+// TODO: keys to localize
 export function getFixtureDisplayName(
   cutoutFixtureId: CutoutFixtureId | null,
   usbPortNumber?: number

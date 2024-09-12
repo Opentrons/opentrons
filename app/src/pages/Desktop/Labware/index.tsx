@@ -46,6 +46,7 @@ import type { LabwareFilter, LabwareSort } from './types'
 import type { LabwareDefAndDate } from './hooks'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
+// TODO: localize
 const labwareDisplayCategoryFilters: LabwareFilter[] = [
   'all',
   'adapter',

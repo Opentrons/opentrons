@@ -9,8 +9,8 @@ import type { InitOptions } from 'i18next'
 
 const i18nConfig: InitOptions = {
   resources,
-  lng: 'en',
-  fallbackLng: 'en',
+  lng: 'cn',
+  fallbackLng: 'cn',
   debug: process.env.NODE_ENV === 'development',
   defaultNS: 'shared',
   interpolation: {

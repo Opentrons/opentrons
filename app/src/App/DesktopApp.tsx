@@ -48,7 +48,7 @@ export const DesktopApp = (): JSX.Element => {
   const desktopRoutes: RouteProps[] = [
     {
       Component: ProtocolsLanding,
-      name: 'Protocols',
+      name: 'protocols',
       navLinkTo: '/protocols',
       path: '/protocols',
     },
@@ -64,13 +64,13 @@ export const DesktopApp = (): JSX.Element => {
     },
     {
       Component: Labware,
-      name: 'Labware',
+      name: 'labware',
       navLinkTo: '/labware',
       path: '/labware',
     },
     {
       Component: DevicesLanding,
-      name: 'Devices',
+      name: 'devices',
       navLinkTo: '/devices',
       path: '/devices',
     },

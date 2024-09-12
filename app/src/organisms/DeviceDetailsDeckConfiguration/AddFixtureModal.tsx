@@ -80,7 +80,7 @@ export function AddFixtureModal({
   providedFixtureOptions,
   isOnDevice = false,
 }: AddFixtureModalProps): JSX.Element {
-  const { t } = useTranslation(['device_details', 'shared'])
+  const { t } = useTranslation(['device_details', 'devices_landing', 'shared'])
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { data: modulesData } = useModulesQuery()
   const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
@@ -265,6 +265,7 @@ export function AddFixtureModal({
         {SINGLE_CENTER_CUTOUTS.includes(cutoutId) ? null : (
           <FixtureOption
             key="fixturesOption"
+            // TODO: localize
             optionName="Fixtures"
             buttonText={t('select_options')}
             onClickHandler={() => {
@@ -275,7 +276,7 @@ export function AddFixtureModal({
         )}
         <FixtureOption
           key="modulesOption"
-          optionName="Modules"
+          optionName={t('devices_landing:modules')}
           buttonText={t('select_options')}
           onClickHandler={() => {
             setOptionStage('moduleOptions')
