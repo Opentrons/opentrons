@@ -132,9 +132,6 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
       const isSmallYDimension = yDimension < STANDARD_Y_DIMENSION
       const isIrregularSize = isSmallXDimension && isSmallYDimension
       const isAdapter = labwareDef.allowedRoles?.includes('adapter')
-      const isGripperIncompatible = labwareDef.parameters.quirks?.includes(
-        'gripperIncompatible'
-      )
       const isAdapter96Channel = parameters.loadName === ADAPTER_96_CHANNEL
       return (
         (filterRecommended &&
@@ -149,7 +146,7 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
           isIrregularSize &&
           moduleType !== HEATERSHAKER_MODULE_TYPE) ||
         (isAdapter96Channel && !has96Channel) ||
-        (slot === 'offDeck' && (isAdapter || isGripperIncompatible)) ||
+        (slot === 'offDeck' && isAdapter) ||
         (PLATE_READER_LOADNAME === parameters.loadName &&
           moduleType !== ABSORBANCE_READER_TYPE)
       )
