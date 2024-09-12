@@ -135,13 +135,13 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
 
             # todo(cb, 2024-09-05): Remove this once we support 50uL single channel pickup on the 96ch
             if (
-                tip_geometry.volume == 50.0
+                (tip_geometry.volume == 50.0 or tip_geometry.volume == 200.0)
                 and self._state_view.pipettes.get_channels(pipette_id) == 96
                 and self._state_view.pipettes.get_nozzle_layout_type(pipette_id)
                 == NozzleConfigurationType.SINGLE
             ):
                 raise NotImplementedError(
-                    "The 96ch Pipette does not current support picking up 50uL tips in a Single Channel pickup configuration."
+                    "The 96ch Pipette does not current support picking up 50uL or 200uL tips in a Single Channel pickup configuration."
                 )
         except TipNotAttachedError as e:
             return DefinedErrorData(
