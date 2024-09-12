@@ -64,6 +64,7 @@ from opentrons.protocol_engine.actions import SucceedCommandAction
 from opentrons.protocol_engine.state import _move_types
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView, LabwareStore
+from opentrons.protocol_engine.state.wells import WellView, WellStore
 from opentrons.protocol_engine.state.modules import ModuleView, ModuleStore
 from opentrons.protocol_engine.state.pipettes import (
     PipetteView,
@@ -92,6 +93,12 @@ from ..mock_rectangular_frusta import TEST_EXAMPLES as RECTANGULAR_TEST_EXAMPLES
 def mock_labware_view(decoy: Decoy) -> LabwareView:
     """Get a mock in the shape of a LabwareView."""
     return decoy.mock(cls=LabwareView)
+
+
+@pytest.fixture
+def mock_well_view(decoy: Decoy) -> WellView:
+    """Get a mock in the shape of a WellView."""
+    return decoy.mock(cls=WellView)
 
 
 @pytest.fixture
@@ -150,6 +157,18 @@ def labware_store(deck_definition: DeckDefinitionV5) -> LabwareStore:
 def labware_view(labware_store: LabwareStore) -> LabwareView:
     """Get a labware view of a real labware store."""
     return LabwareView(labware_store._state)
+
+
+@pytest.fixture
+def well_store() -> WellStore:
+    """Get a well store that can accept actions."""
+    return WellStore()
+
+
+@pytest.fixture
+def well_view(well_store: WellStore) -> WellView:
+    """Get a well view of a real well store."""
+    return WellView(well_store._state)
 
 
 @pytest.fixture
@@ -242,11 +261,13 @@ def nice_adapter_definition() -> LabwareDefinition:
 @pytest.fixture
 def subject(
     mock_labware_view: LabwareView,
+    mock_well_view: WellView,
     mock_module_view: ModuleView,
     mock_pipette_view: PipetteView,
     mock_addressable_area_view: AddressableAreaView,
     state_config: Config,
     labware_view: LabwareView,
+    well_view: WellView,
     module_view: ModuleView,
     pipette_view: PipetteView,
     addressable_area_view: AddressableAreaView,
@@ -267,6 +288,7 @@ def subject(
     return GeometryView(
         config=state_config,
         labware_view=mock_labware_view if use_mocks else labware_view,
+        well_view=mock_well_view if use_mocks else well_view,
         module_view=mock_module_view if use_mocks else module_view,
         pipette_view=mock_pipette_view if use_mocks else pipette_view,
         addressable_area_view=mock_addressable_area_view
