@@ -210,7 +210,7 @@ class WellOrigin(str, Enum):
     TOP = "top"
     BOTTOM = "bottom"
     CENTER = "center"
-    LIQUID_SURFACE = "liquid_surface"
+    MENISCUS = "meniscus"
 
 
 class DropTipWellOrigin(str, Enum):
