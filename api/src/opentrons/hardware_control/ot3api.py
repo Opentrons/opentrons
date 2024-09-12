@@ -2683,6 +2683,15 @@ class OT3API(
         self._pipette_handler.ready_for_tip_action(
             instrument, HardwareAction.LIQUID_PROBE, checked_mount
         )
+        # default to using all available sensors
+        if probe:
+            checked_probe = probe
+        else:
+            checked_probe = (
+                InstrumentProbeType.BOTH
+                if instrument.channels > 1
+                else InstrumentProbeType.PRIMARY
+            )
 
         if not probe_settings:
             probe_settings = deepcopy(self.config.liquid_sense)
@@ -2756,7 +2765,7 @@ class OT3API(
                 height = await self._liquid_probe_pass(
                     checked_mount,
                     probe_settings,
-                    probe if probe else InstrumentProbeType.PRIMARY,
+                    checked_probe,
                     p_pass_travel + p_impulse_mm,
                 )
                 # if we made it here without an error we found the liquid
