@@ -21,7 +21,7 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.data import ui
 
 DEFAULT_TRIALS = 1 # The number of trials each current speed check does
-DEFAULT_CYCLES = 30 # The number of burn-in cycles
+DEFAULT_CYCLES = 0 # The number of burn-in cycles
 TRIALS_PER_CYCLE = 1 # number of plunger cycles in one burn in cycle
 STALL_THRESHOLD_MM = 0.1
 TEST_ACCELERATION = 1500  # used during gravimetric tests
@@ -60,8 +60,15 @@ TEST_SPEEDS = [0.25,0.5,0.75]
 #     0.6: TEST_SPEEDS,
 #     1: TEST_SPEEDS,
 # }
+DISTANCELIST = [0.25,0.5,0.75]
+
 
 PLUNGER_CURRENTS_SPEED = {1: TEST_SPEEDS}
+DISTANCE_SPEEDS={0.25:DISTANCELIST,
+0.5:DISTANCELIST,
+0.75:DISTANCELIST
+
+}
 
 MAX_SPEED = max(TEST_SPEEDS)
 MAX_CURRENT = max(max(list(PLUNGER_CURRENTS_SPEED.keys())), 1.0)
@@ -76,6 +83,10 @@ def _get_test_tag(
 ) -> str:
     return f"cycle-{cycle}-current-{current}-speed-{speed}-trial-{trial}-{direction}-{pos}"
 
+def _get_test_tag_distance(
+    cycle: int, current: float, speed: float, distance: float, trial: int, direction: str, pos: str
+) -> str:
+    return f"cycle-{cycle}-current-{current}-speed-{speed}-distance-{distance}-trial-{trial}-{direction}-{pos}"
 
 def _get_section_tag(cycle: int, current: float) -> str:
     return f"CYCLE-{cycle}-CURRENT-{current}-AMPS"
@@ -99,12 +110,13 @@ def _build_csv_report(cycles: int, trials: int) -> CSVReport:
             title=_get_section_tag(cycle, current),
             lines=[
                 CSVLine(
-                    _get_test_tag(cycle, current, speed, trial, direction, pos),
-                    [float, float, float, float, bool, CSVResult]
+                    _get_test_tag_distance(cycle, current, speed, distance, trial, direction, pos),
+                    [float, float, float,float, float, bool, CSVResult]
                     if _includes_result(current, speed)
                     else [float, float, float, float, bool],
                 )
                 for speed in sorted(PLUNGER_CURRENTS_SPEED[current], reverse=False)
+                for distance in DISTANCE_SPEEDS[speed]
                 for trial in range(trials)
                 for direction in ["down", "up"]
                 for pos in ["start", "end"]
@@ -205,6 +217,43 @@ async def _record_plunger_alignment(
     return _did_pass
 
 
+async def _record_plunger_alignment_distance(
+    api: OT3API,
+    mount: types.OT3Mount,
+    report: CSVReport,
+    cycle: int,
+    trial: int,
+    current: float,
+    speed: float,
+    direction: str,
+    position: str,
+    distance:float
+) -> bool:
+    pipette_ax = types.Axis.of_main_tool_actuator(mount)
+    _current_pos = await api.current_position_ot3(mount)
+    est = _current_pos[pipette_ax]
+    if not api.is_simulator:
+        _encoder_poses = await api.encoder_current_position_ot3(mount)
+        enc = _encoder_poses[pipette_ax]
+    else:
+        enc = est
+    _stalled_mm = est - enc
+    print(f"{position}: motor={round(est, 2)}, encoder={round(enc, 2)}")
+    _did_pass = abs(_stalled_mm) < STALL_THRESHOLD_MM
+    # NOTE: only tests that are required to PASS need to show a results in the file
+    data = [round(current, 2), round(speed, 2),round(distance, 2),
+            round(est, 2), round(enc, 2),
+            _did_pass]
+    if _includes_result(current, speed):
+        data.append(CSVResult.from_bool(_did_pass))  # type: ignore[arg-type]
+    report(
+        _get_section_tag(cycle, current),
+        _get_test_tag_distance(cycle, current, speed, distance ,trial, direction, position),
+        data,
+    )
+    return _did_pass
+
+
 async def _test_direction(
     api: OT3API,
     mount: types.OT3Mount,
@@ -239,6 +288,40 @@ async def _test_direction(
         await _home_plunger(api, mount)
     return aligned
 
+async def _test_direction_distance(
+    api: OT3API,
+    mount: types.OT3Mount,
+    report: CSVReport,
+    cycle: int,
+    trial: int,
+    current: float,
+    speed: float,
+    acceleration: float,
+    direction: str,
+    distance:str
+) -> bool:
+    plunger_poses = helpers_ot3.get_plunger_positions_ot3(api, mount)
+    top, _, bottom, _ = plunger_poses
+    # check that encoder/motor align
+    aligned = await _record_plunger_alignment_distance(
+        api, mount, report, cycle, trial, current, speed, direction, "start",distance
+    )
+    if not aligned:
+        print("ERROR: unable to align at the start")
+        return False
+    # move the plunger
+    _plunger_target = {"down": distance, "up": distance + 1.0}[direction]
+    try:
+        await _move_plunger(api, mount, _plunger_target, speed, current, acceleration)
+        # check that encoder/motor still align
+        aligned = await _record_plunger_alignment_distance(
+            api, mount, report, cycle, trial, current, speed, direction, "end",distance
+        )
+    except StallOrCollisionDetectedError as e:
+        print(e)
+        aligned = False
+        await _home_plunger(api, mount)
+    return aligned
 
 async def _test_plunger(
     api: OT3API,
@@ -256,35 +339,38 @@ async def _test_plunger(
         # start at LOWEST (easiest) speed
         speeds = sorted(PLUNGER_CURRENTS_SPEED[current], reverse=False)
         for speed in speeds:
-            for trial in range(trials):
-                ui.print_header(
-                    f"CURRENT = {current}: "
-                    f"SPEED = {speed}: "
-                    f"TRIAL = {trial + 1}/{trials}: "
-                    f"CYCLE = {cycle}"
-                )
-                await _home_plunger(api, mount)
-                for direction in ["down", "up"]:
-                    _pass = await _test_direction(
-                        api,
-                        mount,
-                        report,
-                        cycle,
-                        trial,
-                        current,
-                        speed,
-                        TEST_ACCELERATION,
-                        direction,
+            for distance in DISTANCE_SPEEDS[speed]:
+                for trial in range(trials):
+                    ui.print_header(
+                        f"CURRENT = {current}: "
+                        f"SPEED = {speed}: "
+                        f"TRIAL = {trial + 1}/{trials}: "
+                        f"CYCLE = {cycle} "
+                        f"DISTANCE = {distance}"
                     )
-                    if not _pass:
-                        ui.print_error(
-                            f"failed moving {direction} at {current} amps and {speed} mm/sec"
+                    await _home_plunger(api, mount)
+                    for direction in ["down", "up"]:
+                        _pass = await _test_direction_distance(
+                            api,
+                            mount,
+                            report,
+                            cycle,
+                            trial,
+                            current,
+                            speed,
+                            TEST_ACCELERATION,
+                            direction,
+                            distance,
                         )
-                        max_failed_current = max(max_failed_current, current)
-                        if continue_after_stall:
-                            break
-                        else:
-                            return max_failed_current
+                        if not _pass:
+                            ui.print_error(
+                                f"failed moving {direction} at {current} amps and {speed} mm/sec"
+                            )
+                            max_failed_current = max(max_failed_current, current)
+                            if continue_after_stall:
+                                break
+                            else:
+                                return max_failed_current
     return max_failed_current
 
 
