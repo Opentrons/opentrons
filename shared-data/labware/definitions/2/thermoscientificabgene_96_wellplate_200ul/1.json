@@ -1003,7 +1003,7 @@
     "format": "96Standard",
     "quirks": [],
     "isTiprack": false,
-    "isMagneticModuleCompatible": true,
+    "isMagneticModuleCompatible": false,
     "loadName": "thermoscientificabgene_96_wellplate_200ul"
   },
   "namespace": "opentrons",
