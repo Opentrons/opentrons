@@ -614,10 +614,10 @@ def get_calibration_offsets(
 def get_logs(storage_directory: str, ip: str) -> List[str]:
     """Get Robot logs."""
     log_types: List[Dict[str, Any]] = [
-        {"log type": "api.log", "records": 1000},
+        {"log type": "api.log", "records": 10000},
         {"log type": "server.log", "records": 10000},
         {"log type": "serial.log", "records": 10000},
-        {"log type": "touchscreen.log", "records": 1000},
+        {"log type": "touchscreen.log", "records": 10000},
     ]
     all_paths = []
     for log_type in log_types:
