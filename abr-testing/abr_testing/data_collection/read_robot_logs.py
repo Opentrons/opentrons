@@ -86,18 +86,23 @@ def count_command_in_run_data(
         command_type = command["commandType"]
         if command_type == command_of_interest:
             total_command += 1
-        if find_avg_time:
-            start_time = datetime.strptime(
-                command.get("startedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
-            )
-            end_time = datetime.strptime(
-                command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
-            )
-            total_time += (end_time - start_time).total_seconds()
-    try:
-        avg_time = total_time / total_command
-    except ZeroDivisionError:
-        avg_time = 0.0
+            if find_avg_time:
+                started_at = command.get("startedAt", "")
+                completed_at = command.get("completedAt", "")
+
+                if started_at and completed_at:
+                    try:
+                        start_time = datetime.strptime(
+                            started_at, "%Y-%m-%dT%H:%M:%S.%f%z"
+                        )
+                        end_time = datetime.strptime(
+                            completed_at, "%Y-%m-%dT%H:%M:%S.%f%z"
+                        )
+                        total_time += (end_time - start_time).total_seconds()
+                    except ValueError:
+                        # Handle case where date parsing fails
+                        pass
+    avg_time = total_time / total_command if total_command > 0 else 0.0
     return total_command, avg_time
 
 
@@ -114,7 +119,6 @@ def instrument_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
     right_pipette_id = ""
     left_pipette_id = ""
     gripper_pickups = 0.0
-    liquid_probes = 0.0
     avg_liquid_probe_time_sec = 0.0
     # Match pipette mount to id
     for pipette in pipettes:
