@@ -136,6 +136,7 @@ export function useRunHeaderDropTip({
   return { dropTipModalUtils, dropTipWizardUtils: buildDTWizUtils() }
 }
 
+// TODO(jh, 09-12-24): Consolidate this with the same utility that exists elsewhere.
 function buildPipetteDetails(
   aPipetteWithTip: PipetteWithTip | null
 ): PipetteDetails | null {
