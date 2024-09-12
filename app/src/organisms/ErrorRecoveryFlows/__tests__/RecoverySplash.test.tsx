@@ -16,7 +16,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockRecoveryContentProps } from '../__fixtures__'
 import { getIsOnDevice } from '../../../redux/config'
-import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'
+import { useRecoverySplash, RecoverySplash } from '../RecoverySplash'
 import { StepInfo } from '../shared'
 import { useToaster } from '../../ToasterOven'
 import { clickButtonLabeled } from './util'
@@ -54,7 +54,7 @@ describe('useRunPausedSplash', () => {
     TEST_CASES.forEach(({ isOnDevice, showERWizard, expected }) => {
       it(`returns ${expected} when isOnDevice is ${isOnDevice} and showERWizard is ${showERWizard}`, () => {
         const { result } = renderHook(
-          () => useRunPausedSplash(isOnDevice, showERWizard),
+          () => useRecoverySplash(isOnDevice, showERWizard),
           {
             wrapper,
           }
@@ -65,10 +65,10 @@ describe('useRunPausedSplash', () => {
   })
 })
 
-const render = (props: React.ComponentProps<typeof RunPausedSplash>) => {
+const render = (props: React.ComponentProps<typeof RecoverySplash>) => {
   return renderWithProviders(
     <MemoryRouter>
-      <RunPausedSplash {...props} />
+      <RecoverySplash {...props} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -76,8 +76,8 @@ const render = (props: React.ComponentProps<typeof RunPausedSplash>) => {
   )
 }
 
-describe('RunPausedSplash', () => {
-  let props: React.ComponentProps<typeof RunPausedSplash>
+describe('RecoverySplash', () => {
+  let props: React.ComponentProps<typeof RecoverySplash>
   const mockToggleERWiz = vi.fn(() => Promise.resolve())
   const mockProceedToRouteAndStep = vi.fn()
   const mockRouteUpdateActions = {

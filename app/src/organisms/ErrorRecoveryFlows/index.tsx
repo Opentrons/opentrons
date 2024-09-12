@@ -18,7 +18,7 @@ import { useHost } from '@opentrons/react-api-client'
 
 import { getIsOnDevice } from '../../redux/config'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
-import { RunPausedSplash, useRunPausedSplash } from './RunPausedSplash'
+import { RecoverySplash, useRecoverySplash } from './RecoverySplash'
 import { RecoveryTakeover } from './RecoveryTakeover'
 import {
   useCurrentlyRecoveringFrom,
@@ -136,7 +136,7 @@ export function ErrorRecoveryFlows(
     toggleERWizAsActiveUser,
   } = useRecoveryTakeover(toggleERWizard)
   const renderWizard = isActiveUser && (showERWizard || isDoorOpen)
-  const showSplash = useRunPausedSplash(isOnDevice, renderWizard)
+  const showSplash = useRecoverySplash(isOnDevice, renderWizard)
 
   const recoveryUtils = useERUtils({
     ...props,
@@ -168,7 +168,7 @@ export function ErrorRecoveryFlows(
         />
       ) : null}
       {showSplash ? (
-        <RunPausedSplash
+        <RecoverySplash
           {...props}
           {...recoveryUtils}
           robotType={robotType}

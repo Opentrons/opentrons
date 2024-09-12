@@ -46,7 +46,7 @@ import { WARNING_TOAST } from '../../atoms/Toast'
 import type { RobotType } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '.'
 
-export function useRunPausedSplash(
+export function useRecoverySplash(
   isOnDevice: boolean,
   showERWizard: boolean
 ): boolean {
@@ -59,7 +59,7 @@ export function useRunPausedSplash(
   }
 }
 
-type RunPausedSplashProps = ErrorRecoveryFlowsProps &
+type RecoverySplashProps = ErrorRecoveryFlowsProps &
   ERUtilsResults & {
     isOnDevice: boolean
     isWizardActive: boolean
@@ -69,9 +69,7 @@ type RunPausedSplashProps = ErrorRecoveryFlowsProps &
     toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
     analytics: UseRecoveryAnalyticsResult
   }
-export function RunPausedSplash(
-  props: RunPausedSplashProps
-): JSX.Element | null {
+export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
   const {
     isOnDevice,
     toggleERWizAsActiveUser,
