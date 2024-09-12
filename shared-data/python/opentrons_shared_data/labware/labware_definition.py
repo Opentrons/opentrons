@@ -307,7 +307,6 @@ class InnerWellGeometry(BaseModel):
     bottomShape: Optional[SphericalSegment] = Field(
         None,
         description="The shape at the bottom of the well: either a spherical segment or a cross-section",
-        discriminator="shape",
     )
 
 
