@@ -119,7 +119,6 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
         break
     }
   }
-
   // Do not launch error recovery, but do utilize the wizard's cancel route.
   const onCancelClick = (): void => {
     const onClick = (): void => {
@@ -138,6 +137,15 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
       })
     }
     handleConditionalClick(onClick)
+  }
+
+  const isDisabled = (): boolean => {
+    switch (runStatus) {
+      case RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR:
+        return true
+      default:
+        return false
+    }
   }
 
   // TODO(jh 05-22-24): The hardcoded Z-indexing is non-ideal but must be done to keep the splash page above
@@ -187,14 +195,18 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
           <LargeButton
             onClick={onCancelClick}
             buttonText={t('cancel_run')}
-            css={SHARED_BUTTON_STYLE_ODD}
+            css={
+              isDisabled() ? BTN_STYLE_DISABLED_ODD : SHARED_BUTTON_STYLE_ODD
+            }
             iconName={'remove'}
             buttonType="alertAlt"
           />
           <LargeButton
             onClick={onLaunchERClick}
             buttonText={t('launch_recovery_mode')}
-            css={SHARED_BUTTON_STYLE_ODD}
+            css={
+              isDisabled() ? BTN_STYLE_DISABLED_ODD : SHARED_BUTTON_STYLE_ODD
+            }
             iconName={'recovery'}
             buttonType="alertStroke"
           />
@@ -232,12 +244,20 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
             </Flex>
           </Flex>
           <Flex gridGap={SPACING.spacing8} marginLeft="auto">
-            <SecondaryButton isDangerous onClick={onCancelClick}>
+            <SecondaryButton
+              isDangerous
+              onClick={onCancelClick}
+              css={isDisabled() ? BTN_STYLES_DISABLED_DESKTOP : undefined}
+            >
               {t('cancel_run')}
             </SecondaryButton>
             <PrimaryButton
               onClick={onLaunchERClick}
-              css={PRIMARY_BTN_STYLES_DESKTOP}
+              css={
+                isDisabled()
+                  ? BTN_STYLES_DISABLED_DESKTOP
+                  : PRIMARY_BTN_STYLES_DESKTOP
+              }
             >
               <StyledText desktopStyle="bodyDefaultSemiBold">
                 {t('launch_recovery_mode')}
@@ -272,6 +292,30 @@ const SHARED_BUTTON_STYLE_ODD = css`
   width: 29rem;
   height: 13.5rem;
 `
+const BTN_STYLE_DISABLED_ODD = css`
+  ${SHARED_BUTTON_STYLE_ODD}
+
+  background-color: ${COLORS.grey35};
+  color: ${COLORS.grey50};
+  border: none;
+  box-shadow: none;
+
+  #btn-icon: {
+    color: ${COLORS.grey50};
+  }
+
+  &:active,
+  &:focus,
+  &:hover {
+    background-color: ${COLORS.grey35};
+    color: ${COLORS.grey50};
+  }
+  &:active,
+  &:focus,
+  &:hover #btn-icon {
+    color: ${COLORS.grey50};
+  }
+`
 
 const PRIMARY_BTN_STYLES_DESKTOP = css`
   background-color: ${COLORS.red50};
@@ -282,4 +326,18 @@ const PRIMARY_BTN_STYLES_DESKTOP = css`
   &:hover {
     background-color: ${COLORS.red55};
   }
+`
+const BTN_STYLES_DISABLED_DESKTOP = css`
+  background-color: ${COLORS.grey30};
+  color: ${COLORS.grey40};
+  border: none;
+  box-shadow: none;
+
+  &:active,
+  &:focus,
+  &:hover {
+    background-color: ${COLORS.grey30};
+    color: ${COLORS.grey40};
+  }
+  cursor: default;
 `
