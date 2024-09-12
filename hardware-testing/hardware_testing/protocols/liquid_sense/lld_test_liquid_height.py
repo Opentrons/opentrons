@@ -13,9 +13,8 @@ from opentrons.types import Point
 ###########################################
 # TODO: use runtime-variables instead of constants
 
-NUM_TRIALS = 10
-STARTING_WELL = "A1"
-TEST_VOLUME = 40
+VOLUMES = [7, 10, 15, 25, 40, 60, 100, 200]
+NUM_TRIALS = 12
 DISPENSE_MM_FROM_BOTTOM = 2
 LABWARE = "armadillo_96_wellplate_200ul_pcr_full_skirt"
 
@@ -43,7 +42,7 @@ SLOT_DIAL = "B3"
 metadata = {"protocolName": "lld-test-liquid-height"}
 requirements = {"robotType": "Flex", "apiLevel": "2.20"}
 
-_all_96_well_names = [f"{r}{c + 1}" for c in range(12) for r in "ABCDEFG"]
+_all_96_well_names = [f"{r}{c + 1}" for c in range(12) for r in "ABCDEFGH"]
 _first_row_well_names = [f"A{c + 1}" for c in range(12)]
 TEST_WELLS = {
     1: {  # channel count
@@ -57,7 +56,8 @@ DIAL_PORT_NAME = "/dev/ttyUSB0"
 DIAL_PORT = None
 RUN_ID = ""
 FILE_NAME = ""
-CSV_HEADER = "trial,volume,height,tip-z-error"
+CSV_HEADER = ["trial", "volume", "height", "tip-z-error", "corrected-height"]
+CSV_SEPARATOR = ","
 
 
 def _setup(
@@ -101,10 +101,10 @@ def _setup(
         FILE_NAME = create_file_name(
             metadata["protocolName"], RUN_ID, f"{liquid_pip_name}-{liquid_rack_name}"
         )
-        _write_line_to_csv(ctx, RUN_ID)
-        _write_line_to_csv(ctx, liquid_pip_name)
-        _write_line_to_csv(ctx, liquid_rack_name)
-        _write_line_to_csv(ctx, LABWARE)
+        _write_line_to_csv(ctx, [RUN_ID])
+        _write_line_to_csv(ctx, [liquid_pip_name])
+        _write_line_to_csv(ctx, [liquid_rack_name])
+        _write_line_to_csv(ctx, [LABWARE])
     return (
         liquid_pipette,
         liquid_rack,
@@ -116,27 +116,26 @@ def _setup(
     )
 
 
-def _write_line_to_csv(ctx: ProtocolContext, line: str) -> None:
+def _write_line_to_csv(ctx: ProtocolContext, line: List[str]) -> None:
     if ctx.is_simulating():
         return
     from hardware_testing.data import append_data_to_file
 
-    append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, f"{line}\n")
+    line_str = f"{CSV_SEPARATOR.join(line)}\n"
+    append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
 
 
 def _get_test_wells(labware: Labware, channels: int) -> List[Well]:
-    test_wells: List[str] = TEST_WELLS[channels][labware.load_name]
-    idx_of_starting_well = test_wells.index(STARTING_WELL)
-    return [labware[w] for w in test_wells[idx_of_starting_well:]]
+    return [labware[w] for w in TEST_WELLS[channels][labware.load_name]]
 
 
 def _get_test_tips(rack: Labware, channels: int) -> List[Well]:
     if channels == 96:
         test_tips = [rack["A1"]]
     elif channels == 8:
-        test_tips = rack.rows()[0][:NUM_TRIALS]
+        test_tips = rack.rows()[0]
     else:
-        test_tips = rack.wells()[:NUM_TRIALS]
+        test_tips = rack.wells()
     return test_tips
 
 
@@ -173,7 +172,7 @@ def _store_dial_baseline(
         return
     DIAL_POS_WITHOUT_TIP[idx] = _read_dial_indicator(ctx, pipette, dial, front_channel)
     tag = f"DIAL-BASELINE-{idx}"
-    _write_line_to_csv(ctx, f"{tag},{DIAL_POS_WITHOUT_TIP[idx]}")
+    _write_line_to_csv(ctx, [tag, str(DIAL_POS_WITHOUT_TIP[idx])])
 
 
 def _get_tip_z_error(
@@ -201,6 +200,7 @@ def _get_height_of_liquid_in_well(
 
 def _test_for_finding_liquid_height(
     ctx: ProtocolContext,
+    volume: float,
     liquid_pipette: InstrumentContext,
     probing_pipette: InstrumentContext,
     dial: Labware,
@@ -212,9 +212,13 @@ def _test_for_finding_liquid_height(
     assert len(liquid_tips) == len(
         probing_tips
     ), f"{len(liquid_tips)},{len(probing_tips)}"
+    assert len(liquid_tips) == len(
+        wells
+    ), f"{len(liquid_tips)},{len(wells)}"
     trial_counter = 0
     _store_dial_baseline(ctx, probing_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
+    all_corrected_heights: List[float] = []
 
     for liq_tip, probe_tip, well in zip(liquid_tips, probing_tips, wells):
         trial_counter += 1
@@ -223,17 +227,26 @@ def _test_for_finding_liquid_height(
         tip_z_error = _get_tip_z_error(ctx, probing_pipette, dial)
         # pickup liquid tip, then immediately transfer liquid
         liquid_pipette.pick_up_tip(liq_tip)
-        liquid_pipette.aspirate(TEST_VOLUME, src_well.bottom(ASPIRATE_MM_FROM_BOTTOM))
-        liquid_pipette.dispense(TEST_VOLUME, well.bottom(DISPENSE_MM_FROM_BOTTOM))
-        liquid_pipette.prepare_to_aspirate()
+        liquid_pipette.aspirate(volume, src_well.bottom(ASPIRATE_MM_FROM_BOTTOM))
+        liquid_pipette.dispense(volume, well.bottom(DISPENSE_MM_FROM_BOTTOM))
+        liquid_pipette.blow_out(well.top()).prepare_to_aspirate()
         # get height of liquid
         height = _get_height_of_liquid_in_well(probing_pipette, well)
+        corrected_height = height + tip_z_error
+        all_corrected_heights.append(corrected_height)
         # drop all tips
         liquid_pipette.drop_tip()
         probing_pipette.drop_tip()
         # save data
-        trial_data = [trial_counter, TEST_VOLUME, height, tip_z_error]
-        _write_line_to_csv(ctx, ",".join([str(d) for d in trial_data]))
+        trial_data = [trial_counter, volume, height, tip_z_error, corrected_height]
+        _write_line_to_csv(ctx, [str(d) for d in trial_data])
+
+    avg = sum(all_corrected_heights) / len(all_corrected_heights)
+    error_mm = (max(all_corrected_heights) - min(all_corrected_heights)) * 0.5
+    error_percent = error_mm / avg if avg else 0.0
+    _write_line_to_csv(ctx, ["average", str(round(avg, 3))])
+    _write_line_to_csv(ctx, ["error (mm)", str(round(error_mm, 3))])
+    _write_line_to_csv(ctx, ["error (%)", str(round(error_percent * 100, 1))])
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -244,13 +257,20 @@ def run(ctx: ProtocolContext) -> None:
     test_wells = _get_test_wells(labware, channels=1)
     test_tips_liquid = _get_test_tips(liq_rack, channels=1)
     test_tips_probe = _get_test_tips(probe_rack, channels=1)
-    _test_for_finding_liquid_height(
-        ctx,
-        liq_pipette,
-        probe_pipette,
-        dial,
-        liquid_tips=test_tips_liquid,
-        probing_tips=test_tips_probe,
-        src_well=reservoir["A1"],
-        wells=test_wells,
-    )
+    stuff_lengths = len(test_tips_liquid), len(test_tips_probe), len(test_wells)
+    assert min(stuff_lengths) >= NUM_TRIALS * len(VOLUMES), f"{stuff_lengths}"
+    for _vol in VOLUMES:
+        _test_for_finding_liquid_height(
+            ctx,
+            _vol,
+            liq_pipette,
+            probe_pipette,
+            dial,
+            liquid_tips=test_tips_liquid[:NUM_TRIALS],
+            probing_tips=test_tips_probe[:NUM_TRIALS],
+            src_well=reservoir["A1"],
+            wells=test_wells[:NUM_TRIALS],
+        )
+        test_wells = test_wells[NUM_TRIALS:]
+        test_tips_liquid = test_tips_liquid[NUM_TRIALS:]
+        test_tips_probe = test_tips_probe[NUM_TRIALS:]
