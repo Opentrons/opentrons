@@ -20,13 +20,10 @@ import { useHomePipettes } from '../../../../../DropTipWizardFlows/hooks'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
-import type { UseHomePipettesProps } from '../../../../../DropTipWizardFlows/hooks'
 import type { TipAttachmentStatusResult } from '../../../../../DropTipWizardFlows'
+import type { UseHomePipettesProps } from '../../../../../DropTipWizardFlows/hooks'
 
-type UseProtocolDropTipModalProps = Pick<
-  UseHomePipettesProps,
-  'robotType' | 'instrumentModelSpecs' | 'mount'
-> & {
+type UseProtocolDropTipModalProps = Omit<UseHomePipettesProps, 'onSettled'> & {
   areTipsAttached: TipAttachmentStatusResult['areTipsAttached']
   toggleDTWiz: () => void
   currentRunId: string
@@ -48,22 +45,20 @@ export function useProtocolDropTipModal({
   toggleDTWiz,
   isRunCurrent,
   onSkipAndHome,
-  ...homePipetteProps
+  pipetteInfo,
 }: UseProtocolDropTipModalProps): UseProtocolDropTipModalResult {
   const [showModal, setShowModal] = React.useState(areTipsAttached)
 
-  const { homePipettes, isHomingPipettes } = useHomePipettes({
-    ...homePipetteProps,
-    isRunCurrent,
-    onHome: () => {
+  const { homePipettes, isHoming } = useHomePipettes({
+    pipetteInfo,
+    onSettled: () => {
       onSkipAndHome()
-      setShowModal(false)
     },
   })
 
   // Close the modal if a different app closes the run context.
   React.useEffect(() => {
-    if (isRunCurrent && !isHomingPipettes) {
+    if (isRunCurrent && !isHoming) {
       setShowModal(areTipsAttached)
     } else if (!isRunCurrent) {
       setShowModal(false)
@@ -71,7 +66,7 @@ export function useProtocolDropTipModal({
   }, [isRunCurrent, areTipsAttached, showModal]) // Continue to show the modal if a client dismisses the maintenance run on a different app.
 
   const onSkip = (): void => {
-    homePipettes()
+    void homePipettes()
   }
 
   const onBeginRemoval = (): void => {
@@ -85,7 +80,7 @@ export function useProtocolDropTipModal({
         modalProps: {
           onSkip,
           onBeginRemoval,
-          isDisabled: isHomingPipettes,
+          isDisabled: isHoming,
         },
       }
     : { showModal: false, modalProps: null }
