@@ -3,6 +3,14 @@ import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen, waitFor, renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+
+import {
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+} from '@opentrons/api-client'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -10,13 +18,14 @@ import { mockRecoveryContentProps } from '../__fixtures__'
 import { getIsOnDevice } from '../../../redux/config'
 import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'
 import { StepInfo } from '../shared'
+import { useToaster } from '../../ToasterOven'
+import { clickButtonLabeled } from './util'
 
 import type { Store } from 'redux'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { Provider } from 'react-redux'
 
 vi.mock('../../../redux/config')
 vi.mock('../shared')
+vi.mock('../../ToasterOven')
 
 const store: Store<any> = createStore(vi.fn(), {})
 
@@ -74,6 +83,8 @@ describe('RunPausedSplash', () => {
   const mockRouteUpdateActions = {
     proceedToRouteAndStep: mockProceedToRouteAndStep,
   } as any
+  const mockMakeToast = vi.fn()
+  const mockResumeRecovery = vi.fn()
 
   beforeEach(() => {
     props = {
@@ -81,9 +92,14 @@ describe('RunPausedSplash', () => {
       robotName: 'testRobot',
       toggleERWizAsActiveUser: mockToggleERWiz,
       routeUpdateActions: mockRouteUpdateActions,
+      recoveryActionMutationUtils: {
+        resumeRecovery: mockResumeRecovery,
+      } as any,
+      isWizardActive: false,
     }
 
     vi.mocked(StepInfo).mockReturnValue(<div>MOCK STEP INFO</div>)
+    vi.mocked(useToaster).mockReturnValue({ makeToast: mockMakeToast } as any)
   })
 
   afterEach(() => {
@@ -146,5 +162,26 @@ describe('RunPausedSplash', () => {
     await waitFor(() => {
       expect(mockToggleERWiz).toHaveBeenCalledWith(true, true)
     })
+  })
+
+  it('should render a door open toast if the door is open', () => {
+    props = {
+      ...props,
+      runStatus: RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+    }
+
+    render(props)
+
+    clickButtonLabeled('Launch Recovery Mode')
+
+    expect(mockMakeToast).toHaveBeenCalled()
+  })
+
+  it(`should transition the run status from ${RUN_STATUS_AWAITING_RECOVERY_PAUSED} to ${RUN_STATUS_AWAITING_RECOVERY}`, () => {
+    props = { ...props, runStatus: RUN_STATUS_AWAITING_RECOVERY_PAUSED }
+
+    render(props)
+
+    expect(mockResumeRecovery).toHaveBeenCalled()
   })
 })

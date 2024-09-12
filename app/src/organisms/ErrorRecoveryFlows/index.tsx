@@ -176,6 +176,7 @@ export function ErrorRecoveryFlows(
           isOnDevice={isOnDevice}
           toggleERWizAsActiveUser={toggleERWizAsActiveUser}
           failedCommand={failedCommandBySource}
+          isWizardActive={renderWizard}
         />
       ) : null}
     </>

@@ -3,24 +3,34 @@ import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
+  ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  DISPLAY_FLEX,
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  ALIGN_CENTER,
-  SPACING,
-  COLORS,
-  DIRECTION_COLUMN,
-  POSITION_ABSOLUTE,
-  TYPOGRAPHY,
-  OVERFLOW_WRAP_BREAK_WORD,
-  DISPLAY_FLEX,
   JUSTIFY_SPACE_BETWEEN,
-  TEXT_ALIGN_CENTER,
-  StyledText,
+  OVERFLOW_WRAP_BREAK_WORD,
+  POSITION_ABSOLUTE,
   PrimaryButton,
   SecondaryButton,
+  SPACING,
+  StyledText,
+  TEXT_ALIGN_CENTER,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+import {
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+} from '@opentrons/api-client'
 
+import type {
+  ERUtilsResults,
+  UseRecoveryAnalyticsResult,
+  UseRecoveryTakeoverResult,
+  useRetainedFailedCommandBySource,
+} from './hooks'
 import { useErrorName } from './hooks'
 import { getErrorKind } from './utils'
 import { LargeButton } from '../../atoms/buttons'
@@ -30,15 +40,11 @@ import {
   RECOVERY_MAP,
 } from './constants'
 import { RecoveryInterventionModal, StepInfo } from './shared'
+import { useToaster } from '../ToasterOven'
+import { WARNING_TOAST } from '../../atoms/Toast'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '.'
-import type {
-  ERUtilsResults,
-  UseRecoveryAnalyticsResult,
-  UseRecoveryTakeoverResult,
-  useRetainedFailedCommandBySource,
-} from './hooks'
 
 export function useRunPausedSplash(
   isOnDevice: boolean,
@@ -53,15 +59,16 @@ export function useRunPausedSplash(
   }
 }
 
-type RunPausedSplashProps = ERUtilsResults & {
-  isOnDevice: boolean
-  failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
-  protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
-  robotType: RobotType
-  robotName: string
-  toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
-  analytics: UseRecoveryAnalyticsResult
-}
+type RunPausedSplashProps = ErrorRecoveryFlowsProps &
+  ERUtilsResults & {
+    isOnDevice: boolean
+    isWizardActive: boolean
+    failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
+    robotType: RobotType
+    robotName: string
+    toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
+    analytics: UseRecoveryAnalyticsResult
+  }
 export function RunPausedSplash(
   props: RunPausedSplashProps
 ): JSX.Element | null {
@@ -72,10 +79,14 @@ export function RunPausedSplash(
     failedCommand,
     analytics,
     robotName,
+    runStatus,
+    recoveryActionMutationUtils,
+    isWizardActive,
   } = props
   const { t } = useTranslation('error_recovery')
   const errorKind = getErrorKind(failedCommand?.byRunRecord ?? null)
   const title = useErrorName(errorKind)
+  const { makeToast } = useToaster()
 
   const { proceedToRouteAndStep } = routeUpdateActions
   const { reportErrorEvent } = analytics
@@ -88,18 +99,47 @@ export function RunPausedSplash(
     )
   }
 
-  // Do not launch error recovery, but do utilize the wizard's cancel route.
-  const onCancelClick = (): Promise<void> => {
-    return toggleERWizAsActiveUser(true, false).then(() => {
-      reportErrorEvent(failedCommand?.byRunRecord ?? null, 'cancel-run')
-      void proceedToRouteAndStep(RECOVERY_MAP.CANCEL_RUN.ROUTE)
-    })
+  // Resume recovery when the run when the door is closed.
+  // The CTA/flow for handling a door open event within the ER wizard is different, and because this splash always renders
+  // behind the wizard, we want to ensure we only implicitly resume recovery when only viewing the splash.
+  React.useEffect(() => {
+    if (runStatus === RUN_STATUS_AWAITING_RECOVERY_PAUSED && !isWizardActive) {
+      recoveryActionMutationUtils.resumeRecovery()
+    }
+  }, [runStatus, isWizardActive])
+  const buildDoorOpenAlert = (): void => {
+    makeToast(t('close_door_to_resume') as string, WARNING_TOAST)
   }
 
-  const onLaunchERClick = (): Promise<void> => {
-    return toggleERWizAsActiveUser(true, true).then(() => {
-      reportErrorEvent(failedCommand?.byRunRecord ?? null, 'launch-recovery')
-    })
+  const handleConditionalClick = (onClick: () => void): void => {
+    switch (runStatus) {
+      case RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR:
+        buildDoorOpenAlert()
+        break
+      default:
+        onClick()
+        break
+    }
+  }
+
+  // Do not launch error recovery, but do utilize the wizard's cancel route.
+  const onCancelClick = (): void => {
+    const onClick = (): void => {
+      void toggleERWizAsActiveUser(true, false).then(() => {
+        reportErrorEvent(failedCommand?.byRunRecord ?? null, 'cancel-run')
+        void proceedToRouteAndStep(RECOVERY_MAP.CANCEL_RUN.ROUTE)
+      })
+    }
+    handleConditionalClick(onClick)
+  }
+
+  const onLaunchERClick = (): void => {
+    const onClick = (): void => {
+      void toggleERWizAsActiveUser(true, true).then(() => {
+        reportErrorEvent(failedCommand?.byRunRecord ?? null, 'launch-recovery')
+      })
+    }
+    handleConditionalClick(onClick)
   }
 
   // TODO(jh 05-22-24): The hardcoded Z-indexing is non-ideal but must be done to keep the splash page above
