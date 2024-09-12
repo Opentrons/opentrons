@@ -232,10 +232,6 @@ def get_well_volumetric_capacity(
 
             well_volume[next_f["topHeight"]] = frustum_volume
     elif is_circular_frusta_list(sorted_frusta):
-        # get height from 0 to 1, 1 to 2, ...
-        # assuming that from this point on, well cross-sections won't change between
-        # circular and rectangular or vise versa
-        # for i in range(len(sorted_frusta) - 1):
         for f, next_f in get_boundary_cross_sections(sorted_frusta):
             top_cross_section_radius = next_f["diameter"] / 2.0
             bottom_cross_section_radius = f["diameter"] / 2.0

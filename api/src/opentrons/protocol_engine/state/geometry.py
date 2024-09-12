@@ -9,7 +9,6 @@ from functools import cached_property
 from opentrons.types import Point, DeckSlotName, StagingSlotName, MountType
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
-
 from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.pipette import PIPETTE_X_SPAN
 from opentrons_shared_data.pipette.types import ChannelCount
