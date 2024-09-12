@@ -15,7 +15,8 @@ import { useDropTipWizardFlows } from '..'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { HostConfig } from '@opentrons/api-client'
 import type { Mock } from 'vitest'
-import type { PipetteWithTip } from '..'
+
+import { PipetteWithTip } from '../hooks/useTipAttachmentStatus'
 
 vi.mock('../../ProtocolUpload/hooks')
 vi.mock('..')

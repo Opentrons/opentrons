@@ -20,8 +20,8 @@ import { useHomePipettes } from '../../../../../DropTipWizardFlows/hooks'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
-import type { TipAttachmentStatusResult } from '../../../../../DropTipWizardFlows'
 import type { UseHomePipettesProps } from '../../../../../DropTipWizardFlows/hooks'
+import { TipAttachmentStatusResult } from '../../../../../DropTipWizardFlows/hooks/useTipAttachmentStatus'
 
 type UseProtocolDropTipModalProps = Omit<UseHomePipettesProps, 'onSettled'> & {
   areTipsAttached: TipAttachmentStatusResult['areTipsAttached']

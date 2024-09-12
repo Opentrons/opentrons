@@ -11,11 +11,11 @@ interface UseHomePipettesResult {
   homePipettes: UseRobotControlCommandsResult['executeCommands']
 }
 
-// TOME: Move this to somewhere else.
 export type UseHomePipettesProps = Pick<
   UseRobotControlCommandsProps,
   'pipetteInfo' | 'onSettled'
 >
+// TODO(jh, 09-12-24): Find a better place for this hook to live.
 // Home pipettes except for plungers.
 export function useHomePipettes(
   props: UseHomePipettesProps

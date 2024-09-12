@@ -4,10 +4,7 @@ import { useHost } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import {
-  useDropTipWizardFlows,
-  useTipAttachmentStatus,
-} from '../../../../../DropTipWizardFlows'
+import { useDropTipWizardFlows } from '../../../../../DropTipWizardFlows'
 import { useProtocolDropTipModal } from '../modals'
 import { useCloseCurrentRun } from '../../../../../ProtocolUpload/hooks'
 import { useIsRunCurrent } from '../../../../../../resources/runs'
@@ -15,12 +12,13 @@ import { isTerminalRunStatus } from '../../utils'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { Run, RunStatus } from '@opentrons/api-client'
-import type {
-  DropTipWizardFlowsProps,
-  PipetteWithTip,
-} from '../../../../../DropTipWizardFlows'
+import type { DropTipWizardFlowsProps } from '../../../../../DropTipWizardFlows'
 import type { UseProtocolDropTipModalResult } from '../modals'
 import type { PipetteDetails } from '../../../../../../resources/maintenance_runs'
+import {
+  PipetteWithTip,
+  useTipAttachmentStatus,
+} from '../../../../../DropTipWizardFlows/hooks/useTipAttachmentStatus'
 
 export type RunHeaderDropTipWizProps =
   | { showDTWiz: true; dtWizProps: DropTipWizardFlowsProps }
