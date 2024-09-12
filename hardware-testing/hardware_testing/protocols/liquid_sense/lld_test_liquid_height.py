@@ -12,21 +12,23 @@ from opentrons.types import Point
 #  VARIABLES - START
 ###########################################
 # TODO: use runtime-variables instead of constants
+
 NUM_TRIALS = 10
+STARTING_WELL = "A1"
 TEST_VOLUME = 40
-CSV_HEADER = "trial,volume,height,tip-z-error"
+DISPENSE_MM_FROM_BOTTOM = 2
+LABWARE = "armadillo_96_wellplate_200ul_pcr_full_skirt"
+
+ASPIRATE_MM_FROM_BOTTOM = 5
+RESERVOIR = "nest_1_reservoir_195ml"
 
 LIQUID_MOUNT = "right"
-LIQUID_TIP_SIZE = 200
+LIQUID_TIP_SIZE = 1000
 LIQUID_PIPETTE_SIZE = 1000
 
 PROBING_MOUNT = "left"
 PROBING_TIP_SIZE = 50
 PROBING_PIPETTE_SIZE = 50
-
-ASPIRATE_MM_FROM_BOTTOM = 5  # depth in source reservoir to aspirate
-RESERVOIR = "nest_1_reservoir_195ml"
-LABWARE = "armadillo_96_wellplate_200ul_pcr_full_skirt"
 
 SLOT_LIQUID_TIPRACK = "C3"
 SLOT_PROBING_TIPRACK = "D3"
@@ -41,8 +43,8 @@ SLOT_DIAL = "B3"
 metadata = {"protocolName": "lld-test-liquid-height"}
 requirements = {"robotType": "Flex", "apiLevel": "2.20"}
 
-_all_96_well_names = [f"{c}{r + 1}" for c in "ABCDEFG" for r in range(12)]
-_first_row_well_names = [f"A{r + 1}" for r in range(12)]
+_all_96_well_names = [f"{r}{c + 1}" for c in range(12) for r in "ABCDEFG"]
+_first_row_well_names = [f"A{c + 1}" for c in range(12)]
 TEST_WELLS = {
     1: {  # channel count
         "corning_96_wellplate_360ul_flat": _all_96_well_names,
@@ -55,6 +57,7 @@ DIAL_PORT_NAME = "/dev/ttyUSB0"
 DIAL_PORT = None
 RUN_ID = ""
 FILE_NAME = ""
+CSV_HEADER = "trial,volume,height,tip-z-error"
 
 
 def _setup(
@@ -122,7 +125,9 @@ def _write_line_to_csv(ctx: ProtocolContext, line: str) -> None:
 
 
 def _get_test_wells(labware: Labware, channels: int) -> List[Well]:
-    return [labware[w] for w in TEST_WELLS[channels][labware.load_name]]
+    test_wells: List[str] = TEST_WELLS[channels][labware.load_name]
+    idx_of_starting_well = test_wells.index(STARTING_WELL)
+    return [labware[w] for w in test_wells[idx_of_starting_well:]]
 
 
 def _get_test_tips(rack: Labware, channels: int) -> List[Well]:
@@ -204,7 +209,9 @@ def _test_for_finding_liquid_height(
     src_well: Well,
     wells: List[Well],
 ) -> None:
-    assert len(liquid_tips) == len(probing_tips), f"{len(liquid_tips)},{len(probing_tips)}"
+    assert len(liquid_tips) == len(
+        probing_tips
+    ), f"{len(liquid_tips)},{len(probing_tips)}"
     trial_counter = 0
     _store_dial_baseline(ctx, probing_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
@@ -217,7 +224,7 @@ def _test_for_finding_liquid_height(
         # pickup liquid tip, then immediately transfer liquid
         liquid_pipette.pick_up_tip(liq_tip)
         liquid_pipette.aspirate(TEST_VOLUME, src_well.bottom(ASPIRATE_MM_FROM_BOTTOM))
-        liquid_pipette.dispense(TEST_VOLUME, well)
+        liquid_pipette.dispense(TEST_VOLUME, well.bottom(DISPENSE_MM_FROM_BOTTOM))
         liquid_pipette.prepare_to_aspirate()
         # get height of liquid
         height = _get_height_of_liquid_in_well(probing_pipette, well)
