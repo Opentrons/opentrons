@@ -37,7 +37,7 @@ import {
 
 import { FloatingActionButton, SmallButton } from '../../atoms/buttons'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
-import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
+import { getLabwareSetupItemGroups } from '../../pages/Desktop/Protocols/utils'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { getNestedLabwareInfo } from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
@@ -57,8 +57,8 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
-import type { LabwareSetupItem } from '../../pages/Protocols/utils'
-import type { SetupScreens } from '../../pages/ProtocolSetup'
+import type { LabwareSetupItem } from '../../pages/Desktop/Protocols/utils'
+import type { SetupScreens } from '../../pages/ODD/ProtocolSetup'
 import type { NestedLabwareInfo } from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
 
@@ -130,13 +130,20 @@ export function ProtocolSetupLabware({
       const nickName = onDeckItems.find(
         item => getLabwareDefURI(item.definition) === foundLabware.definitionUri
       )?.nickName
-      setSelectedLabware({
-        ...labwareDef,
-        location: foundLabware.location,
-        nickName: nickName ?? null,
-        id: labwareId,
-      })
-      setShowLabwareDetailsModal(true)
+      const location = onDeckItems.find(
+        item => item.labwareId === foundLabware.id
+      )?.initialLocation
+      if (location != null) {
+        setSelectedLabware({
+          ...labwareDef,
+          location: location,
+          nickName: nickName ?? null,
+          id: labwareId,
+        })
+        setShowLabwareDetailsModal(true)
+      } else {
+        console.warn('no initial labware location found')
+      }
     }
   }
   const selectedLabwareIsTopOfStack = mostRecentAnalysis?.commands.some(
@@ -176,9 +183,8 @@ export function ProtocolSetupLabware({
           <Chip
             background
             iconName="ot-check"
-            text={t('placements_ready')}
+            text={t('placements_confirmed')}
             type="success"
-            chipSize="small"
           />
         ) : (
           <SmallButton
@@ -187,6 +193,7 @@ export function ProtocolSetupLabware({
               setIsConfirmed(true)
               setSetupScreen('prepare to run')
             }}
+            buttonCategory="rounded"
           />
         )}
       </Flex>

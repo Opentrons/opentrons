@@ -312,6 +312,22 @@ class CurrentWell:
     well_name: str
 
 
+class LiquidHeightInfo(BaseModel):
+    """Payload required to store recent measured liquid heights."""
+
+    height: float
+    last_measured: datetime
+
+
+class LiquidHeightSummary(BaseModel):
+    """Payload for liquid state height in StateSummary."""
+
+    labware_id: str
+    well_name: str
+    height: float
+    last_measured: datetime
+
+
 @dataclass(frozen=True)
 class CurrentAddressableArea:
     """The latest addressable area the robot has accessed."""

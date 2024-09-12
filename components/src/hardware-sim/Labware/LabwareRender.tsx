@@ -51,6 +51,8 @@ export interface LabwareRenderProps {
   labwareStroke?: CSSProperties['stroke']
   /** adds thicker blue border with blur to labware */
   highlight?: boolean
+  /** adds a drop shadow to the highlight border */
+  highlightShadow?: boolean
   /** Optional callback, called with WellMouseEvent args onMouseEnter */
   onMouseEnterWell?: (e: WellMouseEvent) => unknown
   /** Optional callback, called with WellMouseEvent args onMouseLeave */
@@ -90,6 +92,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
             labwareLoadName={labwareLoadName as LabwareAdapterLoadName}
             definition={definition}
             highlight={props.highlight}
+            highlightShadow={props.highlightShadow}
           />
         </g>
       </g>
@@ -107,6 +110,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         onMouseLeaveWell={props.onMouseLeaveWell}
         onLabwareClick={props.onLabwareClick}
         highlight={props.highlight}
+        highlightShadow={props.highlightShadow}
       />
       {props.wellStroke != null ? (
         <StrokedWells

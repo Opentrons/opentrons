@@ -1,34 +1,47 @@
 import * as React from 'react'
 import {
   MAGNETIC_BLOCK_TYPE,
+  STAGING_AREA_CUTOUTS,
   THERMOCYCLER_MODULE_TYPE,
   getLabwareDefURI,
   getLabwareDisplayName,
   getPipetteSpecsV2,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import wasteChuteImage from '../../assets/images/waste_chute.png'
 import trashBinImage from '../../assets/images/flex_trash_bin.png'
 import stagingAreaImage from '../../assets/images/staging_area.png'
 import type {
+  CutoutId,
   LabwareDefByDefURI,
   LabwareDefinition2,
   PipetteName,
 } from '@opentrons/shared-data'
+import type { DropdownOption } from '@opentrons/components'
 import type { AdditionalEquipment, WizardFormState } from './types'
 
 const TOTAL_MODULE_SLOTS = 8
 const MIDDLE_SLOT_NUM = 4
 
+export const getNumOptions = (length: number): DropdownOption[] => {
+  return Array.from({ length }, (_, i) => ({
+    name: `${i + 1}`,
+    value: `${i + 1}`,
+  }))
+}
+
 export const getNumSlotsAvailable = (
   modules: WizardFormState['modules'],
-  additionalEquipment: WizardFormState['additionalEquipment'],
-  //  special-casing the wasteChute available slots when there is a staging area in slot 3
-  isWasteChute?: boolean
+  additionalEquipment: WizardFormState['additionalEquipment']
 ): number => {
   const additionalEquipmentLength = additionalEquipment.length
   const hasTC = Object.values(modules || {}).some(
     module => module.type === THERMOCYCLER_MODULE_TYPE
   )
+  const numStagingAreas = additionalEquipment.filter(ae => ae === 'stagingArea')
+    ?.length
+  const hasWasteChute = additionalEquipment.some(ae => ae === 'wasteChute')
+
   const magneticBlocks = Object.values(modules || {}).filter(
     module => module.type === MAGNETIC_BLOCK_TYPE
   )
@@ -44,24 +57,15 @@ export const getNumSlotsAvailable = (
     filteredModuleLength = filteredModuleLength - numBlocks
   }
 
-  const hasWasteChute = additionalEquipment.some(equipment =>
-    equipment.includes('wasteChute')
-  )
-  const isStagingAreaInD3 = additionalEquipment
-    .filter(equipment => equipment.includes('stagingArea'))
-    .find(stagingArea => stagingArea.split('_')[1] === 'cutoutD3')
   const hasGripper = additionalEquipment.some(equipment =>
     equipment.includes('gripper')
   )
 
   let filteredAdditionalEquipmentLength = additionalEquipmentLength
-  if (hasWasteChute && isStagingAreaInD3) {
-    filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
-  }
-  if (isWasteChute && isStagingAreaInD3) {
-    filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
-  }
   if (hasGripper) {
+    filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
+  }
+  if (numStagingAreas === MIDDLE_SLOT_NUM && hasWasteChute) {
     filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
   }
   return (
@@ -161,4 +165,75 @@ export function getTiprackOptions(
     }, {})
 
   return tiprackOptionsMap
+}
+
+export const MOVABLE_TRASH_CUTOUTS = [
+  {
+    value: 'cutoutA3',
+    slot: 'A3',
+  },
+  {
+    value: 'cutoutA1',
+    slot: 'A1',
+  },
+  {
+    value: 'cutoutB1',
+    slot: 'B1',
+  },
+  {
+    value: 'cutoutB3',
+    slot: 'B3',
+  },
+  {
+    value: 'cutoutC1',
+    slot: 'C1',
+  },
+  {
+    value: 'cutoutC3',
+    slot: 'C3',
+  },
+  {
+    value: 'cutoutD1',
+    slot: 'D1',
+  },
+  {
+    value: 'cutoutD3',
+    slot: 'D3',
+  },
+]
+
+export const getTrashSlot = (values: WizardFormState): string => {
+  const { additionalEquipment, modules } = values
+  const moduleSlots =
+    modules != null
+      ? Object.values(modules).flatMap(module =>
+          module.type === THERMOCYCLER_MODULE_TYPE
+            ? [module.slot, 'A1']
+            : module.slot
+        )
+      : []
+  const stagingAreas = additionalEquipment.filter(equipment =>
+    equipment.includes('stagingArea')
+  )
+
+  const cutouts = stagingAreas.map((_, index) => STAGING_AREA_CUTOUTS[index])
+  const hasWasteChute = additionalEquipment.find(equipment =>
+    equipment.includes('wasteChute')
+  )
+  const wasteChuteSlot = Boolean(hasWasteChute)
+    ? [WASTE_CHUTE_CUTOUT as string]
+    : []
+  const unoccupiedSlot = MOVABLE_TRASH_CUTOUTS.find(
+    cutout =>
+      !cutouts.includes(cutout.value as CutoutId) &&
+      !moduleSlots.includes(cutout.slot) &&
+      !wasteChuteSlot.includes(cutout.value)
+  )
+  if (unoccupiedSlot == null) {
+    console.error(
+      'Expected to find an unoccupied slot for the trash bin but could not'
+    )
+    return ''
+  }
+  return unoccupiedSlot?.value
 }

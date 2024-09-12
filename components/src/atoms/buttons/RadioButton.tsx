@@ -21,12 +21,15 @@ interface RadioButtonProps extends StyleProps {
   onChange: React.ChangeEventHandler<HTMLInputElement>
   disabled?: boolean
   iconName?: IconName
-  id?: string
   isSelected?: boolean
   largeDesktopBorderRadius?: boolean
-  maxLines?: number | null
   radioButtonType?: 'large' | 'small'
   subButtonLabel?: string
+  id?: string
+  maxLines?: number | null
+  //  used for mouseEnter and mouseLeave
+  setNoHover?: () => void
+  setHovered?: () => void
 }
 
 //  used for ODD and helix
@@ -45,6 +48,8 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     largeDesktopBorderRadius = false,
     iconName,
     maxLines = null,
+    setHovered,
+    setNoHover,
   } = props
 
   const isLarge = radioButtonType === 'large'
@@ -79,17 +84,19 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   `
 
   const SettingButtonLabel = styled.label`
-      border-radius: ${
-        !largeDesktopBorderRadius
-          ? BORDERS.borderRadius40
-          : BORDERS.borderRadius8
-      };
-      cursor: pointer;
-      padding: ${SPACING.spacing12} ${SPACING.spacing16};
-      width: 100%;
+    border-radius: ${
+      !largeDesktopBorderRadius ? BORDERS.borderRadius40 : BORDERS.borderRadius8
+    };
+    cursor: pointer;
+    padding: ${SPACING.spacing12} ${SPACING.spacing16};
+    width: 100%;
 
-      ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}
-      ${disabled && DISABLED_BUTTON_STYLE}
+    ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}
+    ${disabled && DISABLED_BUTTON_STYLE}
+
+    &:focus-visible {
+      outline: 2px solid ${COLORS.blue55};
+    }
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
        cursor: default;
@@ -98,6 +105,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
        display: ${maxLines != null ? '-webkit-box' : undefined};
         -webkit-line-clamp: ${maxLines ?? undefined};
         -webkit-box-orient: ${maxLines != null ? 'vertical' : undefined};
+        word-wrap: break-word;
       }
     }
   `
@@ -106,6 +114,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     <Flex
       css={css`
         width: auto;
+
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
           width: 100%;
         }
@@ -119,7 +128,13 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
         type="radio"
         value={buttonValue}
       />
-      <SettingButtonLabel role="label" htmlFor={id}>
+      <SettingButtonLabel
+        tabIndex={0}
+        role="label"
+        htmlFor={id}
+        onMouseEnter={setHovered}
+        onMouseLeave={setNoHover}
+      >
         <Flex
           flexDirection={DIRECTION_ROW}
           gridGap={SPACING.spacing2}

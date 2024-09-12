@@ -16,7 +16,7 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.protocol_engine.execution import ReloadedLabwareData, EquipmentHandler
 from opentrons.protocol_engine.resources import labware_validation
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.reload_labware import (
@@ -30,7 +30,7 @@ from opentrons.protocol_engine.commands.reload_labware import (
 def patch_mock_labware_validation(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Mock out move_types.py functions."""
+    """Mock out labware_validation.py functions."""
     for name, func in inspect.getmembers(labware_validation, inspect.isfunction):
         monkeypatch.setattr(labware_validation, name, decoy.mock(func=func))
 

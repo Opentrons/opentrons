@@ -35,7 +35,7 @@ import { ModulesAndDeckMapView } from './ModulesAndDeckMapView'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type { CutoutId, CutoutFixtureId } from '@opentrons/shared-data'
-import type { SetupScreens } from '../../pages/ProtocolSetup'
+import type { SetupScreens } from '../../pages/ODD/ProtocolSetup'
 
 const ATTACHED_MODULE_POLL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000

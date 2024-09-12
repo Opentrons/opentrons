@@ -8,7 +8,7 @@ import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
 import type {
   LabwareWellGroupProperties,
   LabwareParameters,
-} from '../../pages/Labware/types'
+} from '../../pages/Desktop/Labware/types'
 
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 

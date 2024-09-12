@@ -1,11 +1,11 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { NavLink, useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
+  FLEX_MAX_CONTENT,
   Box,
   COLORS,
   DIRECTION_COLUMN,
@@ -31,12 +31,11 @@ import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
 } from '../../redux/analytics'
-import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
+import { useIsRobotOnWrongVersionOfSoftware } from '../../redux/robot-update'
 import { useDownloadRunLog, useTrackProtocolRunEvent, useRobot } from './hooks'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { Run } from '@opentrons/api-client'
-import type { State } from '../../redux/types'
 
 export interface HistoricalProtocolRunOverflowMenuProps {
   runId: string
@@ -114,11 +113,10 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     isRunLogLoading,
   } = props
 
-  const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
-    useSelector((state: State) => {
-      return getRobotUpdateDisplayInfo(state, robotName)
-    })?.autoUpdateAction
+  const isRobotOnWrongVersionOfSoftware = useIsRobotOnWrongVersionOfSoftware(
+    robotName
   )
+
   const [targetProps, tooltipProps] = useHoverTooltip()
   const onResetSuccess = (createRunResponse: Run): void => {
     navigate(
@@ -133,7 +131,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   }
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
-  const { reset } = useRunControls(runId, onResetSuccess)
+  const { reset, isRunControlLoading } = useRunControls(runId, onResetSuccess)
   const { deleteRun } = useDeleteRunMutation()
   const robot = useRobot(robotName)
   const robotSerialNumber =
@@ -165,7 +163,6 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
 
   return (
     <Flex
-      whiteSpace="nowrap"
       zIndex={10}
       borderRadius="4px 4px 0px 0px"
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
@@ -174,6 +171,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       top="2.3rem"
       right={0}
       flexDirection={DIRECTION_COLUMN}
+      width={FLEX_MAX_CONTENT}
     >
       <NavLink to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}>
         <MenuItem data-testid="RecentProtocolRun_OverflowMenu_viewRunRecord">
@@ -183,7 +181,9 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       <MenuItem
         {...targetProps}
         onClick={handleResetClick}
-        disabled={robotIsBusy || isRobotOnWrongVersionOfSoftware}
+        disabled={
+          robotIsBusy || isRobotOnWrongVersionOfSoftware || isRunControlLoading
+        }
         data-testid="RecentProtocolRun_OverflowMenu_rerunNow"
       >
         {t('rerun_now')}
@@ -191,6 +191,11 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       {isRobotOnWrongVersionOfSoftware && (
         <Tooltip tooltipProps={tooltipProps}>
           {t('shared:a_software_update_is_available')}
+        </Tooltip>
+      )}
+      {isRunControlLoading && (
+        <Tooltip whiteSpace="normal" tooltipProps={tooltipProps}>
+          {t('rerun_loading')}
         </Tooltip>
       )}
       <MenuItem

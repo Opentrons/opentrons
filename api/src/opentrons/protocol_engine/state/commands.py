@@ -49,7 +49,7 @@ from ..errors import (
     ProtocolCommandFailedError,
 )
 from ..types import EngineStatus
-from .abstract_store import HasState, HandlesActions
+from ._abstract_store import HasState, HandlesActions
 from .command_history import (
     CommandEntry,
     CommandHistory,

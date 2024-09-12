@@ -6,7 +6,7 @@ import { i18n } from '../../../i18n'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useToaster } from '../../ToasterOven'
-import { mockRunTimeParameterData } from '../../../pages/ProtocolDetails/fixtures'
+import { mockRunTimeParameterData } from '../../../pages/ODD/ProtocolDetails/fixtures'
 import { ViewOnlyParameters } from '../ViewOnlyParameters'
 
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')

@@ -34,7 +34,7 @@ import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '../../../redux/analytics'
 import { Skeleton } from '../../../atoms/Skeleton'
-import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
+import { useMissingProtocolHardware } from '../../../pages/Desktop/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
 import { useRerunnableStatusText } from './hooks'
 
@@ -51,7 +51,8 @@ export function RecentRunProtocolCard({
   const { data, isLoading } = useProtocolQuery(runData.protocolId ?? null)
   const protocolData = data?.data ?? null
   const isProtocolFetching = isLoading
-  return protocolData == null ? null : (
+  return protocolData == null ||
+    protocolData.protocolKind === 'quick-transfer' ? null : (
     <ProtocolWithLastRun
       protocolData={protocolData}
       runData={runData}

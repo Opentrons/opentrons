@@ -24,7 +24,7 @@ import {
 } from '../../../redux/discovery'
 import { getValidCustomLabwareFiles } from '../../../redux/custom-labware'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
+import { useIsRobotOnWrongVersionOfSoftware } from '../../../redux/robot-update'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -93,11 +93,7 @@ const mockCustomLabwareFile: File = { path: 'fake_custom_labware_path' } as any
 
 describe('SendProtocolToFlexSlideout', () => {
   beforeEach(() => {
-    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
-      autoUpdateAction: '',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
+    vi.mocked(useIsRobotOnWrongVersionOfSoftware).mockReturnValue(false)
     vi.mocked(getConnectableRobots).mockReturnValue([mockConnectableOT3])
     vi.mocked(getUnreachableRobots).mockReturnValue([mockUnreachableOT3])
     vi.mocked(getReachableRobots).mockReturnValue([mockReachableOT3])
@@ -233,11 +229,7 @@ describe('SendProtocolToFlexSlideout', () => {
     })
   })
   it('if selected robot is on a different version of the software than the app, disable CTA and show link to device details in options', () => {
-    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
-      autoUpdateAction: 'upgrade',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
+    vi.mocked(useIsRobotOnWrongVersionOfSoftware).mockReturnValue(true)
     render({
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: vi.fn(),
