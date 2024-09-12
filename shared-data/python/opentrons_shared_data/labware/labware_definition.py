@@ -298,7 +298,9 @@ class Group(BaseModel):
 
 
 class InnerWellGeometry(BaseModel):
-    frusta: Union[List[CircularBoundedSection], List[RectangularBoundedSection]] = Field(
+    frusta: Union[
+        List[CircularBoundedSection], List[RectangularBoundedSection]
+    ] = Field(
         ...,
         description="A list of all of the sections of the well that have a contiguous shape",
     )

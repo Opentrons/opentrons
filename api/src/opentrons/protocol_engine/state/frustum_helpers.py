@@ -1,8 +1,13 @@
 """Helper functions for liquid-level related calculations inside a given frustum."""
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from numpy import pi, iscomplex, roots, real
 
 from ..errors.exceptions import InvalidLiquidHeightFound
+from opentrons_shared_data.labware.types import (
+    is_circular_frusta_list,
+    is_rectangular_frusta_list,
+)
+from opentrons_shared_data.labware.labware_definition import InnerWellGeometry
 
 
 def reject_unacceptable_heights(
@@ -174,3 +179,62 @@ def height_from_volume_spherical(
         max_height=total_frustum_height,
     )
     return height
+
+
+def get_well_volumetric_capacity(
+    well_geometry: InnerWellGeometry,
+) -> Dict[float, float]:
+    """Return the total volumetric capacity of a well as a map of height borders to volume."""
+    # dictionary map of heights to volumetric capacities within their respective segment
+    # {top_height_0: volume_0, top_height_1: volume_1, top_height_2: volume_2}
+    well_volume = {}
+    if well_geometry.bottomShape is not None:
+        if well_geometry.bottomShape.shape == "spherical":
+            bottom_spherical_section_depth = well_geometry.bottomShape.depth
+            bottom_sphere_volume = volume_from_height_spherical(
+                radius_of_curvature=well_geometry.bottomShape.radius_of_curvature,
+                target_height=bottom_spherical_section_depth,
+            )
+            well_volume[bottom_spherical_section_depth] = bottom_sphere_volume
+
+    # get the volume of remaining frusta sorted in ascending order
+    sorted_frusta = sorted(well_geometry.frusta, key=lambda section: section.topHeight)
+    if is_rectangular_frusta_list(sorted_frusta):
+        for i in range(len(sorted_frusta) - 1):
+            top_cross_section_width = sorted_frusta[i + 1]["xDimension"]
+            top_cross_section_length = sorted_frusta[i + 1]["yDimension"]
+            bottom_cross_section_width = sorted_frusta[i]["xDimension"]
+            bottom_cross_section_length = sorted_frusta[i]["yDimension"]
+            frustum_height = (
+                sorted_frusta[i + 1]["topHeight"] - sorted_frusta[i]["topHeight"]
+            )
+            frustum_volume = volume_from_height_rectangular(
+                target_height=frustum_height,
+                total_frustum_height=frustum_height,
+                bottom_length=bottom_cross_section_length,
+                bottom_width=bottom_cross_section_width,
+                top_length=top_cross_section_length,
+                top_width=top_cross_section_width,
+            )
+
+            well_volume[sorted_frusta[i + 1]["topHeight"]] = frustum_volume
+    elif is_circular_frusta_list(sorted_frusta):
+        # get height from 0 to 1, 1 to 2, ...
+        # assuming that from this point on, well cross-sections won't change between
+        # circular and rectangular or vise versa
+        for i in range(len(sorted_frusta) - 1):
+            top_cross_section_radius = sorted_frusta[i + 1]["diameter"] / 2.0
+            bottom_cross_section_radius = sorted_frusta[i]["diameter"] / 2.0
+            frustum_height = (
+                sorted_frusta[i + 1]["topHeight"] - sorted_frusta[i]["topHeight"]
+            )
+            frustum_volume = volume_from_height_circular(
+                target_height=frustum_height,
+                total_frustum_height=frustum_height,
+                bottom_radius=bottom_cross_section_radius,
+                top_radius=top_cross_section_radius,
+            )
+
+            well_volume[sorted_frusta[i + 1]["topHeight"]] = frustum_volume
+
+    return well_volume

@@ -139,11 +139,15 @@ class CircularBoundedSection(TypedDict):
     topHeight: float
 
 
-def is_circular_frusta_list(items: List[Any]) -> TypeGuard[List[CircularBoundedSection]]:
+def is_circular_frusta_list(
+    items: List[Any],
+) -> TypeGuard[List[CircularBoundedSection]]:
     return all(item.shape == "circular" for item in items)
 
 
-def is_rectangular_frusta_list(items: List[Any]) -> TypeGuard[List[RectangularBoundedSection]]:
+def is_rectangular_frusta_list(
+    items: List[Any],
+) -> TypeGuard[List[RectangularBoundedSection]]:
     return all(item.shape == "rectangular" for item in items)
 
 
