@@ -1016,7 +1016,7 @@
     "format": "96Standard",
     "quirks": [],
     "isTiprack": false,
-    "isMagneticModuleCompatible": true,
+    "isMagneticModuleCompatible": false,
     "loadName": "eppendorf_96_wellplate_150ul"
   },
   "namespace": "opentrons",
