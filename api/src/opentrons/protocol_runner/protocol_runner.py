@@ -23,6 +23,7 @@ from opentrons.protocol_engine import (
     Command,
     commands as pe_commands,
 )
+from opentrons.protocol_engine.types import CommandAnnotation
 from opentrons.protocols.parse import PythonParseMode
 from opentrons.util.async_helpers import asyncio_yield
 from opentrons.util.broker import Broker
@@ -310,6 +311,7 @@ class JsonRunner(AbstractRunner):
 
         hardware_api.should_taskify_movement_execution(taskify=False)
         self._queued_commands: List[pe_commands.CommandCreate] = []
+        self._command_annotations: List[CommandAnnotation] = []
 
     async def load(self, protocol_source: ProtocolSource) -> None:
         """Load a JSONv6+ ProtocolSource into managed ProtocolEngine."""
@@ -351,6 +353,11 @@ class JsonRunner(AbstractRunner):
                 color=liquid.displayColor,
             )
             await asyncio_yield()
+
+        self._command_annotations = await anyio.to_thread.run_sync(
+            self._json_translator.translate_command_annotations,
+            protocol,
+        )
 
         initial_home_command = pe_commands.HomeCreate(
             params=pe_commands.HomeParams(axes=None)

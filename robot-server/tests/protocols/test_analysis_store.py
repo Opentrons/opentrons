@@ -203,6 +203,7 @@ async def test_returned_in_order_added(
             commands=[],
             errors=[],
             liquids=[],
+            command_annotations=[],
         )
 
     subject.add_pending(
@@ -266,6 +267,7 @@ async def test_update_adds_details_and_completes_analysis(
         commands=[],
         errors=[],
         liquids=[],
+        command_annotations=[],
     )
 
     result = await subject.get("analysis-id")
@@ -384,6 +386,7 @@ async def test_update_adds_rtp_values_to_completed_store(
         commands=[],
         errors=[],
         liquids=[],
+        command_annotations=[],
     )
     decoy.verify(
         await mock_completed_store.make_room_and_add(
@@ -487,6 +490,7 @@ async def test_update_infers_status_from_errors(
         modules=[],
         pipettes=[],
         liquids=[],
+        command_annotations=[],
     )
     analysis = (await subject.get_by_protocol("protocol-id"))[0]
     assert isinstance(analysis, CompletedAnalysis)

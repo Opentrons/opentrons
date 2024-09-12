@@ -6,10 +6,11 @@ from opentrons.protocol_engine.types import (
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
     CSVRunTimeParamFilesType,
+    CommandAnnotation,
 )
 from opentrons_shared_data.robot.types import RobotType
 from pydantic import BaseModel, Field
-from typing import Any, List, Optional, Union, NamedTuple
+from typing import List, Optional, Union, NamedTuple
 from typing_extensions import Literal
 
 from opentrons.protocol_engine import (
@@ -193,7 +194,8 @@ class CompletedAnalysis(BaseModel):
             " but it won't have more than one element."
         ),
     )
-    commandAnnotations: List[Any] = Field(default_factory=list)
+    commandAnnotations: List[CommandAnnotation] = Field(default_factory=list)
+
 
 AnalysisParameterType = Union[float, bool, str, None]
 

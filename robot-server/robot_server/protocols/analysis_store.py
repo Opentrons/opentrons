@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import sqlalchemy
 from logging import getLogger
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 from typing_extensions import Final
 
 from opentrons_shared_data.robot.types import RobotType
@@ -11,6 +11,7 @@ from opentrons_shared_data.errors import ErrorCodes
 from opentrons.protocol_engine.types import (
     RunTimeParameter,
     CSVParameter,
+    CommandAnnotation,
 )
 from opentrons.protocol_engine import (
     Command,
@@ -152,7 +153,7 @@ class AnalysisStore:
         pipettes: List[LoadedPipette],
         errors: List[ErrorOccurrence],
         liquids: List[Liquid],
-        command_annotations: List[Any],
+        command_annotations: List[CommandAnnotation],
     ) -> None:
         """Promote a pending analysis to completed, adding details of its results.
 
@@ -169,6 +170,7 @@ class AnalysisStore:
                 the completed analysis result is `OK` or `NOT_OK`.
             liquids: See `CompletedAnalysis.liquids`.
             robot_type: See `CompletedAnalysis.robotType`.
+            command_annotations: See `CompletedAnalysis.command_annotations`.
         """
         protocol_id = self._pending_store.get_protocol_id(analysis_id=analysis_id)
 

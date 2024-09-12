@@ -335,6 +335,7 @@ async def _analyze(
         pipettes=analysis.state_summary.pipettes,
         modules=analysis.state_summary.modules,
         liquids=analysis.state_summary.liquids,
+        commandAnnotations=[],
     )
 
     _call_for_output_of_kind(

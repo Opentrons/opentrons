@@ -209,6 +209,7 @@ async def test_analyze(
             pipettes=[analysis_pipette],
             errors=[],
             liquids=[],
+            command_annotations=[],
         )
     )
 
@@ -292,5 +293,6 @@ async def test_analyze_updates_pending_on_error(
             pipettes=[],
             errors=[error_occurrence],
             liquids=[],
+            command_annotations=[],
         ),
     )
