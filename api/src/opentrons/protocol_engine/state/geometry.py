@@ -417,6 +417,7 @@ class GeometryView:
                 offset = offset.copy(update={"z": offset.z + well_depth})
             elif well_location.origin == WellOrigin.CENTER:
                 offset = offset.copy(update={"z": offset.z + well_depth / 2.0})
+            # elif well_location.origin == WellOrigin.MENISCUS:
 
         return Point(
             x=labware_pos.x + offset.x + well_def.x,
