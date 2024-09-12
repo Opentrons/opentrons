@@ -20,6 +20,8 @@ from ..errors import (
     ProtocolEngineError,
 )
 
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
+
 
 PRIMARY_NOZZLE_TO_ENDING_NOZZLE_MAP = {
     "A1": {"COLUMN": "H1", "ROW": "A12"},
@@ -300,6 +302,13 @@ class HardwareTipHandler(TipHandler):
         This function will raise an exception if the specified tip presence status
         isn't matched.
         """
+        if (
+            self._state_view.pipettes.get_nozzle_layout_type(pipette_id)
+            == NozzleConfigurationType.SINGLE
+            and self._state_view.pipettes.get_channels(pipette_id) == 96
+        ):
+            # Tip presence sensing is not supported for single tip pick up on the 96ch Flex Pipette
+            return
         try:
             ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
             hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
