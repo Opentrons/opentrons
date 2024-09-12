@@ -57,6 +57,7 @@ import {
   useRunStatus,
 } from '../../../../organisms/RunTimeControl/hooks'
 import { useIsHeaterShakerInProtocol } from '../../../../organisms/ModuleCard/hooks'
+import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration/useNotifyDeckConfigurationQuery'
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
 import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from '../ConfirmSetupStepsCompleteModal'
@@ -64,7 +65,6 @@ import { ProtocolSetup } from '../'
 import { useNotifyRunQuery } from '../../../../resources/runs'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 import { mockRunTimeParameterData } from '../../../../pages/ODD/ProtocolDetails/fixtures'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type * as SharedData from '@opentrons/shared-data'
@@ -124,9 +124,11 @@ vi.mock('../../../../organisms/ModuleCard/hooks')
 vi.mock('../../../../redux/discovery/selectors')
 vi.mock('../ConfirmAttachedModal')
 vi.mock('../../../../organisms/ToasterOven')
-vi.mock('../../../../resources/deck_configuration/hooks')
 vi.mock('../../../../resources/runs')
-vi.mock('../../../../resources/deck_configuration')
+vi.mock('../../../../resources/deck_configuration/hooks')
+vi.mock(
+  '../../../../resources/deck_configuration/useNotifyDeckConfigurationQuery'
+)
 vi.mock('../ConfirmSetupStepsCompleteModal')
 
 const render = (path = '/') => {

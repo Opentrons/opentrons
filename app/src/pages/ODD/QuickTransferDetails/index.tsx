@@ -46,7 +46,7 @@ import {
   updateConfigValue,
 } from '../../../redux/config'
 import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { useMissingProtocolHardware } from '../../../pages/Desktop/Protocols/hooks'
+import { useMissingProtocolHardware } from '../../../transformations/commands'
 import { DeleteTransferConfirmationModal } from '../QuickTransferDashboard/DeleteTransferConfirmationModal'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'

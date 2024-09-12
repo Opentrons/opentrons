@@ -15,12 +15,10 @@ import {
 import { i18n } from '../../../../i18n'
 import { useHardwareStatusText } from '../../../../organisms/ODD/RobotDashboard/hooks'
 import { useOffsetCandidatesForAnalysis } from '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import {
-  useMissingProtocolHardware,
-  useRunTimeParameters,
-} from '../../../../pages/Desktop/Protocols/hooks'
+import { useRunTimeParameters } from '../../../../pages/Desktop/Protocols/hooks'
 import { ProtocolSetupParameters } from '../../../../organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
 import { formatTimeWithUtcLabel } from '../../../../resources/runs'
+import { useMissingProtocolHardware } from '../../../../transformations/commands'
 import { ProtocolDetails } from '..'
 import { Deck } from '../Deck'
 import { Hardware } from '../Hardware'
@@ -52,6 +50,7 @@ vi.mock(
   '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 )
 vi.mock('../../../../pages/Desktop/Protocols/hooks')
+vi.mock('../../../../transformations/commands')
 vi.mock('../Deck')
 vi.mock('../Hardware')
 vi.mock('../Labware')

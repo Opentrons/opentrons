@@ -42,10 +42,7 @@ import {
   useRobotType,
   useTrackProtocolRunEvent,
 } from '../../../organisms/Devices/hooks'
-import {
-  useRequiredProtocolHardwareFromAnalysis,
-  useMissingProtocolHardwareFromAnalysis,
-} from '../../../pages/Desktop/Protocols/hooks'
+
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import {
   AnalysisFailedModal,
@@ -60,7 +57,6 @@ import {
   ProtocolSetupTitleSkeleton,
   getUnmatchedModulesForProtocol,
   getIncompleteInstrumentCount,
-  getProtocolUsesGripper,
   ViewOnlyParameters,
 } from '../../../organisms/ODD/ProtocolSetup'
 import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchLPC'
@@ -71,7 +67,6 @@ import {
 } from '../../../organisms/RunTimeControl/hooks'
 import { useToaster } from '../../../organisms/ToasterOven'
 import { useIsHeaterShakerInProtocol } from '../../../organisms/ModuleCard/hooks'
-import { getLabwareSetupItemGroups } from '../../../pages/Desktop/Protocols/utils'
 import { getLocalRobot, getRobotSerialNumber } from '../../../redux/discovery'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -90,12 +85,18 @@ import { useNotifyRunQuery } from '../../../resources/runs'
 import type { Run } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../../App/types'
+import type { ProtocolModuleInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import type { SetupScreens } from '../../../organisms/ODD/ProtocolSetup'
 import type {
   ProtocolHardware,
   ProtocolFixture,
-} from '../../../pages/Desktop/Protocols/hooks'
-import type { ProtocolModuleInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import type { SetupScreens } from '../../../organisms/ODD/ProtocolSetup'
+} from '../../../transformations/commands'
+import {
+  getLabwareSetupItemGroups,
+  getProtocolUsesGripper,
+  useRequiredProtocolHardwareFromAnalysis,
+  useMissingProtocolHardwareFromAnalysis,
+} from '../../../transformations/commands'
 
 const FETCH_DURATION_MS = 5000
 

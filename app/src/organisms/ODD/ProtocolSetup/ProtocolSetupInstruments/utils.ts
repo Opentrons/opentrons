@@ -9,16 +9,8 @@ import type {
   PipetteData,
 } from '@opentrons/api-client'
 
-export function getProtocolUsesGripper(
-  analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
-): boolean {
-  return (
-    analysis?.commands.some(
-      c =>
-        c.commandType === 'moveLabware' && c.params.strategy === 'usingGripper'
-    ) ?? false
-  )
-}
+import { getProtocolUsesGripper } from '../../../../transformations/commands'
+
 export function getAttachedGripper(
   attachedInstruments: Instruments
 ): GripperData | null {
