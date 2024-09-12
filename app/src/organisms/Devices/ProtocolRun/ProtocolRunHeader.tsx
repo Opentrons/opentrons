@@ -453,8 +453,8 @@ export function ProtocolRunHeader({
         {/* Note: This banner is for before running a protocol */}
         {isDoorOpen &&
         runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
-        runStatus !== RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR &&
         runStatus != null &&
+        !RECOVERY_STATUSES.includes(runStatus) &&
         CANCELLABLE_STATUSES.includes(runStatus) ? (
           <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
             {t('shared:close_robot_door')}
