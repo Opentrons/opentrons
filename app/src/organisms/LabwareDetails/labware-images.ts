@@ -49,6 +49,11 @@ import tipone_96_tiprack_200ul_side_view from './images/tipone_96_tiprack_200ul_
 import tipone_200ul_tip_side_view from './images/tipone_200ul_tip_side_view.jpg'
 import usascientific_12_reservoir_22ml_side_view from './images/usascientific_12_reservoir_22ml_side_view.jpg'
 import usascientific_96_wellplate_2_4ml_deep_side_view from './images/usascientific_96_wellplate_2.4ml_deep_side_view.jpg'
+import thermoscientificabgene_96_wellplate_200ul from './images/thermoscientificabgene_96_wellplate_200ul_photo.jpg'
+import thermoscientificnunc_384_wellplate_40ul from './images/thermoscientificnunc_384_wellplate_40ul_photo.jpg'
+import thermoscientificabgene_96_wellplate_800ul from './images/thermoscientificabgene_96_wellplate_800ul_photo.jpg'
+import thermoscientific_96_wellplate_1200ul from './images/thermoscientific_96_wellplate_1200ul_photo.jpg'
+import thermoscientific_96_wellplate_v_450ul from './images/thermoscientific_96_wellplate_v_450ul_photo.jpg'
 import thermoscientificnunc_96_wellplate_1300ul from './images/thermoscientificnunc_96_wellplate_1300ul.jpg'
 import thermoscientificnunc_96_wellplate_2000ul from './images/thermoscientificnunc_96_wellplate_2000ul.jpg'
 import appliedbiosystemsmicroamp_384_wellplate_40ul from './images/appliedbiosystemsmicroamp_384_wellplate_40ul.jpg'
@@ -222,6 +227,19 @@ export const labwareImages: Record<string, string[]> = {
   ],
   thermoscientificnunc_96_wellplate_1300ul: [
     thermoscientificnunc_96_wellplate_1300ul,
+  ],
+  thermoscientificabgene_96_wellplate_200ul: [
+    thermoscientificabgene_96_wellplate_200ul,
+  ],
+  thermoscientificnunc_384_wellplate_40ul: [
+    thermoscientificnunc_384_wellplate_40ul,
+  ],
+  thermoscientificabgene_96_wellplate_800ul: [
+    thermoscientificabgene_96_wellplate_800ul,
+  ],
+  thermoscientific_96_wellplate_1200ul: [thermoscientific_96_wellplate_1200ul],
+  thermoscientific_96_wellplate_v_450ul: [
+    thermoscientific_96_wellplate_v_450ul,
   ],
   thermoscientificnunc_96_wellplate_2000ul: [
     thermoscientificnunc_96_wellplate_2000ul,

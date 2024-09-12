@@ -114,6 +114,11 @@ import opentronsFlexLidAbsorbancePlateReaderModuleV1Uncasted from '../labware/de
 import opentronsUniversalFlatAdapterV1Uncasted from '../labware/definitions/2/opentrons_universal_flat_adapter/1.json'
 import opentronsUniversalFlatAdapterCorning384Wellplate112UlFlatV1Uncasted from '../labware/definitions/2/opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat/1.json'
 import opentrons96DeepWellTempModAdapterV1Uncasted from '../labware/definitions/2/opentrons_96_deep_well_temp_mod_adapter/1.json'
+import thermoscientific96Wellplate1200UlV1Uncasted from '../labware/definitions/2/thermoscientific_96_wellplate_1200ul/1.json'
+import thermoscientific96Wellplate450UlV1Uncasted from '../labware/definitions/2/thermoscientific_96_wellplate_v_450ul/1.json'
+import thermoscientificabgene96Wellplate200UlV1Uncasted from '../labware/definitions/2/thermoscientificabgene_96_wellplate_200ul/1.json'
+import thermoscientificabgene96Wellplate800UlV1Uncasted from '../labware/definitions/2/thermoscientificabgene_96_wellplate_800ul/1.json'
+import thermoscientificnunc384Wellplate40UlV1Uncasted from '../labware/definitions/2/thermoscientificnunc_384_wellplate_40ul/1.json'
 import thermoscientificnunc96Wellplate1300UlV1Uncasted from '../labware/definitions/2/thermoscientificnunc_96_wellplate_1300ul/1.json'
 import thermoscientificnunc96Wellplate2000UlV1Uncasted from '../labware/definitions/2/thermoscientificnunc_96_wellplate_2000ul/1.json'
 import tipone96Tiprack200UlV1Uncasted from '../labware/definitions/2/tipone_96_tiprack_200ul/1.json'
@@ -288,6 +293,11 @@ const opentronsFlex96TiprackAdapterV1 = opentronsFlex96TiprackAdapterV1Uncasted 
 const opentronsFlexLidAbsorbancePlateReaderModuleV1 = opentronsFlexLidAbsorbancePlateReaderModuleV1Uncasted as LabwareDefinition2
 const opentronsUniversalFlatAdapterV1 = opentronsUniversalFlatAdapterV1Uncasted as LabwareDefinition2
 const opentronsUniversalFlatAdapterCorning384Wellplate112UlFlatV1 = opentronsUniversalFlatAdapterCorning384Wellplate112UlFlatV1Uncasted as LabwareDefinition2
+const thermoscientific96Wellplate1200UlV1 = thermoscientific96Wellplate1200UlV1Uncasted as LabwareDefinition2
+const thermoscientific96Wellplate450UlV1 = thermoscientific96Wellplate450UlV1Uncasted as LabwareDefinition2
+const thermoscientificabgene96Wellplate200UlV1 = thermoscientificabgene96Wellplate200UlV1Uncasted as LabwareDefinition2
+const thermoscientificabgene96Wellplate800UlV1 = thermoscientificabgene96Wellplate800UlV1Uncasted as LabwareDefinition2
+const thermoscientificnunc384Wellplate40UlV1 = thermoscientificnunc384Wellplate40UlV1Uncasted as LabwareDefinition2
 const thermoscientificnunc96Wellplate1300UlV1 = thermoscientificnunc96Wellplate1300UlV1Uncasted as LabwareDefinition2
 const thermoscientificnunc96Wellplate2000UlV1 = thermoscientificnunc96Wellplate2000UlV1Uncasted as LabwareDefinition2
 const tipone96Tiprack200UlV1 = tipone96Tiprack200UlV1Uncasted as LabwareDefinition2
@@ -455,6 +465,11 @@ const latestDefs = {
   opentronsFlexLidAbsorbancePlateReaderModuleV1,
   opentronsUniversalFlatAdapterV1,
   opentronsUniversalFlatAdapterCorning384Wellplate112UlFlatV1,
+  thermoscientific96Wellplate1200UlV1,
+  thermoscientific96Wellplate450UlV1,
+  thermoscientificabgene96Wellplate200UlV1,
+  thermoscientificabgene96Wellplate800UlV1,
+  thermoscientificnunc384Wellplate40UlV1,
   thermoscientificnunc96Wellplate1300UlV1,
   thermoscientificnunc96Wellplate2000UlV1,
   tipone96Tiprack200UlV1,
