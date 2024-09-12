@@ -1204,9 +1204,10 @@ class GeometryView:
 
     def get_well_volumetric_capacity(
         self, labware_id: str, well_id: str
-    ) -> Dict[Tuple[float, float], float]:
+    ) -> Dict[float, float]:
         """Return the total volumetric capacity of a well as a map of height borders to volume."""
-        # dictionary map of heights to volumetric capacities
+        # dictionary map of heights to volumetric capacities within their respective segment
+        # {top_height_0: volume_0, top_height_1: volume_1, top_height_2: volume_2}
         labware_def = self._labware.get_definition(labware_id)
         if labware_def.innerLabwareGeometry is None:
             raise InvalidWellDefinitionError(message="No InnerLabwareGeometry found.")
@@ -1224,7 +1225,7 @@ class GeometryView:
                     radius_of_curvature=well_geometry.bottomShape.radius_of_curvature,
                     target_height=bottom_spherical_section_depth,
                 )
-                well_volume[0.0, bottom_spherical_section_depth] = bottom_sphere_volume
+                well_volume[bottom_spherical_section_depth] = bottom_sphere_volume
 
         # get the volume of remaining frusta sorted in ascending order
         sorted_frusta = sorted(
@@ -1248,10 +1249,7 @@ class GeometryView:
                     top_width=top_cross_section_width,
                 )
 
-                well_volume[
-                    sorted_frusta[i]["topHeight"],
-                    sorted_frusta[i + 1]["topHeight"],
-                ] = frustum_volume
+                well_volume[sorted_frusta[i + 1]["topHeight"]] = frustum_volume
         elif is_circular_frusta_list(sorted_frusta):
             # get height from 0 to 1, 1 to 2, ...
             # assuming that from this point on, well cross-sections won't change between
@@ -1269,9 +1267,6 @@ class GeometryView:
                     top_radius=top_cross_section_radius,
                 )
 
-                well_volume[
-                    sorted_frusta[i]["topHeight"],
-                    sorted_frusta[i + 1]["topHeight"],
-                ] = frustum_volume
+                well_volume[sorted_frusta[i + 1]["topHeight"]] = frustum_volume
 
         return well_volume
