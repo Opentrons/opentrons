@@ -55,7 +55,6 @@ class Migration6to7(Migration):  # noqa: D101
                     f"ALTER TABLE {table_name} ADD COLUMN {column.key} {column_type}"
                 )
 
-
             add_column(
                 dest_engine,
                 schema_7.run_command_table.name,
