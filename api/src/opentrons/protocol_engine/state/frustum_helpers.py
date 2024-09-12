@@ -185,14 +185,9 @@ def get_boundary_cross_sections(frusta: Sequence[Any]) -> Iterator[Tuple[Any, An
     """Yield tuples representing two cross-section boundaries of a segment of a well."""
     iter_f = iter(frusta)
     el = next(iter_f)
-    next_el = next(iter_f)
-    while True:
+    for next_el in iter_f:
         yield el, next_el
         el = next_el
-        try:
-            next_el = next(iter_f)
-        except StopIteration:
-            break
 
 
 def get_well_volumetric_capacity(
