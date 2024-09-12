@@ -1,2 +1,2 @@
-export * from './useNotifyCurrentMaintenanceRun'
+export * from './notifications'
 export * from './hooks'
