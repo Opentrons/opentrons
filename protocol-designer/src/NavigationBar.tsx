@@ -1,11 +1,12 @@
 import * as React from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
+  Btn,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -15,20 +16,31 @@ import {
 } from '@opentrons/components'
 import { toggleNewProtocolModal } from './navigation/actions'
 import { actions as loadFileActions } from './load-file'
-import { getFileMetadata } from './file-data/selectors'
 import { BUTTON_LINK_STYLE } from './atoms'
+import { getHasUnsavedChanges } from './load-file/selectors'
 import type { ThunkDispatch } from './types'
 
 export function NavigationBar(): JSX.Element | null {
-  const { t, i18n } = useTranslation('shared')
+  const { t } = useTranslation('shared')
   const location = useLocation()
-  const metadata = useSelector(getFileMetadata)
+  const navigate = useNavigate()
   const dispatch: ThunkDispatch<any> = useDispatch()
   const loadFile = (
     fileChangeEvent: React.ChangeEvent<HTMLInputElement>
   ): void => {
     dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
     dispatch(toggleNewProtocolModal(false))
+  }
+  const hasUnsavedChanges = useSelector(getHasUnsavedChanges)
+
+  const handleCreateNew = (): void => {
+    if (
+      !hasUnsavedChanges ||
+      window.confirm(t('alert:confirm_create_new') as string)
+    ) {
+      dispatch(toggleNewProtocolModal(true))
+      navigate('/createNew')
+    }
   }
 
   return location.pathname === '/designer' ||
@@ -51,17 +63,11 @@ export function NavigationBar(): JSX.Element | null {
         </Flex>
         <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
           {location.pathname === '/createNew' ? null : (
-            <NavbarLink
-              key="createNew"
-              to="/createNew"
-              onClick={() => {
-                dispatch(toggleNewProtocolModal(true))
-              }}
-            >
+            <Btn onClick={handleCreateNew} css={BUTTON_LINK_STYLE}>
               <StyledText desktopStyle="bodyDefaultRegular">
                 {t('create_new')}
               </StyledText>
-            </NavbarLink>
+            </Btn>
           )}
           <StyledLabel>
             <Flex css={BUTTON_LINK_STYLE}>
@@ -72,19 +78,6 @@ export function NavigationBar(): JSX.Element | null {
             <input type="file" onChange={loadFile}></input>
           </StyledLabel>
         </Flex>
-        {location.pathname === '/createNew' ? (
-          <NavbarLink
-            key="exit"
-            to={metadata?.created != null ? '/overview' : '/'}
-            onClick={() => {
-              dispatch(toggleNewProtocolModal(false))
-            }}
-          >
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {i18n.format(t('exit'), 'capitalize')}
-            </StyledText>
-          </NavbarLink>
-        ) : null}
       </Flex>
     </Flex>
   )

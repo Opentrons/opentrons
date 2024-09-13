@@ -1,14 +1,17 @@
 import * as React from 'react'
-import { describe, it, vi } from 'vitest'
-import { screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
 import { i18n } from '../assets/localization'
 import { renderWithProviders } from '../__testing-utils__'
 import { NavigationBar } from '../NavigationBar'
+import { getHasUnsavedChanges } from '../load-file/selectors'
+import { toggleNewProtocolModal } from '../navigation/actions'
 
+vi.mock('../navigation/actions')
 vi.mock('../file-data/selectors')
-
+vi.mock('../load-file/selectors')
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
@@ -19,6 +22,9 @@ const render = () => {
 }
 
 describe('NavigationBar', () => {
+  beforeEach(() => {
+    vi.mocked(getHasUnsavedChanges).mockReturnValue(false)
+  })
   it('should render text and link button', () => {
     render()
     screen.getByText('Opentrons')
@@ -28,10 +34,11 @@ describe('NavigationBar', () => {
     screen.getByText('Import')
   })
 
-  it.todo(
-    'when clicking Create new protocol, mock function should be called',
-    () => {}
-  )
+  it('when clicking Create new, should call the toggle action', () => {
+    render()
+    fireEvent.click(screen.getByText('Create new'))
+    expect(vi.mocked(toggleNewProtocolModal)).toHaveBeenCalled()
+  })
 
   it.todo('when clicking Import, mock function should be called', () => {})
 })
