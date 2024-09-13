@@ -15,8 +15,12 @@ import { isTerminalRunStatus } from '../../utils'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { Run, RunStatus } from '@opentrons/api-client'
-import type { DropTipWizardFlowsProps } from '../../../../../DropTipWizardFlows'
+import type {
+  DropTipWizardFlowsProps,
+  PipetteWithTip,
+} from '../../../../../DropTipWizardFlows'
 import type { UseProtocolDropTipModalResult } from '../modals'
+import type { PipetteDetails } from '../../../../../../resources/maintenance_runs'
 
 export type RunHeaderDropTipWizProps =
   | { showDTWiz: true; dtWizProps: DropTipWizardFlowsProps }
@@ -66,9 +70,7 @@ export function useRunHeaderDropTip({
     toggleDTWiz,
     isRunCurrent,
     currentRunId: runId,
-    instrumentModelSpecs: aPipetteWithTip?.specs,
-    mount: aPipetteWithTip?.mount,
-    robotType,
+    pipetteInfo: buildPipetteDetails(aPipetteWithTip),
     onSkipAndHome: () => {
       closeCurrentRun()
     },
@@ -132,4 +134,16 @@ export function useRunHeaderDropTip({
   }, [runStatus, isRunCurrent, enteredER, initialPipettesWithTipsCount])
 
   return { dropTipModalUtils, dropTipWizardUtils: buildDTWizUtils() }
+}
+
+// TODO(jh, 09-12-24): Consolidate this with the same utility that exists elsewhere.
+function buildPipetteDetails(
+  aPipetteWithTip: PipetteWithTip | null
+): PipetteDetails | null {
+  return aPipetteWithTip != null
+    ? {
+        pipetteId: aPipetteWithTip.specs.name,
+        mount: aPipetteWithTip.mount,
+      }
+    : null
 }

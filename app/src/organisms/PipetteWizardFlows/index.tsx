@@ -16,11 +16,11 @@ import {
   ApiHostProvider,
 } from '@opentrons/react-api-client'
 
+import { useCreateTargetedMaintenanceRunMutation } from '../../resources/runs'
 import {
-  useCreateTargetedMaintenanceRunMutation,
   useChainMaintenanceCommands,
-} from '../../resources/runs'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
+  useNotifyCurrentMaintenanceRun,
+} from '../../resources/maintenance_runs'
 import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'

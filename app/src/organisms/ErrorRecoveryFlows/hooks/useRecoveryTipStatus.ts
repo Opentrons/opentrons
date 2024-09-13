@@ -3,13 +3,12 @@ import head from 'lodash/head'
 
 import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-
 import { useTipAttachmentStatus } from '../../DropTipWizardFlows'
 
 import type { Run, Instruments, PipetteData } from '@opentrons/api-client'
 import type {
-  TipAttachmentStatusResult,
   PipetteWithTip,
+  TipAttachmentStatusResult,
 } from '../../DropTipWizardFlows'
 
 interface UseRecoveryTipStatusProps {
