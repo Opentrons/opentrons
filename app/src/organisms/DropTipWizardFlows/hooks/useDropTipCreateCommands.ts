@@ -1,7 +1,6 @@
 import { useCreateMaintenanceCommandMutation } from '@opentrons/react-api-client'
 
 import {
-  useChainMaintenanceCommands,
   useChainRunCommands,
   useCreateRunCommandMutation,
 } from '../../../resources/runs'
@@ -10,6 +9,7 @@ import type { CreateCommand } from '@opentrons/shared-data'
 import type { CommandData } from '@opentrons/api-client'
 import type { UseDTWithTypeParams, SetRobotErrorDetailsParams } from '.'
 import type { FixitCommandTypeUtils } from '../types'
+import { useChainMaintenanceCommands } from '../../../resources/maintenance_runs'
 
 export interface RunCommandByCommandTypeParams {
   command: CreateCommand

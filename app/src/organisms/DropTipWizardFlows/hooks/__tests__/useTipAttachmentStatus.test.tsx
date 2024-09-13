@@ -1,23 +1,18 @@
 import * as React from 'react'
-import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
-import { screen, renderHook, act } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { act, renderHook } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
-import {
-  useTipAttachmentStatus,
-  useDropTipWizardFlows,
-  DropTipWizardFlows,
-} from '..'
-import { getPipettesWithTipAttached } from '../getPipettesWithTipAttached'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { DropTipWizard } from '../DropTipWizard'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
+
+import { mockPipetteInfo } from '../../../../redux/pipettes/__fixtures__'
+import { getPipettesWithTipAttached } from '../useTipAttachmentStatus/getPipettesWithTipAttached'
+import { DropTipWizard } from '../../DropTipWizard'
+import { useTipAttachmentStatus } from '../useTipAttachmentStatus'
 
 import type { Mock } from 'vitest'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
-import type { PipetteWithTip } from '..'
+import type { PipetteWithTip } from '../useTipAttachmentStatus'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getPipetteModelSpecs>()
@@ -26,10 +21,9 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     getPipetteModelSpecs: vi.fn(),
   }
 })
-vi.mock('../DropTipWizard')
-vi.mock('../getPipettesWithTipAttached')
-vi.mock('../hooks')
 vi.mock('@opentrons/react-api-client')
+vi.mock('../useTipAttachmentStatus/getPipettesWithTipAttached')
+vi.mock('../../DropTipWizard')
 
 const MOCK_ACTUAL_PIPETTE = {
   ...mockPipetteInfo.pipetteSpecs,
@@ -122,33 +116,5 @@ describe('useTipAttachmentStatus', () => {
     })
 
     expect(onEmptyCacheMock).toHaveBeenCalled()
-  })
-})
-
-describe('useDropTipWizardFlows', () => {
-  it('should toggle showDTWiz state', () => {
-    const { result } = renderHook(() => useDropTipWizardFlows())
-
-    expect(result.current.showDTWiz).toBe(false)
-
-    act(() => {
-      result.current.toggleDTWiz()
-    })
-
-    expect(result.current.showDTWiz).toBe(true)
-  })
-})
-
-const render = (props: React.ComponentProps<typeof DropTipWizardFlows>) => {
-  return renderWithProviders(<DropTipWizardFlows {...props} />, {
-    i18nInstance: i18n,
-  })[0]
-}
-
-describe('DropTipWizardFlows', () => {
-  it('should render DropTipWizard', () => {
-    render({} as any)
-
-    screen.getByText('MOCK DROP TIP WIZ')
   })
 })

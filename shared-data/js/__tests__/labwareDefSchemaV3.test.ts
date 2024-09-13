@@ -37,7 +37,7 @@ const checkGeometryDefinitions = (
       const topFrustumHeight =
         labwareDef.innerLabwareGeometry[wellGeometryId].frusta[0].topHeight
       const topFrustumShape =
-        labwareDef.innerLabwareGeometry[wellGeometryId].frusta[0].geometry.shape
+        labwareDef.innerLabwareGeometry[wellGeometryId].frusta[0].shape
 
       expect(wellDepth).toEqual(topFrustumHeight)
       expect(wellShape).toEqual(topFrustumShape)

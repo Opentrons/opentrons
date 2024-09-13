@@ -40,7 +40,6 @@ import {
   useDeleteRunMutation,
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import {
   useRunTimestamps,
@@ -67,8 +66,10 @@ import {
   useIsRunCurrent,
   useNotifyRunQuery,
 } from '../../../resources/runs'
-import { handleTipsAttachedModal } from '../../../organisms/DropTipWizardFlows/TipsAttachedModal'
-import { useTipAttachmentStatus } from '../../../organisms/DropTipWizardFlows'
+import {
+  useTipAttachmentStatus,
+  handleTipsAttachedModal,
+} from '../../../organisms/DropTipWizardFlows'
 import { useRecoveryAnalytics } from '../../../organisms/ErrorRecoveryFlows/hooks'
 
 import type { IconName } from '@opentrons/components'
@@ -283,11 +284,7 @@ export function RunSummary(): JSX.Element {
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleReturnToDash),
         host,
         aPipetteWithTip,
-        instrumentModelSpecs: aPipetteWithTip.specs,
-        mount: aPipetteWithTip.mount,
-        robotType: FLEX_ROBOT_TYPE,
-        isRunCurrent,
-        onSkipAndHome: () => {
+        onSettled: () => {
           closeCurrentRunIfValid(() => {
             navigate('/dashboard')
           })
@@ -308,11 +305,7 @@ export function RunSummary(): JSX.Element {
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleRunAgain),
         host,
         aPipetteWithTip,
-        instrumentModelSpecs: aPipetteWithTip.specs,
-        mount: aPipetteWithTip.mount,
-        robotType: FLEX_ROBOT_TYPE,
-        isRunCurrent,
-        onSkipAndHome: () => {
+        onSettled: () => {
           runAgain()
         },
       })
