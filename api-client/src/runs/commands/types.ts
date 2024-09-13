@@ -3,6 +3,7 @@ import type { RunTimeCommand, RunCommandError } from '@opentrons/shared-data'
 export interface GetCommandsParams {
   cursor: number | null // the index of the command at the center of the window
   pageLength: number // the number of items to include
+  includeFixitCommands?: boolean // whether to include fixit command intent
 }
 
 export interface RunCommandErrors {

@@ -64,7 +64,7 @@ export const RunPreviewComponent = (
     isLoading: isRunCommandDataLoading,
   } = useNotifyAllCommandsAsPreSerializedList(
     runId,
-    { cursor: 0, pageLength: MAX_COMMANDS },
+    { cursor: 0, pageLength: MAX_COMMANDS, includeFixitCommands: false },
     {
       enabled: isRunTerminal,
     }

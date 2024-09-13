@@ -17,6 +17,7 @@ const DEFAULT_PAGE_LENGTH = 30
 export const DEFAULT_PARAMS: GetCommandsParams = {
   cursor: null,
   pageLength: DEFAULT_PAGE_LENGTH,
+  includeFixitCommands: null,
 }
 
 export function useAllCommandsAsPreSerializedList<TError = Error>(
@@ -31,7 +32,7 @@ export function useAllCommandsAsPreSerializedList<TError = Error>(
     ...options,
     enabled: host !== null && runId != null && options.enabled !== false,
   }
-  const { cursor, pageLength } = nullCheckedParams
+  const { cursor, pageLength, includeFixitCommands } = nullCheckedParams
 
   // map undefined values to null to agree with react query caching
   // TODO (nd: 05/15/2024) create sanitizer for react query key objects
@@ -45,6 +46,7 @@ export function useAllCommandsAsPreSerializedList<TError = Error>(
       'getCommandsAsPreSerializedList',
       cursor,
       pageLength,
+      includeFixitCommands,
     ],
     () => {
       return getCommandsAsPreSerializedList(
