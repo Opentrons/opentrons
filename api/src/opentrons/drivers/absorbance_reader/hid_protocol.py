@@ -84,7 +84,10 @@ class AbsorbanceHidInterface(Protocol):
         name: DeviceStateNames
         value: int
 
-    def ByonoyAbs96SingleMeasurementConfig(self) -> MeasurementConfig:
+    def ByonoyAbs96SingleMeasurementConfig(self) -> SingleMeasurementConfig:
+        ...
+
+    def ByonoyAbs96MultipleMeasurementConfig(self) -> MultiMeasurementConfig:
         ...
 
     def byonoy_open_device(self, device: Device) -> Tuple[ErrorCode, int]:
@@ -130,13 +133,23 @@ class AbsorbanceHidInterface(Protocol):
         ...
 
     def byonoy_abs96_initialize_single_measurement(
-        self, device_handle: int, conf: MeasurementConfig
+        self, device_handle: int, conf: SingleMeasurementConfig
+    ) -> ErrorCode:
+        ...
+
+    def byonoy_abs96_initialize_multiple_measurement(
+        self, device_handle: int, conf: MultiMeasurementConfig
     ) -> ErrorCode:
         ...
 
     def byonoy_abs96_single_measure(
         self, device_handle: int, conf: MeasurementConfig
     ) -> Tuple[ErrorCode, List[float]]:
+        ...
+
+    def byonoy_abs96_multiple_measure(
+        self, device_handle: int, conf: MultiMeasurementConfig
+    ) -> Tuple[ErrorCode, List[List[float]]]:
         ...
 
     def byonoy_available_devices(self) -> List[Device]:

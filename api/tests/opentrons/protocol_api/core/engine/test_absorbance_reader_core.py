@@ -62,32 +62,65 @@ def test_initialize(
     decoy: Decoy, mock_engine_client: EngineClient, subject: AbsorbanceReaderCore
 ) -> None:
     """It should set the sample wavelength with the engine client."""
-    subject.initialize(wavelength=123)
+    subject.initialize("singleMeasure", [123])
 
     decoy.verify(
         mock_engine_client.execute_command(
             cmd.absorbance_reader.InitializeParams(
                 moduleId="1234",
-                sampleWavelength=123,
+                measureMode="singleMeasure",
+                sampleWavelengths=[123],
+                referenceWavelength=None,
             ),
         ),
         times=1,
     )
-    assert subject._initialized_value == 123
+    assert subject._initialized_value == [123]
+
+    # Test reference wavelength
+    subject.initialize("singleMeasure", [124], 450)
+
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.absorbance_reader.InitializeParams(
+                moduleId="1234",
+                measureMode="singleMeasure",
+                sampleWavelengths=[124],
+                referenceWavelength=450,
+            ),
+        ),
+        times=1,
+    )
+    assert subject._initialized_value == [124]
+
+    # Test initialize multi
+    subject.initialize("multiMeasure", [124, 125, 126])
+
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.absorbance_reader.InitializeParams(
+                moduleId="1234",
+                measureMode="multiMeasure",
+                sampleWavelengths=[124, 125, 126],
+                referenceWavelength=None,
+            ),
+        ),
+        times=1,
+    )
+    assert subject._initialized_value == [124, 125, 126]
 
 
 def test_read(
     decoy: Decoy, mock_engine_client: EngineClient, subject: AbsorbanceReaderCore
 ) -> None:
     """It should call absorbance reader to read with the engine client."""
-    subject._initialized_value = 123
+    subject._initialized_value = [123]
     subject.read()
 
     decoy.verify(
         mock_engine_client.execute_command(
             cmd.absorbance_reader.ReadAbsorbanceParams(
                 moduleId="1234",
-                sampleWavelength=123,
             ),
         ),
         times=1,

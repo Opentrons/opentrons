@@ -1072,3 +1072,6 @@ PrimitiveRunTimeParamValuesType = Mapping[
 
 CSVRunTimeParamFilesType = Mapping[StrictStr, StrictStr]
 CSVRuntimeParamPaths = Dict[str, Path]
+
+
+ABSMeasureMode = Literal["singleMeasure", "multiMeasure"]

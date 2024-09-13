@@ -1,3 +1,4 @@
+from typing import cast
 from mock import MagicMock
 import pytest
 import asyncio
@@ -9,7 +10,7 @@ from opentrons.drivers.absorbance_reader import (
     AbsorbanceHidInterface,
 )
 from opentrons.drivers.absorbance_reader.async_byonoy import AsyncByonoy
-from opentrons.drivers.types import AbsorbanceReaderLidStatus
+from opentrons.drivers.types import ABSMeasurementMode, AbsorbanceReaderLidStatus
 
 
 @pytest.fixture
@@ -132,7 +133,7 @@ async def test_driver_get_supported_wavelengths(
     assert wavelengths == SUPPORTED_WAVELENGTHS
 
 
-async def test_driver_initialize_and_read(
+async def test_driver_initialize_and_read_single(
     mock_interface: MagicMock,
     connected_driver: AbsorbanceReaderDriver,
 ) -> None:
@@ -141,28 +142,79 @@ async def test_driver_initialize_and_read(
     mock_interface.byonoy_abs96_initialize_single_measurement.return_value = (
         MockErrorCode.BYONOY_ERROR_NO_ERROR
     )
-    mock_interface.ByonoyAbs96SingleMeasurementConfig = MagicMock(
-        spec=AbsorbanceHidInterface.MeasurementConfig
-    )
+
+    class MeasurementConfig(AbsorbanceHidInterface.SingleMeasurementConfig):
+        def __init__(self) -> None:
+            self.sample_wavelength = 0
+            self.reference_wavelength = 0
+
+    mock_interface.ByonoyAbs96SingleMeasurementConfig = MeasurementConfig
 
     # current config should not have been setup yet
     assert not connected_driver._connection._current_config
-    await connected_driver.initialize_measurement(450)
+    await connected_driver.initialize_measurement([450], mode=ABSMeasurementMode.SINGLE)
 
-    conf = connected_driver._connection._current_config
+    conf = cast(
+        AbsorbanceHidInterface.SingleMeasurementConfig,
+        connected_driver._connection._current_config,
+    )
     assert conf and conf.sample_wavelength == 450
     mock_interface.byonoy_abs96_initialize_single_measurement.assert_called_once_with(
         1, conf
     )
 
-    # setup up mock interface
-    MEASURE_RESULT = [0.1] * 96
+    # setup up mock interface with a single reading
+    MEASURE_RESULT = [[0.1] * 96]
     mock_interface.byonoy_abs96_single_measure.return_value = (
         MockErrorCode.BYONOY_ERROR_NO_ERROR,
         MEASURE_RESULT,
     )
 
-    result = await connected_driver.get_single_measurement(450)
+    result = await connected_driver.get_measurement()
     mock_interface.byonoy_abs96_single_measure.assert_called_once_with(1, conf)
+
+    assert result == MEASURE_RESULT
+
+
+async def test_driver_initialize_and_read_multi(
+    mock_interface: MagicMock,
+    connected_driver: AbsorbanceReaderDriver,
+) -> None:
+    # set up mock interface
+    connected_driver._connection._supported_wavelengths = [450, 500, 600]
+    mock_interface.byonoy_abs96_initialize_multiple_measurement.return_value = (
+        MockErrorCode.BYONOY_ERROR_NO_ERROR
+    )
+
+    class MeasurementConfig(AbsorbanceHidInterface.MultiMeasurementConfig):
+        def __init__(self) -> None:
+            self.sample_wavelengths = [0]
+
+    mock_interface.ByonoyAbs96MultipleMeasurementConfig = MeasurementConfig
+
+    # current config should not have been setup yet
+    assert not connected_driver._connection._current_config
+    await connected_driver.initialize_measurement(
+        [450, 500, 600], mode=ABSMeasurementMode.MULTI
+    )
+
+    conf = cast(
+        AbsorbanceHidInterface.MultiMeasurementConfig,
+        connected_driver._connection._current_config,
+    )
+    assert conf and conf.sample_wavelengths == [450, 500, 600]
+    mock_interface.byonoy_abs96_initialize_multiple_measurement.assert_called_once_with(
+        1, conf
+    )
+
+    # setup up mock interface with multiple readings
+    MEASURE_RESULT = [[0.1] * 96, [0.2] * 96, [0.3] * 96]
+    mock_interface.byonoy_abs96_multiple_measure.return_value = (
+        MockErrorCode.BYONOY_ERROR_NO_ERROR,
+        MEASURE_RESULT,
+    )
+
+    result = await connected_driver.get_measurement()
+    mock_interface.byonoy_abs96_multiple_measure.assert_called_once_with(1, conf)
 
     assert result == MEASURE_RESULT

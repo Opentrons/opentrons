@@ -3,7 +3,7 @@ import os
 import re
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
-from typing import Optional, List, Dict, Tuple
+from typing import Any, Optional, List, Dict, Tuple
 
 from .hid_protocol import (
     AbsorbanceHidInterface as AbsProtocol,
@@ -229,9 +229,11 @@ class AsyncByonoy:
         """Get a single measurement based on the current configuration."""
         handle = self._verify_device_handle()
         assert (
-            self._current_config
-            and self._current_config.sample_wavelength == wavelength
-        )
+            self._current_config is not None
+        ), "Cannot get measurement without initializing."
+        measure_func: Any = self._interface.byonoy_abs96_single_measure
+        if isinstance(self._current_config, AbsProtocol.MultiMeasurementConfig):
+            measure_func = self._interface.byonoy_abs96_multiple_measure
         err, measurements = await self._loop.run_in_executor(
             executor=self._executor,
             func=partial(
@@ -265,7 +267,14 @@ class AsyncByonoy:
 
     def _initialize_measurement(self, conf: AbsProtocol.MeasurementConfig) -> None:
         handle = self._verify_device_handle()
-        err = self._interface.byonoy_abs96_initialize_single_measurement(handle, conf)
+        if isinstance(conf, AbsProtocol.SingleMeasurementConfig):
+            err = self._interface.byonoy_abs96_initialize_single_measurement(
+                handle, conf
+            )
+        else:
+            err = self._interface.byonoy_abs96_initialize_multiple_measurement(
+                handle, conf
+            )
         self._raise_if_error(err.name, f"Error initializing measurement: {err}")
         self._current_config = conf
 
@@ -273,10 +282,15 @@ class AsyncByonoy:
         if not self._supported_wavelengths:
             self._get_supported_wavelengths()
         assert self._supported_wavelengths
-        if wavelength in self._supported_wavelengths:
-            conf = self._interface.ByonoyAbs96SingleMeasurementConfig()
-            conf.sample_wavelength = wavelength
-            return conf
+        conf: MeasurementConfig
+        if set(wavelengths).issubset(self._supported_wavelengths):
+            if mode == ABSMeasurementMode.SINGLE:
+                conf = self._interface.ByonoyAbs96SingleMeasurementConfig()
+                conf.sample_wavelength = wavelengths[0] or 0
+                conf.reference_wavelength = reference_wavelength or 0
+            else:
+                conf = self._interface.ByonoyAbs96MultipleMeasurementConfig()
+                conf.sample_wavelengths = wavelengths
         else:
             raise ValueError(
                 f"Unsupported wavelength: {wavelength}, expected: {self._supported_wavelengths}"

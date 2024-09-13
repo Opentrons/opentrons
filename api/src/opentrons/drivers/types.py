@@ -83,3 +83,25 @@ class AbsorbanceReaderDeviceState(str, Enum):
     OK = "ok"
     BROKEN_FW = "broken_fw"
     ERROR = "error"
+
+
+class ABSMeasurementMode(Enum):
+    """The current mode configured for reading the Absorbance Reader."""
+
+    SINGLE = "singleMeasure"
+    MULTI = "multiMeasure"
+
+
+@dataclass
+class ABSMeasurementConfig:
+    measure_mode: ABSMeasurementMode
+    sample_wavelengths: List[int]
+    reference_wavelength: Optional[int]
+
+    @property
+    def data(self) -> Dict[str, Any]:
+        return {
+            "measureMode": self.measure_mode.value,
+            "sampleWavelengths": self.sample_wavelengths,
+            "referenceWavelength": self.reference_wavelength,
+        }

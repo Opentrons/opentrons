@@ -8,7 +8,9 @@ from opentrons.drivers.types import (
     AbsorbanceReaderDeviceState,
     AbsorbanceReaderPlatePresence,
 )
-from opentrons.drivers.absorbance_reader.abstract import AbstractAbsorbanceReaderDriver
+from opentrons.drivers.absorbance_reader.abstract import (
+    AbstractAbsorbanceReaderDriver,
+)
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 if TYPE_CHECKING:
@@ -60,9 +62,13 @@ class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
     async def get_available_wavelengths(self) -> List[int]:
         return await self._connection.get_supported_wavelengths()
 
-    async def get_single_measurement(self, wavelength: int) -> List[float]:
-        # TODO (cb, 08-02-2024): The list of measurements for 96 wells is rotated 180 degrees (well A1 is where well H12 should be) this must be corrected
-        return await self._connection.get_single_measurement(wavelength)
+    async def initialize_measurement(
+        self,
+        wavelengths: List[int],
+        mode: ABSMeasurementMode = ABSMeasurementMode.SINGLE,
+        reference_wavelength: Optional[int] = None,
+    ) -> None:
+        await self._connection.initialize(mode, wavelengths, reference_wavelength)
 
     async def initialize_measurement(self, wavelength: int) -> None:
         await self._connection.initialize(wavelength)
