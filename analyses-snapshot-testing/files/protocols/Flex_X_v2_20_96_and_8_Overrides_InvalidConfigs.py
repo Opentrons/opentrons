@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
-from opentrons.protocol_api import SINGLE, COLUMN, PARTIAL_COLUMN, ROW
+from opentrons.protocol_api import PARTIAL_COLUMN
 
 # inspired by https://opentrons.atlassian.net/browse/PLAT-457
 
@@ -29,15 +29,38 @@ class PartialTipConfig:
 
 # Want to see
 "Partial column configuration is only supported on 8-Channel pipettes"
-ninety_six_partial_column_top = PartialTipConfig(
-    key="ninety_six_partial_column_top",
-    pipette_load_name="flex_96channel_1000ul",
+ninety_six_partial_column_1 = PartialTipConfig(
+    key="ninety_six_partial_column_1",
+    pipette_load_name="flex_96channel_1000",
     description="96 2 tip pick up top left of tiprack",
     starting_tip="A1",
     starting_nozzle="H12",
     api_tip_config=PARTIAL_COLUMN,
     api_start="H12",
     api_end="G12",
+)
+
+# https://opentrons.atlassian.net/browse/PLAT-457
+ninety_six_partial_column_2 = PartialTipConfig(
+    key="ninety_six_partial_column_2",
+    pipette_load_name="flex_96channel_1000",
+    description="Full row",
+    starting_tip="A1",
+    starting_nozzle="H12",
+    api_tip_config=PARTIAL_COLUMN,
+    api_start="H1",
+    api_end="A1",
+)
+
+ninety_six_partial_column_3 = PartialTipConfig(
+    key="ninety_six_partial_column_3",
+    pipette_load_name="flex_96channel_1000",
+    description="Full Row",
+    starting_tip="A1",
+    starting_nozzle="H12",
+    api_tip_config=PARTIAL_COLUMN,
+    api_start="H1",
+    api_end="H12",
 )
 
 # We do not allow PARTIAL_COLUMN to start on the bottom of the tip rack
@@ -53,31 +76,7 @@ eight_partial_column_bottom_left = PartialTipConfig(
     api_start="A1",
     api_end="B1",
 )
-# valid PARTIAL_COLUMN
-# for PARTIAL_COLUMN, start must be H1 - which nozzle of the pipette to start at
-# end is the nozzle to end at
-# B1 = 7 tips
-# C1 = 6 tips
-# D1 = 5 tips
-# E1 = 4 tips
-# F1 = 3 tips
-# G1 = 2 tips
-# pipette.configure_nozzle_layout(
-#     style=PARTIAL_COLUMN,
-#     start="H1", # for partial column only H1
-#     end="B1",  # 2 Tips
-#     tip_racks=[partial_tip_rack],
-# )
 
-# invalid - this is the config in eight_partial_column_top
-# start at A1 nozzle
-# this is not permitted
-# pipette.configure_nozzle_layout(
-#     style=PARTIAL_COLUMN,
-#     start="A1",
-#     end="G1", # 2 Tips
-#     tip_racks=[partial_tip_rack],
-# )
 
 # Want to see
 # Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): IncompatibleNozzleConfiguration: No entry for front right nozzle 'G12' in pipette
@@ -132,7 +131,9 @@ drop_tip_with_location = PartialTipConfig(
 )
 
 all_partial_configs = [
-    ninety_six_partial_column_top,
+    ninety_six_partial_column_1,
+    ninety_six_partial_column_2,
+    ninety_six_partial_column_3,
     eight_partial_column_bottom_left,
     eight_partial_column_bottom_right,
     eight_partial_column_no_end,
@@ -146,9 +147,6 @@ def find_partial_tip_config(key: str) -> Optional[PartialTipConfig]:
         if config.key == key:
             return config
     raise ValueError(f"Could not find partial tip config with key {key}")
-
-
-key = "drop_tip_with_location"
 
 
 def comment_column_has_tip(ctx, tip_rack, column):

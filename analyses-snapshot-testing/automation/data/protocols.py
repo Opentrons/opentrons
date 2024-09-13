@@ -641,6 +641,61 @@ class Protocols:
         robot="Flex",
     )
 
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_20_8_None_PARTIAL_COLUMN_HappyPath.py
+    Flex_S_v2_20_8_None_PARTIAL_COLUMN_HappyPath: Protocol = Protocol(
+        file_stem="Flex_S_v2_20_8_None_PARTIAL_COLUMN_HappyPath",
+        file_extension="py",
+        robot="Flex",
+    )
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_20_8_None_SINGLE_HappyPath.py
+    Flex_S_v2_20_8_None_SINGLE_HappyPath: Protocol = Protocol(
+        file_stem="Flex_S_v2_20_8_None_SINGLE_HappyPath",
+        file_extension="py",
+        robot="Flex",
+    )
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_20_96_AllCorners.py
+    Flex_S_v2_20_96_AllCorners: Protocol = Protocol(
+        file_stem="Flex_S_v2_20_96_AllCorners",
+        file_extension="py",
+        robot="Flex",
+    )
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_20_96_None_COLUMN_HappyPath.py
+    Flex_S_v2_20_96_None_COLUMN_HappyPath: Protocol = Protocol(
+        file_stem="Flex_S_v2_20_96_None_COLUMN_HappyPath",
+        file_extension="py",
+        robot="Flex",
+    )
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_20_96_None_Column3_SINGLE_.py
+    Flex_S_v2_20_96_None_Column3_SINGLE_: Protocol = Protocol(
+        file_stem="Flex_S_v2_20_96_None_Column3_SINGLE_",
+        file_extension="py",
+        robot="Flex",
+    )
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_20_96_None_ROW_HappyPath.py
+    Flex_S_v2_20_96_None_ROW_HappyPath: Protocol = Protocol(
+        file_stem="Flex_S_v2_20_96_None_ROW_HappyPath",
+        file_extension="py",
+        robot="Flex",
+    )
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_20_96_None_SINGLE_4Corners50ul.py
+    Flex_S_v2_20_96_None_SINGLE_4Corners50ul: Protocol = Protocol(
+        file_stem="Flex_S_v2_20_96_None_SINGLE_4Corners50ul",
+        file_extension="py",
+        robot="Flex",
+    )
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_20_96_None_SINGLE_HappyPathNorthSide.py
+    Flex_S_v2_20_96_None_SINGLE_HappyPathNorthSide: Protocol = Protocol(
+        file_stem="Flex_S_v2_20_96_None_SINGLE_HappyPathNorthSide",
+        file_extension="py",
+        robot="Flex",
+    )
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_20_96_None_SINGLE_HappyPathSouthSide.py
+    Flex_S_v2_20_96_None_SINGLE_HappyPathSouthSide: Protocol = Protocol(
+        file_stem="Flex_S_v2_20_96_None_SINGLE_HappyPathSouthSide",
+        file_extension="py",
+        robot="Flex",
+    )
+
     OT2_X_v2_18_None_None_duplicateRTPVariableName: Protocol = Protocol(
         file_stem="OT2_X_v2_18_None_None_duplicateRTPVariableName",
         file_extension="py",

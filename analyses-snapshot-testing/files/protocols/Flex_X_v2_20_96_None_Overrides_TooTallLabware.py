@@ -450,7 +450,7 @@ def get_test_case(key: str) -> Optional[TestCase]:
 
 def run(ctx):
     tall_labware_loadname = "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical"
-    test_case = get_test_case(TEST_KEY)
+    test_case = get_test_case(key)
 
     if test_case.tip_rack_slot and test_case.tip_rack_slot != "C2":
         tip_rack = ctx.load_labware("opentrons_96_tiprack_1000ul", test_case.tip_rack_slot)
