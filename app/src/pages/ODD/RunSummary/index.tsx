@@ -66,8 +66,10 @@ import {
   useIsRunCurrent,
   useNotifyRunQuery,
 } from '../../../resources/runs'
-import { handleTipsAttachedModal } from '../../../organisms/DropTipWizardFlows/TipsAttachedModal'
-import { useTipAttachmentStatus } from '../../../organisms/DropTipWizardFlows'
+import {
+  useTipAttachmentStatus,
+  handleTipsAttachedModal,
+} from '../../../organisms/DropTipWizardFlows'
 import { useRecoveryAnalytics } from '../../../organisms/ErrorRecoveryFlows/hooks'
 
 import type { IconName } from '@opentrons/components'

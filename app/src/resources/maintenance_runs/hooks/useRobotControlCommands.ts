@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
-import { useChainMaintenanceCommands } from './chainRunCommands'
+import { useChainMaintenanceCommands } from './useChainMaintenanceCommands'
 import { useCreateTargetedMaintenanceRunMutation } from '../../runs'
 
 import type { CreateCommand } from '@opentrons/shared-data'

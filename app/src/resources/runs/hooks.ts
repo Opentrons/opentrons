@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux'
 import {
   useCreateCommandMutation,
   useCreateLiveCommandMutation,
-  useCreateMaintenanceCommandMutation,
   useCreateMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
 
@@ -23,6 +22,7 @@ import type {
   CreateMaintenanceRunType,
   UseCreateMaintenanceRunMutationOptions,
   UseCreateMaintenanceRunMutationResult,
+  useCreateMaintenanceCommandMutation,
 } from '@opentrons/react-api-client'
 
 export type CreateCommandMutate = ReturnType<
