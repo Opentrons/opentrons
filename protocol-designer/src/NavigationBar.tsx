@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -82,15 +82,6 @@ export function NavigationBar(): JSX.Element | null {
     </Flex>
   )
 }
-
-const NavbarLink = styled(NavLink)`
-  color: ${COLORS.grey60};
-  text-decoration: none;
-  align-self: ${ALIGN_CENTER};
-  &:hover {
-    color: ${COLORS.grey40};
-  }
-`
 
 const StyledLabel = styled.label`
   height: 20px;

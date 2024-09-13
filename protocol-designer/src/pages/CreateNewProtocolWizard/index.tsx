@@ -6,7 +6,6 @@ import uniq from 'lodash/uniq'
 import mapValues from 'lodash/mapValues'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -22,10 +21,7 @@ import {
   getAreSlotsAdjacent,
 } from '@opentrons/shared-data'
 import { Box, COLORS } from '@opentrons/components'
-import {
-  actions as fileActions,
-  selectors as loadFileSelectors,
-} from '../../load-file'
+import { actions as fileActions } from '../../load-file'
 import { uuid } from '../../utils'
 import * as labwareDefSelectors from '../../labware-defs/selectors'
 import * as labwareDefActions from '../../labware-defs/actions'
@@ -154,10 +150,8 @@ const validationSchema: any = Yup.object().shape({
 })
 
 export function CreateNewProtocolWizard(): JSX.Element | null {
-  const { t } = useTranslation(['modal', 'alert'])
   const navigate = useNavigate()
   const showWizard = useSelector(getNewProtocolModal)
-  const hasUnsavedChanges = useSelector(loadFileSelectors.getHasUnsavedChanges)
   const customLabware = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
   )
