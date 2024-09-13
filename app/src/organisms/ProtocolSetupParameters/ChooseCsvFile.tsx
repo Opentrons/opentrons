@@ -12,6 +12,7 @@ import {
   Flex,
   LegacyStyledText,
   SPACING,
+  truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
@@ -27,6 +28,8 @@ import type {
 } from '@opentrons/shared-data'
 import type { CsvFileData } from '@opentrons/api-client'
 
+const MAX_CHARS = 52
+const CSV_FILENAME_BREAK_POINT = 42
 interface ChooseCsvFileProps {
   protocolId: string
   handleGoBack: () => void
@@ -118,13 +121,18 @@ export function ChooseCsvFile({
                 csvFilesOnRobot.map((csv: CsvFileData) => (
                   <React.Fragment key={csv.id}>
                     <RadioButton
-                      buttonLabel={csv.name}
+                      buttonLabel={truncateString(
+                        csv.name,
+                        MAX_CHARS,
+                        CSV_FILENAME_BREAK_POINT
+                      )}
                       buttonValue={csv.id}
                       onChange={() => {
                         setCsvFileSelected({ id: csv.id, fileName: csv.name })
                       }}
                       id={`${csv.id}-on-robot`}
                       isSelected={csvFileSelected?.id === csv.id}
+                      maxLines={3}
                     />
                   </React.Fragment>
                 ))
@@ -145,7 +153,11 @@ export function ChooseCsvFile({
                     <React.Fragment key={fileName}>
                       {csvFilePath.length !== 0 && fileName !== undefined ? (
                         <RadioButton
-                          buttonLabel={fileName}
+                          buttonLabel={truncateString(
+                            fileName,
+                            MAX_CHARS,
+                            CSV_FILENAME_BREAK_POINT
+                          )}
                           buttonValue={csvFilePath}
                           onChange={() => {
                             setCsvFileSelected({
@@ -155,6 +167,7 @@ export function ChooseCsvFile({
                           }}
                           id={`${csvFilePath.replace('/', '-')}}-on-usb`}
                           isSelected={csvFileSelected?.filePath === csvFilePath}
+                          maxLines={3}
                         />
                       ) : null}
                     </React.Fragment>
@@ -180,7 +193,7 @@ const HEADER_TEXT_STYLE = css`
 const CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing16};
-  flex: 1;
+  width: 28rem;
 `
 
 const LIST_CONTAINER_STYLE = css`

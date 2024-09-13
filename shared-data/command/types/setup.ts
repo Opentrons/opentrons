@@ -29,6 +29,15 @@ export interface LoadLabwareRunTimeCommand
     LoadLabwareCreateCommand {
   result?: LoadLabwareResult
 }
+export interface ReloadLabwareCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'reloadLabware'
+  params: { labwareId: string }
+}
+export interface ReloadLabwareRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    ReloadLabwareCreateCommand {
+  result?: ReloadLabwareResult
+}
 export interface MoveLabwareCreateCommand extends CommonCommandCreateInfo {
   commandType: 'moveLabware'
   params: MoveLabwareParams
@@ -76,6 +85,7 @@ export type SetupRunTimeCommand =
   | ConfigureNozzleLayoutRunTimeCommand
   | LoadPipetteRunTimeCommand
   | LoadLabwareRunTimeCommand
+  | ReloadLabwareRunTimeCommand
   | LoadModuleRunTimeCommand
   | LoadLiquidRunTimeCommand
   | MoveLabwareRunTimeCommand
@@ -84,6 +94,7 @@ export type SetupCreateCommand =
   | ConfigureNozzleLayoutCreateCommand
   | LoadPipetteCreateCommand
   | LoadLabwareCreateCommand
+  | ReloadLabwareCreateCommand
   | LoadModuleCreateCommand
   | LoadLiquidCreateCommand
   | MoveLabwareCreateCommand
@@ -123,7 +134,13 @@ interface LoadLabwareParams {
 interface LoadLabwareResult {
   labwareId: string
   definition: LabwareDefinition2
+  // todo(mm, 2024-08-19): This does not match the server-returned offsetId field.
+  // Confirm nothing client-side is trying to use this, then replace it with offsetId.
   offset: LabwareOffset
+}
+interface ReloadLabwareResult {
+  labwareId: string
+  offsetId?: string | null
 }
 
 export type LabwareMovementStrategy =
@@ -158,9 +175,9 @@ interface LoadLiquidResult {
 }
 
 export const COLUMN = 'COLUMN'
-const SINGLE = 'SINGLE'
-const ROW = 'ROW'
-const QUADRANT = 'QUADRANT'
+export const SINGLE = 'SINGLE'
+export const ROW = 'ROW'
+export const QUADRANT = 'QUADRANT'
 export const ALL = 'ALL'
 
 export type NozzleConfigurationStyle =

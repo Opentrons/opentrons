@@ -22,13 +22,14 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  getDeckDefFromRobotType,
+  getLoadedLabwareDefinitionsByUri,
+  getModuleType,
+  inferModuleOrientationFromXCoordinate,
   OT2_ROBOT_TYPE,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
-  getDeckDefFromRobotType,
-  getLoadedLabwareDefinitionsByUri,
-  getModuleType,
 } from '@opentrons/shared-data'
 
 import {
@@ -213,7 +214,13 @@ export function MoveLabwareInterventionContent({
                       nestedLabwareDef,
                       nestedLabwareId,
                     }) => (
-                      <Module key={moduleId} def={moduleDef} x={x} y={y}>
+                      <Module
+                        key={moduleId}
+                        def={moduleDef}
+                        x={x}
+                        y={y}
+                        orientation={inferModuleOrientationFromXCoordinate(x)}
+                      >
                         {nestedLabwareDef != null &&
                         nestedLabwareId !== command.params.labwareId ? (
                           <LabwareRender definition={nestedLabwareDef} />

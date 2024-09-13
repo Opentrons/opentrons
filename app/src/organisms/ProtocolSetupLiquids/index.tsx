@@ -8,7 +8,6 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  JUSTIFY_FLEX_END,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -16,18 +15,17 @@ import {
   Chip,
 } from '@opentrons/components'
 import {
-  parseLiquidsInLoadOrder,
+  MICRO_LITERS,
   parseLabwareInfoByLiquidId,
-} from '@opentrons/api-client'
-import { MICRO_LITERS } from '@opentrons/shared-data'
+  parseLiquidsInLoadOrder,
+} from '@opentrons/shared-data'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { SmallButton } from '../../atoms/buttons'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
 import { LiquidDetails } from './LiquidDetails'
-import type { RunTimeCommand } from '@opentrons/shared-data'
-import type { ParsedLiquid } from '@opentrons/api-client'
+import type { ParsedLiquid, RunTimeCommand } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
 
 export interface ProtocolSetupLiquidsProps {
@@ -67,7 +65,6 @@ export function ProtocolSetupLiquids({
             iconName="ot-check"
             text={t('liquids_confirmed')}
             type="success"
-            chipSize="small"
           />
         ) : (
           <SmallButton
@@ -76,6 +73,7 @@ export function ProtocolSetupLiquids({
               setIsConfirmed(true)
               setSetupScreen('prepare to run')
             }}
+            buttonCategory="rounded"
           />
         )}
       </Flex>
@@ -161,14 +159,14 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
             {liquid.displayName}
           </StyledText>
         </Flex>
-        <Flex justifyContent={JUSTIFY_FLEX_END} flex="1">
+        <Flex flex="1">
           <Flex
             backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
             borderRadius={BORDERS.borderRadius8}
             height="2.75rem"
             padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
             alignItems={TYPOGRAPHY.textAlignCenter}
-            marginRight="8rem"
+            marginLeft="30.825rem"
           >
             {getTotalVolumePerLiquidId(liquid.id, labwareByLiquidId)}{' '}
             {MICRO_LITERS}

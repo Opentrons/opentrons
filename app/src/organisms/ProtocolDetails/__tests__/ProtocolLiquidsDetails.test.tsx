@@ -1,14 +1,22 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi } from 'vitest'
-import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
+import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ProtocolLiquidsDetails } from '../ProtocolLiquidsDetails'
 
+import type * as SharedData from '@opentrons/shared-data'
+
 vi.mock('../../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList')
-vi.mock('@opentrons/api-client')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actualSharedData = await importOriginal<typeof SharedData>()
+  return {
+    ...actualSharedData,
+    parseLiquidsInLoadOrder: vi.fn(),
+  }
+})
 
 const render = (props: React.ComponentProps<typeof ProtocolLiquidsDetails>) => {
   return renderWithProviders(<ProtocolLiquidsDetails {...props} />, {

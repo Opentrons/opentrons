@@ -279,7 +279,7 @@ class ProtocolContext(CommandPublisher):
                 api_element="ProtocolContext.max_speeds",
                 since_version=f"{ENGINE_CORE_API_VERSION}",
                 current_version=f"{self._api_version}",
-                message=" Set speeds using InstrumentContext.default_speed or the per-method 'speed' argument.",
+                extra_message="Set speeds using InstrumentContext.default_speed or the per-method 'speed' argument.",
             )
 
         return self._core.get_max_speeds()
@@ -913,7 +913,10 @@ class ProtocolContext(CommandPublisher):
                              control <advanced-control>` applications. You cannot
                              replace an instrument in the middle of a protocol being run
                              from the Opentrons App or touchscreen.
-        :param bool liquid_presence_detection: If ``True``, enable liquid presence detection for instrument. Only available on Flex robots in API Version 2.20 and above.
+        :param bool liquid_presence_detection: If ``True``, enable automatic
+            :ref:`liquid presence detection <lpd>` for Flex 1-, 8-, or 96-channel pipettes.
+
+            .. versionadded:: 2.20
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
@@ -1046,7 +1049,7 @@ class ProtocolContext(CommandPublisher):
                 api_element="A Python Protocol safely resuming itself after a pause",
                 since_version=f"{ENGINE_CORE_API_VERSION}",
                 current_version=f"{self._api_version}",
-                message=" To wait automatically for a period of time, use ProtocolContext.delay().",
+                extra_message="To wait automatically for a period of time, use ProtocolContext.delay().",
             )
 
         # TODO(mc, 2023-02-13): this assert should be enough for mypy
@@ -1167,7 +1170,7 @@ class ProtocolContext(CommandPublisher):
                     api_element="Fixed Trash",
                     since_version="2.16",
                     current_version=f"{self._api_version}",
-                    message=" Fixed trash is no longer supported on Flex protocols.",
+                    extra_message="Fixed trash is no longer supported on Flex protocols.",
                 )
             disposal_locations = self._core.get_disposal_locations()
             if len(disposal_locations) == 0:
@@ -1240,7 +1243,7 @@ class ProtocolContext(CommandPublisher):
                     api_element="Calling `define_liquid()` without a `description`",
                     current_version=str(self._api_version),
                     until_version=str(desc_and_display_color_omittable_since),
-                    message="Use a newer API version or explicitly supply `description=None`.",
+                    extra_message="Use a newer API version or explicitly supply `description=None`.",
                 )
             else:
                 description = None
@@ -1250,7 +1253,7 @@ class ProtocolContext(CommandPublisher):
                     api_element="Calling `define_liquid()` without a `display_color`",
                     current_version=str(self._api_version),
                     until_version=str(desc_and_display_color_omittable_since),
-                    message="Use a newer API version or explicitly supply `display_color=None`.",
+                    extra_message="Use a newer API version or explicitly supply `display_color=None`.",
                 )
             else:
                 display_color = None

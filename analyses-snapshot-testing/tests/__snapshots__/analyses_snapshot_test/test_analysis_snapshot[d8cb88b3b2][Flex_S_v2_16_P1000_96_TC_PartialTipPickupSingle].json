@@ -3535,7 +3535,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "ValueError [line 16]: Nozzle layout configuration of style SINGLE is unsupported in API Versions lower than 2.20.",
+      "detail": "APIVersionError [line 16]: Error 4011 INCORRECT_API_VERSION (APIVersionError): Nozzle layout configuration of style SINGLE is not available until API version 2.20. You are currently using API version 2.16.",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -3544,14 +3544,14 @@
       "wrappedErrors": [
         {
           "createdAt": "TIMESTAMP",
-          "detail": "ValueError: Nozzle layout configuration of style SINGLE is unsupported in API Versions lower than 2.20.",
-          "errorCode": "4000",
+          "detail": "Nozzle layout configuration of style SINGLE is not available until API version 2.20. You are currently using API version 2.16.",
+          "errorCode": "4011",
           "errorInfo": {
-            "args": "('Nozzle layout configuration of style SINGLE is unsupported in API Versions lower than 2.20.',)",
-            "class": "ValueError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_S_v2_16_P1000_96_TC_PartialTipPickupSingle.py\", line N, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in configure_nozzle_layout\n    raise ValueError(\n"
+            "current_version": "2.16",
+            "identifier": "Nozzle layout configuration of style SINGLE",
+            "until_version": "2.20"
           },
-          "errorType": "PythonException",
+          "errorType": "APIVersionError",
           "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []

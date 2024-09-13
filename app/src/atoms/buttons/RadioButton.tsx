@@ -21,6 +21,7 @@ interface RadioButtonProps extends StyleProps {
   radioButtonType?: 'large' | 'small'
   subButtonLabel?: string
   id?: string
+  maxLines?: number | null
 }
 
 export function RadioButton(props: RadioButtonProps): JSX.Element {
@@ -33,6 +34,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     radioButtonType = 'large',
     subButtonLabel,
     id = buttonLabel,
+    maxLines = null,
   } = props
 
   const isLarge = radioButtonType === 'large'
@@ -77,6 +79,10 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
         cursor: default;
+        display: ${maxLines != null ? '-webkit-box' : undefined};
+        -webkit-line-clamp: ${maxLines ?? undefined};
+        -webkit-box-orient: ${maxLines != null ? 'vertical' : undefined};
+        word-wrap: break-word;
       }
     }
   `

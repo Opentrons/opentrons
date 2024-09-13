@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
-import { useQueryClient } from 'react-query'
 
 import {
   ALIGN_CENTER,
@@ -50,6 +49,7 @@ import {
 import {
   useRunCreatedAtTimestamp,
   useTrackProtocolRunEvent,
+  useTrackEventWithRobotSerial,
   useRobotAnalyticsData,
 } from '../../organisms/Devices/hooks'
 import { useCloseCurrentRun } from '../../organisms/ProtocolUpload/hooks'
@@ -60,6 +60,7 @@ import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_RUN_ACTION,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  ANALYTICS_QUICK_TRANSFER_RERUN,
 } from '../../redux/analytics'
 import { getLocalRobot } from '../../redux/discovery'
 import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
@@ -68,6 +69,7 @@ import { handleTipsAttachedModal } from '../../organisms/DropTipWizardFlows/Tips
 import { useTipAttachmentStatus } from '../../organisms/DropTipWizardFlows'
 import { useRecoveryAnalytics } from '../../organisms/ErrorRecoveryFlows/hooks'
 
+import type { IconName } from '@opentrons/components'
 import type { OnDeviceRouteParams } from '../../App/types'
 import type { PipetteWithTip } from '../../organisms/DropTipWizardFlows'
 
@@ -80,7 +82,13 @@ export function RunSummary(): JSX.Element {
   const { t } = useTranslation('run_details')
   const navigate = useNavigate()
   const host = useHost()
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    staleTime: Infinity,
+    onError: () => {
+      // in case the run is remotely deleted by a desktop app, navigate to the dash
+      navigate('/dashboard')
+    },
+  })
   const isRunCurrent = Boolean(
     useNotifyRunQuery(runId, { refetchInterval: CURRENT_RUN_POLL_MS })?.data
       ?.data?.current
@@ -128,7 +136,7 @@ export function RunSummary(): JSX.Element {
   const robotAnalyticsData = useRobotAnalyticsData(robotName as string)
   const { reportRecoveredRunResult } = useRecoveryAnalytics()
 
-  const enteredER = runRecord?.data.hasEverEnteredErrorRecovery
+  const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
   React.useEffect(() => {
     if (isRunCurrent && typeof enteredER === 'boolean') {
       reportRecoveredRunResult(runStatus, enteredER)
@@ -137,34 +145,96 @@ export function RunSummary(): JSX.Element {
 
   const { reset, isResetRunLoading } = useRunControls(runId, onCloneRunSuccess)
   const trackEvent = useTrackEvent()
-  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
+
+  const { closeCurrentRun } = useCloseCurrentRun()
+  // Close the current run only if it's active and then execute the onSuccess callback. Prefer this wrapper over
+  // closeCurrentRun directly, since the callback is swallowed if currentRun is null.
+  const closeCurrentRunIfValid = (onSuccess?: () => void): void => {
+    if (isRunCurrent) {
+      closeCurrentRun({
+        onSuccess: () => {
+          onSuccess?.()
+        },
+      })
+    } else {
+      onSuccess?.()
+    }
+  }
   const [showRunFailedModal, setShowRunFailedModal] = React.useState<boolean>(
     false
   )
   const [showRunAgainSpinner, setShowRunAgainSpinner] = React.useState<boolean>(
     false
   )
+  const [showReturnToSpinner, setShowReturnToSpinner] = React.useState<boolean>(
+    false
+  )
+
   const robotSerialNumber =
     localRobot?.health?.robot_serial ??
     localRobot?.serverHealth?.serialNumber ??
     null
 
-  const { data: commandErrorList } = useRunCommandErrors(runId, null, {
-    enabled:
-      runStatus != null &&
-      // @ts-expect-error runStatus expected to possibly not be terminal
-      RUN_STATUSES_TERMINAL.includes(runStatus) &&
-      isRunCurrent,
-  })
+  const { data: commandErrorList } = useRunCommandErrors(
+    runId,
+    { cursor: 0, pageLength: 100 },
+    {
+      enabled:
+        runStatus != null &&
+        // @ts-expect-error runStatus expected to possibly not be terminal
+        RUN_STATUSES_TERMINAL.includes(runStatus) &&
+        isRunCurrent,
+    }
+  )
 
-  let headerText =
+  // TODO(jh, 08-14-24): The backend never returns the "user cancelled a run" error and cancelledWithoutRecovery becomes unnecessary.
+  const cancelledWithoutRecovery =
+    !enteredER && runStatus === RUN_STATUS_STOPPED
+  const hasCommandErrors =
     commandErrorList != null && commandErrorList.data.length > 0
-      ? t('run_completed_with_warnings')
+  const disableErrorDetailsBtn = !(
+    (hasCommandErrors && !cancelledWithoutRecovery) ||
+    (runRecord?.data.errors != null && runRecord?.data.errors.length > 0)
+  )
+
+  let headerText: string | null = null
+  if (runStatus === RUN_STATUS_SUCCEEDED) {
+    headerText = hasCommandErrors
+      ? t('run_completed_with_warnings_splash')
       : t('run_completed_splash')
-  if (runStatus === RUN_STATUS_FAILED) {
+  } else if (runStatus === RUN_STATUS_FAILED) {
     headerText = t('run_failed_splash')
   } else if (runStatus === RUN_STATUS_STOPPED) {
-    headerText = t('run_canceled_splash')
+    headerText =
+      enteredER && !disableErrorDetailsBtn
+        ? t('run_canceled_with_errors_splash')
+        : t('run_canceled_splash')
+  }
+
+  const buildHeaderIcon = (): JSX.Element | null => {
+    let iconName: IconName | null = null
+    let iconColor: string | null = null
+
+    if (runStatus === RUN_STATUS_SUCCEEDED) {
+      if (hasCommandErrors) {
+        iconName = 'ot-check'
+        iconColor = COLORS.yellow50
+      } else {
+        iconName = 'ot-check'
+        iconColor = COLORS.green50
+      }
+    } else if (runStatus === RUN_STATUS_FAILED) {
+      iconName = 'ot-alert'
+      iconColor = COLORS.red50
+    } else if (runStatus === RUN_STATUS_STOPPED) {
+      iconName = 'ot-alert'
+      iconColor = COLORS.red50
+    }
+
+    return iconName != null && iconColor != null ? (
+      <Icon name={iconName} size="2rem" color={iconColor} />
+    ) : null
   }
 
   const {
@@ -184,37 +254,31 @@ export function RunSummary(): JSX.Element {
     }
   }, [isRunCurrent, enteredER])
 
-  // TODO(jh, 08-02-24): Revisit useCurrentRunRoute and top level redirects.
-  const queryClient = useQueryClient()
-  const returnToDash = (): void => {
-    // Eagerly clear the query caches to prevent top level redirecting back to this page.
-    queryClient.setQueryData([host, 'runs', 'details'], () => undefined)
-    queryClient.setQueryData([host, 'runs', runId, 'details'], () => undefined)
-    navigate('/')
-  }
-
   const returnToQuickTransfer = (): void => {
-    if (!isRunCurrent) {
+    closeCurrentRunIfValid(() => {
       deleteRun(runId)
-    } else {
-      closeCurrentRun({
-        onSuccess: () => {
-          deleteRun(runId)
-        },
-      })
-    }
-    navigate('/quick-transfer')
+      navigate('/quick-transfer')
+    })
   }
 
   // TODO(jh, 05-30-24): EXEC-487. Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
   const runAgain = (): void => {
     setShowRunAgainSpinner(true)
     reset()
-    trackEvent({
-      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-      properties: { sourceLocation: 'RunSummary', robotSerialNumber },
-    })
-    trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN })
+    if (isQuickTransfer) {
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_RERUN,
+        properties: {
+          name: protocolName,
+        },
+      })
+    } else {
+      trackEvent({
+        name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+        properties: { sourceLocation: 'RunSummary', robotSerialNumber },
+      })
+      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN })
+    }
   }
 
   // If no pipettes have tips attached, execute the routing callback.
@@ -228,6 +292,7 @@ export function RunSummary(): JSX.Element {
   }
 
   const handleReturnToDash = (aPipetteWithTip: PipetteWithTip | null): void => {
+    setShowReturnToSpinner(true)
     if (isRunCurrent && aPipetteWithTip != null) {
       void handleTipsAttachedModal({
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleReturnToDash),
@@ -238,15 +303,17 @@ export function RunSummary(): JSX.Element {
         robotType: FLEX_ROBOT_TYPE,
         isRunCurrent,
         onSkipAndHome: () => {
-          closeCurrentRun()
-          returnToDash()
+          closeCurrentRunIfValid(() => {
+            navigate('/dashboard')
+          })
         },
       })
     } else if (isQuickTransfer) {
       returnToQuickTransfer()
     } else {
-      closeCurrentRun()
-      returnToDash()
+      closeCurrentRunIfValid(() => {
+        navigate('/dashboard')
+      })
     }
   }
 
@@ -283,8 +350,23 @@ export function RunSummary(): JSX.Element {
     setShowSplash(false)
   }
 
-  const RUN_AGAIN_SPINNER_TEXT = (
-    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="25.5rem">
+  const buildReturnToCopy = (): string =>
+    isQuickTransfer ? t('return_to_quick_transfer') : t('return_to_dashboard')
+
+  const buildReturnToWithSpinnerText = (): JSX.Element => (
+    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="16rem">
+      {buildReturnToCopy()}
+      <Icon
+        name="ot-spinner"
+        aria-label="icon_ot-spinner"
+        spin={true}
+        size="3.5rem"
+        color={COLORS.white}
+      />
+    </Flex>
+  )
+  const buildRunAgainWithSpinnerText = (): JSX.Element => (
+    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="16rem">
       {t('run_again')}
       <Icon
         name="ot-spinner"
@@ -304,7 +386,6 @@ export function RunSummary(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
       overflow={OVERFLOW_HIDDEN}
-      disabled={isClosingCurrentRun}
       onClick={handleClickSplash}
     >
       {showSplash ? (
@@ -328,7 +409,7 @@ export function RunSummary(): JSX.Element {
               />
               <SplashHeader>
                 {didRunSucceed
-                  ? t('run_complete_splash')
+                  ? t('run_completed_splash')
                   : t('run_failed_splash')}
               </SplashHeader>
             </Flex>
@@ -360,12 +441,10 @@ export function RunSummary(): JSX.Element {
             gridGap={SPACING.spacing16}
           >
             <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-              <Icon
-                name={didRunSucceed ? 'ot-check' : 'ot-alert'}
-                size="2rem"
-                color={didRunSucceed ? COLORS.green50 : COLORS.red50}
-              />
-              <SummaryHeader>{headerText}</SummaryHeader>
+              {buildHeaderIcon()}
+              {headerText != null ? (
+                <SummaryHeader>{headerText}</SummaryHeader>
+              ) : null}
             </Flex>
             <ProtocolName>{protocolName}</ProtocolName>
             <Flex gridGap={SPACING.spacing8} flexWrap={WRAP}>
@@ -392,51 +471,44 @@ export function RunSummary(): JSX.Element {
               </SummaryDatum>
             </Flex>
           </Flex>
-          <Flex alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing16}>
-            <LargeButton
-              flex="1"
+          <ButtonContainer>
+            <EqualWidthButton
               iconName="arrow-left"
               buttonType="secondary"
               onClick={() => {
                 handleReturnToDash(aPipetteWithTip)
               }}
               buttonText={
-                isQuickTransfer
-                  ? t('return_to_quick_transfer')
-                  : t('return_to_dashboard')
+                showReturnToSpinner
+                  ? buildReturnToWithSpinnerText()
+                  : buildReturnToCopy()
               }
-              height="17rem"
+              css={showReturnToSpinner ? RETURN_TO_CLICKED_STYLE : undefined}
             />
-            <LargeButton
-              flex="1"
+            <EqualWidthButton
               iconName="play-round-corners"
               onClick={() => {
                 handleRunAgain(aPipetteWithTip)
               }}
               buttonText={
-                showRunAgainSpinner ? RUN_AGAIN_SPINNER_TEXT : t('run_again')
+                showRunAgainSpinner
+                  ? buildRunAgainWithSpinnerText()
+                  : t('run_again')
               }
-              height="17rem"
               css={showRunAgainSpinner ? RUN_AGAIN_CLICKED_STYLE : undefined}
             />
-            {(commandErrorList != null && commandErrorList?.data.length > 0) ||
-            !didRunSucceed ? (
-              <LargeButton
-                flex="1"
-                iconName="info"
-                buttonType="alert"
-                onClick={handleViewErrorDetails}
-                buttonText={t('view_error_details')}
-                height="17rem"
-                disabled={
-                  (runRecord?.data.errors == null ||
-                    runRecord?.data.errors.length === 0) &&
-                  (commandErrorList == null ||
-                    commandErrorList?.data.length === 0)
-                }
-              />
-            ) : null}
-          </Flex>
+            <EqualWidthButton
+              iconName="info"
+              buttonType="alert"
+              onClick={handleViewErrorDetails}
+              buttonText={
+                hasCommandErrors && runStatus === RUN_STATUS_SUCCEEDED
+                  ? t('view_warning_details')
+                  : t('view_error_details')
+              }
+              disabled={disableErrorDetailsBtn}
+            />
+          </ButtonContainer>
         </Flex>
       )}
     </Btn>
@@ -467,7 +539,6 @@ const SplashBody = styled.h4`
 const SummaryHeader = styled.h4`
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
 `
@@ -517,6 +588,22 @@ const DURATION_TEXT_STYLE = css`
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
 `
 
+const RETURN_TO_CLICKED_STYLE = css`
+  background-color: ${COLORS.blue40};
+  &:focus {
+    background-color: ${COLORS.blue40};
+  }
+  &:hover {
+    background-color: ${COLORS.blue40};
+  }
+  &:focus-visible {
+    background-color: ${COLORS.blue40};
+  }
+  &:active {
+    background-color: ${COLORS.blue40};
+  }
+`
+
 const RUN_AGAIN_CLICKED_STYLE = css`
   background-color: ${COLORS.blue60};
   &:focus {
@@ -531,4 +618,15 @@ const RUN_AGAIN_CLICKED_STYLE = css`
   &:active {
     background-color: ${COLORS.blue60};
   }
+`
+
+const ButtonContainer = styled(Flex)`
+  align-self: ${ALIGN_STRETCH};
+  gap: ${SPACING.spacing16};
+`
+
+const EqualWidthButton = styled(LargeButton)`
+  flex: 1;
+  min-width: 0;
+  height: 17rem;
 `

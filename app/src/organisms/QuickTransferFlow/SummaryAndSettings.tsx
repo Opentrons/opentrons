@@ -17,6 +17,12 @@ import {
   useCreateRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
+import {
+  ANALYTICS_QUICK_TRANSFER_TIME_TO_CREATE,
+  ANALYTICS_QUICK_TRANSFER_SAVE_FOR_LATER,
+  ANALYTICS_QUICK_TRANSFER_RUN_NOW,
+} from '../../redux/analytics'
+import { useTrackEventWithRobotSerial } from '../Devices/hooks'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import { ChildNavigation } from '../ChildNavigation'
@@ -33,13 +39,15 @@ import type { QuickTransferWizardState } from './types'
 interface SummaryAndSettingsProps {
   exitButtonProps: React.ComponentProps<typeof SmallButton>
   state: QuickTransferWizardState
+  analyticsStartTime: Date
 }
 
 export function SummaryAndSettings(
   props: SummaryAndSettingsProps
 ): JSX.Element | null {
-  const { exitButtonProps, state: wizardFlowState } = props
+  const { exitButtonProps, state: wizardFlowState, analyticsStartTime } = props
   const navigate = useNavigate()
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const queryClient = useQueryClient()
   const host = useHost()
   const { t } = useTranslation(['quick_transfer', 'shared'])
@@ -82,6 +90,17 @@ export function SummaryAndSettings(
     host
   )
 
+  const handleClickCreateTransfer = (): void => {
+    setShowSaveOrRunModal(true)
+    const duration = new Date().getTime() - analyticsStartTime.getTime()
+    trackEventWithRobotSerial({
+      name: ANALYTICS_QUICK_TRANSFER_TIME_TO_CREATE,
+      properties: {
+        duration: `${duration / 1000} seconds`,
+      },
+    })
+  }
+
   const handleClickSave = (protocolName: string): void => {
     const protocolFile = createQuickTransferFile(
       state,
@@ -93,6 +112,12 @@ export function SummaryAndSettings(
       protocolKind: 'quick-transfer',
     }).then(() => {
       navigate('/quick-transfer')
+    })
+    trackEventWithRobotSerial({
+      name: ANALYTICS_QUICK_TRANSFER_SAVE_FOR_LATER,
+      properties: {
+        name: protocolName,
+      },
     })
   }
 
@@ -106,6 +131,10 @@ export function SummaryAndSettings(
         protocolId: data.data.id,
       })
     })
+    trackEventWithRobotSerial({
+      name: ANALYTICS_QUICK_TRANSFER_RUN_NOW,
+      properties: {},
+    })
   }
 
   return showSaveOrRunModal ? (
@@ -115,9 +144,7 @@ export function SummaryAndSettings(
       <ChildNavigation
         header={t('quick_transfer_volume', { volume: wizardFlowState.volume })}
         buttonText={t('create_transfer')}
-        onClickButton={() => {
-          setShowSaveOrRunModal(true)
-        }}
+        onClickButton={handleClickCreateTransfer}
         secondaryButtonProps={exitButtonProps}
       />
       <Flex

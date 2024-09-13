@@ -7,6 +7,7 @@ import last from 'lodash/last'
 import { GET, request } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
+  ALIGN_END,
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
@@ -130,6 +131,7 @@ export function Troubleshooting({
         marginLeft={SPACING_AUTO}
         onClick={handleClick}
         id="AdvancedSettings_downloadLogsButton"
+        alignSelf={ALIGN_END}
       >
         {t('download_logs')}
       </TertiaryButton>

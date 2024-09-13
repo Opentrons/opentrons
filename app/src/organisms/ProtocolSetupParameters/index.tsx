@@ -152,14 +152,14 @@ export function ProtocolSetupParameters({
     }
   }
 
-  const { createProtocolAnalysis } = useCreateProtocolAnalysisMutation(
-    protocolId,
-    host
-  )
+  const {
+    createProtocolAnalysis,
+    isLoading: isAnalysisLoading,
+  } = useCreateProtocolAnalysisMutation(protocolId, host)
 
   const { uploadCsvFile } = useUploadCsvFileMutation({}, host)
 
-  const { createRun, isLoading } = useCreateRunMutation({
+  const { createRun, isLoading: isRunLoading } = useCreateRunMutation({
     onSuccess: data => {
       queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
         console.error(`could not invalidate runs cache: ${e.message}`)
@@ -209,17 +209,23 @@ export function ProtocolSetupParameters({
           mappedResolvedCsvVariableToFileId
         )
         setStartSetup(true)
-        createProtocolAnalysis({
-          protocolKey: protocolId,
-          runTimeParameterValues,
-          runTimeParameterFiles,
-        })
-        createRun({
-          protocolId,
-          labwareOffsets,
-          runTimeParameterValues,
-          runTimeParameterFiles,
-        })
+        createProtocolAnalysis(
+          {
+            protocolKey: protocolId,
+            runTimeParameterValues,
+            runTimeParameterFiles,
+          },
+          {
+            onSuccess: () => {
+              createRun({
+                protocolId,
+                labwareOffsets,
+                runTimeParameterValues,
+                runTimeParameterFiles,
+              })
+            },
+          }
+        )
       })
     }
   }
@@ -250,12 +256,16 @@ export function ProtocolSetupParameters({
         buttonText={t('confirm_values')}
         ariaDisabled={hasMissingFileParam}
         buttonIsDisabled={hasMissingFileParam}
-        iconName={isLoading || startSetup ? 'ot-spinner' : undefined}
+        iconName={
+          isRunLoading || isAnalysisLoading || startSetup
+            ? 'ot-spinner'
+            : undefined
+        }
         iconPlacement="startIcon"
         secondaryButtonProps={{
           buttonType: 'tertiaryLowLight',
           buttonText: t('restore_defaults'),
-          disabled: isLoading || startSetup,
+          disabled: isRunLoading || isAnalysisLoading || startSetup,
           onClick: () => {
             showResetValuesModal(true)
           },

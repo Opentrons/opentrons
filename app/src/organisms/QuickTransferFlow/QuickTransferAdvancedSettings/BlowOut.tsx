@@ -1,4 +1,5 @@
 import * as React from 'react'
+import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 import {
@@ -13,9 +14,11 @@ import {
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '../../../redux/analytics'
 import { getTopPortalEl } from '../../../App/portal'
-import { LargeButton } from '../../../atoms/buttons'
+import { RadioButton } from '../../../atoms/buttons'
 import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import { useTrackEventWithRobotSerial } from '../../Devices/hooks'
 import { ChildNavigation } from '../../ChildNavigation'
 import { ACTIONS } from '../constants'
 
@@ -90,6 +93,7 @@ export const useBlowOutLocationOptions = (
 export function BlowOut(props: BlowOutProps): JSX.Element {
   const { onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
   const [isBlowOutEnabled, setisBlowOutEnabled] = React.useState<boolean>(
@@ -102,14 +106,14 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
 
   const enableBlowOutDisplayItems = [
     {
-      value: true,
+      option: true,
       description: t('option_enabled'),
       onClick: () => {
         setisBlowOutEnabled(true)
       },
     },
     {
-      value: false,
+      option: false,
       description: t('option_disabled'),
       onClick: () => {
         setisBlowOutEnabled(false)
@@ -133,6 +137,12 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
           type: ACTIONS.SET_BLOW_OUT,
           location: undefined,
         })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            settting: `BlowOut`,
+          },
+        })
         onBack()
       } else {
         setCurrentStep(currentStep + 1)
@@ -141,6 +151,12 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
       dispatch({
         type: ACTIONS.SET_BLOW_OUT,
         location: blowOutLocation,
+      })
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+        properties: {
+          settting: `BlowOut`,
+        },
       })
       onBack()
     }
@@ -175,15 +191,13 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
           width="100%"
         >
           {enableBlowOutDisplayItems.map(displayItem => (
-            <LargeButton
+            <RadioButton
               key={displayItem.description}
-              buttonType={
-                displayItem.value === isBlowOutEnabled ? 'primary' : 'secondary'
-              }
-              onClick={() => {
-                setisBlowOutEnabled(displayItem.value)
-              }}
-              buttonText={displayItem.description}
+              isSelected={isBlowOutEnabled === displayItem.option}
+              onChange={displayItem.onClick}
+              buttonValue={displayItem.description}
+              buttonLabel={displayItem.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>
@@ -197,19 +211,20 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
           width="100%"
         >
           {blowOutLocationItems.map(blowOutLocationItem => (
-            <LargeButton
+            <RadioButton
               key={blowOutLocationItem.description}
-              buttonType={
+              isSelected={
+                isEqual(blowOutLocation, blowOutLocationItem.location) ||
                 blowOutLocation === blowOutLocationItem.location
-                  ? 'primary'
-                  : 'secondary'
               }
-              onClick={() => {
+              onChange={() => {
                 setBlowOutLocation(
                   blowOutLocationItem.location as BlowOutLocation
                 )
               }}
-              buttonText={blowOutLocationItem.description}
+              buttonValue={blowOutLocationItem.description}
+              buttonLabel={blowOutLocationItem.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>

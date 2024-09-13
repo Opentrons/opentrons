@@ -9,10 +9,12 @@ import {
   COLORS,
   ALIGN_CENTER,
 } from '@opentrons/components'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '../../../redux/analytics'
 import { getTopPortalEl } from '../../../App/portal'
-import { LargeButton } from '../../../atoms/buttons'
+import { RadioButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
 import { InputField } from '../../../atoms/InputField'
+import { useTrackEventWithRobotSerial } from '../../Devices/hooks'
 import { ACTIONS } from '../constants'
 
 import type {
@@ -33,6 +35,7 @@ interface DelayProps {
 export function Delay(props: DelayProps): JSX.Element {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = React.useRef(null)
 
   const [currentStep, setCurrentStep] = React.useState<number>(1)
@@ -85,6 +88,12 @@ export function Delay(props: DelayProps): JSX.Element {
           type: action,
           delaySettings: undefined,
         })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            settting: `Delay_${kind}`,
+          },
+        })
         onBack()
       } else {
         setCurrentStep(2)
@@ -98,6 +107,12 @@ export function Delay(props: DelayProps): JSX.Element {
           delaySettings: {
             delayDuration,
             positionFromBottom: position,
+          },
+        })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            settting: `Delay_${kind}`,
           },
         })
       }
@@ -178,13 +193,13 @@ export function Delay(props: DelayProps): JSX.Element {
           width="100%"
         >
           {delayEnabledDisplayItems.map(displayItem => (
-            <LargeButton
+            <RadioButton
               key={displayItem.description}
-              buttonType={
-                delayIsEnabled === displayItem.option ? 'primary' : 'secondary'
-              }
-              onClick={displayItem.onClick}
-              buttonText={displayItem.description}
+              isSelected={delayIsEnabled === displayItem.option}
+              onChange={displayItem.onClick}
+              buttonValue={displayItem.description}
+              buttonLabel={displayItem.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>
@@ -222,6 +237,7 @@ export function Delay(props: DelayProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              initialValue={String(delayDuration ?? '')}
               onChange={e => {
                 setDelayDuration(Number(e))
               }}
@@ -262,6 +278,7 @@ export function Delay(props: DelayProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              initialValue={String(position ?? '')}
               onChange={e => {
                 setPosition(Number(e))
               }}

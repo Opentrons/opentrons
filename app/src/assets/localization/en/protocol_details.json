@@ -12,7 +12,6 @@
   "creation_method": "creation method",
   "csv_file_type_required": "CSV file type required",
   "csv_file": "CSV file",
-  "csv_required": "This protocol requires a CSV to proceed.",
   "deck_view": "Deck View",
   "default_value": "Default Value",
   "delete_protocol_perm": "{{name}} and its run history will be permanently deleted.",

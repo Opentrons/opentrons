@@ -11,7 +11,9 @@ import {
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { getAllDefinitions } from '@opentrons/shared-data'
+import { ANALYTICS_QUICK_TRANSFER_WELL_SELECTION_DURATION } from '../../redux/analytics'
 
+import { useTrackEventWithRobotSerial } from '../Devices/hooks'
 import { getTopPortalEl } from '../../App/portal'
 import { Modal } from '../../molecules/Modal'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
@@ -39,6 +41,7 @@ interface SelectDestWellsProps {
 export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
   const { onNext, onBack, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
   const { makeToast } = useToaster()
 
@@ -72,6 +75,21 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
     selectionUnits = t('grids')
   }
 
+  let labwareDefinition =
+    state.destination === 'source' ? state.source : state.destination
+  if (labwareDefinition?.parameters.format === '96Standard') {
+    const allDefinitions = getAllDefinitions()
+    if (Object.values(labwareDefinition.wells)[0].shape === 'circular') {
+      labwareDefinition = allDefinitions[CIRCULAR_WELL_96_PLATE_DEFINITION_URI]
+    } else {
+      labwareDefinition =
+        allDefinitions[RECTANGULAR_WELL_96_PLATE_DEFINITION_URI]
+    }
+  }
+  const is384WellPlate = labwareDefinition?.parameters.format === '384Standard'
+
+  const [analyticsStartTime] = React.useState<Date>(new Date())
+
   const handleClickNext = (): void => {
     if (
       selectedWellCount === 1 ||
@@ -81,6 +99,14 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
       dispatch({
         type: 'SET_DEST_WELLS',
         wells: Object.keys(selectedWells),
+      })
+      const duration = new Date().getTime() - analyticsStartTime.getTime()
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_WELL_SELECTION_DURATION,
+        properties: {
+          is384WellPlate,
+          duration: `${duration / 1000} seconds`,
+        },
       })
       onNext()
     } else {
@@ -107,22 +133,13 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
   const resetButtonProps: React.ComponentProps<typeof SmallButton> = {
     buttonType: 'tertiaryLowLight',
     buttonText: t('shared:reset'),
-    onClick: () => {
+    onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
       setIsNumberWellsSelectedError(false)
       setSelectedWells({})
+      e.currentTarget.blur?.()
     },
   }
-  let labwareDefinition =
-    state.destination === 'source' ? state.source : state.destination
-  if (labwareDefinition?.parameters.format === '96Standard') {
-    const allDefinitions = getAllDefinitions()
-    if (Object.values(labwareDefinition.wells)[0].shape === 'circular') {
-      labwareDefinition = allDefinitions[CIRCULAR_WELL_96_PLATE_DEFINITION_URI]
-    } else {
-      labwareDefinition =
-        allDefinitions[RECTANGULAR_WELL_96_PLATE_DEFINITION_URI]
-    }
-  }
+
   return (
     <>
       {createPortal(
@@ -150,20 +167,15 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
       <Flex
         justifyContent={JUSTIFY_CENTER}
         marginTop={SPACING.spacing120}
-        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
+        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing8} ${SPACING.spacing32}`}
         position={POSITION_FIXED}
         top="0"
         left="0"
+        height="80%"
         width="100%"
       >
         {labwareDefinition != null ? (
-          <Flex
-            width={
-              labwareDefinition?.parameters.format === '384Standard'
-                ? '100%'
-                : '75%'
-            }
-          >
+          <Flex width={is384WellPlate ? '100%' : '75%'}>
             <WellSelection
               definition={labwareDefinition}
               deselectWells={(wells: string[]) => {

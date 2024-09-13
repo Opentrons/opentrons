@@ -45,6 +45,11 @@ import {
   getPinnedQuickTransferIds,
   updateConfigValue,
 } from '../../redux/config'
+import {
+  ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
+  ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
+} from '../../redux/analytics'
+import { useTrackEventWithRobotSerial } from '../../organisms/Devices/hooks'
 import { useOffsetCandidatesForAnalysis } from '../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useMissingProtocolHardware } from '../Protocols/hooks'
 import { DeleteTransferConfirmationModal } from '../QuickTransferDashboard/DeleteTransferConfirmationModal'
@@ -73,6 +78,7 @@ const QuickTransferHeader = ({
   isTransferFetching,
 }: QuickTransferHeaderProps): JSX.Element => {
   const navigate = useNavigate()
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const { t } = useTranslation('protocol_details')
   const [truncate, setTruncate] = React.useState<boolean>(true)
   const [startSetup, setStartSetup] = React.useState<boolean>(false)
@@ -84,6 +90,15 @@ const QuickTransferHeader = ({
   if (displayedTitle !== null && displayedTitle.length > 92 && truncate) {
     displayedTitle = truncateString(displayedTitle, 80, 60)
   }
+
+  React.useEffect(() => {
+    trackEventWithRobotSerial({
+      name: ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
+      properties: {
+        name: title,
+      },
+    })
+  }, [])
 
   return (
     <Flex
@@ -147,6 +162,12 @@ const QuickTransferHeader = ({
         onClick={() => {
           setStartSetup(true)
           handleRunTransfer()
+          trackEventWithRobotSerial({
+            name: ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
+            properties: {
+              name: title,
+            },
+          })
         }}
         buttonText={t('start_setup')}
         disabled={isTransferFetching}
@@ -354,7 +375,7 @@ export function QuickTransferDetails(): JSX.Element | null {
       makeSnackbar(t('unpinned_transfer') as string)
     }
     dispatch(
-      updateConfigValue('protocols.pinnedTransferIds', pinnedTransferIds)
+      updateConfigValue('protocols.pinnedQuickTransferIds', pinnedTransferIds)
     )
   }
   const handleRunTransfer = (): void => {
@@ -403,7 +424,7 @@ export function QuickTransferDetails(): JSX.Element | null {
           isScrolled={isScrolled}
           isTransferFetching={isTransferFetching}
         />
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} paddingTop={SPACING.spacing6}>
           <TransferSectionTabs
             currentOption={currentOption}
             setCurrentOption={setCurrentOption}

@@ -5,15 +5,13 @@ import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
+import { COLORS } from '@opentrons/components'
 import {
   useProtocolQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
-import {
-  RUN_STATUS_FAILED,
-  simpleAnalysisFileFixture,
-} from '@opentrons/api-client'
-import { COLORS } from '@opentrons/components'
+import { simpleAnalysisFileFixture } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
@@ -28,10 +26,6 @@ import { useCloneRun } from '../../../ProtocolUpload/hooks'
 import { useRerunnableStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
 import { useNotifyAllRunsQuery } from '../../../../resources/runs'
-import {
-  useRobotInitializationStatus,
-  INIT_STATUS,
-} from '../../../../resources/health/hooks'
 
 import type { NavigateFunction } from 'react-router-dom'
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
@@ -56,7 +50,6 @@ vi.mock('../../../../organisms/ProtocolUpload/hooks')
 vi.mock('../../../../redux/analytics')
 vi.mock('../hooks')
 vi.mock('../../../../resources/runs')
-vi.mock('../../../../resources/health/hooks')
 
 const RUN_ID = 'mockRunId'
 const ROBOT_NAME = 'otie'
@@ -162,15 +155,14 @@ describe('RecentRunProtocolCard', () => {
         runTimeParameters: [],
       },
     } as any)
-    vi.mocked(useRobotInitializationStatus).mockReturnValue(
-      INIT_STATUS.SUCCEEDED
-    )
     when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
-    when(useCloneRun)
-      .calledWith(RUN_ID, expect.anything())
-      .thenReturn({ cloneRun: mockCloneRun, isLoading: false })
+    vi.mocked(useCloneRun).mockReturnValue({
+      cloneRun: mockCloneRun,
+      isLoadingRun: false,
+      isCloning: false,
+    })
   })
 
   afterEach(() => {
@@ -267,20 +259,6 @@ describe('RecentRunProtocolCard', () => {
       isLoading: true,
       data: { data: { metadata: { protocolName: 'mockProtocol' } } },
     } as any)
-    render(props)
-    screen.getByText('mock Skeleton')
-  })
-
-  it('should render the skeleton when the robot server is initializing', () => {
-    vi.mocked(useRobotInitializationStatus).mockReturnValue(
-      INIT_STATUS.INITIALIZING
-    )
-    render(props)
-    screen.getByText('mock Skeleton')
-  })
-
-  it('should render the skeleton when the robot server is unresponsive', () => {
-    vi.mocked(useRobotInitializationStatus).mockReturnValue(null)
     render(props)
     screen.getByText('mock Skeleton')
   })

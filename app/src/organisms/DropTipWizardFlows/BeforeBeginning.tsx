@@ -92,7 +92,23 @@ export const BeforeBeginning = ({
             height="5.25rem"
           />
         </Flex>
-        <Flex justifyContent={JUSTIFY_FLEX_END} marginTop="auto">
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          justifyContent={
+            issuedCommandsType === 'fixit'
+              ? JUSTIFY_SPACE_BETWEEN
+              : JUSTIFY_FLEX_END
+          }
+          marginTop={issuedCommandsType === 'fixit' ? '6.875rem' : 'auto'}
+        >
+          {fixitCommandTypeUtils != null ? (
+            <TextOnlyButton
+              onClick={
+                fixitCommandTypeUtils.buttonOverrides.goBackBeforeBeginning
+              }
+              buttonText={t('shared:go_back')}
+            />
+          ) : null}
           <SmallButton
             buttonText={i18n.format(t('shared:continue'), 'capitalize')}
             onClick={handleProceed}

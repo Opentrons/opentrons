@@ -8,8 +8,10 @@ import {
   POSITION_FIXED,
   COLORS,
 } from '@opentrons/components'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '../../../redux/analytics'
 import { getTopPortalEl } from '../../../App/portal'
 import { RadioButton } from '../../../atoms/buttons'
+import { useTrackEventWithRobotSerial } from '../../Devices/hooks'
 import { ChildNavigation } from '../../ChildNavigation'
 
 import type {
@@ -27,6 +29,7 @@ interface ChangeTipProps {
 export function ChangeTip(props: ChangeTipProps): JSX.Element {
   const { onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
   const allowedChangeTipOptions: ChangeTipOptions[] = ['once']
   if (
@@ -55,6 +58,12 @@ export function ChangeTip(props: ChangeTipProps): JSX.Element {
       dispatch({
         type: 'SET_CHANGE_TIP',
         changeTip: selectedChangeTipOption,
+      })
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+        properties: {
+          setting: 'ChangeTip',
+        },
       })
     }
     onBack()

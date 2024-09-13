@@ -200,6 +200,7 @@ export function OverpressureBanner(): JSX.Element | null {
     <InlineNotification
       type="alert"
       heading={t('overpressure_is_usually_caused')}
+      message={t('if_issue_persists')}
     />
   )
 }

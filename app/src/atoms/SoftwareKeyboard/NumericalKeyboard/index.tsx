@@ -13,6 +13,7 @@ interface NumericalKeyboardProps {
   isDecimal?: boolean
   hasHyphen?: boolean
   debug?: boolean
+  initialValue?: string
 }
 
 // the default keyboard layout intKeyboard that doesn't have decimal point and hyphen.
@@ -22,6 +23,7 @@ export function NumericalKeyboard({
   isDecimal = false,
   hasHyphen = false,
   debug = false,
+  initialValue = '',
 }: NumericalKeyboardProps): JSX.Element {
   const layoutName = `${isDecimal ? 'float' : 'int'}${
     hasHyphen ? 'NegKeyboard' : 'Keyboard'
@@ -35,6 +37,9 @@ export function NumericalKeyboard({
     <Keyboard
       keyboardRef={r => (keyboardRef.current = r)}
       theme={'hg-theme-default oddTheme1 numerical-keyboard'}
+      onInit={keyboard => {
+        keyboard.setInput(initialValue)
+      }}
       onChange={onChange}
       display={numericalCustom}
       useButtonTag={true}

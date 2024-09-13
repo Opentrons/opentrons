@@ -24,7 +24,7 @@ DEFAULT_MODULE_OFFSET = [0.0, 0.0, 0.0]
 
 DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
     mount_speed=5,
-    plunger_speed=20,
+    plunger_speed=15,
     plunger_impulse_time=0.2,
     sensor_threshold_pascals=15,
     output_option=OutputOptions.sync_buffer_to_csv,

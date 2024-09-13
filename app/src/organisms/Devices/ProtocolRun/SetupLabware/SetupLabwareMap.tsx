@@ -1,7 +1,6 @@
 import * as React from 'react'
 import map from 'lodash/map'
 
-import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
 import {
   BaseDeck,
   Flex,
@@ -13,6 +12,7 @@ import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getSimplestDeckConfigForProtocol,
+  parseInitialLoadedLabwareByAdapter,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
@@ -88,6 +88,10 @@ export function SetupLabwareMap({
         topLabwareDefinition != null &&
         topLabwareId != null &&
         hoverLabwareId === topLabwareId,
+      highlightShadowLabware:
+        topLabwareDefinition != null &&
+        topLabwareId != null &&
+        hoverLabwareId === topLabwareId,
       stacked: topLabwareDefinition != null && topLabwareId != null,
       moduleChildren: (
         // open modal
@@ -128,7 +132,7 @@ export function SetupLabwareMap({
 
   const labwareOnDeck = map(
     labwareRenderInfo,
-    ({ x, y, labwareDef, displayName, slotName }, labwareId) => {
+    ({ labwareDef, displayName, slotName }, labwareId) => {
       const labwareInAdapter = initialLoadedLabwareByAdapter[labwareId]
       //  only rendering the labware on top most layer so
       //  either the adapter or the labware are rendered but not both
@@ -148,6 +152,7 @@ export function SetupLabwareMap({
         topLabwareId,
         topLabwareDisplayName,
         highlight: isLabwareInStack && hoverLabwareId === topLabwareId,
+        highlightShadow: isLabwareInStack && hoverLabwareId === topLabwareId,
         labwareChildren: (
           <g
             cursor={isLabwareInStack ? 'pointer' : ''}
@@ -199,7 +204,7 @@ export function SetupLabwareMap({
       {labwareStackDetailsLabwareId != null && (
         <LabwareStackModal
           labwareIdTop={labwareStackDetailsLabwareId}
-          runId={runId}
+          commands={commands}
           closeModal={() => {
             setLabwareStackDetailsLabwareId(null)
           }}

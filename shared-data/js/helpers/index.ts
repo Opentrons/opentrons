@@ -18,6 +18,8 @@ export { orderWells } from './orderWells'
 export { get96Channel384WellPlateWells } from './get96Channel384WellPlateWells'
 export { getTipTypeFromTipRackDefinition } from './getTipTypeFromTipRackDefinition'
 
+export * from './__fixtures__'
+export * from './parseProtocolCommands'
 export * from './parseProtocolData'
 export * from './volume'
 export * from './wellSets'

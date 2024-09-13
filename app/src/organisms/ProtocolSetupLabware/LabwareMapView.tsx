@@ -14,8 +14,8 @@ import type {
   CompletedProtocolAnalysis,
   DeckDefinition,
   LabwareDefinition2,
+  LoadedLabwareByAdapter,
 } from '@opentrons/shared-data'
-import type { LoadedLabwareByAdapter } from '@opentrons/api-client'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
 
 interface LabwareMapViewProps {
@@ -71,6 +71,8 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
             }
           : undefined,
       highlightLabware: true,
+      highlightShadowLabware:
+        topLabwareDefinition != null && topLabwareId != null,
       moduleChildren: null,
       stacked: topLabwareDefinition != null && topLabwareId != null,
     }
@@ -99,6 +101,7 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
         },
         labwareChildren: null,
         highlight: true,
+        highlightShadow: isLabwareInStack,
         stacked: isLabwareInStack,
       }
     }

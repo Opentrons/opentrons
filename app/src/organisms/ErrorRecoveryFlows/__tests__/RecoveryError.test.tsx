@@ -1,7 +1,7 @@
 /* eslint-disable testing-library/prefer-presence-queries */
 import * as React from 'react'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
-import { screen, fireEvent } from '@testing-library/react'
+import { screen, fireEvent, waitFor } from '@testing-library/react'
 
 import { mockRecoveryContentProps } from '../__fixtures__'
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -23,16 +23,25 @@ describe('RecoveryError', () => {
   let props: React.ComponentProps<typeof RecoveryError>
   let proceedToRouteAndStepMock: Mock
   let getRecoverOptionCopyMock: Mock
+  let setRobotInMotionMock: Mock
+  let homePipetteZAxesMock: Mock
 
   beforeEach(() => {
     proceedToRouteAndStepMock = vi.fn()
     getRecoverOptionCopyMock = vi.fn()
+    setRobotInMotionMock = vi.fn().mockResolvedValue(undefined)
+    homePipetteZAxesMock = vi.fn().mockResolvedValue(undefined)
 
     props = {
       ...mockRecoveryContentProps,
       routeUpdateActions: {
         ...mockRecoveryContentProps.routeUpdateActions,
         proceedToRouteAndStep: proceedToRouteAndStepMock,
+        setRobotInMotion: setRobotInMotionMock,
+      },
+      recoveryCommands: {
+        ...mockRecoveryContentProps.recoveryCommands,
+        homePipetteZAxes: homePipetteZAxesMock,
       },
       getRecoveryOptionCopy: getRecoverOptionCopyMock,
       recoveryMap: {
@@ -100,18 +109,6 @@ describe('RecoveryError', () => {
     expect(screen.queryAllByText('Return to menu')[0]).toBeInTheDocument()
   })
 
-  it(`calls proceedToRouteAndStep with ${RECOVERY_MAP.OPTION_SELECTION.ROUTE} when the "Back to menu" button is clicked in ErrorRecoveryFlowError`, () => {
-    props.recoveryMap.step =
-      RECOVERY_MAP.ERROR_WHILE_RECOVERING.STEPS.RECOVERY_ACTION_FAILED
-    render(props)
-
-    fireEvent.click(screen.queryAllByText('Back to menu')[0])
-
-    expect(proceedToRouteAndStepMock).toHaveBeenCalledWith(
-      RECOVERY_MAP.OPTION_SELECTION.ROUTE
-    )
-  })
-
   it(`calls proceedToRouteAndStep with ${RECOVERY_MAP.OPTION_SELECTION.ROUTE} when the "Return to menu" button is clicked in RecoveryDropTipFlowErrors with step ${ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_GENERAL_ERROR}`, () => {
     props.recoveryMap.step =
       RECOVERY_MAP.ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_GENERAL_ERROR
@@ -146,6 +143,42 @@ describe('RecoveryError', () => {
     expect(proceedToRouteAndStepMock).toHaveBeenCalledWith(
       RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE,
       RECOVERY_MAP.DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP
+    )
+  })
+
+  it(`calls a z-home and proceedToRouteAndStep with ${RECOVERY_MAP.OPTION_SELECTION.ROUTE} in the correct order when "Back to menu" is clicked`, async () => {
+    render(props)
+
+    fireEvent.click(screen.queryAllByText('Back to menu')[0])
+
+    expect(setRobotInMotionMock).toHaveBeenCalledWith(true)
+
+    await waitFor(() => {
+      expect(homePipetteZAxesMock).toHaveBeenCalled()
+    })
+
+    await waitFor(() => {
+      expect(setRobotInMotionMock).toHaveBeenCalledWith(false)
+    })
+
+    await waitFor(() => {
+      expect(proceedToRouteAndStepMock).toHaveBeenCalledWith(
+        RECOVERY_MAP.OPTION_SELECTION.ROUTE
+      )
+    })
+
+    expect(setRobotInMotionMock).toHaveBeenCalledTimes(2)
+    expect(homePipetteZAxesMock).toHaveBeenCalledTimes(1)
+    expect(proceedToRouteAndStepMock).toHaveBeenCalledTimes(1)
+
+    expect(setRobotInMotionMock.mock.invocationCallOrder[0]).toBeLessThan(
+      homePipetteZAxesMock.mock.invocationCallOrder[0]
+    )
+    expect(homePipetteZAxesMock.mock.invocationCallOrder[0]).toBeLessThan(
+      setRobotInMotionMock.mock.invocationCallOrder[1]
+    )
+    expect(setRobotInMotionMock.mock.invocationCallOrder[1]).toBeLessThan(
+      proceedToRouteAndStepMock.mock.invocationCallOrder[0]
     )
   })
 })

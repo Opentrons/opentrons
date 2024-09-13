@@ -42,7 +42,9 @@ import type {
   InstrumentData,
   MaintenanceRun,
   CommandData,
+  RunStatus,
 } from '@opentrons/api-client'
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import type { Coordinates, CreateCommand } from '@opentrons/shared-data'
 
 const RUN_REFETCH_INTERVAL = 5000
@@ -108,6 +110,7 @@ export function GripperWizardFlows(
     }
   }, [
     maintenanceRunData?.data.id,
+    maintenanceRunData?.data.status,
     createdMaintenanceRunId,
     monitorMaintenanceRunForDeletion,
     closeFlow,
@@ -117,12 +120,13 @@ export function GripperWizardFlows(
   const [errorMessage, setErrorMessage] = React.useState<null | string>(null)
 
   const handleClose = (): void => {
-    if (props?.onComplete != null) props.onComplete()
+    if (props?.onComplete != null) {
+      props.onComplete()
+    }
     if (maintenanceRunData != null) {
       deleteMaintenanceRun(maintenanceRunData?.data.id)
-    } else {
-      closeFlow()
     }
+    closeFlow()
   }
 
   const {
@@ -138,19 +142,20 @@ export function GripperWizardFlows(
   })
 
   const handleCleanUpAndClose = (): void => {
-    if (maintenanceRunData?.data.id == null) handleClose()
-    else {
+    if (maintenanceRunData?.data.id == null) {
+      handleClose()
+    } else {
       chainRunCommands(
         maintenanceRunData?.data.id,
         [{ commandType: 'home' as const, params: {} }],
         false
       )
-        .then(() => {
-          handleClose()
-        })
         .catch(error => {
           setIsExiting(true)
           setErrorMessage(error.message as string)
+        })
+        .finally(() => {
+          handleClose()
         })
     }
   }
@@ -160,6 +165,7 @@ export function GripperWizardFlows(
       flowType={flowType}
       createdMaintenanceRunId={createdMaintenanceRunId}
       maintenanceRunId={maintenanceRunData?.data.id}
+      maintenanceRunStatus={maintenanceRunData?.data.status}
       attachedGripper={attachedGripper}
       createMaintenanceRun={createTargetedMaintenanceRun}
       isCreateLoading={isCreateLoading}
@@ -183,6 +189,7 @@ export function GripperWizardFlows(
 interface GripperWizardProps {
   flowType: GripperWizardFlowType
   maintenanceRunId?: string
+  maintenanceRunStatus?: RunStatus
   createdMaintenanceRunId: string | null
   attachedGripper: InstrumentData | null
   createMaintenanceRun: UseMutateFunction<
@@ -212,6 +219,7 @@ export const GripperWizard = (
   const {
     flowType,
     maintenanceRunId,
+    maintenanceRunStatus,
     createMaintenanceRun,
     handleCleanUpAndClose,
     handleClose,
@@ -266,6 +274,7 @@ export const GripperWizard = (
   }
 
   const sharedProps = {
+    maintenanceRunStatus,
     flowType,
     maintenanceRunId:
       maintenanceRunId != null && createdMaintenanceRunId === maintenanceRunId
@@ -283,7 +292,7 @@ export const GripperWizard = (
   let onExit
   if (currentStep == null) return null
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
-  if (showConfirmExit) {
+  if (showConfirmExit && maintenanceRunId !== null) {
     modalContent = (
       <ExitConfirmation
         handleGoBack={cancelExit}
@@ -292,14 +301,17 @@ export const GripperWizard = (
         isRobotMoving={isRobotMoving}
       />
     )
-  } else if (isExiting && errorMessage != null) {
+  } else if (
+    (isExiting && errorMessage != null) ||
+    maintenanceRunStatus === RUN_STATUS_FAILED
+  ) {
     onExit = handleClose
     modalContent = (
       <SimpleWizardBody
         isSuccess={false}
         iconColor={COLORS.red50}
         header={t('shared:error_encountered')}
-        subHeader={errorMessage}
+        subHeader={errorMessage ?? undefined}
       />
     )
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {

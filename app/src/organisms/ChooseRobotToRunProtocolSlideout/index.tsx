@@ -5,16 +5,21 @@ import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
-  Icon,
-  Flex,
+  ALIGN_CENTER,
   DIRECTION_COLUMN,
-  PrimaryButton,
   DIRECTION_ROW,
+  Flex,
+  Icon,
+  NO_WRAP,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
   useHoverTooltip,
 } from '@opentrons/components'
-import { useUploadCsvFileMutation } from '@opentrons/react-api-client'
+import {
+  useUploadCsvFileMutation,
+  ApiHostProvider,
+} from '@opentrons/react-api-client'
 
 import { Tooltip } from '../../atoms/Tooltip'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
@@ -44,11 +49,23 @@ interface ChooseRobotToRunProtocolSlideoutProps extends StyleProps {
   showSlideout: boolean
 }
 
+interface ChooseRobotToRunProtocolSlideoutComponentProps
+  extends ChooseRobotToRunProtocolSlideoutProps {
+  selectedRobot: Robot | null
+  setSelectedRobot: (robot: Robot | null) => void
+}
+
 export function ChooseRobotToRunProtocolSlideoutComponent(
-  props: ChooseRobotToRunProtocolSlideoutProps
+  props: ChooseRobotToRunProtocolSlideoutComponentProps
 ): JSX.Element | null {
   const { t } = useTranslation(['protocol_details', 'shared', 'app_settings'])
-  const { storedProtocolData, showSlideout, onCloseClick } = props
+  const {
+    storedProtocolData,
+    showSlideout,
+    onCloseClick,
+    selectedRobot,
+    setSelectedRobot,
+  } = props
   const navigate = useNavigate()
   const [shouldApplyOffsets, setShouldApplyOffsets] = React.useState<boolean>(
     true
@@ -60,7 +77,6 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     mostRecentAnalysis,
   } = storedProtocolData
   const [currentPage, setCurrentPage] = React.useState<number>(1)
-  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
   const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
     storedProtocolData,
     selectedRobot?.name ?? ''
@@ -81,19 +97,10 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
 
   const offsetCandidates = useOffsetCandidatesForAnalysis(
     mostRecentAnalysis,
-    selectedRobot?.ip ?? null
+    null
   )
 
-  const { uploadCsvFile } = useUploadCsvFileMutation(
-    {},
-    selectedRobot != null
-      ? {
-          hostname: selectedRobot.ip,
-          requestor:
-            selectedRobot?.ip === OPENTRONS_USB ? appShellRequestor : undefined,
-        }
-      : null
-  )
+  const { uploadCsvFile } = useUploadCsvFileMutation()
 
   const {
     createRunFromProtocolSource,
@@ -119,13 +126,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
         })
       },
     },
-    selectedRobot != null
-      ? {
-          hostname: selectedRobot.ip,
-          requestor:
-            selectedRobot?.ip === OPENTRONS_USB ? appShellRequestor : undefined,
-        }
-      : null,
+    null,
     shouldApplyOffsets
       ? offsetCandidates.map(({ vector, location, definitionUri }) => ({
           vector,
@@ -145,7 +146,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           : acc,
       {}
     )
-    Promise.all(
+    void Promise.all(
       Object.entries(dataFilesForProtocolMap).map(([key, file]) => {
         const fileResponse = uploadCsvFile(file)
         const varName = Promise.resolve(key)
@@ -202,9 +203,9 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     first(srcFileNames) ??
     protocolKey
 
-  // intentionally show both robot types if analysis has any error
+  // intentionally show both robot types if analysis fails
   const robotType =
-    mostRecentAnalysis != null && mostRecentAnalysis.errors.length === 0
+    mostRecentAnalysis != null && mostRecentAnalysis.result !== 'not-ok'
       ? mostRecentAnalysis?.robotType ?? null
       : null
 
@@ -258,7 +259,11 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
             </PrimaryButton>
           </>
         ) : (
-          <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_ROW}>
+          <Flex
+            gridGap={SPACING.spacing8}
+            flexDirection={DIRECTION_ROW}
+            whiteSpace={NO_WRAP}
+          >
             <SecondaryButton
               onClick={() => {
                 setCurrentPage(1)
@@ -274,7 +279,14 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
               {...targetProps}
             >
               {isCreatingRun ? (
-                <Icon name="ot-spinner" spin size="1rem" />
+                <Flex
+                  gridGap={SPACING.spacing4}
+                  alignItems={ALIGN_CENTER}
+                  marginLeft={`-${SPACING.spacing4}`}
+                >
+                  <Icon name="ot-spinner" spin size="1rem" />
+                  {t('shared:confirm_values')}
+                </Flex>
               ) : (
                 t('shared:confirm_values')
               )}
@@ -347,5 +359,18 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
 export function ChooseRobotToRunProtocolSlideout(
   props: ChooseRobotToRunProtocolSlideoutProps
 ): JSX.Element | null {
-  return <ChooseRobotToRunProtocolSlideoutComponent {...props} />
+  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
+  return (
+    <ApiHostProvider
+      hostname={selectedRobot?.ip ?? null}
+      port={selectedRobot?.port ?? null}
+      requestor={
+        selectedRobot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
+      }
+    >
+      <ChooseRobotToRunProtocolSlideoutComponent
+        {...{ ...props, selectedRobot, setSelectedRobot }}
+      />
+    </ApiHostProvider>
+  )
 }

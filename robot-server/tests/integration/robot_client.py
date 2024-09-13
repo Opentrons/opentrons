@@ -320,6 +320,14 @@ class RobotClient:
         response.raise_for_status()
         return response
 
+    async def get_deck_configuration(self) -> Response:
+        """PUT /deck_configuration."""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/deck_configuration",
+        )
+        response.raise_for_status()
+        return response
+
     async def put_deck_configuration(
         self,
         req_body: Dict[str, object],

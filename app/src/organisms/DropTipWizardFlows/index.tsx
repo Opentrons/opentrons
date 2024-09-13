@@ -112,9 +112,8 @@ export function useTipAttachmentStatus(
   })
 
   const aPipetteWithTip = head(pipettesWithTip) ?? null
-
   const areTipsAttached =
-    pipettesWithTip.length != null && head(pipettesWithTip)?.specs != null
+    pipettesWithTip.length > 0 && head(pipettesWithTip)?.specs != null
 
   const determineTipStatus = React.useCallback((): Promise<
     PipetteWithTip[]
@@ -146,6 +145,7 @@ export function useTipAttachmentStatus(
 
   const resetTipStatus = (): void => {
     setPipettesWithTip([])
+    setInitialPipettesCount(null)
   }
 
   const setTipStatusResolved = (

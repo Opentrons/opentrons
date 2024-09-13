@@ -268,7 +268,7 @@ export function LabwareListItem(
 
   return (
     <LabwareRow>
-      <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing2}>
+      <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing2} width="5rem">
         {slotInfo != null && isFlex ? (
           <DeckInfoLabel deckLabel={slotInfo} />
         ) : (
@@ -283,7 +283,7 @@ export function LabwareListItem(
           <DeckInfoLabel iconName="stacked" />
         ) : null}
       </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
         {nestedLabwareInfo != null &&
         nestedLabwareInfo?.sharedSlotId === slotInfo ? (
           <>
@@ -305,7 +305,7 @@ export function LabwareListItem(
                 </StyledText>
               </Flex>
             </Flex>
-            <Divider />
+            <Divider marginY="0" />
           </>
         ) : null}
         <Flex>
@@ -328,7 +328,7 @@ export function LabwareListItem(
         </Flex>
         {moduleDisplayName != null ? (
           <>
-            <Divider />
+            <Divider marginY="0" />
             <Flex
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               flexDirection={DIRECTION_ROW}

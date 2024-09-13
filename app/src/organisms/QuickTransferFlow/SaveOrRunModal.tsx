@@ -19,7 +19,8 @@ interface SaveOrRunModalProps {
 
 export const SaveOrRunModal = (props: SaveOrRunModalProps): JSX.Element => {
   const { t } = useTranslation('quick_transfer')
-  const [showNameTransfer, setShowNameTransfer] = React.useState(false)
+  const [showNameTransfer, setShowNameTransfer] = React.useState<boolean>(false)
+  const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
   return showNameTransfer ? (
     <NameQuickTransfer onSave={props.onSave} />
@@ -33,19 +34,17 @@ export const SaveOrRunModal = (props: SaveOrRunModalProps): JSX.Element => {
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing10}
+        gridGap={SPACING.spacing32}
         width="100%"
       >
-        <LegacyStyledText
-          css={TYPOGRAPHY.bodyTextRegular}
-          paddingBottom={SPACING.spacing24}
-        >
+        <LegacyStyledText css={TYPOGRAPHY.bodyTextRegular}>
           {t('save_to_run_later')}
         </LegacyStyledText>
         <Flex gridGap={SPACING.spacing8}>
           <SmallButton
             width="50%"
             buttonText={t('save_for_later')}
+            disabled={isLoading}
             onClick={() => {
               setShowNameTransfer(true)
             }}
@@ -54,7 +53,11 @@ export const SaveOrRunModal = (props: SaveOrRunModalProps): JSX.Element => {
           <SmallButton
             width="50%"
             buttonText={t('run_now')}
-            onClick={props.onRun}
+            disabled={isLoading}
+            onClick={() => {
+              setIsLoading(true)
+              props.onRun()
+            }}
           />
         </Flex>
       </Flex>

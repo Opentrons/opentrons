@@ -581,7 +581,7 @@ class Labware:
                 api_element="Labware.set_calibration()",
                 since_version=f"{ENGINE_CORE_API_VERSION}",
                 current_version=f"{self._api_version}",
-                message=" Try using the Opentrons App's Labware Position Check.",
+                extra_message="Try using the Opentrons App's Labware Position Check.",
             )
         self._core.set_calibration(delta)
 
@@ -632,7 +632,7 @@ class Labware:
                 api_element="Labware.set_offset()",
                 until_version=f"{SET_OFFSET_RESTORED_API_VERSION}",
                 current_version=f"{self._api_version}",
-                message=" This feature not available in versions 2.14 thorugh 2.17. You can also use the Opentrons App's Labware Position Check.",
+                extra_message="This feature not available in versions 2.14 thorugh 2.17. You can also use the Opentrons App's Labware Position Check.",
             )
         else:
             self._core.set_calibration(Point(x=x, y=y, z=z))
@@ -974,7 +974,7 @@ class Labware:
                 api_element="Labware.use_tips",
                 since_version=f"{ENGINE_CORE_API_VERSION}",
                 current_version=f"{self._api_version}",
-                message=" To modify tip state, use Labware.reset.",
+                extra_message="To modify tip state, use Labware.reset.",
             )
 
         assert num_channels > 0, "Bad call to use_tips: num_channels<=0"
@@ -1064,7 +1064,7 @@ class Labware:
                 api_element="Labware.return_tips()",
                 since_version=f"{ENGINE_CORE_API_VERSION}",
                 current_version=f"{self._api_version}",
-                message=" Use Labware.reset() instead.",
+                extra_message="Use Labware.reset() instead.",
             )
 
         # This logic is the inverse of :py:meth:`use_tips`

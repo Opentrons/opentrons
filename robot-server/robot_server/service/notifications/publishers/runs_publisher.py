@@ -75,12 +75,21 @@ class RunsPublisher:
         )
         self._engine_state_slice = _EngineStateSlice()
 
-        await self._publish_runs_advise_refetch_async(run_id=run_id)
+        await self.publish_runs_advise_refetch_async(run_id=run_id)
 
     async def clean_up_run(self, run_id: str) -> None:
         """Publish final refetch and unsubscribe flags for the given run."""
-        await self._publish_runs_advise_refetch_async(run_id=run_id)
+        await self.publish_runs_advise_refetch_async(run_id=run_id)
         await self._publish_runs_advise_unsubscribe_async(run_id=run_id)
+
+    async def publish_runs_advise_refetch_async(self, run_id: str) -> None:
+        """Publish a refetch flag for relevant runs topics."""
+        await self._client.publish_advise_refetch_async(topic=topics.RUNS)
+
+        if self._run_hooks is not None:
+            await self._client.publish_advise_refetch_async(
+                topic=topics.TopicName(f"{topics.RUNS}/{run_id}")
+            )
 
     async def _publish_command_links(self) -> None:
         """Publish an update to the run's command links.
@@ -91,15 +100,6 @@ class RunsPublisher:
         await self._client.publish_advise_refetch_async(
             topic=topics.RUNS_COMMANDS_LINKS
         )
-
-    async def _publish_runs_advise_refetch_async(self, run_id: str) -> None:
-        """Publish a refetch flag for relevant runs topics."""
-        await self._client.publish_advise_refetch_async(topic=topics.RUNS)
-
-        if self._run_hooks is not None:
-            await self._client.publish_advise_refetch_async(
-                topic=topics.TopicName(f"{topics.RUNS}/{run_id}")
-            )
 
     async def _publish_runs_advise_unsubscribe_async(self, run_id: str) -> None:
         """Publish an unsubscribe flag for relevant runs topics."""
@@ -161,7 +161,7 @@ class RunsPublisher:
                 and self._engine_state_slice.state_summary_status
                 != new_state_summary.status
             ):
-                await self._publish_runs_advise_refetch_async(
+                await self.publish_runs_advise_refetch_async(
                     run_id=self._run_hooks.run_id
                 )
                 self._engine_state_slice.state_summary_status = new_state_summary.status

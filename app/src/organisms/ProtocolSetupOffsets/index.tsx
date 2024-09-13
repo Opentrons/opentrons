@@ -1,10 +1,14 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  DIRECTION_ROW,
-  JUSTIFY_SPACE_BETWEEN,
   Chip,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  InfoScreen,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -86,25 +90,39 @@ export function ProtocolSetupOffsets({
               <Chip
                 background
                 iconName="ot-check"
-                text={t('placements_ready')}
+                text={t('offsets_confirmed')}
                 type="success"
-                chipSize="small"
               />
             ) : (
               <SmallButton
-                buttonText={t('confirm_placements')}
+                buttonText={t('confirm_offsets')}
                 disabled={nonIdentityOffsets.length === 0}
                 onClick={() => {
                   setIsConfirmed(true)
                   setSetupScreen('prepare to run')
                 }}
+                buttonCategory="rounded"
               />
             )}
           </Flex>
-          <TerseOffsetTable
-            offsets={nonIdentityOffsets}
-            labwareDefinitions={labwareDefinitions}
-          />
+          <Flex marginTop={SPACING.spacing32} flexDirection={DIRECTION_COLUMN}>
+            {nonIdentityOffsets.length > 0 ? (
+              <>
+                <StyledText
+                  oddStyle="level4HeaderSemiBold"
+                  marginBottom={SPACING.spacing8}
+                >
+                  {t('applied_labware_offset_data')}
+                </StyledText>
+                <TerseOffsetTable
+                  offsets={nonIdentityOffsets}
+                  labwareDefinitions={labwareDefinitions}
+                />
+              </>
+            ) : (
+              <InfoScreen contentType="noLabwareOffsetDataYet" />
+            )}
+          </Flex>
           <FloatingActionButton
             buttonText={t('update_offsets')}
             iconName="reticle"

@@ -33,7 +33,7 @@ export const DeckInfoLabel = styled(DeckInfoLabelComponent)`
   align-items: ${ALIGN_CENTER};
   background-color: ${props =>
     props.highlight ?? false ? COLORS.blue50 : 'inherit'};
-  border: 2px solid
+  border: 1px solid
     ${props => (props.highlight ?? false ? 'transparent' : COLORS.black90)};
   width: ${props => props.width ?? 'max-content'};
   padding: ${SPACING.spacing2} ${SPACING.spacing4};
@@ -48,6 +48,7 @@ export const DeckInfoLabel = styled(DeckInfoLabelComponent)`
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    border-width: 2px;
     border-radius: ${BORDERS.borderRadius12};
     height: ${props => props.height ?? SPACING.spacing32};
     padding: ${SPACING.spacing4}

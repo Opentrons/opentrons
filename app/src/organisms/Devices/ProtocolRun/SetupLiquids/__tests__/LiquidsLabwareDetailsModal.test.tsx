@@ -3,7 +3,7 @@ import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { LabwareRender } from '@opentrons/components'
-import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
+import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
 
 import {
   nestedTextMatcher,
@@ -23,7 +23,7 @@ import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
 import { LiquidDetailCard } from '../LiquidDetailCard'
 
 import type * as Components from '@opentrons/components'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type * as SharedData from '@opentrons/shared-data'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actualComponents = await importOriginal<typeof Components>()
@@ -32,7 +32,13 @@ vi.mock('@opentrons/components', async importOriginal => {
     LabwareRender: vi.fn(() => <div>mock LabwareRender</div>),
   }
 })
-vi.mock('@opentrons/api-client')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actualSharedData = await importOriginal<typeof SharedData>()
+  return {
+    ...actualSharedData,
+    parseLiquidsInLoadOrder: vi.fn(),
+  }
+})
 vi.mock('../../../../../redux/config')
 vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../../../Devices/hooks')
@@ -92,7 +98,7 @@ describe('LiquidsLabwareDetailsModal', () => {
     vi.mocked(LiquidDetailCard).mockReturnValue(<div></div>)
     vi.mocked(getDisabledWellFillFromLabwareId).mockReturnValue({})
     vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue(
-      {} as CompletedProtocolAnalysis
+      {} as SharedData.CompletedProtocolAnalysis
     )
     vi.mocked(getIsOnDevice).mockReturnValue(false)
   })

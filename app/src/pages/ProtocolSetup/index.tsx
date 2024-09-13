@@ -17,10 +17,11 @@ import {
   Icon,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  NO_WRAP,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
-  LegacyStyledText,
   TEXT_ALIGN_RIGHT,
   truncateString,
   TYPOGRAPHY,
@@ -36,7 +37,6 @@ import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
   getFixtureDisplayName,
-  SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
 import {
@@ -116,6 +116,8 @@ interface ProtocolSetupStepProps {
   title: string
   // first line of detail text
   detail?: string | null
+  // clip detail text overflow with ellipsis
+  clipDetail?: boolean
   // second line of detail text
   subDetail?: string | null
   // disallow click handler, disabled styling
@@ -141,6 +143,7 @@ export function ProtocolSetupStep({
   detail,
   subDetail,
   disabled = false,
+  clipDetail = false,
   interactionDisabled = false,
   disabledReason,
   description,
@@ -251,6 +254,7 @@ export function ProtocolSetupStep({
             textAlign={TEXT_ALIGN_RIGHT}
             color={interactionDisabled ? COLORS.grey50 : COLORS.black90}
             maxWidth="20rem"
+            css={clipDetail ? CLIPPED_TEXT_STYLE : undefined}
           >
             {detail}
             {subDetail != null && detail != null ? <br /> : null}
@@ -449,11 +453,7 @@ function PrepareToRun({
       const isCurrentFixtureCompatible =
         cutoutFixtureId != null &&
         compatibleCutoutFixtureIds.includes(cutoutFixtureId)
-      return (
-        !isCurrentFixtureCompatible &&
-        cutoutFixtureId != null &&
-        !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
-      )
+      return !isCurrentFixtureCompatible && cutoutFixtureId != null
     }
   )
   const isLocationConflict = locationConflictSlots.some(
@@ -515,6 +515,7 @@ function PrepareToRun({
       : 'not ready'
   // Liquids information
   const liquidsInProtocol = mostRecentAnalysis?.liquids ?? []
+  const areLiquidsInProtocol = liquidsInProtocol.length > 0
 
   const isReadyToRun =
     incompleteInstrumentCount === 0 && areModulesReady && areFixturesReady
@@ -528,7 +529,7 @@ function PrepareToRun({
           !(
             labwareConfirmed &&
             offsetsConfirmed &&
-            (liquidsConfirmed || liquidsInProtocol.length === 0)
+            (liquidsConfirmed || !areLiquidsInProtocol)
           )
         ) {
           confirmStepsComplete()
@@ -803,18 +804,16 @@ function PrepareToRun({
               }}
               title={i18n.format(t('liquids'), 'capitalize')}
               status={
-                liquidsConfirmed || liquidsInProtocol.length === 0
-                  ? 'ready'
-                  : 'general'
+                liquidsConfirmed || !areLiquidsInProtocol ? 'ready' : 'general'
               }
               detail={
-                liquidsInProtocol.length > 0
+                areLiquidsInProtocol
                   ? t('initial_liquids_num', {
                       count: liquidsInProtocol.length,
                     })
                   : t('liquids_not_in_setup')
               }
-              interactionDisabled={liquidsInProtocol.length === 0}
+              interactionDisabled={!areLiquidsInProtocol}
             />
           </>
         ) : (
@@ -889,6 +888,8 @@ export function ProtocolSetup(): JSX.Element {
     }
   )
 
+  const areLiquidsInProtocol = (mostRecentAnalysis?.liquids?.length ?? 0) > 0
+
   React.useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {
       setIsPollingForCompletedAnalysis(false)
@@ -954,7 +955,7 @@ export function ProtocolSetup(): JSX.Element {
   const missingSteps = [
     !offsetsConfirmed ? t('applied_labware_offsets') : null,
     !labwareConfirmed ? t('labware_placement') : null,
-    !liquidsConfirmed ? t('liquids') : null,
+    !liquidsConfirmed && areLiquidsInProtocol ? t('liquids') : null,
   ].filter(s => s != null)
   const {
     confirm: confirmMissingSteps,
@@ -1044,6 +1045,7 @@ export function ProtocolSetup(): JSX.Element {
         <AnalysisFailedModal
           setShowAnalysisFailedModal={setShowAnalysisFailedModal}
           protocolId={runRecord?.data.protocolId ?? null}
+          runId={runId}
           errors={analysisErrors.map(error => error.detail)}
         />
       ) : null}
@@ -1078,3 +1080,9 @@ export function ProtocolSetup(): JSX.Element {
     </>
   )
 }
+
+const CLIPPED_TEXT_STYLE = css`
+  white-space: ${NO_WRAP};
+  overflow: hidden;
+  text-overflow: ellipsis;
+`

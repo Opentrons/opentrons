@@ -55,8 +55,8 @@ export function ConfirmCancelRunModal({
     dismissCurrentRun,
     isLoading: isDismissing,
   } = useDismissCurrentRunMutation({
-    onSuccess: () => {
-      if (isQuickTransfer && !isActiveRun) {
+    onSettled: () => {
+      if (isQuickTransfer) {
         deleteRun(runId)
       }
     },
@@ -87,8 +87,8 @@ export function ConfirmCancelRunModal({
   React.useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED) {
       trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
-      dismissCurrentRun(runId)
       if (!isActiveRun) {
+        dismissCurrentRun(runId)
         if (isQuickTransfer && protocolId != null) {
           navigate(`/quick-transfer/${protocolId}`)
         } else if (isQuickTransfer) {

@@ -510,6 +510,11 @@ def test_deck_conflict_raises_for_bad_pipette_move(
                 MountType.LEFT: Point(463.7, 433.3, 0.0),
                 MountType.RIGHT: Point(517.7, 433.3),
             },
+            deck_extents=Point(477.2, 493.8, 0.0),
+            padding_rear=-181.21,
+            padding_front=55.8,
+            padding_left_side=31.88,
+            padding_right_side=-80.32,
         )
     )
     decoy.when(
@@ -677,6 +682,11 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
                 MountType.LEFT: Point(463.7, 433.3, 0.0),
                 MountType.RIGHT: Point(517.7, 433.3),
             },
+            deck_extents=Point(477.2, 493.8, 0.0),
+            padding_rear=-181.21,
+            padding_front=55.8,
+            padding_left_side=31.88,
+            padding_right_side=-80.32,
         )
     )
 
@@ -696,7 +706,7 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
     )
     with pytest.raises(
         deck_conflict.PartialTipMovementNotAllowedError,
-        match="collision with thermocycler lid in deck slot A1.",
+        match="Requested motion with the A12 nozzle partial configuration is outside of robot bounds for the pipette.",
     ):
         deck_conflict.check_safe_for_pipette_movement(
             engine_state=mock_state_view,

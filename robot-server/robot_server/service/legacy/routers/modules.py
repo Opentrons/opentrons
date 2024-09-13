@@ -86,9 +86,9 @@ async def post_serial_command(
     if requested_version >= 3:
         raise LegacyErrorResponse.from_exc(
             APIRemoved(
-                "/modules/{serial}",
-                "3",
-                "This endpoint has been removed. Use POST /commands instead.",
+                api_element="/modules/{serial}",
+                since_version="3",
+                extra_message="This endpoint has been removed. Use POST /commands instead.",
             ),
         ).as_error(status.HTTP_410_GONE)
 

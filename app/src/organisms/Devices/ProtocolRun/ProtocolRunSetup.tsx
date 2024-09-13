@@ -2,10 +2,6 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  parseAllRequiredModuleModels,
-  parseLiquidsInLoadOrder,
-} from '@opentrons/api-client'
-import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
@@ -18,7 +14,11 @@ import {
   TYPOGRAPHY,
   FLEX_MAX_CONTENT,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
+  parseAllRequiredModuleModels,
+} from '@opentrons/shared-data'
 
 import { Line } from '../../../atoms/structure'
 import { InfoMessage } from '../../../molecules/InfoMessage'
@@ -164,11 +164,7 @@ export function ProtocolRunSetup({
   })
 
   const liquids = protocolAnalysis?.liquids ?? []
-  const liquidsInLoadOrder =
-    protocolAnalysis != null
-      ? parseLiquidsInLoadOrder(liquids, protocolAnalysis.commands)
-      : []
-  const hasLiquids = liquidsInLoadOrder.length > 0
+  const hasLiquids = liquids.length > 0
   const hasModules = protocolAnalysis != null && modules.length > 0
   // need config compatibility (including check for single slot conflicts)
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(
@@ -188,9 +184,18 @@ export function ProtocolRunSetup({
     setLabwareSetupComplete,
   ] = React.useState<boolean>(false)
   const [liquidSetupComplete, setLiquidSetupComplete] = React.useState<boolean>(
-    !hasLiquids
+    false
   )
-  if (!hasLiquids && missingSteps.includes('liquids')) {
+  React.useEffect(() => {
+    if ((robotProtocolAnalysis || storedProtocolAnalysis) && !hasLiquids) {
+      setLiquidSetupComplete(true)
+    }
+  }, [robotProtocolAnalysis, storedProtocolAnalysis, hasLiquids])
+  if (
+    !hasLiquids &&
+    protocolAnalysis != null &&
+    missingSteps.includes('liquids')
+  ) {
     setMissingSteps(missingSteps.filter(step => step !== 'liquids'))
   }
   const [lpcComplete, setLpcComplete] = React.useState<boolean>(false)
@@ -251,7 +256,6 @@ export function ProtocolRunSetup({
       rightElProps: {
         stepKey: MODULE_SETUP_KEY,
         complete:
-          calibrationStatusRobot.complete &&
           calibrationStatusModules.complete &&
           !isMissingModule &&
           !isFixtureMismatch,
@@ -259,7 +263,8 @@ export function ProtocolRunSetup({
           isFlex && hasModules
             ? t('calibration_ready')
             : t('deck_hardware_ready'),
-        incompleteText: isFlex ? t('calibration_needed') : t('action_needed'),
+        incompleteText:
+          isFlex && hasModules ? t('calibration_needed') : t('action_needed'),
         missingHardware: isMissingModule || isFixtureMismatch,
         missingHardwareText: t('action_needed'),
         incompleteElement: null,

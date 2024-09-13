@@ -39,6 +39,7 @@ import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configurat
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import type {
   CreateCommand,
   CutoutConfig,
@@ -49,6 +50,7 @@ interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
   closeFlow: () => void
   isPrepCommandLoading: boolean
+  isLoadedInRun?: boolean
   onComplete?: () => void
   prepCommandErrorMessage?: string
 }
@@ -60,6 +62,7 @@ export const ModuleWizardFlows = (
 ): JSX.Element | null => {
   const {
     attachedModule,
+    isLoadedInRun = false,
     isPrepCommandLoading,
     closeFlow,
     onComplete,
@@ -271,7 +274,11 @@ export const ModuleWizardFlows = (
         })}
       />
     )
-  } else if (prepCommandErrorMessage != null || errorMessage != null) {
+  } else if (
+    prepCommandErrorMessage != null ||
+    errorMessage != null ||
+    maintenanceRunData?.data.status === RUN_STATUS_FAILED
+  ) {
     modalContent = (
       <SimpleWizardBody
         isSuccess={false}
@@ -312,6 +319,7 @@ export const ModuleWizardFlows = (
         {...calibrateBaseProps}
         availableSlotNames={availableSlotNames}
         deckConfig={deckConfig}
+        isLoadedInRun={isLoadedInRun}
         occupiedCutouts={occupiedCutouts}
         configuredFixtureIdByCutoutId={fixtureIdByCutoutId}
       />

@@ -17,6 +17,7 @@ import {
   SPACING,
   SIZE_1,
   ALIGN_CENTER,
+  FLEX_MAX_CONTENT,
 } from '@opentrons/components'
 import { useDeleteRunMutation } from '@opentrons/react-api-client'
 
@@ -133,7 +134,10 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   }
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
-  const { reset } = useRunControls(runId, onResetSuccess)
+  const { reset, isResetRunLoading, isRunControlLoading } = useRunControls(
+    runId,
+    onResetSuccess
+  )
   const { deleteRun } = useDeleteRunMutation()
   const robot = useRobot(robotName)
   const robotSerialNumber =
@@ -165,7 +169,6 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
 
   return (
     <Flex
-      whiteSpace="nowrap"
       zIndex={10}
       borderRadius="4px 4px 0px 0px"
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
@@ -174,6 +177,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       top="2.3rem"
       right={0}
       flexDirection={DIRECTION_COLUMN}
+      width={FLEX_MAX_CONTENT}
     >
       <NavLink to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}>
         <MenuItem data-testid="RecentProtocolRun_OverflowMenu_viewRunRecord">
@@ -183,14 +187,32 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       <MenuItem
         {...targetProps}
         onClick={handleResetClick}
-        disabled={robotIsBusy || isRobotOnWrongVersionOfSoftware}
+        disabled={
+          robotIsBusy || isRobotOnWrongVersionOfSoftware || isRunControlLoading
+        }
         data-testid="RecentProtocolRun_OverflowMenu_rerunNow"
       >
-        {t('rerun_now')}
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+          {t('rerun_now')}
+          {isResetRunLoading ? (
+            <Icon
+              name="ot-spinner"
+              size={SIZE_1}
+              color={COLORS.grey50}
+              aria-label="spinner"
+              spin
+            />
+          ) : null}
+        </Flex>
       </MenuItem>
       {isRobotOnWrongVersionOfSoftware && (
         <Tooltip tooltipProps={tooltipProps}>
           {t('shared:a_software_update_is_available')}
+        </Tooltip>
+      )}
+      {isRunControlLoading && (
+        <Tooltip whiteSpace="normal" tooltipProps={tooltipProps}>
+          {t('rerun_loading')}
         </Tooltip>
       )}
       <MenuItem

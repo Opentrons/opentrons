@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { vi, it, describe, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
+import { screen } from '@testing-library/react'
+
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
@@ -8,16 +10,24 @@ import {
 import {
   parseLabwareInfoByLiquidId,
   parseLiquidsInLoadOrder,
-} from '@opentrons/api-client'
+} from '@opentrons/shared-data'
+
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { Liquids } from '../Liquids'
+
 import type { UseQueryResult } from 'react-query'
 import type { Protocol } from '@opentrons/api-client'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import { screen } from '@testing-library/react'
+import type * as SharedData from '@opentrons/shared-data'
 
-vi.mock('@opentrons/api-client')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actualSharedData = await importOriginal<typeof SharedData>()
+  return {
+    ...actualSharedData,
+    parseLabwareInfoByLiquidId: vi.fn(),
+    parseLiquidsInLoadOrder: vi.fn(),
+  }
+})
 vi.mock('@opentrons/react-api-client')
 
 const MOCK_PROTOCOL_ID = 'mockProtocolId'
@@ -201,7 +211,7 @@ describe('Liquids', () => {
       })
       .thenReturn({
         data: MOCK_PROTOCOL_ANALYSIS as any,
-      } as UseQueryResult<CompletedProtocolAnalysis>)
+      } as UseQueryResult<SharedData.CompletedProtocolAnalysis>)
   })
   it('should render the correct headers and liquids', () => {
     render(props)

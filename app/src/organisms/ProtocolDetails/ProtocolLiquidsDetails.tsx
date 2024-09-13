@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -17,6 +17,8 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
+
 import { Divider } from '../../atoms/structure'
 
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'

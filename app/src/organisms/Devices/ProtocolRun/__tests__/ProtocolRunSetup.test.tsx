@@ -4,11 +4,9 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
 import {
+  getSimplestDeckConfigForProtocol,
   parseAllRequiredModuleModels,
   parseLiquidsInLoadOrder,
-} from '@opentrons/api-client'
-import {
-  getSimplestDeckConfigForProtocol,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   simple_v4 as noModulesProtocol,
   test_modules_protocol as withModulesProtocol,
@@ -45,7 +43,6 @@ import { useNotifyRunQuery } from '../../../../resources/runs'
 
 import type * as SharedData from '@opentrons/shared-data'
 
-vi.mock('@opentrons/api-client')
 vi.mock('../../hooks')
 vi.mock('../SetupLabware')
 vi.mock('../SetupRobotCalibration')
@@ -61,6 +58,8 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
   return {
     ...actualSharedData,
+    parseAllRequiredModuleModels: vi.fn(),
+    parseLiquidsInLoadOrder: vi.fn(),
     parseProtocolData: vi.fn(),
     getSimplestDeckConfigForProtocol: vi.fn(),
   }

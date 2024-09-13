@@ -75,10 +75,8 @@ export function ConfirmCancelModal(
       onClose={isCanceling ? undefined : onClose}
       title={t('cancel_run_modal_heading')}
     >
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText as="p" marginBottom={SPACING.spacing24}>
-          {cancelRunAlertInfo}
-        </LegacyStyledText>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+        <LegacyStyledText as="p">{cancelRunAlertInfo}</LegacyStyledText>
         <LegacyStyledText as="p" marginBottom={SPACING.spacing24}>
           {t('cancel_run_module_info')}
         </LegacyStyledText>

@@ -814,6 +814,7 @@ def _create_live_context_pe(
             config=_get_protocol_engine_config(
                 robot_type, use_pe_virtual_hardware=use_pe_virtual_hardware
             ),
+            deck_configuration=None,
             error_recovery_policy=error_recovery_policy.never_recover,
             drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,

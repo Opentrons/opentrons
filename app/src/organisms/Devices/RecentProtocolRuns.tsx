@@ -35,6 +35,12 @@ export function RecentProtocolRuns({
   const currentRunId = useCurrentRunId()
   const { isRunTerminal } = useRunStatuses()
   const robotIsBusy = currentRunId != null ? !isRunTerminal : false
+  const nonQuickTransferRuns = runs?.filter(run => {
+    const protocol = protocols?.data?.data.find(
+      protocol => protocol.id === run.protocolId
+    )
+    return protocol?.protocolKind !== 'quick-transfer'
+  })
 
   return (
     <Flex
@@ -64,82 +70,83 @@ export function RecentProtocolRuns({
         paddingX={SPACING.spacing16}
         width="100%"
       >
-        {isRobotViewable && runs && runs.length > 0 && (
-          <>
-            <Flex
-              justifyContent={JUSTIFY_FLEX_START}
-              padding={SPACING.spacing8}
-              width="88%"
-              marginRight="12%"
-              gridGap={SPACING.spacing20}
-              color={COLORS.grey60}
-            >
-              <LegacyStyledText
-                as="p"
-                width="25%"
-                data-testid="RecentProtocolRuns_RunTitle"
+        {isRobotViewable &&
+          nonQuickTransferRuns &&
+          nonQuickTransferRuns?.length > 0 && (
+            <>
+              <Flex
+                justifyContent={JUSTIFY_FLEX_START}
+                padding={SPACING.spacing8}
+                width="88%"
+                marginRight="12%"
+                gridGap={SPACING.spacing20}
+                color={COLORS.grey60}
               >
-                {t('run')}
-              </LegacyStyledText>
-              <LegacyStyledText
-                as="p"
-                width="27%"
-                data-testid="RecentProtocolRuns_ProtocolTitle"
-              >
-                {t('protocol')}
-              </LegacyStyledText>
-              <LegacyStyledText
-                as="p"
-                width="5%"
-                data-testid="RecentProtocolRuns_FilesTitle"
-              >
-                {t('files')}
-              </LegacyStyledText>
-              <LegacyStyledText
-                as="p"
-                width="14%"
-                data-testid="RecentProtocolRuns_StatusTitle"
-              >
-                {t('status')}
-              </LegacyStyledText>
-              <LegacyStyledText
-                as="p"
-                width="14%"
-                data-testid="RecentProtocolRuns_DurationTitle"
-              >
-                {t('run_duration')}
-              </LegacyStyledText>
-            </Flex>
-            {runs
-              .sort(
-                (a, b) =>
-                  new Date(b.createdAt).getTime() -
-                  new Date(a.createdAt).getTime()
-              )
-              .map((run, index) => {
-                const protocol = protocols?.data?.data.find(
-                  protocol => protocol.id === run.protocolId
+                <LegacyStyledText
+                  as="p"
+                  width="25%"
+                  data-testid="RecentProtocolRuns_RunTitle"
+                >
+                  {t('run')}
+                </LegacyStyledText>
+                <LegacyStyledText
+                  as="p"
+                  width="27%"
+                  data-testid="RecentProtocolRuns_ProtocolTitle"
+                >
+                  {t('protocol')}
+                </LegacyStyledText>
+                <LegacyStyledText
+                  as="p"
+                  width="5%"
+                  data-testid="RecentProtocolRuns_FilesTitle"
+                >
+                  {t('files')}
+                </LegacyStyledText>
+                <LegacyStyledText
+                  as="p"
+                  width="14%"
+                  data-testid="RecentProtocolRuns_StatusTitle"
+                >
+                  {t('status')}
+                </LegacyStyledText>
+                <LegacyStyledText
+                  as="p"
+                  width="14%"
+                  data-testid="RecentProtocolRuns_DurationTitle"
+                >
+                  {t('run_duration')}
+                </LegacyStyledText>
+              </Flex>
+              {nonQuickTransferRuns
+                .sort(
+                  (a, b) =>
+                    new Date(b.createdAt).getTime() -
+                    new Date(a.createdAt).getTime()
                 )
+                .map((run, index) => {
+                  const protocol = protocols?.data?.data.find(
+                    protocol => protocol.id === run.protocolId
+                  )
+                  const protocolName =
+                    protocol?.metadata.protocolName ??
+                    protocol?.files[0].name ??
+                    t('shared:loading') ??
+                    ''
 
-                const protocolName =
-                  protocol?.metadata.protocolName ??
-                  protocol?.files[0].name ??
-                  t('shared:loading') ??
-                  ''
-
-                return (
-                  <HistoricalProtocolRun
-                    run={run}
-                    protocolName={protocolName}
-                    protocolKey={protocol?.key}
-                    robotName={robotName}
-                    robotIsBusy={robotIsBusy}
-                    key={index}
-                  />
-                )
-              })}
-          </>
-        )}
+                  return (
+                    <HistoricalProtocolRun
+                      run={run}
+                      protocolName={protocolName}
+                      protocolKey={protocol?.key}
+                      robotName={robotName}
+                      robotIsBusy={robotIsBusy}
+                      key={index}
+                    />
+                  )
+                })}
+            </>
+          )}
         {!isRobotViewable && (
           <LegacyStyledText
             as="p"
@@ -152,17 +159,19 @@ export function RecentProtocolRuns({
             {t('offline_recent_protocol_runs')}
           </LegacyStyledText>
         )}
-        {isRobotViewable && (runs == null || runs.length === 0) && (
-          <LegacyStyledText
-            as="p"
-            alignItems={ALIGN_CENTER}
-            display={DISPLAY_FLEX}
-            flex="1 0"
-            id="RecentProtocolRuns_no_runs"
-          >
-            {t('no_protocol_runs')}
-          </LegacyStyledText>
-        )}
+        {isRobotViewable &&
+          (nonQuickTransferRuns == null ||
+            nonQuickTransferRuns.length === 0) && (
+            <LegacyStyledText
+              as="p"
+              alignItems={ALIGN_CENTER}
+              display={DISPLAY_FLEX}
+              flex="1 0"
+              id="RecentProtocolRuns_no_runs"
+            >
+              {t('no_protocol_runs')}
+            </LegacyStyledText>
+          )}
       </Flex>
     </Flex>
   )

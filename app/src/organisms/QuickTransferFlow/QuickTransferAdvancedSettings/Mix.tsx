@@ -9,10 +9,12 @@ import {
   COLORS,
   ALIGN_CENTER,
 } from '@opentrons/components'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '../../../redux/analytics'
 import { getTopPortalEl } from '../../../App/portal'
-import { LargeButton } from '../../../atoms/buttons'
+import { RadioButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../ChildNavigation'
 import { InputField } from '../../../atoms/InputField'
+import { useTrackEventWithRobotSerial } from '../../Devices/hooks'
 import { ACTIONS } from '../constants'
 
 import type {
@@ -33,6 +35,7 @@ interface MixProps {
 export function Mix(props: MixProps): JSX.Element {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = React.useRef(null)
 
   const [mixIsEnabled, setMixIsEnabled] = React.useState<boolean>(
@@ -85,6 +88,12 @@ export function Mix(props: MixProps): JSX.Element {
           type: mixAction,
           mixSettings: undefined,
         })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            setting: `Mix_${kind}`,
+          },
+        })
         onBack()
       } else {
         setCurrentStep(2)
@@ -96,6 +105,12 @@ export function Mix(props: MixProps): JSX.Element {
         dispatch({
           type: mixAction,
           mixSettings: { mixVolume, repititions: mixReps },
+        })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            setting: `Mix_${kind}`,
+          },
         })
       }
       onBack()
@@ -158,13 +173,13 @@ export function Mix(props: MixProps): JSX.Element {
           width="100%"
         >
           {enableMixDisplayItems.map(displayItem => (
-            <LargeButton
+            <RadioButton
               key={displayItem.description}
-              buttonType={
-                mixIsEnabled === displayItem.option ? 'primary' : 'secondary'
-              }
-              onClick={displayItem.onClick}
-              buttonText={displayItem.description}
+              isSelected={mixIsEnabled === displayItem.option}
+              onChange={displayItem.onClick}
+              buttonValue={displayItem.description}
+              buttonLabel={displayItem.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>
@@ -202,6 +217,7 @@ export function Mix(props: MixProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              initialValue={String(mixVolume ?? '')}
               onChange={e => {
                 setMixVolume(Number(e))
               }}

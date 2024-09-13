@@ -8,7 +8,8 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { getAllDefinitions } from '@opentrons/shared-data'
-
+import { ANALYTICS_QUICK_TRANSFER_WELL_SELECTION_DURATION } from '../../redux/analytics'
+import { useTrackEventWithRobotSerial } from '../Devices/hooks'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { WellSelection } from '../../organisms/WellSelection'
 
@@ -33,6 +34,7 @@ export const RECTANGULAR_WELL_96_PLATE_DEFINITION_URI =
 export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
   const { onNext, onBack, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
   const sourceWells = state.sourceWells ?? []
   const sourceWellGroup = sourceWells.reduce((acc, well) => {
@@ -40,11 +42,21 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
   }, {})
 
   const [selectedWells, setSelectedWells] = React.useState(sourceWellGroup)
+  const [startingTimeStamp] = React.useState<Date>(new Date())
+  const is384WellPlate = state.source?.parameters.format === '384Standard'
 
   const handleClickNext = (): void => {
     dispatch({
       type: 'SET_SOURCE_WELLS',
       wells: Object.keys(selectedWells),
+    })
+    const duration = new Date().getTime() - startingTimeStamp?.getTime()
+    trackEventWithRobotSerial({
+      name: ANALYTICS_QUICK_TRANSFER_WELL_SELECTION_DURATION,
+      properties: {
+        is384WellPlate,
+        duration: `${duration / 1000} seconds`,
+      },
     })
     onNext()
   }
@@ -52,8 +64,9 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
   const resetButtonProps: React.ComponentProps<typeof SmallButton> = {
     buttonType: 'tertiaryLowLight',
     buttonText: t('shared:reset'),
-    onClick: () => {
+    onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
       setSelectedWells({})
+      e.currentTarget.blur?.()
     },
   }
   let displayLabwareDefinition = state.source
@@ -82,18 +95,15 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
       <Flex
         justifyContent={JUSTIFY_CENTER}
         marginTop={SPACING.spacing120}
-        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
+        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing8} ${SPACING.spacing32}`}
         position={POSITION_FIXED}
         top="0"
         left="0"
+        height="80%"
         width="100%"
       >
         {state.source != null && displayLabwareDefinition != null ? (
-          <Flex
-            width={
-              state.source.parameters.format === '384Standard' ? '100%' : '75%'
-            }
-          >
+          <Flex width={is384WellPlate ? '100%' : '75%'}>
             <WellSelection
               definition={displayLabwareDefinition}
               deselectWells={(wells: string[]) => {

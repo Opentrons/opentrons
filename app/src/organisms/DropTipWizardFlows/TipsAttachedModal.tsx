@@ -1,5 +1,4 @@
 import * as React from 'react'
-import capitalize from 'lodash/capitalize'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { Trans, useTranslation } from 'react-i18next'
 
@@ -82,9 +81,7 @@ const TipsAttachedModal = NiceModal.create(
     }
 
     const is96Channel = specs.channels === 96
-    const displayMountText = is96Channel
-      ? '96-Channel'
-      : capitalize(mount as string)
+    const displayMountText = is96Channel ? '96-Channel' : (mount as string)
 
     return (
       <ApiHostProvider {...host} hostname={host?.hostname ?? null}>
