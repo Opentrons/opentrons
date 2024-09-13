@@ -30,8 +30,8 @@ import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import { setFeatureFlags } from '../../feature-flags/actions'
 import { createCustomTiprackDef } from '../../labware-defs/actions'
 import { useKitchen } from '../../organisms/Kitchen/hooks'
-import { IncompatibleTipsModal } from '../../organisms'
-import { PipetteInfoItem } from '../../organisms/'
+import { IncompatibleTipsModal, PipetteInfoItem } from '../../organisms'
+import { BUTTON_LINK_STYLE } from '../../atoms'
 import { WizardBody } from './WizardBody'
 import { PIPETTE_GENS, PIPETTE_TYPES, PIPETTE_VOLUMES } from './constants'
 import { getTiprackOptions } from './utils'
@@ -373,6 +373,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                 </StyledText>
                 {has96Channel ? null : (
                   <Btn
+                    css={BUTTON_LINK_STYLE}
                     onClick={() => {
                       const leftPipetteName = pipettesByMount.left.pipetteName
                       const rightPipetteName = pipettesByMount.right.pipetteName

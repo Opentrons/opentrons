@@ -13,8 +13,10 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { BUTTON_LINK_STYLE } from '../../atoms'
 import { actions as loadFileActions } from '../../load-file'
 import { getFileMetadata } from '../../file-data/selectors'
+import { toggleNewProtocolModal } from '../../navigation/actions'
 import welcomeImage from '../../assets/images/welcome_page.png'
 import type { ThunkDispatch } from '../../types'
 
@@ -64,6 +66,9 @@ export function Landing(): JSX.Element {
         {t('no-code-required')}
       </StyledText>
       <LargeButton
+        onClick={() => {
+          dispatch(toggleNewProtocolModal(true))
+        }}
         marginY={SPACING.spacing32}
         buttonText={
           <StyledNavLink to={'/createNew'}>
@@ -75,9 +80,11 @@ export function Landing(): JSX.Element {
       />
 
       <StyledLabel>
-        <StyledText desktopStyle="bodyLargeRegular" color={COLORS.grey60}>
-          {t('edit_existing')}
-        </StyledText>
+        <Flex css={BUTTON_LINK_STYLE}>
+          <StyledText desktopStyle="bodyLargeRegular">
+            {t('edit_existing')}
+          </StyledText>
+        </Flex>
         <input type="file" onChange={loadFile}></input>
       </StyledLabel>
     </Flex>

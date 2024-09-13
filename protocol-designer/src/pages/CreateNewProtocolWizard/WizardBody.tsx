@@ -15,6 +15,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import temporaryImg from '../../assets/images/placeholder_image_delete.png'
+import { BUTTON_LINK_STYLE } from '../../atoms'
 
 interface WizardBodyProps {
   stepNumber: number
@@ -83,11 +84,8 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           {goBack != null ? (
-            <Btn onClick={goBack}>
-              <StyledText
-                desktopStyle="bodyLargeSemiBold"
-                color={COLORS.grey60}
-              >
+            <Btn onClick={goBack} css={BUTTON_LINK_STYLE}>
+              <StyledText desktopStyle="bodyLargeSemiBold">
                 {t('go_back')}
               </StyledText>
             </Btn>
