@@ -78,20 +78,13 @@ export const RunPreviewComponent = (
     isCurrentCommandVisible,
     setIsCurrentCommandVisible,
   ] = React.useState<boolean>(true)
-  const filteredCommandsFromQuery = React.useMemo(
-    () =>
-      commandsFromQuery?.filter(
-        command => !('intent' in command) || command.intent !== 'fixit'
-      ),
-    [commandsFromQuery == null]
-  )
 
   if (robotSideAnalysis == null) {
     return null
   }
 
   const commands = isRunTerminal
-    ? filteredCommandsFromQuery
+    ? commandsFromQuery
     : robotSideAnalysis.commands
 
   // pass relevant data from run rather than analysis so that CommandText utilities can properly hash the entities' IDs
