@@ -19,6 +19,7 @@ class SupportedLiquid(Enum):
     ETHANOL = "ethanol"
     GLYCEROL = "glycerol"
     HEXANE = "hexane"
+    ISOPROPYL = "isopropyl"
 
     @classmethod
     def from_string(cls, s: str) -> "SupportedLiquid":
@@ -34,6 +35,7 @@ RELATIVE_DENSITIES_WIKIPEDIA: Dict[SupportedLiquid, float] = {
     SupportedLiquid.ETHANOL: 0.78905,
     SupportedLiquid.GLYCEROL: 1.261,
     SupportedLiquid.HEXANE: 0.6606,
+    SupportedLiquid.ISOPROPYL: 0.786,  # TODO: check this is correct
 }
 
 CONSTANT_SCALE_CALIBRATED_DENSITY_KG_M3: Final = 7950  # from certificate
