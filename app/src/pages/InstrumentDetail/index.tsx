@@ -96,7 +96,7 @@ const IconButton = styled('button')`
   &:disabled {
     background-color: transparent;
   }
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     cursor: default;
   }
 `

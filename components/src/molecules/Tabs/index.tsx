@@ -30,7 +30,7 @@ const DEFAULT_TAB_STYLE = css`
     }
   }
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     border-radius: ${BORDERS.borderRadius16};
     box-shadow: none;
     font-size: ${TYPOGRAPHY.fontSize22};
@@ -56,7 +56,7 @@ const CURRENT_TAB_STYLE = css`
 `
 const DEFAULT_CONTAINER_STYLE = css`
   grid-gap: ${SPACING.spacing4};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     grid-gap: ${SPACING.spacing8};
   }
 `

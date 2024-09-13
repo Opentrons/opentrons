@@ -92,7 +92,7 @@ const ErrorHeader = styled.h1`
   text-align: ${TEXT_ALIGN_CENTER};
   ${TYPOGRAPHY.h1Default}
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     ${TYPOGRAPHY.level4HeaderSemiBold}
   }
 `

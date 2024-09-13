@@ -29,7 +29,7 @@ import { SmallButton, TextOnlyButton } from '../../atoms/buttons'
 const ALIGN_BUTTONS = css`
   align-items: ${ALIGN_FLEX_END};
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     align-items: ${ALIGN_CENTER};
   }
 `
@@ -42,7 +42,7 @@ const CAPITALIZE_FIRST_LETTER_STYLE = css`
 
 const Title = styled.h1`
   ${TYPOGRAPHY.h1Default};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     ${TYPOGRAPHY.level4HeaderSemiBold};
     height: ${SPACING.spacing40};
     display: ${DISPLAY_INLINE_BLOCK};
@@ -54,7 +54,7 @@ const TILE_CONTAINER_STYLE = css`
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   padding: ${SPACING.spacing32};
   height: 24.625rem;
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     height: 29.5rem;
   }
 `

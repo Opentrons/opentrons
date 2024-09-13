@@ -35,7 +35,7 @@ const IN_PROGRESS_STYLE = css`
   ${TYPOGRAPHY.pRegular};
   text-align: ${TYPOGRAPHY.textAlignCenter};
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     font-size: ${TYPOGRAPHY.fontSize28};
     line-height: 1.625rem;
     margin-top: ${SPACING.spacing4};

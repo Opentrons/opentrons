@@ -47,7 +47,7 @@ export function TwoColTextAndFailedStepNextStep(
           flexDirection={DIRECTION_COLUMN}
           css={css`
             gap: ${SPACING.spacing16};
-            .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+            body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
               gap: ${SPACING.spacing8};
             }
           `}

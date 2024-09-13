@@ -14,7 +14,7 @@ const meta: Meta<React.ComponentProps<typeof OneColumnComponent>> = {
     <Box
       css={`
         width: 500;
-        .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+        body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
           width: 500;
         }
       `}

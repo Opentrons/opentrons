@@ -32,7 +32,7 @@ const DESCRIPTION_STYLE = css`
   margin-top: ${SPACING.spacing8};
   margin-bottom: ${SPACING.spacing24};
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     font-weight: ${TYPOGRAPHY.fontWeightBold};
     font-size: ${TYPOGRAPHY.fontSize32};
     margin-top: ${SPACING.spacing4};
@@ -49,7 +49,7 @@ const MODAL_STYLE = css`
   justify-content: ${JUSTIFY_CENTER};
   padding: ${SPACING.spacing32};
   height: 24.625rem;
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     height: 31.5625rem;
   }
 `
@@ -57,7 +57,7 @@ const MODAL_STYLE = css`
 const SPINNER_STYLE = css`
   color: ${COLORS.grey50};
   opacity: 100%;
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     color: ${COLORS.black90};
     opacity: 70%;
   }

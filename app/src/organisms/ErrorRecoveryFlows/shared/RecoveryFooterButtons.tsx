@@ -202,7 +202,7 @@ const ODD_ONLY_BUTTON = css`
 `
 
 const DESKTOP_ONLY_BUTTON = css`
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     display: none;
   }
 `

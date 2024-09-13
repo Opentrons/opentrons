@@ -39,7 +39,7 @@ const TILE_CONTAINER_STYLE = css`
   padding: ${SPACING.spacing32};
   height: 24.625rem;
   flex: 1;
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     height: 29.5rem;
   }
 `
@@ -47,7 +47,7 @@ const TILE_CONTAINER_STYLE = css`
 const Title = styled.h1`
   ${TYPOGRAPHY.h1Default};
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     ${TYPOGRAPHY.level4HeaderSemiBold};
   }
 `

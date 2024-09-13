@@ -147,7 +147,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
     border: 1px solid ${COLORS.grey60};
   }
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     flex-direction: ${DIRECTION_ROW};
     justify-content: ${JUSTIFY_FLEX_START};
     background-color: ${COLORS.blue35};
@@ -172,7 +172,7 @@ const SELECTED_OPTIONS_STYLE = css`
     background-color: ${COLORS.blue10};
   }
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     border-width: 0px;
     background-color: ${COLORS.blue50};
     color: ${COLORS.white};

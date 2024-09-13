@@ -95,7 +95,7 @@ export function InlineNotification(
         gap: ${SPACING.spacing8};
         border-radius: ${BORDERS.borderRadius4};
         padding: ${SPACING.spacing8} ${SPACING.spacing12};
-        .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+        body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
           gap: ${SPACING.spacing12};
           border-radius: ${BORDERS.borderRadius8};
           padding: ${SPACING.spacing12} ${SPACING.spacing16};
@@ -108,7 +108,7 @@ export function InlineNotification(
         flexDirection={DIRECTION_ROW}
         css={css`
           gap: ${SPACING.spacing8};
-          .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+          body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
             gap: ${SPACING.spacing12};
           }
         `}
@@ -117,7 +117,7 @@ export function InlineNotification(
           css={css`
             width: ${SPACING.spacing16};
             height: ${SPACING.spacing16};
-            .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+            body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
               width: 1.75rem;
               height: 1.75rem;
             }
@@ -141,7 +141,7 @@ export function InlineNotification(
               inline text layout on ODD. Soooo here you go */}
             <br
               css={`
-                .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+                body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
                   display: none;
                 }
               `}
@@ -173,7 +173,7 @@ export function InlineNotification(
             css={css`
               width: 28px;
               height: 28px;
-              .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+              body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
                 width: ${SPACING.spacing48};
                 height: ${SPACING.spacing48};
               }
@@ -187,7 +187,7 @@ export function InlineNotification(
               css={css`
                 width: 28px;
                 height: 28px;
-                .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+                body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
                   width: ${SPACING.spacing48};
                   height: ${SPACING.spacing48};
                 }

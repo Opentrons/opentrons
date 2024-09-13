@@ -58,7 +58,7 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
       color: ${COLORS.grey50};
     }
 
-    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+    body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
       padding: ${SPACING.spacing20};
       border-radius: ${BORDERS.borderRadius16};
       width: 100%;
@@ -106,7 +106,7 @@ function Check(props: CheckProps): JSX.Element {
 const CHECK_STYLE = css`
   width: 1rem;
   height: 1rem;
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     width: 1.75rem;
     height: 1.75rem;
   }

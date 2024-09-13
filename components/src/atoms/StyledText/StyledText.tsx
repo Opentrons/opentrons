@@ -149,7 +149,7 @@ const ODDStyleMap = {
   level1Header: {
     as: 'h1',
     style: css`
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         ${TYPOGRAPHY.level1Header};
       }
     `,
@@ -157,7 +157,7 @@ const ODDStyleMap = {
   level2HeaderRegular: {
     as: 'h2',
     style: css`
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         ${TYPOGRAPHY.level2HeaderRegular};
       }
     `,
@@ -165,7 +165,7 @@ const ODDStyleMap = {
   level2HeaderSemiBold: {
     as: 'h2',
     style: css`
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         ${TYPOGRAPHY.level2HeaderSemiBold}
       }
     `,
@@ -173,7 +173,7 @@ const ODDStyleMap = {
   level2HeaderBold: {
     as: 'h2',
     style: css`
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         ${TYPOGRAPHY.level2HeaderBold}
       }
     `,
@@ -182,7 +182,7 @@ const ODDStyleMap = {
   level3HeaderRegular: {
     as: 'h3',
     style: css`
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         ${TYPOGRAPHY.level3HeaderRegular};
       }
     `,
@@ -190,7 +190,7 @@ const ODDStyleMap = {
   level3HeaderSemiBold: {
     as: 'h3',
     style: css`
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         ${TYPOGRAPHY.level3HeaderSemiBold}
       }
     `,
@@ -198,7 +198,7 @@ const ODDStyleMap = {
   level3HeaderBold: {
     as: 'h3',
     style: css`
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         ${TYPOGRAPHY.level3HeaderBold}
       }
     `,
@@ -207,7 +207,7 @@ const ODDStyleMap = {
   level4HeaderRegular: {
     as: 'h4',
     style: css`
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         ${TYPOGRAPHY.level4HeaderRegular};
       }
     `,
@@ -215,7 +215,7 @@ const ODDStyleMap = {
   level4HeaderSemiBold: {
     as: 'h4',
     style: css`
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         ${TYPOGRAPHY.level4HeaderSemiBold}
       }
     `,
@@ -223,7 +223,7 @@ const ODDStyleMap = {
   level4HeaderBold: {
     as: 'h4',
     style: css`
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         ${TYPOGRAPHY.level4HeaderBold}
       }
     `,
@@ -232,7 +232,7 @@ const ODDStyleMap = {
   bodyTextRegular: {
     as: 'p',
     style: css`
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         ${TYPOGRAPHY.bodyTextRegular}
       }
     `,
@@ -240,7 +240,7 @@ const ODDStyleMap = {
   bodyTextSemiBold: {
     as: 'p',
     style: css`
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         ${TYPOGRAPHY.bodyTextSemiBold}
       }
     `,
@@ -248,7 +248,7 @@ const ODDStyleMap = {
   bodyTextBold: {
     as: 'p',
     style: css`
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         ${TYPOGRAPHY.bodyTextBold}
       }
     `,
@@ -256,7 +256,7 @@ const ODDStyleMap = {
   smallBodyTextRegular: {
     as: 'label',
     style: css`
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         ${TYPOGRAPHY.smallBodyTextRegular}
       }
     `,
@@ -265,7 +265,7 @@ const ODDStyleMap = {
   smallBodyTextSemiBold: {
     as: 'label',
     style: css`
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         font-size: ${TYPOGRAPHY.fontSize20};
         line-height: ${TYPOGRAPHY.lineHeight24};
       }
@@ -275,7 +275,7 @@ const ODDStyleMap = {
   smallBodyTextBold: {
     as: 'label',
     style: css`
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         ${TYPOGRAPHY.smallBodyTextBold}
       }
     `,
@@ -283,7 +283,7 @@ const ODDStyleMap = {
   hidden: {
     as: 'none',
     style: css`
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         display: none;
       }
     `,

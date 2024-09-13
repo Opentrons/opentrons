@@ -87,7 +87,7 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
     const [targetProps, tooltipProps] = useHoverTooltip()
 
     const OUTER_CSS = css`
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         grid-gap: ${SPACING.spacing8};
         &:focus-within {
           filter: ${hasError
@@ -150,7 +150,7 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
         margin: 0;
       }
 
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         height: ${size === 'small' ? '4.25rem' : '5rem'};
         font-size: ${size === 'small'
           ? TYPOGRAPHY.fontSize28
@@ -187,7 +187,7 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
 
     const FORM_BOTTOM_SPACE_STYLE = css`
       padding-top: ${SPACING.spacing4};
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         padding: ${SPACING.spacing8} 0rem;
         padding-bottom: 0;
       }
@@ -197,7 +197,7 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
       color: ${hasError ? COLORS.red50 : COLORS.black90};
       padding-bottom: ${SPACING.spacing8};
       text-align: ${textAlign};
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         font-size: ${TYPOGRAPHY.fontSize22};
         font-weight: ${TYPOGRAPHY.fontWeightRegular};
         line-height: ${TYPOGRAPHY.lineHeight28};
@@ -208,7 +208,7 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
     const ERROR_TEXT_STYLE = css`
       color: ${COLORS.red50};
       padding-top: ${SPACING.spacing4};
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         font-size: ${TYPOGRAPHY.fontSize22};
         color: ${COLORS.red50};
         padding-top: ${SPACING.spacing8};
@@ -221,7 +221,7 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
       font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
       line-height: ${TYPOGRAPHY.lineHeight12};
       text-align: ${TYPOGRAPHY.textAlignRight};
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
         color: ${props.disabled ? COLORS.grey40 : COLORS.grey50};
         font-size: ${TYPOGRAPHY.fontSize22};
         font-weight: ${TYPOGRAPHY.fontWeightRegular};

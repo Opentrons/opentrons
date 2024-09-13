@@ -48,7 +48,7 @@ export function Tag(props: TagProps): JSX.Element {
   const DEFAULT_CONTAINER_STYLE = css`
     padding: ${SPACING.spacing2} ${SPACING.spacing8};
     border-radius: ${BORDERS.borderRadius4};
-    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+    body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
       border-radius: ${BORDERS.borderRadius8};
       padding: ${SPACING.spacing8} ${SPACING.spacing12};
     }
@@ -68,7 +68,7 @@ export function Tag(props: TagProps): JSX.Element {
   const ICON_STYLE = css`
     width: 0.75rem;
     height: 0.875rem;
-    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+    body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
       width: 1.5rem;
       height: 1.5rem;
     }
@@ -76,7 +76,7 @@ export function Tag(props: TagProps): JSX.Element {
 
   const TEXT_STYLE = css`
     ${TYPOGRAPHY.h3Regular}
-    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+    body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
       ${TYPOGRAPHY.bodyTextRegular}
     }
   `

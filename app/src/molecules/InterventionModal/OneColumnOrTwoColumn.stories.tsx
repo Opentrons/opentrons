@@ -50,7 +50,7 @@ const meta: Meta<React.ComponentProps<typeof Wrapper>> = {
       <VisibleContainer
         css={css`
           min-width: min(max-content, 100vw);
-          .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+          body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
             width: 500px;
           }
         `}

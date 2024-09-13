@@ -65,7 +65,7 @@ const CONTAINER_STYLE = css`
   grid-gap: ${SPACING.spacing16};
   width: 100%;
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     grid-gap: ${SPACING.spacing24};
   }
 `

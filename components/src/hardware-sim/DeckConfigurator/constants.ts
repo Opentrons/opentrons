@@ -34,7 +34,7 @@ export const CONFIG_STYLE_READ_ONLY = css`
   grid-gap: ${SPACING.spacing8};
   justify-content: ${JUSTIFY_CENTER};
   width: 100%;
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     background-color: ${COLORS.grey55};
   }
 `
@@ -53,7 +53,7 @@ export const CONFIG_STYLE_EDITABLE = css`
   &:focus-visible {
     border: 3px solid ${COLORS.yellow50};
     background-color: ${COLORS.grey55};
-    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+    body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
       background-color: ${COLORS.grey60};
     }
   }
@@ -74,7 +74,7 @@ export const CONFIG_STYLE_SELECTED = css`
   &:focus-visible {
     border: 3px solid ${COLORS.yellow50};
     background-color: ${COLORS.blue55};
-    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+    body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
       background-color: ${COLORS.blue60};
     }
   }

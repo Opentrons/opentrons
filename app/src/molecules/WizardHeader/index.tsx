@@ -33,7 +33,7 @@ const EXIT_BUTTON_STYLE = css`
   &:hover {
     color: ${COLORS.grey50};
   }
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     margin-right: 1.75rem;
     font-size: ${TYPOGRAPHY.fontSize22};
     font-weight: ${TYPOGRAPHY.fontWeightBold};
@@ -47,7 +47,7 @@ const EXIT_BUTTON_STYLE = css`
 `
 const BOX_STYLE = css`
   background-color: ${COLORS.white};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     border-radius: ${BORDERS.borderRadius16};
   }
 `
@@ -55,14 +55,14 @@ const HEADER_CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_ROW};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   padding: ${SPACING.spacing16} ${SPACING.spacing32};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     padding: 1.75rem ${SPACING.spacing32};
     border-radius: ${BORDERS.borderRadius16};
   }
 `
 const HEADER_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold}
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     font-size: ${TYPOGRAPHY.fontSize22};
     font-weight: ${TYPOGRAPHY.fontWeightBold};
     line-height: ${TYPOGRAPHY.lineHeight28};
@@ -71,7 +71,7 @@ const HEADER_TEXT_STYLE = css`
 const STEP_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold}
   color: ${COLORS.grey60};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     font-size: 1.375rem;
     margin-left: ${SPACING.spacing16};
   }

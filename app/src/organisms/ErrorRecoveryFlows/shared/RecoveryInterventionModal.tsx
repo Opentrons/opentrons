@@ -51,7 +51,7 @@ const SMALL_MODAL_STYLE = css`
   height: 22rem;
   padding: ${SPACING.spacing32};
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     padding: ${SPACING.spacing32};
     height: 100%;
   }

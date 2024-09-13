@@ -71,7 +71,7 @@ export function CategorizedStepContent(
       justifyContent={JUSTIFY_FLEX_START}
       css={css`
         gap: ${SPACING.spacing16};
-        .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+        body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
           gap: ${SPACING.spacing24};
         }
       `}
@@ -153,7 +153,7 @@ export function CategorizedStepContent(
 }
 
 const HIDE_ON_TOUCHSCREEN_STYLE = `
-   .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+   body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
       display: none;
    }
 `

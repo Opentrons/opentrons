@@ -110,7 +110,7 @@ const ModalArea = styled.div<
   box-shadow: ${BORDERS.smallDropShadow};
   height: ${({ isFullPage }) => (isFullPage ? '100%' : 'auto')};
   background-color: ${COLORS.white};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     border-radius: ${BORDERS.borderRadius16};
   }
   ${styleProps};

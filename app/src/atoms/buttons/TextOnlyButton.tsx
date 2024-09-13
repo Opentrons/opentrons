@@ -10,7 +10,7 @@ const GO_BACK_BUTTON_STYLE = css`
     opacity: 70%;
   }
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     &:hover {
       opacity: 100%;
     }

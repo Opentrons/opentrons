@@ -70,7 +70,7 @@ const PROPS_BY_STATE: Record<
       style: `
       border-radius: ${BORDERS.borderRadius4};
       padding: ${SPACING.spacing8};
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
          border-radius: ${BORDERS.borderRadius8};
          padding: ${SPACING.spacing12} ${SPACING.spacing24};
       }
@@ -88,7 +88,7 @@ const PROPS_BY_STATE: Record<
       border-radius: ${BORDERS.borderRadius4};
       padding: ${SPACING.spacing8};
       background-color: ${COLORS.red20};
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
          border-radius: ${BORDERS.borderRadius8};
          padding: ${SPACING.spacing12} ${SPACING.spacing24};
          background-color: ${COLORS.red35};
@@ -106,7 +106,7 @@ const PROPS_BY_STATE: Record<
       background-color: ${COLORS.grey20};
       border-radius: ${BORDERS.borderRadius4};
       padding: ${SPACING.spacing8};
-      .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+      body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
          border-radius: ${BORDERS.borderRadius8};
          background-color: ${COLORS.grey35};
          padding: ${SPACING.spacing12} ${SPACING.spacing24};
@@ -138,7 +138,7 @@ export function CenteredCommand(
           margin-right: ${SPACING.spacing8};
           max-height: ${ICON_SIZE_DESKTOP};
           max-width: ${ICON_SIZE_DESKTOP};
-          .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+          body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
             margin-right: ${SPACING.spacing12};
             max-height: ${ICON_SIZE_ODD};
             max-width: ${ICON_SIZE_ODD};
@@ -156,7 +156,7 @@ export function CenteredCommand(
         width="100%"
         css={`
           min-height: ${ICON_SIZE_DESKTOP};
-          .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+          body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
             min-height: ${ICON_SIZE_ODD};
           }
         `}
@@ -194,7 +194,7 @@ export function LeftAlignedCommand(
           margin-right: ${SPACING.spacing8};
           max-height: ${ICON_SIZE_DESKTOP};
           max-width: ${ICON_SIZE_DESKTOP};
-          .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+          body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
             margin-right: ${SPACING.spacing12};
             max-height: ${ICON_SIZE_ODD};
             max-width: ${ICON_SIZE_ODD};
@@ -212,7 +212,7 @@ export function LeftAlignedCommand(
         width="100%"
         css={`
           min-height: ${ICON_SIZE_DESKTOP};
-          .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+          body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
             min-height: ${ICON_SIZE_ODD};
           }
         `}

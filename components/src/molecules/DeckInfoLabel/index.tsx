@@ -47,7 +47,7 @@ export const DeckInfoLabel = styled(DeckInfoLabelComponent)`
     width: ${props => props.svgSize ?? '0.875rem'};
   }
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     border-radius: ${BORDERS.borderRadius12};
     height: ${props => props.height ?? SPACING.spacing32};
     padding: ${SPACING.spacing4}

@@ -23,7 +23,7 @@ interface UpdateInProgressModalProps {
 const SPINNER_STYLE = css`
   color: ${COLORS.grey50};
   opacity: 100%;
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     color: ${COLORS.black90};
     opacity: 70%;
   }

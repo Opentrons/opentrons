@@ -24,7 +24,7 @@ export function CommandIndex({
       width="100%"
       maxWidth={`${Math.max(allowSpaceForNDigits ?? 0, 3)}ch`}
       css={`
-        .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+        body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
           display: none;
         }
       `}

@@ -204,7 +204,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
     border: 1px solid ${COLORS.grey35};
   }
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     flex-direction: ${DIRECTION_ROW};
     justify-content: ${JUSTIFY_FLEX_START};
     background-color: ${COLORS.blue35};
@@ -224,7 +224,7 @@ const SELECTED_OPTIONS_STYLE = css`
   border: 1px solid ${COLORS.blue50};
   background-color: ${COLORS.blue30};
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     border-width: 0px;
     background-color: ${COLORS.blue50};
     color: ${COLORS.white};
@@ -239,7 +239,7 @@ const SELECTED_OPTIONS_STYLE = css`
 const Title = styled.h1`
   ${TYPOGRAPHY.h1Default};
   margin-bottom: ${SPACING.spacing8};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     ${TYPOGRAPHY.level4HeaderSemiBold};
     margin-bottom: 0;
     height: ${SPACING.spacing40};
@@ -257,7 +257,7 @@ const TILE_CONTAINER_STYLE = css`
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   padding: ${SPACING.spacing32};
   height: 100%;
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     height: 29.5rem;
   }
 `

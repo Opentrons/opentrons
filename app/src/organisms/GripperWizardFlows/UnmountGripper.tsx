@@ -36,7 +36,7 @@ const GO_BACK_BUTTON_TEXT_STYLE = css`
     opacity: 70%;
   }
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
     font-size: ${TYPOGRAPHY.fontSize22};
     line-height: ${TYPOGRAPHY.lineHeight28};

@@ -49,7 +49,7 @@ export function InterventionInfo(props: InterventionInfoProps): JSX.Element {
             color={COLORS.grey60}
             css={css`
               ${LINE_CLAMP_STYLE}
-              .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+              body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
                 display: none;
               }
             `}
@@ -61,7 +61,7 @@ export function InterventionInfo(props: InterventionInfoProps): JSX.Element {
       <Divider
         borderColor={COLORS.grey35}
         css={`
-          .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+          body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
             display: none;
           }
         `}
@@ -91,7 +91,7 @@ const buildLocArrowLoc = (props: InterventionInfoProps): JSX.Element => {
         alignItems={ALIGN_CENTER}
         css={`
           gap: ${SPACING.spacing4};
-          .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+          body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
             gap: ${SPACING.spacing8};
           }
         `}
@@ -125,7 +125,7 @@ const buildLocColonLoc = (props: InterventionInfoProps): JSX.Element => {
         alignItems={ALIGN_CENTER}
         css={`
           gap: ${SPACING.spacing4};
-          .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+          body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
             gap: ${SPACING.spacing8};
           }
         `}
@@ -143,7 +143,7 @@ const buildLocColonLoc = (props: InterventionInfoProps): JSX.Element => {
 const ICON_STYLE = css`
   width: ${SPACING.spacing24};
   height: ${SPACING.spacing24};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     width: ${SPACING.spacing40};
     height: ${SPACING.spacing40};
   }
@@ -153,7 +153,7 @@ const CARD_STYLE = css`
   background-color: ${COLORS.grey20};
   border-radius: ${BORDERS.borderRadius4};
   gap: ${SPACING.spacing8};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     background-color: ${COLORS.grey35};
     border-radius: ${BORDERS.borderRadius8};
   }

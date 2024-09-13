@@ -46,7 +46,7 @@ const HEADER_STYLE = css`
   margin-top: ${SPACING.spacing24};
   margin-bottom: ${SPACING.spacing8};
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     font-size: 2rem;
     font-weight: 700;
     line-height: ${SPACING.spacing40};
@@ -60,7 +60,7 @@ const SUBHEADER_STYLE = css`
   text-align: ${TYPOGRAPHY.textAlignCenter};
   height: 1.75rem;
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     font-size: ${TYPOGRAPHY.fontSize28};
     line-height: ${TYPOGRAPHY.lineHeight36};
     margin-left: 4.5rem;
@@ -71,7 +71,7 @@ const SUBHEADER_STYLE = css`
 const FLEX_SPACING_STYLE = css`
   height: 1.75rem;
   margin-bottom: ${SPACING.spacing32};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     height: 0rem;
   }
 `
@@ -94,7 +94,7 @@ export function SimpleWizardBodyContent(props: Props): JSX.Element {
     padding-right: ${SPACING.spacing32};
     padding-bottom: ${SPACING.spacing32};
 
-    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+    body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
       justify-content: ${props.justifyContentForOddButton ??
       JUSTIFY_SPACE_BETWEEN};
       padding-bottom: ${SPACING.spacing32};
@@ -105,7 +105,7 @@ export function SimpleWizardBodyContent(props: Props): JSX.Element {
   const ICON_POSITION_STYLE = css`
     justify-content: ${JUSTIFY_CENTER};
 
-    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+    body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
       justify-content: ${JUSTIFY_FLEX_START};
       margin-top: ${isSuccess ? SPACING.spacing32 : '8.1875rem'};
     }

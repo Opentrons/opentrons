@@ -83,7 +83,7 @@ const TEXT_STYLE = css`
   align-items: ${ALIGN_CENTER};
   text-align: ${TEXT_ALIGN_CENTER};
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     grid-gap: ${SPACING.spacing4};
   }
 `
@@ -93,7 +93,7 @@ const ICON_STYLE = css`
   width: ${SPACING.spacing40};
   color: ${COLORS.yellow50};
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     height: ${SPACING.spacing60};
     width: ${SPACING.spacing60};
   }

@@ -26,7 +26,7 @@ const DESCRIPTION_STYLE = css`
   margin-top: ${SPACING.spacing24};
   margin-bottom: ${SPACING.spacing8};
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     font-weight: ${TYPOGRAPHY.fontWeightBold};
     font-size: ${TYPOGRAPHY.fontSize32};
     margin-top: ${SPACING.spacing32};
@@ -41,7 +41,7 @@ const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular}
   text-align: ${TYPOGRAPHY.textAlignCenter};
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     ${TYPOGRAPHY.level4HeaderRegular}
     color: ${COLORS.grey60}
   }
@@ -52,7 +52,7 @@ const MODAL_STYLE = css`
   justify-content: ${JUSTIFY_CENTER};
   padding: ${SPACING.spacing32};
   height: 24.625rem;
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     max-height: 29.5rem;
     height: 100%;
   }
@@ -61,7 +61,7 @@ const SPINNER_STYLE = css`
   color: ${COLORS.grey60};
   width: 5.125rem;
   height: 5.125rem;
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     width: 6.25rem;
     height: 6.25rem;
   }
@@ -70,7 +70,7 @@ const SPINNER_STYLE = css`
 const DESCRIPTION_CONTAINER_STYLE = css`
   padding-x: 6.5625rem;
   gap: ${SPACING.spacing8};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     padding-x: ${SPACING.spacing40};
     gap: ${SPACING.spacing4};
   }

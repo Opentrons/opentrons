@@ -99,7 +99,7 @@ export function Banner(props: BannerProps): JSX.Element {
     font-weight: ${TYPOGRAPHY.fontWeightRegular};
     border-radius: ${SPACING.spacing4};
 
-    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+    body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
       font-size: 1.25rem;
       font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
       background-color: ${COLORS.yellow35};

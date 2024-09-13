@@ -25,7 +25,7 @@ export const MenuItem = styled.button<ButtonProps>`
     color: ${COLORS.grey40};
   }
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     align-items: ${ALIGN_CENTER};
     text-align: ${TYPOGRAPHY.textAlignCenter};
     font-size: ${TYPOGRAPHY.fontSize28};

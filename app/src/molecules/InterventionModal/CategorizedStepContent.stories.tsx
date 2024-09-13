@@ -162,7 +162,7 @@ const meta: Meta<React.ComponentProps<typeof Wrapper>> = {
           border: 4px solid #000000;
           border-radius: ${BORDERS.borderRadius8};
           max-width: 47rem;
-          .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+          body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
             max-width: 62rem;
             max-height: 33.5rem;
           }

@@ -126,7 +126,7 @@ function ThermocyclerRunProfile(
       {...styleProps}
       alignItems={shouldPropagateCenter ? ALIGN_CENTER : undefined}
       css={`
-        .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+        body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
           display: flex !important;
         }
       `}

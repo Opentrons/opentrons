@@ -84,7 +84,7 @@ export const ProbeNotAttached = (
 const ALIGN_BUTTONS = css`
   align-items: ${ALIGN_FLEX_END};
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     align-items: ${ALIGN_CENTER};
   }
 `
@@ -97,7 +97,7 @@ const GO_BACK_BUTTON_STYLE = css`
     opacity: 70%;
   }
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
     font-size: ${TYPOGRAPHY.fontSize22};
     padding-left: 0rem;

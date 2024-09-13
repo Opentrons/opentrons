@@ -17,7 +17,7 @@ import {
 const INTERVENTION_COMMAND_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing4};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     grid-gap: 0;
   }
 `
@@ -26,7 +26,7 @@ const INTERVENTION_COMMAND_NOTES_STYLE = css`
   ${TYPOGRAPHY.h6Default}
   color: ${COLORS.grey60};
   text-transform: ${TEXT_TRANSFORM_UPPERCASE};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     ${TYPOGRAPHY.smallBodyTextBold}
     color: ${COLORS.black90};
     text-transform: ${TEXT_TRANSFORM_CAPITALIZE};
@@ -35,7 +35,7 @@ const INTERVENTION_COMMAND_NOTES_STYLE = css`
 
 const INTERVENTION_COMMAND_MESSAGE_STYLE = css`
   ${TYPOGRAPHY.pRegular}
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     ${TYPOGRAPHY.smallBodyTextRegular}
   }
 `

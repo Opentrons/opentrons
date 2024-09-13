@@ -319,7 +319,7 @@ const ARROW_GRID_STYLES = css`
   @media (max-width: 750px) {
     max-width: 12.5rem;
   }
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     max-width: 415px;
     grid-gap: ${SPACING.spacing20};
     grid-template-areas:
@@ -366,7 +366,7 @@ const ARROW_BUTTON_STYLES = css`
     width: 4rem;
     height: 4rem;
   }
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     width: 125px;
     height: 125px;
     background-color: ${COLORS.grey35};
@@ -399,7 +399,7 @@ const ARROW_ICON_STYLES = css`
   height: 1.125rem;
   width: 1.125rem;
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     width: 84px;
     height: 84px;
   }

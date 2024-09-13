@@ -15,7 +15,7 @@ import {
 const Title = styled.h1`
   ${TYPOGRAPHY.h1Default};
   margin-bottom: ${SPACING.spacing8};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     ${TYPOGRAPHY.level4HeaderSemiBold};
     margin-bottom: 0;
     height: ${SPACING.spacing40};
@@ -28,7 +28,7 @@ const TILE_CONTAINER_STYLE = css`
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   padding: ${SPACING.spacing32};
   height: 24.625rem;
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     height: 29.5rem;
   }
 `

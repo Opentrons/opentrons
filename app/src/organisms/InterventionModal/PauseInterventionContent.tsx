@@ -23,7 +23,7 @@ const PAUSE_INTERVENTION_CONTENT_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing12};
   width: 100%;
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     grid-gap: ${SPACING.spacing20};
   }
 `
@@ -51,7 +51,7 @@ const PAUSE_HEADER_STYLE = css`
   border-radius: ${BORDERS.borderRadius4};
   grid-gap: ${SPACING.spacing6};
   padding: ${SPACING.spacing16};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     align-self: ${ALIGN_CENTER};
     background-color: ${COLORS.grey35};
     border-radius: ${BORDERS.borderRadius8};
@@ -63,14 +63,14 @@ const PAUSE_HEADER_STYLE = css`
 
 const PAUSE_TEXT_STYLE = css`
   ${TYPOGRAPHY.h1Default}
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     ${TYPOGRAPHY.level4HeaderSemiBold}
   }
 `
 
 const PAUSE_TIME_STYLE = css`
   ${TYPOGRAPHY.h1Default}
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     ${TYPOGRAPHY.level1Header}
   }
 `

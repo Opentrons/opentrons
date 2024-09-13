@@ -14,7 +14,7 @@ const WIZARD_CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   height: 'auto';
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     height: 472px;
   }
 `

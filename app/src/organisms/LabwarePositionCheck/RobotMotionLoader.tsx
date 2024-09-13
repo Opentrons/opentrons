@@ -47,7 +47,7 @@ const LoadingText = styled.h1`
     text-transform: uppercase;
   }
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     ${TYPOGRAPHY.level4HeaderSemiBold}
   }
 `

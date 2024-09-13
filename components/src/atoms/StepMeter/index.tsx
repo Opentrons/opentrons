@@ -26,7 +26,7 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
     position: ${styleProps.position ? styleProps.position : POSITION_RELATIVE};
     height: ${SPACING.spacing4};
     background-color: ${COLORS.grey30};
-    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+    body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
       height: ${SPACING.spacing12};
     }
   `

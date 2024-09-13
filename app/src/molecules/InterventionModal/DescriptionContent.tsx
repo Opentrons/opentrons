@@ -36,7 +36,7 @@ export function DescriptionContent(
         flexDirection={DIRECTION_COLUMN}
         css={`
           gap: ${SPACING.spacing16};
-          .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+          body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
             gap: ${SPACING.spacing8};
           }
         `}

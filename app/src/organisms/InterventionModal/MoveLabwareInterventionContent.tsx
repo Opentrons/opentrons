@@ -60,7 +60,7 @@ const LABWARE_DESCRIPTION_STYLE = css`
   padding: ${SPACING.spacing16};
   background-color: ${COLORS.grey20};
   border-radius: ${BORDERS.borderRadius4};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     background-color: ${COLORS.grey35};
     border-radius: ${BORDERS.borderRadius8};
   }
@@ -68,21 +68,21 @@ const LABWARE_DESCRIPTION_STYLE = css`
 
 const LABWARE_NAME_TITLE_STYLE = css`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     display: ${DISPLAY_NONE};
   }
 `
 
 const LABWARE_NAME_STYLE = css`
   color: ${COLORS.grey60};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     ${TYPOGRAPHY.bodyTextBold}
     color: ${COLORS.black90};
   }
 `
 
 const DIVIDER_STYLE = css`
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     display: ${DISPLAY_NONE};
   }
 `
@@ -91,14 +91,14 @@ const LABWARE_DIRECTION_STYLE = css`
   align-items: ${ALIGN_CENTER};
   grid-gap: ${SPACING.spacing4};
   text-transform: ${TEXT_TRANSFORM_UPPERCASE};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     grid-gap: ${SPACING.spacing8};
   }
 `
 
 const ICON_STYLE = css`
   height: 1.5rem;
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     height: 2.5rem;
   }
 `

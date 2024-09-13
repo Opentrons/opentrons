@@ -154,7 +154,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
         .disabledBackgroundColor};
     }
 
-    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+    body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
       cursor: default;
       align-items: ${ALIGN_FLEX_START};
       flex-direction: ${DIRECTION_COLUMN};
@@ -205,7 +205,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
         css={css`
           font-size: ${fontSizeBodyLargeSemiBold};
           padding-right: ${iconName != null ? SPACING.spacing8 : '0'};
-          .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+          body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
             ${TYPOGRAPHY.level3HeaderSemiBold}
           }
         `}
@@ -217,7 +217,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
           css={css`
             width: 1.5rem;
             height: 1.5rem;
-            .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+            body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
               width: 5rem;
               height: 5rem;
             }

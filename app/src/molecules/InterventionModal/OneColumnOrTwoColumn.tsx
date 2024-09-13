@@ -31,7 +31,7 @@ export function OneColumnOrTwoColumn({
         flex="1"
         css={css`
           min-width: ${TWO_COLUMN_ELEMENT_MIN_WIDTH};
-          .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+          body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
             min-width: none;
             width: 100%;
           }
@@ -43,7 +43,7 @@ export function OneColumnOrTwoColumn({
         flex="1"
         minWidth={TWO_COLUMN_ELEMENT_MIN_WIDTH}
         css={css`
-          .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+          body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
             display: none;
           }
         `}

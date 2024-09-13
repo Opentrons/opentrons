@@ -222,7 +222,7 @@ const TouchNavLink = styled(NavLink)`
     background-color: ${COLORS.purple50};
   }
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     cursor: default;
   }
 `
@@ -245,7 +245,7 @@ const IconButton = styled('button')`
   &:disabled {
     background-color: transparent;
   }
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     cursor: default;
   }
 `

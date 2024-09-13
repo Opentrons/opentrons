@@ -84,7 +84,7 @@ const WIZARD_CONTAINER_STYLE = css`
   min-height: 394px;
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     height: 472px;
   }
 `

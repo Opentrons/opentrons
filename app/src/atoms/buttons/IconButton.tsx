@@ -38,7 +38,7 @@ export function IconButton(props: IconButtonProps): JSX.Element {
             : COLORS.transparent};
           color: ${COLORS.grey50};
         }
-        .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+        body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
           cursor: default;
         }
       `}

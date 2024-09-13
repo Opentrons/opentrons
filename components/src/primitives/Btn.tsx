@@ -24,7 +24,7 @@ const BUTTON_BASE_STYLE = css`
     cursor: default;
   }
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     cursor: default;
   }
 `

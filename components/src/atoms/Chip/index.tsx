@@ -91,7 +91,7 @@ export function Chip(props: ChipProps): JSX.Element {
   const MEDIUM_CONTAINER_STYLE = css`
     padding: ${SPACING.spacing2} ${background === false ? 0 : SPACING.spacing8};
     grid-gap: ${SPACING.spacing4};
-    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+    body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
       padding: ${SPACING.spacing8}
         ${background === false ? 0 : SPACING.spacing16};
       grid-gap: ${SPACING.spacing8};
@@ -101,7 +101,7 @@ export function Chip(props: ChipProps): JSX.Element {
   const SMALL_CONTAINER_STYLE = css`
     padding: ${SPACING.spacing4} ${background === false ? 0 : SPACING.spacing6};
     grid-gap: ${SPACING.spacing4};
-    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+    body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
       padding: ${SPACING.spacing4}
         ${background === false ? 0 : SPACING.spacing8};
       grid-gap: ${SPACING.spacing4};
@@ -111,7 +111,7 @@ export function Chip(props: ChipProps): JSX.Element {
   const ICON_STYLE = css`
     width: ${chipSize === 'medium' ? '1rem' : '0.75rem'};
     height: ${chipSize === 'medium' ? '1rem' : '0.75rem'};
-    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+    body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
       width: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
       height: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
     }
@@ -119,7 +119,7 @@ export function Chip(props: ChipProps): JSX.Element {
 
   const TEXT_STYLE = css`
     ${chipSize === 'medium' ? WEB_MEDIUM_TEXT_STYLE : WEB_SMALL_TEXT_STYLE}
-    .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+    body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
       ${chipSize === 'medium'
         ? TYPOGRAPHY.bodyTextSemiBold
         : TYPOGRAPHY.smallBodyTextSemiBold}

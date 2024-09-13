@@ -56,7 +56,7 @@ interface PlaceAdapterProps extends ModuleCalibrationWizardStepProps {
 export const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     font-size: 1.275rem;
     line-height: 1.75rem;
   }

@@ -40,7 +40,7 @@ type ChooseLocationProps = DropTipWizardContainerProps & {
 const Title = styled.h1`
   ${TYPOGRAPHY.h1Default};
   margin-bottom: ${SPACING.spacing8};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     ${TYPOGRAPHY.level4HeaderSemiBold};
     margin-bottom: 0;
     height: ${SPACING.spacing40};
@@ -113,7 +113,7 @@ export const ChooseLocation = (
         <PrimaryButton
           onClick={handleConfirmPosition}
           css={css`
-            .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+            body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
               display: none;
             }
           `}
@@ -137,7 +137,7 @@ export const ChooseLocation = (
 const ALIGN_BUTTONS = css`
   align-items: ${ALIGN_FLEX_END};
 
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     align-items: ${ALIGN_CENTER};
   }
 `
@@ -146,7 +146,7 @@ const CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   padding: ${SPACING.spacing32};
-  .${RESPONSIVENESS.TOUCH_ODD_CLASS} {
+  body.${RESPONSIVENESS.TOUCH_ODD_CLASS} & {
     justify-content: ${JUSTIFY_FLEX_START};
     gap: ${SPACING.spacing32};
     padding: none;
