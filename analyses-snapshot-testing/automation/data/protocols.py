@@ -696,6 +696,19 @@ class Protocols:
         robot="Flex",
     )
 
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_20_P8X1000_P50_LLD.py
+    Flex_S_v2_20_P8X1000_P50_LLD: Protocol = Protocol(
+        file_stem="Flex_S_v2_20_P8X1000_P50_LLD",
+        file_extension="py",
+        robot="Flex",
+    )
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_20_P50_LPD.py
+    Flex_S_v2_20_P50_LPD: Protocol = Protocol(
+        file_stem="Flex_S_v2_20_P50_LPD",
+        file_extension="py",
+        robot="Flex",
+    )
+
     OT2_X_v2_18_None_None_duplicateRTPVariableName: Protocol = Protocol(
         file_stem="OT2_X_v2_18_None_None_duplicateRTPVariableName",
         file_extension="py",
@@ -728,6 +741,19 @@ class Protocols:
 
     OT2_S_v2_19_P300M_P20S_HS_TC_TM_SmokeTestV3: Protocol = Protocol(
         file_stem="OT2_S_v2_19_P300M_P20S_HS_TC_TM_SmokeTestV3",
+        file_extension="py",
+        robot="OT2",
+    )
+
+    # analyses-snapshot-testing/files/protocols/OT2_S_v2_20_8_None_PARTIAL_COLUMN_HappyPathMixedTipRacks.py
+    OT2_S_v2_20_8_None_PARTIAL_COLUMN_HappyPathMixedTipRacks: Protocol = Protocol(
+        file_stem="OT2_S_v2_20_8_None_PARTIAL_COLUMN_HappyPathMixedTipRacks",
+        file_extension="py",
+        robot="OT2",
+    )
+    # analyses-snapshot-testing/files/protocols/OT2_S_v2_20_8_None_SINGLE_HappyPath.py
+    OT2_S_v2_20_8_None_SINGLE_HappyPath: Protocol = Protocol(
+        file_stem="OT2_S_v2_20_8_None_SINGLE_HappyPath",
         file_extension="py",
         robot="OT2",
     )
