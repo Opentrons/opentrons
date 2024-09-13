@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from typing import List, Dict, Optional, Union, cast
 
+from opentrons.drivers.types import ABSMeasurementMode
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.module.types import ModuleModel, ModuleType
 
@@ -1003,11 +1004,23 @@ class AbsorbanceReaderContext(ModuleContext):
         return self._core.is_lid_on()
 
     @requires_version(2, 21)
-    def initialize(self, wavelength: int) -> None:
-        """Initialize the Absorbance Reader by taking zero reading."""
-        self._core.initialize(wavelength)
+    def initialize(
+        self,
+        wavelengths: List[int],
+        mode: ABSMeasurementMode = ABSMeasurementMode.SINGLE,
+        reference_wavelength: Optional[int] = None,
+    ) -> None:
+        """Initialize the Absorbance Reader by taking zero reading.
+
+        You can only use one wavelength when in SINGLE mode
+        You can only use `reference_wavelength` when in SINGLE mode, it is ignored in MULTI mode.
+        """
+        self._core.initialize(
+            wavelengths, mode=mode, reference_wavelength=reference_wavelength
+        )
 
     @requires_version(2, 21)
-    def read(self) -> Optional[Dict[str, float]]:
+    def read(self) -> Optional[Dict[int, Dict[str, float]]]:
         """Initiate read on the Absorbance Reader. Returns a dictionary of values ordered by well name."""
+        # TODO: Update the documentation
         return self._core.read()

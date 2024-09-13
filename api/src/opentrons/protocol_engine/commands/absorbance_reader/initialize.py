@@ -1,9 +1,11 @@
 """Command models to initialize an Absorbance Reader."""
 from __future__ import annotations
-from typing import Optional, Literal, TYPE_CHECKING
+from typing import List, Optional, Literal, TYPE_CHECKING
 from typing_extensions import Type
 
 from pydantic import BaseModel, Field
+
+from opentrons.drivers.types import ABSMeasurementMode
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
@@ -20,7 +22,13 @@ class InitializeParams(BaseModel):
     """Input parameters to initialize an absorbance reading."""
 
     moduleId: str = Field(..., description="Unique ID of the absorbance reader.")
-    sampleWavelength: int = Field(..., description="Sample wavelength in nm.")
+    measureMode: str = Field(
+        ..., description="Initialize single or multi measurement mode."
+    )
+    sampleWavelengths: List[int] = Field(..., description="Sample wavelengths in nm.")
+    referenceWavelength: Optional[int] = Field(
+        ..., description="Reference wavelength in nm."
+    )
 
 
 class InitializeResult(BaseModel):
@@ -54,7 +62,11 @@ class InitializeImpl(
         )
 
         if abs_reader is not None:
-            await abs_reader.set_sample_wavelength(wavelength=params.sampleWavelength)
+            await abs_reader.set_sample_wavelength(
+                mode=ABSMeasurementMode(params.measureMode),
+                wavelengths=params.sampleWavelengths,
+                reference_wavelength=params.referenceWavelength,
+            )
 
         return SuccessData(
             public=InitializeResult(),

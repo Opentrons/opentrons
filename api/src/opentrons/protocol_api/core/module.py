@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from typing import List, Dict, Optional, TypeVar, ClassVar
 
 from opentrons.drivers.types import (
+    ABSMeasurementMode,
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
@@ -355,11 +356,16 @@ class AbstractAbsorbanceReaderCore(AbstractModuleCore):
         """Get the module's unique hardware serial number."""
 
     @abstractmethod
-    def initialize(self, wavelength: int) -> None:
+    def initialize(
+        self,
+        wavelengths: List[int],
+        mode: ABSMeasurementMode = ABSMeasurementMode.SINGLE,
+        reference_wavelength: Optional[int] = None,
+    ) -> None:
         """Initialize the Absorbance Reader by taking zero reading."""
 
     @abstractmethod
-    def read(self) -> Optional[Dict[str, float]]:
+    def read(self) -> Optional[Dict[int, Dict[str, float]]]:
         """Get an absorbance reading from the Absorbance Reader."""
 
     @abstractmethod

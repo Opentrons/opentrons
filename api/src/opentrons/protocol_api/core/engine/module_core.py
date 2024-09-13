@@ -13,6 +13,7 @@ from opentrons.hardware_control.modules.types import (
     module_model_from_string,
 )
 from opentrons.drivers.types import (
+    ABSMeasurementMode,
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
@@ -527,23 +528,27 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
     _sync_module_hardware: SynchronousAdapter[hw_modules.AbsorbanceReader]
     _initialized_value: Optional[int] = None
 
-    def initialize(self, wavelength: int) -> None:
+    def initialize(
+        self,
+        wavelengths: List[int],
+        mode: ABSMeasurementMode = ABSMeasurementMode.SINGLE,
+        reference_wavelength: Optional[int] = None
+    ) -> None:
         """Initialize the Absorbance Reader by taking zero reading."""
         self._engine_client.execute_command(
             cmd.absorbance_reader.InitializeParams(
                 moduleId=self.module_id,
-                sampleWavelength=wavelength,
+                measureMode=mode.value,
+                sampleWavelengths=wavelengths,
+                referenceWavelength=reference_wavelength,
             ),
         )
-        self._initialized_value = wavelength
 
-    def read(self) -> Optional[Dict[str, float]]:
+    def read(self) -> Optional[Dict[int, Dict[str, float]]]:
         """Initiate a read on the Absorbance Reader, and return the results. During Analysis, this will return None."""
         if self._initialized_value:
             self._engine_client.execute_command(
-                cmd.absorbance_reader.ReadAbsorbanceParams(
-                    moduleId=self.module_id, sampleWavelength=self._initialized_value
-                )
+                cmd.absorbance_reader.ReadAbsorbanceParams(moduleId=self.module_id)
             )
         if not self._engine_client.state.config.use_virtual_modules:
             read_result = (
