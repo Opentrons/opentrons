@@ -21,7 +21,7 @@ import { getHasUnsavedChanges } from './load-file/selectors'
 import type { ThunkDispatch } from './types'
 
 export function NavigationBar(): JSX.Element | null {
-  const { t } = useTranslation('shared')
+  const { t } = useTranslation(['shared', 'alert'])
   const location = useLocation()
   const navigate = useNavigate()
   const dispatch: ThunkDispatch<any> = useDispatch()
