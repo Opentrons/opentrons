@@ -338,6 +338,8 @@ def _pipette_with_liquid_settings(  # noqa: C901
 
 def mix_with_liquid_class(
     ctx: ProtocolContext,
+    liquid: str,
+    dilution: float,
     pipette: InstrumentContext,
     tip_volume: int,
     mix_volume: float,
@@ -353,7 +355,12 @@ def mix_with_liquid_class(
 ) -> None:
     """Mix with liquid class."""
     liquid_class = get_liquid_class(
-        int(pipette.max_volume), pipette.channels, tip_volume, int(mix_volume)
+        liquid,
+        dilution,
+        int(pipette.max_volume),
+        pipette.channels,
+        tip_volume,
+        int(mix_volume),
     )
     _pipette_with_liquid_settings(
         ctx,
@@ -374,6 +381,8 @@ def mix_with_liquid_class(
 
 def aspirate_with_liquid_class(
     ctx: ProtocolContext,
+    liquid: str,
+    dilution: float,
     pipette: InstrumentContext,
     tip_volume: int,
     aspirate_volume: float,
@@ -390,7 +399,7 @@ def aspirate_with_liquid_class(
     """Aspirate with liquid class."""
     pip_size = 50 if "50" in pipette.name else 1000
     liquid_class = get_liquid_class(
-        pip_size, pipette.channels, tip_volume, int(aspirate_volume)
+        liquid, dilution, pip_size, pipette.channels, tip_volume, int(aspirate_volume)
     )
     _pipette_with_liquid_settings(
         ctx,
@@ -411,6 +420,8 @@ def aspirate_with_liquid_class(
 
 def dispense_with_liquid_class(
     ctx: ProtocolContext,
+    liquid: str,
+    dilution: float,
     pipette: InstrumentContext,
     tip_volume: int,
     dispense_volume: float,
@@ -428,7 +439,7 @@ def dispense_with_liquid_class(
     """Dispense with liquid class."""
     pip_size = 50 if "50" in pipette.name else 1000
     liquid_class = get_liquid_class(
-        pip_size, pipette.channels, tip_volume, int(dispense_volume)
+        liquid, dilution, pip_size, pipette.channels, tip_volume, int(dispense_volume)
     )
     _pipette_with_liquid_settings(
         ctx,
