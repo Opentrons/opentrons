@@ -29,8 +29,17 @@ import { Bouncing } from './Bouncing'
 import styles from './components/ProtocolEditor.module.css'
 import './css/reset.module.css'
 
+import type { BrowserRouterProps } from 'react-router-dom'
+
 const showGateModal =
   process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
+
+// sandbox urls get deployed to subdirectories in sandbox.designer.opentrons.com/${subFolder}
+// prod urls get deployed to designer.opentrons.com with no subdir, so we don't need to add a base name
+const routerBaseName =
+  process.env.NODE_ENV === 'production'
+    ? null
+    : `/${window.location.pathname.split('/')[1]}`
 
 function ProtocolEditorComponent(): JSX.Element {
   const flags = useSelector(getFeatureFlagData)
@@ -38,13 +47,16 @@ function ProtocolEditorComponent(): JSX.Element {
 
   const prereleaseModeEnabled = flags.PRERELEASE_MODE === true
 
+  const browserRouterProps: BrowserRouterProps =
+    routerBaseName != null ? { basename: routerBaseName } : {}
+
   return (
     <div id="protocol-editor">
       <TopPortalRoot />
       {enableRedesign ? (
         <Flex flexDirection={DIRECTION_COLUMN}>
           {prereleaseModeEnabled ? <Bouncing /> : null}
-          <HashRouter>
+          <HashRouter {...browserRouterProps}>
             <ProtocolRoutes />
           </HashRouter>
         </Flex>

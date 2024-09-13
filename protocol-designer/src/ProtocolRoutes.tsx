@@ -16,7 +16,6 @@ import {
 
 import type { RouteProps } from './types'
 
-const LANDING_ROUTE = '/'
 const pdRoutes: RouteProps[] = [
   {
     Component: ProtocolOverview,
@@ -65,7 +64,7 @@ export function ProtocolRoutes(): JSX.Element {
             {allRoutes.map(({ Component, path }: RouteProps) => {
               return <Route key={path} path={path} element={<Component />} />
             })}
-            <Route path="*" element={<Navigate to={LANDING_ROUTE} />} />
+            <Route path="*" element={<Navigate to={landingPage.path} />} />
           </Routes>
         </Box>
       </Kitchen>

@@ -159,38 +159,28 @@ export type LabwareWell = LabwareWellProperties & {
   geometryDefinitionId?: string
 }
 
-export interface CircularCrossSection {
-  shape: 'circular'
-  diameter: number
-}
-
-export interface RectangularCrossSection {
-  shape: 'rectangular'
-  xDimension: number
-  yDimension: number
-}
-
 export interface SphericalSegment {
   shape: 'spherical'
   radiusOfCurvature: number
   depth: number
 }
 
-export type TopCrossSection = CircularCrossSection | RectangularCrossSection
+export interface CircularBoundedSection {
+  shape: 'circular'
+  diameter: number
+  topHeight: number
+}
 
-export type BottomShape =
-  | CircularCrossSection
-  | RectangularCrossSection
-  | SphericalSegment
-
-export interface BoundedSection {
-  geometry: TopCrossSection
+export interface RectangularBoundedSection {
+  shape: 'rectangular'
+  xDimension: number
+  yDimension: number
   topHeight: number
 }
 
 export interface InnerWellGeometry {
-  frusta: BoundedSection[]
-  bottomShape: BottomShape
+  frusta: CircularBoundedSection[] | RectangularBoundedSection[]
+  bottomShape?: SphericalSegment | null
 }
 
 // TODO(mc, 2019-03-21): exact object is tough to use with the initial value in

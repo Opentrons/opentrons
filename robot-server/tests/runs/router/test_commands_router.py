@@ -345,9 +345,7 @@ async def test_get_run_commands(
     )
     decoy.when(
         mock_run_data_manager.get_commands_slice(
-            run_id="run-id",
-            cursor=None,
-            length=42,
+            run_id="run-id", cursor=None, length=42, include_fixit_commands=True
         )
     ).then_return(CommandSlice(commands=[command], cursor=1, total_length=3))
 
@@ -356,6 +354,7 @@ async def test_get_run_commands(
         run_data_manager=mock_run_data_manager,
         cursor=None,
         pageLength=42,
+        includeFixitCommands=True,
     )
 
     assert result.content.data == [
@@ -412,7 +411,9 @@ async def test_get_run_commands_empty(
     """It should return an empty commands list if no commands."""
     decoy.when(mock_run_data_manager.get_current_command("run-id")).then_return(None)
     decoy.when(
-        mock_run_data_manager.get_commands_slice(run_id="run-id", cursor=21, length=42)
+        mock_run_data_manager.get_commands_slice(
+            run_id="run-id", cursor=21, length=42, include_fixit_commands=True
+        )
     ).then_return(CommandSlice(commands=[], cursor=0, total_length=0))
 
     result = await get_run_commands(
@@ -420,6 +421,7 @@ async def test_get_run_commands_empty(
         run_data_manager=mock_run_data_manager,
         cursor=21,
         pageLength=42,
+        includeFixitCommands=True,
     )
 
     assert result.content.data == []
@@ -436,11 +438,10 @@ async def test_get_run_commands_not_found(
     not_found_error = RunNotFoundError("oh no")
 
     decoy.when(
-        mock_run_data_manager.get_commands_slice(run_id="run-id", cursor=21, length=42)
+        mock_run_data_manager.get_commands_slice(
+            run_id="run-id", cursor=21, length=42, include_fixit_commands=True
+        )
     ).then_raise(not_found_error)
-    decoy.when(mock_run_data_manager.get_current_command(run_id="run-id")).then_raise(
-        not_found_error
-    )
 
     with pytest.raises(ApiError) as exc_info:
         await get_run_commands(
@@ -448,6 +449,7 @@ async def test_get_run_commands_not_found(
             run_data_manager=mock_run_data_manager,
             cursor=21,
             pageLength=42,
+            includeFixitCommands=True,
         )
 
     assert exc_info.value.status_code == 404

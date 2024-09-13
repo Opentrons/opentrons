@@ -70,6 +70,7 @@ from .exceptions import (
     NotSupportedOnRobotType,
     CommandNotAllowedError,
     InvalidLiquidHeightFound,
+    InvalidWellDefinitionError,
 )
 
 from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
@@ -148,4 +149,5 @@ __all__ = [
     "ErrorOccurrence",
     "CommandNotAllowedError",
     "InvalidLiquidHeightFound",
+    "InvalidWellDefinitionError",
 ]
