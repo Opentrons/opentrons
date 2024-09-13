@@ -16,14 +16,19 @@ import {
 } from '@opentrons/components'
 
 import { TextOnlyButton } from '../../../../../../atoms/buttons'
-import { useHomePipettes } from '../../../../../DropTipWizardFlows/hooks'
+import { useHomePipettes } from '../../../../../DropTipWizardFlows'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
-import type { UseHomePipettesProps } from '../../../../../DropTipWizardFlows/hooks'
-import { TipAttachmentStatusResult } from '../../../../../DropTipWizardFlows/hooks/useTipAttachmentStatus'
+import type {
+  UseHomePipettesProps,
+  TipAttachmentStatusResult,
+} from '../../../../../DropTipWizardFlows'
 
-type UseProtocolDropTipModalProps = Omit<UseHomePipettesProps, 'onSettled'> & {
+type UseProtocolDropTipModalProps = Pick<
+  UseHomePipettesProps,
+  'pipetteInfo'
+> & {
   areTipsAttached: TipAttachmentStatusResult['areTipsAttached']
   toggleDTWiz: () => void
   currentRunId: string
