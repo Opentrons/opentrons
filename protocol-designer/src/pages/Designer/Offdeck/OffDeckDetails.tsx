@@ -28,9 +28,10 @@ import type { DeckSlotId } from '@opentrons/shared-data'
 
 interface OffDeckDetailsProps {
   addLabware: () => void
+  tab: 'startingDeck' | 'protocolSteps'
 }
 export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
-  const { addLabware } = props
+  const { addLabware, tab } = props
   const { t, i18n } = useTranslation('starting_deck_state')
   const [hoverSlot, setHoverSlot] = React.useState<DeckSlotId | null>(null)
   const [menuListId, setShowMenuListForId] = React.useState<DeckSlotId | null>(
@@ -124,7 +125,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                         slotBoundingBox={xyzDimensions}
                         slotPosition={[0, 0, 0]}
                         itemId={lw.id}
-                        selectedTerminalItemId={START_TERMINAL_ITEM_ID}
+                        tab={tab}
                       />
                     </>
                   )}

@@ -30,6 +30,7 @@ import { LiquidsOverflowMenu } from './LiquidsOverflowMenu'
 
 import type { CutoutId } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
+import { ProtocolSteps } from './ProtocolSteps'
 
 export interface OpenSlot {
   cutoutId: CutoutId
@@ -114,7 +115,11 @@ export function Designer(): JSX.Element {
   })
 
   const deckViewItems =
-    deckView === leftString ? <DeckSetupContainer /> : <OffDeck />
+    deckView === leftString ? (
+      <DeckSetupContainer tab={tab} />
+    ) : (
+      <OffDeck tab={tab} />
+    )
 
   return (
     <>
@@ -173,17 +178,17 @@ export function Designer(): JSX.Element {
             </SecondaryButton>
           </Flex>
         </Flex>
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          backgroundColor={
-            tab === 'startingDeck' && deckView === rightString
-              ? COLORS.white
-              : COLORS.grey10
-          }
-          padding={zoomIn.slot != null ? '0' : SPACING.spacing80}
-          height="calc(100vh - 64px)"
-        >
-          {tab === 'startingDeck' ? (
+        {tab === 'startingDeck' ? (
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            backgroundColor={
+              tab === 'startingDeck' && deckView === rightString
+                ? COLORS.white
+                : COLORS.grey10
+            }
+            padding={zoomIn.slot != null ? '0' : SPACING.spacing80}
+            height="calc(100vh - 64px)"
+          >
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
               {zoomIn.slot == null ? (
                 <Flex alignSelf={ALIGN_END}>
@@ -202,10 +207,10 @@ export function Designer(): JSX.Element {
               ) : null}
               {deckViewItems}
             </Flex>
-          ) : (
-            <div>TODO wire this up</div>
-          )}
-        </Flex>
+          </Flex>
+        ) : (
+          <ProtocolSteps />
+        )}
       </Flex>
     </>
   )

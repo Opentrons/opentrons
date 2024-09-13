@@ -65,8 +65,13 @@ const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
 ]
 export const lightFill = COLORS.grey35
 
-export function DeckSetupContainer(): JSX.Element {
-  const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)
+interface DeckSetupContainerProps {
+  tab: 'startingDeck' | 'protocolSteps'
+}
+export function DeckSetupContainer(
+  props: DeckSetupContainerProps
+): JSX.Element {
+  const { tab } = props
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const dispatch = useDispatch<any>()
   const zoomIn = useSelector(selectors.getZoomedInSlot)
@@ -293,10 +298,10 @@ export function DeckSetupContainer(): JSX.Element {
                   hoveredModule={hoveredModule}
                   hoveredFixture={hoveredFixture}
                   hover={hoverSlot}
+                  tab={tab}
                   setHover={setHoverSlot}
                   addEquipment={addEquipment}
                   activeDeckSetup={activeDeckSetup}
-                  selectedTerminalItemId={selectedTerminalItemId}
                   stagingAreaCutoutIds={stagingAreaFixtures.map(
                     areas => areas.location as CutoutId
                   )}

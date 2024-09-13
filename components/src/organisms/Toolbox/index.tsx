@@ -15,13 +15,15 @@ import { textDecorationUnderline } from '../../ui-style-constants/typography'
 export interface ToolboxProps {
   title: JSX.Element
   children: React.ReactNode
-  confirmButtonText: string
-  onConfirmClick: () => void
-  onCloseClick: () => void
-  closeButtonText: string
   disableCloseButton?: boolean
   width?: string
   height?: string
+  confirmButtonText?: string
+  onConfirmClick?: () => void
+  confirmButton?: JSX.Element
+  onCloseClick?: () => void
+  closeButtonText?: string
+  side?: 'left' | 'right'
 }
 
 export function Toolbox(props: ToolboxProps): JSX.Element {
@@ -35,6 +37,8 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
     height = '100%',
     disableCloseButton = false,
     width = '19.5rem',
+    confirmButton,
+    side = 'right',
   } = props
 
   const slideOutRef = React.useRef<HTMLDivElement>(null)
@@ -57,9 +61,11 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
 
   return (
     <Box
+      zIndex={10}
       cursor="auto"
       position={POSITION_FIXED}
-      right="0"
+      right={side === 'right' ? '0' : undefined}
+      left={side === 'left' ? '0' : undefined}
       bottom="0"
       backgroundColor={COLORS.white}
       boxShadow="0px 3px 6px rgba(0, 0, 0, 0.23)"
@@ -80,17 +86,19 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
           gridGap={SPACING.spacing12}
         >
           {title}
-          <Btn
-            onClick={onCloseClick}
-            textDecoration={textDecorationUnderline}
-            data-testid={`Toolbox_${closeButtonText}`}
-            whiteSpace={NO_WRAP}
-            disable={disableCloseButton}
-          >
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {closeButtonText}
-            </StyledText>
-          </Btn>
+          {onCloseClick != null && closeButtonText != null ? (
+            <Btn
+              onClick={onCloseClick}
+              textDecoration={textDecorationUnderline}
+              data-testid={`Toolbox_${closeButtonText}`}
+              whiteSpace={NO_WRAP}
+              disable={disableCloseButton}
+            >
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {closeButtonText}
+              </StyledText>
+            </Btn>
+          ) : null}
         </Flex>
         <Box
           padding={SPACING.spacing16}
@@ -109,13 +117,16 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
           borderTop={`1px solid ${COLORS.grey30}`}
           alignItems={ALIGN_CENTER}
         >
-          <PrimaryButton
-            width="100%"
-            data-testid="Toolbox_confirmButton"
-            onClick={onConfirmClick}
-          >
-            {confirmButtonText}
-          </PrimaryButton>
+          {onConfirmClick != null && confirmButtonText != null ? (
+            <PrimaryButton
+              width="100%"
+              data-testid="Toolbox_confirmButton"
+              onClick={onConfirmClick}
+            >
+              {confirmButtonText}
+            </PrimaryButton>
+          ) : null}
+          {confirmButton != null ? confirmButton : null}
         </Box>
       </Flex>
     </Box>
