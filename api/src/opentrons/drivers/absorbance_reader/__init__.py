@@ -1,4 +1,4 @@
-from .abstract import AbstractAbsorbanceReaderDriver
+from .abstract import AbstractAbsorbanceReaderDriver, ABSMeasurement
 from .driver import AbsorbanceReaderDriver
 from .simulator import SimulatingDriver
 from .hid_protocol import AbsorbanceHidInterface
@@ -8,4 +8,5 @@ __all__ = [
     "AbsorbanceReaderDriver",
     "SimulatingDriver",
     "AbsorbanceHidInterface",
+    "ABSMeasurement",
 ]
