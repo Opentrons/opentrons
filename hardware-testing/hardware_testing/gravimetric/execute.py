@@ -328,7 +328,7 @@ def _run_trial(
         # center channel over well
         trial.pipette.move_to(trial.well.top(50).move(trial.channel_offset))
     mnt = OT3Mount.RIGHT if trial.pipette.mount == "right" else OT3Mount.LEFT
-    trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
+    # trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
     ui.print_info(f"\tinitial grams: {m_data_init.grams_average} g")
     # update the vials volumes, using the last-known weight
@@ -357,7 +357,7 @@ def _run_trial(
         mode=trial.mode,
         clear_accuracy_function=trial.cfg.increment,
     )
-    trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
+    # trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
 
     _take_photos(trial, "aspirate")
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
@@ -379,7 +379,7 @@ def _run_trial(
         mode=trial.mode,
         clear_accuracy_function=trial.cfg.increment,
     )
-    trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
+    # trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
     _take_photos(trial, "dispense")
     m_data_dispense = _record_measurement_and_store(MeasurementType.DISPENSE)
     ui.print_info(f"\tgrams after dispense: {m_data_dispense.grams_average} g")
