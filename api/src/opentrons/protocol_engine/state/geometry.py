@@ -1194,7 +1194,7 @@ class GeometryView:
 
     def get_well_volumetric_capacity(
         self, labware_id: str, well_id: str
-    ) -> Dict[float, float]:
+    ) -> List[Tuple[float, float]]:
         """Return a map of heights to partial volumes."""
         labware_def = self._labware.get_definition(labware_id)
         if labware_def.innerLabwareGeometry is None:

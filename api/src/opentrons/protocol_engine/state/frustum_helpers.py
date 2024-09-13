@@ -1,5 +1,5 @@
 """Helper functions for liquid-level related calculations inside a given frustum."""
-from typing import List, Tuple, Dict, Iterator, Sequence, Any
+from typing import List, Tuple, Iterator, Sequence, Any
 from numpy import pi, iscomplex, roots, real
 
 from ..errors.exceptions import InvalidLiquidHeightFound
@@ -192,11 +192,11 @@ def get_boundary_cross_sections(frusta: Sequence[Any]) -> Iterator[Tuple[Any, An
 
 def get_well_volumetric_capacity(
     well_geometry: InnerWellGeometry,
-) -> Dict[float, float]:
+) -> List[Tuple[float, float]]:
     """Return the total volumetric capacity of a well as a map of height borders to volume."""
     # dictionary map of heights to volumetric capacities within their respective segment
     # {top_height_0: volume_0, top_height_1: volume_1, top_height_2: volume_2}
-    well_volume = {}
+    well_volume = []
     if well_geometry.bottomShape is not None:
         if well_geometry.bottomShape.shape == "spherical":
             bottom_spherical_section_depth = well_geometry.bottomShape.depth
@@ -204,7 +204,7 @@ def get_well_volumetric_capacity(
                 radius_of_curvature=well_geometry.bottomShape.radius_of_curvature,
                 target_height=bottom_spherical_section_depth,
             )
-            well_volume[bottom_spherical_section_depth] = bottom_sphere_volume
+            well_volume.append((bottom_spherical_section_depth, bottom_sphere_volume))
 
     # get the volume of remaining frusta sorted in ascending order
     sorted_frusta = sorted(well_geometry.frusta, key=lambda section: section.topHeight)
@@ -225,7 +225,7 @@ def get_well_volumetric_capacity(
                 top_width=top_cross_section_width,
             )
 
-            well_volume[next_f["topHeight"]] = frustum_volume
+            well_volume.append((next_f["topHeight"], frustum_volume))
     elif is_circular_frusta_list(sorted_frusta):
         for f, next_f in get_boundary_cross_sections(sorted_frusta):
             top_cross_section_radius = next_f["diameter"] / 2.0
@@ -238,6 +238,6 @@ def get_well_volumetric_capacity(
                 top_radius=top_cross_section_radius,
             )
 
-            well_volume[next_f["topHeight"]] = frustum_volume
+            well_volume.append((next_f["topHeight"], frustum_volume))
 
     return well_volume
