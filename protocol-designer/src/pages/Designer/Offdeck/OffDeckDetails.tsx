@@ -18,7 +18,6 @@ import {
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { wellFillFromWellContents } from '../../../components/labware'
 import { selectors } from '../../../labware-ingred/selectors'
-import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { DeckItemHover } from '../DeckSetup/DeckItemHover'
 import { SlotDetailsContainer } from '../../../organisms'

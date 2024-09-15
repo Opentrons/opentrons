@@ -24,6 +24,7 @@ export interface ToolboxProps {
   onCloseClick?: () => void
   closeButtonText?: string
   side?: 'left' | 'right'
+  horizontalSide?: 'top' | 'bottom'
 }
 
 export function Toolbox(props: ToolboxProps): JSX.Element {
@@ -39,6 +40,7 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
     width = '19.5rem',
     confirmButton,
     side = 'right',
+    horizontalSide = 'bottom',
   } = props
 
   const slideOutRef = React.useRef<HTMLDivElement>(null)
@@ -59,14 +61,19 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
     handleScroll()
   }, [slideOutRef])
 
+  const positionStyles = {
+    ...(side === 'right' && { right: '0' }),
+    ...(side === 'left' && { left: '0' }),
+    ...(horizontalSide === 'bottom' && { bottom: '0' }),
+    ...(horizontalSide === 'top' && { top: '5rem' }),
+  }
+
   return (
     <Box
       zIndex={10}
       cursor="auto"
       position={POSITION_FIXED}
-      right={side === 'right' ? '0' : undefined}
-      left={side === 'left' ? '0' : undefined}
-      bottom="0"
+      {...positionStyles}
       backgroundColor={COLORS.white}
       boxShadow="0px 3px 6px rgba(0, 0, 0, 0.23)"
       height={height}
@@ -109,25 +116,28 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
         >
           {children}
         </Box>
-        <Box
-          padding={SPACING.spacing16}
-          boxShadow={isScrolledToBottom ? 'none' : '0px -4px 12px #0000001a'}
-          zIndex={3}
-          width="100%"
-          borderTop={`1px solid ${COLORS.grey30}`}
-          alignItems={ALIGN_CENTER}
-        >
-          {onConfirmClick != null && confirmButtonText != null ? (
-            <PrimaryButton
-              width="100%"
-              data-testid="Toolbox_confirmButton"
-              onClick={onConfirmClick}
-            >
-              {confirmButtonText}
-            </PrimaryButton>
-          ) : null}
-          {confirmButton != null ? confirmButton : null}
-        </Box>
+        {(onConfirmClick != null && confirmButtonText != null) ||
+        confirmButton != null ? (
+          <Box
+            padding={SPACING.spacing16}
+            boxShadow={isScrolledToBottom ? 'none' : '0px -4px 12px #0000001a'}
+            zIndex={3}
+            width="100%"
+            borderTop={`1px solid ${COLORS.grey30}`}
+            alignItems={ALIGN_CENTER}
+          >
+            {onConfirmClick != null && confirmButtonText != null ? (
+              <PrimaryButton
+                width="100%"
+                data-testid="Toolbox_confirmButton"
+                onClick={onConfirmClick}
+              >
+                {confirmButtonText}
+              </PrimaryButton>
+            ) : null}
+            {confirmButton != null ? confirmButton : null}
+          </Box>
+        ) : null}
       </Flex>
     </Box>
   )

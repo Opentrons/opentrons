@@ -4,6 +4,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  DIRECTION_COLUMN,
   DeckFromLayers,
   Flex,
   FlexTrash,
@@ -24,7 +25,6 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { getSelectedTerminalItemId } from '../../../ui/steps'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
 import { getRobotType } from '../../../file-data/selectors'
@@ -32,6 +32,7 @@ import { getHasGen1MultiChannelPipette } from '../../../step-forms'
 import { SlotDetailsContainer } from '../../../organisms'
 import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
+import { Alerts } from '../../../components/alerts/Alerts'
 import { DeckSetupDetails } from './DeckSetupDetails'
 import {
   animateZoom,
@@ -182,7 +183,14 @@ export function DeckSetupContainer(
         borderRadius={BORDERS.borderRadius8}
         width="100%"
         height={zoomIn.slot != null ? '75vh' : '70vh'}
+        flexDirection={DIRECTION_COLUMN}
       >
+        {tab === 'protocolSteps' ? (
+          <Flex justifyContent={JUSTIFY_CENTER}>
+            {/* TODO: update the alerts to match latest designs */}
+            <Alerts componentType="Timeline" />
+          </Flex>
+        ) : null}
         <Flex
           width="100%"
           height="100%"

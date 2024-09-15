@@ -1,13 +1,14 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { PRESAVED_STEP_ID } from '../../../steplist/types'
-import { selectors as stepFormSelectors } from '../../../step-forms'
+import { PRESAVED_STEP_ID } from '../../../../steplist/types'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { stepIconsByType } from '../../../../form-types'
 import {
   getHoveredTerminalItemId,
   getSelectedTerminalItemId,
   actions as stepsActions,
-} from '../../../ui/steps'
+} from '../../../../ui/steps'
 import { StepContainer } from './StepContainer'
 
 export const PresavedStep = (): JSX.Element | null => {
@@ -19,9 +20,6 @@ export const PresavedStep = (): JSX.Element | null => {
 
   // Actions
   const dispatch = useDispatch()
-  const toggleStepCollapsed = (): void => {
-    dispatch(stepsActions.toggleStepCollapsed(PRESAVED_STEP_ID))
-  }
   const highlightStep = (): void => {
     dispatch(stepsActions.hoverOnTerminalItem(PRESAVED_STEP_ID))
   }
@@ -32,23 +30,16 @@ export const PresavedStep = (): JSX.Element | null => {
   if (presavedStepForm === null) {
     return null
   }
+  const stepType = presavedStepForm.stepType
 
-  const stepItemProps = {
-    rawForm: null,
-    stepNumber,
-    stepType: presavedStepForm.stepType,
-
-    selected,
-    hovered,
-
-    toggleStepCollapsed,
-    highlightStep,
-    unhighlightStep,
-  }
   return (
     <StepContainer
-      {...stepItemProps}
-      title={`${stepNumber}. ${t(`stepType.${stepItemProps.stepType}`)}`}
+      onMouseEnter={highlightStep}
+      onMouseLeave={unhighlightStep}
+      selected={selected}
+      hovered={hovered}
+      iconName={stepIconsByType[stepType]}
+      title={`${stepNumber}. ${t(`stepType.${stepType}`)}`}
     />
   )
 }

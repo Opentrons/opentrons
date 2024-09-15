@@ -2,18 +2,23 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useDrop, useDrag } from 'react-dnd'
-import { Box } from '@opentrons/components'
-import { DND_TYPES } from '../../../constants'
-import { selectors as stepFormSelectors } from '../../../step-forms'
-import { stepIconsByType } from '../../../form-types'
-import { ConnectedStepItem } from '../../../containers/ConnectedStepItem'
+import {
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+} from '@opentrons/components'
+import { DND_TYPES } from '../../../../constants'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { stepIconsByType } from '../../../../form-types'
 import { StepContainer } from './StepContainer'
-import type { DragLayerMonitor, DropTargetOptions } from 'react-dnd'
-import type { StepIdType } from '../../../form-types'
-import type { ConnectedStepItemProps } from '../../../containers/ConnectedStepItem'
 import { ConnectedStepInfo } from './ConnectedStepInfo'
+import type { DragLayerMonitor, DropTargetOptions } from 'react-dnd'
+import type { StepIdType } from '../../../../form-types'
+import type { ConnectedStepItemProps } from '../../../../containers/ConnectedStepItem'
 
-interface DragDropStepItemProps extends ConnectedStepItemProps {
+interface DragDropStepProps extends ConnectedStepItemProps {
   stepId: StepIdType
   moveStep: (stepId: StepIdType, value: number) => void
   findStepIndex: (stepId: StepIdType) => number
@@ -24,8 +29,8 @@ interface DropType {
   stepId: StepIdType
 }
 
-const DragDropStepItem = (props: DragDropStepItemProps): JSX.Element => {
-  const { stepId, moveStep, findStepIndex, orderedStepIds } = props
+const DragDropStep = (props: DragDropStepProps): JSX.Element => {
+  const { stepId, moveStep, findStepIndex, orderedStepIds, stepNumber } = props
   const ref = React.useRef<HTMLDivElement>(null)
 
   const [{ isDragging }, drag] = useDrag(
@@ -61,21 +66,23 @@ const DragDropStepItem = (props: DragDropStepItemProps): JSX.Element => {
 
   drag(drop(ref))
   return (
-    <div
+    <Box
       ref={ref}
       style={{ opacity: isDragging ? 0.3 : 1 }}
       data-handler-id={handlerId}
     >
-      <ConnectedStepInfo {...props} stepId={stepId} />
-    </div>
+      <ConnectedStepInfo stepNumber={stepNumber} stepId={stepId} />
+    </Box>
   )
 }
 
-interface StepItemsProps {
+interface DraggableStepsProps {
   orderedStepIds: StepIdType[]
   reorderSteps: (steps: StepIdType[]) => void
 }
-export const DraggableSteps = (props: StepItemsProps): JSX.Element | null => {
+export const DraggableSteps = (
+  props: DraggableStepsProps
+): JSX.Element | null => {
   const { orderedStepIds, reorderSteps } = props
   const { t } = useTranslation('shared')
 
@@ -100,24 +107,26 @@ export const DraggableSteps = (props: StepItemsProps): JSX.Element | null => {
   }
 
   return (
-    <>
+    <Flex
+      gridGap={SPACING.spacing4}
+      flexDirection={DIRECTION_COLUMN}
+      width="100%"
+    >
       {orderedStepIds.map((stepId: StepIdType, index: number) => (
-        <DragDropStepItem
+        <DragDropStep
           key={`${stepId}_${index}`}
           stepNumber={index + 1}
           stepId={stepId}
           moveStep={moveStep}
           findStepIndex={findStepIndex}
           orderedStepIds={orderedStepIds}
+          // onStepContextMenu={makeStepOnContextMenu(stepId)}
         />
       ))}
-
       <StepDragPreview />
-    </>
+    </Flex>
   )
 }
-
-const NAV_OFFSET = 64
 
 const StepDragPreview = (): JSX.Element | null => {
   const [{ isDragging, itemType, item, currentOffset }] = useDrag(() => ({
@@ -142,17 +151,11 @@ const StepDragPreview = (): JSX.Element | null => {
   )
     return null
   return (
-    <Box
-      position="absolute"
-      cursor="grabbing"
-      left={currentOffset.x - NAV_OFFSET}
-      top={currentOffset.y}
-      width="18.25rem"
-    >
+    <Flex cursor="grabbing" backgroundColor={COLORS.transparent}>
       <StepContainer
         iconName={stepIconsByType[stepType]}
         title={stepName || ''}
       />
-    </Box>
+    </Flex>
   )
 }

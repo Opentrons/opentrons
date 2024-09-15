@@ -1,28 +1,28 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { TitledList, useConditionalConfirm } from '@opentrons/components'
+import { useConditionalConfirm } from '@opentrons/components'
 import {
   getHoveredTerminalItemId,
   getSelectedTerminalItemId,
   getIsMultiSelectMode,
   actions as stepsActions,
-} from '../../../ui/steps'
+} from '../../../../ui/steps'
 import {
   getCurrentFormIsPresaved,
   getCurrentFormHasUnsavedChanges,
-} from '../../../step-forms/selectors'
-
-import type {
-  SelectTerminalItemAction,
-  HoverOnTerminalItemAction,
-} from '../../../ui/steps'
-import type { TerminalItemId } from '../../../steplist'
+} from '../../../../step-forms/selectors'
 import {
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
-} from '../../../components/modals/ConfirmDeleteModal'
+} from '../../../../components/modals/ConfirmDeleteModal'
 import { StepContainer } from './StepContainer'
+
+import type {
+  SelectTerminalItemAction,
+  HoverOnTerminalItemAction,
+} from '../../../../ui/steps'
+import type { TerminalItemId } from '../../../../steplist'
 
 export interface TerminalItemStepProps {
   id: TerminalItemId
@@ -69,7 +69,7 @@ export const TerminalItemStep = (props: TerminalItemStepProps): JSX.Element => {
       )}
       <StepContainer
         {...{
-          id: `TerminalItem_${id}`,
+          stepId: `TerminalItem_${id}`,
           iconName: 'arrow-right',
           hovered,
           selected,

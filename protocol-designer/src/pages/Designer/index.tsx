@@ -19,6 +19,7 @@ import {
   ToggleGroup,
   useOnClickOutside,
 } from '@opentrons/components'
+import { selectTerminalItem } from '../../ui/steps/actions/actions'
 import { useKitchen } from '../../organisms/Kitchen/hooks'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { generateNewProtocol } from '../../labware-ingred/actions'
@@ -27,10 +28,10 @@ import { DeckSetupContainer } from './DeckSetup'
 import { selectors } from '../../labware-ingred/selectors'
 import { OffDeck } from './Offdeck'
 import { LiquidsOverflowMenu } from './LiquidsOverflowMenu'
+import { ProtocolSteps } from './ProtocolSteps'
 
 import type { CutoutId } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
-import { ProtocolSteps } from './ProtocolSteps'
 
 export interface OpenSlot {
   cutoutId: CutoutId
@@ -120,6 +121,13 @@ export function Designer(): JSX.Element {
     ) : (
       <OffDeck tab={tab} />
     )
+
+  React.useEffect(() => {
+    if (tab === 'startingDeck') {
+      //  ensure that the starting deck page is always showing the initial deck setup
+      dispatch(selectTerminalItem('__initial_setup__'))
+    }
+  }, [tab])
 
   return (
     <>

@@ -12,11 +12,13 @@ import { generateNewProtocol } from '../../../labware-ingred/actions'
 import { DeckSetupContainer } from '../DeckSetup'
 import { Designer } from '../index'
 import { LiquidsOverflowMenu } from '../LiquidsOverflowMenu'
+import { ProtocolSteps } from '../ProtocolSteps'
 
 import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 
+vi.mock('../ProtocolSteps')
 vi.mock('../../../labware-ingred/actions')
 vi.mock('../../../labware-ingred/selectors')
 vi.mock('../LiquidsOverflowMenu')
@@ -44,6 +46,7 @@ const render = () => {
 
 describe('Designer', () => {
   beforeEach(() => {
+    vi.mocked(ProtocolSteps).mockReturnValue(<div>mock ProtocolSteps</div>)
     vi.mocked(getFileMetadata).mockReturnValue({
       protocolName: 'mockProtocolName',
     })
@@ -100,5 +103,9 @@ describe('Designer', () => {
     expect(vi.mocked(generateNewProtocol)).toHaveBeenCalled()
   })
 
-  it.todo('renders the protocol steps page')
+  it('renders the protocol steps page', () => {
+    render()
+    fireEvent.click(screen.getByText('Protocol steps'))
+    screen.getByText('mock ProtocolSteps')
+  })
 })
