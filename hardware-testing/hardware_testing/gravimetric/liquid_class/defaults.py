@@ -1,4 +1,5 @@
 """Defaults."""
+from dataclasses import fields
 from typing import Dict
 
 from .definition import (
@@ -7,110 +8,133 @@ from .definition import (
     DispenseSettings,
     interpolate,
 )
+from ..measurement import SupportedLiquid
 
-_default_submerge_aspirate_mm = 1.5
-_p50_multi_submerge_aspirate_mm = 1.5
-_default_submerge_dispense_mm = 1.5
-_default_retract_mm = 5.0
-_default_retract_discontinuity = 20
 
-_default_aspirate_delay_seconds = 1.0
-_default_dispense_delay_seconds = 0.5
+_WATER = SupportedLiquid.WATER.name
+_GLYCEROL_50 = SupportedLiquid.GLYCEROL.name_with_dilution(0.5)
+_ETHANOL_70 = SupportedLiquid.ETHANOL.name_with_dilution(0.7)
 
-_default_accel_p50_ul_sec_sec = 1200
-_default_accel_p1000_ul_sec_sec = 24000
-_default_accel_96ch_ul_sec_sec = 16000
+_default_aspirate: Dict[str, AspirateSettings] = {
+    _WATER: AspirateSettings(
+        plunger_flow_rate=None,
+        trailing_air_gap=None,
+        z_submerge_depth=1.5,
+        z_retract_height=5.0,
+        delay=1.0,
+    ),
+    _GLYCEROL_50: AspirateSettings(
+        plunger_flow_rate=None,
+        trailing_air_gap=None,
+        z_submerge_depth=1.5,
+        z_retract_height=5.0,
+        delay=1.0,
+    ),
+    _ETHANOL_70: AspirateSettings(
+        plunger_flow_rate=None,
+        trailing_air_gap=None,
+        z_submerge_depth=1.5,
+        z_retract_height=5.0,
+        delay=1.0,
+    ),
+}
+_default_dispense: Dict[str, DispenseSettings] = {
+    _WATER: DispenseSettings(
+        plunger_flow_rate=None,
+        blow_out_submerged=None,
+        z_submerge_depth=1.5,
+        z_retract_height=5.0,
+        delay=0.5,
+    ),
+    _GLYCEROL_50: DispenseSettings(
+        plunger_flow_rate=None,
+        blow_out_submerged=None,
+        z_submerge_depth=1.5,
+        z_retract_height=5.0,
+        delay=0.5,
+    ),
+    _ETHANOL_70: DispenseSettings(
+        plunger_flow_rate=None,
+        blow_out_submerged=None,
+        z_submerge_depth=1.5,
+        z_retract_height=5.0,
+        delay=0.5,
+    ),
+}
 
-# dispense settings are constant across volumes
-_dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, Dict[str, DispenseSettings]]]]] = {
-    1: {
+_aspirate_defaults: Dict[
+    int, Dict[int, Dict[int, Dict[int, Dict[str, AspirateSettings]]]]
+] = {
+    50: {  # T50
         50: {  # P50
-            50: {  # T50
-                1: {
-                    "water": DispenseSettings(  # 1uL
-                        z_submerge_depth=_default_submerge_dispense_mm,
-                        plunger_acceleration=_default_accel_p50_ul_sec_sec,
-                        plunger_flow_rate=57,  # ul/sec
-                        delay=_default_dispense_delay_seconds,
-                        z_retract_discontinuity=_default_retract_discontinuity,
-                        z_retract_height=_default_retract_mm,
-                        blow_out_submerged=7,
+            1: {  # 1CH
+                1: {  # 1uL
+                    _WATER: AspirateSettings(  # water
+                        plunger_flow_rate=35,
+                        trailing_air_gap=0.1,
+                        z_submerge_depth=None,
+                        z_retract_height=None,
+                        delay=None,
                     ),
-                    "ethanol-70": DispenseSettings(  # 1uL
-                        z_submerge_depth=_default_submerge_dispense_mm,
-                        plunger_acceleration=_default_accel_p50_ul_sec_sec,
-                        plunger_flow_rate=57,  # ul/sec
-                        delay=_default_dispense_delay_seconds,
-                        z_retract_discontinuity=_default_retract_discontinuity,
-                        z_retract_height=_default_retract_mm,
-                        blow_out_submerged=7,
+                    _GLYCEROL_50: AspirateSettings(  # glycerol 50%
+                        plunger_flow_rate=35,
+                        trailing_air_gap=0.1,
+                        z_submerge_depth=None,
+                        z_retract_height=None,
+                        delay=None,
                     ),
-                    "glycerol-50": DispenseSettings(  # 1uL
-                        z_submerge_depth=_default_submerge_dispense_mm,
-                        plunger_acceleration=_default_accel_p50_ul_sec_sec,
-                        plunger_flow_rate=57,  # ul/sec
-                        delay=_default_dispense_delay_seconds,
-                        z_retract_discontinuity=_default_retract_discontinuity,
-                        z_retract_height=_default_retract_mm,
-                        blow_out_submerged=7,
+                    _ETHANOL_70: AspirateSettings(  # ethanol 70%
+                        plunger_flow_rate=35,
+                        trailing_air_gap=0.1,
+                        z_submerge_depth=None,
+                        z_retract_height=None,
+                        delay=None,
                     ),
                 },
-                10: {
-                    "water": DispenseSettings(  # 1uL
-                        z_submerge_depth=_default_submerge_dispense_mm,
-                        plunger_acceleration=_default_accel_p50_ul_sec_sec,
-                        plunger_flow_rate=57,  # ul/sec
-                        delay=_default_dispense_delay_seconds,
-                        z_retract_discontinuity=_default_retract_discontinuity,
-                        z_retract_height=_default_retract_mm,
-                        blow_out_submerged=2,
+                10: {  # 1uL
+                    _WATER: AspirateSettings(  # water
+                        plunger_flow_rate=35,
+                        trailing_air_gap=0.1,
+                        z_submerge_depth=None,
+                        z_retract_height=None,
+                        delay=None,
                     ),
-                    "ethanol-70": DispenseSettings(  # 1uL
-                        z_submerge_depth=_default_submerge_dispense_mm,
-                        plunger_acceleration=_default_accel_p50_ul_sec_sec,
-                        plunger_flow_rate=57,  # ul/sec
-                        delay=_default_dispense_delay_seconds,
-                        z_retract_discontinuity=_default_retract_discontinuity,
-                        z_retract_height=_default_retract_mm,
-                        blow_out_submerged=2,
+                    _GLYCEROL_50: AspirateSettings(  # glycerol 50%
+                        plunger_flow_rate=35,
+                        trailing_air_gap=0.1,
+                        z_submerge_depth=None,
+                        z_retract_height=None,
+                        delay=None,
                     ),
-                    "glycerol-50": DispenseSettings(  # 1uL
-                        z_submerge_depth=_default_submerge_dispense_mm,
-                        plunger_acceleration=_default_accel_p50_ul_sec_sec,
-                        plunger_flow_rate=57,  # ul/sec
-                        delay=_default_dispense_delay_seconds,
-                        z_retract_discontinuity=_default_retract_discontinuity,
-                        z_retract_height=_default_retract_mm,
-                        blow_out_submerged=2,
+                    _ETHANOL_70: AspirateSettings(  # ethanol 70%
+                        plunger_flow_rate=35,
+                        trailing_air_gap=0.1,
+                        z_submerge_depth=None,
+                        z_retract_height=None,
+                        delay=None,
                     ),
                 },
-                50: {
-                    "water": DispenseSettings(  # 1uL
-                        z_submerge_depth=_default_submerge_dispense_mm,
-                        plunger_acceleration=_default_accel_p50_ul_sec_sec,
-                        plunger_flow_rate=57,  # ul/sec
-                        delay=_default_dispense_delay_seconds,
-                        z_retract_discontinuity=_default_retract_discontinuity,
-                        z_retract_height=_default_retract_mm,
-                        blow_out_submerged=2,
+                50: {  # 1uL
+                    _WATER: AspirateSettings(  # water
+                        plunger_flow_rate=35,
+                        trailing_air_gap=0.1,
+                        z_submerge_depth=None,
+                        z_retract_height=None,
+                        delay=None,
                     ),
-                    "ethanol-70": DispenseSettings(  # 1uL
-                        z_submerge_depth=_default_submerge_dispense_mm,
-                        plunger_acceleration=_default_accel_p50_ul_sec_sec,
-                        plunger_flow_rate=57,  # ul/sec
-                        delay=_default_dispense_delay_seconds,
-                        z_retract_discontinuity=_default_retract_discontinuity,
-                        z_retract_height=_default_retract_mm,
-                        blow_out_submerged=2,
+                    _GLYCEROL_50: AspirateSettings(  # glycerol 50%
+                        plunger_flow_rate=35,
+                        trailing_air_gap=0.1,
+                        z_submerge_depth=None,
+                        z_retract_height=None,
+                        delay=None,
                     ),
-                    "glycerol-50": DispenseSettings(  # 1uL
-                        z_submerge_depth=_default_submerge_dispense_mm,
-                        plunger_acceleration=_default_accel_p50_ul_sec_sec,
-                        plunger_flow_rate=57,  # ul/sec
-                        delay=_default_dispense_delay_seconds,
-                        z_retract_discontinuity=_default_retract_discontinuity,
-                        z_retract_height=_default_retract_mm,
-                        blow_out_submerged=2,
+                    _ETHANOL_70: AspirateSettings(  # ethanol 70%
+                        plunger_flow_rate=35,
+                        trailing_air_gap=0.1,
+                        z_submerge_depth=None,
+                        z_retract_height=None,
+                        delay=None,
                     ),
                 },
             },
@@ -118,104 +142,79 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, Dict[str, DispenseSe
     },
 }
 
-_aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, Dict[str, AspirateSettings]]]]] = {
-    1: {
+_dispense_defaults: Dict[
+    int, Dict[int, Dict[int, Dict[int, Dict[str, DispenseSettings]]]]
+] = {
+    50: {  # T50
         50: {  # P50
-            50: {  # T50
-                1: {
-                    "water": AspirateSettings(  # 1uL
-                        z_submerge_depth=_default_submerge_aspirate_mm,
-                        plunger_acceleration=_default_accel_p50_ul_sec_sec,
-                        plunger_flow_rate=35,  # ul/sec
-                        delay=_default_aspirate_delay_seconds,
-                        z_retract_discontinuity=_default_retract_discontinuity,
-                        z_retract_height=_default_retract_mm,
-                        leading_air_gap=0,
-                        trailing_air_gap=0.1,
+            1: {  # 1CH
+                1: {  # 1uL
+                    _WATER: DispenseSettings(  # water
+                        plunger_flow_rate=57,
+                        blow_out_submerged=7,
+                        z_submerge_depth=None,
+                        z_retract_height=None,
+                        delay=None,
                     ),
-                    "ethanol-70": AspirateSettings(  # 1uL
-                        z_submerge_depth=_default_submerge_aspirate_mm,
-                        plunger_acceleration=_default_accel_p50_ul_sec_sec,
-                        plunger_flow_rate=35,  # ul/sec
-                        delay=_default_aspirate_delay_seconds,
-                        z_retract_discontinuity=_default_retract_discontinuity,
-                        z_retract_height=_default_retract_mm,
-                        leading_air_gap=0,
-                        trailing_air_gap=0.1,
+                    _GLYCEROL_50: DispenseSettings(  # glycerol 50%
+                        plunger_flow_rate=57,
+                        blow_out_submerged=7,
+                        z_submerge_depth=None,
+                        z_retract_height=None,
+                        delay=None,
                     ),
-                    "glycerol-50": AspirateSettings(  # 1uL
-                        z_submerge_depth=_default_submerge_aspirate_mm,
-                        plunger_acceleration=_default_accel_p50_ul_sec_sec,
-                        plunger_flow_rate=35,  # ul/sec
-                        delay=_default_aspirate_delay_seconds,
-                        z_retract_discontinuity=_default_retract_discontinuity,
-                        z_retract_height=_default_retract_mm,
-                        leading_air_gap=0,
-                        trailing_air_gap=0.1,
+                    _ETHANOL_70: DispenseSettings(  # ethanol 70%
+                        plunger_flow_rate=57,
+                        blow_out_submerged=7,
+                        z_submerge_depth=None,
+                        z_retract_height=None,
+                        delay=None,
                     ),
                 },
-                10: {
-                    "water": AspirateSettings(  # 10uL
-                        z_submerge_depth=_default_submerge_aspirate_mm,
-                        plunger_acceleration=_default_accel_p50_ul_sec_sec,
-                        plunger_flow_rate=23.5,  # ul/sec
-                        delay=_default_aspirate_delay_seconds,
-                        z_retract_discontinuity=_default_retract_discontinuity,
-                        z_retract_height=_default_retract_mm,
-                        leading_air_gap=0,
-                        trailing_air_gap=0.1,
+                10: {  # 1uL
+                    _WATER: DispenseSettings(  # water
+                        plunger_flow_rate=57,
+                        blow_out_submerged=7,
+                        z_submerge_depth=None,
+                        z_retract_height=None,
+                        delay=None,
                     ),
-                    "ethanol-70": AspirateSettings(  # 10uL
-                        z_submerge_depth=_default_submerge_aspirate_mm,
-                        plunger_acceleration=_default_accel_p50_ul_sec_sec,
-                        plunger_flow_rate=23.5,  # ul/sec
-                        delay=_default_aspirate_delay_seconds,
-                        z_retract_discontinuity=_default_retract_discontinuity,
-                        z_retract_height=_default_retract_mm,
-                        leading_air_gap=0,
-                        trailing_air_gap=0.1,
+                    _GLYCEROL_50: DispenseSettings(  # glycerol 50%
+                        plunger_flow_rate=57,
+                        blow_out_submerged=7,
+                        z_submerge_depth=None,
+                        z_retract_height=None,
+                        delay=None,
                     ),
-                    "glycerol-50": AspirateSettings(  # 10uL
-                        z_submerge_depth=_default_submerge_aspirate_mm,
-                        plunger_acceleration=_default_accel_p50_ul_sec_sec,
-                        plunger_flow_rate=23.5,  # ul/sec
-                        delay=_default_aspirate_delay_seconds,
-                        z_retract_discontinuity=_default_retract_discontinuity,
-                        z_retract_height=_default_retract_mm,
-                        leading_air_gap=0,
-                        trailing_air_gap=0.1,
+                    _ETHANOL_70: DispenseSettings(  # ethanol 70%
+                        plunger_flow_rate=57,
+                        blow_out_submerged=7,
+                        z_submerge_depth=None,
+                        z_retract_height=None,
+                        delay=None,
                     ),
                 },
-                50: {
-                    "water": AspirateSettings(  # 50uL
-                        z_submerge_depth=_default_submerge_aspirate_mm,
-                        plunger_acceleration=_default_accel_p50_ul_sec_sec,
-                        plunger_flow_rate=35,  # ul/sec
-                        delay=_default_aspirate_delay_seconds,
-                        z_retract_discontinuity=_default_retract_discontinuity,
-                        z_retract_height=_default_retract_mm,
-                        leading_air_gap=0,
-                        trailing_air_gap=0.1,
+                50: {  # 1uL
+                    _WATER: DispenseSettings(  # water
+                        plunger_flow_rate=57,
+                        blow_out_submerged=7,
+                        z_submerge_depth=None,
+                        z_retract_height=None,
+                        delay=None,
                     ),
-                    "ethanol-70": AspirateSettings(  # 50uL
-                        z_submerge_depth=_default_submerge_aspirate_mm,
-                        plunger_acceleration=_default_accel_p50_ul_sec_sec,
-                        plunger_flow_rate=35,  # ul/sec
-                        delay=_default_aspirate_delay_seconds,
-                        z_retract_discontinuity=_default_retract_discontinuity,
-                        z_retract_height=_default_retract_mm,
-                        leading_air_gap=0,
-                        trailing_air_gap=0.1,
+                    _GLYCEROL_50: DispenseSettings(  # glycerol 50%
+                        plunger_flow_rate=57,
+                        blow_out_submerged=7,
+                        z_submerge_depth=None,
+                        z_retract_height=None,
+                        delay=None,
                     ),
-                    "glycerol": AspirateSettings(  # 50uL
-                        z_submerge_depth=_default_submerge_aspirate_mm,
-                        plunger_acceleration=_default_accel_p50_ul_sec_sec,
-                        plunger_flow_rate=35,  # ul/sec
-                        delay=_default_aspirate_delay_seconds,
-                        z_retract_discontinuity=_default_retract_discontinuity,
-                        z_retract_height=_default_retract_mm,
-                        leading_air_gap=0,
-                        trailing_air_gap=0.1,
+                    _ETHANOL_70: DispenseSettings(  # ethanol 70%
+                        plunger_flow_rate=57,
+                        blow_out_submerged=7,
+                        z_submerge_depth=None,
+                        z_retract_height=None,
+                        delay=None,
                     ),
                 },
             },
@@ -228,19 +227,25 @@ def get_liquid_class(
     liquid: str, dilution: float, pipette: int, channels: int, tip: int, volume: int
 ) -> LiquidClassSettings:
     """Get liquid class."""
-    aspirate_cls_per_volume = _aspirate_defaults[channels][pipette][tip]
-    dispense_cls_per_volume = _dispense_defaults[channels][pipette][tip]
+    aspirate_cls_per_volume = _aspirate_defaults[tip][pipette][channels]
+    dispense_cls_per_volume = _dispense_defaults[tip][pipette][channels]
     defined_volumes = list(aspirate_cls_per_volume.keys())
     defined_volumes.sort()
     assert len(defined_volumes) == 3
 
     def _build_liquid_class(vol: int) -> LiquidClassSettings:
-        if liquid == "water":
-            cls_name =
-        cls_name = liquid if liquid == "water" else f"{liquid}-{int(dilution * 100.0, 0)}"
+        cls_name = SupportedLiquid.from_string(liquid).name_with_dilution(dilution)
+        asp_cls = aspirate_cls_per_volume[vol][cls_name]
+        for f in fields(asp_cls):
+            if getattr(asp_cls, f.name) is None:
+                setattr(asp_cls, f.name, getattr(_default_aspirate[cls_name], f.name))
+        dsp_cls = dispense_cls_per_volume[vol][cls_name]
+        for f in fields(dsp_cls):
+            if getattr(dsp_cls, f.name) is None:
+                setattr(dsp_cls, f.name, getattr(_default_dispense[cls_name], f.name))
         return LiquidClassSettings(
-            aspirate=aspirate_cls_per_volume[vol][cls_name],
-            dispense=dispense_cls_per_volume[vol][cls_name],
+            aspirate=asp_cls,
+            dispense=dsp_cls,
         )
 
     def _get_interp_liq_class(lower_ul: int, upper_ul: int) -> LiquidClassSettings:

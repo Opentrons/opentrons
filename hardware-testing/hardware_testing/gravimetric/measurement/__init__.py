@@ -29,6 +29,11 @@ class SupportedLiquid(Enum):
                 return liq
         raise ValueError(f"no supported liquid matching {s}")
 
+    def name_with_dilution(self, dilution: float) -> str:
+        if dilution == 0.0 or dilution == 1.0:
+            return str(self.name)
+        return f"{self.name}-{int(dilution * 100.0)}"
+
 
 RELATIVE_DENSITIES_WIKIPEDIA: Dict[SupportedLiquid, float] = {
     SupportedLiquid.WATER: 1.0,
