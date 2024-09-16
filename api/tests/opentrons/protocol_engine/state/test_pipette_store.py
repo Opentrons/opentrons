@@ -54,7 +54,6 @@ from .command_fixtures import (
     create_drop_tip_in_place_command,
     create_succeeded_command,
     create_unsafe_drop_tip_in_place_command,
-    create_touch_tip_command,
     create_move_to_well_command,
     create_blow_out_command,
     create_blow_out_in_place_command,
@@ -897,15 +896,6 @@ def test_add_pipette_config(
 @pytest.mark.parametrize(
     "action",
     (
-        SucceedCommandAction(
-            command=create_touch_tip_command(
-                pipette_id="pipette-id",
-                labware_id="labware-id",
-                well_name="well-name",
-                destination=DeckPoint(x=11, y=22, z=33),
-            ),
-            private_result=None,
-        ),
         SucceedCommandAction(
             command=create_move_to_coordinates_command(
                 pipette_id="pipette-id",

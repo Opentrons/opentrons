@@ -322,7 +322,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         if isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
-                commands.TouchTipResult,
                 commands.LiquidProbeResult,
                 commands.TryLiquidProbeResult,
             ),
@@ -440,7 +439,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 commands.MoveRelativeResult,
                 commands.MoveToAddressableAreaResult,
                 commands.MoveToAddressableAreaForDropTipResult,
-                commands.TouchTipResult,
             ),
         ):
             pipette_id = action.command.params.pipetteId
