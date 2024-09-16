@@ -2,19 +2,11 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
 
-import {
-  Flex,
-  COLORS,
-  SPACING,
-  AlertPrimaryButton,
-  JUSTIFY_FLEX_END,
-  StyledText,
-  PrimaryButton,
-} from '@opentrons/components'
+import { COLORS, StyledText } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { SmallButton } from '../../atoms/buttons'
+import { DropTipFooterButtons } from './shared'
 
 import type { DropTipWizardContainerProps } from './types'
 
@@ -53,37 +45,12 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
       }
       marginTop={isOnDevice ? '-2rem' : undefined}
     >
-      {isOnDevice ? (
-        <Flex
-          width="100%"
-          justifyContent={JUSTIFY_FLEX_END}
-          gridGap={SPACING.spacing8}
-        >
-          <SmallButton
-            buttonText={t('shared:go_back')}
-            onClick={handleGoBack}
-          />
-          <SmallButton
-            buttonType="alert"
-            buttonText={t('exit_and_home_pipette')}
-            onClick={handleExit}
-            marginRight={SPACING.spacing4}
-          />
-        </Flex>
-      ) : (
-        <Flex
-          width="100%"
-          justifyContent={JUSTIFY_FLEX_END}
-          gridGap={SPACING.spacing8}
-        >
-          <PrimaryButton onClick={handleGoBack} marginRight={SPACING.spacing4}>
-            {t('shared:go_back')}
-          </PrimaryButton>
-          <AlertPrimaryButton onClick={handleExit}>
-            {t('exit_and_home_pipette')}
-          </AlertPrimaryButton>
-        </Flex>
-      )}
+      <DropTipFooterButtons
+        primaryBtnOnClick={handleExit}
+        secondaryBtnOnClick={handleGoBack}
+        primaryBtnTextOverride={t('exit_and_home_pipette')}
+        primaryBtnStyle="alertStyle"
+      />
     </SimpleWizardBody>
   )
 }

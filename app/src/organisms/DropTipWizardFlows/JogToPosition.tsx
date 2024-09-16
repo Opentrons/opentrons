@@ -10,7 +10,6 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  JUSTIFY_END,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
@@ -23,9 +22,10 @@ import {
 } from '@opentrons/components'
 // import { NeedHelpLink } from '../CalibrationPanels'
 import { JogControls } from '../../molecules/JogControls'
-import { SmallButton, TextOnlyButton } from '../../atoms/buttons'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { TextOnlyButton } from '../../atoms/buttons'
+import { InProgressModal } from '../../molecules/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { DropTipFooterButtons } from './shared'
 
 import type { Jog } from '../../molecules/JogControls'
 import type { DropTipWizardContainerProps } from './types'
@@ -55,6 +55,9 @@ const ConfirmPosition = (props: ConfirmPositionProps): JSX.Element | null => {
   } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const flowTitle = t('drop_tips')
+
+  const buildPrimaryBtnText = (): string =>
+    currentStep === POSITION_AND_BLOWOUT ? t('blowout_liquid') : t('drop_tips')
 
   if (isOnDevice) {
     return (
@@ -90,25 +93,11 @@ const ConfirmPosition = (props: ConfirmPositionProps): JSX.Element | null => {
               : t('confirm_drop_tip_location', { flow: flowTitle })}
           </LegacyStyledText>
         </Flex>
-        <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Flex width="100%">
-            <SmallButton
-              buttonType="tertiaryLowLight"
-              buttonText={t('shared:go_back')}
-              onClick={handleGoBack}
-            />
-          </Flex>
-          <Flex width="100%" justifyContent={JUSTIFY_END}>
-            <SmallButton
-              buttonText={
-                currentStep === POSITION_AND_BLOWOUT
-                  ? i18n.format(t('blowout_liquid'), 'capitalize')
-                  : i18n.format(t('drop_tips'), 'capitalize')
-              }
-              onClick={handlePipetteAction}
-            />
-          </Flex>
-        </Flex>
+        <DropTipFooterButtons
+          primaryBtnOnClick={handlePipetteAction}
+          primaryBtnTextOverride={buildPrimaryBtnText()}
+          secondaryBtnOnClick={handleGoBack}
+        />
       </Flex>
     )
   } else {
@@ -129,31 +118,11 @@ const ConfirmPosition = (props: ConfirmPositionProps): JSX.Element | null => {
           paddingLeft={SPACING.spacing32}
         >
           {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
-          <Flex
-            gridGap={SPACING.spacing8}
-            justifyContent={
-              issuedCommandsType === 'setup'
-                ? JUSTIFY_FLEX_END
-                : JUSTIFY_SPACE_BETWEEN
-            }
-            width="100%"
-          >
-            {issuedCommandsType === 'setup' ? (
-              <SecondaryButton onClick={handleGoBack}>
-                {t('shared:go_back')}
-              </SecondaryButton>
-            ) : (
-              <TextOnlyButton
-                onClick={handleGoBack}
-                buttonText={t('shared:go_back')}
-              />
-            )}
-            <PrimaryButton onClick={handlePipetteAction}>
-              {currentStep === POSITION_AND_BLOWOUT
-                ? i18n.format(t('blowout_liquid'), 'capitalize')
-                : i18n.format(t('drop_tips'), 'capitalize')}
-            </PrimaryButton>
-          </Flex>
+          <DropTipFooterButtons
+            primaryBtnOnClick={handlePipetteAction}
+            primaryBtnTextOverride={buildPrimaryBtnText()}
+            secondaryBtnOnClick={handleGoBack}
+          />
         </Flex>
       </SimpleWizardBody>
     )
@@ -227,23 +196,13 @@ export const JogToPosition = (
         padding={issuedCommandsType === 'fixit' ? SPACING.spacing32 : null}
       >
         <JogControls jog={handleJog} isOnDevice={true} />
-        <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Flex width="100%">
-            <SmallButton
-              buttonType="tertiaryLowLight"
-              buttonText={t('shared:go_back')}
-              onClick={onGoBack}
-            />
-          </Flex>
-          <Flex width="100%" justifyContent={JUSTIFY_END}>
-            <SmallButton
-              buttonText={t('shared:confirm_position')}
-              onClick={() => {
-                setShowPositionConfirmation(true)
-              }}
-            />
-          </Flex>
-        </Flex>
+        <DropTipFooterButtons
+          primaryBtnOnClick={() => {
+            setShowPositionConfirmation(true)
+          }}
+          primaryBtnTextOverride={t('shared:confirm_position')}
+          secondaryBtnOnClick={onGoBack}
+        />
       </Flex>
     )
   } else {
@@ -287,24 +246,13 @@ export const JogToPosition = (
               : JUSTIFY_SPACE_BETWEEN
           }
         >
-          {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
-          {issuedCommandsType === 'setup' ? (
-            <SecondaryButton onClick={onGoBack}>
-              {t('shared:go_back')}
-            </SecondaryButton>
-          ) : (
-            <TextOnlyButton
-              onClick={onGoBack}
-              buttonText={t('shared:go_back')}
-            />
-          )}
-          <PrimaryButton
-            onClick={() => {
+          <DropTipFooterButtons
+            primaryBtnOnClick={() => {
               setShowPositionConfirmation(true)
             }}
-          >
-            {t('shared:confirm_position')}
-          </PrimaryButton>
+            primaryBtnTextOverride={t('shared:confirm_position')}
+            secondaryBtnOnClick={onGoBack}
+          />
         </Flex>
       </Flex>
     )

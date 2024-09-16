@@ -37,7 +37,7 @@ import { BeforeBeginning } from './BeforeBeginning'
 import { ChooseLocation } from './ChooseLocation'
 import { JogToPosition } from './JogToPosition'
 import { Success } from './Success'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { InProgressModal } from '../../molecules/InProgressModal'
 import { useDropTipErrorComponents } from './hooks'
 import { DropTipWizardHeader } from './DropTipWizardHeader'
 

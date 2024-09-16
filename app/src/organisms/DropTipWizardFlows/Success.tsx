@@ -1,9 +1,8 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 
 import {
   StyledText,
-  PrimaryButton,
-  TEXT_TRANSFORM_CAPITALIZE,
   JUSTIFY_FLEX_END,
   ALIGN_CENTER,
   Flex,
@@ -13,11 +12,11 @@ import {
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../atoms/buttons'
+import { DropTipFooterButtons } from './shared'
+
 import SuccessIcon from '../../assets/images/icon_success.png'
 
 import type { DropTipWizardContainerProps } from './types'
-import { css } from 'styled-components'
 
 type SuccessProps = DropTipWizardContainerProps & {
   message: string
@@ -66,15 +65,10 @@ export const Success = (props: SuccessProps): JSX.Element => {
         </StyledText>
       </Flex>
       <Flex justifyContent={JUSTIFY_FLEX_END} width="100%" marginLeft="auto">
-        {isOnDevice ? (
-          <SmallButton
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            buttonText={proceedText}
-            onClick={handleProceed}
-          />
-        ) : (
-          <PrimaryButton onClick={handleProceed}>{proceedText}</PrimaryButton>
-        )}
+        <DropTipFooterButtons
+          primaryBtnOnClick={handleProceed}
+          primaryBtnTextOverride={proceedText}
+        />
       </Flex>
     </Flex>
   )

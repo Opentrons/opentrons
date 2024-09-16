@@ -15,15 +15,15 @@ import {
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
-  PrimaryButton,
   RESPONSIVENESS,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { SmallButton, MediumButton, TextOnlyButton } from '../../atoms/buttons'
+import { MediumButton } from '../../atoms/buttons'
 import { DT_ROUTES } from './constants'
+import { DropTipFooterButtons } from './shared'
 
 import blowoutVideo from '../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
 import droptipVideo from '../../assets/videos/droptip-wizard/Drop-tip.webm'
@@ -93,7 +93,6 @@ export const BeforeBeginning = ({
           />
         </Flex>
         <Flex
-          flexDirection={DIRECTION_ROW}
           justifyContent={
             issuedCommandsType === 'fixit'
               ? JUSTIFY_SPACE_BETWEEN
@@ -101,18 +100,13 @@ export const BeforeBeginning = ({
           }
           marginTop={issuedCommandsType === 'fixit' ? '6.875rem' : 'auto'}
         >
-          {fixitCommandTypeUtils != null ? (
-            <TextOnlyButton
-              onClick={
-                fixitCommandTypeUtils.buttonOverrides.goBackBeforeBeginning
-              }
-              buttonText={t('shared:go_back')}
-            />
-          ) : null}
-          <SmallButton
-            buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-            onClick={handleProceed}
-            disabled={flowType == null}
+          <DropTipFooterButtons
+            primaryBtnOnClick={handleProceed}
+            primaryBtnDisabled={flowType == null}
+            secondaryBtnOnClick={
+              fixitCommandTypeUtils?.buttonOverrides.goBackBeforeBeginning ??
+              undefined
+            }
           />
         </Flex>
       </Flex>
@@ -186,18 +180,14 @@ export const BeforeBeginning = ({
               : JUSTIFY_FLEX_END
           }
         >
-          {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
-          {fixitCommandTypeUtils != null ? (
-            <TextOnlyButton
-              onClick={
-                fixitCommandTypeUtils.buttonOverrides.goBackBeforeBeginning
-              }
-              buttonText={t('shared:go_back')}
-            />
-          ) : null}
-          <PrimaryButton disabled={flowType == null} onClick={handleProceed}>
-            {i18n.format(t('shared:continue'), 'capitalize')}
-          </PrimaryButton>
+          <DropTipFooterButtons
+            primaryBtnOnClick={handleProceed}
+            primaryBtnDisabled={flowType == null}
+            secondaryBtnOnClick={
+              fixitCommandTypeUtils?.buttonOverrides.goBackBeforeBeginning ??
+              undefined
+            }
+          />
         </Flex>
       </Flex>
     )

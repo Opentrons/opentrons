@@ -3,14 +3,10 @@ import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
-  ALIGN_CENTER,
-  ALIGN_FLEX_END,
-  Btn,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_FLEX_START,
-  PrimaryButton,
   RESPONSIVENESS,
   SPACING,
   LegacyStyledText,
@@ -19,16 +15,14 @@ import {
 } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 
-import { SmallButton, TextOnlyButton } from '../../atoms/buttons'
 import { TwoColumn, DeckMapContent } from '../../molecules/InterventionModal'
+import { DropTipFooterButtons } from './shared'
 
 import type {
   AddressableAreaName,
   ModuleLocation,
 } from '@opentrons/shared-data'
 import type { DropTipWizardContainerProps } from './types'
-
-// TODO: get help link article URL
 
 type ChooseLocationProps = DropTipWizardContainerProps & {
   handleProceed: () => void
@@ -60,7 +54,7 @@ export const ChooseLocation = (
     moveToAddressableArea,
     issuedCommandsType,
   } = props
-  const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
+  const { t } = useTranslation('drop_tip_wizard')
   const [
     selectedLocation,
     setSelectedLocation,
@@ -94,53 +88,14 @@ export const ChooseLocation = (
           robotType={robotType}
         />
       </TwoColumn>
-      <Flex
-        width="100%"
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        css={ALIGN_BUTTONS}
-        gridGap={SPACING.spacing8}
-      >
-        <Btn
-          onClick={() => {
-            handleGoBack()
-          }}
-        >
-          <TextOnlyButton
-            onClick={handleGoBack}
-            buttonText={t('shared:go_back')}
-          />
-        </Btn>
-        <PrimaryButton
-          onClick={handleConfirmPosition}
-          css={css`
-            @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-              display: none;
-            }
-          `}
-        >
-          {i18n.format(t('move_to_slot'), 'capitalize')}
-        </PrimaryButton>
-        <SmallButton
-          buttonText={i18n.format(t('move_to_slot'), 'capitalize')}
-          onClick={handleConfirmPosition}
-          css={css`
-            @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-              display: none;
-            }
-          `}
-        />
-      </Flex>
+      <DropTipFooterButtons
+        primaryBtnOnClick={handleConfirmPosition}
+        primaryBtnTextOverride={t('move_to_slot')}
+        secondaryBtnOnClick={handleGoBack}
+      />
     </Flex>
   )
 }
-
-const ALIGN_BUTTONS = css`
-  align-items: ${ALIGN_FLEX_END};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    align-items: ${ALIGN_CENTER};
-  }
-`
 
 const CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
