@@ -1,16 +1,17 @@
 """The liquidProbe and tryLiquidProbe commands."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Tuple, Type, Union
+from typing import TYPE_CHECKING, NamedTuple, Optional, Type, Union
+from typing_extensions import Literal
+
+from pydantic import Field
+
 from opentrons.protocol_engine.errors.exceptions import MustHomeError, TipNotEmptyError
 from opentrons.protocol_engine.state import update_types
 from opentrons.types import MountType
 from opentrons_shared_data.errors.exceptions import (
     PipetteLiquidNotFoundError,
 )
-from typing_extensions import Literal
-
-from pydantic import Field
 
 from ..types import DeckPoint
 from .pipetting_common import (
@@ -85,9 +86,19 @@ _LiquidProbeExecuteReturn = Union[
 _TryLiquidProbeExecuteReturn = SuccessData[TryLiquidProbeResult, None]
 
 
+class _ExecuteCommonResult(NamedTuple):
+    # If the probe succeeded, the z_pos that it returned.
+    # Or, if the probe found no liquid, the error representing that,
+    # so calling code can propagate those details up.
+    z_pos_or_error: float | PipetteLiquidNotFoundError
+
+    state_update: update_types.StateUpdate
+    deck_point: DeckPoint
+
+
 async def _execute_common(
     movement: MovementHandler, pipetting: PipettingHandler, params: _CommonParams
-) -> Tuple[float | PipetteLiquidNotFoundError, update_types.StateUpdate, DeckPoint]:
+) -> _ExecuteCommonResult:
     pipette_id = params.pipetteId
     labware_id = params.labwareId
     well_name = params.wellName
@@ -130,10 +141,14 @@ async def _execute_common(
             well_name=well_name,
             well_location=params.wellLocation,
         )
-    except PipetteLiquidNotFoundError as e:
-        return e, state_update, deck_point
+    except PipetteLiquidNotFoundError as exception:
+        return _ExecuteCommonResult(
+            z_pos_or_error=exception, state_update=state_update, deck_point=deck_point
+        )
     else:
-        return z_pos, state_update, deck_point
+        return _ExecuteCommonResult(
+            z_pos_or_error=z_pos, state_update=state_update, deck_point=deck_point
+        )
 
 
 class LiquidProbeImplementation(
