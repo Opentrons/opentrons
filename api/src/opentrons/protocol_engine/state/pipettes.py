@@ -316,20 +316,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         # todo(mm, 2024-08-29): Port the following isinstance() checks to
         # use `state_update`. https://opentrons.atlassian.net/browse/EXEC-639
 
-        # These commands leave the pipette in a new location.
-        # Update current_location to reflect that.
-        if isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result,
-            (
-                commands.MoveToAddressableAreaResult,
-                commands.MoveToAddressableAreaForDropTipResult,
-            ),
-        ):
-            self._state.current_location = CurrentAddressableArea(
-                pipette_id=action.command.params.pipetteId,
-                addressable_area_name=action.command.params.addressableAreaName,
-            )
-
         # These commands leave the pipette in a place that we can't logically associate
         # with a well. Clear current_location to reflect the fact that it's now unknown.
         #
@@ -410,8 +396,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             (
                 commands.MoveToCoordinatesResult,
                 commands.MoveRelativeResult,
-                commands.MoveToAddressableAreaResult,
-                commands.MoveToAddressableAreaForDropTipResult,
             ),
         ):
             pipette_id = action.command.params.pipetteId
