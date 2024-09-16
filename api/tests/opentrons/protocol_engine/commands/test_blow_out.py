@@ -3,6 +3,7 @@ from decoy import Decoy
 
 from opentrons.types import Point
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.commands import (
     BlowOutResult,
@@ -54,7 +55,18 @@ async def test_blow_out_implementation(
     result = await subject.execute(data)
 
     assert result == SuccessData(
-        public=BlowOutResult(position=DeckPoint(x=1, y=2, z=3)), private=None
+        public=BlowOutResult(position=DeckPoint(x=1, y=2, z=3)),
+        private=None,
+        state_update=update_types.StateUpdate(
+            pipette_location=update_types.PipetteLocationUpdate(
+                pipette_id="pipette-id",
+                new_location=update_types.Well(
+                    labware_id="labware-id",
+                    well_name="C6",
+                ),
+                new_deck_point=DeckPoint(x=1, y=2, z=3),
+            )
+        ),
     )
 
     decoy.verify(
