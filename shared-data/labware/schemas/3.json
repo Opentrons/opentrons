@@ -65,37 +65,9 @@
         }
       }
     },
-    "CircularCrossSection": {
-      "type": "object",
-      "required": ["shape", "diameter"],
-      "properties": {
-        "shape": {
-          "type": "string",
-          "enum": ["circular"]
-        },
-        "diameter": {
-          "type": "number"
-        }
-      }
-    },
-    "RectangularCrossSection": {
-      "type": "object",
-      "required": ["shape", "xDimension", "yDimension"],
-      "properties": {
-        "shape": {
-          "type": "string",
-          "enum": ["rectangular"]
-        },
-        "xDimension": {
-          "type": "number"
-        },
-        "yDimension": {
-          "type": "number"
-        }
-      }
-    },
     "SphericalSegment": {
       "type": "object",
+      "additionalProperties": false,
       "required": ["shape", "radiusOfCurvature", "depth"],
       "properties": {
         "shape": {
@@ -110,19 +82,36 @@
         }
       }
     },
-    "BoundedSection": {
+    "CircularBoundedSection": {
       "type": "object",
-      "required": ["geometry", "topHeight"],
+      "required": ["shape", "diameter", "topHeight"],
       "properties": {
-        "geometry": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/CircularCrossSection"
-            },
-            {
-              "$ref": "#/definitions/RectangularCrossSection"
-            }
-          ]
+        "shape": {
+          "type": "string",
+          "enum": ["circular"]
+        },
+        "diameter": {
+          "type": "number"
+        },
+        "topHeight": {
+          "type": "number",
+          "description": "The height at the top of a bounded subsection of a well, relative to the bottom"
+        }
+      }
+    },
+    "RectangularBoundedSection": {
+      "type": "object",
+      "required": ["shape", "xDimension", "yDimension", "topHeight"],
+      "properties": {
+        "shape": {
+          "type": "string",
+          "enum": ["rectangular"]
+        },
+        "xDimension": {
+          "type": "number"
+        },
+        "yDimension": {
+          "type": "number"
         },
         "topHeight": {
           "type": "number",
@@ -132,28 +121,26 @@
     },
     "InnerWellGeometry": {
       "type": "object",
-      "required": ["frusta", "bottomShape"],
+      "required": ["frusta"],
       "properties": {
         "frusta": {
           "description": "A list of all of the sections of the well that have a contiguous shape",
           "type": "array",
           "items": {
-            "$ref": "#/definitions/BoundedSection"
+            "oneOf": [
+              {
+                "$ref": "#/definitions/CircularBoundedSection"
+              },
+              {
+                "$ref": "#/definitions/RectangularBoundedSection"
+              }
+            ]
           }
         },
         "bottomShape": {
+          "type": "object",
           "description": "The shape at the bottom of the well: either a spherical segment or a cross-section",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/CircularCrossSection"
-            },
-            {
-              "$ref": "#/definitions/RectangularCrossSection"
-            },
-            {
-              "$ref": "#/definitions/SphericalSegment"
-            }
-          ]
+          "$ref": "#/definitions/SphericalSegment"
         }
       }
     }

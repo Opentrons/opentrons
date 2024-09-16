@@ -66,6 +66,9 @@ type HomeActionCreator = ((
 ) => Types.HomeAction) &
   ((robotName: string, target: 'pipette', mount: Mount) => Types.HomeAction)
 
+/**
+ * @deprecated: Prefer performing single robot commands via maintenance run. See useRobotControlCommands.
+ */
 export const home: HomeActionCreator = (
   robotName: string,
   target: 'robot' | 'pipette',
@@ -98,6 +101,9 @@ export const homeFailure = (
   meta,
 })
 
+/**
+ * @deprecated: Prefer performing single robot commands via maintenance run. See useRobotControlCommands.
+ */
 export const move = (
   robotName: string,
   position: Types.MovePosition,

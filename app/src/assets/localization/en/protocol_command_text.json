@@ -66,6 +66,8 @@
   "setting_temperature_module_temp": "Setting Temperature Module to {{temp}} (rounded to nearest integer)",
   "setting_thermocycler_block_temp": "Setting Thermocycler block temperature to {{temp}} with hold time of {{hold_time_seconds}} seconds after target reached",
   "setting_thermocycler_lid_temp": "Setting Thermocycler lid temperature to {{temp}}",
+  "turning_rail_lights_off": "Turning rail lights off",
+  "turning_rail_lights_on": "Turning rail lights on",
   "slot": "Slot {{slot_name}}",
   "target_temperature": "target temperature",
   "tc_awaiting_for_duration": "Waiting for Thermocycler profile to complete",

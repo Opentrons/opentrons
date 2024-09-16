@@ -2,12 +2,9 @@ import * as React from 'react'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { renderHook, act, screen, fireEvent } from '@testing-library/react'
 
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
 import { renderWithProviders } from '../../../../../../../__testing-utils__'
 import { i18n } from '../../../../../../../i18n'
-import { mockLeftSpecs } from '../../../../../../../redux/pipettes/__fixtures__'
-import { useHomePipettes } from '../../../../../../DropTipWizardFlows/hooks'
+import { useHomePipettes } from '../../../../../../DropTipWizardFlows'
 import {
   useProtocolDropTipModal,
   ProtocolDropTipModal,
@@ -15,7 +12,7 @@ import {
 
 import type { Mock } from 'vitest'
 
-vi.mock('../../../../../../DropTipWizardFlows/hooks')
+vi.mock('../../../../../../DropTipWizardFlows')
 
 describe('useProtocolDropTipModal', () => {
   let props: Parameters<typeof useProtocolDropTipModal>[0]
@@ -28,15 +25,17 @@ describe('useProtocolDropTipModal', () => {
       isRunCurrent: true,
       onSkipAndHome: vi.fn(),
       currentRunId: 'MOCK_ID',
-      mount: 'left',
-      instrumentModelSpecs: mockLeftSpecs,
-      robotType: FLEX_ROBOT_TYPE,
+      pipetteInfo: {
+        pipetteId: '123',
+        pipetteName: 'MOCK_NAME',
+        mount: 'left',
+      },
     }
     mockHomePipettes = vi.fn()
 
     vi.mocked(useHomePipettes).mockReturnValue({
       homePipettes: mockHomePipettes,
-      isHomingPipettes: false,
+      isHoming: false,
     })
   })
 
@@ -96,7 +95,7 @@ describe('useProtocolDropTipModal', () => {
   it('should set isDisabled to true when isHomingPipettes is true', () => {
     vi.mocked(useHomePipettes).mockReturnValue({
       homePipettes: mockHomePipettes,
-      isHomingPipettes: true,
+      isHoming: true,
     })
 
     const { result } = renderHook(() => useProtocolDropTipModal(props))

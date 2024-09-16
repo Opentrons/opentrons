@@ -64,42 +64,29 @@
     "daiwudhadfhiew": {
       "frusta": [
         {
-          "geometry": {
-            "shape": "rectangular",
-            "xDimension": 127.76,
-            "yDimension": 85.8
-          },
+          "shape": "rectangular",
+          "xDimension": 127.76,
+          "yDimension": 85.8,
           "topHeight": 42.16
         },
         {
-          "geometry": {
-            "shape": "rectangular",
-            "xDimension": 70.0,
-            "yDimension": 50.0
-          },
+          "shape": "rectangular",
+          "xDimension": 70.0,
+          "yDimension": 50.0,
           "topHeight": 20.0
         }
-      ],
-      "bottomShape": {
-        "shape": "rectangular",
-        "xDimension": 2.0,
-        "yDimension": 3.0
-      }
+      ]
     },
     "iuweofiuwhfn": {
       "frusta": [
         {
-          "geometry": {
-            "shape": "circular",
-            "diameter": 35.0
-          },
+          "shape": "circular",
+          "diameter": 35.0,
           "topHeight": 42.16
         },
         {
-          "geometry": {
-            "shape": "circular",
-            "diameter": 22.0
-          },
+          "shape": "circular",
+          "diameter": 35.0,
           "topHeight": 20.0
         }
       ],

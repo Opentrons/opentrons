@@ -18,6 +18,7 @@ from ..errors import (
     LabwareNotLoadedOnLabwareError,
     LabwareNotLoadedOnModuleError,
     LabwareMovementNotAllowedError,
+    InvalidWellDefinitionError,
 )
 from ..resources import fixture_validation
 from ..types import (
@@ -52,6 +53,7 @@ from .wells import WellView
 from .modules import ModuleView
 from .pipettes import PipetteView
 from .addressable_areas import AddressableAreaView
+from .frustum_helpers import get_well_volumetric_capacity
 
 
 SLOT_WIDTH = 128
@@ -1206,3 +1208,17 @@ class GeometryView:
                 )
 
         return None
+
+    def get_well_volumetric_capacity(
+        self, labware_id: str, well_id: str
+    ) -> List[Tuple[float, float]]:
+        """Return a map of heights to partial volumes."""
+        labware_def = self._labware.get_definition(labware_id)
+        if labware_def.innerLabwareGeometry is None:
+            raise InvalidWellDefinitionError(message="No InnerLabwareGeometry found.")
+        well_geometry = labware_def.innerLabwareGeometry.get(well_id)
+        if well_geometry is None:
+            raise InvalidWellDefinitionError(
+                message=f"No InnerWellGeometry found for well id: {well_id}"
+            )
+        return get_well_volumetric_capacity(well_geometry)
