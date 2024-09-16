@@ -194,7 +194,10 @@ class CompletedAnalysis(BaseModel):
             " but it won't have more than one element."
         ),
     )
-    commandAnnotations: List[CommandAnnotation] = Field(default_factory=list)
+    commandAnnotations: List[CommandAnnotation] = Field(
+        default_factory=list,
+        description="Optional annotations for commands in this run.",
+    )
 
 
 AnalysisParameterType = Union[float, bool, str, None]

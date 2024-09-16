@@ -342,6 +342,7 @@ class RunDataManager:
                 commands,
                 state_summary,
                 parameters,
+                _,
             ) = await self._run_orchestrator_store.clear()
             run_resource: Union[
                 RunResource, BadRunResource

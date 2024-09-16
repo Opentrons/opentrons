@@ -252,6 +252,7 @@ async def test_update_adds_details_and_completes_analysis(
         value=2.0,
         default=3.0,
     )
+    command_annotation = pe_types.CustomCommandAnnotation(commandKeys=["abc", "xyz"])
     subject.add_pending(
         protocol_id="protocol-id", analysis_id="analysis-id", run_time_parameters=[]
     )
@@ -267,7 +268,7 @@ async def test_update_adds_details_and_completes_analysis(
         commands=[],
         errors=[],
         liquids=[],
-        command_annotations=[],
+        command_annotations=[command_annotation],
     )
 
     result = await subject.get("analysis-id")
@@ -285,6 +286,7 @@ async def test_update_adds_details_and_completes_analysis(
         commands=[],
         errors=[],
         liquids=[],
+        commandAnnotations=[command_annotation],
     )
     assert await subject.get_by_protocol("protocol-id") == [result]
     assert json.loads(result_as_document) == {
@@ -318,6 +320,9 @@ async def test_update_adds_details_and_completes_analysis(
         "errors": [],
         "liquids": [],
         "modules": [],
+        "commandAnnotations": [
+            {"annotationType": "custom", "commandKeys": ["abc", "xyz"]}
+        ],
     }
 
 

@@ -278,6 +278,7 @@ async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
                 hasEverEnteredErrorRecovery=False,
             ),
             parameters=[],
+            command_annotations=[],
         )
         return analysis
     return await orchestrator.run(deck_configuration=[])
@@ -335,7 +336,7 @@ async def _analyze(
         pipettes=analysis.state_summary.pipettes,
         modules=analysis.state_summary.modules,
         liquids=analysis.state_summary.liquids,
-        commandAnnotations=[],
+        commandAnnotations=analysis.command_annotations,
     )
 
     _call_for_output_of_kind(

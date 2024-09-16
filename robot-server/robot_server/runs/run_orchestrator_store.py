@@ -282,11 +282,15 @@ class RunOrchestratorStore:
         run_data = self.run_orchestrator.get_state_summary()
         commands = self.run_orchestrator.get_all_commands()
         run_time_parameters = self.run_orchestrator.get_run_time_parameters()
+        command_annotations = self.run_orchestrator.get_command_annotations()
 
         self._run_orchestrator = None
 
         return RunResult(
-            state_summary=run_data, commands=commands, parameters=run_time_parameters
+            state_summary=run_data,
+            commands=commands,
+            parameters=run_time_parameters,
+            command_annotations=command_annotations,
         )
 
     def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:

@@ -35,6 +35,7 @@ from ..protocol_engine.types import (
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
     CSVRuntimeParamPaths,
+    CommandAnnotation,
 )
 from ..protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
@@ -250,6 +251,14 @@ class RunOrchestrator:
             []
             if self._protocol_runner is None
             else self._protocol_runner.run_time_parameters
+        )
+
+    def get_command_annotations(self) -> List[CommandAnnotation]:
+        """Get the list of command annotations defined in the protocol, if any."""
+        return (
+            []
+            if self._protocol_runner is None
+            else self._protocol_runner.command_annotations
         )
 
     def get_current_command(self) -> Optional[CommandPointer]:
