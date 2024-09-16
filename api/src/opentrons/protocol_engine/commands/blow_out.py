@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
+
+from ..state.update_types import StateUpdate
 from ..types import DeckPoint
 from .pipetting_common import (
     PipetteIdMixin,
@@ -55,11 +57,20 @@ class BlowOutImplementation(
 
     async def execute(self, params: BlowOutParams) -> SuccessData[BlowOutResult, None]:
         """Move to and blow-out the requested well."""
+        state_update = StateUpdate()
+
         x, y, z = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.wellLocation,
+        )
+        deck_point = DeckPoint.construct(x=x, y=y, z=z)
+        state_update.set_pipette_location(
+            pipette_id=params.pipetteId,
+            new_labware_id=params.labwareId,
+            new_well_name=params.wellName,
+            new_deck_point=deck_point,
         )
 
         await self._pipetting.blow_out_in_place(
@@ -67,7 +78,9 @@ class BlowOutImplementation(
         )
 
         return SuccessData(
-            public=BlowOutResult(position=DeckPoint(x=x, y=y, z=z)), private=None
+            public=BlowOutResult(position=deck_point),
+            private=None,
+            state_update=state_update,
         )
 
 

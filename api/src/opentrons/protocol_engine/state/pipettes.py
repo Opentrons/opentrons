@@ -1,9 +1,18 @@
 """Basic pipette data state and store."""
 from __future__ import annotations
-from dataclasses import dataclass
-from typing import Dict, List, Mapping, Optional, Tuple, Union
+
+import dataclasses
+from typing import (
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Union,
+)
 from typing_extensions import assert_type
 
+from opentrons_shared_data.errors import EnumeratedError
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -13,13 +22,10 @@ from opentrons.hardware_control.nozzle_manager import (
 )
 from opentrons.protocol_engine.actions.actions import FailCommandAction
 from opentrons.protocol_engine.commands.command import DefinedErrorData
-from opentrons.protocol_engine.commands.pipetting_common import (
-    LiquidNotFoundError,
-    OverpressureError,
-    OverpressureErrorInternalData,
-)
+from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
 from opentrons.types import MountType, Mount as HwMount, Point
 
+from . import update_types
 from .. import commands
 from .. import errors
 from ..types import (
@@ -44,7 +50,7 @@ from ..actions import (
 from ._abstract_store import HasState, HandlesActions
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class HardwarePipette:
     """Hardware pipette data."""
 
@@ -52,7 +58,7 @@ class HardwarePipette:
     config: PipetteDict
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class CurrentDeckPoint:
     """The latest deck point and mount the robot has accessed."""
 
@@ -60,7 +66,7 @@ class CurrentDeckPoint:
     deck_point: Optional[DeckPoint]
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class BoundingNozzlesOffsets:
     """Offsets of the bounding nozzles of the pipette."""
 
@@ -68,7 +74,7 @@ class BoundingNozzlesOffsets:
     front_right_offset: Point
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class PipetteBoundingBoxOffsets:
     """Offsets of the corners of the pipette's bounding box."""
 
@@ -78,7 +84,7 @@ class PipetteBoundingBoxOffsets:
     front_left_corner: Point
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class StaticPipetteConfig:
     """Static config for a pipette."""
 
@@ -100,7 +106,7 @@ class StaticPipetteConfig:
     lld_settings: Optional[Dict[str, Dict[str, float]]]
 
 
-@dataclass
+@dataclasses.dataclass
 class PipetteState:
     """Basic pipette data state and getter methods."""
 
@@ -279,17 +285,43 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
     def _update_current_location(  # noqa: C901
         self, action: Union[SucceedCommandAction, FailCommandAction]
     ) -> None:
+        if isinstance(action, SucceedCommandAction):
+            location_update = action.state_update.pipette_location
+        elif isinstance(action.error, DefinedErrorData):
+            location_update = action.error.state_update.pipette_location
+        else:
+            # The command failed with some undefined error. We have nothing to do.
+            assert_type(action.error, EnumeratedError)
+            return
+
+        if location_update != update_types.NO_CHANGE:
+            match location_update.new_location:
+                case update_types.Well(labware_id=labware_id, well_name=well_name):
+                    self._state.current_location = CurrentWell(
+                        pipette_id=location_update.pipette_id,
+                        labware_id=labware_id,
+                        well_name=well_name,
+                    )
+                case update_types.AddressableArea(
+                    addressable_area_name=addressable_area_name
+                ):
+                    self._state.current_location = CurrentAddressableArea(
+                        pipette_id=location_update.pipette_id,
+                        addressable_area_name=addressable_area_name,
+                    )
+                case None:
+                    self._state.current_location = None
+                case update_types.NO_CHANGE:
+                    pass
+
+        # todo(mm, 2024-08-29): Port the following isinstance() checks to
+        # use `state_update`. https://opentrons.atlassian.net/browse/EXEC-639
+
         # These commands leave the pipette in a new location.
         # Update current_location to reflect that.
         if isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
-                commands.MoveToWellResult,
-                commands.PickUpTipResult,
-                commands.DropTipResult,
-                commands.AspirateResult,
-                commands.DispenseResult,
-                commands.BlowOutResult,
                 commands.TouchTipResult,
                 commands.LiquidProbeResult,
                 commands.TryLiquidProbeResult,
@@ -304,12 +336,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             isinstance(action.error, DefinedErrorData)
             and (
                 (
-                    isinstance(
-                        action.running_command, (commands.Aspirate, commands.Dispense)
-                    )
-                    and isinstance(action.error.public, OverpressureError)
-                )
-                or (
                     isinstance(action.running_command, commands.LiquidProbe)
                     and isinstance(action.error.public, LiquidNotFoundError)
                 )
@@ -380,51 +406,45 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             ):
                 self._state.current_location = None
 
-    def _update_deck_point(
+    def _update_deck_point(  # noqa: C901
         self, action: Union[SucceedCommandAction, FailCommandAction]
     ) -> None:
-        # This function mostly mirrors self._update_current_location().
+        if isinstance(action, SucceedCommandAction):
+            location_update = action.state_update.pipette_location
+        elif isinstance(action.error, DefinedErrorData):
+            location_update = action.error.state_update.pipette_location
+        else:
+            # The command failed with some undefined error. We have nothing to do.
+            assert_type(action.error, EnumeratedError)
+            return
+
+        if (
+            location_update is not update_types.NO_CHANGE
+            and location_update.new_deck_point is not update_types.NO_CHANGE
+        ):
+            loaded_pipette = self._state.pipettes_by_id[location_update.pipette_id]
+            self._state.current_deck_point = CurrentDeckPoint(
+                mount=loaded_pipette.mount, deck_point=location_update.new_deck_point
+            )
+
+        # todo(mm, 2024-08-29): Port the following isinstance() checks to
+        # use `state_update`. https://opentrons.atlassian.net/browse/EXEC-639
+        #
+        # These isinstance() checks mostly mirror self._update_current_location().
         # See there for explanations.
 
         if isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
-                commands.MoveToWellResult,
                 commands.MoveToCoordinatesResult,
                 commands.MoveRelativeResult,
                 commands.MoveToAddressableAreaResult,
                 commands.MoveToAddressableAreaForDropTipResult,
-                commands.PickUpTipResult,
-                commands.DropTipResult,
-                commands.AspirateResult,
-                commands.DispenseResult,
-                commands.BlowOutResult,
                 commands.TouchTipResult,
             ),
         ):
             pipette_id = action.command.params.pipetteId
             deck_point = action.command.result.position
-            loaded_pipette = self._state.pipettes_by_id[pipette_id]
-            self._state.current_deck_point = CurrentDeckPoint(
-                mount=loaded_pipette.mount, deck_point=deck_point
-            )
-        elif (
-            isinstance(action, FailCommandAction)
-            and isinstance(
-                action.running_command,
-                (
-                    commands.Aspirate,
-                    commands.Dispense,
-                    commands.AspirateInPlace,
-                    commands.DispenseInPlace,
-                ),
-            )
-            and isinstance(action.error, DefinedErrorData)
-            and isinstance(action.error.public, OverpressureError)
-        ):
-            assert_type(action.error.private, OverpressureErrorInternalData)
-            pipette_id = action.running_command.params.pipetteId
-            deck_point = action.error.private.position
             loaded_pipette = self._state.pipettes_by_id[pipette_id]
             self._state.current_deck_point = CurrentDeckPoint(
                 mount=loaded_pipette.mount, deck_point=deck_point

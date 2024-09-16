@@ -14,7 +14,6 @@ from .pipetting_common import (
     FlowRateMixin,
     BaseLiquidHandlingResult,
     OverpressureError,
-    OverpressureErrorInternalData,
 )
 from .command import (
     AbstractCommandImpl,
@@ -25,7 +24,6 @@ from .command import (
 )
 from ..errors.error_occurrence import ErrorOccurrence
 from ..errors.exceptions import PipetteNotReadyToAspirateError
-from ..types import DeckPoint
 
 if TYPE_CHECKING:
     from ..execution import PipettingHandler, GantryMover
@@ -50,7 +48,7 @@ class AspirateInPlaceResult(BaseLiquidHandlingResult):
 
 _ExecuteReturn = Union[
     SuccessData[AspirateInPlaceResult, None],
-    DefinedErrorData[OverpressureError, OverpressureErrorInternalData],
+    DefinedErrorData[OverpressureError, None],
 ]
 
 
@@ -123,13 +121,7 @@ class AspirateInPlaceImplementation(
                         }
                     ),
                 ),
-                private=OverpressureErrorInternalData(
-                    position=DeckPoint(
-                        x=current_position.x,
-                        y=current_position.y,
-                        z=current_position.z,
-                    ),
-                ),
+                private=None,
             )
         else:
             return SuccessData(

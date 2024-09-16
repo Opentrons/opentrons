@@ -8,6 +8,7 @@ from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
 
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
 from opentrons.protocol_engine.execution import MovementHandler, PipettingHandler
+from opentrons.protocol_engine.state import update_types
 from opentrons.types import Point
 
 from opentrons.protocol_engine.commands.command import SuccessData, DefinedErrorData
@@ -17,10 +18,7 @@ from opentrons.protocol_engine.commands.dispense import (
     DispenseImplementation,
 )
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.protocol_engine.commands.pipetting_common import (
-    OverpressureError,
-    OverpressureErrorInternalData,
-)
+from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
 
 
 @pytest.fixture
@@ -75,6 +73,16 @@ async def test_dispense_implementation(
     assert result == SuccessData(
         public=DispenseResult(volume=42, position=DeckPoint(x=1, y=2, z=3)),
         private=None,
+        state_update=update_types.StateUpdate(
+            pipette_location=update_types.PipetteLocationUpdate(
+                pipette_id="pipette-id-abc123",
+                new_location=update_types.Well(
+                    labware_id="labware-id-abc123",
+                    well_name="A3",
+                ),
+                new_deck_point=DeckPoint.construct(x=1, y=2, z=3),
+            ),
+        ),
     )
 
 
@@ -134,7 +142,15 @@ async def test_overpressure_error(
             wrappedErrors=[matchers.Anything()],
             errorInfo={"retryLocation": (position.x, position.y, position.z)},
         ),
-        private=OverpressureErrorInternalData(
-            position=DeckPoint(x=position.x, y=position.y, z=position.z)
+        private=None,
+        state_update=update_types.StateUpdate(
+            pipette_location=update_types.PipetteLocationUpdate(
+                pipette_id="pipette-id",
+                new_location=update_types.Well(
+                    labware_id="labware-id",
+                    well_name="well-name",
+                ),
+                new_deck_point=DeckPoint.construct(x=1, y=2, z=3),
+            ),
         ),
     )
