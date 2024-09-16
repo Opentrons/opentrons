@@ -1,7 +1,6 @@
 import type {
   CompletedProtocolAnalysis,
   LoadedPipette,
-  ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type {
   GripperData,

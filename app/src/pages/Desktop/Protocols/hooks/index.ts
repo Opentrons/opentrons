@@ -6,7 +6,6 @@ import {
 
 import {
   getLabwareSetupItemGroups,
-  getProtocolUsesGripper,
   useRequiredProtocolHardwareFromAnalysis,
 } from '../../../../transformations/commands'
 
