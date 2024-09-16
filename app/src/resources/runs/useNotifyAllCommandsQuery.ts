@@ -26,7 +26,6 @@ export function useNotifyAllCommandsQuery<TError = Error>(
     options,
   })
 
-  const queryParams = params ?? null
 
   const httpQueryResult = useAllCommandsQuery(
     runId,
