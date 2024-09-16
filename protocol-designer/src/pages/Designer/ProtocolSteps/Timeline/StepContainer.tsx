@@ -107,7 +107,11 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
             color: ${color};
           `}
         >
-          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Flex
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            alignItems={ALIGN_CENTER}
+            height="1.75rem"
+          >
             <Flex
               alignItems={ALIGN_CENTER}
               gridGap={SPACING.spacing8}
