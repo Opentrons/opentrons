@@ -432,19 +432,17 @@ class GeometryView:
             elif well_location.origin == WellOrigin.CENTER:
                 offset = offset.copy(update={"z": offset.z + well_depth / 2.0})
             elif well_location.origin == WellOrigin.MENISCUS:
-                height = self._wells.get_last_measured_liquid_height(
-                    labware_id, well_name
-                )
+                height = self._wells.get_last_measured_liquid_height(labware_id, well_name) # in deck coordinates
                 if height:
-                    offset = offset.copy(
-                        update={"z": offset.z + height}
-                    )  # ensure height is in proper reference frame
+                    return Point(
+                        x=labware_pos.x + offset.x + well_def.x,
+                        y=labware_pos.y + offset.y + well_def.y,
+                        z=height + offset.z,
+                    )
                 else:
                     raise errors.LiquidHeightUnknownError(
                         "Must liquid probe before specifying WellOrigin.MENISCUS."
                     )
-        # need to ensure height updated after Aspirate/Dispense/Air Gap
-        # is PE Aspirate ever called from somewhere other than Instrument Context (Protocol API)?
         # add tests
 
         return Point(

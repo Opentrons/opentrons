@@ -105,6 +105,10 @@ class LegacyWellCore(AbstractWellCore):
     def get_center(self) -> Point:
         """Get the coordinate of the well's center."""
         return self._geometry.center()
+    
+    def get_meniscus(self, z_offset: float) -> Point:
+        """This will never be called because it was added in API 2.21."""  # confirm
+        assert False, "get_meniscus only supported in API 2.21 & later"  # confirm
 
     def load_liquid(
         self,
