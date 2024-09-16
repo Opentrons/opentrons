@@ -4,13 +4,13 @@ import type { ResponsePromise } from '../../request'
 import type { HostConfig } from '../../types'
 import type {
   CommandsAsPreSerializedListData,
-  GetRunCommandsParams,
+  GetRunCommandsParamsRequest,
 } from './types'
 
 export function getCommandsAsPreSerializedList(
   config: HostConfig,
   runId: string,
-  params: GetRunCommandsParams
+  params: GetRunCommandsParamsRequest
 ): ResponsePromise<CommandsAsPreSerializedListData> {
   return request<CommandsAsPreSerializedListData>(
     GET,
