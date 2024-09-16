@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
+import { createPortal } from 'react-dom'
 
 import { useInstrumentsQuery, useHost } from '@opentrons/react-api-client'
 import {
@@ -13,15 +14,21 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE, getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import { BackButton } from '../../atoms/buttons/BackButton'
+import { BackButton } from '../../atoms/buttons'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 import { InstrumentInfo } from '../../organisms/InstrumentInfo'
-import { handleInstrumentDetailOverflowMenu } from '../../pages/InstrumentDetail/InstrumentDetailOverflowMenu'
+import { handleInstrumentDetailOverflowMenu } from './InstrumentDetailOverflowMenu'
 import {
   useGripperDisplayName,
   usePipetteModelSpecs,
 } from '../../resources/instruments/hooks'
+import {
+  DropTipWizardFlows,
+  useDropTipWizardFlows,
+} from '../../organisms/DropTipWizardFlows'
+import { getTopPortalEl } from '../../App/portal'
 
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel, PipetteModel } from '@opentrons/shared-data'
@@ -41,12 +48,32 @@ export const InstrumentDetail = (): JSX.Element => {
   const gripperDisplayName = useGripperDisplayName(
     instrument?.instrumentModel as GripperModel
   )
+  const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
+  const pipetteModelSpecs =
+    instrument != null
+      ? getPipetteModelSpecs((instrument as PipetteData).instrumentModel) ??
+        null
+      : null
 
   const displayName =
     instrument?.mount !== 'extension' ? pipetteDisplayName : gripperDisplayName
 
   return (
     <>
+      {showDTWiz &&
+      instrument != null &&
+      instrument?.mount !== 'extension' &&
+      pipetteModelSpecs != null
+        ? createPortal(
+            <DropTipWizardFlows
+              robotType={FLEX_ROBOT_TYPE}
+              mount={instrument.mount}
+              instrumentModelSpecs={pipetteModelSpecs}
+              closeFlow={toggleDTWiz}
+            />,
+            getTopPortalEl()
+          )
+        : null}
       <Flex
         padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
         flexDirection={DIRECTION_COLUMN}
@@ -62,7 +89,11 @@ export const InstrumentDetail = (): JSX.Element => {
               <IconButton
                 aria-label="overflow menu button"
                 onClick={() => {
-                  handleInstrumentDetailOverflowMenu(instrument, host)
+                  handleInstrumentDetailOverflowMenu(
+                    instrument,
+                    host,
+                    toggleDTWiz
+                  )
                 }}
               >
                 <Icon
