@@ -46,22 +46,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     }
   `
 
-  //  TODO(ja, 7/23/24): remove stub
-  const FIXTURE_FOR_DO_IT_ALL_V8: CommandAnnotation[] = [
-    {
-      annotationType: 'secondOrderCommand',
-      machineReadableName: 'pipettes and module load commands',
-      params: {},
-      commandKeys: [
-        'a1b95079-5b17-428d-b40c-a8236a9890c5',
-        '6f1e3ad3-8f03-4583-8031-be6be2fcd903',
-        '4997a543-7788-434f-8eae-1c4aa3a2a805',
-      ],
-    },
-  ]
-
-  //  test with doitAllV8
-  const annotations = analysis.commandAnnotations ?? FIXTURE_FOR_DO_IT_ALL_V8
+  const annotations = analysis.commandAnnotations ?? []
 
   const groupedCommands = analysis.commands.reduce<
     Array<LeafNode | ParentNode>
