@@ -81,7 +81,7 @@ class TryLiquidProbeResult(DestinationPositionResult):
 
 _LiquidProbeExecuteReturn = Union[
     SuccessData[LiquidProbeResult, None],
-    DefinedErrorData[LiquidNotFoundError, None],
+    DefinedErrorData[LiquidNotFoundError],
 ]
 _TryLiquidProbeExecuteReturn = SuccessData[TryLiquidProbeResult, None]
 
@@ -197,7 +197,6 @@ class LiquidProbeImplementation(
                         )
                     ],
                 ),
-                private=None,
                 state_update=state_update,
             )
         else:

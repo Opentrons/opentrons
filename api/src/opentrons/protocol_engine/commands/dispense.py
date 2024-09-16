@@ -54,7 +54,7 @@ class DispenseResult(BaseLiquidHandlingResult, DestinationPositionResult):
 
 _ExecuteReturn = Union[
     SuccessData[DispenseResult, None],
-    DefinedErrorData[OverpressureError, None],
+    DefinedErrorData[OverpressureError],
 ]
 
 
@@ -111,7 +111,6 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
                     ],
                     errorInfo={"retryLocation": (position.x, position.y, position.z)},
                 ),
-                private=None,
                 state_update=state_update,
             )
         else:
