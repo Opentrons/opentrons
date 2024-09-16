@@ -229,7 +229,7 @@ class InstrumentContext(publisher.CommandPublisher):
             c_vol = self._core.get_available_volume() if not volume else volume
         flow_rate = self._core.get_aspirate_flow_rate(rate)
 
-        target, move_to_location, well = self.determine_aspirate_move_to_location(
+        target, move_to_location, well = self._determine_aspirate_move_to_location(
             location=location,
             volume=c_vol,
             meniscus_relative=meniscus_relative,
@@ -2109,8 +2109,7 @@ class InstrumentContext(publisher.CommandPublisher):
         )
         self._tip_racks = tip_racks or []
 
-    # move these to core
-    def determine_aspirate_move_to_location(
+    def _determine_aspirate_move_to_location(
         self,
         location: Optional[Union[types.Location, labware.Well]],
         volume: float,
@@ -2138,14 +2137,13 @@ class InstrumentContext(publisher.CommandPublisher):
             )
             well = target.well
             if self.api_version >= APIVersion(2, 20):
-                updated_position = self.liquid_probe_before_aspirate(
+                if self._liquid_probe_before_aspirate(
                     well=well,
                     meniscus_relative=meniscus_relative,
                     offset_from_meniscus_mm=offset_from_meniscus_mm,
                     volume=volume,
-                )
-                if updated_position is not None:
-                    move_to_location = updated_position
+                ):
+                    move_to_location = target.well.meniscus(z=offset_from_meniscus_mm)
         if isinstance(target, validation.PointTarget):
             move_to_location = target.location
         if self.api_version >= APIVersion(2, 11):
@@ -2157,13 +2155,13 @@ class InstrumentContext(publisher.CommandPublisher):
         return target, move_to_location, well
 
     # confirm release version 2.21, update where needed
-    def liquid_probe_before_aspirate(
+    def _liquid_probe_before_aspirate(
         self,
         well: labware.Well,
         meniscus_relative: bool,
         offset_from_meniscus_mm: float,
         volume: float,
-    ) -> Optional[types.Location]:
+    ) -> bool:
         if self.api_version < APIVersion(2, 21) and meniscus_relative:
             raise APIVersionError(
                 api_element="Meniscus-relative aspiration",
@@ -2187,13 +2185,12 @@ class InstrumentContext(publisher.CommandPublisher):
         ):
             height = self._core.get_last_measured_liquid_height(well_core=well._core)
             if height is None:
-                height = self.measure_liquid_height(well=well)
+                self.measure_liquid_height(well=well)
             # new parameters fit into location param, sent to Protocol Engine command (via well.meniscus symbol)
             # need below? well.meniscus
             # convert height to volume, subtract `volume`, convert volume to height, use as offset below
             # raise error if not enough liquid present to aspirate desired volume. Error Recovery option
-            move_to_location = well.bottom(z=height + offset_from_meniscus_mm)
-            return move_to_location
+            return True
         elif (
             self.api_version >= APIVersion(2, 20)
             and well is not None
@@ -2201,9 +2198,9 @@ class InstrumentContext(publisher.CommandPublisher):
             and self._96_tip_config_valid()
         ):
             self.require_liquid_presence(well=well)
-            return None
+            return False
         else:
-            return None
+            return False
 
     @requires_version(2, 20)
     def detect_liquid_presence(self, well: labware.Well) -> bool:

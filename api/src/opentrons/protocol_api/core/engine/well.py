@@ -125,6 +125,17 @@ class WellCore(AbstractWellCore):
             well_location=WellLocation(origin=WellOrigin.CENTER),
         )
 
+    def get_meniscus(self, z_offset: float) -> Point:
+        """Get the coordinate of the well's meniscus, with a z-offset."""
+        return self._engine_client.state.geometry.get_well_position(
+            well_name=self._name,
+            labware_id=self._labware_id,
+            well_location=WellLocation(
+                origin=WellOrigin.BOTTOM,  # make WellOrigin.MENISCUS
+                offset=WellOffset(x=0, y=0, z=z_offset),
+            ),
+        )
+
     def load_liquid(
         self,
         liquid: Liquid,

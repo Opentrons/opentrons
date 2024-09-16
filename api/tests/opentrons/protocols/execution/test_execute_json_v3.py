@@ -327,7 +327,12 @@ def test_aspirate() -> None:
     assert m.mock_calls == [
         mock.call.mock_get_location_with_offset(mock.sentinel.loaded_labware, params),
         mock.call.mock_set_flow_rate(m.pipette_mock, params),
-        mock.call.pipette_mock.aspirate(42, mock.sentinel.location),
+        mock.call.pipette_mock.aspirate(
+            volume=42,
+            location=mock.sentinel.location,
+            meniscus_relative=False,
+            offset_from_meniscus_mm=0.0,
+        ),
     ]
 
 
