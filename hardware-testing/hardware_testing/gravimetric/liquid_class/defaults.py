@@ -1,4 +1,5 @@
 """Defaults."""
+from copy import deepcopy
 from dataclasses import fields
 from typing import Dict
 
@@ -62,159 +63,242 @@ _default_dispense: Dict[str, DispenseSettings] = {
     ),
 }
 
-_aspirate_defaults: Dict[
-    int, Dict[int, Dict[int, Dict[int, Dict[str, AspirateSettings]]]]
+_defaults: Dict[
+    int, Dict[int, Dict[int, Dict[int, Dict[str, LiquidClassSettings]]]]
 ] = {
     50: {  # T50
         50: {  # P50
             1: {  # 1CH
                 1: {  # 1uL
-                    _WATER: AspirateSettings(  # water
-                        plunger_flow_rate=35,
-                        trailing_air_gap=0.1,
-                        z_submerge_depth=None,
-                        z_retract_height=None,
-                        delay=None,
-                    ),
-                    _GLYCEROL_50: AspirateSettings(  # glycerol 50%
-                        plunger_flow_rate=35,
-                        trailing_air_gap=0.1,
-                        z_submerge_depth=None,
-                        z_retract_height=None,
-                        delay=None,
-                    ),
-                    _ETHANOL_70: AspirateSettings(  # ethanol 70%
-                        plunger_flow_rate=35,
-                        trailing_air_gap=0.1,
-                        z_submerge_depth=None,
-                        z_retract_height=None,
-                        delay=None,
+                    _WATER: LiquidClassSettings(  # water
+                        aspirate=AspirateSettings(
+                            plunger_flow_rate=35,
+                            trailing_air_gap=0.1,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
+                        dispense=DispenseSettings(
+                            plunger_flow_rate=57,
+                            blow_out_submerged=7,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
                     ),
                 },
-                10: {  # 1uL
-                    _WATER: AspirateSettings(  # water
-                        plunger_flow_rate=35,
-                        trailing_air_gap=0.1,
-                        z_submerge_depth=None,
-                        z_retract_height=None,
-                        delay=None,
-                    ),
-                    _GLYCEROL_50: AspirateSettings(  # glycerol 50%
-                        plunger_flow_rate=35,
-                        trailing_air_gap=0.1,
-                        z_submerge_depth=None,
-                        z_retract_height=None,
-                        delay=None,
-                    ),
-                    _ETHANOL_70: AspirateSettings(  # ethanol 70%
-                        plunger_flow_rate=35,
-                        trailing_air_gap=0.1,
-                        z_submerge_depth=None,
-                        z_retract_height=None,
-                        delay=None,
+                10: {  # 10uL
+                    _WATER: LiquidClassSettings(  # water
+                        aspirate=AspirateSettings(
+                            plunger_flow_rate=23.5,
+                            trailing_air_gap=0.1,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
+                        dispense=DispenseSettings(
+                            plunger_flow_rate=57,
+                            blow_out_submerged=2,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
                     ),
                 },
-                50: {  # 1uL
-                    _WATER: AspirateSettings(  # water
-                        plunger_flow_rate=35,
-                        trailing_air_gap=0.1,
-                        z_submerge_depth=None,
-                        z_retract_height=None,
-                        delay=None,
+                50: {  # 50uL
+                    _WATER: LiquidClassSettings(  # water
+                        aspirate=AspirateSettings(
+                            plunger_flow_rate=35,
+                            trailing_air_gap=0.1,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
+                        dispense=DispenseSettings(
+                            plunger_flow_rate=57,
+                            blow_out_submerged=2,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
                     ),
-                    _GLYCEROL_50: AspirateSettings(  # glycerol 50%
-                        plunger_flow_rate=35,
-                        trailing_air_gap=0.1,
-                        z_submerge_depth=None,
-                        z_retract_height=None,
-                        delay=None,
+                },
+            },
+        },
+        1000: {  # P1000
+            1: {  # 1CH
+                5: {  # 5uL
+                    _WATER: LiquidClassSettings(  # water
+                        aspirate=AspirateSettings(
+                            plunger_flow_rate=318,
+                            trailing_air_gap=0.1,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
+                        dispense=DispenseSettings(
+                            plunger_flow_rate=318,
+                            blow_out_submerged=5,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
                     ),
-                    _ETHANOL_70: AspirateSettings(  # ethanol 70%
-                        plunger_flow_rate=35,
-                        trailing_air_gap=0.1,
-                        z_submerge_depth=None,
-                        z_retract_height=None,
-                        delay=None,
+                },
+                10: {  # 10uL
+                    _WATER: LiquidClassSettings(  # water
+                        aspirate=AspirateSettings(
+                            plunger_flow_rate=478,
+                            trailing_air_gap=0.1,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
+                        dispense=DispenseSettings(
+                            plunger_flow_rate=478,
+                            blow_out_submerged=5,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
+                    ),
+                },
+                50: {  # 50uL
+                    _WATER: LiquidClassSettings(  # water
+                        aspirate=AspirateSettings(
+                            plunger_flow_rate=478,
+                            trailing_air_gap=0.1,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
+                        dispense=DispenseSettings(
+                            plunger_flow_rate=57,
+                            blow_out_submerged=5,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
                     ),
                 },
             },
         },
     },
-}
-
-_dispense_defaults: Dict[
-    int, Dict[int, Dict[int, Dict[int, Dict[str, DispenseSettings]]]]
-] = {
-    50: {  # T50
-        50: {  # P50
+    200: {  # T200
+        1000: {  # P1000
             1: {  # 1CH
-                1: {  # 1uL
-                    _WATER: DispenseSettings(  # water
-                        plunger_flow_rate=57,
-                        blow_out_submerged=7,
-                        z_submerge_depth=None,
-                        z_retract_height=None,
-                        delay=None,
-                    ),
-                    _GLYCEROL_50: DispenseSettings(  # glycerol 50%
-                        plunger_flow_rate=57,
-                        blow_out_submerged=7,
-                        z_submerge_depth=None,
-                        z_retract_height=None,
-                        delay=None,
-                    ),
-                    _ETHANOL_70: DispenseSettings(  # ethanol 70%
-                        plunger_flow_rate=57,
-                        blow_out_submerged=7,
-                        z_submerge_depth=None,
-                        z_retract_height=None,
-                        delay=None,
+                5: {  # 5uL
+                    _WATER: LiquidClassSettings(  # water
+                        aspirate=AspirateSettings(
+                            plunger_flow_rate=716,
+                            trailing_air_gap=5,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
+                        dispense=DispenseSettings(
+                            plunger_flow_rate=716,
+                            blow_out_submerged=5,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
                     ),
                 },
-                10: {  # 1uL
-                    _WATER: DispenseSettings(  # water
-                        plunger_flow_rate=57,
-                        blow_out_submerged=7,
-                        z_submerge_depth=None,
-                        z_retract_height=None,
-                        delay=None,
-                    ),
-                    _GLYCEROL_50: DispenseSettings(  # glycerol 50%
-                        plunger_flow_rate=57,
-                        blow_out_submerged=7,
-                        z_submerge_depth=None,
-                        z_retract_height=None,
-                        delay=None,
-                    ),
-                    _ETHANOL_70: DispenseSettings(  # ethanol 70%
-                        plunger_flow_rate=57,
-                        blow_out_submerged=7,
-                        z_submerge_depth=None,
-                        z_retract_height=None,
-                        delay=None,
+                50: {  # 50uL
+                    _WATER: LiquidClassSettings(  # water
+                        aspirate=AspirateSettings(
+                            plunger_flow_rate=716,
+                            trailing_air_gap=3.5,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
+                        dispense=DispenseSettings(
+                            plunger_flow_rate=716,
+                            blow_out_submerged=5,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
                     ),
                 },
-                50: {  # 1uL
-                    _WATER: DispenseSettings(  # water
-                        plunger_flow_rate=57,
-                        blow_out_submerged=7,
-                        z_submerge_depth=None,
-                        z_retract_height=None,
-                        delay=None,
+                200: {  # 200uL
+                    _WATER: LiquidClassSettings(  # water
+                        aspirate=AspirateSettings(
+                            plunger_flow_rate=716,
+                            trailing_air_gap=2,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
+                        dispense=DispenseSettings(
+                            plunger_flow_rate=716,
+                            blow_out_submerged=5,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
                     ),
-                    _GLYCEROL_50: DispenseSettings(  # glycerol 50%
-                        plunger_flow_rate=57,
-                        blow_out_submerged=7,
-                        z_submerge_depth=None,
-                        z_retract_height=None,
-                        delay=None,
+                },
+            },
+        },
+    },
+    1000: {  # T1000
+        1000: {  # P1000
+            1: {  # 1CH
+                10: {  # 10uL
+                    _WATER: LiquidClassSettings(  # water
+                        aspirate=AspirateSettings(
+                            plunger_flow_rate=160,
+                            trailing_air_gap=10,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
+                        dispense=DispenseSettings(
+                            plunger_flow_rate=160,
+                            blow_out_submerged=20,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
                     ),
-                    _ETHANOL_70: DispenseSettings(  # ethanol 70%
-                        plunger_flow_rate=57,
-                        blow_out_submerged=7,
-                        z_submerge_depth=None,
-                        z_retract_height=None,
-                        delay=None,
+                },
+                100: {  # 100uL
+                    _WATER: LiquidClassSettings(  # water
+                        aspirate=AspirateSettings(
+                            plunger_flow_rate=716,
+                            trailing_air_gap=10,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
+                        dispense=DispenseSettings(
+                            plunger_flow_rate=716,
+                            blow_out_submerged=20,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
+                    ),
+                },
+                1000: {  # 1000uL
+                    _WATER: LiquidClassSettings(  # water
+                        aspirate=AspirateSettings(
+                            plunger_flow_rate=716,
+                            trailing_air_gap=10,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
+                        dispense=DispenseSettings(
+                            plunger_flow_rate=716,
+                            blow_out_submerged=20,
+                            z_submerge_depth=None,
+                            z_retract_height=None,
+                            delay=None,
+                        ),
                     ),
                 },
             },
@@ -227,26 +311,25 @@ def get_liquid_class(
     liquid: str, dilution: float, pipette: int, channels: int, tip: int, volume: int
 ) -> LiquidClassSettings:
     """Get liquid class."""
-    aspirate_cls_per_volume = _aspirate_defaults[tip][pipette][channels]
-    dispense_cls_per_volume = _dispense_defaults[tip][pipette][channels]
-    defined_volumes = list(aspirate_cls_per_volume.keys())
+    _cls_per_volume = _defaults[tip][pipette][channels]
+    defined_volumes = list(_cls_per_volume.keys())
     defined_volumes.sort()
     assert len(defined_volumes) == 3
 
     def _build_liquid_class(vol: int) -> LiquidClassSettings:
         cls_name = SupportedLiquid.from_string(liquid).name_with_dilution(dilution)
-        asp_cls = aspirate_cls_per_volume[vol][cls_name]
-        for f in fields(asp_cls):
-            if getattr(asp_cls, f.name) is None:
-                setattr(asp_cls, f.name, getattr(_default_aspirate[cls_name], f.name))
-        dsp_cls = dispense_cls_per_volume[vol][cls_name]
-        for f in fields(dsp_cls):
-            if getattr(dsp_cls, f.name) is None:
-                setattr(dsp_cls, f.name, getattr(_default_dispense[cls_name], f.name))
-        return LiquidClassSettings(
-            aspirate=asp_cls,
-            dispense=dsp_cls,
-        )
+        _cls = deepcopy(_cls_per_volume[vol][cls_name])
+        for f in fields(_cls.aspirate):
+            if getattr(_cls.aspirate, f.name) is None:
+                setattr(
+                    _cls.aspirate, f.name, getattr(_default_aspirate[cls_name], f.name)
+                )
+        for f in fields(_cls.dispense):
+            if getattr(_cls.dispense, f.name) is None:
+                setattr(
+                    _cls.dispense, f.name, getattr(_default_dispense[cls_name], f.name)
+                )
+        return _cls
 
     def _get_interp_liq_class(lower_ul: int, upper_ul: int) -> LiquidClassSettings:
         factor = (volume - lower_ul) / (upper_ul - lower_ul)
