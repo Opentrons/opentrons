@@ -12,6 +12,7 @@ const DEFAULT_PAGE_LENGTH = 30
 export const DEFAULT_PARAMS: GetCommandsParams = {
   cursor: null,
   pageLength: DEFAULT_PAGE_LENGTH,
+  includeFixitCommands: null,
 }
 
 export function useAllCommandsQuery<TError = Error>(
@@ -26,9 +27,9 @@ export function useAllCommandsQuery<TError = Error>(
     ...options,
     enabled: host !== null && runId != null && options.enabled !== false,
   }
-  const { cursor, pageLength } = nullCheckedParams
+  const { cursor, pageLength, includeFixitCommands } = nullCheckedParams
   const query = useQuery<CommandsData, TError>(
-    [host, 'runs', runId, 'commands', cursor, pageLength],
+    [host, 'runs', runId, 'commands', cursor, pageLength, includeFixitCommands],
     () => {
       return getCommands(
         host as HostConfig,
