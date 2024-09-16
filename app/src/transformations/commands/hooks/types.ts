@@ -1,39 +1,39 @@
 import type {
-    CutoutFixtureId,
-    CutoutId,
-    ModuleModel,
-    PipetteName,
+  CutoutFixtureId,
+  CutoutId,
+  ModuleModel,
+  PipetteName,
 } from '@opentrons/shared-data'
 
 export interface ProtocolPipette {
-    hardwareType: 'pipette'
-    pipetteName: PipetteName
-    mount: 'left' | 'right'
-    connected: boolean
+  hardwareType: 'pipette'
+  pipetteName: PipetteName
+  mount: 'left' | 'right'
+  connected: boolean
 }
 
 export interface ProtocolModule {
-    hardwareType: 'module'
-    moduleModel: ModuleModel
-    slot: string
-    connected: boolean
-    hasSlotConflict: boolean
+  hardwareType: 'module'
+  moduleModel: ModuleModel
+  slot: string
+  connected: boolean
+  hasSlotConflict: boolean
 }
 
 export interface ProtocolGripper {
-    hardwareType: 'gripper'
-    connected: boolean
+  hardwareType: 'gripper'
+  connected: boolean
 }
 
 export interface ProtocolFixture {
-    hardwareType: 'fixture'
-    cutoutFixtureId: CutoutFixtureId | null
-    location: { cutout: CutoutId }
-    hasSlotConflict: boolean
+  hardwareType: 'fixture'
+  cutoutFixtureId: CutoutFixtureId | null
+  location: { cutout: CutoutId }
+  hasSlotConflict: boolean
 }
 
 export type ProtocolHardware =
-    | ProtocolPipette
-    | ProtocolModule
-    | ProtocolGripper
-    | ProtocolFixture
+  | ProtocolPipette
+  | ProtocolModule
+  | ProtocolGripper
+  | ProtocolFixture
