@@ -32,7 +32,7 @@ export function useAllCommandsAsPreSerializedList<TError = Error>(
     enabled: host !== null && runId != null && options.enabled !== false,
   }
   const { cursor, pageLength } = nullCheckedParams
-  const nullCheckedFixitCommands = params?.includeFixitCommands ?? undefined
+  const nullCheckedFixitCommands = params?.includeFixitCommands ?? null
   const finalizedNullCheckParams = {
     ...nullCheckedParams,
     includeFixitCommands: nullCheckedFixitCommands,
