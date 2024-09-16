@@ -63,7 +63,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
     backgroundColor = COLORS.blue50
     color = COLORS.white
   }
-  if (hovered) {
+  if (hovered && !selected) {
     backgroundColor = COLORS.grey30
     color = COLORS.black90
   }
@@ -125,7 +125,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
             {selected && !isStartingOrEndingState && formData == null ? (
               <OverflowBtn
                 data-testid={`StepContainer_${stepId}`}
-                color={COLORS.white}
+                fillColor={COLORS.white}
                 onClick={(e: React.MouseEvent) => {
                   e.preventDefault()
                   e.stopPropagation()
