@@ -18,7 +18,7 @@ export const DEFAULT_PARAMS: GetRunCommandsParamsRequest = {
 
 export function useAllCommandsQuery<TError = Error>(
   runId: string | null,
-  params?: GetRunCommandsParams | null,
+  params?: GetRunCommandsParamsRequest | null,
   options: UseQueryOptions<CommandsData, TError> = {}
 ): UseQueryResult<CommandsData, TError> {
   const host = useHost()
