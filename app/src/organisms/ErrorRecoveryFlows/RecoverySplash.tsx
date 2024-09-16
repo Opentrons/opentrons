@@ -62,10 +62,11 @@ export function useRecoverySplash(
 type RecoverySplashProps = ErrorRecoveryFlowsProps &
   ERUtilsResults & {
     isOnDevice: boolean
-    isWizardActive: boolean
     failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
     robotType: RobotType
     robotName: string
+    /* Whether the app should resume any paused recovery state without user action. */
+    resumePausedRecovery: boolean
     toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
     analytics: UseRecoveryAnalyticsResult
   }
@@ -79,7 +80,7 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
     robotName,
     runStatus,
     recoveryActionMutationUtils,
-    isWizardActive,
+    resumePausedRecovery,
   } = props
   const { t } = useTranslation('error_recovery')
   const errorKind = getErrorKind(failedCommand?.byRunRecord ?? null)
@@ -99,12 +100,15 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
 
   // Resume recovery when the run when the door is closed.
   // The CTA/flow for handling a door open event within the ER wizard is different, and because this splash always renders
-  // behind the wizard, we want to ensure we only implicitly resume recovery when only viewing the splash.
+  // behind the wizard, we want to ensure we only implicitly resume recovery when only viewing the splash from this app.
   React.useEffect(() => {
-    if (runStatus === RUN_STATUS_AWAITING_RECOVERY_PAUSED && !isWizardActive) {
+    if (
+      runStatus === RUN_STATUS_AWAITING_RECOVERY_PAUSED &&
+      resumePausedRecovery
+    ) {
       recoveryActionMutationUtils.resumeRecovery()
     }
-  }, [runStatus, isWizardActive])
+  }, [runStatus, resumePausedRecovery])
   const buildDoorOpenAlert = (): void => {
     makeToast(t('close_door_to_resume') as string, WARNING_TOAST)
   }

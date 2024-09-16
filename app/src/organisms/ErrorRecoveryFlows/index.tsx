@@ -147,6 +147,8 @@ export function ErrorRecoveryFlows(
     failedCommand: failedCommandBySource,
   })
 
+  console.log('=>(index.tsx:180) showTakeover', showTakeover)
+
   return (
     <>
       {showTakeover ? (
@@ -176,7 +178,7 @@ export function ErrorRecoveryFlows(
           isOnDevice={isOnDevice}
           toggleERWizAsActiveUser={toggleERWizAsActiveUser}
           failedCommand={failedCommandBySource}
-          isWizardActive={renderWizard}
+          resumePausedRecovery={!renderWizard && !showTakeover}
         />
       ) : null}
     </>
