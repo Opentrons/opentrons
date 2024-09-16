@@ -95,7 +95,7 @@ describe('RecoverySplash', () => {
       recoveryActionMutationUtils: {
         resumeRecovery: mockResumeRecovery,
       } as any,
-      isWizardActive: false,
+      resumePausedRecovery: true,
     }
 
     vi.mocked(StepInfo).mockReturnValue(<div>MOCK STEP INFO</div>)
@@ -177,7 +177,7 @@ describe('RecoverySplash', () => {
     expect(mockMakeToast).toHaveBeenCalled()
   })
 
-  it(`should transition the run status from ${RUN_STATUS_AWAITING_RECOVERY_PAUSED} to ${RUN_STATUS_AWAITING_RECOVERY}`, () => {
+  it(`should transition the run status from ${RUN_STATUS_AWAITING_RECOVERY_PAUSED} to ${RUN_STATUS_AWAITING_RECOVERY} when resumePausedRecovery is true`, () => {
     props = { ...props, runStatus: RUN_STATUS_AWAITING_RECOVERY_PAUSED }
 
     render(props)
