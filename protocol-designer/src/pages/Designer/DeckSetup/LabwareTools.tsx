@@ -20,6 +20,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  ABSORBANCE_READER_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   OT2_ROBOT_TYPE,
@@ -60,6 +61,8 @@ import type { LabwareDefByDefURI } from '../../../labware-defs'
 const CUSTOM_CATEGORY = 'custom'
 const STANDARD_X_DIMENSION = 127.75
 const STANDARD_Y_DIMENSION = 85.48
+const PLATE_READER_LOADNAME =
+  'opentrons_flex_lid_absorbance_plate_reader_module'
 interface LabwareToolsProps {
   slot: DeckSlotId
   setHoveredLabware: (defUri: string | null) => void
@@ -128,10 +131,8 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
       const isSmallXDimension = xDimension < STANDARD_X_DIMENSION
       const isSmallYDimension = yDimension < STANDARD_Y_DIMENSION
       const isIrregularSize = isSmallXDimension && isSmallYDimension
-
       const isAdapter = labwareDef.allowedRoles?.includes('adapter')
       const isAdapter96Channel = parameters.loadName === ADAPTER_96_CHANNEL
-
       return (
         (filterRecommended &&
           !getLabwareIsRecommended(labwareDef, selectedModuleModel)) ||
@@ -145,7 +146,9 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
           isIrregularSize &&
           moduleType !== HEATERSHAKER_MODULE_TYPE) ||
         (isAdapter96Channel && !has96Channel) ||
-        (slot === 'offDeck' && isAdapter)
+        (slot === 'offDeck' && isAdapter) ||
+        (PLATE_READER_LOADNAME === parameters.loadName &&
+          moduleType !== ABSORBANCE_READER_TYPE)
       )
     },
     [filterRecommended, filterHeight, getLabwareCompatible, moduleType, slot]
