@@ -48,6 +48,7 @@ export function FileUpload({
       <Btn
         onClick={handleClick}
         aria-label="remove_file"
+        maxWidth="19rem"
         css={FILE_UPLOAD_FOCUS_VISIBLE}
       >
         <Flex
@@ -56,7 +57,6 @@ export function FileUpload({
           borderRadius={BORDERS.borderRadius4}
           height={SPACING.spacing44}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          maxWidth="19rem"
           padding={SPACING.spacing8}
           css={FILE_UPLOAD_STYLE}
         >
