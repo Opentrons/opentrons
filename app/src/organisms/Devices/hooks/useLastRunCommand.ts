@@ -19,7 +19,7 @@ export function useLastRunCommand(
   const runStatus = useRunStatus(runId)
   const { data: commandsData } = useNotifyAllCommandsQuery(
     runId,
-    { cursor: null, pageLength: 1, includeFixitCommands: null },
+    { cursor: null, pageLength: 1 },
     {
       ...options,
       refetchInterval:

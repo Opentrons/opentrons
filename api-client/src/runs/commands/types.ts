@@ -6,6 +6,10 @@ export interface GetCommandsParams {
 }
 
 export interface GetRunCommandsParams extends GetCommandsParams {
+  includeFixitCommands?: boolean
+}
+
+export interface GetRunCommandsParamsRequest extends GetCommandsParams {
   includeFixitCommands: boolean | null
 }
 

@@ -61,7 +61,6 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const { data: mostRecentCommandData } = useNotifyAllCommandsQuery(runId, {
     cursor: null,
     pageLength: 1,
-    includeFixitCommands: null,
   })
   // This lastRunCommand also includes "fixit" commands.
   const lastRunCommand = mostRecentCommandData?.data[0] ?? null

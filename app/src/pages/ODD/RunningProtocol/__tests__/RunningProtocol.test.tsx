@@ -154,7 +154,6 @@ describe('RunningProtocol', () => {
       .calledWith(RUN_ID, {
         cursor: null,
         pageLength: 1,
-        includeFixitCommands: null,
       })
       .thenReturn(mockUseAllCommandsResponseNonDeterministic)
     vi.mocked(useLastRunCommand).mockReturnValue({

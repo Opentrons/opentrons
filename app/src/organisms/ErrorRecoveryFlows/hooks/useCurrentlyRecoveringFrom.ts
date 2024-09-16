@@ -31,7 +31,7 @@ export function useCurrentlyRecoveringFrom(
 
   const { data: allCommandsQueryData } = useNotifyAllCommandsQuery(
     runId,
-    { cursor: null, pageLength: 0, includeFixitCommands: null }, // pageLength 0 because we only care about the links.
+    { cursor: null, pageLength: 0 }, // pageLength 0 because we only care about the links.
     {
       enabled: isRunInRecoveryMode,
       refetchInterval: ALL_COMMANDS_POLL_MS,

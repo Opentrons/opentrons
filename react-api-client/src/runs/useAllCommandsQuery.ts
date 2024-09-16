@@ -4,12 +4,13 @@ import { useHost } from '../api'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
   GetRunCommandsParams,
+  GetRunCommandsParamsRequest,
   HostConfig,
   CommandsData,
 } from '@opentrons/api-client'
 
 const DEFAULT_PAGE_LENGTH = 30
-export const DEFAULT_PARAMS: GetRunCommandsParams = {
+export const DEFAULT_PARAMS: GetRunCommandsParamsRequest = {
   cursor: null,
   pageLength: DEFAULT_PAGE_LENGTH,
   includeFixitCommands: null,
@@ -27,14 +28,27 @@ export function useAllCommandsQuery<TError = Error>(
     ...options,
     enabled: host !== null && runId != null && options.enabled !== false,
   }
-  const { cursor, pageLength, includeFixitCommands } = nullCheckedParams
+  const { cursor, pageLength } = nullCheckedParams
+  const nullCheckedFixitCommands = params?.includeFixitCommands ?? null
+  const finalizedNullCheckParams = {
+    ...nullCheckedParams,
+    includeFixitCommands: nullCheckedFixitCommands,
+  }
   const query = useQuery<CommandsData, TError>(
-    [host, 'runs', runId, 'commands', cursor, pageLength, includeFixitCommands],
+    [
+      host,
+      'runs',
+      runId,
+      'commands',
+      cursor,
+      pageLength,
+      finalizedNullCheckParams,
+    ],
     () => {
       return getCommands(
         host as HostConfig,
         runId as string,
-        nullCheckedParams
+        finalizedNullCheckParams
       ).then(response => response.data)
     },
     allOptions
