@@ -285,6 +285,11 @@ async def get_run_commands(
             description="The maximum number of commands in the list to return.",
         ),
     ] = _DEFAULT_COMMAND_LIST_LENGTH,
+    includeFixitCommands: bool = Query(
+        True,
+        description="If `true`, return all commands (protocol, setup, fixit)."
+        " If `false`, only return safe commands (protocol, setup).",
+    ),
 ) -> PydanticResponse[MultiBody[RunCommandSummary, CommandCollectionLinks]]:
     """Get a summary of a set of commands in a run.
 
@@ -293,12 +298,15 @@ async def get_run_commands(
         cursor: Cursor index for the collection response.
         pageLength: Maximum number of items to return.
         run_data_manager: Run data retrieval interface.
+        includeFixitCommands: If `true`, return all commands."
+            " If `false`, only return safe commands.
     """
     try:
         command_slice = run_data_manager.get_commands_slice(
             run_id=runId,
             cursor=cursor,
             length=pageLength,
+            include_fixit_commands=includeFixitCommands,
         )
     except RunNotFoundError as e:
         raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
@@ -368,15 +376,24 @@ async def get_run_commands(
 async def get_run_commands_as_pre_serialized_list(
     runId: str,
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    includeFixitCommands: bool = Query(
+        True,
+        description="If `true`, return all commands (protocol, setup, fixit)."
+        " If `false`, only return safe commands (protocol, setup).",
+    ),
 ) -> PydanticResponse[SimpleMultiBody[str]]:
     """Get all commands of a completed run as a list of pre-serialized (string encoded) commands.
 
     Arguments:
         runId: Requested run ID, from the URL
         run_data_manager: Run data retrieval interface.
+        includeFixitCommands: If `true`, return all commands."
+            " If `false`, only return safe commands.
     """
     try:
-        commands = run_data_manager.get_all_commands_as_preserialized_list(runId)
+        commands = run_data_manager.get_all_commands_as_preserialized_list(
+            run_id=runId, include_fixit_commands=includeFixitCommands
+        )
     except RunNotFoundError as e:
         raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
     except PreSerializedCommandsNotAvailableError as e:

@@ -8,7 +8,6 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   Btn,
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
   InfoScreen,
@@ -45,6 +44,7 @@ import { resetScrollElements } from '../../ui/steps/utils'
 import { useBlockingHint } from '../../components/Hints/useBlockingHint'
 import { v8WarningContent } from '../../components/FileSidebar/FileSidebar'
 import { MaterialsListModal } from '../../organisms/MaterialsListModal'
+import { BUTTON_LINK_STYLE } from '../../atoms'
 import {
   EditProtocolMetadataModal,
   EditInstrumentsModal,
@@ -322,6 +322,7 @@ export function ProtocolOverview(): JSX.Element {
                   onClick={() => {
                     setShowEditMetadataModal(true)
                   }}
+                  css={BUTTON_LINK_STYLE}
                   data-testid="ProtocolOverview_MetadataEditButton"
                 >
                   <StyledText desktopStyle="bodyDefaultRegular">
@@ -358,6 +359,7 @@ export function ProtocolOverview(): JSX.Element {
                   onClick={() => {
                     setShowEditInstrumentsModal(true)
                   }}
+                  css={BUTTON_LINK_STYLE}
                 >
                   <StyledText desktopStyle="bodyDefaultRegular">
                     {t('edit')}
@@ -438,16 +440,13 @@ export function ProtocolOverview(): JSX.Element {
                               </StyledText>
                             </Flex>
                           }
-                          content={liquid.description ?? t('n/a')}
+                          content={liquid.description ?? t('na')}
                         />
                       </ListItem>
                     )
                   )
                 ) : (
-                  <InfoScreen
-                    content={t('no_liquids_defined')}
-                    backgroundColor={COLORS.grey35}
-                  />
+                  <InfoScreen content={t('no_liquids_defined')} />
                 )}
               </Flex>
             </Flex>
@@ -459,10 +458,7 @@ export function ProtocolOverview(): JSX.Element {
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
                 {Object.keys(savedStepForms).length <= 1 ? (
-                  <InfoScreen
-                    content={t('no_steps')}
-                    backgroundColor={COLORS.grey35}
-                  />
+                  <InfoScreen content={t('no_steps')} />
                 ) : (
                   <ListItem type="noActive" key="ProtocolOverview_Step">
                     <ListItemDescriptor
@@ -493,6 +489,7 @@ export function ProtocolOverview(): JSX.Element {
                   onClick={() => {
                     setShowMaterialsListModal(true)
                   }}
+                  css={BUTTON_LINK_STYLE}
                 >
                   <StyledText desktopStyle="bodyDefaultRegular">
                     {t('materials_list')}
@@ -524,7 +521,7 @@ export function ProtocolOverview(): JSX.Element {
               <SlotDetailsContainer
                 robotType={robotType}
                 slot={isOffDeckHover ? 'offDeck' : hover}
-                offDeckLabwareId={hover ?? undefined}
+                offDeckLabwareId={isOffDeckHover ? hover : null}
               />
             </Flex>
           </Flex>

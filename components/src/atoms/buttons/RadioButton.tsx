@@ -84,17 +84,19 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   `
 
   const SettingButtonLabel = styled.label`
-      border-radius: ${
-        !largeDesktopBorderRadius
-          ? BORDERS.borderRadius40
-          : BORDERS.borderRadius8
-      };
-      cursor: pointer;
-      padding: ${SPACING.spacing12} ${SPACING.spacing16};
-      width: 100%;
+    border-radius: ${
+      !largeDesktopBorderRadius ? BORDERS.borderRadius40 : BORDERS.borderRadius8
+    };
+    cursor: pointer;
+    padding: ${SPACING.spacing12} ${SPACING.spacing16};
+    width: 100%;
 
-      ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}
-      ${disabled && DISABLED_BUTTON_STYLE}
+    ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}
+    ${disabled && DISABLED_BUTTON_STYLE}
+
+    &:focus-visible {
+      outline: 2px solid ${COLORS.blue55};
+    }
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
        cursor: default;
@@ -112,6 +114,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     <Flex
       css={css`
         width: auto;
+
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
           width: 100%;
         }
@@ -126,6 +129,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
         value={buttonValue}
       />
       <SettingButtonLabel
+        tabIndex={0}
         role="label"
         htmlFor={id}
         onMouseEnter={setHovered}

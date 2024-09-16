@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { DndProvider } from 'react-dnd'
-import { BrowserRouter } from 'react-router-dom'
+import { HashRouter } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
@@ -22,15 +22,24 @@ import { FileUploadMessageModal } from './components/modals/FileUploadMessageMod
 import { LabwareUploadMessageModal } from './components/modals/LabwareUploadMessageModal/LabwareUploadMessageModal'
 import { GateModal } from './components/modals/GateModal'
 import { CreateFileWizard } from './components/modals/CreateFileWizard'
-import { AnnouncementModal } from './components/modals/AnnouncementModal'
+import { AnnouncementModal } from './organisms'
 import { ProtocolRoutes } from './ProtocolRoutes'
 import { Bouncing } from './Bouncing'
 
 import styles from './components/ProtocolEditor.module.css'
 import './css/reset.module.css'
 
+import type { BrowserRouterProps } from 'react-router-dom'
+
 const showGateModal =
   process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
+
+// sandbox urls get deployed to subdirectories in sandbox.designer.opentrons.com/${subFolder}
+// prod urls get deployed to designer.opentrons.com with no subdir, so we don't need to add a base name
+const routerBaseName =
+  process.env.NODE_ENV === 'production'
+    ? null
+    : `/${window.location.pathname.split('/')[1]}`
 
 function ProtocolEditorComponent(): JSX.Element {
   const flags = useSelector(getFeatureFlagData)
@@ -38,15 +47,18 @@ function ProtocolEditorComponent(): JSX.Element {
 
   const prereleaseModeEnabled = flags.PRERELEASE_MODE === true
 
+  const browserRouterProps: BrowserRouterProps =
+    routerBaseName != null ? { basename: routerBaseName } : {}
+
   return (
     <div id="protocol-editor">
       <TopPortalRoot />
       {enableRedesign ? (
         <Flex flexDirection={DIRECTION_COLUMN}>
           {prereleaseModeEnabled ? <Bouncing /> : null}
-          <BrowserRouter>
+          <HashRouter {...browserRouterProps}>
             <ProtocolRoutes />
-          </BrowserRouter>
+          </HashRouter>
         </Flex>
       ) : (
         <div className="container">

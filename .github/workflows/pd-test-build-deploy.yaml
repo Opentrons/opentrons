@@ -162,7 +162,7 @@ jobs:
           OT_PD_MIXPANEL_ID: ${{ secrets.OT_PD_MIXPANEL_ID }}
           OT_PD_MIXPANEL_DEV_ID: ${{ secrets.OT_PD_MIXPANEL_DEV_ID }}
         run: |
-          make -C protocol-designer
+          make -C protocol-designer NODE_ENV=development
       - name: 'upload github artifact'
         uses: actions/upload-artifact@v3
         with:
@@ -215,4 +215,7 @@ jobs:
           aws configure set role_arn ${{ secrets.OT_PD_DEPLOY_ROLE }} --profile deploy
           aws configure set source_profile identity --profile deploy
           aws s3 sync ./dist s3://sandbox.designer.opentrons.com/${{ env.OT_BRANCH }} --acl=public-read --profile=deploy
+          # invalidate both sandbox.opentrons.com and www.sandbox.opentrons.com cloudfront caches
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.PD_CLOUDFRONT_SANDBOX_DISTRIBUTION_ID }} --paths "/*" --profile deploy
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.PD_CLOUDFRONT_SANDBOX_WWW_DISTRIBUTION_ID }} --paths "/*" --profile deploy
         shell: bash

@@ -16,6 +16,7 @@ import type {
   LiquidGroupsById,
   DisplayLabware,
   ZoomedIntoSlotInfoState,
+  GenerateNewProtocolState,
 } from '../types'
 import type { LoadFileAction } from '../../load-file'
 import type {
@@ -38,6 +39,7 @@ import type {
   SelectModuleAction,
   SelectFixtureAction,
   ZoomedIntoSlotAction,
+  GenerateNewProtocolAction,
 } from '../actions'
 // REDUCERS
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
@@ -402,6 +404,24 @@ export const zoomedInSlotInfo = (
       return state
   }
 }
+
+const initialGenerateNewProtocolState: GenerateNewProtocolState = {
+  isNewProtocol: false,
+}
+
+export const generateNewProtocol = (
+  state: GenerateNewProtocolState = initialGenerateNewProtocolState,
+  action: GenerateNewProtocolAction
+): GenerateNewProtocolState => {
+  switch (action.type) {
+    case 'GENERATE_NEW_PROTOCOL': {
+      const { isNewProtocol } = action.payload
+      return { ...state, isNewProtocol }
+    }
+    default:
+      return state
+  }
+}
 export interface RootState {
   zoomedInSlotInfo: ZoomedIntoSlotInfoState
   modeLabwareSelection: DeckSlot | false
@@ -412,6 +432,7 @@ export interface RootState {
   selectedLiquidGroup: SelectedLiquidGroupState
   ingredients: IngredientsState
   ingredLocations: LocationsState
+  generateNewProtocol: GenerateNewProtocolState
 }
 // TODO Ian 2018-01-15 factor into separate files
 export const rootReducer: Reducer<RootState, Action> = combineReducers({
@@ -424,4 +445,5 @@ export const rootReducer: Reducer<RootState, Action> = combineReducers({
   savedLabware,
   ingredients,
   ingredLocations,
+  generateNewProtocol,
 })

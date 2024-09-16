@@ -17,7 +17,7 @@ import type { ContentsByWell } from '../../labware-ingred/types'
 interface SlotDetailContainerProps {
   robotType: RobotType
   slot: DeckSlotId | null
-  offDeckLabwareId?: string
+  offDeckLabwareId?: string | null
 }
 
 export function SlotDetailsContainer(
@@ -91,14 +91,15 @@ export function SlotDetailsContainer(
     .filter(Boolean)
 
   const labwares: string[] = []
+  const adapters: string[] = []
   if (offDeckLabwareNickName != null) {
     labwares.push(offDeckLabwareNickName)
   } else {
-    if (labwareOnSlot != null) {
-      labwares.push(nickNames[labwareOnSlot.id])
-    }
-    if (nestedLabwareOnSlot != null) {
+    if (nestedLabwareOnSlot != null && labwareOnSlot != null) {
+      adapters.push(nickNames[labwareOnSlot.id])
       labwares.push(nickNames[nestedLabwareOnSlot.id])
+    } else if (nestedLabwareOnSlot == null && labwareOnSlot != null) {
+      labwares.push(nickNames[labwareOnSlot.id])
     }
   }
 
@@ -116,6 +117,7 @@ export function SlotDetailsContainer(
         labwares={labwares}
         fixtures={fixtureDisplayNames}
         liquids={liquidNamesOnLabware}
+        adapters={adapters}
       />
     </RobotCoordsForeignObject>
   ) : (
@@ -124,6 +126,7 @@ export function SlotDetailsContainer(
       robotType={robotType}
       modules={moduleDisplayName != null ? [moduleDisplayName] : []}
       labwares={labwares}
+      adapters={adapters}
       fixtures={fixtureDisplayNames}
       liquids={liquidNamesOnLabware}
     />

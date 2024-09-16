@@ -15,7 +15,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { ChooseEnum } from '../ChooseEnum'
 import { ChooseNumber } from '../ChooseNumber'
 import { ChooseCsvFile } from '../ChooseCsvFile'
-import { mockRunTimeParameterData } from '../../../pages/ProtocolDetails/fixtures'
+import { mockRunTimeParameterData } from '../../../pages/ODD/ProtocolDetails/fixtures'
 import { useToaster } from '../../ToasterOven'
 import { ProtocolSetupParameters } from '..'
 

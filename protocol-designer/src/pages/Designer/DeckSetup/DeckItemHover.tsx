@@ -87,6 +87,7 @@ export function DeckItemHover(props: DeckItemHoverProps): JSX.Element | null {
           color: COLORS.white,
           fontSize: PRODUCT.TYPOGRAPHY.fontSizeBodyDefaultSemiBold,
           borderRadius: BORDERS.borderRadius8,
+          cursor: 'pointer',
         },
         onMouseEnter: () => {
           setHover(itemId)

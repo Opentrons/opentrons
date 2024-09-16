@@ -1056,3 +1056,16 @@ class TipNotEmptyError(ProtocolEngineError):
     ) -> None:
         """Build a TipNotEmptyError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class InvalidWellDefinitionError(ProtocolEngineError):
+    """Raised when an InnerWellGeometry definition is invalid."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidWellDefinitionError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
