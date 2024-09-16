@@ -151,7 +151,10 @@ describe('RunningProtocol', () => {
       .calledWith(RUN_ID)
       .thenReturn(mockRobotSideAnalysis)
     when(vi.mocked(useNotifyAllCommandsQuery))
-      .calledWith(RUN_ID, { cursor: null, pageLength: 1 })
+      .calledWith(RUN_ID, {
+        cursor: null,
+        pageLength: 1,
+      })
       .thenReturn(mockUseAllCommandsResponseNonDeterministic)
     vi.mocked(useLastRunCommand).mockReturnValue({
       key: 'FAKE_COMMAND_KEY',
