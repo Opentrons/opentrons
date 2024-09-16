@@ -83,6 +83,7 @@ export function useERUtils({
   const { data: runCommands } = useNotifyAllCommandsQuery(runId, {
     cursor: 0,
     pageLength: 999,
+    includeFixitCommands: null,
   })
   const failedCommandByRunRecord = failedCommand?.byRunRecord ?? null
 

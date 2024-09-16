@@ -149,6 +149,7 @@ export function CurrentRunningProtocolCommand({
   const { data: mostRecentCommandData } = useNotifyAllCommandsQuery(runId, {
     cursor: null,
     pageLength: 1,
+    includeFixitCommands: null,
   })
 
   const currentCommand =

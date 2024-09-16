@@ -134,7 +134,7 @@ export function useRunTimestamps(runId: string | null): RunTimestamps {
   const runCommands =
     useRunCommands(
       runId,
-      { cursor: null, pageLength: 1 },
+      { cursor: null, pageLength: 1, includeFixitCommands: null },
       {
         enabled:
           runStatus === RUN_STATUS_SUCCEEDED ||

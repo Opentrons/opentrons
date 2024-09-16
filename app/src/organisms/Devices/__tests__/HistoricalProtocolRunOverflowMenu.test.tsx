@@ -93,6 +93,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
         {
           cursor: 0,
           pageLength: PAGE_LENGTH,
+          includeFixitCommands: null,
         },
         { staleTime: Infinity }
       )

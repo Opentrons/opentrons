@@ -3,13 +3,13 @@ import { getCommands } from '@opentrons/api-client'
 import { useHost } from '../api'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
-  GetCommandsParams,
+  GetRunCommandsParams,
   HostConfig,
   CommandsData,
 } from '@opentrons/api-client'
 
 const DEFAULT_PAGE_LENGTH = 30
-export const DEFAULT_PARAMS: GetCommandsParams = {
+export const DEFAULT_PARAMS: GetRunCommandsParams = {
   cursor: null,
   pageLength: DEFAULT_PAGE_LENGTH,
   includeFixitCommands: null,
@@ -17,7 +17,7 @@ export const DEFAULT_PARAMS: GetCommandsParams = {
 
 export function useAllCommandsQuery<TError = Error>(
   runId: string | null,
-  params?: GetCommandsParams | null,
+  params?: GetRunCommandsParams | null,
   options: UseQueryOptions<CommandsData, TError> = {}
 ): UseQueryResult<CommandsData, TError> {
   const host = useHost()
