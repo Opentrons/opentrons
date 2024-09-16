@@ -11,7 +11,6 @@ from .command import DefinedErrorData
 from .pipetting_common import (
     OverpressureError,
     LiquidNotFoundError,
-    LiquidNotFoundErrorInternalData,
 )
 
 from . import absorbance_reader
@@ -706,7 +705,7 @@ CommandPrivateResult = Union[
 CommandDefinedErrorData = Union[
     DefinedErrorData[TipPhysicallyMissingError, None],
     DefinedErrorData[OverpressureError, None],
-    DefinedErrorData[LiquidNotFoundError, LiquidNotFoundErrorInternalData],
+    DefinedErrorData[LiquidNotFoundError, None],
 ]
 
 

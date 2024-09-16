@@ -9,12 +9,6 @@ from opentrons_shared_data.pipette import pipette_definition
 from opentrons.protocol_engine.state import update_types
 from opentrons.types import DeckSlotName, MountType, Point
 from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.commands.command import DefinedErrorData
-from opentrons.protocol_engine.commands.pipetting_common import (
-    LiquidNotFoundError,
-    LiquidNotFoundErrorInternalData,
-)
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.types import (
     CurrentAddressableArea,
     DeckPoint,
@@ -438,120 +432,6 @@ def test_blow_out_clears_volume(
     )
 
     assert subject.state.aspirated_volume_by_id["pipette-id"] is None
-
-
-@pytest.mark.parametrize(
-    ("action", "expected_location"),
-    (
-        # liquidProbe and tryLiquidProbe succeeding and with overpressure error
-        (
-            SucceedCommandAction(
-                command=cmd.LiquidProbe(
-                    id="command-id",
-                    createdAt=datetime.now(),
-                    startedAt=datetime.now(),
-                    completedAt=datetime.now(),
-                    key="command-key",
-                    status=cmd.CommandStatus.SUCCEEDED,
-                    params=cmd.LiquidProbeParams(
-                        labwareId="liquid-probe-labware-id",
-                        wellName="liquid-probe-well-name",
-                        pipetteId="pipette-id",
-                    ),
-                    result=cmd.LiquidProbeResult(
-                        position=DeckPoint(x=0, y=0, z=0), z_position=0
-                    ),
-                ),
-                private_result=None,
-            ),
-            CurrentWell(
-                pipette_id="pipette-id",
-                labware_id="liquid-probe-labware-id",
-                well_name="liquid-probe-well-name",
-            ),
-        ),
-        (
-            FailCommandAction(
-                running_command=cmd.LiquidProbe(
-                    id="command-id",
-                    createdAt=datetime.now(),
-                    startedAt=datetime.now(),
-                    key="command-key",
-                    status=cmd.CommandStatus.RUNNING,
-                    params=cmd.LiquidProbeParams(
-                        labwareId="liquid-probe-labware-id",
-                        wellName="liquid-probe-well-name",
-                        pipetteId="pipette-id",
-                    ),
-                ),
-                error=DefinedErrorData(
-                    public=LiquidNotFoundError(
-                        id="error-id",
-                        createdAt=datetime.now(),
-                    ),
-                    private=LiquidNotFoundErrorInternalData(
-                        position=DeckPoint(x=0, y=0, z=0)
-                    ),
-                ),
-                command_id="command-id",
-                error_id="error-id",
-                failed_at=datetime.now(),
-                notes=[],
-                type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
-            ),
-            CurrentWell(
-                pipette_id="pipette-id",
-                labware_id="liquid-probe-labware-id",
-                well_name="liquid-probe-well-name",
-            ),
-        ),
-        (
-            SucceedCommandAction(
-                command=cmd.TryLiquidProbe(
-                    id="command-id",
-                    createdAt=datetime.now(),
-                    startedAt=datetime.now(),
-                    completedAt=datetime.now(),
-                    key="command-key",
-                    status=cmd.CommandStatus.SUCCEEDED,
-                    params=cmd.TryLiquidProbeParams(
-                        labwareId="try-liquid-probe-labware-id",
-                        wellName="try-liquid-probe-well-name",
-                        pipetteId="pipette-id",
-                    ),
-                    result=cmd.TryLiquidProbeResult(
-                        position=DeckPoint(x=0, y=0, z=0),
-                        z_position=0,
-                    ),
-                ),
-                private_result=None,
-            ),
-            CurrentWell(
-                pipette_id="pipette-id",
-                labware_id="try-liquid-probe-labware-id",
-                well_name="try-liquid-probe-well-name",
-            ),
-        ),
-    ),
-)
-def test_movement_commands_update_current_well(
-    action: Union[SucceedCommandAction, FailCommandAction],
-    expected_location: CurrentWell,
-    subject: PipetteStore,
-) -> None:
-    """It should save the last used pipette, labware, and well for movement commands."""
-    load_pipette_command = create_load_pipette_command(
-        pipette_id="pipette-id",
-        pipette_name=PipetteNameType.P300_SINGLE,
-        mount=MountType.LEFT,
-    )
-
-    subject.handle_action(
-        SucceedCommandAction(private_result=None, command=load_pipette_command)
-    )
-    subject.handle_action(action)
-
-    assert subject.state.current_location == expected_location
 
 
 @pytest.mark.parametrize(
