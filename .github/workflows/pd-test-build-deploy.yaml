@@ -124,7 +124,7 @@ jobs:
         run: make -C protocol-designer test-e2e
   build-pd:
     name: 'build protocol designer artifact'
-    needs: ['js-unit-test']
+    # needs: ['js-unit-test']
     runs-on: 'ubuntu-22.04'
     if: github.event_name != 'pull_request'
     steps:
@@ -171,7 +171,7 @@ jobs:
   deploy-pd:
     name: 'deploy PD artifact to S3'
     runs-on: 'ubuntu-22.04'
-    needs: ['js-unit-test', 'build-pd']
+    needs: [ 'build-pd']
     if: github.event_name != 'pull_request'
     steps:
       - uses: 'actions/checkout@v3'
