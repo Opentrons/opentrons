@@ -27,7 +27,8 @@ const FILE_UPLOAD_STYLE = css`
 const FILE_UPLOAD_FOCUS_VISIBLE = css`
   &:focus-visible {
     border-radius: ${BORDERS.borderRadius4};
-    box-shadow: 0 0 0 ${SPACING.spacing2} ${COLORS.blue50};
+    outline: 2px ${BORDERS.styleSolid} ${COLORS.blue50};
+    outline-offset: 2px;
   }
 `
 
@@ -55,6 +56,7 @@ export function FileUpload({
           borderRadius={BORDERS.borderRadius4}
           height={SPACING.spacing44}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
+          maxWidth="19rem"
           padding={SPACING.spacing8}
           css={FILE_UPLOAD_STYLE}
         >
