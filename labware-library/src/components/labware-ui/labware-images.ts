@@ -350,6 +350,36 @@ export const labwareImages: Record<string, string[]> = {
       import.meta.url
     ).href,
   ],
+  thermoscientificabgene_96_wellplate_200ul: [
+    new URL(
+      '../../images/thermoscientificabgene_96_wellplate_200ul_photo.jpg',
+      import.meta.url
+    ).href,
+  ],
+  thermoscientificnunc_384_wellplate_40ul: [
+    new URL(
+      '../../images/thermoscientificnunc_384_wellplate_40ul_photo.jpg',
+      import.meta.url
+    ).href,
+  ],
+  thermoscientificabgene_96_wellplate_800ul: [
+    new URL(
+      '../../images/thermoscientificabgene_96_wellplate_800ul_photo.jpg',
+      import.meta.url
+    ).href,
+  ],
+  thermoscientific_96_wellplate_1200ul: [
+    new URL(
+      '../../images/thermoscientific_96_wellplate_1200ul_photo.jpg',
+      import.meta.url
+    ).href,
+  ],
+  thermoscientific_96_wellplate_v_450ul: [
+    new URL(
+      '../../images/thermoscientific_96_wellplate_v_450ul_photo.jpg',
+      import.meta.url
+    ).href,
+  ],
   thermoscientificnunc_96_wellplate_1300ul: [
     new URL(
       '../../images/thermoscientificnunc_96_wellplate_1300ul.jpg',
