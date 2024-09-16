@@ -1499,6 +1499,59 @@ def test_get_well_position_with_center_offset(
     )
 
 
+def test_get_well_position_with_meniscus_offset(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    mock_labware_view: LabwareView,
+    mock_well_view: WellView,
+    mock_addressable_area_view: AddressableAreaView,
+    subject: GeometryView,
+) -> None:
+    """It should be able to get the position of a well center in a labware."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="offset-id",
+    )
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    slot_pos = Point(4, 5, 6)
+    well_def = well_plate_def.wells["B2"]
+
+    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
+        calibration_offset
+    )
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+    ).then_return(slot_pos)
+    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
+    )
+    decoy.when(
+        mock_well_view.get_last_measured_liquid_height("labware-id", "B2")
+    ).then_return(70.5)
+
+    result = subject.get_well_position(
+        labware_id="labware-id",
+        well_name="B2",
+        well_location=WellLocation(
+            origin=WellOrigin.MENISCUS,
+            offset=WellOffset(x=2, y=3, z=4),
+        ),
+    )
+
+    assert result == Point(
+        x=slot_pos[0] + 1 + well_def.x + 2,
+        y=slot_pos[1] - 2 + well_def.y + 3,
+        z=70.5 + 4,
+    )
+
+
 def test_get_relative_well_location(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
