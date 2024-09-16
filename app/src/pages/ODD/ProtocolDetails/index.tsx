@@ -37,8 +37,8 @@ import {
   ProtocolDetailsHeaderChipSkeleton,
   ProcotolDetailsHeaderTitleSkeleton,
   ProtocolDetailsSectionContentSkeleton,
-} from '../../../organisms/OnDeviceDisplay/ProtocolDetails'
-import { useHardwareStatusText } from '../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
+} from '../../../organisms/ODD/ProtocolDetails'
+import { useHardwareStatusText } from '../../../organisms/ODD/RobotDashboard/hooks'
 import { OddModal, SmallModalChildren } from '../../../molecules/OddModal'
 import { useToaster } from '../../../organisms/ToasterOven'
 import {
@@ -47,11 +47,9 @@ import {
   updateConfigValue,
 } from '../../../redux/config'
 import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import {
-  useMissingProtocolHardware,
-  useRunTimeParameters,
-} from '../../../pages/Desktop/Protocols/hooks'
-import { ProtocolSetupParameters } from '../../../organisms/ProtocolSetupParameters'
+import { useRunTimeParameters } from '../../../pages/Desktop/Protocols/hooks'
+import { useMissingProtocolHardware } from '../../../transformations/commands'
+import { ProtocolSetupParameters } from '../../../organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
 import { Parameters } from './Parameters'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'

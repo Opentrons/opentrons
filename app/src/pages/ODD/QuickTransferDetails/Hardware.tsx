@@ -32,7 +32,7 @@ import { useRequiredProtocolHardware } from '../../../pages/Desktop/Protocols/ho
 import type {
   ProtocolHardware,
   ProtocolPipette,
-} from '../../../pages/Desktop/Protocols/hooks'
+} from '../../../transformations/commands'
 import type { TFunction } from 'i18next'
 
 const Table = styled('table')`
