@@ -6,10 +6,10 @@ type HandledCommands = Extract<RunTimeCommand, { commandType: 'setRailLights' }>
 export type GetRailLightsCommandText = HandlesCommands<HandledCommands>
 
 export function getRailLightsCommandText({
-    command,
-    t,
+  command,
+  t,
 }: GetRailLightsCommandText): string {
-    return command.params.on
-        ? t('turning_rail_lights_on')
-        : t('turning_rail_lights_off')
+  return command.params.on
+    ? t('turning_rail_lights_on')
+    : t('turning_rail_lights_off')
 }
