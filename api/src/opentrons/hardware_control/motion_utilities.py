@@ -36,6 +36,19 @@ from .types import Axis, OT3Mount
 # ) -> Point:
 #     ...
 
+EMPTY_ORDERED_DICT = OrderedDict(
+    (
+        (Axis.X, 0.0),
+        (Axis.Y, 0.0),
+        (Axis.Z_L, 0.0),
+        (Axis.Z_R, 0.0),
+        (Axis.Z_G, 0.0),
+        (Axis.P_L, 0.0),
+        (Axis.P_R, 0.0),
+        (Axis.Q, 0.0),
+    )
+)
+
 
 @lru_cache(4)
 def offset_for_mount(
@@ -93,6 +106,39 @@ def target_position_from_relative(
             (y_ax, current_position[y_ax] + delta[1]),
             (primary_z, current_position[primary_z] + delta[2]),
         )
+    )
+    return target_position
+
+
+def target_axis_map_from_absolute(
+    axis_map: Dict[Axis, float],
+    critical_point: Dict[Axis, float],
+    mount_offset: Dict[Axis, float],
+) -> "OrderedDict[Axis, float]":
+    """Create an absolute target position for all specified machine axes."""
+    axis_with_cp = {ax: axis_map[ax] - val for ax, val in critical_point.items()}
+    axis_map.update(axis_with_cp)
+    axis_with_offset = {
+        ax: axis_map[ax] - val
+        for ax, val in mount_offset.items()
+        if ax in axis_map.keys()
+    }
+    axis_map.update(axis_with_offset)
+    target_position = OrderedDict(
+        ((ax, axis_map[ax]) for ax in EMPTY_ORDERED_DICT.keys())
+    )
+    return target_position
+
+
+def target_axis_map_from_relative(
+    axis_map: Dict[Axis, float],
+    current_position: Dict[Axis, float],
+) -> "OrderedDict[Axis, float]":
+    """Create a target position for all specified machine axes."""
+    target_position = OrderedDict(
+        ((ax, current_position[ax] + axis_map[ax])
+        for ax in EMPTY_ORDERED_DICT.keys()
+        if ax in axis_map.keys())
     )
     return target_position
 
