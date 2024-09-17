@@ -247,11 +247,11 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 action.state_update.loaded_labware.labware_id
             ] = LoadedLabware.construct(
                 id=action.state_update.loaded_labware.labware_id,
-                location=action.state_update.labware_location,
+                location=action.state_update.labware_location.new_location,
                 loadName=action.state_update.loaded_labware.definition.parameters.loadName,
                 definitionUri=definition_uri,
                 offsetId=action.state_update.loaded_labware.offsetId,
-                displayName=action.state_update.labware_display_name,
+                displayName=action.state_update.labware_location.display_name,
             )
 
 

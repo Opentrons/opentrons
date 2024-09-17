@@ -59,6 +59,22 @@ class PipetteLocationUpdate:
 
 
 @dataclasses.dataclass
+class LabwareLocationUpdate:
+    """Represents an update to perform on a labware's location."""
+
+    labware_id: typing.Optional[str]
+
+    display_name: typing.Optional[str]
+
+    new_location: LabwareLocation | None | NoChangeType
+    """The labware's new logical location.
+
+    Note: `new_location=None` means "change the location to `None` (unknown)",
+    not "do not change the location".
+    """
+
+
+@dataclasses.dataclass
 class StateUpdate:
     """Represents an update to perform on engine state."""
 
@@ -66,6 +82,10 @@ class StateUpdate:
     # deck point and the logical location, for e.g. home commands. Consider an explicit
     # `CLEAR` sentinel if `None` is confusing.
     pipette_location: PipetteLocationUpdate | NoChangeType = NO_CHANGE
+
+    labware_location: LabwareLocationUpdate | NoChangeType = NO_CHANGE
+
+    loaded_labware: typing.Optional[LoadedLabwareData] = None
 
     # These convenience functions let the caller avoid the boilerplate of constructing a
     # complicated dataclass tree, and they give us a
@@ -124,7 +144,11 @@ class StateUpdate:
         self.loaded_labware = labware
 
     def set_location_and_display_name(
-        self, location: LabwareLocation, display_name: typing.Optional[str]
+        self,
+        location: LabwareLocation,
+        labware_id: typing.Optional[str],
+        display_name: typing.Optional[str],
     ) -> None:
-        self.labware_display_name = display_name
-        self.labware_location = location
+        self.labware_location = LabwareLocationUpdate(
+            labware_id=labware_id, display_name=display_name, new_location=location
+        )
