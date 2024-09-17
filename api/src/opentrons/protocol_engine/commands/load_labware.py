@@ -17,6 +17,7 @@ from ..types import (
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
+from ..state.update_types import StateUpdate
 
 if TYPE_CHECKING:
     from ..state.state import StateView
@@ -113,6 +114,8 @@ class LoadLabwareImplementation(
                 f"{params.loadName} is not allowed in slot {params.location.slotName}"
             )
 
+        state_update = StateUpdate()
+
         if isinstance(params.location, AddressableAreaLocation):
             area_name = params.location.addressableAreaName
             if not (
@@ -140,6 +143,10 @@ class LoadLabwareImplementation(
             location=verified_location,
             labware_id=params.labwareId,
         )
+        state_update.set_loaded_labware(loaded_labware)
+        state_update.set_location_and_display_name(
+            location=verified_location, display_name=params.displayName
+        )
 
         # TODO(jbl 2023-06-23) these validation checks happen after the labware is loaded, because they rely on
         #   on the definition. In practice this will not cause any issues since they will raise protocol ending
@@ -157,6 +164,7 @@ class LoadLabwareImplementation(
                 offsetId=loaded_labware.offsetId,
             ),
             private=None,
+            state_update=state_update,
         )
 
 

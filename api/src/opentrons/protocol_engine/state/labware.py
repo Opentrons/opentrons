@@ -154,6 +154,8 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
+        self._add_loaded_labware(action)
+
         if isinstance(action, SucceedCommandAction):
             self._handle_command(action.command)
 
@@ -178,7 +180,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
     def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
         if isinstance(command.result, LoadLabwareResult):
-            # If the labware load refers to an offset, that offset must actually exist.
+            #  If the labware load refers to an offset, that offset must actually exist.
             if command.result.offsetId is not None:
                 assert command.result.offsetId in self._state.labware_offsets_by_id
 
@@ -243,6 +245,39 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         assert labware_offset.id not in self._state.labware_offsets_by_id
 
         self._state.labware_offsets_by_id[labware_offset.id] = labware_offset
+
+    def _add_loaded_labware(self, action: Action) -> None:
+        if (
+            isinstance(action, SucceedCommandAction)
+            and action.state_update.loaded_labware
+        ):
+            # If the labware load refers to an offset, that offset must actually exist.
+            if action.state_update.loaded_labware.offsetId is not None:
+                assert (
+                    action.state_update.loaded_labware.offsetId
+                    in self._state.labware_offsets_by_id
+                )
+
+            definition_uri = uri_from_details(
+                namespace=action.state_update.loaded_labware.definition.namespace,
+                load_name=action.state_update.loaded_labware.definition.parameters.loadName,
+                version=action.state_update.loaded_labware.definition.version,
+            )
+
+            self._state.definitions_by_uri[
+                definition_uri
+            ] = action.state_update.loaded_labware.definition
+
+            self._state.labware_by_id[
+                action.state_update.loaded_labware.labware_id
+            ] = LoadedLabware.construct(
+                id=action.state_update.loaded_labware.labware_id,
+                location=action.state_update.labware_location,
+                loadName=action.state_update.loaded_labware.definition.parameters.loadName,
+                definitionUri=definition_uri,
+                offsetId=action.state_update.loaded_labware.offsetId,
+                displayName=action.state_update.labware_display_name,
+            )
 
 
 class LabwareView(HasState[LabwareState]):

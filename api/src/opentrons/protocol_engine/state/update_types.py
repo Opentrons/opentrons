@@ -5,7 +5,8 @@ import dataclasses
 import enum
 import typing
 
-from opentrons.protocol_engine.types import DeckPoint
+from opentrons.protocol_engine.execution.equipment import LoadedLabwareData
+from opentrons.protocol_engine.types import DeckPoint, LabwareLocation
 
 
 class _NoChangeEnum(enum.Enum):
@@ -118,3 +119,12 @@ class StateUpdate:
                 new_location=Well(labware_id=new_labware_id, well_name=new_well_name),
                 new_deck_point=new_deck_point,
             )
+
+    def set_loaded_labware(self, labware: LoadedLabwareData) -> None:
+        self.loaded_labware = labware
+
+    def set_location_and_display_name(
+        self, location: LabwareLocation, display_name: typing.Optional[str]
+    ) -> None:
+        self.labware_display_name = display_name
+        self.labware_location = location
