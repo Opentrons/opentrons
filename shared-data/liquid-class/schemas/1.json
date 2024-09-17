@@ -435,7 +435,12 @@
                   "$ref": "#/definitions/multiDispenseParams"
                 }
               },
-              "required": ["aspirate", "singleDispense", "multiDispense"]
+              "required": [
+                "tipType",
+                "aspirate",
+                "singleDispense",
+                "multiDispense"
+              ]
             }
           }
         },
