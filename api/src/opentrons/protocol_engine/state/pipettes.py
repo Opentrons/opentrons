@@ -320,7 +320,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         # with a well. Clear current_location to reflect the fact that it's now unknown.
         #
         # TODO(mc, 2021-11-12): Wipe out current_location on movement failures, too.
-        # TODO(jbl 2023-02-14): Need to investigate whether move relative should clear current location
         elif isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
@@ -393,10 +392,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
         if isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
-            (
-                commands.MoveToCoordinatesResult,
-                commands.MoveRelativeResult,
-            ),
+            commands.MoveToCoordinatesResult,
         ):
             pipette_id = action.command.params.pipetteId
             deck_point = action.command.result.position

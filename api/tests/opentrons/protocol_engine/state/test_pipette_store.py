@@ -53,7 +53,6 @@ from .command_fixtures import (
     create_blow_out_in_place_command,
     create_move_labware_command,
     create_move_to_coordinates_command,
-    create_move_relative_command,
     create_prepare_to_aspirate_command,
     create_unsafe_blow_out_in_place_command,
 )
@@ -780,13 +779,6 @@ def test_add_pipette_config(
             command=create_move_to_coordinates_command(
                 pipette_id="pipette-id",
                 coordinates=DeckPoint(x=11, y=22, z=33),
-            ),
-            private_result=None,
-        ),
-        SucceedCommandAction(
-            command=create_move_relative_command(
-                pipette_id="pipette-id",
-                destination=DeckPoint(x=11, y=22, z=33),
             ),
             private_result=None,
         ),
