@@ -466,14 +466,6 @@ def test_blow_out_clears_volume(
 @pytest.mark.parametrize(
     "command",
     [
-        cmd.Home(
-            id="command-id-2",
-            key="command-key-2",
-            status=cmd.CommandStatus.SUCCEEDED,
-            createdAt=datetime(year=2021, month=1, day=1),
-            params=cmd.HomeParams(),
-            result=cmd.HomeResult(),
-        ),
         cmd.thermocycler.OpenLid(
             id="command-id-2",
             key="command-key-2",
@@ -794,14 +786,6 @@ def test_add_pipette_config(
 @pytest.mark.parametrize(
     "command",
     (
-        cmd.Home(
-            id="command-id-2",
-            key="command-key-2",
-            status=cmd.CommandStatus.SUCCEEDED,
-            createdAt=datetime(year=2021, month=1, day=1),
-            params=cmd.HomeParams(),
-            result=cmd.HomeResult(),
-        ),
         cmd.thermocycler.OpenLid(
             id="command-id-2",
             key="command-key-2",
