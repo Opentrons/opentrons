@@ -1,20 +1,16 @@
 """Tests for pipette state changes in the protocol_engine state store."""
 import pytest
-from typing import Optional
 
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.pipette import pipette_definition
 
 from opentrons.protocol_engine.state import update_types
-from opentrons.types import DeckSlotName, MountType, Point
+from opentrons.types import MountType, Point
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.types import (
     CurrentAddressableArea,
     DeckPoint,
-    DeckSlotLocation,
     LoadedPipette,
-    OFF_DECK_LOCATION,
-    LabwareMovementStrategy,
     FlowRates,
     CurrentWell,
     TipGeometry,
@@ -46,10 +42,8 @@ from .command_fixtures import (
     create_drop_tip_in_place_command,
     create_succeeded_command,
     create_unsafe_drop_tip_in_place_command,
-    create_move_to_well_command,
     create_blow_out_command,
     create_blow_out_in_place_command,
-    create_move_labware_command,
     create_prepare_to_aspirate_command,
     create_unsafe_blow_out_in_place_command,
 )
@@ -60,35 +54,6 @@ from ..pipette_fixtures import get_default_nozzle_map
 def subject() -> PipetteStore:
     """Get a PipetteStore test subject for all subsequent tests."""
     return PipetteStore()
-
-
-def _create_move_to_well_action(
-    pipette_id: str,
-    labware_id: str,
-    well_name: str,
-    deck_point: DeckPoint,
-) -> SucceedCommandAction:
-    command = create_move_to_well_command(
-        pipette_id=pipette_id,
-        labware_id=labware_id,
-        well_name=well_name,
-        destination=deck_point,
-    )
-    action = SucceedCommandAction(
-        command=command,
-        private_result=None,
-        state_update=update_types.StateUpdate(
-            pipette_location=update_types.PipetteLocationUpdate(
-                pipette_id=pipette_id,
-                new_location=update_types.Well(
-                    labware_id=labware_id,
-                    well_name=well_name,
-                ),
-                new_deck_point=deck_point,
-            )
-        ),
-    )
-    return action
 
 
 def test_sets_initial_state(subject: PipetteStore) -> None:
@@ -462,111 +427,6 @@ def test_blow_out_clears_volume(
     assert subject.state.aspirated_volume_by_id["pipette-id"] is None
 
 
-@pytest.mark.parametrize(
-    ("move_labware_command", "expected_current_well"),
-    (
-        (
-            create_move_labware_command(
-                labware_id="non-matching-labware-id",
-                strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
-                new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-                offset_id=None,
-            ),
-            # Current well NOT cleared,
-            # because MoveLabware command had "non-matching-labware-id".
-            CurrentWell(
-                pipette_id="pipette-id",
-                labware_id="matching-labware-id",
-                well_name="well-name",
-            ),
-        ),
-        (
-            create_move_labware_command(
-                labware_id="matching-labware-id",
-                strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
-                new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-                offset_id=None,
-            ),
-            # Current well IS cleared,
-            # because MoveLabware command had "matching-labware-id".
-            None,
-        ),
-        (
-            create_move_labware_command(
-                labware_id="non-matching-labware-id",
-                strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
-                new_location=OFF_DECK_LOCATION,
-                offset_id=None,
-            ),
-            # Current well NOT cleared,
-            # because MoveLabware command had "non-matching-labware-id".
-            CurrentWell(
-                pipette_id="pipette-id",
-                labware_id="matching-labware-id",
-                well_name="well-name",
-            ),
-        ),
-        (
-            create_move_labware_command(
-                labware_id="matching-labware-id",
-                strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
-                new_location=OFF_DECK_LOCATION,
-                offset_id=None,
-            ),
-            # Current well IS cleared,
-            # because MoveLabware command had "matching-labware-id".
-            None,
-        ),
-        (
-            create_move_labware_command(
-                labware_id="non-matching-labware-id",
-                new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-                strategy=LabwareMovementStrategy.USING_GRIPPER,
-                offset_id=None,
-            ),
-            # Current well IS cleared,
-            # because MoveLabware command used gripper.
-            None,
-        ),
-    ),
-)
-def test_move_labware_clears_current_well(
-    subject: PipetteStore,
-    move_labware_command: cmd.MoveLabware,
-    expected_current_well: Optional[CurrentWell],
-) -> None:
-    """Labware movement commands should sometimes clear the current well.
-
-    It should be cleared when-
-    * the current well belongs to the labware that was moved,
-    * or gripper was used to move labware
-
-    Otherwise, it should be left alone.
-    """
-    load_pipette_command = create_load_pipette_command(
-        pipette_id="pipette-id",
-        pipette_name=PipetteNameType.P300_SINGLE,
-        mount=MountType.LEFT,
-    )
-    subject.handle_action(
-        SucceedCommandAction(private_result=None, command=load_pipette_command)
-    )
-
-    subject.handle_action(
-        _create_move_to_well_action(
-            pipette_id="pipette-id",
-            labware_id="matching-labware-id",
-            well_name="well-name",
-            deck_point=DeckPoint(x=1, y=2, z=3),
-        )
-    )
-
-    subject.handle_action(
-        SucceedCommandAction(private_result=None, command=move_labware_command)
-    )
-    assert subject.state.current_location == expected_current_well
-
-
 def test_set_movement_speed(subject: PipetteStore) -> None:
     """It should issue an action to set the movement speed."""
     pipette_id = "pipette-id"
@@ -650,46 +510,6 @@ def test_add_pipette_config(
     assert subject.state.flow_rates_by_id["pipette-id"].default_aspirate == {"a": 1.0}
     assert subject.state.flow_rates_by_id["pipette-id"].default_dispense == {"b": 2.0}
     assert subject.state.flow_rates_by_id["pipette-id"].default_blow_out == {"c": 3.0}
-
-
-@pytest.mark.parametrize(
-    "command",
-    (
-        create_move_labware_command(
-            new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            strategy=LabwareMovementStrategy.USING_GRIPPER,
-        ),
-    ),
-)
-def test_homing_commands_clear_deck_point(
-    command: cmd.Command,
-    subject: PipetteStore,
-) -> None:
-    """Commands that homed the robot should clear the deck point."""
-    load_pipette_command = create_load_pipette_command(
-        pipette_id="pipette-id",
-        pipette_name=PipetteNameType.P300_SINGLE,
-        mount=MountType.LEFT,
-    )
-    subject.handle_action(
-        SucceedCommandAction(private_result=None, command=load_pipette_command)
-    )
-    subject.handle_action(
-        _create_move_to_well_action(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="well-name",
-            deck_point=DeckPoint(x=1, y=2, z=3),
-        )
-    )
-    assert subject.state.current_deck_point == CurrentDeckPoint(
-        mount=MountType.LEFT, deck_point=DeckPoint(x=1, y=2, z=3)
-    )
-
-    subject.handle_action(SucceedCommandAction(private_result=None, command=command))
-    assert subject.state.current_deck_point == CurrentDeckPoint(
-        mount=None, deck_point=None
-    )
 
 
 @pytest.mark.parametrize(

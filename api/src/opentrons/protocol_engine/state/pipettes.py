@@ -317,29 +317,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 case update_types.NO_CHANGE:
                     pass
 
-        # todo(mm, 2024-08-29): Port the following isinstance() checks to
-        # use `state_update`. https://opentrons.atlassian.net/browse/EXEC-639
-
         # TODO(mc, 2021-11-12): Wipe out current_location on movement failures, too.
-
-        # A moveLabware command may have moved the labware that contains the current
-        # well out from under the pipette. Clear the current location to reflect the
-        # fact that the pipette is no longer over any labware.
-        #
-        # This is necessary for safe motion planning in case the next movement
-        # goes to the same labware (now in a new place).
-        if isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result, commands.MoveLabwareResult
-        ):
-            moved_labware_id = action.command.params.labwareId
-            if action.command.params.strategy == "usingGripper":
-                # All mounts will have been retracted.
-                self._state.current_location = None
-            elif (
-                isinstance(self._state.current_location, CurrentWell)
-                and self._state.current_location.labware_id == moved_labware_id
-            ):
-                self._state.current_location = None
 
     def _update_deck_point(
         self, action: Union[SucceedCommandAction, FailCommandAction]
@@ -364,19 +342,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     mount=loaded_pipette.mount,
                     deck_point=location_update.new_deck_point,
                 )
-
-        # todo(mm, 2024-08-29): Port the following isinstance() checks to
-        # use `state_update`. https://opentrons.atlassian.net/browse/EXEC-639
-        #
-        # These isinstance() checks mostly mirror self._update_current_location().
-        # See there for explanations.
-
-        if isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result, commands.MoveLabwareResult
-        ):
-            if action.command.params.strategy == "usingGripper":
-                # All mounts will have been retracted.
-                self._clear_deck_point()
 
     def _update_volumes(
         self, action: Union[SucceedCommandAction, FailCommandAction]
