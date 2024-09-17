@@ -796,7 +796,7 @@ class PipetteView(HasState[PipetteState]):
         nozzle_map = self._state.nozzle_configuration_by_id.get(pipette_id)
         return nozzle_map.starting_nozzle if nozzle_map else None
 
-    def get_critical_point_offset_without_tip(
+    def _get_critical_point_offset_without_tip(
         self, pipette_id: str, critical_point: Optional[CriticalPoint]
     ) -> Point:
         """Get the offset of the specified critical point from pipette's mount position."""
@@ -828,6 +828,10 @@ class PipetteView(HasState[PipetteState]):
         """Get the bounding box of the pipette."""
         return self.get_config(pipette_id).pipette_bounding_box_offsets
 
+    # TODO (spp, 2024-09-17): in order to find the position of pipette at destination,
+    #  this method repeats the same steps that waypoints builder does while finding
+    #  waypoints to move to. We should consolidate these steps into a shared entity
+    #  so that the deck conflict checker and movement plan builder always remain in sync.
     def get_pipette_bounds_at_specified_move_to_position(
         self,
         pipette_id: str,
@@ -843,16 +847,16 @@ class PipetteView(HasState[PipetteState]):
         tip = self.get_attached_tip(pipette_id)
 
         # *Offset* of pipette's critical point w.r.t pipette mount
-        critical_point_offset = self.get_critical_point_offset_without_tip(
+        critical_point_offset = self._get_critical_point_offset_without_tip(
             pipette_id, critical_point
         )
 
-        # Position of critical point (including tip length) at destination, in deck coordinates
+        # Position of the above critical point at destination, in deck coordinates
         critical_point_position = destination_position + Point(
             x=0, y=0, z=tip.length if tip else 0
         )
 
-        # Get the pipette bounding box coordinates in absolute
+        # Get the pipette bounding box coordinates
         pipette_bounds_offsets = self.get_config(
             pipette_id
         ).pipette_bounding_box_offsets
