@@ -10,8 +10,8 @@ export interface OnDeviceLocalizationProviderProps {
   children?: React.ReactNode
 }
 
-const BRANDED_RESOURCE = 'branded'
-const ANONYMOUS_RESOURCE = 'anonymous'
+export const BRANDED_RESOURCE = 'branded'
+export const ANONYMOUS_RESOURCE = 'anonymous'
 
 // TODO(bh, 2024-03-26): anonymization limited to ODD for now, may change in future OEM phases
 export function OnDeviceLocalizationProvider(

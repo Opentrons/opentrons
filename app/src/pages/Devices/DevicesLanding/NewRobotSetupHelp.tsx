@@ -23,7 +23,7 @@ const NEW_OT2_SETUP_SUPPORT_ARTICLE_HREF =
   'https://insights.opentrons.com/hubfs/Products/OT-2/OT-2%20Quick%20Start%20Guide.pdf'
 
 export function NewRobotSetupHelp(): JSX.Element {
-  const { t } = useTranslation(['devices_landing', 'shared'])
+  const { t } = useTranslation(['devices_landing', 'shared', 'branded'])
   const [showNewRobotHelpModal, setShowNewRobotHelpModal] = React.useState(
     false
   )
@@ -49,13 +49,13 @@ export function NewRobotSetupHelp(): JSX.Element {
             >
               <Flex flexDirection={DIRECTION_COLUMN}>
                 <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
-                  {t('new_robot_instructions')}
+                  {t('branded:new_robot_instructions')}
                 </LegacyStyledText>
                 <ExternalLink
                   href={NEW_FLEX_SETUP_SUPPORT_ARTICLE_HREF}
                   width={FLEX_MAX_CONTENT}
                 >
-                  {t('opentrons_flex_quickstart_guide')}
+                  {t('branded:opentrons_flex_quickstart_guide')}
                 </ExternalLink>
                 <ExternalLink
                   href={NEW_OT2_SETUP_SUPPORT_ARTICLE_HREF}
