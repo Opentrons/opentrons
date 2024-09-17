@@ -1,10 +1,12 @@
-from typing import Literal, Dict, Optional, Type, TYPE_CHECKING
+"""Command models for moving any robot axis to an absolute position."""
+from __future__ import annotations
+from typing import Literal, Optional, Type, TYPE_CHECKING
 from pydantic import Field, BaseModel
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.protocols.types import FlexRobotType
-  
-from ..pipetting_common import DestinationPositionResult
+from opentrons.protocol_engine.resources import ensure_ot3_hardware
+
+from .common import MotorAxisMapType, DestinationRobotPositionResult
 from ..command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -12,10 +14,9 @@ from ..command import (
     SuccessData,
 )
 from ...errors.error_occurrence import ErrorOccurrence
-from ...types import DeckPoint
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.execution.movement import MovementHandler
+    from opentrons.protocol_engine.execution import GantryMover
 
 
 MoveAxesToCommandType = Literal["robot/moveAxesTo"]
@@ -24,19 +25,19 @@ MoveAxesToCommandType = Literal["robot/moveAxesTo"]
 class MoveAxesToParams(BaseModel):
     """Payload required to move axes to absolute position."""
 
-    axis_map: Dict[str, float] = Field(
+    axis_map: MotorAxisMapType = Field(
         ..., description="The specified axes to move to an absolute deck position with."
     )
-    critical_point: Dict[str, float] = Field(
+    critical_point: MotorAxisMapType = Field(
         ..., description="The critical point to move the mount with."
     )
-    velocity: Optional[float] = Field(
+    speed: Optional[float] = Field(
         default=None,
         description="The max velocity to move the axes at. Will fall to hardware defaults if none provided.",
     )
 
 
-class MoveAxesToResult(DestinationPositionResult):
+class MoveAxesToResult(DestinationRobotPositionResult):
     """Result data from the execution of a MoveAxesTo command."""
 
     pass
@@ -49,26 +50,24 @@ class MoveAxesToImplementation(
 
     def __init__(
         self,
-        # movement: MovementHandler,
+        gantry_mover: GantryMover,
         hardware_api: HardwareControlAPI,
-        **kwargs: object
+        **kwargs: object,
     ) -> None:
-        # self._movement = movement
+        self._gantry_mover = gantry_mover
         self._hardware_api = hardware_api
 
     async def execute(
         self, params: MoveAxesToParams
     ) -> SuccessData[MoveAxesToResult, None]:
-        if self._hardware_api.get_robot_type() == FlexRobotType:
-            self._movement.move_axes(axis_map=params.axis_map, speed=params.speed, relative_move=True)
-        else:
-            self._movement.move_to(mount=params.mount, speed=params.speed)
-        # x, y, z = self._movement.move_to_with_mount(
-        #     params.axis_map, params.critical_point, params.velocity
-        # )
-        x, y, z = (0, 0, 0)
+        # TODO (lc 08-16-2024) implement `move_axes` for OT 2 hardware controller
+        # and then we can remove this validation.
+        ensure_ot3_hardware(self._hardware_api)
+        current_position = await self._gantry_mover.move_axes(
+            axis_map=params.axis_map, speed=params.speed, critical_point=params.critical_point
+        )
         return SuccessData(
-            public=MoveAxesToResult(position=DeckPoint(x=x, y=y, z=z)),
+            public=MoveAxesToResult(position=current_position),
             private=None,
         )
 
