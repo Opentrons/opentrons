@@ -53,7 +53,7 @@ describe('Liquids', () => {
   it('calls navigate when there is no active labware', () => {
     vi.mocked(labwareIngredSelectors.getSelectedLabwareId).mockReturnValue(null)
     render()
-    expect(mockNavigate).toHaveBeenCalledWith('/overview')
+    expect(mockNavigate).toHaveBeenCalledWith('/designer')
   })
 
   it('renders nav and assign liquids modal', () => {

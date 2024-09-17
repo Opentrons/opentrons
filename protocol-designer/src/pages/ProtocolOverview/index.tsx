@@ -117,6 +117,15 @@ export function ProtocolOverview(): JSX.Element {
     typeof leftString | typeof rightString
   >(leftString)
 
+  React.useEffect(() => {
+    if (formValues?.created == null) {
+      console.warn(
+        'formValues was refreshed while on the overview page, redirecting to landing page'
+      )
+      navigate('/')
+    }
+  }, [formValues])
+
   const {
     modules: modulesOnDeck,
     labware: labwaresOnDeck,
