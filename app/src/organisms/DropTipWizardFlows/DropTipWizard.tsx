@@ -148,14 +148,18 @@ export function DropTipWizardSetupType(
     props.isOnDevice ? (
       <Flex css={SIMPLE_CONTAINER_STYLE}>
         <DropTipWizardHeader {...props} />
-        <DropTipWizardContent {...props} />
+        <Flex css={SIMPLE_CONTENT_CONTAINER_STYLE}>
+          <DropTipWizardContent {...props} />
+        </Flex>
       </Flex>
     ) : (
       <ModalShell
         css={SIMPLE_CONTAINER_STYLE}
         header={<DropTipWizardHeader {...props} />}
       >
-        <DropTipWizardContent {...props} />
+        <Flex css={SIMPLE_CONTENT_CONTAINER_STYLE}>
+          <DropTipWizardContent {...props} />
+        </Flex>
       </ModalShell>
     ),
     getTopPortalEl()
@@ -180,9 +184,6 @@ export const DropTipWizardContent = (
     dropTipCommands,
     proceedWithConditionalClose,
     goBackRunValid,
-    confirmExit,
-    cancelExit,
-    toggleExitInitiated,
     errorComponents,
   } = props
 
@@ -197,16 +198,7 @@ export const DropTipWizardContent = (
   }
 
   function buildShowExitConfirmation(): JSX.Element {
-    return (
-      <ExitConfirmation
-        {...props}
-        handleGoBack={cancelExit}
-        handleExit={() => {
-          toggleExitInitiated()
-          confirmExit()
-        }}
-      />
-    )
+    return <ExitConfirmation {...props} />
   }
 
   function buildErrorScreen(): JSX.Element {
@@ -401,22 +393,32 @@ const INTERVENTION_CONTAINER_STYLE = css`
 
 const SIMPLE_CONTAINER_STYLE = css`
   width: 47rem;
+  min-height: 26.75rem;
   overflow: ${OVERFLOW_HIDDEN};
+  display: ${DISPLAY_FLEX};
+  flex-direction: ${DIRECTION_COLUMN};
 
-  // Because there is no ModalShell analogue for the ODD, we essentially make one here.
+  // TODO(jh 09-17-24): This is effectively making a ModalShell analogue on the ODD, since one does not exist.
+  //  Consider making one.
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    position: ${POSITION_ABSOLUTE};
     width: 62rem;
     height: 35.5rem;
-    left: 14.5px;
+    left: 16px;
     top: 16px;
     border: ${BORDERS.lineBorder};
     box-shadow: ${BORDERS.shadowSmall};
     border-radius: ${BORDERS.borderRadius16};
-    position: ${POSITION_ABSOLUTE};
     background-color: ${COLORS.white};
-    padding: ${SPACING.spacing32};
-    display: ${DISPLAY_FLEX};
-    flex-direction: ${DIRECTION_COLUMN};
-    justify-content: ${JUSTIFY_SPACE_BETWEEN};
   }
+`
+
+const SIMPLE_CONTENT_CONTAINER_STYLE = css`
+  display: ${DISPLAY_FLEX};
+  flex-direction: ${DIRECTION_COLUMN};
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  width: 100%;
+  height: 100%;
+  padding: ${SPACING.spacing32};
+  flex: 1;
 `
