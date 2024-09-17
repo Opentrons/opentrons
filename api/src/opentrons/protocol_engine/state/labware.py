@@ -154,10 +154,8 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        self._add_loaded_labware(action)
-
         if isinstance(action, SucceedCommandAction):
-            self._handle_command(action.command)
+            self._handle_command(action)
 
         elif isinstance(action, AddLabwareOffsetAction):
             labware_offset = LabwareOffset.construct(
@@ -177,45 +175,22 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             )
             self._state.definitions_by_uri[uri] = action.definition
 
-    def _handle_command(self, command: Command) -> None:
+    def _handle_command(self, action: Action) -> None:
         """Modify state in reaction to a command."""
-        if isinstance(command.result, LoadLabwareResult):
-            #  If the labware load refers to an offset, that offset must actually exist.
-            if command.result.offsetId is not None:
-                assert command.result.offsetId in self._state.labware_offsets_by_id
+        self._add_loaded_labware(action)
 
-            definition_uri = uri_from_details(
-                namespace=command.result.definition.namespace,
-                load_name=command.result.definition.parameters.loadName,
-                version=command.result.definition.version,
-            )
+        if not isinstance(action, SucceedCommandAction):
+            return
 
-            self._state.definitions_by_uri[definition_uri] = command.result.definition
-            if isinstance(command.result, LoadLabwareResult):
-                location = command.params.location
-            else:
-                location = self._state.labware_by_id[command.result.labwareId].location
-
-            self._state.labware_by_id[
-                command.result.labwareId
-            ] = LoadedLabware.construct(
-                id=command.result.labwareId,
-                location=location,
-                loadName=command.result.definition.parameters.loadName,
-                definitionUri=definition_uri,
-                offsetId=command.result.offsetId,
-                displayName=command.params.displayName,
-            )
-
-        elif isinstance(command.result, ReloadLabwareResult):
-            labware_id = command.params.labwareId
-            new_offset_id = command.result.offsetId
+        if isinstance(action.command.result, ReloadLabwareResult):
+            labware_id = action.command.params.labwareId
+            new_offset_id = action.command.result.offsetId
             self._state.labware_by_id[labware_id].offsetId = new_offset_id
 
-        elif isinstance(command.result, MoveLabwareResult):
-            labware_id = command.params.labwareId
-            new_location = command.params.newLocation
-            new_offset_id = command.result.offsetId
+        elif isinstance(action.command.result, MoveLabwareResult):
+            labware_id = action.command.params.labwareId
+            new_location = action.command.params.newLocation
+            new_offset_id = action.command.result.offsetId
 
             self._state.labware_by_id[labware_id].offsetId = new_offset_id
             if isinstance(
@@ -227,10 +202,10 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 new_location = OFF_DECK_LOCATION
             self._state.labware_by_id[labware_id].location = new_location
 
-        elif isinstance(command.result, absorbance_reader.MoveLidResult):
-            lid_id = command.result.lidId
-            new_location = command.result.newLocation
-            new_offset_id = command.result.offsetId
+        elif isinstance(action.command.result, absorbance_reader.MoveLidResult):
+            lid_id = action.command.result.lidId
+            new_location = action.command.result.newLocation
+            new_offset_id = action.command.result.offsetId
 
             self._state.labware_by_id[lid_id].offsetId = new_offset_id
             self._state.labware_by_id[lid_id].location = new_location
