@@ -327,7 +327,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         if isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
-                commands.RetractAxisResult,
                 commands.thermocycler.OpenLidResult,
                 commands.thermocycler.CloseLidResult,
             ),
@@ -398,7 +397,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         if isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
-                commands.RetractAxisResult,
                 commands.thermocycler.OpenLidResult,
                 commands.thermocycler.CloseLidResult,
             ),
