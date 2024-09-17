@@ -13,6 +13,7 @@ from opentrons.legacy_commands import publisher
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.protocols.api_support.util import requires_version
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 from . import validation
 from .core.common import ProtocolCore, RobotCore
@@ -45,7 +46,9 @@ class RobotContext(publisher.CommandPublisher):
 
     """
 
-    def __init__(self, core: RobotCore, protocol_core: ProtocolCore, api_version: APIVersion) -> None:
+    def __init__(
+        self, core: RobotCore, protocol_core: ProtocolCore, api_version: APIVersion
+    ) -> None:
         self._hardware = HardwareManager(hardware=protocol_core.get_hardware())
         self._core = core
         self._protocol_core = protocol_core
@@ -82,13 +85,13 @@ class RobotContext(publisher.CommandPublisher):
         :param speed:
         """
         mount = validation.ensure_instrument_mount(mount)
-        self._core.move_to(mount, destination, speed)
+        self._core.move_to(mount, destination.point, speed)
 
     @requires_version(2, 20)
     def move_axes_to(
         self,
         axis_map: Union[AxisMapType, StringAxisMap],
-        critical_point: AxisMapType,
+        critical_point: Union[AxisMapType, StringAxisMap],
         speed: Optional[float] = None,
     ) -> None:
         """
@@ -100,10 +103,8 @@ class RobotContext(publisher.CommandPublisher):
         :param float speed: The maximum speed with which you want to move all the axes
         in the axis map.
         """
-        instrument_on_left = self._protocol_core.loaded_instruments.get("left")
-        is_96_channel = (
-            instrument_on_left.channels == 96 if instrument_on_left else False
-        )
+        instrument_on_left = self._core.get_pipette_type_from_engine(Mount.LEFT)
+        is_96_channel = instrument_on_left == PipetteNameType.P1000_96
         axis_map = validation.ensure_axis_map_type(
             axis_map, self._protocol_core.robot_type, is_96_channel
         )
@@ -130,10 +131,9 @@ class RobotContext(publisher.CommandPublisher):
         :param float speed: The maximum speed with which you want to move all the axes
         in the axis map.
         """
-        instrument_on_left = self._protocol_core.loaded_instruments.get("left")
-        is_96_channel = (
-            instrument_on_left.channels == 96 if instrument_on_left else False
-        )
+        instrument_on_left = self._core.get_pipette_type_from_engine(Mount.LEFT)
+        is_96_channel = instrument_on_left == PipetteNameType.P1000_96
+
         axis_map = validation.ensure_axis_map_type(
             axis_map, self._protocol_core.robot_type, is_96_channel
         )
@@ -212,10 +212,9 @@ class RobotContext(publisher.CommandPublisher):
         Note that capitalization does not matter.
 
         """
-        instrument_on_left = self._protocol_core.loaded_instruments.get("left")
-        is_96_channel = (
-            instrument_on_left.channels == 96 if instrument_on_left else False
-        )
+        instrument_on_left = self._core.get_pipette_type_from_engine(Mount.LEFT)
+        is_96_channel = instrument_on_left == PipetteNameType.P1000_96
+
         return validation.ensure_axis_map_type(
             axis_map, self._protocol_core.robot_type, is_96_channel
         )
