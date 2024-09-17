@@ -32,9 +32,7 @@ export interface ConnectedStepInfoProps {
   stepNumber: number
 }
 
-export const ConnectedStepInfo = (
-  props: ConnectedStepInfoProps
-): JSX.Element => {
+export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const { stepId, stepNumber } = props
   const { t } = useTranslation('application')
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
@@ -43,7 +41,7 @@ export const ConnectedStepInfo = (
     stepId
   ]
   const errorStepId = useSelector(fileDataSelectors.getErrorStepId)
-  const hasError = errorStepId === stepId || argsAndErrors.errors !== undefined
+  const hasError = errorStepId === stepId || argsAndErrors.errors != null
   const hasTimelineWarningsPerStep = useSelector(
     timelineWarningSelectors.getHasTimelineWarningsPerStep
   )

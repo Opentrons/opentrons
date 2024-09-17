@@ -23,7 +23,7 @@ describe('StepOverflowMenu', () => {
     props = {
       stepId: 'mockId',
       top: 0,
-      menuRoot: { current: null },
+      menuRootRef: { current: null },
     }
   })
 

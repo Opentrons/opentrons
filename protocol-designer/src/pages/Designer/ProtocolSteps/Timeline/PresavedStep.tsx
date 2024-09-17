@@ -11,15 +11,18 @@ import {
 } from '../../../../ui/steps'
 import { StepContainer } from './StepContainer'
 
-export const PresavedStep = (): JSX.Element | null => {
+export function PresavedStep(): JSX.Element | null {
   const { t } = useTranslation('application')
   const presavedStepForm = useSelector(stepFormSelectors.getPresavedStepForm)
   const stepNumber = useSelector(stepFormSelectors.getOrderedStepIds).length + 1
   const hovered = useSelector(getHoveredTerminalItemId) === PRESAVED_STEP_ID
   const selected = useSelector(getSelectedTerminalItemId) === PRESAVED_STEP_ID
-
-  // Actions
   const dispatch = useDispatch()
+
+  if (presavedStepForm === null) {
+    return null
+  }
+
   const highlightStep = (): void => {
     dispatch(stepsActions.hoverOnTerminalItem(PRESAVED_STEP_ID))
   }
@@ -27,9 +30,6 @@ export const PresavedStep = (): JSX.Element | null => {
     dispatch(stepsActions.hoverOnTerminalItem(null))
   }
 
-  if (presavedStepForm === null) {
-    return null
-  }
   const stepType = presavedStepForm.stepType
 
   return (

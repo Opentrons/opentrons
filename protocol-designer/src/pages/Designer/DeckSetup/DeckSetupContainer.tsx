@@ -51,6 +51,7 @@ import type {
   AdditionalEquipmentEntity,
   DeckSlot,
 } from '@opentrons/step-generation'
+import type { DeckSetupTabType } from '../types'
 import type { Fixture } from './constants'
 
 const WASTE_CHUTE_SPACE = 30
@@ -66,12 +67,7 @@ const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
 ]
 export const lightFill = COLORS.grey35
 
-interface DeckSetupContainerProps {
-  tab: 'startingDeck' | 'protocolSteps'
-}
-export function DeckSetupContainer(
-  props: DeckSetupContainerProps
-): JSX.Element {
+export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
   const { tab } = props
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const dispatch = useDispatch<any>()

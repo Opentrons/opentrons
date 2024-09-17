@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import { useSelector } from 'react-redux'
 import { createPortal } from 'react-dom'
 import {
@@ -52,7 +51,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
   } = props
   const formData = useSelector(getUnsavedForm)
   const [top, setTop] = React.useState<number>(0)
-  const menuRoot = React.useRef<HTMLDivElement | null>(null)
+  const menuRootRef = React.useRef<HTMLDivElement | null>(null)
   const [stepOverflowMenu, setStepOverflowMenu] = React.useState<boolean>(false)
   const isStartingOrEndingState =
     title === STARTING_DECK_STATE || title === FINAL_DECK_STATE
@@ -69,11 +68,16 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
   }
 
   const handleOverflowClick = (event: React.MouseEvent): void => {
-    const clickY = event.clientY
+    const { clientY } = event
 
-    const screenH = window.innerHeight
-    const rootH = menuRoot.current ? menuRoot.current.offsetHeight : 0
-    const top = screenH - clickY > rootH ? clickY + 5 : clickY - rootH - 5
+    const screenHeight = window.innerHeight
+    const rootHeight = menuRootRef.current
+      ? menuRootRef.current.offsetHeight
+      : 0
+    const top =
+      screenHeight - clientY > rootHeight
+        ? clientY + 5
+        : clientY - rootHeight - 5
 
     setTop(top)
   }
@@ -87,7 +91,8 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
 
   const handleClick = (event: MouseEvent): void => {
     const wasOutside = !(
-      event.target instanceof Node && menuRoot.current?.contains(event.target)
+      event.target instanceof Node &&
+      menuRootRef.current?.contains(event.target)
     )
 
     if (wasOutside && stepOverflowMenu) {
@@ -102,10 +107,8 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
           padding={SPACING.spacing12}
           borderRadius={BORDERS.borderRadius8}
           width={formData != null ? '6rem' : '100%'}
-          css={css`
-            background-color: ${backgroundColor};
-            color: ${color};
-          `}
+          backgroundColor={backgroundColor}
+          color={color}
         >
           <Flex
             justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -143,7 +146,11 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
       </Box>
       {stepOverflowMenu && stepId != null
         ? createPortal(
-            <StepOverflowMenu stepId={stepId} menuRoot={menuRoot} top={top} />,
+            <StepOverflowMenu
+              stepId={stepId}
+              menuRootRef={menuRootRef}
+              top={top}
+            />,
             getTopPortalEl()
           )
         : null}

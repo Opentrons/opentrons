@@ -24,10 +24,10 @@ import { SlotDetailsContainer } from '../../../organisms'
 import { getRobotType } from '../../../file-data/selectors'
 import { SlotOverflowMenu } from '../DeckSetup/SlotOverflowMenu'
 import type { DeckSlotId } from '@opentrons/shared-data'
+import type { DeckSetupTabType } from '../types'
 
-interface OffDeckDetailsProps {
+interface OffDeckDetailsProps extends DeckSetupTabType {
   addLabware: () => void
-  tab: 'startingDeck' | 'protocolSteps'
 }
 export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
   const { addLabware, tab } = props

@@ -22,8 +22,9 @@ import type {
   DeckSlotId,
   Dimensions,
 } from '@opentrons/shared-data'
+import type { DeckSetupTabType } from '../types'
 
-interface DeckItemHoverProps {
+interface DeckItemHoverProps extends DeckSetupTabType {
   hover: string | null
   setHover: React.Dispatch<React.SetStateAction<string | null>>
   slotBoundingBox: Dimensions
@@ -32,7 +33,6 @@ interface DeckItemHoverProps {
   slotPosition: CoordinateTuple | null
   setShowMenuListForId: React.Dispatch<React.SetStateAction<string | null>>
   menuListId: DeckSlotId | null
-  tab: 'startingDeck' | 'protocolSteps'
   isSelected?: boolean
 }
 

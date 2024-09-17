@@ -42,7 +42,7 @@ import type { ThunkDispatch } from 'redux-thunk'
 import type { BaseState } from '../../../../types'
 import type { StepType } from '../../../../form-types'
 
-export const AddStepButton = (): JSX.Element => {
+export function AddStepButton(): JSX.Element {
   const { t } = useTranslation(['tooltip', 'button'])
   const enableComment = useSelector(getEnableComment)
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()

@@ -16,18 +16,18 @@ import {
 import { actions as steplistActions } from '../../../../steplist'
 import { actions as stepsActions } from '../../../../ui/steps'
 
+import type { ThunkDispatch } from 'redux-thunk'
 import type { BaseState } from '../../../../types'
 import type { StepIdType } from '../../../../form-types'
-import type { ThunkDispatch } from 'redux-thunk'
 
 interface StepOverflowMenuProps {
   stepId: string
-  menuRoot: React.MutableRefObject<HTMLDivElement | null>
+  menuRootRef: React.MutableRefObject<HTMLDivElement | null>
   top: number
 }
 
 export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
-  const { stepId, menuRoot, top } = props
+  const { stepId, menuRootRef, top } = props
   const { t } = useTranslation('protocol_steps')
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const deleteStep = (stepId: StepIdType): void => {
@@ -40,7 +40,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
 
   return (
     <Flex
-      ref={menuRoot}
+      ref={menuRootRef}
       zIndex={5}
       top={top}
       left="19.5rem"

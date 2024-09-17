@@ -29,7 +29,7 @@ export interface TerminalItemStepProps {
   title: string
 }
 
-export const TerminalItemStep = (props: TerminalItemStepProps): JSX.Element => {
+export function TerminalItemStep(props: TerminalItemStepProps): JSX.Element {
   const { id, title } = props
   const hovered = useSelector(getHoveredTerminalItemId) === id
   const selected = useSelector(getSelectedTerminalItemId) === id

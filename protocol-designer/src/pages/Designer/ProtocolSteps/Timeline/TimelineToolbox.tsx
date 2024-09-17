@@ -34,8 +34,7 @@ export const TimelineToolbox = (): JSX.Element => {
   const dispatch = useDispatch<ThunkDispatch<any>>()
 
   const handleKeyDown: (e: KeyboardEvent) => void = e => {
-    const key = e.key
-    const altIsPressed = e.altKey
+    const { key, altKey: altIsPressed } = e
 
     if (altIsPressed) {
       let delta = 0
@@ -44,7 +43,6 @@ export const TimelineToolbox = (): JSX.Element => {
       } else if (key === 'ArrowDown') {
         delta = 1
       }
-      if (!delta) return
       dispatch(stepsActions.reorderSelectedStep(delta))
     }
   }

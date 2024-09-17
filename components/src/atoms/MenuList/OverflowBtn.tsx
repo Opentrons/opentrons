@@ -16,6 +16,7 @@ export const OverflowBtn: (
     props: OverflowBtnProps,
     ref: React.ForwardedRef<HTMLInputElement>
   ): JSX.Element => {
+    const { fillColor } = props
     return (
       <Btn
         css={css`
@@ -62,7 +63,7 @@ export const OverflowBtn: (
           width="19"
           height="31"
           viewBox="0 0 19 31"
-          fill={props.fillColor ?? COLORS.grey50}
+          fill={fillColor ?? COLORS.grey50}
           xmlns="http://www.w3.org/2000/svg"
         >
           <circle cx="9.5" cy="9.5" r="1.5" />

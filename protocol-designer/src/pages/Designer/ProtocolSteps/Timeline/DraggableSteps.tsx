@@ -29,9 +29,9 @@ interface DropType {
   stepId: StepIdType
 }
 
-const DragDropStep = (props: DragDropStepProps): JSX.Element => {
+function DragDropStep(props: DragDropStepProps): JSX.Element {
   const { stepId, moveStep, findStepIndex, orderedStepIds, stepNumber } = props
-  const ref = React.useRef<HTMLDivElement>(null)
+  const stepRef = React.useRef<HTMLDivElement>(null)
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
@@ -64,10 +64,10 @@ const DragDropStep = (props: DragDropStepProps): JSX.Element => {
     [orderedStepIds]
   )
 
-  drag(drop(ref))
+  drag(drop(stepRef))
   return (
     <Box
-      ref={ref}
+      ref={stepRef}
       style={{ opacity: isDragging ? 0.3 : 1 }}
       data-handler-id={handlerId}
     >
@@ -80,9 +80,7 @@ interface DraggableStepsProps {
   orderedStepIds: StepIdType[]
   reorderSteps: (steps: StepIdType[]) => void
 }
-export const DraggableSteps = (
-  props: DraggableStepsProps
-): JSX.Element | null => {
+export function DraggableSteps(props: DraggableStepsProps): JSX.Element | null {
   const { orderedStepIds, reorderSteps } = props
   const { t } = useTranslation('shared')
 
@@ -120,7 +118,6 @@ export const DraggableSteps = (
           moveStep={moveStep}
           findStepIndex={findStepIndex}
           orderedStepIds={orderedStepIds}
-          // onStepContextMenu={makeStepOnContextMenu(stepId)}
         />
       ))}
       <StepDragPreview />
@@ -128,7 +125,7 @@ export const DraggableSteps = (
   )
 }
 
-const StepDragPreview = (): JSX.Element | null => {
+function StepDragPreview(): JSX.Element | null {
   const [{ isDragging, itemType, item, currentOffset }] = useDrag(() => ({
     type: DND_TYPES.STEP_ITEM,
     collect: (monitor: DragLayerMonitor) => ({
@@ -146,10 +143,12 @@ const StepDragPreview = (): JSX.Element | null => {
   if (
     itemType !== DND_TYPES.STEP_ITEM ||
     !isDragging ||
-    !stepType ||
-    !currentOffset
-  )
+    stepType == null ||
+    currentOffset == null
+  ) {
     return null
+  }
+
   return (
     <Flex cursor="grabbing" backgroundColor={COLORS.transparent}>
       <StepContainer

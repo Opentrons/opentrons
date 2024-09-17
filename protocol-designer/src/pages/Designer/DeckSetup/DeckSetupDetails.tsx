@@ -43,9 +43,10 @@ import type {
   LabwareOnDeck as LabwareOnDeckType,
   ModuleOnDeck,
 } from '../../../step-forms'
+import type { DeckSetupTabType } from '../types'
 import type { Fixture } from './constants'
 
-interface DeckSetupDetailsProps {
+interface DeckSetupDetailsProps extends DeckSetupTabType {
   activeDeckSetup: InitialDeckSetup
   addEquipment: (slotId: string) => void
   deckDef: DeckDefinition
@@ -56,7 +57,6 @@ interface DeckSetupDetailsProps {
   setHover: React.Dispatch<React.SetStateAction<string | null>>
   showGen1MultichannelCollisionWarnings: boolean
   stagingAreaCutoutIds: CutoutId[]
-  tab: 'startingDeck' | 'protocolSteps'
   selectedZoomInSlot?: DeckSlotId
 }
 
@@ -148,7 +148,7 @@ export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
         ): React.ComponentProps<typeof Module>['innerProps'] => {
           if (moduleState.type === THERMOCYCLER_MODULE_TYPE) {
             let lidMotorState = 'unknown'
-            if (tab === 'startingDeck' || moduleState.lidOpen === true) {
+            if (tab === 'startingDeck' || moduleState.lidOpen) {
               lidMotorState = 'open'
             } else if (moduleState.lidOpen === false) {
               lidMotorState = 'closed'
