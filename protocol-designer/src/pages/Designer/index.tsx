@@ -23,6 +23,7 @@ import { useKitchen } from '../../organisms/Kitchen/hooks'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { generateNewProtocol } from '../../labware-ingred/actions'
 import { DefineLiquidsModal, ProtocolMetadataNav } from '../../organisms'
+import { SettingsIcon } from '../../molecules'
 import { DeckSetupContainer } from './DeckSetup'
 import { selectors } from '../../labware-ingred/selectors'
 import { OffDeck } from './Offdeck'
@@ -146,7 +147,8 @@ export function Designer(): JSX.Element {
             <Tabs tabs={[startingDeckTab, protocolStepTab]} />
           )}
           <ProtocolMetadataNav />
-          <Flex gridGap={SPACING.spacing8}>
+          <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+            <SettingsIcon />
             <PrimaryButton
               onClick={() => {
                 showLiquidOverflowMenu(true)
@@ -159,7 +161,6 @@ export function Designer(): JSX.Element {
                 </StyledText>
               </Flex>
             </PrimaryButton>
-
             <SecondaryButton
               onClick={() => {
                 if (hasTrashEntity) {
