@@ -10,7 +10,6 @@ import {
   DIRECTION_COLUMN,
   RESPONSIVENESS,
   Flex,
-  JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
   SPACING,
@@ -21,7 +20,6 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { getIsOnDevice } from '../../redux/config'
 import { ExitConfirmation } from './ExitConfirmation'
 import {
@@ -41,6 +39,7 @@ import { Success } from './Success'
 import { InProgressModal } from '../../molecules/InProgressModal'
 import { useDropTipErrorComponents } from './hooks'
 import { DropTipWizardHeader } from './DropTipWizardHeader'
+import { ErrorInfo } from './ErrorInfo'
 
 import type { DropTipWizardFlowsProps } from '.'
 import type { DropTipWizardContainerProps, IssuedCommandsType } from './types'
@@ -182,7 +181,6 @@ export const DropTipWizardContent = (
     dropTipCommands,
     proceedWithConditionalClose,
     goBackRunValid,
-    errorComponents,
   } = props
 
   const { t, i18n } = useTranslation('drop_tip_wizard')
@@ -200,20 +198,7 @@ export const DropTipWizardContent = (
   }
 
   function buildErrorScreen(): JSX.Element {
-    const { button, subHeader } = errorComponents
-
-    return (
-      <SimpleWizardBody
-        isSuccess={false}
-        iconColor={COLORS.red50}
-        header={errorDetails?.header ?? t('error_dropping_tips')}
-        subHeader={subHeader}
-        justifyContentForOddButton={JUSTIFY_FLEX_END}
-        css={INTERVENTION_ERROR_MODAL_STYLE}
-      >
-        {button}
-      </SimpleWizardBody>
-    )
+    return <ErrorInfo {...props} />
   }
 
   function buildBeforeBeginning(): JSX.Element {
@@ -339,12 +324,6 @@ function useInitiateExit(): {
 
   return { isExitInitiated, toggleExitInitiated }
 }
-
-const INTERVENTION_ERROR_MODAL_STYLE = css`
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    margin-top: -${SPACING.spacing68}; // See EXEC-520. This clearly isn't ideal.
-  }
-`
 
 const INTERVENTION_CONTAINER_STYLE = css`
   padding: ${SPACING.spacing32};
