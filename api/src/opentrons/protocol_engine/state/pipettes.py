@@ -325,7 +325,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             (
                 commands.HomeResult,
                 commands.RetractAxisResult,
-                commands.MoveToCoordinatesResult,
                 commands.thermocycler.OpenLidResult,
                 commands.thermocycler.CloseLidResult,
             ),
@@ -363,7 +362,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             ):
                 self._state.current_location = None
 
-    def _update_deck_point(  # noqa: C901
+    def _update_deck_point(
         self, action: Union[SucceedCommandAction, FailCommandAction]
     ) -> None:
         if isinstance(action, SucceedCommandAction):
@@ -389,17 +388,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         #
         # These isinstance() checks mostly mirror self._update_current_location().
         # See there for explanations.
-
-        if isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result,
-            commands.MoveToCoordinatesResult,
-        ):
-            pipette_id = action.command.params.pipetteId
-            deck_point = action.command.result.position
-            loaded_pipette = self._state.pipettes_by_id[pipette_id]
-            self._state.current_deck_point = CurrentDeckPoint(
-                mount=loaded_pipette.mount, deck_point=deck_point
-            )
 
         elif isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,

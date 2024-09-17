@@ -1,7 +1,7 @@
 """Tests for pipette state changes in the protocol_engine state store."""
 import pytest
 from datetime import datetime
-from typing import Optional, Union
+from typing import Optional
 
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.pipette import pipette_definition
@@ -21,7 +21,6 @@ from opentrons.protocol_engine.types import (
     TipGeometry,
 )
 from opentrons.protocol_engine.actions import (
-    FailCommandAction,
     SetPipetteMovementSpeedAction,
     SucceedCommandAction,
 )
@@ -52,7 +51,6 @@ from .command_fixtures import (
     create_blow_out_command,
     create_blow_out_in_place_command,
     create_move_labware_command,
-    create_move_to_coordinates_command,
     create_prepare_to_aspirate_command,
     create_unsafe_blow_out_in_place_command,
 )
@@ -444,17 +442,6 @@ def test_blow_out_clears_volume(
             params=cmd.HomeParams(),
             result=cmd.HomeResult(),
         ),
-        cmd.MoveToCoordinates(
-            id="command-id-2",
-            key="command-key-2",
-            status=cmd.CommandStatus.SUCCEEDED,
-            createdAt=datetime(year=2021, month=1, day=1),
-            params=cmd.MoveToCoordinatesParams(
-                pipetteId="pipette-id",
-                coordinates=DeckPoint(x=1.1, y=2.2, z=3.3),
-            ),
-            result=cmd.MoveToCoordinatesResult(),
-        ),
         cmd.thermocycler.OpenLid(
             id="command-id-2",
             key="command-key-2",
@@ -770,39 +757,6 @@ def test_add_pipette_config(
     assert subject.state.flow_rates_by_id["pipette-id"].default_aspirate == {"a": 1.0}
     assert subject.state.flow_rates_by_id["pipette-id"].default_dispense == {"b": 2.0}
     assert subject.state.flow_rates_by_id["pipette-id"].default_blow_out == {"c": 3.0}
-
-
-@pytest.mark.parametrize(
-    "action",
-    (
-        SucceedCommandAction(
-            command=create_move_to_coordinates_command(
-                pipette_id="pipette-id",
-                coordinates=DeckPoint(x=11, y=22, z=33),
-            ),
-            private_result=None,
-        ),
-    ),
-)
-def test_movement_commands_update_deck_point(
-    action: Union[SucceedCommandAction, FailCommandAction],
-    subject: PipetteStore,
-) -> None:
-    """It should save the last used pipette, labware, and well for movement commands."""
-    load_pipette_command = create_load_pipette_command(
-        pipette_id="pipette-id",
-        pipette_name=PipetteNameType.P300_SINGLE,
-        mount=MountType.LEFT,
-    )
-
-    subject.handle_action(
-        SucceedCommandAction(private_result=None, command=load_pipette_command)
-    )
-    subject.handle_action(action)
-
-    assert subject.state.current_deck_point == CurrentDeckPoint(
-        mount=MountType.LEFT, deck_point=DeckPoint(x=11, y=22, z=33)
-    )
 
 
 @pytest.mark.parametrize(
