@@ -457,7 +457,7 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
         justifyContent={JUSTIFY_CENTER}
       >
         <StyledLabel css={BUTTON_LINK_STYLE}>
-          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+          <StyledText desktopStyle="bodyDefaultRegular">
             {t('upload_custom_labware')}
           </StyledText>
           <input
