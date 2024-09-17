@@ -293,7 +293,11 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             assert_type(action.error, EnumeratedError)
             return
 
-        if location_update != update_types.NO_CHANGE:
+        if location_update is update_types.NO_CHANGE:
+            pass
+        elif location_update is update_types.CLEAR:
+            self._state.current_location = None
+        else:
             match location_update.new_location:
                 case update_types.Well(labware_id=labware_id, well_name=well_name):
                     self._state.current_location = CurrentWell(
@@ -320,7 +324,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         # with a well. Clear current_location to reflect the fact that it's now unknown.
         #
         # TODO(mc, 2021-11-12): Wipe out current_location on movement failures, too.
-        elif isinstance(action, SucceedCommandAction) and isinstance(
+        if isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
                 commands.HomeResult,
@@ -362,7 +366,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             ):
                 self._state.current_location = None
 
-    def _update_deck_point(
+    def _update_deck_point(  # noqa: C901
         self, action: Union[SucceedCommandAction, FailCommandAction]
     ) -> None:
         if isinstance(action, SucceedCommandAction):
@@ -374,14 +378,17 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             assert_type(action.error, EnumeratedError)
             return
 
-        if (
-            location_update is not update_types.NO_CHANGE
-            and location_update.new_deck_point is not update_types.NO_CHANGE
-        ):
-            loaded_pipette = self._state.pipettes_by_id[location_update.pipette_id]
-            self._state.current_deck_point = CurrentDeckPoint(
-                mount=loaded_pipette.mount, deck_point=location_update.new_deck_point
-            )
+        if location_update is update_types.NO_CHANGE:
+            pass
+        elif location_update is update_types.CLEAR:
+            self._clear_deck_point()
+        else:
+            if location_update.new_deck_point is not update_types.NO_CHANGE:
+                loaded_pipette = self._state.pipettes_by_id[location_update.pipette_id]
+                self._state.current_deck_point = CurrentDeckPoint(
+                    mount=loaded_pipette.mount,
+                    deck_point=location_update.new_deck_point,
+                )
 
         # todo(mm, 2024-08-29): Port the following isinstance() checks to
         # use `state_update`. https://opentrons.atlassian.net/browse/EXEC-639
@@ -389,7 +396,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         # These isinstance() checks mostly mirror self._update_current_location().
         # See there for explanations.
 
-        elif isinstance(action, SucceedCommandAction) and isinstance(
+        if isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
                 commands.HomeResult,

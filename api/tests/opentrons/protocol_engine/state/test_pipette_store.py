@@ -188,6 +188,38 @@ def test_location_state_update(subject: PipetteStore) -> None:
         mount=MountType.RIGHT, deck_point=DeckPoint(x=333, y=444, z=555)
     )
 
+    # Repopulate the locations, then test clearing all pipette locations:
+    subject.handle_action(
+        SucceedCommandAction(
+            command=dummy_command,
+            private_result=None,
+            state_update=update_types.StateUpdate(
+                pipette_location=update_types.PipetteLocationUpdate(
+                    pipette_id="pipette-id",
+                    new_location=update_types.AddressableArea(
+                        addressable_area_name="na na na na na"
+                    ),
+                    new_deck_point=DeckPoint(x=333, y=444, z=555),
+                )
+            ),
+        )
+    )
+    assert subject.state.current_location is not None
+    assert subject.state.current_deck_point != CurrentDeckPoint(
+        mount=None, deck_point=None
+    )
+    subject.handle_action(
+        SucceedCommandAction(
+            command=dummy_command,
+            private_result=None,
+            state_update=update_types.StateUpdate(pipette_location=update_types.CLEAR),
+        )
+    )
+    assert subject.state.current_location is None
+    assert subject.state.current_deck_point == CurrentDeckPoint(
+        mount=None, deck_point=None
+    )
+
 
 def test_handles_load_pipette(subject: PipetteStore) -> None:
     """It should add the pipette data to the state."""
