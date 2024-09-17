@@ -37,7 +37,7 @@ export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
 
   const def = getModuleDef2(moduleModel)
   const overhang =
-    def != null && def?.dimensions.labwareInterfaceXDimension != null
+    def?.dimensions.labwareInterfaceXDimension != null
       ? def.dimensions.xDimension - def?.dimensions.labwareInterfaceXDimension
       : 0
   //  TODO(ja 9/6/24): definitely need to refine these overhang values
@@ -55,21 +55,21 @@ export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
       ref={labelContainerRef}
       deckLabels={[
         {
-          text: def.displayName,
-          isSelected: isSelected,
-          isLast: isLast,
-          moduleModel: def.model,
+          text: def?.displayName,
+          isSelected,
+          isLast,
+          moduleModel: def?.model,
         },
         ...labwareInfos,
       ]}
       x={
         (orientation === 'right'
           ? position[0] - overhang
-          : position[0] - leftOverhang) - def.cornerOffsetFromSlot.x
+          : position[0] - leftOverhang) - def?.cornerOffsetFromSlot.x
       }
-      y={position[1] + def.cornerOffsetFromSlot.y - labelContainerHeight}
-      width={def.dimensions.xDimension + 2}
-      height={def.dimensions.yDimension + 2}
+      y={position[1] + def?.cornerOffsetFromSlot.y - labelContainerHeight}
+      width={def?.dimensions.xDimension + 2}
+      height={def?.dimensions.yDimension + 2}
     />
   )
 }
