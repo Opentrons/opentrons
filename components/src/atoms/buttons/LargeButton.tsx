@@ -213,7 +213,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       padding: ${SPACING.spacing24};
       line-height: ${TYPOGRAPHY.lineHeight20};
       gap: ${SPACING.spacing60};
-      border: ${BORDERS.borderRadius4} solid
+      outline: ${BORDERS.borderRadius4} solid
         ${
           buttonType === 'alertStroke' && !disabled
             ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor
@@ -237,7 +237,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
             : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor
         };
         ${!disabled && activeColorFor(buttonType)};
-        border: ${BORDERS.borderRadius4} solid
+        outline: ${BORDERS.borderRadius4} solid
           ${
             disabled
               ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
