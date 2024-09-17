@@ -549,7 +549,7 @@ CommandType = Union[
     unsafe.UnsafeEngageAxesCommandType,
     robot.MoveAxesRelativeCommandType,
     robot.MoveAxesToCommandType,
-    robot.MoveToCommandType
+    robot.MoveToCommandType,
 ]
 
 CommandCreate = Annotated[

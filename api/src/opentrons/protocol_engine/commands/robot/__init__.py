@@ -23,8 +23,8 @@ from .move_axes_relative import (
 )
 
 __all__ = [
-	# robot/moveTo
-	"MoveTo",
+    # robot/moveTo
+    "MoveTo",
     "MoveToCreate",
     "MoveToParams",
     "MoveToResult",
