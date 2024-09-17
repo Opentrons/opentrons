@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next'
 
 import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
-import { ChildNavigation } from '../../../organisms/ChildNavigation'
-import { SetWifiSsid } from '../../../organisms/NetworkSettings/SetWifiSsid'
+import { ChildNavigation } from '../../../../organisms/ChildNavigation'
+import { SetWifiSsid } from '../../NetworkSettings'
 
-import type { SetSettingOption } from '../../../pages/ODD/RobotSettingsDashboard'
+import type { SetSettingOption } from '../types'
 
 interface RobotSettingsJoinOtherNetworkProps {
   setCurrentOption: SetSettingOption

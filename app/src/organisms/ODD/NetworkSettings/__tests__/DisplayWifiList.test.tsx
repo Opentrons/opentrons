@@ -2,9 +2,9 @@ import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import * as Fixtures from '../../../redux/networking/__fixtures__'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../i18n'
+import * as Fixtures from '../../../../redux/networking/__fixtures__'
 import { DisplaySearchNetwork } from '../DisplaySearchNetwork'
 import { DisplayWifiList } from '../DisplayWifiList'
 
@@ -20,8 +20,8 @@ const mockWifiList = [
   },
 ]
 
-vi.mock('../../../redux/networking/selectors')
-vi.mock('../../../redux/discovery/selectors')
+vi.mock('../../../../redux/networking/selectors')
+vi.mock('../../../../redux/discovery/selectors')
 vi.mock('../DisplaySearchNetwork')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()

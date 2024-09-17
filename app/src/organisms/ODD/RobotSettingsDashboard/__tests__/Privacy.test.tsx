@@ -2,15 +2,15 @@ import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { toggleAnalyticsOptedIn } from '../../../redux/analytics'
-import { getRobotSettings } from '../../../redux/robot-settings'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../i18n'
+import { toggleAnalyticsOptedIn } from '../../../../redux/analytics'
+import { getRobotSettings } from '../../../../redux/robot-settings'
 
 import { Privacy } from '../Privacy'
 
-vi.mock('../../../redux/analytics')
-vi.mock('../../../redux/robot-settings')
+vi.mock('../../../../redux/analytics')
+vi.mock('../../../../redux/robot-settings')
 
 const render = (props: React.ComponentProps<typeof Privacy>) => {
   return renderWithProviders(<Privacy {...props} />, {

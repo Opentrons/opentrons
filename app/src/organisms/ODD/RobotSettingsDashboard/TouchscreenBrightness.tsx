@@ -16,15 +16,15 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '../../organisms/ChildNavigation'
+import { ChildNavigation } from '../../../organisms/ChildNavigation'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
-} from '../../redux/config'
+} from '../../../redux/config'
 
-import type { Dispatch } from '../../redux/types'
-import type { SetSettingOption } from '../../pages/ODD/RobotSettingsDashboard'
-import { IconButton } from '../../atoms/buttons/IconButton'
+import type { Dispatch } from '../../../redux/types'
+import type { SetSettingOption } from './types'
+import { IconButton } from '../../../atoms/buttons/IconButton'
 
 interface BrightnessTileProps {
   isActive: boolean

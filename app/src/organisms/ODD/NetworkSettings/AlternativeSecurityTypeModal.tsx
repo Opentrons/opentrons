@@ -12,10 +12,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../atoms/buttons'
-import { OddModal } from '../../molecules/OddModal'
+import { SmallButton } from '../../../atoms/buttons'
+import { OddModal } from '../../../molecules/OddModal'
 
-import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
 
 interface AlternativeSecurityTypeModalProps {
   setShowAlternativeSecurityTypeModal: (

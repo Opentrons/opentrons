@@ -3,19 +3,22 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { useWifiList } from '../../../resources/networking/hooks'
-import { getNetworkInterfaces, INTERFACE_WIFI } from '../../../redux/networking'
-import * as Fixtures from '../../../redux/networking/__fixtures__'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../i18n'
+import { useWifiList } from '../../../../resources/networking/hooks'
+import {
+  getNetworkInterfaces,
+  INTERFACE_WIFI,
+} from '../../../../redux/networking'
+import * as Fixtures from '../../../../redux/networking/__fixtures__'
 import { NetworkDetailsModal } from '../../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
 
 import type { NavigateFunction } from 'react-router-dom'
 
-vi.mock('../../../resources/networking/hooks')
-vi.mock('../../../redux/networking')
-vi.mock('../../../redux/discovery/selectors')
+vi.mock('../../../../resources/networking/hooks')
+vi.mock('../../../../redux/networking')
+vi.mock('../../../../redux/discovery/selectors')
 vi.mock('../../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal')
 
 const mockNavigate = vi.fn()

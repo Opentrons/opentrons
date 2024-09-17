@@ -8,7 +8,7 @@ import {
   getIsOnDevice,
   getOnDeviceDisplaySettings,
 } from '../../../../redux/config'
-import { useIsUnboxingFlowOngoing } from '../hooks'
+import { useIsUnboxingFlowOngoing } from '../useIsUnboxingFlowOngoing'
 
 import type { Store } from 'redux'
 import type { State } from '../../../../redux/types'

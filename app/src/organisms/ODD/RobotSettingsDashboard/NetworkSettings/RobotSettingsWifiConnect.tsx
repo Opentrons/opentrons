@@ -3,15 +3,12 @@ import { useTranslation } from 'react-i18next'
 
 import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 
-import { ChildNavigation } from '../../../organisms/ChildNavigation'
-import {
-  ConnectingNetwork,
-  FailedToConnect,
-} from '../../../organisms/NetworkSettings'
-import { FAILURE, PENDING, SUCCESS } from '../../../redux/robot-api'
+import { ChildNavigation } from '../../../../organisms/ChildNavigation'
+import { ConnectingNetwork, FailedToConnect } from '../../NetworkSettings'
+import { FAILURE, PENDING, SUCCESS } from '../../../../redux/robot-api'
 
-import type { SetSettingOption } from '../../../pages/ODD/RobotSettingsDashboard'
-import type { RequestState } from '../../../redux/robot-api/types'
+import type { SetSettingOption } from '../types'
+import type { RequestState } from '../../../../redux/robot-api/types'
 
 interface RobotSettingsWifiConnectProps {
   handleConnect: () => void

@@ -10,7 +10,7 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import type { SetSettingOption } from '../../pages/ODD/RobotSettingsDashboard'
+import type { SetSettingOption } from './types'
 
 interface RobotNameProps {
   setCurrentOption: SetSettingOption

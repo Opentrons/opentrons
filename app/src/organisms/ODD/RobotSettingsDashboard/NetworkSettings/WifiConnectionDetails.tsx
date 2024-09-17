@@ -20,12 +20,12 @@ import {
 
 import { NetworkDetailsModal } from './NetworkDetailsModal'
 import { DisplayWifiList } from '../../NetworkSettings'
-import { getLocalRobot } from '../../../redux/discovery'
-import { getNetworkInterfaces } from '../../../redux/networking'
-import { useWifiList } from '../../../resources/networking/hooks'
+import { getLocalRobot } from '../../../../redux/discovery'
+import { getNetworkInterfaces } from '../../../../redux/networking'
+import { useWifiList } from '../../../../resources/networking/hooks'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { State } from '../../../redux/types'
+import type { State } from '../../../../redux/types'
 
 const FETCH_WIFI_LIST_MS = 5000
 

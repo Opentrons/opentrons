@@ -18,7 +18,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { SetSettingOption } from '../../pages/ODD/RobotSettingsDashboard'
+import type { SetSettingOption } from './types'
 
 interface RectProps {
   isActive: boolean

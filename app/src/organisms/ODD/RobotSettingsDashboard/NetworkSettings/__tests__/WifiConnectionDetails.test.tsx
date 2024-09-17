@@ -4,17 +4,17 @@ import { when } from 'vitest-when'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
-import { i18n } from '../../../../i18n'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { getLocalRobot } from '../../../../redux/discovery'
-import * as Networking from '../../../../redux/networking'
+import { i18n } from '../../../../../i18n'
+import { renderWithProviders } from '../../../../../__testing-utils__'
+import { getLocalRobot } from '../../../../../redux/discovery'
+import * as Networking from '../../../../../redux/networking'
 import { NetworkDetailsModal } from '../NetworkDetailsModal'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
 import type * as Dom from 'react-router-dom'
-import type { State } from '../../../../redux/types'
+import type { State } from '../../../../../redux/types'
 
-vi.mock('../../../../redux/discovery')
-vi.mock('../../../../redux/networking')
+vi.mock('../../../../../redux/discovery')
+vi.mock('../../../../../redux/networking')
 vi.mock('../NetworkDetailsModal')
 
 const mockNavigate = vi.fn()

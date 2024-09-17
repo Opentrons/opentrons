@@ -4,19 +4,19 @@ import { screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
-import { i18n } from '../../../../i18n'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { getLocalRobot } from '../../../../redux/discovery'
-import { useWifiList } from '../../../../resources/networking/hooks'
+import { i18n } from '../../../../../i18n'
+import { renderWithProviders } from '../../../../../__testing-utils__'
+import { getLocalRobot } from '../../../../../redux/discovery'
+import { useWifiList } from '../../../../../resources/networking/hooks'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
 import { EthernetConnectionDetails } from '../EthernetConnectionDetails'
 import { NetworkSettings } from '..'
 
-import type { DiscoveredRobot } from '../../../../redux/discovery/types'
-import type { WifiNetwork } from '../../../../redux/networking/types'
+import type { DiscoveredRobot } from '../../../../../redux/discovery/types'
+import type { WifiNetwork } from '../../../../../redux/networking/types'
 
-vi.mock('../../../../redux/discovery')
-vi.mock('../../../../resources/networking/hooks')
+vi.mock('../../../../../redux/discovery')
+vi.mock('../../../../../resources/networking/hooks')
 vi.mock('../WifiConnectionDetails')
 vi.mock('../EthernetConnectionDetails')
 

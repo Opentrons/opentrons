@@ -3,8 +3,8 @@ import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../i18n'
 import { ConnectingNetwork } from '../ConnectingNetwork'
 
 const render = (props: React.ComponentProps<typeof ConnectingNetwork>) => {

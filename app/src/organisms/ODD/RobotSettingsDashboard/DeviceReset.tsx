@@ -15,20 +15,20 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 
-import { MediumButton, SmallButton } from '../../atoms/buttons'
-import { OddModal } from '../../molecules/OddModal'
-import { ChildNavigation } from '../../organisms/ChildNavigation'
+import { MediumButton, SmallButton } from '../../../atoms/buttons'
+import { OddModal } from '../../../molecules/OddModal'
+import { ChildNavigation } from '../../../organisms/ChildNavigation'
 import {
   getResetConfigOptions,
   fetchResetConfigOptions,
   resetConfig,
-} from '../../redux/robot-admin'
-import { useDispatchApiRequest } from '../../redux/robot-api'
+} from '../../../redux/robot-admin'
+import { useDispatchApiRequest } from '../../../redux/robot-api'
 
-import type { Dispatch, State } from '../../redux/types'
-import type { ResetConfigRequest } from '../../redux/robot-admin/types'
-import type { SetSettingOption } from '../../pages/ODD/RobotSettingsDashboard'
-import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
+import type { Dispatch, State } from '../../../redux/types'
+import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
+import type { SetSettingOption } from './types'
+import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
 
 interface LabelProps {
   isSelected?: boolean

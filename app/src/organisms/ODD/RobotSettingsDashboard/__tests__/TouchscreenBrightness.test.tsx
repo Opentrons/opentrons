@@ -2,15 +2,15 @@ import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '../../../../i18n'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
-} from '../../../redux/config'
-import { renderWithProviders } from '../../../__testing-utils__'
+} from '../../../../redux/config'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { TouchscreenBrightness } from '../TouchscreenBrightness'
 
-vi.mock('../../../redux/config')
+vi.mock('../../../../redux/config')
 
 const mockFunc = vi.fn()
 

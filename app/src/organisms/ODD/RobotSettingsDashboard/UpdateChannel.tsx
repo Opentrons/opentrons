@@ -13,15 +13,15 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '../../organisms/ChildNavigation'
+import { ChildNavigation } from '../../../organisms/ChildNavigation'
 import {
   getDevtoolsEnabled,
   getUpdateChannel,
   getUpdateChannelOptions,
   updateConfigValue,
-} from '../../redux/config'
+} from '../../../redux/config'
 
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '../../../redux/types'
 
 interface LabelProps {
   isSelected?: boolean

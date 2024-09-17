@@ -15,11 +15,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '../../../organisms/ChildNavigation'
-import { getNetworkInterfaces } from '../../../redux/networking'
-import { getLocalRobot } from '../../../redux/discovery'
+import { ChildNavigation } from '../../../../organisms/ChildNavigation'
+import { getNetworkInterfaces } from '../../../../redux/networking'
+import { getLocalRobot } from '../../../../redux/discovery'
 
-import type { State } from '../../../redux/types'
+import type { State } from '../../../../redux/types'
 
 const STRETCH_LIST_STYLE = css`
   width: 100%;

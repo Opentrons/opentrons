@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Flex, DIRECTION_COLUMN } from '@opentrons/components'
 
-import { SetWifiCred as SetWifiCredComponent } from '../../../organisms/NetworkSettings'
+import { SetWifiCred as SetWifiCredComponent } from '../../../organisms/ODD/NetworkSettings'
 import { RobotSetupHeader } from '../../../organisms/RobotSetupHeader'
 
 import type { WifiScreenOption } from './'

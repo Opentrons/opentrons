@@ -14,9 +14,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { MediumButton } from '../../atoms/buttons'
+import { MediumButton } from '../../../atoms/buttons'
 
-import type { RequestState } from '../../redux/robot-api/types'
+import type { RequestState } from '../../../redux/robot-api/types'
 
 interface FailedToConnectProps {
   selectedSsid: string

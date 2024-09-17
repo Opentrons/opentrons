@@ -3,17 +3,17 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '../../../../i18n'
 import {
   getDevtoolsEnabled,
   getUpdateChannelOptions,
   updateConfigValue,
-} from '../../../redux/config'
-import { renderWithProviders } from '../../../__testing-utils__'
+} from '../../../../redux/config'
+import { renderWithProviders } from '../../../../__testing-utils__'
 
 import { UpdateChannel } from '../UpdateChannel'
 
-vi.mock('../../../redux/config')
+vi.mock('../../../../redux/config')
 
 const mockChannelOptions = [
   {

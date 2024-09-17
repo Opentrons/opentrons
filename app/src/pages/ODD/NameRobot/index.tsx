@@ -35,7 +35,7 @@ import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '../../../redux/analytics'
 import { AlphanumericKeyboard } from '../../../atoms/SoftwareKeyboard'
 import { SmallButton } from '../../../atoms/buttons'
 import { StepMeter } from '../../../atoms/StepMeter'
-import { useIsUnboxingFlowOngoing } from '../../../organisms/RobotSettingsDashboard/NetworkSettings/hooks'
+import { useIsUnboxingFlowOngoing } from '../../../organisms/ODD/hooks'
 import { ConfirmRobotName } from '../../../organisms/ODD/NameRobot/ConfirmRobotName'
 
 import type { FieldError, Resolver } from 'react-hook-form'

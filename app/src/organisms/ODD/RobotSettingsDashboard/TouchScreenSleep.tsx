@@ -9,15 +9,15 @@ import {
   RadioButton,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '../../organisms/ChildNavigation'
+import { ChildNavigation } from '../../../organisms/ChildNavigation'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
-} from '../../redux/config'
-import { SLEEP_NEVER_MS } from '../../App/constants'
+} from '../../../redux/config'
+import { SLEEP_NEVER_MS } from '../../../App/constants'
 
-import type { Dispatch } from '../../redux/types'
-import type { SetSettingOption } from '../../pages/ODD/RobotSettingsDashboard'
+import type { Dispatch } from '../../../redux/types'
+import type { SetSettingOption } from './types'
 
 const SLEEP_TIME_MS = 60 * 1000 // 1 min
 

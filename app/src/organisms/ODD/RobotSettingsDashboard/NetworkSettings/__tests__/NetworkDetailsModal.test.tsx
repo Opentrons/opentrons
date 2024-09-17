@@ -3,8 +3,8 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
-import { i18n } from '../../../../i18n'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../../i18n'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import { NetworkDetailsModal } from '../NetworkDetailsModal'
 
 const mockFn = vi.fn()

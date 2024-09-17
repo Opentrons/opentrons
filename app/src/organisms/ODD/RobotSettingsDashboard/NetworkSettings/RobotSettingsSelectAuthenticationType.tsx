@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next'
 
 import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
-import { ChildNavigation } from '../../../organisms/ChildNavigation'
-import { SelectAuthenticationType } from '../../../organisms/NetworkSettings/SelectAuthenticationType'
+import { ChildNavigation } from '../../../../organisms/ChildNavigation'
+import { SelectAuthenticationType } from '../../NetworkSettings'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { SetSettingOption } from '../../../pages/ODD/RobotSettingsDashboard'
+import type { SetSettingOption } from '../types'
 
 interface RobotSettingsSelectAuthenticationTypeProps {
   handleWifiConnect: () => void

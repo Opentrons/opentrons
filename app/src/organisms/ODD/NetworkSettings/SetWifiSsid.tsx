@@ -12,8 +12,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { FullKeyboard } from '../../atoms/SoftwareKeyboard'
-import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
+import { FullKeyboard } from '../../../atoms/SoftwareKeyboard'
+import { useIsUnboxingFlowOngoing } from '../hooks'
 
 interface SetWifiSsidProps {
   errorMessage?: string | null
