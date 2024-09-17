@@ -53,10 +53,10 @@ from opentrons.protocol_engine.resources.pipette_data_provider import (
 )
 from opentrons.protocol_engine.execution.equipment import (
     EquipmentHandler,
-    LoadedLabwareData,
     LoadedPipetteData,
     LoadedModuleData,
 )
+from opentrons.protocol_engine.resources.models import LoadedLabwareData
 from ..pipette_fixtures import get_default_nozzle_map
 
 

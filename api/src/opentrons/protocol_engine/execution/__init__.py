@@ -4,12 +4,12 @@ from .command_executor import CommandExecutor
 from .create_queue_worker import create_queue_worker
 from .equipment import (
     EquipmentHandler,
-    LoadedLabwareData,
     LoadedPipetteData,
     LoadedModuleData,
     LoadedConfigureForVolumeData,
     ReloadedLabwareData,
 )
+from ..resources.models import LoadedLabwareData
 from .movement import MovementHandler
 from .gantry_mover import GantryMover
 from .labware_movement import LabwareMovementHandler
