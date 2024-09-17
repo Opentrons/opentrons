@@ -70,6 +70,7 @@ import type {
   PipetteType,
 } from '../../pages/CreateNewProtocolWizard/types'
 import type { ThunkDispatch } from '../../types'
+import { BUTTON_LINK_STYLE } from '../../atoms'
 
 interface EditInstrumentsModalProps {
   onClose: () => void
@@ -209,6 +210,7 @@ export function EditInstrumentsModal(
               </StyledText>
               {has96Channel ? null : (
                 <Btn
+                  css={BUTTON_LINK_STYLE}
                   onClick={() =>
                     dispatch(
                       changeSavedStepForm({
@@ -220,7 +222,7 @@ export function EditInstrumentsModal(
                     )
                   }
                 >
-                  <Flex color={COLORS.grey60} flexDirection={DIRECTION_ROW}>
+                  <Flex flexDirection={DIRECTION_ROW}>
                     <Icon
                       name="swap-horizontal"
                       size="1rem"
@@ -345,6 +347,7 @@ export function EditInstrumentsModal(
                       </Flex>
                       <Flex textDecoration={TYPOGRAPHY.textDecorationUnderline}>
                         <Btn
+                          css={BUTTON_LINK_STYLE}
                           onClick={() => {
                             dispatch(toggleIsGripperRequired())
                           }}
