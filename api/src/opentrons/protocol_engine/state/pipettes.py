@@ -326,8 +326,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     mount=loaded_pipette.mount, deck_point=new_deck_point
                 )
 
-        # TODO(mc, 2021-11-12): Wipe out current_location on movement failures, too.
-
     def _update_volumes(
         self, action: Union[SucceedCommandAction, FailCommandAction]
     ) -> None:
