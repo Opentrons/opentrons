@@ -15,8 +15,10 @@ import {
   POSITION_ABSOLUTE,
   SPACING,
   LegacyStyledText,
-  ModalShell,
   useConditionalConfirm,
+  ModalShell,
+  DISPLAY_FLEX,
+  OVERFLOW_HIDDEN,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
@@ -132,56 +134,26 @@ export function DropTipWizardContainer(
 export function DropTipWizardFixitType(
   props: DropTipWizardContainerProps
 ): JSX.Element {
-  return <DropTipWizardContent {...props} />
+  return (
+    <Flex css={INTERVENTION_CONTAINER_STYLE}>
+      <DropTipWizardContent {...props} />
+    </Flex>
+  )
 }
 
 export function DropTipWizardSetupType(
   props: DropTipWizardContainerProps
 ): JSX.Element {
-  const {
-    activeMaintenanceRunId,
-    isCommandInProgress,
-    isExiting,
-    showConfirmExit,
-    errorDetails,
-  } = props
-
-  // TODO(jh: 06-10-24): This is not ideal. See EXEC-520.
-  const inMotion =
-    isCommandInProgress || isExiting || activeMaintenanceRunId == null
-  const simpleWizardPaddingOverrides =
-    inMotion || showConfirmExit || errorDetails
-
   return createPortal(
     props.isOnDevice ? (
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        width="992px"
-        height="568px"
-        left="14.5px"
-        top="16px"
-        border={BORDERS.lineBorder}
-        boxShadow={BORDERS.shadowSmall}
-        borderRadius={BORDERS.borderRadius16}
-        position={POSITION_ABSOLUTE}
-        backgroundColor={COLORS.white}
-      >
+      <Flex css={SIMPLE_CONTAINER_STYLE}>
         <DropTipWizardHeader {...props} />
-        <Flex
-          padding={simpleWizardPaddingOverrides ? 0 : SPACING.spacing32}
-          flexDirection={DIRECTION_COLUMN}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          height="100%"
-          flex="1"
-        >
-          <DropTipWizardContent {...props} />
-        </Flex>
+        <DropTipWizardContent {...props} />
       </Flex>
     ) : (
       <ModalShell
-        width="47rem"
+        css={SIMPLE_CONTAINER_STYLE}
         header={<DropTipWizardHeader {...props} />}
-        overflow="hidden"
       >
         <DropTipWizardContent {...props} />
       </ModalShell>
@@ -252,7 +224,7 @@ export const DropTipWizardContent = (
         header={errorDetails?.header ?? t('error_dropping_tips')}
         subHeader={subHeader}
         justifyContentForOddButton={JUSTIFY_FLEX_END}
-        css={ERROR_MODAL_FIXIT_STYLE}
+        css={INTERVENTION_ERROR_MODAL_STYLE}
       >
         {button}
       </SimpleWizardBody>
@@ -415,8 +387,40 @@ function useInitiateExit(): {
   return { isExitInitiated, toggleExitInitiated }
 }
 
-const ERROR_MODAL_FIXIT_STYLE = css`
+const INTERVENTION_ERROR_MODAL_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     margin-top: -${SPACING.spacing68}; // See EXEC-520. This clearly isn't ideal.
+  }
+`
+
+const INTERVENTION_CONTAINER_STYLE = css`
+  padding: ${SPACING.spacing32};
+  grid-gap: ${SPACING.spacing24};
+  height: 100%;
+  width: 100%;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    grid-gap: ${SPACING.spacing32};
+  }
+`
+
+const SIMPLE_CONTAINER_STYLE = css`
+  width: 47rem;
+  overflow: ${OVERFLOW_HIDDEN};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: 62rem;
+    height: 35.5rem;
+    left: 14.5px;
+    top: 16px;
+    border: ${BORDERS.lineBorder};
+    box-shadow: ${BORDERS.shadowSmall};
+    border-radius: ${BORDERS.borderRadius16};
+    position: ${POSITION_ABSOLUTE};
+    background-color: ${COLORS.white};
+    padding: ${SPACING.spacing32};
+    display: ${DISPLAY_FLEX};
+    flex-direction: ${DIRECTION_COLUMN};
+    justify-content: ${JUSTIFY_SPACE_BETWEEN};
   }
 `
