@@ -6,6 +6,7 @@ from contextlib import nullcontext as does_not_raise
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType
 
+from opentrons.hardware_control import CriticalPoint
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
 from opentrons.motion_planning import adjacent_slots_getters
@@ -546,8 +547,20 @@ def test_deck_conflict_raises_for_bad_pipette_move(
         )
     ).then_return(destination_well_point)
     decoy.when(
+        mock_state_view.labware.get_should_center_column_on_target_well(
+            "destination-labware-id"
+        )
+    ).then_return(False)
+    decoy.when(
+        mock_state_view.labware.get_should_center_pipette_on_target_well(
+            "destination-labware-id"
+        )
+    ).then_return(False)
+    decoy.when(
         mock_state_view.pipettes.get_pipette_bounds_at_specified_move_to_position(
-            pipette_id="pipette-id", destination_position=destination_well_point
+            pipette_id="pipette-id",
+            destination_position=destination_well_point,
+            critical_point=None,
         )
     ).then_return(pipette_bounds)
 
@@ -653,9 +666,17 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
             well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
         )
     ).then_return(destination_well_point)
+
+    decoy.when(
+        mock_state_view.labware.get_should_center_column_on_target_well(
+            "destination-labware-id"
+        )
+    ).then_return(True)
     decoy.when(
         mock_state_view.pipettes.get_pipette_bounds_at_specified_move_to_position(
-            pipette_id="pipette-id", destination_position=destination_well_point
+            pipette_id="pipette-id",
+            destination_position=destination_well_point,
+            critical_point=CriticalPoint.Y_CENTER,
         )
     ).then_return(pipette_bounds_at_destination)
     decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
