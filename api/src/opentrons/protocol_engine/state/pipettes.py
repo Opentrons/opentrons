@@ -152,7 +152,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         self, action: Union[SucceedCommandAction, FailCommandAction]
     ) -> None:
         self._update_current_location(action)
-        self._update_deck_point(action)
         self._update_volumes(action)
 
         if not isinstance(action, SucceedCommandAction):
@@ -297,8 +296,13 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             pass
         elif location_update is update_types.CLEAR:
             self._state.current_location = None
+            self._state.current_deck_point = CurrentDeckPoint(
+                mount=None, deck_point=None
+            )
         else:
-            match location_update.new_location:
+            new_logical_location = location_update.new_location
+            new_deck_point = location_update.new_deck_point
+            match new_logical_location:
                 case update_types.Well(labware_id=labware_id, well_name=well_name):
                     self._state.current_location = CurrentWell(
                         pipette_id=location_update.pipette_id,
@@ -316,32 +320,13 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     self._state.current_location = None
                 case update_types.NO_CHANGE:
                     pass
-
-        # TODO(mc, 2021-11-12): Wipe out current_location on movement failures, too.
-
-    def _update_deck_point(
-        self, action: Union[SucceedCommandAction, FailCommandAction]
-    ) -> None:
-        if isinstance(action, SucceedCommandAction):
-            location_update = action.state_update.pipette_location
-        elif isinstance(action.error, DefinedErrorData):
-            location_update = action.error.state_update.pipette_location
-        else:
-            # The command failed with some undefined error. We have nothing to do.
-            assert_type(action.error, EnumeratedError)
-            return
-
-        if location_update is update_types.NO_CHANGE:
-            pass
-        elif location_update is update_types.CLEAR:
-            self._clear_deck_point()
-        else:
-            if location_update.new_deck_point is not update_types.NO_CHANGE:
+            if new_deck_point is not update_types.NO_CHANGE:
                 loaded_pipette = self._state.pipettes_by_id[location_update.pipette_id]
                 self._state.current_deck_point = CurrentDeckPoint(
-                    mount=loaded_pipette.mount,
-                    deck_point=location_update.new_deck_point,
+                    mount=loaded_pipette.mount, deck_point=new_deck_point
                 )
+
+        # TODO(mc, 2021-11-12): Wipe out current_location on movement failures, too.
 
     def _update_volumes(
         self, action: Union[SucceedCommandAction, FailCommandAction]
@@ -385,10 +370,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         ):
             pipette_id = action.command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = 0
-
-    def _clear_deck_point(self) -> None:
-        """Reset last deck point to default None value for mount and point."""
-        self._state.current_deck_point = CurrentDeckPoint(mount=None, deck_point=None)
 
 
 class PipetteView(HasState[PipetteState]):
