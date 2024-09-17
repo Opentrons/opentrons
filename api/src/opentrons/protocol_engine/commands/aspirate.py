@@ -99,9 +99,7 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
                 pipette_id=pipette_id,
                 labware_id=labware_id,
                 well_name=well_name,
-                well_location=WellLocation(
-                    origin=WellOrigin.TOP
-                ),  # do we want to incorporate an offset (for clearance) for prepare_for_aspirate?
+                well_location=WellLocation(origin=WellOrigin.TOP),
             )
 
             await self._pipetting.prepare_for_aspirate(pipette_id=pipette_id)

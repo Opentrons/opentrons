@@ -490,10 +490,10 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         self._protocol_interface.get_hardware.retract(self._mount)  # type: ignore [attr-defined]
 
     def get_last_measured_liquid_height(self, well_core: WellCore) -> Optional[float]:
-        """This will never be called because it was added in API 2.21."""  # confirm
+        """This will never be called because it was added in API 2.21."""
         assert (
             False
-        ), "get_last_measured_liquid_height only supported in API 2.21 & later"  # confirm
+        ), "get_last_measured_liquid_height only supported in API 2.21 & later"
 
     def detect_liquid_presence(self, well_core: WellCore, loc: types.Location) -> bool:
         """This will never be called because it was added in API 2.20."""

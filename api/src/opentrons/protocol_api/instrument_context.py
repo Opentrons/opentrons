@@ -2154,7 +2154,6 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         return target, move_to_location, well
 
-    # confirm release version 2.21, update where needed
     def _liquid_probe_before_aspirate(
         self,
         well: labware.Well,
