@@ -192,7 +192,7 @@ describe('QuickTransferAdvancedSettings', () => {
     expect(screen.getAllByText('Disabled')).toHaveLength(10)
   })
 
-  //aspirate settings
+  // aspirate settings
   it('opens aspirate tip position when pressed', () => {
     render(props)
     const aspirateTipPosition = screen.getAllByText('Tip position')[0]
