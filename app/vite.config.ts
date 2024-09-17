@@ -68,6 +68,9 @@ export default defineConfig(
           '@opentrons/react-api-client': path.resolve(
             '../react-api-client/src/index.ts'
           ),
+          // "The resulting path (...) trailing slashes are removed unless the path is resolved to the root directory."
+          // https://nodejs.org/api/path.html#pathresolvepaths
+          '/app/': path.resolve('./src/') + '/',
         },
       },
     }
