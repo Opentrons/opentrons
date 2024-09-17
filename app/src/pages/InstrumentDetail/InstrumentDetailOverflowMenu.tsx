@@ -13,8 +13,6 @@ import {
 import {
   SINGLE_MOUNT_PIPETTES,
   NINETY_SIX_CHANNEL,
-  FLEX_ROBOT_TYPE,
-  getPipetteModelSpecs,
 } from '@opentrons/shared-data'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
@@ -22,10 +20,6 @@ import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
-import {
-  DropTipWizardFlows,
-  useDropTipWizardFlows,
-} from '../../organisms/DropTipWizardFlows'
 import { FLOWS } from '../../organisms/PipetteWizardFlows/constants'
 import { GRIPPER_FLOW_TYPES } from '../../organisms/GripperWizardFlows/constants'
 
@@ -38,18 +32,24 @@ import type {
 interface InstrumentDetailsOverflowMenuProps {
   instrument: PipetteData | GripperData
   host: HostConfig | null
+  toggleDTWiz: () => void
 }
 
 export const handleInstrumentDetailOverflowMenu = (
   instrument: InstrumentDetailsOverflowMenuProps['instrument'],
-  host: InstrumentDetailsOverflowMenuProps['host']
+  host: InstrumentDetailsOverflowMenuProps['host'],
+  toggleDTWiz: () => void
 ): void => {
-  NiceModal.show(InstrumentDetailsOverflowMenu, { instrument, host })
+  NiceModal.show(InstrumentDetailsOverflowMenu, {
+    instrument,
+    host,
+    toggleDTWiz,
+  })
 }
 
 const InstrumentDetailsOverflowMenu = NiceModal.create(
   (props: InstrumentDetailsOverflowMenuProps): JSX.Element => {
-    const { instrument, host } = props
+    const { instrument, host, toggleDTWiz } = props
     const { t } = useTranslation('robot_controls')
     const modal = useModal()
     const [wizardProps, setWizardProps] = React.useState<
@@ -66,9 +66,6 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
         modal.remove()
       },
     }
-    const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
-    const pipetteModelSpecs =
-      getPipetteModelSpecs((instrument as PipetteData).instrumentModel) ?? null
 
     const is96Channel =
       instrument?.ok &&
@@ -97,6 +94,11 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
       }
     }
 
+    const handleDropTip = (): void => {
+      toggleDTWiz()
+      modal.remove()
+    }
+
     return (
       <ApiHostProvider {...host} hostname={host?.hostname ?? null}>
         <MenuList onClick={modal.remove} isOnDevice={true}>
@@ -120,7 +122,7 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
             </MenuItem>
           ) : null}
           {instrument.mount !== 'extension' ? (
-            <MenuItem key="drop-tips" onClick={toggleDTWiz}>
+            <MenuItem key="drop-tips" onClick={handleDropTip}>
               <Flex alignItems={ALIGN_CENTER}>
                 <Icon
                   name="reset-position"
@@ -143,16 +145,6 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
         ) : null}
         {wizardProps != null && !('mount' in wizardProps) ? (
           <GripperWizardFlows {...wizardProps} />
-        ) : null}
-        {showDTWiz &&
-        instrument.mount !== 'extension' &&
-        pipetteModelSpecs != null ? (
-          <DropTipWizardFlows
-            robotType={FLEX_ROBOT_TYPE}
-            mount={instrument.mount}
-            instrumentModelSpecs={pipetteModelSpecs}
-            closeFlow={modal.remove}
-          />
         ) : null}
       </ApiHostProvider>
     )

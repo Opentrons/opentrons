@@ -13,9 +13,21 @@ import {
   usePipetteModelSpecs,
 } from '../../../resources/instruments/hooks'
 import { useIsOEMMode } from '../../../resources/robot-settings/hooks'
+import {
+  DropTipWizardFlows,
+  useDropTipWizardFlows,
+} from '../../../organisms/DropTipWizardFlows'
 
 import type { Instruments } from '@opentrons/api-client'
+import type * as SharedData from '@opentrons/shared-data'
 
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof SharedData>()
+  return {
+    ...actual,
+    getPipetteModelSpecs: vi.fn(),
+  }
+})
 vi.mock('@opentrons/react-api-client')
 vi.mock('react-router-dom', () => ({
   useParams: vi.fn(),
@@ -23,6 +35,7 @@ vi.mock('react-router-dom', () => ({
 }))
 vi.mock('../../../resources/instruments/hooks')
 vi.mock('../../../resources/robot-settings/hooks')
+vi.mock('../../../organisms/DropTipWizardFlows')
 
 const render = () => {
   return renderWithProviders(<InstrumentDetail />, {
@@ -98,6 +111,11 @@ describe('InstrumentDetail', () => {
     vi.mocked(useGripperDisplayName).mockReturnValue('mockGripper')
     vi.mocked(useParams).mockReturnValue({ mount: 'left' })
     vi.mocked(useIsOEMMode).mockReturnValue(false)
+    vi.mocked(useDropTipWizardFlows).mockReturnValue({
+      toggleDTWiz: () => null,
+      showDTWiz: false,
+    })
+    vi.mocked(DropTipWizardFlows).mockReturnValue(<div>MOCK_DROP_TIP_WIZ</div>)
   })
 
   afterEach(() => {
