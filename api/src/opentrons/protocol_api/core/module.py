@@ -5,7 +5,6 @@ from abc import ABC, abstractmethod
 from typing import List, Dict, Optional, TypeVar, ClassVar
 
 from opentrons.drivers.types import (
-    ABSMeasurementMode,
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )

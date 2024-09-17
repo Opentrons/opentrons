@@ -230,7 +230,9 @@ class AsyncByonoy:
     async def get_measurement(self) -> List[List[float]]:
         """Get a measurement based on the current configuration."""
         handle = self._verify_device_handle()
-        assert self._current_config is not None
+        assert (
+            self._current_config is not None
+        ), "Cannot get measurement without initializing."
         measure_func: Any = self._interface.byonoy_abs96_single_measure
         if isinstance(self._current_config, AbsProtocol.MultiMeasurementConfig):
             measure_func = self._interface.byonoy_abs96_multiple_measure

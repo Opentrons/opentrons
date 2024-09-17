@@ -62,13 +62,39 @@ class InitializeImpl(
             abs_reader_substate.module_id
         )
 
-        # TODO: add limiters here so we fail during analysis
-        # singleMeasure and 1 wavelength
-        # singleMeaure and referenceWavelength in sampleWavelengths
-        # multiMeasure and 1-6 wavelengths
-        # multiMeasure and no referenceWavelength
-
         if abs_reader is not None:
+            # Validate the parameters before initializing.
+            sample_wavelengths = set(params.sampleWavelengths)
+            sample_wavelengths_len = len(params.sampleWavelengths)
+            reference_wavelength = params.referenceWavelength
+            supported_wavelenths = set(abs_reader.supported_wavelengths)
+            unsuported_wavelengths = sample_wavelengths.difference(supported_wavelenths)
+            if unsuported_wavelengths:
+                raise ValueError(f"Unsuported wavelengths: {unsuported_wavelengths}")
+
+            if params.measureMode == "singleMeasure":
+                if sample_wavelengths_len != 1:
+                    raise ValueError(
+                        f"singleMeasure requires one sample wavelength, provided {sample_wavelengths}"
+                    )
+                if (
+                    reference_wavelength is not None
+                    and reference_wavelength not in supported_wavelenths
+                ):
+                    raise ValueError(
+                        f"Reference wavelength {reference_wavelength} not supported {supported_wavelenths}"
+                    )
+
+            if params.measureMode == "multiMeasure":
+                if sample_wavelengths_len < 1 or sample_wavelengths_len > 6:
+                    raise ValueError(
+                        f"multiMeasure requires 1-6 sample wavelengths, provided {sample_wavelengths}"
+                    )
+                if reference_wavelength is not None:
+                    raise RuntimeError(
+                        "Reference wavelength cannot be used with multiMeasure mode."
+                    )
+
             await abs_reader.set_sample_wavelength(
                 ABSMeasurementMode(params.measureMode),
                 params.sampleWavelengths,

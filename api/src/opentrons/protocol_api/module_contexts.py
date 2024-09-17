@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 from typing import List, Dict, Optional, Union, cast
 
-from opentrons.drivers.types import ABSMeasurementMode
 from opentrons.protocol_engine.types import ABSMeasureMode
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.module.types import ModuleModel, ModuleType

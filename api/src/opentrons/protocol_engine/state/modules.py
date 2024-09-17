@@ -12,7 +12,6 @@ from typing import (
     Type,
     TypeVar,
     Union,
-    cast,
     overload,
 )
 from numpy import array, dot, double as npdouble
@@ -26,9 +25,6 @@ from opentrons.motion_planning.adjacent_slots_getters import (
     get_east_slot,
     get_west_slot,
     get_adjacent_staging_slot,
-)
-from opentrons.protocol_engine.commands.absorbance_reader.initialize import (
-    InitializeParams,
 )
 from opentrons.protocol_engine.commands.calibration.calibrate_module import (
     CalibrateModuleResult,

@@ -10,7 +10,6 @@ from opentrons.drivers.types import (
     AbsorbanceReaderPlatePresence,
 )
 from opentrons.drivers.absorbance_reader.abstract import (
-    ABSMeasurement,
     AbstractAbsorbanceReaderDriver,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort

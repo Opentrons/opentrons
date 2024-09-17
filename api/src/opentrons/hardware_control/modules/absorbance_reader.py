@@ -226,6 +226,11 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         return self._reader.uptime
 
     @property
+    def supported_wavelengths(self) -> List[int]:
+        """The wavelengths in nm this plate reader supports."""
+        return self._reader.supported_wavelengths
+
+    @property
     def measurement_config(self) -> Optional[ABSMeasurementConfig]:
         return self._measurement_config
 
