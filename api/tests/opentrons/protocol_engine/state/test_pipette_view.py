@@ -652,6 +652,68 @@ _pipette_spec_cases = [
         ),
     ),
     _PipetteSpecs(
+        # 8-channel P300, full configuration. Critical point of XY_CENTER
+        tip_length=42,
+        bounding_box_offsets=PipetteBoundingBoxOffsets(
+            back_left_corner=Point(0.0, 31.5, 35.52),
+            front_right_corner=Point(0.0, -31.5, 35.52),
+            front_left_corner=Point(0.0, -31.5, 35.52),
+            back_right_corner=Point(0.0, 31.5, 35.52),
+        ),
+        nozzle_map=NozzleMap.build(
+            physical_nozzles=EIGHT_CHANNEL_MAP,
+            physical_rows=EIGHT_CHANNEL_ROWS,
+            physical_columns=EIGHT_CHANNEL_COLS,
+            starting_nozzle="A1",
+            back_left_nozzle="A1",
+            front_right_nozzle="H1",
+            valid_nozzle_maps=ValidNozzleMaps(maps={"Full": EIGHT_CHANNEL_COLS["1"]}),
+        ),
+        critical_point=CriticalPoint.XY_CENTER,
+        destination_position=Point(100, 200, 300),
+        pipette_bounds_result=(
+            (
+                Point(x=100.0, y=231.5, z=342.0),
+                Point(x=100.0, y=168.5, z=342.0),
+                Point(x=100.0, y=231.5, z=342.0),
+                Point(x=100.0, y=168.5, z=342.0),
+            )
+        ),
+    ),
+    _PipetteSpecs(
+        # 8-channel P300, Partial A1-E1 configuration. Critical point of XY_CENTER
+        tip_length=42,
+        bounding_box_offsets=PipetteBoundingBoxOffsets(
+            back_left_corner=Point(0.0, 31.5, 35.52),
+            front_right_corner=Point(0.0, -31.5, 35.52),
+            front_left_corner=Point(0.0, -31.5, 35.52),
+            back_right_corner=Point(0.0, 31.5, 35.52),
+        ),
+        nozzle_map=NozzleMap.build(
+            physical_nozzles=EIGHT_CHANNEL_MAP,
+            physical_rows=EIGHT_CHANNEL_ROWS,
+            physical_columns=EIGHT_CHANNEL_COLS,
+            starting_nozzle="H1",
+            back_left_nozzle="E1",
+            front_right_nozzle="H1",
+            valid_nozzle_maps=ValidNozzleMaps(
+                maps={
+                    "H1toE1": ["E1", "F1", "G1", "H1"],
+                }
+            ),
+        ),
+        critical_point=CriticalPoint.XY_CENTER,
+        destination_position=Point(100, 200, 300),
+        pipette_bounds_result=(
+            (
+                Point(x=100.0, y=249.5, z=342.0),
+                Point(x=100.0, y=186.5, z=342.0),
+                Point(x=100.0, y=249.5, z=342.0),
+                Point(x=100.0, y=186.5, z=342.0),
+            )
+        ),
+    ),
+    _PipetteSpecs(
         # 96-channel P1000, full configuration
         tip_length=42,
         bounding_box_offsets=PipetteBoundingBoxOffsets(

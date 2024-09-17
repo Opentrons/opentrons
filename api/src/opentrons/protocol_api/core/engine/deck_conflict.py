@@ -293,6 +293,10 @@ def _get_critical_point_to_use(
     engine_state: StateView, labware_id: str
 ) -> Optional[CriticalPoint]:
     """Return the critical point to use when accessing the given labware."""
+    # TODO (spp, 2024-09-17): looks like Y_CENTER of column is the same as its XY_CENTER.
+    #   I'm using this if-else ladder to be consistent with what we do in
+    #   `MotionPlanning.get_movement_waypoints_to_well()`.
+    #   We should probably use only XY_CENTER in both places.
     if engine_state.labware.get_should_center_column_on_target_well(labware_id):
         return CriticalPoint.Y_CENTER
     elif engine_state.labware.get_should_center_pipette_on_target_well(labware_id):
