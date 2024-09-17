@@ -1,22 +1,25 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Flex, DIRECTION_COLUMN } from '@opentrons/components'
+import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
-import { SetWifiSsid } from '../../../organisms/ODD/NetworkSettings'
-import { RobotSetupHeader } from '../../../organisms/RobotSetupHeader'
+import { ChildNavigation } from '../../../../organisms/ChildNavigation'
+import { SetWifiSsid } from '../../NetworkSettings'
 
-import type { WifiScreenOption } from './'
+import type { SetSettingOption } from '../types'
 
-interface JoinOtherNetworkProps {
-  setCurrentOption: (option: WifiScreenOption) => void
+interface RobotSettingsJoinOtherNetworkProps {
+  setCurrentOption: SetSettingOption
   setSelectedSsid: React.Dispatch<React.SetStateAction<string>>
 }
 
-export function JoinOtherNetwork({
+/**
+ * Robot settings page wrapper for shared SetWifiSsid organism with child navigation header
+ */
+export function RobotSettingsJoinOtherNetwork({
   setCurrentOption,
   setSelectedSsid,
-}: JoinOtherNetworkProps): JSX.Element {
+}: RobotSettingsJoinOtherNetworkProps): JSX.Element {
   const { i18n, t } = useTranslation('device_settings')
 
   const [inputSsid, setInputSsid] = React.useState<string>('')
@@ -25,7 +28,7 @@ export function JoinOtherNetwork({
   const handleContinue = (): void => {
     if (inputSsid.length >= 2 && inputSsid.length <= 32) {
       setSelectedSsid(inputSsid)
-      setCurrentOption('SelectAuthType')
+      setCurrentOption('RobotSettingsSelectAuthenticationType')
     } else {
       setErrorMessage(t('join_other_network_error_message') as string)
     }
@@ -33,11 +36,11 @@ export function JoinOtherNetwork({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <RobotSetupHeader
+      <ChildNavigation
         buttonText={i18n.format(t('continue'), 'capitalize')}
         header={t('join_other_network')}
         onClickBack={() => {
-          setCurrentOption('WifiList')
+          setCurrentOption('RobotSettingsWifi')
         }}
         onClickButton={handleContinue}
       />
