@@ -1,8 +1,9 @@
+"""Command models for moving any robot mount to a destination point."""
+from __future__ import annotations
 from typing import Literal, Type, Optional, TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 from opentrons.types import MountType
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.protocols.types import FlexRobotType
 
 from ..pipetting_common import DestinationPositionResult
@@ -26,12 +27,18 @@ MoveToCommandType = Literal["robot/moveTo"]
 class MoveToParams(BaseModel):
     """Payload required to move to a destination position."""
 
-    mount: MountType
+    mount: MountType = Field(
+        ...,
+        description="The mount to move to the destination point.",
+    )
     destination: DeckPoint = Field(
         ...,
         description="X, Y and Z coordinates in mm from deck's origin location (left-front-bottom corner of work space)",
     )
-    speed: float
+    speed: Optional[float] = Field(
+        default=None,
+        description="The max velocity to move the axes at. Will fall to hardware defaults if none provided.",
+    )
 
 
 class MoveToResult(DestinationPositionResult):
@@ -45,18 +52,17 @@ class MoveToImplementation(
 ):
     """MoveTo command implementation."""
 
-    def __init__(self, movement: MovementHandler, hardware_api: HardwareControlAPI, **kwargs: object) -> None:
+    def __init__(
+        self,
+        movement: MovementHandler,
+        **kwargs: object,
+    ) -> None:
         self._movement = movement
-        self._hardware_api = hardware_api
 
     async def execute(self, params: MoveToParams) -> SuccessData[MoveToResult, None]:
-        if self._hardware_api.get_robot_type() == FlexRobotType:
-            x, y, z =  self._movement.move_axes(axis_map=params.axis_map, speed=params.speed, relative_move=True)
-        else:
-            x, y, z = self._movement.move_to(mount=params.mount, speed=params.speed)
-        # x, y, z = self._hardware_api.move_to(
-        #     params.mount, params.destination, params.velocity
-        # )
+        x, y, z = await self._movement.move_mount_to(
+            mount=params.mount, destination=params.destination, speed=params.speed
+        )
         return SuccessData(
             public=MoveToResult(position=DeckPoint(x=x, y=y, z=z)),
             private=None,
