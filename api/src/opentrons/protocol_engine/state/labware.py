@@ -15,6 +15,7 @@ from typing import (
     Union,
 )
 
+from opentrons.protocol_engine.state.update_types import _NoChangeEnum
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
 from opentrons_shared_data.labware.labware_definition import LabwareRole
@@ -247,11 +248,19 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 action.state_update.loaded_labware.labware_id
             ] = LoadedLabware.construct(
                 id=action.state_update.loaded_labware.labware_id,
-                location=action.state_update.labware_location.new_location,
+                location=action.state_update.labware_location.new_location
+                if action.state_update.labware_location != _NoChangeEnum.NO_CHANGE
+                else self._state.labware_by_id[
+                    action.state_update.loaded_labware.labware_id
+                ].location,
                 loadName=action.state_update.loaded_labware.definition.parameters.loadName,
                 definitionUri=definition_uri,
                 offsetId=action.state_update.loaded_labware.offsetId,
-                displayName=action.state_update.labware_location.display_name,
+                displayName=action.state_update.labware_location.display_name
+                if action.state_update.labware_location != _NoChangeEnum.NO_CHANGE
+                else self._state.labware_by_id[
+                    action.state_update.loaded_labware.labware_id
+                ].displayName,
             )
 
 
