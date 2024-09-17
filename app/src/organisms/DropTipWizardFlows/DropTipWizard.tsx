@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
@@ -14,7 +14,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
   SPACING,
-  LegacyStyledText,
   useConditionalConfirm,
   ModalShell,
   DISPLAY_FLEX,
@@ -170,7 +169,6 @@ export const DropTipWizardContent = (
   props: DropTipWizardContainerProps
 ): JSX.Element => {
   const {
-    isOnDevice,
     activeMaintenanceRunId,
     currentStep,
     errorDetails,
@@ -223,39 +221,7 @@ export const DropTipWizardContent = (
   }
 
   function buildChooseLocation(): JSX.Element {
-    const { moveToAddressableArea } = dropTipCommands
-
-    let bodyTextKey: string
-    if (currentStep === CHOOSE_BLOWOUT_LOCATION) {
-      bodyTextKey = isOnDevice
-        ? 'select_blowout_slot_odd'
-        : 'select_blowout_slot'
-    } else {
-      bodyTextKey = isOnDevice
-        ? 'select_drop_tip_slot_odd'
-        : 'select_drop_tip_slot'
-    }
-
-    return (
-      <ChooseLocation
-        {...props}
-        handleProceed={proceedWithConditionalClose}
-        handleGoBack={goBackRunValid}
-        title={
-          currentStep === CHOOSE_BLOWOUT_LOCATION
-            ? i18n.format(t('choose_blowout_location'), 'capitalize')
-            : i18n.format(t('choose_drop_tip_location'), 'capitalize')
-        }
-        body={
-          <Trans
-            t={t}
-            i18nKey={bodyTextKey}
-            components={{ block: <LegacyStyledText as="p" /> }}
-          />
-        }
-        moveToAddressableArea={moveToAddressableArea}
-      />
-    )
+    return <ChooseLocation {...props} />
   }
 
   function buildJogToPosition(): JSX.Element {

@@ -1,59 +1,31 @@
 import * as React from 'react'
-import styled, { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 
 import {
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_FLEX_START,
-  RESPONSIVENESS,
   SPACING,
   LegacyStyledText,
-  TYPOGRAPHY,
-  DISPLAY_INLINE_BLOCK,
+  StyledText,
 } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 
 import { TwoColumn, DeckMapContent } from '../../molecules/InterventionModal'
 import { DropTipFooterButtons } from './shared'
 
-import type {
-  AddressableAreaName,
-  ModuleLocation,
-} from '@opentrons/shared-data'
+import type { ModuleLocation } from '@opentrons/shared-data'
 import type { DropTipWizardContainerProps } from './types'
+import { CHOOSE_BLOWOUT_LOCATION } from './constants'
 
-type ChooseLocationProps = DropTipWizardContainerProps & {
-  handleProceed: () => void
-  handleGoBack: () => void
-  title: string
-  body: string | JSX.Element
-  moveToAddressableArea: (addressableArea: AddressableAreaName) => Promise<void>
-}
-const Title = styled.h1`
-  ${TYPOGRAPHY.h1Default};
-  margin-bottom: ${SPACING.spacing8};
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    ${TYPOGRAPHY.level4HeaderSemiBold};
-    margin-bottom: 0;
-    height: ${SPACING.spacing40};
-    display: ${DISPLAY_INLINE_BLOCK};
-  }
-`
-
-export const ChooseLocation = (
-  props: ChooseLocationProps
-): JSX.Element | null => {
-  const {
-    handleProceed,
-    handleGoBack,
-    title,
-    body,
-    robotType,
-    moveToAddressableArea,
-    issuedCommandsType,
-  } = props
+export const ChooseLocation = ({
+  robotType,
+  dropTipCommands,
+  proceedWithConditionalClose,
+  goBackRunValid,
+  currentStep,
+  isOnDevice,
+}: DropTipWizardContainerProps): JSX.Element | null => {
+  const { moveToAddressableArea } = dropTipCommands
   const { t } = useTranslation('drop_tip_wizard')
   const [
     selectedLocation,
@@ -68,19 +40,41 @@ export const ChooseLocation = (
 
     if (deckSlot != null) {
       void moveToAddressableArea(deckSlot).then(() => {
-        handleProceed()
+        proceedWithConditionalClose()
       })
     }
   }
+
+  const buildTitleText = (): string =>
+    currentStep === CHOOSE_BLOWOUT_LOCATION
+      ? t('choose_blowout_location')
+      : t('choose_drop_tip_location')
+
+  const buildBodyText = (): string => {
+    if (currentStep === CHOOSE_BLOWOUT_LOCATION) {
+      return isOnDevice ? 'select_blowout_slot_odd' : 'select_blowout_slot'
+    } else {
+      return isOnDevice ? 'select_drop_tip_slot_odd' : 'select_drop_tip_slot'
+    }
+  }
+
   return (
-    <Flex
-      css={CONTAINER_STYLE}
-      height={issuedCommandsType === 'fixit' ? '100%' : '24.625rem'}
-    >
+    <>
       <TwoColumn>
         <Flex flexDirection={DIRECTION_COLUMN} flex="1" gap={SPACING.spacing16}>
-          <Title>{title}</Title>
-          <LegacyStyledText as="p">{body}</LegacyStyledText>
+          <StyledText
+            desktopStyle="headingSmallBold"
+            oddStyle="level4HeaderSemiBold"
+          >
+            {buildTitleText()}
+          </StyledText>
+          <StyledText>
+            <Trans
+              t={t}
+              i18nKey={buildBodyText()}
+              components={{ block: <LegacyStyledText as="p" /> }}
+            />
+          </StyledText>
         </Flex>
         <DeckMapContent
           kind={'deck-config'}
@@ -91,20 +85,8 @@ export const ChooseLocation = (
       <DropTipFooterButtons
         primaryBtnOnClick={handleConfirmPosition}
         primaryBtnTextOverride={t('move_to_slot')}
-        secondaryBtnOnClick={handleGoBack}
+        secondaryBtnOnClick={goBackRunValid}
       />
-    </Flex>
+    </>
   )
 }
-
-const CONTAINER_STYLE = css`
-  flex-direction: ${DIRECTION_COLUMN};
-  justify-content: ${JUSTIFY_SPACE_BETWEEN};
-  padding: ${SPACING.spacing32};
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    justify-content: ${JUSTIFY_FLEX_START};
-    gap: ${SPACING.spacing32};
-    padding: none;
-    height: 29.5rem;
-  }
-`

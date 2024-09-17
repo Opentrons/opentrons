@@ -121,6 +121,7 @@ const TipsAttachedModal = NiceModal.create(
             closeFlow={isTakeover => {
               cleanUpAndClose(isTakeover)
             }}
+            modalStyle="simple"
           />
         ) : null}
       </ApiHostProvider>
