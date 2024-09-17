@@ -1,6 +1,5 @@
 """Tests for pipette state changes in the protocol_engine state store."""
 import pytest
-from datetime import datetime
 from typing import Optional
 
 from opentrons_shared_data.pipette.types import PipetteNameType
@@ -464,120 +463,6 @@ def test_blow_out_clears_volume(
 
 
 @pytest.mark.parametrize(
-    "command",
-    [
-        cmd.heater_shaker.SetAndWaitForShakeSpeed(
-            id="command-id-2",
-            key="command-key-2",
-            status=cmd.CommandStatus.SUCCEEDED,
-            createdAt=datetime(year=2021, month=1, day=1),
-            params=cmd.heater_shaker.SetAndWaitForShakeSpeedParams(
-                moduleId="xyz",
-                rpm=123,
-            ),
-            result=cmd.heater_shaker.SetAndWaitForShakeSpeedResult(
-                pipetteRetracted=True
-            ),
-        ),
-        cmd.heater_shaker.OpenLabwareLatch(
-            id="command-id-2",
-            key="command-key-2",
-            status=cmd.CommandStatus.SUCCEEDED,
-            createdAt=datetime(year=2021, month=1, day=1),
-            params=cmd.heater_shaker.OpenLabwareLatchParams(moduleId="xyz"),
-            result=cmd.heater_shaker.OpenLabwareLatchResult(pipetteRetracted=True),
-        ),
-    ],
-)
-def test_movement_commands_without_well_clear_current_well(
-    subject: PipetteStore, command: cmd.Command
-) -> None:
-    """Commands that make the current well unknown should clear the current well."""
-    load_pipette_command = create_load_pipette_command(
-        pipette_id="pipette-id",
-        pipette_name=PipetteNameType.P300_SINGLE,
-        mount=MountType.LEFT,
-    )
-    subject.handle_action(
-        SucceedCommandAction(private_result=None, command=load_pipette_command)
-    )
-
-    subject.handle_action(
-        _create_move_to_well_action(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="well-name",
-            deck_point=DeckPoint(x=1, y=2, z=3),
-        )
-    )
-
-    subject.handle_action(SucceedCommandAction(command=command, private_result=None))
-
-    assert subject.state.current_location is None
-
-
-@pytest.mark.parametrize(
-    "command",
-    [
-        cmd.heater_shaker.SetAndWaitForShakeSpeed(
-            id="command-id-2",
-            key="command-key-2",
-            status=cmd.CommandStatus.SUCCEEDED,
-            createdAt=datetime(year=2021, month=1, day=1),
-            params=cmd.heater_shaker.SetAndWaitForShakeSpeedParams(
-                moduleId="xyz",
-                rpm=123,
-            ),
-            result=cmd.heater_shaker.SetAndWaitForShakeSpeedResult(
-                pipetteRetracted=False
-            ),
-        ),
-        cmd.heater_shaker.OpenLabwareLatch(
-            id="command-id-2",
-            key="command-key-2",
-            status=cmd.CommandStatus.SUCCEEDED,
-            createdAt=datetime(year=2021, month=1, day=1),
-            params=cmd.heater_shaker.OpenLabwareLatchParams(moduleId="xyz"),
-            result=cmd.heater_shaker.OpenLabwareLatchResult(pipetteRetracted=False),
-        ),
-    ],
-)
-def test_heater_shaker_command_without_movement(
-    subject: PipetteStore, command: cmd.Command
-) -> None:
-    """Heater Shaker commands that don't move pipettes shouldn't clear current_well or deck point."""
-    load_pipette_command = create_load_pipette_command(
-        pipette_id="pipette-id",
-        pipette_name=PipetteNameType.P300_SINGLE,
-        mount=MountType.LEFT,
-    )
-    subject.handle_action(
-        SucceedCommandAction(private_result=None, command=load_pipette_command)
-    )
-
-    subject.handle_action(
-        _create_move_to_well_action(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="well-name",
-            deck_point=DeckPoint(x=1, y=2, z=3),
-        )
-    )
-
-    subject.handle_action(SucceedCommandAction(private_result=None, command=command))
-
-    assert subject.state.current_location == CurrentWell(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="well-name",
-    )
-
-    assert subject.state.current_deck_point == CurrentDeckPoint(
-        mount=MountType.LEFT, deck_point=DeckPoint(x=1, y=2, z=3)
-    )
-
-
-@pytest.mark.parametrize(
     ("move_labware_command", "expected_current_well"),
     (
         (
@@ -770,27 +655,6 @@ def test_add_pipette_config(
 @pytest.mark.parametrize(
     "command",
     (
-        cmd.heater_shaker.SetAndWaitForShakeSpeed(
-            id="command-id-2",
-            key="command-key-2",
-            status=cmd.CommandStatus.SUCCEEDED,
-            createdAt=datetime(year=2021, month=1, day=1),
-            params=cmd.heater_shaker.SetAndWaitForShakeSpeedParams(
-                moduleId="xyz",
-                rpm=123,
-            ),
-            result=cmd.heater_shaker.SetAndWaitForShakeSpeedResult(
-                pipetteRetracted=True
-            ),
-        ),
-        cmd.heater_shaker.OpenLabwareLatch(
-            id="command-id-2",
-            key="command-key-2",
-            status=cmd.CommandStatus.SUCCEEDED,
-            createdAt=datetime(year=2021, month=1, day=1),
-            params=cmd.heater_shaker.OpenLabwareLatchParams(moduleId="xyz"),
-            result=cmd.heater_shaker.OpenLabwareLatchResult(pipetteRetracted=True),
-        ),
         create_move_labware_command(
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             strategy=LabwareMovementStrategy.USING_GRIPPER,

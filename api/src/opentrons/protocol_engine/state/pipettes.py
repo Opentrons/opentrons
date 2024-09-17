@@ -281,7 +281,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
                 )
 
-    def _update_current_location(  # noqa: C901
+    def _update_current_location(
         self, action: Union[SucceedCommandAction, FailCommandAction]
     ) -> None:
         if isinstance(action, SucceedCommandAction):
@@ -322,25 +322,13 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
         # TODO(mc, 2021-11-12): Wipe out current_location on movement failures, too.
 
-        # Heater-Shaker commands may have left the pipette in a place that we can't
-        # associate with a logical location, depending on their result.
-        if isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result,
-            (
-                commands.heater_shaker.SetAndWaitForShakeSpeedResult,
-                commands.heater_shaker.OpenLabwareLatchResult,
-            ),
-        ):
-            if action.command.result.pipetteRetracted:
-                self._state.current_location = None
-
         # A moveLabware command may have moved the labware that contains the current
         # well out from under the pipette. Clear the current location to reflect the
         # fact that the pipette is no longer over any labware.
         #
         # This is necessary for safe motion planning in case the next movement
         # goes to the same labware (now in a new place).
-        elif isinstance(action, SucceedCommandAction) and isinstance(
+        if isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result, commands.MoveLabwareResult
         ):
             moved_labware_id = action.command.params.labwareId
@@ -353,7 +341,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             ):
                 self._state.current_location = None
 
-    def _update_deck_point(  # noqa: C901
+    def _update_deck_point(
         self, action: Union[SucceedCommandAction, FailCommandAction]
     ) -> None:
         if isinstance(action, SucceedCommandAction):
@@ -384,16 +372,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         # See there for explanations.
 
         if isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result,
-            (
-                commands.heater_shaker.SetAndWaitForShakeSpeedResult,
-                commands.heater_shaker.OpenLabwareLatchResult,
-            ),
-        ):
-            if action.command.result.pipetteRetracted:
-                self._clear_deck_point()
-
-        elif isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result, commands.MoveLabwareResult
         ):
             if action.command.params.strategy == "usingGripper":
