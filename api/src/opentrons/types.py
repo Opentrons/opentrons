@@ -256,21 +256,21 @@ class AxisType(enum.Enum):
 
     @classmethod
     def axis_for_mount(cls, mount: Mount) -> "AxisType":
-        if mount == Mount.LEFT:
-            return cls.Z_L
-        elif mount == Mount.RIGHT:
-            return cls.Z_R
-        elif mount == Mount.EXTENSION:
-            return cls.Z_G
+        map_axis_to_mount = {
+            Mount.LEFT: cls.Z_L,
+            Mount.RIGHT: cls.Z_R,
+            Mount.EXTENSION: cls.Z_G,
+        }
+        return map_axis_to_mount[mount]
 
     @classmethod
     def mount_for_axis(cls, axis: "AxisType") -> Mount:
-        if axis == cls.Z_L:
-            return Mount.LEFT
-        elif axis == cls.Z_R:
-            return Mount.RIGHT
-        elif axis == cls.Z_G:
-            return Mount.EXTENSION
+        map_mount_to_axis = {
+            cls.Z_L: Mount.LEFT,
+            cls.Z_R: Mount.RIGHT,
+            cls.Z_G: Mount.EXTENSION,
+        }
+        return map_mount_to_axis[axis]
 
     @classmethod
     def ot2_axes(cls) -> List["AxisType"]:

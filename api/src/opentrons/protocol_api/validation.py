@@ -207,17 +207,13 @@ def ensure_axis_map_type(
         raise IncorrectAxisError(
             "Please provide an `axis_map` with only string or only AxisType keys."
         )
-    if robot_type == "OT-2 Standard":
-        if list(key_type)[0] is AxisType and any(
-            k not in AxisType.ot2_axes() for k in axis_map_keys
-        ):
-            raise IncorrectAxisError(
-                f"An OT-2 Robot only accepts the following axes {AxisType.ot2_axes()}"
-            )
-        if list(key_type)[0] is str and any(
-            k.upper() not in [axis.value for axis in AxisType.ot2_axes()]
-            for k in axis_map_keys
-        ):
+    if robot_type == "OT-2 Standard" and isinstance(axis_map_keys[0], AxisType):
+        if any(k not in AxisType.ot2_axes() for k in axis_map_keys):
+                raise IncorrectAxisError(
+                    f"An OT-2 Robot only accepts the following axes {AxisType.ot2_axes()}"
+                )
+    if robot_type == "OT-2 Standard" and isinstance(axis_map_keys[0], str):
+        if any(k.upper() not in [axis.value for axis in AxisType.ot2_axes()] for k in axis_map_keys): # type: ignore [attr-defined]
             raise IncorrectAxisError(
                 f"An OT-2 Robot only accepts the following axes {AxisType.ot2_axes()}"
             )
@@ -234,10 +230,11 @@ def ensure_axis_map_type(
             "A 96 channel is not attached. The clamp `Q` motor does not exist."
         )
 
-    if isinstance(axis_map_keys[0], AxisType):
-        return axis_map
+    if all(isinstance(k, AxisType) for k in axis_map_keys):
+        return_map: AxisMapType = axis_map # type: ignore
+        return return_map
     try:
-        return {AxisType[k.upper()]: v for k, v in axis_map.items()}
+        return {AxisType[k.upper()]: v for k, v in axis_map.items()} # type: ignore [union-attr]
     except KeyError as e:
         raise IncorrectAxisError(f"{e} is not a supported `AxisMapType`")
 
