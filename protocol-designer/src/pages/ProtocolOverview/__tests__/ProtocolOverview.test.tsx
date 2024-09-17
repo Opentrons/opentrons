@@ -16,9 +16,13 @@ import { useBlockingHint } from '../../../components/Hints/useBlockingHint'
 import { MaterialsListModal } from '../../../organisms/MaterialsListModal'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { ProtocolOverview } from '../index'
+import { DeckThumbnail } from '../DeckThumbnail'
+import { OffDeckThumbnail } from '../OffdeckThumbnail'
 
 import type { NavigateFunction } from 'react-router-dom'
 
+vi.mock('../OffdeckThumbnail')
+vi.mock('../DeckThumbnail')
 vi.mock('../../../step-forms/selectors')
 vi.mock('../../../file-data/selectors')
 vi.mock('../../../components/Hints/useBlockingHint')
@@ -62,10 +66,15 @@ describe('ProtocolOverview', () => {
       protocolName: 'mockName',
       author: 'mockAuthor',
       description: 'mockDescription',
+      created: 123,
     })
     vi.mocked(useBlockingHint).mockReturnValue(null)
     vi.mocked(MaterialsListModal).mockReturnValue(
       <div>mock MaterialsListModal</div>
+    )
+    vi.mocked(DeckThumbnail).mockReturnValue(<div>mock DeckThumbnail</div>)
+    vi.mocked(OffDeckThumbnail).mockReturnValue(
+      <div>mock OffdeckThumbnail</div>
     )
   })
 
@@ -86,6 +95,8 @@ describe('ProtocolOverview', () => {
     screen.getByText('mockAuthor')
     screen.getByText('Date created')
     screen.getByText('Last exported')
+    screen.getByText('Required app version')
+    screen.getByText('8.0.0 or higher')
     //  instruments
     screen.getByText('Instruments')
     screen.getByText('Robot type')
@@ -99,6 +110,13 @@ describe('ProtocolOverview', () => {
     screen.getByText('Protocol steps')
   })
 
+  it('should render the deck thumbnail and offdeck thumbnail', () => {
+    render()
+    screen.getByText('mock DeckThumbnail')
+    fireEvent.click(screen.getByText('Off-deck'))
+    screen.getByText('mock OffdeckThumbnail')
+  })
+
   it('should render text N/A if there is no data', () => {
     vi.mocked(getFileMetadata).mockReturnValue({
       protocolName: undefined,
@@ -108,8 +126,6 @@ describe('ProtocolOverview', () => {
     render()
     expect(screen.getAllByText('N/A').length).toBe(7)
   })
-
-  it.todo('should render mock materials list modal')
 
   it('navigates to starting deck state', () => {
     render()
@@ -140,6 +156,4 @@ describe('ProtocolOverview', () => {
     fireEvent.click(screen.getByTestId('ProtocolOverview_MetadataEditButton'))
     screen.getByText('mock EditProtocolMetadataModal')
   })
-
-  it.todo('warning modal tests')
 })

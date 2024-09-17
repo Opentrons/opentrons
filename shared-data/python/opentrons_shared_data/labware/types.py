@@ -3,8 +3,8 @@
 types in this file by and large require the use of typing_extensions.
 this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 """
-from typing import Dict, List, NewType, Union
-from typing_extensions import Literal, TypedDict, NotRequired
+from typing import Dict, List, NewType, Union, Optional, Any
+from typing_extensions import Literal, TypedDict, NotRequired, TypeGuard
 
 
 LabwareUri = NewType("LabwareUri", str)
@@ -120,35 +120,40 @@ class WellGroup(TypedDict, total=False):
     brand: LabwareBrandData
 
 
-class CircularCrossSection(TypedDict):
-    shape: Circular
-    diameter: float
-
-
-class RectangularCrossSection(TypedDict):
-    shape: Rectangular
-    xDimension: float
-    yDimension: float
-
-
 class SphericalSegment(TypedDict):
     shape: Spherical
     radiusOfCurvature: float
     depth: float
 
 
-TopCrossSection = Union[CircularCrossSection, RectangularCrossSection]
-BottomShape = Union[CircularCrossSection, RectangularCrossSection, SphericalSegment]
-
-
-class BoundedSection(TypedDict):
-    geometry: TopCrossSection
+class RectangularBoundedSection(TypedDict):
+    shape: Rectangular
+    xDimension: float
+    yDimension: float
     topHeight: float
 
 
+class CircularBoundedSection(TypedDict):
+    shape: Circular
+    diameter: float
+    topHeight: float
+
+
+def is_circular_frusta_list(
+    items: List[Any],
+) -> TypeGuard[List[CircularBoundedSection]]:
+    return all(item.shape == "circular" for item in items)
+
+
+def is_rectangular_frusta_list(
+    items: List[Any],
+) -> TypeGuard[List[RectangularBoundedSection]]:
+    return all(item.shape == "rectangular" for item in items)
+
+
 class InnerWellGeometry(TypedDict):
-    frusta: List[BoundedSection]
-    bottomShape: BottomShape
+    frusta: Union[List[CircularBoundedSection], List[RectangularBoundedSection]]
+    bottomShape: Optional[SphericalSegment]
 
 
 class LabwareDefinition(TypedDict):

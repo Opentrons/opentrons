@@ -11,10 +11,12 @@ import {
   Checkbox,
   COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   DISPLAY_FLEX,
   DISPLAY_INLINE_BLOCK,
   EmptySelectorButton,
   Flex,
+  Icon,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   ListItem,
@@ -218,7 +220,12 @@ export function EditInstrumentsModal(
                     )
                   }
                 >
-                  <Flex color={COLORS.grey60}>
+                  <Flex color={COLORS.grey60} flexDirection={DIRECTION_ROW}>
+                    <Icon
+                      name="swap-horizontal"
+                      size="1rem"
+                      transform="rotate(90deg)"
+                    />
                     <StyledText desktopStyle="captionSemiBold">
                       {t('swap')}
                     </StyledText>

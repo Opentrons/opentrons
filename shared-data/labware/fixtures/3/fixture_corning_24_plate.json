@@ -325,17 +325,16 @@
     "venirhgerug": {
       "frusta": [
         {
-          "geometry": {
-            "shape": "circular",
-            "diameter": 16.26
-          },
+          "shape": "circular",
+          "diameter": 16.26,
           "topHeight": 17.4
+        },
+        {
+          "shape": "circular",
+          "diameter": 16.26,
+          "topHeight": 0.0
         }
-      ],
-      "bottomShape": {
-        "shape": "circular",
-        "diameter": 16.26
-      }
+      ]
     }
   }
 }

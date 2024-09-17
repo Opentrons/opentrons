@@ -73,7 +73,9 @@ export function LiquidsOverflowMenu(
           </MenuButton>
         )
       })}
-      <Box width="100%" border={`1px solid ${COLORS.grey20}`} />
+      {liquids.length > 0 ? (
+        <Box width="100%" border={`1px solid ${COLORS.grey20}`} />
+      ) : null}
       <MenuButton
         data-testid="defineLiquid"
         onClick={() => {
@@ -98,6 +100,7 @@ const MenuButton = styled.button`
   cursor: pointer;
   padding: ${SPACING.spacing8} ${SPACING.spacing12};
   border: none;
+  border-radius: inherit;
   &:hover {
     background-color: ${COLORS.blue10};
   }

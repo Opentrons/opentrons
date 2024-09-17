@@ -42,4 +42,15 @@ describe('EditNickNameModal', () => {
     expect(vi.mocked(renameLabware)).toHaveBeenCalled()
     expect(props.onClose).toHaveBeenCalled()
   })
+  it('renders the too long nickname error', () => {
+    render(props)
+    const input = screen.getByRole('textbox')
+    fireEvent.change(input, {
+      target: {
+        value:
+          'mockNickNameisthelongestnicknameihaveeverseen mockNickNameisthelongestnicknameihaveeverseen mockNickNameisthelongest',
+      },
+    })
+    screen.getByText('Labware names must be 115 characters or fewer.')
+  })
 })

@@ -1,16 +1,28 @@
 import * as React from 'react'
-import { describe, it, beforeEach, expect } from 'vitest'
+import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { screen } from '@testing-library/react'
-
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 
 import { SlotInformation } from '..'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import type { NavigateFunction } from 'react-router-dom'
 
 const mockLiquids = ['Mastermix', 'Ethanol', 'Water']
-const mockLabwares = ['96 Well Plate', 'Adapter']
+const mockLabwares = ['96 Well Plate']
+const mockAdapters = ['Adapter']
 const mockModules = ['Thermocycler Module Gen2', 'Heater-Shaker Module']
+
+const mockLocation = vi.fn()
+
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<NavigateFunction>()
+  return {
+    ...actual,
+    useLocation: () => mockLocation,
+  }
+})
 
 const render = (props: React.ComponentProps<typeof SlotInformation>) => {
   return renderWithProviders(<SlotInformation {...props} />, {
@@ -27,6 +39,7 @@ describe('SlotInformation', () => {
       location: 'A1',
       liquids: [],
       labwares: [],
+      adapters: [],
       modules: [],
       fixtures: [],
     }
@@ -52,11 +65,16 @@ describe('SlotInformation', () => {
       ...props,
       liquids: mockLiquids,
       labwares: mockLabwares,
+      adapters: mockAdapters,
       modules: mockModules,
     }
     render(props)
+    screen.debug()
+
     expect(screen.getAllByText('Liquid').length).toBe(1)
-    expect(screen.getAllByText('Labware').length).toBe(mockLabwares.length)
+    expect(screen.getAllByText('Labware').length).toBe(
+      mockLabwares.length + mockAdapters.length
+    )
     expect(screen.getAllByText('Module').length).toBe(mockModules.length)
     screen.getByText('Mastermix, Ethanol, Water')
     screen.getByText('96 Well Plate')

@@ -29,7 +29,7 @@ import {
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getModalPortalEl } from '../../App/portal'
-import { useRunStatus } from '../RunTimeControl/hooks'
+import { useRunControls, useRunStatus } from '../RunTimeControl/hooks'
 import { InterventionModal, useInterventionModal } from '../InterventionModal'
 import { ProgressBar } from '../../atoms/ProgressBar'
 import { useDownloadRunLog, useRobotType } from '../Devices/hooks'
@@ -45,13 +45,13 @@ interface RunProgressMeterProps {
   runId: string
   robotName: string
   makeHandleJumpToStep: (index: number) => () => void
-  resumeRunHandler: () => void
 }
 export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
-  const { runId, robotName, makeHandleJumpToStep, resumeRunHandler } = props
+  const { runId, robotName, makeHandleJumpToStep } = props
   const { t } = useTranslation('run_details')
   const robotType = useRobotType(robotName)
   const runStatus = useRunStatus(runId)
+  const { play } = useRunControls(runId)
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
@@ -122,10 +122,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     <>
       {showIntervention
         ? createPortal(
-            <InterventionModal
-              {...interventionProps}
-              onResume={resumeRunHandler}
-            />,
+            <InterventionModal {...interventionProps} onResume={play} />,
             getModalPortalEl()
           )
         : null}

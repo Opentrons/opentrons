@@ -8,12 +8,14 @@ import { i18n } from '../../../assets/localization'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { getRobotType } from '../../../file-data/selectors'
+import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { MaterialsListModal } from '..'
 
 import type { InfoScreen } from '@opentrons/components'
 import type { LabwareOnDeck, ModuleOnDeck } from '../../../step-forms'
 import type { FixtureInList } from '..'
 
+vi.mock('../../../step-forms/selectors')
 vi.mock('../../../labware-ingred/selectors')
 vi.mock('../../../file-data/selectors')
 vi.mock('@opentrons/components', async importOriginal => {
@@ -78,6 +80,12 @@ describe('MaterialsListModal', () => {
       liquids: [],
       setShowMaterialsListModal: mockSetShowMaterialsListModal,
     }
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      labware: {},
+      modules: {},
+      additionalEquipmentOnDeck: {},
+      pipettes: {},
+    })
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(labwareIngredSelectors.getLiquidsByLabwareId).mockReturnValue({})
   })

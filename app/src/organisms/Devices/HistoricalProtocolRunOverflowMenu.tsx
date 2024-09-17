@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { NavLink, useNavigate } from 'react-router-dom'
 
@@ -32,12 +31,11 @@ import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
 } from '../../redux/analytics'
-import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
+import { useIsRobotOnWrongVersionOfSoftware } from '../../redux/robot-update'
 import { useDownloadRunLog, useTrackProtocolRunEvent, useRobot } from './hooks'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { Run } from '@opentrons/api-client'
-import type { State } from '../../redux/types'
 
 export interface HistoricalProtocolRunOverflowMenuProps {
   runId: string
@@ -115,11 +113,10 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     isRunLogLoading,
   } = props
 
-  const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
-    useSelector((state: State) => {
-      return getRobotUpdateDisplayInfo(state, robotName)
-    })?.autoUpdateAction
+  const isRobotOnWrongVersionOfSoftware = useIsRobotOnWrongVersionOfSoftware(
+    robotName
   )
+
   const [targetProps, tooltipProps] = useHoverTooltip()
   const onResetSuccess = (createRunResponse: Run): void => {
     navigate(

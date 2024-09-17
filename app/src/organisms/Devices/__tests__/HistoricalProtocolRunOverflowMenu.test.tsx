@@ -1,21 +1,22 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
-import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
+
 import { useDeleteRunMutation } from '@opentrons/react-api-client'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import runRecord from '../../../organisms/RunDetails/__fixtures__/runRecord.json'
+import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+import runRecord from '../ProtocolRun/ProtocolRunHeader/RunHeaderModalContainer/modals/__fixtures__/runRecord.json'
 import { useDownloadRunLog, useTrackProtocolRunEvent, useRobot } from '../hooks'
 import { useRunControls } from '../../RunTimeControl/hooks'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '../../../redux/analytics'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
+import { useIsRobotOnWrongVersionOfSoftware } from '../../../redux/robot-update'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
 import { useNotifyAllCommandsQuery } from '../../../resources/runs'
@@ -31,6 +32,7 @@ vi.mock('../../../redux/analytics')
 vi.mock('../../../redux/config')
 vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 vi.mock('../../../resources/runs')
+vi.mock('../../../redux/robot-update')
 vi.mock('@opentrons/react-api-client')
 
 const render = (
@@ -58,11 +60,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
     mockTrackEvent = vi.fn()
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     mockTrackProtocolRunEvent = vi.fn(() => new Promise(resolve => resolve({})))
-    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
-      autoUpdateAction: 'reinstall',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
+    vi.mocked(useIsRobotOnWrongVersionOfSoftware).mockReturnValue(false)
     vi.mocked(useDownloadRunLog).mockReturnValue({
       downloadRunLog: mockDownloadRunLog,
       isRunLogLoading: false,
@@ -140,11 +138,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
   })
 
   it('disables the rerun protocol menu item if robot software update is available', () => {
-    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
-      autoUpdateAction: 'upgrade',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
+    vi.mocked(useIsRobotOnWrongVersionOfSoftware).mockReturnValue(true)
     render(props)
     const btn = screen.getByRole('button')
     fireEvent.click(btn)

@@ -20,11 +20,7 @@ from opentrons.protocol_engine.errors.exceptions import PipetteNotReadyToAspirat
 from opentrons.protocol_engine.notes import CommandNoteAdder
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state.state import StateStore
-from opentrons.protocol_engine.types import DeckPoint
-from opentrons.protocol_engine.commands.pipetting_common import (
-    OverpressureError,
-    OverpressureErrorInternalData,
-)
+from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
 
 
 @pytest.fixture
@@ -205,7 +201,5 @@ async def test_overpressure_error(
             wrappedErrors=[matchers.Anything()],
             errorInfo={"retryLocation": (position.x, position.y, position.z)},
         ),
-        private=OverpressureErrorInternalData(
-            position=DeckPoint(x=position.x, y=position.y, z=position.z)
-        ),
+        private=None,
     )

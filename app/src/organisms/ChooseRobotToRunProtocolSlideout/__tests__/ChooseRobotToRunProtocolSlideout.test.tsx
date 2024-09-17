@@ -16,7 +16,7 @@ import {
   getUnreachableRobots,
   startDiscovery,
 } from '../../../redux/discovery'
-import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
+import { useIsRobotOnWrongVersionOfSoftware } from '../../../redux/robot-update'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -72,11 +72,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     mockTrackCreateProtocolRunEvent = vi.fn(
       () => new Promise(resolve => resolve({}))
     )
-    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
-      autoUpdateAction: '',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
+    vi.mocked(useIsRobotOnWrongVersionOfSoftware).mockReturnValue(false)
     vi.mocked(getConnectableRobots).mockReturnValue([mockConnectableRobot])
     vi.mocked(getUnreachableRobots).mockReturnValue([mockUnreachableRobot])
     vi.mocked(getReachableRobots).mockReturnValue([mockReachableRobot])
@@ -221,11 +217,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
   })
   it('if selected robot is on a different version of the software than the app, disable CTA and show link to device details in options', () => {
-    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
-      autoUpdateAction: 'upgrade',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
+    vi.mocked(useIsRobotOnWrongVersionOfSoftware).mockReturnValue(true)
     render({
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: vi.fn(),

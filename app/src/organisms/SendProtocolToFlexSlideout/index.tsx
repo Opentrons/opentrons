@@ -21,7 +21,7 @@ import { useToaster } from '../../organisms/ToasterOven'
 import { appShellRequestor } from '../../redux/shell/remote'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
-import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
+import { useIsRobotOnWrongVersionOfSoftware } from '../../redux/robot-update'
 import { getValidCustomLabwareFiles } from '../../redux/custom-labware'
 
 import type { AxiosError } from 'axios'
@@ -54,14 +54,9 @@ export function SendProtocolToFlexSlideout(
 
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
 
-  const { autoUpdateAction } = useSelector((state: State) =>
-    getRobotUpdateDisplayInfo(state, selectedRobot?.name ?? '')
+  const isSelectedRobotOnDifferentSoftwareVersion = useIsRobotOnWrongVersionOfSoftware(
+    selectedRobot?.name ?? ''
   )
-
-  const isSelectedRobotOnDifferentSoftwareVersion = [
-    'upgrade',
-    'downgrade',
-  ].includes(autoUpdateAction)
 
   const { eatToast, makeToast } = useToaster()
 

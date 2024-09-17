@@ -25,7 +25,22 @@ const matchHandler = (e: KeyboardEvent) => (h: KeypressHandler) =>
  */
 export class HandleKeypress extends React.Component<HandleKeypressProps> {
   handlePressIfKey = (event: KeyboardEvent): void => {
-    this.props.handlers.filter(matchHandler(event)).forEach(h => h.onPress())
+    const pressHandlers = this.props.handlers.filter(matchHandler(event))
+
+    // Check if any element is currently focused
+    const focusedElement = document.activeElement as HTMLElement
+
+    if (pressHandlers.length > 0) {
+      if (
+        focusedElement &&
+        event.key === 'Enter' &&
+        focusedElement.matches(':focus-visible')
+      ) {
+        focusedElement.click()
+      } else if (!focusedElement || !focusedElement.matches(':focus-visible')) {
+        pressHandlers.forEach(h => h.onPress())
+      }
+    }
   }
 
   preventDefaultIfKey = (event: KeyboardEvent): void => {
