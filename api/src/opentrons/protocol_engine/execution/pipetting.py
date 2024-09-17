@@ -195,8 +195,8 @@ class HardwarePipettingHandler(PipettingHandler):
             max_z_dist=well_depth - lld_min_height + well_location.offset.z,
         )
         labware_pos = self._state_view.geometry.get_labware_position(labware_id)
-        height = z_pos - labware_pos.z - well_def.z
-        return float(height)
+        relative_height = z_pos - labware_pos.z - well_def.z
+        return float(relative_height)
 
     @contextmanager
     def _set_flow_rate(
