@@ -66,6 +66,7 @@ describe('ProtocolOverview', () => {
       protocolName: 'mockName',
       author: 'mockAuthor',
       description: 'mockDescription',
+      created: 123,
     })
     vi.mocked(useBlockingHint).mockReturnValue(null)
     vi.mocked(MaterialsListModal).mockReturnValue(

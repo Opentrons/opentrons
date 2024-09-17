@@ -24,6 +24,7 @@ import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations
 import { generateNewProtocol } from '../../labware-ingred/actions'
 import { DefineLiquidsModal, ProtocolMetadataNav } from '../../organisms'
 import { SettingsIcon } from '../../molecules'
+import { getFileMetadata } from '../../file-data/selectors'
 import { DeckSetupContainer } from './DeckSetup'
 import { selectors } from '../../labware-ingred/selectors'
 import { OffDeck } from './Offdeck'
@@ -46,6 +47,7 @@ export function Designer(): JSX.Element {
   const { bakeToast, makeSnackbar } = useKitchen()
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const fileMetadata = useSelector(getFileMetadata)
   const zoomIn = useSelector(selectors.getZoomedInSlot)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const isNewProtocol = useSelector(selectors.getIsNewProtocol)
@@ -105,6 +107,15 @@ export function Designer(): JSX.Element {
       dispatch(generateNewProtocol({ isNewProtocol: false }))
     }
   }, [])
+
+  React.useEffect(() => {
+    if (fileMetadata?.created == null) {
+      console.warn(
+        'fileMetadata was refreshed while on the designer page, redirecting to landing page'
+      )
+      navigate('/')
+    }
+  }, [fileMetadata])
 
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
