@@ -1548,7 +1548,7 @@ def test_get_well_position_with_meniscus_offset(
     assert result == Point(
         x=slot_pos[0] + 1 + well_def.x + 2,
         y=slot_pos[1] - 2 + well_def.y + 3,
-        z=70.5 + 4,
+        z=slot_pos[2] + 3 + well_def.z + 4 + 70.5,
     )
 
 
