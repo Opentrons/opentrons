@@ -8,7 +8,9 @@ import { renderWithProviders } from '../__testing-utils__'
 import { NavigationBar } from '../NavigationBar'
 import { getHasUnsavedChanges } from '../load-file/selectors'
 import { toggleNewProtocolModal } from '../navigation/actions'
+import { SettingsIcon } from '../atoms'
 
+vi.mock('../atoms')
 vi.mock('../navigation/actions')
 vi.mock('../file-data/selectors')
 vi.mock('../load-file/selectors')
@@ -24,6 +26,7 @@ const render = () => {
 describe('NavigationBar', () => {
   beforeEach(() => {
     vi.mocked(getHasUnsavedChanges).mockReturnValue(false)
+    vi.mocked(SettingsIcon).mockReturnValue(<div>mock SettingsIcon</div>)
   })
   it('should render text and link button', () => {
     render()
@@ -32,6 +35,7 @@ describe('NavigationBar', () => {
     screen.getByText('Version # fake_PD_version')
     screen.getByText('Create new')
     screen.getByText('Import')
+    screen.getByText('mock SettingsIcon')
   })
 
   it('when clicking Create new, should call the toggle action', () => {

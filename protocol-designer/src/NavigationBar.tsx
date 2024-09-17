@@ -16,7 +16,7 @@ import {
 } from '@opentrons/components'
 import { toggleNewProtocolModal } from './navigation/actions'
 import { actions as loadFileActions } from './load-file'
-import { BUTTON_LINK_STYLE } from './atoms'
+import { BUTTON_LINK_STYLE, SettingsIcon } from './atoms'
 import { getHasUnsavedChanges } from './load-file/selectors'
 import type { ThunkDispatch } from './types'
 
@@ -77,6 +77,7 @@ export function NavigationBar(): JSX.Element | null {
             </Flex>
             <input type="file" onChange={loadFile}></input>
           </StyledLabel>
+          {location.pathname === '/createNew' ? null : <SettingsIcon />}
         </Flex>
       </Flex>
     </Flex>
