@@ -437,12 +437,8 @@ class GeometryView:
                 height = self._wells.get_last_measured_liquid_height(
                     labware_id, well_name
                 )  # in deck coordinates
-                if height:
-                    return Point(
-                        x=labware_pos.x + offset.x + well_def.x,
-                        y=labware_pos.y + offset.y + well_def.y,
-                        z=height + offset.z,
-                    )
+                if height is not None:
+                    offset = offset.copy(update={"z": offset.z + height})
                 else:
                     raise errors.LiquidHeightUnknownError(
                         "Must liquid probe before specifying WellOrigin.MENISCUS."

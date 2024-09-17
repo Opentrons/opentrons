@@ -221,7 +221,7 @@ class Well:
         """
         return Location(self._core.get_center(), self)
 
-    @requires_version(2, 21)  # confirm
+    @requires_version(2, 21)
     def meniscus(self, z: float = 0.0) -> Location:
         """
         :param z: An offset on the z-axis, in mm. Positive offsets are higher and
