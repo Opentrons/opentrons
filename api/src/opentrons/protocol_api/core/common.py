@@ -28,4 +28,4 @@ HeaterShakerCore = AbstractHeaterShakerCore
 MagneticBlockCore = AbstractMagneticBlockCore
 AbsorbanceReaderCore = AbstractAbsorbanceReaderCore
 RobotCore = AbstractRobot
-ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore, RobotCore]
+ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]

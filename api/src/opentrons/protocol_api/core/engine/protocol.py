@@ -80,7 +80,6 @@ class ProtocolCore(
         InstrumentCore,
         LabwareCore,
         Union[ModuleCore, NonConnectedModuleCore],
-        RobotCore,
     ]
 ):
     """Protocol API core using a ProtocolEngine.
@@ -525,8 +524,7 @@ class ProtocolCore(
             )
 
     def load_robot(self) -> RobotCore:
-        """Load a robot core into the RobotContext.
-        """
+        """Load a robot core into the RobotContext."""
         return RobotCore(
             engine_client=self._engine_client, sync_hardware_api=self._sync_hardware
         )

@@ -184,7 +184,9 @@ class ProtocolContext(CommandPublisher):
         self._params: Parameters = Parameters()
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self._robot = RobotContext(
-            core=self._core.load_robot(), protocol_core=self._core, api_version=self._api_version
+            core=self._core.load_robot(),
+            protocol_core=self._core,
+            api_version=self._api_version,
         )
         self.clear_commands()
 
