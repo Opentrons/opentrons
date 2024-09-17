@@ -15,6 +15,7 @@ from opentrons.types import (
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api.core.common import ProtocolCore, RobotCore
 from opentrons.protocol_api import RobotContext, ModuleContext, MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.deck import Deck
 
 
 @pytest.fixture
@@ -30,25 +31,34 @@ def api_version() -> APIVersion:
 
 
 @pytest.fixture
-def mock_protocol(decoy: Decoy, mock_core: RobotCore) -> ProtocolCore:
+def mock_deck(decoy: Decoy) -> Deck:
+    deck = decoy.mock(cls=Deck)
+    decoy.when(deck.get_slot_center(DeckSlotName.SLOT_D1)).then_return(Point(3, 3, 3))
+    return deck
+
+
+@pytest.fixture
+def mock_protocol(decoy: Decoy, mock_deck: Deck, mock_core: RobotCore) -> ProtocolCore:
     """Get a mock protocol implementation core without a 96 channel attached."""
     protocol_core = decoy.mock(cls=ProtocolCore)
     decoy.when(protocol_core.robot_type).then_return("OT-3 Standard")
-    decoy.when(protocol_core.loaded_instruments).then_return({})
     decoy.when(protocol_core.load_robot()).then_return(mock_core)
-    decoy.when(protocol_core.deck.get_slot_center(DeckSlotName.SLOT_D1)).then_return(
-        Point(3, 3, 3)
-    )
+    decoy.when(protocol_core._deck).then_return(mock_deck)
     return protocol_core
 
 
 @pytest.fixture
 def subject(
+    decoy: Decoy,
+    mock_core: RobotCore,
     mock_protocol: ProtocolCore,
     api_version: APIVersion,
 ) -> RobotContext:
     """Get a RobotContext test subject with its dependencies mocked out."""
-    return RobotContext(api_version=api_version, protocol_core=mock_protocol)
+    decoy.when(mock_core.get_pipette_type_from_engine(Mount.LEFT)).then_return(None)
+    return RobotContext(
+        core=mock_core, api_version=api_version, protocol_core=mock_protocol
+    )
 
 
 @pytest.mark.parametrize(
