@@ -8,9 +8,6 @@ from opentrons.drivers.types import (
 )
 
 
-ABSMeasurement = List[float]
-
-
 class AbstractAbsorbanceReaderDriver(ABC):
     @abstractmethod
     async def connect(self) -> None:

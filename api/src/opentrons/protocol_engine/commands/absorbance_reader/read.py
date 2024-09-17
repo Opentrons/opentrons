@@ -24,13 +24,10 @@ class ReadAbsorbanceParams(BaseModel):
 
 
 class ReadAbsorbanceResult(BaseModel):
-    """Result data from running an aborbance reading, returned as a dictionary map of values by well name (eg. ("A1": 0.0, ...))."""
+    """Result data from running an aborbance reading, returned as a dictionary map of wavelenths containing a map of values by well name (eg. {450: {"A1": 0.0, ...}})."""
 
-    # TODO: change description and return type
-
-    # data: Optional[Dict[str, float]] = Field(..., description="Absorbance data points.")
     data: Optional[Dict[int, Dict[str, float]]] = Field(
-        ..., description="Absorbance data points."
+        ..., description="Absorbance data points per wavelength."
     )
 
 
