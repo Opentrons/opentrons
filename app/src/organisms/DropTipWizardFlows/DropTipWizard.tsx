@@ -193,12 +193,7 @@ export const DropTipWizardContent = (
   }
 
   function buildRobotInMotion(): JSX.Element {
-    return (
-      <>
-        {issuedCommandsType === 'fixit' ? <Flex /> : null}
-        <InProgressModal description={t('stand_back_robot_in_motion')} />
-      </>
-    )
+    return <InProgressModal description={t('stand_back_robot_in_motion')} />
   }
 
   function buildShowExitConfirmation(): JSX.Element {
@@ -408,6 +403,7 @@ const SIMPLE_CONTAINER_STYLE = css`
   width: 47rem;
   overflow: ${OVERFLOW_HIDDEN};
 
+  // Because there is no ModalShell analogue for the ODD, we essentially make one here.
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     width: 62rem;
     height: 35.5rem;
