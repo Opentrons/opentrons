@@ -20,6 +20,9 @@ class GCODE(str, Enum):
     DISABLE_MOTOR = 'M18'
     WRITE_TO_REGISTER = 'M921'
     READ_FROM_REGISTER = 'M920'
+    SET_PEAK_CURRENT = 'M906'
+    SET_IHOLD_CURRENT = 'M907'
+    SET_MICROSTEPPING = 'M909'
 
 class DIR(str, Enum):
     POSITIVE = '',
@@ -61,11 +64,11 @@ HOME_SPEED = 20
 RETRACT_SPEED_X = 10
 RETRACT_SPEED_Z = 10
 HOME_ACCELERATION = 10
-MOVE_ACCELERATION_X = 150
-MOVE_ACCELERATION_Z = 10
-MOVE_SPEED_X = 300
-MOVE_SPEED_UPZ = 100
-MOVE_SPEED_DOWNZ = 100
+MOVE_ACCELERATION_X = 20
+MOVE_ACCELERATION_Z = 5
+MOVE_SPEED_X = 150
+MOVE_SPEED_UPZ = 50
+MOVE_SPEED_DOWNZ = 50
 LABWARE_CLEARANCE = 9
 
 class FlexStacker():
@@ -253,7 +256,7 @@ class FlexStacker():
         return states
 
     def move(self, axis: AXIS, distance: float, direction: DIR, velocity: int, acceleration: int):
-        # max_speed_discontinuity = 10
+        max_speed_discontinuity = 5
         if self.current_position['X'] == None or self.current_position['Z'] == None:
             raise(f"Motor must be Home{axis}")
         c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
@@ -263,9 +266,9 @@ class FlexStacker():
                                                 f'{distance}').add_element(
                                                     f'V{velocity}'
                                                     ).add_element(
-                                                    f'A{acceleration}')
-                                                    # ).add_element(
-                                                    # f'D{max_speed_discontinuity}'
+                                                    f'A{acceleration}' #)
+                                                    ).add_element(
+                                                    f'D{max_speed_discontinuity}')
 
         print(c)
         self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
@@ -336,20 +339,22 @@ class FlexStacker():
         return current
 
     def set_ihold_current(self, current: float, axis: AXIS) -> str:
-        """‘10101srx’ = sets irun to 0b10101 on the x axis"""
-        current = self.convert_current_to_binary(current)
+        """
+            M907 - Set axis hold current in Amps ex: M907 X0.5
+            M909 - Set microstepping using power of 2 ex: M90  Z2 = 2^2 microstepping"""
+        # current = self.convert_current_to_binary(current)
         # print(current)
-        c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_element(f'{current}').add_gcode(
+        c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.SET_IHOLD_CURRENT
-        ).add_element(axis.lower())
+        ).add_element(axis).add_element(f''{current})
         self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
 
     def set_run_current(self, current: float, axis: AXIS) -> str:
-        """‘10101srx’ = sets irun to 0b10101 on the x axis"""
-        current = convert_current_to_binary(current)
-        c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_element(f'{current}').add_gcode(
-            gcode=GCODE.SET_IRUN_CURRENT
-        ).add_element(axis.lower())
+        """ M906 - Set axis peak run current in Amps ex: M906 X1.5"""
+        # current = convert_current_to_binary(current)
+        c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
+            gcode=GCODE.SET_PEAK_CURRENT
+        ).add_element(axis).add_element(f''{current})
         self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
 
     def close_latch(self):
@@ -390,12 +395,13 @@ class FlexStacker():
         self.open_latch()
         self.home(AXIS.Z, DIR.POSITIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
         self.close_latch()
-        self.move(AXIS.Z, TOTAL_TRAVEL_Z-20, DIR.NEGATIVE, self.move_speed_down_z, self.move_acceleration_z)
+        self.move(AXIS.Z, TOTAL_TRAVEL_Z-10, DIR.NEGATIVE, self.move_speed_down_z, self.move_acceleration_z)
         self.home(AXIS.Z, DIR.NEGATIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
         self.move(AXIS.X, TOTAL_TRAVEL_X-5, DIR.POSITIVE, self.move_speed_x, self.move_acceleration_x)
+        self.home(AXIS.X, DIR.POSITIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
 
     def unload_labware(self):
-        labware_clearance = 20
+        labware_clearance = 9
         labware_retract_speed= 50
         # ----------------Set up the Stacker------------------------
         self.home(AXIS.X, DIR.POSITIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
@@ -412,6 +418,7 @@ class FlexStacker():
         self.move(AXIS.Z, TOTAL_TRAVEL_Z-20, DIR.NEGATIVE, self.move_speed_down_z, self.move_acceleration_z)
         self.home(AXIS.Z, DIR.NEGATIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
         self.move(AXIS.X, TOTAL_TRAVEL_X-5, DIR.POSITIVE, self.move_speed_x, self.move_acceleration_x)
+        self.home(AXIS.X, DIR.POSITIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
 
     def write_to_motor_drive(self, register, data):
         """
