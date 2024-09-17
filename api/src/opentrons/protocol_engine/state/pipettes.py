@@ -320,22 +320,11 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         # todo(mm, 2024-08-29): Port the following isinstance() checks to
         # use `state_update`. https://opentrons.atlassian.net/browse/EXEC-639
 
-        # These commands leave the pipette in a place that we can't logically associate
-        # with a well. Clear current_location to reflect the fact that it's now unknown.
-        #
         # TODO(mc, 2021-11-12): Wipe out current_location on movement failures, too.
-        if isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result,
-            (
-                commands.thermocycler.OpenLidResult,
-                commands.thermocycler.CloseLidResult,
-            ),
-        ):
-            self._state.current_location = None
 
         # Heater-Shaker commands may have left the pipette in a place that we can't
         # associate with a logical location, depending on their result.
-        elif isinstance(action, SucceedCommandAction) and isinstance(
+        if isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
                 commands.heater_shaker.SetAndWaitForShakeSpeedResult,
@@ -395,15 +384,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         # See there for explanations.
 
         if isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result,
-            (
-                commands.thermocycler.OpenLidResult,
-                commands.thermocycler.CloseLidResult,
-            ),
-        ):
-            self._clear_deck_point()
-
-        elif isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
                 commands.heater_shaker.SetAndWaitForShakeSpeedResult,

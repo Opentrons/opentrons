@@ -466,22 +466,6 @@ def test_blow_out_clears_volume(
 @pytest.mark.parametrize(
     "command",
     [
-        cmd.thermocycler.OpenLid(
-            id="command-id-2",
-            key="command-key-2",
-            status=cmd.CommandStatus.SUCCEEDED,
-            createdAt=datetime(year=2021, month=1, day=1),
-            params=cmd.thermocycler.OpenLidParams(moduleId="xyz"),
-            result=cmd.thermocycler.OpenLidResult(),
-        ),
-        cmd.thermocycler.CloseLid(
-            id="command-id-2",
-            key="command-key-2",
-            status=cmd.CommandStatus.SUCCEEDED,
-            createdAt=datetime(year=2021, month=1, day=1),
-            params=cmd.thermocycler.CloseLidParams(moduleId="xyz"),
-            result=cmd.thermocycler.CloseLidResult(),
-        ),
         cmd.heater_shaker.SetAndWaitForShakeSpeed(
             id="command-id-2",
             key="command-key-2",
@@ -786,22 +770,6 @@ def test_add_pipette_config(
 @pytest.mark.parametrize(
     "command",
     (
-        cmd.thermocycler.OpenLid(
-            id="command-id-2",
-            key="command-key-2",
-            status=cmd.CommandStatus.SUCCEEDED,
-            createdAt=datetime(year=2021, month=1, day=1),
-            params=cmd.thermocycler.OpenLidParams(moduleId="xyz"),
-            result=cmd.thermocycler.OpenLidResult(),
-        ),
-        cmd.thermocycler.CloseLid(
-            id="command-id-2",
-            key="command-key-2",
-            status=cmd.CommandStatus.SUCCEEDED,
-            createdAt=datetime(year=2021, month=1, day=1),
-            params=cmd.thermocycler.CloseLidParams(moduleId="xyz"),
-            result=cmd.thermocycler.CloseLidResult(),
-        ),
         cmd.heater_shaker.SetAndWaitForShakeSpeed(
             id="command-id-2",
             key="command-key-2",
