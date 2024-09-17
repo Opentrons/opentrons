@@ -65,9 +65,6 @@ import type { Dispatch } from '../redux/types'
 // network calls to localhost. see ./hacks.ts for more.
 hackWindowNavigatorOnLine()
 
-// add a touch class to the window object to tell CSS that we're in ODD mode
-hackAddTouchClass()
-
 export const ON_DEVICE_DISPLAY_PATHS = [
   '/dashboard',
   '/deck-configuration',
@@ -178,6 +175,11 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
       )
     }
   }, [dispatch, isIdle, userSetBrightness])
+
+  React.useEffect(() => {
+    // add a touch class to the window object to tell CSS that we're in ODD mode
+    hackAddTouchClass()
+  }, [])
 
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (

@@ -19,5 +19,7 @@ export const hackWindowNavigatorOnLine = (): void => {
 
 // explicitly add a touch class to the body so UI elements know to render in ODD mode
 export const hackAddTouchClass = (): void => {
-  document.body.classList.add(RESPONSIVENESS.TOUCH_ODD_CLASS)
+  if (!document.body.classList.contains(RESPONSIVENESS.TOUCH_ODD_CLASS)) {
+    document.body.classList.add(RESPONSIVENESS.TOUCH_ODD_CLASS)
+  }
 }
