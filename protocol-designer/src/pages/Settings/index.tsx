@@ -8,7 +8,6 @@ import {
   Btn,
   COLORS,
   DIRECTION_COLUMN,
-  FLEX_AUTO,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
@@ -73,8 +72,8 @@ export function Settings(): JSX.Element {
         </Flex>
         <Btn
           role="switch"
-          data-testid={`btn_${flagName}`}
           aria-checked={Boolean(flags[flagName])}
+          data-testid={`btn_${flagName}`}
           size="2rem"
           css={
             Boolean(flags[flagName])
@@ -87,7 +86,7 @@ export function Settings(): JSX.Element {
             })
           }}
         >
-          <Icon name={iconName} height="1rem" />
+          <Icon name={iconName} size="1rem" />
         </Btn>
       </Flex>
     )
@@ -101,7 +100,7 @@ export function Settings(): JSX.Element {
       width="100%"
       minHeight="calc(100vh - 56px)"
       height="100%"
-      padding="80px 272px"
+      padding={`${SPACING.spacing80} 17rem`}
     >
       <Flex
         borderRadius={BORDERS.borderRadius4}
@@ -158,7 +157,7 @@ export function Settings(): JSX.Element {
               textDecoration={
                 canClearHintDismissals
                   ? TYPOGRAPHY.textDecorationUnderline
-                  : FLEX_AUTO
+                  : 'none'
               }
               onClick={() => dispatch(tutorialActions.clearAllHintDismissals())}
             >

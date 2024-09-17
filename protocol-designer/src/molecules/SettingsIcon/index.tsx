@@ -10,7 +10,7 @@ import {
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { getFileMetadata } from '../../file-data/selectors'
-import { BUTTON_LINK_STYLE } from '../constants'
+import { BUTTON_LINK_STYLE } from '../../atoms/constants'
 
 //  TODO(ja): this icon needs to be updated to match css states and correct svg
 export const SettingsIcon = (): JSX.Element => {
@@ -45,7 +45,9 @@ export const SettingsIcon = (): JSX.Element => {
         css={BUTTON_LINK_STYLE}
         data-testid="SettingsIconButton"
       >
-        <Icon size="1rem" name="settings" />
+        <Flex justifyContent={JUSTIFY_CENTER}>
+          <Icon size="1rem" name="settings" />
+        </Flex>
       </Btn>
     </Flex>
   )

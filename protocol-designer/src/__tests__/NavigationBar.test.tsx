@@ -8,9 +8,9 @@ import { renderWithProviders } from '../__testing-utils__'
 import { NavigationBar } from '../NavigationBar'
 import { getHasUnsavedChanges } from '../load-file/selectors'
 import { toggleNewProtocolModal } from '../navigation/actions'
-import { SettingsIcon } from '../atoms'
+import { SettingsIcon } from '../molecules'
 
-vi.mock('../atoms')
+vi.mock('../molecules')
 vi.mock('../navigation/actions')
 vi.mock('../file-data/selectors')
 vi.mock('../load-file/selectors')
