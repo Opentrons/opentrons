@@ -40,6 +40,7 @@ import { InProgressModal } from '../../molecules/InProgressModal'
 import { useDropTipErrorComponents } from './hooks'
 import { DropTipWizardHeader } from './DropTipWizardHeader'
 import { ErrorInfo } from './ErrorInfo'
+import { ConfirmPosition, useConfirmPosition } from './ConfirmPosition'
 
 import type { DropTipWizardFlowsProps } from '.'
 import type { DropTipWizardContainerProps, IssuedCommandsType } from './types'
@@ -175,15 +176,13 @@ export const DropTipWizardContent = (
     fixitCommandTypeUtils,
     issuedCommandsType,
     isExiting,
-    proceed,
     proceedToRoute,
     showConfirmExit,
-    dropTipCommands,
     proceedWithConditionalClose,
-    goBackRunValid,
   } = props
 
   const { t, i18n } = useTranslation('drop_tip_wizard')
+  const confirmPositionUtils = useConfirmPosition(currentStep)
 
   function buildGettingReady(): JSX.Element {
     return <InProgressModal description={t('getting_ready')} />
@@ -191,6 +190,18 @@ export const DropTipWizardContent = (
 
   function buildRobotInMotion(): JSX.Element {
     return <InProgressModal description={t('stand_back_robot_in_motion')} />
+  }
+
+  function buildRobotPipetteMoving(): JSX.Element {
+    return (
+      <InProgressModal
+        description={
+          currentStep === POSITION_AND_BLOWOUT
+            ? t('stand_back_blowing_out')
+            : t('stand_back_dropping_tips')
+        }
+      />
+    )
   }
 
   function buildShowExitConfirmation(): JSX.Element {
@@ -210,21 +221,11 @@ export const DropTipWizardContent = (
   }
 
   function buildJogToPosition(): JSX.Element {
-    const { handleJog, blowoutOrDropTip } = dropTipCommands
+    return <JogToPosition {...props} {...confirmPositionUtils} />
+  }
 
-    return (
-      <JogToPosition
-        {...props}
-        handleJog={handleJog}
-        handleProceed={() => blowoutOrDropTip(currentStep, proceed)}
-        handleGoBack={goBackRunValid}
-        body={
-          currentStep === POSITION_AND_BLOWOUT
-            ? t('position_and_blowout')
-            : t('position_and_drop_tip')
-        }
-      />
-    )
+  function buildConfirmPosition(): JSX.Element {
+    return <ConfirmPosition {...props} {...confirmPositionUtils} />
   }
 
   function buildSuccess(): JSX.Element {
@@ -281,6 +282,8 @@ export const DropTipWizardContent = (
       return buildGettingReady()
     } else if (isCommandInProgress || isExiting) {
       return buildRobotInMotion()
+    } else if (confirmPositionUtils.showConfirmPosition) {
+      return buildConfirmPosition()
     } else if (showConfirmExit) {
       return buildShowExitConfirmation()
     } else if (errorDetails != null) {
@@ -302,6 +305,8 @@ export const DropTipWizardContent = (
       currentStep === DROP_TIP_SUCCESS
     ) {
       return buildSuccess()
+    } else if (confirmPositionUtils.isRobotPipetteMoving) {
+      return buildRobotPipetteMoving()
     } else {
       return <div>UNASSIGNED STEP</div>
     }
@@ -366,4 +371,9 @@ const SIMPLE_CONTENT_CONTAINER_STYLE = css`
   height: 100%;
   padding: ${SPACING.spacing32};
   flex: 1;
+  grid-gap: ${SPACING.spacing24};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    grid-gap: ${SPACING.spacing32};
+  }
 `
