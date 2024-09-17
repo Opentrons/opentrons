@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled, { css } from 'styled-components'
+import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -8,17 +8,15 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  DISPLAY_INLINE_BLOCK,
+  DISPLAY_FLEX,
   Flex,
   JUSTIFY_CENTER,
-  JUSTIFY_FLEX_END,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_AROUND,
-  JUSTIFY_SPACE_BETWEEN,
   RESPONSIVENESS,
   SPACING,
   LegacyStyledText,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
 import { MediumButton } from '../../atoms/buttons'
@@ -30,16 +28,16 @@ import droptipVideo from '../../assets/videos/droptip-wizard/Drop-tip.webm'
 
 import type { DropTipWizardContainerProps } from './types'
 
+type FlowType = 'blowout' | 'drop_tips' | null
+
 export const BeforeBeginning = ({
   proceedToRoute,
   isOnDevice,
   issuedCommandsType,
   fixitCommandTypeUtils,
 }: DropTipWizardContainerProps): JSX.Element | null => {
-  const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
-  const [flowType, setFlowType] = React.useState<
-    'blowout' | 'drop_tips' | null
-  >(null)
+  const { t } = useTranslation('drop_tip_wizard')
+  const [flowType, setFlowType] = React.useState<FlowType>(null)
 
   const handleProceed = (): void => {
     if (flowType === 'blowout') {
@@ -60,138 +58,121 @@ export const BeforeBeginning = ({
 
   if (isOnDevice) {
     return (
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        height="100%"
-        padding={issuedCommandsType === 'fixit' ? SPACING.spacing32 : null}
-      >
-        <Flex css={ODD_TITLE_STYLE}>{buildTopText()}</Flex>
-        <Flex paddingBottom={SPACING.spacing8}>
+      <>
+        <Flex css={CONTAINER_STYLE}>
+          <StyledText
+            oddStyle="level4HeaderSemiBold"
+            desktopStyle="headingSmallBold"
+          >
+            {buildTopText()}
+          </StyledText>
           <MediumButton
+            css={ODD_MEDIUM_BUTTON_STYLE}
             buttonType={flowType === 'blowout' ? 'primary' : 'secondary'}
-            flex="1"
             onClick={() => {
               setFlowType('blowout')
             }}
-            buttonText={i18n.format(t('yes_blow_out_liquid'), 'capitalize')}
-            justifyContent={JUSTIFY_FLEX_START}
-            paddingLeft={SPACING.spacing24}
-            height="5.25rem"
+            buttonText={t('yes_blow_out_liquid')}
           />
-        </Flex>
-        <Flex>
           <MediumButton
+            css={ODD_MEDIUM_BUTTON_STYLE}
             buttonType={flowType === 'drop_tips' ? 'primary' : 'secondary'}
-            flex="1"
             onClick={() => {
               setFlowType('drop_tips')
             }}
-            buttonText={i18n.format(t('no_proceed_to_drop_tip'), 'capitalize')}
-            justifyContent={JUSTIFY_FLEX_START}
-            paddingLeft={SPACING.spacing24}
-            height="5.25rem"
+            buttonText={t('no_proceed_to_drop_tip')}
           />
         </Flex>
-        <Flex
-          justifyContent={
-            issuedCommandsType === 'fixit'
-              ? JUSTIFY_SPACE_BETWEEN
-              : JUSTIFY_FLEX_END
+        <DropTipFooterButtons
+          primaryBtnOnClick={handleProceed}
+          primaryBtnDisabled={flowType == null}
+          secondaryBtnOnClick={
+            fixitCommandTypeUtils?.buttonOverrides.goBackBeforeBeginning ??
+            undefined
           }
-          marginTop={issuedCommandsType === 'fixit' ? '6.875rem' : 'auto'}
-        >
-          <DropTipFooterButtons
-            primaryBtnOnClick={handleProceed}
-            primaryBtnDisabled={flowType == null}
-            secondaryBtnOnClick={
-              fixitCommandTypeUtils?.buttonOverrides.goBackBeforeBeginning ??
-              undefined
-            }
-          />
-        </Flex>
-      </Flex>
+        />
+      </>
     )
   } else {
     return (
-      <Flex css={TILE_CONTAINER_STYLE}>
-        <Title>{buildTopText()}</Title>
-        <Flex
-          justifyContent={JUSTIFY_SPACE_AROUND}
-          alignItems={ALIGN_CENTER}
-          marginTop={SPACING.spacing16}
-          marginBottom={SPACING.spacing32}
-        >
-          <Flex
-            onClick={() => {
-              setFlowType('blowout')
-            }}
-            css={
-              flowType === 'blowout'
-                ? SELECTED_OPTIONS_STYLE
-                : UNSELECTED_OPTIONS_STYLE
-            }
+      <>
+        <Flex css={CONTAINER_STYLE}>
+          <StyledText
+            desktopStyle="headingSmallBold"
+            oddStyle="level4HeaderSemiBold"
           >
-            <video
-              css={css`
-                max-width: 8.96rem;
-              `}
-              autoPlay={true}
-              loop={true}
-              controls={false}
-              aria-label="blowout"
-            >
-              <source src={blowoutVideo} />
-            </video>
-            <LegacyStyledText as="h3">
-              {t('yes_blow_out_liquid')}
-            </LegacyStyledText>
-          </Flex>
-          <Flex
-            onClick={() => {
-              setFlowType('drop_tips')
-            }}
-            css={
-              flowType === 'drop_tips'
-                ? SELECTED_OPTIONS_STYLE
-                : UNSELECTED_OPTIONS_STYLE
-            }
-          >
-            <video
-              css={css`
-                max-width: 8.96rem;
-              `}
-              autoPlay={true}
-              loop={true}
-              controls={false}
-              aria-label="droptip"
-            >
-              <source src={droptipVideo} />
-            </video>
-            <LegacyStyledText as="h3">
-              {t('no_proceed_to_drop_tip')}
-            </LegacyStyledText>
+            {buildTopText()}
+          </StyledText>
+          <Flex css={DESKTOP_GIF_CONTAINER_STYLE}>
+            <DropTipOption
+              flowType="blowout"
+              currentFlow={flowType}
+              onClick={() => {
+                setFlowType('blowout')
+              }}
+              videoSrc={blowoutVideo}
+              text={t('yes_blow_out_liquid')}
+            />
+            <DropTipOption
+              flowType="drop_tips"
+              currentFlow={flowType}
+              onClick={() => {
+                setFlowType('drop_tips')
+              }}
+              videoSrc={droptipVideo}
+              text={t('no_proceed_to_drop_tip')}
+            />
           </Flex>
         </Flex>
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          justifyContent={
-            issuedCommandsType === 'fixit'
-              ? JUSTIFY_SPACE_BETWEEN
-              : JUSTIFY_FLEX_END
+        <DropTipFooterButtons
+          primaryBtnOnClick={handleProceed}
+          primaryBtnDisabled={flowType == null}
+          secondaryBtnOnClick={
+            fixitCommandTypeUtils?.buttonOverrides.goBackBeforeBeginning ??
+            undefined
           }
-        >
-          <DropTipFooterButtons
-            primaryBtnOnClick={handleProceed}
-            primaryBtnDisabled={flowType == null}
-            secondaryBtnOnClick={
-              fixitCommandTypeUtils?.buttonOverrides.goBackBeforeBeginning ??
-              undefined
-            }
-          />
-        </Flex>
-      </Flex>
+        />
+      </>
     )
   }
+}
+
+function DropTipOption({
+  flowType,
+  currentFlow,
+  onClick,
+  videoSrc,
+  text,
+}: {
+  flowType: 'blowout' | 'drop_tips'
+  currentFlow: FlowType
+  onClick: () => void
+  videoSrc: string
+  text: string
+}): JSX.Element {
+  return (
+    <Flex
+      onClick={onClick}
+      css={
+        flowType === currentFlow
+          ? SELECTED_OPTIONS_STYLE
+          : UNSELECTED_OPTIONS_STYLE
+      }
+    >
+      <video
+        css={css`
+          max-width: 8.96rem;
+        `}
+        autoPlay={true}
+        loop={true}
+        controls={false}
+        aria-label={flowType}
+      >
+        <source src={videoSrc} />
+      </video>
+      <LegacyStyledText as="h3">{text}</LegacyStyledText>
+    </Flex>
+  )
 }
 
 const UNSELECTED_OPTIONS_STYLE = css`
@@ -242,28 +223,22 @@ const SELECTED_OPTIONS_STYLE = css`
   }
 `
 
-const Title = styled.h1`
-  ${TYPOGRAPHY.h1Default};
-  margin-bottom: ${SPACING.spacing8};
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    ${TYPOGRAPHY.level4HeaderSemiBold};
-    margin-bottom: 0;
-    height: ${SPACING.spacing40};
-    display: ${DISPLAY_INLINE_BLOCK};
-  }
-`
-
-const ODD_TITLE_STYLE = css`
-  ${TYPOGRAPHY.level4HeaderSemiBold}
-  margin-bottom: ${SPACING.spacing16};
-`
-
-const TILE_CONTAINER_STYLE = css`
+const CONTAINER_STYLE = css`
+  display: ${DISPLAY_FLEX};
   flex-direction: ${DIRECTION_COLUMN};
-  justify-content: ${JUSTIFY_SPACE_BETWEEN};
-  padding: ${SPACING.spacing32};
-  height: 100%;
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    height: 29.5rem;
-  }
+  grid-gap: ${SPACING.spacing16};
+`
+
+const ODD_MEDIUM_BUTTON_STYLE = css`
+  flex: 1;
+  justify-content: ${JUSTIFY_FLEX_START};
+  padding-left: ${SPACING.spacing24};
+  height: 5.25rem;
+`
+
+const DESKTOP_GIF_CONTAINER_STYLE = css`
+  justify-content: ${JUSTIFY_SPACE_AROUND};
+  align-items: ${ALIGN_CENTER};
+  grid-gap: ${SPACING.spacing16};
+  height: 18.75rem;
 `
