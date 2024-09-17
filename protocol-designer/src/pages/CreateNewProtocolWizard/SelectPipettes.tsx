@@ -405,11 +405,10 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                     <Flex flexDirection={DIRECTION_ROW}>
                       <Icon
                         name="swap-horizontal"
-                        size={"1rem"}
+                        size="1rem"
                         transform="rotate(90deg)"
-                        marginTop={SPACING.spacing2}
                       />
-                      <StyledText desktopStyle="bodyDefaultRegular">
+                      <StyledText desktopStyle="captionSemiBold">
                         {t('swap')}
                       </StyledText>
                     </Flex>

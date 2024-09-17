@@ -223,7 +223,7 @@ export function EditInstrumentsModal(
                   <Flex color={COLORS.grey60} flexDirection={DIRECTION_ROW}>
                     <Icon
                       name="swap-horizontal"
-                      size={'1rem'}
+                      size="1rem"
                       transform="rotate(90deg)"
                     />
                     <StyledText desktopStyle="captionSemiBold">
