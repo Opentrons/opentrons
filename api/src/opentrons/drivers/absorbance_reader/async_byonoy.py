@@ -5,8 +5,6 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
 from typing import Any, Optional, List, Dict, Tuple
 
-from opentrons.drivers.absorbance_reader.abstract import ABSMeasurement
-
 from .hid_protocol import (
     AbsorbanceHidInterface as AbsProtocol,
     ErrorCodeNames,
@@ -235,7 +233,7 @@ class AsyncByonoy:
         assert self._current_config is not None
         measure_func: Any = self._interface.byonoy_abs96_single_measure
         if isinstance(self._current_config, AbsProtocol.MultiMeasurementConfig):
-            measure_func = self._interface.byonoy_abs96_multi_measure
+            measure_func = self._interface.byonoy_abs96_multiple_measure
         err, measurements = await self._loop.run_in_executor(
             executor=self._executor,
             func=partial(
@@ -274,7 +272,7 @@ class AsyncByonoy:
                 handle, conf
             )
         else:
-            err = self._interface.byonoy_abs96_initialize_multi_measurement(
+            err = self._interface.byonoy_abs96_initialize_multiple_measurement(
                 handle, conf
             )
         self._raise_if_error(err.name, f"Error initializing measurement: {err}")
@@ -293,10 +291,10 @@ class AsyncByonoy:
         if set(wavelengths).issubset(self._supported_wavelengths):
             if mode == ABSMeasurementMode.SINGLE:
                 conf = self._interface.ByonoyAbs96SingleMeasurementConfig()
-                conf.sample_wavelength = wavelengths[0]
-                conf.reference_wavelength = reference_wavelength
+                conf.sample_wavelength = wavelengths[0] or 0
+                conf.reference_wavelength = reference_wavelength or 0
             else:
-                conf = self._interface.ByonoyAbs96MultiMeasurementConfig()
+                conf = self._interface.ByonoyAbs96MultipleMeasurementConfig()
                 conf.sample_wavelengths = wavelengths
         else:
             raise ValueError(

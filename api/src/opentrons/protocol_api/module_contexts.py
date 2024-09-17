@@ -4,6 +4,7 @@ import logging
 from typing import List, Dict, Optional, Union, cast
 
 from opentrons.drivers.types import ABSMeasurementMode
+from opentrons.protocol_engine.types import ABSMeasureMode
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.module.types import ModuleModel, ModuleType
 
@@ -1006,17 +1007,22 @@ class AbsorbanceReaderContext(ModuleContext):
     @requires_version(2, 21)
     def initialize(
         self,
+        mode: ABSMeasureMode,
         wavelengths: List[int],
-        mode: ABSMeasurementMode = ABSMeasurementMode.SINGLE,
         reference_wavelength: Optional[int] = None,
     ) -> None:
         """Initialize the Absorbance Reader by taking zero reading.
+        You can initialize in `singleMeasure` or `multiMeasure` modes.
 
-        You can only use one wavelength when in SINGLE mode
-        You can only use `reference_wavelength` when in SINGLE mode, it is ignored in MULTI mode.
+        `singleMeasure` mode takes one sample wavelength and an optional
+        reference wavelength and performs a single read with the `read` method.
+
+        `multiMeasure` mode takes a list of up to 6 wavelengths and  measures the
+        absorbance on the given wavelengths when the `read` method is used.
+        Note you cannot use the `reference_wavelength` in this mode.
         """
         self._core.initialize(
-            wavelengths, mode=mode, reference_wavelength=reference_wavelength
+            mode, wavelengths, reference_wavelength=reference_wavelength
         )
 
     @requires_version(2, 21)

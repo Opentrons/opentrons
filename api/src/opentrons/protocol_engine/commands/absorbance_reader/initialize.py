@@ -6,6 +6,7 @@ from typing_extensions import Type
 from pydantic import BaseModel, Field
 
 from opentrons.drivers.types import ABSMeasurementMode
+from opentrons.protocol_engine.types import ABSMeasureMode
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
@@ -22,12 +23,12 @@ class InitializeParams(BaseModel):
     """Input parameters to initialize an absorbance reading."""
 
     moduleId: str = Field(..., description="Unique ID of the absorbance reader.")
-    measureMode: str = Field(
+    measureMode: ABSMeasureMode = Field(
         ..., description="Initialize single or multi measurement mode."
     )
     sampleWavelengths: List[int] = Field(..., description="Sample wavelengths in nm.")
     referenceWavelength: Optional[int] = Field(
-        ..., description="Reference wavelength in nm."
+        ..., description="Optional reference wavelength in nm."
     )
 
 
@@ -61,10 +62,16 @@ class InitializeImpl(
             abs_reader_substate.module_id
         )
 
+        # TODO: add limiters here so we fail during analysis
+        # singleMeasure and 1 wavelength
+        # singleMeaure and referenceWavelength in sampleWavelengths
+        # multiMeasure and 1-6 wavelengths
+        # multiMeasure and no referenceWavelength
+
         if abs_reader is not None:
             await abs_reader.set_sample_wavelength(
-                mode=ABSMeasurementMode(params.measureMode),
-                wavelengths=params.sampleWavelengths,
+                ABSMeasurementMode(params.measureMode),
+                params.sampleWavelengths,
                 reference_wavelength=params.referenceWavelength,
             )
 

@@ -64,11 +64,11 @@ class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
     async def get_available_wavelengths(self) -> List[int]:
         return await self._connection.get_supported_wavelengths()
 
-    async def intialize_measurement(
+    async def initialize_measurement(
         self,
         wavelengths: List[int],
-        reference_wavelength: Optional[int] = None,
         mode: ABSMeasurementMode = ABSMeasurementMode.SINGLE,
+        reference_wavelength: Optional[int] = None,
     ) -> None:
         await self._connection.initialize(mode, wavelengths, reference_wavelength)
 

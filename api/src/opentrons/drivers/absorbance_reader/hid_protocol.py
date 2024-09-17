@@ -94,7 +94,7 @@ class AbsorbanceHidInterface(Protocol):
     def ByonoyAbs96SingleMeasurementConfig(self) -> SingleMeasurementConfig:
         ...
 
-    def ByonoyAbs96MultiMeasurementConfig(self) -> MultiMeasurementConfig:
+    def ByonoyAbs96MultipleMeasurementConfig(self) -> MultiMeasurementConfig:
         ...
 
     def byonoy_open_device(self, device: Device) -> Tuple[ErrorCode, int]:
@@ -144,7 +144,7 @@ class AbsorbanceHidInterface(Protocol):
     ) -> ErrorCode:
         ...
 
-    def byonoy_abs96_initialize_multi_measurement(
+    def byonoy_abs96_initialize_multiple_measurement(
         self, device_handle: int, conf: MultiMeasurementConfig
     ) -> ErrorCode:
         ...
@@ -154,7 +154,7 @@ class AbsorbanceHidInterface(Protocol):
     ) -> Tuple[ErrorCode, List[float]]:
         ...
 
-    def byonoy_abs96_multi_measure(
+    def byonoy_abs96_multiple_measure(
         self, device_handle: int, conf: MultiMeasurementConfig
     ) -> Tuple[ErrorCode, List[List[float]]]:
         ...

@@ -88,20 +88,20 @@ class AbsorbanceReaderDeviceState(str, Enum):
 class ABSMeasurementMode(Enum):
     """The current mode configured for reading the Absorbance Reader."""
 
-    SINGLE = "single"
-    MULTI = "multi"
+    SINGLE = "singleMeasure"
+    MULTI = "multiMeasure"
 
 
 @dataclass
 class ABSMeasurementConfig:
-    read_mode: ABSMeasurementMode
+    measure_mode: ABSMeasurementMode
     sample_wavelengths: List[int]
     reference_wavelength: Optional[int]
 
     @property
     def data(self) -> Dict[str, Any]:
         return {
-            "readMode": self.read_mode.value,
+            "measureMode": self.measure_mode.value,
             "sampleWavelengths": self.sample_wavelengths,
             "referenceWavelength": self.reference_wavelength,
         }

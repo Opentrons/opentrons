@@ -17,6 +17,7 @@ from opentrons.hardware_control.modules.types import (
     MagneticStatus,
     SpeedStatus,
 )
+from opentrons.protocol_engine.types import ABSMeasureMode
 from opentrons.types import DeckSlotName
 
 
@@ -358,8 +359,8 @@ class AbstractAbsorbanceReaderCore(AbstractModuleCore):
     @abstractmethod
     def initialize(
         self,
+        mode: ABSMeasureMode,
         wavelengths: List[int],
-        mode: ABSMeasurementMode = ABSMeasurementMode.SINGLE,
         reference_wavelength: Optional[int] = None,
     ) -> None:
         """Initialize the Absorbance Reader by taking zero reading."""

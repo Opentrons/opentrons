@@ -237,6 +237,7 @@ class AbsorbanceReader(mod_abc.AbstractModule):
     @property
     def live_data(self) -> LiveData:
         """Return a dict of the module's dynamic information"""
+        conf = self._measurement_config.data if self._measurement_config else dict()
         return {
             "status": self.status.value,
             "data": {
@@ -244,6 +245,9 @@ class AbsorbanceReader(mod_abc.AbstractModule):
                 "deviceStatus": self.status.value,
                 "lidStatus": self.lid_status.value,
                 "platePresence": self.plate_presence.value,
+                "measureMode": conf.get("measureMode", ""),
+                "sampleWavelengths": conf.get("sampleWavelengths", []),
+                "referenceWavelength": conf.get("referenceWavelength", 0),
             },
         }
 
@@ -331,17 +335,19 @@ class AbsorbanceReader(mod_abc.AbstractModule):
 
     async def set_sample_wavelength(
         self,
+        mode: ABSMeasurementMode,
         wavelengths: List[int],
-        mode: ABSMeasurementMode = ABSMeasurementMode.SINGLE,
         reference_wavelength: Optional[int] = None,
     ) -> None:
-        """Set the Absorbance Reader's active wavelength and measurement mode."""
-        assert (
-            mode == ABSMeasurementMode.SINGLE and len(wavelengths) == 1
-        ), "Cannot initialize single read mode with more than 1 wavelength."
+        """Set the Absorbance Reader's measurement mode and active wavelength."""
+        if mode == ABSMeasurementMode.SINGLE:
+            assert (
+                len(wavelengths) == 1
+            ), "Cannot initialize single read mode with more than 1 wavelength."
+
         await self._driver.initialize_measurement(wavelengths, mode)
         self._measurement_config = ABSMeasurementConfig(
-            read_mode=mode,
+            measure_mode=mode,
             sample_wavelengths=wavelengths,
             reference_wavelength=reference_wavelength,
         )
