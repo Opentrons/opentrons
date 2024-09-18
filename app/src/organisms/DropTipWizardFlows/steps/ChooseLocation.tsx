@@ -10,12 +10,12 @@ import {
 } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 
-import { TwoColumn, DeckMapContent } from '../../molecules/InterventionModal'
-import { DropTipFooterButtons } from './shared'
+import { TwoColumn, DeckMapContent } from '../../../molecules/InterventionModal'
+import { CHOOSE_BLOWOUT_LOCATION } from '../constants'
+import { DropTipFooterButtons } from '../shared'
 
 import type { ModuleLocation } from '@opentrons/shared-data'
-import type { DropTipWizardContainerProps } from './types'
-import { CHOOSE_BLOWOUT_LOCATION } from './constants'
+import type { DropTipWizardContainerProps } from '../types'
 
 export const ChooseLocation = ({
   robotType,

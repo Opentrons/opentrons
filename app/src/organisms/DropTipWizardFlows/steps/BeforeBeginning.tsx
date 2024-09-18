@@ -19,14 +19,14 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { MediumButton } from '../../atoms/buttons'
-import { DT_ROUTES } from './constants'
-import { DropTipFooterButtons } from './shared'
+import { MediumButton } from '../../../atoms/buttons'
+import { DT_ROUTES } from '../constants'
+import { DropTipFooterButtons } from '../shared'
 
-import blowoutVideo from '../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
-import droptipVideo from '../../assets/videos/droptip-wizard/Drop-tip.webm'
+import blowoutVideo from '../../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
+import droptipVideo from '../../../assets/videos/droptip-wizard/Drop-tip.webm'
 
-import type { DropTipWizardContainerProps } from './types'
+import type { DropTipWizardContainerProps } from '../types'
 
 type FlowType = 'blowout' | 'drop_tips' | null
 

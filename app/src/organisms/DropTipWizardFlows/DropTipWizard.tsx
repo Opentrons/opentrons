@@ -31,10 +31,12 @@ import {
   POSITION_AND_BLOWOUT,
   POSITION_AND_DROP_TIP,
 } from './constants'
-import { BeforeBeginning } from './BeforeBeginning'
-import { ChooseLocation } from './ChooseLocation'
-import { JogToPosition } from './JogToPosition'
-import { Success } from './Success'
+import {
+  BeforeBeginning,
+  ChooseLocation,
+  JogToPosition,
+  Success,
+} from './steps'
 import { InProgressModal } from '../../molecules/InProgressModal'
 import { useDropTipErrorComponents } from './hooks'
 import { DropTipWizardHeader } from './DropTipWizardHeader'

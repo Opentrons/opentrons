@@ -11,12 +11,12 @@ import {
   RESPONSIVENESS,
 } from '@opentrons/components'
 
-import { POSITION_AND_BLOWOUT } from './constants'
-import { JogControls } from '../../molecules/JogControls'
-import { DropTipFooterButtons } from './shared'
+import { POSITION_AND_BLOWOUT } from '../constants'
+import { JogControls } from '../../../molecules/JogControls'
+import { DropTipFooterButtons } from '../shared'
 
-import type { DropTipWizardContainerProps } from './types'
-import type { UseConfirmPositionResult } from './ConfirmPosition'
+import type { DropTipWizardContainerProps } from '../types'
+import type { UseConfirmPositionResult } from '../ConfirmPosition'
 
 type JogToPositionProps = DropTipWizardContainerProps & UseConfirmPositionResult
 

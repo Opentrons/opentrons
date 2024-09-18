@@ -12,12 +12,12 @@ import {
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 
-import { DropTipFooterButtons } from './shared'
-import { BLOWOUT_SUCCESS, DROP_TIP_SUCCESS, DT_ROUTES } from './constants'
+import { DropTipFooterButtons } from '../shared'
+import { BLOWOUT_SUCCESS, DROP_TIP_SUCCESS, DT_ROUTES } from '../constants'
 
-import SuccessIcon from '../../assets/images/icon_success.png'
+import SuccessIcon from '../../../assets/images/icon_success.png'
 
-import type { DropTipWizardContainerProps } from './types'
+import type { DropTipWizardContainerProps } from '../types'
 
 export const Success = ({
   currentStep,
