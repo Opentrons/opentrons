@@ -72,7 +72,6 @@ import type {
 } from '../../pages/CreateNewProtocolWizard/types'
 import type { ThunkDispatch } from '../../types'
 
-
 interface EditInstrumentsModalProps {
   onClose: () => void
 }
