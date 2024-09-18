@@ -4,7 +4,7 @@ import { TYPOGRAPHY, SPACING } from '../../ui-style-constants'
 import { isntStyleProp, styleProps } from '../../primitives'
 import { BORDERS, COLORS } from '../../helix-design-system'
 
-import type { StyleProps } from '../../index'
+import { CURSOR_DEFAULT, CURSOR_POINTER, type StyleProps } from '../../index'
 
 interface SecondaryButtonProps extends StyleProps {
   /** button action is dangerous and may have non-reversible side-effects for user */
@@ -14,7 +14,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   shouldForwardProp: p => isntStyleProp(p) && p !== 'isDangerous',
 })<SecondaryButtonProps>`
   appearance: none;
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   color: ${props => (props.isDangerous ? COLORS.red50 : COLORS.blue50)};
   border: ${BORDERS.lineBorder};
   border-color: ${props => (props.isDangerous ? COLORS.red50 : 'initial')};
@@ -55,7 +55,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
     box-shadow: none;
     border-color: ${COLORS.grey30};
     color: ${COLORS.grey40};
-    cursor: default;
+    cursor: ${CURSOR_DEFAULT};
   }
 
   ${styleProps}

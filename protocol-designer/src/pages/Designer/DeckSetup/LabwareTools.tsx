@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   COLORS,
+  CURSOR_POINTER,
   CheckboxField,
   DIRECTION_COLUMN,
   DISPLAY_INLINE_BLOCK,
@@ -468,9 +469,9 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
 
 const StyledLabel = styled.label`
   text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
-  text-align: ${TYPOGRAPHY.textAlignCenter}};
-  display: ${DISPLAY_INLINE_BLOCK}
-  cursor: pointer;
+  text-align: ${TYPOGRAPHY.textAlignCenter};
+  display: ${DISPLAY_INLINE_BLOCK};
+  cursor: ${CURSOR_POINTER};
   input[type='file'] {
     display: none;
   }

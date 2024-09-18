@@ -5,6 +5,7 @@ import {
   BORDERS,
   Btn,
   COLORS,
+  CURSOR_DEFAULT,
   DIRECTION_ROW,
   Flex,
   Icon,
@@ -105,7 +106,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
       .defaultBackgroundColor};
-    cursor: default;
+    cursor: ${CURSOR_DEFAULT};
     border-radius: ${buttonCategory === 'rounded'
       ? BORDERS.borderRadius40
       : BORDERS.borderRadius16};

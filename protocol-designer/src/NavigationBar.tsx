@@ -8,6 +8,7 @@ import {
   ALIGN_CENTER,
   Btn,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
@@ -87,7 +88,7 @@ export function NavigationBar(): JSX.Element | null {
 
 const StyledLabel = styled.label`
   height: 20px;
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   input[type='file'] {
     display: none;
   }

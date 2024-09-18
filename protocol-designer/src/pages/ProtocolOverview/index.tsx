@@ -17,6 +17,7 @@ import {
   LiquidIcon,
   ListItem,
   ListItemDescriptor,
+  NO_WRAP,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -293,7 +294,7 @@ export function ProtocolOverview(): JSX.Element {
               onClick={() => {
                 navigate('/designer')
               }}
-              whiteSpace="nowrap"
+              whiteSpace={NO_WRAP}
               height="3.5rem"
             />
             <LargeButton
@@ -309,7 +310,7 @@ export function ProtocolOverview(): JSX.Element {
                 }
               }}
               iconName="arrow-right"
-              whiteSpace="nowrap"
+              whiteSpace={NO_WRAP}
             />
           </Flex>
         </Flex>

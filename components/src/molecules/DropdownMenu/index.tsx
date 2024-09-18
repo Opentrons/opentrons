@@ -4,6 +4,7 @@ import { css } from 'styled-components'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import {
   ALIGN_CENTER,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
@@ -136,7 +137,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   const DROPDOWN_STYLE = css`
     flex-direction: ${DIRECTION_ROW};
     background-color: ${COLORS.white};
-    cursor: pointer;
+    cursor: ${CURSOR_POINTER};
     padding: ${SPACING.spacing8} ${SPACING.spacing12};
     border: 1px ${BORDERS.styleSolid}
       ${showDropdownMenu ? COLORS.blue50 : COLORS.grey50};

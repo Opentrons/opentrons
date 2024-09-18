@@ -7,6 +7,8 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  CURSOR_DEFAULT,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -146,7 +148,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
               &:hover {
                 color: ${downloadIsDisabled ? COLORS.grey40 : COLORS.black90};
               }
-              cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
+              cursor: ${downloadIsDisabled ? CURSOR_DEFAULT : CURSOR_POINTER};
             `}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             onClick={onDownloadClick}
