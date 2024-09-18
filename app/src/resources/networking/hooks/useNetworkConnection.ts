@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import { useInterval } from '@opentrons/components'
-import { useWifiList } from '../../../resources/networking/hooks'
+import { useWifiList } from '/app/resources/networking/hooks'
 import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
 
 import type { IconName } from '@opentrons/components'

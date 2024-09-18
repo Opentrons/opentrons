@@ -16,7 +16,7 @@ import { useMissingProtocolHardware } from '../../../../transformations/commands
 import { getOnDeviceDisplaySettings } from '/app/redux/config'
 import { WelcomeModal } from '../WelcomeModal'
 import { RobotDashboard } from '..'
-import { useNotifyAllRunsQuery } from '../../../../resources/runs'
+import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type { NavigateFunction } from 'react-router-dom'
@@ -37,7 +37,7 @@ vi.mock('../../../../organisms/Navigation')
 vi.mock('../../../../transformations/commands')
 vi.mock('/app/redux/config')
 vi.mock('../WelcomeModal')
-vi.mock('../../../../resources/runs')
+vi.mock('/app/resources/runs')
 
 const render = () => {
   return renderWithProviders(

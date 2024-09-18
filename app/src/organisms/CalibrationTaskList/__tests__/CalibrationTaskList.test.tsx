@@ -26,7 +26,7 @@ import {
 import { mockLeftProtoPipette } from '/app/redux/pipettes/__fixtures__'
 
 vi.mock('../../Devices/hooks')
-vi.mock('../../../resources/runs')
+vi.mock('/app/resources/runs')
 
 const render = (robotName: string = 'otie') => {
   return renderWithProviders(

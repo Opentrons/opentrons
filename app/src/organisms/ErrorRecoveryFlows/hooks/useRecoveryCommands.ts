@@ -7,7 +7,7 @@ import {
   useUpdateErrorRecoveryPolicy,
 } from '@opentrons/react-api-client'
 
-import { useChainRunCommands } from '../../../resources/runs'
+import { useChainRunCommands } from '/app/resources/runs'
 import { RECOVERY_MAP } from '../constants'
 
 import type {

@@ -4,7 +4,7 @@ import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
 import { MANAGED_PIPETTE_ID, POSITION_AND_BLOWOUT } from '../constants'
 import { getAddressableAreaFromConfig } from '../utils'
-import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import type {
   CreateCommand,
   AddressableAreaName,

@@ -43,7 +43,7 @@ import {
   getLoadedLabware,
   getLoadedModule,
 } from '../../molecules/Command/utils/accessors'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type {
   CompletedProtocolAnalysis,

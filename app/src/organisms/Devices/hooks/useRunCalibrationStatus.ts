@@ -6,7 +6,7 @@ import {
   useStoredProtocolAnalysis,
 } from '.'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { isGripperInCommands } from '../../../resources/protocols/utils'
+import { isGripperInCommands } from '/app/resources/protocols/utils'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import type {
   GripperData,

@@ -30,8 +30,8 @@ import {
 } from '/app/redux/discovery'
 import { fetchStatus, postWifiConfigure } from '/app/redux/networking'
 import { getRequestById, useDispatchApiRequest } from '/app/redux/robot-api'
-import { useWifiList } from '../../../resources/networking/hooks'
-import { useNetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
+import { useWifiList } from '/app/resources/networking/hooks'
+import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
 import { RobotSettingsList } from './RobotSettingsList'
 
 import type { WifiSecurityType } from '@opentrons/api-client'

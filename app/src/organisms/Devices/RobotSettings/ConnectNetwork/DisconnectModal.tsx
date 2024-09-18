@@ -26,7 +26,7 @@ import {
   getNetworkInterfaces,
   postWifiDisconnect,
 } from '/app/redux/networking'
-import { useWifiList } from '../../../../resources/networking/hooks'
+import { useWifiList } from '/app/resources/networking/hooks'
 import {
   dismissRequest,
   getRequestById,

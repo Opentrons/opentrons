@@ -19,7 +19,7 @@ import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 import {
   useRobotInitializationStatus,
   INIT_STATUS,
-} from '../../../../../resources/health/hooks'
+} from '/app/resources/health/hooks'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { RobotUpdateSession } from '/app/redux/robot-update/types'
@@ -28,7 +28,7 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('../useRobotUpdateInfo')
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/robot-update/hooks')
-vi.mock('../../../../../resources/health/hooks')
+vi.mock('/app/resources/health/hooks')
 
 const render = (
   props: React.ComponentProps<typeof RobotUpdateProgressModal>

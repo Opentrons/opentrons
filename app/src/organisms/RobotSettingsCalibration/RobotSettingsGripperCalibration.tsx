@@ -23,7 +23,7 @@ import {
 
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
 import { formatLastCalibrated } from './CalibrationDetails/utils'
-import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { GripperData } from '@opentrons/api-client'
 

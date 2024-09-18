@@ -5,7 +5,7 @@ import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useCurrentRunId } from '../../../resources/runs'
+import { useCurrentRunId } from '/app/resources/runs'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { RobotOverflowMenu } from '../RobotOverflowMenu'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
@@ -17,10 +17,10 @@ import {
 } from '/app/redux/discovery/__fixtures__'
 
 vi.mock('/app/redux/robot-update/hooks')
-vi.mock('../../../resources/runs')
+vi.mock('/app/resources/runs')
 vi.mock('../../ChooseProtocolSlideout')
 vi.mock('../hooks')
-vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
 const render = (props: React.ComponentProps<typeof RobotOverflowMenu>) => {
   return renderWithProviders(

@@ -14,7 +14,7 @@ import { UpdateNeededModal } from '../UpdateNeededModal'
 import { UpdateInProgressModal } from '../UpdateInProgressModal'
 import { useIsUnboxingFlowOngoing } from '../../ODD/hooks'
 import { FirmwareUpdateTakeover } from '../FirmwareUpdateTakeover'
-import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
 import type { BadPipette, PipetteData } from '@opentrons/api-client'
 
@@ -22,7 +22,7 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('../UpdateNeededModal')
 vi.mock('../UpdateInProgressModal')
 vi.mock('../../ODD/hooks')
-vi.mock('../../../resources/maintenance_runs')
+vi.mock('/app/resources/maintenance_runs')
 
 const render = () => {
   return renderWithProviders(<FirmwareUpdateTakeover />, {

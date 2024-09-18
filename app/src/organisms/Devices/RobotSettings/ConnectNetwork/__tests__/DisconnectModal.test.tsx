@@ -7,7 +7,7 @@ import { when } from 'vitest-when'
 
 import { i18n } from '/app/i18n'
 import { useRobot } from '../../../../../organisms/Devices/hooks'
-import { useWifiList } from '../../../../../resources/networking/hooks'
+import { useWifiList } from '/app/resources/networking/hooks'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -33,7 +33,7 @@ import type { DispatchApiRequestType } from '/app/redux/robot-api'
 import type { RequestState } from '/app/redux/robot-api/types'
 import type { State } from '/app/redux/types'
 
-vi.mock('../../../../../resources/networking/hooks')
+vi.mock('/app/resources/networking/hooks')
 vi.mock('../../../../../organisms/Devices/hooks')
 vi.mock('/app/redux/networking')
 vi.mock('/app/redux/robot-api')

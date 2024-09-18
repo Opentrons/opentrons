@@ -21,7 +21,7 @@ import {
   useModuleRenderInfoForProtocolById,
   useStoredProtocolAnalysis,
 } from '..'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type {
   CutoutConfig,
@@ -37,7 +37,7 @@ vi.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
 vi.mock('../useAttachedModules')
 vi.mock('../useStoredProtocolAnalysis')
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../../../../resources/deck_configuration')
+vi.mock('/app/resources/deck_configuration')
 
 const heaterShakerCommandsWithResultsKey = (heater_shaker_commands_with_results_key as unknown) as ProtocolAnalysisOutput
 

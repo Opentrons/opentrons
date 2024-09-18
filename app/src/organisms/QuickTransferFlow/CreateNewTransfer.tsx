@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 
 import { ChildNavigation } from '../ChildNavigation'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import type { SmallButton } from '../../atoms/buttons'
 
 interface CreateNewTransferProps {

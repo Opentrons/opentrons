@@ -8,7 +8,7 @@ import { renderHook } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
 
 import { i18n } from '/app/i18n'
-import { useWifiList } from '../../../resources/networking/hooks'
+import { useWifiList } from '/app/resources/networking/hooks'
 import * as Networking from '/app/redux/networking'
 import * as Fixtures from '/app/redux/networking/__fixtures__'
 import { getNetworkInterfaces } from '/app/redux/networking'
@@ -16,7 +16,7 @@ import { getNetworkInterfaces } from '/app/redux/networking'
 import { useNetworkConnection } from '../hooks/useNetworkConnection'
 import type { Store } from 'redux'
 
-vi.mock('../../../resources/networking/hooks')
+vi.mock('/app/resources/networking/hooks')
 vi.mock('/app/redux/networking/selectors')
 
 const mockRobotName = 'robot-name'

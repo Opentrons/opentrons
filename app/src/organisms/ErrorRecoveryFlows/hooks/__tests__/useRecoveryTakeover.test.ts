@@ -7,7 +7,7 @@ import { getUserId } from '/app/redux/config'
 import {
   useClientDataRecovery,
   useUpdateClientDataRecovery,
-} from '../../../../resources/client_data'
+} from '/app/resources/client_data'
 
 import type { Mock } from 'vitest'
 
@@ -15,7 +15,7 @@ vi.mock('react-redux', () => ({
   useSelector: vi.fn(),
 }))
 vi.mock('/app/redux/config')
-vi.mock('../../../../resources/client_data')
+vi.mock('/app/resources/client_data')
 
 describe('useRecoveryTakeover', () => {
   let mockToggleERWiz: Mock

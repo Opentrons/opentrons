@@ -16,7 +16,7 @@ import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { Jog } from '../../molecules/JogControls/types'
-import type { useChainRunCommands } from '../../resources/runs'
+import type { useChainRunCommands } from '/app/resources/runs'
 import type {
   DetachProbeStep,
   RegisterPositionAction,

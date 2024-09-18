@@ -18,14 +18,14 @@ import {
 import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useCreateRunFromProtocol } from '../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ChooseProtocolSlideout } from '../'
-import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
+import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 vi.mock('../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol')
 vi.mock('/app/redux/protocol-storage')
 vi.mock('../../../organisms/Devices/hooks')
 vi.mock('/app/redux/config')
-vi.mock('../../../resources/useNotifyDataReady')
+vi.mock('/app/resources/useNotifyDataReady')
 
 const render = (props: React.ComponentProps<typeof ChooseProtocolSlideout>) => {
   return renderWithProviders(

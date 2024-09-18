@@ -30,8 +30,8 @@ import {
 import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 import { useOffsetCandidatesForAnalysis } from '../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotToRunProtocolSlideout } from '../'
-import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
-import { useCurrentRunId } from '../../../resources/runs'
+import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
+import { useCurrentRunId } from '/app/resources/runs'
 
 import type { State } from '/app/redux/types'
 
@@ -44,8 +44,8 @@ vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/networking')
 vi.mock('../useCreateRunFromProtocol')
 vi.mock('../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis')
-vi.mock('../../../resources/useNotifyDataReady')
-vi.mock('../../../resources/runs')
+vi.mock('/app/resources/useNotifyDataReady')
+vi.mock('/app/resources/runs')
 
 const render = (
   props: React.ComponentProps<typeof ChooseRobotToRunProtocolSlideout>

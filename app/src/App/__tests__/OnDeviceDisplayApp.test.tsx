@@ -28,7 +28,7 @@ import { getIsShellReady } from '/app/redux/shell'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { useProtocolReceiptToast } from '../hooks'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { ODDTopLevelRedirects } from '../ODDTopLevelRedirects'
 
 import type { UseQueryResult } from 'react-query'
@@ -66,7 +66,7 @@ vi.mock('../../pages/ODD/DeckConfiguration')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/shell')
 vi.mock('/app/redux/discovery')
-vi.mock('../../resources/maintenance_runs')
+vi.mock('/app/resources/maintenance_runs')
 vi.mock('../hooks')
 vi.mock('../ODDTopLevelRedirects')
 

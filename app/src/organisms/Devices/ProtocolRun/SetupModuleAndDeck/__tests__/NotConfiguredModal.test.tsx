@@ -7,13 +7,13 @@ import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 
 import { i18n } from '/app/i18n'
 import { NotConfiguredModal } from '../NotConfiguredModal'
-import { useNotifyDeckConfigurationQuery } from '../../../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../../resources/deck_configuration')
+vi.mock('/app/resources/deck_configuration')
 
 const render = (props: React.ComponentProps<typeof NotConfiguredModal>) => {
   return renderWithProviders(<NotConfiguredModal {...props} />, {

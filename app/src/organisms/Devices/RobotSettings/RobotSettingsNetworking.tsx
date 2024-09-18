@@ -18,10 +18,7 @@ import {
   useInterval,
 } from '@opentrons/components'
 
-import {
-  useCanDisconnect,
-  useWifiList,
-} from '../../../resources/networking/hooks'
+import { useCanDisconnect, useWifiList } from '/app/resources/networking/hooks'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { Divider } from '../../../atoms/structure'
 
@@ -35,7 +32,7 @@ import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
 import { useIsFlex, useIsRobotBusy } from '../hooks'
 import { DisconnectModal } from './ConnectNetwork/DisconnectModal'
 import { SelectNetwork } from './SelectNetwork'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { State, Dispatch } from '/app/redux/types'
 import { getModalPortalEl } from '../../../App/portal'

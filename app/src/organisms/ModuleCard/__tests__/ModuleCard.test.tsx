@@ -15,7 +15,7 @@ import {
   mockHeaterShaker,
 } from '/app/redux/modules/__fixtures__'
 import { mockRobot } from '/app/redux/robot-api/__fixtures__'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { FAILURE, getRequestById, PENDING, SUCCESS } from '/app/redux/robot-api'
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import { useToaster } from '../../ToasterOven'
@@ -49,7 +49,7 @@ vi.mock('../FirmwareUpdateFailedModal')
 vi.mock('/app/redux/robot-api')
 vi.mock('../../../organisms/ToasterOven')
 vi.mock('../../../organisms/Devices/hooks')
-vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {

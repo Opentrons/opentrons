@@ -21,7 +21,7 @@ import {
 } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
-import { usePipetteNameSpecs } from '../../resources/instruments/hooks'
+import { usePipetteNameSpecs } from '/app/resources/instruments/hooks'
 import {
   CALIBRATION_PROBE,
   FLOWS,
@@ -32,7 +32,7 @@ import {
   BODY_STYLE,
 } from './constants'
 import { getIsGantryEmpty } from './utils'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { UseMutateFunction } from 'react-query'
 import type { AxiosError } from 'axios'

@@ -28,7 +28,7 @@ import { RobotMotionLoader } from './RobotMotionLoader'
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
-} from '../../resources/maintenance_runs'
+} from '/app/resources/maintenance_runs'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 
 import type {

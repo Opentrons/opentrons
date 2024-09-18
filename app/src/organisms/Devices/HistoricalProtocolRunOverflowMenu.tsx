@@ -34,7 +34,7 @@ import {
 } from '/app/redux/analytics'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { useDownloadRunLog, useTrackProtocolRunEvent, useRobot } from './hooks'
-import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { Run } from '@opentrons/api-client'
 

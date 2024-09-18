@@ -5,10 +5,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
-import { useChainLiveCommands } from '../../../../resources/runs'
+import { useChainLiveCommands } from '/app/resources/runs'
 import { mockThermocyclerGen2 } from '/app/redux/modules/__fixtures__'
 import { useRunStatuses } from '../../../Devices/hooks'
-import { useIsEstopNotDisengaged } from '../../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import { ModuleCalibrationOverflowMenu } from '../ModuleCalibrationOverflowMenu'
 
@@ -17,8 +17,8 @@ import type { Mount } from '@opentrons/components'
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../ModuleWizardFlows')
 vi.mock('../../../Devices/hooks')
-vi.mock('../../../../resources/runs')
-vi.mock('../../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/resources/runs')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
 const mockPipetteOffsetCalibrations = [
   {

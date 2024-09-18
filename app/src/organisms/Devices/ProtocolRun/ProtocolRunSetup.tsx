@@ -27,8 +27,8 @@ import { INCOMPATIBLE, INEXACT_MATCH } from '/app/redux/pipettes'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
-} from '../../../resources/deck_configuration/utils'
-import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
+} from '/app/resources/deck_configuration/utils'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
   useIsFlex,
   useModuleCalibrationStatus,

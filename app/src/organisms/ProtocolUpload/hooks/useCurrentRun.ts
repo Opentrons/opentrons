@@ -1,4 +1,4 @@
-import { useNotifyRunQuery, useCurrentRunId } from '../../../resources/runs'
+import { useNotifyRunQuery, useCurrentRunId } from '/app/resources/runs'
 
 import type { Run } from '@opentrons/api-client'
 

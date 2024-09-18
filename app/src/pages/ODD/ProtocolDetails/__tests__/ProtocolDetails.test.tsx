@@ -17,7 +17,7 @@ import { useHardwareStatusText } from '../../../../organisms/ODD/RobotDashboard/
 import { useOffsetCandidatesForAnalysis } from '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useRunTimeParameters } from '../../../../pages/Desktop/Protocols/hooks'
 import { ProtocolSetupParameters } from '../../../../organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
-import { formatTimeWithUtcLabel } from '../../../../resources/runs'
+import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '../../../../transformations/commands'
 import { ProtocolDetails } from '..'
 import { Deck } from '../Deck'

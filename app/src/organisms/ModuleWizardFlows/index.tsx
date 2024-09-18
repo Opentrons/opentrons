@@ -17,7 +17,7 @@ import {
 import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'
-import { useCreateTargetedMaintenanceRunMutation } from '../../resources/runs'
+import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 import { getIsOnDevice } from '/app/redux/config'
 import {
   SimpleWizardBody,
@@ -31,11 +31,11 @@ import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 import { DetachProbe } from './DetachProbe'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
-} from '../../resources/maintenance_runs'
+} from '/app/resources/maintenance_runs'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import { RUN_STATUS_FAILED } from '@opentrons/api-client'

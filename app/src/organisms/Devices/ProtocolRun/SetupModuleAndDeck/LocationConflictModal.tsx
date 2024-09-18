@@ -35,7 +35,7 @@ import {
 import { getTopPortalEl } from '../../../../App/portal'
 import { OddModal } from '../../../../molecules/OddModal'
 import { SmallButton } from '../../../../atoms/buttons/SmallButton'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type {
   CutoutConfig,

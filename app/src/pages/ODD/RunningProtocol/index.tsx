@@ -28,7 +28,7 @@ import {
 
 import { StepMeter } from '../../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useNotifyRunQuery } from '../../../resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 import {
   InterventionModal,
   useInterventionModal,

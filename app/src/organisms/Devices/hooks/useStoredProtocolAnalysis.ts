@@ -8,7 +8,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getStoredProtocol } from '/app/redux/protocol-storage'
-import { useNotifyRunQuery } from '../../../resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '/app/redux/types'

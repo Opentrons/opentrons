@@ -18,7 +18,7 @@ import {
 
 import { HistoricalProtocolRun } from './HistoricalProtocolRun'
 import { useIsRobotViewable, useRunStatuses } from './hooks'
-import { useNotifyAllRunsQuery, useCurrentRunId } from '../../resources/runs'
+import { useNotifyAllRunsQuery, useCurrentRunId } from '/app/resources/runs'
 
 interface RecentProtocolRunsProps {
   robotName: string

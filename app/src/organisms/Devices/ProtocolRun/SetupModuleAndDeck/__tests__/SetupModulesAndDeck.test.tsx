@@ -8,7 +8,7 @@ import { mockTemperatureModule } from '/app/redux/modules/__fixtures__'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
-} from '../../../../../resources/deck_configuration/utils'
+} from '/app/resources/deck_configuration/utils'
 import {
   useIsFlex,
   useRunHasStarted,
@@ -25,7 +25,7 @@ vi.mock('../SetupModulesList')
 vi.mock('../SetupModulesMap')
 vi.mock('../SetupFixtureList')
 vi.mock('/app/redux/config')
-vi.mock('../../../../../resources/deck_configuration/utils')
+vi.mock('/app/resources/deck_configuration/utils')
 
 const MOCK_ROBOT_NAME = 'otie'
 const MOCK_RUN_ID = '1'

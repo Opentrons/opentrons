@@ -26,8 +26,8 @@ import { getCommandTextData } from '../../../molecules/Command/utils/getCommandT
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
-import { useRunningStepCounts } from '../../../resources/protocols/hooks'
-import { useNotifyAllCommandsQuery } from '../../../resources/runs'
+import { useRunningStepCounts } from '/app/resources/protocols/hooks'
+import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
 import type {
   CompletedProtocolAnalysis,

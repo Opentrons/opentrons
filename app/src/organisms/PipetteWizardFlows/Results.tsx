@@ -18,7 +18,7 @@ import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '../../molecules/SimpleWizardBody'
-import { usePipetteNameSpecs } from '../../resources/instruments/hooks'
+import { usePipetteNameSpecs } from '/app/resources/instruments/hooks'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
 

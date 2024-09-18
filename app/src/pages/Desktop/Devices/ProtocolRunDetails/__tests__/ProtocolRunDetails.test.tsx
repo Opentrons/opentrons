@@ -20,7 +20,7 @@ import { ProtocolRunModuleControls } from '../../../../../organisms/Devices/Prot
 import { ProtocolRunSetup } from '../../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { RunPreviewComponent } from '../../../../../organisms/RunPreview'
 import { ProtocolRunRuntimeParameters } from '../../../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
-import { useCurrentRunId } from '../../../../../resources/runs'
+import { useCurrentRunId } from '/app/resources/runs'
 import { mockRobotSideAnalysis } from '../../../../../molecules/Command/__fixtures__'
 import { ProtocolRunDetails } from '..'
 
@@ -36,7 +36,7 @@ vi.mock('../../../../../organisms/RunPreview')
 vi.mock(
   '../../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 )
-vi.mock('../../../../../resources/runs')
+vi.mock('/app/resources/runs')
 vi.mock(
   '../../../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 )

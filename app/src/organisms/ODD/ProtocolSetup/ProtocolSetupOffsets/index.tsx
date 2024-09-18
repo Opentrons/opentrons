@@ -19,7 +19,7 @@ import type { SetupScreens } from '../types'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { TerseOffsetTable } from '../../../../organisms/LabwarePositionCheck/ResultsSummary'
 import { getLabwareDefinitionsFromCommands } from '../../../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
-import { useNotifyRunQuery } from '../../../../resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 import { getLatestCurrentOffsets } from '../../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 
 export interface ProtocolSetupOffsetsProps {

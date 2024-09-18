@@ -14,7 +14,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { getTopPortalEl } from '../../../App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
 import { useBlowOutLocationOptions } from './BlowOut'

@@ -51,7 +51,7 @@ import { DeleteTransferConfirmationModal } from '../QuickTransferDashboard/Delet
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
-import { formatTimeWithUtcLabel } from '../../../resources/runs'
+import { formatTimeWithUtcLabel } from '/app/resources/runs'
 
 import type { Protocol } from '@opentrons/api-client'
 import type { Dispatch } from '/app/redux/types'

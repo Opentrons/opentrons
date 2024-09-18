@@ -27,7 +27,7 @@ import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { Divider } from '../../atoms/structure'
 import { getTopPortalEl } from '../../App/portal'
 import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
-import { useCurrentRunId } from '../../resources/runs'
+import { useCurrentRunId } from '/app/resources/runs'
 import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
 import { useIsRobotBusy } from './hooks'
 

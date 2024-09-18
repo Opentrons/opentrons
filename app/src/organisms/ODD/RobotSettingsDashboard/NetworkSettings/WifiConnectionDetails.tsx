@@ -22,7 +22,7 @@ import { NetworkDetailsModal } from './NetworkDetailsModal'
 import { DisplayWifiList } from '../../NetworkSettings'
 import { getLocalRobot } from '/app/redux/discovery'
 import { getNetworkInterfaces } from '/app/redux/networking'
-import { useWifiList } from '../../../../resources/networking/hooks'
+import { useWifiList } from '/app/resources/networking/hooks'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'

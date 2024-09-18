@@ -7,11 +7,11 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
-import { useNetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
+import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
 import { NavigationMenu } from '../NavigationMenu'
 import { Navigation } from '..'
 
-vi.mock('../../../resources/networking/hooks/useNetworkConnection')
+vi.mock('/app/resources/networking/hooks/useNetworkConnection')
 vi.mock('/app/redux/discovery')
 vi.mock('../NavigationMenu')
 

@@ -52,7 +52,7 @@ import {
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 import { TertiaryButton } from '../../atoms/buttons'
 import { OddModal } from '../../molecules/OddModal'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration/'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
 
 import type {
   CutoutConfig,

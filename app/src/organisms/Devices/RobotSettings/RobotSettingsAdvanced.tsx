@@ -43,7 +43,7 @@ import { FactoryModeSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryM
 import { handleUpdateBuildroot } from './UpdateBuildroot'
 import { getRobotSerialNumber, UNREACHABLE } from '/app/redux/discovery'
 import { getTopPortalEl } from '../../../App/portal'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { State, Dispatch } from '/app/redux/types'
 import type {

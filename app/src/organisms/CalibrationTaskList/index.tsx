@@ -25,7 +25,7 @@ import {
   useCalibrationTaskList,
   useRunHasStarted,
 } from '../Devices/hooks'
-import { useCurrentRunId } from '../../resources/runs'
+import { useCurrentRunId } from '/app/resources/runs'
 
 import type { DashboardCalOffsetInvoker } from '../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
 import type { DashboardCalTipLengthInvoker } from '../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'

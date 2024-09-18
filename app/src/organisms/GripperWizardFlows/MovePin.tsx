@@ -26,7 +26,7 @@ import calibratingFrontJaw from '/app/assets/videos/gripper-wizards/CALIBRATING_
 import calibratingRearJaw from '/app/assets/videos/gripper-wizards/CALIBRATING_REAR_JAW.webm'
 
 import type { Coordinates } from '@opentrons/shared-data'
-import type { CreateMaintenanceCommand } from '../../resources/runs'
+import type { CreateMaintenanceCommand } from '/app/resources/runs'
 import type { GripperWizardStepProps, MovePinStep } from './types'
 
 interface MovePinProps extends GripperWizardStepProps, MovePinStep {

@@ -14,7 +14,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useCurrentRunId } from '../../resources/runs'
+import { useCurrentRunId } from '/app/resources/runs'
 
 import type {
   HeaterShakerCloseLatchCreateCommand,

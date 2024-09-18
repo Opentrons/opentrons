@@ -37,7 +37,7 @@ import { RunningProtocol } from '..'
 import {
   useNotifyRunQuery,
   useNotifyAllCommandsQuery,
-} from '../../../../resources/runs'
+} from '/app/resources/runs'
 import { useFeatureFlag } from '/app/redux/config'
 import {
   ErrorRecoveryFlows,
@@ -64,7 +64,7 @@ vi.mock('../../../../organisms/ODD/RunningProtocol')
 vi.mock('/app/redux/discovery')
 vi.mock('../../../../organisms/ODD/RunningProtocol/CancelingRunModal')
 vi.mock('../../../../organisms/OpenDoorAlertModal')
-vi.mock('../../../../resources/runs')
+vi.mock('/app/resources/runs')
 vi.mock('/app/redux/config')
 vi.mock('../../../../organisms/ErrorRecoveryFlows')
 vi.mock('../../../../organisms/Devices/hooks/useLastRunCommand')

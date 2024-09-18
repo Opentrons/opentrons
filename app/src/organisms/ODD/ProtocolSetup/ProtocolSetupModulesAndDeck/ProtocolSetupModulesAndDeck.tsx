@@ -32,7 +32,7 @@ import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { FixtureTable } from './FixtureTable'
 import { ModuleTable } from './ModuleTable'
 import { ModulesAndDeckMapView } from './ModulesAndDeckMapView'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { CutoutId, CutoutFixtureId } from '@opentrons/shared-data'
 import type { SetupScreens } from '../types'

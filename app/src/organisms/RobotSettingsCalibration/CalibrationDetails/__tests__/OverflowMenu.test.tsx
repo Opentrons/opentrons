@@ -25,7 +25,7 @@ import {
   mockTipLengthCalibrationResponse,
 } from '../__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { useIsEstopNotDisengaged } from '../../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { OverflowMenu } from '../OverflowMenu'
 
 import type { Mount } from '@opentrons/components'
@@ -70,7 +70,7 @@ vi.mock(
 vi.mock('../../../../organisms/ProtocolUpload/hooks')
 vi.mock('../../../../organisms/Devices/hooks')
 vi.mock('../../../PipetteWizardFlows')
-vi.mock('../../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
 const RUN_STATUSES = {
   isRunRunning: false,

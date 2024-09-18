@@ -37,7 +37,7 @@ import { getRobotSettings, updateSetting } from '/app/redux/robot-settings'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
 import { Navigation } from '../../../organisms/Navigation'
 import { useLEDLights } from '../../../organisms/Devices/hooks'
-import { useNetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
+import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
 import {
   RobotSettingButton,
   OnOffToggle,

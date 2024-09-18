@@ -38,7 +38,7 @@ import {
 import { FloatingActionButton, SmallButton } from '../../../../atoms/buttons'
 import { ODDBackButton } from '../../../../molecules/ODDBackButton'
 import { getLabwareSetupItemGroups } from '../../../../transformations/commands'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { getProtocolModulesInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { getNestedLabwareInfo } from '../../../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
 import { LabwareStackModal } from '../../../Devices/ProtocolRun/SetupLabware/LabwareStackModal'

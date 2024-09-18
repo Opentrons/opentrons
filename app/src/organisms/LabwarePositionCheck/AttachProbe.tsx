@@ -21,7 +21,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type { Jog } from '../../molecules/JogControls/types'
-import type { useChainRunCommands } from '../../resources/runs'
+import type { useChainRunCommands } from '/app/resources/runs'
 import type {
   AttachProbeStep,
   RegisterPositionAction,

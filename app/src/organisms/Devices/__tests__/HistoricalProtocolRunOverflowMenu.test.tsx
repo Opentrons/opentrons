@@ -17,9 +17,9 @@ import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '/app/redux/analytics'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
-import { useNotifyAllCommandsQuery } from '../../../resources/runs'
+import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
 import type { UseQueryResult } from 'react-query'
 import type { CommandsData } from '@opentrons/api-client'
@@ -30,8 +30,8 @@ vi.mock('../../Devices/hooks')
 vi.mock('../../RunTimeControl/hooks')
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/config')
-vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
-vi.mock('../../../resources/runs')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/resources/runs')
 vi.mock('/app/redux/robot-update')
 vi.mock('@opentrons/react-api-client')
 

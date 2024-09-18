@@ -27,7 +27,7 @@ import {
   mockUseModulesQueryOpening,
   mockUseModulesQueryUnknown,
 } from '../__fixtures__'
-import { useNotifyDeckConfigurationQuery } from '../../../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type * as ReactApiClient from '@opentrons/react-api-client'
 
@@ -44,7 +44,7 @@ vi.mock(
   '../../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
 vi.mock('../../../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
-vi.mock('../../../../../resources/deck_configuration')
+vi.mock('/app/resources/deck_configuration')
 
 const RUN_ID = "otie's run"
 const mockSetSetupScreen = vi.fn()

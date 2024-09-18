@@ -12,7 +12,7 @@ import {
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useMostRecentCompletedAnalysis } from '../../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useIsOEMMode } from '../../../../../resources/robot-settings/hooks'
+import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
 import { mockRecentAnalysis } from '../__fixtures__'
 import { ProtocolSetupInstruments } from '..'
 
@@ -20,7 +20,7 @@ vi.mock('@opentrons/react-api-client')
 vi.mock(
   '../../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
-vi.mock('../../../../../resources/robot-settings/hooks')
+vi.mock('/app/resources/robot-settings/hooks')
 
 const mockGripperData = {
   instrumentModel: 'gripper_v1',

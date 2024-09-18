@@ -21,7 +21,7 @@ import { GripperWizardFlows } from '../GripperWizardFlows'
 import { MediumButton } from '../../atoms/buttons'
 import { FLOWS } from '../PipetteWizardFlows/constants'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
-import { formatTimeWithUtcLabel } from '../../resources/runs'
+import { formatTimeWithUtcLabel } from '/app/resources/runs'
 
 import type { InstrumentData } from '@opentrons/api-client'
 import type { PipetteMount } from '@opentrons/shared-data'

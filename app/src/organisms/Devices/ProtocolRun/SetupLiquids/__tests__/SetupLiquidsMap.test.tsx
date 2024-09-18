@@ -54,7 +54,7 @@ vi.mock('../utils')
 vi.mock('../../utils/getLabwareRenderInfo')
 vi.mock('../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils')
 vi.mock('../../utils/getProtocolModulesInfo')
-vi.mock('../../../../../resources/deck_configuration/utils')
+vi.mock('/app/resources/deck_configuration/utils')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getSimplestDeckConfigForProtocol>()
   return {

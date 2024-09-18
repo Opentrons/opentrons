@@ -39,8 +39,8 @@ import { InterventionTicks } from './InterventionTicks'
 import {
   useNotifyRunQuery,
   useNotifyAllCommandsQuery,
-} from '../../resources/runs'
-import { useRunningStepCounts } from '../../resources/protocols/hooks'
+} from '/app/resources/runs'
+import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 import { useRunProgressCopy } from './hooks'
 
 interface RunProgressMeterProps {

@@ -28,7 +28,7 @@ import type {
   MoveLabwareCreateCommand,
 } from '@opentrons/shared-data'
 import type { VectorOffset } from '@opentrons/api-client'
-import type { useChainRunCommands } from '../../resources/runs'
+import type { useChainRunCommands } from '/app/resources/runs'
 import type { ReturnTipStep } from './types'
 import type { TFunction } from 'i18next'
 

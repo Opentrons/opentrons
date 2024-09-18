@@ -34,7 +34,7 @@ import { deleteProtocol } from '@opentrons/api-client'
 import { SmallButton } from '../../../atoms/buttons'
 import { OddModal } from '../../../molecules/OddModal'
 import { LongPressModal } from './LongPressModal'
-import { formatTimeWithUtcLabel } from '../../../resources/runs'
+import { formatTimeWithUtcLabel } from '/app/resources/runs'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'

@@ -22,7 +22,7 @@ import probing96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_9
 import { BODY_STYLE, SECTIONS, FLOWS } from './constants'
 import { getPipetteAnimations } from './utils'
 import { ProbeNotAttached } from './ProbeNotAttached'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { MotorAxes, CreateCommand } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'

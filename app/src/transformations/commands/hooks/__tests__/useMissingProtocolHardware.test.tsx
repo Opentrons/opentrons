@@ -19,14 +19,12 @@ import type {
   DeckConfiguration,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration/useNotifyDeckConfigurationQuery'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/useNotifyDeckConfigurationQuery'
 import { useMissingProtocolHardware } from '../useMissingProtocolHardware'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock(
-  '../../../../resources/deck_configuration/useNotifyDeckConfigurationQuery'
-)
+vi.mock('/app/resources/deck_configuration/useNotifyDeckConfigurationQuery')
 
 const mockRTPData = [
   {

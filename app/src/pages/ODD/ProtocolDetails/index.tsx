@@ -55,7 +55,7 @@ import { Deck } from './Deck'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 import { Liquids } from './Liquids'
-import { formatTimeWithUtcLabel } from '../../../resources/runs'
+import { formatTimeWithUtcLabel } from '/app/resources/runs'
 
 import type { Protocol } from '@opentrons/api-client'
 import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'

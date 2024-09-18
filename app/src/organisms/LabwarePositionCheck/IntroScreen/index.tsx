@@ -37,7 +37,7 @@ import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import type { useChainRunCommands } from '../../../resources/runs'
+import type { useChainRunCommands } from '/app/resources/runs'
 import type { RegisterPositionAction } from '../types'
 import type { Jog } from '../../../molecules/JogControls'
 

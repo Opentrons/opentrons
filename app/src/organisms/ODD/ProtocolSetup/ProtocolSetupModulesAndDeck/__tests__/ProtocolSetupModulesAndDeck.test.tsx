@@ -13,7 +13,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useChainLiveCommands } from '../../../../../resources/runs'
+import { useChainLiveCommands } from '/app/resources/runs'
 import { mockRobotSideAnalysis } from '../../../../../molecules/Command/__fixtures__'
 import {
   useAttachedModules,
@@ -35,16 +35,16 @@ import { SetupInstructionsModal } from '../SetupInstructionsModal'
 import { FixtureTable } from '../FixtureTable'
 import { ModulesAndDeckMapView } from '../ModulesAndDeckMapView'
 import { ProtocolSetupModulesAndDeck } from '..'
-import { useNotifyDeckConfigurationQuery } from '../../../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useRunStatus } from '../../../../RunTimeControl/hooks'
 
 import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
 import type { UseQueryResult } from 'react-query'
 
-vi.mock('../../../../../resources/runs')
+vi.mock('/app/resources/runs')
 vi.mock('/app/redux/discovery')
 vi.mock('../../../../../organisms/Devices/hooks')
-vi.mock('../../../../../resources/deck_configuration')
+vi.mock('/app/resources/deck_configuration')
 vi.mock(
   '../../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )

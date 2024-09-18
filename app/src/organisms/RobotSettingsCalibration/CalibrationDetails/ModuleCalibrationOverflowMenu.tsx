@@ -17,12 +17,12 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 
-import { useChainLiveCommands } from '../../../resources/runs'
+import { useChainLiveCommands } from '/app/resources/runs'
 import { useRunStatuses } from '../../Devices/hooks'
 import { getModulePrepCommands } from '../../Devices/getModulePrepCommands'
 import { ModuleWizardFlows } from '../../ModuleWizardFlows'
 import { getModuleTooHot } from '../../Devices/getModuleTooHot'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { AttachedModule } from '/app/redux/modules/types'
 import type { FormattedPipetteOffsetCalibration } from '..'

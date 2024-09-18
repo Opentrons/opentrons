@@ -32,7 +32,7 @@ import { getFixtureImage } from './utils'
 import { DeckFixtureSetupInstructionsModal } from '../../../DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 
 import type { DeckDefinition } from '@opentrons/shared-data'
-import type { CutoutConfigAndCompatibility } from '../../../../resources/deck_configuration/hooks'
+import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
 
 interface SetupFixtureListProps {
   deckConfigCompatibility: CutoutConfigAndCompatibility[]

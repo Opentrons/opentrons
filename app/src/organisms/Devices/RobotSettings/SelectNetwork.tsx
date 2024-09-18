@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
 
-import { useWifiList } from '../../../resources/networking/hooks'
+import { useWifiList } from '/app/resources/networking/hooks'
 import * as RobotApi from '/app/redux/robot-api'
 import * as Networking from '/app/redux/networking'
 import { getModalPortalEl } from '../../../App/portal'

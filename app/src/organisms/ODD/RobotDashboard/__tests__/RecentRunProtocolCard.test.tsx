@@ -25,7 +25,7 @@ import {
 import { useCloneRun } from '../../../ProtocolUpload/hooks'
 import { useRerunnableStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
-import { useNotifyAllRunsQuery } from '../../../../resources/runs'
+import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import type { NavigateFunction } from 'react-router-dom'
 import type { ProtocolHardware } from '../../../../transformations/commands'
@@ -49,7 +49,7 @@ vi.mock('../../../../organisms/RunTimeControl/hooks')
 vi.mock('../../../../organisms/ProtocolUpload/hooks')
 vi.mock('/app/redux/analytics')
 vi.mock('../hooks')
-vi.mock('../../../../resources/runs')
+vi.mock('/app/resources/runs')
 
 const RUN_ID = 'mockRunId'
 const ROBOT_NAME = 'otie'

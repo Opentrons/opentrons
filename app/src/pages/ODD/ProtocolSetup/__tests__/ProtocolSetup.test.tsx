@@ -57,12 +57,12 @@ import {
   useRunStatus,
 } from '../../../../organisms/RunTimeControl/hooks'
 import { useIsHeaterShakerInProtocol } from '../../../../organisms/ModuleCard/hooks'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration/useNotifyDeckConfigurationQuery'
-import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/useNotifyDeckConfigurationQuery'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from '../ConfirmSetupStepsCompleteModal'
 import { ProtocolSetup } from '../'
-import { useNotifyRunQuery } from '../../../../resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { mockRunTimeParameterData } from '../../../../pages/ODD/ProtocolDetails/fixtures'
 
@@ -124,11 +124,9 @@ vi.mock('../../../../organisms/ModuleCard/hooks')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('../ConfirmAttachedModal')
 vi.mock('../../../../organisms/ToasterOven')
-vi.mock('../../../../resources/runs')
-vi.mock('../../../../resources/deck_configuration/hooks')
-vi.mock(
-  '../../../../resources/deck_configuration/useNotifyDeckConfigurationQuery'
-)
+vi.mock('/app/resources/runs')
+vi.mock('/app/resources/deck_configuration/hooks')
+vi.mock('/app/resources/deck_configuration/useNotifyDeckConfigurationQuery')
 vi.mock('../ConfirmSetupStepsCompleteModal')
 
 const render = (path = '/') => {

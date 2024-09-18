@@ -7,12 +7,12 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import * as RobotApi from '/app/redux/robot-api'
 import * as Fixtures from '/app/redux/networking/__fixtures__'
-import { useWifiList } from '../../../../resources/networking/hooks'
+import { useWifiList } from '/app/resources/networking/hooks'
 import * as Networking from '/app/redux/networking'
 import { ConnectViaWifi } from '../'
 
 vi.mock('/app/redux/discovery')
-vi.mock('../../../../resources/networking/hooks')
+vi.mock('/app/resources/networking/hooks')
 vi.mock('/app/redux/networking/selectors')
 vi.mock('/app/redux/robot-api/selectors')
 

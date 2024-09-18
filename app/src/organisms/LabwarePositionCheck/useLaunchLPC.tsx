@@ -8,7 +8,7 @@ import {
 import {
   useCreateTargetedMaintenanceRunMutation,
   useNotifyRunQuery,
-} from '../../resources/runs'
+} from '/app/resources/runs'
 import { LabwarePositionCheck } from '.'
 import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 import { getLabwareDefinitionsFromCommands } from '../../molecules/Command/utils/getLabwareDefinitionsFromCommands'

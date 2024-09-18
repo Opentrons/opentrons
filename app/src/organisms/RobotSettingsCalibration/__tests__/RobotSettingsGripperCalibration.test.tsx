@@ -7,14 +7,14 @@ import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
 import { formatLastCalibrated } from '../CalibrationDetails/utils'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { RobotSettingsGripperCalibration } from '../RobotSettingsGripperCalibration'
 
 import type { GripperData } from '@opentrons/api-client'
 
 vi.mock('../../../organisms/GripperWizardFlows')
 vi.mock('../CalibrationDetails/utils')
-vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
 const mockGripperData = {
   serialNumber: 'mockSerial123',

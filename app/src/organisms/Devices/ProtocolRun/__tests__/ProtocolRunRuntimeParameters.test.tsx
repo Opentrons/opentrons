@@ -7,7 +7,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useRunStatus } from '../../../RunTimeControl/hooks'
-import { useNotifyRunQuery } from '../../../../resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 import {
   mockSucceededRun,
   mockIdleUnstartedRun,
@@ -30,7 +30,7 @@ vi.mock('@opentrons/components', async importOriginal => {
 })
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../../RunTimeControl/hooks')
-vi.mock('../../../../resources/runs')
+vi.mock('/app/resources/runs')
 vi.mock('/app/redux/config')
 
 const RUN_ID = 'mockId'

@@ -20,7 +20,7 @@ import {
 import { getOnDeviceDisplaySettings } from '/app/redux/config'
 import { WelcomeModal } from './WelcomeModal'
 import { ServerInitializing } from '../../../organisms/ODD/RobotDashboard/ServerInitializing'
-import { useNotifyAllRunsQuery } from '../../../resources/runs'
+import { useNotifyAllRunsQuery } from '/app/resources/runs'
 import type { RunData } from '@opentrons/api-client'
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8

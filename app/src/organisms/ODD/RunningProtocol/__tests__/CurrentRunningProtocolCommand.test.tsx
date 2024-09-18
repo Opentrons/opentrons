@@ -8,12 +8,12 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockRobotSideAnalysis } from '../../../../molecules/Command/__fixtures__'
 import { CurrentRunningProtocolCommand } from '../CurrentRunningProtocolCommand'
-import { useRunningStepCounts } from '../../../../resources/protocols/hooks'
-import { useNotifyAllCommandsQuery } from '../../../../resources/runs'
+import { useRunningStepCounts } from '/app/resources/protocols/hooks'
+import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-vi.mock('../../../../resources/runs')
-vi.mock('../../../../resources/protocols/hooks')
+vi.mock('/app/resources/runs')
+vi.mock('/app/resources/protocols/hooks')
 
 const mockPlayRun = vi.fn()
 const mockPauseRun = vi.fn()

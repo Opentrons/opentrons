@@ -43,7 +43,7 @@ import {
   useTipLengthCalibrations,
 } from '../../../organisms/Devices/hooks'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { CalibrationDataDownload } from '../CalibrationDataDownload'
 
 // file-saver has circular dep, need to mock with factory to prevent error
@@ -57,7 +57,7 @@ vi.mock('file-saver', async importOriginal => {
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/analytics')
 vi.mock('../../../organisms/Devices/hooks')
-vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
 let mockTrackEvent: any
 const mockSetShowHowCalibrationWorksModal = vi.fn()

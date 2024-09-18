@@ -28,7 +28,7 @@ import {
 import {
   useGripperDisplayName,
   usePipetteNameSpecs,
-} from '../../../resources/instruments/hooks'
+} from '/app/resources/instruments/hooks'
 import { useRequiredProtocolHardware } from '../../../pages/Desktop/Protocols/hooks'
 import { EmptySection } from './EmptySection'
 

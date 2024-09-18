@@ -17,7 +17,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { useCurrentRunId } from '../../resources/runs'
+import { useCurrentRunId } from '/app/resources/runs'
 import {
   useIsFlex,
   useRunStatuses,

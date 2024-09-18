@@ -14,13 +14,13 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useIsRobotViewable, useRunStatuses } from '../../Devices/hooks'
 import { DeckFixtureSetupInstructionsModal } from '../DeckFixtureSetupInstructionsModal'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { DeviceDetailsDeckConfiguration } from '../'
-import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import {
   useDeckConfigurationEditingTools,
   useNotifyDeckConfigurationQuery,
-} from '../../../resources/deck_configuration'
+} from '/app/resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type { MaintenanceRun } from '@opentrons/api-client'
@@ -37,9 +37,9 @@ vi.mock('@opentrons/components', async importOriginal => {
 vi.mock('@opentrons/react-api-client')
 vi.mock('../DeckFixtureSetupInstructionsModal')
 vi.mock('../../Devices/hooks')
-vi.mock('../../../resources/maintenance_runs')
-vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
-vi.mock('../../../resources/deck_configuration')
+vi.mock('/app/resources/maintenance_runs')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/resources/deck_configuration')
 
 const mockDeckConfig = [
   {

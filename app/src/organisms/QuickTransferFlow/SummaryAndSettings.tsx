@@ -17,7 +17,7 @@ import {
   useCreateRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { ChildNavigation } from '../ChildNavigation'
 import { Overview } from './Overview'

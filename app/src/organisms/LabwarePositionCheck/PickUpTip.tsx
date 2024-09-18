@@ -33,7 +33,7 @@ import type {
   MoveLabwareCreateCommand,
   RobotType,
 } from '@opentrons/shared-data'
-import type { useChainRunCommands } from '../../resources/runs'
+import type { useChainRunCommands } from '/app/resources/runs'
 import type { Jog } from '../../molecules/JogControls/types'
 import type {
   PickUpTipStep,

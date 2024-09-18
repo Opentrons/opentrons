@@ -21,13 +21,13 @@ import {
 } from '/app/redux/discovery/__fixtures__'
 import { getNetworkInterfaces } from '/app/redux/networking'
 import { ChooseRobotSlideout } from '..'
-import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
+import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/networking')
-vi.mock('../../../resources/useNotifyDataReady')
+vi.mock('/app/resources/useNotifyDataReady')
 const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
   return renderWithProviders(
     <MemoryRouter>

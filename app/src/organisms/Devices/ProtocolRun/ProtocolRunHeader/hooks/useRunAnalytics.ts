@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useRobotAnalyticsData, useTrackProtocolRunEvent } from '../../../hooks'
 import { useRunStatus } from '../../../../RunTimeControl/hooks'
-import { useIsRunCurrent } from '../../../../../resources/runs'
+import { useIsRunCurrent } from '/app/resources/runs'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 
 import { useRecoveryAnalytics } from '../../../../ErrorRecoveryFlows/hooks'

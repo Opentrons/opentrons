@@ -19,7 +19,7 @@ import {
 } from '/app/redux/modules/__fixtures__'
 import { useIsRobotBusy, useRunStatuses } from '../../Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useCurrentRunId } from '../../../resources/runs'
+import { useCurrentRunId } from '/app/resources/runs'
 import {
   useLatchControls,
   useModuleOverflowMenu,
@@ -31,7 +31,7 @@ import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../../../resources/runs')
+vi.mock('/app/resources/runs')
 vi.mock('../../Devices/hooks')
 
 const mockCloseLatchHeaterShaker = {

@@ -21,8 +21,8 @@ import { PipetteCard } from '../PipetteCard'
 import { FlexPipetteCard } from '../PipetteCard/FlexPipetteCard'
 import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
 import { getShowPipetteCalibrationWarning } from '../utils'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
-import { useCurrentRunId } from '../../../resources/runs'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useCurrentRunId } from '/app/resources/runs'
 import type * as Components from '@opentrons/components'
 
 vi.mock('@opentrons/components', async importOriginal => {
@@ -39,11 +39,11 @@ vi.mock('../../ModuleCard')
 vi.mock('../PipetteCard')
 vi.mock('../PipetteCard/FlexPipetteCard')
 vi.mock('../PipetteCard/PipetteRecalibrationWarning')
-vi.mock('../../../resources/runs')
+vi.mock('/app/resources/runs')
 vi.mock('../../../atoms/Banner')
 vi.mock('../utils')
 vi.mock('../../RunTimeControl/hooks')
-vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
 const ROBOT_NAME = 'otie'
 

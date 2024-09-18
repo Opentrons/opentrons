@@ -15,7 +15,7 @@ import { DeckConfigurationEditor } from '..'
 import {
   useNotifyDeckConfigurationQuery,
   useDeckConfigurationEditingTools,
-} from '../../../../resources/deck_configuration'
+} from '/app/resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
@@ -53,7 +53,7 @@ vi.mock(
 vi.mock(
   '../../../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 )
-vi.mock('../../../../resources/deck_configuration')
+vi.mock('/app/resources/deck_configuration')
 
 const render = () => {
   return renderWithProviders(

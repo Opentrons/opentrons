@@ -16,9 +16,9 @@ import { NotConfiguredModal } from '../NotConfiguredModal'
 import { LocationConflictModal } from '../LocationConflictModal'
 import { DeckFixtureSetupInstructionsModal } from '../../../../DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 
-import type { CutoutConfigAndCompatibility } from '../../../../../resources/deck_configuration/hooks'
+import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
 
-vi.mock('../../../../../resources/deck_configuration/hooks')
+vi.mock('/app/resources/deck_configuration/hooks')
 vi.mock('../LocationConflictModal')
 vi.mock('../NotConfiguredModal')
 vi.mock(

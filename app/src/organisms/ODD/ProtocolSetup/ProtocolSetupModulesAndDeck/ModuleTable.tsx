@@ -33,8 +33,8 @@ import { LocationConflictModal } from '../../../Devices/ProtocolRun/SetupModuleA
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { useToaster } from '../../../ToasterOven'
 import { getLocalRobot } from '/app/redux/discovery'
-import { useChainLiveCommands } from '../../../../resources/runs'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
+import { useChainLiveCommands } from '/app/resources/runs'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { CommandData } from '@opentrons/api-client'
 import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'

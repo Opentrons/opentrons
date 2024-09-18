@@ -14,14 +14,14 @@ import {
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
 import { AttachProbe } from '../AttachProbe'
-import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 const render = (props: React.ComponentProps<typeof AttachProbe>) => {
   return renderWithProviders(<AttachProbe {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
-vi.mock('../../../resources/deck_configuration')
+vi.mock('/app/resources/deck_configuration')
 
 describe('AttachProbe', () => {
   let props: React.ComponentProps<typeof AttachProbe>

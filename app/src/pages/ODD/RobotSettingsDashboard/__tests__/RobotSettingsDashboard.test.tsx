@@ -21,7 +21,7 @@ import {
   UpdateChannel,
 } from '../../../../organisms/ODD/RobotSettingsDashboard'
 import { getRobotUpdateAvailable } from '/app/redux/robot-update'
-import { useNetworkConnection } from '../../../../resources/networking/hooks/useNetworkConnection'
+import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
 import { useLEDLights } from '../../../../organisms/Devices/hooks'
 
 import { RobotSettingsDashboard } from '../'
@@ -30,7 +30,7 @@ vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/robot-settings')
-vi.mock('../../../../resources/networking/hooks/useNetworkConnection')
+vi.mock('/app/resources/networking/hooks/useNetworkConnection')
 vi.mock('../../../../organisms/Navigation')
 vi.mock('../../../../organisms/ODD/RobotSettingsDashboard/TouchScreenSleep')
 vi.mock('../../../../organisms/ODD/RobotSettingsDashboard/NetworkSettings')

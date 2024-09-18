@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useSelector } from 'react-redux'
 import { getUserId } from '/app/redux/config'
-import { useClientDataRecovery } from '../../../resources/client_data'
+import { useClientDataRecovery } from '/app/resources/client_data'
 import { renderHook } from '@testing-library/react'
 import { useErrorRecoveryBanner } from '../index'
 
@@ -9,7 +9,7 @@ vi.mock('react-redux', () => ({
   useSelector: vi.fn(),
 }))
 vi.mock('/app/redux/config')
-vi.mock('../../../resources/client_data')
+vi.mock('/app/resources/client_data')
 
 describe('useErrorRecoveryBanner', () => {
   beforeEach(() => {

@@ -20,7 +20,7 @@ import { getLocationInfoNames } from '../../utils/getLocationInfoNames'
 import { SetupLiquidsList } from '../SetupLiquidsList'
 import { getTotalVolumePerLiquidId, getVolumePerWell } from '../utils'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
-import { useNotifyRunQuery } from '../../../../../resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
 import type { Mock } from 'vitest'
 import type * as SharedData from '@opentrons/shared-data'
@@ -65,7 +65,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
   }
 })
 vi.mock('/app/redux/analytics')
-vi.mock('../../../../../resources/runs')
+vi.mock('/app/resources/runs')
 
 const render = (props: React.ComponentProps<typeof SetupLiquidsList>) => {
   return renderWithProviders(<SetupLiquidsList {...props} />, {

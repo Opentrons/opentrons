@@ -9,7 +9,7 @@ import { i18n } from '/app/i18n'
 import { ChoosePipette } from '../../../../organisms/PipetteWizardFlows/ChoosePipette'
 import { GripperWizardFlows } from '../../../../organisms/GripperWizardFlows'
 import { InstrumentsDashboard } from '..'
-import { formatTimeWithUtcLabel } from '../../../../resources/runs'
+import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { InstrumentDetail } from '../../InstrumentDetail'
 import type * as ReactApiClient from '@opentrons/react-api-client'
 

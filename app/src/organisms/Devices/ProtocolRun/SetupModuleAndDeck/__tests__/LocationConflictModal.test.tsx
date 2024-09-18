@@ -19,13 +19,13 @@ import { i18n } from '/app/i18n'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { useCloseCurrentRun } from '../../../../ProtocolUpload/hooks'
 import { LocationConflictModal } from '../LocationConflictModal'
-import { useNotifyDeckConfigurationQuery } from '../../../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../../resources/deck_configuration')
+vi.mock('/app/resources/deck_configuration')
 vi.mock('../../../../ProtocolUpload/hooks')
 
 const mockFixture = {

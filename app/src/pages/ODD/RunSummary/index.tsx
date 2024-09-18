@@ -65,7 +65,7 @@ import {
   formatTimeWithUtcLabel,
   useIsRunCurrent,
   useNotifyRunQuery,
-} from '../../../resources/runs'
+} from '/app/resources/runs'
 import {
   useTipAttachmentStatus,
   handleTipsAttachedModal,

@@ -18,7 +18,7 @@ import { getTopPortalEl } from '../../../App/portal'
 import {
   useDeckConfigurationEditingTools,
   useNotifyDeckConfigurationQuery,
-} from '../../../resources/deck_configuration'
+} from '/app/resources/deck_configuration'
 
 import type { SmallButton } from '../../../atoms/buttons'
 

@@ -20,7 +20,7 @@ import { useHomePipettes } from './hooks'
 import type { HostConfig } from '@opentrons/api-client'
 import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 import type { UseHomePipettesProps, PipetteWithTip } from './hooks'
-import type { PipetteDetails } from '../../resources/maintenance_runs'
+import type { PipetteDetails } from '/app/resources/maintenance_runs'
 
 type TipsAttachedModalProps = Pick<UseHomePipettesProps, 'onSettled'> & {
   aPipetteWithTip: PipetteWithTip

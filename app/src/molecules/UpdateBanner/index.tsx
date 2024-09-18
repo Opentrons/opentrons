@@ -14,7 +14,7 @@ import {
 
 import { Banner } from '../../atoms/Banner'
 import { useIsFlex } from '../../organisms/Devices/hooks'
-import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 interface UpdateBannerProps {
   robotName: string

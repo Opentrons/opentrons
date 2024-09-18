@@ -22,7 +22,7 @@ import { getNetworkInterfaces, fetchStatus } from '/app/redux/networking'
 import { appShellRequestor } from '/app/redux/shell/remote'
 import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 import FLEX_PNG from '/app/assets/images/FLEX.png'
-import { useCurrentRunId, useNotifyRunQuery } from '../../resources/runs'
+import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
 import type { IconName } from '@opentrons/components'
 import type { Runs } from '@opentrons/api-client'

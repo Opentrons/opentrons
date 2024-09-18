@@ -36,7 +36,7 @@ import {
 
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
-import { useChainLiveCommands } from '../../../../resources/runs'
+import { useChainLiveCommands } from '/app/resources/runs'
 import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { getModulePrepCommands } from '../../getModulePrepCommands'

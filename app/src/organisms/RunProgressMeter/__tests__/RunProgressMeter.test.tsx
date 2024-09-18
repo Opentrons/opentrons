@@ -23,7 +23,7 @@ import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMo
 import {
   useNotifyRunQuery,
   useNotifyAllCommandsQuery,
-} from '../../../resources/runs'
+} from '/app/resources/runs'
 import { useDownloadRunLog } from '../../Devices/hooks'
 import {
   mockUseAllCommandsResponseNonDeterministic,
@@ -34,7 +34,7 @@ import {
 import { RunProgressMeter } from '..'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { useLastRunCommand } from '../../Devices/hooks/useLastRunCommand'
-import { useRunningStepCounts } from '../../../resources/protocols/hooks'
+import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 
 import type { RunCommandSummary } from '@opentrons/api-client'
 import type * as ApiClient from '@opentrons/react-api-client'
@@ -48,12 +48,12 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
 })
 vi.mock('../../RunTimeControl/hooks')
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../../../resources/runs')
+vi.mock('/app/resources/runs')
 vi.mock('../../Devices/hooks')
 vi.mock('../../../atoms/ProgressBar')
 vi.mock('../../InterventionModal')
 vi.mock('../../Devices/hooks/useLastRunCommand')
-vi.mock('../../../resources/protocols/hooks')
+vi.mock('/app/resources/protocols/hooks')
 
 const render = (props: React.ComponentProps<typeof RunProgressMeter>) => {
   return renderWithProviders(<RunProgressMeter {...props} />, {

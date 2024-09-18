@@ -35,7 +35,7 @@ import {
 } from '../../../organisms/Devices/hooks'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { Mount } from '@opentrons/components'
 import type { PipetteName } from '@opentrons/shared-data'

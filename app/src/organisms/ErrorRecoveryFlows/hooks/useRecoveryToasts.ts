@@ -4,7 +4,7 @@ import { useToaster } from '../../ToasterOven'
 import { RECOVERY_MAP } from '../constants'
 import { useCommandTextString } from '../../../molecules/Command'
 
-import type { StepCounts } from '../../../resources/protocols/hooks'
+import type { StepCounts } from '/app/resources/protocols/hooks'
 import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
 import type { UseCommandTextStringParams } from '../../../molecules/Command'
 
