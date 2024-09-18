@@ -17,10 +17,7 @@ import {
 import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'
-import {
-  useChainMaintenanceCommands,
-  useCreateTargetedMaintenanceRunMutation,
-} from '../../resources/runs'
+import { useCreateTargetedMaintenanceRunMutation } from '../../resources/runs'
 import { getIsOnDevice } from '../../redux/config'
 import {
   SimpleWizardBody,
@@ -35,9 +32,13 @@ import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 import { DetachProbe } from './DetachProbe'
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
+import {
+  useChainMaintenanceCommands,
+  useNotifyCurrentMaintenanceRun,
+} from '../../resources/maintenance_runs'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import type {
   CreateCommand,
   CutoutConfig,
@@ -48,6 +49,7 @@ interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
   closeFlow: () => void
   isPrepCommandLoading: boolean
+  isLoadedInRun?: boolean
   onComplete?: () => void
   prepCommandErrorMessage?: string
 }
@@ -59,6 +61,7 @@ export const ModuleWizardFlows = (
 ): JSX.Element | null => {
   const {
     attachedModule,
+    isLoadedInRun = false,
     isPrepCommandLoading,
     closeFlow,
     onComplete,
@@ -270,7 +273,11 @@ export const ModuleWizardFlows = (
         })}
       />
     )
-  } else if (prepCommandErrorMessage != null || errorMessage != null) {
+  } else if (
+    prepCommandErrorMessage != null ||
+    errorMessage != null ||
+    maintenanceRunData?.data.status === RUN_STATUS_FAILED
+  ) {
     modalContent = (
       <SimpleWizardBody
         isSuccess={false}
@@ -311,6 +318,7 @@ export const ModuleWizardFlows = (
         {...calibrateBaseProps}
         availableSlotNames={availableSlotNames}
         deckConfig={deckConfig}
+        isLoadedInRun={isLoadedInRun}
         occupiedCutouts={occupiedCutouts}
         configuredFixtureIdByCutoutId={fixtureIdByCutoutId}
       />

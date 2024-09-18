@@ -69,6 +69,7 @@ def engine_state_summary() -> StateSummary:
         pipettes=[LoadedPipette.construct(id="some-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.construct(id="some-module-id")],  # type: ignore[call-arg]
         liquids=[Liquid(id="some-liquid-id", displayName="liquid", description="desc")],
+        wells=[],
     )
 
 

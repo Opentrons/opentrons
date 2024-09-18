@@ -7,15 +7,15 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
 import { handleTipsAttachedModal } from '../TipsAttachedModal'
-import { FLEX_ROBOT_TYPE, LEFT } from '@opentrons/shared-data'
+import { LEFT } from '@opentrons/shared-data'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
 import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
 import { useDropTipWizardFlows } from '..'
 
+import type { Mock } from 'vitest'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { HostConfig } from '@opentrons/api-client'
-import type { Mock } from 'vitest'
-import type { PipetteWithTip } from '..'
+import type { PipetteWithTip } from '../hooks'
 
 vi.mock('../../ProtocolUpload/hooks')
 vi.mock('..')
@@ -52,11 +52,7 @@ const render = (aPipetteWithTip: PipetteWithTip) => {
             host: MOCK_HOST,
             aPipetteWithTip,
             setTipStatusResolved: mockSetTipStatusResolved,
-            robotType: FLEX_ROBOT_TYPE,
-            mount: 'left',
-            instrumentModelSpecs: mockPipetteInfo.pipetteSpecs as any,
-            onSkipAndHome: vi.fn(),
-            isRunCurrent: true,
+            onSettled: vi.fn(),
           })
         }
         data-testid="testButton"

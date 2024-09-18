@@ -71,6 +71,7 @@ export function useCommandTextString(
       }
 
     case 'loadLabware':
+    case 'reloadLabware':
     case 'loadPipette':
     case 'loadModule':
     case 'loadLiquid':
@@ -214,6 +215,11 @@ export function useCommandTextString(
     case 'custom':
       return {
         commandText: utils.getCustomCommandText({ ...fullParams, command }),
+      }
+
+    case 'setRailLights':
+      return {
+        commandText: utils.getRailLightsCommandText({ ...fullParams, command }),
       }
 
     case undefined:

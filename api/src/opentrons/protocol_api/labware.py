@@ -30,7 +30,6 @@ from opentrons.hardware_control.nozzle_manager import NozzleMap
 # remove when their usage is no longer needed
 from opentrons.protocols.labware import (  # noqa: F401
     get_labware_definition as get_labware_definition,
-    get_all_labware_definitions as get_all_labware_definitions,
     verify_definition as verify_definition,
     save_definition as save_definition,
 )
@@ -221,6 +220,17 @@ class Well:
             absolute position of the center of the well (in all three dimensions).
         """
         return Location(self._core.get_center(), self)
+
+    @requires_version(2, 21)
+    def meniscus(self, z: float = 0.0) -> Location:
+        """
+        :param z: An offset on the z-axis, in mm. Positive offsets are higher and
+            negative offsets are lower.
+        :return: A :py:class:`~opentrons.types.Location` corresponding to the
+            absolute position of the meniscus-center of the well, plus the ``z`` offset
+            (if specified).
+        """
+        return Location(self._core.get_meniscus(z_offset=z), self)
 
     @requires_version(2, 8)
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
@@ -581,7 +591,7 @@ class Labware:
                 api_element="Labware.set_calibration()",
                 since_version=f"{ENGINE_CORE_API_VERSION}",
                 current_version=f"{self._api_version}",
-                message=" Try using the Opentrons App's Labware Position Check.",
+                extra_message="Try using the Opentrons App's Labware Position Check.",
             )
         self._core.set_calibration(delta)
 
@@ -632,7 +642,7 @@ class Labware:
                 api_element="Labware.set_offset()",
                 until_version=f"{SET_OFFSET_RESTORED_API_VERSION}",
                 current_version=f"{self._api_version}",
-                message=" This feature not available in versions 2.14 thorugh 2.17. You can also use the Opentrons App's Labware Position Check.",
+                extra_message="This feature not available in versions 2.14 thorugh 2.17. You can also use the Opentrons App's Labware Position Check.",
             )
         else:
             self._core.set_calibration(Point(x=x, y=y, z=z))
@@ -974,7 +984,7 @@ class Labware:
                 api_element="Labware.use_tips",
                 since_version=f"{ENGINE_CORE_API_VERSION}",
                 current_version=f"{self._api_version}",
-                message=" To modify tip state, use Labware.reset.",
+                extra_message="To modify tip state, use Labware.reset.",
             )
 
         assert num_channels > 0, "Bad call to use_tips: num_channels<=0"
@@ -1064,7 +1074,7 @@ class Labware:
                 api_element="Labware.return_tips()",
                 since_version=f"{ENGINE_CORE_API_VERSION}",
                 current_version=f"{self._api_version}",
-                message=" Use Labware.reset() instead.",
+                extra_message="Use Labware.reset() instead.",
             )
 
         # This logic is the inverse of :py:meth:`use_tips`

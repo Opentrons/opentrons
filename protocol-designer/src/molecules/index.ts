@@ -1,1 +1,1 @@
-console.log('molecules for new components')
+export * from './SettingsIcon'

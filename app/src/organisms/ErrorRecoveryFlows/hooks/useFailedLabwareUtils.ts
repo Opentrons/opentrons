@@ -174,6 +174,7 @@ interface UseTipSelectionUtilsResult {
   tipSelectorDef: LabwareDefinition2
   selectTips: (tipGroup: WellGroup) => void
   deselectTips: (locations: string[]) => void
+  areTipsSelected: boolean
 }
 
 // TODO(jh, 06-18-24): Enforce failure/warning when accessing tipSelectionUtils
@@ -215,11 +216,15 @@ function useTipSelectionUtils(
     []
   )
 
+  const areTipsSelected =
+    selectedLocs != null && Object.keys(selectedLocs).length > 0
+
   return {
     selectedTipLocations: selectedLocs,
     tipSelectorDef,
     selectTips,
     deselectTips,
+    areTipsSelected,
   }
 }
 

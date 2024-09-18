@@ -25,6 +25,11 @@ Welcome to the v8.0.0 release of the Opentrons App!
 - Lists of liquids now separately show the total volume and per-well volume (when it is the same in each well containing that liquid).
 - Improved instructions for what to do when a Flex protocol completes or is canceled with liquid-filled tips attached to the pipette.
 
+### Known Issues
+
+- Labware offsets can't be applied to protocols that require selecting a CSV file as a runtime parameter value. Write the protocol in such a way that it passes analysis with or without the CSV file, or run Labware Position Check after confirming parameter values.
+- Error recovery can't perform partial tip pickup, because it doesn't account for the pipette nozzle configuration of 8- and 96-channel pipettes. If a recovery step requires partial tip pickup, cancel the protocol instead.
+
 ---
 
 ## Opentrons App Changes in 7.5.0

@@ -8,7 +8,7 @@ import { i18n } from '../../../i18n'
 import { useCurrentRunId } from '../../../resources/runs'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { RobotOverflowMenu } from '../RobotOverflowMenu'
-import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
+import { useIsRobotOnWrongVersionOfSoftware } from '../../../redux/robot-update'
 import { useIsRobotBusy } from '../hooks'
 
 import {
@@ -16,7 +16,7 @@ import {
   mockConnectedRobot,
 } from '../../../redux/discovery/__fixtures__'
 
-vi.mock('../../../redux/robot-update/selectors')
+vi.mock('../../../redux/robot-update/hooks')
 vi.mock('../../../resources/runs')
 vi.mock('../../ChooseProtocolSlideout')
 vi.mock('../hooks')
@@ -44,11 +44,7 @@ describe('RobotOverflowMenu', () => {
     vi.mocked(ChooseProtocolSlideout).mockReturnValue(
       <div>choose protocol slideout</div>
     )
-    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
-      autoUpdateAction: 'reinstall',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
+    vi.mocked(useIsRobotOnWrongVersionOfSoftware).mockReturnValue(false)
     vi.mocked(useIsRobotBusy).mockReturnValue(false)
   })
 
@@ -74,11 +70,7 @@ describe('RobotOverflowMenu', () => {
 
   it('disables the run a protocol menu item if robot software update is available', () => {
     vi.mocked(useCurrentRunId).mockReturnValue(null)
-    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
-      autoUpdateAction: 'upgrade',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
+    vi.mocked(useIsRobotOnWrongVersionOfSoftware).mockReturnValue(true)
     render(props)
     const btn = screen.getByLabelText('RobotOverflowMenu_button')
     fireEvent.click(btn)

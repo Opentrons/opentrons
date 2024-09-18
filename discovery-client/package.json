@@ -21,7 +21,7 @@
   "homepage": "https://github.com/Opentrons/opentrons#readme",
   "dependencies": {
     "@types/lodash": "^4.14.191",
-    "@types/node-fetch": "^2.5.8",
+    "@types/node-fetch": "2.6.11",
     "@types/yargs": "17.0.32",
     "escape-string-regexp": "1.0.5",
     "is-ip": "3.1.0",

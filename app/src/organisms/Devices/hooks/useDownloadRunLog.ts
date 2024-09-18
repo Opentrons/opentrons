@@ -29,12 +29,14 @@ export function useDownloadRunLog(
     getCommands(host, runId, {
       cursor: null,
       pageLength: 0,
+      includeFixitCommands: true,
     })
       .then(response => {
         const { totalLength } = response.data.meta
         getCommands(host, runId, {
           cursor: 0,
           pageLength: totalLength,
+          includeFixitCommands: true,
         })
           .then(response => {
             const commands = response.data

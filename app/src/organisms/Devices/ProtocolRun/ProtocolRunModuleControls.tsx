@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -74,6 +75,7 @@ export const ProtocolRunModuleControls = ({
   robotName,
   runId,
 }: ProtocolRunModuleControlsProps): JSX.Element => {
+  const { t } = useTranslation('protocol_setup')
   const {
     attachPipetteRequired,
     calibratePipetteRequired,
@@ -102,7 +104,7 @@ export const ProtocolRunModuleControls = ({
       padding={SPACING.spacing16}
       backgroundColor={COLORS.white}
     >
-      <InfoScreen contentType="moduleControls" />
+      <InfoScreen content={t('connect_modules_for_controls')} />
     </Flex>
   ) : (
     <Flex gridGap={SPACING.spacing8} padding={SPACING.spacing16}>

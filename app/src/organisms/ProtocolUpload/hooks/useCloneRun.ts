@@ -15,7 +15,8 @@ import type { Run } from '@opentrons/api-client'
 
 interface UseCloneRunResult {
   cloneRun: () => void
-  isLoading: boolean
+  isLoadingRun: boolean
+  isCloning: boolean
 }
 
 export function useCloneRun(
@@ -25,10 +26,9 @@ export function useCloneRun(
 ): UseCloneRunResult {
   const host = useHost()
   const queryClient = useQueryClient()
-  const { data: runRecord } = useNotifyRunQuery(runId)
+  const { data: runRecord, isLoading: isLoadingRun } = useNotifyRunQuery(runId)
   const protocolKey = runRecord?.data.protocolId ?? null
-
-  const { createRun, isLoading } = useCreateRunMutation({
+  const { createRun, isLoading: isCloning } = useCreateRunMutation({
     onSuccess: response => {
       const invalidateRuns = queryClient.invalidateQueries([host, 'runs'])
       const invalidateProtocols = queryClient.invalidateQueries([
@@ -36,10 +36,13 @@ export function useCloneRun(
         'protocols',
         protocolKey,
       ])
-      Promise.all([invalidateRuns, invalidateProtocols]).catch((e: Error) => {
-        console.error(`error invalidating runs query: ${e.message}`)
-      })
-      if (onSuccessCallback != null) onSuccessCallback(response)
+      Promise.all([invalidateRuns, invalidateProtocols])
+        .then(() => {
+          onSuccessCallback?.(response)
+        })
+        .catch((e: Error) => {
+          console.error(`error invalidating runs query: ${e.message}`)
+        })
     },
   })
   const { createProtocolAnalysis } = useCreateProtocolAnalysisMutation(
@@ -77,5 +80,5 @@ export function useCloneRun(
     }
   }
 
-  return { cloneRun, isLoading }
+  return { cloneRun, isLoadingRun, isCloning }
 }

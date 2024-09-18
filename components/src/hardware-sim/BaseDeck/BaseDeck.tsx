@@ -57,6 +57,7 @@ export interface LabwareOnDeck {
   labwareChildren?: React.ReactNode
   onLabwareClick?: () => void
   highlight?: boolean
+  highlightShadow?: boolean
   stacked?: boolean
 }
 
@@ -70,6 +71,7 @@ export interface ModuleOnDeck {
   moduleChildren?: React.ReactNode
   onLabwareClick?: () => void
   highlightLabware?: boolean
+  highlightShadowLabware?: boolean
   stacked?: boolean
 }
 interface BaseDeckProps {
@@ -89,6 +91,8 @@ interface BaseDeckProps {
   /** extra props to pass to svg tag */
   svgProps?: React.ComponentProps<typeof Svg>
 }
+
+const LABWARE_OFFSET_DISPLAY_THRESHOLD = 2
 
 export function BaseDeck(props: BaseDeckProps): JSX.Element {
   const {
@@ -237,6 +241,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
         </>
       )}
       <>
+        {/* render modules, nested labware, and overlays */}
         {modulesOnDeck.map(
           ({
             moduleModel,
@@ -247,7 +252,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             moduleChildren,
             onLabwareClick,
             highlightLabware,
-            stacked = false,
+            highlightShadowLabware,
           }) => {
             const slotPosition = getPositionFromSlotId(
               moduleLocation.slotName,
@@ -275,14 +280,15 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                         'left' && moduleModel === HEATERSHAKER_MODULE_V1
                     }
                     highlight={highlightLabware}
+                    highlightShadow={highlightShadowLabware}
                   />
                 ) : null}
                 {moduleChildren}
-                {stacked ? <StackedBadge /> : null}
               </Module>
             ) : null
           }
         )}
+        {/* render non-module labware and overlays */}
         {labwareOnDeck.map(
           ({
             labwareLocation,
@@ -292,7 +298,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             missingTips,
             onLabwareClick,
             highlight,
-            stacked = false,
+            highlightShadow,
           }) => {
             if (
               labwareLocation === 'offDeck' ||
@@ -321,9 +327,75 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   wellFill={wellFill ?? undefined}
                   missingTips={missingTips}
                   highlight={highlight}
+                  highlightShadow={highlightShadow}
                 />
                 {labwareChildren}
-                {stacked ? <StackedBadge /> : null}
+              </g>
+            ) : null
+          }
+        )}
+        {/* render stacked badge on module labware */}
+        {modulesOnDeck.map(
+          ({ moduleModel, moduleLocation, stacked = false }) => {
+            const slotPosition = getPositionFromSlotId(
+              moduleLocation.slotName,
+              deckDef
+            )
+            const moduleDef = getModuleDef2(moduleModel)
+
+            const {
+              x: nestedLabwareOffsetX,
+              y: nestedLabwareOffsetY,
+            } = moduleDef.labwareOffset
+
+            // labwareOffset values are more accurate than our SVG renderings, so ignore any deviations under a certain threshold
+            const clampedLabwareOffsetX =
+              Math.abs(nestedLabwareOffsetX) > LABWARE_OFFSET_DISPLAY_THRESHOLD
+                ? nestedLabwareOffsetX
+                : 0
+            const clampedLabwareOffsetY =
+              Math.abs(nestedLabwareOffsetY) > LABWARE_OFFSET_DISPLAY_THRESHOLD
+                ? nestedLabwareOffsetY
+                : 0
+            // transform to be applied to children which render within the labware interfacing surface of the module
+            const childrenTransform = `translate(${clampedLabwareOffsetX}, ${clampedLabwareOffsetY})`
+
+            return slotPosition != null && stacked ? (
+              <g
+                key={`stacked_${moduleLocation.slotName}`}
+                transform={`translate(${slotPosition[0].toString()},${slotPosition[1].toString()})`}
+              >
+                <g transform={childrenTransform}>
+                  <StackedBadge />
+                </g>
+              </g>
+            ) : null
+          }
+        )}
+        {/* render stacked badge on non-module labware */}
+        {labwareOnDeck.map(
+          ({ labwareLocation, definition, stacked = false }) => {
+            if (
+              labwareLocation === 'offDeck' ||
+              !('slotName' in labwareLocation) ||
+              // for legacy protocols that list fixed trash as a labware, do not render
+              definition.parameters.loadName ===
+                'opentrons_1_trash_3200ml_fixed'
+            ) {
+              return null
+            }
+
+            const slotPosition = getPositionFromSlotId(
+              labwareLocation.slotName,
+              deckDef
+            )
+
+            return slotPosition != null && stacked ? (
+              <g
+                key={`stacked_${labwareLocation.slotName}`}
+                transform={`translate(${slotPosition[0].toString()},${slotPosition[1].toString()})`}
+              >
+                <StackedBadge />
               </g>
             ) : null
           }

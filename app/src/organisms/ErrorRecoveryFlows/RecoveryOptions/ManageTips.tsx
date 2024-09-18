@@ -24,9 +24,11 @@ import { DropTipWizardFlows } from '../../DropTipWizardFlows'
 import { DT_ROUTES } from '../../DropTipWizardFlows/constants'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
-import type { PipetteWithTip } from '../../DropTipWizardFlows'
 import type { RecoveryContentProps, RecoveryRoute, RouteStep } from '../types'
-import type { FixitCommandTypeUtils } from '../../DropTipWizardFlows/types'
+import type {
+  FixitCommandTypeUtils,
+  PipetteWithTip,
+} from '../../DropTipWizardFlows'
 
 // The Drop Tip flow entry point. Includes entry from SelectRecoveryOption and CancelRun.
 export function ManageTips(props: RecoveryContentProps): JSX.Element {

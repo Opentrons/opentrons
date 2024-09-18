@@ -1,18 +1,11 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { DndProvider } from 'react-dnd'
-import { BrowserRouter } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { HashRouter } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import {
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  Flex,
-  PrimaryButton,
-  SPACING,
-} from '@opentrons/components'
+import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 import { getEnableRedesign } from './feature-flags/selectors'
-import { setFeatureFlags } from './feature-flags/actions'
 import { ComputingSpinner } from './components/ComputingSpinner'
 import { ConnectedNav } from './containers/ConnectedNav'
 import { Sidebar } from './containers/ConnectedSidebar'
@@ -26,7 +19,7 @@ import { FileUploadMessageModal } from './components/modals/FileUploadMessageMod
 import { LabwareUploadMessageModal } from './components/modals/LabwareUploadMessageModal/LabwareUploadMessageModal'
 import { GateModal } from './components/modals/GateModal'
 import { CreateFileWizard } from './components/modals/CreateFileWizard'
-import { AnnouncementModal } from './components/modals/AnnouncementModal'
+import { AnnouncementModal } from './organisms'
 import { ProtocolRoutes } from './ProtocolRoutes'
 
 import styles from './components/ProtocolEditor.module.css'
@@ -37,25 +30,15 @@ const showGateModal =
 
 function ProtocolEditorComponent(): JSX.Element {
   const enableRedesign = useSelector(getEnableRedesign)
-  const dispatch = useDispatch()
 
   return (
     <div id="protocol-editor">
       <TopPortalRoot />
       {enableRedesign ? (
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <Flex padding={SPACING.spacing12} flexDirection={DIRECTION_ROW}>
-            <PrimaryButton
-              onClick={() => {
-                dispatch(setFeatureFlags({ OT_PD_ENABLE_REDESIGN: false }))
-              }}
-            >
-              turn off redesign
-            </PrimaryButton>
-          </Flex>
-          <BrowserRouter>
+          <HashRouter>
             <ProtocolRoutes />
-          </BrowserRouter>
+          </HashRouter>
         </Flex>
       ) : (
         <div className="container">

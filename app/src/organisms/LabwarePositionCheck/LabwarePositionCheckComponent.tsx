@@ -23,10 +23,12 @@ import { DetachProbe } from './DetachProbe'
 import { PickUpTip } from './PickUpTip'
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
-import { useChainMaintenanceCommands } from '../../resources/runs'
-import { FatalErrorModal } from './FatalErrorModal'
+import { FatalError } from './FatalErrorModal'
 import { RobotMotionLoader } from './RobotMotionLoader'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
+import {
+  useChainMaintenanceCommands,
+  useNotifyCurrentMaintenanceRun,
+} from '../../resources/maintenance_runs'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 
 import type {
@@ -333,10 +335,10 @@ export const LabwarePositionCheckComponent = (
     )
   } else if (fatalError != null) {
     modalContent = (
-      <FatalErrorModal
+      <FatalError
         errorMessage={fatalError}
         shouldUseMetalProbe={shouldUseMetalProbe}
-        onClose={handleCleanUpAndClose}
+        onClose={onCloseClick}
       />
     )
   } else if (showConfirmation) {
@@ -413,18 +415,12 @@ export const LabwarePositionCheckComponent = (
   const wizardHeader = (
     <WizardHeader
       title={t('labware_position_check_title')}
-      currentStep={currentStepIndex}
-      totalSteps={totalStepCount}
+      currentStep={fatalError != null ? undefined : currentStepIndex}
+      totalSteps={fatalError != null ? undefined : totalStepCount}
       onExit={
-        showConfirmation || isExiting
+        showConfirmation || isExiting || fatalError != null
           ? undefined
-          : () => {
-              if (fatalError != null) {
-                handleCleanUpAndClose()
-              } else {
-                confirmExitLPC()
-              }
-            }
+          : confirmExitLPC
       }
     />
   )

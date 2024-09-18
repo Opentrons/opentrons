@@ -12,23 +12,17 @@ export function useNotifyRunQuery<TError = Error>(
   options: QueryOptionsWithPolling<Run, TError> = {},
   hostOverride?: HostConfig | null
 ): UseQueryResult<Run, TError> {
-  const isEnabled = options.enabled !== false && runId != null
-
-  const { notifyOnSettled, shouldRefetch } = useNotifyDataReady({
+  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
     topic: `robot-server/runs/${runId}` as NotifyTopic,
-    options: { ...options, enabled: options.enabled != null && runId != null },
+    options,
     hostOverride,
   })
 
-  const httpResponse = useRunQuery(
-    runId,
-    {
-      ...options,
-      enabled: isEnabled && shouldRefetch,
-      onSettled: notifyOnSettled,
-    },
-    hostOverride
-  )
+  const httpQueryResult = useRunQuery(runId, queryOptionsNotify, hostOverride)
 
-  return httpResponse
+  if (shouldRefetch) {
+    void httpQueryResult.refetch()
+  }
+
+  return httpQueryResult
 }

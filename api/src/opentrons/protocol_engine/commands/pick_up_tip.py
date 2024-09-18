@@ -1,15 +1,14 @@
 """Pick up tip command request, result, and implementation models."""
 from __future__ import annotations
-from dataclasses import dataclass
 from opentrons_shared_data.errors import ErrorCodes
 from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type, Union
 from typing_extensions import Literal
 
-from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 
-from ..errors import ErrorOccurrence
+from ..errors import ErrorOccurrence, TipNotAttachedError
 from ..resources import ModelUtils
+from ..state import update_types
 from ..types import DeckPoint
 from .pipetting_common import (
     PipetteIdMixin,
@@ -25,7 +24,7 @@ from .command import (
 )
 
 if TYPE_CHECKING:
-    from ..state import StateView
+    from ..state.state import StateView
     from ..execution import MovementHandler, TipHandler
 
 
@@ -78,18 +77,9 @@ class TipPhysicallyMissingError(ErrorOccurrence):
     detail: str = "No tip detected."
 
 
-@dataclass(frozen=True)
-class TipPhysicallyMissingErrorInternalData:
-    """Internal-to-ProtocolEngine data about a TipPhysicallyMissingError."""
-
-    pipette_id: str
-    labware_id: str
-    well_name: str
-
-
 _ExecuteReturn = Union[
     SuccessData[PickUpTipResult, None],
-    DefinedErrorData[TipPhysicallyMissingError, TipPhysicallyMissingErrorInternalData],
+    DefinedErrorData[TipPhysicallyMissingError],
 ]
 
 
@@ -118,11 +108,20 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
         well_name = params.wellName
         well_location = params.wellLocation
 
+        state_update = update_types.StateUpdate()
+
         position = await self._movement.move_to_well(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
+        )
+        deck_point = DeckPoint.construct(x=position.x, y=position.y, z=position.z)
+        state_update.set_pipette_location(
+            pipette_id=pipette_id,
+            new_labware_id=labware_id,
+            new_well_name=well_name,
+            new_deck_point=deck_point,
         )
 
         try:
@@ -144,11 +143,7 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
                         )
                     ],
                 ),
-                private=TipPhysicallyMissingErrorInternalData(
-                    pipette_id=pipette_id,
-                    labware_id=labware_id,
-                    well_name=well_name,
-                ),
+                state_update=state_update,
             )
         else:
             return SuccessData(
@@ -156,9 +151,10 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
                     tipVolume=tip_geometry.volume,
                     tipLength=tip_geometry.length,
                     tipDiameter=tip_geometry.diameter,
-                    position=DeckPoint(x=position.x, y=position.y, z=position.z),
+                    position=deck_point,
                 ),
                 private=None,
+                state_update=state_update,
             )
 
 

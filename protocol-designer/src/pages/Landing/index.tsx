@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
@@ -13,21 +13,30 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { BUTTON_LINK_STYLE } from '../../atoms'
 import { actions as loadFileActions } from '../../load-file'
+import { getFileMetadata } from '../../file-data/selectors'
+import { toggleNewProtocolModal } from '../../navigation/actions'
 import welcomeImage from '../../assets/images/welcome_page.png'
 import type { ThunkDispatch } from '../../types'
 
 export function Landing(): JSX.Element {
   const { t } = useTranslation('shared')
   const dispatch: ThunkDispatch<any> = useDispatch()
+  const metadata = useSelector(getFileMetadata)
   const navigate = useNavigate()
+
+  React.useEffect(() => {
+    if (metadata?.created != null) {
+      console.warn('protocol already exists, navigating to overview')
+      navigate('/overview')
+    }
+  }, [metadata, navigate])
+
   const loadFile = (
     fileChangeEvent: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    if (window.confirm(t('confirm_import') as string)) {
-      dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
-      navigate('/overview')
-    }
+    dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
   }
 
   return (
@@ -36,7 +45,7 @@ export function Landing(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
       paddingTop="14.875rem"
-      height="100vh"
+      height="calc(100vh - 56px)"
       width="100%"
     >
       <img
@@ -54,9 +63,12 @@ export function Landing(): JSX.Element {
         maxWidth="34.25rem"
         textAlign={TYPOGRAPHY.textAlignCenter}
       >
-        {t('no-code-solution')}
+        {t('no-code-required')}
       </StyledText>
       <LargeButton
+        onClick={() => {
+          dispatch(toggleNewProtocolModal(true))
+        }}
         marginY={SPACING.spacing32}
         buttonText={
           <StyledNavLink to={'/createNew'}>
@@ -68,9 +80,11 @@ export function Landing(): JSX.Element {
       />
 
       <StyledLabel>
-        <StyledText desktopStyle="bodyLargeRegular" color={COLORS.grey60}>
-          {t('import_existing')}
-        </StyledText>
+        <Flex css={BUTTON_LINK_STYLE}>
+          <StyledText desktopStyle="bodyLargeRegular">
+            {t('edit_existing')}
+          </StyledText>
+        </Flex>
         <input type="file" onChange={loadFile}></input>
       </StyledLabel>
     </Flex>

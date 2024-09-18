@@ -3,12 +3,23 @@ import { useAllCommandsQuery } from '@opentrons/react-api-client'
 import { useNotifyDataReady } from '../useNotifyDataReady'
 
 import type { UseQueryResult } from 'react-query'
-import type { CommandsData, GetCommandsParams } from '@opentrons/api-client'
+import type {
+  CommandsData,
+  GetRunCommandsParams,
+  GetCommandsParams,
+} from '@opentrons/api-client'
 import type { QueryOptionsWithPolling } from '../useNotifyDataReady'
+
+const DEFAULT_PAGE_LENGTH = 30
+
+export const DEFAULT_PARAMS: GetCommandsParams = {
+  cursor: null,
+  pageLength: DEFAULT_PAGE_LENGTH,
+}
 
 export function useNotifyAllCommandsQuery<TError = Error>(
   runId: string | null,
-  params?: GetCommandsParams | null,
+  params?: GetRunCommandsParams | null,
   options: QueryOptionsWithPolling<CommandsData, TError> = {}
 ): UseQueryResult<CommandsData, TError> {
   // Assume the useAllCommandsQuery() response can only change when the command links change.
@@ -17,16 +28,27 @@ export function useNotifyAllCommandsQuery<TError = Error>(
   // running to succeeded, that may change the useAllCommandsQuery response, but it
   // will not necessarily change the command links. We might need an MQTT topic
   // covering "any change in `GET /runs/{id}/commands`".
-  const { notifyOnSettled, shouldRefetch } = useNotifyDataReady({
+  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
     topic: 'robot-server/runs/commands_links',
     options,
   })
+  const nullCheckedParams = params ?? DEFAULT_PARAMS
 
-  const httpResponse = useAllCommandsQuery(runId, params, {
-    ...options,
-    enabled: options?.enabled !== false && shouldRefetch,
-    onSettled: notifyOnSettled,
-  })
+  const nullCheckedFixitCommands = params?.includeFixitCommands ?? null
+  const finalizedNullCheckParams = {
+    ...nullCheckedParams,
+    includeFixitCommands: nullCheckedFixitCommands,
+  }
 
-  return httpResponse
+  const httpQueryResult = useAllCommandsQuery(
+    runId,
+    finalizedNullCheckParams,
+    queryOptionsNotify
+  )
+
+  if (shouldRefetch) {
+    void httpQueryResult.refetch()
+  }
+
+  return httpQueryResult
 }

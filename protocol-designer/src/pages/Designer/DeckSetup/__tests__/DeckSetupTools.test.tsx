@@ -2,7 +2,11 @@ import * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { FLEX_ROBOT_TYPE, fixture96Plate } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  HEATERSHAKER_MODULE_V1,
+  fixture96Plate,
+} from '@opentrons/shared-data'
 import { i18n } from '../../../../assets/localization'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { deleteContainer } from '../../../../labware-ingred/actions'
@@ -16,20 +20,21 @@ import {
   createDeckFixture,
   deleteDeckFixture,
 } from '../../../../step-forms/actions/additionalItems'
+import { selectors } from '../../../../labware-ingred/selectors'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import { DeckSetupTools } from '../DeckSetupTools'
 import { LabwareTools } from '../LabwareTools'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
+vi.mock('../LabwareTools')
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../top-selectors/labware-locations')
-vi.mock('../LabwareTools')
 vi.mock('../../../../labware-ingred/actions')
 vi.mock('../../../../step-forms/actions')
 vi.mock('../../../../step-forms/actions/additionalItems')
-
+vi.mock('../../../../labware-ingred/selectors')
 const render = (props: React.ComponentProps<typeof DeckSetupTools>) => {
   return renderWithProviders(<DeckSetupTools {...props} />, {
     i18nInstance: i18n,
@@ -41,10 +46,20 @@ describe('DeckSetupTools', () => {
 
   beforeEach(() => {
     props = {
-      cutoutId: 'cutoutD3',
-      slot: 'D3',
       onCloseClick: vi.fn(),
+      setHoveredLabware: vi.fn(),
+      onDeckProps: {
+        setHoveredModule: vi.fn(),
+        setHoveredFixture: vi.fn(),
+      },
     }
+    vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
+      selectedLabwareDefUri: null,
+      selectedNestedLabwareDefUri: null,
+      selectedFixture: null,
+      selectedModuleModel: null,
+      selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
+    })
     vi.mocked(LabwareTools).mockReturnValue(<div>mock labware tools</div>)
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getEnableAbsorbanceReader).mockReturnValue(true)
@@ -60,7 +75,8 @@ describe('DeckSetupTools', () => {
     render(props)
     screen.getByText('Add a module')
     screen.getByText('Add a fixture')
-    screen.getByText('Customize slot D3')
+    screen.getByTestId('DeckInfoLabel_D3')
+    screen.getByText('Customize slot')
     screen.getByText('Deck hardware')
     screen.getByText('Labware')
     screen.getByText('Absorbance Plate Reader Module GEN1')
@@ -69,8 +85,8 @@ describe('DeckSetupTools', () => {
     screen.getByText('Temperature Module GEN2')
     screen.getByText('Staging area')
     screen.getByText('Waste chute')
-    screen.getByText('Trash bin')
-    screen.getByText('Waste chute and staging area')
+    screen.getByText('Trash Bin')
+    screen.getByText('Waste chute and staging area slot')
   })
   it('should render the labware tab', () => {
     render(props)
@@ -116,6 +132,13 @@ describe('DeckSetupTools', () => {
     expect(vi.mocked(deleteDeckFixture)).toHaveBeenCalled()
   })
   it('should close and add h-s module when done is called', () => {
+    vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
+      selectedLabwareDefUri: null,
+      selectedNestedLabwareDefUri: null,
+      selectedFixture: null,
+      selectedModuleModel: HEATERSHAKER_MODULE_V1,
+      selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
+    })
     render(props)
     fireEvent.click(screen.getByText('Heater-Shaker Module GEN1'))
     fireEvent.click(screen.getByText('Done'))
@@ -123,8 +146,15 @@ describe('DeckSetupTools', () => {
     expect(vi.mocked(createModule)).toHaveBeenCalled()
   })
   it('should close and add waste chute and staging area when done is called', () => {
+    vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
+      selectedLabwareDefUri: null,
+      selectedNestedLabwareDefUri: null,
+      selectedFixture: 'wasteChuteAndStagingArea',
+      selectedModuleModel: HEATERSHAKER_MODULE_V1,
+      selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
+    })
     render(props)
-    fireEvent.click(screen.getByText('Waste chute and staging area'))
+    fireEvent.click(screen.getByText('Waste chute and staging area slot'))
     fireEvent.click(screen.getByText('Done'))
     expect(props.onCloseClick).toHaveBeenCalled()
     expect(vi.mocked(createDeckFixture)).toHaveBeenCalledTimes(2)

@@ -6,6 +6,7 @@ import reduce from 'lodash/reduce'
 import type { Selector } from 'reselect'
 import type { Options } from '@opentrons/components'
 import type { LabwareLiquidState } from '@opentrons/step-generation'
+import type { CutoutId } from '@opentrons/shared-data'
 import type {
   RootState,
   ContainersState,
@@ -19,6 +20,7 @@ import type {
   IngredInputs,
   LiquidGroup,
   OrderedLiquids,
+  ZoomedIntoSlotInfoState,
 } from './types'
 import type { BaseState, DeckSlot } from './../types'
 // TODO: Ian 2019-02-15 no RootSlice, use BaseState
@@ -157,6 +159,25 @@ const getLiquidDisplayColors: Selector<RootSlice, string[]> = createSelector(
       return acc
     }, [])
 )
+
+const getZoomedInSlotInfo: Selector<
+  RootSlice,
+  ZoomedIntoSlotInfoState
+> = createSelector(rootSelector, rootState => rootState.zoomedInSlotInfo)
+
+const getZoomedInSlot: Selector<
+  RootSlice,
+  { slot: DeckSlot | null; cutout: CutoutId | null }
+> = createSelector(
+  rootSelector,
+  rootState => rootState.zoomedInSlotInfo.selectedSlot
+)
+
+const getIsNewProtocol: Selector<RootSlice, boolean> = createSelector(
+  rootSelector,
+  rootState => rootState.generateNewProtocol.isNewProtocol
+)
+
 // TODO: prune selectors
 export const selectors = {
   rootSelector,
@@ -177,4 +198,7 @@ export const selectors = {
   selectedAddLabwareSlot,
   getDeckHasLiquid,
   getLiquidDisplayColors,
+  getZoomedInSlotInfo,
+  getZoomedInSlot,
+  getIsNewProtocol,
 }
