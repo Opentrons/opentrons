@@ -52,6 +52,8 @@ import type {
   WizardTileProps,
 } from './types'
 
+const MAX_TIPRACKS_ALLOWED = 3
+
 export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, setValue } = props
   const { t } = useTranslation(['create_new_protocol', 'shared'])
@@ -312,7 +314,10 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                                       `pipettesByMount.${defaultMount}.tiprackDefURI`,
                                       updatedValues.slice(0, 3)
                                     )
-                                    if (selectedValues.length === 3) {
+                                    if (
+                                      selectedValues.length ===
+                                      MAX_TIPRACKS_ALLOWED
+                                    ) {
                                       makeSnackbar(
                                         t('up_to_3_tipracks') as string
                                       )
