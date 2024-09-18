@@ -26,7 +26,7 @@ Welcome to the v8.0.0 release of the Opentrons robot software!
 
 ### Known Issues
 
-- During single-tip or partial-column pickup with a multi-channel pipette, tips in adjacent columns may cling to empty nozzles due to static electricity. Pick up tips row-by-row, rather than column-by-column, to avoid this.
+- During single-tip or partial-column pickup with a multi-channel pipette, tips in adjacent columns may cling to empty nozzles due to static electricity. Pick up tips row by row, rather than column by column, to avoid this.
 - Protocol analysis and `opentrons_simulate` do not raise an error when a protocol tries to detect liquid with a pipette nozzle configuration that doesn't contain a pressure sensor (single-tip pickup with A12 or H1). Avoid using the A12 and H1 nozzles for single-tip pickup if you need to detect liquid presence within wells.
 - `opentrons_simulate` describes motion to wells only with respect to the primary channel, regardless of the current pipette nozzle configuration.
 
