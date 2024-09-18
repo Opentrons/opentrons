@@ -130,7 +130,7 @@ class SuccessData(Generic[_ResultT_co, _PrivateResultT_co]):
 
 
 @dataclasses.dataclass(frozen=True)
-class DefinedErrorData(Generic[_ErrorT_co, _PrivateResultT_co]):
+class DefinedErrorData(Generic[_ErrorT_co]):
     """Data from a command that failed with a defined error.
 
     This should only be used for "defined" errors, not any error.
@@ -139,13 +139,6 @@ class DefinedErrorData(Generic[_ErrorT_co, _PrivateResultT_co]):
 
     public: _ErrorT_co
     """Public error data. Exposed over HTTP and stored in databases."""
-
-    private: _PrivateResultT_co
-    """Additional error data, only given to `opentrons.protocol_engine` internals.
-
-    Deprecated:
-        Use `state_update` instead.
-    """
 
     state_update: StateUpdate = dataclasses.field(
         # todo(mm, 2024-08-22): Remove the default once all command implementations
@@ -246,9 +239,9 @@ class BaseCommand(
                     object,
                 ],
                 DefinedErrorData[
-                    # Likewise, for our `error` field:
+                    # Our _ImplementationCls must return public error data that can fit
+                    # in our `error` field:
                     _ErrorT,
-                    object,
                 ],
             ],
         ]
@@ -259,7 +252,7 @@ _ExecuteReturnT_co = TypeVar(
     "_ExecuteReturnT_co",
     bound=Union[
         SuccessData[BaseModel, object],
-        DefinedErrorData[ErrorOccurrence, object],
+        DefinedErrorData[ErrorOccurrence],
     ],
     covariant=True,
 )

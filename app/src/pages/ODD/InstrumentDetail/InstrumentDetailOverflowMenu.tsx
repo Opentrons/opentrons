@@ -152,6 +152,7 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
             mount={instrument.mount}
             instrumentModelSpecs={pipetteModelSpecs}
             closeFlow={modal.remove}
+            modalStyle="simple"
           />
         ) : null}
       </ApiHostProvider>

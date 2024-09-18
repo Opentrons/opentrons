@@ -79,7 +79,7 @@ class TipPhysicallyMissingError(ErrorOccurrence):
 
 _ExecuteReturn = Union[
     SuccessData[PickUpTipResult, None],
-    DefinedErrorData[TipPhysicallyMissingError, None],
+    DefinedErrorData[TipPhysicallyMissingError],
 ]
 
 
@@ -143,7 +143,6 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
                         )
                     ],
                 ),
-                private=None,
                 state_update=state_update,
             )
         else:

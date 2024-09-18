@@ -15,13 +15,14 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  NO_WRAP,
+  OVERFLOW_HIDDEN,
   OVERFLOW_WRAP_ANYWHERE,
   OVERFLOW_WRAP_BREAK_WORD,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
   useLongPress,
-  OVERFLOW_HIDDEN,
 } from '@opentrons/components'
 import {
   useHost,
@@ -221,7 +222,7 @@ export function QuickTransferCard(props: {
           {transferName}
         </LegacyStyledText>
       </Flex>
-      <Flex width="12.5rem" whiteSpace="nowrap">
+      <Flex width="12.5rem" whiteSpace={NO_WRAP}>
         <LegacyStyledText as="p" color={COLORS.grey60}>
           {formatTimeWithUtcLabel(quickTransfer.createdAt)}
         </LegacyStyledText>

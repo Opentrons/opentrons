@@ -24,6 +24,7 @@ export const mockDropTipWizardContainerProps: DropTipWizardContainerProps = {
   robotType: 'OT-3 Standard',
   isExiting: false,
   mount: 'left',
+  modalStyle: 'simple',
   isOnDevice: true,
   fixitCommandTypeUtils: undefined,
   instrumentModelSpecs: MOCK_ACTUAL_PIPETTE,

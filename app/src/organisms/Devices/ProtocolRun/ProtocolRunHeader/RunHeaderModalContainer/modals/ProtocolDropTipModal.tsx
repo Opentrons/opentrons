@@ -118,7 +118,7 @@ export function ProtocolDropTipModal({
   const buildHeader = (): JSX.Element => {
     return (
       <ModalHeader
-        title={t('remove_attached_tips')}
+        title={t('remove_any_attached_tips')}
         icon={buildIcon()}
         color={COLORS.black90}
         backgroundColor={COLORS.white}

@@ -14,9 +14,10 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  NO_WRAP,
   SPACING,
   TYPOGRAPHY,
-  LegacyStyledText,
 } from '@opentrons/components'
 
 import type { IconName } from '@opentrons/components'
@@ -65,7 +66,7 @@ export function RobotSettingButton({
         gridGap={SPACING.spacing24}
         alignItems={ALIGN_CENTER}
         width="100%"
-        whiteSpace="nowrap"
+        whiteSpace={NO_WRAP}
       >
         {iconName != null ? (
           <Icon name={iconName} size="3rem" color={COLORS.black90} />

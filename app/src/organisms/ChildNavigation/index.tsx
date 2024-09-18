@@ -14,6 +14,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  CURSOR_DEFAULT,
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 
@@ -128,6 +129,6 @@ const IconButton = styled('button')`
     background-color: transparent;
   }
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    cursor: default;
+    cursor: ${CURSOR_DEFAULT};
   }
 `

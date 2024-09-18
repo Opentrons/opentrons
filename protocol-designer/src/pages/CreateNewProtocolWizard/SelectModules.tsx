@@ -2,6 +2,9 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import {
+  ALIGN_CENTER,
+  BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
   EmptySelectorButton,
   Flex,
@@ -262,10 +265,17 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                           }}
                           header={getModuleDisplayName(module.model)}
                           leftHeaderItem={
-                            <ModuleDiagram
-                              type={module.type}
-                              model={module.model}
-                            />
+                            <Flex
+                              backgroundColor={COLORS.white}
+                              borderRadius={BORDERS.borderRadius8}
+                              alignItems={ALIGN_CENTER}
+                              width="3.75rem"
+                            >
+                              <ModuleDiagram
+                                type={module.type}
+                                model={module.model}
+                              />
+                            </Flex>
                           }
                         />
                       </ListItem>

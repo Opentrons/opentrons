@@ -10,6 +10,9 @@ import {
   BORDERS,
   Box,
   COLORS,
+  CURSOR_AUTO,
+  CURSOR_DEFAULT,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_BLOCK,
@@ -549,7 +552,7 @@ export function ChooseProtocolSlideoutComponent(
           }}
           css={css`
             &:hover {
-              cursor: auto;
+              cursor: ${CURSOR_AUTO};
             }
           `}
         >
@@ -611,7 +614,7 @@ export function ChooseProtocolSlideoutComponent(
             <Flex
               gridGap={SPACING.spacing4}
               alignItems={ALIGN_CENTER}
-              whiteSpace="nowrap"
+              whiteSpace={NO_WRAP}
               marginLeft={`-${SPACING.spacing4}`}
             >
               <Icon name="ot-spinner" spin size="1rem" />
@@ -926,13 +929,13 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
 
 const ENABLED_LINK_CSS = css`
   ${TYPOGRAPHY.linkPSemiBold}
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
 `
 
 const DISABLED_LINK_CSS = css`
   ${TYPOGRAPHY.linkPSemiBold}
   color: ${COLORS.grey40};
-  cursor: default;
+  cursor: ${CURSOR_DEFAULT};
 
   &:hover {
     color: ${COLORS.grey40};

@@ -48,7 +48,7 @@ class AspirateInPlaceResult(BaseLiquidHandlingResult):
 
 _ExecuteReturn = Union[
     SuccessData[AspirateInPlaceResult, None],
-    DefinedErrorData[OverpressureError, None],
+    DefinedErrorData[OverpressureError],
 ]
 
 
@@ -121,7 +121,6 @@ class AspirateInPlaceImplementation(
                         }
                     ),
                 ),
-                private=None,
             )
         else:
             return SuccessData(

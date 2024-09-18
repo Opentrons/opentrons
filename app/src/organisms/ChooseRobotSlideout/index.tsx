@@ -9,6 +9,9 @@ import {
   ALIGN_FLEX_END,
   BORDERS,
   COLORS,
+  CURSOR_AUTO,
+  CURSOR_DEFAULT,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_INLINE_BLOCK,
@@ -644,7 +647,7 @@ export function ChooseRobotSlideout(
             }}
             css={css`
               &:hover {
-                cursor: auto;
+                cursor: ${CURSOR_AUTO};
               }
             `}
           >
@@ -682,13 +685,13 @@ export function ChooseRobotSlideout(
 
 const ENABLED_LINK_CSS = css`
   ${TYPOGRAPHY.linkPSemiBold}
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
 `
 
 const DISABLED_LINK_CSS = css`
   ${TYPOGRAPHY.linkPSemiBold}
   color: ${COLORS.grey40};
-  cursor: default;
+  cursor: ${CURSOR_DEFAULT};
 
   &:hover {
     color: ${COLORS.grey40};

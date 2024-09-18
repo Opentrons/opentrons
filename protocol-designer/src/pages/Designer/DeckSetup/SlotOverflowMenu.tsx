@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom'
 import {
   BORDERS,
   COLORS,
+  CURSOR_AUTO,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
   NO_WRAP,
@@ -275,7 +277,7 @@ export function SlotOverflowMenu(
 const MenuButton = styled.button`
   background-color: ${COLORS.transparent};
   border-radius: inherit;
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   padding: ${SPACING.spacing8} ${SPACING.spacing12};
   border: none;
   border-radius: inherit;
@@ -284,6 +286,6 @@ const MenuButton = styled.button`
   }
   &:disabled {
     color: ${COLORS.grey40};
-    cursor: auto;
+    cursor: ${CURSOR_AUTO};
   }
 `

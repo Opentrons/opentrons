@@ -12,6 +12,7 @@ import {
   Box,
   Btn,
   Checkbox,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
@@ -20,6 +21,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_AUTO,
   PRODUCT,
   RadioButton,
   SPACING,
@@ -137,7 +139,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
             <Flex
               flexDirection="column"
               height="41.5vh"
-              overflowY="scroll"
+              overflowY={OVERFLOW_AUTO}
               marginBottom={SPACING.spacing16}
               marginTop={SPACING.spacing60}
             >
@@ -494,7 +496,7 @@ const StyledLabel = styled.label`
   text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
   font-size: ${PRODUCT.TYPOGRAPHY.fontSizeBodyDefaultSemiBold};
   display: ${DISPLAY_INLINE_BLOCK};
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   input[type='file'] {
     display: none;
   }

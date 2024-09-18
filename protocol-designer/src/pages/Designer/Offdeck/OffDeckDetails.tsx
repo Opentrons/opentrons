@@ -18,19 +18,19 @@ import {
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { wellFillFromWellContents } from '../../../components/labware'
 import { selectors } from '../../../labware-ingred/selectors'
-import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { DeckItemHover } from '../DeckSetup/DeckItemHover'
 import { SlotDetailsContainer } from '../../../organisms'
 import { getRobotType } from '../../../file-data/selectors'
 import { SlotOverflowMenu } from '../DeckSetup/SlotOverflowMenu'
 import type { DeckSlotId } from '@opentrons/shared-data'
+import type { DeckSetupTabType } from '../types'
 
-interface OffDeckDetailsProps {
+interface OffDeckDetailsProps extends DeckSetupTabType {
   addLabware: () => void
 }
 export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
-  const { addLabware } = props
+  const { addLabware, tab } = props
   const { t, i18n } = useTranslation('starting_deck_state')
   const [hoverSlot, setHoverSlot] = React.useState<DeckSlotId | null>(null)
   const [menuListId, setShowMenuListForId] = React.useState<DeckSlotId | null>(
@@ -124,7 +124,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                         slotBoundingBox={xyzDimensions}
                         slotPosition={[0, 0, 0]}
                         itemId={lw.id}
-                        selectedTerminalItemId={START_TERMINAL_ITEM_ID}
+                        tab={tab}
                       />
                     </>
                   )}

@@ -1,7 +1,12 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { SPACING, TYPOGRAPHY, LegacyStyledText } from '@opentrons/components'
+import {
+  CURSOR_POINTER,
+  LegacyStyledText,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
@@ -45,7 +50,7 @@ interface FlexPipetteCardProps {
 }
 const BANNER_LINK_CSS = css`
   text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   margin-left: ${SPACING.spacing8};
 `
 
@@ -266,6 +271,7 @@ export function FlexPipetteCard({
           mount={mount}
           instrumentModelSpecs={pipetteModelSpecs}
           closeFlow={toggleDTWiz}
+          modalStyle="simple"
         />
       ) : null}
       {attachedPipette?.ok && showAboutPipetteSlideout ? (
