@@ -29,7 +29,6 @@ import {
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../../types'
-import { getSelectedWells } from '../../../well-selection/selectors'
 
 const ROBOT_BOTTOM_HALF_SLOTS = [
   'D1',
