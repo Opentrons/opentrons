@@ -219,7 +219,7 @@ class _TestCommandDefinedError(ErrorOccurrence):
 
 _TestCommandReturn = Union[
     SuccessData[_TestCommandResult, None],
-    DefinedErrorData[_TestCommandDefinedError, None],
+    DefinedErrorData[_TestCommandDefinedError],
 ]
 
 
@@ -561,7 +561,6 @@ async def test_execute_defined_error(
     error_id = "error-id"
     returned_error = DefinedErrorData(
         public=_TestCommandDefinedError(id=error_id, createdAt=failed_at),
-        private=None,
     )
     queued_command = cast(
         Command,

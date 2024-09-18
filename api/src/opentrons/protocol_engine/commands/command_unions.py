@@ -703,9 +703,9 @@ CommandPrivateResult = Union[
 
 # All `DefinedErrorData`s that implementations will actually return in practice.
 CommandDefinedErrorData = Union[
-    DefinedErrorData[TipPhysicallyMissingError, None],
-    DefinedErrorData[OverpressureError, None],
-    DefinedErrorData[LiquidNotFoundError, None],
+    DefinedErrorData[TipPhysicallyMissingError],
+    DefinedErrorData[OverpressureError],
+    DefinedErrorData[LiquidNotFoundError],
 ]
 
 

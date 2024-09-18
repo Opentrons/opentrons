@@ -215,7 +215,6 @@ async def test_liquid_not_found_error(
                 createdAt=error_timestamp,
                 wrappedErrors=[matchers.Anything()],
             ),
-            private=None,
             state_update=expected_state_update,
         )
     else:
