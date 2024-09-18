@@ -65,7 +65,7 @@ export function EditNickNameModal(props: EditNickNameModalProps): JSX.Element {
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        girGap={SPACING.spacing12}
+        gridGap={SPACING.spacing12}
         height="3.75rem"
       >
         <Flex color={COLORS.grey60}>

@@ -12,7 +12,6 @@ import {
   getInitialDeckSetup,
   getSavedStepForms,
 } from '../../../step-forms/selectors'
-import { useBlockingHint } from '../../../components/Hints/useBlockingHint'
 import { MaterialsListModal } from '../../../organisms/MaterialsListModal'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { ProtocolOverview } from '../index'
@@ -25,7 +24,6 @@ vi.mock('../OffdeckThumbnail')
 vi.mock('../DeckThumbnail')
 vi.mock('../../../step-forms/selectors')
 vi.mock('../../../file-data/selectors')
-vi.mock('../../../components/Hints/useBlockingHint')
 vi.mock('../../../organisms/MaterialsListModal')
 vi.mock('../../../labware-ingred/selectors')
 vi.mock('../../../organisms')
@@ -68,7 +66,6 @@ describe('ProtocolOverview', () => {
       description: 'mockDescription',
       created: 123,
     })
-    vi.mocked(useBlockingHint).mockReturnValue(null)
     vi.mocked(MaterialsListModal).mockReturnValue(
       <div>mock MaterialsListModal</div>
     )
@@ -132,14 +129,6 @@ describe('ProtocolOverview', () => {
     const button = screen.getByRole('button', { name: 'Edit protocol' })
     fireEvent.click(button)
     expect(mockNavigate).toHaveBeenCalledWith('/designer')
-  })
-
-  it('renders the file sidebar and exports with blocking hint for exporting', () => {
-    vi.mocked(useBlockingHint).mockReturnValue(<div>mock blocking hint</div>)
-    render()
-    fireEvent.click(screen.getByRole('button', { name: 'Export protocol' }))
-    expect(vi.mocked(useBlockingHint)).toHaveBeenCalled()
-    screen.getByText('mock blocking hint')
   })
 
   it('render mock materials list modal when clicking materials list', () => {
