@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+import { useTranslation } from 'react-i18next'
 
 import {
   StyledText,
-  JUSTIFY_FLEX_END,
   ALIGN_CENTER,
   Flex,
   SPACING,
@@ -13,72 +13,79 @@ import {
 } from '@opentrons/components'
 
 import { DropTipFooterButtons } from './shared'
+import { BLOWOUT_SUCCESS, DROP_TIP_SUCCESS, DT_ROUTES } from './constants'
 
 import SuccessIcon from '../../assets/images/icon_success.png'
 
 import type { DropTipWizardContainerProps } from './types'
 
-type SuccessProps = DropTipWizardContainerProps & {
-  message: string
-  proceedText: string
-  handleProceed: () => void
-}
-export const Success = (props: SuccessProps): JSX.Element => {
-  const {
-    message,
-    proceedText,
-    handleProceed,
-    isOnDevice,
-    issuedCommandsType,
-  } = props
+export const Success = ({
+  currentStep,
+  proceedToRoute,
+  fixitCommandTypeUtils,
+  proceedWithConditionalClose,
+}: DropTipWizardContainerProps): JSX.Element => {
+  const { tipDropComplete } = fixitCommandTypeUtils?.buttonOverrides ?? {}
+  const { t } = useTranslation('drop_tip_wizard')
+
+  // Route to the drop tip route if user is at the blowout success screen, otherwise proceed conditionally.
+  const handleProceed = (): void => {
+    if (currentStep === BLOWOUT_SUCCESS) {
+      void proceedToRoute(DT_ROUTES.DROP_TIP)
+    } else {
+      // Clear the error recovery submap upon completion of drop tip wizard.
+      fixitCommandTypeUtils?.reportMap(null)
+
+      if (tipDropComplete != null) {
+        tipDropComplete()
+      } else {
+        proceedWithConditionalClose()
+      }
+    }
+  }
+
+  const buildProceedText = (): string => {
+    if (fixitCommandTypeUtils != null && currentStep === DROP_TIP_SUCCESS) {
+      return fixitCommandTypeUtils.copyOverrides.tipDropCompleteBtnCopy
+    } else {
+      return currentStep === BLOWOUT_SUCCESS ? t('continue') : t('exit')
+    }
+  }
 
   return (
-    <Flex
-      css={WIZARD_CONTAINER_STYLE}
-      alignItems={ALIGN_CENTER}
-      padding={SPACING.spacing32}
-      gridGap={issuedCommandsType === 'fixit' ? SPACING.spacing24 : null}
-      height="100%"
-      marginBottom={
-        issuedCommandsType === 'setup' && isOnDevice ? SPACING.spacing80 : null
-      }
-      marginTop={
-        issuedCommandsType === 'fixit' && isOnDevice ? '3.125rem' : null
-      }
-    >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_CENTER}
-        flex="1"
-        height="100%"
-        gridGap={SPACING.spacing24}
-      >
-        <img
-          src={SuccessIcon}
-          alt="Success Icon"
-          width={isOnDevice ? '282px' : '170px'}
-          height={isOnDevice ? '234px' : '141px'}
-        />
+    <>
+      <Flex css={WIZARD_CONTAINER_STYLE}>
+        <img src={SuccessIcon} alt="Success Icon" css={IMAGE_STYLE} />
         <StyledText desktopStyle="headingSmallBold" oddStyle="level3HeaderBold">
-          {message}
+          {currentStep === BLOWOUT_SUCCESS
+            ? t('blowout_complete')
+            : t('drop_tip_complete')}
         </StyledText>
       </Flex>
-      <Flex justifyContent={JUSTIFY_FLEX_END} width="100%" marginLeft="auto">
-        <DropTipFooterButtons
-          primaryBtnOnClick={handleProceed}
-          primaryBtnTextOverride={proceedText}
-        />
-      </Flex>
-    </Flex>
+      <DropTipFooterButtons
+        primaryBtnOnClick={handleProceed}
+        primaryBtnTextOverride={buildProceedText()}
+      />
+    </>
   )
 }
 
 const WIZARD_CONTAINER_STYLE = css`
-  min-height: 394px;
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
+  align-items: ${ALIGN_CENTER};
+  grid-gap: ${SPACING.spacing24};
+  height: 100%;
+  width: 100%;
+`
+
+const IMAGE_STYLE = css`
+  width: 170px;
+  height: 141px;
+  margin-top: ${SPACING.spacing24};
+
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    height: 472px;
+    width: 282px;
+    height: 234px;
   }
 `

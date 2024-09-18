@@ -28,7 +28,6 @@ import {
   CHOOSE_BLOWOUT_LOCATION,
   CHOOSE_DROP_TIP_LOCATION,
   DROP_TIP_SUCCESS,
-  DT_ROUTES,
   POSITION_AND_BLOWOUT,
   POSITION_AND_DROP_TIP,
 } from './constants'
@@ -112,8 +111,6 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
   )
 }
 
-// TODO(jh, 06-07-24): All content views could use refactoring and DQA. Create shared components from designs.
-// Convince design not to use SimpleWizardBody. EXEC-520.
 export function DropTipWizardContainer(
   props: DropTipWizardContainerProps
 ): JSX.Element {
@@ -173,15 +170,12 @@ export const DropTipWizardContent = (
     currentStep,
     errorDetails,
     isCommandInProgress,
-    fixitCommandTypeUtils,
     issuedCommandsType,
     isExiting,
-    proceedToRoute,
     showConfirmExit,
-    proceedWithConditionalClose,
   } = props
 
-  const { t, i18n } = useTranslation('drop_tip_wizard')
+  const { t } = useTranslation('drop_tip_wizard')
   const confirmPositionUtils = useConfirmPosition(currentStep)
 
   function buildGettingReady(): JSX.Element {
@@ -229,46 +223,7 @@ export const DropTipWizardContent = (
   }
 
   function buildSuccess(): JSX.Element {
-    const { tipDropComplete } = fixitCommandTypeUtils?.buttonOverrides ?? {}
-
-    // Route to the drop tip route if user is at the blowout success screen, otherwise proceed conditionally.
-    const handleProceed = (): void => {
-      if (currentStep === BLOWOUT_SUCCESS) {
-        void proceedToRoute(DT_ROUTES.DROP_TIP)
-      } else {
-        // Clear the error recovery submap upon completion of drop tip wizard.
-        fixitCommandTypeUtils?.reportMap(null)
-
-        if (tipDropComplete != null) {
-          tipDropComplete()
-        } else {
-          proceedWithConditionalClose()
-        }
-      }
-    }
-
-    const buildProceedText = (): string => {
-      if (fixitCommandTypeUtils != null && currentStep === DROP_TIP_SUCCESS) {
-        return fixitCommandTypeUtils.copyOverrides.tipDropCompleteBtnCopy
-      } else {
-        return currentStep === BLOWOUT_SUCCESS
-          ? i18n.format(t('shared:continue'), 'capitalize')
-          : i18n.format(t('shared:exit'), 'capitalize')
-      }
-    }
-
-    return (
-      <Success
-        {...props}
-        message={
-          currentStep === BLOWOUT_SUCCESS
-            ? t('blowout_complete')
-            : t('drop_tip_complete')
-        }
-        handleProceed={handleProceed}
-        proceedText={buildProceedText()}
-      />
-    )
+    return <Success {...props} />
   }
 
   function buildModalContent(): JSX.Element {
