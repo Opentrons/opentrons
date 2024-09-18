@@ -9,10 +9,10 @@ import {
   WifiConnectionDetails,
 } from '../../../organisms/ODD/NetworkSettings'
 import { RobotSetupHeader } from '../../../organisms/RobotSetupHeader'
-import * as RobotApi from '../../../redux/robot-api'
+import * as RobotApi from '/app/redux/robot-api'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { RequestState } from '../../../redux/robot-api/types'
+import type { RequestState } from '/app/redux/robot-api/types'
 import type { WifiScreenOption } from './'
 
 interface WifiConnectStatusProps {

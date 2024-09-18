@@ -2,11 +2,11 @@ import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi } from 'vitest'
 import { i18n } from '../../../i18n'
-import { getIsOnDevice } from '../../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { InProgressModal } from '../InProgressModal'
 
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 
 const render = (props: React.ComponentProps<typeof InProgressModal>) => {
   return renderWithProviders(<InProgressModal {...props} />, {

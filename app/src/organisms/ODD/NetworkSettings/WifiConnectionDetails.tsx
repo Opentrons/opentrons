@@ -19,12 +19,12 @@ import {
 
 import { MediumButton } from '../../../atoms/buttons'
 import { RobotSetupHeader } from '../../../organisms/RobotSetupHeader'
-import { getLocalRobot } from '../../../redux/discovery'
-import { getNetworkInterfaces, fetchStatus } from '../../../redux/networking'
+import { getLocalRobot } from '/app/redux/discovery'
+import { getNetworkInterfaces, fetchStatus } from '/app/redux/networking'
 import { NetworkDetailsModal } from '../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { Dispatch, State } from '../../../redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 interface WifiConnectionDetailsProps {
   ssid?: string

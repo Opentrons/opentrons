@@ -6,15 +6,15 @@ import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { getHasCalibrationBlock } from '../../../redux/config'
-import { getMovementStatus } from '../../../redux/robot-controls'
-import { getCalibrationForPipette } from '../../../redux/calibration'
+import { getHasCalibrationBlock } from '/app/redux/config'
+import { getMovementStatus } from '/app/redux/robot-controls'
+import { getCalibrationForPipette } from '/app/redux/calibration'
 import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
 import {
   getRequestById,
   SUCCESS,
   useDispatchApiRequests,
-} from '../../../redux/robot-api'
+} from '/app/redux/robot-api'
 import { useAttachedPipettes } from '../../Devices/hooks'
 import { PipetteSelection } from '../PipetteSelection'
 import { ExitModal } from '../ExitModal'
@@ -23,8 +23,8 @@ import { ChangePipette } from '..'
 
 import type { NavigateFunction } from 'react-router-dom'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
-import type { AttachedPipette } from '../../../redux/pipettes/types'
-import type { DispatchApiRequestType } from '../../../redux/robot-api'
+import type { AttachedPipette } from '/app/redux/pipettes/types'
+import type { DispatchApiRequestType } from '/app/redux/robot-api'
 
 const mockNavigate = vi.fn()
 
@@ -43,10 +43,10 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     getPipetteNameSpecs: vi.fn(),
   }
 })
-vi.mock('../../../redux/config')
-vi.mock('../../../redux/robot-controls')
-vi.mock('../../../redux/calibration')
-vi.mock('../../../redux/robot-api')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/robot-controls')
+vi.mock('/app/redux/calibration')
+vi.mock('/app/redux/robot-api')
 vi.mock('../PipetteSelection')
 vi.mock('../ExitModal')
 vi.mock('../../../molecules/InProgressModal/InProgressModal')

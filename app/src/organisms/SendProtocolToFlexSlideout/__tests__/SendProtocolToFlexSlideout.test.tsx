@@ -21,18 +21,18 @@ import {
   startDiscovery,
   ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT3,
-} from '../../../redux/discovery'
-import { getValidCustomLabwareFiles } from '../../../redux/custom-labware'
+} from '/app/redux/discovery'
+import { getValidCustomLabwareFiles } from '/app/redux/custom-labware'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { useIsRobotOnWrongVersionOfSoftware } from '../../../redux/robot-update'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
-} from '../../../redux/discovery/__fixtures__'
-import { getNetworkInterfaces } from '../../../redux/networking'
-import { getIsProtocolAnalysisInProgress } from '../../../redux/protocol-storage/selectors'
-import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
+} from '/app/redux/discovery/__fixtures__'
+import { getNetworkInterfaces } from '/app/redux/networking'
+import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage/selectors'
+import { storedProtocolData as storedProtocolDataFixture } from '/app/redux/protocol-storage/__fixtures__'
 import { SendProtocolToFlexSlideout } from '..'
 import { useNotifyAllRunsQuery } from '../../../resources/runs'
 
@@ -46,11 +46,11 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   }
 })
 vi.mock('../../../organisms/ToasterOven')
-vi.mock('../../../redux/robot-update')
-vi.mock('../../../redux/discovery')
-vi.mock('../../../redux/networking')
-vi.mock('../../../redux/custom-labware')
-vi.mock('../../../redux/protocol-storage/selectors')
+vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/networking')
+vi.mock('/app/redux/custom-labware')
+vi.mock('/app/redux/protocol-storage/selectors')
 vi.mock('../../../resources/runs')
 
 const render = (

@@ -11,7 +11,7 @@ import { useAllHistoricOffsets } from '../useAllHistoricOffsets'
 import { getLabwareLocationCombos } from '../getLabwareLocationCombos'
 
 import { useOffsetCandidatesForAnalysis } from '../useOffsetCandidatesForAnalysis'
-import { storedProtocolData as storedProtocolDataFixture } from '../../../../redux/protocol-storage/__fixtures__'
+import { storedProtocolData as storedProtocolDataFixture } from '/app/redux/protocol-storage/__fixtures__'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { OffsetCandidate } from '../useOffsetCandidatesForAnalysis'

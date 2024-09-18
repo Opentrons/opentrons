@@ -18,7 +18,7 @@ import {
   getLabwareDisplayName,
   getPositionFromSlotId,
 } from '@opentrons/shared-data'
-import * as Sessions from '../../redux/sessions'
+import * as Sessions from '/app/redux/sessions'
 import { NeedHelpLink } from './NeedHelpLink'
 import { CalibrationLabwareRender } from './CalibrationLabwareRender'
 

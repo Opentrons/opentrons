@@ -4,7 +4,7 @@ import { vi, it, describe, expect } from 'vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
-import { setUseTrashSurfaceForTipCal } from '../../../redux/calibration'
+import { setUseTrashSurfaceForTipCal } from '/app/redux/calibration'
 import { AskForCalibrationBlockModal } from '../AskForCalibrationBlockModal'
 import { fireEvent, screen } from '@testing-library/react'
 

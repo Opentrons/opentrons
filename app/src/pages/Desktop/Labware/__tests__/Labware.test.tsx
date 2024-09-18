@@ -7,19 +7,19 @@ import { i18n } from '../../../../i18n'
 import {
   useTrackEvent,
   ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
-} from '../../../../redux/analytics'
+} from '/app/redux/analytics'
 import { LabwareCard } from '../../../../organisms/LabwareCard'
 import { AddCustomLabwareSlideout } from '../../../../organisms/AddCustomLabwareSlideout'
 import { useToaster } from '../../../../organisms/ToasterOven'
 import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
 import { Labware } from '..'
-import { mockDefinition } from '../../../../redux/custom-labware/__fixtures__'
+import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
 
 vi.mock('../../../../organisms/LabwareCard')
 vi.mock('../../../../organisms/AddCustomLabwareSlideout')
 vi.mock('../../../../organisms/ToasterOven')
 vi.mock('../hooks')
-vi.mock('../../../../redux/analytics')
+vi.mock('/app/redux/analytics')
 
 const mockTrackEvent = vi.fn()
 const mockMakeSnackbar = vi.fn()

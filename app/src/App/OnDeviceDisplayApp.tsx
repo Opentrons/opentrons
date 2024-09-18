@@ -46,8 +46,11 @@ import { Welcome } from '../pages/ODD/Welcome'
 import { InitialLoadingScreen } from '../pages/ODD/InitialLoadingScreen'
 import { DeckConfigurationEditor } from '../pages/ODD/DeckConfiguration'
 import { PortalRoot as ModalPortalRoot } from './portal'
-import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
-import { updateBrightness } from '../redux/shell'
+import {
+  getOnDeviceDisplaySettings,
+  updateConfigValue,
+} from '/app/redux/config'
+import { updateBrightness } from '/app/redux/shell'
 import { SLEEP_NEVER_MS } from './constants'
 import { useProtocolReceiptToast, useSoftwareUpdatePoll } from './hooks'
 import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
@@ -56,7 +59,7 @@ import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
 
 import { hackWindowNavigatorOnLine } from './hacks'
 
-import type { Dispatch } from '../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 // forces electron to think we're online which means axios won't elide
 // network calls to localhost. see ./hacks.ts for more.

@@ -16,7 +16,7 @@ import {
   mockTemperatureModuleGen2,
   mockThermocycler,
   mockThermocyclerGen2,
-} from '../../../redux/modules/__fixtures__'
+} from '/app/redux/modules/__fixtures__'
 import { useIsRobotBusy, useRunStatuses } from '../../Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useCurrentRunId } from '../../../resources/runs'
@@ -27,7 +27,7 @@ import {
 } from '../hooks'
 
 import type { Store } from 'redux'
-import type { State } from '../../../redux/types'
+import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')

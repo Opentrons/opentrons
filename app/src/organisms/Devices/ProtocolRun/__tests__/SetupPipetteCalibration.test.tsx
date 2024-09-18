@@ -5,7 +5,7 @@ import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtures__'
+import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
 import { useRunPipetteInfoByMount } from '../../hooks'
 import { SetupPipetteCalibrationItem } from '../SetupPipetteCalibrationItem'
 import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'

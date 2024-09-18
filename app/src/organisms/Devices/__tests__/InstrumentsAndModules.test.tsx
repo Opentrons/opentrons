@@ -12,7 +12,7 @@ import {
 
 import { i18n } from '../../../i18n'
 import { Banner } from '../../../atoms/Banner'
-import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
+import { mockMagneticModule } from '/app/redux/modules/__fixtures__'
 import { useIsFlex, useIsRobotViewable, useRunStatuses } from '../hooks'
 import { ModuleCard } from '../../ModuleCard'
 import { InstrumentsAndModules } from '../InstrumentsAndModules'

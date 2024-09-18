@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 
-import { getUserId } from '../../../redux/config'
+import { getUserId } from '/app/redux/config'
 import {
   useClientDataRecovery,
   useUpdateClientDataRecovery,

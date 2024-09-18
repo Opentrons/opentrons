@@ -14,7 +14,7 @@ import {
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
+import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import {
   getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
@@ -34,8 +34,8 @@ import {
   useRunCreatedAtTimestamp,
   useTrackProtocolRunEvent,
 } from '../../../../organisms/Devices/hooks'
-import { getLocalRobot } from '../../../../redux/discovery'
-import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../../redux/analytics'
+import { getLocalRobot } from '/app/redux/discovery'
+import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { getProtocolModulesInfo } from '../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import {
   ProtocolSetupLabware,
@@ -63,7 +63,7 @@ import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from '../ConfirmSetupStepsCompleteModal'
 import { ProtocolSetup } from '../'
 import { useNotifyRunQuery } from '../../../../resources/runs'
-import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { mockRunTimeParameterData } from '../../../../pages/ODD/ProtocolDetails/fixtures'
 
 import type { UseQueryResult } from 'react-query'
@@ -121,7 +121,7 @@ vi.mock(
 vi.mock('../../../../organisms/ODD/RunningProtocol')
 vi.mock('../../../../organisms/RunTimeControl/hooks')
 vi.mock('../../../../organisms/ModuleCard/hooks')
-vi.mock('../../../../redux/discovery/selectors')
+vi.mock('/app/redux/discovery/selectors')
 vi.mock('../ConfirmAttachedModal')
 vi.mock('../../../../organisms/ToasterOven')
 vi.mock('../../../../resources/runs')

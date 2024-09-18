@@ -6,15 +6,15 @@ import '@testing-library/jest-dom/vitest'
 
 import { i18n } from '../../../../../i18n'
 import { renderWithProviders } from '../../../../../__testing-utils__'
-import { getLocalRobot } from '../../../../../redux/discovery'
-import * as Networking from '../../../../../redux/networking'
+import { getLocalRobot } from '/app/redux/discovery'
+import * as Networking from '/app/redux/networking'
 import { NetworkDetailsModal } from '../NetworkDetailsModal'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
 import type * as Dom from 'react-router-dom'
-import type { State } from '../../../../../redux/types'
+import type { State } from '/app/redux/types'
 
-vi.mock('../../../../../redux/discovery')
-vi.mock('../../../../../redux/networking')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/networking')
 vi.mock('../NetworkDetailsModal')
 
 const mockNavigate = vi.fn()

@@ -7,11 +7,11 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { getDeckDefinitions } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
-import * as Sessions from '../../../redux/sessions'
-import { mockTipLengthCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
+import * as Sessions from '/app/redux/sessions'
+import { mockTipLengthCalibrationSessionAttributes } from '/app/redux/sessions/__fixtures__'
 
 import { CalibrateTipLength } from '../index'
-import type { TipLengthCalibrationStep } from '../../../redux/sessions/types'
+import type { TipLengthCalibrationStep } from '/app/redux/sessions/types'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getDeckDefinitions>()
@@ -20,9 +20,9 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     getDeckDefinitions: vi.fn(),
   }
 })
-vi.mock('../../../redux/sessions/selectors')
-vi.mock('../../../redux/robot-api/selectors')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/sessions/selectors')
+vi.mock('/app/redux/robot-api/selectors')
+vi.mock('/app/redux/config')
 
 interface CalibrateTipLengthSpec {
   heading: string

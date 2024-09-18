@@ -46,7 +46,7 @@ import {
   startDiscovery,
   RE_ROBOT_MODEL_OT2,
   RE_ROBOT_MODEL_OT3,
-} from '../../redux/discovery'
+} from '/app/redux/discovery'
 import { Banner } from '../../atoms/Banner'
 import { Slideout } from '../../atoms/Slideout'
 import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
@@ -59,8 +59,8 @@ import type { RobotType, RunTimeParameter } from '@opentrons/shared-data'
 import type { DropdownOption } from '@opentrons/components'
 import type { SlideoutProps } from '../../atoms/Slideout'
 import type { UseCreateRun } from '../../organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
-import type { State, Dispatch } from '../../redux/types'
-import type { Robot } from '../../redux/discovery/types'
+import type { State, Dispatch } from '/app/redux/types'
+import type { Robot } from '/app/redux/discovery/types'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};

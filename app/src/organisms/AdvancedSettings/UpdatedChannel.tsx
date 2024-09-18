@@ -17,10 +17,10 @@ import {
   getUpdateChannel,
   getUpdateChannelOptions,
   updateConfigValue,
-} from '../../redux/config'
+} from '/app/redux/config'
 
 import type { SelectOption } from '../../atoms/SelectField/Select'
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 export function UpdatedChannel(): JSX.Element {
   const { t } = useTranslation('app_settings')

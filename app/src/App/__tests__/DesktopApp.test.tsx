@@ -15,7 +15,7 @@ import { ProtocolRunDetails } from '../../pages/Desktop/Devices/ProtocolRunDetai
 import { RobotSettings } from '../../pages/Desktop/Devices/RobotSettings'
 import { GeneralSettings } from '../../pages/Desktop/AppSettings/GeneralSettings'
 import { AlertsModal } from '../../organisms/Alerts/AlertsModal'
-import { useFeatureFlag } from '../../redux/config'
+import { useFeatureFlag } from '/app/redux/config'
 import { useIsFlex } from '../../organisms/Devices/hooks'
 import { ProtocolTimeline } from '../../pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline'
 import { useSoftwareUpdatePoll } from '../hooks'
@@ -32,7 +32,7 @@ vi.mock('../../pages/Desktop/Devices/ProtocolRunDetails')
 vi.mock('../../pages/Desktop/Devices/RobotSettings')
 vi.mock('../../organisms/Alerts/AlertsModal')
 vi.mock('../../pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline')
-vi.mock('../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../hooks')
 
 const render = (path = '/') => {

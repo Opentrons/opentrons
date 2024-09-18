@@ -8,7 +8,7 @@ import { i18n } from '../../../i18n'
 
 import { handleTipsAttachedModal } from '../TipsAttachedModal'
 import { LEFT } from '@opentrons/shared-data'
-import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
+import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
 import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
 import { useDropTipWizardFlows } from '..'
 

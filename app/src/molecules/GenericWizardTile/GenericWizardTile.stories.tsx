@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 import { Skeleton } from '../../atoms/Skeleton'
 import { WizardHeader } from '../WizardHeader'
-import { configReducer } from '../../redux/config/reducer'
+import { configReducer } from '/app/redux/config/reducer'
 import { GenericWizardTile } from './index'
 
 import type { Store, StoreEnhancer } from 'redux'

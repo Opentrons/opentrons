@@ -6,11 +6,11 @@ import { i18n } from '../../../../i18n'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
-} from '../../../../redux/config'
+} from '/app/redux/config'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { TouchscreenBrightness } from '../TouchscreenBrightness'
 
-vi.mock('../../../../redux/config')
+vi.mock('/app/redux/config')
 
 const mockFunc = vi.fn()
 

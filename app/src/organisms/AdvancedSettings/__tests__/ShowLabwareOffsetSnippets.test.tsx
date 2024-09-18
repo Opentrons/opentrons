@@ -5,11 +5,11 @@ import { i18n } from '../../../i18n'
 import {
   getIsLabwareOffsetCodeSnippetsOn,
   updateConfigValue,
-} from '../../../redux/config'
+} from '/app/redux/config'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { ShowLabwareOffsetSnippets } from '../ShowLabwareOffsetSnippets'
 
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 
 const render = () => {
   return (

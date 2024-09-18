@@ -22,7 +22,7 @@ import {
 import { Banner } from '../../atoms/Banner'
 import { getTopPortalEl } from '../../App/portal'
 
-import type { AttachedModule } from '../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 interface ErrorInfoProps {
   attachedModule: AttachedModule

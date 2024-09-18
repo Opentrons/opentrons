@@ -16,12 +16,12 @@ import {
   updateSetting,
   getRobotSettings,
   fetchSettings,
-} from '../../../redux/robot-settings'
-import type { State, Dispatch } from '../../../redux/types'
+} from '/app/redux/robot-settings'
+import type { State, Dispatch } from '/app/redux/types'
 import type {
   RobotSettings,
   RobotSettingsField,
-} from '../../../redux/robot-settings/types'
+} from '/app/redux/robot-settings/types'
 
 interface RobotSettingsFeatureFlagsProps {
   robotName: string

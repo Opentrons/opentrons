@@ -9,13 +9,13 @@ import {
   getRobotSerialNumber,
   getRobotFirmwareVersion,
   getRobotProtocolApiVersion,
-} from '../../../../../redux/discovery'
+} from '/app/redux/discovery'
 import { useRobot } from '../../../hooks'
-import { mockConnectableRobot } from '../../../../../redux/discovery/__fixtures__'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { RobotInformation } from '../RobotInformation'
 
 vi.mock('../../../hooks')
-vi.mock('../../../../../redux/discovery/selectors')
+vi.mock('/app/redux/discovery/selectors')
 
 const MOCK_ROBOT_SERIAL_NUMBER = '0.0.0'
 const MOCK_FIRMWARE_VERSION = '4.5.6'

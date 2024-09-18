@@ -7,13 +7,13 @@ import { i18n } from '../../../i18n'
 import {
   resetUseTrashSurfaceForTipCal,
   setUseTrashSurfaceForTipCal,
-} from '../../../redux/calibration'
-import { getUseTrashSurfaceForTipCal } from '../../../redux/config'
+} from '/app/redux/calibration'
+import { getUseTrashSurfaceForTipCal } from '/app/redux/config'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { OT2AdvancedSettings } from '../OT2AdvancedSettings'
 
-vi.mock('../../../redux/calibration')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/calibration')
+vi.mock('/app/redux/config')
 
 const render = () => {
   return renderWithProviders(<OT2AdvancedSettings />, {

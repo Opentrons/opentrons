@@ -19,7 +19,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useSelector } from 'react-redux'
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { SmallButton } from '../../atoms/buttons'
 
 interface ExitConfirmationProps {

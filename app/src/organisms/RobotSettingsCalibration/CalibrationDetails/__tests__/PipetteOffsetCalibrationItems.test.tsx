@@ -8,7 +8,7 @@ import { i18n } from '../../../../i18n'
 import {
   mockAttachedPipette,
   mockAttachedPipetteInformation,
-} from '../../../../redux/pipettes/__fixtures__'
+} from '/app/redux/pipettes/__fixtures__'
 import {
   useAttachedPipettes,
   useIsFlex,
@@ -20,7 +20,7 @@ import { OverflowMenu } from '../OverflowMenu'
 import { formatLastCalibrated } from '../utils'
 
 import type { Mount } from '@opentrons/components'
-import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
+import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 
 const render = (
   props: React.ComponentProps<typeof PipetteOffsetCalibrationItems>
@@ -58,9 +58,9 @@ const mockPipetteOffsetCalibrationsForOt3 = [
   },
 ]
 
-vi.mock('../../../../redux/custom-labware/selectors')
-vi.mock('../../../../redux/sessions/selectors')
-vi.mock('../../../../redux/discovery')
+vi.mock('/app/redux/custom-labware/selectors')
+vi.mock('/app/redux/sessions/selectors')
+vi.mock('/app/redux/discovery')
 vi.mock('../../../../assets/labware/findLabware')
 vi.mock('../../../../organisms/Devices/hooks')
 vi.mock('../OverflowMenu')

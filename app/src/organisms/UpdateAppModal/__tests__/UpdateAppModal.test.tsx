@@ -4,18 +4,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
 import { i18n } from '../../../i18n'
-import * as Shell from '../../../redux/shell'
+import * as Shell from '/app/redux/shell'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { useRemoveActiveAppUpdateToast } from '../../Alerts'
 import { UpdateAppModal, RELEASE_NOTES_URL_BASE } from '..'
 
-import type { State } from '../../../redux/types'
-import type { ShellUpdateState } from '../../../redux/shell/types'
-import type * as ShellState from '../../../redux/shell'
+import type { State } from '/app/redux/types'
+import type { ShellUpdateState } from '/app/redux/shell/types'
+import type * as ShellState from '/app/redux/shell'
 import type * as Dom from 'react-router-dom'
 import type { UpdateAppModalProps } from '..'
 
-vi.mock('../../../redux/shell/update', async importOriginal => {
+vi.mock('/app/redux/shell/update', async importOriginal => {
   const actual = await importOriginal<typeof ShellState>()
   return {
     ...actual,

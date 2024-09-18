@@ -30,8 +30,8 @@ import {
   getReachableRobots,
   getUnreachableRobots,
   getLocalRobot,
-} from '../../../redux/discovery'
-import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '../../../redux/analytics'
+} from '/app/redux/discovery'
+import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '/app/redux/analytics'
 import { AlphanumericKeyboard } from '../../../atoms/SoftwareKeyboard'
 import { SmallButton } from '../../../atoms/buttons'
 import { StepMeter } from '../../../atoms/StepMeter'
@@ -40,7 +40,7 @@ import { ConfirmRobotName } from '../../../organisms/ODD/NameRobot/ConfirmRobotN
 
 import type { FieldError, Resolver } from 'react-hook-form'
 import type { UpdatedRobotName } from '@opentrons/api-client'
-import type { State, Dispatch } from '../../../redux/types'
+import type { State, Dispatch } from '/app/redux/types'
 
 interface FormValues {
   newRobotName: string

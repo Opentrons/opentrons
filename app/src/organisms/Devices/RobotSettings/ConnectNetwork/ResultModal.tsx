@@ -5,10 +5,10 @@ import { AlertModal, SpinnerModal } from '@opentrons/components'
 import * as Copy from './i18n'
 import { ErrorModal } from '../../../../molecules/modals'
 import { DISCONNECT } from './constants'
-import { PENDING, FAILURE } from '../../../../redux/robot-api'
+import { PENDING, FAILURE } from '/app/redux/robot-api'
 
 import type { NetworkChangeType } from './types'
-import type { RequestStatus } from '../../../../redux/robot-api/types'
+import type { RequestStatus } from '/app/redux/robot-api/types'
 
 export interface ResultModalProps {
   type: NetworkChangeType

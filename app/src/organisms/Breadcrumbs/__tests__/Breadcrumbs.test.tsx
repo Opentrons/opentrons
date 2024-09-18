@@ -11,19 +11,19 @@ import {
   useRunCreatedAtTimestamp,
 } from '../../../organisms/Devices/hooks'
 import { getProtocolDisplayName } from '../../../organisms/ProtocolsLanding/utils'
-import { getIsOnDevice } from '../../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { getStoredProtocol } from '../../../redux/protocol-storage'
-import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import { getStoredProtocol } from '/app/redux/protocol-storage'
+import { storedProtocolData as storedProtocolDataFixture } from '/app/redux/protocol-storage/__fixtures__'
 import { Breadcrumbs } from '..'
 
-import type { State } from '../../../redux/types'
+import type { State } from '/app/redux/types'
 
 vi.mock('../../../organisms/Devices/hooks')
 vi.mock('../../../organisms/ProtocolsLanding/utils')
-vi.mock('../../../redux/config')
-vi.mock('../../../redux/protocol-storage')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/protocol-storage')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'

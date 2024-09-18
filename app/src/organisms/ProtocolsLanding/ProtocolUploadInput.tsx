@@ -12,15 +12,15 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 import { UploadInput } from '../../molecules/UploadInput'
-import { addProtocol } from '../../redux/protocol-storage'
+import { addProtocol } from '/app/redux/protocol-storage'
 import {
   useTrackEvent,
   ANALYTICS_IMPORT_PROTOCOL_TO_APP,
-} from '../../redux/analytics'
+} from '/app/redux/analytics'
 import { useLogger } from '../../logger'
 import { useToaster } from '../ToasterOven'
 
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 export interface UploadInputProps {
   onUpload?: () => void

@@ -13,7 +13,7 @@ import {
   mockMagneticModule,
   mockTemperatureModule,
   mockThermocycler,
-} from '../../../../../redux/modules/__fixtures__'
+} from '/app/redux/modules/__fixtures__'
 import { mockLabwareDef } from '../../../../LabwarePositionCheck/__fixtures__/mockLabwareDef'
 import { SecureLabwareModal } from '../SecureLabwareModal'
 import { LabwareListItem } from '../LabwareListItem'
@@ -24,7 +24,7 @@ import type {
   LabwareDefinition2,
   LoadModuleRunTimeCommand,
 } from '@opentrons/shared-data'
-import type { AttachedModule } from '../../../../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 import type { ModuleRenderInfoForProtocol } from '../../../hooks'
 
 vi.mock('../SecureLabwareModal')

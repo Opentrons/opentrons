@@ -3,17 +3,17 @@ import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { getIsLabwareOffsetCodeSnippetsOn } from '../../../redux/config'
+import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import { ResultsSummary } from '../ResultsSummary'
 import { SECTIONS } from '../constants'
-import { mockTipRackDefinition } from '../../../redux/custom-labware/__fixtures__'
+import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
 import {
   mockCompletedAnalysis,
   mockExistingOffsets,
   mockWorkingOffsets,
 } from '../__fixtures__'
 
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 
 const render = (props: React.ComponentProps<typeof ResultsSummary>) => {
   return renderWithProviders(<ResultsSummary {...props} />, {

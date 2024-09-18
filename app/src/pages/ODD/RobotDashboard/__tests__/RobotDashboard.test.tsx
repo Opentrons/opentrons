@@ -13,7 +13,7 @@ import {
 } from '../../../../organisms/ODD/RobotDashboard'
 import { Navigation } from '../../../../organisms/Navigation'
 import { useMissingProtocolHardware } from '../../../../transformations/commands'
-import { getOnDeviceDisplaySettings } from '../../../../redux/config'
+import { getOnDeviceDisplaySettings } from '/app/redux/config'
 import { WelcomeModal } from '../WelcomeModal'
 import { RobotDashboard } from '..'
 import { useNotifyAllRunsQuery } from '../../../../resources/runs'
@@ -35,7 +35,7 @@ vi.mock('../../../../organisms/ODD/RobotDashboard/EmptyRecentRun')
 vi.mock('../../../../organisms/ODD/RobotDashboard/RecentRunProtocolCarousel')
 vi.mock('../../../../organisms/Navigation')
 vi.mock('../../../../transformations/commands')
-vi.mock('../../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../WelcomeModal')
 vi.mock('../../../../resources/runs')
 

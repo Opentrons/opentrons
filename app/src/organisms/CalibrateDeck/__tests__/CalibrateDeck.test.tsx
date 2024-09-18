@@ -6,16 +6,16 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { getDeckDefinitions } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
-import * as Sessions from '../../../redux/sessions'
-import { mockDeckCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
+import * as Sessions from '/app/redux/sessions'
+import { mockDeckCalibrationSessionAttributes } from '/app/redux/sessions/__fixtures__'
 import { CalibrateDeck } from '../index'
 
-import type { DeckCalibrationStep } from '../../../redux/sessions/types'
-import type { DispatchRequestsType } from '../../../redux/robot-api'
+import type { DeckCalibrationStep } from '/app/redux/sessions/types'
+import type { DispatchRequestsType } from '/app/redux/robot-api'
 
-vi.mock('../../../redux/sessions/selectors')
-vi.mock('../../../redux/robot-api/selectors')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/sessions/selectors')
+vi.mock('/app/redux/robot-api/selectors')
+vi.mock('/app/redux/config')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getDeckDefinitions>()
   return {

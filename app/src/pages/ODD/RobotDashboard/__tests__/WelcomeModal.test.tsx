@@ -10,7 +10,7 @@ import { WelcomeModal } from '../WelcomeModal'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 
-vi.mock('../../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('@opentrons/react-api-client')
 
 const mockFunc = vi.fn()

@@ -7,8 +7,8 @@ import { i18n } from '../../../i18n'
 import {
   mockTipLengthCalBlock,
   mockTipLengthTipRack,
-} from '../../../redux/sessions/__fixtures__'
-import * as Sessions from '../../../redux/sessions'
+} from '/app/redux/sessions/__fixtures__'
+import * as Sessions from '/app/redux/sessions'
 
 import { MeasureTip } from '../MeasureTip'
 

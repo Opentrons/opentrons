@@ -28,7 +28,7 @@ const mockNavigate = vi.fn()
 vi.mock('../ChooseEnum')
 vi.mock('../ChooseNumber')
 vi.mock('../ChooseCsvFile')
-vi.mock('../../../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../../../../ToasterOven')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
@@ -39,7 +39,7 @@ vi.mock('react-router-dom', async importOriginal => {
     useNavigate: () => mockNavigate,
   }
 })
-vi.mock('../../../../../redux/config')
+vi.mock('/app/redux/config')
 
 const MOCK_HOST_CONFIG: HostConfig = { hostname: 'MOCK_HOST' }
 const mockCreateProtocolAnalysis = vi.fn()

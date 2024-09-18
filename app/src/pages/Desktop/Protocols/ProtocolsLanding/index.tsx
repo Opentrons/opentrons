@@ -1,13 +1,10 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  fetchProtocols,
-  getStoredProtocols,
-} from '../../../../redux/protocol-storage'
+import { fetchProtocols, getStoredProtocols } from '/app/redux/protocol-storage'
 import { ProtocolsEmptyState } from '../../../../organisms/ProtocolsLanding/ProtocolsEmptyState'
 import { ProtocolList } from '../../../../organisms/ProtocolsLanding/ProtocolList'
 
-import type { Dispatch, State } from '../../../../redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 export function ProtocolsLanding(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()

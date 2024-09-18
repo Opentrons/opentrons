@@ -6,7 +6,7 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
+import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { HeaterShakerSlideout } from '../HeaterShakerSlideout'
 
 vi.mock('@opentrons/react-api-client')

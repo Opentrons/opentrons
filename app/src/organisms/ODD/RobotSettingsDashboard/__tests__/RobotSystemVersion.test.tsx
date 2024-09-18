@@ -9,7 +9,7 @@ import { renderWithProviders } from '../../../../__testing-utils__'
 import { RobotSystemVersion } from '../RobotSystemVersion'
 import { RobotSystemVersionModal } from '../RobotSystemVersionModal'
 
-vi.mock('../../../../redux/shell')
+vi.mock('/app/redux/shell')
 vi.mock('../RobotSystemVersionModal')
 
 const mockBack = vi.fn()

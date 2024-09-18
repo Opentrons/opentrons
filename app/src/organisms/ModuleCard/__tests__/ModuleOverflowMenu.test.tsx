@@ -10,7 +10,7 @@ import {
   mockThermocycler,
   mockHeaterShaker,
   mockThermocyclerGen2,
-} from '../../../redux/modules/__fixtures__'
+} from '/app/redux/modules/__fixtures__'
 import {
   useRunStatuses,
   useIsLegacySessionInProgress,

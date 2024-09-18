@@ -27,7 +27,7 @@ import { getTopPortalEl } from '../../App/portal'
 import { Banner } from '../../atoms/Banner'
 import { SmallButton } from '../../atoms/buttons'
 import { OddModal } from '../../molecules/OddModal'
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 
 import type {
   OddModalHeaderBaseProps,

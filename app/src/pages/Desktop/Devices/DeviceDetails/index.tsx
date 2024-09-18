@@ -8,8 +8,8 @@ import {
   useRobot,
   useSyncRobotClock,
 } from '../../../../organisms/Devices/hooks'
-import { getScanning, OPENTRONS_USB } from '../../../../redux/discovery'
-import { appShellRequestor } from '../../../../redux/shell/remote'
+import { getScanning, OPENTRONS_USB } from '/app/redux/discovery'
+import { appShellRequestor } from '/app/redux/shell/remote'
 import { DeviceDetailsComponent } from './DeviceDetailsComponent'
 
 import type { DesktopRouteParams } from '../../../../App/types'

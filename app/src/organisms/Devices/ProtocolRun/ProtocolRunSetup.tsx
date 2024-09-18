@@ -23,7 +23,7 @@ import {
 
 import { Line } from '../../../atoms/structure'
 import { InfoMessage } from '../../../molecules/InfoMessage'
-import { INCOMPATIBLE, INEXACT_MATCH } from '../../../redux/pipettes'
+import { INCOMPATIBLE, INEXACT_MATCH } from '/app/redux/pipettes'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,

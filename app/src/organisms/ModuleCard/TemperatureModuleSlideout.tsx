@@ -22,7 +22,7 @@ import { Slideout } from '../../atoms/Slideout'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
 
 import type { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
-import type { TemperatureModule } from '../../redux/modules/types'
+import type { TemperatureModule } from '/app/redux/modules/types'
 
 interface TemperatureModuleSlideoutProps {
   module: TemperatureModule

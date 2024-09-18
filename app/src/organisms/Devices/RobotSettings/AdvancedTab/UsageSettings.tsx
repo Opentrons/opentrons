@@ -13,10 +13,10 @@ import {
 } from '@opentrons/components'
 
 import { ToggleButton } from '../../../../atoms/buttons'
-import { updateSetting } from '../../../../redux/robot-settings'
+import { updateSetting } from '/app/redux/robot-settings'
 
-import type { Dispatch } from '../../../../redux/types'
-import type { RobotSettingsField } from '../../../../redux/robot-settings/types'
+import type { Dispatch } from '/app/redux/types'
+import type { RobotSettingsField } from '/app/redux/robot-settings/types'
 
 interface UsageSettingsProps {
   settings: RobotSettingsField | undefined

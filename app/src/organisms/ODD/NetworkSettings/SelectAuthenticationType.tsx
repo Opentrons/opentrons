@@ -16,13 +16,13 @@ import {
   RadioButton,
 } from '@opentrons/components'
 
-import { getLocalRobot } from '../../../redux/discovery'
-import { getNetworkInterfaces, fetchStatus } from '../../../redux/networking'
+import { getLocalRobot } from '/app/redux/discovery'
+import { getNetworkInterfaces, fetchStatus } from '/app/redux/networking'
 import { useIsUnboxingFlowOngoing } from '../hooks'
 import { AlternativeSecurityTypeModal } from './AlternativeSecurityTypeModal'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { Dispatch, State } from '../../../redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 interface SelectAuthenticationTypeProps {
   selectedAuthType: WifiSecurityType

@@ -37,7 +37,7 @@ import type {
 import type { SetupScreens } from '../types'
 import type { CutoutConfigAndCompatibility } from '../../../../resources/deck_configuration/hooks'
 import { useSelector } from 'react-redux'
-import { getLocalRobot } from '../../../../redux/discovery'
+import { getLocalRobot } from '/app/redux/discovery'
 
 interface FixtureTableProps {
   robotType: RobotType

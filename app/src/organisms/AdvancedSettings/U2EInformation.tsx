@@ -20,9 +20,9 @@ import {
   getU2EAdapterDevice,
   getU2EWindowsDriverStatus,
   OUTDATED,
-} from '../../redux/system-info'
+} from '/app/redux/system-info'
 
-import type { State } from '../../redux/types'
+import type { State } from '/app/redux/types'
 
 const REALTEK_URL = 'https://www.realtek.com/en/'
 

@@ -6,17 +6,17 @@ import { when } from 'vitest-when'
 import { renderWithProviders } from '../../../../../__testing-utils__'
 
 import { i18n } from '../../../../../i18n'
-import { getStoredProtocol } from '../../../../../redux/protocol-storage'
-import { storedProtocolData } from '../../../../../redux/protocol-storage/__fixtures__'
+import { getStoredProtocol } from '/app/redux/protocol-storage'
+import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
 import { ProtocolDetails as ProtocolDetailsContents } from '../../../../../organisms/ProtocolDetails'
 
 import { ProtocolDetails } from '../'
 
-import type { State } from '../../../../../redux/types'
+import type { State } from '/app/redux/types'
 
 const mockProtocolKey = 'protocolKeyStub'
 
-vi.mock('../../../../../redux/protocol-storage')
+vi.mock('/app/redux/protocol-storage')
 vi.mock('../../../../../organisms/ProtocolDetails')
 
 const MOCK_STATE: State = {

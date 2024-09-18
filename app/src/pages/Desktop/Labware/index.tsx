@@ -33,13 +33,13 @@ import { LabwareCreator } from '@opentrons/labware-library'
 import {
   useTrackEvent,
   ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
-} from '../../../redux/analytics'
-import { addCustomLabwareFileFromCreator } from '../../../redux/custom-labware'
+} from '/app/redux/analytics'
+import { addCustomLabwareFileFromCreator } from '/app/redux/custom-labware'
 import { LabwareCard } from '../../../organisms/LabwareCard'
 import { AddCustomLabwareSlideout } from '../../../organisms/AddCustomLabwareSlideout'
 import { LabwareDetails } from '../../../organisms/LabwareDetails'
 import { useToaster } from '../../../organisms/ToasterOven'
-import { useFeatureFlag } from '../../../redux/config'
+import { useFeatureFlag } from '/app/redux/config'
 import { useAllLabware, useLabwareFailure, useNewLabwareName } from './hooks'
 
 import type { DropdownOption } from '@opentrons/components'

@@ -6,7 +6,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { StatusLabel } from '../../../atoms/StatusLabel'
 import { MagneticModuleData } from '../MagneticModuleData'
-import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
+import { mockMagneticModule } from '/app/redux/modules/__fixtures__'
 
 vi.mock('../../../atoms/StatusLabel')
 

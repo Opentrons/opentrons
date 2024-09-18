@@ -26,8 +26,8 @@ import {
   getReachableRobots,
   getUnreachableRobots,
   OPENTRONS_USB,
-} from '../../../../redux/discovery'
-import { appShellRequestor } from '../../../../redux/shell/remote'
+} from '/app/redux/discovery'
+import { appShellRequestor } from '/app/redux/shell/remote'
 import { RobotCard } from '../../../../organisms/Devices/RobotCard'
 import { DevicesEmptyState } from '../../../../organisms/Devices/DevicesEmptyState'
 import { CollapsibleSection } from '../../../../molecules/CollapsibleSection'
@@ -35,7 +35,7 @@ import { CollapsibleSection } from '../../../../molecules/CollapsibleSection'
 import { Divider } from '../../../../atoms/structure'
 import { NewRobotSetupHelp } from './NewRobotSetupHelp'
 
-import type { State } from '../../../../redux/types'
+import type { State } from '/app/redux/types'
 
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/en/articles/2687601-troubleshooting-connection-problems'

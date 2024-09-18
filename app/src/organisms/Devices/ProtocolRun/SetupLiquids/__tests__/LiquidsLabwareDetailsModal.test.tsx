@@ -10,9 +10,9 @@ import {
   renderWithProviders,
 } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
-import { getIsOnDevice } from '../../../../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { mockDefinition } from '../../../../../redux/custom-labware/__fixtures__'
+import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
 import { getLocationInfoNames } from '../../utils/getLocationInfoNames'
 import { getSlotLabwareDefinition } from '../../utils/getSlotLabwareDefinition'
 import {
@@ -39,7 +39,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     parseLiquidsInLoadOrder: vi.fn(),
   }
 })
-vi.mock('../../../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../../../Devices/hooks')
 vi.mock('../../utils/getLocationInfoNames')

@@ -33,7 +33,7 @@ import type {
   PipetteName,
   LoadedPipette,
 } from '@opentrons/shared-data'
-import type { Mount } from '../../redux/pipettes/types'
+import type { Mount } from '/app/redux/pipettes/types'
 
 export const MountItem = styled.div<{ isReady: boolean }>`
   display: flex;

@@ -18,18 +18,15 @@ import {
   getConnectableRobots,
   getReachableRobots,
   getUnreachableRobots,
-} from '../../../../../redux/discovery'
-import {
-  useTrackEvent,
-  ANALYTICS_RENAME_ROBOT,
-} from '../../../../../redux/analytics'
+} from '/app/redux/discovery'
+import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '/app/redux/analytics'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { Banner } from '../../../../../atoms/Banner'
 import { useIsFlex } from '../../../hooks'
 
 import type { Resolver, FieldError } from 'react-hook-form'
 import type { UpdatedRobotName } from '@opentrons/api-client'
-import type { State, Dispatch } from '../../../../../redux/types'
+import type { State, Dispatch } from '/app/redux/types'
 interface RenameRobotSlideoutProps {
   isExpanded: boolean
   onCloseClick: () => void

@@ -9,11 +9,11 @@ import { FileCard } from '../FileCard'
 
 import type { CsvFileParameter } from '@opentrons/shared-data'
 
-vi.mock('../../../redux/discovery')
-vi.mock('../../../redux/robot-update')
-vi.mock('../../../redux/networking')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux/networking')
 vi.mock('../../../resources/useNotifyDataReady')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 
 const render = (props: React.ComponentProps<typeof FileCard>) => {
   return renderWithProviders(

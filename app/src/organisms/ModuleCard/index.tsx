@@ -40,7 +40,7 @@ import {
   getErrorResponseMessage,
   dismissRequest,
   SUCCESS,
-} from '../../redux/robot-api'
+} from '/app/redux/robot-api'
 import { Banner } from '../../atoms/Banner'
 import { UpdateBanner } from '../../molecules/UpdateBanner'
 import { useChainLiveCommands } from '../../resources/runs'
@@ -71,9 +71,9 @@ import type { IconProps } from '@opentrons/components'
 import type {
   AttachedModule,
   HeaterShakerModule,
-} from '../../redux/modules/types'
-import type { State, Dispatch } from '../../redux/types'
-import type { RequestState } from '../../redux/robot-api/types'
+} from '/app/redux/modules/types'
+import type { State, Dispatch } from '/app/redux/types'
+import type { RequestState } from '/app/redux/robot-api/types'
 import { AbsorbanceReaderData } from './AbsorbanceReaderData'
 import { AbsorbanceReaderSlideout } from './AbsorbanceReaderSlideout'
 

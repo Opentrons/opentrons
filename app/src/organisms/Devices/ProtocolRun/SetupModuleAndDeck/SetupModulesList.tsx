@@ -58,7 +58,7 @@ import type {
   DeckDefinition,
   ModuleModel,
 } from '@opentrons/shared-data'
-import type { AttachedModule } from '../../../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 import type {
   ModuleRenderInfoForProtocol,
   ProtocolCalibrationStatus,

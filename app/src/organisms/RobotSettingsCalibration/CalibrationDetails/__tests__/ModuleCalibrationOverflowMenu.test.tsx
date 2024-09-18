@@ -6,7 +6,7 @@ import { i18n } from '../../../../i18n'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { useChainLiveCommands } from '../../../../resources/runs'
-import { mockThermocyclerGen2 } from '../../../../redux/modules/__fixtures__'
+import { mockThermocyclerGen2 } from '/app/redux/modules/__fixtures__'
 import { useRunStatuses } from '../../../Devices/hooks'
 import { useIsEstopNotDisengaged } from '../../../../resources/devices/hooks/useIsEstopNotDisengaged'
 

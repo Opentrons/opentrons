@@ -12,24 +12,24 @@ import {
   HEALTH_STATUS_OK,
   HEALTH_STATUS_NOT_OK,
   OPENTRONS_USB,
-} from '../../../../redux/discovery'
-import * as Networking from '../../../../redux/networking'
+} from '/app/redux/discovery'
+import * as Networking from '/app/redux/networking'
 import {
   useCanDisconnect,
   useWifiList,
 } from '../../../../resources/networking/hooks'
-import * as Fixtures from '../../../../redux/networking/__fixtures__'
+import * as Fixtures from '/app/redux/networking/__fixtures__'
 import { useIsFlex, useIsRobotBusy } from '../../hooks'
 import { DisconnectModal } from '../ConnectNetwork/DisconnectModal'
 import { useIsEstopNotDisengaged } from '../../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { RobotSettingsNetworking } from '../RobotSettingsNetworking'
 
-import type { DiscoveryClientRobotAddress } from '../../../../redux/discovery/types'
-import type { State } from '../../../../redux/types'
+import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'
+import type { State } from '/app/redux/types'
 
-vi.mock('../../../../redux/discovery/selectors')
-vi.mock('../../../../redux/networking')
-vi.mock('../../../../redux/robot-api/selectors')
+vi.mock('/app/redux/discovery/selectors')
+vi.mock('/app/redux/networking')
+vi.mock('/app/redux/robot-api/selectors')
 vi.mock('../../../../resources/networking/hooks')
 vi.mock('../../hooks')
 vi.mock('../ConnectNetwork/DisconnectModal')

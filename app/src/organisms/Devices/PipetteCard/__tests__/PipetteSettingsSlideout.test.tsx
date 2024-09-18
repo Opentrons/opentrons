@@ -14,7 +14,7 @@ import { PipetteSettingsSlideout } from '../PipetteSettingsSlideout'
 import {
   mockLeftSpecs,
   mockPipetteSettingsFieldsMap,
-} from '../../../../redux/pipettes/__fixtures__'
+} from '/app/redux/pipettes/__fixtures__'
 
 import type { Mock } from 'vitest'
 

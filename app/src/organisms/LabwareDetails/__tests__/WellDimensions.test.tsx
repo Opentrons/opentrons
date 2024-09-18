@@ -7,7 +7,7 @@ import {
   mockDefinition,
   mockCircularLabwareWellGroupProperties,
   mockRectangularLabwareWellGroupProperties,
-} from '../../../redux/custom-labware/__fixtures__'
+} from '/app/redux/custom-labware/__fixtures__'
 import { WellDimensions } from '../WellDimensions'
 
 const render = (props: React.ComponentProps<typeof WellDimensions>) => {

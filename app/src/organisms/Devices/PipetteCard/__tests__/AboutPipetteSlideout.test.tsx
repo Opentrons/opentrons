@@ -5,7 +5,7 @@ import { renderWithProviders } from '../../../../__testing-utils__'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../../i18n'
 import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
-import { mockLeftSpecs } from '../../../../redux/pipettes/__fixtures__'
+import { mockLeftSpecs } from '/app/redux/pipettes/__fixtures__'
 
 vi.mock('@opentrons/react-api-client')
 

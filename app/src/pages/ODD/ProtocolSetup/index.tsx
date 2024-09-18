@@ -67,13 +67,13 @@ import {
 } from '../../../organisms/RunTimeControl/hooks'
 import { useToaster } from '../../../organisms/ToasterOven'
 import { useIsHeaterShakerInProtocol } from '../../../organisms/ModuleCard/hooks'
-import { getLocalRobot, getRobotSerialNumber } from '../../../redux/discovery'
+import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
-} from '../../../redux/analytics'
-import { getIsHeaterShakerAttached } from '../../../redux/config'
+} from '/app/redux/analytics'
+import { getIsHeaterShakerAttached } from '/app/redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal'
 import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'

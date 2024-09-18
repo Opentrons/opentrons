@@ -6,9 +6,9 @@ import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 
 import { StepMeter } from '../../../atoms/StepMeter'
 import { DisplayWifiList } from '../../../organisms/ODD/NetworkSettings'
-import * as Networking from '../../../redux/networking'
-import { getLocalRobot } from '../../../redux/discovery'
-import * as RobotApi from '../../../redux/robot-api'
+import * as Networking from '/app/redux/networking'
+import { getLocalRobot } from '/app/redux/discovery'
+import * as RobotApi from '/app/redux/robot-api'
 import { useWifiList } from '../../../resources/networking/hooks'
 import { JoinOtherNetwork } from './JoinOtherNetwork'
 import { SelectAuthenticationType } from './SelectAuthenticationType'
@@ -16,7 +16,7 @@ import { SetWifiCred } from './SetWifiCred'
 import { WifiConnectStatus } from './WifiConnectStatus'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { State } from '../../../redux/types'
+import type { State } from '/app/redux/types'
 
 const WIFI_LIST_POLL_MS = 5000
 export type WifiScreenOption =

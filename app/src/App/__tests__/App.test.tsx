@@ -4,16 +4,16 @@ import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
 
 import { i18n } from '../../i18n'
-import { getIsOnDevice, getConfig } from '../../redux/config'
+import { getIsOnDevice, getConfig } from '/app/redux/config'
 
 import { DesktopApp } from '../DesktopApp'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 import { App } from '../'
 
-import type { State } from '../../redux/types'
+import type { State } from '/app/redux/types'
 import { renderWithProviders } from '../../__testing-utils__'
 
-vi.mock('../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../DesktopApp')
 vi.mock('../OnDeviceDisplayApp')
 

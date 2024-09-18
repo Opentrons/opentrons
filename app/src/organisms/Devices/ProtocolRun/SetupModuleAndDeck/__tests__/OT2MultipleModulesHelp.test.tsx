@@ -4,10 +4,10 @@ import '@testing-library/jest-dom/vitest'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
-import { getIsOnDevice } from '../../../../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { OT2MultipleModulesHelp } from '../OT2MultipleModulesHelp'
 
-vi.mock('../../../../../redux/config')
+vi.mock('/app/redux/config')
 
 const render = () =>
   renderWithProviders(<OT2MultipleModulesHelp />, {

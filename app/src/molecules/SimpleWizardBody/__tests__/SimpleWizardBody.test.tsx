@@ -4,11 +4,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { COLORS } from '@opentrons/components'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { Skeleton } from '../../../atoms/Skeleton'
-import { getIsOnDevice } from '../../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { SimpleWizardBody } from '..'
 
 vi.mock('../../../atoms/Skeleton')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 
 const render = (props: React.ComponentProps<typeof SimpleWizardBody>) => {
   return renderWithProviders(<SimpleWizardBody {...props} />)[0]

@@ -5,13 +5,13 @@ import { screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
 
 import { i18n } from '../../../../i18n'
-import * as Networking from '../../../../redux/networking'
+import * as Networking from '/app/redux/networking'
 import { TitleHeader } from '../TitleHeader'
 import { DisplayConnectionStatus } from '../DisplayConnectionStatus'
 import { ConnectViaEthernet } from '../'
 
-vi.mock('../../../../redux/networking')
-vi.mock('../../../../redux/discovery')
+vi.mock('/app/redux/networking')
+vi.mock('/app/redux/discovery')
 vi.mock('../TitleHeader')
 vi.mock('../DisplayConnectionStatus')
 

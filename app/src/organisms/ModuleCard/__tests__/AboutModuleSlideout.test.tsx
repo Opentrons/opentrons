@@ -16,7 +16,7 @@ import {
   mockTemperatureModule,
   mockTemperatureModuleGen2,
   mockThermocycler,
-} from '../../../redux/modules/__fixtures__'
+} from '/app/redux/modules/__fixtures__'
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import { AboutModuleSlideout } from '../AboutModuleSlideout'
 

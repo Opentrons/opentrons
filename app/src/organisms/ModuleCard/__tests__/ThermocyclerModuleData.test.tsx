@@ -8,10 +8,10 @@ import { i18n } from '../../../i18n'
 import {
   mockThermocycler,
   mockThermocyclerGen2,
-} from '../../../redux/modules/__fixtures__'
+} from '/app/redux/modules/__fixtures__'
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
 
-import type { ThermocyclerData } from '../../../redux/modules/api-types'
+import type { ThermocyclerData } from '/app/redux/modules/api-types'
 
 const render = (props: React.ComponentProps<typeof ThermocyclerModuleData>) => {
   return renderWithProviders(<ThermocyclerModuleData {...props} />, {

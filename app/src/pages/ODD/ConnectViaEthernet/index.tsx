@@ -11,12 +11,12 @@ import {
 
 import { StepMeter } from '../../../atoms/StepMeter'
 import { NetworkDetailsModal } from '../../../organisms/ODD/RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
-import { getNetworkInterfaces, fetchStatus } from '../../../redux/networking'
-import { getLocalRobot } from '../../../redux/discovery'
+import { getNetworkInterfaces, fetchStatus } from '/app/redux/networking'
+import { getLocalRobot } from '/app/redux/discovery'
 import { TitleHeader } from './TitleHeader'
 import { DisplayConnectionStatus } from './DisplayConnectionStatus'
 
-import type { State, Dispatch } from '../../../redux/types'
+import type { State, Dispatch } from '/app/redux/types'
 
 const STATUS_REFRESH_MS = 5000
 

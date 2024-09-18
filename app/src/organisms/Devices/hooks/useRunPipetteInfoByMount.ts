@@ -5,7 +5,7 @@ import {
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
-import { MATCH, INEXACT_MATCH, INCOMPATIBLE } from '../../../redux/pipettes'
+import { MATCH, INEXACT_MATCH, INCOMPATIBLE } from '/app/redux/pipettes'
 import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
@@ -22,7 +22,7 @@ import type {
   Mount,
   AttachedPipette,
   TipRackCalibrationData,
-} from '../../../redux/pipettes/types'
+} from '/app/redux/pipettes/types'
 
 const EMPTY_MOUNTS = { left: null, right: null }
 

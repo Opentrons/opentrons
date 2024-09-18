@@ -21,10 +21,10 @@ import {
 } from '../../../../Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { mockApiHeaterShaker } from '../../../../../redux/modules/__fixtures__'
+import { mockApiHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { mockProtocolModuleInfo } from '../../ProtocolSetupInstruments/__fixtures__'
-import { getLocalRobot } from '../../../../../redux/discovery'
-import { mockConnectedRobot } from '../../../../../redux/discovery/__fixtures__'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
@@ -42,7 +42,7 @@ import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
 import type { UseQueryResult } from 'react-query'
 
 vi.mock('../../../../../resources/runs')
-vi.mock('../../../../../redux/discovery')
+vi.mock('/app/redux/discovery')
 vi.mock('../../../../../organisms/Devices/hooks')
 vi.mock('../../../../../resources/deck_configuration')
 vi.mock(

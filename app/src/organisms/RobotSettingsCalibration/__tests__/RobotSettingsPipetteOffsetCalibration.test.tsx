@@ -8,14 +8,14 @@ import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
-} from '../../../redux/calibration/pipette-offset/__fixtures__'
+} from '/app/redux/calibration/pipette-offset/__fixtures__'
 import {
   useIsFlex,
   usePipetteOffsetCalibrations,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../../organisms/Devices/hooks'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 
 import { RobotSettingsPipetteOffsetCalibration } from '../RobotSettingsPipetteOffsetCalibration'
 import { PipetteOffsetCalibrationItems } from '../CalibrationDetails/PipetteOffsetCalibrationItems'

@@ -29,7 +29,7 @@ import {
 import { SmallButton } from '../../atoms/buttons'
 import { OddModal } from '../../molecules/OddModal'
 import { InterventionModal as InterventionModalMolecule } from '../../molecules/InterventionModal'
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { PauseInterventionContent } from './PauseInterventionContent'
 import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
 import { isInterventionCommand } from './utils'

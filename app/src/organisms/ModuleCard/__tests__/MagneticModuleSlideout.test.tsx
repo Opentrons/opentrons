@@ -11,7 +11,7 @@ import { MagneticModuleSlideout } from '../MagneticModuleSlideout'
 import {
   mockMagneticModule,
   mockMagneticModuleGen2,
-} from '../../../redux/modules/__fixtures__'
+} from '/app/redux/modules/__fixtures__'
 
 vi.mock('@opentrons/react-api-client')
 

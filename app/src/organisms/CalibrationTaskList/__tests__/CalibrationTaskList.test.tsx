@@ -23,7 +23,7 @@ import {
   useRunHasStarted,
   useAttachedPipettes,
 } from '../../Devices/hooks'
-import { mockLeftProtoPipette } from '../../../redux/pipettes/__fixtures__'
+import { mockLeftProtoPipette } from '/app/redux/pipettes/__fixtures__'
 
 vi.mock('../../Devices/hooks')
 vi.mock('../../../resources/runs')

@@ -17,7 +17,7 @@ import { MediumButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '../../../organisms/ChildNavigation'
 import { RobotSystemVersionModal } from './RobotSystemVersionModal'
 
-import type { RobotUpdateInfo } from '../../../redux/robot-update/types'
+import type { RobotUpdateInfo } from '/app/redux/robot-update/types'
 import type { SetSettingOption } from './types'
 
 const GITHUB_URL = 'https://github.com/Opentrons/opentrons/releases'

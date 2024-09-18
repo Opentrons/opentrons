@@ -7,7 +7,7 @@ import {
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { Banner } from '../../../atoms/Banner'
-import * as Sessions from '../../../redux/sessions'
+import * as Sessions from '/app/redux/sessions'
 
 interface InvalidationWarningProps {
   sessionType:

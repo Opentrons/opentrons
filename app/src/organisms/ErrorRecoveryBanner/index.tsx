@@ -9,7 +9,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { getUserId } from '../../redux/config'
+import { getUserId } from '/app/redux/config'
 import { useClientDataRecovery } from '../../resources/client_data'
 import { Banner } from '../../atoms/Banner'
 

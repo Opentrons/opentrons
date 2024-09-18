@@ -22,19 +22,19 @@ import { i18n } from '../../../i18n'
 import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
-} from '../../../redux/analytics'
-import { mockDeckCalData } from '../../../redux/calibration/__fixtures__'
+} from '/app/redux/analytics'
+import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
-} from '../../../redux/calibration/pipette-offset/__fixtures__'
+} from '/app/redux/calibration/pipette-offset/__fixtures__'
 import {
   mockTipLengthCalibration1,
   mockTipLengthCalibration2,
   mockTipLengthCalibration3,
-} from '../../../redux/calibration/tip-length/__fixtures__'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+} from '/app/redux/calibration/tip-length/__fixtures__'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import {
   useDeckCalibrationData,
   useIsFlex,
@@ -55,7 +55,7 @@ vi.mock('file-saver', async importOriginal => {
   }
 })
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../redux/analytics')
+vi.mock('/app/redux/analytics')
 vi.mock('../../../organisms/Devices/hooks')
 vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 

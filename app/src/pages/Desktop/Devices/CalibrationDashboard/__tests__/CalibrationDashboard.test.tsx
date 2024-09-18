@@ -15,7 +15,7 @@ import { useDashboardCalibratePipOffset } from '../hooks/useDashboardCalibratePi
 import { useDashboardCalibrateTipLength } from '../hooks/useDashboardCalibrateTipLength'
 import { useDashboardCalibrateDeck } from '../hooks/useDashboardCalibrateDeck'
 import { expectedTaskList } from '../../../../../organisms/Devices/hooks/__fixtures__/taskListFixtures'
-import { mockLeftProtoPipette } from '../../../../../redux/pipettes/__fixtures__'
+import { mockLeftProtoPipette } from '/app/redux/pipettes/__fixtures__'
 import { useNotifyAllRunsQuery } from '../../../../../resources/runs'
 
 vi.mock('../../../../../organisms/Devices/hooks')

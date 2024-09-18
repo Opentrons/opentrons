@@ -24,7 +24,7 @@ import { ModuleWizardFlows } from '../../ModuleWizardFlows'
 import { getModuleTooHot } from '../../Devices/getModuleTooHot'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 
-import type { AttachedModule } from '../../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 import type { FormattedPipetteOffsetCalibration } from '..'
 interface ModuleCalibrationOverflowMenuProps {
   isCalibrated: boolean

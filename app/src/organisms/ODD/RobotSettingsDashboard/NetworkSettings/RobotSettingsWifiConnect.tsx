@@ -5,10 +5,10 @@ import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 
 import { ChildNavigation } from '../../../../organisms/ChildNavigation'
 import { ConnectingNetwork, FailedToConnect } from '../../NetworkSettings'
-import { FAILURE, PENDING, SUCCESS } from '../../../../redux/robot-api'
+import { FAILURE, PENDING, SUCCESS } from '/app/redux/robot-api'
 
 import type { SetSettingOption } from '../types'
-import type { RequestState } from '../../../../redux/robot-api/types'
+import type { RequestState } from '/app/redux/robot-api/types'
 
 interface RobotSettingsWifiConnectProps {
   handleConnect: () => void

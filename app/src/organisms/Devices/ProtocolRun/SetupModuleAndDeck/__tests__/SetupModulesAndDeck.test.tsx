@@ -4,7 +4,7 @@ import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
-import { mockTemperatureModule } from '../../../../../redux/modules/__fixtures__'
+import { mockTemperatureModule } from '/app/redux/modules/__fixtures__'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
@@ -24,7 +24,7 @@ vi.mock('../../../hooks')
 vi.mock('../SetupModulesList')
 vi.mock('../SetupModulesMap')
 vi.mock('../SetupFixtureList')
-vi.mock('../../../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../../../../../resources/deck_configuration/utils')
 
 const MOCK_ROBOT_NAME = 'otie'

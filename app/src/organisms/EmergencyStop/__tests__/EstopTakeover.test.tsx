@@ -15,15 +15,15 @@ import {
   NOT_PRESENT,
   PHYSICALLY_ENGAGED,
 } from '../constants'
-import { getLocalRobot } from '../../../redux/discovery'
-import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { EstopTakeover } from '../EstopTakeover'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../EstopMissingModal')
 vi.mock('../EstopPressedModal')
 vi.mock('../../ODD/hooks')
-vi.mock('../../../redux/discovery')
+vi.mock('/app/redux/discovery')
 
 const mockPressed = {
   data: {

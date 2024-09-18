@@ -11,7 +11,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'
-import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
+import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import { PipetteWizardFlows } from '../../../PipetteWizardFlows'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
 import {
@@ -19,7 +19,7 @@ import {
   useRunStatuses,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../../Devices/hooks'
-import { mockAttachedPipetteInformation } from '../../../../redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import {
   mockPipetteOffsetCalibrationsResponse,
   mockTipLengthCalibrationResponse,
@@ -61,9 +61,9 @@ vi.mock('@opentrons/shared-data', async () => {
   }
 })
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../redux/sessions/selectors')
-vi.mock('../../../../redux/discovery')
-vi.mock('../../../../redux/robot-api/selectors')
+vi.mock('/app/redux/sessions/selectors')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/robot-api/selectors')
 vi.mock(
   '../../../../organisms/CalibratePipetteOffset/useCalibratePipetteOffset'
 )

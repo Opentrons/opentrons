@@ -31,13 +31,13 @@ import {
   getRobotAddressesByName,
   HEALTH_STATUS_OK,
   OPENTRONS_USB,
-} from '../../redux/discovery'
-import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
+} from '/app/redux/discovery'
+import { getNetworkInterfaces, fetchStatus } from '/app/redux/networking'
 import { useNotifyRunQuery, useCurrentRunId } from '../../resources/runs'
 
 import type { IconName, StyleProps } from '@opentrons/components'
-import type { DiscoveredRobot } from '../../redux/discovery/types'
-import type { Dispatch, State } from '../../redux/types'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 type RobotStatusHeaderProps = StyleProps &
   Pick<DiscoveredRobot, 'name' | 'local'> & {

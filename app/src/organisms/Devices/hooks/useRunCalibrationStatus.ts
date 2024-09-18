@@ -1,4 +1,4 @@
-import { MATCH, INEXACT_MATCH } from '../../../redux/pipettes'
+import { MATCH, INEXACT_MATCH } from '/app/redux/pipettes'
 import {
   useDeckCalibrationStatus,
   useIsFlex,
@@ -18,7 +18,7 @@ import type {
   LoadedPipette,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { DeckCalibrationStatus } from '../../../redux/calibration/api-types'
+import type { DeckCalibrationStatus } from '/app/redux/calibration/api-types'
 
 export interface ProtocolCalibrationStatus {
   complete: boolean

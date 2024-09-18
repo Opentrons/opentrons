@@ -9,7 +9,7 @@ import {
   JUSTIFY_FLEX_END,
   Flex,
 } from '@opentrons/components'
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,

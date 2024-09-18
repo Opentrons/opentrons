@@ -7,14 +7,14 @@ import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
-import { home } from '../../../redux/robot-controls'
-import { useIsRobotOnWrongVersionOfSoftware } from '../../../redux/robot-update'
-import { restartRobot } from '../../../redux/robot-admin'
+import { home } from '/app/redux/robot-controls'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { restartRobot } from '/app/redux/robot-admin'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
-} from '../../../redux/discovery/__fixtures__'
+} from '/app/redux/discovery/__fixtures__'
 import { useCanDisconnect } from '../../../resources/networking/hooks'
 import { DisconnectModal } from '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
@@ -24,10 +24,10 @@ import { handleUpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 
-vi.mock('../../../redux/robot-controls')
-vi.mock('../../../redux/robot-admin')
+vi.mock('/app/redux/robot-controls')
+vi.mock('/app/redux/robot-admin')
 vi.mock('../hooks')
-vi.mock('../../../redux/robot-update')
+vi.mock('/app/redux/robot-update')
 vi.mock('../../../resources/networking/hooks')
 vi.mock(
   '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'

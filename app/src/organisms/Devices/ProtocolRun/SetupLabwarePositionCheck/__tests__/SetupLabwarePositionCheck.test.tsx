@@ -15,7 +15,7 @@ import { i18n } from '../../../../../i18n'
 import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
 import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
 import { useLaunchLPC } from '../../../../LabwarePositionCheck/useLaunchLPC'
-import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../../redux/config'
+import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import {
   useLPCDisabledReason,
   useRunCalibrationStatus,
@@ -31,7 +31,7 @@ import type { Mock } from 'vitest'
 vi.mock('../../../../LabwarePositionCheck/useLaunchLPC')
 vi.mock('../../utils/getModuleTypesThatRequireExtraAttention')
 vi.mock('../../../../RunTimeControl/hooks')
-vi.mock('../../../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../../../hooks')
 vi.mock('../../../hooks/useLPCSuccessToast')
 vi.mock('@opentrons/react-api-client')

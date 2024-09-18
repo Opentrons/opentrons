@@ -19,7 +19,7 @@ import { Slideout } from '../../atoms/Slideout'
 import { Banner } from '../../atoms/Banner'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 
-import type { AttachedModule } from '../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 interface AboutModuleSlideoutProps {
   module: AttachedModule

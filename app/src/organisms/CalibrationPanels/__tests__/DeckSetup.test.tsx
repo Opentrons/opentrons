@@ -7,8 +7,8 @@ import {
   mockDeckCalTipRack,
   mockRobotCalibrationCheckSessionDetails,
   mockTipLengthCalBlock,
-} from '../../../redux/sessions/__fixtures__'
-import * as Sessions from '../../../redux/sessions'
+} from '/app/redux/sessions/__fixtures__'
+import * as Sessions from '/app/redux/sessions'
 import { DeckSetup } from '../DeckSetup'
 
 import type { getDeckDefinitions } from '@opentrons/shared-data'

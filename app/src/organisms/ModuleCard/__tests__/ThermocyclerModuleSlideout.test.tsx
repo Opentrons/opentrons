@@ -6,7 +6,7 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { mockThermocycler } from '../../../redux/modules/__fixtures__'
+import { mockThermocycler } from '/app/redux/modules/__fixtures__'
 import { ThermocyclerModuleSlideout } from '../ThermocyclerModuleSlideout'
 
 vi.mock('@opentrons/react-api-client')

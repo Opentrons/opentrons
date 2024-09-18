@@ -31,8 +31,8 @@ import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
-} from '../../redux/analytics'
-import { useIsRobotOnWrongVersionOfSoftware } from '../../redux/robot-update'
+} from '/app/redux/analytics'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { useDownloadRunLog, useTrackProtocolRunEvent, useRobot } from './hooks'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 

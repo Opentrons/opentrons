@@ -4,7 +4,7 @@ import { it, describe, beforeEach, vi, afterEach, expect } from 'vitest'
 import { FLEX_ROBOT_TYPE, HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { useProtocolMetadata } from '../../Devices/hooks'
-import { getIsOnDevice } from '../../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { PickUpTip } from '../PickUpTip'
 import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
@@ -16,7 +16,7 @@ import {
 import type { Mock } from 'vitest'
 
 vi.mock('../../Devices/hooks')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 
 const mockStartPosition = { x: 10, y: 20, z: 30 }
 

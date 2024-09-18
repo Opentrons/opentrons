@@ -6,7 +6,7 @@ import { useRobotSettingsQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 
-import { getIsShellReady } from '../../../../redux/shell'
+import { getIsShellReady } from '/app/redux/shell'
 
 import { InitialLoadingScreen } from '..'
 
@@ -14,8 +14,8 @@ import type { UseQueryResult } from 'react-query'
 import type { RobotSettingsResponse } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../redux/config')
-vi.mock('../../../../redux/shell')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/shell')
 
 const render = () => {
   return renderWithProviders(<InitialLoadingScreen />)

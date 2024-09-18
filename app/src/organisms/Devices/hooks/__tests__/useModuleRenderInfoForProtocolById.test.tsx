@@ -15,7 +15,7 @@ import { getProtocolModulesInfo } from '../../ProtocolRun/utils/getProtocolModul
 import {
   mockTemperatureModuleGen2,
   mockThermocycler,
-} from '../../../../redux/modules/__fixtures__'
+} from '/app/redux/modules/__fixtures__'
 import {
   useAttachedModules,
   useModuleRenderInfoForProtocolById,
@@ -31,7 +31,7 @@ import type {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type { UseQueryResult } from 'react-query'
-import type { AttachedModule } from '../../../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 vi.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
 vi.mock('../useAttachedModules')

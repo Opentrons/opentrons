@@ -5,25 +5,25 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 
 import { i18n } from '../../../../i18n'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { useTrackEvent } from '../../../../redux/analytics'
+import { useTrackEvent } from '/app/redux/analytics'
 import {
   getConnectableRobots,
   getReachableRobots,
   getUnreachableRobots,
-} from '../../../../redux/discovery'
+} from '/app/redux/discovery'
 import { useIsUnboxingFlowOngoing } from '../../../../organisms/ODD/hooks'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
-} from '../../../../redux/discovery/__fixtures__'
+} from '/app/redux/discovery/__fixtures__'
 
 import { NameRobot } from '..'
 import type { NavigateFunction } from 'react-router-dom'
 
-vi.mock('../../../../redux/discovery/selectors')
-vi.mock('../../../../redux/config')
-vi.mock('../../../../redux/analytics')
+vi.mock('/app/redux/discovery/selectors')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/analytics')
 vi.mock('../../../../organisms/ODD/hooks')
 
 const mockNavigate = vi.fn()

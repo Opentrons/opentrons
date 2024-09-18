@@ -15,33 +15,33 @@ import {
   getScanning,
   getUnreachableRobots,
   startDiscovery,
-} from '../../../redux/discovery'
-import { useIsRobotOnWrongVersionOfSoftware } from '../../../redux/robot-update'
+} from '/app/redux/discovery'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
-} from '../../../redux/discovery/__fixtures__'
-import { getNetworkInterfaces } from '../../../redux/networking'
+} from '/app/redux/discovery/__fixtures__'
+import { getNetworkInterfaces } from '/app/redux/networking'
 import {
   storedProtocolData as storedProtocolDataFixture,
   storedProtocolDataWithCsvRunTimeParameter,
-} from '../../../redux/protocol-storage/__fixtures__'
+} from '/app/redux/protocol-storage/__fixtures__'
 import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 import { useOffsetCandidatesForAnalysis } from '../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotToRunProtocolSlideout } from '../'
 import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
 import { useCurrentRunId } from '../../../resources/runs'
 
-import type { State } from '../../../redux/types'
+import type { State } from '/app/redux/types'
 
 vi.mock('../../../organisms/Devices/hooks')
 vi.mock('../../../organisms/ProtocolUpload/hooks')
 vi.mock('../../../organisms/RunTimeControl/hooks')
-vi.mock('../../../redux/config')
-vi.mock('../../../redux/discovery')
-vi.mock('../../../redux/robot-update')
-vi.mock('../../../redux/networking')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux/networking')
 vi.mock('../useCreateRunFromProtocol')
 vi.mock('../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis')
 vi.mock('../../../resources/useNotifyDataReady')

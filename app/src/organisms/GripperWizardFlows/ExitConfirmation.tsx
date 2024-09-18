@@ -9,7 +9,7 @@ import {
   SecondaryButton,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,

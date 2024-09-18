@@ -4,10 +4,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { restartRobot } from '../../../redux/robot-admin'
+import { restartRobot } from '/app/redux/robot-admin'
 import { RestartRobotConfirmationModal } from '../RestartRobotConfirmationModal'
 
-vi.mock('../../../redux/robot-admin')
+vi.mock('/app/redux/robot-admin')
 
 const mockFunc = vi.fn()
 

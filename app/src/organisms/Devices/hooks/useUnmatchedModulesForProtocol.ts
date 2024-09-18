@@ -1,6 +1,6 @@
 import reduce from 'lodash/reduce'
 
-import type { AttachedModule } from '../../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 import {
   useAttachedModules,

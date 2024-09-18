@@ -4,16 +4,16 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
 import { i18n } from '../../../../../i18n'
-import { INTERFACE_ETHERNET } from '../../../../../redux/networking'
-import { getNetworkInterfaces } from '../../../../../redux/networking/selectors'
+import { INTERFACE_ETHERNET } from '/app/redux/networking'
+import { getNetworkInterfaces } from '/app/redux/networking/selectors'
 import { renderWithProviders } from '../../../../../__testing-utils__'
-import { getLocalRobot } from '../../../../../redux/discovery'
-import { mockConnectedRobot } from '../../../../../redux/discovery/__fixtures__'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { EthernetConnectionDetails } from '../EthernetConnectionDetails'
 
-vi.mock('../../../../../redux/discovery')
-vi.mock('../../../../../redux/discovery/selectors')
-vi.mock('../../../../../redux/networking/selectors')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/discovery/selectors')
+vi.mock('/app/redux/networking/selectors')
 
 const render = (
   props: React.ComponentProps<typeof EthernetConnectionDetails>

@@ -6,11 +6,11 @@ import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 
 import { i18n } from '../../i18n'
-import { checkShellUpdate } from '../../redux/shell'
+import { checkShellUpdate } from '/app/redux/shell'
 import { useSoftwareUpdatePoll } from '../hooks'
 
 import type { Store } from 'redux'
-import type { State } from '../../redux/types'
+import type { State } from '/app/redux/types'
 
 describe('useSoftwareUpdatePoll', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>

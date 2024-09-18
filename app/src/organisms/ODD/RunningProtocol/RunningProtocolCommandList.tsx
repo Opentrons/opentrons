@@ -26,7 +26,7 @@ import { CommandText, CommandIcon } from '../../../molecules/Command'
 import { getCommandTextData } from '../../../molecules/Command/utils/getCommandTextData'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
-import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../redux/analytics'
+import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 
 import type { ViewportListRef } from 'react-viewport-list'
 import type {
@@ -35,7 +35,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
 import type { TrackProtocolRunEvent } from '../../Devices/hooks'
-import type { RobotAnalyticsData } from '../../../redux/analytics/types'
+import type { RobotAnalyticsData } from '/app/redux/analytics/types'
 
 const TITLE_TEXT_STYLE = css`
   color: ${COLORS.grey60};

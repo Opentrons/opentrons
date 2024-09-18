@@ -25,7 +25,7 @@ import {
 } from '../Devices/hooks'
 import { useModuleOverflowMenu } from './hooks'
 
-import type { AttachedModule } from '../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule

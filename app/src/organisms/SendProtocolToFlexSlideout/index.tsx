@@ -18,17 +18,17 @@ import {
   getProtocolDisplayName,
 } from '../../organisms/ProtocolsLanding/utils'
 import { useToaster } from '../../organisms/ToasterOven'
-import { appShellRequestor } from '../../redux/shell/remote'
-import { OPENTRONS_USB } from '../../redux/discovery'
-import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
-import { useIsRobotOnWrongVersionOfSoftware } from '../../redux/robot-update'
-import { getValidCustomLabwareFiles } from '../../redux/custom-labware'
+import { appShellRequestor } from '/app/redux/shell/remote'
+import { OPENTRONS_USB } from '/app/redux/discovery'
+import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { getValidCustomLabwareFiles } from '/app/redux/custom-labware'
 
 import type { AxiosError } from 'axios'
 import type { IconProps, StyleProps } from '@opentrons/components'
-import type { Robot } from '../../redux/discovery/types'
-import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { State } from '../../redux/types'
+import type { Robot } from '/app/redux/discovery/types'
+import type { StoredProtocolData } from '/app/redux/protocol-storage'
+import type { State } from '/app/redux/types'
 
 const _getFileBaseName = (filePath: string): string => {
   return filePath.split('/').reverse()[0]

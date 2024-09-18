@@ -20,7 +20,7 @@ import {
   useRecoveryAnalytics,
   useRecoveryTakeover,
 } from '../hooks'
-import { getIsOnDevice } from '../../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { useERWizard, ErrorRecoveryWizard } from '../ErrorRecoveryWizard'
 import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'
 
@@ -29,7 +29,7 @@ import type { RunStatus } from '@opentrons/api-client'
 vi.mock('../ErrorRecoveryWizard')
 vi.mock('../hooks')
 vi.mock('../useRecoveryCommands')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../RunPausedSplash')
 vi.mock('@opentrons/react-api-client')
 vi.mock('react-redux', async () => {

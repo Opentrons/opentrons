@@ -30,9 +30,9 @@ import {
   clearDiscoveryCache,
   getReachableRobots,
   getUnreachableRobots,
-} from '../../redux/discovery'
+} from '/app/redux/discovery'
 
-import type { Dispatch, State } from '../../redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 export function ClearUnavailableRobots(): JSX.Element {
   const { t } = useTranslation('app_settings')

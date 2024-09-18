@@ -20,7 +20,7 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { ExitConfirmation } from './ExitConfirmation'
 import {
   BEFORE_BEGINNING,

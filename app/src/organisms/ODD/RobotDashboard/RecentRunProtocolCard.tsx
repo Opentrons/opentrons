@@ -32,7 +32,7 @@ import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '../../../redux/analytics'
+} from '/app/redux/analytics'
 import { Skeleton } from '../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../transformations/commands'
 import { useCloneRun } from '../../ProtocolUpload/hooks'

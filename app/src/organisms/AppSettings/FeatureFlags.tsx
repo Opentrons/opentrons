@@ -12,10 +12,10 @@ import {
 } from '@opentrons/components'
 import { Divider } from '../../atoms/structure'
 import { ToggleButton } from '../../atoms/buttons'
-import * as Config from '../../redux/config'
+import * as Config from '/app/redux/config'
 
-import type { DevInternalFlag } from '../../redux/config/types'
-import type { Dispatch } from '../../redux/types'
+import type { DevInternalFlag } from '/app/redux/config/types'
+import type { Dispatch } from '/app/redux/types'
 
 export function FeatureFlags(): JSX.Element {
   const { t } = useTranslation('app_settings')

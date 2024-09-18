@@ -4,15 +4,15 @@ import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '../../../__testing-utils__'
-import * as Buildroot from '../../../redux/robot-update'
+import * as Buildroot from '/app/redux/robot-update'
 import {
   mockConnectableRobot,
   mockReachableRobot,
-} from '../../../redux/discovery/__fixtures__'
+} from '/app/redux/discovery/__fixtures__'
 import { handleUpdateBuildroot } from '../../Devices/RobotSettings/UpdateBuildroot'
 import { UpdateRobotBanner } from '..'
 
-vi.mock('../../../redux/robot-update')
+vi.mock('/app/redux/robot-update')
 vi.mock('../../Devices/RobotSettings/UpdateBuildroot')
 
 const getUpdateDisplayInfo = Buildroot.getRobotUpdateDisplayInfo

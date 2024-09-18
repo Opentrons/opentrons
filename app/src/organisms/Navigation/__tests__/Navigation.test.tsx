@@ -5,14 +5,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { getLocalRobot } from '../../../redux/discovery'
-import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { useNetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
 import { NavigationMenu } from '../NavigationMenu'
 import { Navigation } from '..'
 
 vi.mock('../../../resources/networking/hooks/useNetworkConnection')
-vi.mock('../../../redux/discovery')
+vi.mock('/app/redux/discovery')
 vi.mock('../NavigationMenu')
 
 mockConnectedRobot.name = '12345678901234567'

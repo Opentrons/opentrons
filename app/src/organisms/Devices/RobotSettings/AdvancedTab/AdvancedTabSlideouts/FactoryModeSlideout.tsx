@@ -26,11 +26,11 @@ import { ToggleButton } from '../../../../../atoms/buttons'
 import { MultiSlideout } from '../../../../../atoms/Slideout/MultiSlideout'
 import { FileUpload } from '../../../../../molecules/FileUpload'
 import { UploadInput } from '../../../../../molecules/UploadInput'
-import { restartRobot } from '../../../../../redux/robot-admin'
+import { restartRobot } from '/app/redux/robot-admin'
 
 import type { FieldError, Resolver } from 'react-hook-form'
 import type { RobotSettingsField } from '@opentrons/api-client'
-import type { Dispatch } from '../../../../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 interface FactoryModeSlideoutProps {
   isExpanded: boolean

@@ -10,21 +10,16 @@ import {
   renderWithProviders,
 } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { getIsHeaterShakerAttached } from '../../../redux/config'
+import { getIsHeaterShakerAttached } from '/app/redux/config'
 import {
   mockMagneticModule,
   mockTemperatureModuleGen2,
   mockThermocycler,
   mockHeaterShaker,
-} from '../../../redux/modules/__fixtures__'
-import { mockRobot } from '../../../redux/robot-api/__fixtures__'
+} from '/app/redux/modules/__fixtures__'
+import { mockRobot } from '/app/redux/robot-api/__fixtures__'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
-import {
-  FAILURE,
-  getRequestById,
-  PENDING,
-  SUCCESS,
-} from '../../../redux/robot-api'
+import { FAILURE, getRequestById, PENDING, SUCCESS } from '/app/redux/robot-api'
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import { useToaster } from '../../ToasterOven'
 import { useIsFlex } from '../../Devices/hooks'
@@ -42,7 +37,7 @@ import type {
   HeaterShakerModule,
   MagneticModule,
   ThermocyclerModule,
-} from '../../../redux/modules/types'
+} from '/app/redux/modules/types'
 import type { Mock } from 'vitest'
 
 vi.mock('../ErrorInfo')
@@ -50,11 +45,11 @@ vi.mock('../MagneticModuleData')
 vi.mock('../TemperatureModuleData')
 vi.mock('../ThermocyclerModuleData')
 vi.mock('../HeaterShakerModuleData')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../ModuleOverflowMenu')
 vi.mock('../../RunTimeControl/hooks')
 vi.mock('../FirmwareUpdateFailedModal')
-vi.mock('../../../redux/robot-api')
+vi.mock('/app/redux/robot-api')
 vi.mock('../../../organisms/ToasterOven')
 vi.mock('../../../organisms/Devices/hooks')
 vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')

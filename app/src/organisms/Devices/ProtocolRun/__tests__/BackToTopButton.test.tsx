@@ -5,18 +5,18 @@ import { MemoryRouter } from 'react-router-dom'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { i18n } from '../../../../i18n'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '../../../../redux/analytics'
+} from '/app/redux/analytics'
 import { BackToTopButton } from '../BackToTopButton'
 import { useRobot } from '../../hooks'
 
 import type { Mock } from 'vitest'
 
-vi.mock('../../../../redux/analytics')
+vi.mock('/app/redux/analytics')
 vi.mock('../../hooks')
 
 const ROBOT_NAME = 'otie'

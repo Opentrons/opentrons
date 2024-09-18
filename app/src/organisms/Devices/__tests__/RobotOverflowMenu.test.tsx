@@ -8,15 +8,15 @@ import { i18n } from '../../../i18n'
 import { useCurrentRunId } from '../../../resources/runs'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { RobotOverflowMenu } from '../RobotOverflowMenu'
-import { useIsRobotOnWrongVersionOfSoftware } from '../../../redux/robot-update'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { useIsRobotBusy } from '../hooks'
 
 import {
   mockUnreachableRobot,
   mockConnectedRobot,
-} from '../../../redux/discovery/__fixtures__'
+} from '/app/redux/discovery/__fixtures__'
 
-vi.mock('../../../redux/robot-update/hooks')
+vi.mock('/app/redux/robot-update/hooks')
 vi.mock('../../../resources/runs')
 vi.mock('../../ChooseProtocolSlideout')
 vi.mock('../hooks')

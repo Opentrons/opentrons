@@ -28,7 +28,7 @@ import {
 import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
-} from '../../redux/analytics'
+} from '/app/redux/analytics'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 // TODO(bc, 2022-02-08): replace with support article when available

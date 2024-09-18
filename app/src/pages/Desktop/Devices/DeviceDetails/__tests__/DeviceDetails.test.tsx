@@ -14,17 +14,17 @@ import {
 import { InstrumentsAndModules } from '../../../../../organisms/Devices/InstrumentsAndModules'
 import { RecentProtocolRuns } from '../../../../../organisms/Devices/RecentProtocolRuns'
 import { RobotOverview } from '../../../../../organisms/Devices/RobotOverview'
-import { getScanning } from '../../../../../redux/discovery'
-import { mockConnectableRobot } from '../../../../../redux/discovery/__fixtures__'
+import { getScanning } from '/app/redux/discovery'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { DeviceDetails } from '..'
 
-import type { State } from '../../../../../redux/types'
+import type { State } from '/app/redux/types'
 
 vi.mock('../../../../../organisms/Devices/hooks')
 vi.mock('../../../../../organisms/Devices/InstrumentsAndModules')
 vi.mock('../../../../../organisms/Devices/RecentProtocolRuns')
 vi.mock('../../../../../organisms/Devices/RobotOverview')
-vi.mock('../../../../../redux/discovery')
+vi.mock('/app/redux/discovery')
 
 const render = (path = '/') => {
   return renderWithProviders(

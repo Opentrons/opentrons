@@ -17,7 +17,7 @@ import {
   useTrackEvent,
   ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
-} from '../../../../../redux/analytics'
+} from '/app/redux/analytics'
 import { useIsFlex } from '../../../hooks'
 import { getLocationInfoNames } from '../../utils/getLocationInfoNames'
 import { SetupLiquidsList } from '../SetupLiquidsList'
@@ -67,7 +67,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     parseLiquidsInLoadOrder: vi.fn(),
   }
 })
-vi.mock('../../../../../redux/analytics')
+vi.mock('/app/redux/analytics')
 vi.mock('../../../../../resources/runs')
 
 const render = (props: React.ComponentProps<typeof SetupLiquidsList>) => {

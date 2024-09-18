@@ -11,17 +11,17 @@ import {
   getConnectableRobots,
   getReachableRobots,
   getUnreachableRobots,
-} from '../../../../../redux/discovery'
+} from '/app/redux/discovery'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
-} from '../../../../../redux/discovery/__fixtures__'
+} from '/app/redux/discovery/__fixtures__'
 import { DevicesLanding } from '..'
 
 vi.mock('../../../../../organisms/Devices/DevicesEmptyState')
 vi.mock('../../../../../organisms/Devices/RobotCard')
-vi.mock('../../../../../redux/discovery')
+vi.mock('/app/redux/discovery')
 
 const render = () => {
   return renderWithProviders(<DevicesLanding />, {

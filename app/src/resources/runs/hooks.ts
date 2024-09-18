@@ -12,7 +12,7 @@ import {
   chainRunCommandsRecursive,
   setCommandIntent,
 } from './utils'
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { useMaintenanceRunTakeover } from '../../organisms/TakeoverModal'
 
 import type { CreateCommand } from '@opentrons/shared-data'

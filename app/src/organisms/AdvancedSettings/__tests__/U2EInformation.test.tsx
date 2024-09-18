@@ -8,13 +8,13 @@ import {
   NOT_APPLICABLE,
   OUTDATED,
   UP_TO_DATE,
-} from '../../../redux/system-info'
-import * as Fixtures from '../../../redux/system-info/__fixtures__'
+} from '/app/redux/system-info'
+import * as Fixtures from '/app/redux/system-info/__fixtures__'
 import { renderWithProviders } from '../../../__testing-utils__'
 
 import { U2EInformation } from '../U2EInformation'
 
-vi.mock('../../../redux/system-info')
+vi.mock('/app/redux/system-info')
 
 const render = () => {
   return renderWithProviders(<U2EInformation />, {

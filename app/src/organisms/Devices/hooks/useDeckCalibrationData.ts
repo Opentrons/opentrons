@@ -1,7 +1,7 @@
 import {
   DECK_CAL_STATUS_OK,
   DECK_CAL_STATUS_BAD_CALIBRATION,
-} from '../../../redux/calibration'
+} from '/app/redux/calibration'
 
 import { useCalibrationStatusQuery } from '@opentrons/react-api-client'
 import { useRobot } from './useRobot'

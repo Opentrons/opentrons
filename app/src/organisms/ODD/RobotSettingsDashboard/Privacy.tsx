@@ -16,9 +16,9 @@ import { OnOffToggle } from './OnOffToggle'
 import {
   getAnalyticsOptedIn,
   toggleAnalyticsOptedIn,
-} from '../../../redux/analytics'
+} from '/app/redux/analytics'
 
-import type { Dispatch } from '../../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 import type { SetSettingOption } from './types'
 
 interface PrivacyProps {

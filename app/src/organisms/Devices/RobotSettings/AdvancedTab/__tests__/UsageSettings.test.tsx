@@ -6,11 +6,11 @@ import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../../../__testing-utils__'
 
 import { i18n } from '../../../../../i18n'
-import { getRobotSettings } from '../../../../../redux/robot-settings'
+import { getRobotSettings } from '/app/redux/robot-settings'
 
 import { UsageSettings } from '../UsageSettings'
 
-vi.mock('../../../../../redux/robot-settings/selectors')
+vi.mock('/app/redux/robot-settings/selectors')
 
 const mockSettings = {
   id: 'enableDoorSafetySwitch',

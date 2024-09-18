@@ -5,27 +5,24 @@ import { describe, it, vi, expect, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../../../../__testing-utils__'
 import { i18n } from '../../../../../../i18n'
-import {
-  useTrackEvent,
-  ANALYTICS_RENAME_ROBOT,
-} from '../../../../../../redux/analytics'
+import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '/app/redux/analytics'
 import {
   getConnectableRobots,
   getReachableRobots,
   getUnreachableRobots,
-} from '../../../../../../redux/discovery'
+} from '/app/redux/discovery'
 import {
   mockConnectableRobot,
   mockReachableRobot,
-} from '../../../../../../redux/discovery/__fixtures__'
+} from '/app/redux/discovery/__fixtures__'
 
 import { RenameRobotSlideout } from '../RenameRobotSlideout'
 import { useIsFlex } from '../../../../hooks'
 
-vi.mock('../../../../../../redux/discovery/selectors')
-vi.mock('../../../../../../redux/analytics')
+vi.mock('/app/redux/discovery/selectors')
+vi.mock('/app/redux/analytics')
 vi.mock('../../../../hooks')
-vi.mock('../../../../../../redux/discovery', async importOriginal => {
+vi.mock('/app/redux/discovery', async importOriginal => {
   const actual = await importOriginal<typeof getUnreachableRobots>()
   return {
     ...actual,

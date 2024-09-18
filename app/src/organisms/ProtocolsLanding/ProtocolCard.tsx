@@ -34,7 +34,7 @@ import {
   WRAP,
 } from '@opentrons/components'
 
-import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
+import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
@@ -48,8 +48,8 @@ import {
 } from './utils'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
-import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { State } from '../../redux/types'
+import type { StoredProtocolData } from '/app/redux/protocol-storage'
+import type { State } from '/app/redux/types'
 
 interface ProtocolCardProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void

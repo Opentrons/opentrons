@@ -16,10 +16,10 @@ import {
 } from '@opentrons/components'
 
 import { ChildNavigation } from '../../../../organisms/ChildNavigation'
-import { getNetworkInterfaces } from '../../../../redux/networking'
-import { getLocalRobot } from '../../../../redux/discovery'
+import { getNetworkInterfaces } from '/app/redux/networking'
+import { getLocalRobot } from '/app/redux/discovery'
 
-import type { State } from '../../../../redux/types'
+import type { State } from '/app/redux/types'
 
 const STRETCH_LIST_STYLE = css`
   width: 100%;

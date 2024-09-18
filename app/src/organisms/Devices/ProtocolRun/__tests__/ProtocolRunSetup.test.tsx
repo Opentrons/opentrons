@@ -14,7 +14,7 @@ import {
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
@@ -50,7 +50,7 @@ vi.mock('../SetupModuleAndDeck')
 vi.mock('../SetupLiquids')
 vi.mock('../EmptySetupStep')
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../../../../resources/deck_configuration/utils')
 vi.mock('../../../../resources/deck_configuration/hooks')
 vi.mock('../../../../resources/runs/useNotifyRunQuery')

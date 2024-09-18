@@ -7,7 +7,7 @@ import { COLORS, TYPOGRAPHY } from '@opentrons/components'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { useFeatureFlag } from '../../../../redux/config'
+import { useFeatureFlag } from '/app/redux/config'
 import { PinnedProtocol } from '../PinnedProtocol'
 
 import type { Chip } from '@opentrons/components'
@@ -30,7 +30,7 @@ vi.mock('@opentrons/components', async importOriginal => {
     Chip: () => <div>mock Chip</div>,
   }
 })
-vi.mock('../../../../redux/config')
+vi.mock('/app/redux/config')
 
 const mockProtocol: ProtocolResource = {
   id: 'mockProtocol1',

@@ -8,12 +8,12 @@ import {
   getDevtoolsEnabled,
   getUpdateChannelOptions,
   updateConfigValue,
-} from '../../../../redux/config'
+} from '/app/redux/config'
 import { renderWithProviders } from '../../../../__testing-utils__'
 
 import { UpdateChannel } from '../UpdateChannel'
 
-vi.mock('../../../../redux/config')
+vi.mock('/app/redux/config')
 
 const mockChannelOptions = [
   {

@@ -28,7 +28,7 @@ import {
   getQuickTransfersOnDeviceSortKey,
   getHasDismissedQuickTransferIntro,
   updateConfigValue,
-} from '../../../redux/config'
+} from '/app/redux/config'
 import { PinnedTransferCarousel } from './PinnedTransferCarousel'
 import { sortQuickTransfers } from './utils'
 import { QuickTransferCard } from './QuickTransferCard'
@@ -40,8 +40,8 @@ import { DeleteTransferConfirmationModal } from './DeleteTransferConfirmationMod
 
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type { PipetteData } from '@opentrons/api-client'
-import type { Dispatch } from '../../../redux/types'
-import type { QuickTransfersOnDeviceSortKey } from '../../../redux/config/types'
+import type { Dispatch } from '/app/redux/types'
+import type { QuickTransfersOnDeviceSortKey } from '/app/redux/config/types'
 
 export function QuickTransferDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()

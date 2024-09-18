@@ -17,17 +17,17 @@ import {
 } from '@opentrons/components'
 
 import { MiniCard } from '../../molecules/MiniCard'
-import { getRobotModelByName, OPENTRONS_USB } from '../../redux/discovery'
-import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
-import { appShellRequestor } from '../../redux/shell/remote'
+import { getRobotModelByName, OPENTRONS_USB } from '/app/redux/discovery'
+import { getNetworkInterfaces, fetchStatus } from '/app/redux/networking'
+import { appShellRequestor } from '/app/redux/shell/remote'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import FLEX_PNG from '../../assets/images/FLEX.png'
 import { useCurrentRunId, useNotifyRunQuery } from '../../resources/runs'
 
 import type { IconName } from '@opentrons/components'
 import type { Runs } from '@opentrons/api-client'
-import type { Robot } from '../../redux/discovery/types'
-import type { Dispatch, State } from '../../redux/types'
+import type { Robot } from '/app/redux/discovery/types'
+import type { Dispatch, State } from '/app/redux/types'
 import type { RobotBusyStatusAction } from '.'
 
 interface AvailableRobotOptionProps {

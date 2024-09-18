@@ -4,8 +4,8 @@ import { describe, it, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { getStoredProtocols } from '../../../redux/protocol-storage'
-import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
+import { getStoredProtocols } from '/app/redux/protocol-storage'
+import { storedProtocolData as storedProtocolDataFixture } from '/app/redux/protocol-storage/__fixtures__'
 import { useRunStatus, useRunTimestamps } from '../../RunTimeControl/hooks'
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
@@ -13,7 +13,7 @@ import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverf
 import type { RunStatus, RunData } from '@opentrons/api-client'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
-vi.mock('../../../redux/protocol-storage')
+vi.mock('/app/redux/protocol-storage')
 vi.mock('../../RunTimeControl/hooks')
 vi.mock('../HistoricalProtocolRunOverflowMenu')
 

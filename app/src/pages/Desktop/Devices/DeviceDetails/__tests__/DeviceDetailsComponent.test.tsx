@@ -20,7 +20,7 @@ vi.mock('../../../../../organisms/Devices/InstrumentsAndModules')
 vi.mock('../../../../../organisms/Devices/RecentProtocolRuns')
 vi.mock('../../../../../organisms/Devices/RobotOverview')
 vi.mock('../../../../../organisms/DeviceDetailsDeckConfiguration')
-vi.mock('../../../../../redux/discovery')
+vi.mock('/app/redux/discovery')
 
 const ROBOT_NAME = 'otie'
 const mockEstopStatus = {

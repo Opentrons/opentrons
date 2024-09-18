@@ -44,7 +44,7 @@ import {
   getApplyHistoricOffsets,
   getPinnedQuickTransferIds,
   updateConfigValue,
-} from '../../../redux/config'
+} from '/app/redux/config'
 import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useMissingProtocolHardware } from '../../../transformations/commands'
 import { DeleteTransferConfirmationModal } from '../QuickTransferDashboard/DeleteTransferConfirmationModal'
@@ -54,7 +54,7 @@ import { Labware } from './Labware'
 import { formatTimeWithUtcLabel } from '../../../resources/runs'
 
 import type { Protocol } from '@opentrons/api-client'
-import type { Dispatch } from '../../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 import type { OnDeviceRouteParams } from '../../../App/types'
 
 interface QuickTransferHeaderProps {

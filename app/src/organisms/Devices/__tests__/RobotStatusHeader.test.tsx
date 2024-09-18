@@ -14,20 +14,20 @@ import {
   getRobotAddressesByName,
   HEALTH_STATUS_OK,
   OPENTRONS_USB,
-} from '../../../redux/discovery'
-import { getNetworkInterfaces } from '../../../redux/networking'
+} from '/app/redux/discovery'
+import { getNetworkInterfaces } from '/app/redux/networking'
 import { useIsFlex } from '../hooks'
 import { RobotStatusHeader } from '../RobotStatusHeader'
 import { useNotifyRunQuery, useCurrentRunId } from '../../../resources/runs'
 
-import type { DiscoveryClientRobotAddress } from '../../../redux/discovery/types'
-import type { SimpleInterfaceStatus } from '../../../redux/networking/types'
-import type { State } from '../../../redux/types'
+import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'
+import type { SimpleInterfaceStatus } from '/app/redux/networking/types'
+import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../organisms/RunTimeControl/hooks')
-vi.mock('../../../redux/discovery')
-vi.mock('../../../redux/networking')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/networking')
 vi.mock('../hooks')
 vi.mock('../../../resources/runs')
 

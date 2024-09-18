@@ -5,17 +5,17 @@ import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
-import * as RobotUpdate from '../../../redux/robot-update'
+import * as RobotUpdate from '/app/redux/robot-update'
 import * as UpdateRobotSoftware from '../'
 import {
   CompleteUpdateSoftware,
   UpdateSoftware,
 } from '../../../organisms/UpdateRobotSoftware'
 
-import type { State } from '../../../redux/types'
+import type { State } from '/app/redux/types'
 
-vi.mock('../../../redux/discovery')
-vi.mock('../../../redux/robot-update')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/robot-update')
 vi.mock('../../../organisms/UpdateRobotSoftware/CheckUpdates')
 vi.mock('../../../organisms/UpdateRobotSoftware/CompleteUpdateSoftware')
 vi.mock('../../../organisms/UpdateRobotSoftware/ErrorUpdateSoftware')

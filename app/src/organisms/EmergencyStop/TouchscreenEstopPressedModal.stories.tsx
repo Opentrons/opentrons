@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { VIEWPORT } from '@opentrons/components'
 
-import { configReducer } from '../../redux/config/reducer'
+import { configReducer } from '/app/redux/config/reducer'
 import { EstopPressedModal } from '.'
 
 import type { Store, StoreEnhancer } from 'redux'

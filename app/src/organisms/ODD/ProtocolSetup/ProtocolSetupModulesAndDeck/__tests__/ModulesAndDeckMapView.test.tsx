@@ -15,7 +15,7 @@ import { ModulesAndDeckMapView } from '../ModulesAndDeckMapView'
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck')
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/shared-data/js/helpers/getSimplestFlexDeckConfig')
-vi.mock('../../../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../../../../Devices/hooks')
 vi.mock('../../../../../resources/deck_configuration/utils')
 vi.mock('../../../../Devices/ModuleInfo')

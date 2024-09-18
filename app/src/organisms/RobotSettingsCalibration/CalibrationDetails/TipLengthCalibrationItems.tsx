@@ -12,12 +12,12 @@ import {
 } from '@opentrons/components'
 
 import { useAttachedPipettes } from '../../../organisms/Devices/hooks'
-import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'
+import { getCustomLabwareDefinitions } from '/app/redux/custom-labware'
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
 
 import type { Mount } from '@opentrons/components'
-import type { State } from '../../../redux/types'
+import type { State } from '/app/redux/types'
 import type { FormattedTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
 import type { FormattedPipetteOffsetCalibration } from '..'
 

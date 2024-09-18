@@ -21,7 +21,7 @@ import { useTrackProtocolRunEvent } from '../../../Devices/hooks'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '../../../../redux/analytics'
+} from '/app/redux/analytics'
 import { useCloneRun } from '../../../ProtocolUpload/hooks'
 import { useRerunnableStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
@@ -47,7 +47,7 @@ vi.mock('../../../../pages/ODD/ProtocolDetails')
 vi.mock('../../../../organisms/Devices/hooks')
 vi.mock('../../../../organisms/RunTimeControl/hooks')
 vi.mock('../../../../organisms/ProtocolUpload/hooks')
-vi.mock('../../../../redux/analytics')
+vi.mock('/app/redux/analytics')
 vi.mock('../hooks')
 vi.mock('../../../../resources/runs')
 

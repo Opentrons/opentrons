@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import { Flex, POSITION_FIXED, DIRECTION_ROW } from '@opentrons/components'
 
 import { GlobalStyle } from '../atoms/GlobalStyle'
-import { getConfig, getIsOnDevice } from '../redux/config'
+import { getConfig, getIsOnDevice } from '/app/redux/config'
 import { DesktopApp } from './DesktopApp'
 import { OnDeviceDisplayApp } from './OnDeviceDisplayApp'
 import { TopPortalRoot } from './portal'

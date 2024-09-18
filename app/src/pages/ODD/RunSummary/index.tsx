@@ -58,8 +58,8 @@ import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_RUN_ACTION,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '../../../redux/analytics'
-import { getLocalRobot } from '../../../redux/discovery'
+} from '/app/redux/analytics'
+import { getLocalRobot } from '/app/redux/discovery'
 import { RunFailedModal } from '../../../organisms/ODD/RunningProtocol'
 import {
   formatTimeWithUtcLabel,

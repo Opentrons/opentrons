@@ -7,12 +7,12 @@ import { i18n } from '../../../i18n'
 import {
   useTrackEvent,
   ANALYTICS_IMPORT_PROTOCOL_TO_APP,
-} from '../../../redux/analytics'
+} from '/app/redux/analytics'
 import { ProtocolUploadInput } from '../ProtocolUploadInput'
 
 import type { Mock } from 'vitest'
 
-vi.mock('../../../redux/analytics')
+vi.mock('/app/redux/analytics')
 
 describe('ProtocolUploadInput', () => {
   let onUpload: Mock

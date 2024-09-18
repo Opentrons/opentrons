@@ -8,11 +8,11 @@ import { i18n } from '../../../../../i18n'
 import {
   mockMagneticModule as mockMagneticModuleFixture,
   mockHeaterShaker,
-} from '../../../../../redux/modules/__fixtures__/index'
+} from '/app/redux/modules/__fixtures__/index'
 import {
   mockMagneticModuleGen2,
   mockThermocycler,
-} from '../../../../../redux/modules/__fixtures__'
+} from '/app/redux/modules/__fixtures__'
 import { useChainLiveCommands } from '../../../../../resources/runs'
 import { ModuleSetupModal } from '../../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
@@ -29,7 +29,7 @@ import { SetupModulesList } from '../SetupModulesList'
 import { LocationConflictModal } from '../LocationConflictModal'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
-import type { DiscoveredRobot } from '../../../../../redux/discovery/types'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../hooks')
@@ -39,7 +39,7 @@ vi.mock('../../../../ModuleCard/ModuleSetupModal')
 vi.mock('../../../../ModuleWizardFlows')
 vi.mock('../OT2MultipleModulesHelp')
 vi.mock('../../../../../resources/runs')
-vi.mock('../../../../../redux/config')
+vi.mock('/app/redux/config')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'

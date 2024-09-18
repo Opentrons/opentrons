@@ -16,9 +16,9 @@ import { ToggleButton } from '../../atoms/buttons'
 import {
   getIsLabwareOffsetCodeSnippetsOn,
   updateConfigValue,
-} from '../../redux/config'
+} from '/app/redux/config'
 
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 export function ShowLabwareOffsetSnippets(): JSX.Element {
   const { t } = useTranslation(['app_settings', 'shared', 'branded'])

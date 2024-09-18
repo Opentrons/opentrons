@@ -11,7 +11,7 @@ import { useMostRecentCompletedAnalysis } from '../../../../../../../LabwarePosi
 import { useHeaterShakerModuleIdsFromRun } from '../hooks'
 
 import type { Store } from 'redux'
-import type { State } from '../../../../../../../../redux/types'
+import type { State } from '/app/redux/types'
 
 vi.mock(
   '../../../../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'

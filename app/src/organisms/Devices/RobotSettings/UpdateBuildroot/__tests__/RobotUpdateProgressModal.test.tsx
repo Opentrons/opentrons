@@ -14,20 +14,20 @@ import { useRobotUpdateInfo } from '../useRobotUpdateInfo'
 import {
   getRobotSessionIsManualFile,
   getRobotUpdateDownloadError,
-} from '../../../../../redux/robot-update'
-import { useDispatchStartRobotUpdate } from '../../../../../redux/robot-update/hooks'
+} from '/app/redux/robot-update'
+import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 import {
   useRobotInitializationStatus,
   INIT_STATUS,
 } from '../../../../../resources/health/hooks'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
-import type { RobotUpdateSession } from '../../../../../redux/robot-update/types'
+import type { RobotUpdateSession } from '/app/redux/robot-update/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../useRobotUpdateInfo')
-vi.mock('../../../../../redux/robot-update')
-vi.mock('../../../../../redux/robot-update/hooks')
+vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux/robot-update/hooks')
 vi.mock('../../../../../resources/health/hooks')
 
 const render = (

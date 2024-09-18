@@ -23,8 +23,8 @@ import { Divider } from '../../../../atoms/structure'
 import {
   useTrackEvent,
   ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,
-} from '../../../../redux/analytics'
-import { getIsOnDevice } from '../../../../redux/config'
+} from '/app/redux/analytics'
+import { getIsOnDevice } from '/app/redux/config'
 import { getWellRangeForLiquidLabwarePair } from './utils'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`

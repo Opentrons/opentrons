@@ -20,9 +20,9 @@ import { ChildNavigation } from '../../../organisms/ChildNavigation'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
-} from '../../../redux/config'
+} from '/app/redux/config'
 
-import type { Dispatch } from '../../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 import type { SetSettingOption } from './types'
 import { IconButton } from '../../../atoms/buttons/IconButton'
 

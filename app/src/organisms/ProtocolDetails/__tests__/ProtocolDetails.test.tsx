@@ -9,30 +9,30 @@ import { ChooseRobotToRunProtocolSlideout } from '../../../organisms/ChooseRobot
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '../../../redux/analytics'
-import { getValidCustomLabwareFiles } from '../../../redux/custom-labware/selectors'
+} from '/app/redux/analytics'
+import { getValidCustomLabwareFiles } from '/app/redux/custom-labware/selectors'
 import {
   getConnectableRobots,
   getReachableRobots,
   getScanning,
   getUnreachableRobots,
-} from '../../../redux/discovery'
-import { getIsProtocolAnalysisInProgress } from '../../../redux/protocol-storage/selectors'
+} from '/app/redux/discovery'
+import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage/selectors'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
-} from '../../../redux/discovery/__fixtures__'
-import { storedProtocolData } from '../../../redux/protocol-storage/__fixtures__'
+} from '/app/redux/discovery/__fixtures__'
+import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
 import { ProtocolDetails } from '..'
 
 import type { Mock } from 'vitest'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
-vi.mock('../../../redux/analytics')
-vi.mock('../../../redux/custom-labware/selectors')
-vi.mock('../../../redux/discovery/selectors')
-vi.mock('../../../redux/protocol-storage/selectors')
+vi.mock('/app/redux/analytics')
+vi.mock('/app/redux/custom-labware/selectors')
+vi.mock('/app/redux/discovery/selectors')
+vi.mock('/app/redux/protocol-storage/selectors')
 vi.mock('../../../organisms/ChooseRobotToRunProtocolSlideout')
 vi.mock('../../../organisms/SendProtocolToFlexSlideout')
 

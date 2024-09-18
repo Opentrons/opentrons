@@ -18,7 +18,7 @@ import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'
 import { useCreateTargetedMaintenanceRunMutation } from '../../resources/runs'
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,

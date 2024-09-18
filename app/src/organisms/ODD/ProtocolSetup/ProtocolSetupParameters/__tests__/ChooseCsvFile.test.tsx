@@ -7,17 +7,17 @@ import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../../i18n'
 import { renderWithProviders } from '../../../../../__testing-utils__'
-import { mockConnectedRobot } from '../../../../../redux/discovery/__fixtures__'
-import { getLocalRobot } from '../../../../../redux/discovery'
-import { getShellUpdateDataFiles } from '../../../../../redux/shell'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
+import { getLocalRobot } from '/app/redux/discovery'
+import { getShellUpdateDataFiles } from '/app/redux/shell'
 import { EmptyFile } from '../EmptyFile'
 import { ChooseCsvFile } from '../ChooseCsvFile'
 
 import type { CsvFileParameter } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../../redux/discovery')
-vi.mock('../../../../../redux/shell')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/shell')
 vi.mock('../EmptyFile')
 
 const mockHandleGoBack = vi.fn()

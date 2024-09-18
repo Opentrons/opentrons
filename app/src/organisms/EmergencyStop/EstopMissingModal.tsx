@@ -15,7 +15,7 @@ import {
 
 import { getTopPortalEl } from '../../App/portal'
 import { OddModal } from '../../molecules/OddModal'
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 
 import type { ModalProps } from '@opentrons/components'
 import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'

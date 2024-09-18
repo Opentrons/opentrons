@@ -3,7 +3,7 @@ import { renderHook, act } from '@testing-library/react'
 import { useSelector } from 'react-redux'
 
 import { useRecoveryTakeover } from '../useRecoveryTakeover'
-import { getUserId } from '../../../../redux/config'
+import { getUserId } from '/app/redux/config'
 import {
   useClientDataRecovery,
   useUpdateClientDataRecovery,
@@ -14,7 +14,7 @@ import type { Mock } from 'vitest'
 vi.mock('react-redux', () => ({
   useSelector: vi.fn(),
 }))
-vi.mock('../../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../../../../resources/client_data')
 
 describe('useRecoveryTakeover', () => {

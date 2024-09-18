@@ -16,7 +16,7 @@ import {
 
 import { MediumButton } from '../../../atoms/buttons'
 
-import type { RequestState } from '../../../redux/robot-api/types'
+import type { RequestState } from '/app/redux/robot-api/types'
 
 interface FailedToConnectProps {
   selectedSsid: string

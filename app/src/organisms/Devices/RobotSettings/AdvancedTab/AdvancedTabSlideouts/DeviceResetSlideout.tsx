@@ -23,15 +23,15 @@ import {
 
 import { Slideout } from '../../../../../atoms/Slideout'
 import { Divider } from '../../../../../atoms/structure'
-import { UNREACHABLE } from '../../../../../redux/discovery'
+import { UNREACHABLE } from '/app/redux/discovery'
 import {
   getResetConfigOptions,
   fetchResetConfigOptions,
-} from '../../../../../redux/robot-admin'
+} from '/app/redux/robot-admin'
 import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
-} from '../../../../../redux/analytics'
+} from '/app/redux/analytics'
 import {
   useDeckCalibrationData,
   useIsFlex,
@@ -41,8 +41,8 @@ import {
 } from '../../../hooks'
 import { useNotifyAllRunsQuery } from '../../../../../resources/runs'
 
-import type { State, Dispatch } from '../../../../../redux/types'
-import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
+import type { State, Dispatch } from '/app/redux/types'
+import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
 
 interface DeviceResetSlideoutProps {
   isExpanded: boolean

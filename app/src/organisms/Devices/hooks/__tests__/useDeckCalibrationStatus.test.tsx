@@ -7,16 +7,16 @@ import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { useCalibrationStatusQuery } from '@opentrons/react-api-client'
 
-import { DECK_CAL_STATUS_OK } from '../../../../redux/calibration'
-import { getDiscoverableRobotByName } from '../../../../redux/discovery'
+import { DECK_CAL_STATUS_OK } from '/app/redux/calibration'
+import { getDiscoverableRobotByName } from '/app/redux/discovery'
 
 import { useDeckCalibrationStatus } from '..'
-import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import type { Store } from 'redux'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../redux/calibration')
-vi.mock('../../../../redux/discovery')
+vi.mock('/app/redux/calibration')
+vi.mock('/app/redux/discovery')
 
 const store: Store<any> = createStore(vi.fn(), {})
 

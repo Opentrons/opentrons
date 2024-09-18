@@ -13,7 +13,7 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import * as Sessions from '../../redux/sessions'
+import * as Sessions from '/app/redux/sessions'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import { JogControls } from '../../molecules/JogControls'
 import type { CalibrationPanelProps } from './types'

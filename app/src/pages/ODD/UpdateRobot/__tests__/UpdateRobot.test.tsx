@@ -7,16 +7,16 @@ import { screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 
-import * as RobotUpdate from '../../../../redux/robot-update'
-import type { RobotUpdateSession } from '../../../../redux/robot-update/types'
-import { getLocalRobot } from '../../../../redux/discovery'
+import * as RobotUpdate from '/app/redux/robot-update'
+import type { RobotUpdateSession } from '/app/redux/robot-update/types'
+import { getLocalRobot } from '/app/redux/discovery'
 
 import { UpdateRobot } from '../UpdateRobot'
 
-import type { State } from '../../../../redux/types'
+import type { State } from '/app/redux/types'
 
-vi.mock('../../../../redux/discovery')
-vi.mock('../../../../redux/robot-update')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/robot-update')
 
 const MOCK_STATE: State = {
   discovery: {

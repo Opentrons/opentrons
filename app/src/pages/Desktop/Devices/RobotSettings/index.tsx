@@ -21,10 +21,10 @@ import {
   UNREACHABLE,
   REACHABLE,
   OPENTRONS_USB,
-} from '../../../../redux/discovery'
-import { appShellRequestor } from '../../../../redux/shell/remote'
-import { getRobotUpdateSession } from '../../../../redux/robot-update'
-import { getDevtoolsEnabled } from '../../../../redux/config'
+} from '/app/redux/discovery'
+import { appShellRequestor } from '/app/redux/shell/remote'
+import { getRobotUpdateSession } from '/app/redux/robot-update'
+import { getDevtoolsEnabled } from '/app/redux/config'
 import { Banner } from '../../../../atoms/Banner'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import { Line } from '../../../../atoms/structure'

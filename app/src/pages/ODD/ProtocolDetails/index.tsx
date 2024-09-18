@@ -45,7 +45,7 @@ import {
   getApplyHistoricOffsets,
   getPinnedProtocolIds,
   updateConfigValue,
-} from '../../../redux/config'
+} from '/app/redux/config'
 import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useRunTimeParameters } from '../../../pages/Desktop/Protocols/hooks'
 import { useMissingProtocolHardware } from '../../../transformations/commands'
@@ -59,7 +59,7 @@ import { formatTimeWithUtcLabel } from '../../../resources/runs'
 
 import type { Protocol } from '@opentrons/api-client'
 import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
-import type { Dispatch } from '../../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 import type { OnDeviceRouteParams } from '../../../App/types'
 
 interface ProtocolHeaderProps {

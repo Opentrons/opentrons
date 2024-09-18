@@ -16,7 +16,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../../i18n'
-import { mockHeaterShaker } from '../../../../../redux/modules/__fixtures__'
+import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { useCloseCurrentRun } from '../../../../ProtocolUpload/hooks'
 import { LocationConflictModal } from '../LocationConflictModal'
 import { useNotifyDeckConfigurationQuery } from '../../../../../resources/deck_configuration'

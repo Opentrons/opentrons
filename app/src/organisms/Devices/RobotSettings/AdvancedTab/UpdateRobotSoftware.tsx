@@ -20,11 +20,11 @@ import {
 
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { TertiaryButton } from '../../../../atoms/buttons'
-import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
-import { useDispatchStartRobotUpdate } from '../../../../redux/robot-update/hooks'
+import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
+import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 import { Banner } from '../../../../atoms/Banner'
 
-import type { State } from '../../../../redux/types'
+import type { State } from '/app/redux/types'
 
 const OT_APP_UPDATE_PAGE_LINK = 'https://opentrons.com/ot-app/'
 const HIDDEN_CSS = css`

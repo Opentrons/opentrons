@@ -32,7 +32,7 @@ import { useRunCalibrationStatus } from '../../../Devices/hooks'
 import { LocationConflictModal } from '../../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { useToaster } from '../../../ToasterOven'
-import { getLocalRobot } from '../../../../redux/discovery'
+import { getLocalRobot } from '/app/redux/discovery'
 import { useChainLiveCommands } from '../../../../resources/runs'
 import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
 

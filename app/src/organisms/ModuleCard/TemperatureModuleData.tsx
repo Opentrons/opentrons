@@ -9,7 +9,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StatusLabel } from '../../atoms/StatusLabel'
-import type { TemperatureStatus } from '../../redux/modules/api-types'
+import type { TemperatureStatus } from '/app/redux/modules/api-types'
 
 interface TemperatureModuleProps {
   moduleStatus: TemperatureStatus

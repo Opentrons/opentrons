@@ -3,7 +3,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { mockTemperatureModule } from '../../../redux/modules/__fixtures__'
+import { mockTemperatureModule } from '/app/redux/modules/__fixtures__'
 import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
 
 const render = (

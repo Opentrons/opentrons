@@ -9,7 +9,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import * as PipetteConstants from '../../../redux/pipettes/constants'
+import * as PipetteConstants from '/app/redux/pipettes/constants'
 import { getShowPipetteCalibrationWarning } from '../utils'
 import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
 import {

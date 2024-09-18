@@ -48,7 +48,7 @@ vi.mock('../../../../transformations/commands')
 vi.mock('../Deck')
 vi.mock('../Hardware')
 vi.mock('../Labware')
-vi.mock('../../../../redux/config')
+vi.mock('/app/redux/config')
 
 const MOCK_HOST_CONFIG = {} as HostConfig
 const mockCreateRun = vi.fn((id: string) => {})

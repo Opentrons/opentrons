@@ -13,9 +13,9 @@ import {
 
 import { SmallButton } from '../../atoms/buttons'
 import { OddModal } from '../../molecules/OddModal'
-import { restartRobot } from '../../redux/robot-admin'
+import { restartRobot } from '/app/redux/robot-admin'
 
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
 interface RestartRobotConfirmationModalProps {

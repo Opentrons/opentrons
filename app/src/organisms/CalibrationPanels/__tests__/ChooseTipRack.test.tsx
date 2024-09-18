@@ -7,24 +7,24 @@ import { LEFT } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { mockAttachedPipette } from '../../../redux/pipettes/__fixtures__'
-import { mockDeckCalTipRack } from '../../../redux/sessions/__fixtures__'
-import { mockTipRackDefinition } from '../../../redux/custom-labware/__fixtures__'
+import { mockAttachedPipette } from '/app/redux/pipettes/__fixtures__'
+import { mockDeckCalTipRack } from '/app/redux/sessions/__fixtures__'
+import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
 import { Select } from '../../../atoms/SelectField/Select'
 import {
   getCalibrationForPipette,
   getTipLengthForPipetteAndTiprack,
   getTipLengthCalibrations,
-} from '../../../redux/calibration'
-import { getCustomTipRackDefinitions } from '../../../redux/custom-labware'
+} from '/app/redux/calibration'
+import { getCustomTipRackDefinitions } from '/app/redux/custom-labware'
 import { ChooseTipRack } from '../ChooseTipRack'
 
-import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
+import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../redux/pipettes/selectors')
-vi.mock('../../../redux/calibration')
-vi.mock('../../../redux/custom-labware/selectors')
+vi.mock('/app/redux/pipettes/selectors')
+vi.mock('/app/redux/calibration')
+vi.mock('/app/redux/custom-labware/selectors')
 vi.mock('../../../atoms/SelectField/Select')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {

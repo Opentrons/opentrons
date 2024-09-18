@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import {
   useTrackEvent,
   ANALYTICS_OPEN_LABWARE_CREATOR_FROM_OVERFLOW_MENU,
-} from '../../redux/analytics'
+} from '/app/redux/analytics'
 import {
   AlertPrimaryButton,
   ALIGN_CENTER,
@@ -34,9 +34,9 @@ import { getTopPortalEl } from '../../App/portal'
 import {
   deleteCustomLabwareFile,
   openCustomLabwareDirectory,
-} from '../../redux/custom-labware'
+} from '/app/redux/custom-labware'
 
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
 

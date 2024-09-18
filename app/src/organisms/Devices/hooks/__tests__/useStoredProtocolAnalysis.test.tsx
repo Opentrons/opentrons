@@ -14,8 +14,8 @@ import {
   parseRequiredModulesEntity,
 } from '@opentrons/shared-data'
 
-import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
-import { getStoredProtocol } from '../../../../redux/protocol-storage'
+import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
+import { getStoredProtocol } from '/app/redux/protocol-storage'
 import { useStoredProtocolAnalysis } from '../useStoredProtocolAnalysis'
 import {
   LABWARE_ENTITY,
@@ -29,7 +29,7 @@ import type { Store } from 'redux'
 import type { UseQueryResult } from 'react-query'
 import type { Protocol, Run } from '@opentrons/api-client'
 import type * as SharedData from '@opentrons/shared-data'
-import type { StoredProtocolData } from '../../../../redux/protocol-storage'
+import type { StoredProtocolData } from '/app/redux/protocol-storage'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
@@ -41,7 +41,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
   }
 })
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../redux/protocol-storage/selectors')
+vi.mock('/app/redux/protocol-storage/selectors')
 vi.mock('../../../../resources/runs')
 
 const store: Store<any> = createStore(vi.fn(), {})

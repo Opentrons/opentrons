@@ -14,7 +14,7 @@ import {
 } from '@opentrons/components'
 
 import { useLogger } from '../../logger'
-import * as Sessions from '../../redux/sessions'
+import * as Sessions from '/app/redux/sessions'
 import {
   JogControls,
   MEDIUM_STEP_SIZE_MM,
@@ -44,7 +44,7 @@ import type {
   CalibrationSessionStep,
   SessionCommandString,
   CalibrationLabware,
-} from '../../redux/sessions/types'
+} from '/app/redux/sessions/types'
 import type { Mount } from '@opentrons/components'
 
 const assetMap: Record<

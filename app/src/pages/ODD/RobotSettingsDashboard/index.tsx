@@ -22,20 +22,20 @@ import {
 import {
   getRobotUpdateAvailable,
   getRobotUpdateInfoForRobot,
-} from '../../../redux/robot-update'
+} from '/app/redux/robot-update'
 import {
   getLocalRobot,
   getRobotApiVersion,
   UNREACHABLE,
-} from '../../../redux/discovery'
-import { fetchStatus, postWifiConfigure } from '../../../redux/networking'
-import { getRequestById, useDispatchApiRequest } from '../../../redux/robot-api'
+} from '/app/redux/discovery'
+import { fetchStatus, postWifiConfigure } from '/app/redux/networking'
+import { getRequestById, useDispatchApiRequest } from '/app/redux/robot-api'
 import { useWifiList } from '../../../resources/networking/hooks'
 import { useNetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
 import { RobotSettingsList } from './RobotSettingsList'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { Dispatch, State } from '../../../redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 import type { SettingOption } from '../../../organisms/ODD/RobotSettingsDashboard'
 
 export function RobotSettingsDashboard(): JSX.Element {

@@ -4,12 +4,12 @@ import { screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../../__testing-utils__'
 
 import { ProtocolsEmptyState } from '../../../../../organisms/ProtocolsLanding/ProtocolsEmptyState'
-import { getStoredProtocols } from '../../../../../redux/protocol-storage'
-import { storedProtocolData } from '../../../../../redux/protocol-storage/__fixtures__'
+import { getStoredProtocols } from '/app/redux/protocol-storage'
+import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
 import { ProtocolList } from '../../../../../organisms/ProtocolsLanding/ProtocolList'
 import { ProtocolsLanding } from '..'
 
-vi.mock('../../../../../redux/protocol-storage')
+vi.mock('/app/redux/protocol-storage')
 vi.mock('../../../../../organisms/ProtocolsLanding/ProtocolsEmptyState')
 vi.mock('../../../../../organisms/ProtocolsLanding/ProtocolList')
 

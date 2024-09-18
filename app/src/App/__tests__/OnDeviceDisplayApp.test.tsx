@@ -23,10 +23,10 @@ import { Welcome } from '../../pages/ODD/Welcome'
 import { NameRobot } from '../../pages/ODD/NameRobot'
 import { EmergencyStop } from '../../pages/ODD/EmergencyStop'
 import { DeckConfigurationEditor } from '../../pages/ODD/DeckConfiguration'
-import { getOnDeviceDisplaySettings } from '../../redux/config'
-import { getIsShellReady } from '../../redux/shell'
-import { getLocalRobot } from '../../redux/discovery'
-import { mockConnectedRobot } from '../../redux/discovery/__fixtures__'
+import { getOnDeviceDisplaySettings } from '/app/redux/config'
+import { getIsShellReady } from '/app/redux/shell'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { useProtocolReceiptToast } from '../hooks'
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 import { ODDTopLevelRedirects } from '../ODDTopLevelRedirects'
@@ -34,7 +34,7 @@ import { ODDTopLevelRedirects } from '../ODDTopLevelRedirects'
 import type { UseQueryResult } from 'react-query'
 import type { RobotSettingsResponse } from '@opentrons/api-client'
 import type { OnDeviceLocalizationProviderProps } from '../../LocalizationProvider'
-import type { OnDeviceDisplaySettings } from '../../redux/config/schema-types'
+import type { OnDeviceDisplaySettings } from '/app/redux/config/schema-types'
 
 vi.mock('@opentrons/react-api-client', async () => {
   const actual = await vi.importActual('@opentrons/react-api-client')
@@ -63,9 +63,9 @@ vi.mock('../../pages/ODD/RunSummary')
 vi.mock('../../pages/ODD/NameRobot')
 vi.mock('../../pages/ODD/EmergencyStop')
 vi.mock('../../pages/ODD/DeckConfiguration')
-vi.mock('../../redux/config')
-vi.mock('../../redux/shell')
-vi.mock('../../redux/discovery')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/shell')
+vi.mock('/app/redux/discovery')
 vi.mock('../../resources/maintenance_runs')
 vi.mock('../hooks')
 vi.mock('../ODDTopLevelRedirects')

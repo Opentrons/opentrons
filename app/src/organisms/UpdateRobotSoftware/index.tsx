@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 import {
   getRobotUpdateSession,
   startRobotUpdate,
-} from '../../redux/robot-update'
+} from '/app/redux/robot-update'
 
-import type { ViewableRobot } from '../../redux/discovery/types'
+import type { ViewableRobot } from '/app/redux/discovery/types'
 
 import { CompleteUpdateSoftware } from '../../organisms/UpdateRobotSoftware/CompleteUpdateSoftware'
 import { UpdateSoftware } from '../../organisms/UpdateRobotSoftware/UpdateSoftware'

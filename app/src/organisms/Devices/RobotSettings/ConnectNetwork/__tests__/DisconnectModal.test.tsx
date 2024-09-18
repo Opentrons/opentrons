@@ -11,14 +11,14 @@ import { useWifiList } from '../../../../../resources/networking/hooks'
 import {
   mockConnectableRobot,
   mockReachableRobot,
-} from '../../../../../redux/discovery/__fixtures__'
+} from '/app/redux/discovery/__fixtures__'
 import {
   clearWifiStatus,
   getNetworkInterfaces,
   INTERFACE_WIFI,
   postWifiDisconnect,
-} from '../../../../../redux/networking'
-import { mockWifiNetwork } from '../../../../../redux/networking/__fixtures__'
+} from '/app/redux/networking'
+import { mockWifiNetwork } from '/app/redux/networking/__fixtures__'
 import {
   dismissRequest,
   getRequestById,
@@ -26,17 +26,17 @@ import {
   PENDING,
   FAILURE,
   SUCCESS,
-} from '../../../../../redux/robot-api'
+} from '/app/redux/robot-api'
 import { DisconnectModal } from '../DisconnectModal'
 
-import type { DispatchApiRequestType } from '../../../../../redux/robot-api'
-import type { RequestState } from '../../../../../redux/robot-api/types'
-import type { State } from '../../../../../redux/types'
+import type { DispatchApiRequestType } from '/app/redux/robot-api'
+import type { RequestState } from '/app/redux/robot-api/types'
+import type { State } from '/app/redux/types'
 
 vi.mock('../../../../../resources/networking/hooks')
 vi.mock('../../../../../organisms/Devices/hooks')
-vi.mock('../../../../../redux/networking')
-vi.mock('../../../../../redux/robot-api')
+vi.mock('/app/redux/networking')
+vi.mock('/app/redux/robot-api')
 
 const ROBOT_NAME = 'otie'
 const LAST_ID = 'a request id'

@@ -18,11 +18,11 @@ import {
   WRAP_REVERSE,
 } from '@opentrons/components'
 
-import { analyzeProtocol } from '../../redux/protocol-storage'
+import { analyzeProtocol } from '/app/redux/protocol-storage'
 import { Banner } from '../../atoms/Banner'
 import { getTopPortalEl } from '../../App/portal'
 
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 interface ProtocolAnalysisFailureProps {
   errors: string[]
   protocolKey: string

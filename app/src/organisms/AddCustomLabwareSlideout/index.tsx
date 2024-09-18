@@ -13,14 +13,14 @@ import {
 import {
   addCustomLabwareFile,
   addCustomLabware,
-} from '../../redux/custom-labware'
+} from '/app/redux/custom-labware'
 import { Slideout } from '../../atoms/Slideout'
 import {
   useTrackEvent,
   ANALYTICS_ADD_CUSTOM_LABWARE,
-} from '../../redux/analytics'
+} from '/app/redux/analytics'
 import { UploadInput } from '../../molecules/UploadInput'
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 export interface AddCustomLabwareSlideoutProps {
   isExpanded: boolean

@@ -31,7 +31,7 @@ vi.mock('@opentrons/components', async importOriginal => {
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../../RunTimeControl/hooks')
 vi.mock('../../../../resources/runs')
-vi.mock('../../../../redux/config')
+vi.mock('/app/redux/config')
 
 const RUN_ID = 'mockId'
 

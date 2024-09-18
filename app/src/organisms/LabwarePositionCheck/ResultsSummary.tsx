@@ -34,7 +34,7 @@ import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetS
 import {
   getIsLabwareOffsetCodeSnippetsOn,
   getIsOnDevice,
-} from '../../redux/config'
+} from '/app/redux/config'
 import { SmallButton } from '../../atoms/buttons'
 import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'

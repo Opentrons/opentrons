@@ -14,7 +14,7 @@ import {
   getRobotSerialNumber,
   getRobotFirmwareVersion,
   getRobotProtocolApiVersion,
-} from '../../../../redux/discovery'
+} from '/app/redux/discovery'
 
 interface RobotInformationProps {
   robotName: string

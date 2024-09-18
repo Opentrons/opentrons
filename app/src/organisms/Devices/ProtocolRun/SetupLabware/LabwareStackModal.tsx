@@ -17,7 +17,7 @@ import {
   Modal,
 } from '@opentrons/components'
 import { OddModal } from '../../../../molecules/OddModal'
-import { getIsOnDevice } from '../../../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
 import { Divider } from '../../../../atoms/structure'

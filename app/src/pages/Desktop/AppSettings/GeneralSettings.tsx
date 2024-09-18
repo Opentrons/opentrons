@@ -29,23 +29,23 @@ import {
   CURRENT_VERSION,
   getAvailableShellUpdate,
   checkShellUpdate,
-} from '../../../redux/shell'
+} from '/app/redux/shell'
 import {
   ALERT_APP_UPDATE_AVAILABLE,
   getAlertIsPermanentlyIgnored,
   alertPermanentlyIgnored,
   alertUnignored,
-} from '../../../redux/alerts'
+} from '/app/redux/alerts'
 import {
   useTrackEvent,
   ANALYTICS_APP_UPDATE_NOTIFICATIONS_TOGGLED,
-} from '../../../redux/analytics'
+} from '/app/redux/analytics'
 import { UpdateAppModal } from '../../../organisms/UpdateAppModal'
 import { PreviousVersionModal } from '../../../organisms/AppSettings/PreviousVersionModal'
 import { ConnectRobotSlideout } from '../../../organisms/AppSettings/ConnectRobotSlideout'
 import { getTopPortalEl } from '../../../App/portal'
 
-import type { Dispatch, State } from '../../../redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 const SOFTWARE_SYNC_URL = 'https://support.opentrons.com/s/'
 const GITHUB_LINK =

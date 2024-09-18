@@ -15,8 +15,8 @@ import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
-} from '../../../../../redux/discovery/__fixtures__'
-import { getRobotUpdateSession } from '../../../../../redux/robot-update'
+} from '/app/redux/discovery/__fixtures__'
+import { getRobotUpdateSession } from '/app/redux/robot-update'
 
 vi.mock('../../../../../organisms/RobotSettingsCalibration')
 vi.mock(
@@ -24,8 +24,8 @@ vi.mock(
 )
 vi.mock('../../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced')
 vi.mock('../../../../../organisms/Devices/hooks')
-vi.mock('../../../../../redux/discovery/selectors')
-vi.mock('../../../../../redux/robot-update')
+vi.mock('/app/redux/discovery/selectors')
+vi.mock('/app/redux/robot-update')
 
 const render = (path = '/') => {
   return renderWithProviders(

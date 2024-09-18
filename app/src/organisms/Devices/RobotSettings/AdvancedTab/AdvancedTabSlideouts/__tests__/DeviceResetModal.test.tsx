@@ -5,15 +5,15 @@ import { describe, it, vi, expect, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../../../../__testing-utils__'
 import { i18n } from '../../../../../../i18n'
-import { resetConfig } from '../../../../../../redux/robot-admin'
-import { useDispatchApiRequest } from '../../../../../../redux/robot-api'
+import { resetConfig } from '/app/redux/robot-admin'
+import { useDispatchApiRequest } from '/app/redux/robot-api'
 import { DeviceResetModal } from '../DeviceResetModal'
 
-import type { DispatchApiRequestType } from '../../../../../../redux/robot-api'
+import type { DispatchApiRequestType } from '/app/redux/robot-api'
 
 vi.mock('../../../../hooks')
-vi.mock('../../../../../../redux/robot-admin')
-vi.mock('../../../../../../redux/robot-api')
+vi.mock('/app/redux/robot-admin')
+vi.mock('/app/redux/robot-api')
 
 const mockResetOptions = {}
 const mockCloseModal = vi.fn()

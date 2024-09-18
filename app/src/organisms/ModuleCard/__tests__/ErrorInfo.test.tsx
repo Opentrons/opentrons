@@ -8,11 +8,11 @@ import {
   mockHeaterShaker,
   mockTemperatureModule,
   mockThermocycler,
-} from '../../../redux/modules/__fixtures__'
+} from '/app/redux/modules/__fixtures__'
 import type {
   HeaterShakerModule,
   ThermocyclerModule,
-} from '../../../redux/modules/types'
+} from '/app/redux/modules/types'
 
 const mockErrorThermocycler = {
   id: 'thermocycler_id',

@@ -3,13 +3,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../i18n'
-import { getIsOnDevice } from '../../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { StepMeter } from '../../../atoms/StepMeter'
 import { WizardHeader } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'
 
 vi.mock('../../../atoms/StepMeter')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 
 const render = (props: React.ComponentProps<typeof WizardHeader>) => {
   return renderWithProviders(<WizardHeader {...props} />, {

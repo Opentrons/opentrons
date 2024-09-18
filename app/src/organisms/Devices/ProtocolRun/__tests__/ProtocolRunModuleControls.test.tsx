@@ -14,7 +14,7 @@ import {
   mockTemperatureModuleGen2,
   mockThermocycler,
   mockHeaterShaker,
-} from '../../../../redux/modules/__fixtures__'
+} from '/app/redux/modules/__fixtures__'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')

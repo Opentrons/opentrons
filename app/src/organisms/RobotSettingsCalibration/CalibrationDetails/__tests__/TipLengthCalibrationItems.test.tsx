@@ -8,10 +8,10 @@ import { TipLengthCalibrationItems } from '../TipLengthCalibrationItems'
 import { OverflowMenu } from '../OverflowMenu'
 import type { Mount } from '@opentrons/components'
 
-vi.mock('../../../../redux/custom-labware/selectors')
-vi.mock('../../../../redux/config')
-vi.mock('../../../../redux/sessions/selectors')
-vi.mock('../../../../redux/discovery')
+vi.mock('/app/redux/custom-labware/selectors')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/sessions/selectors')
+vi.mock('/app/redux/discovery')
 vi.mock('../../../../assets/labware/findLabware')
 vi.mock('../../../../organisms/Devices/hooks')
 vi.mock('../OverflowMenu')

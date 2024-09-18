@@ -21,14 +21,14 @@ import {
 
 import { AdvancedSettings } from '../AdvancedSettings'
 
-vi.mock('../../../../redux/config')
-vi.mock('../../../../redux/calibration')
-vi.mock('../../../../redux/custom-labware')
-vi.mock('../../../../redux/discovery')
-vi.mock('../../../../redux/protocol-analysis')
-vi.mock('../../../../redux/system-info')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/calibration')
+vi.mock('/app/redux/custom-labware')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/protocol-analysis')
+vi.mock('/app/redux/system-info')
 vi.mock('@opentrons/components/src/hooks')
-vi.mock('../../../../redux/analytics')
+vi.mock('/app/redux/analytics')
 vi.mock('../../../../organisms/AdvancedSettings')
 
 const render = (): ReturnType<typeof renderWithProviders> => {

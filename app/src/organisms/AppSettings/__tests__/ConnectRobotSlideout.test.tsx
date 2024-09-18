@@ -3,13 +3,13 @@ import { fireEvent, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { i18n } from '../../../i18n'
-import { getScanning, getViewableRobots } from '../../../redux/discovery'
-import { getConfig } from '../../../redux/config'
+import { getScanning, getViewableRobots } from '/app/redux/discovery'
+import { getConfig } from '/app/redux/config'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { ConnectRobotSlideout } from '../ConnectRobotSlideout'
 
-vi.mock('../../../redux/discovery')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/config')
 
 const render = (props: React.ComponentProps<typeof ConnectRobotSlideout>) => {
   return renderWithProviders(<ConnectRobotSlideout {...props} />, {

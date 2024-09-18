@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next'
 
 import { useInterval } from '@opentrons/components'
 import { useWifiList } from '../../../resources/networking/hooks'
-import { fetchStatus, getNetworkInterfaces } from '../../../redux/networking'
+import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
 
 import type { IconName } from '@opentrons/components'
-import type { Dispatch, State } from '../../../redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 export interface NetworkConnection {
   isWifiConnected: boolean

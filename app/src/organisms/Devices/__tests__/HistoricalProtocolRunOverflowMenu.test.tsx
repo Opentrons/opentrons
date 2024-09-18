@@ -8,15 +8,15 @@ import { useDeleteRunMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import runRecord from '../ProtocolRun/ProtocolRunHeader/RunHeaderModalContainer/modals/__fixtures__/runRecord.json'
 import { useDownloadRunLog, useTrackProtocolRunEvent, useRobot } from '../hooks'
 import { useRunControls } from '../../RunTimeControl/hooks'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '../../../redux/analytics'
-import { useIsRobotOnWrongVersionOfSoftware } from '../../../redux/robot-update'
+} from '/app/redux/analytics'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
 import { useNotifyAllCommandsQuery } from '../../../resources/runs'
@@ -24,15 +24,15 @@ import { useNotifyAllCommandsQuery } from '../../../resources/runs'
 import type { UseQueryResult } from 'react-query'
 import type { CommandsData } from '@opentrons/api-client'
 
-vi.mock('../../../redux/analytics')
-vi.mock('../../../redux/robot-update/selectors')
+vi.mock('/app/redux/analytics')
+vi.mock('/app/redux/robot-update/selectors')
 vi.mock('../../Devices/hooks')
 vi.mock('../../RunTimeControl/hooks')
-vi.mock('../../../redux/analytics')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/analytics')
+vi.mock('/app/redux/config')
 vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 vi.mock('../../../resources/runs')
-vi.mock('../../../redux/robot-update')
+vi.mock('/app/redux/robot-update')
 vi.mock('@opentrons/react-api-client')
 
 const render = (

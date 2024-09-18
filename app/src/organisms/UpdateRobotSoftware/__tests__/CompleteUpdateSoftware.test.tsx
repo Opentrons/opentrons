@@ -6,7 +6,7 @@ import { i18n } from '../../../i18n'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { CompleteUpdateSoftware } from '../CompleteUpdateSoftware'
 
-vi.mock('../../../redux/robot-admin')
+vi.mock('/app/redux/robot-admin')
 
 const render = (props: React.ComponentProps<typeof CompleteUpdateSoftware>) => {
   return renderWithProviders(<CompleteUpdateSoftware {...props} />, {

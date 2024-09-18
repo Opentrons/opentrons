@@ -9,12 +9,12 @@ import {
 } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { getStoredProtocols } from '../../../redux/protocol-storage'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+import { getStoredProtocols } from '/app/redux/protocol-storage'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import {
   storedProtocolData as storedProtocolDataFixture,
   storedProtocolDataWithoutRunTimeParameters,
-} from '../../../redux/protocol-storage/__fixtures__'
+} from '/app/redux/protocol-storage/__fixtures__'
 import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useCreateRunFromProtocol } from '../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ChooseProtocolSlideout } from '../'
@@ -22,9 +22,9 @@ import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 vi.mock('../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol')
-vi.mock('../../../redux/protocol-storage')
+vi.mock('/app/redux/protocol-storage')
 vi.mock('../../../organisms/Devices/hooks')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../../../resources/useNotifyDataReady')
 
 const render = (props: React.ComponentProps<typeof ChooseProtocolSlideout>) => {

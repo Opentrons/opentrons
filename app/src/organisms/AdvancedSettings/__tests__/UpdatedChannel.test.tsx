@@ -6,11 +6,11 @@ import {
   getUpdateChannelOptions,
   getUpdateChannel,
   // updateConfigValue,
-} from '../../../redux/config'
+} from '/app/redux/config'
 import { UpdatedChannel } from '../UpdatedChannel'
 import { renderWithProviders } from '../../../__testing-utils__'
 
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 
 const render = () => {
   return renderWithProviders(<UpdatedChannel />, { i18nInstance: i18n })

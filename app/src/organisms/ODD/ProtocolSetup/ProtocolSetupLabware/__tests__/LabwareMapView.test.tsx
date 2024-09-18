@@ -30,7 +30,7 @@ vi.mock('@opentrons/components/src/hardware-sim/Labware/LabwareRender')
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck')
 vi.mock('@opentrons/shared-data/js/helpers/getSimplestFlexDeckConfig')
 vi.mock('../../../../../resources/deck_configuration/utils')
-vi.mock('../../../../../redux/config')
+vi.mock('/app/redux/config')
 
 const MOCK_300_UL_TIPRACK_COORDS = [30, 40, 0]
 

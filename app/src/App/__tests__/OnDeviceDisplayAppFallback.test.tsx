@@ -3,19 +3,19 @@ import { vi, describe, beforeEach, it, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../__testing-utils__'
 
-import { getLocalRobot } from '../../redux/discovery'
-import { mockConnectableRobot } from '../../redux/discovery/__fixtures__'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { i18n } from '../../i18n'
-import { appRestart } from '../../redux/shell'
-import { useTrackEvent, ANALYTICS_ODD_APP_ERROR } from '../../redux/analytics'
+import { appRestart } from '/app/redux/shell'
+import { useTrackEvent, ANALYTICS_ODD_APP_ERROR } from '/app/redux/analytics'
 import { OnDeviceDisplayAppFallback } from '../OnDeviceDisplayAppFallback'
 
 import type { FallbackProps } from 'react-error-boundary'
 import type { Mock } from 'vitest'
 
-vi.mock('../../redux/shell')
-vi.mock('../../redux/analytics')
-vi.mock('../../redux/discovery', async importOriginal => {
+vi.mock('/app/redux/shell')
+vi.mock('/app/redux/analytics')
+vi.mock('/app/redux/discovery', async importOriginal => {
   const actual = await importOriginal<typeof getLocalRobot>()
   return {
     ...actual,

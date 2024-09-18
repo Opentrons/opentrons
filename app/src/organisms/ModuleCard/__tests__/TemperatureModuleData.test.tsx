@@ -6,7 +6,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { StatusLabel } from '../../../atoms/StatusLabel'
 import { TemperatureModuleData } from '../TemperatureModuleData'
-import { mockTemperatureModuleGen2 } from '../../../redux/modules/__fixtures__'
+import { mockTemperatureModuleGen2 } from '/app/redux/modules/__fixtures__'
 
 vi.mock('../../../atoms/StatusLabel')
 

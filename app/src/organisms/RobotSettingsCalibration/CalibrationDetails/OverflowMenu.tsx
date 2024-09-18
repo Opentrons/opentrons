@@ -28,7 +28,7 @@ import { Divider } from '../../../atoms/structure'
 import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
-} from '../../../redux/analytics'
+} from '/app/redux/analytics'
 import {
   useRunStatuses,
   useAttachedPipettesFromInstrumentsQuery,

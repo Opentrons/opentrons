@@ -26,15 +26,15 @@ import {
   REINSTALL,
   DOWNGRADE,
   getRobotUpdateVersion,
-} from '../../../../redux/robot-update'
+} from '/app/redux/robot-update'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
 import { useIsRobotBusy } from '../../hooks'
 import { Banner } from '../../../../atoms/Banner'
-import { useDispatchStartRobotUpdate } from '../../../../redux/robot-update/hooks'
+import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 
-import type { State, Dispatch } from '../../../../redux/types'
-import type { RobotSystemType } from '../../../../redux/robot-update/types'
+import type { State, Dispatch } from '/app/redux/types'
+import type { RobotSystemType } from '/app/redux/robot-update/types'
 
 export const RELEASE_NOTES_URL_BASE =
   'https://github.com/Opentrons/opentrons/releases/tag/v'

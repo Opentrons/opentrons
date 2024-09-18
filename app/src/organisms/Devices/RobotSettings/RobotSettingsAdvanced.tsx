@@ -35,22 +35,22 @@ import {
   updateSetting,
   getRobotSettings,
   fetchSettings,
-} from '../../../redux/robot-settings'
+} from '/app/redux/robot-settings'
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { DeviceResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetSlideout'
 import { DeviceResetModal } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetModal'
 import { FactoryModeSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryModeSlideout'
 import { handleUpdateBuildroot } from './UpdateBuildroot'
-import { getRobotSerialNumber, UNREACHABLE } from '../../../redux/discovery'
+import { getRobotSerialNumber, UNREACHABLE } from '/app/redux/discovery'
 import { getTopPortalEl } from '../../../App/portal'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 
-import type { State, Dispatch } from '../../../redux/types'
+import type { State, Dispatch } from '/app/redux/types'
 import type {
   RobotSettings,
   RobotSettingsField,
-} from '../../../redux/robot-settings/types'
-import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
+} from '/app/redux/robot-settings/types'
+import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
 
 interface RobotSettingsAdvancedProps {
   robotName: string

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { mockDefinition } from '../../../../../redux/custom-labware/__fixtures__'
+import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
 import { getNestedLabwareInfo } from '../getNestedLabwareInfo'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareSetupItem } from '../../../../../transformations/commands'

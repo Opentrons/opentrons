@@ -28,7 +28,7 @@ import {
 import { Slideout } from '../../atoms/Slideout'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
 
-import type { MagneticModule } from '../../redux/modules/types'
+import type { MagneticModule } from '/app/redux/modules/types'
 import type {
   MagneticModuleEngageMagnetCreateCommand,
   MagneticModuleModel,

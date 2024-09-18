@@ -7,7 +7,7 @@ import {
 } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { useAllLabware } from '../../../pages/Desktop/Labware/hooks'
-import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
+import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
 import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
 import { LabwareCard } from '..'
 

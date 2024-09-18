@@ -11,7 +11,7 @@ import { COLORS } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import { useIsOEMMode } from '../../../resources/robot-settings/hooks'
 import { i18n } from '../../../i18n'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'

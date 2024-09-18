@@ -24,7 +24,7 @@ import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetS
 import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
 import { getLabwareDefinitionsFromCommands } from '../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
 import { LabwareOffsetTable } from './LabwareOffsetTable'
-import { getIsLabwareOffsetCodeSnippetsOn } from '../../redux/config'
+import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   LoadedLabware,

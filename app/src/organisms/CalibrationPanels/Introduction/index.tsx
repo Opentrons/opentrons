@@ -12,7 +12,7 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import * as Sessions from '../../../redux/sessions'
+import * as Sessions from '/app/redux/sessions'
 import { NeedHelpLink } from '../NeedHelpLink'
 import { ChooseTipRack } from '../ChooseTipRack'
 

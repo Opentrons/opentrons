@@ -8,8 +8,8 @@ import { i18n } from '../../../../i18n'
 import { SetWifiCred } from '../SetWifiCred'
 
 const mockSetPassword = vi.fn()
-vi.mock('../../../../redux/discovery')
-vi.mock('../../../../redux/robot-api')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/robot-api')
 
 const render = (props: React.ComponentProps<typeof SetWifiCred>) => {
   return renderWithProviders(

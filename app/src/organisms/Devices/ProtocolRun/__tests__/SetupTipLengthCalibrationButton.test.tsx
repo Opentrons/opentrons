@@ -7,7 +7,7 @@ import { fixtureTiprack300ul } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
+import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import { mockTipLengthCalLauncher } from '../../hooks/__fixtures__/taskListFixtures'
 import { useDeckCalibrationData, useRunHasStarted } from '../../hooks'
 import { useDashboardCalibrateTipLength } from '../../../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
@@ -20,8 +20,8 @@ vi.mock('../../../../organisms/RunTimeControl/hooks')
 vi.mock(
   '../../../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 )
-vi.mock('../../../../redux/config')
-vi.mock('../../../../redux/sessions/selectors')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/sessions/selectors')
 vi.mock('../../hooks')
 
 const ROBOT_NAME = 'otie'

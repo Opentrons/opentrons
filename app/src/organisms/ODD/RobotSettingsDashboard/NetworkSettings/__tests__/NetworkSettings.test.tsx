@@ -6,16 +6,16 @@ import '@testing-library/jest-dom/vitest'
 
 import { i18n } from '../../../../../i18n'
 import { renderWithProviders } from '../../../../../__testing-utils__'
-import { getLocalRobot } from '../../../../../redux/discovery'
+import { getLocalRobot } from '/app/redux/discovery'
 import { useWifiList } from '../../../../../resources/networking/hooks'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
 import { EthernetConnectionDetails } from '../EthernetConnectionDetails'
 import { NetworkSettings } from '..'
 
-import type { DiscoveredRobot } from '../../../../../redux/discovery/types'
-import type { WifiNetwork } from '../../../../../redux/networking/types'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
+import type { WifiNetwork } from '/app/redux/networking/types'
 
-vi.mock('../../../../../redux/discovery')
+vi.mock('/app/redux/discovery')
 vi.mock('../../../../../resources/networking/hooks')
 vi.mock('../WifiConnectionDetails')
 vi.mock('../EthernetConnectionDetails')

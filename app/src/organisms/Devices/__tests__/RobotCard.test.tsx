@@ -13,19 +13,19 @@ import {
 } from '../../../../../discovery-client/src/fixtures'
 
 import { i18n } from '../../../i18n'
-import { mockFetchModulesSuccessActionPayloadModules } from '../../../redux/modules/__fixtures__'
+import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
 import {
   mockLeftProtoPipette,
   mockRightProtoPipette,
-} from '../../../redux/pipettes/__fixtures__'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
-import { getRobotModelByName } from '../../../redux/discovery'
+} from '/app/redux/pipettes/__fixtures__'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
+import { getRobotModelByName } from '/app/redux/discovery'
 import {
   HEALTH_STATUS_OK,
   ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT3,
-} from '../../../redux/discovery/constants'
+} from '/app/redux/discovery/constants'
 import { useAttachedModules, useAttachedPipettes } from '../hooks'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotOverflowMenu } from '../RobotOverflowMenu'
@@ -36,13 +36,13 @@ import {
   useErrorRecoveryBanner,
 } from '../../ErrorRecoveryBanner'
 
-import type { State } from '../../../redux/types'
+import type { State } from '/app/redux/types'
 
-vi.mock('../../../redux/robot-update/selectors')
-vi.mock('../../../redux/discovery/selectors')
+vi.mock('/app/redux/robot-update/selectors')
+vi.mock('/app/redux/discovery/selectors')
 vi.mock('../hooks')
 vi.mock('../../UpdateRobotBanner')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../RobotOverflowMenu')
 vi.mock('../RobotStatusHeader')
 vi.mock('../../ErrorRecoveryBanner')

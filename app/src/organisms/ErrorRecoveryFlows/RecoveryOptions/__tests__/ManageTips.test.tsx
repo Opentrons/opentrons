@@ -7,7 +7,7 @@ import {
   render as testingRender,
 } from '@testing-library/react'
 
-import { mockPipetteInfo } from '../../../../redux/pipettes/__fixtures__'
+import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'

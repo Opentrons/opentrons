@@ -4,7 +4,7 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 import { SPACING, LegacyStyledText, TYPOGRAPHY } from '@opentrons/components'
 import { Slideout } from '../../atoms/Slideout'
 
-import type { AbsorbanceReaderModule } from '../../redux/modules/types'
+import type { AbsorbanceReaderModule } from '/app/redux/modules/types'
 
 interface AbsorbanceReaderSlideoutProps {
   module: AbsorbanceReaderModule

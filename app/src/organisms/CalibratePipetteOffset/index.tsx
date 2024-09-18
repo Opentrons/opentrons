@@ -8,7 +8,7 @@ import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { useConditionalConfirm, ModalShell } from '@opentrons/components'
 
-import * as Sessions from '../../redux/sessions'
+import * as Sessions from '/app/redux/sessions'
 import {
   Introduction,
   DeckSetup,
@@ -28,7 +28,7 @@ import type {
   CalibrationLabware,
   CalibrationSessionStep,
   SessionCommandParams,
-} from '../../redux/sessions/types'
+} from '/app/redux/sessions/types'
 import type { CalibratePipetteOffsetParentProps } from './types'
 import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 

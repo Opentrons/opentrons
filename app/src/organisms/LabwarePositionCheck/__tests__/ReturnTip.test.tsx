@@ -9,11 +9,11 @@ import { i18n } from '../../../i18n'
 import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis } from '../__fixtures__'
 import { useProtocolMetadata } from '../../Devices/hooks'
-import { getIsOnDevice } from '../../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { ReturnTip } from '../ReturnTip'
 
 vi.mock('../../Devices/hooks')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 
 const render = (props: React.ComponentProps<typeof ReturnTip>) => {
   return renderWithProviders(<ReturnTip {...props} />, {

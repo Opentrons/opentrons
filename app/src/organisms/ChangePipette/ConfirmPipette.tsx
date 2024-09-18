@@ -18,8 +18,8 @@ import type {
   PipetteModelSpecs,
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
-import type { PipetteOffsetCalibration } from '../../redux/calibration/types'
-import type { Mount } from '../../redux/pipettes/types'
+import type { PipetteOffsetCalibration } from '/app/redux/calibration/types'
+import type { Mount } from '/app/redux/pipettes/types'
 
 export interface ConfirmPipetteProps {
   robotName: string

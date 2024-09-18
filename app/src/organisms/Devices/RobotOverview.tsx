@@ -23,13 +23,13 @@ import { useAuthorization } from '@opentrons/react-api-client'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import FLEX_PNG from '../../assets/images/FLEX.png'
 import { ToggleButton } from '../../atoms/buttons'
-import { getConfig } from '../../redux/config'
+import { getConfig } from '/app/redux/config'
 import {
   CONNECTABLE,
   getRobotAddressesByName,
   getRobotModelByName,
   OPENTRONS_USB,
-} from '../../redux/discovery'
+} from '/app/redux/discovery'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { RobotStatusHeader } from './RobotStatusHeader'
 import { ReachableBanner } from './ReachableBanner'
@@ -46,7 +46,7 @@ import {
   useErrorRecoveryBanner,
 } from '../ErrorRecoveryBanner'
 
-import type { State } from '../../redux/types'
+import type { State } from '/app/redux/types'
 
 interface RobotOverviewProps {
   robotName: string

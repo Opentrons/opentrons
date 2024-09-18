@@ -14,7 +14,7 @@ import { Hardware } from '../Hardware'
 
 vi.mock('../../../../transformations/commands')
 vi.mock('../../../../pages/Desktop/Protocols/hooks')
-vi.mock('../../../../redux/config')
+vi.mock('/app/redux/config')
 
 const MOCK_PROTOCOL_ID = 'mock_protocol_id'
 

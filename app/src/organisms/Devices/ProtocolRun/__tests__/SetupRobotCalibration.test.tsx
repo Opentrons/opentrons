@@ -8,8 +8,8 @@ import { i18n } from '../../../../i18n'
 import {
   useTrackEvent,
   ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
-} from '../../../../redux/analytics'
-import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
+} from '/app/redux/analytics'
+import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import {
   useDeckCalibrationData,
   useIsFlex,
@@ -20,7 +20,7 @@ import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 
-vi.mock('../../../../redux/analytics')
+vi.mock('/app/redux/analytics')
 vi.mock('../../hooks')
 vi.mock('../SetupDeckCalibration')
 vi.mock('../SetupInstrumentCalibration')

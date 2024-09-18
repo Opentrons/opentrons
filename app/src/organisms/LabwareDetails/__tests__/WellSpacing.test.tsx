@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react'
 import { describe, it, beforeEach, expect } from 'vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { mockCircularLabwareWellGroupProperties } from '../../../redux/custom-labware/__fixtures__'
+import { mockCircularLabwareWellGroupProperties } from '/app/redux/custom-labware/__fixtures__'
 import { WellSpacing } from '../WellSpacing'
 
 const render = (props: React.ComponentProps<typeof WellSpacing>) => {

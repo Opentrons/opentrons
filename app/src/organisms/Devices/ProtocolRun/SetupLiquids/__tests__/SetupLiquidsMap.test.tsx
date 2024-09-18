@@ -28,7 +28,7 @@ import { getStandardDeckViewLayerBlockList } from '../../utils/getStandardDeckVi
 import { getAttachedProtocolModuleMatches } from '../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
 import { getProtocolModulesInfo } from '../../utils/getProtocolModulesInfo'
 import { mockProtocolModuleInfo } from '../../../../ODD/ProtocolSetup/ProtocolSetupLabware/__fixtures__'
-import { mockFetchModulesSuccessActionPayloadModules } from '../../../../../redux/modules/__fixtures__'
+import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
 
 import { SetupLiquidsMap } from '../SetupLiquidsMap'
 

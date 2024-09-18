@@ -6,13 +6,13 @@ import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
-import { getRobotUpdateDisplayInfo } from '../../../../../redux/robot-update'
+import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 
 import { UpdateRobotSoftware } from '../UpdateRobotSoftware'
 
-vi.mock('../../../../../redux/robot-settings/selectors')
-vi.mock('../../../../../redux/discovery')
-vi.mock('../../../../../redux/robot-update/selectors')
+vi.mock('/app/redux/robot-settings/selectors')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/robot-update/selectors')
 vi.mock('../../../hooks')
 
 const mockOnUpdateStart = vi.fn()

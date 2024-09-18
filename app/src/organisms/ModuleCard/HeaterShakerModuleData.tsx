@@ -17,8 +17,8 @@ import type {
   LatchStatus,
   SpeedStatus,
   TemperatureStatus,
-} from '../../redux/modules/api-types'
-import type { HeaterShakerModule } from '../../redux/modules/types'
+} from '/app/redux/modules/api-types'
+import type { HeaterShakerModule } from '/app/redux/modules/types'
 
 interface HeaterShakerModuleDataProps {
   moduleData: HeaterShakerModule['data']

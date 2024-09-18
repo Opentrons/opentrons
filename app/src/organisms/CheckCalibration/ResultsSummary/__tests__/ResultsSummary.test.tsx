@@ -5,8 +5,8 @@ import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import * as Fixtures from '../../../../redux/sessions/__fixtures__'
-import * as Sessions from '../../../../redux/sessions'
+import * as Fixtures from '/app/redux/sessions/__fixtures__'
+import * as Sessions from '/app/redux/sessions'
 import { CalibrationHealthCheckResults } from '../CalibrationHealthCheckResults'
 import { RenderMountInformation } from '../RenderMountInformation'
 import { CalibrationResult } from '../CalibrationResult'
@@ -23,8 +23,8 @@ vi.mock('file-saver', async importOriginal => {
     saveAs: vi.fn(),
   }
 })
-vi.mock('../../../../redux/sessions')
-vi.mock('../../../../redux/pipettes')
+vi.mock('/app/redux/sessions')
+vi.mock('/app/redux/pipettes')
 vi.mock('../CalibrationHealthCheckResults')
 vi.mock('../RenderMountInformation')
 vi.mock('../CalibrationResult')

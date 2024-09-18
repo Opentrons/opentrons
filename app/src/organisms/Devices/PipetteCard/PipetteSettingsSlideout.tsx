@@ -8,7 +8,7 @@ import { ConfigurePipette } from '../../ConfigurePipette'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteSettingsFieldsMap } from '@opentrons/api-client'
-import type { AttachedPipette } from '../../../redux/pipettes/types'
+import type { AttachedPipette } from '/app/redux/pipettes/types'
 
 interface PipetteSettingsSlideoutProps {
   robotName: string

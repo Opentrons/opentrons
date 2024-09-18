@@ -24,7 +24,7 @@ import {
   startRobotUpdate,
   clearRobotUpdateSession,
   getRobotUpdateDownloadError,
-} from '../../../../redux/robot-update'
+} from '/app/redux/robot-update'
 import { useRobotUpdateInfo } from './useRobotUpdateInfo'
 import successIcon from '../../../../assets/images/icon_success.png'
 import {
@@ -32,9 +32,9 @@ import {
   INIT_STATUS,
 } from '../../../../resources/health/hooks'
 
-import type { State } from '../../../../redux/types'
+import type { State } from '/app/redux/types'
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol'
-import type { RobotUpdateSession } from '../../../../redux/robot-update/types'
+import type { RobotUpdateSession } from '/app/redux/robot-update/types'
 import type { UpdateStep } from './useRobotUpdateInfo'
 import type { RobotInitializationStatus } from '../../../../resources/health/hooks'
 

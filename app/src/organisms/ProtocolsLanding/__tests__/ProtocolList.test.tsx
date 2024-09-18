@@ -6,19 +6,19 @@ import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { getProtocolsDesktopSortKey } from '../../../redux/config'
+import { getProtocolsDesktopSortKey } from '/app/redux/config'
 import {
   storedProtocolData,
   storedProtocolDataTwo,
-} from '../../../redux/protocol-storage/__fixtures__'
+} from '/app/redux/protocol-storage/__fixtures__'
 import { ProtocolList } from '../ProtocolList'
 import { useSortedProtocols } from '../hooks'
 import { EmptyStateLinks } from '../EmptyStateLinks'
 import { ProtocolCard } from '../ProtocolCard'
 
 vi.mock('../hooks')
-vi.mock('../../../redux/protocol-storage')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/protocol-storage')
+vi.mock('/app/redux/config')
 vi.mock('../EmptyStateLinks')
 vi.mock('../ProtocolCard')
 

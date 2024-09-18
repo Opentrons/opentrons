@@ -29,15 +29,15 @@ import {
   getRobotAddressesByName,
   HEALTH_STATUS_OK,
   OPENTRONS_USB,
-} from '../../../redux/discovery'
-import { fetchStatus, getNetworkInterfaces } from '../../../redux/networking'
+} from '/app/redux/discovery'
+import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
 
 import { useIsFlex, useIsRobotBusy } from '../hooks'
 import { DisconnectModal } from './ConnectNetwork/DisconnectModal'
 import { SelectNetwork } from './SelectNetwork'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 
-import type { State, Dispatch } from '../../../redux/types'
+import type { State, Dispatch } from '/app/redux/types'
 import { getModalPortalEl } from '../../../App/portal'
 interface NetworkingProps {
   robotName: string

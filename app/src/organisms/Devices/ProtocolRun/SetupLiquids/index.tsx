@@ -9,7 +9,7 @@ import {
   PrimaryButton,
 } from '@opentrons/components'
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
-import { ANALYTICS_LIQUID_SETUP_VIEW_TOGGLE } from '../../../../redux/analytics'
+import { ANALYTICS_LIQUID_SETUP_VIEW_TOGGLE } from '/app/redux/analytics'
 import { SetupLiquidsList } from './SetupLiquidsList'
 import { SetupLiquidsMap } from './SetupLiquidsMap'
 

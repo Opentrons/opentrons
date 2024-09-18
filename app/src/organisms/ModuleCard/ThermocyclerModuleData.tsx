@@ -14,7 +14,7 @@ import {
   WRAP,
 } from '@opentrons/components'
 
-import type { ThermocyclerData } from '../../redux/modules/api-types'
+import type { ThermocyclerData } from '/app/redux/modules/api-types'
 
 interface ThermocyclerModuleProps {
   data: ThermocyclerData

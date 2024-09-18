@@ -5,14 +5,14 @@ import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtures__'
+import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
 import { useRunPipetteInfoByMount } from '../../hooks'
 import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationButton'
 import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
 
 import type { PipetteInfo } from '../../hooks'
 
-vi.mock('../../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../../hooks')
 vi.mock('../SetupTipLengthCalibrationButton')
 

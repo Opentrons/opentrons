@@ -6,7 +6,7 @@ import { when } from 'vitest-when'
 
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
-import { mockConnectableRobot } from '../../../../../redux/discovery/__fixtures__'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import {
   useModuleRenderInfoForProtocolById,
   useRobot,
@@ -40,7 +40,7 @@ vi.mock('../../../../../resources/runs')
 vi.mock(
   '../../../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 )
-vi.mock('../../../../../redux/config')
+vi.mock('/app/redux/config')
 
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
 

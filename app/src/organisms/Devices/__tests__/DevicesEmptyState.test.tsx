@@ -5,13 +5,13 @@ import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
-import { startDiscovery } from '../../../redux/discovery'
+import { startDiscovery } from '/app/redux/discovery'
 import {
   DevicesEmptyState,
   TROUBLESHOOTING_CONNECTION_PROBLEMS_URL,
 } from '../DevicesEmptyState'
 
-vi.mock('../../../redux/discovery')
+vi.mock('/app/redux/discovery')
 
 const render = () => {
   return renderWithProviders(<DevicesEmptyState />, {

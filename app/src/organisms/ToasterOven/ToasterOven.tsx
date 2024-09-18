@@ -14,7 +14,7 @@ import {
   Toast,
 } from '@opentrons/components'
 
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { ToasterContext } from './ToasterContext'
 
 import type { SnackbarProps } from '@opentrons/components'

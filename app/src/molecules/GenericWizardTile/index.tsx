@@ -22,7 +22,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { NeedHelpLink } from '../../organisms/CalibrationPanels'
 import { SmallButton, TextOnlyButton } from '../../atoms/buttons'
 

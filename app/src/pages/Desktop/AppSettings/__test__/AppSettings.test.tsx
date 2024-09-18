@@ -6,14 +6,14 @@ import { MemoryRouter, Routes } from 'react-router-dom'
 import { renderWithProviders } from '../../../../__testing-utils__'
 
 import { i18n } from '../../../../i18n'
-import * as Config from '../../../../redux/config'
+import * as Config from '/app/redux/config'
 import { GeneralSettings } from '../GeneralSettings'
 import { PrivacySettings } from '../PrivacySettings'
 import { AdvancedSettings } from '../AdvancedSettings'
 import { FeatureFlags } from '../../../../organisms/AppSettings/FeatureFlags'
 import { AppSettings } from '..'
 
-vi.mock('../../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../GeneralSettings')
 vi.mock('../PrivacySettings')
 vi.mock('../AdvancedSettings')

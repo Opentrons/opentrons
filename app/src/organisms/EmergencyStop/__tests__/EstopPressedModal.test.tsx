@@ -6,11 +6,11 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { useAcknowledgeEstopDisengageMutation } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
-import { getIsOnDevice } from '../../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { EstopPressedModal } from '../EstopPressedModal'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 
 const render = (props: React.ComponentProps<typeof EstopPressedModal>) => {
   return renderWithProviders(<EstopPressedModal {...props} />, {

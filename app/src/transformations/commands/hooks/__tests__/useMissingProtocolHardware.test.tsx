@@ -21,7 +21,7 @@ import type {
 } from '@opentrons/shared-data'
 import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration/useNotifyDeckConfigurationQuery'
 import { useMissingProtocolHardware } from '../useMissingProtocolHardware'
-import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
+import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock(

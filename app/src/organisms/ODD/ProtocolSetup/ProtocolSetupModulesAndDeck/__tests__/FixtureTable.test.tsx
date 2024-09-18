@@ -15,10 +15,10 @@ import { i18n } from '../../../../../i18n'
 import { LocationConflictModal } from '../../../../../organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { useDeckConfigurationCompatibility } from '../../../../../resources/deck_configuration/hooks'
 import { FixtureTable } from '../FixtureTable'
-import { getLocalRobot } from '../../../../../redux/discovery'
-import { mockConnectedRobot } from '../../../../../redux/discovery/__fixtures__'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 
-vi.mock('../../../../../redux/discovery')
+vi.mock('/app/redux/discovery')
 vi.mock('../../../../../resources/deck_configuration/hooks')
 vi.mock(
   '../../../../../organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'

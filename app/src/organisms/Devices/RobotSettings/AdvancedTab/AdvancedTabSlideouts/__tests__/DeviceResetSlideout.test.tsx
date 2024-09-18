@@ -5,13 +5,13 @@ import { describe, it, vi, expect, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../../../../__testing-utils__'
 import { i18n } from '../../../../../../i18n'
-import { getResetConfigOptions } from '../../../../../../redux/robot-admin'
+import { getResetConfigOptions } from '/app/redux/robot-admin'
 import { useIsFlex } from '../../../../hooks'
 import { DeviceResetSlideout } from '../DeviceResetSlideout'
 
-vi.mock('../../../../../../redux/config')
-vi.mock('../../../../../../redux/discovery')
-vi.mock('../../../../../../redux/robot-admin/selectors')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/robot-admin/selectors')
 vi.mock('../../../../hooks')
 
 const mockOnCloseClick = vi.fn()

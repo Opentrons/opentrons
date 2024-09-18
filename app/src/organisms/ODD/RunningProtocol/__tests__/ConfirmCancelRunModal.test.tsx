@@ -15,9 +15,9 @@ import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { useTrackProtocolRunEvent } from '../../../../organisms/Devices/hooks'
 import { useRunStatus } from '../../../../organisms/RunTimeControl/hooks'
-import { useTrackEvent } from '../../../../redux/analytics'
-import { getLocalRobot } from '../../../../redux/discovery'
-import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
+import { useTrackEvent } from '/app/redux/analytics'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { ConfirmCancelRunModal } from '../ConfirmCancelRunModal'
 import { CancelingRunModal } from '../CancelingRunModal'
 
@@ -26,10 +26,10 @@ import type { NavigateFunction } from 'react-router-dom'
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../organisms/Devices/hooks')
 vi.mock('../../../../organisms/RunTimeControl/hooks')
-vi.mock('../../../../redux/analytics')
+vi.mock('/app/redux/analytics')
 vi.mock('../../../ProtocolUpload/hooks')
 vi.mock('../CancelingRunModal')
-vi.mock('../../../../redux/discovery')
+vi.mock('/app/redux/discovery')
 const mockNavigate = vi.fn()
 const mockStopRun = vi.fn()
 const mockDeleteRun = vi.fn()

@@ -18,7 +18,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { Divider } from '../../atoms/structure'
 import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
 import { equipmentImages } from './equipmentImages'

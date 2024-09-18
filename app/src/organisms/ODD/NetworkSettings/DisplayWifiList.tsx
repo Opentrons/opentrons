@@ -21,7 +21,7 @@ import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
 import { RobotSetupHeader } from '../../../organisms/RobotSetupHeader'
 import { DisplaySearchNetwork } from './DisplaySearchNetwork'
 
-import type { WifiNetwork } from '../../../redux/networking/types'
+import type { WifiNetwork } from '/app/redux/networking/types'
 
 const NETWORK_ROW_STYLE = css`
   display: ${DISPLAY_FLEX};

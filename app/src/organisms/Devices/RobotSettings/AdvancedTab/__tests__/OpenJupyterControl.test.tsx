@@ -5,13 +5,10 @@ import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
-import {
-  useTrackEvent,
-  ANALYTICS_JUPYTER_OPEN,
-} from '../../../../../redux/analytics'
+import { useTrackEvent, ANALYTICS_JUPYTER_OPEN } from '/app/redux/analytics'
 import { OpenJupyterControl } from '../OpenJupyterControl'
 
-vi.mock('../../../../../redux/analytics')
+vi.mock('/app/redux/analytics')
 
 const mockIpAddress = '1.1.1.1'
 const mockLink = `http://${mockIpAddress}:48888`

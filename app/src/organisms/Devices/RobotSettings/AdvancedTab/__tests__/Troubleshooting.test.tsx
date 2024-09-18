@@ -12,7 +12,7 @@ import { useToaster } from '../../../../../organisms/ToasterOven'
 import {
   mockConnectableRobot,
   mockUnreachableRobot,
-} from '../../../../../redux/discovery/__fixtures__'
+} from '/app/redux/discovery/__fixtures__'
 import { useRobot } from '../../../hooks'
 import { Troubleshooting } from '../Troubleshooting'
 
@@ -21,7 +21,7 @@ import type { ToasterContextType } from '../../../../ToasterOven/ToasterContext'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../../organisms/ToasterOven')
-vi.mock('../../../../../redux/discovery/selectors')
+vi.mock('/app/redux/discovery/selectors')
 vi.mock('../../../hooks')
 
 const ROBOT_NAME = 'otie'

@@ -20,7 +20,7 @@ import {
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import type { Store } from 'redux'
 import type * as SharedData from '@opentrons/shared-data'
-import type { State } from '../../../../redux/types'
+import type { State } from '/app/redux/types'
 
 vi.mock('..')
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')

@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach } from 'vitest'
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { mockFetchModulesSuccessActionPayloadModules } from '../../../redux/modules/__fixtures__'
+import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
 import { RobotSettingsModuleCalibration } from '../RobotSettingsModuleCalibration'
 import { ModuleCalibrationItems } from '../CalibrationDetails/ModuleCalibrationItems'
 
