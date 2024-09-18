@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next'
 import without from 'lodash/without'
 import { THERMOCYCLER_MODULE_V2 } from '@opentrons/shared-data'
 import {
+  ALIGN_CENTER,
+  BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
   EmptySelectorButton,
   Flex,
@@ -168,7 +171,16 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
                       }
                       header={t(`${ae}`)}
                       leftHeaderItem={
-                        <AdditionalEquipmentDiagram additionalEquipment={ae} />
+                        <Flex
+                          backgroundColor={COLORS.white}
+                          borderRadius={BORDERS.borderRadius8}
+                          alignItems={ALIGN_CENTER}
+                          width="3.75rem"
+                        >
+                          <AdditionalEquipmentDiagram
+                            additionalEquipment={ae}
+                          />
+                        </Flex>
                       }
                     />
                   </ListItem>

@@ -21,6 +21,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_AUTO,
   PRODUCT,
   RadioButton,
   SPACING,
@@ -138,7 +139,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
             <Flex
               flexDirection="column"
               height="41.5vh"
-              overflowY="scroll"
+              overflowY={OVERFLOW_AUTO}
               marginBottom={SPACING.spacing16}
               marginTop={SPACING.spacing60}
             >
