@@ -10,7 +10,7 @@ import { i18n } from '/app/i18n'
 import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import { mockTipLengthCalLauncher } from '../../hooks/__fixtures__/taskListFixtures'
 import { useDeckCalibrationData, useRunHasStarted } from '../../hooks'
-import { useDashboardCalibrateTipLength } from '../../../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
+import { useDashboardCalibrateTipLength } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationButton'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -18,7 +18,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 vi.mock('@opentrons/components/src/hooks')
 vi.mock('../../../../organisms/RunTimeControl/hooks')
 vi.mock(
-  '../../../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
+  '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 )
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/sessions/selectors')

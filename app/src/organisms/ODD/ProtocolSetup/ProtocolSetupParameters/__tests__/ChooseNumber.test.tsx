@@ -5,7 +5,7 @@ import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useToaster } from '../../../../ToasterOven'
-import { mockRunTimeParameterData } from '../../../../../pages/ODD/ProtocolDetails/fixtures'
+import { mockRunTimeParameterData } from '/app/pages/ODD/ProtocolDetails/fixtures'
 import { ChooseNumber } from '../ChooseNumber'
 
 import type { NumberParameter } from '@opentrons/shared-data'

@@ -27,7 +27,7 @@ import {
   useGripperDisplayName,
   usePipetteNameSpecs,
 } from '/app/resources/instruments/hooks'
-import { useRequiredProtocolHardware } from '../../../pages/Desktop/Protocols/hooks'
+import { useRequiredProtocolHardware } from '/app/pages/Desktop/Protocols/hooks'
 
 import type {
   ProtocolHardware,

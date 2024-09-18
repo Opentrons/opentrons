@@ -47,7 +47,7 @@ import {
   updateConfigValue,
 } from '/app/redux/config'
 import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { useRunTimeParameters } from '../../../pages/Desktop/Protocols/hooks'
+import { useRunTimeParameters } from '/app/pages/Desktop/Protocols/hooks'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { ProtocolSetupParameters } from '../../../organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
 import { Parameters } from './Parameters'

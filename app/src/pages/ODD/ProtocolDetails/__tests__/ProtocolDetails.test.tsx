@@ -15,7 +15,7 @@ import {
 import { i18n } from '/app/i18n'
 import { useHardwareStatusText } from '../../../../organisms/ODD/RobotDashboard/hooks'
 import { useOffsetCandidatesForAnalysis } from '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { useRunTimeParameters } from '../../../../pages/Desktop/Protocols/hooks'
+import { useRunTimeParameters } from '/app/pages/Desktop/Protocols/hooks'
 import { ProtocolSetupParameters } from '../../../../organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
@@ -49,7 +49,7 @@ vi.mock('../../../../organisms/ODD/RobotDashboard/hooks')
 vi.mock(
   '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 )
-vi.mock('../../../../pages/Desktop/Protocols/hooks')
+vi.mock('/app/pages/Desktop/Protocols/hooks')
 vi.mock('/app/transformations/commands')
 vi.mock('../Deck')
 vi.mock('../Hardware')

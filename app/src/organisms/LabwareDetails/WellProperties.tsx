@@ -17,7 +17,7 @@ import type {
   LabwareDefinition,
   LabwareWellGroupProperties,
   LabwareVolumeUnits,
-} from '../../pages/Desktop/Labware/types'
+} from '/app/pages/Desktop/Labware/types'
 
 export interface AllWellPropertiesProps {
   definition: LabwareDefinition

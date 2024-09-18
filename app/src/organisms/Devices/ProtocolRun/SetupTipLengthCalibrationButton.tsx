@@ -26,7 +26,7 @@ import {
   useDeckCalibrationData,
   useRunHasStarted,
 } from '../hooks'
-import { useDashboardCalibrateTipLength } from '../../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
+import { useDashboardCalibrateTipLength } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 
 import type { Mount } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

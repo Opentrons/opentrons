@@ -4,7 +4,7 @@ import { describe, it, beforeEach, afterEach, vi, expect } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useAllLabware } from '../../../pages/Desktop/Labware/hooks'
+import { useAllLabware } from '/app/pages/Desktop/Labware/hooks'
 import { mockOpentronsLabwareDetailsDefinition } from '/app/redux/custom-labware/__fixtures__'
 import { CustomLabwareOverflowMenu } from '../../LabwareCard/CustomLabwareOverflowMenu'
 import { Dimensions } from '../Dimensions'
@@ -17,7 +17,7 @@ import { WellSpacing } from '../WellSpacing'
 
 import { LabwareDetails } from '..'
 
-vi.mock('../../../pages/Desktop/Labware/hooks')
+vi.mock('/app/pages/Desktop/Labware/hooks')
 vi.mock('../../LabwareCard/CustomLabwareOverflowMenu')
 vi.mock('../Dimensions')
 vi.mock('../Gallery')
