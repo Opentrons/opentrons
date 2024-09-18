@@ -6,9 +6,9 @@ import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
-import { useCloseCurrentRun } from '../../../organisms/ProtocolUpload/hooks'
-import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
+import { useTrackCreateProtocolRunEvent } from '/app/organisms/Devices/hooks'
+import { useCloseCurrentRun } from '/app/organisms/ProtocolUpload/hooks'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -35,9 +35,9 @@ import { useCurrentRunId } from '/app/resources/runs'
 
 import type { State } from '/app/redux/types'
 
-vi.mock('../../../organisms/Devices/hooks')
-vi.mock('../../../organisms/ProtocolUpload/hooks')
-vi.mock('../../../organisms/RunTimeControl/hooks')
+vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/organisms/ProtocolUpload/hooks')
+vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')

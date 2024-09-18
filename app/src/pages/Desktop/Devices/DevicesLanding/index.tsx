@@ -28,8 +28,8 @@ import {
   OPENTRONS_USB,
 } from '/app/redux/discovery'
 import { appShellRequestor } from '/app/redux/shell/remote'
-import { RobotCard } from '../../../../organisms/Devices/RobotCard'
-import { DevicesEmptyState } from '../../../../organisms/Devices/DevicesEmptyState'
+import { RobotCard } from '/app/organisms/Devices/RobotCard'
+import { DevicesEmptyState } from '/app/organisms/Devices/DevicesEmptyState'
 import { CollapsibleSection } from '../../../../molecules/CollapsibleSection'
 
 import { Divider } from '../../../../atoms/structure'

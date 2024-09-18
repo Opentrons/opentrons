@@ -23,7 +23,7 @@ import { RenderMountInformation } from './RenderMountInformation'
 import { CalibrationResult } from './CalibrationResult'
 
 import type { Mount } from '/app/redux/pipettes/types'
-import type { CalibrationPanelProps } from '../../../organisms/CalibrationPanels/types'
+import type { CalibrationPanelProps } from '/app/organisms/CalibrationPanels/types'
 import type {
   CalibrationCheckInstrument,
   CalibrationCheckComparisonsPerCalibration,

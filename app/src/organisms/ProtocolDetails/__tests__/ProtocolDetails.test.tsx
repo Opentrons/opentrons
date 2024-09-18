@@ -5,7 +5,7 @@ import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ChooseRobotToRunProtocolSlideout } from '../../../organisms/ChooseRobotToRunProtocolSlideout'
+import { ChooseRobotToRunProtocolSlideout } from '/app/organisms/ChooseRobotToRunProtocolSlideout'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -33,8 +33,8 @@ vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/custom-labware/selectors')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/protocol-storage/selectors')
-vi.mock('../../../organisms/ChooseRobotToRunProtocolSlideout')
-vi.mock('../../../organisms/SendProtocolToFlexSlideout')
+vi.mock('/app/organisms/ChooseRobotToRunProtocolSlideout')
+vi.mock('/app/organisms/SendProtocolToFlexSlideout')
 
 const render = (
   props: Partial<React.ComponentProps<typeof ProtocolDetails>> = {}

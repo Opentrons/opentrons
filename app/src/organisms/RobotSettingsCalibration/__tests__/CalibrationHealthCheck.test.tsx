@@ -23,7 +23,7 @@ import {
   useAttachedPipettes,
   useAttachedPipetteCalibrations,
   useRunStatuses,
-} from '../../../organisms/Devices/hooks'
+} from '/app/organisms/Devices/hooks'
 
 import { CalibrationHealthCheck } from '../CalibrationHealthCheck'
 
@@ -35,7 +35,7 @@ import type {
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/pipettes')
-vi.mock('../../../organisms/Devices/hooks')
+vi.mock('/app/organisms/Devices/hooks')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,

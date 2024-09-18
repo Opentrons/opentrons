@@ -16,7 +16,7 @@ import {
   mockUnreachableRobot,
 } from '/app/redux/discovery/__fixtures__'
 import { useCanDisconnect } from '/app/resources/networking/hooks'
-import { DisconnectModal } from '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
+import { DisconnectModal } from '/app/organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { useCurrentRunId } from '/app/resources/runs'
 import { useIsRobotBusy } from '../hooks'
@@ -29,9 +29,7 @@ vi.mock('/app/redux/robot-admin')
 vi.mock('../hooks')
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/resources/networking/hooks')
-vi.mock(
-  '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
-)
+vi.mock('/app/organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal')
 vi.mock('../../ChooseProtocolSlideout')
 vi.mock('/app/resources/runs')
 vi.mock('../RobotSettings/UpdateBuildroot')

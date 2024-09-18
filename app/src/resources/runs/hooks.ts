@@ -13,11 +13,11 @@ import {
   setCommandIntent,
 } from './utils'
 import { getIsOnDevice } from '/app/redux/config'
-import { useMaintenanceRunTakeover } from '../../organisms/TakeoverModal'
+import { useMaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { HostConfig } from '@opentrons/api-client'
-import type { ModulePrepCommandsType } from '../../organisms/Devices/getModulePrepCommands'
+import type { ModulePrepCommandsType } from '/app/organisms/Devices/getModulePrepCommands'
 import type {
   CreateMaintenanceRunType,
   UseCreateMaintenanceRunMutationOptions,

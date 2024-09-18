@@ -24,7 +24,7 @@ import {
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
-import { useToaster } from '../../organisms/ToasterOven'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { getTopPortalEl } from '../../App/portal'
 import {
   clearDiscoveryCache,

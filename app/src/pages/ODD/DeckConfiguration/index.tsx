@@ -11,9 +11,9 @@ import {
   JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '../../../organisms/ChildNavigation'
-import { DeckFixtureSetupInstructionsModal } from '../../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
-import { DeckConfigurationDiscardChangesModal } from '../../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
+import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { DeckFixtureSetupInstructionsModal } from '/app/organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
+import { DeckConfigurationDiscardChangesModal } from '/app/organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { getTopPortalEl } from '../../../App/portal'
 import {
   useDeckConfigurationEditingTools,

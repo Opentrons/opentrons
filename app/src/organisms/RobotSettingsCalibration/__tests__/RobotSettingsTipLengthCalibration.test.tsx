@@ -13,7 +13,7 @@ import { mockAttachedPipette } from '/app/redux/pipettes/__fixtures__'
 import {
   useAttachedPipettes,
   useTipLengthCalibrations,
-} from '../../../organisms/Devices/hooks'
+} from '/app/organisms/Devices/hooks'
 
 import { RobotSettingsTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
 import { TipLengthCalibrationItems } from '../CalibrationDetails/TipLengthCalibrationItems'
@@ -22,7 +22,7 @@ import type { FormattedPipetteOffsetCalibration } from '..'
 import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 
 vi.mock('/app/redux/config')
-vi.mock('../../../organisms/Devices/hooks')
+vi.mock('/app/organisms/Devices/hooks')
 vi.mock('../CalibrationDetails/TipLengthCalibrationItems')
 
 const mockFormattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] = []

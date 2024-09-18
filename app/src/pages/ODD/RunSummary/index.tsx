@@ -44,23 +44,23 @@ import {
 import {
   useRunTimestamps,
   useRunControls,
-} from '../../../organisms/RunTimeControl/hooks'
+} from '/app/organisms/RunTimeControl/hooks'
 import {
   useRunCreatedAtTimestamp,
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
-} from '../../../organisms/Devices/hooks'
-import { useCloseCurrentRun } from '../../../organisms/ProtocolUpload/hooks'
-import { onDeviceDisplayFormatTimestamp } from '../../../organisms/Devices/utils'
-import { EMPTY_TIMESTAMP } from '../../../organisms/Devices/constants'
-import { RunTimer } from '../../../organisms/Devices/ProtocolRun/RunTimer'
+} from '/app/organisms/Devices/hooks'
+import { useCloseCurrentRun } from '/app/organisms/ProtocolUpload/hooks'
+import { onDeviceDisplayFormatTimestamp } from '/app/organisms/Devices/utils'
+import { EMPTY_TIMESTAMP } from '/app/organisms/Devices/constants'
+import { RunTimer } from '/app/organisms/Devices/ProtocolRun/RunTimer'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_RUN_ACTION,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
-import { RunFailedModal } from '../../../organisms/ODD/RunningProtocol'
+import { RunFailedModal } from '/app/organisms/ODD/RunningProtocol'
 import {
   formatTimeWithUtcLabel,
   useIsRunCurrent,
@@ -69,12 +69,12 @@ import {
 import {
   useTipAttachmentStatus,
   handleTipsAttachedModal,
-} from '../../../organisms/DropTipWizardFlows'
-import { useRecoveryAnalytics } from '../../../organisms/ErrorRecoveryFlows/hooks'
+} from '/app/organisms/DropTipWizardFlows'
+import { useRecoveryAnalytics } from '/app/organisms/ErrorRecoveryFlows/hooks'
 
 import type { IconName } from '@opentrons/components'
 import type { OnDeviceRouteParams } from '../../../App/types'
-import type { PipetteWithTip } from '../../../organisms/DropTipWizardFlows'
+import type { PipetteWithTip } from '/app/organisms/DropTipWizardFlows'
 
 export function RunSummary(): JSX.Element {
   const { runId } = useParams<

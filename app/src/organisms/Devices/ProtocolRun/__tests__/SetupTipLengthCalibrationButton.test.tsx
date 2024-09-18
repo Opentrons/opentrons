@@ -16,7 +16,7 @@ import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationBut
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/components/src/hooks')
-vi.mock('../../../../organisms/RunTimeControl/hooks')
+vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock(
   '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 )

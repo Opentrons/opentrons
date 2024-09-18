@@ -9,8 +9,8 @@ import {
 
 import type { ViewableRobot } from '/app/redux/discovery/types'
 
-import { CompleteUpdateSoftware } from '../../organisms/UpdateRobotSoftware/CompleteUpdateSoftware'
-import { UpdateSoftware } from '../../organisms/UpdateRobotSoftware/UpdateSoftware'
+import { CompleteUpdateSoftware } from '/app/organisms/UpdateRobotSoftware/CompleteUpdateSoftware'
+import { UpdateSoftware } from '/app/organisms/UpdateRobotSoftware/UpdateSoftware'
 
 import { CheckUpdates } from './CheckUpdates'
 import { NoUpdateFound } from './NoUpdateFound'

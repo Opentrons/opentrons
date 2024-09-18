@@ -21,7 +21,7 @@ import {
   useAttachedPipettes,
   useIsFlex,
   useAttachedPipettesFromInstrumentsQuery,
-} from '../../../organisms/Devices/hooks'
+} from '/app/organisms/Devices/hooks'
 
 import type { State } from '/app/redux/types'
 import type { FormattedPipetteOffsetCalibration } from '..'

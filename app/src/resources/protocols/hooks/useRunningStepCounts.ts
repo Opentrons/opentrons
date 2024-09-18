@@ -1,4 +1,4 @@
-import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import { useLastRunProtocolCommand } from './useLastRunProtocolCommand'
 

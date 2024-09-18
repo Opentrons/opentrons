@@ -7,8 +7,8 @@ import {
   ConnectingNetwork,
   FailedToConnect,
   WifiConnectionDetails,
-} from '../../../organisms/ODD/NetworkSettings'
-import { RobotSetupHeader } from '../../../organisms/RobotSetupHeader'
+} from '/app/organisms/ODD/NetworkSettings'
+import { RobotSetupHeader } from '/app/organisms/RobotSetupHeader'
 import * as RobotApi from '/app/redux/robot-api'
 
 import type { WifiSecurityType } from '@opentrons/api-client'

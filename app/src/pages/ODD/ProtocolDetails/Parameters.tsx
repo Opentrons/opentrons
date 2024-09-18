@@ -16,7 +16,7 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import { useToaster } from '../../../organisms/ToasterOven'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { useRunTimeParameters } from '/app/pages/Desktop/Protocols/hooks'
 import { EmptySection } from './EmptySection'
 import type { RunTimeParameter } from '@opentrons/shared-data'

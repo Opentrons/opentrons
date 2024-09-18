@@ -43,14 +43,10 @@ import type { UseQueryResult } from 'react-query'
 
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux/discovery')
-vi.mock('../../../../../organisms/Devices/hooks')
+vi.mock('/app/organisms/Devices/hooks')
 vi.mock('/app/resources/deck_configuration')
-vi.mock(
-  '../../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-)
-vi.mock(
-  '../../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-)
+vi.mock('/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('/app/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
 vi.mock('../utils')
 vi.mock('../SetupInstructionsModal')
 vi.mock('../../../../ModuleWizardFlows')

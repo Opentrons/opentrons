@@ -21,8 +21,8 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 import {
   useRobot,
   useRunCreatedAtTimestamp,
-} from '../../organisms/Devices/hooks'
-import { getProtocolDisplayName } from '../../organisms/ProtocolsLanding/utils'
+} from '/app/organisms/Devices/hooks'
+import { getProtocolDisplayName } from '/app/organisms/ProtocolsLanding/utils'
 import { getIsOnDevice } from '/app/redux/config'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getStoredProtocol } from '/app/redux/protocol-storage'

@@ -9,7 +9,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useRobot } from '../../../../organisms/Devices/hooks'
+import { useRobot } from '/app/organisms/Devices/hooks'
 import {
   getRobotSerialNumber,
   getRobotFirmwareVersion,

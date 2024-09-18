@@ -9,8 +9,8 @@ import { i18n } from '/app/i18n'
 import {
   useRobot,
   useRunCreatedAtTimestamp,
-} from '../../../organisms/Devices/hooks'
-import { getProtocolDisplayName } from '../../../organisms/ProtocolsLanding/utils'
+} from '/app/organisms/Devices/hooks'
+import { getProtocolDisplayName } from '/app/organisms/ProtocolsLanding/utils'
 import { getIsOnDevice } from '/app/redux/config'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
@@ -20,8 +20,8 @@ import { Breadcrumbs } from '..'
 
 import type { State } from '/app/redux/types'
 
-vi.mock('../../../organisms/Devices/hooks')
-vi.mock('../../../organisms/ProtocolsLanding/utils')
+vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/organisms/ProtocolsLanding/utils')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/protocol-storage')
 

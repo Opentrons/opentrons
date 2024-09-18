@@ -24,7 +24,7 @@ import {
   usePipetteOffsetCalibrations,
   useRobot,
   useTipLengthCalibrations,
-} from '../../organisms/Devices/hooks'
+} from '/app/organisms/Devices/hooks'
 import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,

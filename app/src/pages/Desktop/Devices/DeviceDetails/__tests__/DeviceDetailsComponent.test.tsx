@@ -6,20 +6,20 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { useEstopQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '/app/i18n'
-import { InstrumentsAndModules } from '../../../../../organisms/Devices/InstrumentsAndModules'
-import { RecentProtocolRuns } from '../../../../../organisms/Devices/RecentProtocolRuns'
-import { RobotOverview } from '../../../../../organisms/Devices/RobotOverview'
-import { DISENGAGED, NOT_PRESENT } from '../../../../../organisms/EmergencyStop'
-import { DeviceDetailsDeckConfiguration } from '../../../../../organisms/DeviceDetailsDeckConfiguration'
-import { useIsFlex } from '../../../../../organisms/Devices/hooks'
+import { InstrumentsAndModules } from '/app/organisms/Devices/InstrumentsAndModules'
+import { RecentProtocolRuns } from '/app/organisms/Devices/RecentProtocolRuns'
+import { RobotOverview } from '/app/organisms/Devices/RobotOverview'
+import { DISENGAGED, NOT_PRESENT } from '/app/organisms/EmergencyStop'
+import { DeviceDetailsDeckConfiguration } from '/app/organisms/DeviceDetailsDeckConfiguration'
+import { useIsFlex } from '/app/organisms/Devices/hooks'
 import { DeviceDetailsComponent } from '../DeviceDetailsComponent'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../../organisms/Devices/hooks')
-vi.mock('../../../../../organisms/Devices/InstrumentsAndModules')
-vi.mock('../../../../../organisms/Devices/RecentProtocolRuns')
-vi.mock('../../../../../organisms/Devices/RobotOverview')
-vi.mock('../../../../../organisms/DeviceDetailsDeckConfiguration')
+vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/organisms/Devices/InstrumentsAndModules')
+vi.mock('/app/organisms/Devices/RecentProtocolRuns')
+vi.mock('/app/organisms/Devices/RobotOverview')
+vi.mock('/app/organisms/DeviceDetailsDeckConfiguration')
 vi.mock('/app/redux/discovery')
 
 const ROBOT_NAME = 'otie'

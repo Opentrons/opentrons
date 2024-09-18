@@ -17,7 +17,7 @@ import {
 
 import { BackButton } from '../../../atoms/buttons/BackButton'
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
-import { InstrumentInfo } from '../../../organisms/InstrumentInfo'
+import { InstrumentInfo } from '/app/organisms/InstrumentInfo'
 import { handleInstrumentDetailOverflowMenu } from './InstrumentDetailOverflowMenu'
 import {
   useGripperDisplayName,

@@ -17,7 +17,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '../../../../organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ChildNavigation'
 
 import type { IconName, ChipType } from '@opentrons/components'
 import type { NetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'

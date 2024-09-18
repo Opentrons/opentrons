@@ -13,7 +13,7 @@ import { CalibrationResult } from '../CalibrationResult'
 
 import { ResultsSummary } from '../'
 
-import type { CalibrationPanelProps } from '../../../../organisms/CalibrationPanels/types'
+import type { CalibrationPanelProps } from '/app/organisms/CalibrationPanels/types'
 
 // file-saver has circular dep, need to mock with factory to prevent error
 vi.mock('file-saver', async importOriginal => {

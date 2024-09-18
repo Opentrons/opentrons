@@ -17,7 +17,7 @@ import {
   MeasureTip,
   LoadingState,
   ConfirmExit,
-} from '../../organisms/CalibrationPanels'
+} from '/app/organisms/CalibrationPanels'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { getTopPortalEl } from '../../App/portal'
 import { ReturnTip } from './ReturnTip'
@@ -31,7 +31,7 @@ import type {
   SessionCommandParams,
 } from '/app/redux/sessions/types'
 
-import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
+import type { CalibrationPanelProps } from '/app/organisms/CalibrationPanels/types'
 import type { CalibrationCheckParentProps } from './types'
 import { CHECK_PIPETTE_RANK_FIRST } from '/app/redux/sessions'
 

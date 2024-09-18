@@ -19,7 +19,7 @@ import {
 import { useDispatch } from 'react-redux'
 
 import styles from './styles.module.css'
-import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
+import { labwareImages } from '/app/organisms/CalibrationPanels/labwareImages'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { getTopPortalEl } from '../../App/portal'
 import { setUseTrashSurfaceForTipCal } from '/app/redux/calibration'

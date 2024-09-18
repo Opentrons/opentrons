@@ -62,7 +62,7 @@ vi.mock('/app/redux/custom-labware/selectors')
 vi.mock('/app/redux/sessions/selectors')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/assets/labware/findLabware')
-vi.mock('../../../../organisms/Devices/hooks')
+vi.mock('/app/organisms/Devices/hooks')
 vi.mock('../OverflowMenu')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {

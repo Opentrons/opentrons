@@ -23,7 +23,7 @@ import {
   CheckUpdates,
   NoUpdateFound,
   ErrorUpdateSoftware,
-} from '../../../organisms/UpdateRobotSoftware'
+} from '/app/organisms/UpdateRobotSoftware'
 
 import type { Dispatch, State } from '/app/redux/types'
 

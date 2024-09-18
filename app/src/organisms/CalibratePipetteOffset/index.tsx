@@ -19,7 +19,7 @@ import {
   ConfirmExit,
   LoadingState,
   CompleteConfirmation,
-} from '../../organisms/CalibrationPanels'
+} from '/app/organisms/CalibrationPanels'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { getTopPortalEl } from '../../App/portal'
 
@@ -30,7 +30,7 @@ import type {
   SessionCommandParams,
 } from '/app/redux/sessions/types'
 import type { CalibratePipetteOffsetParentProps } from './types'
-import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
+import type { CalibrationPanelProps } from '/app/organisms/CalibrationPanels/types'
 
 const PANEL_BY_STEP: Partial<
   Record<CalibrationSessionStep, React.ComponentType<CalibrationPanelProps>>

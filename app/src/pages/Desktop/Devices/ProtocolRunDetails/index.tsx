@@ -29,21 +29,21 @@ import {
   useRunHasStarted,
   useRunStatuses,
   useSyncRobotClock,
-} from '../../../../organisms/Devices/hooks'
-import { ProtocolRunHeader } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
-import { RunPreview } from '../../../../organisms/RunPreview'
+} from '/app/organisms/Devices/hooks'
+import { ProtocolRunHeader } from '/app/organisms/Devices/ProtocolRun/ProtocolRunHeader'
+import { RunPreview } from '/app/organisms/RunPreview'
 import {
   ProtocolRunSetup,
   initialMissingSteps,
-} from '../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
-import { BackToTopButton } from '../../../../organisms/Devices/ProtocolRun/BackToTopButton'
-import { ProtocolRunModuleControls } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
-import { ProtocolRunRuntimeParameters } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
+} from '/app/organisms/Devices/ProtocolRun/ProtocolRunSetup'
+import { BackToTopButton } from '/app/organisms/Devices/ProtocolRun/BackToTopButton'
+import { ProtocolRunModuleControls } from '/app/organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
+import { ProtocolRunRuntimeParameters } from '/app/organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 import { useCurrentRunId } from '/app/resources/runs'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { fetchProtocols } from '/app/redux/protocol-storage'
 import { appShellRequestor } from '/app/redux/shell/remote'
-import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import type { ViewportListRef } from 'react-viewport-list'
 import type {

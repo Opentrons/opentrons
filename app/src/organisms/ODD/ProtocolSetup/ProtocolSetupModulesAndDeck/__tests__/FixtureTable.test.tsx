@@ -12,7 +12,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { LocationConflictModal } from '../../../../../organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
+import { LocationConflictModal } from '/app/organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { FixtureTable } from '../FixtureTable'
 import { getLocalRobot } from '/app/redux/discovery'
@@ -21,7 +21,7 @@ import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 vi.mock('/app/redux/discovery')
 vi.mock('/app/resources/deck_configuration/hooks')
 vi.mock(
-  '../../../../../organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
+  '/app/organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 )
 
 const mockSetSetupScreen = vi.fn()

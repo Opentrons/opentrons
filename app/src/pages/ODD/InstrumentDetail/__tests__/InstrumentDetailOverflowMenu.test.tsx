@@ -9,9 +9,9 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { i18n } from '/app/i18n'
 import { handleInstrumentDetailOverflowMenu } from '../InstrumentDetailOverflowMenu'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
-import { PipetteWizardFlows } from '../../../../organisms/PipetteWizardFlows'
-import { GripperWizardFlows } from '../../../../organisms/GripperWizardFlows'
-import { useDropTipWizardFlows } from '../../../../organisms/DropTipWizardFlows'
+import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
+import { useDropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
 
 import type { Mock } from 'vitest'
 import type {
@@ -29,9 +29,9 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
   }
 })
 vi.mock('/app/resources/maintenance_runs')
-vi.mock('../../../../organisms/PipetteWizardFlows')
-vi.mock('../../../../organisms/GripperWizardFlows')
-vi.mock('../../../../organisms/DropTipWizardFlows')
+vi.mock('/app/organisms/PipetteWizardFlows')
+vi.mock('/app/organisms/GripperWizardFlows')
+vi.mock('/app/organisms/DropTipWizardFlows')
 
 const MOCK_PIPETTE = {
   mount: 'left',

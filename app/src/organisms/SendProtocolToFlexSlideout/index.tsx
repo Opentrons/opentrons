@@ -12,12 +12,12 @@ import {
   INFO_TOAST,
   SUCCESS_TOAST,
 } from '@opentrons/components'
-import { ChooseRobotSlideout } from '../../organisms/ChooseRobotSlideout'
+import { ChooseRobotSlideout } from '/app/organisms/ChooseRobotSlideout'
 import {
   getAnalysisStatus,
   getProtocolDisplayName,
-} from '../../organisms/ProtocolsLanding/utils'
-import { useToaster } from '../../organisms/ToasterOven'
+} from '/app/organisms/ProtocolsLanding/utils'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { appShellRequestor } from '/app/redux/shell/remote'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage'

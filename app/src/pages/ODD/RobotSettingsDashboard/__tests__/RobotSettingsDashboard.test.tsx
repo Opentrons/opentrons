@@ -10,7 +10,7 @@ import { getRobotSettings } from '/app/redux/robot-settings'
 import { getLocalRobot } from '/app/redux/discovery'
 import { toggleDevtools, toggleHistoricOffsets } from '/app/redux/config'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
-import { Navigation } from '../../../../organisms/Navigation'
+import { Navigation } from '/app/organisms/Navigation'
 import {
   DeviceReset,
   TouchScreenSleep,
@@ -19,10 +19,10 @@ import {
   Privacy,
   RobotSystemVersion,
   UpdateChannel,
-} from '../../../../organisms/ODD/RobotSettingsDashboard'
+} from '/app/organisms/ODD/RobotSettingsDashboard'
 import { getRobotUpdateAvailable } from '/app/redux/robot-update'
 import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
-import { useLEDLights } from '../../../../organisms/Devices/hooks'
+import { useLEDLights } from '/app/organisms/Devices/hooks'
 
 import { RobotSettingsDashboard } from '../'
 
@@ -31,17 +31,15 @@ vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/robot-settings')
 vi.mock('/app/resources/networking/hooks/useNetworkConnection')
-vi.mock('../../../../organisms/Navigation')
-vi.mock('../../../../organisms/ODD/RobotSettingsDashboard/TouchScreenSleep')
-vi.mock('../../../../organisms/ODD/RobotSettingsDashboard/NetworkSettings')
-vi.mock('../../../../organisms/ODD/RobotSettingsDashboard/DeviceReset')
-vi.mock('../../../../organisms/ODD/RobotSettingsDashboard/RobotSystemVersion')
-vi.mock(
-  '../../../../organisms/ODD/RobotSettingsDashboard/TouchscreenBrightness'
-)
-vi.mock('../../../../organisms/ODD/RobotSettingsDashboard/UpdateChannel')
-vi.mock('../../../../organisms/Devices/hooks')
-vi.mock('../../../../organisms/ODD/RobotSettingsDashboard/Privacy')
+vi.mock('/app/organisms/Navigation')
+vi.mock('/app/organisms/ODD/RobotSettingsDashboard/TouchScreenSleep')
+vi.mock('/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings')
+vi.mock('/app/organisms/ODD/RobotSettingsDashboard/DeviceReset')
+vi.mock('/app/organisms/ODD/RobotSettingsDashboard/RobotSystemVersion')
+vi.mock('/app/organisms/ODD/RobotSettingsDashboard/TouchscreenBrightness')
+vi.mock('/app/organisms/ODD/RobotSettingsDashboard/UpdateChannel')
+vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/organisms/ODD/RobotSettingsDashboard/Privacy')
 
 const mockToggleLights = vi.fn()
 

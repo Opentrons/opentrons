@@ -18,7 +18,7 @@ import {
 
 import { getTopPortalEl } from '../../App/portal'
 import { TertiaryButton } from '../../atoms/buttons'
-import { AskForCalibrationBlockModal } from '../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
+import { AskForCalibrationBlockModal } from '/app/organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
@@ -32,7 +32,7 @@ import {
   useAttachedPipettes,
   useAttachedPipetteCalibrations,
   useRunStatuses,
-} from '../../organisms/Devices/hooks'
+} from '/app/organisms/Devices/hooks'
 
 import type {
   AttachedPipettesByMount,

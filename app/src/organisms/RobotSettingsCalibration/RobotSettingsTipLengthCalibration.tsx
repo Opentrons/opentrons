@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 
-import { useAttachedPipettes } from '../../organisms/Devices/hooks'
+import { useAttachedPipettes } from '/app/organisms/Devices/hooks'
 import { getDefaultTiprackDefForPipetteName } from '../Devices/constants'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
 

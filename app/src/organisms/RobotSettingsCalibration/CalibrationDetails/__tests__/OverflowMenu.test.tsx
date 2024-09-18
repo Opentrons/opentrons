@@ -64,11 +64,9 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/sessions/selectors')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-api/selectors')
-vi.mock(
-  '../../../../organisms/CalibratePipetteOffset/useCalibratePipetteOffset'
-)
-vi.mock('../../../../organisms/ProtocolUpload/hooks')
-vi.mock('../../../../organisms/Devices/hooks')
+vi.mock('/app/organisms/CalibratePipetteOffset/useCalibratePipetteOffset')
+vi.mock('/app/organisms/ProtocolUpload/hooks')
+vi.mock('/app/organisms/Devices/hooks')
 vi.mock('../../../PipetteWizardFlows')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 

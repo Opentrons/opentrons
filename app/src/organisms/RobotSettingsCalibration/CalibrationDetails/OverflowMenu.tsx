@@ -32,7 +32,7 @@ import {
 import {
   useRunStatuses,
   useAttachedPipettesFromInstrumentsQuery,
-} from '../../../organisms/Devices/hooks'
+} from '/app/organisms/Devices/hooks'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 
-import { ChildNavigation } from '../../../../organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ChildNavigation'
 import { ConnectingNetwork, FailedToConnect } from '../../NetworkSettings'
 import { FAILURE, PENDING, SUCCESS } from '/app/redux/robot-api'
 

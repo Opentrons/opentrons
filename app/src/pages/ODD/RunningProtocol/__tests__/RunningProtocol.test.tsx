@@ -22,17 +22,17 @@ import { mockRobotSideAnalysis } from '../../../../molecules/Command/__fixtures_
 import {
   CurrentRunningProtocolCommand,
   RunningProtocolSkeleton,
-} from '../../../../organisms/ODD/RunningProtocol'
-import { mockUseAllCommandsResponseNonDeterministic } from '../../../../organisms/RunProgressMeter/__fixtures__'
+} from '/app/organisms/ODD/RunningProtocol'
+import { mockUseAllCommandsResponseNonDeterministic } from '/app/organisms/RunProgressMeter/__fixtures__'
 import {
   useRunStatus,
   useRunTimestamps,
-} from '../../../../organisms/RunTimeControl/hooks'
+} from '/app/organisms/RunTimeControl/hooks'
 import { getLocalRobot } from '/app/redux/discovery'
-import { CancelingRunModal } from '../../../../organisms/ODD/RunningProtocol/CancelingRunModal'
-import { useTrackProtocolRunEvent } from '../../../../organisms/Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { OpenDoorAlertModal } from '../../../../organisms/OpenDoorAlertModal'
+import { CancelingRunModal } from '/app/organisms/ODD/RunningProtocol/CancelingRunModal'
+import { useTrackProtocolRunEvent } from '/app/organisms/Devices/hooks'
+import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { OpenDoorAlertModal } from '/app/organisms/OpenDoorAlertModal'
 import { RunningProtocol } from '..'
 import {
   useNotifyRunQuery,
@@ -42,33 +42,31 @@ import { useFeatureFlag } from '/app/redux/config'
 import {
   ErrorRecoveryFlows,
   useErrorRecoveryFlows,
-} from '../../../../organisms/ErrorRecoveryFlows'
-import { useLastRunCommand } from '../../../../organisms/Devices/hooks/useLastRunCommand'
+} from '/app/organisms/ErrorRecoveryFlows'
+import { useLastRunCommand } from '/app/organisms/Devices/hooks/useLastRunCommand'
 import {
   useInterventionModal,
   InterventionModal,
-} from '../../../../organisms/InterventionModal'
+} from '/app/organisms/InterventionModal'
 
 import type { UseQueryResult } from 'react-query'
 import type { ProtocolAnalyses, RunCommandSummary } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../organisms/Devices/hooks')
-vi.mock('../../../../organisms/Devices/hooks/useLastRunCommandKey')
-vi.mock('../../../../organisms/RunTimeControl/hooks')
-vi.mock(
-  '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-)
-vi.mock('../../../../organisms/RunTimeControl/hooks')
-vi.mock('../../../../organisms/ODD/RunningProtocol')
+vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/organisms/Devices/hooks/useLastRunCommandKey')
+vi.mock('/app/organisms/RunTimeControl/hooks')
+vi.mock('/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('/app/organisms/RunTimeControl/hooks')
+vi.mock('/app/organisms/ODD/RunningProtocol')
 vi.mock('/app/redux/discovery')
-vi.mock('../../../../organisms/ODD/RunningProtocol/CancelingRunModal')
-vi.mock('../../../../organisms/OpenDoorAlertModal')
+vi.mock('/app/organisms/ODD/RunningProtocol/CancelingRunModal')
+vi.mock('/app/organisms/OpenDoorAlertModal')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux/config')
-vi.mock('../../../../organisms/ErrorRecoveryFlows')
-vi.mock('../../../../organisms/Devices/hooks/useLastRunCommand')
-vi.mock('../../../../organisms/InterventionModal')
+vi.mock('/app/organisms/ErrorRecoveryFlows')
+vi.mock('/app/organisms/Devices/hooks/useLastRunCommand')
+vi.mock('/app/organisms/InterventionModal')
 
 const RUN_ID = 'run_id'
 const ROBOT_NAME = 'otie'

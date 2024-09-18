@@ -13,7 +13,7 @@ import {
   useIsFlex,
   usePipetteOffsetCalibrations,
   useAttachedPipettesFromInstrumentsQuery,
-} from '../../../organisms/Devices/hooks'
+} from '/app/organisms/Devices/hooks'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 
@@ -22,7 +22,7 @@ import { PipetteOffsetCalibrationItems } from '../CalibrationDetails/PipetteOffs
 
 import type { FormattedPipetteOffsetCalibration } from '..'
 
-vi.mock('../../../organisms/Devices/hooks')
+vi.mock('/app/organisms/Devices/hooks')
 vi.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')
 
 const mockFormattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] = []

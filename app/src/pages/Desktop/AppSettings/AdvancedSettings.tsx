@@ -12,7 +12,7 @@ import {
   U2EInformation,
   UpdatedChannel,
   AdditionalCustomLabwareSourceFolder,
-} from '../../../organisms/AdvancedSettings'
+} from '/app/organisms/AdvancedSettings'
 
 export function AdvancedSettings(): JSX.Element {
   return (

@@ -9,7 +9,7 @@ import {
   RadioButton,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '../../../organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ChildNavigation'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,

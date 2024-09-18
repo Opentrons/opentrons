@@ -5,7 +5,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { i18n } from '/app/i18n'
-import { CalibrationStatusCard } from '../../../organisms/CalibrationStatusCard'
+import { CalibrationStatusCard } from '/app/organisms/CalibrationStatusCard'
 import { useFeatureFlag } from '/app/redux/config'
 import * as RobotApi from '/app/redux/robot-api'
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -26,7 +26,7 @@ import {
   useAttachedPipettes,
   useRunStatuses,
   useAttachedPipettesFromInstrumentsQuery,
-} from '../../../organisms/Devices/hooks'
+} from '/app/organisms/Devices/hooks'
 
 import { CalibrationDataDownload } from '../CalibrationDataDownload'
 import { CalibrationHealthCheck } from '../CalibrationHealthCheck'
@@ -46,11 +46,11 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     useInstrumentsQuery: vi.fn(),
   }
 })
-vi.mock('../../../organisms/CalibrationStatusCard')
+vi.mock('/app/organisms/CalibrationStatusCard')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/sessions/selectors')
 vi.mock('/app/redux/robot-api/selectors')
-vi.mock('../../../organisms/Devices/hooks')
+vi.mock('/app/organisms/Devices/hooks')
 vi.mock('../CalibrationDataDownload')
 vi.mock('../CalibrationHealthCheck')
 vi.mock('../RobotSettingsDeckCalibration')

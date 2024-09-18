@@ -7,7 +7,7 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import { formatInterval } from '../../../organisms/RunTimeControl/utils'
+import { formatInterval } from '/app/organisms/RunTimeControl/utils'
 import { EMPTY_TIMESTAMP } from '../constants'
 import type { CSSProp } from 'styled-components'
 

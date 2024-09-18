@@ -11,8 +11,8 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import { formatLastModified } from '../../organisms/CalibrationPanels/utils'
-import { useDeckCalibrationData, useRobot } from '../../organisms/Devices/hooks'
+import { formatLastModified } from '/app/organisms/CalibrationPanels/utils'
+import { useDeckCalibrationData, useRobot } from '/app/organisms/Devices/hooks'
 import * as RobotApi from '/app/redux/robot-api'
 
 import type { State } from '/app/redux/types'

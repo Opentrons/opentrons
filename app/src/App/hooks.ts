@@ -13,7 +13,7 @@ import {
 import { getProtocol } from '@opentrons/api-client'
 
 import { checkShellUpdate } from '/app/redux/shell'
-import { useToaster } from '../organisms/ToasterOven'
+import { useToaster } from '/app/organisms/ToasterOven'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { Dispatch } from '/app/redux/types'

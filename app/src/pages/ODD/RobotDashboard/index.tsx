@@ -12,14 +12,14 @@ import {
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
-import { Navigation } from '../../../organisms/Navigation'
+import { Navigation } from '/app/organisms/Navigation'
 import {
   EmptyRecentRun,
   RecentRunProtocolCarousel,
-} from '../../../organisms/ODD/RobotDashboard'
+} from '/app/organisms/ODD/RobotDashboard'
 import { getOnDeviceDisplaySettings } from '/app/redux/config'
 import { WelcomeModal } from './WelcomeModal'
-import { ServerInitializing } from '../../../organisms/ODD/RobotDashboard/ServerInitializing'
+import { ServerInitializing } from '/app/organisms/ODD/RobotDashboard/ServerInitializing'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 import type { RunData } from '@opentrons/api-client'
 

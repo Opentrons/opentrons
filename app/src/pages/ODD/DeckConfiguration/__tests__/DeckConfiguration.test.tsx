@@ -10,7 +10,7 @@ import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 
 import { i18n } from '/app/i18n'
-import { DeckFixtureSetupInstructionsModal } from '../../../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
+import { DeckFixtureSetupInstructionsModal } from '/app/organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { DeckConfigurationEditor } from '..'
 import {
   useNotifyDeckConfigurationQuery,
@@ -48,10 +48,10 @@ const mockDeckConfig = [
 
 vi.mock('@opentrons/react-api-client')
 vi.mock(
-  '../../../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
+  '/app/organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 )
 vi.mock(
-  '../../../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
+  '/app/organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 )
 vi.mock('/app/resources/deck_configuration')
 

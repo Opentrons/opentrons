@@ -14,16 +14,16 @@ import {
   useDeckCalibrationData,
   useRobot,
   useAttachedPipettes,
-} from '../../../organisms/Devices/hooks'
+} from '/app/organisms/Devices/hooks'
 import { renderWithProviders } from '/app/__testing-utils__'
 
 import { RobotSettingsDeckCalibration } from '../RobotSettingsDeckCalibration'
 
 import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 
-vi.mock('../../../organisms/CalibrationStatusCard')
+vi.mock('/app/organisms/CalibrationStatusCard')
 vi.mock('/app/redux/robot-api/selectors')
-vi.mock('../../../organisms/Devices/hooks')
+vi.mock('/app/organisms/Devices/hooks')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,

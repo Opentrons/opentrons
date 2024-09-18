@@ -20,7 +20,7 @@ import {
   ConfirmExit,
   LoadingState,
   CompleteConfirmation,
-} from '../../organisms/CalibrationPanels'
+} from '/app/organisms/CalibrationPanels'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { getTopPortalEl } from '../../App/portal'
 
@@ -33,7 +33,7 @@ import type {
   CalibrationLabware,
   CalibrationSessionStep,
 } from '/app/redux/sessions/types'
-import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
+import type { CalibrationPanelProps } from '/app/organisms/CalibrationPanels/types'
 import type { CalibrateTipLengthParentProps } from './types'
 
 export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'

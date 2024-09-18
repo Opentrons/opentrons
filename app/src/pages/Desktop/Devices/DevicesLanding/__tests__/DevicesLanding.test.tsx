@@ -4,8 +4,8 @@ import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { DevicesEmptyState } from '../../../../../organisms/Devices/DevicesEmptyState'
-import { RobotCard } from '../../../../../organisms/Devices/RobotCard'
+import { DevicesEmptyState } from '/app/organisms/Devices/DevicesEmptyState'
+import { RobotCard } from '/app/organisms/Devices/RobotCard'
 import {
   getScanning,
   getConnectableRobots,
@@ -19,8 +19,8 @@ import {
 } from '/app/redux/discovery/__fixtures__'
 import { DevicesLanding } from '..'
 
-vi.mock('../../../../../organisms/Devices/DevicesEmptyState')
-vi.mock('../../../../../organisms/Devices/RobotCard')
+vi.mock('/app/organisms/Devices/DevicesEmptyState')
+vi.mock('/app/organisms/Devices/RobotCard')
 vi.mock('/app/redux/discovery')
 
 const render = () => {

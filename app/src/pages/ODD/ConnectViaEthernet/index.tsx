@@ -10,7 +10,7 @@ import {
 } from '@opentrons/components'
 
 import { StepMeter } from '../../../atoms/StepMeter'
-import { NetworkDetailsModal } from '../../../organisms/ODD/RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
+import { NetworkDetailsModal } from '/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 import { getNetworkInterfaces, fetchStatus } from '/app/redux/networking'
 import { getLocalRobot } from '/app/redux/discovery'
 import { TitleHeader } from './TitleHeader'

@@ -14,9 +14,9 @@ import { getAllDefinitions } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../App/portal'
 import { OddModal } from '../../molecules/OddModal'
-import { ChildNavigation } from '../../organisms/ChildNavigation'
-import { useToaster } from '../../organisms/ToasterOven'
-import { WellSelection } from '../../organisms/WellSelection'
+import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { WellSelection } from '/app/organisms/WellSelection'
 import {
   CIRCULAR_WELL_96_PLATE_DEFINITION_URI,
   RECTANGULAR_WELL_96_PLATE_DEFINITION_URI,

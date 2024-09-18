@@ -16,7 +16,7 @@ import {
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/organisms/Devices/hooks'
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 import { getIsOnDevice } from '/app/redux/config'
 import {

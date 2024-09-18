@@ -23,9 +23,9 @@ import {
 
 import { getTopPortalEl } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
-import { ChooseProtocolSlideout } from '../../organisms/ChooseProtocolSlideout'
-import { DisconnectModal } from '../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
-import { handleUpdateBuildroot } from '../../organisms/Devices/RobotSettings/UpdateBuildroot'
+import { ChooseProtocolSlideout } from '/app/organisms/ChooseProtocolSlideout'
+import { DisconnectModal } from '/app/organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
+import { handleUpdateBuildroot } from '/app/organisms/Devices/RobotSettings/UpdateBuildroot'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { UNREACHABLE, CONNECTABLE, REACHABLE } from '/app/redux/discovery'
 import { checkShellUpdate } from '/app/redux/shell'

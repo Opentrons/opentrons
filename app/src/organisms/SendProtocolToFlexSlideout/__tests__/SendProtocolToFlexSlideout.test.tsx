@@ -12,7 +12,7 @@ import { useCreateProtocolMutation } from '@opentrons/react-api-client'
 
 import { mockSuccessQueryResults } from '../../../__fixtures__'
 import { i18n } from '/app/i18n'
-import { useToaster } from '../../../organisms/ToasterOven'
+import { useToaster } from '/app/organisms/ToasterOven'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -45,7 +45,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     useCreateProtocolMutation: vi.fn(),
   }
 })
-vi.mock('../../../organisms/ToasterOven')
+vi.mock('/app/organisms/ToasterOven')
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/networking')

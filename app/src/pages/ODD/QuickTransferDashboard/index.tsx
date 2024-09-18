@@ -22,7 +22,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { SmallButton, FloatingActionButton } from '../../../atoms/buttons'
-import { Navigation } from '../../../organisms/Navigation'
+import { Navigation } from '/app/organisms/Navigation'
 import {
   getPinnedQuickTransferIds,
   getQuickTransfersOnDeviceSortKey,

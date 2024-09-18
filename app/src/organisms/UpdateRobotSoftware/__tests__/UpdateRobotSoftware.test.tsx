@@ -10,17 +10,17 @@ import * as UpdateRobotSoftware from '../'
 import {
   CompleteUpdateSoftware,
   UpdateSoftware,
-} from '../../../organisms/UpdateRobotSoftware'
+} from '/app/organisms/UpdateRobotSoftware'
 
 import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
-vi.mock('../../../organisms/UpdateRobotSoftware/CheckUpdates')
-vi.mock('../../../organisms/UpdateRobotSoftware/CompleteUpdateSoftware')
-vi.mock('../../../organisms/UpdateRobotSoftware/ErrorUpdateSoftware')
-vi.mock('../../../organisms/UpdateRobotSoftware/NoUpdateFound')
-vi.mock('../../../organisms/UpdateRobotSoftware/UpdateSoftware')
+vi.mock('/app/organisms/UpdateRobotSoftware/CheckUpdates')
+vi.mock('/app/organisms/UpdateRobotSoftware/CompleteUpdateSoftware')
+vi.mock('/app/organisms/UpdateRobotSoftware/ErrorUpdateSoftware')
+vi.mock('/app/organisms/UpdateRobotSoftware/NoUpdateFound')
+vi.mock('/app/organisms/UpdateRobotSoftware/UpdateSoftware')
 
 const getRobotUpdateSession = RobotUpdate.getRobotUpdateSession
 

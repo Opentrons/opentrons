@@ -8,16 +8,16 @@ import {
   useTrackEvent,
   ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
 } from '/app/redux/analytics'
-import { LabwareCard } from '../../../../organisms/LabwareCard'
-import { AddCustomLabwareSlideout } from '../../../../organisms/AddCustomLabwareSlideout'
-import { useToaster } from '../../../../organisms/ToasterOven'
+import { LabwareCard } from '/app/organisms/LabwareCard'
+import { AddCustomLabwareSlideout } from '/app/organisms/AddCustomLabwareSlideout'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
 import { Labware } from '..'
 import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
 
-vi.mock('../../../../organisms/LabwareCard')
-vi.mock('../../../../organisms/AddCustomLabwareSlideout')
-vi.mock('../../../../organisms/ToasterOven')
+vi.mock('/app/organisms/LabwareCard')
+vi.mock('/app/organisms/AddCustomLabwareSlideout')
+vi.mock('/app/organisms/ToasterOven')
 vi.mock('../hooks')
 vi.mock('/app/redux/analytics')
 

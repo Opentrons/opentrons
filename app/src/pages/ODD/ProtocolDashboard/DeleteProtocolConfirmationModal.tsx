@@ -19,7 +19,7 @@ import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../../atoms/buttons'
 import { OddModal } from '../../../molecules/OddModal'
-import { useToaster } from '../../../organisms/ToasterOven'
+import { useToaster } from '/app/organisms/ToasterOven'
 
 import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
 

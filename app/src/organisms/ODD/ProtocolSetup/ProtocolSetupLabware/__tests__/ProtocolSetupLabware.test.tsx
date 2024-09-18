@@ -15,7 +15,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useMostRecentCompletedAnalysis } from '../../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '..'
 import {
@@ -40,9 +40,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   }
 })
 
-vi.mock(
-  '../../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-)
+vi.mock('/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
 vi.mock('/app/resources/deck_configuration')
 

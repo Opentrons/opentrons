@@ -20,7 +20,7 @@ import {
 
 import { getIsOnDevice } from '/app/redux/config'
 import { Divider } from '../../atoms/structure'
-import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
+import { labwareImages } from '/app/organisms/CalibrationPanels/labwareImages'
 import { equipmentImages } from './equipmentImages'
 
 import type { StyleProps } from '@opentrons/components'

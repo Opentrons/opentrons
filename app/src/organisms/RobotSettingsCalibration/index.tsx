@@ -18,16 +18,16 @@ import {
 
 import { getTopPortalEl } from '../../App/portal'
 import { Line } from '../../atoms/structure'
-import { CalibrateDeck } from '../../organisms/CalibrateDeck'
-import { CalibrationStatusCard } from '../../organisms/CalibrationStatusCard'
-import { CheckCalibration } from '../../organisms/CheckCalibration'
+import { CalibrateDeck } from '/app/organisms/CalibrateDeck'
+import { CalibrationStatusCard } from '/app/organisms/CalibrationStatusCard'
+import { CheckCalibration } from '/app/organisms/CheckCalibration'
 import {
   useRobot,
   useRunStatuses,
   useIsFlex,
   useAttachedPipettesFromInstrumentsQuery,
-} from '../../organisms/Devices/hooks'
-import { HowCalibrationWorksModal } from '../../organisms/HowCalibrationWorksModal'
+} from '/app/organisms/Devices/hooks'
+import { HowCalibrationWorksModal } from '/app/organisms/HowCalibrationWorksModal'
 import { CONNECTABLE } from '/app/redux/discovery'
 import * as RobotApi from '/app/redux/robot-api'
 import { getDeckCalibrationSession } from '/app/redux/sessions/deck-calibration/selectors'

@@ -27,35 +27,35 @@ import {
 } from '@opentrons/api-client'
 
 import { StepMeter } from '../../../atoms/StepMeter'
-import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useNotifyRunQuery } from '/app/resources/runs'
 import {
   InterventionModal,
   useInterventionModal,
-} from '../../../organisms/InterventionModal'
+} from '/app/organisms/InterventionModal'
 import {
   useRunStatus,
   useRunTimestamps,
-} from '../../../organisms/RunTimeControl/hooks'
+} from '/app/organisms/RunTimeControl/hooks'
 import {
   CurrentRunningProtocolCommand,
   RunningProtocolCommandList,
   RunningProtocolSkeleton,
-} from '../../../organisms/ODD/RunningProtocol'
+} from '/app/organisms/ODD/RunningProtocol'
 import {
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
   useRobotType,
-} from '../../../organisms/Devices/hooks'
-import { CancelingRunModal } from '../../../organisms/ODD/RunningProtocol/CancelingRunModal'
-import { ConfirmCancelRunModal } from '../../../organisms/ODD/RunningProtocol/ConfirmCancelRunModal'
+} from '/app/organisms/Devices/hooks'
+import { CancelingRunModal } from '/app/organisms/ODD/RunningProtocol/CancelingRunModal'
+import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol/ConfirmCancelRunModal'
 import { getLocalRobot } from '/app/redux/discovery'
-import { OpenDoorAlertModal } from '../../../organisms/OpenDoorAlertModal'
+import { OpenDoorAlertModal } from '/app/organisms/OpenDoorAlertModal'
 import {
   useErrorRecoveryFlows,
   ErrorRecoveryFlows,
-} from '../../../organisms/ErrorRecoveryFlows'
-import { useLastRunCommand } from '../../../organisms/Devices/hooks/useLastRunCommand'
+} from '/app/organisms/ErrorRecoveryFlows'
+import { useLastRunCommand } from '/app/organisms/Devices/hooks/useLastRunCommand'
 
 import type { OnDeviceRouteParams } from '../../../App/types'
 

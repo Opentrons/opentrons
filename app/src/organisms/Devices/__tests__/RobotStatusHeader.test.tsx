@@ -9,7 +9,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { useProtocolQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '/app/i18n'
-import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
 import {
   getRobotAddressesByName,
   HEALTH_STATUS_OK,
@@ -25,7 +25,7 @@ import type { SimpleInterfaceStatus } from '/app/redux/networking/types'
 import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../organisms/RunTimeControl/hooks')
+vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/networking')
 vi.mock('../hooks')

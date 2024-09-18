@@ -17,7 +17,7 @@ import {
   ShowLabwareOffsetSnippets,
   U2EInformation,
   UpdatedChannel,
-} from '../../../../organisms/AdvancedSettings'
+} from '/app/organisms/AdvancedSettings'
 
 import { AdvancedSettings } from '../AdvancedSettings'
 
@@ -29,7 +29,7 @@ vi.mock('/app/redux/protocol-analysis')
 vi.mock('/app/redux/system-info')
 vi.mock('@opentrons/components/src/hooks')
 vi.mock('/app/redux/analytics')
-vi.mock('../../../../organisms/AdvancedSettings')
+vi.mock('/app/organisms/AdvancedSettings')
 
 const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(

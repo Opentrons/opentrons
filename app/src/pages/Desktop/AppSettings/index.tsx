@@ -19,7 +19,7 @@ import * as Config from '/app/redux/config'
 import { GeneralSettings } from './GeneralSettings'
 import { PrivacySettings } from './PrivacySettings'
 import { AdvancedSettings } from './AdvancedSettings'
-import { FeatureFlags } from '../../../organisms/AppSettings/FeatureFlags'
+import { FeatureFlags } from '/app/organisms/AppSettings/FeatureFlags'
 import { NavTab } from '../../../molecules/NavTab'
 import { Line } from '../../../atoms/structure'
 

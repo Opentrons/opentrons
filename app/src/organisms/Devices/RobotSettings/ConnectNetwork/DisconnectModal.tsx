@@ -19,7 +19,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { useRobot } from '../../../../organisms/Devices/hooks'
+import { useRobot } from '/app/organisms/Devices/hooks'
 import { CONNECTABLE } from '/app/redux/discovery'
 import {
   clearWifiStatus,

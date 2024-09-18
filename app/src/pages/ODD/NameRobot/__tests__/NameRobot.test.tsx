@@ -11,7 +11,7 @@ import {
   getReachableRobots,
   getUnreachableRobots,
 } from '/app/redux/discovery'
-import { useIsUnboxingFlowOngoing } from '../../../../organisms/ODD/hooks'
+import { useIsUnboxingFlowOngoing } from '/app/organisms/ODD/hooks'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -24,7 +24,7 @@ import type { NavigateFunction } from 'react-router-dom'
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/analytics')
-vi.mock('../../../../organisms/ODD/hooks')
+vi.mock('/app/organisms/ODD/hooks')
 
 const mockNavigate = vi.fn()
 

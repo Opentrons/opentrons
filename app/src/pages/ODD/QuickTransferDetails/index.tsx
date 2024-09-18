@@ -36,16 +36,16 @@ import {
   ProtocolDetailsHeaderChipSkeleton,
   ProcotolDetailsHeaderTitleSkeleton,
   ProtocolDetailsSectionContentSkeleton,
-} from '../../../organisms/ODD/ProtocolDetails'
-import { useHardwareStatusText } from '../../../organisms/ODD/RobotDashboard/hooks'
+} from '/app/organisms/ODD/ProtocolDetails'
+import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
 import { SmallModalChildren } from '../../../molecules/OddModal'
-import { useToaster } from '../../../organisms/ToasterOven'
+import { useToaster } from '/app/organisms/ToasterOven'
 import {
   getApplyHistoricOffsets,
   getPinnedQuickTransferIds,
   updateConfigValue,
 } from '/app/redux/config'
-import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { useOffsetCandidatesForAnalysis } from '/app/organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { DeleteTransferConfirmationModal } from '../QuickTransferDashboard/DeleteTransferConfirmationModal'
 import { Deck } from './Deck'

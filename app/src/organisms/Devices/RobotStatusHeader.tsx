@@ -25,8 +25,8 @@ import {
 } from '@opentrons/components'
 
 import { QuaternaryButton } from '../../atoms/buttons'
-import { useIsFlex } from '../../organisms/Devices/hooks'
-import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
+import { useIsFlex } from '/app/organisms/Devices/hooks'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
 import {
   getRobotAddressesByName,
   HEALTH_STATUS_OK,

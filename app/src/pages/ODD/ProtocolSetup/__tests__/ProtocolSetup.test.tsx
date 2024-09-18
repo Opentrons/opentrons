@@ -23,7 +23,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { i18n } from '/app/i18n'
-import { useToaster } from '../../../../organisms/ToasterOven'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { mockRobotSideAnalysis } from '../../../../molecules/Command/__fixtures__'
 import {
   useAttachedModules,
@@ -33,10 +33,10 @@ import {
   useRobotType,
   useRunCreatedAtTimestamp,
   useTrackProtocolRunEvent,
-} from '../../../../organisms/Devices/hooks'
+} from '/app/organisms/Devices/hooks'
 import { getLocalRobot } from '/app/redux/discovery'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
-import { getProtocolModulesInfo } from '../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { getProtocolModulesInfo } from '/app/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import {
   ProtocolSetupLabware,
   ProtocolSetupLiquids,
@@ -47,16 +47,16 @@ import {
   ProtocolSetupStepSkeleton,
   getUnmatchedModulesForProtocol,
   getIncompleteInstrumentCount,
-} from '../../../../organisms/ODD/ProtocolSetup'
-import { useLaunchLPC } from '../../../../organisms/LabwarePositionCheck/useLaunchLPC'
-import { ConfirmCancelRunModal } from '../../../../organisms/ODD/RunningProtocol'
-import { mockProtocolModuleInfo } from '../../../../organisms/ODD/ProtocolSetup/ProtocolSetupInstruments/__fixtures__'
+} from '/app/organisms/ODD/ProtocolSetup'
+import { useLaunchLPC } from '/app/organisms/LabwarePositionCheck/useLaunchLPC'
+import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
+import { mockProtocolModuleInfo } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupInstruments/__fixtures__'
 import {
   useProtocolHasRunTimeParameters,
   useRunControls,
   useRunStatus,
-} from '../../../../organisms/RunTimeControl/hooks'
-import { useIsHeaterShakerInProtocol } from '../../../../organisms/ModuleCard/hooks'
+} from '/app/organisms/RunTimeControl/hooks'
+import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/useNotifyDeckConfigurationQuery'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
@@ -101,9 +101,9 @@ vi.mock('react-router-dom', async importOriginal => {
 })
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../organisms/LabwarePositionCheck/useLaunchLPC')
-vi.mock('../../../../organisms/Devices/hooks')
-vi.mock('../../../../organisms/ODD/ProtocolSetup', async importOriginal => {
+vi.mock('/app/organisms/LabwarePositionCheck/useLaunchLPC')
+vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/organisms/ODD/ProtocolSetup', async importOriginal => {
   const ACTUALS = ['ProtocolSetupStep']
   const actual = await importOriginal<object>()
   return Object.fromEntries(
@@ -112,18 +112,14 @@ vi.mock('../../../../organisms/ODD/ProtocolSetup', async importOriginal => {
     )
   )
 })
-vi.mock(
-  '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-)
-vi.mock(
-  '../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-)
-vi.mock('../../../../organisms/ODD/RunningProtocol')
-vi.mock('../../../../organisms/RunTimeControl/hooks')
-vi.mock('../../../../organisms/ModuleCard/hooks')
+vi.mock('/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('/app/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
+vi.mock('/app/organisms/ODD/RunningProtocol')
+vi.mock('/app/organisms/RunTimeControl/hooks')
+vi.mock('/app/organisms/ModuleCard/hooks')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('../ConfirmAttachedModal')
-vi.mock('../../../../organisms/ToasterOven')
+vi.mock('/app/organisms/ToasterOven')
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/deck_configuration/hooks')
 vi.mock('/app/resources/deck_configuration/useNotifyDeckConfigurationQuery')

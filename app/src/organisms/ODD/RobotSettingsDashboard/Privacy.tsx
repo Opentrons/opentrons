@@ -10,7 +10,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '../../../organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ChildNavigation'
 import { RobotSettingButton } from './RobotSettingButton'
 import { OnOffToggle } from './OnOffToggle'
 import {
