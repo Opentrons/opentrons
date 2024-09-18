@@ -76,7 +76,6 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
     <Flex
       css={HIDE_SCROLLBAR}
       flexDirection={DIRECTION_COLUMN}
-      maxHeight="31.25rem"
       overflowY="auto"
       data-testid="SetupLiquidsList_ListView"
       gridGap={SPACING.spacing8}
