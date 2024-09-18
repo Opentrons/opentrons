@@ -12,6 +12,10 @@ import corning_48_wellplate_1_6ml_flat_photo_three_quarters from './images/corni
 import corning_6_wellplate_16_8ml_flat_photo_three_quarters from './images/corning_6_wellplate_16.8ml_flat_photo_three_quarters.jpg'
 import eppendorf_1000ul_tip_eptips_side_view from './images/eppendorf_1000ul_tip_eptips_side_view.jpg'
 import eppendorf_10ul_tips_eptips_side_view from './images/eppendorf_10ul_tips_eptips_side_view.jpg'
+import eppendorf_96_wellplate_150ul_photo from './images/eppendorf_96_wellplate_150ul_photo.jpg'
+import eppendorf_96_wellplate_1000ul_photo from './images/eppendorf_96_wellplate_1000ul_photo.jpg'
+import eppendorf_96_wellplate_2000ul_photo from './images/eppendorf_96_wellplate_2000ul_photo.jpg'
+import eppendorf_twintec_384_wellplate_45ul_photo from './images/eppendorf_twintec_384_wellplate_45ul_photo.jpg'
 import geb_96_tiprack_1000ul_side_view from './images/geb_96_tiprack_1000ul_side_view.jpg'
 import geb_1000ul_tip_side_view from './images/geb_1000ul_tip_side_view.jpg'
 import geb_96_tiprack_10ul_side_view from './images/geb_96_tiprack_10ul_side_view.jpg'
@@ -86,6 +90,12 @@ export const labwareImages: Record<string, string[]> = {
   ],
   eppendorf_96_tiprack_1000ul_eptips: [eppendorf_1000ul_tip_eptips_side_view],
   eppendorf_96_tiprack_10ul_eptips: [eppendorf_10ul_tips_eptips_side_view],
+  eppendorf_96_wellplate_150ul: [eppendorf_96_wellplate_150ul_photo],
+  eppendorf_96_wellplate_1000ul: [eppendorf_96_wellplate_1000ul_photo],
+  eppendorf_96_wellplate_2000ul: [eppendorf_96_wellplate_2000ul_photo],
+  eppendorf_twintec_384_wellplate_45ul: [
+    eppendorf_twintec_384_wellplate_45ul_photo,
+  ],
   geb_96_tiprack_1000ul: [
     geb_96_tiprack_1000ul_side_view,
     geb_1000ul_tip_side_view,
