@@ -269,7 +269,7 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                               backgroundColor={COLORS.white}
                               borderRadius={BORDERS.borderRadius8}
                               alignItems={ALIGN_CENTER}
-                              minWidth="3.75rem"
+                              width="3.75rem"
                             >
                               <ModuleDiagram
                                 type={module.type}
