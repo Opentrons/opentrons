@@ -177,8 +177,7 @@ class RobotContext(publisher.CommandPublisher):
                 top_of_labware = loc.wells()[0].top()
                 loc = top_of_labware.point
                 return {mount_axis: loc.z, AxisType.X: loc.x, AxisType.Y: loc.y}
-            elif location is DeckLocation:
-                assert not isinstance(location, Location)
+            elif location is DeckLocation and not isinstance(location, Location):
                 slot_name = validation.ensure_and_convert_deck_slot(
                     location,
                     api_version=self._api_version,
@@ -186,10 +185,14 @@ class RobotContext(publisher.CommandPublisher):
                 )
                 loc = self._protocol_core.get_slot_center(slot_name)
                 return {mount_axis: loc.z, AxisType.X: loc.x, AxisType.Y: loc.y}
-            else:
+            elif isinstance(location, Location):
                 assert isinstance(location, Location)
                 loc = location.point
                 return {mount_axis: loc.z, AxisType.X: loc.x, AxisType.Y: loc.y}
+            else:
+                raise ValueError(
+                    "Location parameter must be a Module, Deck Location, or Location type."
+                )
         else:
             raise TypeError("You must specify a location to move to.")
 
