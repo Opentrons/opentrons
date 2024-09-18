@@ -11,6 +11,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
+  NO_WRAP,
 } from '../../styles'
 import { LegacyStyledText } from '../StyledText'
 import type {
@@ -362,7 +363,7 @@ export function Toast(props: ToastProps): JSX.Element {
               maxWidth={showODDStyle ? '30.375rem' : 'auto'}
               overflow="hidden"
               textOverflow="ellipsis"
-              whiteSpace="nowrap"
+              whiteSpace={NO_WRAP}
             >
               {headingText}
             </LegacyStyledText>
@@ -412,7 +413,7 @@ export function Toast(props: ToastProps): JSX.Element {
               showODDStyle ? 'none' : TYPOGRAPHY.textDecorationUnderline
             }
             textTransform={TYPOGRAPHY.textTransformCapitalize}
-            whiteSpace="nowrap"
+            whiteSpace={NO_WRAP}
           >
             {closeText}
           </LegacyStyledText>

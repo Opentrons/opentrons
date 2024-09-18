@@ -19,14 +19,18 @@ import {
   ToggleGroup,
   useOnClickOutside,
 } from '@opentrons/components'
+import { selectTerminalItem } from '../../ui/steps/actions/actions'
 import { useKitchen } from '../../organisms/Kitchen/hooks'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { generateNewProtocol } from '../../labware-ingred/actions'
 import { DefineLiquidsModal, ProtocolMetadataNav } from '../../organisms'
+import { SettingsIcon } from '../../molecules'
+import { getFileMetadata } from '../../file-data/selectors'
 import { DeckSetupContainer } from './DeckSetup'
 import { selectors } from '../../labware-ingred/selectors'
 import { OffDeck } from './Offdeck'
 import { LiquidsOverflowMenu } from './LiquidsOverflowMenu'
+import { ProtocolSteps } from './ProtocolSteps'
 
 import type { CutoutId } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
@@ -45,6 +49,7 @@ export function Designer(): JSX.Element {
   const { bakeToast, makeSnackbar } = useKitchen()
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const fileMetadata = useSelector(getFileMetadata)
   const zoomIn = useSelector(selectors.getZoomedInSlot)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const isNewProtocol = useSelector(selectors.getIsNewProtocol)
@@ -105,6 +110,15 @@ export function Designer(): JSX.Element {
     }
   }, [])
 
+  React.useEffect(() => {
+    if (fileMetadata?.created == null) {
+      console.warn(
+        'fileMetadata was refreshed while on the designer page, redirecting to landing page'
+      )
+      navigate('/')
+    }
+  }, [fileMetadata])
+
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
       if (!showDefineLiquidModal) {
@@ -114,7 +128,18 @@ export function Designer(): JSX.Element {
   })
 
   const deckViewItems =
-    deckView === leftString ? <DeckSetupContainer /> : <OffDeck />
+    deckView === leftString ? (
+      <DeckSetupContainer tab={tab} />
+    ) : (
+      <OffDeck tab={tab} />
+    )
+
+  React.useEffect(() => {
+    if (tab === 'startingDeck') {
+      //  ensure that the starting deck page is always showing the initial deck setup
+      dispatch(selectTerminalItem('__initial_setup__'))
+    }
+  }, [tab])
 
   return (
     <>
@@ -146,7 +171,8 @@ export function Designer(): JSX.Element {
             <Tabs tabs={[startingDeckTab, protocolStepTab]} />
           )}
           <ProtocolMetadataNav />
-          <Flex gridGap={SPACING.spacing8}>
+          <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+            <SettingsIcon />
             <PrimaryButton
               onClick={() => {
                 showLiquidOverflowMenu(true)
@@ -159,7 +185,6 @@ export function Designer(): JSX.Element {
                 </StyledText>
               </Flex>
             </PrimaryButton>
-
             <SecondaryButton
               onClick={() => {
                 if (hasTrashEntity) {
@@ -173,17 +198,17 @@ export function Designer(): JSX.Element {
             </SecondaryButton>
           </Flex>
         </Flex>
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          backgroundColor={
-            tab === 'startingDeck' && deckView === rightString
-              ? COLORS.white
-              : COLORS.grey10
-          }
-          padding={zoomIn.slot != null ? '0' : SPACING.spacing80}
-          height="calc(100vh - 64px)"
-        >
-          {tab === 'startingDeck' ? (
+        {tab === 'startingDeck' ? (
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            backgroundColor={
+              tab === 'startingDeck' && deckView === rightString
+                ? COLORS.white
+                : COLORS.grey10
+            }
+            padding={zoomIn.slot != null ? '0' : SPACING.spacing80}
+            height="calc(100vh - 64px)"
+          >
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
               {zoomIn.slot == null ? (
                 <Flex alignSelf={ALIGN_END}>
@@ -202,10 +227,10 @@ export function Designer(): JSX.Element {
               ) : null}
               {deckViewItems}
             </Flex>
-          ) : (
-            <div>TODO wire this up</div>
-          )}
-        </Flex>
+          </Flex>
+        ) : (
+          <ProtocolSteps />
+        )}
       </Flex>
     </>
   )

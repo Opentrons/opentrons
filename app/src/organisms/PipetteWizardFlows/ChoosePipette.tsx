@@ -9,6 +9,7 @@ import {
   ALIGN_FLEX_END,
   BORDERS,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -18,12 +19,12 @@ import {
   JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
+  ModalShell,
   POSITION_ABSOLUTE,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
-  ModalShell,
 } from '@opentrons/components'
 import {
   EIGHT_CHANNEL,
@@ -55,7 +56,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
   border-radius: ${BORDERS.borderRadius8};
   height: 14.5625rem;
   width: 14.5625rem;
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};

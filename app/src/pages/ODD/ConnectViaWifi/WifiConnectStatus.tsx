@@ -7,7 +7,7 @@ import {
   ConnectingNetwork,
   FailedToConnect,
   WifiConnectionDetails,
-} from '../../../organisms/NetworkSettings'
+} from '../../../organisms/ODD/NetworkSettings'
 import { RobotSetupHeader } from '../../../organisms/RobotSetupHeader'
 import * as RobotApi from '../../../redux/robot-api'
 

@@ -15,7 +15,7 @@ import {
   mockMagneticModule as mockMagneticModuleFixture,
 } from '../../../../../redux/modules/__fixtures__/index'
 import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getAttachedProtocolModuleMatches } from '../../../../ProtocolSetupModulesAndDeck/utils'
+import { getAttachedProtocolModuleMatches } from '../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
 import { ModuleInfo } from '../../../ModuleInfo'
 import { SetupModulesMap } from '../SetupModulesMap'
 
@@ -44,7 +44,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
   }
 })
 vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../../../../ProtocolSetupModulesAndDeck/utils')
+vi.mock('../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils')
 vi.mock('../../../ModuleInfo')
 vi.mock('../../../hooks')
 

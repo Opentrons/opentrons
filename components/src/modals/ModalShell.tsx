@@ -2,6 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import {
   ALIGN_CENTER,
+  CURSOR_DEFAULT,
   JUSTIFY_CENTER,
   OVERFLOW_AUTO,
   POSITION_ABSOLUTE,
@@ -82,7 +83,7 @@ const Overlay = styled.div`
   bottom: 0;
   z-index: 1;
   background-color: ${COLORS.black90}${COLORS.opacity40HexCode};
-  cursor: default;
+  cursor: ${CURSOR_DEFAULT};
 `
 const ContentArea = styled.div<{ zIndex: string | number }>`
   display: flex;

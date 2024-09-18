@@ -1,5 +1,6 @@
 {
   "add_gripper": "Add a gripper",
+  "app_version": "{{version}} or higher",
   "author": "Organization/Author",
   "created": "Date created",
   "deck_hardware": "Deck hardware",
@@ -24,6 +25,7 @@
   "no_liquids": "No liquids",
   "no_steps": "No steps defined",
   "protocol_metadata": "Protocol Metadata",
+  "required_app_version": "Required app version",
   "right_pip": "Right pipette",
   "robotType": "Robot type",
   "starting_deck": "Protocol Starting Deck",

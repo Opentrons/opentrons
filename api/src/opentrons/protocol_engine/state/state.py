@@ -354,6 +354,7 @@ class StateStore(StateView, ActionHandler):
         self._geometry = GeometryView(
             config=self._config,
             labware_view=self._labware,
+            well_view=self._wells,
             module_view=self._modules,
             pipette_view=self._pipettes,
             addressable_area_view=self._addressable_areas,

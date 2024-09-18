@@ -7,6 +7,7 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  CURSOR_POINTER,
   DIRECTION_ROW,
   DISPLAY_FLEX,
   Flex,
@@ -188,7 +189,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
   border-radius: ${BORDERS.borderRadius8};
   height: 12.5625rem;
   width: 14.5625rem;
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};

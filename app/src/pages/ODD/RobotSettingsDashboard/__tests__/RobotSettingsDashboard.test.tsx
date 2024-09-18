@@ -19,7 +19,7 @@ import {
   Privacy,
   RobotSystemVersion,
   UpdateChannel,
-} from '../../../../organisms/RobotSettingsDashboard'
+} from '../../../../organisms/ODD/RobotSettingsDashboard'
 import { getRobotUpdateAvailable } from '../../../../redux/robot-update'
 import { useNetworkConnection } from '../../../../resources/networking/hooks/useNetworkConnection'
 import { useLEDLights } from '../../../../organisms/Devices/hooks'
@@ -32,14 +32,16 @@ vi.mock('../../../../redux/config')
 vi.mock('../../../../redux/robot-settings')
 vi.mock('../../../../resources/networking/hooks/useNetworkConnection')
 vi.mock('../../../../organisms/Navigation')
-vi.mock('../../../../organisms/RobotSettingsDashboard/TouchScreenSleep')
-vi.mock('../../../../organisms/RobotSettingsDashboard/NetworkSettings')
-vi.mock('../../../../organisms/RobotSettingsDashboard/DeviceReset')
-vi.mock('../../../../organisms/RobotSettingsDashboard/RobotSystemVersion')
-vi.mock('../../../../organisms/RobotSettingsDashboard/TouchscreenBrightness')
-vi.mock('../../../../organisms/RobotSettingsDashboard/UpdateChannel')
+vi.mock('../../../../organisms/ODD/RobotSettingsDashboard/TouchScreenSleep')
+vi.mock('../../../../organisms/ODD/RobotSettingsDashboard/NetworkSettings')
+vi.mock('../../../../organisms/ODD/RobotSettingsDashboard/DeviceReset')
+vi.mock('../../../../organisms/ODD/RobotSettingsDashboard/RobotSystemVersion')
+vi.mock(
+  '../../../../organisms/ODD/RobotSettingsDashboard/TouchscreenBrightness'
+)
+vi.mock('../../../../organisms/ODD/RobotSettingsDashboard/UpdateChannel')
 vi.mock('../../../../organisms/Devices/hooks')
-vi.mock('../../../../organisms/RobotSettingsDashboard/Privacy')
+vi.mock('../../../../organisms/ODD/RobotSettingsDashboard/Privacy')
 
 const mockToggleLights = vi.fn()
 

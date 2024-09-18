@@ -275,7 +275,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
                 <Flex
                   gridGap={SPACING.spacing4}
                   alignItems={ALIGN_CENTER}
-                  whiteSpace="nowrap"
+                  whiteSpace={NO_WRAP}
                   marginLeft={`-${SPACING.spacing4}`}
                 >
                   <Icon name="ot-spinner" spin size="1rem" />

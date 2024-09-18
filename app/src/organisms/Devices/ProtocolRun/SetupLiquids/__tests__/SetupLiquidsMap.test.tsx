@@ -25,9 +25,9 @@ import { useAttachedModules } from '../../../hooks'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
 import { getLabwareRenderInfo } from '../../utils/getLabwareRenderInfo'
 import { getStandardDeckViewLayerBlockList } from '../../utils/getStandardDeckViewLayerBlockList'
-import { getAttachedProtocolModuleMatches } from '../../../../ProtocolSetupModulesAndDeck/utils'
+import { getAttachedProtocolModuleMatches } from '../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
 import { getProtocolModulesInfo } from '../../utils/getProtocolModulesInfo'
-import { mockProtocolModuleInfo } from '../../../../ProtocolSetupLabware/__fixtures__'
+import { mockProtocolModuleInfo } from '../../../../ODD/ProtocolSetup/ProtocolSetupLabware/__fixtures__'
 import { mockFetchModulesSuccessActionPayloadModules } from '../../../../../redux/modules/__fixtures__'
 
 import { SetupLiquidsMap } from '../SetupLiquidsMap'
@@ -52,7 +52,7 @@ vi.mock('../../LabwareInfoOverlay')
 vi.mock('../../../hooks')
 vi.mock('../utils')
 vi.mock('../../utils/getLabwareRenderInfo')
-vi.mock('../../../../ProtocolSetupModulesAndDeck/utils')
+vi.mock('../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils')
 vi.mock('../../utils/getProtocolModulesInfo')
 vi.mock('../../../../../resources/deck_configuration/utils')
 vi.mock('@opentrons/shared-data', async importOriginal => {

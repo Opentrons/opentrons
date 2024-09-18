@@ -41,14 +41,14 @@ import {
   CurrentRunningProtocolCommand,
   RunningProtocolCommandList,
   RunningProtocolSkeleton,
-} from '../../../organisms/OnDeviceDisplay/RunningProtocol'
+} from '../../../organisms/ODD/RunningProtocol'
 import {
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
   useRobotType,
 } from '../../../organisms/Devices/hooks'
-import { CancelingRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
-import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
+import { CancelingRunModal } from '../../../organisms/ODD/RunningProtocol/CancelingRunModal'
+import { ConfirmCancelRunModal } from '../../../organisms/ODD/RunningProtocol/ConfirmCancelRunModal'
 import { getLocalRobot } from '../../../redux/discovery'
 import { OpenDoorAlertModal } from '../../../organisms/OpenDoorAlertModal'
 import {
