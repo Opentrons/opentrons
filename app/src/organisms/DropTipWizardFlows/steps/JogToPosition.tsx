@@ -20,16 +20,14 @@ import type { UseConfirmPositionResult } from '../ConfirmPosition'
 
 type JogToPositionProps = DropTipWizardContainerProps & UseConfirmPositionResult
 
-export const JogToPosition = (
-  props: JogToPositionProps
-): JSX.Element | null => {
-  const {
-    goBackRunValid,
-    dropTipCommands,
-    currentStep,
-    isOnDevice,
-    toggleShowConfirmPosition,
-  } = props
+export const JogToPosition = ({
+  goBackRunValid,
+  dropTipCommands,
+  currentStep,
+  isOnDevice,
+  toggleShowConfirmPosition,
+  modalStyle,
+}: JogToPositionProps): JSX.Element | null => {
   const { handleJog } = dropTipCommands
   const { t } = useTranslation('drop_tip_wizard')
 
@@ -48,12 +46,24 @@ export const JogToPosition = (
             : t('position_and_drop_tip')}
         </LegacyStyledText>
       </Flex>
-      <JogControls jog={handleJog} isOnDevice={isOnDevice} />
-      <DropTipFooterButtons
-        primaryBtnOnClick={toggleShowConfirmPosition}
-        primaryBtnTextOverride={t('shared:confirm_position')}
-        secondaryBtnOnClick={goBackRunValid}
-      />
+      <Flex
+        css={
+          modalStyle === 'simple'
+            ? SIMPLE_CONTENT_SECTION_STYLE
+            : INTERVENTION_CONTENT_SECTION_STYLE
+        }
+      >
+        <JogControls
+          jog={handleJog}
+          isOnDevice={isOnDevice}
+          height={isOnDevice ? '80%' : '100%'}
+        />
+        <DropTipFooterButtons
+          primaryBtnOnClick={toggleShowConfirmPosition}
+          primaryBtnTextOverride={t('shared:confirm_position')}
+          secondaryBtnOnClick={goBackRunValid}
+        />
+      </Flex>
     </>
   )
 }
@@ -64,5 +74,27 @@ const TITLE_SECTION_STYLE = css`
 
   @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
     display: none;
+  }
+`
+
+const SHARED_CONTENT_SECTION_STYLE = `
+  flex-direction: ${DIRECTION_COLUMN};
+  grid-gap: ${SPACING.spacing16};
+`
+
+const SIMPLE_CONTENT_SECTION_STYLE = css`
+  ${SHARED_CONTENT_SECTION_STYLE}
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    grid-gap: 1.5rem;
+  }
+`
+
+const INTERVENTION_CONTENT_SECTION_STYLE = css`
+  ${SHARED_CONTENT_SECTION_STYLE}
+  grid-gap: ${SPACING.spacing40};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    grid-gap: 0.9rem;
   }
 `

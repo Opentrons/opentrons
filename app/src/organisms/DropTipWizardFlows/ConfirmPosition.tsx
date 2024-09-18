@@ -53,8 +53,8 @@ export function useConfirmPosition(
       isRobotPipetteMoving &&
       showConfirmPosition
     ) {
-      toggleIsRobotPipetteMoving()
       toggleShowConfirmPosition()
+      toggleIsRobotPipetteMoving()
     }
   }, [currentStep, isRobotPipetteMoving])
 
@@ -131,6 +131,10 @@ const SHARED_CONTAINER_STYLE = `
 const INTERVENTION_CONTAINER_STYLE = css`
   ${SHARED_CONTAINER_STYLE}
   margin-top: ${SPACING.spacing60};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    margin-top: ${SPACING.spacing48};
+  }
 `
 
 const SIMPLE_CONTAINER_STYLE = css`

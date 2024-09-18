@@ -1,17 +1,19 @@
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
 import {
   PrimaryButton,
   AlertPrimaryButton,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_FLEX_END,
+  ALIGN_CENTER,
   Box,
   RESPONSIVENESS,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
 
 import { TextOnlyButton, SmallButton } from '../../../atoms/buttons'
-import { useTranslation } from 'react-i18next'
-import * as React from 'react'
-import { css } from 'styled-components'
 
 interface DropTipFooterButtonsProps {
   primaryBtnOnClick: () => void
@@ -26,14 +28,15 @@ export function DropTipFooterButtons(
   props: DropTipFooterButtonsProps
 ): JSX.Element {
   return (
-    <Flex
-      width="100%"
-      height="100%"
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      alignItems={ALIGN_FLEX_END}
-    >
-      <DropTipGoBackButton {...props} />
-      <DropTipPrimaryBtn {...props} />
+    <Flex width="100%" height="100%" alignItems={ALIGN_FLEX_END}>
+      <Flex
+        width="100%"
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_CENTER}
+      >
+        <DropTipGoBackButton {...props} />
+        <DropTipPrimaryBtn {...props} />
+      </Flex>
     </Flex>
   )
 }

@@ -95,6 +95,7 @@ const SHARED_IMAGE_STYLE = `
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     width: 282px;
     height: 234px;
+    margin-top: 0;
   }
 `
 

@@ -82,7 +82,9 @@ const CONTAINER_STYLE = css`
 const ICON_STYLE = css`
   width: 40px;
   height: 40px;
-  color: ${COLORS.red50} @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+  color: ${COLORS.red50};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     width: 60px;
     height: 60px;
   }
