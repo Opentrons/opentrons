@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   CheckboxField,
-  COLORS,
   DIRECTION_COLUMN,
   DISPLAY_INLINE_BLOCK,
   Flex,
