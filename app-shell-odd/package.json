@@ -55,7 +55,7 @@
     "node-fetch": "2.6.7",
     "node-stream-zip": "1.8.2",
     "pump": "3.0.0",
-    "semver": "5.5.0",
+    "semver": "5.7.2",
     "tempy": "1.0.1",
     "uuid": "3.2.1",
     "winston": "3.1.0",

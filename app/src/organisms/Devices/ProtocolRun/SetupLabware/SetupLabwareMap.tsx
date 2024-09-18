@@ -16,7 +16,7 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
+import { getLabwareSetupItemGroups } from '../../../../transformations/commands'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { getLabwareRenderInfo } from '../utils/getLabwareRenderInfo'
 import { getProtocolModulesInfo } from '../utils/getProtocolModulesInfo'
@@ -88,6 +88,10 @@ export function SetupLabwareMap({
         topLabwareDefinition != null &&
         topLabwareId != null &&
         hoverLabwareId === topLabwareId,
+      highlightShadowLabware:
+        topLabwareDefinition != null &&
+        topLabwareId != null &&
+        hoverLabwareId === topLabwareId,
       stacked: topLabwareDefinition != null && topLabwareId != null,
       moduleChildren: (
         // open modal
@@ -148,6 +152,7 @@ export function SetupLabwareMap({
         topLabwareId,
         topLabwareDisplayName,
         highlight: isLabwareInStack && hoverLabwareId === topLabwareId,
+        highlightShadow: isLabwareInStack && hoverLabwareId === topLabwareId,
         labwareChildren: (
           <g
             cursor={isLabwareInStack ? 'pointer' : ''}

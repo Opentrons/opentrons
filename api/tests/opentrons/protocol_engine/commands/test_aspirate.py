@@ -5,10 +5,8 @@ from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
 from decoy import matchers, Decoy
 import pytest
 
-from opentrons.protocol_engine.commands.pipetting_common import (
-    OverpressureError,
-    OverpressureErrorInternalData,
-)
+from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
+from opentrons.protocol_engine.state import update_types
 from opentrons.types import MountType, Point
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
 
@@ -19,7 +17,7 @@ from opentrons.protocol_engine.commands.aspirate import (
 )
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
 
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 
 from opentrons.protocol_engine.execution import (
     MovementHandler,
@@ -98,6 +96,13 @@ async def test_aspirate_implementation_no_prep(
     assert result == SuccessData(
         public=AspirateResult(volume=50, position=DeckPoint(x=1, y=2, z=3)),
         private=None,
+        state_update=update_types.StateUpdate(
+            pipette_location=update_types.PipetteLocationUpdate(
+                pipette_id="abc",
+                new_location=update_types.Well(labware_id="123", well_name="A3"),
+                new_deck_point=DeckPoint(x=1, y=2, z=3),
+            )
+        ),
     )
 
 
@@ -157,6 +162,13 @@ async def test_aspirate_implementation_with_prep(
     assert result == SuccessData(
         public=AspirateResult(volume=50, position=DeckPoint(x=1, y=2, z=3)),
         private=None,
+        state_update=update_types.StateUpdate(
+            pipette_location=update_types.PipetteLocationUpdate(
+                pipette_id="abc",
+                new_location=update_types.Well(labware_id="123", well_name="A3"),
+                new_deck_point=DeckPoint(x=1, y=2, z=3),
+            )
+        ),
     )
 
     decoy.verify(
@@ -173,6 +185,7 @@ async def test_aspirate_implementation_with_prep(
 async def test_aspirate_raises_volume_error(
     decoy: Decoy,
     pipetting: PipettingHandler,
+    movement: MovementHandler,
     mock_command_note_adder: CommandNoteAdder,
     subject: AspirateImplementation,
 ) -> None:
@@ -189,6 +202,16 @@ async def test_aspirate_raises_volume_error(
     )
 
     decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id="abc")).then_return(True)
+
+    decoy.when(
+        await movement.move_to_well(
+            pipette_id="abc",
+            labware_id="123",
+            well_name="A3",
+            well_location=location,
+            current_well=None,
+        ),
+    ).then_return(Point(1, 2, 3))
 
     decoy.when(
         await pipetting.aspirate_in_place(
@@ -268,7 +291,14 @@ async def test_overpressure_error(
             wrappedErrors=[matchers.Anything()],
             errorInfo={"retryLocation": (position.x, position.y, position.z)},
         ),
-        private=OverpressureErrorInternalData(
-            position=DeckPoint(x=position.x, y=position.y, z=position.z)
+        private=None,
+        state_update=update_types.StateUpdate(
+            pipette_location=update_types.PipetteLocationUpdate(
+                pipette_id=pipette_id,
+                new_location=update_types.Well(
+                    labware_id=labware_id, well_name=well_name
+                ),
+                new_deck_point=DeckPoint(x=position.x, y=position.y, z=position.z),
+            )
         ),
     )

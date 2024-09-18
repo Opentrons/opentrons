@@ -15,13 +15,14 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import temporaryImg from '../../assets/images/placeholder_image_delete.png'
+import { BUTTON_LINK_STYLE } from '../../atoms'
 
 interface WizardBodyProps {
   stepNumber: number
   header: string
   children: React.ReactNode
   proceed: () => void
-  disabled: boolean
+  disabled?: boolean
   goBack?: () => void
   subHeader?: string
   imgSrc?: string
@@ -34,7 +35,7 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
     goBack,
     subHeader,
     proceed,
-    disabled,
+    disabled = false,
     imgSrc,
   } = props
   const { t } = useTranslation('shared')
@@ -83,17 +84,14 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           {goBack != null ? (
-            <Btn onClick={goBack}>
-              <StyledText
-                desktopStyle="bodyLargeSemiBold"
-                color={COLORS.grey60}
-              >
+            <Btn onClick={goBack} css={BUTTON_LINK_STYLE}>
+              <StyledText desktopStyle="bodyLargeSemiBold">
                 {t('go_back')}
               </StyledText>
             </Btn>
           ) : null}
           <LargeButton
-            disabled={disabled}
+            ariaDisabled={disabled}
             onClick={proceed}
             iconName="arrow-right"
             buttonText={t('shared:confirm')}

@@ -12,6 +12,7 @@ from .pipetting_common import (
 )
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
+from ..state import update_types
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
@@ -43,6 +44,8 @@ class MoveToWellImplementation(
         self, params: MoveToWellParams
     ) -> SuccessData[MoveToWellResult, None]:
         """Move the requested pipette to the requested well."""
+        state_update = update_types.StateUpdate()
+
         x, y, z = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
@@ -52,9 +55,18 @@ class MoveToWellImplementation(
             minimum_z_height=params.minimumZHeight,
             speed=params.speed,
         )
+        deck_point = DeckPoint.construct(x=x, y=y, z=z)
+        state_update.set_pipette_location(
+            pipette_id=params.pipetteId,
+            new_labware_id=params.labwareId,
+            new_well_name=params.wellName,
+            new_deck_point=deck_point,
+        )
 
         return SuccessData(
-            public=MoveToWellResult(position=DeckPoint(x=x, y=y, z=z)), private=None
+            public=MoveToWellResult(position=deck_point),
+            private=None,
+            state_update=state_update,
         )
 
 

@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { css } from 'styled-components'
 
 import {
   ALIGN_FLEX_END,
@@ -22,7 +23,7 @@ import {
 } from '@opentrons/components'
 
 import { CONNECTABLE, removeRobot } from '../../redux/discovery'
-import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
+import { useIsRobotOnWrongVersionOfSoftware } from '../../redux/robot-update'
 import { Divider } from '../../atoms/structure'
 import { getTopPortalEl } from '../../App/portal'
 import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
@@ -32,8 +33,7 @@ import { useIsRobotBusy } from './hooks'
 
 import type { StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
-import type { Dispatch, State } from '../../redux/types'
-import { css } from 'styled-components'
+import type { Dispatch } from '../../redux/types'
 
 interface RobotOverflowMenuProps extends StyleProps {
   robot: DiscoveredRobot
@@ -60,11 +60,9 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
     setShowConnectionTroubleshootingModal,
   ] = React.useState<boolean>(false)
 
-  const { autoUpdateAction } = useSelector((state: State) => {
-    return getRobotUpdateDisplayInfo(state, robot.name)
-  })
-  const isRobotOnWrongVersionOfSoftware =
-    autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'
+  const isRobotOnWrongVersionOfSoftware = useIsRobotOnWrongVersionOfSoftware(
+    robot.name
+  )
 
   const isRobotBusy = useIsRobotBusy({ poll: true })
 

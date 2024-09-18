@@ -10,7 +10,6 @@ export function WellSelectionInstructions(): JSX.Element {
       <Icon className={styles.click_drag_icon} name="ot-click-and-drag" />
       <div className={styles.instructional_text}>
         <p>{t('select_instructions')}</p>
-        <p>{t('deselect_instructions')}</p>
       </div>
     </div>
   )

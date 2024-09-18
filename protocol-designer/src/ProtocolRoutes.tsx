@@ -7,15 +7,16 @@ import { Liquids } from './pages/Liquids'
 import { Designer } from './pages/Designer'
 import { CreateNewProtocolWizard } from './pages/CreateNewProtocolWizard'
 import { NavigationBar } from './NavigationBar'
+import { Settings } from './pages/Settings'
 import {
   Kitchen,
   FileUploadMessagesModal,
   LabwareUploadModal,
+  AnnouncementModal,
 } from './organisms'
 
 import type { RouteProps } from './types'
 
-const LANDING_ROUTE = '/'
 const pdRoutes: RouteProps[] = [
   {
     Component: ProtocolOverview,
@@ -41,6 +42,12 @@ const pdRoutes: RouteProps[] = [
     navLinkTo: '/createNew',
     path: '/createNew',
   },
+  {
+    Component: Settings,
+    name: 'Settings',
+    navLinkTo: '/settings',
+    path: '/settings',
+  },
 ]
 
 export function ProtocolRoutes(): JSX.Element {
@@ -57,13 +64,14 @@ export function ProtocolRoutes(): JSX.Element {
       <NavigationBar />
       <Kitchen>
         <Box width="100%">
+          <AnnouncementModal />
           <LabwareUploadModal />
           <FileUploadMessagesModal />
           <Routes>
             {allRoutes.map(({ Component, path }: RouteProps) => {
               return <Route key={path} path={path} element={<Component />} />
             })}
-            <Route path="*" element={<Navigate to={LANDING_ROUTE} />} />
+            <Route path="*" element={<Navigate to={landingPage.path} />} />
           </Routes>
         </Box>
       </Kitchen>

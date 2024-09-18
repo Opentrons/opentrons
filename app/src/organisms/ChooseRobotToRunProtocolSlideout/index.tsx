@@ -1,25 +1,27 @@
 import * as React from 'react'
 import first from 'lodash/first'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
+  ALIGN_CENTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   Icon,
+  NO_WRAP,
   PrimaryButton,
   SecondaryButton,
   SPACING,
   Tooltip,
   useHoverTooltip,
-  ALIGN_CENTER,
-  NO_WRAP,
 } from '@opentrons/components'
-import { useUploadCsvFileMutation } from '@opentrons/react-api-client'
+import {
+  useUploadCsvFileMutation,
+  ApiHostProvider,
+} from '@opentrons/react-api-client'
 
-import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
+import { useIsRobotOnWrongVersionOfSoftware } from '../../redux/robot-update'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { appShellRequestor } from '../../redux/shell/remote'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
@@ -33,7 +35,6 @@ import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
 import type { StyleProps } from '@opentrons/components'
 import type { RunTimeParameter } from '@opentrons/shared-data'
-import type { State } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 
@@ -46,11 +47,23 @@ interface ChooseRobotToRunProtocolSlideoutProps extends StyleProps {
   showSlideout: boolean
 }
 
+interface ChooseRobotToRunProtocolSlideoutComponentProps
+  extends ChooseRobotToRunProtocolSlideoutProps {
+  selectedRobot: Robot | null
+  setSelectedRobot: (robot: Robot | null) => void
+}
+
 export function ChooseRobotToRunProtocolSlideoutComponent(
-  props: ChooseRobotToRunProtocolSlideoutProps
+  props: ChooseRobotToRunProtocolSlideoutComponentProps
 ): JSX.Element | null {
   const { t } = useTranslation(['protocol_details', 'shared', 'app_settings'])
-  const { storedProtocolData, showSlideout, onCloseClick } = props
+  const {
+    storedProtocolData,
+    showSlideout,
+    onCloseClick,
+    selectedRobot,
+    setSelectedRobot,
+  } = props
   const navigate = useNavigate()
   const [shouldApplyOffsets, setShouldApplyOffsets] = React.useState<boolean>(
     true
@@ -62,7 +75,6 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     mostRecentAnalysis,
   } = storedProtocolData
   const [currentPage, setCurrentPage] = React.useState<number>(1)
-  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
   const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
     storedProtocolData,
     selectedRobot?.name ?? ''
@@ -83,19 +95,10 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
 
   const offsetCandidates = useOffsetCandidatesForAnalysis(
     mostRecentAnalysis,
-    selectedRobot?.ip ?? null
+    null
   )
 
-  const { uploadCsvFile } = useUploadCsvFileMutation(
-    {},
-    selectedRobot != null
-      ? {
-          hostname: selectedRobot.ip,
-          requestor:
-            selectedRobot?.ip === OPENTRONS_USB ? appShellRequestor : undefined,
-        }
-      : null
-  )
+  const { uploadCsvFile } = useUploadCsvFileMutation()
 
   const {
     createRunFromProtocolSource,
@@ -121,13 +124,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
         })
       },
     },
-    selectedRobot != null
-      ? {
-          hostname: selectedRobot.ip,
-          requestor:
-            selectedRobot?.ip === OPENTRONS_USB ? appShellRequestor : undefined,
-        }
-      : null,
+    null,
     shouldApplyOffsets
       ? offsetCandidates.map(({ vector, location, definitionUri }) => ({
           vector,
@@ -175,14 +172,9 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     })
   }
 
-  const { autoUpdateAction } = useSelector((state: State) =>
-    getRobotUpdateDisplayInfo(state, selectedRobot?.name ?? '')
+  const isSelectedRobotOnDifferentSoftwareVersion = useIsRobotOnWrongVersionOfSoftware(
+    selectedRobot?.name ?? ''
   )
-
-  const isSelectedRobotOnDifferentSoftwareVersion = [
-    'upgrade',
-    'downgrade',
-  ].includes(autoUpdateAction)
 
   const hasRunTimeParameters = runTimeParameters.length > 0
 
@@ -204,9 +196,9 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     first(srcFileNames) ??
     protocolKey
 
-  // intentionally show both robot types if analysis has any error
+  // intentionally show both robot types if analysis fails
   const robotType =
-    mostRecentAnalysis != null && mostRecentAnalysis.errors.length === 0
+    mostRecentAnalysis != null && mostRecentAnalysis.result !== 'not-ok'
       ? mostRecentAnalysis?.robotType ?? null
       : null
 
@@ -260,7 +252,11 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
             </PrimaryButton>
           </>
         ) : (
-          <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_ROW}>
+          <Flex
+            gridGap={SPACING.spacing8}
+            flexDirection={DIRECTION_ROW}
+            whiteSpace={NO_WRAP}
+          >
             <SecondaryButton
               onClick={() => {
                 setCurrentPage(1)
@@ -357,5 +353,18 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
 export function ChooseRobotToRunProtocolSlideout(
   props: ChooseRobotToRunProtocolSlideoutProps
 ): JSX.Element | null {
-  return <ChooseRobotToRunProtocolSlideoutComponent {...props} />
+  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
+  return (
+    <ApiHostProvider
+      hostname={selectedRobot?.ip ?? null}
+      port={selectedRobot?.port ?? null}
+      requestor={
+        selectedRobot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
+      }
+    >
+      <ChooseRobotToRunProtocolSlideoutComponent
+        {...{ ...props, selectedRobot, setSelectedRobot }}
+      />
+    </ApiHostProvider>
+  )
 }

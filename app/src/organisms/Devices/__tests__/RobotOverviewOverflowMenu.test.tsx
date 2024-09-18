@@ -8,7 +8,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
 import { home } from '../../../redux/robot-controls'
-import * as Buildroot from '../../../redux/robot-update'
+import { useIsRobotOnWrongVersionOfSoftware } from '../../../redux/robot-update'
 import { restartRobot } from '../../../redux/robot-admin'
 import {
   mockConnectableRobot,
@@ -24,8 +24,6 @@ import { handleUpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 
-import type { State } from '../../../redux/types'
-
 vi.mock('../../../redux/robot-controls')
 vi.mock('../../../redux/robot-admin')
 vi.mock('../hooks')
@@ -38,8 +36,6 @@ vi.mock('../../ChooseProtocolSlideout')
 vi.mock('../../../resources/runs')
 vi.mock('../RobotSettings/UpdateBuildroot')
 vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
-
-const getBuildrootUpdateDisplayInfo = Buildroot.getRobotUpdateDisplayInfo
 
 const render = (
   props: React.ComponentProps<typeof RobotOverviewOverflowMenu>
@@ -60,13 +56,7 @@ describe('RobotOverviewOverflowMenu', () => {
 
   beforeEach(() => {
     props = { robot: mockConnectableRobot }
-    when(getBuildrootUpdateDisplayInfo)
-      .calledWith({} as State, mockConnectableRobot.name)
-      .thenReturn({
-        autoUpdateAction: 'reinstall',
-        autoUpdateDisabledReason: null,
-        updateFromFileDisabledReason: null,
-      })
+    vi.mocked(useIsRobotOnWrongVersionOfSoftware).mockReturnValue(false)
     vi.mocked(useCurrentRunId).mockReturnValue(null)
     vi.mocked(useIsRobotBusy).mockReturnValue(false)
     vi.mocked(handleUpdateBuildroot).mockReturnValue()
@@ -107,13 +97,7 @@ describe('RobotOverviewOverflowMenu', () => {
   })
 
   it('should render update robot software button when robot is on wrong version of software', () => {
-    when(getBuildrootUpdateDisplayInfo)
-      .calledWith({} as State, mockConnectableRobot.name)
-      .thenReturn({
-        autoUpdateAction: 'upgrade',
-        autoUpdateDisabledReason: null,
-        updateFromFileDisabledReason: null,
-      })
+    vi.mocked(useIsRobotOnWrongVersionOfSoftware).mockReturnValue(true)
 
     render(props)
 
@@ -238,11 +222,6 @@ describe('RobotOverviewOverflowMenu', () => {
     expect(restartRobot).toBeCalled()
   })
   it('render overflow menu buttons without the update robot software button', () => {
-    vi.mocked(getBuildrootUpdateDisplayInfo).mockReturnValue({
-      autoUpdateAction: 'reinstall',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
     render(props)
     const btn = screen.getByRole('button')
     fireEvent.click(btn)
@@ -263,11 +242,6 @@ describe('RobotOverviewOverflowMenu', () => {
   })
 
   it('should render disabled menu items except restart robot and robot settings when e-stop is pressed', () => {
-    vi.mocked(getBuildrootUpdateDisplayInfo).mockReturnValue({
-      autoUpdateAction: 'reinstall',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
     when(useIsEstopNotDisengaged)
       .calledWith(mockConnectableRobot.name)
       .thenReturn(true)

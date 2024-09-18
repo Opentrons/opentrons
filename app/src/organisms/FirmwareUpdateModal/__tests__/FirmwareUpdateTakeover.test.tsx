@@ -12,7 +12,7 @@ import {
 import { i18n } from '../../../i18n'
 import { UpdateNeededModal } from '../UpdateNeededModal'
 import { UpdateInProgressModal } from '../UpdateInProgressModal'
-import { useIsUnboxingFlowOngoing } from '../../RobotSettingsDashboard/NetworkSettings/hooks'
+import { useIsUnboxingFlowOngoing } from '../../ODD/hooks'
 import { FirmwareUpdateTakeover } from '../FirmwareUpdateTakeover'
 import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
 
@@ -21,7 +21,7 @@ import type { BadPipette, PipetteData } from '@opentrons/api-client'
 vi.mock('@opentrons/react-api-client')
 vi.mock('../UpdateNeededModal')
 vi.mock('../UpdateInProgressModal')
-vi.mock('../../RobotSettingsDashboard/NetworkSettings/hooks')
+vi.mock('../../ODD/hooks')
 vi.mock('../../../resources/maintenance_runs')
 
 const render = () => {

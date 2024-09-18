@@ -248,7 +248,6 @@ export function StackingOffsets(): JSX.Element | null {
                       {isChecked ? (
                         <div
                           style={{
-                            marginTop: '-1.2rem',
                             height: '2.0rem',
                             fontSize: '0.75rem',
                           }}

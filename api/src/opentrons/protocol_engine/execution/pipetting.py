@@ -5,7 +5,8 @@ from contextlib import contextmanager
 
 from opentrons.hardware_control import HardwareControlAPI
 
-from ..state import StateView, HardwarePipette
+from ..state.state import StateView
+from ..state.pipettes import HardwarePipette
 from ..notes import CommandNoteAdder, CommandNote
 from ..errors.exceptions import (
     TipNotAttachedError,
@@ -193,7 +194,9 @@ class HardwarePipettingHandler(PipettingHandler):
             mount=hw_pipette.mount,
             max_z_dist=well_depth - lld_min_height + well_location.offset.z,
         )
-        return float(z_pos)
+        labware_pos = self._state_view.geometry.get_labware_position(labware_id)
+        relative_height = z_pos - labware_pos.z - well_def.z
+        return float(relative_height)
 
     @contextmanager
     def _set_flow_rate(

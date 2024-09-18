@@ -11,7 +11,8 @@ from opentrons_shared_data.robot import load as load_robot
 
 from .protocol_engine import ProtocolEngine
 from .resources import DeckDataProvider, ModuleDataProvider
-from .state import Config, StateStore
+from .state.config import Config
+from .state.state import StateStore
 from .types import PostRunHardwareState, DeckConfigurationType
 
 from .engine_support import create_run_orchestrator

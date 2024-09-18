@@ -73,7 +73,8 @@
       "calibration/moveToMaintenancePosition": "#/definitions/MoveToMaintenancePositionCreate",
       "unsafe/blowOutInPlace": "#/definitions/UnsafeBlowOutInPlaceCreate",
       "unsafe/dropTipInPlace": "#/definitions/UnsafeDropTipInPlaceCreate",
-      "unsafe/updatePositionEstimators": "#/definitions/UpdatePositionEstimatorsCreate"
+      "unsafe/updatePositionEstimators": "#/definitions/UpdatePositionEstimatorsCreate",
+      "unsafe/engageAxes": "#/definitions/UnsafeEngageAxesCreate"
     }
   },
   "oneOf": [
@@ -283,13 +284,16 @@
     },
     {
       "$ref": "#/definitions/UpdatePositionEstimatorsCreate"
+    },
+    {
+      "$ref": "#/definitions/UnsafeEngageAxesCreate"
     }
   ],
   "definitions": {
     "WellOrigin": {
       "title": "WellOrigin",
       "description": "Origin of WellLocation offset.\n\nProps:\n    TOP: the top-center of the well\n    BOTTOM: the bottom-center of the well\n    CENTER: the middle-center of the well",
-      "enum": ["top", "bottom", "center"],
+      "enum": ["top", "bottom", "center", "meniscus"],
       "type": "string"
     },
     "WellOffset": {
@@ -4452,6 +4456,51 @@
         },
         "params": {
           "$ref": "#/definitions/UpdatePositionEstimatorsParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "UnsafeEngageAxesParams": {
+      "title": "UnsafeEngageAxesParams",
+      "description": "Payload required for an UnsafeEngageAxes command.",
+      "type": "object",
+      "properties": {
+        "axes": {
+          "description": "The axes for which to enable.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MotorAxis"
+          }
+        }
+      },
+      "required": ["axes"]
+    },
+    "UnsafeEngageAxesCreate": {
+      "title": "UnsafeEngageAxesCreate",
+      "description": "UnsafeEngageAxes command request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "unsafe/engageAxes",
+          "enum": ["unsafe/engageAxes"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/UnsafeEngageAxesParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",

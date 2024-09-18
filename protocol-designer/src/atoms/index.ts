@@ -1,1 +1,1 @@
-console.log('atoms for new components')
+export * from './constants'

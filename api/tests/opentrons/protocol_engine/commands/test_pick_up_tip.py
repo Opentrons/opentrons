@@ -9,7 +9,8 @@ from opentrons.protocol_engine import WellLocation, WellOffset, DeckPoint
 from opentrons.protocol_engine.errors import TipNotAttachedError
 from opentrons.protocol_engine.execution import MovementHandler, TipHandler
 from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import TipGeometry
 
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
@@ -18,7 +19,6 @@ from opentrons.protocol_engine.commands.pick_up_tip import (
     PickUpTipResult,
     PickUpTipImplementation,
     TipPhysicallyMissingError,
-    TipPhysicallyMissingErrorInternalData,
 )
 
 
@@ -73,6 +73,13 @@ async def test_success(
             position=DeckPoint(x=111, y=222, z=333),
         ),
         private=None,
+        state_update=update_types.StateUpdate(
+            pipette_location=update_types.PipetteLocationUpdate(
+                pipette_id="pipette-id",
+                new_location=update_types.Well(labware_id="labware-id", well_name="A3"),
+                new_deck_point=DeckPoint(x=111, y=222, z=333),
+            )
+        ),
     )
 
 
@@ -98,6 +105,14 @@ async def test_tip_physically_missing_error(
     error_created_at = datetime(1234, 5, 6)
 
     decoy.when(
+        await movement.move_to_well(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="well-name",
+            well_location=WellLocation(offset=WellOffset()),
+        )
+    ).then_return(Point(x=111, y=222, z=333))
+    decoy.when(
         await tip_handler.pick_up_tip(
             pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
         )
@@ -113,7 +128,14 @@ async def test_tip_physically_missing_error(
         public=TipPhysicallyMissingError.construct(
             id=error_id, createdAt=error_created_at, wrappedErrors=[matchers.Anything()]
         ),
-        private=TipPhysicallyMissingErrorInternalData(
-            pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
+        private=None,
+        state_update=update_types.StateUpdate(
+            pipette_location=update_types.PipetteLocationUpdate(
+                pipette_id="pipette-id",
+                new_location=update_types.Well(
+                    labware_id="labware-id", well_name="well-name"
+                ),
+                new_deck_point=DeckPoint(x=111, y=222, z=333),
+            )
         ),
     )

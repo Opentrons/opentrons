@@ -8,7 +8,7 @@ import { useEstopQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { EstopMissingModal } from '../EstopMissingModal'
 import { EstopPressedModal } from '../EstopPressedModal'
-import { useIsUnboxingFlowOngoing } from '../../RobotSettingsDashboard/NetworkSettings/hooks'
+import { useIsUnboxingFlowOngoing } from '../../ODD/hooks'
 import {
   ENGAGED,
   LOGICALLY_ENGAGED,
@@ -22,7 +22,7 @@ import { EstopTakeover } from '../EstopTakeover'
 vi.mock('@opentrons/react-api-client')
 vi.mock('../EstopMissingModal')
 vi.mock('../EstopPressedModal')
-vi.mock('../../RobotSettingsDashboard/NetworkSettings/hooks')
+vi.mock('../../ODD/hooks')
 vi.mock('../../../redux/discovery')
 
 const mockPressed = {

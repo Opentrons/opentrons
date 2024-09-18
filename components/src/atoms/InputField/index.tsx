@@ -2,14 +2,14 @@ import * as React from 'react'
 import styled, { css } from 'styled-components'
 
 import { Flex } from '../../primitives'
-import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
+import { ALIGN_CENTER, DIRECTION_COLUMN, TEXT_ALIGN_RIGHT } from '../../styles'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { Tooltip } from '../Tooltip'
 import { useHoverTooltip } from '../../tooltips'
 import { LegacyStyledText } from '../StyledText'
-
+import type { IconName } from '../../icons'
 export const INPUT_TYPE_NUMBER = 'number' as const
 export const LEGACY_INPUT_TYPE_TEXT = 'text' as const
 export const LEGACY_INPUT_TYPE_PASSWORD = 'password' as const
@@ -68,6 +68,9 @@ export interface InputFieldProps {
   size?: 'medium' | 'small'
   /** react useRef to control input field instead of react event */
   ref?: React.MutableRefObject<HTMLInputElement | null>
+  leftIcon?: IconName
+  showDeleteIcon?: boolean
+  onDelete?: () => void
 }
 
 export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
@@ -79,6 +82,7 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
       title,
       tooltipText,
       tabIndex = 0,
+      showDeleteIcon = false,
       ...inputProps
     } = props
     const hasError = props.error != null
@@ -106,7 +110,7 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
         ${hasError ? COLORS.red50 : COLORS.grey50};
       font-size: ${TYPOGRAPHY.fontSizeP};
       width: 100%;
-      height: 2rem;
+      height: ${size === 'small' ? '2rem' : '2.75rem'};
 
       &:active:enabled {
         border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
@@ -275,6 +279,15 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
                 }
               }}
             >
+              {props.leftIcon != null ? (
+                <Flex marginRight={SPACING.spacing8}>
+                  <Icon
+                    name={props.leftIcon}
+                    color={COLORS.grey60}
+                    size="1.25rem"
+                  />
+                </Flex>
+              ) : null}
               <StyledInput
                 {...inputProps}
                 data-testid={props.id}
@@ -288,6 +301,15 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
               />
               {props.units != null ? (
                 <Flex css={UNITS_STYLE}>{props.units}</Flex>
+              ) : null}
+              {showDeleteIcon ? (
+                <Flex
+                  alignSelf={TEXT_ALIGN_RIGHT}
+                  onClick={props.onDelete}
+                  cursor="pointer"
+                >
+                  <Icon name="close" size="1.75rem" />
+                </Flex>
               ) : null}
             </Flex>
           </Flex>

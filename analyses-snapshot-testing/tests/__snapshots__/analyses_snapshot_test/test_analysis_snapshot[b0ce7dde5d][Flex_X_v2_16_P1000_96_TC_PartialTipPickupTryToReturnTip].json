@@ -3606,6 +3606,39 @@
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ddccee6754fe0092b9c66898d66b79a7",
+      "notes": [],
+      "params": {
+        "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 20.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -9.8
+          },
+          "origin": "top"
+        },
+        "wellName": "A2"
+      },
+      "result": {
+        "position": {
+          "x": 23.28,
+          "y": 181.18,
+          "z": 4.5
+        },
+        "volume": 20.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
     }
   ],
   "config": {
@@ -3619,7 +3652,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "PartialTipMovementNotAllowedError [line 21]: Error 2004 MOTION_PLANNING_FAILURE (PartialTipMovementNotAllowedError): Requested motion with the A12 nozzle partial configuration is outside of robot bounds for the pipette.",
+      "detail": "UnexpectedProtocolError [line 22]: Error 4000 GENERAL_ERROR (UnexpectedProtocolError): Cannot return tip to a tiprack while the pipette is configured for partial tip.",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -3628,10 +3661,10 @@
       "wrappedErrors": [
         {
           "createdAt": "TIMESTAMP",
-          "detail": "Requested motion with the A12 nozzle partial configuration is outside of robot bounds for the pipette.",
-          "errorCode": "2004",
+          "detail": "Cannot return tip to a tiprack while the pipette is configured for partial tip.",
+          "errorCode": "4000",
           "errorInfo": {},
-          "errorType": "PartialTipMovementNotAllowedError",
+          "errorType": "UnexpectedProtocolError",
           "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []

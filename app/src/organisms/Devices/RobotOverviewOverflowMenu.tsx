@@ -3,7 +3,7 @@ import { css } from 'styled-components'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import {
   BORDERS,
@@ -26,7 +26,7 @@ import { Divider } from '../../atoms/structure'
 import { ChooseProtocolSlideout } from '../../organisms/ChooseProtocolSlideout'
 import { DisconnectModal } from '../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 import { handleUpdateBuildroot } from '../../organisms/Devices/RobotSettings/UpdateBuildroot'
-import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
+import { useIsRobotOnWrongVersionOfSoftware } from '../../redux/robot-update'
 import { UNREACHABLE, CONNECTABLE, REACHABLE } from '../../redux/discovery'
 import { checkShellUpdate } from '../../redux/shell'
 import { restartRobot } from '../../redux/robot-admin'
@@ -36,7 +36,7 @@ import { useCanDisconnect } from '../../resources/networking/hooks'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { useCurrentRunId } from '../../resources/runs'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
-import type { Dispatch, State } from '../../redux/types'
+import type { Dispatch } from '../../redux/types'
 
 interface RobotOverviewOverflowMenuProps {
   robot: DiscoveredRobot
@@ -91,11 +91,9 @@ export const RobotOverviewOverflowMenu = (
     setShowChooseProtocolSlideout(true)
   }
 
-  const { autoUpdateAction } = useSelector((state: State) => {
-    return getRobotUpdateDisplayInfo(state, robot.name)
-  })
-  const isRobotOnWrongVersionOfSoftware =
-    autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'
+  const isRobotOnWrongVersionOfSoftware = useIsRobotOnWrongVersionOfSoftware(
+    robot.name
+  )
   const isRobotUnavailable = isRobotBusy || robot?.status !== CONNECTABLE
   const isUpdateSoftwareItemVisible =
     isRobotOnWrongVersionOfSoftware &&

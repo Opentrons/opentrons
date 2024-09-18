@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, Optional, List, Union
 
-from .abstract_store import HasState, HandlesActions
+from ._abstract_store import HasState, HandlesActions
 from ..actions import (
     Action,
     SucceedCommandAction,
