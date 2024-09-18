@@ -79,8 +79,8 @@ async def test_driver_get_device_info(
 ) -> None:
 
     DEVICE_INFO = MagicMock(AbsorbanceHidInterface.DeviceInfo)
-    DEVICE_INFO.ref_no = ""
-    DEVICE_INFO.sn = "SN: BYOMAA00013 REF: DE MAA 001"
+    DEVICE_INFO.ref_no = "DE MAA 001"
+    DEVICE_INFO.sn = "BYOMAA00013"
     DEVICE_INFO.version = "Absorbance V1.0.2 2024-04-18"
 
     mock_interface.get_device_information.return_value = (
