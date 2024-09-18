@@ -20,7 +20,7 @@ import {
 } from '@opentrons/components'
 import { RobotMotionLoader } from '../RobotMotionLoader'
 import { getPrepCommands } from './getPrepCommands'
-import { WizardRequiredEquipmentList } from '../../../molecules/WizardRequiredEquipmentList'
+import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 import { getLatestCurrentOffsets } from '../../Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 import { getIsOnDevice } from '/app/redux/config'
 import { NeedHelpLink } from '../../CalibrationPanels'
@@ -30,7 +30,7 @@ import { getTopPortalEl } from '../../../App/portal'
 import { SmallButton } from '../../../atoms/buttons'
 import { CALIBRATION_PROBE } from '../../PipetteWizardFlows/constants'
 import { TerseOffsetTable } from '../ResultsSummary'
-import { getLabwareDefinitionsFromCommands } from '../../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
@@ -39,7 +39,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { useChainRunCommands } from '/app/resources/runs'
 import type { RegisterPositionAction } from '../types'
-import type { Jog } from '../../../molecules/JogControls'
+import type { Jog } from '/app/molecules/JogControls'
 
 export const INTERVAL_MS = 3000
 

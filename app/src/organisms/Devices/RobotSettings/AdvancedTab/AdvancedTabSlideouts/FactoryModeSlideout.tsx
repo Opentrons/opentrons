@@ -24,8 +24,8 @@ import {
 
 import { ToggleButton } from '../../../../../atoms/buttons'
 import { MultiSlideout } from '../../../../../atoms/Slideout/MultiSlideout'
-import { FileUpload } from '../../../../../molecules/FileUpload'
-import { UploadInput } from '../../../../../molecules/UploadInput'
+import { FileUpload } from '/app/molecules/FileUpload'
+import { UploadInput } from '/app/molecules/UploadInput'
 import { restartRobot } from '/app/redux/robot-admin'
 
 import type { FieldError, Resolver } from 'react-hook-form'

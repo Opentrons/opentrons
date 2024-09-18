@@ -8,7 +8,7 @@ import {
   ALIGN_CENTER,
   PrimaryButton,
 } from '@opentrons/components'
-import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
+import { useToggleGroup } from '/app/molecules/ToggleGroup/useToggleGroup'
 import { ANALYTICS_LIQUID_SETUP_VIEW_TOGGLE } from '/app/redux/analytics'
 import { SetupLiquidsList } from './SetupLiquidsList'
 import { SetupLiquidsMap } from './SetupLiquidsMap'

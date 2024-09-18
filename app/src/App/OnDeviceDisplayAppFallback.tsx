@@ -18,11 +18,11 @@ import {
 } from '@opentrons/components'
 
 import { MediumButton } from '../atoms/buttons'
-import { OddModal } from '../molecules/OddModal'
+import { OddModal } from '/app/molecules/OddModal'
 import { appRestart, sendLog } from '/app/redux/shell'
 
 import type { Dispatch } from '/app/redux/types'
-import type { OddModalHeaderBaseProps } from '../molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 export function OnDeviceDisplayAppFallback({
   error,

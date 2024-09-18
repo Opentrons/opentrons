@@ -12,10 +12,10 @@ import {
 
 import { SmallButton } from '../../../atoms/buttons'
 import { InlineNotification } from '../../../atoms/InlineNotification'
-import { ReleaseNotes } from '../../../molecules/ReleaseNotes'
-import { OddModal } from '../../../molecules/OddModal'
+import { ReleaseNotes } from '/app/molecules/ReleaseNotes'
+import { OddModal } from '/app/molecules/OddModal'
 
-import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface RobotSystemVersionModalProps {
   version: string

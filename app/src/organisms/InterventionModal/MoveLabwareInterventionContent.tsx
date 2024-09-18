@@ -42,7 +42,7 @@ import { Divider } from '../../atoms/structure'
 import {
   getLoadedLabware,
   getLoadedModule,
-} from '../../molecules/Command/utils/accessors'
+} from '/app/molecules/Command/utils/accessors'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type {

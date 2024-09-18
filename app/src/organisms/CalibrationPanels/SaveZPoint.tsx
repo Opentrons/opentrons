@@ -19,7 +19,7 @@ import {
   MEDIUM_STEP_SIZE_MM,
   SMALL_STEP_SIZE_MM,
   VERTICAL_PLANE,
-} from '../../molecules/JogControls'
+} from '/app/molecules/JogControls'
 import { formatJogVector } from './utils'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { NeedHelpLink } from './NeedHelpLink'
@@ -29,7 +29,7 @@ import slot5LeftSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_LEF
 import slot5RightMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_RIGHT_MULTI_Z.webm'
 import slot5RightSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_RIGHT_SINGLE_Z.webm'
 
-import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { CalibrationPanelProps } from './types'
 
 const assetMap = {

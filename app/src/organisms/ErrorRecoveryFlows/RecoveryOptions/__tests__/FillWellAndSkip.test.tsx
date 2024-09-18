@@ -25,12 +25,12 @@ vi.mock('../../shared', async () => {
     )),
   }
 })
-vi.mock('../../../../molecules/InterventionModal/DeckMapContent', () => ({
+vi.mock('/app/molecules/InterventionModal/DeckMapContent', () => ({
   DeckMapContent: vi.fn(() => <div>MOCK_RECOVERY_MAP</div>),
 }))
 vi.mock('../CancelRun')
 vi.mock('../SelectRecoveryOption')
-vi.mock('../../../../molecules/Command')
+vi.mock('/app/molecules/Command')
 
 const render = (props: React.ComponentProps<typeof FillWellAndSkip>) => {
   return renderWithProviders(<FillWellAndSkip {...props} />, {

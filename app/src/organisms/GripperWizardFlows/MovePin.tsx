@@ -12,8 +12,8 @@ import { css } from 'styled-components'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '../../molecules/SimpleWizardBody'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+} from '/app/molecules/SimpleWizardBody'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
   MOVE_PIN_TO_FRONT_JAW,

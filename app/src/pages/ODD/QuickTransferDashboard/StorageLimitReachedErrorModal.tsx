@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { OddModal } from '../../../molecules/OddModal'
+import { OddModal } from '/app/molecules/OddModal'
 import { SmallButton } from '../../../atoms/buttons'
 
 interface StorageLimitReachedErrorModalProps {

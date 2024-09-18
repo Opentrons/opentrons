@@ -10,7 +10,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import type { ModuleCalibrationWizardStepProps } from './types'
 
 export const BODY_STYLE = css`

@@ -24,7 +24,7 @@ import {
 
 import { i18n } from '/app/i18n'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { mockRobotSideAnalysis } from '../../../../molecules/Command/__fixtures__'
+import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import {
   useAttachedModules,
   useLPCDisabledReason,

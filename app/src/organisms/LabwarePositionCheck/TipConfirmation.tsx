@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next'
 import { NeedHelpLink } from '../CalibrationPanels'
 import { useSelector } from 'react-redux'
 import { getIsOnDevice } from '/app/redux/config'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { SmallButton } from '../../atoms/buttons'
 import { i18n } from '/app/i18n'
 

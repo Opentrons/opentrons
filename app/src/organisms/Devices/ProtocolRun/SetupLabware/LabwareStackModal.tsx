@@ -16,7 +16,7 @@ import {
   StyledText,
   Modal,
 } from '@opentrons/components'
-import { OddModal } from '../../../../molecules/OddModal'
+import { OddModal } from '/app/molecules/OddModal'
 import { getIsOnDevice } from '/app/redux/config'
 import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'

@@ -36,7 +36,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { FloatingActionButton, SmallButton } from '../../../../atoms/buttons'
-import { ODDBackButton } from '../../../../molecules/ODDBackButton'
+import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { getLabwareSetupItemGroups } from '/app/transformations/commands'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { getProtocolModulesInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'

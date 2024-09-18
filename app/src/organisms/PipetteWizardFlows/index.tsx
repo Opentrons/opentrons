@@ -22,10 +22,10 @@ import {
   useNotifyCurrentMaintenanceRun,
 } from '/app/resources/maintenance_runs'
 import { getTopPortalEl } from '../../App/portal'
-import { WizardHeader } from '../../molecules/WizardHeader'
+import { WizardHeader } from '/app/molecules/WizardHeader'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { getIsOnDevice } from '/app/redux/config'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import { usePipetteFlowWizardHeaderText } from './hooks'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'

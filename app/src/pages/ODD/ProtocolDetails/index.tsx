@@ -39,7 +39,7 @@ import {
   ProtocolDetailsSectionContentSkeleton,
 } from '/app/organisms/ODD/ProtocolDetails'
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
-import { OddModal, SmallModalChildren } from '../../../molecules/OddModal'
+import { OddModal, SmallModalChildren } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 import {
   getApplyHistoricOffsets,
@@ -58,7 +58,7 @@ import { Liquids } from './Liquids'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 
 import type { Protocol } from '@opentrons/api-client'
-import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { Dispatch } from '/app/redux/types'
 import type { OnDeviceRouteParams } from '../../../App/types'
 

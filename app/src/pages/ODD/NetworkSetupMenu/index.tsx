@@ -14,7 +14,7 @@ import {
 } from '@opentrons/components'
 
 import { StepMeter } from '../../../atoms/StepMeter'
-import { CardButton } from '../../../molecules/CardButton'
+import { CardButton } from '/app/molecules/CardButton'
 
 import type { IconName } from '@opentrons/components'
 

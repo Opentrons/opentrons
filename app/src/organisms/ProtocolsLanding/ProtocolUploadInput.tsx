@@ -11,7 +11,7 @@ import {
   SPACING,
   LegacyStyledText,
 } from '@opentrons/components'
-import { UploadInput } from '../../molecules/UploadInput'
+import { UploadInput } from '/app/molecules/UploadInput'
 import { addProtocol } from '/app/redux/protocol-storage'
 import {
   useTrackEvent,

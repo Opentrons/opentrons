@@ -7,7 +7,7 @@ import { i18n } from '/app/i18n'
 import { mockDropTipWizardContainerProps } from '../__fixtures__'
 import { DropTipWizardContent, DropTipWizardContainer } from '../DropTipWizard'
 import { DropTipWizardHeader } from '../DropTipWizardHeader'
-import { InProgressModal } from '../../../molecules/InProgressModal'
+import { InProgressModal } from '/app/molecules/InProgressModal'
 import { ExitConfirmation } from '../ExitConfirmation'
 import {
   BeforeBeginning,
@@ -26,7 +26,7 @@ import {
   DROP_TIP_SUCCESS,
 } from '../constants'
 
-vi.mock('../../../molecules/InProgressModal')
+vi.mock('/app/molecules/InProgressModal')
 vi.mock('../ExitConfirmation')
 vi.mock('../steps')
 vi.mock('../ErrorInfo')

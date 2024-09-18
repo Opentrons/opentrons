@@ -10,7 +10,7 @@ import {
   SecondaryButton,
 } from '@opentrons/components'
 import { CheckPipettesButton } from './CheckPipettesButton'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { LevelPipette } from './LevelPipette'
 
 import type {

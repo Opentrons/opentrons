@@ -15,7 +15,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
+import { useToggleGroup } from '/app/molecules/ToggleGroup/useToggleGroup'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
   getIsFixtureMismatch,

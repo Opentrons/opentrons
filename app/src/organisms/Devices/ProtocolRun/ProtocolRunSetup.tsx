@@ -22,7 +22,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { Line } from '../../../atoms/structure'
-import { InfoMessage } from '../../../molecules/InfoMessage'
+import { InfoMessage } from '/app/molecules/InfoMessage'
 import { INCOMPATIBLE, INEXACT_MATCH } from '/app/redux/pipettes'
 import {
   getIsFixtureMismatch,

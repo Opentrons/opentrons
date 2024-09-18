@@ -14,13 +14,13 @@ import {
 } from '../useRecoveryToasts'
 import { RECOVERY_MAP } from '../../constants'
 import { useToaster } from '../../../ToasterOven'
-import { useCommandTextString } from '../../../../molecules/Command'
+import { useCommandTextString } from '/app/molecules/Command'
 
 import type { Mock } from 'vitest'
 import type { BuildToast } from '../useRecoveryToasts'
 
 vi.mock('../../../ToasterOven')
-vi.mock('../../../../molecules/Command')
+vi.mock('/app/molecules/Command')
 
 const TEST_COMMAND = 'test command'
 const TC_COMMAND = 'tc command cycle some more text'

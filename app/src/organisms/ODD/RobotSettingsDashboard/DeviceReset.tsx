@@ -16,7 +16,7 @@ import {
 } from '@opentrons/components'
 
 import { MediumButton, SmallButton } from '../../../atoms/buttons'
-import { OddModal } from '../../../molecules/OddModal'
+import { OddModal } from '/app/molecules/OddModal'
 import { ChildNavigation } from '/app/organisms/ChildNavigation'
 import {
   getResetConfigOptions,
@@ -28,7 +28,7 @@ import { useDispatchApiRequest } from '/app/redux/robot-api'
 import type { Dispatch, State } from '/app/redux/types'
 import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
 import type { SetSettingOption } from './types'
-import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface LabelProps {
   isSelected?: boolean

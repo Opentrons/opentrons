@@ -52,7 +52,7 @@ import { Slideout } from '../../atoms/Slideout'
 import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
 import { ToggleButton } from '../../atoms/buttons'
 import { AvailableRobotOption } from './AvailableRobotOption'
-import { UploadInput } from '../../molecules/UploadInput'
+import { UploadInput } from '/app/molecules/UploadInput'
 import { FileCard } from './FileCard'
 
 import type { RobotType, RunTimeParameter } from '@opentrons/shared-data'

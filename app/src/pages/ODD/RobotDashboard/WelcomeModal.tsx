@@ -13,7 +13,7 @@ import {
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../../atoms/buttons'
-import { OddModal } from '../../../molecules/OddModal'
+import { OddModal } from '/app/molecules/OddModal'
 
 import welcomeModalImage from '/app/assets/images/on-device-display/welcome_dashboard_modal.png'
 

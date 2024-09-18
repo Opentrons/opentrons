@@ -19,7 +19,7 @@ import {
   parseLabwareInfoByLiquidId,
   parseLiquidsInLoadOrder,
 } from '@opentrons/shared-data'
-import { ODDBackButton } from '../../../../molecules/ODDBackButton'
+import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { SmallButton } from '../../../../atoms/buttons'
 
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'

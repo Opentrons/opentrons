@@ -15,7 +15,7 @@ import {
 } from '@opentrons/components'
 
 import { useErrorName } from '../hooks'
-import { OddModal } from '../../../molecules/OddModal'
+import { OddModal } from '/app/molecules/OddModal'
 import { getModalPortalEl, getTopPortalEl } from '../../../App/portal'
 import { ERROR_KINDS } from '../constants'
 import { InlineNotification } from '../../../atoms/InlineNotification'
@@ -24,7 +24,7 @@ import { getErrorKind } from '../utils'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { IconProps } from '@opentrons/components'
-import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { ERUtilsResults, useRetainedFailedCommandBySource } from '../hooks'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { DesktopSizeType } from '../types'

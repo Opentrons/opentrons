@@ -30,7 +30,7 @@ import {
 import { appShellRequestor } from '/app/redux/shell/remote'
 import { RobotCard } from '/app/organisms/Devices/RobotCard'
 import { DevicesEmptyState } from '/app/organisms/Devices/DevicesEmptyState'
-import { CollapsibleSection } from '../../../../molecules/CollapsibleSection'
+import { CollapsibleSection } from '/app/molecules/CollapsibleSection'
 
 import { Divider } from '../../../../atoms/structure'
 import { NewRobotSetupHelp } from './NewRobotSetupHelp'

@@ -33,7 +33,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../../../App/portal'
-import { OddModal } from '../../../../molecules/OddModal'
+import { OddModal } from '/app/molecules/OddModal'
 import { SmallButton } from '../../../../atoms/buttons/SmallButton'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 

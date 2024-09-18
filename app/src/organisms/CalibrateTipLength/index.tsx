@@ -21,7 +21,7 @@ import {
   LoadingState,
   CompleteConfirmation,
 } from '/app/organisms/CalibrationPanels'
-import { WizardHeader } from '../../molecules/WizardHeader'
+import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getTopPortalEl } from '../../App/portal'
 
 import slotOneRemoveBlockAsset from '/app/assets/videos/tip-length-cal/Slot_1_Remove_CalBlock_(330x260)REV1.webm'

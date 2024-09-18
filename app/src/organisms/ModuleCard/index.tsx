@@ -42,7 +42,7 @@ import {
   SUCCESS,
 } from '/app/redux/robot-api'
 import { Banner } from '../../atoms/Banner'
-import { UpdateBanner } from '../../molecules/UpdateBanner'
+import { UpdateBanner } from '/app/molecules/UpdateBanner'
 import { useChainLiveCommands } from '/app/resources/runs'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { useIsFlex } from '/app/organisms/Devices/hooks'

@@ -27,8 +27,8 @@ import {
   THERMOCYCLER_V2_FRONT_FIXTURE,
 } from '@opentrons/shared-data'
 
-import { SimpleWizardInProgressBody } from '../../molecules/SimpleWizardBody'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { LEFT_SLOTS } from './constants'
 
 import type { DeckConfiguration, CreateCommand } from '@opentrons/shared-data'

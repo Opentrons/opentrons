@@ -6,12 +6,10 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { i18n } from '/app/i18n'
 import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
-import { InterventionInfo } from '../../../../molecules/InterventionModal/InterventionContent/InterventionInfo'
+import { InterventionInfo } from '/app/molecules/InterventionModal/InterventionContent/InterventionInfo'
 import { InlineNotification } from '../../../../atoms/InlineNotification'
 
-vi.mock(
-  '../../../../molecules/InterventionModal/InterventionContent/InterventionInfo'
-)
+vi.mock('/app/molecules/InterventionModal/InterventionContent/InterventionInfo')
 vi.mock('../../../../atoms/InlineNotification')
 
 const render = (props: React.ComponentProps<typeof LeftColumnLabwareInfo>) => {

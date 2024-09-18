@@ -13,12 +13,12 @@ import {
 
 import type { LabwareOffset } from '@opentrons/api-client'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { ODDBackButton } from '../../../../molecules/ODDBackButton'
+import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { FloatingActionButton, SmallButton } from '../../../../atoms/buttons'
 import type { SetupScreens } from '../types'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { TerseOffsetTable } from '/app/organisms/LabwarePositionCheck/ResultsSummary'
-import { getLabwareDefinitionsFromCommands } from '../../../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
 import { useNotifyRunQuery } from '/app/resources/runs'
 import { getLatestCurrentOffsets } from '/app/organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 

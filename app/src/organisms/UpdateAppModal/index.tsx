@@ -27,7 +27,7 @@ import {
 } from '/app/redux/shell'
 
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
-import { ReleaseNotes } from '../../molecules/ReleaseNotes'
+import { ReleaseNotes } from '/app/molecules/ReleaseNotes'
 import { Banner } from '../../atoms/Banner'
 import { ProgressBar } from '../../atoms/ProgressBar'
 import { useRemoveActiveAppUpdateToast } from '../Alerts'

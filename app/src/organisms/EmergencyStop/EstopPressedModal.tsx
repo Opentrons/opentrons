@@ -26,13 +26,13 @@ import { useAcknowledgeEstopDisengageMutation } from '@opentrons/react-api-clien
 import { getTopPortalEl } from '../../App/portal'
 import { Banner } from '../../atoms/Banner'
 import { SmallButton } from '../../atoms/buttons'
-import { OddModal } from '../../molecules/OddModal'
+import { OddModal } from '/app/molecules/OddModal'
 import { getIsOnDevice } from '/app/redux/config'
 
 import type {
   OddModalHeaderBaseProps,
   ModalSize,
-} from '../../molecules/OddModal/types'
+} from '/app/molecules/OddModal/types'
 import type { ModalProps } from '@opentrons/components'
 
 // Note (07/13/2023) After the launch, we will unify the modal components into one component.

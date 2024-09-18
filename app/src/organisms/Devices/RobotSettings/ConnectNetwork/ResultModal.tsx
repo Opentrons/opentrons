@@ -3,7 +3,7 @@ import * as React from 'react'
 import { AlertModal, SpinnerModal } from '@opentrons/components'
 
 import * as Copy from './i18n'
-import { ErrorModal } from '../../../../molecules/modals'
+import { ErrorModal } from '/app/molecules/modals'
 import { DISCONNECT } from './constants'
 import { PENDING, FAILURE } from '/app/redux/robot-api'
 

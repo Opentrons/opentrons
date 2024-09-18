@@ -13,7 +13,7 @@ import { getIsOnDevice } from '/app/redux/config'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '../../molecules/SimpleWizardBody'
+} from '/app/molecules/SimpleWizardBody'
 import { SmallButton } from '../../atoms/buttons'
 import { GRIPPER_FLOW_TYPES } from './constants'
 import type { GripperWizardFlowType } from './types'

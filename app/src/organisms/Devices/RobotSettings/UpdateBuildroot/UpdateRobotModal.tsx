@@ -28,7 +28,7 @@ import {
   getRobotUpdateVersion,
 } from '/app/redux/robot-update'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
-import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
+import { ReleaseNotes } from '/app/molecules/ReleaseNotes'
 import { useIsRobotBusy } from '../../hooks'
 import { Banner } from '../../../../atoms/Banner'
 import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'

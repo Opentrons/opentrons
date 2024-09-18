@@ -20,9 +20,9 @@ import {
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
-import { CommandText } from '../../../molecules/Command'
+import { CommandText } from '/app/molecules/Command'
 import { RunTimer } from '../../Devices/ProtocolRun/RunTimer'
-import { getCommandTextData } from '../../../molecules/Command/utils/getCommandTextData'
+import { getCommandTextData } from '/app/molecules/Command/utils/getCommandTextData'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'

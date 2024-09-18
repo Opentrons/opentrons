@@ -37,7 +37,7 @@ import {
   JogToPosition,
   Success,
 } from './steps'
-import { InProgressModal } from '../../molecules/InProgressModal'
+import { InProgressModal } from '/app/molecules/InProgressModal'
 import { useDropTipErrorComponents } from './hooks'
 import { DropTipWizardHeader } from './DropTipWizardHeader'
 import { ErrorInfo } from './ErrorInfo'

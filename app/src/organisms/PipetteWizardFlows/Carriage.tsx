@@ -8,8 +8,8 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { getPipetteAnimations96 } from './utils'
 import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
 

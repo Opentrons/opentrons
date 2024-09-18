@@ -20,7 +20,7 @@ import {
   LoadingState,
   CompleteConfirmation,
 } from '/app/organisms/CalibrationPanels'
-import { WizardHeader } from '../../molecules/WizardHeader'
+import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getTopPortalEl } from '../../App/portal'
 
 import type { Mount } from '@opentrons/components'

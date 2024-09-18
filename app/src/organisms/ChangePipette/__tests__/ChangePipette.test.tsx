@@ -9,7 +9,7 @@ import { i18n } from '/app/i18n'
 import { getHasCalibrationBlock } from '/app/redux/config'
 import { getMovementStatus } from '/app/redux/robot-controls'
 import { getCalibrationForPipette } from '/app/redux/calibration'
-import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
+import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
 import {
   getRequestById,
   SUCCESS,
@@ -49,7 +49,7 @@ vi.mock('/app/redux/calibration')
 vi.mock('/app/redux/robot-api')
 vi.mock('../PipetteSelection')
 vi.mock('../ExitModal')
-vi.mock('../../../molecules/InProgressModal/InProgressModal')
+vi.mock('/app/molecules/InProgressModal/InProgressModal')
 vi.mock('../ConfirmPipette')
 vi.mock('../../Devices/hooks')
 vi.mock('/app/assets/images')

@@ -13,7 +13,7 @@ import {
 import { getAllDefinitions } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../App/portal'
-import { OddModal } from '../../molecules/OddModal'
+import { OddModal } from '/app/molecules/OddModal'
 import { ChildNavigation } from '/app/organisms/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { WellSelection } from '/app/organisms/WellSelection'
@@ -23,7 +23,7 @@ import {
 } from './SelectSourceWells'
 
 import type { SmallButton } from '../../atoms/buttons'
-import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type {
   QuickTransferWizardState,
   QuickTransferWizardAction,

@@ -21,7 +21,7 @@ import { ProtocolRunSetup } from '/app/organisms/Devices/ProtocolRun/ProtocolRun
 import { RunPreviewComponent } from '/app/organisms/RunPreview'
 import { ProtocolRunRuntimeParameters } from '/app/organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 import { useCurrentRunId } from '/app/resources/runs'
-import { mockRobotSideAnalysis } from '../../../../../molecules/Command/__fixtures__'
+import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import { ProtocolRunDetails } from '..'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'

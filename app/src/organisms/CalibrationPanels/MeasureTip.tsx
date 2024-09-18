@@ -18,7 +18,7 @@ import {
   JogControls,
   MEDIUM_STEP_SIZE_MM,
   SMALL_STEP_SIZE_MM,
-} from '../../molecules/JogControls'
+} from '/app/molecules/JogControls'
 import { NeedHelpLink } from './NeedHelpLink'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { formatJogVector } from './utils'
@@ -37,7 +37,7 @@ import leftSingleBlockAssetHealth from '/app/assets/videos/health-check/Left_Sin
 import rightSingleBlockAssetHealth from '/app/assets/videos/health-check/Right_Single_CalBlock_WITH_TIP_(330x260)REV2.webm'
 
 import type { Mount } from '@opentrons/components'
-import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { CalibrationPanelProps } from './types'
 
 const assetMapTrash = {

@@ -15,7 +15,7 @@ import {
   OneColumn,
   TwoColumn,
   OneColumnOrTwoColumn,
-} from '../../../molecules/InterventionModal'
+} from '/app/molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
 interface SingleColumnContentWrapperProps {

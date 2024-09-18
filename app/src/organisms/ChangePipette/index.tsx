@@ -29,8 +29,8 @@ import {
   HOME,
 } from '/app/redux/robot-controls'
 
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
 import { useAttachedPipettes } from '../Devices/hooks'
 import { ExitModal } from './ExitModal'
 import { Instructions } from './Instructions'

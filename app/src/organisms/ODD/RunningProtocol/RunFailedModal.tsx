@@ -17,10 +17,10 @@ import {
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../../atoms/buttons'
-import { OddModal } from '../../../molecules/OddModal'
+import { OddModal } from '/app/molecules/OddModal'
 import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 
-import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type {
   RunCommandErrors,
   RunError,

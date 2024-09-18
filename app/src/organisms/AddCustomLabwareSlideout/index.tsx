@@ -19,7 +19,7 @@ import {
   useTrackEvent,
   ANALYTICS_ADD_CUSTOM_LABWARE,
 } from '/app/redux/analytics'
-import { UploadInput } from '../../molecules/UploadInput'
+import { UploadInput } from '/app/molecules/UploadInput'
 import type { Dispatch } from '/app/redux/types'
 
 export interface AddCustomLabwareSlideoutProps {

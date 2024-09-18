@@ -17,7 +17,7 @@ import { NeedHelpLink } from '../NeedHelpLink'
 import { ChooseTipRack } from '../ChooseTipRack'
 
 import { TRASH_BIN_LOAD_NAME } from '../constants'
-import { WizardRequiredEquipmentList } from '../../../molecules/WizardRequiredEquipmentList'
+import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 import { Body } from './Body'
 import { InvalidationWarning } from './InvalidationWarning'
 

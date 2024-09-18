@@ -14,13 +14,13 @@ import {
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
 } from '/app/redux/pipettes/__fixtures__'
-import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
+import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
 import { DetachPipette } from '../DetachPipette'
 
 vi.mock('../CheckPipetteButton')
-vi.mock('../../../molecules/InProgressModal/InProgressModal')
+vi.mock('/app/molecules/InProgressModal/InProgressModal')
 
 const render = (props: React.ComponentProps<typeof DetachPipette>) => {
   return renderWithProviders(<DetachPipette {...props} />, {

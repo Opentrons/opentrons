@@ -17,7 +17,7 @@ import { SmallButton } from '../../atoms/buttons'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '../../molecules/SimpleWizardBody'
+} from '/app/molecules/SimpleWizardBody'
 import { usePipetteNameSpecs } from '/app/resources/instruments/hooks'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'

@@ -13,7 +13,7 @@ import {
 import { useCreateRunMutation } from '@opentrons/react-api-client'
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
-import { SmallModalChildren } from '../../../molecules/OddModal'
+import { SmallModalChildren } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getPinnedQuickTransferIds, updateConfigValue } from '/app/redux/config'
 

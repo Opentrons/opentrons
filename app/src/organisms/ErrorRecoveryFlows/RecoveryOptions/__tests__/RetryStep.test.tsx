@@ -13,7 +13,7 @@ import { clickButtonLabeled } from '../../__tests__/util'
 
 import type { Mock } from 'vitest'
 
-vi.mock('../../../../molecules/Command')
+vi.mock('/app/molecules/Command')
 vi.mock('../SelectRecoveryOption')
 
 const render = (props: React.ComponentProps<typeof RetryStep>) => {

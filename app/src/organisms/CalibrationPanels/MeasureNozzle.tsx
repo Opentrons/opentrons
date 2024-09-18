@@ -18,9 +18,9 @@ import {
   JogControls,
   SMALL_STEP_SIZE_MM,
   MEDIUM_STEP_SIZE_MM,
-} from '../../molecules/JogControls'
+} from '/app/molecules/JogControls'
 import * as Sessions from '/app/redux/sessions'
-import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { CalibrationPanelProps } from './types'
 
 import { NeedHelpLink } from './NeedHelpLink'

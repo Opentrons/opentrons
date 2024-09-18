@@ -18,9 +18,9 @@ import { Banner } from '../../atoms/Banner'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '../../molecules/SimpleWizardBody'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
+} from '/app/molecules/SimpleWizardBody'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 import { usePipetteNameSpecs } from '/app/resources/instruments/hooks'
 import {
   CALIBRATION_PROBE,

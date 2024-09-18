@@ -20,8 +20,8 @@ import {
   useNotifyCurrentMaintenanceRun,
 } from '/app/resources/maintenance_runs'
 import { getTopPortalEl } from '../../App/portal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { getIsOnDevice } from '/app/redux/config'
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'

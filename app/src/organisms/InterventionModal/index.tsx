@@ -27,8 +27,8 @@ import {
 } from '@opentrons/api-client'
 
 import { SmallButton } from '../../atoms/buttons'
-import { OddModal } from '../../molecules/OddModal'
-import { InterventionModal as InterventionModalMolecule } from '../../molecules/InterventionModal'
+import { OddModal } from '/app/molecules/OddModal'
+import { InterventionModal as InterventionModalMolecule } from '/app/molecules/InterventionModal'
 import { getIsOnDevice } from '/app/redux/config'
 import { PauseInterventionContent } from './PauseInterventionContent'
 import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'

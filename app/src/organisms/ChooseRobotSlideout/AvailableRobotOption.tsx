@@ -16,7 +16,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { MiniCard } from '../../molecules/MiniCard'
+import { MiniCard } from '/app/molecules/MiniCard'
 import { getRobotModelByName, OPENTRONS_USB } from '/app/redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '/app/redux/networking'
 import { appShellRequestor } from '/app/redux/shell/remote'

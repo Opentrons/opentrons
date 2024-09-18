@@ -14,8 +14,8 @@ import {
 } from '@opentrons/components'
 
 import * as Sessions from '/app/redux/sessions'
-import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
-import { JogControls } from '../../molecules/JogControls'
+import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
+import { JogControls } from '/app/molecules/JogControls'
 import type { CalibrationPanelProps } from './types'
 import { formatJogVector } from './utils'
 

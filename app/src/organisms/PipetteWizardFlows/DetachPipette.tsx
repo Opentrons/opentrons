@@ -18,11 +18,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Banner } from '../../atoms/Banner'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '../../molecules/SimpleWizardBody'
+} from '/app/molecules/SimpleWizardBody'
 import { Skeleton } from '../../atoms/Skeleton'
 import { SmallButton } from '../../atoms/buttons'
 import { BODY_STYLE, SECTIONS } from './constants'

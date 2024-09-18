@@ -12,7 +12,7 @@ import { clickButtonLabeled } from '../../__tests__/util'
 
 import type { Mock } from 'vitest'
 
-vi.mock('../../../../molecules/Command')
+vi.mock('/app/molecules/Command')
 vi.mock('../SelectRecoveryOption')
 vi.mock('../../shared', async () => {
   const actual = await vi.importActual('../../shared')

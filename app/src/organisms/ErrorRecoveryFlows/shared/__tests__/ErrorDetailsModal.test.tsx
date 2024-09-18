@@ -7,7 +7,7 @@ import { i18n } from '/app/i18n'
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { InlineNotification } from '../../../../atoms/InlineNotification'
 import { StepInfo } from '../StepInfo'
-import { OddModal } from '../../../../molecules/OddModal'
+import { OddModal } from '/app/molecules/OddModal'
 import {
   useErrorDetailsModal,
   ErrorDetailsModal,
@@ -18,7 +18,7 @@ vi.mock('react-dom', () => ({
   ...vi.importActual('react-dom'),
   createPortal: vi.fn((element, container) => element),
 }))
-vi.mock('../../../../molecules/OddModal', () => ({
+vi.mock('/app/molecules/OddModal', () => ({
   OddModal: vi.fn(({ children }) => <div>{children}</div>),
 }))
 

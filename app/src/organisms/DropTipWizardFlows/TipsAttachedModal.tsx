@@ -13,12 +13,12 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
-import { OddModal } from '../../molecules/OddModal'
+import { OddModal } from '/app/molecules/OddModal'
 import { DropTipWizardFlows, useDropTipWizardFlows } from '.'
 import { useHomePipettes } from './hooks'
 
 import type { HostConfig } from '@opentrons/api-client'
-import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { UseHomePipettesProps, PipetteWithTip } from './hooks'
 import type { PipetteDetails } from '/app/resources/maintenance_runs'
 

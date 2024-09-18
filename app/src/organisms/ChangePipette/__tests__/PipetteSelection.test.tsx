@@ -4,10 +4,10 @@ import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { PipetteSelect } from '../../../molecules/PipetteSelect'
+import { PipetteSelect } from '/app/molecules/PipetteSelect'
 import { PipetteSelection } from '../PipetteSelection'
 
-vi.mock('../../../molecules/PipetteSelect')
+vi.mock('/app/molecules/PipetteSelect')
 
 const render = (props: React.ComponentProps<typeof PipetteSelection>) => {
   return renderWithProviders(<PipetteSelection {...props} />, {

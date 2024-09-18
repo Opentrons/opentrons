@@ -12,10 +12,10 @@ import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
 import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
 import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { Jog } from '../../molecules/JogControls/types'
+import type { Jog } from '/app/molecules/JogControls/types'
 import type { useChainRunCommands } from '/app/resources/runs'
 import type {
   DetachProbeStep,
