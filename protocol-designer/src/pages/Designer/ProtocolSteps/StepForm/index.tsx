@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
 import { actions } from '../../../../steplist'
 import { actions as stepsActions } from '../../../../ui/steps'
-import { resetScrollElements } from '../../../../ui/steps/utils'
 import {
   getHydratedForm,
   selectors as stepFormSelectors,
@@ -20,7 +19,7 @@ import {
 import { AutoAddPauseUntilTempStepModal } from '../../../../components/modals/AutoAddPauseUntilTempStepModal'
 import { AutoAddPauseUntilHeaterShakerTempStepModal } from '../../../../components/modals/AutoAddPauseUntilHeaterShakerTempStepModal'
 import { getDirtyFields, makeSingleEditFieldProps } from './utils'
-import { StepFormComponent } from './StepFormComponent'
+import { StepFormToolbox } from './StepFormToolbox'
 
 import type { InvariantContext } from '@opentrons/step-generation'
 import type { BaseState, ThunkDispatch } from '../../../../types'
@@ -49,7 +48,7 @@ interface DispatchProps {
 }
 type StepEditFormManagerProps = StateProps & DispatchProps
 
-const StepEditFormManager = (
+const StepFormManager = (
   props: StepEditFormManagerProps
 ): JSX.Element | null => {
   const {
@@ -68,18 +67,10 @@ const StepEditFormManager = (
     invariantContext,
   } = props
   const { t } = useTranslation('tooltip')
-  const [
-    showMoreOptionsModal,
-    setShowMoreOptionsModal,
-  ] = React.useState<boolean>(false)
   const [focusedField, setFocusedField] = React.useState<string | null>(null)
   const [dirtyFields, setDirtyFields] = React.useState<StepFieldName[]>(
     getDirtyFields(isNewStep, formData)
   )
-  const toggleMoreOptionsModal = (): void => {
-    resetScrollElements()
-    setShowMoreOptionsModal(!showMoreOptionsModal)
-  }
   const focus = setFocusedField
   const blur = (fieldName: StepFieldName): void => {
     if (fieldName === focusedField) {
@@ -184,7 +175,7 @@ const StepEditFormManager = (
           handleContinueClick={confirmAddPauseUntilHeaterShakerTempStep}
         />
       )}
-      <StepFormComponent
+      <StepFormToolbox
         {...{
           canSave,
           dirtyFields,
@@ -195,8 +186,6 @@ const StepEditFormManager = (
           handleDelete: confirmDelete,
           handleSave,
           propsForFields,
-          showMoreOptionsModal,
-          toggleMoreOptionsModal,
         }}
       />
     </>
@@ -251,13 +240,13 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DispatchProps => {
 // It doesn't matter if the children are using connect or useSelector,
 // only the parent matters.)
 // https://react-redux.js.org/api/hooks#stale-props-and-zombie-children
-export const StepEditForm = connect(
+export const StepForm = connect(
   mapStateToProps,
   mapDispatchToProps
 )((props: StepEditFormManagerProps) => {
   const { formData } = props
   return (
     // key by ID so manager state doesn't persist across different forms
-    <StepEditFormManager key={formData?.id ?? 'empty'} {...props} />
+    <StepFormManager key={formData?.id ?? 'empty'} {...props} />
   )
 })

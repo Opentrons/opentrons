@@ -1,10 +1,3 @@
-import { getFieldErrors } from '../../../../steplist/fieldLevel'
-import {
-  getDisabledFields,
-  getDefaultsForStepType,
-} from '../../../../steplist/formLevel'
-import type { FieldProps, FieldPropsByName, FocusHandlers } from './types'
-
 import difference from 'lodash/difference'
 import isEqual from 'lodash/isEqual'
 import without from 'lodash/without'
@@ -13,6 +6,11 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
 import { ALL, COLUMN } from '@opentrons/shared-data'
+import { getFieldErrors } from '../../../../steplist/fieldLevel'
+import {
+  getDisabledFields,
+  getDefaultsForStepType,
+} from '../../../../steplist/formLevel'
 import { PROFILE_CYCLE } from '../../../../form-types'
 import type { PipetteEntity } from '@opentrons/step-generation'
 import type { Options } from '@opentrons/components'
@@ -27,6 +25,7 @@ import type {
   PathOption,
 } from '../../../../form-types'
 import type { NozzleType } from '../../../../types'
+import type { FieldProps, FieldPropsByName, FocusHandlers } from './types'
 
 export function getBlowoutLocationOptionsForForm(args: {
   stepType: StepType
