@@ -4,7 +4,7 @@ import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { useIsOEMMode } from '../../../resources/robot-settings/hooks'
 import { SelectPipette } from '../SelectPipette'
 

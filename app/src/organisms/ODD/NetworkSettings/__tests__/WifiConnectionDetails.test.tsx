@@ -4,7 +4,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { useWifiList } from '../../../../resources/networking/hooks'
 import { getNetworkInterfaces, INTERFACE_WIFI } from '/app/redux/networking'
 import * as Fixtures from '/app/redux/networking/__fixtures__'

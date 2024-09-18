@@ -3,7 +3,7 @@ import { when } from 'vitest-when'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { i18n } from '/app/i18n'
 import { mockTemperatureModule } from '/app/redux/modules/__fixtures__'
 import {
   getIsFixtureMismatch,

@@ -22,7 +22,7 @@ import {
   flexDeckDefV5,
 } from '@opentrons/shared-data'
 
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { useToaster } from '../../../../organisms/ToasterOven'
 import { mockRobotSideAnalysis } from '../../../../molecules/Command/__fixtures__'
 import {

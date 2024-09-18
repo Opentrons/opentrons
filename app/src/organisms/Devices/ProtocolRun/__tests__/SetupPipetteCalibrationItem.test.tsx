@@ -4,7 +4,7 @@ import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
 import { useDeckCalibrationData } from '../../hooks'

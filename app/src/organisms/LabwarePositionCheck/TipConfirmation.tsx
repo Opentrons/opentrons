@@ -18,7 +18,7 @@ import { useSelector } from 'react-redux'
 import { getIsOnDevice } from '/app/redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { SmallButton } from '../../atoms/buttons'
-import { i18n } from '../../i18n'
+import { i18n } from '/app/i18n'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'

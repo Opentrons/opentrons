@@ -8,7 +8,7 @@ import {
   LEFT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,

@@ -3,7 +3,7 @@ import { describe, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { useErrorRecoveryBanner, ErrorRecoveryBanner } from '..'
 
 vi.mock('..', async importOriginal => {

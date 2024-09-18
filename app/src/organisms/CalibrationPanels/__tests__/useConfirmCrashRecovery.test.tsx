@@ -6,7 +6,7 @@ import { vi, it, describe, expect } from 'vitest'
 import { LEFT } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { useConfirmCrashRecovery } from '../useConfirmCrashRecovery'
 import { mockCalibrationCheckLabware } from '/app/redux/sessions/__fixtures__'
 import {

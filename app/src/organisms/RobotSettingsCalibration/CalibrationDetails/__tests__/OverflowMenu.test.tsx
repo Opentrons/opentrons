@@ -10,7 +10,7 @@ import {
   useAllTipLengthCalibrationsQuery,
 } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import { PipetteWizardFlows } from '../../../PipetteWizardFlows'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'

@@ -10,7 +10,7 @@ import {
 } from '@opentrons/api-client'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../../../../../i18n'
+import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { useIsFlex, useTrackProtocolRunEvent } from '../../../../../hooks'
 import { useTrackEvent } from '/app/redux/analytics'

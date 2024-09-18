@@ -3,7 +3,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
 import { ExitConfirmation } from '../ExitConfirmation'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 
 const render = (props: React.ComponentProps<typeof ExitConfirmation>) => {
   return renderWithProviders(<ExitConfirmation {...props} />, {

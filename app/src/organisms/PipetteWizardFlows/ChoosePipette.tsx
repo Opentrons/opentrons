@@ -33,7 +33,7 @@ import {
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { i18n } from '../../i18n'
+import { i18n } from '/app/i18n'
 import { getIsOnDevice } from '/app/redux/config'
 import { getTopPortalEl } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'

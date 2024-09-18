@@ -6,7 +6,7 @@ import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   getRobotAddressesByName,
   HEALTH_STATUS_OK,

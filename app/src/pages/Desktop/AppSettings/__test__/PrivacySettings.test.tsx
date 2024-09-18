@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { PrivacySettings } from '../PrivacySettings'
 
 vi.mock('/app/redux/analytics')

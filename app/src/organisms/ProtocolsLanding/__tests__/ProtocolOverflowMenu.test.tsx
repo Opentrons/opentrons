@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,

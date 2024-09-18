@@ -5,7 +5,7 @@ import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { useEstopQuery } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { EstopMissingModal } from '../EstopMissingModal'
 import { EstopPressedModal } from '../EstopPressedModal'
 import { useIsUnboxingFlowOngoing } from '../../ODD/hooks'

@@ -5,7 +5,7 @@ import { screen, fireEvent, waitFor } from '@testing-library/react'
 
 import { mockRecoveryContentProps } from '../__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { RecoveryError } from '../RecoveryError'
 import { RECOVERY_MAP } from '../constants'
 

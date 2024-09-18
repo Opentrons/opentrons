@@ -9,7 +9,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { DeckFixtureSetupInstructionsModal } from '../../../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { DeckConfigurationEditor } from '..'
 import {

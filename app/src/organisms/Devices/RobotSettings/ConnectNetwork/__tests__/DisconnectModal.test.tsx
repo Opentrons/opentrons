@@ -5,7 +5,7 @@ import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { when } from 'vitest-when'
 
-import { i18n } from '../../../../../i18n'
+import { i18n } from '/app/i18n'
 import { useRobot } from '../../../../../organisms/Devices/hooks'
 import { useWifiList } from '../../../../../resources/networking/hooks'
 import {

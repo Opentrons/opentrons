@@ -4,7 +4,7 @@ import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { mockRecoveryContentProps } from '../../__fixtures__'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
 import { InterventionInfo } from '../../../../molecules/InterventionModal/InterventionContent/InterventionInfo'
 import { InlineNotification } from '../../../../atoms/InlineNotification'

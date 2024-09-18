@@ -3,7 +3,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { UpdateResultsModal } from '../UpdateResultsModal'
 
 const render = (props: React.ComponentProps<typeof UpdateResultsModal>) => {

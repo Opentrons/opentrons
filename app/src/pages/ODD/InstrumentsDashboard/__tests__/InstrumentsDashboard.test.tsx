@@ -5,7 +5,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { vi, describe, it, afterEach, beforeEach, expect } from 'vitest'
 
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { ChoosePipette } from '../../../../organisms/PipetteWizardFlows/ChoosePipette'
 import { GripperWizardFlows } from '../../../../organisms/GripperWizardFlows'
 import { InstrumentsDashboard } from '..'

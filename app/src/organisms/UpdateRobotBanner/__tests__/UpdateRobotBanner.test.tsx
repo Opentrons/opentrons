@@ -2,7 +2,7 @@ import * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
 import * as Buildroot from '/app/redux/robot-update'
 import {

@@ -3,7 +3,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, afterEach, vi, expect } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { useAllLabware } from '../../../pages/Desktop/Labware/hooks'
 import { mockOpentronsLabwareDetailsDefinition } from '/app/redux/custom-labware/__fixtures__'
 import { CustomLabwareOverflowMenu } from '../../LabwareCard/CustomLabwareOverflowMenu'

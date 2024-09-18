@@ -1,11 +1,8 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach } from 'vitest'
-import {
-  renderWithProviders,
-  nestedTextMatcher,
-} from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders, nestedTextMatcher } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { useAllLabware } from '../../../pages/Desktop/Labware/hooks'
 import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
 import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'

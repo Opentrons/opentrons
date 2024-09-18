@@ -3,7 +3,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { SelectDestLabware } from '../SelectDestLabware'
 
 vi.mock('@opentrons/react-api-client')

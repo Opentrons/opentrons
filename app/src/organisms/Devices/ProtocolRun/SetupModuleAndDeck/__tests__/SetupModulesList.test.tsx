@@ -4,7 +4,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { i18n } from '../../../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   mockMagneticModule as mockMagneticModuleFixture,
   mockHeaterShaker,

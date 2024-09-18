@@ -5,7 +5,7 @@ import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 
-import { i18n } from '../../i18n'
+import { i18n } from '/app/i18n'
 import { checkShellUpdate } from '/app/redux/shell'
 import { useSoftwareUpdatePoll } from '../hooks'
 

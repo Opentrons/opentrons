@@ -6,7 +6,7 @@ import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { home } from '/app/redux/robot-controls'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { restartRobot } from '/app/redux/robot-admin'

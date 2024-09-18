@@ -4,11 +4,8 @@ import { describe, it, beforeEach, vi, expect } from 'vitest'
 
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 
-import {
-  nestedTextMatcher,
-  renderWithProviders,
-} from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import {
   mock8ChannelAttachedPipetteInformation,
   mock96ChannelAttachedPipetteInformation,

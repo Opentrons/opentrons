@@ -5,7 +5,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import { i18n } from '../../i18n'
+import { i18n } from '/app/i18n'
 import { appRestart } from '/app/redux/shell'
 import { useTrackEvent, ANALYTICS_ODD_APP_ERROR } from '/app/redux/analytics'
 import { OnDeviceDisplayAppFallback } from '../OnDeviceDisplayAppFallback'

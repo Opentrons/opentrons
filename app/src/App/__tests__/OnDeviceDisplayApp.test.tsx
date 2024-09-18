@@ -4,7 +4,7 @@ import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../i18n'
+import { i18n } from '/app/i18n'
 import { OnDeviceLocalizationProvider } from '../../LocalizationProvider'
 import { ConnectViaEthernet } from '../../pages/ODD/ConnectViaEthernet'
 import { ConnectViaUSB } from '../../pages/ODD/ConnectViaUSB'

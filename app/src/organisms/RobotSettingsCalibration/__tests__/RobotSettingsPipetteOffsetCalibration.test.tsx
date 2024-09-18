@@ -3,7 +3,7 @@ import { when } from 'vitest-when'
 import { describe, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,

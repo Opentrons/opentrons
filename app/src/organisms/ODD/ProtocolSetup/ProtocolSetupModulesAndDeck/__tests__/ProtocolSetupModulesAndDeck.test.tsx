@@ -12,7 +12,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { i18n } from '/app/i18n'
 import { useChainLiveCommands } from '../../../../../resources/runs'
 import { mockRobotSideAnalysis } from '../../../../../molecules/Command/__fixtures__'
 import {

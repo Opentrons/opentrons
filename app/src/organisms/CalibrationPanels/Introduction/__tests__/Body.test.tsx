@@ -5,7 +5,7 @@ import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import * as Sessions from '/app/redux/sessions'
 
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { Body } from '../Body'
 
 const render = (props: React.ComponentProps<typeof Body>) => {

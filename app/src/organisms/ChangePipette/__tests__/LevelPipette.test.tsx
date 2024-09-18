@@ -3,11 +3,8 @@ import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
 import { LEFT } from '@opentrons/shared-data'
-import {
-  nestedTextMatcher,
-  renderWithProviders,
-} from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { LevelPipette } from '../LevelPipette'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 

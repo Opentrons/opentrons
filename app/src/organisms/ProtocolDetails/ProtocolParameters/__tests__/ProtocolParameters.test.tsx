@@ -3,7 +3,7 @@ import { describe, it, vi, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { ProtocolParameters } from '..'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useConditionalConfirm } from '@opentrons/components'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { getReachableRobots, getUnreachableRobots } from '/app/redux/discovery'
 import {
   mockReachableRobot,

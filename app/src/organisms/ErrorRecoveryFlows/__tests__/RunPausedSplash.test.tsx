@@ -5,7 +5,7 @@ import { fireEvent, screen, waitFor, renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { mockRecoveryContentProps } from '../__fixtures__'
 import { getIsOnDevice } from '/app/redux/config'
 import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'

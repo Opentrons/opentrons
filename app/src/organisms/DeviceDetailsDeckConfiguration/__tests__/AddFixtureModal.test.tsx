@@ -12,7 +12,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { AddFixtureModal } from '../AddFixtureModal'
 import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 

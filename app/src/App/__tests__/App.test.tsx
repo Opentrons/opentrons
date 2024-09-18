@@ -3,7 +3,7 @@ import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
 
-import { i18n } from '../../i18n'
+import { i18n } from '/app/i18n'
 import { getIsOnDevice, getConfig } from '/app/redux/config'
 
 import { DesktopApp } from '../DesktopApp'

@@ -3,7 +3,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { toggleAnalyticsOptedIn } from '/app/redux/analytics'
 import { getRobotSettings } from '/app/redux/robot-settings'
 

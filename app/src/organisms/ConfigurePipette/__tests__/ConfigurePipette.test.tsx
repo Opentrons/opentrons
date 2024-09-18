@@ -3,7 +3,7 @@ import { when } from 'vitest-when'
 import { vi, it, expect, describe, beforeEach } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import * as RobotApi from '/app/redux/robot-api'
 import { ConfigurePipette } from '../../ConfigurePipette'
 import { mockPipetteSettingsFieldsMap } from '/app/redux/pipettes/__fixtures__'

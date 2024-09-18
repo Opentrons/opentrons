@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { getNetworkInterfaces, INTERFACE_WIFI } from '/app/redux/networking'
 import { useIsUnboxingFlowOngoing } from '../../hooks'
 import { AlternativeSecurityTypeModal } from '../AlternativeSecurityTypeModal'

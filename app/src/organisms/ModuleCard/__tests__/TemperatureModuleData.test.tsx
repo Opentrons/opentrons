@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { StatusLabel } from '../../../atoms/StatusLabel'
 import { TemperatureModuleData } from '../TemperatureModuleData'
 import { mockTemperatureModuleGen2 } from '/app/redux/modules/__fixtures__'

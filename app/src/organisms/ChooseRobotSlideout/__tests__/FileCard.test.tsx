@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { FileCard } from '../FileCard'
 
 import type { CsvFileParameter } from '@opentrons/shared-data'

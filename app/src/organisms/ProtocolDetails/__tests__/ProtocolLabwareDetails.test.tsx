@@ -2,7 +2,7 @@ import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { ProtocolLabwareDetails } from '../ProtocolLabwareDetails'
 
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'

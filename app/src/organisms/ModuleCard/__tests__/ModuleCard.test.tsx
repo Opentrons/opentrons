@@ -5,11 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
-import {
-  nestedTextMatcher,
-  renderWithProviders,
-} from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { getIsHeaterShakerAttached } from '/app/redux/config'
 import {
   mockMagneticModule,

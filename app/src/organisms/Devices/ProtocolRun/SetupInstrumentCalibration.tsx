@@ -25,7 +25,7 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { isGripperInCommands } from '../../../resources/protocols/utils'
 
 import type { GripperData } from '@opentrons/api-client'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 
 const EQUIPMENT_POLL_MS = 5000
 

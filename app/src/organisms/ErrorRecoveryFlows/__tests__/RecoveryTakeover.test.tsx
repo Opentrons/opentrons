@@ -9,7 +9,7 @@ import {
 } from '@opentrons/api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { RecoveryTakeover, RecoveryTakeoverDesktop } from '../RecoveryTakeover'
 import { useUpdateClientDataRecovery } from '../../../resources/client_data'
 import { clickButtonLabeled } from './util'

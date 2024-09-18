@@ -9,7 +9,7 @@ import { screen } from '@testing-library/react'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   mockThermocycler as mockThermocyclerFixture,
   mockMagneticModule as mockMagneticModuleFixture,

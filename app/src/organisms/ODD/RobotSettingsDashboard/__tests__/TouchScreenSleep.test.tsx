@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { updateConfigValue } from '/app/redux/config'
 import { TouchScreenSleep } from '../TouchScreenSleep'
 import { renderWithProviders } from '/app/__testing-utils__'

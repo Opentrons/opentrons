@@ -3,7 +3,7 @@ import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { useTrackEvent } from '/app/redux/analytics'
 import {

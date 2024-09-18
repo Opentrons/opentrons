@@ -6,7 +6,7 @@ import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { handleInstrumentDetailOverflowMenu } from '../InstrumentDetailOverflowMenu'
 import { useNotifyCurrentMaintenanceRun } from '../../../../resources/maintenance_runs'
 import { PipetteWizardFlows } from '../../../../organisms/PipetteWizardFlows'

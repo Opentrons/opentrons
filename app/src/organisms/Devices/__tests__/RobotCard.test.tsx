@@ -12,7 +12,7 @@ import {
   mockOT3ServerHealthResponse,
 } from '../../../../../discovery-client/src/fixtures'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
 import {
   mockLeftProtoPipette,

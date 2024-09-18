@@ -4,7 +4,7 @@ import { vi, it, describe, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import * as Networking from '/app/redux/networking'
 import { TitleHeader } from '../TitleHeader'
 import { DisplayConnectionStatus } from '../DisplayConnectionStatus'

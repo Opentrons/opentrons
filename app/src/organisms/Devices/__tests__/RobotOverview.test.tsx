@@ -8,7 +8,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import * as DiscoveryClientFixtures from '../../../../../discovery-client/src/fixtures'
 import { useAuthorization } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { useCurrentRunId } from '../../../resources/runs'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'

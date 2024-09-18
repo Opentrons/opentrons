@@ -3,7 +3,7 @@ import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { act, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 
 import * as RobotUpdate from '/app/redux/robot-update'
 import type { RobotUpdateSession } from '/app/redux/robot-update/types'

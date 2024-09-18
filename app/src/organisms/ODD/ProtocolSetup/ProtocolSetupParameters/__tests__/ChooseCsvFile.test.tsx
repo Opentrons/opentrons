@@ -5,7 +5,7 @@ import { when } from 'vitest-when'
 
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../../../i18n'
+import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { getLocalRobot } from '/app/redux/discovery'

@@ -4,7 +4,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { Route, MemoryRouter, Routes } from 'react-router-dom'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { i18n } from '/app/i18n'
 import { RobotSettingsCalibration } from '../../../../../organisms/RobotSettingsCalibration'
 import { RobotSettingsNetworking } from '../../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsAdvanced } from '../../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'

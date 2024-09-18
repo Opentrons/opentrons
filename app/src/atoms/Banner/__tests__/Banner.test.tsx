@@ -2,7 +2,7 @@ import * as React from 'react'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { Banner } from '..'
 
 const render = (props: React.ComponentProps<typeof Banner>) => {

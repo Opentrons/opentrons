@@ -8,7 +8,7 @@ import {
   getLoadedLabwareDefinitionsByUri,
   simple_v6 as _uncastedSimpleV6Protocol,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
 import { useLPCDisabledReason } from '../useLPCDisabledReason'
 import {

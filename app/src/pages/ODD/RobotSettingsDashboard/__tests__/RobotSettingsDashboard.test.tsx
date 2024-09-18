@@ -5,7 +5,7 @@ import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { getRobotSettings } from '/app/redux/robot-settings'
 import { getLocalRobot } from '/app/redux/discovery'
 import { toggleDevtools, toggleHistoricOffsets } from '/app/redux/config'

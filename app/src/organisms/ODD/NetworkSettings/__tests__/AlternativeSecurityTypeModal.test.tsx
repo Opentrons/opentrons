@@ -3,7 +3,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { AlternativeSecurityTypeModal } from '../AlternativeSecurityTypeModal'
 
 import type { NavigateFunction } from 'react-router-dom'

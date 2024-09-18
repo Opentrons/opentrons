@@ -7,7 +7,7 @@ import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { useModulesQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { i18n } from '/app/i18n'
 import { ProtocolRunHeader } from '..'
 import { useRunStatus } from '../../../../RunTimeControl/hooks'
 import { useIsRobotViewable, useProtocolDetailsForRun } from '../../../hooks'

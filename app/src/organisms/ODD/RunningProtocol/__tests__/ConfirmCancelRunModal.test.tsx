@@ -12,7 +12,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { useTrackProtocolRunEvent } from '../../../../organisms/Devices/hooks'
 import { useRunStatus } from '../../../../organisms/RunTimeControl/hooks'
 import { useTrackEvent } from '/app/redux/analytics'

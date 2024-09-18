@@ -5,7 +5,7 @@ import { describe, it, vi, expect, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 
-import { i18n } from '../../../../../i18n'
+import { i18n } from '/app/i18n'
 import { getRobotSettings } from '/app/redux/robot-settings'
 
 import { GantryHoming } from '../GantryHoming'

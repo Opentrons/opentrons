@@ -10,7 +10,7 @@ import {
   usePipettesQuery,
 } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { Banner } from '../../../atoms/Banner'
 import { mockMagneticModule } from '/app/redux/modules/__fixtures__'
 import { useIsFlex, useIsRobotViewable, useRunStatuses } from '../hooks'

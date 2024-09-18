@@ -10,7 +10,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { i18n } from '/app/i18n'
 import { useMostRecentCompletedAnalysis } from '../../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useIsOEMMode } from '../../../../../resources/robot-settings/hooks'
 import { mockRecentAnalysis } from '../__fixtures__'

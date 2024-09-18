@@ -4,7 +4,7 @@ import { screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   mockAttachedPipette,
   mockAttachedPipetteInformation,

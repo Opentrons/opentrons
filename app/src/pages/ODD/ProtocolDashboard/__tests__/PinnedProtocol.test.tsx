@@ -6,7 +6,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { COLORS, TYPOGRAPHY } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { useFeatureFlag } from '/app/redux/config'
 import { PinnedProtocol } from '../PinnedProtocol'
 

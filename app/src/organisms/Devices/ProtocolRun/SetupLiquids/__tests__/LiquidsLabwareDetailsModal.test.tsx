@@ -5,11 +5,8 @@ import { screen } from '@testing-library/react'
 import { LabwareRender } from '@opentrons/components'
 import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
 
-import {
-  nestedTextMatcher,
-  renderWithProviders,
-} from '/app/__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { getIsOnDevice } from '/app/redux/config'
 import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'

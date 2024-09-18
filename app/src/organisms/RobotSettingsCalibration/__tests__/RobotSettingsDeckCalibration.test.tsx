@@ -2,7 +2,7 @@ import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach } from 'vitest'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import * as RobotApi from '/app/redux/robot-api'
 import {
   mockDeckCalData,

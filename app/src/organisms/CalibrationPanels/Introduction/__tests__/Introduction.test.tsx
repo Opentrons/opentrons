@@ -5,7 +5,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { mockCalibrationCheckLabware } from '/app/redux/sessions/__fixtures__'
 import * as Sessions from '/app/redux/sessions'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { Introduction } from '../'
 import { ChooseTipRack } from '../../ChooseTipRack'
 

@@ -10,7 +10,7 @@ import {
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../../../i18n'
+import { i18n } from '/app/i18n'
 import { SetupFixtureList } from '../SetupFixtureList'
 import { NotConfiguredModal } from '../NotConfiguredModal'
 import { LocationConflictModal } from '../LocationConflictModal'

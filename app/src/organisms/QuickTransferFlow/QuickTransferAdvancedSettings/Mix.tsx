@@ -22,7 +22,7 @@ import type {
   QuickTransferSummaryAction,
   FlowRateKind,
 } from '../types'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
 
 interface MixProps {

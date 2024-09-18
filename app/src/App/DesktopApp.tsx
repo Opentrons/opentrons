@@ -12,7 +12,7 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import NiceModal from '@ebay/nice-modal-react'
 
-import { i18n } from '../i18n'
+import { i18n } from '/app/i18n'
 import { Alerts } from '../organisms/Alerts'
 import { Breadcrumbs } from '../organisms/Breadcrumbs'
 import { ToasterOven } from '../organisms/ToasterOven'

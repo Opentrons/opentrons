@@ -14,7 +14,7 @@ import {
 import { simpleAnalysisFileFixture } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { Skeleton } from '../../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../../transformations/commands'
 import { useTrackProtocolRunEvent } from '../../../Devices/hooks'

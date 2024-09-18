@@ -8,7 +8,7 @@ import {
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { CommandText } from '../CommandText'
 import { mockCommandTextData } from '../__fixtures__'
 import { getCommandTextData } from '../utils/getCommandTextData'

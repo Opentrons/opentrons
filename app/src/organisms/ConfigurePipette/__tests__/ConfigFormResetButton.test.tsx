@@ -3,7 +3,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { vi, it, expect, describe, beforeEach } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { ConfigFormResetButton } from '../ConfigFormResetButton'
 
 const render = (props: React.ComponentProps<typeof ConfigFormResetButton>) => {

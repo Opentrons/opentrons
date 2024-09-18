@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { heater_shaker_commands_with_results_key } from '@opentrons/shared-data'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   mockHeaterShaker,
   mockMagneticModuleGen2,

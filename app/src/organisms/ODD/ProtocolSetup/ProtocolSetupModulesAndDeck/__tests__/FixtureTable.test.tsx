@@ -11,7 +11,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { i18n } from '/app/i18n'
 import { LocationConflictModal } from '../../../../../organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { useDeckConfigurationCompatibility } from '../../../../../resources/deck_configuration/hooks'
 import { FixtureTable } from '../FixtureTable'

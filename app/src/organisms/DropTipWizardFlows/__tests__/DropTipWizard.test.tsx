@@ -3,7 +3,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { mockDropTipWizardContainerProps } from '../__fixtures__'
 import { DropTipWizardContent, DropTipWizardContainer } from '../DropTipWizard'
 import { DropTipWizardHeader } from '../DropTipWizardHeader'

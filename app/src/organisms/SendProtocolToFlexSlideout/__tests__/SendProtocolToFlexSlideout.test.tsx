@@ -11,7 +11,7 @@ import {
 import { useCreateProtocolMutation } from '@opentrons/react-api-client'
 
 import { mockSuccessQueryResults } from '../../../__fixtures__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { useToaster } from '../../../organisms/ToasterOven'
 import {
   getConnectableRobots,

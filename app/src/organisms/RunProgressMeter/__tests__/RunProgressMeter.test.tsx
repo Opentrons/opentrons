@@ -12,7 +12,7 @@ import {
   RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   useInterventionModal,
   InterventionModal,
