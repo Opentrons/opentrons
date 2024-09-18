@@ -167,7 +167,7 @@ export function getRecoveryRouteNavigation(
 }
 
 type DetermineRecoveryRoutingParams = GetRouteUpdateActionsParams & {
-  updatedStep: string
+  updatedStep: RouteStep
   currentRoute: RecoveryRoute
 }
 

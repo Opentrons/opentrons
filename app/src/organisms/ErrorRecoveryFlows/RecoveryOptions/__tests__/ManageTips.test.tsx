@@ -82,7 +82,10 @@ describe('ManageTips', () => {
   })
 
   it('renders SelectRecoveryOption when the route is unknown', () => {
-    props = { ...props, recoveryMap: { ...props.recoveryMap, step: 'UNKNOWN' } }
+    props = {
+      ...props,
+      recoveryMap: { ...props.recoveryMap, step: 'UNKNOWN' as any },
+    }
     render(props)
 
     screen.getByText('MOCK SELECT RECOVERY OPTION')

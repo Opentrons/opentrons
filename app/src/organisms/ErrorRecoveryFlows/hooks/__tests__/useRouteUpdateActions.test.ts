@@ -184,7 +184,10 @@ describe('useRouteUpdateActions', () => {
     )
     const { proceedToRouteAndStep } = result.current
 
-    proceedToRouteAndStep(RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE, 'invalid-step')
+    proceedToRouteAndStep(
+      RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE,
+      'invalid-step' as any
+    )
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
       route: RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE,
       step: RECOVERY_MAP.ROBOT_IN_MOTION.STEPS.IN_MOTION,
