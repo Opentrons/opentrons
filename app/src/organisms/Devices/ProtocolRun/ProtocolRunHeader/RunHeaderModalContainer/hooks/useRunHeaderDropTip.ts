@@ -97,6 +97,7 @@ export function useRunHeaderDropTip({
             mount: aPipetteWithTip.mount,
             instrumentModelSpecs: aPipetteWithTip.specs,
             closeFlow: onCloseFlow,
+            modalStyle: 'simple',
           },
         }
       : { showDTWiz: false, dtWizProps: null }

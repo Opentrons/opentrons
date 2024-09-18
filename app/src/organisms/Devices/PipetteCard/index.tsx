@@ -111,6 +111,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           mount={mount}
           instrumentModelSpecs={pipetteModelSpecs}
           closeFlow={toggleDTWiz}
+          modalStyle="simple"
         />
       ) : null}
       {showSlideout &&

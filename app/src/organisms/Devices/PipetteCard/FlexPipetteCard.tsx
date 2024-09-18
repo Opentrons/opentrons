@@ -266,6 +266,7 @@ export function FlexPipetteCard({
           mount={mount}
           instrumentModelSpecs={pipetteModelSpecs}
           closeFlow={toggleDTWiz}
+          modalStyle="simple"
         />
       ) : null}
       {attachedPipette?.ok && showAboutPipetteSlideout ? (
