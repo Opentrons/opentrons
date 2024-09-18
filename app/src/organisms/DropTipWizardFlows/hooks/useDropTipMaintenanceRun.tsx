@@ -62,7 +62,7 @@ export function useDropTipMaintenanceRun({
 
 type UseCreateDropTipMaintenanceRunParams = Omit<
   UseDropTipMaintenanceRunParams,
-  'robotType' | 'closeFlow'
+  'robotType' | 'closeFlow' | 'modalStyle'
 > & {
   setCreatedMaintenanceRunId: (id: string) => void
   instrumentModelName?: PipetteModelSpecs['name']

@@ -50,6 +50,7 @@ export function RecoveryInterventionModal({
 const SMALL_MODAL_STYLE = css`
   height: 22rem;
   padding: ${SPACING.spacing32};
+  width: 100%;
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     padding: ${SPACING.spacing32};
@@ -58,4 +59,9 @@ const SMALL_MODAL_STYLE = css`
 `
 const LARGE_MODAL_STYLE = css`
   height: 26.75rem;
+  width: 100%;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: 100%;
+  }
 `
