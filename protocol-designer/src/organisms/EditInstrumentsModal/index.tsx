@@ -345,19 +345,17 @@ export function EditInstrumentsModal(
                           {t('gripper')}
                         </StyledText>
                       </Flex>
-                      <Flex>
-                        <Btn
-                          css={BUTTON_LINK_STYLE}
-                          textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                          onClick={() => {
-                            dispatch(toggleIsGripperRequired())
-                          }}
-                        >
-                          <StyledText desktopStyle="bodyDefaultRegular">
-                            {t('remove')}
-                          </StyledText>
-                        </Btn>
-                      </Flex>
+                      <Btn
+                        css={BUTTON_LINK_STYLE}
+                        textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                        onClick={() => {
+                          dispatch(toggleIsGripperRequired())
+                        }}
+                      >
+                        <StyledText desktopStyle="bodyDefaultRegular">
+                          {t('remove')}
+                        </StyledText>
+                      </Btn>
                     </Flex>
                   </ListItem>
                 ) : (
