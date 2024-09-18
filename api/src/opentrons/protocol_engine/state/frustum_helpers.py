@@ -1,5 +1,5 @@
 """Helper functions for liquid-level related calculations inside a given frustum."""
-from typing import List, Tuple, Iterator, Sequence, Any
+from typing import List, Tuple, Iterator, Sequence, Any, Union
 from numpy import pi, iscomplex, roots, real
 from math import sqrt
 
@@ -7,6 +7,8 @@ from ..errors.exceptions import InvalidLiquidHeightFound
 from opentrons_shared_data.labware.types import (
     is_circular_frusta_list,
     is_rectangular_frusta_list,
+    CircularBoundedSection,
+    RectangularBoundedSection,
 )
 from opentrons_shared_data.labware.labware_definition import InnerWellGeometry
 
@@ -30,16 +32,35 @@ def reject_unacceptable_heights(
     return valid_heights[0]
 
 
+def get_cross_section_area(
+    bounded_section: Union[CircularBoundedSection, RectangularBoundedSection]
+) -> float:
+    """Find the shape of a cross-section and calculate the area appropriately."""
+    if bounded_section["shape"] == "circular":
+        cross_section_area = cross_section_area_circular(bounded_section["diameter"])
+    elif bounded_section["shape"] == "rectangular":
+        cross_section_area = cross_section_area_rectangular(
+            bounded_section["xDimension"],
+            bounded_section["yDimension"],
+        )
+    else:
+        raise InvalidLiquidHeightFound(message="Invalid well volume components.")
+    return cross_section_area
+
+
 def cross_section_area_circular(diameter: float) -> float:
+    """Get the area of a circular cross-section."""
     radius = diameter / 2
     return pi * (radius**2)
 
 
 def cross_section_area_rectangular(x_dimension: float, y_dimension: float) -> float:
+    """Get the area of a rectangular cross-section."""
     return x_dimension * y_dimension
 
 
 def volume_from_frustum_formula(area_1: float, area_2: float, height: float) -> float:
+    """Get the area of a section with differently shaped boundary cross-sections."""
     area_term = area_1 + area_2 + sqrt(area_1 * area_2)
     return (height / 3) * area_term
 
@@ -254,8 +275,15 @@ def get_well_volumetric_capacity(
             )
 
             well_volume.append((next_f["topHeight"], frustum_volume))
-    # else:
-    # for f, next_f in get_boundary_cross_sections(sorted_frusta):
+    else:
+        for f, next_f in get_boundary_cross_sections(sorted_frusta):
+            bottom_cross_section_area = get_cross_section_area(f)
+            top_cross_section_area = get_cross_section_area(next_f)
+            section_height = next_f["topHeight"] - f["topHeight"]
+            bounded_volume = volume_from_frustum_formula(
+                bottom_cross_section_area, top_cross_section_area, section_height
+            )
+            well_volume.append((next_f["topHeight"], bounded_volume))
 
     # cycle through every one, see what the boundaries are
     # write helper that does volume of a frustum formula
