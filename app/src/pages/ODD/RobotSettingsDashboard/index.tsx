@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import last from 'lodash/last'
 
-import { EthernetConnectionDetails } from '../../../organisms/RobotSettingsDashboard/NetworkSettings/EthernetConnectionDetails'
+import { EthernetConnectionDetails } from '../../../organisms/ODD/RobotSettingsDashboard/NetworkSettings/EthernetConnectionDetails'
 import {
   DeviceReset,
   TouchscreenBrightness,
@@ -18,7 +18,7 @@ import {
   RobotSettingsWifiConnect,
   RobotSystemVersion,
   UpdateChannel,
-} from '../../../organisms/RobotSettingsDashboard'
+} from '../../../organisms/ODD/RobotSettingsDashboard'
 import {
   getRobotUpdateAvailable,
   getRobotUpdateInfoForRobot,
@@ -36,28 +36,7 @@ import { RobotSettingsList } from './RobotSettingsList'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { Dispatch, State } from '../../../redux/types'
-
-/**
- * a set of screen options for the robot settings dashboard page
- */
-export type SettingOption =
-  | 'NetworkSettings'
-  | 'RobotName'
-  | 'RobotSystemVersion'
-  | 'TouchscreenSleep'
-  | 'TouchscreenBrightness'
-  | 'TextSize'
-  | 'Privacy'
-  | 'DeviceReset'
-  | 'UpdateChannel'
-  | 'EthernetConnectionDetails'
-  | 'RobotSettingsSelectAuthenticationType'
-  | 'RobotSettingsJoinOtherNetwork'
-  | 'RobotSettingsSetWifiCred'
-  | 'RobotSettingsWifi'
-  | 'RobotSettingsWifiConnect'
-
-export type SetSettingOption = (option: SettingOption | null) => void
+import type { SettingOption } from '../../../organisms/ODD/RobotSettingsDashboard'
 
 export function RobotSettingsDashboard(): JSX.Element {
   const { i18n, t } = useTranslation('shared')

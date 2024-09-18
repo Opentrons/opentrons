@@ -13,10 +13,12 @@ import {
   Btn,
   Checkbox,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   DISPLAY_FLEX,
   DISPLAY_INLINE_BLOCK,
   EmptySelectorButton,
   Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
   PRODUCT,
   RadioButton,
@@ -400,9 +402,16 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                       )
                     }}
                   >
-                    <StyledText desktopStyle="bodyDefaultRegular">
-                      {t('swap')}
-                    </StyledText>
+                    <Flex flexDirection={DIRECTION_ROW}>
+                      <Icon
+                        name="swap-horizontal"
+                        size="1rem"
+                        transform="rotate(90deg)"
+                      />
+                      <StyledText desktopStyle="captionSemiBold">
+                        {t('swap')}
+                      </StyledText>
+                    </Flex>
                   </Btn>
                 )}
               </Flex>

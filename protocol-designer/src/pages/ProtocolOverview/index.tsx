@@ -58,6 +58,7 @@ import type { DeckSlot } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../types'
 import type { HintKey } from '../../tutorial'
 
+const REQUIRED_APP_VERSION = '8.0.0'
 const DATE_ONLY_FORMAT = 'MMMM dd, yyyy'
 const DATETIME_FORMAT = 'MMMM dd, yyyy | h:mm a'
 
@@ -115,6 +116,15 @@ export function ProtocolOverview(): JSX.Element {
   const [deckView, setDeckView] = React.useState<
     typeof leftString | typeof rightString
   >(leftString)
+
+  React.useEffect(() => {
+    if (formValues?.created == null) {
+      console.warn(
+        'formValues was refreshed while on the overview page, redirecting to landing page'
+      )
+      navigate('/')
+    }
+  }, [formValues])
 
   const {
     modules: modulesOnDeck,
@@ -330,7 +340,11 @@ export function ProtocolOverview(): JSX.Element {
                   </StyledText>
                 </Btn>
               </Flex>
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing4}
+                marginBottom={SPACING.spacing4}
+              >
                 {metaDataInfo.map(info => {
                   const [title, value] = Object.entries(info)[0]
 
@@ -345,6 +359,15 @@ export function ProtocolOverview(): JSX.Element {
                   )
                 })}
               </Flex>
+              <ListItem type="noActive" key="ProtocolOverview_robotVersion">
+                <ListItemDescriptor
+                  type="default"
+                  description={t('required_app_version')}
+                  content={t('app_version', {
+                    version: REQUIRED_APP_VERSION,
+                  })}
+                />
+              </ListItem>
             </Flex>
             <Flex flexDirection={DIRECTION_COLUMN}>
               <Flex

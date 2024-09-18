@@ -46,6 +46,7 @@ describe('Designer', () => {
   beforeEach(() => {
     vi.mocked(getFileMetadata).mockReturnValue({
       protocolName: 'mockProtocolName',
+      created: 123,
     })
     vi.mocked(selectors.getIsNewProtocol).mockReturnValue(true)
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({

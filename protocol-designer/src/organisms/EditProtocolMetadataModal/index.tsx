@@ -60,6 +60,7 @@ export function EditProtocolMetadataModal(
         <Flex
           justifyContent={JUSTIFY_END}
           padding={`0 ${SPACING.spacing24} ${SPACING.spacing24}`}
+          gridGap={SPACING.spacing8}
         >
           <SecondaryButton onClick={onClose}>
             {t('shared:cancel')}

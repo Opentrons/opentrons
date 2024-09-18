@@ -70,6 +70,7 @@ from .exceptions import (
     NotSupportedOnRobotType,
     CommandNotAllowedError,
     InvalidLiquidHeightFound,
+    LiquidHeightUnknownError,
     InvalidWellDefinitionError,
 )
 
@@ -149,5 +150,6 @@ __all__ = [
     "ErrorOccurrence",
     "CommandNotAllowedError",
     "InvalidLiquidHeightFound",
+    "LiquidHeightUnknownError",
     "InvalidWellDefinitionError",
 ]

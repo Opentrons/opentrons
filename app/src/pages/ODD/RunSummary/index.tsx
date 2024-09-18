@@ -60,7 +60,7 @@ import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '../../../redux/analytics'
 import { getLocalRobot } from '../../../redux/discovery'
-import { RunFailedModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
+import { RunFailedModal } from '../../../organisms/ODD/RunningProtocol'
 import {
   formatTimeWithUtcLabel,
   useIsRunCurrent,

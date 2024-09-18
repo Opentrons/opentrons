@@ -49,6 +49,7 @@ from ..types import (
 )
 from .config import Config
 from .labware import LabwareView
+from .wells import WellView
 from .modules import ModuleView
 from .pipettes import PipetteView
 from .addressable_areas import AddressableAreaView
@@ -98,6 +99,7 @@ class GeometryView:
         self,
         config: Config,
         labware_view: LabwareView,
+        well_view: WellView,
         module_view: ModuleView,
         pipette_view: PipetteView,
         addressable_area_view: AddressableAreaView,
@@ -105,6 +107,7 @@ class GeometryView:
         """Initialize a GeometryView instance."""
         self._config = config
         self._labware = labware_view
+        self._wells = well_view
         self._modules = module_view
         self._pipettes = pipette_view
         self._addressable_areas = addressable_area_view
@@ -430,6 +433,16 @@ class GeometryView:
                 offset = offset.copy(update={"z": offset.z + well_depth})
             elif well_location.origin == WellOrigin.CENTER:
                 offset = offset.copy(update={"z": offset.z + well_depth / 2.0})
+            elif well_location.origin == WellOrigin.MENISCUS:
+                liquid_height = self._wells.get_last_measured_liquid_height(
+                    labware_id, well_name
+                )
+                if liquid_height is not None:
+                    offset = offset.copy(update={"z": offset.z + liquid_height})
+                else:
+                    raise errors.LiquidHeightUnknownError(
+                        "Must liquid probe before specifying WellOrigin.MENISCUS."
+                    )
 
         return Point(
             x=labware_pos.x + offset.x + well_def.x,

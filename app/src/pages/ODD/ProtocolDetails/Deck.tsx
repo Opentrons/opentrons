@@ -9,8 +9,8 @@ import {
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { LabwareStackModal } from '../../../organisms/Devices/ProtocolRun/SetupLabware/LabwareStackModal'
-import { SingleLabwareModal } from '../../../organisms/ProtocolSetupLabware/SingleLabwareModal'
-import { getLabwareSetupItemGroups } from '../../../pages/Desktop/Protocols/utils'
+import { SingleLabwareModal } from '../../../organisms/ODD/ProtocolSetup/ProtocolSetupLabware/SingleLabwareModal'
+import { getLabwareSetupItemGroups } from '../../../transformations/commands'
 
 import type {
   LabwareDefinition2,

@@ -66,6 +66,7 @@ describe('ProtocolOverview', () => {
       protocolName: 'mockName',
       author: 'mockAuthor',
       description: 'mockDescription',
+      created: 123,
     })
     vi.mocked(useBlockingHint).mockReturnValue(null)
     vi.mocked(MaterialsListModal).mockReturnValue(
@@ -94,6 +95,8 @@ describe('ProtocolOverview', () => {
     screen.getByText('mockAuthor')
     screen.getByText('Date created')
     screen.getByText('Last exported')
+    screen.getByText('Required app version')
+    screen.getByText('8.0.0 or higher')
     //  instruments
     screen.getByText('Instruments')
     screen.getByText('Robot type')
