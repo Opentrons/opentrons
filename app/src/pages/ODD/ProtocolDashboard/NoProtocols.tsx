@@ -13,7 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import imgSrc from '../../../assets/images/on-device-display/empty_protocol_dashboard.png'
+import imgSrc from '/app/assets/images/on-device-display/empty_protocol_dashboard.png'
 
 export function NoProtocols(): JSX.Element {
   const { t } = useTranslation(['protocol_info', 'branded'])

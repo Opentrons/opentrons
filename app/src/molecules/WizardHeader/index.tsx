@@ -15,7 +15,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StepMeter } from '../../atoms/StepMeter'
+import { StepMeter } from '/app/atoms/StepMeter'
 
 interface WizardHeaderProps {
   title: string

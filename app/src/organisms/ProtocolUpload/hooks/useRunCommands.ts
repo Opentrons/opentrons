@@ -1,4 +1,4 @@
-import { useNotifyAllCommandsQuery } from '../../../resources/runs'
+import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
 import type { UseQueryOptions } from 'react-query'
 import type {

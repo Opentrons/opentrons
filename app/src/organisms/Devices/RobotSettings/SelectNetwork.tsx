@@ -3,17 +3,17 @@ import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
 
-import { useWifiList } from '../../../resources/networking/hooks'
-import * as RobotApi from '../../../redux/robot-api'
-import * as Networking from '../../../redux/networking'
+import { useWifiList } from '/app/resources/networking/hooks'
+import * as RobotApi from '/app/redux/robot-api'
+import * as Networking from '/app/redux/networking'
 import { getModalPortalEl } from '../../../App/portal'
 import { SelectSsid } from './ConnectNetwork/SelectSsid'
 import { ConnectModal } from './ConnectNetwork/ConnectModal'
 import { ResultModal } from './ConnectNetwork/ResultModal'
 import { CONNECT, JOIN_OTHER } from './ConnectNetwork/constants'
 
-import type { State, Dispatch } from '../../../redux/types'
-import type { WifiNetwork } from '../../../redux/networking/types'
+import type { State, Dispatch } from '/app/redux/types'
+import type { WifiNetwork } from '/app/redux/networking/types'
 import type {
   WifiConfigureRequest,
   NetworkChangeState,

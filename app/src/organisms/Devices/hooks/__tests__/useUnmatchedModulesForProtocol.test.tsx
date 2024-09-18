@@ -2,8 +2,8 @@ import { vi, it, expect, describe, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
 import { renderHook } from '@testing-library/react'
 
-import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
-import { mockTemperatureModule } from '../../../../redux/modules/__fixtures__'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
+import { mockTemperatureModule } from '/app/redux/modules/__fixtures__'
 import {
   useAttachedModules,
   useModuleRenderInfoForProtocolById,

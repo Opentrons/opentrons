@@ -10,10 +10,10 @@ import {
 import { COLORS } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
-import { useIsOEMMode } from '../../../resources/robot-settings/hooks'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
+import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
+import { i18n } from '/app/i18n'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { Results } from '../Results'
 import { FLOWS } from '../constants'
@@ -21,7 +21,7 @@ import { FLOWS } from '../constants'
 import type { Mock } from 'vitest'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../resources/robot-settings/hooks')
+vi.mock('/app/resources/robot-settings/hooks')
 
 const render = (props: React.ComponentProps<typeof Results>) => {
   return renderWithProviders(<Results {...props} />, {

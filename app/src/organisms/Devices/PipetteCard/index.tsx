@@ -21,7 +21,7 @@ import {
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { usePipetteSettingsQuery } from '@opentrons/react-api-client'
 
-import { LEFT } from '../../../redux/pipettes'
+import { LEFT } from '/app/redux/pipettes'
 import { ChangePipette } from '../../ChangePipette'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
@@ -32,7 +32,7 @@ import {
 } from '../../DropTipWizardFlows'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
-import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
+import type { AttachedPipette, Mount } from '/app/redux/pipettes/types'
 
 interface PipetteCardProps {
   pipetteModelSpecs: PipetteModelSpecs | null

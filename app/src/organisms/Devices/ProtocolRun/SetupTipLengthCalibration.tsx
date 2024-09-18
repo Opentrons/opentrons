@@ -10,7 +10,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import * as PipetteConstants from '../../../redux/pipettes/constants'
+import * as PipetteConstants from '/app/redux/pipettes/constants'
 import { useRunPipetteInfoByMount } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 import { SetupTipLengthCalibrationButton } from './SetupTipLengthCalibrationButton'

@@ -16,13 +16,13 @@ import {
 } from '@opentrons/react-api-client'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../App/portal'
-import { SmallButton } from '../../atoms/buttons'
-import { OddModal } from '../../molecules/OddModal'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
 import { UpdateInProgressModal } from './UpdateInProgressModal'
 import { UpdateResultsModal } from './UpdateResultsModal'
 import type { Subsystem } from '@opentrons/api-client'
 
-import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface UpdateNeededModalProps {
   onClose: () => void

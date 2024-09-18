@@ -3,7 +3,7 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { I18nextProvider } from 'react-i18next'
 import { getAllDefs } from '../helpers/getAllDefs'
 
@@ -11,19 +11,19 @@ import {
   getValidCustomLabware,
   getAddLabwareFailure,
   getAddNewLabwareName,
-} from '../../../../redux/custom-labware'
+} from '/app/redux/custom-labware'
 import {
   mockDefinition,
   mockValidLabware,
-} from '../../../../redux/custom-labware/__fixtures__'
+} from '/app/redux/custom-labware/__fixtures__'
 
 import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
 
 import type { Store } from 'redux'
-import type { State } from '../../../../redux/types'
-import type { FailedLabwareFile } from '../../../../redux/custom-labware/types'
+import type { State } from '/app/redux/types'
+import type { FailedLabwareFile } from '/app/redux/custom-labware/types'
 
-vi.mock('../../../../redux/custom-labware')
+vi.mock('/app/redux/custom-labware')
 vi.mock('../helpers/getAllDefs')
 
 describe('useAllLabware hook', () => {

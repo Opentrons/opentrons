@@ -9,7 +9,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Slideout } from '../../atoms/Slideout'
+import { Slideout } from '/app/atoms/Slideout'
 
 interface AboutGripperSlideoutProps {
   serialNumber: string

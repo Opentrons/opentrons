@@ -19,14 +19,14 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { useRobot } from '../../../../organisms/Devices/hooks'
-import { CONNECTABLE } from '../../../../redux/discovery'
+import { useRobot } from '/app/organisms/Devices/hooks'
+import { CONNECTABLE } from '/app/redux/discovery'
 import {
   clearWifiStatus,
   getNetworkInterfaces,
   postWifiDisconnect,
-} from '../../../../redux/networking'
-import { useWifiList } from '../../../../resources/networking/hooks'
+} from '/app/redux/networking'
+import { useWifiList } from '/app/resources/networking/hooks'
 import {
   dismissRequest,
   getRequestById,
@@ -34,9 +34,9 @@ import {
   PENDING,
   FAILURE,
   SUCCESS,
-} from '../../../../redux/robot-api'
+} from '/app/redux/robot-api'
 
-import type { Dispatch, State } from '../../../../redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 export interface DisconnectModalProps {
   onCancel: () => unknown

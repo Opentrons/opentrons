@@ -12,11 +12,11 @@ import {
 } from '@opentrons/react-api-client'
 import { getProtocol } from '@opentrons/api-client'
 
-import { checkShellUpdate } from '../redux/shell'
-import { useToaster } from '../organisms/ToasterOven'
+import { checkShellUpdate } from '/app/redux/shell'
+import { useToaster } from '/app/organisms/ToasterOven'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
-import type { Dispatch } from '../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 const UPDATE_RECHECK_INTERVAL_MS = 60000
 const PROTOCOL_IDS_RECHECK_INTERVAL_MS = 3000

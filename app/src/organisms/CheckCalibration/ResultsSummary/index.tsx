@@ -16,18 +16,18 @@ import {
 } from '@opentrons/components'
 
 import find from 'lodash/find'
-import { LEFT, RIGHT } from '../../../redux/pipettes'
-import { CHECK_STATUS_OUTSIDE_THRESHOLD } from '../../../redux/sessions'
+import { LEFT, RIGHT } from '/app/redux/pipettes'
+import { CHECK_STATUS_OUTSIDE_THRESHOLD } from '/app/redux/sessions'
 import { CalibrationHealthCheckResults } from './CalibrationHealthCheckResults'
 import { RenderMountInformation } from './RenderMountInformation'
 import { CalibrationResult } from './CalibrationResult'
 
-import type { Mount } from '../../../redux/pipettes/types'
-import type { CalibrationPanelProps } from '../../../organisms/CalibrationPanels/types'
+import type { Mount } from '/app/redux/pipettes/types'
+import type { CalibrationPanelProps } from '/app/organisms/CalibrationPanels/types'
 import type {
   CalibrationCheckInstrument,
   CalibrationCheckComparisonsPerCalibration,
-} from '../../../redux/sessions/types'
+} from '/app/redux/sessions/types'
 
 export function ResultsSummary(
   props: CalibrationPanelProps

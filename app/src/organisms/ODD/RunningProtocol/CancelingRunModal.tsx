@@ -13,7 +13,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { OddModal } from '../../../molecules/OddModal'
+import { OddModal } from '/app/molecules/OddModal'
 
 export function CancelingRunModal(): JSX.Element {
   const { t, i18n } = useTranslation('run_details')

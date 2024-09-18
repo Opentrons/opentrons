@@ -31,30 +31,30 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
-import { MediumButton, SmallButton } from '../../../atoms/buttons'
+import { MediumButton, SmallButton } from '/app/atoms/buttons'
 import {
   ProtocolDetailsHeaderChipSkeleton,
   ProcotolDetailsHeaderTitleSkeleton,
   ProtocolDetailsSectionContentSkeleton,
-} from '../../../organisms/ODD/ProtocolDetails'
-import { useHardwareStatusText } from '../../../organisms/ODD/RobotDashboard/hooks'
-import { SmallModalChildren } from '../../../molecules/OddModal'
-import { useToaster } from '../../../organisms/ToasterOven'
+} from '/app/organisms/ODD/ProtocolDetails'
+import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
+import { SmallModalChildren } from '/app/molecules/OddModal'
+import { useToaster } from '/app/organisms/ToasterOven'
 import {
   getApplyHistoricOffsets,
   getPinnedQuickTransferIds,
   updateConfigValue,
-} from '../../../redux/config'
-import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { useMissingProtocolHardware } from '../../../transformations/commands'
+} from '/app/redux/config'
+import { useOffsetCandidatesForAnalysis } from '/app/organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { DeleteTransferConfirmationModal } from '../QuickTransferDashboard/DeleteTransferConfirmationModal'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
-import { formatTimeWithUtcLabel } from '../../../resources/runs'
+import { formatTimeWithUtcLabel } from '/app/resources/runs'
 
 import type { Protocol } from '@opentrons/api-client'
-import type { Dispatch } from '../../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 import type { OnDeviceRouteParams } from '../../../App/types'
 
 interface QuickTransferHeaderProps {

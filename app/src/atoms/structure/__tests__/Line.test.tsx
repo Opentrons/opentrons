@@ -4,7 +4,7 @@ import '@testing-library/jest-dom/vitest'
 import { screen } from '@testing-library/react'
 import { SPACING, COLORS } from '@opentrons/components'
 import { Line } from '../index'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
 const render = (props: React.ComponentProps<typeof Line>) => {
   return renderWithProviders(<Line {...props} />)[0]

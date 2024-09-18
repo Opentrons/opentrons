@@ -17,7 +17,7 @@ import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import {
   useNotifyDeckConfigurationQuery,
   useDeckConfigurationCompatibility,
-} from '../../../resources/deck_configuration'
+} from '/app/resources/deck_configuration'
 import type {
   ProtocolHardware,
   ProtocolGripper,

@@ -21,14 +21,14 @@ import {
   parseAllRequiredModuleModels,
 } from '@opentrons/shared-data'
 
-import { Line } from '../../../atoms/structure'
-import { InfoMessage } from '../../../molecules/InfoMessage'
-import { INCOMPATIBLE, INEXACT_MATCH } from '../../../redux/pipettes'
+import { Line } from '/app/atoms/structure'
+import { InfoMessage } from '/app/molecules/InfoMessage'
+import { INCOMPATIBLE, INEXACT_MATCH } from '/app/redux/pipettes'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
-} from '../../../resources/deck_configuration/utils'
-import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
+} from '/app/resources/deck_configuration/utils'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
   useIsFlex,
   useModuleCalibrationStatus,

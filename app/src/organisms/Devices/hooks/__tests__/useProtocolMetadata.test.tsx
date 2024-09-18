@@ -9,7 +9,7 @@ import { useCurrentProtocol } from '../../../ProtocolUpload/hooks'
 import { useProtocolMetadata } from '../useProtocolMetadata'
 
 import type { Store } from 'redux'
-import type { State } from '../../../../redux/types'
+import type { State } from '/app/redux/types'
 
 vi.mock('../../../ProtocolUpload/hooks')
 

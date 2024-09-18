@@ -4,13 +4,13 @@ import { useSelector } from 'react-redux'
 import {
   getCalibrationForPipette,
   fetchPipetteOffsetCalibrations,
-} from '../../../redux/calibration'
-import { useDispatchApiRequest } from '../../../redux/robot-api'
+} from '/app/redux/calibration'
+import { useDispatchApiRequest } from '/app/redux/robot-api'
 import { useRobot } from '.'
 
-import type { PipetteOffsetCalibration } from '../../../redux/calibration/types'
-import type { State } from '../../../redux/types'
-import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
+import type { PipetteOffsetCalibration } from '/app/redux/calibration/types'
+import type { State } from '/app/redux/types'
+import type { AttachedPipette, Mount } from '/app/redux/pipettes/types'
 
 export function usePipetteOffsetCalibration(
   robotName: string | null = null,

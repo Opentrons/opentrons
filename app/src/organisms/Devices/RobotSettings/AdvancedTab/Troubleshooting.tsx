@@ -20,9 +20,9 @@ import {
 } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
-import { TertiaryButton } from '../../../../atoms/buttons'
-import { useToaster } from '../../../../organisms/ToasterOven'
-import { CONNECTABLE } from '../../../../redux/discovery'
+import { TertiaryButton } from '/app/atoms/buttons'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { CONNECTABLE } from '/app/redux/discovery'
 import { useRobot } from '../../hooks'
 
 import type { IconProps } from '@opentrons/components'

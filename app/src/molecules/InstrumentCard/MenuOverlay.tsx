@@ -10,7 +10,7 @@ import {
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
 
-import { Divider } from '../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 
 import type { StyleProps } from '@opentrons/components'
 

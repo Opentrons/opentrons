@@ -18,13 +18,13 @@ import {
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
-} from '../../resources/maintenance_runs'
+} from '/app/resources/maintenance_runs'
 import { getTopPortalEl } from '../../App/portal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
-import { getIsOnDevice } from '../../redux/config'
-import { useCreateTargetedMaintenanceRunMutation } from '../../resources/runs'
+import { getIsOnDevice } from '/app/redux/config'
+import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 import { getGripperWizardSteps } from './getGripperWizardSteps'
 import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'

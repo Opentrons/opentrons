@@ -11,10 +11,10 @@ import { getProtocolModulesInfo } from '../ProtocolRun/utils/getProtocolModulesI
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useAttachedModules } from './useAttachedModules'
 import { useStoredProtocolAnalysis } from './useStoredProtocolAnalysis'
-import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { CutoutConfig } from '@opentrons/shared-data'
-import type { AttachedModule } from '../../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 import type { ProtocolModuleInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 
 export interface ModuleRenderInfoForProtocol extends ProtocolModuleInfo {

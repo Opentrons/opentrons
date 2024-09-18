@@ -3,20 +3,20 @@ import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   RecentRunProtocolCarousel,
   EmptyRecentRun,
-} from '../../../../organisms/ODD/RobotDashboard'
-import { Navigation } from '../../../../organisms/Navigation'
-import { useMissingProtocolHardware } from '../../../../transformations/commands'
-import { getOnDeviceDisplaySettings } from '../../../../redux/config'
+} from '/app/organisms/ODD/RobotDashboard'
+import { Navigation } from '/app/organisms/Navigation'
+import { useMissingProtocolHardware } from '/app/transformations/commands'
+import { getOnDeviceDisplaySettings } from '/app/redux/config'
 import { WelcomeModal } from '../WelcomeModal'
 import { RobotDashboard } from '..'
-import { useNotifyAllRunsQuery } from '../../../../resources/runs'
+import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type { NavigateFunction } from 'react-router-dom'
@@ -31,13 +31,13 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../organisms/ODD/RobotDashboard/EmptyRecentRun')
-vi.mock('../../../../organisms/ODD/RobotDashboard/RecentRunProtocolCarousel')
-vi.mock('../../../../organisms/Navigation')
-vi.mock('../../../../transformations/commands')
-vi.mock('../../../../redux/config')
+vi.mock('/app/organisms/ODD/RobotDashboard/EmptyRecentRun')
+vi.mock('/app/organisms/ODD/RobotDashboard/RecentRunProtocolCarousel')
+vi.mock('/app/organisms/Navigation')
+vi.mock('/app/transformations/commands')
+vi.mock('/app/redux/config')
 vi.mock('../WelcomeModal')
-vi.mock('../../../../resources/runs')
+vi.mock('/app/resources/runs')
 
 const render = () => {
   return renderWithProviders(

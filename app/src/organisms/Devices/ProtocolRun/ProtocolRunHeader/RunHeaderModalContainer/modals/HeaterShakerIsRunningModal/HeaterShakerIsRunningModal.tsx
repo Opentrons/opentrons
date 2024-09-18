@@ -25,7 +25,7 @@ import { useIsHeaterShakerInProtocol } from '../../../../../../ModuleCard/hooks'
 
 import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data'
 import type { AttachedModule } from '@opentrons/api-client'
-import type { HeaterShakerModule } from '../../../../../../../redux/modules/types'
+import type { HeaterShakerModule } from '/app/redux/modules/types'
 
 export type UseHeaterShakerIsRunningModalResult =
   | { showModal: true; module: HeaterShakerModule; toggleModal: () => void }

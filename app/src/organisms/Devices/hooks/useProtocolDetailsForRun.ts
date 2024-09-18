@@ -6,7 +6,7 @@ import {
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 
-import { useNotifyRunQuery } from '../../../resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
 import type {
   RobotType,

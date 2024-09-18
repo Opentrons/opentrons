@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import last from 'lodash/last'
 
-import { EthernetConnectionDetails } from '../../../organisms/ODD/RobotSettingsDashboard/NetworkSettings/EthernetConnectionDetails'
+import { EthernetConnectionDetails } from '/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings/EthernetConnectionDetails'
 import {
   DeviceReset,
   TouchscreenBrightness,
@@ -18,25 +18,25 @@ import {
   RobotSettingsWifiConnect,
   RobotSystemVersion,
   UpdateChannel,
-} from '../../../organisms/ODD/RobotSettingsDashboard'
+} from '/app/organisms/ODD/RobotSettingsDashboard'
 import {
   getRobotUpdateAvailable,
   getRobotUpdateInfoForRobot,
-} from '../../../redux/robot-update'
+} from '/app/redux/robot-update'
 import {
   getLocalRobot,
   getRobotApiVersion,
   UNREACHABLE,
-} from '../../../redux/discovery'
-import { fetchStatus, postWifiConfigure } from '../../../redux/networking'
-import { getRequestById, useDispatchApiRequest } from '../../../redux/robot-api'
-import { useWifiList } from '../../../resources/networking/hooks'
-import { useNetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
+} from '/app/redux/discovery'
+import { fetchStatus, postWifiConfigure } from '/app/redux/networking'
+import { getRequestById, useDispatchApiRequest } from '/app/redux/robot-api'
+import { useWifiList } from '/app/resources/networking/hooks'
+import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
 import { RobotSettingsList } from './RobotSettingsList'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { Dispatch, State } from '../../../redux/types'
-import type { SettingOption } from '../../../organisms/ODD/RobotSettingsDashboard'
+import type { Dispatch, State } from '/app/redux/types'
+import type { SettingOption } from '/app/organisms/ODD/RobotSettingsDashboard'
 
 export function RobotSettingsDashboard(): JSX.Element {
   const { i18n, t } = useTranslation('shared')

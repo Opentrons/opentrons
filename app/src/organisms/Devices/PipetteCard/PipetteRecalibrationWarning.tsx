@@ -8,7 +8,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Banner } from '../../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 
 export const PipetteRecalibrationWarning = (): JSX.Element | null => {
   const { t } = useTranslation('device_details')

@@ -17,8 +17,8 @@ import {
   useCurrentSubsystemUpdateQuery,
   useHost,
 } from '@opentrons/react-api-client'
-import { Banner } from '../../../atoms/Banner'
-import { InstrumentCard } from '../../../molecules/InstrumentCard'
+import { Banner } from '/app/atoms/Banner'
+import { InstrumentCard } from '/app/molecules/InstrumentCard'
 import { ChoosePipette } from '../../PipetteWizardFlows/ChoosePipette'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { handlePipetteWizardFlows } from '../../PipetteWizardFlows'

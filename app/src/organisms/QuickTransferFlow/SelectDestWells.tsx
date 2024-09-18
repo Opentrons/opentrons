@@ -13,17 +13,17 @@ import {
 import { getAllDefinitions } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../App/portal'
-import { OddModal } from '../../molecules/OddModal'
-import { ChildNavigation } from '../../organisms/ChildNavigation'
-import { useToaster } from '../../organisms/ToasterOven'
-import { WellSelection } from '../../organisms/WellSelection'
+import { OddModal } from '/app/molecules/OddModal'
+import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { WellSelection } from '/app/organisms/WellSelection'
 import {
   CIRCULAR_WELL_96_PLATE_DEFINITION_URI,
   RECTANGULAR_WELL_96_PLATE_DEFINITION_URI,
 } from './SelectSourceWells'
 
-import type { SmallButton } from '../../atoms/buttons'
-import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
+import type { SmallButton } from '/app/atoms/buttons'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type {
   QuickTransferWizardState,
   QuickTransferWizardAction,

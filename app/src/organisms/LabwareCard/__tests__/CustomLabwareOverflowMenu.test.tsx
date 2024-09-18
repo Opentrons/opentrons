@@ -4,15 +4,15 @@ import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
 
 import { useConditionalConfirm } from '@opentrons/components'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { useTrackEvent } from '../../../redux/analytics'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useTrackEvent } from '/app/redux/analytics'
 import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
 
 import type { Mock } from 'vitest'
 import type * as OpentronsComponents from '@opentrons/components'
 
-vi.mock('../../../redux/analytics')
+vi.mock('/app/redux/analytics')
 
 const mockConfirm = vi.fn()
 const mockCancel = vi.fn()

@@ -9,7 +9,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { Banner } from '../../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 

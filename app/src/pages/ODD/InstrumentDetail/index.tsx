@@ -15,14 +15,14 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { BackButton } from '../../../atoms/buttons/BackButton'
-import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
-import { InstrumentInfo } from '../../../organisms/InstrumentInfo'
+import { BackButton } from '/app/atoms/buttons/BackButton'
+import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
+import { InstrumentInfo } from '/app/organisms/InstrumentInfo'
 import { handleInstrumentDetailOverflowMenu } from './InstrumentDetailOverflowMenu'
 import {
   useGripperDisplayName,
   usePipetteModelSpecs,
-} from '../../../resources/instruments/hooks'
+} from '/app/resources/instruments/hooks'
 
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel, PipetteModel } from '@opentrons/shared-data'

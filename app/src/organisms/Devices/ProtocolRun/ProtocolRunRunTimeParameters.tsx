@@ -30,11 +30,11 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { Banner } from '../../../atoms/Banner'
-import { Divider } from '../../../atoms/structure'
+import { Banner } from '/app/atoms/Banner'
+import { Divider } from '/app/atoms/structure'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useRunStatus } from '../../RunTimeControl/hooks'
-import { useNotifyRunQuery } from '../../../resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'

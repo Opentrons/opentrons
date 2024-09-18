@@ -3,12 +3,12 @@ import NiceModal from '@ebay/nice-modal-react'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 
 import { handleTipsAttachedModal } from '../TipsAttachedModal'
 import { LEFT } from '@opentrons/shared-data'
-import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
+import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
 import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
 import { useDropTipWizardFlows } from '..'
 

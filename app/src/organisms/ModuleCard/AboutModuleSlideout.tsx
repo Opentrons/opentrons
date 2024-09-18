@@ -15,11 +15,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import { Slideout } from '../../atoms/Slideout'
-import { Banner } from '../../atoms/Banner'
+import { Slideout } from '/app/atoms/Slideout'
+import { Banner } from '/app/atoms/Banner'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 
-import type { AttachedModule } from '../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 interface AboutModuleSlideoutProps {
   module: AttachedModule

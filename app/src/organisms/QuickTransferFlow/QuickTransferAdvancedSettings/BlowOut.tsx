@@ -16,7 +16,7 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../App/portal'
-import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { ChildNavigation } from '../../ChildNavigation'
 import { ACTIONS } from '../constants'
 
@@ -28,7 +28,7 @@ import type {
   BlowOutLocation,
   TransferType,
 } from '../types'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 
 interface BlowOutProps {
   onBack: () => void

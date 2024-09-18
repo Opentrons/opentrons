@@ -2,17 +2,17 @@ import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   useTrackEvent,
   ANALYTICS_ADD_CUSTOM_LABWARE,
-} from '../../../redux/analytics'
-import { renderWithProviders } from '../../../__testing-utils__'
+} from '/app/redux/analytics'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { AddCustomLabwareSlideout } from '..'
 
-vi.mock('../../../redux/custom-labware')
-vi.mock('../../../pages/Desktop/Labware/helpers/getAllDefs')
-vi.mock('../../../redux/analytics')
+vi.mock('/app/redux/custom-labware')
+vi.mock('/app/pages/Desktop/Labware/helpers/getAllDefs')
+vi.mock('/app/redux/analytics')
 
 let mockTrackEvent: any
 

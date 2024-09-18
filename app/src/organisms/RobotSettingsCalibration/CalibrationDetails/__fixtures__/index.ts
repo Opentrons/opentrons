@@ -1,7 +1,7 @@
 import type {
   PipetteOffsetCalibration,
   TipLengthCalibration,
-} from '../../../../redux/calibration/api-types'
+} from '/app/redux/calibration/api-types'
 
 export const mockPipetteOffsetCalibrationsResponse: PipetteOffsetCalibration = {
   id: 'pipetteName&left',

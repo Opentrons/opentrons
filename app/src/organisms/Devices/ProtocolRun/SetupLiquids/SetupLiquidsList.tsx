@@ -31,7 +31,7 @@ import {
   useTrackEvent,
   ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
-} from '../../../../redux/analytics'
+} from '/app/redux/analytics'
 import { useIsFlex } from '../../hooks'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLocationInfoNames } from '../utils/getLocationInfoNames'

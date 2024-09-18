@@ -15,10 +15,10 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import heaterShakerModule from '../../../../../../../assets/images/heater_shaker_module_transparent.png'
+import heaterShakerModule from '/app/assets/images/heater_shaker_module_transparent.png'
 import { HeaterShakerModuleData } from '../../../../../../ModuleCard/HeaterShakerModuleData'
 
-import type { HeaterShakerModule } from '../../../../../../../redux/modules/types'
+import type { HeaterShakerModule } from '/app/redux/modules/types'
 
 interface HeaterShakerModuleCardProps {
   module: HeaterShakerModule

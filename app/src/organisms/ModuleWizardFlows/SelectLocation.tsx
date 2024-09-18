@@ -24,8 +24,8 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Banner } from '../../atoms/Banner'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { Banner } from '/app/atoms/Banner'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import type { ModuleCalibrationWizardStepProps } from './types'
 import type {
   CutoutConfig,

@@ -16,7 +16,7 @@ import {
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import type { AttachedModule } from '@opentrons/api-client'
 import { useIsFlex } from '../Devices/hooks'
-import { InterventionModal } from '../../molecules/InterventionModal'
+import { InterventionModal } from '/app/molecules/InterventionModal'
 export interface IncompatibleModuleDesktopModalBodyProps {
   modules: AttachedModule[]
   robotName: string

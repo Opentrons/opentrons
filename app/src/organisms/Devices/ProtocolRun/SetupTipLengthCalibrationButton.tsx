@@ -20,13 +20,13 @@ import {
 } from '@opentrons/react-api-client'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
-import { TertiaryButton } from '../../../atoms/buttons'
+import { TertiaryButton } from '/app/atoms/buttons'
 import {
   useAttachedPipettes,
   useDeckCalibrationData,
   useRunHasStarted,
 } from '../hooks'
-import { useDashboardCalibrateTipLength } from '../../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
+import { useDashboardCalibrateTipLength } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 
 import type { Mount } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

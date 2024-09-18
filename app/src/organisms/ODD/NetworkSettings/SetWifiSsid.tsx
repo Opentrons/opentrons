@@ -12,7 +12,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { FullKeyboard } from '../../../atoms/SoftwareKeyboard'
+import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { useIsUnboxingFlowOngoing } from '../hooks'
 
 interface SetWifiSsidProps {

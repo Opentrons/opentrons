@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { SPACING, TYPOGRAPHY, LegacyStyledText } from '@opentrons/components'
 import { LabwareListItem } from './LabwareListItem'
 import type { RunTimeCommand } from '@opentrons/shared-data'
-import type { LabwareSetupItem } from '../../../../transformations/commands'
+import type { LabwareSetupItem } from '/app/transformations/commands'
 
 interface OffDeckLabwareListProps {
   labwareItems: LabwareSetupItem[]

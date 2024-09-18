@@ -36,8 +36,8 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
-import { ToggleButton } from '../../../../atoms/buttons'
-import { Divider } from '../../../../atoms/structure'
+import { ToggleButton } from '/app/atoms/buttons'
+import { Divider } from '/app/atoms/structure'
 import { SecureLabwareModal } from './SecureLabwareModal'
 
 import type {
@@ -50,7 +50,7 @@ import type {
   LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
-import type { LabwareSetupItem } from '../../../../transformations/commands'
+import type { LabwareSetupItem } from '/app/transformations/commands'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import type { NestedLabwareInfo } from './getNestedLabwareInfo'
 

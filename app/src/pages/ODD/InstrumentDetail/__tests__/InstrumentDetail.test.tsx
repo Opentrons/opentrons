@@ -4,15 +4,15 @@ import { screen } from '@testing-library/react'
 import { useParams } from 'react-router-dom'
 
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { InstrumentDetail } from '..'
 import {
   useGripperDisplayName,
   usePipetteModelSpecs,
-} from '../../../../resources/instruments/hooks'
-import { useIsOEMMode } from '../../../../resources/robot-settings/hooks'
+} from '/app/resources/instruments/hooks'
+import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
 
 import type { Instruments } from '@opentrons/api-client'
 
@@ -21,8 +21,8 @@ vi.mock('react-router-dom', () => ({
   useParams: vi.fn(),
   useNavigate: vi.fn(),
 }))
-vi.mock('../../../../resources/instruments/hooks')
-vi.mock('../../../../resources/robot-settings/hooks')
+vi.mock('/app/resources/instruments/hooks')
+vi.mock('/app/resources/robot-settings/hooks')
 
 const render = () => {
   return renderWithProviders(<InstrumentDetail />, {

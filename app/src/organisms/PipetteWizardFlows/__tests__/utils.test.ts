@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
-import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import {
   getIsGantryEmpty,
   getPipetteAnimations,

@@ -5,7 +5,7 @@ import {
 } from '@opentrons/api-client'
 import { useCommandQuery } from '@opentrons/react-api-client'
 
-import { useNotifyAllCommandsQuery } from '../../../resources/runs'
+import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { FailedCommand } from '../types'

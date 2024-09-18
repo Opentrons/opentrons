@@ -4,7 +4,7 @@ import type {
   LoadModuleRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { LabwareSetupItem } from '../../../../transformations/commands'
+import type { LabwareSetupItem } from '/app/transformations/commands'
 
 export interface NestedLabwareInfo {
   nestedLabwareDisplayName: string

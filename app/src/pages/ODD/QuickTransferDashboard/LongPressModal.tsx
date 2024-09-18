@@ -13,15 +13,12 @@ import {
 import { useCreateRunMutation } from '@opentrons/react-api-client'
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
-import { SmallModalChildren } from '../../../molecules/OddModal'
-import { useToaster } from '../../../organisms/ToasterOven'
-import {
-  getPinnedQuickTransferIds,
-  updateConfigValue,
-} from '../../../redux/config'
+import { SmallModalChildren } from '/app/molecules/OddModal'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { getPinnedQuickTransferIds, updateConfigValue } from '/app/redux/config'
 
 import type { UseLongPressResult } from '@opentrons/components'
-import type { Dispatch } from '../../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 interface LongPressModalProps {
   longpress: UseLongPressResult

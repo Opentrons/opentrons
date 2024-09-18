@@ -26,10 +26,10 @@ import {
   truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 
-import { useNetworkConnection } from '../../resources/networking/hooks/useNetworkConnection'
-import { getLocalRobot } from '../../redux/discovery'
+import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
+import { getLocalRobot } from '/app/redux/discovery'
 import { NavigationMenu } from './NavigationMenu'
 import type { ON_DEVICE_DISPLAY_PATHS } from '../../App/OnDeviceDisplayApp'
 

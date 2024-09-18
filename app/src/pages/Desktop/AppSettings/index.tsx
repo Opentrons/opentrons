@@ -15,13 +15,13 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import * as Config from '../../../redux/config'
+import * as Config from '/app/redux/config'
 import { GeneralSettings } from './GeneralSettings'
 import { PrivacySettings } from './PrivacySettings'
 import { AdvancedSettings } from './AdvancedSettings'
-import { FeatureFlags } from '../../../organisms/AppSettings/FeatureFlags'
-import { NavTab } from '../../../molecules/NavTab'
-import { Line } from '../../../atoms/structure'
+import { FeatureFlags } from '/app/organisms/AppSettings/FeatureFlags'
+import { NavTab } from '/app/molecules/NavTab'
+import { Line } from '/app/atoms/structure'
 
 import type { DesktopRouteParams, AppSettingsTab } from '../../../App/types'
 

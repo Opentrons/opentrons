@@ -4,21 +4,21 @@ import { useSelector, useDispatch } from 'react-redux'
 
 import { SpinnerModalPage } from '@opentrons/components'
 
-import * as RobotApi from '../../redux/robot-api'
-import * as Sessions from '../../redux/sessions'
-import { getPipetteOffsetCalibrationSession } from '../../redux/sessions/pipette-offset-calibration/selectors'
+import * as RobotApi from '/app/redux/robot-api'
+import * as Sessions from '/app/redux/sessions'
+import { getPipetteOffsetCalibrationSession } from '/app/redux/sessions/pipette-offset-calibration/selectors'
 
-import type { State } from '../../redux/types'
+import type { State } from '/app/redux/types'
 import type {
   SessionCommandString,
   PipetteOffsetCalibrationSession,
   PipetteOffsetCalibrationSessionParams,
-} from '../../redux/sessions/types'
-import type { RequestState } from '../../redux/robot-api/types'
+} from '/app/redux/sessions/types'
+import type { RequestState } from '/app/redux/robot-api/types'
 
 import { getTopPortalEl } from '../../App/portal'
 import { CalibratePipetteOffset } from '.'
-import { pipetteOffsetCalibrationStarted } from '../../redux/analytics'
+import { pipetteOffsetCalibrationStarted } from '/app/redux/analytics'
 import { useTranslation } from 'react-i18next'
 
 // pipette calibration commands for which the full page spinner should not appear

@@ -16,22 +16,22 @@ import {
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
-import { SmallButton } from '../../../atoms/buttons'
-import { Navigation } from '../../../organisms/Navigation'
+import { SmallButton } from '/app/atoms/buttons'
+import { Navigation } from '/app/organisms/Navigation'
 import {
   getPinnedProtocolIds,
   getProtocolsOnDeviceSortKey,
   updateConfigValue,
-} from '../../../redux/config'
+} from '/app/redux/config'
 import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
 import { sortProtocols } from './utils'
 import { ProtocolCard } from './ProtocolCard'
 import { NoProtocols } from './NoProtocols'
 import { DeleteProtocolConfirmationModal } from './DeleteProtocolConfirmationModal'
-import { useNotifyAllRunsQuery } from '../../../resources/runs'
+import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
-import type { Dispatch } from '../../../redux/types'
-import type { ProtocolsOnDeviceSortKey } from '../../../redux/config/types'
+import type { Dispatch } from '/app/redux/types'
+import type { ProtocolsOnDeviceSortKey } from '/app/redux/config/types'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
 export function ProtocolDashboard(): JSX.Element {

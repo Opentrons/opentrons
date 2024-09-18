@@ -4,15 +4,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { getIsHeaterShakerAttached } from '../../../redux/config'
-import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getIsHeaterShakerAttached } from '/app/redux/config'
+import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { useLatchControls } from '../hooks'
 import { TestShakeSlideout } from '../TestShakeSlideout'
 import { ModuleSetupModal } from '../ModuleSetupModal'
 
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../hooks')
 vi.mock('../ModuleSetupModal')

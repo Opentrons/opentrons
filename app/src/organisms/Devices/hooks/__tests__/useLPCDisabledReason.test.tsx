@@ -8,7 +8,7 @@ import {
   getLoadedLabwareDefinitionsByUri,
   simple_v6 as _uncastedSimpleV6Protocol,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
 import { useLPCDisabledReason } from '../useLPCDisabledReason'
 import {
@@ -20,7 +20,7 @@ import {
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import type { Store } from 'redux'
 import type * as SharedData from '@opentrons/shared-data'
-import type { State } from '../../../../redux/types'
+import type { State } from '/app/redux/types'
 
 vi.mock('..')
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')

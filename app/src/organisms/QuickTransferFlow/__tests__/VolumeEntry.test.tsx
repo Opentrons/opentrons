@@ -4,13 +4,13 @@ import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
 
 import { InputField } from '@opentrons/components'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { getVolumeRange } from '../utils'
 import { VolumeEntry } from '../VolumeEntry'
 
-vi.mock('../../../atoms/SoftwareKeyboard')
+vi.mock('/app/atoms/SoftwareKeyboard')
 vi.mock('../utils')
 
 vi.mock('@opentrons/components', async importOriginal => {

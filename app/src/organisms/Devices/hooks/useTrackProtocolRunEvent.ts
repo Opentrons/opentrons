@@ -1,4 +1,4 @@
-import { useTrackEvent } from '../../../redux/analytics'
+import { useTrackEvent } from '/app/redux/analytics'
 import { useProtocolRunAnalyticsData } from './useProtocolRunAnalyticsData'
 import { useRobot } from './useRobot'
 

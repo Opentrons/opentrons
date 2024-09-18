@@ -15,7 +15,7 @@ import {
   ModalShell,
 } from '@opentrons/components'
 
-import { TextOnlyButton } from '../../../../../../atoms/buttons'
+import { TextOnlyButton } from '/app/atoms/buttons'
 import { useHomePipettes } from '../../../../../DropTipWizardFlows'
 
 import type { PipetteData } from '@opentrons/api-client'

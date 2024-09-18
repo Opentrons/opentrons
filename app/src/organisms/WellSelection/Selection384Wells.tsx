@@ -13,7 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { IconButton } from '../../atoms/buttons/IconButton'
+import { IconButton } from '/app/atoms/buttons/IconButton'
 
 import type { WellGroup } from '@opentrons/components'
 import type {
