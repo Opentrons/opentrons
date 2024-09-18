@@ -30,7 +30,7 @@ import {
 } from '@opentrons/components'
 
 import { Divider } from '/app/atoms/structure'
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import {
   deleteCustomLabwareFile,
   openCustomLabwareDirectory,

@@ -8,8 +8,8 @@ import {
   useTrackEvent,
   ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
 } from '/app/redux/analytics'
-import { LabwareCard } from '/app/organisms/LabwareCard'
-import { AddCustomLabwareSlideout } from '/app/organisms/AddCustomLabwareSlideout'
+import { LabwareCard } from '/app/organisms/Desktop/LabwareCard'
+import { AddCustomLabwareSlideout } from '/app/organisms/Desktop/AddCustomLabwareSlideout'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
 import { Labware } from '..'

@@ -35,9 +35,9 @@ import {
   ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
 } from '/app/redux/analytics'
 import { addCustomLabwareFileFromCreator } from '/app/redux/custom-labware'
-import { LabwareCard } from '/app/organisms/LabwareCard'
-import { AddCustomLabwareSlideout } from '/app/organisms/AddCustomLabwareSlideout'
-import { LabwareDetails } from '/app/organisms/LabwareDetails'
+import { LabwareCard } from '/app/organisms/Desktop/LabwareCard'
+import { AddCustomLabwareSlideout } from '/app/organisms/Desktop/AddCustomLabwareSlideout'
+import { LabwareDetails } from '/app/organisms/Desktop/LabwareDetails'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useFeatureFlag } from '/app/redux/config'
 import { useAllLabware, useLabwareFailure, useNewLabwareName } from './hooks'
