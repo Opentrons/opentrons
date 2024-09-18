@@ -10,6 +10,7 @@ import {
   Btn,
   Checkbox,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
@@ -583,7 +584,7 @@ const StyledLabel = styled.label`
   text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
   font-size: ${PRODUCT.TYPOGRAPHY.fontSizeBodyDefaultSemiBold};
   display: ${DISPLAY_INLINE_BLOCK};
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   input[type='file'] {
     display: none;
   }

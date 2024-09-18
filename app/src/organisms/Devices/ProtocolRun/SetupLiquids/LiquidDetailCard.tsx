@@ -6,15 +6,16 @@ import {
   BORDERS,
   Box,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
@@ -41,7 +42,7 @@ const LIQUID_CARD_STYLE = css`
   &:hover {
     border: 1px solid ${COLORS.grey60};
     border-radius: ${BORDERS.borderRadius8};
-    cursor: pointer;
+    cursor: ${CURSOR_POINTER};
   }
 `
 const LIQUID_CARD_ODD_STYLE = css`

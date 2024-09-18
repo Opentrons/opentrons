@@ -8,6 +8,7 @@ import {
   BORDERS,
   Box,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -40,7 +41,7 @@ import type { Dispatch } from '../../redux/types'
 
 const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   &:hover {
     background-color: ${COLORS.grey30};
   }

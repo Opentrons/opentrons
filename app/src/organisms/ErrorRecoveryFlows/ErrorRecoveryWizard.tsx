@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
-import { StyledText } from '@opentrons/components'
+import { CURSOR_POINTER, StyledText } from '@opentrons/components'
 
 import { RecoveryError } from './RecoveryError'
 import { RecoveryDoorOpen } from './RecoveryDoorOpen'
@@ -129,7 +129,7 @@ export function ErrorRecoveryComponent(
       oddStyle="bodyTextSemiBold"
       desktopStyle="bodyDefaultSemiBold"
       css={css`
-        cursor: pointer;
+        cursor: ${CURSOR_POINTER};
       `}
     >
       {t('view_error_details')}

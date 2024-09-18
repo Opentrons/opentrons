@@ -1,7 +1,12 @@
 import * as React from 'react'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
-import { MenuItem, Tooltip, useHoverTooltip } from '@opentrons/components'
+import {
+  MenuItem,
+  NO_WRAP,
+  Tooltip,
+  useHoverTooltip,
+} from '@opentrons/components'
 import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -153,7 +158,7 @@ export function useModuleOverflowMenu(
       onClick={() => {
         handleInstructionsClick()
       }}
-      whiteSpace="nowrap"
+      whiteSpace={NO_WRAP}
     >
       {t('heater_shaker:show_attachment_instructions')}
     </MenuItem>
@@ -244,7 +249,7 @@ export function useModuleOverflowMenu(
       key={`thermocycler_block_temp_command_btn_${String(module.moduleModel)}`}
       onClick={sendBlockTempCommand}
       disabled={isDisabled}
-      whiteSpace="nowrap"
+      whiteSpace={NO_WRAP}
     >
       {module.data.status !== 'idle'
         ? t('overflow_menu_deactivate_block')

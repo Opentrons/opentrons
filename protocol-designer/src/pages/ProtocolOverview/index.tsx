@@ -20,12 +20,13 @@ import {
   ListItem,
   ListItemDescriptor,
   Modal,
+  NO_WRAP,
   PrimaryButton,
-  SPACING,
   SecondaryButton,
+  SPACING,
   StyledText,
-  TYPOGRAPHY,
   ToggleGroup,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getPipetteSpecsV2,
@@ -316,7 +317,7 @@ export function ProtocolOverview(): JSX.Element {
               onClick={() => {
                 navigate('/designer')
               }}
-              whiteSpace="nowrap"
+              whiteSpace={NO_WRAP}
               height="3.5rem"
             />
             <LargeButton
@@ -329,7 +330,7 @@ export function ProtocolOverview(): JSX.Element {
                 }
               }}
               iconName="arrow-right"
-              whiteSpace="nowrap"
+              whiteSpace={NO_WRAP}
             />
           </Flex>
         </Flex>

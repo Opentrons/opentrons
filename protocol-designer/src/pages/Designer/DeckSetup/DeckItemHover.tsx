@@ -6,6 +6,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  CURSOR_POINTER,
   DISPLAY_FLEX,
   Flex,
   JUSTIFY_CENTER,
@@ -81,7 +82,7 @@ export function DeckItemHover(props: DeckItemHoverProps): JSX.Element | null {
           color: COLORS.white,
           fontSize: PRODUCT.TYPOGRAPHY.fontSizeBodyDefaultSemiBold,
           borderRadius: BORDERS.borderRadius8,
-          cursor: 'pointer',
+          cursor: CURSOR_POINTER,
         },
         onMouseEnter: () => {
           setHover(itemId)

@@ -10,9 +10,11 @@ import {
   BORDERS,
   Box,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DropdownMenu,
+  ERROR_TOAST,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
@@ -22,9 +24,8 @@ import {
   POSITION_ABSOLUTE,
   PrimaryButton,
   SecondaryButton,
-  ERROR_TOAST,
-  SUCCESS_TOAST,
   SPACING,
+  SUCCESS_TOAST,
   TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
@@ -66,7 +67,7 @@ const FILTER_OPTIONS: DropdownOption[] = labwareDisplayCategoryFilters.map(
 
 const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   &:hover {
     background-color: ${COLORS.grey30};
   }

@@ -6,8 +6,9 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Box,
-  DeckInfoLabel,
   COLORS,
+  CURSOR_POINTER,
+  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -149,14 +150,14 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
     ${CARD_OUTLINE_BORDER_STYLE}
 
     &:hover {
-      cursor: pointer;
+      cursor: ${CURSOR_POINTER};
       border: 1px solid ${COLORS.grey35};
     }
   `
   const LIQUID_CARD_ITEM_STYLE = css`
     border: 1px solid ${COLORS.white};
     &:hover {
-      cursor: pointer;
+      cursor: ${CURSOR_POINTER};
       border: 1px solid ${COLORS.grey30};
     }
   `
