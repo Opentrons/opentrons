@@ -63,7 +63,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
     color = COLORS.white
   }
   if (hovered && !selected) {
-    backgroundColor = COLORS.grey30
+    backgroundColor = COLORS.blue30
     color = COLORS.black90
   }
 
@@ -119,6 +119,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
               alignItems={ALIGN_CENTER}
               gridGap={SPACING.spacing8}
               justifyContent={formData != null ? JUSTIFY_CENTER : JUSTIFY_START}
+              width="100%"
             >
               {iconName && (
                 <Icon size="1rem" name={iconName} color={iconColor ?? color} />
@@ -132,7 +133,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
             {hovered && !isStartingOrEndingState && formData == null ? (
               <OverflowBtn
                 data-testid={`StepContainer_${stepId}`}
-                fillColor={COLORS.white}
+                fillColor={hovered && !selected ? COLORS.grey50 : COLORS.white}
                 onClick={(e: React.MouseEvent) => {
                   e.preventDefault()
                   e.stopPropagation()

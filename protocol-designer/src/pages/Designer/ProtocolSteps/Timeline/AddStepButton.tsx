@@ -6,7 +6,6 @@ import {
   useHoverTooltip,
   TOOLTIP_TOP,
   TOOLTIP_FIXED,
-  PrimaryButton,
   Tooltip,
   COLORS,
   DIRECTION_COLUMN,
@@ -15,6 +14,7 @@ import {
   BORDERS,
   NO_WRAP,
   useOnClickOutside,
+  SecondaryButton,
 } from '@opentrons/components'
 import {
   HEATERSHAKER_MODULE_TYPE,
@@ -180,7 +180,7 @@ export function AddStepButton(): JSX.Element {
           {t(`disabled_step_creation`)}
         </Tooltip>
       )}
-      <PrimaryButton
+      <SecondaryButton
         width="100%"
         {...targetProps}
         id="AddStepButton"
@@ -190,7 +190,7 @@ export function AddStepButton(): JSX.Element {
         disabled={isStepCreationDisabled}
       >
         {t('button:add_step')}
-      </PrimaryButton>
+      </SecondaryButton>
     </>
   )
 }
