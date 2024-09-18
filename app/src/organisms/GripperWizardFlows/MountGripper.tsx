@@ -23,7 +23,7 @@ import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '../../molecules/SimpleWizardBody'
-import mountGripper from '../../assets/videos/gripper-wizards/MOUNT_GRIPPER.webm'
+import mountGripper from '/app/assets/videos/gripper-wizards/MOUNT_GRIPPER.webm'
 
 import type { GripperWizardStepProps } from './types'
 import type { BadGripper, GripperData } from '@opentrons/api-client'

@@ -13,7 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import abstractImage from '../../../assets/images/on-device-display/empty_protocol_dashboard.png'
+import abstractImage from '/app/assets/images/on-device-display/empty_protocol_dashboard.png'
 
 export function EmptyRecentRun(): JSX.Element {
   const { t } = useTranslation('device_details')

@@ -11,7 +11,7 @@ import {
 import { OddModal } from '../../../molecules/OddModal'
 import { SmallButton } from '../../../atoms/buttons'
 
-import imgSrc from '../../../assets/images/on-device-display/odd-abstract-6.png'
+import imgSrc from '/app/assets/images/on-device-display/odd-abstract-6.png'
 
 interface IntroductoryModalProps {
   onClose: () => void

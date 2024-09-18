@@ -18,7 +18,7 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
-import RobotCalHelpImage from '../../assets/images/robot_calibration_help.png'
+import RobotCalHelpImage from '/app/assets/images/robot_calibration_help.png'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
 

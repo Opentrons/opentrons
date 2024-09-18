@@ -22,8 +22,8 @@ import { formatJogVector } from './utils'
 import { NeedHelpLink } from './NeedHelpLink'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 
-import multiDemoAsset from '../../assets/videos/tip-pick-up/A1_Multi_Channel_REV1.webm'
-import singleDemoAsset from '../../assets/videos/tip-pick-up/A1_Single_Channel_REV1.webm'
+import multiDemoAsset from '/app/assets/videos/tip-pick-up/A1_Multi_Channel_REV1.webm'
+import singleDemoAsset from '/app/assets/videos/tip-pick-up/A1_Single_Channel_REV1.webm'
 
 const ASSET_MAP = {
   multi: multiDemoAsset,

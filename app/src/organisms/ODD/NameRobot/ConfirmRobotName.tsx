@@ -15,7 +15,7 @@ import {
 
 import { StepMeter } from '../../../atoms/StepMeter'
 import { MediumButton } from '../../../atoms/buttons'
-import screenImage from '../../../assets/images/on-device-display/odd_abstract@x2.png'
+import screenImage from '/app/assets/images/on-device-display/odd_abstract@x2.png'
 
 const IMAGE_ALT = 'finish setting up a robot'
 

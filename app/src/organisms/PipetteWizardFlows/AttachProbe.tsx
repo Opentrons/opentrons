@@ -16,9 +16,9 @@ import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '../../molecules/SimpleWizardBody'
-import pipetteProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
-import pipetteProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
-import probing96 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
+import pipetteProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
+import pipetteProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
+import probing96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
 import { BODY_STYLE, SECTIONS, FLOWS } from './constants'
 import { getPipetteAnimations } from './utils'
 import { ProbeNotAttached } from './ProbeNotAttached'

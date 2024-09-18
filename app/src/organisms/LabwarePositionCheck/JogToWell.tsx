@@ -29,10 +29,10 @@ import {
   getVectorSum,
 } from '@opentrons/shared-data'
 
-import levelWithTip from '../../assets/images/lpc_level_with_tip.svg'
-import levelWithLabware from '../../assets/images/lpc_level_with_labware.svg'
-import levelProbeWithTip from '../../assets/images/lpc_level_probe_with_tip.svg'
-import levelProbeWithLabware from '../../assets/images/lpc_level_probe_with_labware.svg'
+import levelWithTip from '/app/assets/images/lpc_level_with_tip.svg'
+import levelWithLabware from '/app/assets/images/lpc_level_with_labware.svg'
+import levelProbeWithTip from '/app/assets/images/lpc_level_probe_with_tip.svg'
+import levelProbeWithLabware from '/app/assets/images/lpc_level_probe_with_labware.svg'
 import { getIsOnDevice } from '/app/redux/config'
 import { getTopPortalEl } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'

@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import SuccessIcon from '../../assets/images/icon_success.png'
+import SuccessIcon from '/app/assets/images/icon_success.png'
 
 import {
   LegacyStyledText,

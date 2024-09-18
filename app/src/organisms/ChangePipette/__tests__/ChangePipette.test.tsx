@@ -52,7 +52,7 @@ vi.mock('../ExitModal')
 vi.mock('../../../molecules/InProgressModal/InProgressModal')
 vi.mock('../ConfirmPipette')
 vi.mock('../../Devices/hooks')
-vi.mock('../../../assets/images')
+vi.mock('/app/assets/images')
 
 const render = (props: React.ComponentProps<typeof ChangePipette>) => {
   return renderWithProviders(<ChangePipette {...props} />, {

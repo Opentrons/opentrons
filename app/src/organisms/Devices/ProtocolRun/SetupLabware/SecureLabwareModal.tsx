@@ -15,8 +15,8 @@ import {
   Modal,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
-import secureMagModBracketImage from '../../../../assets/images/secure_mag_mod_bracket.png'
-import secureTCLatchImage from '../../../../assets/images/secure_tc_latch.png'
+import secureMagModBracketImage from '/app/assets/images/secure_mag_mod_bracket.png'
+import secureTCLatchImage from '/app/assets/images/secure_tc_latch.png'
 import { getModuleName } from '../utils/getModuleName'
 
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'

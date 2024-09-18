@@ -61,7 +61,7 @@ const mockPipetteOffsetCalibrationsForOt3 = [
 vi.mock('/app/redux/custom-labware/selectors')
 vi.mock('/app/redux/sessions/selectors')
 vi.mock('/app/redux/discovery')
-vi.mock('../../../../assets/labware/findLabware')
+vi.mock('/app/assets/labware/findLabware')
 vi.mock('../../../../organisms/Devices/hooks')
 vi.mock('../OverflowMenu')
 

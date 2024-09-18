@@ -17,7 +17,7 @@ import { OddModal } from '../../molecules/OddModal'
 import type { ModalProps } from '@opentrons/components'
 import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
 
-import imgSrc from '../../assets/images/on-device-display/deck_fixture_setup_qrcode.png'
+import imgSrc from '/app/assets/images/on-device-display/deck_fixture_setup_qrcode.png'
 
 const SETUP_INSTRUCTION_URL =
   'https://support.opentrons.com/s/article/Deck-configuration-on-Opentrons-Flex'

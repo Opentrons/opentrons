@@ -30,7 +30,7 @@ import {
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import tiprackAdapter from '../../../../assets/images/labware/opentrons_flex_96_tiprack_adapter.png'
+import tiprackAdapter from '/app/assets/images/labware/opentrons_flex_96_tiprack_adapter.png'
 
 import type { RobotType, RunTimeCommand } from '@opentrons/shared-data'
 

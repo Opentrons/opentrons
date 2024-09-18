@@ -19,7 +19,7 @@ import { useEstopQuery } from '@opentrons/react-api-client'
 import { MediumButton } from '../../../atoms/buttons'
 import { StepMeter } from '../../../atoms/StepMeter'
 
-import estopImg from '../../../assets/images/on-device-display/install_e_stop.png'
+import estopImg from '/app/assets/images/on-device-display/install_e_stop.png'
 
 const ESTOP_STATUS_REFETCH_INTERVAL_MS = 10000
 

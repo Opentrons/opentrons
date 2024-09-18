@@ -26,7 +26,7 @@ import {
   getRobotUpdateDownloadError,
 } from '/app/redux/robot-update'
 import { useRobotUpdateInfo } from './useRobotUpdateInfo'
-import successIcon from '../../../../assets/images/icon_success.png'
+import successIcon from '/app/assets/images/icon_success.png'
 import {
   useRobotInitializationStatus,
   INIT_STATUS,

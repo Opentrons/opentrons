@@ -13,7 +13,7 @@ import { DeckSetup } from '../DeckSetup'
 
 import type { getDeckDefinitions } from '@opentrons/shared-data'
 
-vi.mock('../../../assets/labware/getLabware')
+vi.mock('/app/assets/labware/getLabware')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getDeckDefinitions>()
   return {

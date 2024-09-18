@@ -31,8 +31,8 @@ import {
   useModulesQuery,
 } from '@opentrons/react-api-client'
 
-import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
-import FLEX_PNG from '../../assets/images/FLEX.png'
+import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
+import FLEX_PNG from '/app/assets/images/FLEX.png'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
