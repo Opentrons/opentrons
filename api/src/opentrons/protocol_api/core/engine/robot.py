@@ -20,6 +20,7 @@ _AXIS_TYPE_TO_MOTOR_AXIS = {
     AxisType.Q: MotorAxis.CLAMP_JAW_96_CHANNEL,
 }
 
+
 class RobotCore(AbstractRobot):
     """Robot API core using a ProtocolEngine.
 
@@ -46,7 +47,9 @@ class RobotCore(AbstractRobot):
 
     def move_to(self, mount: Mount, destination: Point, speed: Optional[float]) -> None:
         engine_mount = MountType[mount.name]
-        engine_destination = DeckPoint(x=destination.x, y=destination.y, z=destination.z)
+        engine_destination = DeckPoint(
+            x=destination.x, y=destination.y, z=destination.z
+        )
         self._engine_client.execute_command(
             cmd.robot.MoveToParams(
                 mount=engine_mount, destination=engine_destination, speed=speed

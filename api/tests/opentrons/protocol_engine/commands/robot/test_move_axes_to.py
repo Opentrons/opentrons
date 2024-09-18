@@ -22,7 +22,7 @@ async def test_move_to_implementation(
     state_view: StateView,
     gantry_mover: GantryMover,
     movement: MovementHandler,
-    hardware_api: HardwareControlAPI
+    hardware_api: HardwareControlAPI,
 ) -> None:
     """Test the `robot.moveAxesTo` implementation.
 
@@ -48,7 +48,9 @@ async def test_move_to_implementation(
     result = await subject.execute(params=params)
 
     assert result == SuccessData(
-        public=MoveAxesToResult(position={MotorAxis.X: 10, MotorAxis.Y: 10, MotorAxis.EXTENSION_Z: 20}),
+        public=MoveAxesToResult(
+            position={MotorAxis.X: 10, MotorAxis.Y: 10, MotorAxis.EXTENSION_Z: 20}
+        ),
         private=None,
     )
 
@@ -58,6 +60,8 @@ async def test_move_to_implementation(
     result = await subject.execute(params=params)
 
     assert result == SuccessData(
-        public=MoveAxesToResult(position={MotorAxis.X: 10, MotorAxis.Y: 10, MotorAxis.EXTENSION_Z: 20}),
+        public=MoveAxesToResult(
+            position={MotorAxis.X: 10, MotorAxis.Y: 10, MotorAxis.EXTENSION_Z: 20}
+        ),
         private=None,
     )

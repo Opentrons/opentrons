@@ -64,7 +64,9 @@ class MoveAxesToImplementation(
         # and then we can remove this validation.
         ensure_ot3_hardware(self._hardware_api)
         current_position = await self._gantry_mover.move_axes(
-            axis_map=params.axis_map, speed=params.speed, critical_point=params.critical_point
+            axis_map=params.axis_map,
+            speed=params.speed,
+            critical_point=params.critical_point,
         )
         return SuccessData(
             public=MoveAxesToResult(position=current_position),

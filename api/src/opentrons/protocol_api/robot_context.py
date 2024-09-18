@@ -18,6 +18,7 @@ from opentrons_shared_data.pipette.types import PipetteNameType
 from . import validation
 from .core.common import ProtocolCore, RobotCore
 from .module_contexts import ModuleContext
+from .labware import Labware
 
 
 class HardwareManager(NamedTuple):
@@ -168,7 +169,7 @@ class RobotContext(publisher.CommandPublisher):
 
         mount_axis = AxisType.axis_for_mount(mount)
         if location:
-            loc: Point
+            loc: Union[Point, Labware, None]
             if isinstance(location, ModuleContext):
                 loc = location.labware
                 if not loc:
@@ -176,15 +177,17 @@ class RobotContext(publisher.CommandPublisher):
                 top_of_labware = loc.wells()[0].top()
                 loc = top_of_labware.point
                 return {mount_axis: loc.z, AxisType.X: loc.x, AxisType.Y: loc.y}
-            elif isinstance(location, DeckLocation):
+            elif location is DeckLocation:
+                assert not isinstance(location, Location)
                 slot_name = validation.ensure_and_convert_deck_slot(
                     location,
                     api_version=self._api_version,
                     robot_type=self._protocol_core.robot_type,
                 )
-                loc = self._protocol_core.deck.get_slot_center(slot_name)
+                loc = self._protocol_core.get_slot_center(slot_name)
                 return {mount_axis: loc.z, AxisType.X: loc.x, AxisType.Y: loc.y}
             else:
+                assert isinstance(location, Location)
                 loc = location.point
                 return {mount_axis: loc.z, AxisType.X: loc.x, AxisType.Y: loc.y}
         else:

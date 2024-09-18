@@ -136,9 +136,11 @@ def target_axis_map_from_relative(
 ) -> "OrderedDict[Axis, float]":
     """Create a target position for all specified machine axes."""
     target_position = OrderedDict(
-        ((ax, current_position[ax] + axis_map[ax])
-        for ax in EMPTY_ORDERED_DICT.keys()
-        if ax in axis_map.keys())
+        (
+            (ax, current_position[ax] + axis_map[ax])
+            for ax in EMPTY_ORDERED_DICT.keys()
+            if ax in axis_map.keys()
+        )
     )
     return target_position
 
