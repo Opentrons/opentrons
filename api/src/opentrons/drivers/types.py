@@ -1,6 +1,6 @@
 """ Type definitions for modules in this tree """
 from dataclasses import dataclass
-from typing import Dict, NamedTuple, Optional
+from typing import Any, Dict, List, NamedTuple, Optional
 from enum import Enum
 
 

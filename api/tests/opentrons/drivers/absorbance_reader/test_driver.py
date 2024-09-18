@@ -29,7 +29,9 @@ class MockErrorCode(Enum):
 
 
 @pytest.fixture
-async def mock_async_byonoy(mock_interface, mock_device) -> AsyncByonoy:
+async def mock_async_byonoy(
+    mock_interface: MagicMock, mock_device: MagicMock
+) -> AsyncByonoy:
     loop = asyncio.get_running_loop()
     return AsyncByonoy(
         mock_interface, mock_device, ThreadPoolExecutor(max_workers=1), loop

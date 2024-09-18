@@ -10,11 +10,13 @@ from .hid_protocol import (
     ErrorCodeNames,
     DeviceStateNames,
     SlotStateNames,
+    MeasurementConfig,
 )
 from opentrons.drivers.types import (
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
     AbsorbanceReaderDeviceState,
+    ABSMeasurementMode,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnectedError
@@ -110,7 +112,7 @@ class AsyncByonoy:
         self._loop = loop
         self._supported_wavelengths: Optional[list[int]] = None
         self._device_handle: Optional[int] = None
-        self._current_config: Optional[AbsProtocol.MeasurementConfig] = None
+        self._current_config: Optional[MeasurementConfig] = None
 
     async def open(self) -> bool:
         """
@@ -225,8 +227,8 @@ class AsyncByonoy:
         self._supported_wavelengths = wavelengths
         return wavelengths
 
-    async def get_single_measurement(self, wavelength: int) -> List[float]:
-        """Get a single measurement based on the current configuration."""
+    async def get_measurement(self) -> List[List[float]]:
+        """Get a measurement based on the current configuration."""
         handle = self._verify_device_handle()
         assert (
             self._current_config is not None
@@ -237,13 +239,13 @@ class AsyncByonoy:
         err, measurements = await self._loop.run_in_executor(
             executor=self._executor,
             func=partial(
-                self._interface.byonoy_abs96_single_measure,
+                measure_func,
                 handle,
                 self._current_config,
             ),
         )
-        self._raise_if_error(err.name, f"Error getting single measurement: {err}")
-        return measurements
+        self._raise_if_error(err.name, f"Error getting measurement: {err}")
+        return measurements if isinstance(measurements[0], List) else [measurements]  # type: ignore
 
     async def get_plate_presence(self) -> AbsorbanceReaderPlatePresence:
         """Get the state of the plate for the reader."""
@@ -265,7 +267,7 @@ class AsyncByonoy:
         self._supported_wavelengths = wavelengths
         return wavelengths
 
-    def _initialize_measurement(self, conf: AbsProtocol.MeasurementConfig) -> None:
+    def _initialize_measurement(self, conf: MeasurementConfig) -> None:
         handle = self._verify_device_handle()
         if isinstance(conf, AbsProtocol.SingleMeasurementConfig):
             err = self._interface.byonoy_abs96_initialize_single_measurement(
@@ -278,7 +280,12 @@ class AsyncByonoy:
         self._raise_if_error(err.name, f"Error initializing measurement: {err}")
         self._current_config = conf
 
-    def _set_sample_wavelength(self, wavelength: int) -> AbsProtocol.MeasurementConfig:
+    def _initialize(
+        self,
+        mode: ABSMeasurementMode,
+        wavelengths: List[int],
+        reference_wavelength: Optional[int] = None,
+    ) -> None:
         if not self._supported_wavelengths:
             self._get_supported_wavelengths()
         assert self._supported_wavelengths
@@ -293,17 +300,20 @@ class AsyncByonoy:
                 conf.sample_wavelengths = wavelengths
         else:
             raise ValueError(
-                f"Unsupported wavelength: {wavelength}, expected: {self._supported_wavelengths}"
+                f"Unsupported wavelength: {wavelengths}, expected: {self._supported_wavelengths}"
             )
-
-    def _initialize(self, wavelength: int) -> None:
-        conf = self._set_sample_wavelength(wavelength)
         self._initialize_measurement(conf)
 
-    async def initialize(self, wavelength: int) -> None:
-        """Initialize the device so we can start reading samples from it."""
+    async def initialize(
+        self,
+        mode: ABSMeasurementMode,
+        wavelengths: List[int],
+        reference_wavelength: Optional[int] = None,
+    ) -> None:
+        """initialize the device so we can start reading samples from it."""
         await self._loop.run_in_executor(
-            executor=self._executor, func=partial(self._initialize, wavelength)
+            executor=self._executor,
+            func=partial(self._initialize, mode, wavelengths, reference_wavelength),
         )
 
     def _verify_device_handle(self) -> int:

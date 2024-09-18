@@ -4,6 +4,7 @@ import asyncio
 from typing import Dict, Optional, List, Tuple, TYPE_CHECKING
 
 from opentrons.drivers.types import (
+    ABSMeasurementMode,
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderDeviceState,
     AbsorbanceReaderPlatePresence,
@@ -70,8 +71,8 @@ class AbsorbanceReaderDriver(AbstractAbsorbanceReaderDriver):
     ) -> None:
         await self._connection.initialize(mode, wavelengths, reference_wavelength)
 
-    async def initialize_measurement(self, wavelength: int) -> None:
-        await self._connection.initialize(wavelength)
+    async def get_measurement(self) -> List[List[float]]:
+        return await self._connection.get_measurement()
 
     async def get_status(self) -> AbsorbanceReaderDeviceState:
         return await self._connection.get_device_status()
