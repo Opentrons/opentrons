@@ -5,10 +5,8 @@ import { Box, SPACING, getMeasurementDiagram } from '@opentrons/components'
 import { LabeledValue } from './StyledComponents/LabeledValue'
 import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
 
-import type {
-  LabwareWellGroupProperties,
-  LabwareParameters,
-} from '/app/pages/Desktop/Labware/types'
+import type { LabwareParameters } from '@opentrons/shared-data'
+import type { LabwareWellGroupProperties } from '/app/local-resources/labware'
 
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 

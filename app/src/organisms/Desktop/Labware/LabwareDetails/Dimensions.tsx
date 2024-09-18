@@ -4,7 +4,7 @@ import round from 'lodash/round'
 import { Box, SPACING, getFootprintDiagram } from '@opentrons/components'
 import { LabeledValue } from './StyledComponents/LabeledValue'
 import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
-import type { LabwareDefinition } from '/app/pages/Desktop/Labware/types'
+import type { LabwareDefinition2 as LabwareDefinition } from '@opentrons/shared-data'
 
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 

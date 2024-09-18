@@ -12,7 +12,7 @@ import {
   SPACING,
   LegacyStyledText,
 } from '@opentrons/components'
-import type { LabwareBrand } from '/app/pages/Desktop/Labware/types'
+import type { LabwareBrand } from '@opentrons/shared-data'
 
 export interface ManufacturerDetailsProps {
   brand: LabwareBrand

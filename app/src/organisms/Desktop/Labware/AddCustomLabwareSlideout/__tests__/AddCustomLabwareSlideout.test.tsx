@@ -11,7 +11,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { AddCustomLabwareSlideout } from '..'
 
 vi.mock('/app/redux/custom-labware')
-vi.mock('/app/pages/Desktop/Labware/helpers/getAllDefs')
+vi.mock('/app/local-resources/labware')
 vi.mock('/app/redux/analytics')
 
 let mockTrackEvent: any

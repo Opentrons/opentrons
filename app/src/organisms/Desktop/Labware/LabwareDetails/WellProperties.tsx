@@ -13,11 +13,12 @@ import {
 } from '@opentrons/components'
 import { getDisplayVolume } from '@opentrons/shared-data'
 
+import type { LabwareWellGroupProperties } from '/app/local-resources/labware'
+
 import type {
-  LabwareDefinition,
-  LabwareWellGroupProperties,
+  LabwareDefinition2 as LabwareDefinition,
   LabwareVolumeUnits,
-} from '/app/pages/Desktop/Labware/types'
+} from '@opentrons/shared-data'
 
 export interface AllWellPropertiesProps {
   definition: LabwareDefinition

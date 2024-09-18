@@ -11,9 +11,10 @@ import {
   SPACING_AUTO,
   SPACING,
 } from '@opentrons/components'
+
 import { labwareImages } from './labware-images'
 
-import type { LabwareDefinition } from '/app/pages/Desktop/Labware/types'
+import type { LabwareDefinition2 as LabwareDefinition } from '@opentrons/shared-data'
 
 export const UNIVERSAL_FLAT_ADAPTER_X_DIMENSION = 127.4
 
