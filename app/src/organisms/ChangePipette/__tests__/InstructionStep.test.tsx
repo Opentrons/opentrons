@@ -4,7 +4,7 @@ import { screen } from '@testing-library/react'
 
 import { GEN1, GEN2, LEFT, RIGHT } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../i18n'
 import { InstructionStep } from '../InstructionStep'
 

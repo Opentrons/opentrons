@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { mockLabwareDef } from '../../../../LabwarePositionCheck/__fixtures__/mockLabwareDef'
 import { LabwareListItem } from '../LabwareListItem'

@@ -7,7 +7,7 @@ import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
 } from '/app/redux/config'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { TouchscreenBrightness } from '../TouchscreenBrightness'
 
 vi.mock('/app/redux/config')

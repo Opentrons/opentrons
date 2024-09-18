@@ -2,7 +2,7 @@ import * as React from 'react'
 import { describe, it, beforeEach, vi } from 'vitest'
 import { screen, fireEvent } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { SetupLiquids } from '../index'
 import { SetupLiquidsList } from '../SetupLiquidsList'

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach } from 'vitest'
 
-import { renderWithProviders } from '../../../../../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { i18n } from '../../../../../../../../i18n'
 import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'

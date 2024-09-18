@@ -8,7 +8,7 @@ import {
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
 } from '@opentrons/api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../i18n'
 import { RecoveryTakeover, RecoveryTakeoverDesktop } from '../RecoveryTakeover'
 import { useUpdateClientDataRecovery } from '../../../resources/client_data'

@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { i18n } from '../../../i18n'
 import { getScanning, getViewableRobots } from '/app/redux/discovery'
 import { getConfig } from '/app/redux/config'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { ConnectRobotSlideout } from '../ConnectRobotSlideout'
 
 vi.mock('/app/redux/discovery')

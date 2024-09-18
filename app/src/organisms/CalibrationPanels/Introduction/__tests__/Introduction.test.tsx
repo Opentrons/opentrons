@@ -2,7 +2,7 @@ import * as React from 'react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { mockCalibrationCheckLabware } from '/app/redux/sessions/__fixtures__'
 import * as Sessions from '/app/redux/sessions'
 import { i18n } from '../../../../i18n'

@@ -9,7 +9,7 @@ import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
 
 import { COLORS } from '@opentrons/components'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import { getIsOnDevice } from '/app/redux/config'

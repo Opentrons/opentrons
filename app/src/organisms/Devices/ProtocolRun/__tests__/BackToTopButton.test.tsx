@@ -4,7 +4,7 @@ import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { i18n } from '../../../../i18n'
 import {

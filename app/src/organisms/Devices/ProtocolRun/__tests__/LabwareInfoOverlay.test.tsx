@@ -9,7 +9,7 @@ import {
 import {
   nestedTextMatcher,
   renderWithProviders,
-} from '../../../../__testing-utils__'
+} from '/app/__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { useCurrentRun } from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../utils/getLabwareLocation'

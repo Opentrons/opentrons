@@ -7,7 +7,7 @@ import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import {
   nestedTextMatcher,
   renderWithProviders,
-} from '../../../__testing-utils__'
+} from '/app/__testing-utils__'
 import { i18n } from '../../../i18n'
 import {
   mock8ChannelAttachedPipetteInformation,

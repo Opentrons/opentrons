@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { describe, it, vi, beforeEach } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { LEFT } from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../i18n'

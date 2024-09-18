@@ -8,7 +8,7 @@ import { i18n } from '../../../i18n'
 import { CalibrationStatusCard } from '../../../organisms/CalibrationStatusCard'
 import { useFeatureFlag } from '/app/redux/config'
 import * as RobotApi from '/app/redux/robot-api'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,

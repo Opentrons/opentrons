@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { vi, describe, beforeEach, it, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'

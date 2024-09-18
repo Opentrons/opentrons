@@ -7,7 +7,7 @@ import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import {
   nestedTextMatcher,
   renderWithProviders,
-} from '../../../__testing-utils__'
+} from '/app/__testing-utils__'
 import { LEFT } from '@opentrons/shared-data'
 import { fixtureP10Multi } from '@opentrons/shared-data/pipette/fixtures/name'
 import { i18n } from '../../../i18n'

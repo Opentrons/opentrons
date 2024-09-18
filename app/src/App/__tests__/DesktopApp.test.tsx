@@ -4,7 +4,7 @@ import { screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 
-import { renderWithProviders } from '../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../i18n'
 import { Breadcrumbs } from '../../organisms/Breadcrumbs'
 import { CalibrationDashboard } from '../../pages/Desktop/Devices/CalibrationDashboard'

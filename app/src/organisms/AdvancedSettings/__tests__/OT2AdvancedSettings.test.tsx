@@ -9,7 +9,7 @@ import {
   setUseTrashSurfaceForTipCal,
 } from '/app/redux/calibration'
 import { getUseTrashSurfaceForTipCal } from '/app/redux/config'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { OT2AdvancedSettings } from '../OT2AdvancedSettings'
 
 vi.mock('/app/redux/calibration')

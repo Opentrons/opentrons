@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
 import { RobotSettingsFeatureFlags } from '../RobotSettingsFeatureFlags'
 

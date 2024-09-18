@@ -3,7 +3,7 @@ import { fireEvent, waitFor, screen } from '@testing-library/react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 import { LEFT, NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'

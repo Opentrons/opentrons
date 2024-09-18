@@ -5,7 +5,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { opentrons96PcrAdapterV1, fixture96Plate } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import { getLabwareDefinitionsFromCommands } from '../../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
 import { ApplyHistoricOffsets } from '..'

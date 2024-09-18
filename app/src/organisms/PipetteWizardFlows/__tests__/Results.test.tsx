@@ -10,7 +10,7 @@ import {
 import { COLORS } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import { useIsOEMMode } from '../../../resources/robot-settings/hooks'
 import { i18n } from '../../../i18n'

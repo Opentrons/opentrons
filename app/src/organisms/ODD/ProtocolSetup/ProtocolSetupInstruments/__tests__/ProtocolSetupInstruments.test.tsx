@@ -9,7 +9,7 @@ import {
   useAllPipetteOffsetCalibrationsQuery,
 } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useIsOEMMode } from '../../../../../resources/robot-settings/hooks'

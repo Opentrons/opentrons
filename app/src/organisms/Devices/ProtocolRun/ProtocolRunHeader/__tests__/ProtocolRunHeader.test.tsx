@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { useModulesQuery } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { ProtocolRunHeader } from '..'
 import { useRunStatus } from '../../../../RunTimeControl/hooks'

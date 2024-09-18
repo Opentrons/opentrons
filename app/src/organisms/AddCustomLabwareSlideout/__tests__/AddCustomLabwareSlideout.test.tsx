@@ -7,7 +7,7 @@ import {
   useTrackEvent,
   ANALYTICS_ADD_CUSTOM_LABWARE,
 } from '/app/redux/analytics'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { AddCustomLabwareSlideout } from '..'
 
 vi.mock('/app/redux/custom-labware')

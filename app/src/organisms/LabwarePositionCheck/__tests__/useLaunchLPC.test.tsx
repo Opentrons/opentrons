@@ -18,7 +18,7 @@ import {
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, fixtureTiprack300ul } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import {
   useCreateTargetedMaintenanceRunMutation,
   useNotifyRunQuery,

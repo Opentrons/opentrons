@@ -9,7 +9,7 @@ import {
 
 import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
 import { mockRecoveryContentProps } from '../../__fixtures__'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { ManageTips, useDropTipFlowUtils } from '../ManageTips'
 import { RECOVERY_MAP } from '../../constants'

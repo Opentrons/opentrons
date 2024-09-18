@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { vi, describe, it, afterEach, beforeEach, expect } from 'vitest'
 
 import { useInstrumentsQuery } from '@opentrons/react-api-client'

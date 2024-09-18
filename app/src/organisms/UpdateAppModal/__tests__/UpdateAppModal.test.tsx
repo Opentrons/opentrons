@@ -5,7 +5,7 @@ import '@testing-library/jest-dom/vitest'
 
 import { i18n } from '../../../i18n'
 import * as Shell from '/app/redux/shell'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { useRemoveActiveAppUpdateToast } from '../../Alerts'
 import { UpdateAppModal, RELEASE_NOTES_URL_BASE } from '..'
 

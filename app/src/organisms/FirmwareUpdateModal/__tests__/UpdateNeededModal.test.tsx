@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { describe, it, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import {
   useInstrumentsQuery,
   useSubsystemUpdateQuery,

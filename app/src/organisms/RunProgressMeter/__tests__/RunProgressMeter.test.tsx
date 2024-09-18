@@ -32,7 +32,7 @@ import {
 } from '../__fixtures__'
 
 import { RunProgressMeter } from '..'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { useLastRunCommand } from '../../Devices/hooks/useLastRunCommand'
 import { useRunningStepCounts } from '../../../resources/protocols/hooks'
 

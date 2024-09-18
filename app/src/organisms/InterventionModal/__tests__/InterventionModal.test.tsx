@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { RUN_STATUS_RUNNING, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
 import { i18n } from '../../../i18n'
 import {

@@ -7,7 +7,7 @@ import { fireEvent, renderHook, screen } from '@testing-library/react'
 import { useLongPress } from '@opentrons/components'
 import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { LongPressModal } from '../LongPressModal'
 

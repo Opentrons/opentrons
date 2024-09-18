@@ -5,7 +5,7 @@ import { describe, it, expect } from 'vitest'
 import { COLORS } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { ProtocolStatusBanner } from '../index'
 
 const render = () => {

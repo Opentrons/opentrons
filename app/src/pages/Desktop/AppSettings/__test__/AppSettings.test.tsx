@@ -3,7 +3,7 @@ import { vi, describe, beforeEach, it, expect, afterEach } from 'vitest'
 import { Route } from 'react-router'
 import { MemoryRouter, Routes } from 'react-router-dom'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
 import { i18n } from '../../../../i18n'
 import * as Config from '/app/redux/config'

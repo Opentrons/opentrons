@@ -42,7 +42,7 @@ import {
   useRobot,
   useTipLengthCalibrations,
 } from '../../../organisms/Devices/hooks'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { CalibrationDataDownload } from '../CalibrationDataDownload'
 

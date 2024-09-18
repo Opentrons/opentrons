@@ -8,7 +8,7 @@ import {
   // updateConfigValue,
 } from '/app/redux/config'
 import { UpdatedChannel } from '../UpdatedChannel'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
 vi.mock('/app/redux/config')
 

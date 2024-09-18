@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { screen, fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { Slideout } from '..'
 
 const render = (props: React.ComponentProps<typeof Slideout>) => {

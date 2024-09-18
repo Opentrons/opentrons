@@ -8,7 +8,7 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '/app/redux/discovery/__fixtures__'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { ClearUnavailableRobots } from '../ClearUnavailableRobots'
 import type * as OpentronsComponents from '@opentrons/components'
 

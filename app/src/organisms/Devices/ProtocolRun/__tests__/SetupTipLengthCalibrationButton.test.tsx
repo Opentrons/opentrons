@@ -5,7 +5,7 @@ import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
 import { fixtureTiprack300ul } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import { mockTipLengthCalLauncher } from '../../hooks/__fixtures__/taskListFixtures'

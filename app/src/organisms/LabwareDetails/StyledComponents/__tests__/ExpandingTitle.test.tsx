@@ -2,7 +2,7 @@ import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, beforeEach } from 'vitest'
 import { getFootprintDiagram } from '@opentrons/components'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { ExpandingTitle } from '../ExpandingTitle'
 
 const render = (props: React.ComponentProps<typeof ExpandingTitle>) => {

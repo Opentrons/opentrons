@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react'
 import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 
-import { renderWithProviders } from '../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../i18n'
 import { OnDeviceLocalizationProvider } from '../../LocalizationProvider'
 import { ConnectViaEthernet } from '../../pages/ODD/ConnectViaEthernet'

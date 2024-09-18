@@ -10,7 +10,7 @@ import {
   UP_TO_DATE,
 } from '/app/redux/system-info'
 import * as Fixtures from '/app/redux/system-info/__fixtures__'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
 import { U2EInformation } from '../U2EInformation'
 

@@ -8,7 +8,7 @@ import {
   useTrackEvent,
   ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
 } from '/app/redux/analytics'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { openPythonInterpreterDirectory } from '/app/redux/protocol-analysis'
 
 import { OverridePathToPython } from '../OverridePathToPython'

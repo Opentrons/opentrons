@@ -17,7 +17,7 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { mockRobotSideAnalysis } from '../../../../molecules/Command/__fixtures__'
 import {
   CurrentRunningProtocolCommand,

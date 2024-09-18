@@ -7,7 +7,7 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { useRequiredProtocolHardware } from '../../../../pages/Desktop/Protocols/hooks'
 import { Hardware } from '../Hardware'

@@ -4,7 +4,7 @@ import { screen } from '@testing-library/react'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { LEFT, RIGHT } from '/app/redux/pipettes'
 import * as Fixtures from '/app/redux/sessions/__fixtures__'

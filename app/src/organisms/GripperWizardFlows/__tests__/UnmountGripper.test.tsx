@@ -5,7 +5,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { instrumentsResponseFixture } from '@opentrons/api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../i18n'
 
 import { UnmountGripper } from '../UnmountGripper'

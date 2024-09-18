@@ -3,7 +3,7 @@ import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { saveAs } from 'file-saver'
 import { fireEvent, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../../i18n'
 import * as Fixtures from '/app/redux/sessions/__fixtures__'
 import * as Sessions from '/app/redux/sessions'

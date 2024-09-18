@@ -2,7 +2,7 @@ import * as React from 'react'
 import { beforeEach, describe, it } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockRecoveryContentProps } from '../__fixtures__'
 import { RecoveryInProgress } from '../RecoveryInProgress'

@@ -6,7 +6,7 @@ import { MemoryRouter } from 'react-router-dom'
 
 import { useDeleteRunMutation } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import runRecord from '../ProtocolRun/ProtocolRunHeader/RunHeaderModalContainer/modals/__fixtures__/runRecord.json'

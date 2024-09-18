@@ -7,7 +7,7 @@ import {
   multiple_tipacks_with_tc,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'

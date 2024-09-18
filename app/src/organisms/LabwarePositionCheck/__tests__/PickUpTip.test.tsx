@@ -12,7 +12,7 @@ import type { CommandData } from '@opentrons/api-client'
 import {
   nestedTextMatcher,
   renderWithProviders,
-} from '../../../__testing-utils__'
+} from '/app/__testing-utils__'
 import type { Mock } from 'vitest'
 
 vi.mock('../../Devices/hooks')

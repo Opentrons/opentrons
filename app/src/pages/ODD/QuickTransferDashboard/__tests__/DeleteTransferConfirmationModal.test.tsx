@@ -4,7 +4,7 @@ import { when } from 'vitest-when'
 import { act, fireEvent, screen } from '@testing-library/react'
 
 import { getProtocol, deleteProtocol, deleteRun } from '@opentrons/api-client'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'

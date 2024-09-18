@@ -6,7 +6,7 @@ import {
   getIsLabwareOffsetCodeSnippetsOn,
   updateConfigValue,
 } from '/app/redux/config'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { ShowLabwareOffsetSnippets } from '../ShowLabwareOffsetSnippets'
 
 vi.mock('/app/redux/config')

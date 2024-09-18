@@ -4,7 +4,7 @@ import { fireEvent, screen } from '@testing-library/react'
 
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../i18n'
 import { getHasCalibrationBlock } from '/app/redux/config'
 import { getMovementStatus } from '/app/redux/robot-controls'

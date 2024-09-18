@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { screen, fireEvent } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../i18n'
 import { AboutGripperSlideout } from '../AboutGripperSlideout'
 

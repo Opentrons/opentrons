@@ -8,7 +8,7 @@ import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   nestedTextMatcher,
   renderWithProviders,
-} from '../../../__testing-utils__'
+} from '/app/__testing-utils__'
 import { i18n } from '../../../i18n'
 import { getIsHeaterShakerAttached } from '/app/redux/config'
 import {

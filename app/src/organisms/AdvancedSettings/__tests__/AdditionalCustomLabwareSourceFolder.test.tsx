@@ -9,7 +9,7 @@ import {
 } from '/app/redux/analytics'
 
 import { AdditionalCustomLabwareSourceFolder } from '../AdditionalCustomLabwareSourceFolder'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
 vi.mock('/app/redux/custom-labware')
 vi.mock('/app/redux/analytics')

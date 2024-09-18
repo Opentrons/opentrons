@@ -23,7 +23,7 @@ import {
   ROBOT_MODEL_OT3,
 } from '/app/redux/discovery'
 import { getValidCustomLabwareFiles } from '/app/redux/custom-labware'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import {
   mockConnectableRobot,

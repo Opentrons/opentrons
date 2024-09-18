@@ -14,7 +14,7 @@ import {
   useIsFlex,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../../Devices/hooks'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
 import { OverflowMenu } from '../OverflowMenu'
 import { formatLastCalibrated } from '../utils'

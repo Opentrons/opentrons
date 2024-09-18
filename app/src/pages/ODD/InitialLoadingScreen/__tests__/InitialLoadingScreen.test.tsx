@@ -4,7 +4,7 @@ import { screen } from '@testing-library/react'
 
 import { useRobotSettingsQuery } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
 import { getIsShellReady } from '/app/redux/shell'
 

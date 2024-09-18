@@ -7,7 +7,7 @@ import { screen, fireEvent } from '@testing-library/react'
 import { COLORS, BORDERS } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { getIsOnDevice } from '/app/redux/config'
 
 import { InterventionModal } from '../'

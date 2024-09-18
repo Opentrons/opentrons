@@ -4,7 +4,7 @@ import { describe, it, vi, beforeEach } from 'vitest'
 import {
   renderWithProviders,
   nestedTextMatcher,
-} from '../../../__testing-utils__'
+} from '/app/__testing-utils__'
 import { i18n } from '../../../i18n'
 import { useAllLabware } from '../../../pages/Desktop/Labware/hooks'
 import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'

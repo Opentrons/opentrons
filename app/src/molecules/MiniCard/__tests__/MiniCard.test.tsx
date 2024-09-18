@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { COLORS, SPACING, BORDERS, CURSOR_POINTER } from '@opentrons/components'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { MiniCard } from '../'
 
 const render = (props: React.ComponentProps<typeof MiniCard>) => {

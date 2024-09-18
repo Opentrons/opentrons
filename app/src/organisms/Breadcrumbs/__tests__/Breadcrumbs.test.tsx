@@ -12,7 +12,7 @@ import {
 } from '../../../organisms/Devices/hooks'
 import { getProtocolDisplayName } from '../../../organisms/ProtocolsLanding/utils'
 import { getIsOnDevice } from '/app/redux/config'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { getStoredProtocol } from '/app/redux/protocol-storage'
 import { storedProtocolData as storedProtocolDataFixture } from '/app/redux/protocol-storage/__fixtures__'

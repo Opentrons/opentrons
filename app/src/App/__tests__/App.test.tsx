@@ -11,7 +11,7 @@ import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 import { App } from '../'
 
 import type { State } from '/app/redux/types'
-import { renderWithProviders } from '../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
 vi.mock('/app/redux/config')
 vi.mock('../DesktopApp')

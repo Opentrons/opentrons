@@ -5,7 +5,7 @@ import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../../../../../i18n'
-import { renderWithProviders } from '../../../../../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
 import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'

@@ -4,7 +4,7 @@ import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
 import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { AnalysisFailedModal } from '../AnalysisFailedModal'
 import type { NavigateFunction } from 'react-router-dom'

@@ -13,7 +13,7 @@ import {
   useModulesQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import {
   getDeckDefFromRobotType,

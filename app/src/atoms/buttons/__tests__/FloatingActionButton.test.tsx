@@ -5,7 +5,7 @@ import { screen } from '@testing-library/react'
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { FloatingActionButton } from '..'
 
 const render = (props: React.ComponentProps<typeof FloatingActionButton>) => {
