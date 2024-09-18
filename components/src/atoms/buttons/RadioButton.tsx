@@ -5,6 +5,9 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  CURSOR_DEFAULT,
+  CURSOR_NOT_ALLOWED,
+  CURSOR_POINTER,
   DIRECTION_ROW,
   Icon,
   RESPONSIVENESS,
@@ -80,14 +83,14 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   const DISABLED_BUTTON_STYLE = css`
     background-color: ${COLORS.grey35};
     color: ${COLORS.grey50};
-    cursor: not-allowed;
+    cursor: ${CURSOR_NOT_ALLOWED};
   `
 
   const SettingButtonLabel = styled.label`
     border-radius: ${
       !largeDesktopBorderRadius ? BORDERS.borderRadius40 : BORDERS.borderRadius8
     };
-    cursor: pointer;
+    cursor: ${CURSOR_POINTER};
     padding: ${SPACING.spacing12} ${SPACING.spacing16};
     width: 100%;
 
@@ -99,7 +102,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     }
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-       cursor: default;
+       cursor: ${CURSOR_DEFAULT};
        padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
        border-radius: ${BORDERS.borderRadius16};
        display: ${maxLines != null ? '-webkit-box' : undefined};

@@ -17,15 +17,15 @@ const BUTTON_BASE_STYLE = css`
   border-width: 0;
   border-style: solid;
   background-color: transparent;
-  cursor: pointer;
+  cursor: ${Styles.CURSOR_POINTER};
 
   &:disabled,
   &.disabled {
-    cursor: default;
+    cursor: ${Styles.CURSOR_DEFAULT};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    cursor: default;
+    cursor: ${Styles.CURSOR_DEFAULT};
   }
 `
 

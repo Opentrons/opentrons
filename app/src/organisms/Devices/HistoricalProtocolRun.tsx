@@ -12,6 +12,7 @@ import {
   OVERFLOW_HIDDEN,
   SPACING,
   LegacyStyledText,
+  CURSOR_POINTER,
 } from '@opentrons/components'
 import { formatInterval } from '../RunTimeControl/utils'
 import { formatTimestamp } from './utils'
@@ -125,7 +126,7 @@ export function HistoricalProtocolRun(
             <Icon
               name={drawerOpen ? 'chevron-up' : 'chevron-down'}
               size="1.25rem"
-              css={{ cursor: 'pointer' }}
+              css={{ cursor: CURSOR_POINTER }}
             />
           </Box>
           <OverflowMenu

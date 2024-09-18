@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   CheckboxField,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DISPLAY_INLINE_BLOCK,
   Flex,
@@ -477,7 +478,7 @@ const StyledLabel = styled.label`
   text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
   text-align: ${TYPOGRAPHY.textAlignCenter};
   display: ${DISPLAY_INLINE_BLOCK};
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   input[type='file'] {
     display: none;
   }

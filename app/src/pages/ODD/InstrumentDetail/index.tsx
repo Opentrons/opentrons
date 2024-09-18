@@ -4,14 +4,15 @@ import styled from 'styled-components'
 
 import { useInstrumentsQuery, useHost } from '@opentrons/react-api-client'
 import {
-  Icon,
-  DIRECTION_COLUMN,
-  Flex,
-  SPACING,
   COLORS,
-  RESPONSIVENESS,
+  CURSOR_DEFAULT,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
+  RESPONSIVENESS,
+  SPACING,
 } from '@opentrons/components'
 
 import { BackButton } from '../../../atoms/buttons/BackButton'
@@ -97,6 +98,6 @@ const IconButton = styled('button')`
     background-color: transparent;
   }
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    cursor: default;
+    cursor: ${CURSOR_DEFAULT};
   }
 `

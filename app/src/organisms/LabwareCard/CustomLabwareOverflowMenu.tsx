@@ -19,6 +19,7 @@ import {
   LegacyStyledText,
   MenuItem,
   Modal,
+  NO_WRAP,
   OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
@@ -118,7 +119,7 @@ export function CustomLabwareOverflowMenu(
           top={SPACING.spacing32}
           right={0}
           flexDirection={DIRECTION_COLUMN}
-          whiteSpace="nowrap"
+          whiteSpace={NO_WRAP}
         >
           <MenuItem onClick={handleOpenInFolder}>
             {t('show_in_folder')}

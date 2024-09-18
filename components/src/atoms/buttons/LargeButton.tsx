@@ -9,6 +9,8 @@ import { fontSizeBodyLargeSemiBold } from '../../helix-design-system/product/typ
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
+  CURSOR_DEFAULT,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   JUSTIFY_SPACE_BETWEEN,
@@ -158,7 +160,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     background-color: ${
       LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultBackgroundColor
     };
-    cursor: pointer;
+    cursor: ${CURSOR_POINTER};
     padding: ${SPACING.spacing16} ${SPACING.spacing24};
     text-align: ${TYPOGRAPHY.textAlignCenter};
     border-radius: ${BORDERS.borderRadiusFull};
@@ -205,7 +207,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     }
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      cursor: default;
+      cursor: ${CURSOR_DEFAULT};
       align-items: ${ALIGN_FLEX_START};
       flex-direction: ${DIRECTION_COLUMN};
       border-radius: ${BORDERS.borderRadius16};

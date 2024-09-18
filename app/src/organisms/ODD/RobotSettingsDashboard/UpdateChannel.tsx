@@ -11,6 +11,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  CURSOR_POINTER,
 } from '@opentrons/components'
 
 import { ChildNavigation } from '../../../organisms/ChildNavigation'
@@ -34,7 +35,7 @@ const SettingButton = styled.input`
 const SettingButtonLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadius16};
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   background: ${({ isSelected }) =>
     isSelected === true ? COLORS.blue50 : COLORS.blue35};
   color: ${({ isSelected }) => isSelected === true && COLORS.white};

@@ -15,6 +15,7 @@ import {
   SPACING,
   Modal,
   TYPOGRAPHY,
+  CURSOR_DEFAULT,
 } from '@opentrons/components'
 import {
   useModulesQuery,
@@ -385,7 +386,7 @@ export function AddFixtureModal({
 
 const FIXTURE_BUTTON_STYLE_ODD = css`
   background-color: ${COLORS.grey35};
-  cursor: default;
+  cursor: ${CURSOR_DEFAULT};
   border-radius: ${BORDERS.borderRadius16};
   box-shadow: none;
 
