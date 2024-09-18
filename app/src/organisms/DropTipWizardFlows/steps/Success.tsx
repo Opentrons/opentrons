@@ -24,6 +24,7 @@ export const Success = ({
   proceedToRoute,
   fixitCommandTypeUtils,
   proceedWithConditionalClose,
+  modalStyle,
 }: DropTipWizardContainerProps): JSX.Element => {
   const { tipDropComplete } = fixitCommandTypeUtils?.buttonOverrides ?? {}
   const { t } = useTranslation('drop_tip_wizard')
@@ -55,7 +56,15 @@ export const Success = ({
   return (
     <>
       <Flex css={WIZARD_CONTAINER_STYLE}>
-        <img src={SuccessIcon} alt="Success Icon" css={IMAGE_STYLE} />
+        <img
+          src={SuccessIcon}
+          alt="Success Icon"
+          css={
+            modalStyle === 'simple'
+              ? SIMPLE_IMAGE_STYLE
+              : INTERVENTION_IMAGE_STYLE
+          }
+        />
         <StyledText desktopStyle="headingSmallBold" oddStyle="level3HeaderBold">
           {currentStep === BLOWOUT_SUCCESS
             ? t('blowout_complete')
@@ -79,13 +88,22 @@ const WIZARD_CONTAINER_STYLE = css`
   width: 100%;
 `
 
-const IMAGE_STYLE = css`
+const SHARED_IMAGE_STYLE = `
   width: 170px;
   height: 141px;
-  margin-top: ${SPACING.spacing24};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     width: 282px;
     height: 234px;
   }
+`
+
+const SIMPLE_IMAGE_STYLE = css`
+  ${SHARED_IMAGE_STYLE}
+  margin-top: ${SPACING.spacing32};
+`
+
+const INTERVENTION_IMAGE_STYLE = css`
+  ${SHARED_IMAGE_STYLE}
+  margin-top: ${SPACING.spacing60};
 `

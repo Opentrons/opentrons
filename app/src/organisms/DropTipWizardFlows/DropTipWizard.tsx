@@ -287,7 +287,14 @@ function useInitiateExit(): {
   return { isExitInitiated, toggleExitInitiated }
 }
 
+const SHARED_STYLE = `
+  display: ${DISPLAY_FLEX};
+  flex-direction: ${DIRECTION_COLUMN};
+  overflow: ${OVERFLOW_HIDDEN};
+`
+
 const INTERVENTION_CONTAINER_STYLE = css`
+  ${SHARED_STYLE}
   padding: ${SPACING.spacing32};
   grid-gap: ${SPACING.spacing24};
   height: 100%;
@@ -299,11 +306,9 @@ const INTERVENTION_CONTAINER_STYLE = css`
 `
 
 const SIMPLE_CONTAINER_STYLE = css`
+  ${SHARED_STYLE}
   width: 47rem;
   min-height: 26.75rem;
-  overflow: ${OVERFLOW_HIDDEN};
-  display: ${DISPLAY_FLEX};
-  flex-direction: ${DIRECTION_COLUMN};
 
   // TODO(jh 09-17-24): This is effectively making a ModalShell analogue on the ODD, since one does not exist.
   //  Consider making one.

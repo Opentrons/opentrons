@@ -35,6 +35,7 @@ export const BeforeBeginning = ({
   isOnDevice,
   issuedCommandsType,
   fixitCommandTypeUtils,
+  modalStyle,
 }: DropTipWizardContainerProps): JSX.Element | null => {
   const { t } = useTranslation('drop_tip_wizard')
   const [flowType, setFlowType] = React.useState<FlowType>(null)
@@ -103,7 +104,13 @@ export const BeforeBeginning = ({
           >
             {buildTopText()}
           </StyledText>
-          <Flex css={DESKTOP_GIF_CONTAINER_STYLE}>
+          <Flex
+            css={
+              modalStyle === 'simple'
+                ? SIMPLE_DESKTOP_GIF_CONTAINER_STYLE
+                : INTERVENTION_DESKTOP_GIF_CONTAINER_STYLE
+            }
+          >
             <DropTipOption
               flowType="blowout"
               currentFlow={flowType}
@@ -236,9 +243,18 @@ const ODD_MEDIUM_BUTTON_STYLE = css`
   height: 5.25rem;
 `
 
-const DESKTOP_GIF_CONTAINER_STYLE = css`
+const SHARED_GIF_CONTAINER_STYLE = `
   justify-content: ${JUSTIFY_SPACE_AROUND};
   align-items: ${ALIGN_CENTER};
   grid-gap: ${SPACING.spacing16};
+`
+
+const SIMPLE_DESKTOP_GIF_CONTAINER_STYLE = css`
+  ${SHARED_GIF_CONTAINER_STYLE}
   height: 18.75rem;
+`
+
+const INTERVENTION_DESKTOP_GIF_CONTAINER_STYLE = css`
+  ${SHARED_GIF_CONTAINER_STYLE}
+  height: 14.563rem;
 `

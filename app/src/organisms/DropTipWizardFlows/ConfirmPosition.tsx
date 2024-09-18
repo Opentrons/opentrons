@@ -45,6 +45,7 @@ export function useConfirmPosition(
     setIsRobotPipetteMoving(!isRobotPipetteMoving)
   }
 
+  // NOTE: The useEffect logic is potentially problematic on views that are not steps, but it is not currently.
   React.useEffect(() => {
     if (
       currentStep !== POSITION_AND_BLOWOUT &&
@@ -74,6 +75,7 @@ export function ConfirmPosition({
   currentStep,
   dropTipCommands,
   proceed,
+  modalStyle,
 }: ConfirmPositionProps): JSX.Element {
   const { blowoutOrDropTip } = dropTipCommands
   const { t } = useTranslation('drop_tip_wizard')
@@ -88,17 +90,19 @@ export function ConfirmPosition({
 
   return (
     <>
-      <Flex css={CONTAINER_STYLE}>
+      <Flex
+        css={
+          modalStyle === 'simple'
+            ? SIMPLE_CONTAINER_STYLE
+            : INTERVENTION_CONTAINER_STYLE
+        }
+      >
         <Icon name="alert-circle" css={ICON_STYLE} />
         <StyledText oddStyle="level3HeaderBold" desktopStyle="headingSmallBold">
           {currentStep === POSITION_AND_BLOWOUT
             ? t('confirm_blowout_location')
             : t('confirm_drop_tip_location')}
         </StyledText>
-        <StyledText
-          desktopStyle="bodyDefaultRegular"
-          oddStyle="level3HeaderBold"
-        ></StyledText>
       </Flex>
       <DropTipFooterButtons
         primaryBtnOnClick={handleProceed}
@@ -109,7 +113,7 @@ export function ConfirmPosition({
   )
 }
 
-const CONTAINER_STYLE = css`
+const SHARED_CONTAINER_STYLE = `
   display: ${DISPLAY_FLEX};
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing16};
@@ -117,12 +121,21 @@ const CONTAINER_STYLE = css`
   align-items: ${ALIGN_CENTER};
   justify-content: ${JUSTIFY_CENTER};
   text-align: ${TEXT_ALIGN_CENTER};
-  margin-top: ${SPACING.spacing32};
-
+  
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     grid-gap: ${SPACING.spacing24};
     padding: ${SPACING.spacing40};
   }
+`
+
+const INTERVENTION_CONTAINER_STYLE = css`
+  ${SHARED_CONTAINER_STYLE}
+  margin-top: ${SPACING.spacing60};
+`
+
+const SIMPLE_CONTAINER_STYLE = css`
+  ${SHARED_CONTAINER_STYLE}
+  margin-top: ${SPACING.spacing32};
 `
 
 const ICON_STYLE = css`
