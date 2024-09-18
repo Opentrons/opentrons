@@ -6,7 +6,7 @@ import { DeckSetupContainer } from '../../DeckSetup'
 import { TimelineToolbox } from '../Timeline'
 import { ProtocolSteps } from '..'
 
-vi.mock('../../../../components/StepEditForm')
+vi.mock('../StepForm')
 vi.mock('../../DeckSetup')
 vi.mock('../Timeline')
 const render = () => {
@@ -19,7 +19,6 @@ describe('ProtocolSteps', () => {
     vi.mocked(DeckSetupContainer).mockReturnValue(
       <div>mock DeckSetupContainer</div>
     )
-
     render()
     screen.getByText('mock TimelineToolbox')
     screen.getByText('mock DeckSetupContainer')
