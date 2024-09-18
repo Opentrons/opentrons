@@ -5,13 +5,13 @@ import styled from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
-  COLORS,
-  CURSOR_POINTER,
   CheckboxField,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DISPLAY_INLINE_BLOCK,
   Flex,
   InputField,
+  JUSTIFY_CENTER,
   ListButton,
   ListButtonAccordion,
   ListButtonAccordionContainer,
@@ -32,6 +32,7 @@ import {
   getModuleType,
 } from '@opentrons/shared-data'
 
+import { BUTTON_LINK_STYLE } from '../../../atoms'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import {
@@ -208,12 +209,8 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        marginY={SPACING.spacing16}
-        gridGap={SPACING.spacing8}
-      >
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
         <StyledText desktopStyle="bodyDefaultSemiBold">
           {t('add_labware')}
         </StyledText>
@@ -251,7 +248,11 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
           </Flex>
         ) : null}
       </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        paddingTop={SPACING.spacing8}
+      >
         {customLabwareURIs.length === 0 ? null : (
           <ListButton
             key={`ListButton_${CUSTOM_CATEGORY}`}
@@ -450,19 +451,25 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
           }
         })}
       </Flex>
-      <StyledLabel>
-        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-          {t('custom_labware')}
-        </StyledText>
-        <input
-          data-testid="customLabwareInput"
-          type="file"
-          onChange={e => {
-            setSelectedCategory(CUSTOM_CATEGORY)
-            dispatch(createCustomLabwareDef(e))
-          }}
-        />
-      </StyledLabel>
+      <Flex
+        padding={`${SPACING.spacing4} ${SPACING.spacing12}`}
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_CENTER}
+      >
+        <StyledLabel css={BUTTON_LINK_STYLE}>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('upload_custom_labware')}
+          </StyledText>
+          <input
+            data-testid="customLabwareInput"
+            type="file"
+            onChange={e => {
+              setSelectedCategory(CUSTOM_CATEGORY)
+              dispatch(createCustomLabwareDef(e))
+            }}
+          />
+        </StyledLabel>
+      </Flex>
     </Flex>
   )
 }
