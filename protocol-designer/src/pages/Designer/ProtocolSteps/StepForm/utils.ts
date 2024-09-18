@@ -233,12 +233,12 @@ export const showFieldErrors = ({
   focusedField,
   dirtyFields,
 }: ShowFieldErrorParams): boolean | undefined | StepFieldName[] =>
-  !(name === focusedField) && dirtyFields && dirtyFields.includes(name)
+  !(name === focusedField) && dirtyFields != null && dirtyFields.includes(name)
 export const makeSingleEditFieldProps = (
   focusHandlers: FocusHandlers,
   formData: FormData,
   handleChangeFormInput: (name: string, value: unknown) => void,
-  hydratedForm: { [key: string]: any }, //  TODO: create real HydratedFormData type
+  hydratedForm: { [key: string]: any },
   t: any
 ): FieldPropsByName => {
   const { dirtyFields, blur, focusedField, focus } = focusHandlers
@@ -246,10 +246,9 @@ export const makeSingleEditFieldProps = (
     getDefaultsForStepType(formData.stepType)
   )
   return fieldNames.reduce<FieldPropsByName>((acc, name) => {
-    const disabled = hydratedForm
-      ? getDisabledFields(hydratedForm).has(name)
-      : false
-    const value = formData ? formData[name] : null
+    const disabled =
+      hydratedForm != null ? getDisabledFields(hydratedForm).has(name) : false
+    const value = formData != null ? formData[name] : null
     const showErrors = showFieldErrors({
       name,
       focusedField,
