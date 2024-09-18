@@ -9,7 +9,7 @@ import {
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 import { OddModal } from '/app/molecules/OddModal'
-import { SmallButton } from '../../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 
 import imgSrc from '/app/assets/images/on-device-display/odd-abstract-6.png'
 

@@ -5,7 +5,7 @@ import { screen } from '@testing-library/react'
 import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { ChosenTipRackRender } from '../ChosenTipRackRender'
-import type { SelectOption } from '../../../atoms/SelectField/Select'
+import type { SelectOption } from '/app/atoms/SelectField/Select'
 
 const render = (props: React.ComponentProps<typeof ChosenTipRackRender>) => {
   return renderWithProviders(<ChosenTipRackRender {...props} />, {

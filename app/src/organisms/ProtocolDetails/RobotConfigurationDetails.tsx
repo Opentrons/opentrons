@@ -26,8 +26,8 @@ import {
   FLEX_USB_MODULE_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { InstrumentContainer } from '../../atoms/InstrumentContainer'
-import { Divider } from '../../atoms/structure'
+import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
+import { Divider } from '/app/atoms/structure'
 import { getRobotTypeDisplayName } from '../ProtocolsLanding/utils'
 import { getSlotsForThermocycler } from './utils'
 

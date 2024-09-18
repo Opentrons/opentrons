@@ -18,7 +18,7 @@ import { useErrorName } from '../hooks'
 import { OddModal } from '/app/molecules/OddModal'
 import { getModalPortalEl, getTopPortalEl } from '../../../App/portal'
 import { ERROR_KINDS } from '../constants'
-import { InlineNotification } from '../../../atoms/InlineNotification'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 import { StepInfo } from './StepInfo'
 import { getErrorKind } from '../utils'
 

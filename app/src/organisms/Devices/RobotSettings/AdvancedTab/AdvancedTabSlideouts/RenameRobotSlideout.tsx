@@ -20,8 +20,8 @@ import {
   getUnreachableRobots,
 } from '/app/redux/discovery'
 import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '/app/redux/analytics'
-import { Slideout } from '../../../../../atoms/Slideout'
-import { Banner } from '../../../../../atoms/Banner'
+import { Slideout } from '/app/atoms/Slideout'
+import { Banner } from '/app/atoms/Banner'
 import { useIsFlex } from '../../../hooks'
 
 import type { Resolver, FieldError } from 'react-hook-form'

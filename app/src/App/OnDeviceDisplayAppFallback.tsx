@@ -17,7 +17,7 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import { MediumButton } from '../atoms/buttons'
+import { MediumButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { appRestart, sendLog } from '/app/redux/shell'
 

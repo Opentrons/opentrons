@@ -9,7 +9,7 @@ import {
   AlertPrimaryButton,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,

@@ -35,7 +35,7 @@ import {
 } from '@opentrons/components'
 
 import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage'
-import { InstrumentContainer } from '../../atoms/InstrumentContainer'
+import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import { ProtocolStatusBanner } from '../ProtocolStatusBanner'

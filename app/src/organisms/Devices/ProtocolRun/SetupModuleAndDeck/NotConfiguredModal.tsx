@@ -18,7 +18,7 @@ import {
   getCutoutDisplayName,
   getFixtureDisplayName,
 } from '@opentrons/shared-data'
-import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
+import { TertiaryButton } from '/app/atoms/buttons/TertiaryButton'
 import { getTopPortalEl } from '../../../../App/portal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 

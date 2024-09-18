@@ -33,7 +33,7 @@ import {
 
 import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 import FLEX_PNG from '/app/assets/images/FLEX.png'
-import { InstrumentContainer } from '../../atoms/InstrumentContainer'
+import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
 import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
 import { ModuleIcon } from '/app/molecules/ModuleIcon'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'

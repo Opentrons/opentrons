@@ -6,7 +6,7 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
-import { Banner } from '../../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 import * as Sessions from '/app/redux/sessions'
 
 interface InvalidationWarningProps {

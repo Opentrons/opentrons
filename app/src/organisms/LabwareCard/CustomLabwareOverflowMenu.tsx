@@ -29,7 +29,7 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 
-import { Divider } from '../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import { getTopPortalEl } from '../../App/portal'
 import {
   deleteCustomLabwareFile,

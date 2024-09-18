@@ -26,10 +26,10 @@ import {
   applyShellUpdate,
 } from '/app/redux/shell'
 
-import { ExternalLink } from '../../atoms/Link/ExternalLink'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { ReleaseNotes } from '/app/molecules/ReleaseNotes'
-import { Banner } from '../../atoms/Banner'
-import { ProgressBar } from '../../atoms/ProgressBar'
+import { Banner } from '/app/atoms/Banner'
+import { ProgressBar } from '/app/atoms/ProgressBar'
 import { useRemoveActiveAppUpdateToast } from '../Alerts'
 
 import type { Dispatch } from '/app/redux/types'

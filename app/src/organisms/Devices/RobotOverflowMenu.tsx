@@ -24,7 +24,7 @@ import {
 
 import { CONNECTABLE, removeRobot } from '/app/redux/discovery'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { Divider } from '../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import { getTopPortalEl } from '../../App/portal'
 import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
 import { useCurrentRunId } from '/app/resources/runs'

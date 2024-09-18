@@ -26,7 +26,7 @@ import {
   truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 
 import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
 import { getLocalRobot } from '/app/redux/discovery'

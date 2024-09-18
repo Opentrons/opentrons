@@ -26,7 +26,7 @@ import {
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { InterventionModal as InterventionModalMolecule } from '/app/molecules/InterventionModal'
 import { getIsOnDevice } from '/app/redux/config'

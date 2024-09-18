@@ -16,8 +16,8 @@ import {
 } from '@opentrons/components'
 import { useEstopQuery } from '@opentrons/react-api-client'
 
-import { MediumButton } from '../../../atoms/buttons'
-import { StepMeter } from '../../../atoms/StepMeter'
+import { MediumButton } from '/app/atoms/buttons'
+import { StepMeter } from '/app/atoms/StepMeter'
 
 import estopImg from '/app/assets/images/on-device-display/install_e_stop.png'
 

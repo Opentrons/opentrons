@@ -16,7 +16,7 @@ import {
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
-import { SmallButton } from '../../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { Navigation } from '/app/organisms/Navigation'
 import {
   getPinnedProtocolIds,

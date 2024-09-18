@@ -24,7 +24,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { getUniqueWellProperties } from '@opentrons/shared-data'
-import { Slideout } from '../../atoms/Slideout'
+import { Slideout } from '/app/atoms/Slideout'
 import { getWellLabel } from './helpers/labels'
 import { WellCount } from './WellCount'
 import { WellProperties } from './WellProperties'

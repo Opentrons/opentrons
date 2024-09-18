@@ -13,7 +13,7 @@ import {
 import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
 
-import { MediumButton } from '../../../atoms/buttons'
+import { MediumButton } from '/app/atoms/buttons'
 import {
   UpdateRobotSoftware,
   NoUpdateFound,

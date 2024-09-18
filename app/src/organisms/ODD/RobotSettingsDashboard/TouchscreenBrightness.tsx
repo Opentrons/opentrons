@@ -24,7 +24,7 @@ import {
 
 import type { Dispatch } from '/app/redux/types'
 import type { SetSettingOption } from './types'
-import { IconButton } from '../../../atoms/buttons/IconButton'
+import { IconButton } from '/app/atoms/buttons/IconButton'
 
 interface BrightnessTileProps {
   isActive: boolean

@@ -13,7 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StepMeter } from '../../../atoms/StepMeter'
+import { StepMeter } from '/app/atoms/StepMeter'
 import { CardButton } from '/app/molecules/CardButton'
 
 import type { IconName } from '@opentrons/components'

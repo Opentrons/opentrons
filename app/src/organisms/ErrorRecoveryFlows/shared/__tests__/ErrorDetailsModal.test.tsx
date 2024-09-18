@@ -5,7 +5,7 @@ import { screen, act, renderHook } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockRecoveryContentProps } from '../../__fixtures__'
-import { InlineNotification } from '../../../../atoms/InlineNotification'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 import { StepInfo } from '../StepInfo'
 import { OddModal } from '/app/molecules/OddModal'
 import {
@@ -22,7 +22,7 @@ vi.mock('/app/molecules/OddModal', () => ({
   OddModal: vi.fn(({ children }) => <div>{children}</div>),
 }))
 
-vi.mock('../../../../atoms/InlineNotification')
+vi.mock('/app/atoms/InlineNotification')
 vi.mock('../StepInfo')
 
 describe('useErrorDetailsModal', () => {

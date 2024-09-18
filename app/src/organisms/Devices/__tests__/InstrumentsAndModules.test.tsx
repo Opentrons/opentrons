@@ -11,7 +11,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { i18n } from '/app/i18n'
-import { Banner } from '../../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 import { mockMagneticModule } from '/app/redux/modules/__fixtures__'
 import { useIsFlex, useIsRobotViewable, useRunStatuses } from '../hooks'
 import { ModuleCard } from '../../ModuleCard'
@@ -40,7 +40,7 @@ vi.mock('../PipetteCard')
 vi.mock('../PipetteCard/FlexPipetteCard')
 vi.mock('../PipetteCard/PipetteRecalibrationWarning')
 vi.mock('/app/resources/runs')
-vi.mock('../../../atoms/Banner')
+vi.mock('/app/atoms/Banner')
 vi.mock('../utils')
 vi.mock('../../RunTimeControl/hooks')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')

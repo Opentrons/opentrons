@@ -16,7 +16,7 @@ import { ChildNavigation } from '../ChildNavigation'
 import { getCompatibleLabwareByCategory } from './utils'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { SmallButton } from '../../atoms/buttons'
+import type { SmallButton } from '/app/atoms/buttons'
 import type { LabwareFilter } from '/app/pages/Desktop/Labware/types'
 import type {
   QuickTransferWizardState,

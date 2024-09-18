@@ -32,7 +32,7 @@ import { RobotCard } from '/app/organisms/Devices/RobotCard'
 import { DevicesEmptyState } from '/app/organisms/Devices/DevicesEmptyState'
 import { CollapsibleSection } from '/app/molecules/CollapsibleSection'
 
-import { Divider } from '../../../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import { NewRobotSetupHelp } from './NewRobotSetupHelp'
 
 import type { State } from '/app/redux/types'

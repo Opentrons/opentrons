@@ -18,7 +18,7 @@ import {
   useDismissCurrentRunMutation,
 } from '@opentrons/react-api-client'
 
-import { SmallButton } from '../../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { useTrackProtocolRunEvent } from '/app/organisms/Devices/hooks'
 import { useRunStatus } from '/app/organisms/RunTimeControl/hooks'

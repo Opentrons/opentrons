@@ -13,7 +13,7 @@ import {
   WRAP_REVERSE,
 } from '@opentrons/components'
 
-import { Banner } from '../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 
 import type { Dispatch } from '/app/redux/types'
 import { analyzeProtocol } from '/app/redux/protocol-storage'

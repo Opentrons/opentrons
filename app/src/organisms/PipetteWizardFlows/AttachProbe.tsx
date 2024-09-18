@@ -10,7 +10,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LEFT, WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
-import { Banner } from '../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,

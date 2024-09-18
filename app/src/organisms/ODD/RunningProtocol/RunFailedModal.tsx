@@ -16,7 +16,7 @@ import {
 } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
-import { SmallButton } from '../../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 

@@ -12,7 +12,7 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import { StatusLabel } from '../../atoms/StatusLabel'
+import { StatusLabel } from '/app/atoms/StatusLabel'
 import type {
   LatchStatus,
   SpeedStatus,

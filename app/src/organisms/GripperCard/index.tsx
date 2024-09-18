@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 import { getGripperDisplayName } from '@opentrons/shared-data'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
-import { Banner } from '../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 import { InstrumentCard } from '/app/molecules/InstrumentCard'
 import { GripperWizardFlows } from '../GripperWizardFlows'
 import { AboutGripperSlideout } from './AboutGripperSlideout'

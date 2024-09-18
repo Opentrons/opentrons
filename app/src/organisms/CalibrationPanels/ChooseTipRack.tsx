@@ -24,9 +24,9 @@ import {
   getTipLengthCalibrations,
   getTipLengthForPipetteAndTiprack,
 } from '/app/redux/calibration/'
-import { Select } from '../../atoms/SelectField/Select'
-import { Banner } from '../../atoms/Banner'
-import { Divider } from '../../atoms/structure'
+import { Select } from '/app/atoms/SelectField/Select'
+import { Banner } from '/app/atoms/Banner'
+import { Divider } from '/app/atoms/structure'
 import { NeedHelpLink } from './NeedHelpLink'
 import { ChosenTipRackRender } from './ChosenTipRackRender'
 

@@ -11,7 +11,7 @@ import {
 
 import { getUserId } from '/app/redux/config'
 import { useClientDataRecovery } from '/app/resources/client_data'
-import { Banner } from '../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 
 import type { RecoveryIntent } from '/app/resources/client_data'
 import type { StyleProps } from '@opentrons/components'

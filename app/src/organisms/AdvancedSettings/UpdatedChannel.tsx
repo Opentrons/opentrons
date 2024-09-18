@@ -12,14 +12,14 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { SelectField } from '../../atoms/SelectField'
+import { SelectField } from '/app/atoms/SelectField'
 import {
   getUpdateChannel,
   getUpdateChannelOptions,
   updateConfigValue,
 } from '/app/redux/config'
 
-import type { SelectOption } from '../../atoms/SelectField/Select'
+import type { SelectOption } from '/app/atoms/SelectField/Select'
 import type { Dispatch } from '/app/redux/types'
 
 export function UpdatedChannel(): JSX.Element {

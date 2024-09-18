@@ -9,7 +9,7 @@ import type { InputField } from '@opentrons/components'
 
 vi.mock('../utils')
 
-vi.mock('../../../atoms/InputField', async importOriginal => {
+vi.mock('/app/atoms/InputField', async importOriginal => {
   const actualComponents = await importOriginal<typeof InputField>()
   return {
     ...actualComponents,

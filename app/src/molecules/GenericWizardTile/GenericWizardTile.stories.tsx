@@ -9,7 +9,7 @@ import {
   LegacyStyledText,
   ModalShell,
 } from '@opentrons/components'
-import { Skeleton } from '../../atoms/Skeleton'
+import { Skeleton } from '/app/atoms/Skeleton'
 import { WizardHeader } from '../WizardHeader'
 import { configReducer } from '/app/redux/config/reducer'
 import { GenericWizardTile } from './index'

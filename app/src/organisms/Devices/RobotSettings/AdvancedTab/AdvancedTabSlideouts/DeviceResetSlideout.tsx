@@ -21,8 +21,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Slideout } from '../../../../../atoms/Slideout'
-import { Divider } from '../../../../../atoms/structure'
+import { Slideout } from '/app/atoms/Slideout'
+import { Divider } from '/app/atoms/structure'
 import { UNREACHABLE } from '/app/redux/discovery'
 import {
   getResetConfigOptions,

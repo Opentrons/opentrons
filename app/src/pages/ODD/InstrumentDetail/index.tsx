@@ -15,8 +15,8 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { BackButton } from '../../../atoms/buttons/BackButton'
-import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
+import { BackButton } from '/app/atoms/buttons/BackButton'
+import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 import { InstrumentInfo } from '/app/organisms/InstrumentInfo'
 import { handleInstrumentDetailOverflowMenu } from './InstrumentDetailOverflowMenu'
 import {

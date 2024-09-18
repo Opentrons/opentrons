@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 import { MiniCard } from './'
-import { Slideout } from '../../atoms/Slideout'
+import { Slideout } from '/app/atoms/Slideout'
 
 import type { Story, Meta } from '@storybook/react'
 

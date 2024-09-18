@@ -18,7 +18,7 @@ import {
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
-import { ProgressBar } from '../../../../atoms/ProgressBar'
+import { ProgressBar } from '/app/atoms/ProgressBar'
 import { FOOTER_BUTTON_STYLE } from './UpdateRobotModal'
 import {
   startRobotUpdate,

@@ -9,7 +9,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { OddModal } from '/app/molecules/OddModal'
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { NameQuickTransfer } from './NameQuickTransfer'
 
 interface SaveOrRunModalProps {

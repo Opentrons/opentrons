@@ -22,7 +22,7 @@ import {
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { SmallButton } from '../../../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 import { LocationConflictModal } from '../../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'

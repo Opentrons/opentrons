@@ -21,7 +21,7 @@ import { useBlowOutLocationOptions } from './BlowOut'
 
 import { ACTIONS } from '../constants'
 import { i18n } from '/app/i18n'
-import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 
 import type {
   PathOption,

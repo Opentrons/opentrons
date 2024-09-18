@@ -15,7 +15,7 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import NiceModal from '@ebay/nice-modal-react'
 
-import { SleepScreen } from '../atoms/SleepScreen'
+import { SleepScreen } from '/app/atoms/SleepScreen'
 import { OnDeviceLocalizationProvider } from '../LocalizationProvider'
 import { ToasterOven } from '/app/organisms/ToasterOven'
 import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'

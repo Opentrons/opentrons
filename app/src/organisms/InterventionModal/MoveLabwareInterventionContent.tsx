@@ -38,7 +38,7 @@ import {
   getLabwareNameFromRunData,
   getModuleModelFromRunData,
 } from './utils'
-import { Divider } from '../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import {
   getLoadedLabware,
   getLoadedModule,

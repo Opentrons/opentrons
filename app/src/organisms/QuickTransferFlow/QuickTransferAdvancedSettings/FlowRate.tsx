@@ -18,7 +18,7 @@ import {
 
 import { getTopPortalEl } from '../../../App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
-import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ACTIONS } from '../constants'
 
 import type { SupportedTip } from '@opentrons/shared-data'

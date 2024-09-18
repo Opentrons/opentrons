@@ -22,7 +22,7 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
-import { Divider } from '../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import { ChooseProtocolSlideout } from '/app/organisms/ChooseProtocolSlideout'
 import { DisconnectModal } from '/app/organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 import { handleUpdateBuildroot } from '/app/organisms/Devices/RobotSettings/UpdateBuildroot'

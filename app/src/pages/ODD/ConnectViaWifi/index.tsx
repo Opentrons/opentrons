@@ -4,7 +4,7 @@ import last from 'lodash/last'
 
 import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 
-import { StepMeter } from '../../../atoms/StepMeter'
+import { StepMeter } from '/app/atoms/StepMeter'
 import { DisplayWifiList } from '/app/organisms/ODD/NetworkSettings'
 import * as Networking from '/app/redux/networking'
 import { getLocalRobot } from '/app/redux/discovery'

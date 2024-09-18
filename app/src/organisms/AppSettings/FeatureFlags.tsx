@@ -10,8 +10,8 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Divider } from '../../atoms/structure'
-import { ToggleButton } from '../../atoms/buttons'
+import { Divider } from '/app/atoms/structure'
+import { ToggleButton } from '/app/atoms/buttons'
 import * as Config from '/app/redux/config'
 
 import type { DevInternalFlag } from '/app/redux/config/types'

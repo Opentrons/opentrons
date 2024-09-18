@@ -17,7 +17,7 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
-import { TertiaryButton } from '../../atoms/buttons'
+import { TertiaryButton } from '/app/atoms/buttons'
 import { AskForCalibrationBlockModal } from '/app/organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import {
   useTrackEvent,

@@ -13,7 +13,7 @@ import {
   getLabwareDefURI,
 } from '@opentrons/shared-data'
 
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { TerseOffsetTable } from './ResultsSummary'
 
 import type { Story, Meta } from '@storybook/react'

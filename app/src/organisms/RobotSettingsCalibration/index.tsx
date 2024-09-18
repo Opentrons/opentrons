@@ -17,7 +17,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '../../App/portal'
-import { Line } from '../../atoms/structure'
+import { Line } from '/app/atoms/structure'
 import { CalibrateDeck } from '/app/organisms/CalibrateDeck'
 import { CalibrationStatusCard } from '/app/organisms/CalibrationStatusCard'
 import { CheckCalibration } from '/app/organisms/CheckCalibration'

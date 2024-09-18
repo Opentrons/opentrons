@@ -31,7 +31,7 @@ import {
 } from '@opentrons/react-api-client'
 import { deleteProtocol } from '@opentrons/api-client'
 
-import { SmallButton } from '../../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { LongPressModal } from './LongPressModal'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'

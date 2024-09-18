@@ -34,8 +34,8 @@ import {
   TC_MODULE_LOCATION_OT3,
 } from '@opentrons/shared-data'
 
-import { TertiaryButton } from '../../../../atoms/buttons'
-import { StatusLabel } from '../../../../atoms/StatusLabel'
+import { TertiaryButton } from '/app/atoms/buttons'
+import { StatusLabel } from '/app/atoms/StatusLabel'
 import { useChainLiveCommands } from '/app/resources/runs'
 import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Flex } from '@opentrons/components'
 import { useUpdatePipetteSettingsMutation } from '@opentrons/react-api-client'
-import { Slideout } from '../../../atoms/Slideout'
+import { Slideout } from '/app/atoms/Slideout'
 import { ConfigFormSubmitButton } from '../../ConfigurePipette/ConfigFormSubmitButton'
 import { ConfigurePipette } from '../../ConfigurePipette'
 

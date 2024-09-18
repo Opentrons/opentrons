@@ -12,7 +12,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ToggleButton } from '../../atoms/buttons'
+import { ToggleButton } from '/app/atoms/buttons'
 import { getDevtoolsEnabled, toggleDevtools } from '/app/redux/config'
 
 import type { Dispatch } from '/app/redux/types'

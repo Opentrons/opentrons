@@ -24,7 +24,7 @@ import {
   useAllTipLengthCalibrationsQuery,
 } from '@opentrons/react-api-client'
 
-import { Divider } from '../../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,

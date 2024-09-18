@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Box, SPACING } from '@opentrons/components'
-import { Divider } from '../../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import {
   ClearUnavailableRobots,
   EnableDevTools,

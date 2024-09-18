@@ -11,7 +11,7 @@ import {
   Modal,
   LegacyStyledText,
 } from '@opentrons/components'
-import { ExternalLink } from '../../atoms/Link/ExternalLink'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { OddModal } from '/app/molecules/OddModal'
 
 import type { ModalProps } from '@opentrons/components'

@@ -18,8 +18,8 @@ import {
   JUSTIFY_FLEX_END,
   WRAP,
 } from '@opentrons/components'
-import { TertiaryButton } from '../../../atoms/buttons'
-import { Banner } from '../../../atoms/Banner'
+import { TertiaryButton } from '/app/atoms/buttons'
+import { Banner } from '/app/atoms/Banner'
 import * as PipetteConstants from '/app/redux/pipettes/constants'
 import { useDeckCalibrationData } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'

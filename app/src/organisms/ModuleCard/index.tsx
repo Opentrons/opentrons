@@ -41,7 +41,7 @@ import {
   dismissRequest,
   SUCCESS,
 } from '/app/redux/robot-api'
-import { Banner } from '../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 import { UpdateBanner } from '/app/molecules/UpdateBanner'
 import { useChainLiveCommands } from '/app/resources/runs'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'

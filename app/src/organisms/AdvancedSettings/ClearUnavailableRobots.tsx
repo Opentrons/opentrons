@@ -23,7 +23,7 @@ import {
   Modal,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '../../atoms/buttons'
+import { TertiaryButton } from '/app/atoms/buttons'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getTopPortalEl } from '../../App/portal'
 import {

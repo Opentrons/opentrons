@@ -33,7 +33,7 @@ import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostR
 import { getModalPortalEl } from '../../App/portal'
 import { useRunControls, useRunStatus } from '../RunTimeControl/hooks'
 import { InterventionModal, useInterventionModal } from '../InterventionModal'
-import { ProgressBar } from '../../atoms/ProgressBar'
+import { ProgressBar } from '/app/atoms/ProgressBar'
 import { useDownloadRunLog, useRobotType } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
 import {

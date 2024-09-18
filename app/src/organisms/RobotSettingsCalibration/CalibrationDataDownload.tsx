@@ -17,7 +17,7 @@ import {
   useInstrumentsQuery,
   useModulesQuery,
 } from '@opentrons/react-api-client'
-import { TertiaryButton } from '../../atoms/buttons'
+import { TertiaryButton } from '/app/atoms/buttons'
 import {
   useDeckCalibrationData,
   useIsFlex,

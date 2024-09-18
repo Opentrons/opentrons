@@ -49,7 +49,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../App/portal'
-import { Divider } from '../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,

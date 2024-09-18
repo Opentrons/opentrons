@@ -18,11 +18,11 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
-import { TertiaryButton } from '../../../../atoms/buttons'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { TertiaryButton } from '/app/atoms/buttons'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
-import { Banner } from '../../../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 
 import type { State } from '/app/redux/types'
 

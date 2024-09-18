@@ -17,14 +17,14 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Banner } from '../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
-import { Skeleton } from '../../atoms/Skeleton'
-import { SmallButton } from '../../atoms/buttons'
+import { Skeleton } from '/app/atoms/Skeleton'
+import { SmallButton } from '/app/atoms/buttons'
 import { BODY_STYLE, SECTIONS } from './constants'
 import { getPipetteAnimations, getPipetteAnimations96 } from './utils'
 import type { PipetteWizardStepProps } from './types'

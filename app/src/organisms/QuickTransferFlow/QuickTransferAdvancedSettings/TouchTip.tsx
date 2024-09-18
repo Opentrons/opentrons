@@ -17,7 +17,7 @@ import { getTopPortalEl } from '../../../App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
 import { ACTIONS } from '../constants'
 import { i18n } from '/app/i18n'
-import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 
 import type {
   QuickTransferSummaryState,

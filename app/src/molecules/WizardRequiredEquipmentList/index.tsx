@@ -19,7 +19,7 @@ import {
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '/app/redux/config'
-import { Divider } from '../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import { labwareImages } from '/app/organisms/CalibrationPanels/labwareImages'
 import { equipmentImages } from './equipmentImages'
 

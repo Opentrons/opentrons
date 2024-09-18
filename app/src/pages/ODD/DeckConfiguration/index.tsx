@@ -20,7 +20,7 @@ import {
   useNotifyDeckConfigurationQuery,
 } from '/app/resources/deck_configuration'
 
-import type { SmallButton } from '../../../atoms/buttons'
+import type { SmallButton } from '/app/atoms/buttons'
 
 export function DeckConfigurationEditor(): JSX.Element {
   const { t, i18n } = useTranslation([

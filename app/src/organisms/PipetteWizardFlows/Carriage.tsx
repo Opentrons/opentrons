@@ -7,7 +7,7 @@ import {
   SPACING,
   LegacyStyledText,
 } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { getPipetteAnimations96 } from './utils'

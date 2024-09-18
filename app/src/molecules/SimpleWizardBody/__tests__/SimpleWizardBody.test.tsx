@@ -3,11 +3,11 @@ import { screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { COLORS } from '@opentrons/components'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { Skeleton } from '../../../atoms/Skeleton'
+import { Skeleton } from '/app/atoms/Skeleton'
 import { getIsOnDevice } from '/app/redux/config'
 import { SimpleWizardBody } from '..'
 
-vi.mock('../../../atoms/Skeleton')
+vi.mock('/app/atoms/Skeleton')
 vi.mock('/app/redux/config')
 
 const render = (props: React.ComponentProps<typeof SimpleWizardBody>) => {

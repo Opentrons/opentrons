@@ -22,7 +22,7 @@ import {
   RECTANGULAR_WELL_96_PLATE_DEFINITION_URI,
 } from './SelectSourceWells'
 
-import type { SmallButton } from '../../atoms/buttons'
+import type { SmallButton } from '/app/atoms/buttons'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type {
   QuickTransferWizardState,

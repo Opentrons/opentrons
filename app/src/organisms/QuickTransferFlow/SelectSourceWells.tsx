@@ -12,7 +12,7 @@ import { getAllDefinitions } from '@opentrons/shared-data'
 import { ChildNavigation } from '/app/organisms/ChildNavigation'
 import { WellSelection } from '/app/organisms/WellSelection'
 
-import type { SmallButton } from '../../atoms/buttons'
+import type { SmallButton } from '/app/atoms/buttons'
 import type {
   QuickTransferWizardState,
   QuickTransferWizardAction,

@@ -12,7 +12,7 @@ import {
 
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
-import { Skeleton } from '../../../atoms/Skeleton'
+import { Skeleton } from '/app/atoms/Skeleton'
 
 import type { ScreenOption } from '/app/pages/ODD/RunningProtocol'
 

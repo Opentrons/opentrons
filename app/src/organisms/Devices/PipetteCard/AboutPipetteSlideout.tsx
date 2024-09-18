@@ -9,7 +9,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Slideout } from '../../../atoms/Slideout'
+import { Slideout } from '/app/atoms/Slideout'
 
 import type { AttachedPipette } from '/app/redux/pipettes/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'

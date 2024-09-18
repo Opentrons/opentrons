@@ -10,7 +10,7 @@ import { i18n } from '/app/i18n'
 import { mockAttachedPipette } from '/app/redux/pipettes/__fixtures__'
 import { mockDeckCalTipRack } from '/app/redux/sessions/__fixtures__'
 import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
-import { Select } from '../../../atoms/SelectField/Select'
+import { Select } from '/app/atoms/SelectField/Select'
 import {
   getCalibrationForPipette,
   getTipLengthForPipetteAndTiprack,
@@ -25,7 +25,7 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/pipettes/selectors')
 vi.mock('/app/redux/calibration')
 vi.mock('/app/redux/custom-labware/selectors')
-vi.mock('../../../atoms/SelectField/Select')
+vi.mock('/app/atoms/SelectField/Select')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,

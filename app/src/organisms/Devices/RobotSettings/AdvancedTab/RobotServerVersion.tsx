@@ -13,7 +13,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { TertiaryButton } from '../../../../atoms/buttons'
+import { TertiaryButton } from '/app/atoms/buttons'
 import { getRobotApiVersion } from '/app/redux/discovery'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'

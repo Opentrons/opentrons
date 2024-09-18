@@ -16,7 +16,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
-import { Banner } from '../../../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 import multipleModuleHelp from '/app/assets/images/Moam_modal_image.png'
 
 const HOW_TO_MULTIPLE_MODULES_HREF =

@@ -17,7 +17,7 @@ import {
   useInterventionModal,
   InterventionModal,
 } from '../../InterventionModal'
-import { ProgressBar } from '../../../atoms/ProgressBar'
+import { ProgressBar } from '/app/atoms/ProgressBar'
 import { useRunControls, useRunStatus } from '../../RunTimeControl/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
@@ -50,7 +50,7 @@ vi.mock('../../RunTimeControl/hooks')
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('/app/resources/runs')
 vi.mock('../../Devices/hooks')
-vi.mock('../../../atoms/ProgressBar')
+vi.mock('/app/atoms/ProgressBar')
 vi.mock('../../InterventionModal')
 vi.mock('../../Devices/hooks/useLastRunCommand')
 vi.mock('/app/resources/protocols/hooks')

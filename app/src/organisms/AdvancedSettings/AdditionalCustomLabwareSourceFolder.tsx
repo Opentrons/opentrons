@@ -16,7 +16,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '../../atoms/buttons'
+import { TertiaryButton } from '/app/atoms/buttons'
 import {
   changeCustomLabwareDirectory,
   getCustomLabwareDirectory,

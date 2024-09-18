@@ -36,7 +36,7 @@ import {
 import { i18n } from '/app/i18n'
 import { getIsOnDevice } from '/app/redux/config'
 import { getTopPortalEl } from '../../App/portal'
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { WizardHeader } from '/app/molecules/WizardHeader'
 import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
 import singleChannelAndEightChannel from '/app/assets/images/change-pip/1_and_8_channel.png'

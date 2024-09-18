@@ -26,7 +26,7 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 
-import { StepMeter } from '../../../atoms/StepMeter'
+import { StepMeter } from '/app/atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useNotifyRunQuery } from '/app/resources/runs'
 import {

@@ -24,7 +24,7 @@ import {
   useInterval,
 } from '@opentrons/components'
 
-import { QuaternaryButton } from '../../atoms/buttons'
+import { QuaternaryButton } from '/app/atoms/buttons'
 import { useIsFlex } from '/app/organisms/Devices/hooks'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
 import {

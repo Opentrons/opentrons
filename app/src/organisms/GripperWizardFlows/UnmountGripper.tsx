@@ -17,7 +17,7 @@ import {
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
 import { getIsOnDevice } from '/app/redux/config'
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,

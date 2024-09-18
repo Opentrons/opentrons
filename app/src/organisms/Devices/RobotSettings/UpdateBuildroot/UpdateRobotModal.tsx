@@ -27,10 +27,10 @@ import {
   DOWNGRADE,
   getRobotUpdateVersion,
 } from '/app/redux/robot-update'
-import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { ReleaseNotes } from '/app/molecules/ReleaseNotes'
 import { useIsRobotBusy } from '../../hooks'
-import { Banner } from '../../../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 
 import type { State, Dispatch } from '/app/redux/types'

@@ -14,7 +14,7 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { TertiaryButton } from '../../../atoms/buttons'
+import { TertiaryButton } from '/app/atoms/buttons'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useStoredProtocolAnalysis } from '../hooks'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'

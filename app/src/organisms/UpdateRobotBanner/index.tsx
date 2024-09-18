@@ -9,7 +9,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Banner } from '../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { handleUpdateBuildroot } from '../Devices/RobotSettings/UpdateBuildroot'
 

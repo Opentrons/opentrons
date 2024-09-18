@@ -14,7 +14,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { MediumButton } from '../../../atoms/buttons'
+import { MediumButton } from '/app/atoms/buttons'
 
 import type { RequestState } from '/app/redux/robot-api/types'
 

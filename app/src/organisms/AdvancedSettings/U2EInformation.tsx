@@ -15,7 +15,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Banner } from '../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 import {
   getU2EAdapterDevice,
   getU2EWindowsDriverStatus,

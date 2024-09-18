@@ -25,7 +25,7 @@ import {
 } from '@opentrons/components'
 import { useDeleteRunMutation } from '@opentrons/react-api-client'
 
-import { Divider } from '../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import {
   useTrackEvent,

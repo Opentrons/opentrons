@@ -13,7 +13,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { Divider } from '../../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteSettingsFieldsMap } from '@opentrons/api-client'

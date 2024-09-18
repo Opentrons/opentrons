@@ -14,7 +14,7 @@ import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import {
   SUCCESSFULLY_ATTACHED,
   SUCCESSFULLY_ATTACHED_AND_CALIBRATED,

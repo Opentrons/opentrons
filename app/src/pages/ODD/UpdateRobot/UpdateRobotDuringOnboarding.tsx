@@ -17,7 +17,7 @@ import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
 } from '/app/redux/config'
-import { MediumButton } from '../../../atoms/buttons'
+import { MediumButton } from '/app/atoms/buttons'
 import {
   UpdateRobotSoftware,
   CheckUpdates,

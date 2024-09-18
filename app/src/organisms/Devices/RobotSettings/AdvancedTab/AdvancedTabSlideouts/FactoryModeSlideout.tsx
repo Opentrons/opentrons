@@ -22,8 +22,8 @@ import {
   useUpdateRobotSettingMutation,
 } from '@opentrons/react-api-client'
 
-import { ToggleButton } from '../../../../../atoms/buttons'
-import { MultiSlideout } from '../../../../../atoms/Slideout/MultiSlideout'
+import { ToggleButton } from '/app/atoms/buttons'
+import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
 import { FileUpload } from '/app/molecules/FileUpload'
 import { UploadInput } from '/app/molecules/UploadInput'
 import { restartRobot } from '/app/redux/robot-admin'

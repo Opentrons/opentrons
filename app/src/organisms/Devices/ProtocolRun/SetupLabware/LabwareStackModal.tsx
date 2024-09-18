@@ -20,7 +20,7 @@ import { OddModal } from '/app/molecules/OddModal'
 import { getIsOnDevice } from '/app/redux/config'
 import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
-import { Divider } from '../../../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import { getModuleImage } from '../SetupModuleAndDeck/utils'
 import {
   FLEX_ROBOT_TYPE,

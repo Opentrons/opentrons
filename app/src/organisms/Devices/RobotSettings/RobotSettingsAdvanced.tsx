@@ -12,8 +12,8 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import { Divider } from '../../../atoms/structure'
-import { ToggleButton } from '../../../atoms/buttons'
+import { Divider } from '/app/atoms/structure'
+import { ToggleButton } from '/app/atoms/buttons'
 import { useIsFlex, useIsRobotBusy, useRobot } from '../hooks'
 import {
   DeviceReset,

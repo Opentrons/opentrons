@@ -7,10 +7,10 @@ import { mockRecoveryContentProps } from '../../__fixtures__'
 import { i18n } from '/app/i18n'
 import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
 import { InterventionInfo } from '/app/molecules/InterventionModal/InterventionContent/InterventionInfo'
-import { InlineNotification } from '../../../../atoms/InlineNotification'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 
 vi.mock('/app/molecules/InterventionModal/InterventionContent/InterventionInfo')
-vi.mock('../../../../atoms/InlineNotification')
+vi.mock('/app/atoms/InlineNotification')
 
 const render = (props: React.ComponentProps<typeof LeftColumnLabwareInfo>) => {
   return renderWithProviders(<LeftColumnLabwareInfo {...props} />, {

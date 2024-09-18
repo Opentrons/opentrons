@@ -14,7 +14,7 @@ import {
   addCustomLabwareFile,
   addCustomLabware,
 } from '/app/redux/custom-labware'
-import { Slideout } from '../../atoms/Slideout'
+import { Slideout } from '/app/atoms/Slideout'
 import {
   useTrackEvent,
   ANALYTICS_ADD_CUSTOM_LABWARE,

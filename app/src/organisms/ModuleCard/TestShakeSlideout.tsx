@@ -33,9 +33,9 @@ import {
 
 import { getIsHeaterShakerAttached } from '/app/redux/config'
 import { getTopPortalEl } from '../../App/portal'
-import { Slideout } from '../../atoms/Slideout'
-import { TertiaryButton } from '../../atoms/buttons'
-import { Divider } from '../../atoms/structure'
+import { Slideout } from '/app/atoms/Slideout'
+import { TertiaryButton } from '/app/atoms/buttons'
+import { Divider } from '/app/atoms/structure'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 import { useLatchControls } from './hooks'
 import { ModuleSetupModal } from './ModuleSetupModal'

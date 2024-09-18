@@ -15,7 +15,7 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 
-import { MediumButton, SmallButton } from '../../../atoms/buttons'
+import { MediumButton, SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { ChildNavigation } from '/app/organisms/ChildNavigation'
 import {

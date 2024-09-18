@@ -25,7 +25,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { SmallButton } from '../../../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { getModulePrepCommands } from '../../../Devices/getModulePrepCommands'
 import { getModuleTooHot } from '../../../Devices/getModuleTooHot'
 import { useRunCalibrationStatus } from '../../../Devices/hooks'

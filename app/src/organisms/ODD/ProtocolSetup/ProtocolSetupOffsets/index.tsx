@@ -14,7 +14,7 @@ import {
 import type { LabwareOffset } from '@opentrons/api-client'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
-import { FloatingActionButton, SmallButton } from '../../../../atoms/buttons'
+import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
 import type { SetupScreens } from '../types'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { TerseOffsetTable } from '/app/organisms/LabwarePositionCheck/ResultsSummary'

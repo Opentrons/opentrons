@@ -17,7 +17,7 @@ import { NeedHelpLink } from '../CalibrationPanels'
 import { useSelector } from 'react-redux'
 import { getIsOnDevice } from '/app/redux/config'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { i18n } from '/app/i18n'
 
 const LPC_HELP_LINK_URL =

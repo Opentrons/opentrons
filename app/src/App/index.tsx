@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 
 import { Flex, POSITION_FIXED, DIRECTION_ROW } from '@opentrons/components'
 
-import { GlobalStyle } from '../atoms/GlobalStyle'
+import { GlobalStyle } from '/app/atoms/GlobalStyle'
 import { getConfig, getIsOnDevice } from '/app/redux/config'
 import { DesktopApp } from './DesktopApp'
 import { OnDeviceDisplayApp } from './OnDeviceDisplayApp'

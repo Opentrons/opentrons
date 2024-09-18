@@ -32,9 +32,9 @@ import {
   getLocalRobot,
 } from '/app/redux/discovery'
 import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '/app/redux/analytics'
-import { AlphanumericKeyboard } from '../../../atoms/SoftwareKeyboard'
-import { SmallButton } from '../../../atoms/buttons'
-import { StepMeter } from '../../../atoms/StepMeter'
+import { AlphanumericKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { SmallButton } from '/app/atoms/buttons'
+import { StepMeter } from '/app/atoms/StepMeter'
 import { useIsUnboxingFlowOngoing } from '/app/organisms/ODD/hooks'
 import { ConfirmRobotName } from '/app/organisms/ODD/NameRobot/ConfirmRobotName'
 

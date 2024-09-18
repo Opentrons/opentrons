@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   Box,
 } from '@opentrons/components'
-import { InlineNotification } from '../../atoms/InlineNotification'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 
 import { TwoColumn as TwoColumnComponent } from './'
 import { StandInContent } from './story-utils/StandIn'

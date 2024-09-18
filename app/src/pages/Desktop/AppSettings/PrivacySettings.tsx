@@ -16,7 +16,7 @@ import {
   toggleAnalyticsOptedIn,
   getAnalyticsOptedIn,
 } from '/app/redux/analytics'
-import { ToggleButton } from '../../../atoms/buttons'
+import { ToggleButton } from '/app/atoms/buttons'
 
 import type { Dispatch, State } from '/app/redux/types'
 

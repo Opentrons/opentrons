@@ -17,7 +17,7 @@ import { css } from 'styled-components'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getIsOnDevice } from '/app/redux/config'
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,

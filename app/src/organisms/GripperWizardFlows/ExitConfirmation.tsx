@@ -14,7 +14,7 @@ import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { GRIPPER_FLOW_TYPES } from './constants'
 import type { GripperWizardFlowType } from './types'
 

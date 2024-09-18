@@ -19,7 +19,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
-import { Divider } from '../../../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import {
   useTrackEvent,
   ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,

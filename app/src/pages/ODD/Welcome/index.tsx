@@ -10,7 +10,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { MediumButton } from '../../../atoms/buttons'
+import { MediumButton } from '/app/atoms/buttons'
 
 import screenImage from '/app/assets/images/on-device-display/welcome_background.png'
 

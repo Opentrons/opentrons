@@ -36,8 +36,8 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
-import { ToggleButton } from '../../../../atoms/buttons'
-import { Divider } from '../../../../atoms/structure'
+import { ToggleButton } from '/app/atoms/buttons'
+import { Divider } from '/app/atoms/structure'
 import { SecureLabwareModal } from './SecureLabwareModal'
 
 import type {

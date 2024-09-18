@@ -32,7 +32,7 @@ import {
   toggleDevtools,
   toggleHistoricOffsets,
 } from '/app/redux/config'
-import { InlineNotification } from '../../../atoms/InlineNotification'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 import { getRobotSettings, updateSetting } from '/app/redux/robot-settings'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
 import { Navigation } from '/app/organisms/Navigation'

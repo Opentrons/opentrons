@@ -17,7 +17,7 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
+import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 import { RobotSetupHeader } from '/app/organisms/RobotSetupHeader'
 import { DisplaySearchNetwork } from './DisplaySearchNetwork'
 

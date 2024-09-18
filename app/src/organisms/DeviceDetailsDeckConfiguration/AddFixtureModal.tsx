@@ -49,8 +49,8 @@ import {
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
-import { TertiaryButton } from '../../atoms/buttons'
+import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
+import { TertiaryButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
 

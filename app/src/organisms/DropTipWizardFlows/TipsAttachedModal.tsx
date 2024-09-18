@@ -12,7 +12,7 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { DropTipWizardFlows, useDropTipWizardFlows } from '.'
 import { useHomePipettes } from './hooks'

@@ -21,7 +21,7 @@ import {
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 
-import { SmallButton, FloatingActionButton } from '../../../atoms/buttons'
+import { SmallButton, FloatingActionButton } from '/app/atoms/buttons'
 import { Navigation } from '/app/organisms/Navigation'
 import {
   getPinnedQuickTransferIds,

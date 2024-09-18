@@ -13,7 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '../../../../atoms/buttons'
+import { TertiaryButton } from '/app/atoms/buttons'
 interface DisplayRobotNameProps {
   robotName: string
   updateIsExpanded: (

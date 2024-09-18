@@ -20,7 +20,7 @@ import {
 } from '@opentrons/components'
 import { useSelector } from 'react-redux'
 import { getIsOnDevice } from '/app/redux/config'
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 
 interface ExitConfirmationProps {
   onGoBack: () => void

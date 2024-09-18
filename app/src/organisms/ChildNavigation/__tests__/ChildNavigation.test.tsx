@@ -4,7 +4,7 @@ import { vi, it, describe, expect, beforeEach } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { ChildNavigation } from '..'
-import type { SmallButton } from '../../../atoms/buttons'
+import type { SmallButton } from '/app/atoms/buttons'
 
 const render = (props: React.ComponentProps<typeof ChildNavigation>) =>
   renderWithProviders(<ChildNavigation {...props} />)

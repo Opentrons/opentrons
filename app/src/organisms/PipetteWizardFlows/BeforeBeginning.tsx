@@ -14,7 +14,7 @@ import {
   WEIGHT_OF_96_CHANNEL,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { Banner } from '../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,

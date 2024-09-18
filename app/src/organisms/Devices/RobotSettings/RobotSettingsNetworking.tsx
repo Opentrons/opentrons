@@ -19,8 +19,8 @@ import {
 } from '@opentrons/components'
 
 import { useCanDisconnect, useWifiList } from '/app/resources/networking/hooks'
-import { ExternalLink } from '../../../atoms/Link/ExternalLink'
-import { Divider } from '../../../atoms/structure'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { Divider } from '/app/atoms/structure'
 
 import {
   getRobotAddressesByName,

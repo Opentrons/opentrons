@@ -17,7 +17,7 @@ import {
   Modal,
 } from '@opentrons/components'
 
-import { StatusLabel } from '../../atoms/StatusLabel'
+import { StatusLabel } from '/app/atoms/StatusLabel'
 import { TaskList } from '../TaskList'
 
 import {

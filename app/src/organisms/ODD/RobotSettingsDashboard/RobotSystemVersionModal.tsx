@@ -10,8 +10,8 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../../atoms/buttons'
-import { InlineNotification } from '../../../atoms/InlineNotification'
+import { SmallButton } from '/app/atoms/buttons'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 import { ReleaseNotes } from '/app/molecules/ReleaseNotes'
 import { OddModal } from '/app/molecules/OddModal'
 

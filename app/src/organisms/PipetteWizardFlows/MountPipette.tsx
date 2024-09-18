@@ -11,9 +11,9 @@ import {
   SPACING,
   LegacyStyledText,
 } from '@opentrons/components'
-import { Banner } from '../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import { Skeleton } from '../../atoms/Skeleton'
+import { Skeleton } from '/app/atoms/Skeleton'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { BODY_STYLE, SECTIONS } from './constants'
 import { getPipetteAnimations, getPipetteAnimations96 } from './utils'

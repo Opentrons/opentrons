@@ -24,7 +24,7 @@ import {
 
 import { getIsOnDevice } from '/app/redux/config'
 import { NeedHelpLink } from '/app/organisms/CalibrationPanels'
-import { SmallButton, TextOnlyButton } from '../../atoms/buttons'
+import { SmallButton, TextOnlyButton } from '/app/atoms/buttons'
 
 const ALIGN_BUTTONS = css`
   align-items: ${ALIGN_FLEX_END};

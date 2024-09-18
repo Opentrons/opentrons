@@ -19,7 +19,7 @@ import {
   useMenuHandleClickOutside,
 } from '@opentrons/components'
 import { getLabwareDefURI } from '@opentrons/shared-data'
-import { Divider } from '../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import { getTopPortalEl } from '../../App/portal'
 import { LabwareDetails } from '../LabwareDetails'
 

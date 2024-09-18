@@ -11,7 +11,7 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'

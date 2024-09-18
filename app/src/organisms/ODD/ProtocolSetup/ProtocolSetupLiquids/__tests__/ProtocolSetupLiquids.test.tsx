@@ -23,7 +23,7 @@ import { ProtocolSetupLiquids } from '..'
 import type * as SharedData from '@opentrons/shared-data'
 
 vi.mock('../../../../Devices/ProtocolRun/SetupLiquids/utils')
-vi.mock('../../../../../atoms/buttons')
+vi.mock('/app/atoms/buttons')
 vi.mock('../LiquidDetails')
 vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('@opentrons/shared-data', async importOriginal => {

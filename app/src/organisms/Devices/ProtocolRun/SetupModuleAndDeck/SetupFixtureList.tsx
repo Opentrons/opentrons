@@ -24,8 +24,8 @@ import {
   getDeckDefFromRobotType,
   getFixtureDisplayName,
 } from '@opentrons/shared-data'
-import { StatusLabel } from '../../../../atoms/StatusLabel'
-import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
+import { StatusLabel } from '/app/atoms/StatusLabel'
+import { TertiaryButton } from '/app/atoms/buttons/TertiaryButton'
 import { LocationConflictModal } from './LocationConflictModal'
 import { NotConfiguredModal } from './NotConfiguredModal'
 import { getFixtureImage } from './utils'

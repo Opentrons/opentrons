@@ -32,7 +32,7 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
-import { MediumButton, SmallButton } from '../../../atoms/buttons'
+import { MediumButton, SmallButton } from '/app/atoms/buttons'
 import {
   ProtocolDetailsHeaderChipSkeleton,
   ProcotolDetailsHeaderTitleSkeleton,

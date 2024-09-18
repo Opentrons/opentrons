@@ -27,7 +27,7 @@ import { SaveOrRunModal } from './SaveOrRunModal'
 import { getInitialSummaryState, createQuickTransferFile } from './utils'
 import { quickTransferSummaryReducer } from './reducers'
 
-import type { SmallButton } from '../../atoms/buttons'
+import type { SmallButton } from '/app/atoms/buttons'
 import type { QuickTransferWizardState } from './types'
 
 interface SummaryAndSettingsProps {

@@ -4,11 +4,11 @@ import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '/app/i18n'
 import { getIsOnDevice } from '/app/redux/config'
-import { StepMeter } from '../../../atoms/StepMeter'
+import { StepMeter } from '/app/atoms/StepMeter'
 import { WizardHeader } from '..'
 import { renderWithProviders } from '/app/__testing-utils__'
 
-vi.mock('../../../atoms/StepMeter')
+vi.mock('/app/atoms/StepMeter')
 vi.mock('/app/redux/config')
 
 const render = (props: React.ComponentProps<typeof WizardHeader>) => {
