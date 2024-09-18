@@ -56,7 +56,7 @@ interface StepFormToolboxProps {
   handleSave: () => void
 }
 
-export const StepFormToolbox = (props: StepFormToolboxProps): JSX.Element => {
+export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   const {
     formData,
     focusHandlers,
@@ -65,7 +65,7 @@ export const StepFormToolbox = (props: StepFormToolboxProps): JSX.Element => {
     handleSave,
     propsForFields,
   } = props
-  const { t, i18n } = useTranslation(['shared', 'application'])
+  const { t, i18n } = useTranslation(['application', 'shared'])
   const icon = stepIconsByType[formData.stepType]
 
   const Tools: typeof STEP_FORM_MAP[keyof typeof STEP_FORM_MAP] = get(
@@ -74,7 +74,8 @@ export const StepFormToolbox = (props: StepFormToolboxProps): JSX.Element => {
   )
 
   if (!Tools) {
-    // early-exit if step form doesn't exist
+    // early-exit if step form doesn't exist, this is a good check for when new steps
+    // are added
     return (
       <div>
         <div>Todo: support {formData && formData.stepType} step</div>
@@ -93,10 +94,10 @@ export const StepFormToolbox = (props: StepFormToolboxProps): JSX.Element => {
 
       <Toolbox
         onCloseClick={handleClose}
-        closeButtonText={t('cancel')}
+        closeButtonText={t('shared:cancel')}
         confirmButton={
           <PrimaryButton onClick={handleSave} disabled={!canSave} width="100%">
-            {t('save')}
+            {t('shared:save')}
           </PrimaryButton>
         }
         height="calc(100vh - 64px)"
@@ -104,10 +105,7 @@ export const StepFormToolbox = (props: StepFormToolboxProps): JSX.Element => {
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
             <Icon size="1rem" name={icon} />
             <StyledText desktopStyle="bodyLargeSemiBold">
-              {i18n.format(
-                t(`application:stepType.${formData.stepType}`),
-                'capitalize'
-              )}
+              {i18n.format(t(`stepType.${formData.stepType}`), 'capitalize')}
             </StyledText>
           </Flex>
         }

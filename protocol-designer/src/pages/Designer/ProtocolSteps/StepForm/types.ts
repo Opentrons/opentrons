@@ -2,19 +2,19 @@ import type { FormData, StepFieldName } from '../../../../form-types'
 export interface FocusHandlers {
   focusedField: StepFieldName | null
   dirtyFields: StepFieldName[]
-  focus: (arg0: StepFieldName) => void
-  blur: (arg0: StepFieldName) => void
+  focus: (arg: StepFieldName) => void
+  blur: (arg: StepFieldName) => void
 }
 export interface FieldProps {
   disabled: boolean
-  errorToShow?: string | null
-  isIndeterminate?: boolean
   name: string
   onFieldBlur: () => void
   onFieldFocus: () => void
-  tooltipContent?: string | null
-  updateValue: (arg0: unknown) => void
+  updateValue: (arg: unknown) => void
   value: unknown
+  errorToShow?: string | null
+  isIndeterminate?: boolean
+  tooltipContent?: string | null
 }
 export type FieldPropsByName = Record<StepFieldName, FieldProps>
 

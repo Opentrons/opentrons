@@ -31,12 +31,12 @@ import type {
 
 interface StateProps {
   canSave: boolean
-  formData?: FormData | null
   formHasChanges: boolean
   isNewStep: boolean
   isPristineSetTempForm: boolean
   isPristineSetHeaterShakerTempForm: boolean
   invariantContext: InvariantContext
+  formData?: FormData | null
 }
 interface DispatchProps {
   deleteStep: (stepId: string) => void
@@ -48,9 +48,7 @@ interface DispatchProps {
 }
 type StepEditFormManagerProps = StateProps & DispatchProps
 
-const StepFormManager = (
-  props: StepEditFormManagerProps
-): JSX.Element | null => {
+function StepFormManager(props: StepEditFormManagerProps): JSX.Element | null {
   const {
     canSave,
     deleteStep,
@@ -71,8 +69,7 @@ const StepFormManager = (
   const [dirtyFields, setDirtyFields] = React.useState<StepFieldName[]>(
     getDirtyFields(isNewStep, formData)
   )
-  const focus = setFocusedField
-  const blur = (fieldName: StepFieldName): void => {
+  const handleBlur = (fieldName: StepFieldName): void => {
     if (fieldName === focusedField) {
       setFocusedField(null)
     }
@@ -122,8 +119,8 @@ const StepFormManager = (
   const focusHandlers = {
     focusedField,
     dirtyFields,
-    focus,
-    blur,
+    focus: setFocusedField,
+    blur: handleBlur,
   }
   const propsForFields = makeSingleEditFieldProps(
     focusHandlers,

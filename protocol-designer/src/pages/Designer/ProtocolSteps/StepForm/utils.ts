@@ -257,7 +257,7 @@ export const makeSingleEditFieldProps = (
     })
     const errors = getFieldErrors(name, value)
     const errorToShow =
-      showErrors && errors.length > 0 ? errors.join(', ') : null
+      showErrors != null && errors.length > 0 ? errors.join(', ') : null
 
     const updateValue = (value: unknown): void => {
       handleChangeFormInput(name, value)
