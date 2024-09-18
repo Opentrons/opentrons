@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
+import { createPortal } from 'react-dom'
 
 import {
   ALIGN_CENTER,
@@ -11,13 +12,17 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InfoScreen,
+  JUSTIFY_END,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   LargeButton,
   LiquidIcon,
   ListItem,
   ListItemDescriptor,
+  Modal,
+  PrimaryButton,
   SPACING,
+  SecondaryButton,
   StyledText,
   TYPOGRAPHY,
   ToggleGroup,
@@ -40,11 +45,9 @@ import {
   getUnusedStagingAreas,
   getUnusedTrash,
 } from '../../components/FileSidebar/utils'
-import { resetScrollElements } from '../../ui/steps/utils'
-import { useBlockingHint } from '../../components/Hints/useBlockingHint'
-import { v8WarningContent } from '../../components/FileSidebar/FileSidebar'
 import { MaterialsListModal } from '../../organisms/MaterialsListModal'
 import { BUTTON_LINK_STYLE } from '../../atoms'
+import { getMainPagePortalEl } from '../../components/portals/MainPageModalPortal'
 import {
   EditProtocolMetadataModal,
   EditInstrumentsModal,
@@ -52,11 +55,11 @@ import {
 } from '../../organisms'
 import { DeckThumbnail } from './DeckThumbnail'
 import { OffDeckThumbnail } from './OffdeckThumbnail'
+import { getWarningContent } from './UnusedModalContent'
 
 import type { CreateCommand, PipetteName } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../types'
-import type { HintKey } from '../../tutorial'
 
 const REQUIRED_APP_VERSION = '8.0.0'
 const DATE_ONLY_FORMAT = 'MMMM dd, yyyy'
@@ -69,7 +72,7 @@ const LOAD_COMMANDS: Array<CreateCommand['commandType']> = [
   'loadLiquid',
 ]
 
-interface Fixture {
+export interface Fixture {
   trashBin: boolean
   wasteChute: boolean
   stagingAreaSlots: string[]
@@ -91,6 +94,10 @@ export function ProtocolOverview(): JSX.Element {
     showEditMetadataModal,
     setShowEditMetadataModal,
   ] = React.useState<boolean>(false)
+  const [
+    showExportWarningModal,
+    setShowExportWarningModal,
+  ] = React.useState<boolean>(false)
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
   const initialDeckSetup = useSelector(getInitialDeckSetup)
@@ -99,7 +106,6 @@ export function ProtocolOverview(): JSX.Element {
   )
   const dispatch: ThunkDispatch<any> = useDispatch()
   const [hover, setHover] = React.useState<DeckSlot | string | null>(null)
-  const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
   const [
     showMaterialsListModal,
     setShowMaterialsListModal,
@@ -116,6 +122,15 @@ export function ProtocolOverview(): JSX.Element {
   const [deckView, setDeckView] = React.useState<
     typeof leftString | typeof rightString
   >(leftString)
+
+  React.useEffect(() => {
+    if (formValues?.created == null) {
+      console.warn(
+        'formValues was refreshed while on the overview page, redirecting to landing page'
+      )
+      navigate('/')
+    }
+  }, [formValues])
 
   const {
     modules: modulesOnDeck,
@@ -195,31 +210,20 @@ export function ProtocolOverview(): JSX.Element {
     fixtureWithoutStep.wasteChute ||
     fixtureWithoutStep.stagingAreaSlots.length > 0
 
-  const getExportHintContent = (): {
-    hintKey: HintKey
-    content: React.ReactNode
-  } => {
-    return {
-      hintKey: t('alert:export_v8_1_protocol_7_3'),
-      content: v8WarningContent(t),
-    }
+  const warning =
+    hasWarning &&
+    getWarningContent({
+      noCommands,
+      pipettesWithoutStep,
+      modulesWithoutStep,
+      gripperWithoutStep,
+      fixtureWithoutStep,
+      t,
+    })
+
+  const cancelModal = (): void => {
+    setShowExportWarningModal(false)
   }
-
-  const { hintKey, content } = getExportHintContent()
-
-  const blockingExportHint = useBlockingHint({
-    enabled: showBlockingHint,
-    hintKey,
-    content,
-    handleCancel: () => {
-      setShowBlockingHint(false)
-    },
-    handleContinue: () => {
-      setShowBlockingHint(false)
-      dispatch(loadFileActions.saveProtocolFile())
-    },
-  })
-
   return (
     <>
       {showEditMetadataModal ? (
@@ -236,7 +240,35 @@ export function ProtocolOverview(): JSX.Element {
           }}
         />
       ) : null}
-      {blockingExportHint}
+      {showExportWarningModal &&
+        createPortal(
+          <Modal
+            title={warning && warning.heading}
+            onClose={cancelModal}
+            footer={
+              <Flex
+                justifyContent={JUSTIFY_END}
+                gridGap={SPACING.spacing8}
+                padding={SPACING.spacing12}
+              >
+                <SecondaryButton onClick={cancelModal}>
+                  {t('shared:cancel')}
+                </SecondaryButton>
+                <PrimaryButton
+                  onClick={() => {
+                    setShowExportWarningModal(false)
+                    dispatch(loadFileActions.saveProtocolFile())
+                  }}
+                >
+                  {t('alert:continue_with_export')}
+                </PrimaryButton>
+              </Flex>
+            }
+          >
+            {warning && warning.content}
+          </Modal>,
+          getMainPagePortalEl()
+        )}
       {showMaterialsListModal ? (
         <MaterialsListModal
           hardware={Object.values(modulesOnDeck)}
@@ -290,13 +322,10 @@ export function ProtocolOverview(): JSX.Element {
             <LargeButton
               buttonText={t('export_protocol')}
               onClick={() => {
-                //  ToDo (kk:08/26/2024) should use hasWarning later
-                if (!hasWarning) {
-                  resetScrollElements()
-                  // ToDo (kk:08/26/2024) create warning modal
+                if (hasWarning) {
+                  setShowExportWarningModal(true)
                 } else {
-                  resetScrollElements()
-                  setShowBlockingHint(true)
+                  dispatch(loadFileActions.saveProtocolFile())
                 }
               }}
               iconName="arrow-right"

@@ -43,7 +43,8 @@ export function Liquids(): JSX.Element {
 
   React.useEffect(() => {
     if (selectedLabware == null) {
-      navigate('/overview')
+      console.warn('selectedLabware was lost, navigate to deisgner page')
+      navigate('/designer')
     }
   })
 

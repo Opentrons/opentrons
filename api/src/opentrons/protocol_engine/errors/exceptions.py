@@ -1015,6 +1015,19 @@ class InvalidLiquidHeightFound(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class LiquidHeightUnknownError(ProtocolEngineError):
+    """Raised when attempting to specify WellOrigin.MENISCUS before liquid probing has been done."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LiquidHeightUnknownError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class EStopActivatedError(ProtocolEngineError):
     """Represents an E-stop event."""
 

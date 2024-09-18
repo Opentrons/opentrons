@@ -1,5 +1,4 @@
 """Common pipetting command base models."""
-from dataclasses import dataclass
 from opentrons_shared_data.errors import ErrorCodes
 from pydantic import BaseModel, Field
 from typing import Literal, Optional, Tuple, TypedDict
@@ -169,11 +168,3 @@ class LiquidNotFoundError(ErrorOccurrence):
 
     errorCode: str = ErrorCodes.PIPETTE_LIQUID_NOT_FOUND.value.code
     detail: str = ErrorCodes.PIPETTE_LIQUID_NOT_FOUND.value.detail
-
-
-@dataclass(frozen=True)
-class LiquidNotFoundErrorInternalData:
-    """Internal-to-ProtocolEngine data about a LiquidNotFoundError."""
-
-    position: DeckPoint
-    """Same meaning as DestinationPositionResult.position."""

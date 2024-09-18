@@ -16,16 +16,15 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
-import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 
 import type {
   CoordinateTuple,
   DeckSlotId,
   Dimensions,
 } from '@opentrons/shared-data'
-import type { TerminalItemId } from '../../../steplist'
+import type { DeckSetupTabType } from '../types'
 
-interface DeckItemHoverProps {
+interface DeckItemHoverProps extends DeckSetupTabType {
   hover: string | null
   setHover: React.Dispatch<React.SetStateAction<string | null>>
   slotBoundingBox: Dimensions
@@ -35,13 +34,12 @@ interface DeckItemHoverProps {
   setShowMenuListForId: React.Dispatch<React.SetStateAction<string | null>>
   menuListId: DeckSlotId | null
   isSelected?: boolean
-  selectedTerminalItemId?: TerminalItemId | null
 }
 
 export function DeckItemHover(props: DeckItemHoverProps): JSX.Element | null {
   const {
     hover,
-    selectedTerminalItemId,
+    tab,
     setHover,
     slotBoundingBox,
     itemId,
@@ -55,11 +53,7 @@ export function DeckItemHover(props: DeckItemHoverProps): JSX.Element | null {
   const offDeckLabware = Object.values(deckSetup.labware).find(
     lw => lw.id === itemId
   )
-  if (
-    selectedTerminalItemId !== START_TERMINAL_ITEM_ID ||
-    slotPosition === null ||
-    isSelected
-  )
+  if (tab === 'protocolSteps' || slotPosition === null || isSelected)
     return null
 
   const hoverOpacity =

@@ -4,6 +4,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  DIRECTION_COLUMN,
   DeckFromLayers,
   Flex,
   FlexTrash,
@@ -24,7 +25,6 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { getSelectedTerminalItemId } from '../../../ui/steps'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
 import { getRobotType } from '../../../file-data/selectors'
@@ -32,6 +32,7 @@ import { getHasGen1MultiChannelPipette } from '../../../step-forms'
 import { SlotDetailsContainer } from '../../../organisms'
 import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
+import { Alerts } from '../../../components/alerts/Alerts'
 import { DeckSetupDetails } from './DeckSetupDetails'
 import {
   animateZoom,
@@ -50,6 +51,7 @@ import type {
   AdditionalEquipmentEntity,
   DeckSlot,
 } from '@opentrons/step-generation'
+import type { DeckSetupTabType } from '../types'
 import type { Fixture } from './constants'
 
 const WASTE_CHUTE_SPACE = 30
@@ -65,8 +67,8 @@ const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
 ]
 export const lightFill = COLORS.grey35
 
-export function DeckSetupContainer(): JSX.Element {
-  const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)
+export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
+  const { tab } = props
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const dispatch = useDispatch<any>()
   const zoomIn = useSelector(selectors.getZoomedInSlot)
@@ -177,7 +179,14 @@ export function DeckSetupContainer(): JSX.Element {
         borderRadius={BORDERS.borderRadius8}
         width="100%"
         height={zoomIn.slot != null ? '75vh' : '70vh'}
+        flexDirection={DIRECTION_COLUMN}
       >
+        {tab === 'protocolSteps' ? (
+          <Flex justifyContent={JUSTIFY_CENTER}>
+            {/* TODO: update the alerts to match latest designs */}
+            <Alerts componentType="Timeline" />
+          </Flex>
+        ) : null}
         <Flex
           width="100%"
           height="100%"
@@ -293,10 +302,10 @@ export function DeckSetupContainer(): JSX.Element {
                   hoveredModule={hoveredModule}
                   hoveredFixture={hoveredFixture}
                   hover={hoverSlot}
+                  tab={tab}
                   setHover={setHoverSlot}
                   addEquipment={addEquipment}
                   activeDeckSetup={activeDeckSetup}
-                  selectedTerminalItemId={selectedTerminalItemId}
                   stagingAreaCutoutIds={stagingAreaFixtures.map(
                     areas => areas.location as CutoutId
                   )}

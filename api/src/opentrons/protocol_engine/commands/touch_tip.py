@@ -4,6 +4,8 @@ from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
+from opentrons.protocol_engine.state import update_types
+
 from ..errors import TouchTipDisabledError, LabwareIsTipRackError
 from ..types import DeckPoint
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
@@ -71,6 +73,8 @@ class TouchTipImplementation(
         labware_id = params.labwareId
         well_name = params.wellName
 
+        state_update = update_types.StateUpdate()
+
         if self._state_view.labware.get_has_quirk(labware_id, "touchTipDisabled"):
             raise TouchTipDisabledError(
                 f"Touch tip not allowed on labware {labware_id}"
@@ -98,14 +102,25 @@ class TouchTipImplementation(
             center_point=center_point,
         )
 
-        x, y, z = await self._gantry_mover.move_to(
+        final_point = await self._gantry_mover.move_to(
             pipette_id=pipette_id,
             waypoints=touch_waypoints,
             speed=touch_speed,
         )
+        final_deck_point = DeckPoint.construct(
+            x=final_point.x, y=final_point.y, z=final_point.z
+        )
+        state_update.set_pipette_location(
+            pipette_id=pipette_id,
+            new_labware_id=labware_id,
+            new_well_name=well_name,
+            new_deck_point=final_deck_point,
+        )
 
         return SuccessData(
-            public=TouchTipResult(position=DeckPoint(x=x, y=y, z=z)), private=None
+            public=TouchTipResult(position=final_deck_point),
+            private=None,
+            state_update=state_update,
         )
 
 
