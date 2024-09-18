@@ -26,8 +26,10 @@ import {
   duplicateLabware,
   openIngredientSelector,
 } from '../../../labware-ingred/actions'
+import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../../types'
+import { getSelectedWells } from '../../../well-selection/selectors'
 
 const ROBOT_BOTTOM_HALF_SLOTS = [
   'D1',
@@ -155,6 +157,14 @@ export function SlotOverflowMenu(
   } else if (isOffDeckLocation) {
     nickNameId = location
   }
+
+  const liquidLocations = useSelector(
+    labwareIngredSelectors.getLiquidsByLabwareId
+  )
+
+  const selectionHasLiquids =
+    nickNameId != null && liquidLocations[nickNameId] != null
+
   const slotOverflowBody = (
     <>
       {showNickNameModal && nickNameId != null ? (
@@ -214,7 +224,7 @@ export function SlotOverflowMenu(
               }}
             >
               <StyledText desktopStyle="bodyDefaultRegular">
-                {t('add_liquid')}
+                {selectionHasLiquids ? t('edit_liquids') : t('add_liquid')}
               </StyledText>
             </MenuButton>
           </>
