@@ -41,6 +41,7 @@ export function EmptySelectorButton(
     border: none;
     width: ${buttonSizing};
     height: ${buttonSizing};
+    cursor: ${disabled ? 'default' : 'pointer'};
     &:focus-visible {
       outline: 2px solid ${COLORS.white};
       box-shadow: 0 0 0 4px ${COLORS.blue50};
