@@ -1,6 +1,7 @@
 """Helper functions for liquid-level related calculations inside a given frustum."""
 from typing import List, Tuple, Iterator, Sequence, Any
 from numpy import pi, iscomplex, roots, real
+from math import sqrt
 
 from ..errors.exceptions import InvalidLiquidHeightFound
 from opentrons_shared_data.labware.types import (
@@ -27,6 +28,20 @@ def reject_unacceptable_heights(
             message="Unable to estimate valid liquid height from volume."
         )
     return valid_heights[0]
+
+
+def cross_section_area_circular(diameter: float) -> float:
+    radius = diameter / 2
+    return pi * (radius**2)
+
+
+def cross_section_area_rectangular(x_dimension: float, y_dimension: float) -> float:
+    return x_dimension * y_dimension
+
+
+def volume_from_frustum_formula(area_1: float, area_2: float, height: float) -> float:
+    area_term = area_1 + area_2 + sqrt(area_1 * area_2)
+    return (height / 3) * area_term
 
 
 def rectangular_frustum_polynomial_roots(
@@ -239,5 +254,9 @@ def get_well_volumetric_capacity(
             )
 
             well_volume.append((next_f["topHeight"], frustum_volume))
+    # else:
+    # for f, next_f in get_boundary_cross_sections(sorted_frusta):
 
+    # cycle through every one, see what the boundaries are
+    # write helper that does volume of a frustum formula
     return well_volume
