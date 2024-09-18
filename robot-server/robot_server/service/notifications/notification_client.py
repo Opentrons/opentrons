@@ -182,9 +182,7 @@ def initialize_notification_client(app_state: AppState) -> None:
         )
 
 
-# todo(mm, 2024-08-20): When ASGI app teardown no longer uses asyncio.gather(),
-# this can be non-async.
-async def clean_up_notification_client(app_state: AppState) -> None:
+def clean_up_notification_client(app_state: AppState) -> None:
     """Clean up the `NotificationClient` stored on `app_state`.
 
     Intended to be called just once, when the server shuts down.
