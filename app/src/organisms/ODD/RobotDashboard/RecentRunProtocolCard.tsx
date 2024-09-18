@@ -34,7 +34,7 @@ import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '/app/redux/analytics'
 import { Skeleton } from '../../../atoms/Skeleton'
-import { useMissingProtocolHardware } from '../../../transformations/commands'
+import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
 import { useRerunnableStatusText } from './hooks'
 

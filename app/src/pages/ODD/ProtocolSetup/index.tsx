@@ -90,13 +90,13 @@ import type { SetupScreens } from '../../../organisms/ODD/ProtocolSetup'
 import type {
   ProtocolHardware,
   ProtocolFixture,
-} from '../../../transformations/commands'
+} from '/app/transformations/commands'
 import {
   getLabwareSetupItemGroups,
   getProtocolUsesGripper,
   useRequiredProtocolHardwareFromAnalysis,
   useMissingProtocolHardwareFromAnalysis,
-} from '../../../transformations/commands'
+} from '/app/transformations/commands'
 
 const FETCH_DURATION_MS = 5000
 

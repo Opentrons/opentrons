@@ -12,7 +12,7 @@ import {
   EmptyRecentRun,
 } from '../../../../organisms/ODD/RobotDashboard'
 import { Navigation } from '../../../../organisms/Navigation'
-import { useMissingProtocolHardware } from '../../../../transformations/commands'
+import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { getOnDeviceDisplaySettings } from '/app/redux/config'
 import { WelcomeModal } from '../WelcomeModal'
 import { RobotDashboard } from '..'
@@ -34,7 +34,7 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../organisms/ODD/RobotDashboard/EmptyRecentRun')
 vi.mock('../../../../organisms/ODD/RobotDashboard/RecentRunProtocolCarousel')
 vi.mock('../../../../organisms/Navigation')
-vi.mock('../../../../transformations/commands')
+vi.mock('/app/transformations/commands')
 vi.mock('/app/redux/config')
 vi.mock('../WelcomeModal')
 vi.mock('/app/resources/runs')

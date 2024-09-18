@@ -14,7 +14,7 @@ import {
 import { i18n } from '/app/i18n'
 import { useHardwareStatusText } from '../../../../organisms/ODD/RobotDashboard/hooks'
 import { useOffsetCandidatesForAnalysis } from '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { useMissingProtocolHardware } from '../../../../transformations/commands'
+import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { DeleteTransferConfirmationModal } from '../../QuickTransferDashboard/DeleteTransferConfirmationModal'
 import { QuickTransferDetails } from '..'
@@ -44,7 +44,7 @@ vi.mock(
   '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 )
 vi.mock('../../QuickTransferDashboard/DeleteTransferConfirmationModal')
-vi.mock('../../../../transformations/commands')
+vi.mock('/app/transformations/commands')
 vi.mock('../Deck')
 vi.mock('../Hardware')
 vi.mock('../Labware')

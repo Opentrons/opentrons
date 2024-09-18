@@ -18,7 +18,7 @@ import { useOffsetCandidatesForAnalysis } from '../../../../organisms/ApplyHisto
 import { useRunTimeParameters } from '../../../../pages/Desktop/Protocols/hooks'
 import { ProtocolSetupParameters } from '../../../../organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
-import { useMissingProtocolHardware } from '../../../../transformations/commands'
+import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { ProtocolDetails } from '..'
 import { Deck } from '../Deck'
 import { Hardware } from '../Hardware'
@@ -50,7 +50,7 @@ vi.mock(
   '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 )
 vi.mock('../../../../pages/Desktop/Protocols/hooks')
-vi.mock('../../../../transformations/commands')
+vi.mock('/app/transformations/commands')
 vi.mock('../Deck')
 vi.mock('../Hardware')
 vi.mock('../Labware')

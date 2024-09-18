@@ -12,7 +12,7 @@ import { i18n } from '/app/i18n'
 import { useRequiredProtocolHardware } from '../../../../pages/Desktop/Protocols/hooks'
 import { Hardware } from '../Hardware'
 
-vi.mock('../../../../transformations/commands')
+vi.mock('/app/transformations/commands')
 vi.mock('../../../../pages/Desktop/Protocols/hooks')
 vi.mock('/app/redux/config')
 

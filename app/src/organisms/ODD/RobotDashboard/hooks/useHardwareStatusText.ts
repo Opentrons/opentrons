@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import type { ProtocolHardware } from '../../../../transformations/commands'
+import type { ProtocolHardware } from '/app/transformations/commands'
 
 export function useHardwareStatusText(
   missingProtocolHardware: ProtocolHardware[],

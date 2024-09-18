@@ -39,7 +39,7 @@ import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
-import { getProtocolUsesGripper } from '../../transformations/commands'
+import { getProtocolUsesGripper } from '/app/transformations/commands'
 import { ProtocolAnalysisStale } from '../ProtocolAnalysisFailure/ProtocolAnalysisStale'
 import {
   getAnalysisStatus,

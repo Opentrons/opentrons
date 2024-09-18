@@ -8,7 +8,7 @@ import type {
   PipetteData,
 } from '@opentrons/api-client'
 
-import { getProtocolUsesGripper } from '../../../../transformations/commands'
+import { getProtocolUsesGripper } from '/app/transformations/commands'
 
 export function getAttachedGripper(
   attachedInstruments: Instruments

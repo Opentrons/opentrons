@@ -16,7 +16,7 @@ import { simpleAnalysisFileFixture } from '@opentrons/shared-data'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { Skeleton } from '../../../../atoms/Skeleton'
-import { useMissingProtocolHardware } from '../../../../transformations/commands'
+import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { useTrackProtocolRunEvent } from '../../../Devices/hooks'
 import {
   useTrackEvent,
@@ -28,7 +28,7 @@ import { RecentRunProtocolCard } from '../'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import type { NavigateFunction } from 'react-router-dom'
-import type { ProtocolHardware } from '../../../../transformations/commands'
+import type { ProtocolHardware } from '/app/transformations/commands'
 
 const mockNavigate = vi.fn()
 
@@ -42,7 +42,7 @@ vi.mock('react-router-dom', async importOriginal => {
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../atoms/Skeleton')
-vi.mock('../../../../transformations/commands')
+vi.mock('/app/transformations/commands')
 vi.mock('../../../../pages/ODD/ProtocolDetails')
 vi.mock('../../../../organisms/Devices/hooks')
 vi.mock('../../../../organisms/RunTimeControl/hooks')

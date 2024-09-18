@@ -36,7 +36,7 @@ import type { TFunction } from 'i18next'
 import type {
   ProtocolHardware,
   ProtocolPipette,
-} from '../../../transformations/commands'
+} from '/app/transformations/commands'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
