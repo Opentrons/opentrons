@@ -8,6 +8,7 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  Divider,
   Flex,
   NO_WRAP,
   POSITION_ABSOLUTE,
@@ -76,6 +77,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
       >
         {t('duplicate')}
       </MenuButton>
+      <Divider marginY="0" />
       <MenuButton
         onClick={() => {
           deleteStep(stepId)
