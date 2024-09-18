@@ -3,6 +3,7 @@ import logging
 from contextlib import ExitStack
 from typing import Any, List, Optional, Sequence, Union, cast, Dict
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
+from opentrons.protocol_engine.types import WellLocation, WellOrigin, WellOffset
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
@@ -160,9 +161,6 @@ class InstrumentContext(publisher.CommandPublisher):
     def default_speed(self, speed: float) -> None:
         self._core.set_default_speed(speed)
 
-    # we do volume tracking already
-    # update old_well/new_well heights/volumes after (successful) liquid handling actions (using handled volume)
-    # (initially) populate well heights/volumes via user input?! Error (and recovery) if not enough volume to liquid probe?
     @requires_version(2, 0)
     def aspirate(
         self,
@@ -2143,7 +2141,10 @@ class InstrumentContext(publisher.CommandPublisher):
                     offset_from_meniscus_mm=offset_from_meniscus_mm,
                     volume=volume,
                 ):
-                    move_to_location = target.well.meniscus(z=offset_from_meniscus_mm)
+                    move_to_location = WellLocation(
+                        origin=WellOrigin.MENISCUS,
+                        offset=WellOffset(x=0, y=0, z=offset_from_meniscus_mm),
+                    )
         if isinstance(target, validation.PointTarget):
             move_to_location = target.location
         if self.api_version >= APIVersion(2, 11):
@@ -2185,10 +2186,6 @@ class InstrumentContext(publisher.CommandPublisher):
             height = self._core.get_last_measured_liquid_height(well_core=well._core)
             if height is None:
                 self.measure_liquid_height(well=well)
-            # new parameters fit into location param, sent to Protocol Engine command (via well.meniscus symbol)
-            # need below? well.meniscus
-            # convert height to volume, subtract `volume`, convert volume to height, use as offset below
-            # raise error if not enough liquid present to aspirate desired volume. Error Recovery option
             return True
         elif (
             self.api_version >= APIVersion(2, 20)

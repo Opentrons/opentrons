@@ -111,7 +111,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def aspirate(
         self,
-        location: Location,
+        location: Union[Location, WellLocation],
         well_core: Optional[WellCore],
         volume: float,
         rate: float,
@@ -129,6 +129,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         """
         if well_core is None:
             if not in_place:
+                assert isinstance(location, Location)
                 self._engine_client.execute_command(
                     cmd.MoveToCoordinatesParams(
                         pipetteId=self._pipette_id,
@@ -150,14 +151,17 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         else:
             well_name = well_core.get_name()
             labware_id = well_core.labware_id
-
-            well_location = (
-                self._engine_client.state.geometry.get_relative_well_location(
-                    labware_id=labware_id,
-                    well_name=well_name,
-                    absolute_point=location.point,
+            if isinstance(location, WellLocation):
+                well_location = location
+                location = Location(well_core.get_meniscus(z_offset=location.offset.z))
+            else:
+                well_location = (
+                    self._engine_client.state.geometry.get_relative_well_location(
+                        labware_id=labware_id,
+                        well_name=well_name,
+                        absolute_point=location.point,
+                    )
                 )
-            )
             deck_conflict.check_safe_for_pipette_movement(
                 engine_state=self._engine_client.state,
                 pipette_id=self._pipette_id,
@@ -176,6 +180,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 )
             )
 
+        assert isinstance(location, Location)
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def dispense(

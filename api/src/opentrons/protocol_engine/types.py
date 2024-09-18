@@ -239,11 +239,18 @@ class WellOffset(BaseModel):
     z: float = 0
 
 
+class WellVolumeOffset(BaseModel):
+    """A z-offset to account for volume in an operation."""
+
+    volumeOffset: Union[float, Literal["operationVolume"]] = 0
+
+
 class WellLocation(BaseModel):
     """A relative location in reference to a well's location."""
 
     origin: WellOrigin = WellOrigin.TOP
     offset: WellOffset = Field(default_factory=WellOffset)
+    volumeOffset: WellVolumeOffset = Field(default_factory=WellVolumeOffset)
 
 
 class DropTipWellLocation(BaseModel):
