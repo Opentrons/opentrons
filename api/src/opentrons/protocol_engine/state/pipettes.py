@@ -22,7 +22,6 @@ from opentrons.hardware_control.nozzle_manager import (
 )
 from opentrons.protocol_engine.actions.actions import FailCommandAction
 from opentrons.protocol_engine.commands.command import DefinedErrorData
-from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
 from opentrons.types import MountType, Mount as HwMount, Point
 
 from . import update_types
@@ -322,33 +321,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         if isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
-                commands.TouchTipResult,
-                commands.LiquidProbeResult,
-                commands.TryLiquidProbeResult,
-            ),
-        ):
-            self._state.current_location = CurrentWell(
-                pipette_id=action.command.params.pipetteId,
-                labware_id=action.command.params.labwareId,
-                well_name=action.command.params.wellName,
-            )
-        elif isinstance(action, FailCommandAction) and (
-            isinstance(action.error, DefinedErrorData)
-            and (
-                (
-                    isinstance(action.running_command, commands.LiquidProbe)
-                    and isinstance(action.error.public, LiquidNotFoundError)
-                )
-            )
-        ):
-            self._state.current_location = CurrentWell(
-                pipette_id=action.running_command.params.pipetteId,
-                labware_id=action.running_command.params.labwareId,
-                well_name=action.running_command.params.wellName,
-            )
-        elif isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result,
-            (
                 commands.MoveToAddressableAreaResult,
                 commands.MoveToAddressableAreaForDropTipResult,
             ),
@@ -440,7 +412,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 commands.MoveRelativeResult,
                 commands.MoveToAddressableAreaResult,
                 commands.MoveToAddressableAreaForDropTipResult,
-                commands.TouchTipResult,
             ),
         ):
             pipette_id = action.command.params.pipetteId
