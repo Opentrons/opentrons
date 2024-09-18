@@ -1,4 +1,5 @@
 """Tests for the PythonAndLegacyRunner's LegacyContextPlugin."""
+import asyncio
 import pytest
 from anyio import to_thread
 from decoy import Decoy, matchers
@@ -60,7 +61,7 @@ def mock_action_dispatcher(decoy: Decoy) -> pe_actions.ActionDispatcher:
 
 
 @pytest.fixture
-def subject(
+async def subject(
     mock_legacy_broker: LegacyBroker,
     mock_equipment_broker: ReadOnlyBroker[LoadInfo],
     mock_legacy_command_mapper: LegacyCommandMapper,
@@ -69,6 +70,7 @@ def subject(
 ) -> LegacyContextPlugin:
     """Get a configured LegacyContextPlugin with its dependencies mocked out."""
     plugin = LegacyContextPlugin(
+        engine_loop=asyncio.get_running_loop(),
         broker=mock_legacy_broker,
         equipment_broker=mock_equipment_broker,
         legacy_command_mapper=mock_legacy_command_mapper,
