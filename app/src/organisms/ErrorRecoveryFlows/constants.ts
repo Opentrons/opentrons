@@ -10,7 +10,7 @@ import {
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
-import type { StepOrder } from './types'
+import type { RecoveryRouteStepMetadata, StepOrder } from './types'
 
 // Server-defined error types.
 // (Values for the .error.errorType property of a run command.)
@@ -205,6 +205,105 @@ export const STEP_ORDER: StepOrder = {
     ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_BLOWOUT_FAILED,
   ],
 }
+
+// Contains metadata specific to all routes and/or steps.
+export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
+  [RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE]: {
+    [RECOVERY_MAP.DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL]: { allowDoorOpen: false },
+    [RECOVERY_MAP.DROP_TIP_FLOWS.STEPS.BEFORE_BEGINNING]: {
+      allowDoorOpen: false,
+    },
+    [RECOVERY_MAP.DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP]: {
+      allowDoorOpen: false,
+    },
+    [RECOVERY_MAP.DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT]: {
+      allowDoorOpen: false,
+    },
+  },
+  [RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE]: {
+    [RECOVERY_MAP.ERROR_WHILE_RECOVERING.STEPS.RECOVERY_ACTION_FAILED]: {
+      allowDoorOpen: false,
+    },
+    [RECOVERY_MAP.ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_BLOWOUT_FAILED]: {
+      allowDoorOpen: false,
+    },
+    [RECOVERY_MAP.ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_TIP_DROP_FAILED]: {
+      allowDoorOpen: false,
+    },
+    [RECOVERY_MAP.ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_GENERAL_ERROR]: {
+      allowDoorOpen: false,
+    },
+  },
+  [RECOVERY_MAP.ROBOT_CANCELING.ROUTE]: {
+    [RECOVERY_MAP.ROBOT_CANCELING.STEPS.CANCELING]: { allowDoorOpen: false },
+  },
+  [RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE]: {
+    [RECOVERY_MAP.ROBOT_IN_MOTION.STEPS.IN_MOTION]: { allowDoorOpen: false },
+  },
+  [RECOVERY_MAP.ROBOT_PICKING_UP_TIPS.ROUTE]: {
+    [RECOVERY_MAP.ROBOT_PICKING_UP_TIPS.STEPS.PICKING_UP_TIPS]: {
+      allowDoorOpen: false,
+    },
+  },
+  [RECOVERY_MAP.ROBOT_RESUMING.ROUTE]: {
+    [RECOVERY_MAP.ROBOT_RESUMING.STEPS.RESUMING]: { allowDoorOpen: false },
+  },
+  [RECOVERY_MAP.ROBOT_RETRYING_STEP.ROUTE]: {
+    [RECOVERY_MAP.ROBOT_RETRYING_STEP.STEPS.RETRYING]: { allowDoorOpen: false },
+  },
+  [RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE]: {
+    [RECOVERY_MAP.ROBOT_SKIPPING_STEP.STEPS.SKIPPING]: { allowDoorOpen: false },
+  },
+  [RECOVERY_MAP.OPTION_SELECTION.ROUTE]: {
+    [RECOVERY_MAP.OPTION_SELECTION.STEPS.SELECT]: { allowDoorOpen: false },
+  },
+  [RECOVERY_MAP.CANCEL_RUN.ROUTE]: {
+    [RECOVERY_MAP.CANCEL_RUN.STEPS.CONFIRM_CANCEL]: { allowDoorOpen: false },
+  },
+  [RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE]: {
+    [RECOVERY_MAP.IGNORE_AND_SKIP.STEPS.SELECT_IGNORE_KIND]: {
+      allowDoorOpen: false,
+    },
+  },
+  [RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE]: {
+    [RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.STEPS.MANUALLY_FILL]: {
+      allowDoorOpen: true,
+    },
+    [RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.STEPS.SKIP]: { allowDoorOpen: true },
+  },
+  [RECOVERY_MAP.REFILL_AND_RESUME.ROUTE]: {},
+  [RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE]: {
+    [RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY]: {
+      allowDoorOpen: false,
+    },
+  },
+  [RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE]: {
+    [RECOVERY_MAP.RETRY_NEW_TIPS.STEPS.DROP_TIPS]: { allowDoorOpen: false },
+    [RECOVERY_MAP.RETRY_NEW_TIPS.STEPS.REPLACE_TIPS]: { allowDoorOpen: true },
+    [RECOVERY_MAP.RETRY_NEW_TIPS.STEPS.SELECT_TIPS]: { allowDoorOpen: true },
+    [RECOVERY_MAP.RETRY_NEW_TIPS.STEPS.RETRY]: { allowDoorOpen: true },
+  },
+  [RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE]: {
+    [RECOVERY_MAP.RETRY_SAME_TIPS.STEPS.RETRY]: { allowDoorOpen: true },
+  },
+  [RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE]: {
+    [RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.STEPS.DROP_TIPS]: {
+      allowDoorOpen: false,
+    },
+    [RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS]: {
+      allowDoorOpen: true,
+    },
+    [RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.STEPS.SELECT_TIPS]: {
+      allowDoorOpen: true,
+    },
+    [RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.STEPS.SKIP]: { allowDoorOpen: true },
+  },
+  [RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE]: {
+    [RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.STEPS.SKIP]: {
+      allowDoorOpen: true,
+    },
+  },
+} as const
 
 export const INVALID = 'INVALID' as const
 
