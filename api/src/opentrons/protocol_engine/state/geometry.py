@@ -439,7 +439,7 @@ class GeometryView:
                     labware_id, well_name
                 )
                 if starting_liquid_height is not None:
-                    height_after_operation = self.get_ending_height(starting_liquid_height, operation_volume)
+                    height_after_operation = self.get_ending_height(starting_liquid_height, well_location.volumeOffset)
                     offset = offset.copy(update={"z": offset.z + height_after_operation})
                 else:
                     raise errors.LiquidHeightUnknownError(
