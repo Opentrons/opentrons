@@ -53,7 +53,10 @@ from .wells import WellView
 from .modules import ModuleView
 from .pipettes import PipetteView
 from .addressable_areas import AddressableAreaView
-from .frustum_helpers import get_well_volumetric_capacity
+from .frustum_helpers import (
+    get_well_volumetric_capacity,
+    find_volume_at_non_boundary_height,
+)
 
 
 SLOT_WIDTH = 128
@@ -1218,3 +1221,19 @@ class GeometryView:
                 message=f"No InnerWellGeometry found for well id: {well_id}"
             )
         return get_well_volumetric_capacity(well_geometry)
+
+    def get_volume_at_height(
+        self, labware_id: str, well_id: str, target_height: float
+    ) -> float:
+        """Find the volume at any known height within a well."""
+        labware_def = self._labware.get_definition(labware_id)
+        if labware_def.innerLabwareGeometry is None:
+            raise InvalidWellDefinitionError(message="No InnerLabwareGeometry found.")
+        well_geometry = labware_def.innerLabwareGeometry.get(well_id)
+        if well_geometry is None:
+            raise InvalidWellDefinitionError(
+                message=f"No InnerWellGeometry found for well id: {well_id}"
+            )
+        return find_volume_at_non_boundary_height(
+            target_height=target_height, well_geometry=well_geometry
+        )
