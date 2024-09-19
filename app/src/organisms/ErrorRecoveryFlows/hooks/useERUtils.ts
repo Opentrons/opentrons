@@ -157,7 +157,10 @@ export function useERUtils({
     failedLabwareUtils,
   })
 
-  const recoveryActionMutationUtils = useRecoveryActionMutation(runId)
+  const recoveryActionMutationUtils = useRecoveryActionMutation(
+    runId,
+    routeUpdateActions
+  )
 
   // TODO(jh, 06-14-24): Ensure other string build utilities that are internal to ErrorRecoveryFlows are exported under
   // one utility object in useERUtils.
