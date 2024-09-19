@@ -6,6 +6,7 @@ import {
   BORDERS,
   Box,
   COLORS,
+  DISPLAY_GRID,
   Flex,
   JUSTIFY_FLEX_END,
   SecondaryButton,
@@ -69,7 +70,7 @@ export function RunHeaderSectionLower({
 }
 
 const SECTION_STYLE = css`
-  display: grid;
+  display: ${DISPLAY_GRID};
   grid-template-columns: 4fr 6fr 4fr;
   background-color: ${COLORS.grey10};
   padding: ${SPACING.spacing8};

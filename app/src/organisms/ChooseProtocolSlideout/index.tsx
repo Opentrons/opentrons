@@ -16,6 +16,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_BLOCK,
+  DISPLAY_GRID,
   DropdownMenu,
   Flex,
   Icon,
@@ -754,7 +755,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 }}
               >
                 <Box
-                  display="grid"
+                  display={DISPLAY_GRID}
                   gridTemplateColumns="1fr 3fr"
                   marginRight={SPACING.spacing16}
                 >
