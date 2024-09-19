@@ -2,7 +2,10 @@
 from dataclasses import dataclass
 from typing import Optional, overload, Union
 
-from opentrons.protocol_engine.resources.models import LoadedLabwareData
+from opentrons.protocol_engine.resources.models import (
+    LoadedLabwareData,
+    ReloadedLabwareData,
+)
 from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.calibration_storage.helpers import uri_from_details
@@ -49,14 +52,6 @@ from ..types import (
     ModuleDefinition,
     AddressableAreaLocation,
 )
-
-
-@dataclass(frozen=True)
-class ReloadedLabwareData:
-    """The result of a reload labware procedure."""
-
-    location: LabwareLocation
-    offsetId: Optional[str]
 
 
 @dataclass(frozen=True)

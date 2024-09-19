@@ -7,9 +7,8 @@ from .equipment import (
     LoadedPipetteData,
     LoadedModuleData,
     LoadedConfigureForVolumeData,
-    ReloadedLabwareData,
 )
-from ..resources.models import LoadedLabwareData
+from ..resources.models import LoadedLabwareData, ReloadedLabwareData
 from .movement import MovementHandler
 from .gantry_mover import GantryMover
 from .labware_movement import LabwareMovementHandler

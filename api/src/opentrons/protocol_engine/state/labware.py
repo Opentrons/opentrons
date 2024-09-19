@@ -16,8 +16,8 @@ from typing import (
     get_args,
 )
 
+from opentrons.protocol_engine.commands.reload_labware import ReloadLabwareParams
 from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.state.update_types import _NoChangeEnum
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
 from opentrons_shared_data.labware.labware_definition import LabwareRole
@@ -33,9 +33,7 @@ from ..resources import DeckFixedLabware, labware_validation, fixture_validation
 from ..commands import (
     Command,
     absorbance_reader,
-    LoadLabwareResult,
     MoveLabwareResult,
-    ReloadLabwareResult,
 )
 from ..types import (
     DeckSlotLocation,
@@ -181,14 +179,10 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
     def _handle_command(self, action: Action) -> None:
         """Modify state in reaction to a command."""
         self._add_loaded_labware(action)
+        self._set_reloaded_labware(action)
 
         if not isinstance(action, SucceedCommandAction):
             return
-
-        if isinstance(action.command.result, ReloadLabwareResult):
-            labware_id = action.command.params.labwareId
-            new_offset_id = action.command.result.offsetId
-            self._state.labware_by_id[labware_id].offsetId = new_offset_id
 
         elif isinstance(action.command.result, MoveLabwareResult):
             labware_id = action.command.params.labwareId
@@ -223,6 +217,16 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         assert labware_offset.id not in self._state.labware_offsets_by_id
 
         self._state.labware_offsets_by_id[labware_offset.id] = labware_offset
+
+    def _set_reloaded_labware(self, action: Action) -> None:
+        if (
+            isinstance(action, SucceedCommandAction)
+            and action.state_update.reloaded_labware
+        ):
+            assert isinstance(action.command.params, ReloadLabwareParams)
+            labware_id = action.command.params.labwareId
+            new_offset_id = action.state_update.reloaded_labware.offsetId
+            self._state.labware_by_id[labware_id].offsetId = new_offset_id
 
     def _add_loaded_labware(self, action: Action) -> None:
         if (
@@ -259,6 +263,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                         action.state_update.loaded_labware.labware_id
                     ].location
 
+                display_name = None
                 if action.state_update.labware_location.display_name:
                     display_name = action.state_update.labware_location.display_name
                 else:

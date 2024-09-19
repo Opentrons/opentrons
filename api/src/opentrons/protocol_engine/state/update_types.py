@@ -5,7 +5,10 @@ import dataclasses
 import enum
 import typing
 
-from opentrons.protocol_engine.resources.models import LoadedLabwareData
+from opentrons.protocol_engine.resources.models import (
+    LoadedLabwareData,
+    ReloadedLabwareData,
+)
 from opentrons.protocol_engine.types import DeckPoint, LabwareLocation
 
 
@@ -86,6 +89,8 @@ class StateUpdate:
     labware_location: LabwareLocationUpdate | NoChangeType = NO_CHANGE
 
     loaded_labware: typing.Optional[LoadedLabwareData] = None
+
+    reloaded_labware: typing.Optional[ReloadedLabwareData] = None
 
     # These convenience functions let the caller avoid the boilerplate of constructing a
     # complicated dataclass tree, and they give us a

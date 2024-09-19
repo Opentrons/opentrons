@@ -1,5 +1,8 @@
 """Labware state store tests."""
-from opentrons.protocol_engine.resources.models import LoadedLabwareData
+from opentrons.protocol_engine.resources.models import (
+    LoadedLabwareData,
+    ReloadedLabwareData,
+)
 from opentrons.protocol_engine.state import update_types
 import pytest
 
@@ -166,7 +169,22 @@ def test_handles_reload_labware(
     )
 
     subject.handle_action(
-        SucceedCommandAction(private_result=None, command=load_labware)
+        SucceedCommandAction(
+            private_result=None,
+            command=load_labware,
+            state_update=update_types.StateUpdate(
+                labware_location=update_types.LabwareLocationUpdate(
+                    labware_id="test-labware-id",
+                    display_name="display-name",
+                    new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                ),
+                loaded_labware=LoadedLabwareData(
+                    labware_id="test-labware-id",
+                    definition=well_plate_def,
+                    offsetId=None,
+                ),
+            ),
+        )
     )
     expected_definition_uri = uri_from_details(
         load_name=well_plate_def.parameters.loadName,
@@ -195,14 +213,23 @@ def test_handles_reload_labware(
         offset_id="offset-id",
     )
     subject.handle_action(
-        SucceedCommandAction(private_result=None, command=reload_labware)
+        SucceedCommandAction(
+            private_result=None,
+            command=reload_labware,
+            state_update=update_types.StateUpdate(
+                reloaded_labware=ReloadedLabwareData(
+                    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                    offsetId="offset-id",
+                )
+            ),
+        )
     )
 
     expected_labware_data = LoadedLabware(
         id="test-labware-id",
         loadName=well_plate_def.parameters.loadName,
         definitionUri=expected_definition_uri,
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A1),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         offsetId="offset-id",
         displayName="display-name",
     )
