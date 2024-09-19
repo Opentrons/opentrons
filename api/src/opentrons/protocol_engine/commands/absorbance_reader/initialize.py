@@ -68,7 +68,9 @@ class InitializeImpl(
             sample_wavelengths_len = len(params.sampleWavelengths)
             reference_wavelength = params.referenceWavelength
             supported_wavelengths = set(abs_reader.supported_wavelengths)
-            unsupported_wavelengths = sample_wavelengths.difference(supported_wavelengths)
+            unsupported_wavelengths = sample_wavelengths.difference(
+                supported_wavelengths
+            )
             if unsupported_wavelengths:
                 raise ValueError(f"Unsupported wavelengths: {unsupported_wavelengths}")
 
