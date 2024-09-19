@@ -316,31 +316,15 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         # todo(mm, 2024-08-29): Port the following isinstance() checks to
         # use `state_update`. https://opentrons.atlassian.net/browse/EXEC-639
 
-        # These commands leave the pipette in a new location.
-        # Update current_location to reflect that.
-        if isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result,
-            (
-                commands.MoveToAddressableAreaResult,
-                commands.MoveToAddressableAreaForDropTipResult,
-            ),
-        ):
-            self._state.current_location = CurrentAddressableArea(
-                pipette_id=action.command.params.pipetteId,
-                addressable_area_name=action.command.params.addressableAreaName,
-            )
-
         # These commands leave the pipette in a place that we can't logically associate
         # with a well. Clear current_location to reflect the fact that it's now unknown.
         #
         # TODO(mc, 2021-11-12): Wipe out current_location on movement failures, too.
-        # TODO(jbl 2023-02-14): Need to investigate whether move relative should clear current location
         elif isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
             (
                 commands.HomeResult,
                 commands.RetractAxisResult,
-                commands.MoveToCoordinatesResult,
                 commands.thermocycler.OpenLidResult,
                 commands.thermocycler.CloseLidResult,
             ),
@@ -378,7 +362,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             ):
                 self._state.current_location = None
 
-    def _update_deck_point(  # noqa: C901
+    def _update_deck_point(
         self, action: Union[SucceedCommandAction, FailCommandAction]
     ) -> None:
         if isinstance(action, SucceedCommandAction):
@@ -404,22 +388,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         #
         # These isinstance() checks mostly mirror self._update_current_location().
         # See there for explanations.
-
-        if isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result,
-            (
-                commands.MoveToCoordinatesResult,
-                commands.MoveRelativeResult,
-                commands.MoveToAddressableAreaResult,
-                commands.MoveToAddressableAreaForDropTipResult,
-            ),
-        ):
-            pipette_id = action.command.params.pipetteId
-            deck_point = action.command.result.position
-            loaded_pipette = self._state.pipettes_by_id[pipette_id]
-            self._state.current_deck_point = CurrentDeckPoint(
-                mount=loaded_pipette.mount, deck_point=deck_point
-            )
 
         elif isinstance(action, SucceedCommandAction) and isinstance(
             action.command.result,
