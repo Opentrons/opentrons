@@ -830,6 +830,9 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   if (isProtocolAnalyzing) {
     buttonIconName = 'ot-spinner'
     buttonText = t('analyzing_on_robot')
+  } else if (isClosingCurrentRun) {
+    buttonIconName = 'ot-spinner'
+    buttonText = t('canceling_run')
   } else if (
     runStatus === RUN_STATUS_RUNNING ||
     (runStatus != null && RECOVERY_STATUSES.includes(runStatus))
@@ -909,7 +912,8 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
             spin={
               isProtocolAnalyzing ||
               runStatus === RUN_STATUS_STOP_REQUESTED ||
-              isResetRunLoading
+              isResetRunLoading ||
+              isClosingCurrentRun
             }
           />
         ) : null}
