@@ -259,6 +259,13 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                         action.state_update.loaded_labware.labware_id
                     ].location
 
+                if action.state_update.labware_location.display_name:
+                    display_name = action.state_update.labware_location.display_name
+                else:
+                    display_name = self._state.labware_by_id[
+                        action.state_update.loaded_labware.labware_id
+                    ].displayName
+
                 self._state.labware_by_id[
                     action.state_update.loaded_labware.labware_id
                 ] = LoadedLabware.construct(
@@ -267,11 +274,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                     loadName=action.state_update.loaded_labware.definition.parameters.loadName,
                     definitionUri=definition_uri,
                     offsetId=action.state_update.loaded_labware.offsetId,
-                    displayName=action.state_update.labware_location.display_name
-                    if isinstance(action.state_update.labware_location, _NoChangeEnum)
-                    else self._state.labware_by_id[
-                        action.state_update.loaded_labware.labware_id
-                    ].displayName,
+                    displayName=display_name,
                 )
 
 
