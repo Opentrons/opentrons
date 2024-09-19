@@ -33,7 +33,7 @@ describe('Landing', () => {
   it('renders the landing page image and text', () => {
     render()
     screen.getByLabelText('welcome image')
-    screen.getByText('Welcome to Protocol Designer')
+    screen.getByText('Welcome to Protocol Designer!')
     screen.getByText(
       'The easiest way to automate liquid handling on your Opentrons robot. No code required.'
     )
