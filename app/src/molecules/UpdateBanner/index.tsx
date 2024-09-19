@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 
 import { Banner } from '/app/atoms/Banner'
-import { useIsFlex } from '/app/organisms/Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 interface UpdateBannerProps {

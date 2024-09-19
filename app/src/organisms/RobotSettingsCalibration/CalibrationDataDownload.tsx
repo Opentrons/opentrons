@@ -20,7 +20,6 @@ import {
 import { TertiaryButton } from '/app/atoms/buttons'
 import {
   useDeckCalibrationData,
-  useIsFlex,
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
 } from '/app/organisms/Devices/hooks'
@@ -28,7 +27,7 @@ import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
 } from '/app/redux/analytics'
-import { useRobot } from '/app/redux-resources/robots'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 // TODO(bc, 2022-02-08): replace with support article when available

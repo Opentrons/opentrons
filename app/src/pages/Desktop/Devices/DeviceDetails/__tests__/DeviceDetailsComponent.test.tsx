@@ -11,11 +11,11 @@ import { RecentProtocolRuns } from '/app/organisms/Devices/RecentProtocolRuns'
 import { RobotOverview } from '/app/organisms/Devices/RobotOverview'
 import { DISENGAGED, NOT_PRESENT } from '/app/organisms/EmergencyStop'
 import { DeviceDetailsDeckConfiguration } from '/app/organisms/DeviceDetailsDeckConfiguration'
-import { useIsFlex } from '/app/organisms/Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { DeviceDetailsComponent } from '../DeviceDetailsComponent'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/organisms/Devices/InstrumentsAndModules')
 vi.mock('/app/organisms/Devices/RecentProtocolRuns')
 vi.mock('/app/organisms/Devices/RobotOverview')

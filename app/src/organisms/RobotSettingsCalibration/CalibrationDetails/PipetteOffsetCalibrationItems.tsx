@@ -19,9 +19,9 @@ import { getCustomLabwareDefinitions } from '/app/redux/custom-labware'
 import { LEFT } from '/app/redux/pipettes'
 import {
   useAttachedPipettes,
-  useIsFlex,
   useAttachedPipettesFromInstrumentsQuery,
 } from '/app/organisms/Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 
 import type { State } from '/app/redux/types'
 import type { FormattedPipetteOffsetCalibration } from '..'

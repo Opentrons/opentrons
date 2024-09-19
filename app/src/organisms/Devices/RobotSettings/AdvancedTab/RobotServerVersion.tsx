@@ -17,9 +17,8 @@ import { TertiaryButton } from '/app/atoms/buttons'
 import { getRobotApiVersion } from '/app/redux/discovery'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
-import { useIsFlex } from '../../hooks'
 import { handleUpdateBuildroot } from '../UpdateBuildroot'
-import { useRobot } from '/app/redux-resources/robots'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 
 import type { State } from '/app/redux/types'
 

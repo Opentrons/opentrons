@@ -12,7 +12,8 @@ import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { useIsFlex, useTrackProtocolRunEvent } from '../../../../../hooks'
+import { useTrackProtocolRunEvent } from '../../../../../hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useTrackEvent } from '/app/redux/analytics'
 import { ConfirmCancelModal } from '../ConfirmCancelModal'
 

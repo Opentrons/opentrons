@@ -16,13 +16,12 @@ import { RobotSettings } from '/app/pages/Desktop/Devices/RobotSettings'
 import { GeneralSettings } from '/app/pages/Desktop/AppSettings/GeneralSettings'
 import { AlertsModal } from '/app/organisms/Alerts/AlertsModal'
 import { useFeatureFlag } from '/app/redux/config'
-import { useIsFlex } from '/app/organisms/Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { ProtocolTimeline } from '/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline'
 import { useSoftwareUpdatePoll } from '../hooks'
 import { DesktopApp } from '../DesktopApp'
 
 vi.mock('/app/organisms/Breadcrumbs')
-vi.mock('/app/organisms/Devices/hooks')
 vi.mock('/app/pages/Desktop/AppSettings/GeneralSettings')
 vi.mock('/app/pages/Desktop/Devices/CalibrationDashboard')
 vi.mock('/app/pages/Desktop/Devices/DeviceDetails')

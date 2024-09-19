@@ -13,12 +13,11 @@ import {
   mockMagneticModuleGen2,
   mockThermocycler,
 } from '/app/redux/modules/__fixtures__'
-import { useRobot } from '/app/redux-resources/robots'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { useChainLiveCommands } from '/app/resources/runs'
 import { ModuleSetupModal } from '../../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
 import {
-  useIsFlex,
   useModuleRenderInfoForProtocolById,
   useUnmatchedModulesForProtocol,
   useRunCalibrationStatus,

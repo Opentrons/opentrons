@@ -14,8 +14,8 @@ import {
 import {
   useRunStatuses,
   useIsLegacySessionInProgress,
-  useIsFlex,
-} from '../../Devices/hooks'
+} from '/app/organisms/Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useCurrentRunId } from '/app/resources/runs'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 

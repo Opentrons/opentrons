@@ -16,7 +16,7 @@ import {
   truncatedCommandMessage,
 } from '../__fixtures__'
 import { InterventionModal, useInterventionModal } from '..'
-import { useIsFlex } from '../../Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { RunData } from '@opentrons/api-client'

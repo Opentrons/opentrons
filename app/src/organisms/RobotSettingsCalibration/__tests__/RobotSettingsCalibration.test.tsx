@@ -20,13 +20,12 @@ import {
   mockAttachedPipetteInformation,
 } from '/app/redux/pipettes/__fixtures__'
 import {
-  useIsFlex,
   usePipetteOffsetCalibrations,
   useAttachedPipettes,
   useRunStatuses,
   useAttachedPipettesFromInstrumentsQuery,
 } from '/app/organisms/Devices/hooks'
-import { useRobot } from '/app/redux-resources/robots'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 
 import { CalibrationDataDownload } from '../CalibrationDataDownload'
 import { CalibrationHealthCheck } from '../CalibrationHealthCheck'

@@ -21,9 +21,8 @@ import {
 } from '/app/resources/deck_configuration/utils'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
-import { useRobot } from '/app/redux-resources/robots'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import {
-  useIsFlex,
   useModuleCalibrationStatus,
   useProtocolAnalysisErrors,
   useRunCalibrationStatus,

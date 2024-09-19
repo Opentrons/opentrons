@@ -37,11 +37,10 @@ import {
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import {
   useDeckCalibrationData,
-  useIsFlex,
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
 } from '/app/organisms/Devices/hooks'
-import { useRobot } from '/app/redux-resources/robots'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { CalibrationDataDownload } from '../CalibrationDataDownload'

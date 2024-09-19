@@ -11,8 +11,8 @@ import {
 import { useToggleGroup } from '/app/molecules/ToggleGroup/useToggleGroup'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useIsFlex } from '/app/redux-resources/robots'
 import {
-  useIsFlex,
   useModuleRenderInfoForProtocolById,
   useStoredProtocolAnalysis,
 } from '../../hooks'

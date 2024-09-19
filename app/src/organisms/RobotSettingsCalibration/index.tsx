@@ -23,10 +23,9 @@ import { CalibrationStatusCard } from '/app/organisms/CalibrationStatusCard'
 import { CheckCalibration } from '/app/organisms/CheckCalibration'
 import {
   useRunStatuses,
-  useIsFlex,
   useAttachedPipettesFromInstrumentsQuery,
 } from '/app/organisms/Devices/hooks'
-import { useRobot } from '/app/redux-resources/robots'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { HowCalibrationWorksModal } from '/app/organisms/HowCalibrationWorksModal'
 import { CONNECTABLE } from '/app/redux/discovery'
 import * as RobotApi from '/app/redux/robot-api'

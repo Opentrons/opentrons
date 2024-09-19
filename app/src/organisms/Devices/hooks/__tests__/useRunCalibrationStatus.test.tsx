@@ -8,9 +8,9 @@ import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
 import {
   useRunCalibrationStatus,
   useDeckCalibrationStatus,
-  useIsFlex,
   useRunPipetteInfoByMount,
 } from '..'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useNotifyRunQuery } from '/app/resources/runs'
 
 import type { PipetteInfo } from '..'

@@ -25,6 +25,7 @@ import {
 
 vi.mock('react-router-dom')
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../../../../RunTimeControl/hooks')
 vi.mock('../../../hooks')
 vi.mock('/app/resources/runs')

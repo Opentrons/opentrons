@@ -9,12 +9,10 @@ import {
   useTrackEvent,
   ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
 } from '/app/redux/analytics'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
-import {
-  useDeckCalibrationData,
-  useIsFlex,
-  useRunHasStarted,
-} from '../../hooks'
+import { useDeckCalibrationData, useRunHasStarted } from '../../hooks'
+
 import { SetupDeckCalibration } from '../SetupDeckCalibration'
 import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
@@ -22,6 +20,7 @@ import { SetupRobotCalibration } from '../SetupRobotCalibration'
 
 vi.mock('/app/redux/analytics')
 vi.mock('../../hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../SetupDeckCalibration')
 vi.mock('../SetupInstrumentCalibration')
 vi.mock('../SetupTipLengthCalibration')
