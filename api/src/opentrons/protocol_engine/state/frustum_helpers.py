@@ -284,7 +284,4 @@ def get_well_volumetric_capacity(
                 bottom_cross_section_area, top_cross_section_area, section_height
             )
             well_volume.append((next_f["topHeight"], bounded_volume))
-
-    # cycle through every one, see what the boundaries are
-    # write helper that does volume of a frustum formula
     return well_volume
