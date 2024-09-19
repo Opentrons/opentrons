@@ -540,12 +540,14 @@ class InstrumentContext(publisher.CommandPublisher):
             ),
         ):
             self.aspirate(volume, location, rate)
+            auto_presence = self.liquid_presence_detection
+            self.liquid_presence_detection = False
             while repetitions - 1 > 0:
                 self.dispense(volume, rate=rate, **dispense_kwargs)
                 self.aspirate(volume, rate=rate)
                 repetitions -= 1
             self.dispense(volume, rate=rate)
-
+            self.liquid_presence_detection = auto_presence
         return self
 
     @requires_version(2, 0)
