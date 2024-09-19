@@ -229,6 +229,8 @@ class Well:
         :return: A :py:class:`~opentrons.types.Location` corresponding to the
             absolute position of the meniscus-center of the well, plus the ``z`` offset
             (if specified).
+
+        :meta private:
         """
         return Location(self._core.get_meniscus(z_offset=z), self)
 
