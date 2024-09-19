@@ -435,14 +435,12 @@ class GeometryView:
             elif well_location.origin == WellOrigin.CENTER:
                 offset = offset.copy(update={"z": offset.z + well_depth / 2.0})
             elif well_location.origin == WellOrigin.MENISCUS:
-                liquid_height = self._wells.get_last_measured_liquid_height(
+                starting_liquid_height = self._wells.get_last_measured_liquid_height(
                     labware_id, well_name
                 )
-                if liquid_height is not None:
-                    # use operation_volume
-                    if operation_volume:
-                        pass
-                    offset = offset.copy(update={"z": offset.z + liquid_height})
+                if starting_liquid_height is not None:
+                    height_after_operation = self.get_ending_height(starting_liquid_height, operation_volume)
+                    offset = offset.copy(update={"z": offset.z + height_after_operation})
                 else:
                     raise errors.LiquidHeightUnknownError(
                         "Must liquid probe before specifying WellOrigin.MENISCUS."
