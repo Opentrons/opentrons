@@ -1543,6 +1543,7 @@ def test_get_well_position_with_meniscus_offset(
             origin=WellOrigin.MENISCUS,
             offset=WellOffset(x=2, y=3, z=4),
         ),
+        operation_volume=0.0,
     )
 
     assert result == Point(

@@ -242,7 +242,7 @@ class WellOffset(BaseModel):
 class WellVolumeOffset(BaseModel):
     """A z-offset to account for volume in an operation."""
 
-    volumeOffset: Union[float, Literal["operationVolume"]] = 0
+    volumeOffset: Union[float, Literal["operationVolume"]] = 0.0
 
 
 class WellLocation(BaseModel):

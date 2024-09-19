@@ -86,7 +86,6 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
         pipette_id = params.pipetteId
         labware_id = params.labwareId
         well_name = params.wellName
-        well_location = params.wellLocation
         volume = params.volume
 
         ready_to_aspirate = self._pipetting.get_is_ready_to_aspirate(
@@ -118,7 +117,7 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
-            well_location=well_location,
+            well_location=params.wellLocation,
             current_well=current_well,
             operation_volume=-volume,
         )

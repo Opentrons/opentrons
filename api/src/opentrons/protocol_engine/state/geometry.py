@@ -439,8 +439,17 @@ class GeometryView:
                     labware_id, well_name
                 )
                 if starting_liquid_height is not None:
-                    height_after_operation = self.get_ending_height(starting_liquid_height, well_location.volumeOffset)
-                    offset = offset.copy(update={"z": offset.z + height_after_operation})
+                    if well_location.volumeOffset.volumeOffset == "operationVolume":
+                        volume = operation_volume or 0.0
+                    else:
+                        volume = well_location.volumeOffset.volumeOffset
+                    # height_after_operation = self.get_ending_height(labware_id, well_name, starting_liquid_height, volume)
+                    height_after_operation = starting_liquid_height  # delete, use above method once implemented
+                    if volume:  # delete
+                        pass  # delete
+                    offset = offset.copy(
+                        update={"z": offset.z + height_after_operation}
+                    )
                 else:
                     raise errors.LiquidHeightUnknownError(
                         "Must liquid probe before specifying WellOrigin.MENISCUS."
