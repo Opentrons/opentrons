@@ -90,13 +90,18 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
 
   //  initialize pipette name once all fields are filled out
   React.useEffect(() => {
-    if (pipetteType != null && pipetteVolume != null) {
+    if (
+      pipetteType != null &&
+      pipetteVolume != null &&
+      robotType === OT2_ROBOT_TYPE &&
+      pipetteGen != null
+    ) {
       setValue(
         `pipettesByMount.${defaultMount}.pipetteName`,
         selectedPipetteName
       )
     }
-  }, [pipetteType, pipetteVolume, selectedPipetteName])
+  }, [pipetteType, pipetteGen, pipetteVolume, selectedPipetteName])
 
   const isDisabled =
     page === 'add' && pipettesByMount[defaultMount].tiprackDefURI == null
