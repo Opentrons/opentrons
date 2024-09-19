@@ -19,6 +19,7 @@ import type { ProtocolAnalyticsData } from '/app/redux/analytics/types'
 vi.mock('../../hooks')
 vi.mock('../useProtocolRunAnalyticsData')
 vi.mock('../useStoredProtocolAnalysis')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/pipettes')
 vi.mock('/app/redux/analytics')

@@ -33,6 +33,7 @@ vi.mock('/app/pages/Desktop/Devices/RobotSettings')
 vi.mock('/app/organisms/Alerts/AlertsModal')
 vi.mock('/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline')
 vi.mock('/app/redux/config')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../hooks')
 
 const render = (path = '/') => {

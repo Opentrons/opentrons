@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
-import { useRobot } from './'
+import { useRobot } from '/app/redux-resources/robots'
 import { getAttachedPipettes } from '/app/redux/pipettes'
 import { getRobotSettings, fetchSettings } from '/app/redux/robot-settings'
 import {

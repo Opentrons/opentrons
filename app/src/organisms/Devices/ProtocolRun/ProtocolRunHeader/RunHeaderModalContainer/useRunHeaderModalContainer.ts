@@ -12,17 +12,13 @@ import {
   useRunHeaderDropTip,
 } from './hooks'
 import { useErrorRecoveryFlows } from '../../../../ErrorRecoveryFlows'
-import {
-  useProtocolDetailsForRun,
-  useRobot,
-  useRobotType,
-} from '../../../hooks'
+import { useProtocolDetailsForRun, useRobotType } from '../../../hooks'
 import { getFallbackRobotSerialNumber } from '../utils'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   useTrackEvent,
 } from '/app/redux/analytics'
-
+import { useRobot } from '/app/redux-resources/robots'
 import type { AttachedModule, RunStatus, Run } from '@opentrons/api-client'
 import type { UseErrorRecoveryResult } from '../../../../ErrorRecoveryFlows'
 import type {

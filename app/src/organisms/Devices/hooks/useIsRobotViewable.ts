@@ -1,4 +1,4 @@
-import { useRobot } from './useRobot'
+import { useRobot } from '/app/redux-resources/robots'
 
 import { CONNECTABLE } from '/app/redux/discovery'
 

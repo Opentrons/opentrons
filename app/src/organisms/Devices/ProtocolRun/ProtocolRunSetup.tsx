@@ -29,11 +29,11 @@ import {
   getRequiredDeckConfig,
 } from '/app/resources/deck_configuration/utils'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
+import { useRobot } from '/app/redux-resources/robots'
 import {
   useIsFlex,
   useModuleCalibrationStatus,
   useProtocolAnalysisErrors,
-  useRobot,
   useRunCalibrationStatus,
   useRunHasStarted,
   useRunPipetteInfoByMount,

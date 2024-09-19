@@ -37,8 +37,8 @@ import {
   useIsFlex,
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
-  useRobot,
 } from '../../../hooks'
+import { useRobot } from '/app/redux-resources/robots'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import type { State, Dispatch } from '/app/redux/types'

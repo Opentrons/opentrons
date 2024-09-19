@@ -1,5 +1,5 @@
 import { useCalibrationStatusQuery } from '@opentrons/react-api-client'
-import { useRobot } from './useRobot'
+import { useRobot } from '/app/redux-resources/robots'
 import type { DeckCalibrationStatus } from '/app/redux/calibration/types'
 
 export function useDeckCalibrationStatus(

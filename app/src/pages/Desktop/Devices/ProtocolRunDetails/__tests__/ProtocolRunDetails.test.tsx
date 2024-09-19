@@ -9,7 +9,6 @@ import { i18n } from '/app/i18n'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import {
   useModuleRenderInfoForProtocolById,
-  useRobot,
   useRunStatuses,
   useSyncRobotClock,
   useRunHasStarted,
@@ -22,6 +21,7 @@ import { RunPreviewComponent } from '/app/organisms/RunPreview'
 import { ProtocolRunRuntimeParameters } from '/app/organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 import { useCurrentRunId } from '/app/resources/runs'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
+import { useRobot } from '/app/redux-resources/robots'
 import { ProtocolRunDetails } from '..'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
@@ -35,6 +35,7 @@ vi.mock('/app/organisms/Devices/ProtocolRun/ProtocolRunModuleControls')
 vi.mock('/app/resources/runs')
 vi.mock('/app/organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters')
 vi.mock('/app/redux/config')
+vi.mock('/app/redux-resources/robots')
 
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
 

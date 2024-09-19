@@ -6,7 +6,7 @@ import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
-import { useRobot } from '../'
+import { useRobot } from '/app/redux-resources/robots'
 import { useRobotAnalyticsData } from '../useRobotAnalyticsData'
 import { getAttachedPipettes } from '/app/redux/pipettes'
 import { getRobotSettings } from '/app/redux/robot-settings'
@@ -24,6 +24,7 @@ import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/pipettes')
 vi.mock('/app/redux/robot-settings')

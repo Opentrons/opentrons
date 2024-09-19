@@ -13,12 +13,12 @@ import {
   ANALYTICS_PROTOCOL_RUN_ACTION,
 } from '/app/redux/analytics'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import { useRobot } from '../useRobot'
+import { useRobot } from '/app/redux-resources/robots'
 
 import type { Store } from 'redux'
 import type { Mock } from 'vitest'
 
-vi.mock('../useRobot')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../useProtocolRunAnalyticsData')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/pipettes')

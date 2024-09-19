@@ -1,6 +1,6 @@
 import { useTrackEvent } from '/app/redux/analytics'
 import { useProtocolRunAnalyticsData } from './useProtocolRunAnalyticsData'
-import { useRobot } from './useRobot'
+import { useRobot } from '/app/redux-resources/robots'
 
 interface ProtocolRunAnalyticsEvent {
   name: string

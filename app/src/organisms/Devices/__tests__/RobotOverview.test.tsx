@@ -22,11 +22,11 @@ import {
   OPENTRONS_USB,
   ROBOT_MODEL_OT3,
 } from '/app/redux/discovery/constants'
+import { useRobot } from '/app/redux-resources/robots'
 import {
   useCalibrationTaskList,
   useIsRobotBusy,
   useLights,
-  useRobot,
   useRunStatuses,
   useIsRobotViewable,
 } from '../hooks'
@@ -67,6 +67,7 @@ vi.mock('/app/redux/config')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/resources/runs')
 vi.mock('../hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../RobotStatusHeader')
 vi.mock('../../UpdateRobotBanner')
 vi.mock('../RobotOverviewOverflowMenu')
