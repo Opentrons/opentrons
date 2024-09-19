@@ -18,6 +18,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  DISPLAY_GRID,
 } from '@opentrons/components'
 
 import { UNIVERSAL_FLAT_ADAPTER_X_DIMENSION } from '../LabwareDetails/Gallery'
@@ -51,7 +52,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
       height="auto"
       onClick={props.onClick}
       cursor="pointer"
-      display="grid"
+      display={DISPLAY_GRID}
       gridTemplateColumns=" minmax(5rem, 1fr) minmax(7.5rem, 1fr) 4fr minmax(
         3rem,
         1fr

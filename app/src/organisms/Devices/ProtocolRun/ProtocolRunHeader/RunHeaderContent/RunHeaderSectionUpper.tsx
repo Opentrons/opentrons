@@ -2,7 +2,12 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
-import { Box, Flex, JUSTIFY_FLEX_END } from '@opentrons/components'
+import {
+  Box,
+  DISPLAY_GRID,
+  Flex,
+  JUSTIFY_FLEX_END,
+} from '@opentrons/components'
 
 import { LabeledValue } from './LabeledValue'
 import { DisplayRunStatus } from '../DisplayRunStatus'
@@ -50,6 +55,6 @@ export function RunHeaderSectionUpper(
 }
 
 const SECTION_STYLE = css`
-  display: grid;
+  display: ${DISPLAY_GRID};
   grid-template-columns: 4fr 3fr 3fr 4fr;
 `

@@ -18,6 +18,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  DISPLAY_GRID,
   DISPLAY_INLINE,
   Flex,
   Icon,
@@ -259,7 +260,7 @@ const StyledTable = styled.table`
   text-align: left;
 `
 const StyledTableHeaderContainer = styled.thead`
-  display: grid;
+  display: ${DISPLAY_GRID};
   grid-template-columns: 0.35fr 0.35fr;
   grid-gap: ${SPACING.spacing48};
   border-bottom: ${BORDERS.lineBorder};
@@ -275,7 +276,7 @@ interface StyledTableRowProps {
 }
 
 const StyledTableRow = styled.tr<StyledTableRowProps>`
-  display: grid;
+  display: ${DISPLAY_GRID};
   grid-template-columns: 0.35fr 0.35fr;
   grid-gap: ${SPACING.spacing48};
   border-bottom: ${props => (props.isLast ? 'none' : BORDERS.lineBorder)};
