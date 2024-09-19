@@ -16,8 +16,8 @@ import { Labware } from '..'
 import { useAllLabware } from '/app/local-resources/labware'
 import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
 
-vi.mock('/app/organisms/LabwareCard')
-vi.mock('/app/organisms/AddCustomLabwareSlideout')
+vi.mock('/app/organisms/Desktop/Labware/LabwareCard')
+vi.mock('/app/organisms/Desktop/Labware/AddCustomLabwareSlideout')
 vi.mock('/app/organisms/ToasterOven')
 vi.mock('../hooks')
 vi.mock('/app/redux/analytics')
