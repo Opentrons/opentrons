@@ -265,12 +265,15 @@ Detect Liquids
 
 The :py:meth:`.InstrumentContext.detect_liquid_presence` method tells a Flex pipette to check for liquid in a well. It returns ``True`` if the pressure sensors in the pipette detect a liquid and ``False`` if the sensors do not. 
 
-Aspiration isn't required to use ``detect_liquid_presence()``. This is a standalone method that can be called when you want the robot to record the presence or absence of a liquid. When ``detect_liquid_presence()`` finds an empty well it won't raise an error or stop your protocol.
+``detect_liquid_presence()`` is a standalone method that can be called when you want the robot to record the presence or absence of a liquid. You should always call :py:meth:`.pick_up_tip` immediately prior, in order to ensure that the pipette uses a clean, dry tip. 
+
+When ``detect_liquid_presence()`` finds an empty well it won't raise an error or stop your protocol. You don't have to aspirate after detecting liquid presence.
 
 A potential use of liquid detection is to try aspirating from another well if the first well is found to contain no liquid.
 
 .. code-block:: python
     
+    pipette.pick_up_tip()
     if pipette.detect_liquid_presence(reservoir["A1"]):
         pipette.aspirate(100, reservoir["A1"])
     else:
@@ -285,11 +288,16 @@ Require Liquids
 
 The :py:meth:`.InstrumentContext.require_liquid_presence` method tells a Flex pipette to check for `and require` liquid in a well. 
 
-Aspiration isn't required to use ``require_liquid_presence()``. This is a standalone method that can be called when you want the robot to react to a missing liquid or empty well. When ``require_liquid_presence()`` finds an empty well, it raises an error and pauses the protocol to let you resolve the problem. See also :ref:`lpd`.
+``require_liquid_presence()`` is a standalone method that can be called when you want the robot to react to a missing liquid or empty well. You should always call :py:meth:`.pick_up_tip` immediately prior, in order to ensure that the pipette uses a clean, dry tip. 
+
+When ``require_liquid_presence()`` finds an empty well, it raises an error and pauses the protocol to let you resolve the problem. You don't have to aspirate after requiring liquid presence.
 
 .. code-block:: python
 
+    pipette.pick_up_tip()
     pipette.require_liquid_presence(reservoir["A1"])
     pipette.aspirate(100, reservoir["A1"])  # only occurs if liquid found
+
+You can also require liquid presence for all aspirations performed with a given pipette. See :ref:`lpd`.
 
 .. versionadded:: 2.20
