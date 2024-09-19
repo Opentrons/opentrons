@@ -16,6 +16,7 @@ import { useRecoveryActionMutation } from './useRecoveryActionMutation'
 import { useRunningStepCounts } from '../../../resources/protocols/hooks'
 import { useRecoveryToasts } from './useRecoveryToasts'
 import { useRecoveryAnalytics } from './useRecoveryAnalytics'
+import { useShowDoorInfo } from './useShowDoorInfo'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
@@ -56,6 +57,7 @@ export interface ERUtilsResults {
   recoveryActionMutationUtils: RecoveryActionMutationResult
   failedPipetteInfo: PipetteData | null
   hasLaunchedRecovery: boolean
+  isProhibitedDoorOpen: boolean
   stepCounts: StepCounts
   commandsAfterFailedCommand: ReturnType<typeof getNextSteps>
   subMapUtils: SubMapUtils
@@ -72,6 +74,7 @@ export function useERUtils({
   protocolAnalysis,
   isOnDevice,
   robotType,
+  runStatus,
 }: ERUtilsProps): ERUtilsResults {
   const { data: attachedInstruments } = useInstrumentsQuery()
   const { data: runRecord } = useNotifyRunQuery(runId)
@@ -96,6 +99,8 @@ export function useERUtils({
     currentRecoveryOptionUtils,
     ...subMapUtils
   } = useRecoveryRouting()
+
+  const isProhibitedDoorOpen = useShowDoorInfo(runStatus, recoveryMap)
 
   const recoveryToastUtils = useRecoveryToasts({
     currentStepCount: stepCounts.currentStepNumber,
@@ -168,6 +173,7 @@ export function useERUtils({
     routeUpdateActions,
     recoveryCommands,
     hasLaunchedRecovery,
+    isProhibitedDoorOpen,
     tipStatusUtils,
     failedLabwareUtils,
     failedPipetteInfo,

@@ -67,7 +67,6 @@ export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps &
   ERUtilsResults & {
     robotType: RobotType
     isOnDevice: boolean
-    isDoorOpen: boolean
     analytics: UseRecoveryAnalyticsResult
     failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
   }
@@ -98,7 +97,7 @@ export function ErrorRecoveryComponent(
   const {
     recoveryMap,
     hasLaunchedRecovery,
-    isDoorOpen,
+    isProhibitedDoorOpen,
     isOnDevice,
     analytics,
   } = props
@@ -138,7 +137,7 @@ export function ErrorRecoveryComponent(
 
   // TODO(jh, 07-29-24): Make RecoveryDoorOpen render logic equivalent to RecoveryTakeover. Do not nest it in RecoveryWizard.
   const buildInterventionContent = (): JSX.Element => {
-    if (isDoorOpen) {
+    if (isProhibitedDoorOpen) {
       return <RecoveryDoorOpen {...props} />
     } else {
       return <ErrorRecoveryContent {...props} />
@@ -146,7 +145,7 @@ export function ErrorRecoveryComponent(
   }
 
   const isLargeDesktopStyle =
-    !isDoorOpen &&
+    !isProhibitedDoorOpen &&
     route === RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE &&
     step !== RECOVERY_MAP.DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL
   const desktopType = isLargeDesktopStyle ? 'desktop-large' : 'desktop-small'

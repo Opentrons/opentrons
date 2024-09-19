@@ -1,7 +1,6 @@
 export { useCurrentlyRecoveringFrom } from './useCurrentlyRecoveringFrom'
 export { useErrorMessage } from './useErrorMessage'
 export { useErrorName } from './useErrorName'
-export { useShowDoorInfo } from './useShowDoorInfo'
 export { useRecoveryCommands } from './useRecoveryCommands'
 export { useRouteUpdateActions } from './useRouteUpdateActions'
 export { useERUtils } from './useERUtils'
