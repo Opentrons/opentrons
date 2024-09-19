@@ -13,6 +13,7 @@ from typing import (
     NamedTuple,
     cast,
     Union,
+    get_args,
 )
 
 from opentrons.protocol_engine.state import update_types
@@ -247,16 +248,22 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                     definition_uri
                 ] = action.state_update.loaded_labware.definition
 
+                location = None
+                if isinstance(
+                    action.state_update.labware_location.new_location,
+                    get_args(LabwareLocation),
+                ):
+                    location = action.state_update.labware_location.new_location
+                else:
+                    location = self._state.labware_by_id[
+                        action.state_update.loaded_labware.labware_id
+                    ].location
+
                 self._state.labware_by_id[
                     action.state_update.loaded_labware.labware_id
                 ] = LoadedLabware.construct(
                     id=action.state_update.loaded_labware.labware_id,
-                    location=self._state.labware_by_id[
-                        action.state_update.loaded_labware.labware_id
-                    ].location
-                    if action.state_update.labware_location is None
-                    or isinstance(action.state_update.labware_location, _NoChangeEnum)
-                    else action.state_update.labware_location.new_location,
+                    location=location,
                     loadName=action.state_update.loaded_labware.definition.parameters.loadName,
                     definitionUri=definition_uri,
                     offsetId=action.state_update.loaded_labware.offsetId,
