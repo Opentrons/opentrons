@@ -99,6 +99,16 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
       setStepOverflowMenu(false)
     }
   }
+
+  const capitalizeFirstLetterAfterNumber = (title: string): string => {
+    return title.replace(
+      /(^[\d\W]*)([a-zA-Z])/,
+      (match, prefix, firstLetter) => {
+        return prefix + firstLetter.toUpperCase()
+      }
+    )
+  }
+
   return (
     <>
       <Box id={stepId} {...{ onMouseEnter, onMouseLeave }}>
@@ -126,7 +136,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
               )}
               {formData != null ? null : (
                 <StyledText desktopStyle="bodyDefaultRegular">
-                  {title}
+                  {capitalizeFirstLetterAfterNumber(title)}
                 </StyledText>
               )}
             </Flex>
