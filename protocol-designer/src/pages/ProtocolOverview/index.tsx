@@ -33,6 +33,7 @@ import {
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+
 import {
   getAdditionalEquipmentEntities,
   getInitialDeckSetup,
