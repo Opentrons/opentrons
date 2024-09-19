@@ -346,18 +346,20 @@ export function ProtocolOverview(): JSX.Element {
                 <StyledText desktopStyle="headingSmallBold">
                   {t('protocol_metadata')}
                 </StyledText>
-                <Btn
-                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                  onClick={() => {
-                    setShowEditMetadataModal(true)
-                  }}
-                  css={BUTTON_LINK_STYLE}
-                  data-testid="ProtocolOverview_MetadataEditButton"
-                >
-                  <StyledText desktopStyle="bodyDefaultRegular">
-                    {t('edit')}
-                  </StyledText>
-                </Btn>
+                <Flex padding={SPACING.spacing4}>
+                  <Btn
+                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                    onClick={() => {
+                      setShowEditMetadataModal(true)
+                    }}
+                    css={BUTTON_LINK_STYLE}
+                    data-testid="ProtocolOverview_MetadataEditButton"
+                  >
+                    <StyledText desktopStyle="bodyDefaultRegular">
+                      {t('edit')}
+                    </StyledText>
+                  </Btn>
+                </Flex>
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
                 {metaDataInfo.map(info => {
@@ -389,17 +391,19 @@ export function ProtocolOverview(): JSX.Element {
                 <StyledText desktopStyle="headingSmallBold">
                   {t('instruments')}
                 </StyledText>
-                <Btn
-                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                  onClick={() => {
-                    setShowEditInstrumentsModal(true)
-                  }}
-                  css={BUTTON_LINK_STYLE}
-                >
-                  <StyledText desktopStyle="bodyDefaultRegular">
-                    {t('edit')}
-                  </StyledText>
-                </Btn>
+                <Flex padding={SPACING.spacing4}>
+                  <Btn
+                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                    onClick={() => {
+                      setShowEditInstrumentsModal(true)
+                    }}
+                    css={BUTTON_LINK_STYLE}
+                  >
+                    <StyledText desktopStyle="bodyDefaultRegular">
+                      {t('edit')}
+                    </StyledText>
+                  </Btn>
+                </Flex>
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
                 <ListItem type="noActive" key={`ProtocolOverview_robotType`}>
