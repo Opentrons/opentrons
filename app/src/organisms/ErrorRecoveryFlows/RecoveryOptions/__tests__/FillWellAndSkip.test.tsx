@@ -137,13 +137,13 @@ describe('FillWell', () => {
 
 describe('SkipToNextStep', () => {
   let props: React.ComponentProps<typeof SkipToNextStep>
-  let mockSetRobotInMotion: Mock
+  let mockhandleMotionRouting: Mock
   let mockGoBackPrevStep: Mock
   let mockProceedToRouteAndStep: Mock
   let mockSkipFailedCommand: Mock
 
   beforeEach(() => {
-    mockSetRobotInMotion = vi.fn(() => Promise.resolve())
+    mockhandleMotionRouting = vi.fn(() => Promise.resolve())
     mockGoBackPrevStep = vi.fn()
     mockProceedToRouteAndStep = vi.fn()
     mockSkipFailedCommand = vi.fn(() => Promise.resolve())
@@ -151,7 +151,7 @@ describe('SkipToNextStep', () => {
     props = {
       ...mockRecoveryContentProps,
       routeUpdateActions: {
-        setRobotInMotion: mockSetRobotInMotion,
+        handleMotionRouting: mockhandleMotionRouting,
         goBackPrevStep: mockGoBackPrevStep,
         proceedToRouteAndStep: mockProceedToRouteAndStep,
       } as any,
@@ -186,7 +186,7 @@ describe('SkipToNextStep', () => {
     renderSkipToNextStep(props)
     clickButtonLabeled('Continue run now')
     await waitFor(() => {
-      expect(mockSetRobotInMotion).toHaveBeenCalledWith(
+      expect(mockhandleMotionRouting).toHaveBeenCalledWith(
         true,
         RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE
       )
@@ -195,7 +195,7 @@ describe('SkipToNextStep', () => {
       expect(mockSkipFailedCommand).toHaveBeenCalled()
     })
 
-    expect(mockSetRobotInMotion.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(mockhandleMotionRouting.mock.invocationCallOrder[0]).toBeLessThan(
       mockSkipFailedCommand.mock.invocationCallOrder[0]
     )
   })

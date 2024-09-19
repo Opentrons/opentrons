@@ -421,22 +421,22 @@ describe('ErrorRecoveryContent', () => {
 
 describe('useInitialPipetteHome', () => {
   let mockZHomePipetteZAxes: Mock
-  let mockSetRobotInMotion: Mock
+  let mockhandleMotionRouting: Mock
   let mockRecoveryCommands: any
   let mockRouteUpdateActions: any
 
   beforeEach(() => {
     mockZHomePipetteZAxes = vi.fn()
-    mockSetRobotInMotion = vi.fn()
+    mockhandleMotionRouting = vi.fn()
 
-    mockSetRobotInMotion.mockResolvedValue(() => mockZHomePipetteZAxes())
-    mockZHomePipetteZAxes.mockResolvedValue(() => mockSetRobotInMotion())
+    mockhandleMotionRouting.mockResolvedValue(() => mockZHomePipetteZAxes())
+    mockZHomePipetteZAxes.mockResolvedValue(() => mockhandleMotionRouting())
 
     mockRecoveryCommands = {
       homePipetteZAxes: mockZHomePipetteZAxes,
     } as any
     mockRouteUpdateActions = {
-      setRobotInMotion: mockSetRobotInMotion,
+      handleMotionRouting: mockhandleMotionRouting,
     } as any
   })
 
@@ -449,7 +449,7 @@ describe('useInitialPipetteHome', () => {
       })
     )
 
-    expect(mockSetRobotInMotion).not.toHaveBeenCalled()
+    expect(mockhandleMotionRouting).not.toHaveBeenCalled()
   })
 
   it('sets the motion screen properly and z-homes all pipettes only on the initial render of Error Recovery', async () => {
@@ -462,26 +462,26 @@ describe('useInitialPipetteHome', () => {
     )
 
     await waitFor(() => {
-      expect(mockSetRobotInMotion).toHaveBeenCalledWith(true)
+      expect(mockhandleMotionRouting).toHaveBeenCalledWith(true)
     })
     await waitFor(() => {
       expect(mockZHomePipetteZAxes).toHaveBeenCalledTimes(1)
     })
     await waitFor(() => {
-      expect(mockSetRobotInMotion).toHaveBeenCalledWith(false)
+      expect(mockhandleMotionRouting).toHaveBeenCalledWith(false)
     })
 
-    expect(mockSetRobotInMotion.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(mockhandleMotionRouting.mock.invocationCallOrder[0]).toBeLessThan(
       mockZHomePipetteZAxes.mock.invocationCallOrder[0]
     )
     expect(mockZHomePipetteZAxes.mock.invocationCallOrder[0]).toBeLessThan(
-      mockSetRobotInMotion.mock.invocationCallOrder[1]
+      mockhandleMotionRouting.mock.invocationCallOrder[1]
     )
 
     rerender()
 
     await waitFor(() => {
-      expect(mockSetRobotInMotion).toHaveBeenCalledTimes(2)
+      expect(mockhandleMotionRouting).toHaveBeenCalledTimes(2)
     })
     await waitFor(() => {
       expect(mockZHomePipetteZAxes).toHaveBeenCalledTimes(1)

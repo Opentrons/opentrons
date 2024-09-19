@@ -107,9 +107,9 @@ describe('useRouteUpdateActions', () => {
     const { result } = renderHook(() =>
       useRouteUpdateActions(useRouteUpdateActionsParams)
     )
-    const { setRobotInMotion } = result.current
+    const { handleMotionRouting } = result.current
 
-    setRobotInMotion(true)
+    handleMotionRouting(true)
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
       route: RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE,
       step: RECOVERY_MAP.ROBOT_IN_MOTION.STEPS.IN_MOTION,
@@ -120,9 +120,9 @@ describe('useRouteUpdateActions', () => {
     const { result } = renderHook(() =>
       useRouteUpdateActions(useRouteUpdateActionsParams)
     )
-    const { setRobotInMotion } = result.current
+    const { handleMotionRouting } = result.current
 
-    setRobotInMotion(true, RECOVERY_MAP.ROBOT_RESUMING.ROUTE)
+    handleMotionRouting(true, RECOVERY_MAP.ROBOT_RESUMING.ROUTE)
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
       route: RECOVERY_MAP.ROBOT_RESUMING.ROUTE,
       step: RECOVERY_MAP.ROBOT_RESUMING.STEPS.RESUMING,
@@ -133,15 +133,15 @@ describe('useRouteUpdateActions', () => {
     const { result, rerender } = renderHook(() =>
       useRouteUpdateActions(useRouteUpdateActionsParams)
     )
-    const { setRobotInMotion } = result.current
+    const { handleMotionRouting } = result.current
 
-    setRobotInMotion(true)
+    handleMotionRouting(true)
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
       route: RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE,
       step: RECOVERY_MAP.ROBOT_IN_MOTION.STEPS.IN_MOTION,
     })
 
-    setRobotInMotion(false)
+    handleMotionRouting(false)
     rerender()
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
       route: RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,

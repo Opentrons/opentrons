@@ -273,14 +273,14 @@ export function useInitialPipetteHome({
   routeUpdateActions,
 }: UseInitialPipetteHomeParams): void {
   const { homePipetteZAxes } = recoveryCommands
-  const { setRobotInMotion } = routeUpdateActions
+  const { handleMotionRouting } = routeUpdateActions
 
   // Synchronously set the recovery route to "robot in motion" before initial render to prevent screen flicker on ER launch.
   React.useLayoutEffect(() => {
     if (hasLaunchedRecovery) {
-      void setRobotInMotion(true)
+      void handleMotionRouting(true)
         .then(() => homePipetteZAxes())
-        .finally(() => setRobotInMotion(false))
+        .finally(() => handleMotionRouting(false))
     }
   }, [hasLaunchedRecovery])
 }

@@ -73,19 +73,19 @@ describe('RetrySameTips', () => {
 
 describe('RetrySameTipsInfo', () => {
   let props: React.ComponentProps<typeof RetrySameTipsInfo>
-  let mockSetRobotInMotion: Mock
+  let mockhandleMotionRouting: Mock
   let mockRetryFailedCommand: Mock
   let mockResumeRun: Mock
 
   beforeEach(() => {
-    mockSetRobotInMotion = vi.fn(() => Promise.resolve())
+    mockhandleMotionRouting = vi.fn(() => Promise.resolve())
     mockRetryFailedCommand = vi.fn(() => Promise.resolve())
     mockResumeRun = vi.fn()
 
     props = {
       ...mockRecoveryContentProps,
       routeUpdateActions: {
-        setRobotInMotion: mockSetRobotInMotion,
+        handleMotionRouting: mockhandleMotionRouting,
       } as any,
       recoveryCommands: {
         retryFailedCommand: mockRetryFailedCommand,
@@ -111,7 +111,7 @@ describe('RetrySameTipsInfo', () => {
     clickButtonLabeled('Retry now')
 
     await waitFor(() => {
-      expect(mockSetRobotInMotion).toHaveBeenCalledWith(
+      expect(mockhandleMotionRouting).toHaveBeenCalledWith(
         true,
         RECOVERY_MAP.ROBOT_RETRYING_STEP.ROUTE
       )
@@ -123,7 +123,7 @@ describe('RetrySameTipsInfo', () => {
       expect(mockResumeRun).toHaveBeenCalled()
     })
 
-    expect(mockSetRobotInMotion.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(mockhandleMotionRouting.mock.invocationCallOrder[0]).toBeLessThan(
       mockRetryFailedCommand.mock.invocationCallOrder[0]
     )
     expect(mockRetryFailedCommand.mock.invocationCallOrder[0]).toBeLessThan(

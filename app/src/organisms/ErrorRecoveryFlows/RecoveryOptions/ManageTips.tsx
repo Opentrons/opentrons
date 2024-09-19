@@ -66,7 +66,7 @@ export function BeginRemoval({
   const { aPipetteWithTip } = tipStatusUtils
   const {
     proceedNextStep,
-    setRobotInMotion,
+    handleMotionRouting,
     proceedToRouteAndStep,
   } = routeUpdateActions
   const { cancelRun } = recoveryCommands
@@ -85,7 +85,7 @@ export function BeginRemoval({
         RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
       )
     } else {
-      void setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => {
+      void handleMotionRouting(true, ROBOT_CANCELING.ROUTE).then(() => {
         cancelRun()
       })
     }
@@ -153,7 +153,7 @@ function DropTipFlowsContainer(
     currentRecoveryOptionUtils,
   } = props
   const { DROP_TIP_FLOWS, ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
-  const { proceedToRouteAndStep, setRobotInMotion } = routeUpdateActions
+  const { proceedToRouteAndStep, handleMotionRouting } = routeUpdateActions
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { setTipStatusResolved } = tipStatusUtils
   const { cancelRun } = recoveryCommands
@@ -172,7 +172,7 @@ function DropTipFlowsContainer(
   }
 
   const onEmptyCache = (): void => {
-    void setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => {
+    void handleMotionRouting(true, ROBOT_CANCELING.ROUTE).then(() => {
       cancelRun()
     })
   }

@@ -122,7 +122,7 @@ export function useOnCancelRun({
 } {
   const { ROBOT_CANCELING, DROP_TIP_FLOWS } = RECOVERY_MAP
   const { isLoadingTipStatus, areTipsAttached } = tipStatusUtils
-  const { setRobotInMotion, proceedToRouteAndStep } = routeUpdateActions
+  const { handleMotionRouting, proceedToRouteAndStep } = routeUpdateActions
   const { cancelRun } = recoveryCommands
 
   const [hasUserClicked, setHasUserClicked] = React.useState(false)
@@ -135,7 +135,7 @@ export function useOnCancelRun({
         if (areTipsAttached) {
           void proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)
         } else {
-          void setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => {
+          void handleMotionRouting(true, ROBOT_CANCELING.ROUTE).then(() => {
             cancelRun()
           })
         }

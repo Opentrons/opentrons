@@ -129,6 +129,7 @@ export function useERUtils({
     recoveryMap,
     toggleERWizAsActiveUser,
     setRecoveryMap: setRM,
+    doorStatusUtils,
   })
 
   const failedLabwareUtils = useFailedLabwareUtils({
@@ -166,6 +167,9 @@ export function useERUtils({
     protocolAnalysis,
     SUBSEQUENT_COMMAND_DEPTH
   )
+
+  // TOME: Cleanup util if takeover is true!!!
+
   return {
     recoveryMap,
     subMapUtils,
