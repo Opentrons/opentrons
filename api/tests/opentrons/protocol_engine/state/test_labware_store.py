@@ -301,11 +301,21 @@ def test_handles_move_labware(
         strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
     )
     subject.handle_action(
-        SucceedCommandAction(private_result=None, command=move_command)
+        SucceedCommandAction(
+            private_result=None,
+            command=move_command,
+            state_update=update_types.StateUpdate(
+                move_labware=update_types.StateDataUpdate(
+                    id="my-labware-id",
+                    offset_id="my-new-offset",
+                    new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                ),
+            ),
+        )
     )
 
     assert subject.state.labware_by_id["my-labware-id"].location == DeckSlotLocation(
-        slotName=DeckSlotName.SLOT_4
+        slotName=DeckSlotName.SLOT_1
     )
     assert subject.state.labware_by_id["my-labware-id"].offsetId == "my-new-offset"
 

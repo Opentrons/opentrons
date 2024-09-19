@@ -103,6 +103,8 @@ class StateUpdate:
 
     lid_status: typing.Optional[StateDataUpdate] = None
 
+    move_labware: typing.Optional[StateDataUpdate] = None
+
     # These convenience functions let the caller avoid the boilerplate of constructing a
     # complicated dataclass tree, and they give us a
 

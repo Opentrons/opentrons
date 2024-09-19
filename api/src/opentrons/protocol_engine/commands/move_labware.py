@@ -19,6 +19,7 @@ from ..errors import LabwareMovementNotAllowedError, NotSupportedOnRobotType
 from ..resources import labware_validation, fixture_validation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
+from ..state.update_types import StateDataUpdate, StateUpdate
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
 if TYPE_CHECKING:
@@ -213,8 +214,15 @@ class MoveLabwareImplementation(
             # Pause to allow for manual labware movement
             await self._run_control.wait_for_resume()
 
+        state_update = StateUpdate()
+        state_update.move_labware = StateDataUpdate(
+            id=params.labwareId, new_location=validated_new_loc, offset_id=new_offset_id
+        )
+
         return SuccessData(
-            public=MoveLabwareResult(offsetId=new_offset_id), private=None
+            public=MoveLabwareResult(offsetId=new_offset_id),
+            private=None,
+            state_update=state_update,
         )
 
 

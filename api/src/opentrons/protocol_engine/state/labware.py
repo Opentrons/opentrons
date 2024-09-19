@@ -181,24 +181,10 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         self._add_loaded_labware(action)
         self._set_reloaded_labware(action)
         self._set_move_lid_result(action)
+        self._set_move_labware(action)
 
         if not isinstance(action, SucceedCommandAction):
             return
-
-        elif isinstance(action.command.result, MoveLabwareResult):
-            labware_id = action.command.params.labwareId
-            new_location = action.command.params.newLocation
-            new_offset_id = action.command.result.offsetId
-
-            self._state.labware_by_id[labware_id].offsetId = new_offset_id
-            if isinstance(
-                new_location, AddressableAreaLocation
-            ) and fixture_validation.is_gripper_waste_chute(
-                new_location.addressableAreaName
-            ):
-                # If a labware has been moved into a waste chute it's been chuted away and is now technically off deck
-                new_location = OFF_DECK_LOCATION
-            self._state.labware_by_id[labware_id].location = new_location
 
     def _add_labware_offset(self, labware_offset: LabwareOffset) -> None:
         """Add a new labware offset to state.
@@ -222,6 +208,25 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
             self._state.labware_by_id[lid_id].offsetId = new_offset_id
             self._state.labware_by_id[lid_id].location = new_location
+
+    def _set_move_labware(self, action: Action) -> None:
+        if (
+            isinstance(action, SucceedCommandAction)
+            and action.state_update.move_labware is not None
+        ):
+            labware_id = action.state_update.move_labware.id
+            new_location = action.state_update.move_labware.new_location
+            new_offset_id = action.state_update.move_labware.offset_id
+
+            self._state.labware_by_id[labware_id].offsetId = new_offset_id
+            if isinstance(
+                new_location, AddressableAreaLocation
+            ) and fixture_validation.is_gripper_waste_chute(
+                new_location.addressableAreaName
+            ):
+                # If a labware has been moved into a waste chute it's been chuted away and is now technically off deck
+                new_location = OFF_DECK_LOCATION
+            self._state.labware_by_id[labware_id].location = new_location
 
     def _set_reloaded_labware(self, action: Action) -> None:
         if (
