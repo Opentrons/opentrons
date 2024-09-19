@@ -81,6 +81,11 @@ export function SlotOverflowMenu(
     },
   })
   const deckSetup = useSelector(getDeckSetupForActiveItem)
+
+  const liquidLocations = useSelector(
+    labwareIngredSelectors.getLiquidsByLabwareId
+  )
+
   const {
     labware: deckSetupLabware,
     modules: deckSetupModules,
@@ -157,12 +162,10 @@ export function SlotOverflowMenu(
     nickNameId = location
   }
 
-  const liquidLocations = useSelector(
-    labwareIngredSelectors.getLiquidsByLabwareId
-  )
-
   const selectionHasLiquids =
-    nickNameId != null && liquidLocations[nickNameId] != null
+    nickNameId != null &&
+    liquidLocations[nickNameId] != null &&
+    Object.keys(liquidLocations[nickNameId]).length > 0
 
   const slotOverflowBody = (
     <>
