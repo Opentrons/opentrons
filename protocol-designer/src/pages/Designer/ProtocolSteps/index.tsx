@@ -22,7 +22,9 @@ export function ProtocolSteps(): JSX.Element {
   const leftString = t('onDeck')
   const rightString = t('offDeck')
 
-  const [deckView, setDeckView] = React.useState<string>(leftString)
+  const [deckView, setDeckView] = React.useState<
+    typeof leftString | typeof rightString
+  >(leftString)
 
   const formType = formData?.stepType
 
