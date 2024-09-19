@@ -86,6 +86,8 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
         pipette_id = params.pipetteId
         labware_id = params.labwareId
         well_name = params.wellName
+        well_location = params.wellLocation
+        volume = params.volume
 
         ready_to_aspirate = self._pipetting.get_is_ready_to_aspirate(
             pipette_id=pipette_id
@@ -116,8 +118,9 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
-            well_location=params.wellLocation,
+            well_location=well_location,
             current_well=current_well,
+            operation_volume=-volume,
         )
         deck_point = DeckPoint.construct(x=position.x, y=position.y, z=position.z)
         state_update.set_pipette_location(
@@ -130,7 +133,7 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
         try:
             volume_aspirated = await self._pipetting.aspirate_in_place(
                 pipette_id=pipette_id,
-                volume=params.volume,
+                volume=volume,
                 flow_rate=params.flowRate,
                 command_note_adder=self._command_note_adder,
             )

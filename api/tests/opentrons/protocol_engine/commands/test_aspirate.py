@@ -79,6 +79,7 @@ async def test_aspirate_implementation_no_prep(
             well_name="A3",
             well_location=location,
             current_well=None,
+            operation_volume=-50,
         ),
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -145,6 +146,7 @@ async def test_aspirate_implementation_with_prep(
                 labware_id="123",
                 well_name="A3",
             ),
+            operation_volume=-50,
         ),
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -210,6 +212,7 @@ async def test_aspirate_raises_volume_error(
             well_name="A3",
             well_location=location,
             current_well=None,
+            operation_volume=-50,
         ),
     ).then_return(Point(1, 2, 3))
 
@@ -267,6 +270,7 @@ async def test_overpressure_error(
             well_name=well_name,
             well_location=well_location,
             current_well=None,
+            operation_volume=-50,
         ),
     ).then_return(position)
 

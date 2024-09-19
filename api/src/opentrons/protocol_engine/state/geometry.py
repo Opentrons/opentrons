@@ -420,6 +420,7 @@ class GeometryView:
         labware_id: str,
         well_name: str,
         well_location: Optional[WellLocation] = None,
+        operation_volume: Optional[float] = None,
     ) -> Point:
         """Given relative well location in a labware, get absolute position."""
         labware_pos = self.get_labware_position(labware_id)
@@ -438,6 +439,9 @@ class GeometryView:
                     labware_id, well_name
                 )
                 if liquid_height is not None:
+                    # use operation_volume
+                    if operation_volume:
+                        pass
                     offset = offset.copy(update={"z": offset.z + liquid_height})
                 else:
                     raise errors.LiquidHeightUnknownError(

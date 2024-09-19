@@ -149,6 +149,7 @@ async def test_move_to_well(
             current_well=None,
             force_direct=True,
             minimum_z_height=12.3,
+            operation_volume=None,
         )
     ).then_return(
         [Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER), Waypoint(Point(4, 5, 6))]
@@ -257,6 +258,7 @@ async def test_move_to_well_from_starting_location(
             well_location=well_location,
             force_direct=False,
             minimum_z_height=None,
+            operation_volume=None,
         )
     ).then_return([Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER)])
 

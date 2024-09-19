@@ -96,6 +96,7 @@ class MotionView:
         current_well: Optional[CurrentWell] = None,
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
+        operation_volume: Optional[float] = None,
     ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as a well."""
         location = current_well or self._pipettes.get_current_location()
@@ -107,9 +108,10 @@ class MotionView:
             destination_cp = CriticalPoint.XY_CENTER
 
         destination = self._geometry.get_well_position(
-            labware_id,
-            well_name,
-            well_location,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+            operation_volume=operation_volume,
         )
 
         move_type = _move_types.get_move_type_to_well(
