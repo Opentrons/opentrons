@@ -147,8 +147,6 @@ export function ErrorRecoveryFlows(
     failedCommand: failedCommandBySource,
   })
 
-  console.log('=>(index.tsx:180) showTakeover', showTakeover)
-
   return (
     <>
       {showTakeover ? (
