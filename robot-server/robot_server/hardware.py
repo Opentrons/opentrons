@@ -74,6 +74,9 @@ log = logging.getLogger(__name__)
 
 _hw_api_accessor = AppStateAccessor[ThreadManagedHardware]("hardware_api")
 _init_task_accessor = AppStateAccessor["asyncio.Task[None]"]("hardware_init_task")
+_front_button_light_blinker_accessor = AppStateAccessor["_FrontButtonLightBlinker"](
+    "front_button_light_blinker"
+)
 _postinit_task_accessor = AppStateAccessor["asyncio.Task[None]"](
     "hardware_postinit_task"
 )
@@ -94,6 +97,9 @@ def start_initializing_hardware(
     """Initialize the hardware API singleton, attaching it to global state.
 
     Returns immediately while the hardware API initializes in the background.
+
+    Any defined callbacks will be called after the hardware API is initialized, but
+    before the post-init tasks are executed.
     """
     initialize_task = _init_task_accessor.get_from(app_state)
 
@@ -127,9 +133,7 @@ async def clean_up_hardware(app_state: AppState) -> None:
 
 
 # TODO(mm, 2024-01-30): Consider merging this with the Flex's LightController.
-class FrontButtonLightBlinker:
-    """Blinks the OT-2's front button light during certain stages of startup."""
-
+class _FrontButtonLightBlinker:
     def __init__(self) -> None:
         self._hardware_and_task: Optional[
             Tuple[HardwareControlAPI, "asyncio.Task[None]"]
@@ -137,27 +141,11 @@ class FrontButtonLightBlinker:
         self._hardware_init_complete = False
         self._persistence_init_complete = False
 
-    async def start_blinking(self, hardware: HardwareControlAPI) -> None:
-        """Start blinking the OT-2's front button light.
-
-        This should be called once during server startup, as soon as the hardware is
-        initialized enough to support the front button light.
-
-        Note that this is preceded by two other visually indistinguishable stages of
-        blinking:
-        1. A separate system process blinks the light while this process's Python
-           interpreter is initializing.
-        2. build_hardware_controller() blinks the light internally while it's doing hardware
-           initialization.
-
-        Blinking will continue until `mark_hardware_init_complete()` and
-        `mark_persistence_init_complete()` have both been called.
-        """
+    async def set_hardware(self, hardware: HardwareControlAPI) -> None:
         assert self._hardware_and_task is None, "hardware should only be set once."
 
         async def blink_forever() -> None:
             while True:
-                # This should no-op on a Flex.
                 await hardware.set_lights(button=True)
                 await asyncio.sleep(0.5)
                 await hardware.set_lights(button=False)
@@ -168,17 +156,14 @@ class FrontButtonLightBlinker:
         self._hardware_and_task = (hardware, task)
 
     async def mark_hardware_init_complete(self) -> None:
-        """See `start_blinking()`."""
         self._hardware_init_complete = True
         await self._maybe_stop_blinking()
 
     async def mark_persistence_init_complete(self) -> None:
-        """See `start_blinking()`."""
         self._persistence_init_complete = True
         await self._maybe_stop_blinking()
 
     async def clean_up(self) -> None:
-        """Free resources used by the `FrontButtonLightBlinker`."""
         if self._hardware_and_task is not None:
             _, task = self._hardware_and_task
             task.cancel()
@@ -196,6 +181,62 @@ class FrontButtonLightBlinker:
 
     def _all_complete(self) -> bool:
         return self._persistence_init_complete and self._hardware_init_complete
+
+
+def fbl_init(app_state: AppState) -> None:
+    """Prepare to blink the OT-2's front button light.
+
+    This should be called once during server startup.
+    """
+    if should_use_ot3():
+        # This is only for the OT-2's front button light.
+        # The Flex's status bar is handled elsewhere -- see LightController.
+        return
+    _front_button_light_blinker_accessor.set_on(app_state, _FrontButtonLightBlinker())
+
+
+async def fbl_start_blinking(app_state: AppState, hardware: HardwareControlAPI) -> None:
+    """Start blinking the OT-2's front button light.
+
+    This should be called once during server startup, as soon as the hardware is
+    initialized enough to support the front button light.
+
+    Note that this is preceded by two other visually indistinguishable stages of
+    blinking:
+    1. A separate system process blinks the light while this process's Python
+       interpreter is initializing.
+    2. build_hardware_controller() blinks the light internally while it's doing hardware
+       initialization.
+
+    Blinking will continue until `fbl_mark_hardware_init_complete()` and
+    `fbl_mark_persistence_init_complete()` have both been called.
+    """
+    blinker = _front_button_light_blinker_accessor.get_from(app_state)
+    if blinker is not None:  # May be None on a Flex.
+        await blinker.set_hardware(hardware)
+
+
+async def fbl_mark_hardware_init_complete(
+    app_state: AppState, hardware: HardwareControlAPI
+) -> None:
+    """See `fbl_start_blinking()`."""
+    blinker = _front_button_light_blinker_accessor.get_from(app_state)
+    if blinker is not None:  # May be None on a Flex.
+        await blinker.mark_hardware_init_complete()
+
+
+async def fbl_mark_persistence_init_complete(app_state: AppState) -> None:
+    """See `fbl_start_blinking()`."""
+    blinker = _front_button_light_blinker_accessor.get_from(app_state)
+    if blinker is not None:  # May be None on a Flex.
+        await blinker.mark_persistence_init_complete()
+
+
+async def fbl_clean_up(app_state: AppState) -> None:
+    """Clean up the background task that blinks the OT-2's front button light."""
+    blinker = _front_button_light_blinker_accessor.get_from(app_state)
+    if blinker is not None:
+        await blinker.clean_up()
 
 
 # TODO(mm, 2022-10-18): Deduplicate this background initialization infrastructure
