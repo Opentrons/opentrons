@@ -611,7 +611,7 @@ class PipetteView(HasState[PipetteState]):
 
         Returns:
             The volume the pipette has aspirated.
-            None, after blow-out and the plunger is in an unsafe position or drop-tip and there is no tip attached.
+            None, after blow-out and the plunger is in an unsafe position.
 
         Raises:
             PipetteNotLoadedError: pipette ID does not exist.
