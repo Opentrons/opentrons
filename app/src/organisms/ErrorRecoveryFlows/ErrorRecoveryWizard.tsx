@@ -221,6 +221,10 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     return <IgnoreErrorSkipStep {...props} />
   }
 
+  const buildManuallyRouteToDoorOpen = (): JSX.Element => {
+    return <RecoveryDoorOpen {...props} />
+  }
+
   switch (props.recoveryMap.route) {
     case RECOVERY_MAP.OPTION_SELECTION.ROUTE:
       return buildSelectRecoveryOption()
@@ -251,6 +255,8 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     case RECOVERY_MAP.ROBOT_PICKING_UP_TIPS.ROUTE:
     case RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE:
       return buildRecoveryInProgress()
+    case RECOVERY_MAP.ROBOT_DOOR_OPEN.ROUTE:
+      return buildManuallyRouteToDoorOpen()
     default:
       return buildSelectRecoveryOption()
   }

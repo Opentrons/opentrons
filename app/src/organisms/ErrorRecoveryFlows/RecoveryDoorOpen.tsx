@@ -23,6 +23,11 @@ import {
 
 import type { RecoveryContentProps } from './types'
 
+// There are two code paths that render this component:
+// 1) The door is open on a route & step in which it is not permitted to have the door open.
+// 2) The door is open on a route & step in which it is permitted to have the door open, but the app manually redirects
+// to this component. This is commonly done when the route & step itself allows the user to keep the door open, but some
+// action on that route & step is about to occur that requires the door to be closed.
 export function RecoveryDoorOpen({
   recoveryActionMutationUtils,
   runStatus,

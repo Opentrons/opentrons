@@ -17,7 +17,9 @@ const DOOR_OPEN_STATUSES: RunStatus[] = [
 ]
 
 export interface UseShowDoorInfoResult {
+  /* Whether the door actually open, regardless of whether a door open event is prohibited . */
   isDoorOpen: boolean
+  /* Whether the door is open and prohibited to be open. */
   isProhibitedDoorOpen: boolean
 }
 
