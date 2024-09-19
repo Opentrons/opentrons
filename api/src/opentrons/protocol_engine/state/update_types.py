@@ -26,6 +26,24 @@ Unfortunately, mypy doesn't let us write `Literal[NO_CHANGE]`. Use this instead.
 """
 
 
+class _ClearEnum(enum.Enum):
+    CLEAR = enum.auto()
+
+
+CLEAR: typing.Final = _ClearEnum.CLEAR
+"""A sentinel value to indicate that a value should be cleared.
+
+Useful when `None` is semantically unclear or has some other meaning.
+"""
+
+
+ClearType: typing.TypeAlias = typing.Literal[_ClearEnum.CLEAR]
+"""The type of `CLEAR`, as `NoneType` is to `None`.
+
+Unfortunately, mypy doesn't let us write `Literal[CLEAR]`. Use this instead.
+"""
+
+
 @dataclasses.dataclass(frozen=True)
 class Well:
     """Designates a well in a labware."""
@@ -61,10 +79,7 @@ class PipetteLocationUpdate:
 class StateUpdate:
     """Represents an update to perform on engine state."""
 
-    # todo(mm, 2024-08-29): Extend this with something to represent clearing both the
-    # deck point and the logical location, for e.g. home commands. Consider an explicit
-    # `CLEAR` sentinel if `None` is confusing.
-    pipette_location: PipetteLocationUpdate | NoChangeType = NO_CHANGE
+    pipette_location: PipetteLocationUpdate | NoChangeType | ClearType = NO_CHANGE
 
     # These convenience functions let the caller avoid the boilerplate of constructing a
     # complicated dataclass tree, and they give us a
@@ -118,3 +133,7 @@ class StateUpdate:
                 new_location=Well(labware_id=new_labware_id, well_name=new_well_name),
                 new_deck_point=new_deck_point,
             )
+
+    def clear_all_pipette_locations(self) -> None:
+        """Mark all pipettes as having an unknown location."""
+        self.pipette_location = CLEAR
