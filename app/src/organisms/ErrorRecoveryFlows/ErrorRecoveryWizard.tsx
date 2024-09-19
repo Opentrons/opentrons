@@ -97,10 +97,11 @@ export function ErrorRecoveryComponent(
   const {
     recoveryMap,
     hasLaunchedRecovery,
-    isProhibitedDoorOpen,
+    doorStatusUtils,
     isOnDevice,
     analytics,
   } = props
+  const { isProhibitedDoorOpen } = doorStatusUtils
   const { route, step } = recoveryMap
   const { t } = useTranslation('error_recovery')
   const { showModal, toggleModal } = useErrorDetailsModal()

@@ -36,6 +36,7 @@ import type { StepCounts } from '../../../resources/protocols/hooks'
 import type { UseRecoveryAnalyticsResult } from './useRecoveryAnalytics'
 import type { UseRecoveryTakeoverResult } from './useRecoveryTakeover'
 import type { useRetainedFailedCommandBySource } from './useRetainedFailedCommandBySource'
+import type { UseShowDoorInfoResult } from './useShowDoorInfo'
 
 export type ERUtilsProps = Omit<ErrorRecoveryFlowsProps, 'failedCommand'> & {
   toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
@@ -57,11 +58,11 @@ export interface ERUtilsResults {
   recoveryActionMutationUtils: RecoveryActionMutationResult
   failedPipetteInfo: PipetteData | null
   hasLaunchedRecovery: boolean
-  isProhibitedDoorOpen: boolean
   stepCounts: StepCounts
   commandsAfterFailedCommand: ReturnType<typeof getNextSteps>
   subMapUtils: SubMapUtils
   analytics: UseRecoveryAnalyticsResult
+  doorStatusUtils: UseShowDoorInfoResult
 }
 
 const SUBSEQUENT_COMMAND_DEPTH = 2
@@ -100,7 +101,7 @@ export function useERUtils({
     ...subMapUtils
   } = useRecoveryRouting()
 
-  const isProhibitedDoorOpen = useShowDoorInfo(runStatus, recoveryMap)
+  const doorStatusUtils = useShowDoorInfo(runStatus, recoveryMap)
 
   const recoveryToastUtils = useRecoveryToasts({
     currentStepCount: stepCounts.currentStepNumber,
@@ -173,7 +174,6 @@ export function useERUtils({
     routeUpdateActions,
     recoveryCommands,
     hasLaunchedRecovery,
-    isProhibitedDoorOpen,
     tipStatusUtils,
     failedLabwareUtils,
     failedPipetteInfo,
@@ -182,5 +182,6 @@ export function useERUtils({
     stepCounts,
     commandsAfterFailedCommand,
     analytics,
+    doorStatusUtils,
   }
 }
