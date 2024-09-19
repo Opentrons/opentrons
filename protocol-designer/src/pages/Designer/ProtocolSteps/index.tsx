@@ -22,9 +22,7 @@ export function ProtocolSteps(): JSX.Element {
   const leftString = t('onDeck')
   const rightString = t('offDeck')
 
-  const [deckView, setDeckView] = React.useState<
-    typeof leftString | typeof rightString
-  >(leftString)
+  const [deckView, setDeckView] = React.useState<string>(leftString)
 
   const formType = formData?.stepType
 
@@ -32,7 +30,7 @@ export function ProtocolSteps(): JSX.Element {
     if (formData != null && formType !== 'moveLabware') {
       setDeckView(leftString)
     }
-  }, [formData, deckView])
+  }, [formData, formType, deckView])
 
   return (
     <>
