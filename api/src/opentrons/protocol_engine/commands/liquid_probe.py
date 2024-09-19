@@ -138,7 +138,7 @@ class LiquidProbeImplementation(
             # a tip that's previously held liquid, which they should avoid anyway.
             raise PipetteNotReadyToAspirateError(
                 "The pipette cannot probe liquid because of a previous blow out."
-                " Run a `prepareToAspirate` command in a safe place to reset the plunger."
+                " The plunger must be reset while the tip is somewhere away from liquid."
             )
         elif aspirated_volume != 0:
             raise TipNotEmptyError(
