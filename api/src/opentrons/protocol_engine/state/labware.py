@@ -15,6 +15,7 @@ from typing import (
     Union,
 )
 
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.update_types import _NoChangeEnum
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
@@ -227,41 +228,44 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             isinstance(action, SucceedCommandAction)
             and action.state_update.loaded_labware
         ):
-            # If the labware load refers to an offset, that offset must actually exist.
-            if action.state_update.loaded_labware.offsetId is not None:
-                assert (
-                    action.state_update.loaded_labware.offsetId
-                    in self._state.labware_offsets_by_id
+            if action.state_update.labware_location != update_types.NO_CHANGE:
+
+                # If the labware load refers to an offset, that offset must actually exist.
+                if action.state_update.loaded_labware.offsetId is not None:
+                    assert (
+                        action.state_update.loaded_labware.offsetId
+                        in self._state.labware_offsets_by_id
+                    )
+
+                definition_uri = uri_from_details(
+                    namespace=action.state_update.loaded_labware.definition.namespace,
+                    load_name=action.state_update.loaded_labware.definition.parameters.loadName,
+                    version=action.state_update.loaded_labware.definition.version,
                 )
 
-            definition_uri = uri_from_details(
-                namespace=action.state_update.loaded_labware.definition.namespace,
-                load_name=action.state_update.loaded_labware.definition.parameters.loadName,
-                version=action.state_update.loaded_labware.definition.version,
-            )
+                self._state.definitions_by_uri[
+                    definition_uri
+                ] = action.state_update.loaded_labware.definition
 
-            self._state.definitions_by_uri[
-                definition_uri
-            ] = action.state_update.loaded_labware.definition
-
-            self._state.labware_by_id[
-                action.state_update.loaded_labware.labware_id
-            ] = LoadedLabware.construct(
-                id=action.state_update.loaded_labware.labware_id,
-                location=action.state_update.labware_location.new_location
-                if action.state_update.labware_location != _NoChangeEnum.NO_CHANGE
-                else self._state.labware_by_id[
+                self._state.labware_by_id[
                     action.state_update.loaded_labware.labware_id
-                ].location,
-                loadName=action.state_update.loaded_labware.definition.parameters.loadName,
-                definitionUri=definition_uri,
-                offsetId=action.state_update.loaded_labware.offsetId,
-                displayName=action.state_update.labware_location.display_name
-                if action.state_update.labware_location != _NoChangeEnum.NO_CHANGE
-                else self._state.labware_by_id[
-                    action.state_update.loaded_labware.labware_id
-                ].displayName,
-            )
+                ] = LoadedLabware.construct(
+                    id=action.state_update.loaded_labware.labware_id,
+                    location=self._state.labware_by_id[
+                        action.state_update.loaded_labware.labware_id
+                    ].location
+                    if action.state_update.labware_location is None
+                    or isinstance(action.state_update.labware_location, _NoChangeEnum)
+                    else action.state_update.labware_location.new_location,
+                    loadName=action.state_update.loaded_labware.definition.parameters.loadName,
+                    definitionUri=definition_uri,
+                    offsetId=action.state_update.loaded_labware.offsetId,
+                    displayName=action.state_update.labware_location.display_name
+                    if isinstance(action.state_update.labware_location, _NoChangeEnum)
+                    else self._state.labware_by_id[
+                        action.state_update.loaded_labware.labware_id
+                    ].displayName,
+                )
 
 
 class LabwareView(HasState[LabwareState]):
