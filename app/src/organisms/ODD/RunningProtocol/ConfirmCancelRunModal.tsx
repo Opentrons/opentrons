@@ -18,15 +18,15 @@ import {
   useDismissCurrentRunMutation,
 } from '@opentrons/react-api-client'
 
-import { SmallButton } from '../../../atoms/buttons'
-import { OddModal } from '../../../molecules/OddModal'
-import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
-import { useRunStatus } from '../../../organisms/RunTimeControl/hooks'
-import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../redux/analytics'
-import { getLocalRobot } from '../../../redux/discovery'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+import { useTrackProtocolRunEvent } from '/app/organisms/Devices/hooks'
+import { useRunStatus } from '/app/organisms/RunTimeControl/hooks'
+import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
+import { getLocalRobot } from '/app/redux/discovery'
 import { CancelingRunModal } from './CancelingRunModal'
 
-import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface ConfirmCancelRunModalProps {
   runId: string

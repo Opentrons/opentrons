@@ -12,7 +12,7 @@ import { WellProperties } from './WellProperties'
 import { WellDimensions } from './WellDimensions'
 import { ManufacturerDetails } from './ManufacturerDetails'
 
-import type { LabwareDefinition } from '../../pages/Desktop/Labware/types'
+import type { LabwareDefinition } from '/app/pages/Desktop/Labware/types'
 
 export interface InsertDetailsProps {
   definition: LabwareDefinition

@@ -22,7 +22,7 @@ import {
 
 import { UNIVERSAL_FLAT_ADAPTER_X_DIMENSION } from '../LabwareDetails/Gallery'
 import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
-import type { LabwareDefAndDate } from '../../pages/Desktop/Labware/hooks'
+import type { LabwareDefAndDate } from '/app/pages/Desktop/Labware/hooks'
 
 export interface LabwareCardProps {
   labware: LabwareDefAndDate

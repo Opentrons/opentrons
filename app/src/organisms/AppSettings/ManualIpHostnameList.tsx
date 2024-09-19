@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
-import { getConfig, removeManualIp } from '../../redux/config'
-import { getViewableRobots } from '../../redux/discovery'
+import { getConfig, removeManualIp } from '/app/redux/config'
+import { getViewableRobots } from '/app/redux/discovery'
 import { ManualIpHostnameItem } from './ManualIpHostnameItem'
 
-import type { State, Dispatch } from '../../redux/types'
+import type { State, Dispatch } from '/app/redux/types'
 
 interface IpHostnameListProps {
   mostRecentAddition: string | null

@@ -9,11 +9,11 @@ import {
   mockTemperatureModuleGen2,
   mockThermocycler,
   mockThermocyclerGen2,
-} from '../../../redux/modules/__fixtures__'
+} from '/app/redux/modules/__fixtures__'
 import { getModuleCardImage, useModuleApiRequests } from '../utils'
-import { useDispatchApiRequest } from '../../../redux/robot-api'
+import { useDispatchApiRequest } from '/app/redux/robot-api'
 
-vi.mock('../../../redux/robot-api')
+vi.mock('/app/redux/robot-api')
 
 const mockThermocyclerGen2ClosedLid = {
   id: 'thermocycler_id2',

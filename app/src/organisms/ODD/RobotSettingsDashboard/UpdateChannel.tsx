@@ -14,15 +14,15 @@ import {
   CURSOR_POINTER,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '../../../organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ChildNavigation'
 import {
   getDevtoolsEnabled,
   getUpdateChannel,
   getUpdateChannelOptions,
   updateConfigValue,
-} from '../../../redux/config'
+} from '/app/redux/config'
 
-import type { Dispatch } from '../../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 interface LabelProps {
   isSelected?: boolean

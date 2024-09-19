@@ -9,11 +9,11 @@ import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
-} from '../../../redux/calibration/pipette-offset/__fixtures__'
+} from '/app/redux/calibration/pipette-offset/__fixtures__'
 import type {
   FetchPipettesResponseBody,
   FetchPipettesResponsePipette,
-} from '../../../redux/pipettes/types'
+} from '/app/redux/pipettes/types'
 
 describe('formatTimestamp', () => {
   it('should format an ISO 8601 date string', () => {

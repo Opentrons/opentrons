@@ -5,10 +5,10 @@ import {
   useCreateProtocolMutation,
   useCreateRunMutation,
 } from '@opentrons/react-api-client'
-import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { createQuickTransferFile } from '../utils'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { SummaryAndSettings } from '../SummaryAndSettings'
 import { NameQuickTransfer } from '../NameQuickTransfer'
 import { Overview } from '../Overview'
@@ -34,7 +34,7 @@ vi.mock('../utils', async () => {
 })
 vi.mock('../utils/createQuickTransferFile')
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../resources/deck_configuration')
+vi.mock('/app/resources/deck_configuration')
 
 const render = (props: React.ComponentProps<typeof SummaryAndSettings>) => {
   return renderWithProviders(<SummaryAndSettings {...props} />, {

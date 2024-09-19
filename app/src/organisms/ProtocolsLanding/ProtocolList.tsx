@@ -26,18 +26,18 @@ import {
 import {
   getProtocolsDesktopSortKey,
   updateConfigValue,
-} from '../../redux/config'
+} from '/app/redux/config'
 import { useSortedProtocols } from './hooks'
-import { Slideout } from '../../atoms/Slideout'
+import { Slideout } from '/app/atoms/Slideout'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { ProtocolUploadInput } from './ProtocolUploadInput'
 import { ProtocolCard } from './ProtocolCard'
 import { EmptyStateLinks } from './EmptyStateLinks'
 
-import type { StoredProtocolData } from '../../redux/protocol-storage'
+import type { StoredProtocolData } from '/app/redux/protocol-storage'
 import type { ProtocolSort } from './hooks'
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};

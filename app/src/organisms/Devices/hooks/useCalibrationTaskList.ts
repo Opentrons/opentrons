@@ -9,7 +9,7 @@ import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { useAttachedPipettes } from '.'
 import { getDefaultTiprackDefForPipetteName } from '../constants'
-import { DECK_CAL_STATUS_OK } from '../../../redux/calibration/constants'
+import { DECK_CAL_STATUS_OK } from '/app/redux/calibration/constants'
 import { formatTimestamp } from '../utils'
 
 import type { PipetteName } from '@opentrons/shared-data'
@@ -18,10 +18,10 @@ import type {
   TaskListProps,
   TaskProps,
 } from '../../TaskList/types'
-import type { AttachedPipette } from '../../../redux/pipettes/types'
-import type { DashboardCalOffsetInvoker } from '../../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
-import type { DashboardCalTipLengthInvoker } from '../../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
-import type { DashboardCalDeckInvoker } from '../../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
+import type { AttachedPipette } from '/app/redux/pipettes/types'
+import type { DashboardCalOffsetInvoker } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
+import type { DashboardCalTipLengthInvoker } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
+import type { DashboardCalDeckInvoker } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
 
 const CALIBRATION_DATA_POLL_MS = 5000
 

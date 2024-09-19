@@ -13,7 +13,7 @@ import {
 
 import { useToaster } from '../../../ToasterOven'
 import { ChildNavigation } from '../../../ChildNavigation'
-import { NumericalKeyboard } from '../../../../atoms/SoftwareKeyboard'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import type { NumberParameter } from '@opentrons/shared-data'
 
 interface ChooseNumberProps {

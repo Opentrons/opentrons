@@ -15,7 +15,7 @@ import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { useRunStatus } from '../../../RunTimeControl/hooks'
 import { useIsRobotViewable, useProtocolDetailsForRun } from '../../hooks'
 import { RunProgressMeter } from '../../../RunProgressMeter'
-import { useNotifyRunQuery } from '../../../../resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 import { RunHeaderProtocolName } from './RunHeaderProtocolName'
 import {
   RunHeaderModalContainer,

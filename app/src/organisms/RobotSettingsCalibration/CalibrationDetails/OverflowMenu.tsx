@@ -24,18 +24,18 @@ import {
   useAllTipLengthCalibrationsQuery,
 } from '@opentrons/react-api-client'
 
-import { Divider } from '../../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
-} from '../../../redux/analytics'
+} from '/app/redux/analytics'
 import {
   useRunStatuses,
   useAttachedPipettesFromInstrumentsQuery,
-} from '../../../organisms/Devices/hooks'
+} from '/app/organisms/Devices/hooks'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { Mount } from '@opentrons/components'
 import type { PipetteName } from '@opentrons/shared-data'

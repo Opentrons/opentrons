@@ -4,7 +4,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   TOO_HOT_TEMP,
 } from '@opentrons/shared-data'
-import type { AttachedModule } from '../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 export function getModuleTooHot(module: AttachedModule): boolean {
   switch (module.moduleType) {

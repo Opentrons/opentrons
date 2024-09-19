@@ -7,7 +7,7 @@ import {
   ANALYTICS_RECOVERY_RUN_RESULT,
   ANALYTICS_RECOVERY_VIEW_ERROR_DETAILS,
   useTrackEvent,
-} from '../../../redux/analytics'
+} from '/app/redux/analytics'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { FailedCommand, RecoveryRoute, RouteStep } from '../types'

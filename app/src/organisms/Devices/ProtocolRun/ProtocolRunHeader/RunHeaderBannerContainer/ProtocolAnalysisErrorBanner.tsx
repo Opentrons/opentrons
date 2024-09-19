@@ -16,7 +16,7 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../../../App/portal'
-import { Banner } from '../../../../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 
 import type { AnalysisError } from '@opentrons/shared-data'
 

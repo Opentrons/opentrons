@@ -2,26 +2,26 @@ import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
-import { DevicesEmptyState } from '../../../../../organisms/Devices/DevicesEmptyState'
-import { RobotCard } from '../../../../../organisms/Devices/RobotCard'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { DevicesEmptyState } from '/app/organisms/Devices/DevicesEmptyState'
+import { RobotCard } from '/app/organisms/Devices/RobotCard'
 import {
   getScanning,
   getConnectableRobots,
   getReachableRobots,
   getUnreachableRobots,
-} from '../../../../../redux/discovery'
+} from '/app/redux/discovery'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
-} from '../../../../../redux/discovery/__fixtures__'
+} from '/app/redux/discovery/__fixtures__'
 import { DevicesLanding } from '..'
 
-vi.mock('../../../../../organisms/Devices/DevicesEmptyState')
-vi.mock('../../../../../organisms/Devices/RobotCard')
-vi.mock('../../../../../redux/discovery')
+vi.mock('/app/organisms/Devices/DevicesEmptyState')
+vi.mock('/app/organisms/Devices/RobotCard')
+vi.mock('/app/redux/discovery')
 
 const render = () => {
   return renderWithProviders(<DevicesLanding />, {

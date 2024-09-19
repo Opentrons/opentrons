@@ -4,24 +4,24 @@ import { when } from 'vitest-when'
 import { screen, fireEvent } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import * as DiscoveryClientFixtures from '../../../../../discovery-client/src/fixtures'
 import { useAuthorization } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../i18n'
-import { useCurrentRunId } from '../../../resources/runs'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
-import { getConfig, useFeatureFlag } from '../../../redux/config'
+import { i18n } from '/app/i18n'
+import { useCurrentRunId } from '/app/resources/runs'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
+import { getConfig, useFeatureFlag } from '/app/redux/config'
 import {
   getRobotAddressesByName,
   getRobotModelByName,
-} from '../../../redux/discovery'
+} from '/app/redux/discovery'
 import {
   HEALTH_STATUS_OK,
   OPENTRONS_USB,
   ROBOT_MODEL_OT3,
-} from '../../../redux/discovery/constants'
+} from '/app/redux/discovery/constants'
 import {
   useCalibrationTaskList,
   useIsRobotBusy,
@@ -49,9 +49,9 @@ import {
   useErrorRecoveryBanner,
 } from '../../ErrorRecoveryBanner'
 
-import type { Config } from '../../../redux/config/types'
-import type { DiscoveryClientRobotAddress } from '../../../redux/discovery/types'
-import type { State } from '../../../redux/types'
+import type { Config } from '/app/redux/config/types'
+import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'
+import type { State } from '/app/redux/types'
 import type * as ReactApiClient from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
@@ -61,11 +61,11 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     useAuthorization: vi.fn(),
   }
 })
-vi.mock('../../../redux/robot-controls')
-vi.mock('../../../redux/robot-update/selectors')
-vi.mock('../../../redux/config')
-vi.mock('../../../redux/discovery/selectors')
-vi.mock('../../../resources/runs')
+vi.mock('/app/redux/robot-controls')
+vi.mock('/app/redux/robot-update/selectors')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/discovery/selectors')
+vi.mock('/app/resources/runs')
 vi.mock('../hooks')
 vi.mock('../RobotStatusHeader')
 vi.mock('../../UpdateRobotBanner')

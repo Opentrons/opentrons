@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
-import { renderWithProviders } from '../../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import {
   SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
@@ -15,17 +15,17 @@ import {
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../../../i18n'
-import { mockHeaterShaker } from '../../../../../redux/modules/__fixtures__'
+import { i18n } from '/app/i18n'
+import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { useCloseCurrentRun } from '../../../../ProtocolUpload/hooks'
 import { LocationConflictModal } from '../LocationConflictModal'
-import { useNotifyDeckConfigurationQuery } from '../../../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../../resources/deck_configuration')
+vi.mock('/app/resources/deck_configuration')
 vi.mock('../../../../ProtocolUpload/hooks')
 
 const mockFixture = {

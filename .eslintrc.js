@@ -117,6 +117,12 @@ module.exports = {
       },
     },
     {
+      files: ['./app/src/**/*.@(ts|tsx)'],
+      rules: {
+        'import/no-absolute-path': 'off',
+      },
+    },
+    {
       files: [
         '**/test/**.js',
         '**/__tests__/**.@(js|ts|tsx)',

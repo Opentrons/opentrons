@@ -24,7 +24,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { getUniqueWellProperties } from '@opentrons/shared-data'
-import { Slideout } from '../../atoms/Slideout'
+import { Slideout } from '/app/atoms/Slideout'
 import { getWellLabel } from './helpers/labels'
 import { WellCount } from './WellCount'
 import { WellProperties } from './WellProperties'
@@ -35,7 +35,7 @@ import { ManufacturerDetails } from './ManufacturerDetails'
 import { InsertDetails } from './InsertDetails'
 import { Gallery } from './Gallery'
 import { CustomLabwareOverflowMenu } from '../LabwareCard/CustomLabwareOverflowMenu'
-import type { LabwareDefAndDate } from '../../pages/Desktop/Labware/hooks'
+import type { LabwareDefAndDate } from '/app/pages/Desktop/Labware/hooks'
 
 const CLOSE_ICON_STYLE = css`
   border-radius: 50%;

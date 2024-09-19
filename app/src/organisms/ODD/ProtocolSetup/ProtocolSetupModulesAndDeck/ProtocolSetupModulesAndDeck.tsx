@@ -17,12 +17,12 @@ import {
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 
 import { getTopPortalEl } from '../../../../App/portal'
-import { FloatingActionButton } from '../../../../atoms/buttons'
-import { InlineNotification } from '../../../../atoms/InlineNotification'
-import { ChildNavigation } from '../../../../organisms/ChildNavigation'
-import { useAttachedModules } from '../../../../organisms/Devices/hooks'
-import { getProtocolModulesInfo } from '../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { FloatingActionButton } from '/app/atoms/buttons'
+import { InlineNotification } from '/app/atoms/InlineNotification'
+import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { useAttachedModules } from '/app/organisms/Devices/hooks'
+import { getProtocolModulesInfo } from '/app/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useRunStatus } from '../../../RunTimeControl/hooks'
 import {
   getAttachedProtocolModuleMatches,
@@ -32,7 +32,7 @@ import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { FixtureTable } from './FixtureTable'
 import { ModuleTable } from './ModuleTable'
 import { ModulesAndDeckMapView } from './ModulesAndDeckMapView'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { CutoutId, CutoutFixtureId } from '@opentrons/shared-data'
 import type { SetupScreens } from '../types'

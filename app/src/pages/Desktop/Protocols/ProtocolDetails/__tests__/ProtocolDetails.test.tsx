@@ -3,21 +3,21 @@ import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
 import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { when } from 'vitest-when'
-import { renderWithProviders } from '../../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
-import { i18n } from '../../../../../i18n'
-import { getStoredProtocol } from '../../../../../redux/protocol-storage'
-import { storedProtocolData } from '../../../../../redux/protocol-storage/__fixtures__'
-import { ProtocolDetails as ProtocolDetailsContents } from '../../../../../organisms/ProtocolDetails'
+import { i18n } from '/app/i18n'
+import { getStoredProtocol } from '/app/redux/protocol-storage'
+import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
+import { ProtocolDetails as ProtocolDetailsContents } from '/app/organisms/ProtocolDetails'
 
 import { ProtocolDetails } from '../'
 
-import type { State } from '../../../../../redux/types'
+import type { State } from '/app/redux/types'
 
 const mockProtocolKey = 'protocolKeyStub'
 
-vi.mock('../../../../../redux/protocol-storage')
-vi.mock('../../../../../organisms/ProtocolDetails')
+vi.mock('/app/redux/protocol-storage')
+vi.mock('/app/organisms/ProtocolDetails')
 
 const MOCK_STATE: State = {
   protocolStorage: {

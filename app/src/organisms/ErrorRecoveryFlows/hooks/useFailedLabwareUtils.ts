@@ -9,7 +9,7 @@ import {
 
 import { ERROR_KINDS } from '../constants'
 import { getErrorKind } from '../utils'
-import { getLoadedLabware } from '../../../molecules/Command/utils/accessors'
+import { getLoadedLabware } from '/app/molecules/Command/utils/accessors'
 
 import type { WellGroup } from '@opentrons/components'
 import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'

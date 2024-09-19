@@ -1,17 +1,17 @@
 import { when } from 'vitest-when'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useIsFlex } from '../../../organisms/Devices/hooks'
+import { useIsFlex } from '/app/organisms/Devices/hooks'
 import { useEstopQuery } from '@opentrons/react-api-client'
 import {
   DISENGAGED,
   NOT_PRESENT,
   PHYSICALLY_ENGAGED,
   LOGICALLY_ENGAGED,
-} from '../../../organisms/EmergencyStop'
+} from '/app/organisms/EmergencyStop'
 import { useIsEstopNotDisengaged } from '../hooks/useIsEstopNotDisengaged'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../organisms/Devices/hooks')
+vi.mock('/app/organisms/Devices/hooks')
 
 const ROBOT_NAME = 'mockRobot'
 const mockEstopStatus = {

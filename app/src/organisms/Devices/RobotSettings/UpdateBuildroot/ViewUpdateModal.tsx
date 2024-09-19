@@ -8,15 +8,15 @@ import {
   getRobotUpdateDownloadError,
   getRobotSystemType,
   getRobotUpdateAvailable,
-} from '../../../../redux/robot-update'
-import { getAvailableShellUpdate } from '../../../../redux/shell'
+} from '/app/redux/robot-update'
+import { getAvailableShellUpdate } from '/app/redux/shell'
 import { getTopPortalEl } from '../../../../App/portal'
-import { UpdateAppModal } from '../../../../organisms/UpdateAppModal'
+import { UpdateAppModal } from '/app/organisms/UpdateAppModal'
 import { MigrationWarningModal } from './MigrationWarningModal'
 import { UpdateRobotModal } from './UpdateRobotModal'
 
-import type { State } from '../../../../redux/types'
-import type { ReachableRobot, Robot } from '../../../../redux/discovery/types'
+import type { State } from '/app/redux/types'
+import type { ReachableRobot, Robot } from '/app/redux/discovery/types'
 
 export interface ViewUpdateModalProps {
   robotName: string

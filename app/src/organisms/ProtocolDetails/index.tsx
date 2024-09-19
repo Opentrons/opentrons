@@ -49,16 +49,16 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../App/portal'
-import { Divider } from '../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '../../redux/analytics'
+} from '/app/redux/analytics'
 import {
   getIsProtocolAnalysisInProgress,
   analyzeProtocol,
-} from '../../redux/protocol-storage'
-import { useFeatureFlag } from '../../redux/config'
+} from '/app/redux/protocol-storage'
+import { useFeatureFlag } from '/app/redux/config'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
@@ -67,7 +67,7 @@ import {
   getAnalysisStatus,
   getProtocolDisplayName,
 } from '../ProtocolsLanding/utils'
-import { getProtocolUsesGripper } from '../../transformations/commands'
+import { getProtocolUsesGripper } from '/app/transformations/commands'
 import { ProtocolOverflowMenu } from '../ProtocolsLanding/ProtocolOverflowMenu'
 import { ProtocolStats } from './ProtocolStats'
 import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
@@ -77,8 +77,8 @@ import { ProtocolParameters } from './ProtocolParameters'
 import { AnnotatedSteps } from './AnnotatedSteps'
 
 import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
-import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { State, Dispatch } from '../../redux/types'
+import type { StoredProtocolData } from '/app/redux/protocol-storage'
+import type { State, Dispatch } from '/app/redux/types'
 
 const GRID_STYLE = css`
   display: grid;

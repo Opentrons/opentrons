@@ -1,4 +1,4 @@
-import { useCurrentRunId } from '../../../resources/runs'
+import { useCurrentRunId } from '/app/resources/runs'
 import { useRunCommands } from './useRunCommands'
 import type { UseQueryOptions } from 'react-query'
 import type {

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { BEFORE_BEGINNING, BLOWOUT_SUCCESS, DT_ROUTES } from './constants'
-import { WizardHeader } from '../../molecules/WizardHeader'
+import { WizardHeader } from '/app/molecules/WizardHeader'
 
 import type { DropTipWizardProps } from './DropTipWizard'
 import type { DropTipFlowsRoute, DropTipFlowsStep, ErrorDetails } from './types'

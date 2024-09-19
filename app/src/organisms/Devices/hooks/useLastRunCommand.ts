@@ -1,6 +1,6 @@
 import { RUN_STATUSES_TERMINAL } from '@opentrons/api-client'
 
-import { useNotifyAllCommandsQuery } from '../../../resources/runs'
+import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 
 import type { UseQueryOptions } from 'react-query'

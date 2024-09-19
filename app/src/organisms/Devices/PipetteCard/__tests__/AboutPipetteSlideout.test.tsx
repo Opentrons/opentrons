@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
-import { mockLeftSpecs } from '../../../../redux/pipettes/__fixtures__'
+import { mockLeftSpecs } from '/app/redux/pipettes/__fixtures__'
 
 vi.mock('@opentrons/react-api-client')
 

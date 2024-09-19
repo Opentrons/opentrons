@@ -5,8 +5,8 @@ import {
   useCurrentAllSubsystemUpdatesQuery,
 } from '@opentrons/react-api-client'
 
-import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
-import { useNotifyAllRunsQuery } from '../../../resources/runs'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+import { useNotifyAllRunsQuery } from '/app/resources/runs'
 import { DISENGAGED } from '../../EmergencyStop'
 import { useIsFlex } from './useIsFlex'
 

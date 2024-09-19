@@ -5,7 +5,7 @@ import { getSpacingDiagram } from '@opentrons/components'
 import { LabeledValue } from './StyledComponents/LabeledValue'
 import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
 
-import type { LabwareWellGroupProperties } from '../../pages/Desktop/Labware/types'
+import type { LabwareWellGroupProperties } from '/app/pages/Desktop/Labware/types'
 
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 

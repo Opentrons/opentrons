@@ -11,7 +11,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Divider } from '../../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 
 interface ExpandingTitleProps {
   label: React.ReactNode

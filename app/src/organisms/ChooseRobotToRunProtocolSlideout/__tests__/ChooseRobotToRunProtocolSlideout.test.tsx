@@ -4,48 +4,48 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { when } from 'vitest-when'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
-import { useCloseCurrentRun } from '../../../organisms/ProtocolUpload/hooks'
-import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useTrackCreateProtocolRunEvent } from '/app/organisms/Devices/hooks'
+import { useCloseCurrentRun } from '/app/organisms/ProtocolUpload/hooks'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
 import {
   getConnectableRobots,
   getReachableRobots,
   getScanning,
   getUnreachableRobots,
   startDiscovery,
-} from '../../../redux/discovery'
-import { useIsRobotOnWrongVersionOfSoftware } from '../../../redux/robot-update'
+} from '/app/redux/discovery'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
-} from '../../../redux/discovery/__fixtures__'
-import { getNetworkInterfaces } from '../../../redux/networking'
+} from '/app/redux/discovery/__fixtures__'
+import { getNetworkInterfaces } from '/app/redux/networking'
 import {
   storedProtocolData as storedProtocolDataFixture,
   storedProtocolDataWithCsvRunTimeParameter,
-} from '../../../redux/protocol-storage/__fixtures__'
+} from '/app/redux/protocol-storage/__fixtures__'
 import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 import { useOffsetCandidatesForAnalysis } from '../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotToRunProtocolSlideout } from '../'
-import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
-import { useCurrentRunId } from '../../../resources/runs'
+import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
+import { useCurrentRunId } from '/app/resources/runs'
 
-import type { State } from '../../../redux/types'
+import type { State } from '/app/redux/types'
 
-vi.mock('../../../organisms/Devices/hooks')
-vi.mock('../../../organisms/ProtocolUpload/hooks')
-vi.mock('../../../organisms/RunTimeControl/hooks')
-vi.mock('../../../redux/config')
-vi.mock('../../../redux/discovery')
-vi.mock('../../../redux/robot-update')
-vi.mock('../../../redux/networking')
+vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/organisms/ProtocolUpload/hooks')
+vi.mock('/app/organisms/RunTimeControl/hooks')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux/networking')
 vi.mock('../useCreateRunFromProtocol')
 vi.mock('../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis')
-vi.mock('../../../resources/useNotifyDataReady')
-vi.mock('../../../resources/runs')
+vi.mock('/app/resources/useNotifyDataReady')
+vi.mock('/app/resources/runs')
 
 const render = (
   props: React.ComponentProps<typeof ChooseRobotToRunProtocolSlideout>

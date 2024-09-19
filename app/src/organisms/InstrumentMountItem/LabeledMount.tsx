@@ -15,7 +15,7 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import type { Mount } from '../../redux/pipettes/types'
+import type { Mount } from '/app/redux/pipettes/types'
 
 const MountButton = styled.button<{ isAttached: boolean }>`
   display: flex;

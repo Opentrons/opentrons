@@ -14,7 +14,7 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { TertiaryButton } from '../../../atoms/buttons'
+import { TertiaryButton } from '/app/atoms/buttons'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useStoredProtocolAnalysis } from '../hooks'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
@@ -22,7 +22,7 @@ import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 import type { PipetteData } from '@opentrons/api-client'
 import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data'
-import type { Mount } from '../../../redux/pipettes/types'
+import type { Mount } from '/app/redux/pipettes/types'
 
 interface SetupInstrumentCalibrationItemProps {
   mount: Mount

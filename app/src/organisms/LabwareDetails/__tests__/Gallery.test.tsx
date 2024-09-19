@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
 import { labwareImages } from '../labware-images'
 import { Gallery } from '../Gallery'
 

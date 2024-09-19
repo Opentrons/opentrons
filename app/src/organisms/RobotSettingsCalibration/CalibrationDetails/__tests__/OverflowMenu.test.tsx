@@ -10,8 +10,8 @@ import {
   useAllTipLengthCalibrationsQuery,
 } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../../i18n'
-import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
+import { i18n } from '/app/i18n'
+import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import { PipetteWizardFlows } from '../../../PipetteWizardFlows'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
 import {
@@ -19,13 +19,13 @@ import {
   useRunStatuses,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../../Devices/hooks'
-import { mockAttachedPipetteInformation } from '../../../../redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import {
   mockPipetteOffsetCalibrationsResponse,
   mockTipLengthCalibrationResponse,
 } from '../__fixtures__'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { useIsEstopNotDisengaged } from '../../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { OverflowMenu } from '../OverflowMenu'
 
 import type { Mount } from '@opentrons/components'
@@ -61,16 +61,14 @@ vi.mock('@opentrons/shared-data', async () => {
   }
 })
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../redux/sessions/selectors')
-vi.mock('../../../../redux/discovery')
-vi.mock('../../../../redux/robot-api/selectors')
-vi.mock(
-  '../../../../organisms/CalibratePipetteOffset/useCalibratePipetteOffset'
-)
-vi.mock('../../../../organisms/ProtocolUpload/hooks')
-vi.mock('../../../../organisms/Devices/hooks')
+vi.mock('/app/redux/sessions/selectors')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/robot-api/selectors')
+vi.mock('/app/organisms/CalibratePipetteOffset/useCalibratePipetteOffset')
+vi.mock('/app/organisms/ProtocolUpload/hooks')
+vi.mock('/app/organisms/Devices/hooks')
 vi.mock('../../../PipetteWizardFlows')
-vi.mock('../../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
 const RUN_STATUSES = {
   isRunRunning: false,

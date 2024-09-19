@@ -12,8 +12,8 @@ import {
   parseLiquidsInLoadOrder,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { Liquids } from '../Liquids'
 
 import type { UseQueryResult } from 'react-query'

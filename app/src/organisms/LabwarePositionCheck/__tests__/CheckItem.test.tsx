@@ -9,18 +9,15 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
-import {
-  nestedTextMatcher,
-  renderWithProviders,
-} from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { CheckItem } from '../CheckItem'
 import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 
 import type { Mock } from 'vitest'
 
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../../Devices/hooks')
 
 const mockStartPosition = { x: 10, y: 20, z: 30 }

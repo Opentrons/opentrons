@@ -10,12 +10,12 @@ import {
 } from '@opentrons/react-api-client'
 import { COLORS } from '@opentrons/components'
 
-import { i18n } from '../../../../../i18n'
-import { renderWithProviders } from '../../../../../__testing-utils__'
+import { i18n } from '/app/i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { ChooseEnum } from '../ChooseEnum'
 import { ChooseNumber } from '../ChooseNumber'
 import { ChooseCsvFile } from '../ChooseCsvFile'
-import { mockRunTimeParameterData } from '../../../../../pages/ODD/ProtocolDetails/fixtures'
+import { mockRunTimeParameterData } from '/app/pages/ODD/ProtocolDetails/fixtures'
 import { useToaster } from '../../../../ToasterOven'
 import { ProtocolSetupParameters } from '..'
 
@@ -28,7 +28,7 @@ const mockNavigate = vi.fn()
 vi.mock('../ChooseEnum')
 vi.mock('../ChooseNumber')
 vi.mock('../ChooseCsvFile')
-vi.mock('../../../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../../../../ToasterOven')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
@@ -39,7 +39,7 @@ vi.mock('react-router-dom', async importOriginal => {
     useNavigate: () => mockNavigate,
   }
 })
-vi.mock('../../../../../redux/config')
+vi.mock('/app/redux/config')
 
 const MOCK_HOST_CONFIG: HostConfig = { hostname: 'MOCK_HOST' }
 const mockCreateProtocolAnalysis = vi.fn()

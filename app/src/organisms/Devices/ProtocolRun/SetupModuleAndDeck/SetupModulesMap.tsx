@@ -19,7 +19,7 @@ import { ModuleInfo } from '../../ModuleInfo'
 import { useAttachedModules, useStoredProtocolAnalysis } from '../../hooks'
 import { getProtocolModulesInfo } from '../utils/getProtocolModulesInfo'
 import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 const ATTACHED_MODULE_POLL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000

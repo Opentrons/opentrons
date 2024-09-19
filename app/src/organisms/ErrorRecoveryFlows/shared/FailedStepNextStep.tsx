@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { CategorizedStepContent } from '../../../molecules/InterventionModal'
+import { CategorizedStepContent } from '/app/molecules/InterventionModal'
 import type { RecoveryContentProps } from '../types'
 
 export function FailedStepNextStep({

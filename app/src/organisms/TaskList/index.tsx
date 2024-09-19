@@ -20,7 +20,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '../../atoms/buttons'
+import { TertiaryButton } from '/app/atoms/buttons'
 
 import type { SubTaskProps, TaskListProps, TaskProps } from './types'
 

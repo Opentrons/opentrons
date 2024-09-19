@@ -9,7 +9,7 @@ import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { useConditionalConfirm, ModalShell } from '@opentrons/components'
 
-import * as Sessions from '../../redux/sessions'
+import * as Sessions from '/app/redux/sessions'
 import {
   Introduction,
   DeckSetup,
@@ -20,20 +20,20 @@ import {
   ConfirmExit,
   LoadingState,
   CompleteConfirmation,
-} from '../../organisms/CalibrationPanels'
-import { WizardHeader } from '../../molecules/WizardHeader'
+} from '/app/organisms/CalibrationPanels'
+import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getTopPortalEl } from '../../App/portal'
 
-import slotOneRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_1_Remove_CalBlock_(330x260)REV1.webm'
-import slotThreeRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_3_Remove_CalBlock_(330x260)REV1.webm'
+import slotOneRemoveBlockAsset from '/app/assets/videos/tip-length-cal/Slot_1_Remove_CalBlock_(330x260)REV1.webm'
+import slotThreeRemoveBlockAsset from '/app/assets/videos/tip-length-cal/Slot_3_Remove_CalBlock_(330x260)REV1.webm'
 
 import type { Mount } from '@opentrons/components'
 import type {
   SessionCommandParams,
   CalibrationLabware,
   CalibrationSessionStep,
-} from '../../redux/sessions/types'
-import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
+} from '/app/redux/sessions/types'
+import type { CalibrationPanelProps } from '/app/organisms/CalibrationPanels/types'
 import type { CalibrateTipLengthParentProps } from './types'
 
 export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'

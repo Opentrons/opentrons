@@ -8,7 +8,7 @@ import {
   mockTipLengthCalibration1,
   mockTipLengthCalibration2,
   mockTipLengthCalibration3,
-} from '../../../../redux/calibration/tip-length/__fixtures__'
+} from '/app/redux/calibration/tip-length/__fixtures__'
 import { useTipLengthCalibrations } from '..'
 
 vi.mock('@opentrons/react-api-client')

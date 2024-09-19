@@ -4,16 +4,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
-import {
-  getIsOnDevice,
-  getOnDeviceDisplaySettings,
-} from '../../../../redux/config'
+import { getIsOnDevice, getOnDeviceDisplaySettings } from '/app/redux/config'
 import { useIsUnboxingFlowOngoing } from '../useIsUnboxingFlowOngoing'
 
 import type { Store } from 'redux'
-import type { State } from '../../../../redux/types'
+import type { State } from '/app/redux/types'
 
-vi.mock('../../../../redux/config')
+vi.mock('/app/redux/config')
 
 const store: Store<State> = createStore(vi.fn(), {})
 

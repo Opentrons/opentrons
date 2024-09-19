@@ -3,18 +3,18 @@ import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-import * as RobotApi from '../../../../redux/robot-api'
-import * as Fixtures from '../../../../redux/networking/__fixtures__'
-import { useWifiList } from '../../../../resources/networking/hooks'
-import * as Networking from '../../../../redux/networking'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import * as RobotApi from '/app/redux/robot-api'
+import * as Fixtures from '/app/redux/networking/__fixtures__'
+import { useWifiList } from '/app/resources/networking/hooks'
+import * as Networking from '/app/redux/networking'
 import { ConnectViaWifi } from '../'
 
-vi.mock('../../../../redux/discovery')
-vi.mock('../../../../resources/networking/hooks')
-vi.mock('../../../../redux/networking/selectors')
-vi.mock('../../../../redux/robot-api/selectors')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/resources/networking/hooks')
+vi.mock('/app/redux/networking/selectors')
+vi.mock('/app/redux/robot-api/selectors')
 
 const mockWifiList = [
   { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },

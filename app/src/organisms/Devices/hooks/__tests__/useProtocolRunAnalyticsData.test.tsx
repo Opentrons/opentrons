@@ -7,17 +7,17 @@ import { Provider } from 'react-redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { useProtocolRunAnalyticsData } from '../useProtocolRunAnalyticsData'
-import { hash } from '../../../../redux/analytics/hash'
-import { getStoredProtocol } from '../../../../redux/protocol-storage'
+import { hash } from '/app/redux/analytics/hash'
+import { getStoredProtocol } from '/app/redux/protocol-storage'
 import { useStoredProtocolAnalysis, useProtocolDetailsForRun } from '../'
 import { useProtocolMetadata } from '../useProtocolMetadata'
 import { useRunTimestamps } from '../../../RunTimeControl/hooks'
 import { formatInterval } from '../../../RunTimeControl/utils'
-import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import type { Store } from 'redux'
 
-vi.mock('../../../../redux/analytics/hash')
-vi.mock('../../../../redux/protocol-storage')
+vi.mock('/app/redux/analytics/hash')
+vi.mock('/app/redux/protocol-storage')
 vi.mock('../../hooks')
 vi.mock('../useProtocolMetadata')
 vi.mock('../../../RunTimeControl/hooks')

@@ -28,13 +28,13 @@ import {
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 
-import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
+import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '../../../redux/analytics'
-import { Skeleton } from '../../../atoms/Skeleton'
-import { useMissingProtocolHardware } from '../../../transformations/commands'
+} from '/app/redux/analytics'
+import { Skeleton } from '/app/atoms/Skeleton'
+import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
 import { useRerunnableStatusText } from './hooks'
 

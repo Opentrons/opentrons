@@ -3,9 +3,9 @@ import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 import { RUN_STATUS_AWAITING_RECOVERY_PAUSED } from '@opentrons/api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { mockRecoveryContentProps } from '../__fixtures__'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { RecoveryDoorOpen } from '../RecoveryDoorOpen'
 
 import type { Mock } from 'vitest'

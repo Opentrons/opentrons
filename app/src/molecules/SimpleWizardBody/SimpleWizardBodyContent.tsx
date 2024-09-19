@@ -17,10 +17,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import SuccessIcon from '../../assets/images/icon_success.png'
-import { getIsOnDevice } from '../../redux/config'
+import SuccessIcon from '/app/assets/images/icon_success.png'
+import { getIsOnDevice } from '/app/redux/config'
 
-import { Skeleton } from '../../atoms/Skeleton'
+import { Skeleton } from '/app/atoms/Skeleton'
 import type { RobotType } from '@opentrons/shared-data'
 
 interface Props {

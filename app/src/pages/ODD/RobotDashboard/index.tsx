@@ -12,15 +12,15 @@ import {
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
-import { Navigation } from '../../../organisms/Navigation'
+import { Navigation } from '/app/organisms/Navigation'
 import {
   EmptyRecentRun,
   RecentRunProtocolCarousel,
-} from '../../../organisms/ODD/RobotDashboard'
-import { getOnDeviceDisplaySettings } from '../../../redux/config'
+} from '/app/organisms/ODD/RobotDashboard'
+import { getOnDeviceDisplaySettings } from '/app/redux/config'
 import { WelcomeModal } from './WelcomeModal'
-import { ServerInitializing } from '../../../organisms/ODD/RobotDashboard/ServerInitializing'
-import { useNotifyAllRunsQuery } from '../../../resources/runs'
+import { ServerInitializing } from '/app/organisms/ODD/RobotDashboard/ServerInitializing'
+import { useNotifyAllRunsQuery } from '/app/resources/runs'
 import type { RunData } from '@opentrons/api-client'
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8

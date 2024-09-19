@@ -13,11 +13,11 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { Divider } from '../../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteSettingsFieldsMap } from '@opentrons/api-client'
-import type { Mount } from '../../../redux/pipettes/types'
+import type { Mount } from '/app/redux/pipettes/types'
 
 interface PipetteOverflowMenuProps {
   pipetteSpecs: PipetteModelSpecs | null

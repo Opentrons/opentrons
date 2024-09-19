@@ -4,7 +4,7 @@ import {
   getModuleDef2,
 } from '@opentrons/shared-data'
 
-import { mockTemperatureModuleGen2 } from '../../../../../redux/modules/__fixtures__'
+import { mockTemperatureModuleGen2 } from '/app/redux/modules/__fixtures__'
 import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,

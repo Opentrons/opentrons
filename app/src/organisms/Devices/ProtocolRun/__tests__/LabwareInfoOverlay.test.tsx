@@ -6,11 +6,8 @@ import {
   getLabwareDisplayName,
   fixtureTiprack300ul,
 } from '@opentrons/shared-data'
-import {
-  nestedTextMatcher,
-  renderWithProviders,
-} from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { useCurrentRun } from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../utils/getLabwareLocation'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'

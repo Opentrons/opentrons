@@ -11,8 +11,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { i18n } from '../../../../../i18n'
-import { renderWithProviders } from '../../../../../__testing-utils__'
+import { i18n } from '/app/i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
 
 import { EmptyFile } from '../EmptyFile'
 

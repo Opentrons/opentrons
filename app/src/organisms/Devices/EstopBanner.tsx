@@ -9,7 +9,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Banner } from '../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 import {
   NOT_PRESENT,
   PHYSICALLY_ENGAGED,

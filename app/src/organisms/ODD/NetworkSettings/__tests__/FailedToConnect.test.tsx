@@ -3,11 +3,11 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { FailedToConnect } from '../FailedToConnect'
 
-import type { RequestState } from '../../../../redux/robot-api/types'
+import type { RequestState } from '/app/redux/robot-api/types'
 
 const render = (props: React.ComponentProps<typeof FailedToConnect>) => {
   return renderWithProviders(

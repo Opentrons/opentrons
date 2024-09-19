@@ -16,7 +16,7 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { getLabwareSetupItemGroups } from '../../../../transformations/commands'
+import { getLabwareSetupItemGroups } from '/app/transformations/commands'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { getLabwareRenderInfo } from '../utils/getLabwareRenderInfo'
 import { getProtocolModulesInfo } from '../utils/getProtocolModulesInfo'

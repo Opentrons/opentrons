@@ -15,13 +15,13 @@ import { getProtocolModulesInfo } from '../../ProtocolRun/utils/getProtocolModul
 import {
   mockTemperatureModuleGen2,
   mockThermocycler,
-} from '../../../../redux/modules/__fixtures__'
+} from '/app/redux/modules/__fixtures__'
 import {
   useAttachedModules,
   useModuleRenderInfoForProtocolById,
   useStoredProtocolAnalysis,
 } from '..'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type {
   CutoutConfig,
@@ -31,13 +31,13 @@ import type {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type { UseQueryResult } from 'react-query'
-import type { AttachedModule } from '../../../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 vi.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
 vi.mock('../useAttachedModules')
 vi.mock('../useStoredProtocolAnalysis')
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../../../../resources/deck_configuration')
+vi.mock('/app/resources/deck_configuration')
 
 const heaterShakerCommandsWithResultsKey = (heater_shaker_commands_with_results_key as unknown) as ProtocolAnalysisOutput
 

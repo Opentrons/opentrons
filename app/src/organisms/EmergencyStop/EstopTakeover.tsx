@@ -6,7 +6,7 @@ import { EstopPressedModal } from './EstopPressedModal'
 import { EstopMissingModal } from './EstopMissingModal'
 import { useEstopContext } from './hooks'
 import { useIsUnboxingFlowOngoing } from '../ODD/hooks'
-import { getLocalRobot } from '../../redux/discovery'
+import { getLocalRobot } from '/app/redux/discovery'
 import {
   PHYSICALLY_ENGAGED,
   LOGICALLY_ENGAGED,

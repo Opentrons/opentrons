@@ -19,12 +19,12 @@ import {
   useMenuHandleClickOutside,
 } from '@opentrons/components'
 import { getLabwareDefURI } from '@opentrons/shared-data'
-import { Divider } from '../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import { getTopPortalEl } from '../../App/portal'
 import { LabwareDetails } from '../LabwareDetails'
 
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
-import type { LabwareDefAndDate } from '../../pages/Desktop/Labware/hooks'
+import type { LabwareDefAndDate } from '/app/pages/Desktop/Labware/hooks'
 
 interface ProtocolLabwareDetailsProps {
   requiredLabwareDetails: LoadLabwareRunTimeCommand[] | null

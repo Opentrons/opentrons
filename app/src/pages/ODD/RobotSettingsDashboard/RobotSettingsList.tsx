@@ -21,8 +21,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { getLocalRobot, getRobotApiVersion } from '../../../redux/discovery'
-import { getRobotUpdateAvailable } from '../../../redux/robot-update'
+import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
+import { getRobotUpdateAvailable } from '/app/redux/robot-update'
 import {
   DEV_INTERNAL_FLAGS,
   getApplyHistoricOffsets,
@@ -31,20 +31,20 @@ import {
   toggleDevInternalFlag,
   toggleDevtools,
   toggleHistoricOffsets,
-} from '../../../redux/config'
-import { InlineNotification } from '../../../atoms/InlineNotification'
-import { getRobotSettings, updateSetting } from '../../../redux/robot-settings'
-import { UNREACHABLE } from '../../../redux/discovery/constants'
-import { Navigation } from '../../../organisms/Navigation'
-import { useLEDLights } from '../../../organisms/Devices/hooks'
-import { useNetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
+} from '/app/redux/config'
+import { InlineNotification } from '/app/atoms/InlineNotification'
+import { getRobotSettings, updateSetting } from '/app/redux/robot-settings'
+import { UNREACHABLE } from '/app/redux/discovery/constants'
+import { Navigation } from '/app/organisms/Navigation'
+import { useLEDLights } from '/app/organisms/Devices/hooks'
+import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
 import {
   RobotSettingButton,
   OnOffToggle,
-} from '../../../organisms/ODD/RobotSettingsDashboard'
+} from '/app/organisms/ODD/RobotSettingsDashboard'
 
-import type { Dispatch, State } from '../../../redux/types'
-import type { SetSettingOption } from '../../../organisms/ODD/RobotSettingsDashboard'
+import type { Dispatch, State } from '/app/redux/types'
+import type { SetSettingOption } from '/app/organisms/ODD/RobotSettingsDashboard'
 
 const HOME_GANTRY_SETTING_ID = 'disableHomeOnBoot'
 interface RobotSettingsListProps {

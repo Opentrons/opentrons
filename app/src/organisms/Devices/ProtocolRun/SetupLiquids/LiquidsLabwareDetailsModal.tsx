@@ -20,8 +20,8 @@ import {
   parseLiquidsInLoadOrder,
 } from '@opentrons/shared-data'
 
-import { OddModal } from '../../../../molecules/OddModal'
-import { getIsOnDevice } from '../../../../redux/config'
+import { OddModal } from '/app/molecules/OddModal'
+import { getIsOnDevice } from '/app/redux/config'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'

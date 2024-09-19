@@ -9,10 +9,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LEFT, WASTE_CHUTE_FIXTURES } from '@opentrons/shared-data'
-import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
-import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
-import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
-import { SimpleWizardInProgressBody } from '../../molecules/SimpleWizardBody'
+import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
+import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
+import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
+import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
 import type {
   CreateCommand,
@@ -20,8 +20,8 @@ import type {
   CutoutId,
   CutoutFixtureId,
 } from '@opentrons/shared-data'
-import { Banner } from '../../atoms/Banner'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { Banner } from '/app/atoms/Banner'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
 import type { ModuleCalibrationWizardStepProps } from './types'
 interface AttachProbeProps extends ModuleCalibrationWizardStepProps {

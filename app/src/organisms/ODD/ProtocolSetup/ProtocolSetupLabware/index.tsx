@@ -35,10 +35,10 @@ import {
   useModulesQuery,
 } from '@opentrons/react-api-client'
 
-import { FloatingActionButton, SmallButton } from '../../../../atoms/buttons'
-import { ODDBackButton } from '../../../../molecules/ODDBackButton'
-import { getLabwareSetupItemGroups } from '../../../../transformations/commands'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
+import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
+import { ODDBackButton } from '/app/molecules/ODDBackButton'
+import { getLabwareSetupItemGroups } from '/app/transformations/commands'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { getProtocolModulesInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { getNestedLabwareInfo } from '../../../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
 import { LabwareStackModal } from '../../../Devices/ProtocolRun/SetupLabware/LabwareStackModal'
@@ -57,7 +57,7 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
-import type { LabwareSetupItem } from '../../../../transformations/commands'
+import type { LabwareSetupItem } from '/app/transformations/commands'
 import type { SetupScreens } from '../types'
 import type { NestedLabwareInfo } from '../../../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'

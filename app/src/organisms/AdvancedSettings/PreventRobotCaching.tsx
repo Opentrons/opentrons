@@ -12,10 +12,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ToggleButton } from '../../atoms/buttons'
-import { getConfig, toggleConfigValue } from '../../redux/config'
+import { ToggleButton } from '/app/atoms/buttons'
+import { getConfig, toggleConfigValue } from '/app/redux/config'
 
-import type { Dispatch, State } from '../../redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 export function PreventRobotCaching(): JSX.Element {
   const { t } = useTranslation('app_settings')

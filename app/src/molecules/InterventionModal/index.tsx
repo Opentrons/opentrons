@@ -21,7 +21,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 
 import type { IconName } from '@opentrons/components'
 import { ModalContentOneColSimpleButtons } from './ModalContentOneColSimpleButtons'

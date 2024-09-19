@@ -8,14 +8,14 @@ import {
   setRobotUpdateSeen,
   robotUpdateIgnored,
   getRobotUpdateSession,
-} from '../../../../redux/robot-update'
+} from '/app/redux/robot-update'
 import { ViewUpdateModal } from './ViewUpdateModal'
 import { RobotUpdateProgressModal } from './RobotUpdateProgressModal'
-import { UNREACHABLE, OPENTRONS_USB } from '../../../../redux/discovery'
-import { appShellRequestor } from '../../../../redux/shell/remote'
+import { UNREACHABLE, OPENTRONS_USB } from '/app/redux/discovery'
+import { appShellRequestor } from '/app/redux/shell/remote'
 
-import type { Dispatch } from '../../../../redux/types'
-import type { DiscoveredRobot } from '../../../../redux/discovery/types'
+import type { Dispatch } from '/app/redux/types'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
 
 interface UpdateBuildrootProps {
   robot: DiscoveredRobot | null

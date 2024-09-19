@@ -4,7 +4,7 @@ import type {
   ProtocolAnalysisOutput,
   RobotType,
 } from '@opentrons/shared-data'
-import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import type { ProtocolHardware, ProtocolModule, ProtocolFixture } from './types'
 
 /**

@@ -4,10 +4,10 @@ import { when } from 'vitest-when'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
-import { useRunStatus } from '../../../../organisms/RunTimeControl/hooks'
+import { useRunStatus } from '/app/organisms/RunTimeControl/hooks'
 import { useRunHasStarted } from '../useRunHasStarted'
 
-vi.mock('../../../../organisms/RunTimeControl/hooks')
+vi.mock('/app/organisms/RunTimeControl/hooks')
 
 const MOCK_RUN_ID = '1'
 

@@ -25,10 +25,10 @@ import {
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../../App/portal'
-import { OddModal } from '../../../../molecules/OddModal'
+import { OddModal } from '/app/molecules/OddModal'
 import { FixtureOption } from '../../../DeviceDetailsDeckConfiguration/AddFixtureModal'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
-import { SmallButton } from '../../../../atoms/buttons'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { SmallButton } from '/app/atoms/buttons'
 import { useCloseCurrentRun } from '../../../ProtocolUpload/hooks'
 
 import type { ModuleModel, DeckDefinition } from '@opentrons/shared-data'

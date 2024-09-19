@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { COLORS } from '@opentrons/components'
 import { ODDBackButton } from '..'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
 const render = (props: React.ComponentProps<typeof ODDBackButton>) => {
   return renderWithProviders(<ODDBackButton {...props} />)[0]

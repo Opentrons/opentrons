@@ -15,12 +15,12 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '../../atoms/buttons'
-import { addManualIp } from '../../redux/config'
-import { startDiscovery } from '../../redux/discovery'
+import { TertiaryButton } from '/app/atoms/buttons'
+import { addManualIp } from '/app/redux/config'
+import { startDiscovery } from '/app/redux/discovery'
 
 import type { FieldError, Resolver } from 'react-hook-form'
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 const FlexForm = styled.form`
   display: flex;
