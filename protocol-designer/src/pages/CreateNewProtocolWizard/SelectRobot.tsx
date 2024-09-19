@@ -28,11 +28,7 @@ export function SelectRobot(props: WizardTileProps): JSX.Element {
           proceed(1)
         }}
       >
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing16}
-          paddingTop={SPACING.spacing60}
-        >
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
           <StyledText desktopStyle="headingSmallBold">
             {t('robot_type')}
           </StyledText>
