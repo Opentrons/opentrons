@@ -62,13 +62,13 @@ def test_initialize(
     decoy: Decoy, mock_engine_client: EngineClient, subject: AbsorbanceReaderCore
 ) -> None:
     """It should set the sample wavelength with the engine client."""
-    subject.initialize("singleMeasure", [123])
+    subject.initialize("single", [123])
 
     decoy.verify(
         mock_engine_client.execute_command(
             cmd.absorbance_reader.InitializeParams(
                 moduleId="1234",
-                measureMode="singleMeasure",
+                measureMode="single",
                 sampleWavelengths=[123],
                 referenceWavelength=None,
             ),
@@ -78,13 +78,13 @@ def test_initialize(
     assert subject._initialized_value == [123]
 
     # Test reference wavelength
-    subject.initialize("singleMeasure", [124], 450)
+    subject.initialize("single", [124], 450)
 
     decoy.verify(
         mock_engine_client.execute_command(
             cmd.absorbance_reader.InitializeParams(
                 moduleId="1234",
-                measureMode="singleMeasure",
+                measureMode="single",
                 sampleWavelengths=[124],
                 referenceWavelength=450,
             ),
@@ -94,13 +94,13 @@ def test_initialize(
     assert subject._initialized_value == [124]
 
     # Test initialize multi
-    subject.initialize("multiMeasure", [124, 125, 126])
+    subject.initialize("multi", [124, 125, 126])
 
     decoy.verify(
         mock_engine_client.execute_command(
             cmd.absorbance_reader.InitializeParams(
                 moduleId="1234",
-                measureMode="multiMeasure",
+                measureMode="multi",
                 sampleWavelengths=[124, 125, 126],
                 referenceWavelength=None,
             ),

@@ -72,10 +72,10 @@ class InitializeImpl(
             if unsuported_wavelengths:
                 raise ValueError(f"Unsuported wavelengths: {unsuported_wavelengths}")
 
-            if params.measureMode == "singleMeasure":
+            if params.measureMode == "single":
                 if sample_wavelengths_len != 1:
                     raise ValueError(
-                        f"singleMeasure requires one sample wavelength, provided {sample_wavelengths}"
+                        f"single requires one sample wavelength, provided {sample_wavelengths}"
                     )
                 if (
                     reference_wavelength is not None
@@ -85,14 +85,14 @@ class InitializeImpl(
                         f"Reference wavelength {reference_wavelength} not supported {supported_wavelenths}"
                     )
 
-            if params.measureMode == "multiMeasure":
+            if params.measureMode == "multi":
                 if sample_wavelengths_len < 1 or sample_wavelengths_len > 6:
                     raise ValueError(
-                        f"multiMeasure requires 1-6 sample wavelengths, provided {sample_wavelengths}"
+                        f"multi requires 1-6 sample wavelengths, provided {sample_wavelengths}"
                     )
                 if reference_wavelength is not None:
                     raise RuntimeError(
-                        "Reference wavelength cannot be used with multiMeasure mode."
+                        "Reference wavelength cannot be used with multi mode."
                     )
 
             await abs_reader.set_sample_wavelength(

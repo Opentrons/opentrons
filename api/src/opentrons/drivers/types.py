@@ -88,8 +88,8 @@ class AbsorbanceReaderDeviceState(str, Enum):
 class ABSMeasurementMode(Enum):
     """The current mode configured for reading the Absorbance Reader."""
 
-    SINGLE = "singleMeasure"
-    MULTI = "multiMeasure"
+    SINGLE = "single"
+    MULTI = "multi"
 
 
 @dataclass
