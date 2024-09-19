@@ -78,7 +78,6 @@ export const SetupModulesMap = ({
   return (
     <Flex
       flex="1"
-      maxHeight="180vh"
       marginTop={SPACING.spacing16}
       flexDirection={DIRECTION_COLUMN}
     >
