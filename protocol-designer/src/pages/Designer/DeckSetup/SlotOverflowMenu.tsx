@@ -18,6 +18,7 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+
 import { deleteModule } from '../../../step-forms/actions'
 import { EditNickNameModal } from '../../../organisms'
 import { deleteDeckFixture } from '../../../step-forms/actions/additionalItems'
@@ -226,7 +227,7 @@ export function SlotOverflowMenu(
               }}
             >
               <StyledText desktopStyle="bodyDefaultRegular">
-                {selectionHasLiquids ? t('edit_liquids') : t('add_liquid')}
+                {selectionHasLiquids ? t('edit_liquid') : t('add_liquid')}
               </StyledText>
             </MenuButton>
           </>
