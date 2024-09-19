@@ -3,7 +3,7 @@ from typing import List, Tuple, Iterator, Sequence, Any, Union
 from numpy import pi, iscomplex, roots, real
 from math import sqrt
 
-from ..errors.exceptions import InvalidLiquidHeightFound
+from ..errors.exceptions import InvalidLiquidHeightFound, InvalidWellDefinitionError
 from opentrons_shared_data.labware.types import (
     is_circular_frusta_list,
     is_rectangular_frusta_list,
@@ -44,7 +44,7 @@ def get_cross_section_area(
             bounded_section["yDimension"],
         )
     else:
-        raise InvalidLiquidHeightFound(message="Invalid well volume components.")
+        raise InvalidWellDefinitionError(message="Invalid well volume components.")
     return cross_section_area
 
 
