@@ -184,7 +184,7 @@ The ``start`` parameter sets the first and only nozzle used in the configuration
         | (A1 through H1, A2 through H2, …)
 
 .. warning::
-    In certain environmental conditions, tips in adjacent columns may cling to empty nozzles due to static electricity. You can avoid this by overriding automatic tip tracking to pick up tips row by row, rather than column by column. The code sample below demonstrates how to pick up tips this way.
+    In certain conditions, tips in adjacent columns may cling to empty nozzles during single-tip pickup. You can avoid this by overriding automatic tip tracking to pick up tips row by row, rather than column by column. The code sample below demonstrates how to pick up tips this way.
 
     However, as with all partial tip layouts, be careful that you don't place the pipette in a position where it overlaps more tips than intended.
 
@@ -256,7 +256,7 @@ To specify the number of tips to pick up, add the ``end`` parameter when calling
 When picking up 3, 5, 6, or 7 tips, extra tips will be left at the front of each column. You can use these tips with a different nozzle configuration, or you can manually re-rack them at the end of your protocol for future use.
 
 .. warning::
-    In certain environmental conditions, tips in adjacent columns may cling to empty nozzles due to static electricity. You can avoid this by overriding automatic tip tracking to pick up tips row by row, rather than column by column. The code sample below demonstrates how to pick up tips this way.
+    In certain conditions, tips in adjacent columns may cling to empty nozzles during partial-column pickup. You can avoid this by overriding automatic tip tracking to pick up tips row by row, rather than column by column. The code sample below demonstrates how to pick up tips this way.
 
     However, as with all partial tip layouts, be careful that you don't place the pipette in a position where it overlaps more tips than intended.
 
