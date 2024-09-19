@@ -523,18 +523,20 @@ export function ProtocolOverview(): JSX.Element {
                 <StyledText desktopStyle="headingSmallBold">
                   {t('starting_deck')}
                 </StyledText>
-                <Btn
-                  data-testid="Materials_list"
-                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                  onClick={() => {
-                    setShowMaterialsListModal(true)
-                  }}
-                  css={BUTTON_LINK_STYLE}
-                >
-                  <StyledText desktopStyle="bodyDefaultRegular">
-                    {t('materials_list')}
-                  </StyledText>
-                </Btn>
+                <Flex padding={SPACING.spacing4}>
+                  <Btn
+                    data-testid="Materials_list"
+                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                    onClick={() => {
+                      setShowMaterialsListModal(true)
+                    }}
+                    css={BUTTON_LINK_STYLE}
+                  >
+                    <StyledText desktopStyle="bodyDefaultRegular">
+                      {t('materials_list')}
+                    </StyledText>
+                  </Btn>
+                </Flex>
               </Flex>
               <ToggleGroup
                 selectedValue={deckView}
