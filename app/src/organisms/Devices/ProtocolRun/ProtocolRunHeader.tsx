@@ -507,6 +507,7 @@ export function ProtocolRunHeader({
               isFixtureMismatch={isFixtureMismatch}
               isResetRunLoadingRef={isResetRunLoadingRef}
               missingSetupSteps={missingSetupSteps}
+              isClosingCurrentRun={isClosingCurrentRun}
             />
           </Flex>
         </Box>
@@ -668,6 +669,7 @@ interface ActionButtonProps {
   isFixtureMismatch: boolean
   isResetRunLoadingRef: React.MutableRefObject<boolean>
   missingSetupSteps: string[]
+  isClosingCurrentRun: boolean
 }
 
 // TODO(jh, 04-22-2024): Refactor switch cases into separate factories to increase readability and testability.
@@ -681,6 +683,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isFixtureMismatch,
     isResetRunLoadingRef,
     missingSetupSteps,
+    isClosingCurrentRun,
   } = props
   const navigate = useNavigate()
   const { t } = useTranslation(['run_details', 'shared'])
@@ -737,6 +740,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isPlayRunActionLoading ||
     isPauseRunActionLoading ||
     isResetRunLoading ||
+    isClosingCurrentRun ||
     isOtherRunCurrent ||
     isProtocolAnalyzing ||
     isFixtureMismatch ||
@@ -814,6 +818,8 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     START_RUN_STATUSES.includes(runStatus)
   ) {
     disableReason = t('close_door')
+  } else if (isClosingCurrentRun) {
+    disableReason = t('shared:robot_is_busy')
   }
 
   const shouldShowHSConfirm =
