@@ -132,10 +132,10 @@ class LiquidProbeImplementation(
         aspirated_volume = self._state_view.pipettes.get_aspirated_volume(pipette_id)
 
         if aspirated_volume is None:
-            # Theoretically, we could avoid raising an error here by automatically
-            # preparing to aspirate, like AspirateImplementation does. However, the
-            # only way for this to happen is if someone tries to do a liquid probe
-            # with a tip that's previously held liquid, which they should avoid anyway.
+            # Theoretically, we could avoid raising an error by automatically preparing
+            # to aspirate above the well like AspirateImplementation does. However, the
+            # only way for this to happen is if someone tries to do a liquid probe with
+            # a tip that's previously held liquid, which they should avoid anyway.
             raise PipetteNotReadyToAspirateError(
                 "The pipette cannot probe liquid because of a previous blow out."
                 " Run a `prepareToAspirate` command in a safe place to reset the plunger."
