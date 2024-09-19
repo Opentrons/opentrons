@@ -180,6 +180,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         """Modify state in reaction to a command."""
         self._add_loaded_labware(action)
         self._set_reloaded_labware(action)
+        self._set_move_lid_result(action)
 
         if not isinstance(action, SucceedCommandAction):
             return
@@ -199,14 +200,6 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 new_location = OFF_DECK_LOCATION
             self._state.labware_by_id[labware_id].location = new_location
 
-        elif isinstance(action.command.result, absorbance_reader.MoveLidResult):
-            lid_id = action.command.result.lidId
-            new_location = action.command.result.newLocation
-            new_offset_id = action.command.result.offsetId
-
-            self._state.labware_by_id[lid_id].offsetId = new_offset_id
-            self._state.labware_by_id[lid_id].location = new_location
-
     def _add_labware_offset(self, labware_offset: LabwareOffset) -> None:
         """Add a new labware offset to state.
 
@@ -217,6 +210,18 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         assert labware_offset.id not in self._state.labware_offsets_by_id
 
         self._state.labware_offsets_by_id[labware_offset.id] = labware_offset
+
+    def _set_move_lid_result(self, action: Action) -> None:
+        if (
+            isinstance(action, SucceedCommandAction)
+            and action.state_update.lid_status is not None
+        ):
+            lid_id = action.state_update.lid_status.id
+            new_location = action.state_update.lid_status.new_location
+            new_offset_id = action.state_update.lid_status.offset_id
+
+            self._state.labware_by_id[lid_id].offsetId = new_offset_id
+            self._state.labware_by_id[lid_id].location = new_location
 
     def _set_reloaded_labware(self, action: Action) -> None:
         if (

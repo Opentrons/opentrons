@@ -340,10 +340,15 @@ def test_handles_move_labware_off_deck(
             command=load_labware_command,
             state_update=update_types.StateUpdate(
                 labware_location=update_types.LabwareLocationUpdate(
-                    labware_id="my-labware-id",
+                    labware_id="test-labware-id",
                     display_name="display-name",
                     new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-                )
+                ),
+                loaded_labware=LoadedLabwareData(
+                    labware_id="test-labware-id",
+                    definition=well_plate_def,
+                    offsetId="offset-id",
+                ),
             ),
         )
     )
@@ -354,7 +359,15 @@ def test_handles_move_labware_off_deck(
         strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
     )
     subject.handle_action(
-        SucceedCommandAction(private_result=None, command=move_labware_off_deck_cmd)
+        SucceedCommandAction(
+            private_result=None,
+            command=move_labware_off_deck_cmd,
+            state_update=update_types.StateUpdate(
+                lid_status=update_types.StateDataUpdate(
+                    id="my-labware-id", new_location=OFF_DECK_LOCATION, offset_id=None
+                )
+            ),
+        )
     )
     assert subject.state.labware_by_id["my-labware-id"].location == OFF_DECK_LOCATION
     assert subject.state.labware_by_id["my-labware-id"].offsetId is None

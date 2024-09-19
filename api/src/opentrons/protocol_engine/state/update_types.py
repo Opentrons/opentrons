@@ -31,6 +31,15 @@ Unfortunately, mypy doesn't let us write `Literal[NO_CHANGE]`. Use this instead.
 
 
 @dataclasses.dataclass(frozen=True)
+class StateDataUpdate:
+    """Base class for updating results."""
+
+    id: str
+    new_location: LabwareLocation
+    offset_id: typing.Optional[str]
+
+
+@dataclasses.dataclass(frozen=True)
 class Well:
     """Designates a well in a labware."""
 
@@ -91,6 +100,8 @@ class StateUpdate:
     loaded_labware: typing.Optional[LoadedLabwareData] = None
 
     reloaded_labware: typing.Optional[ReloadedLabwareData] = None
+
+    lid_status: typing.Optional[StateDataUpdate] = None
 
     # These convenience functions let the caller avoid the boilerplate of constructing a
     # complicated dataclass tree, and they give us a
