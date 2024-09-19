@@ -67,10 +67,10 @@ class InitializeImpl(
             sample_wavelengths = set(params.sampleWavelengths)
             sample_wavelengths_len = len(params.sampleWavelengths)
             reference_wavelength = params.referenceWavelength
-            supported_wavelenths = set(abs_reader.supported_wavelengths)
-            unsuported_wavelengths = sample_wavelengths.difference(supported_wavelenths)
-            if unsuported_wavelengths:
-                raise ValueError(f"Unsuported wavelengths: {unsuported_wavelengths}")
+            supported_wavelengths = set(abs_reader.supported_wavelengths)
+            unsupported_wavelengths = sample_wavelengths.difference(supported_wavelengths)
+            if unsupported_wavelengths:
+                raise ValueError(f"Unsupported wavelengths: {unsupported_wavelengths}")
 
             if params.measureMode == "singleMeasure":
                 if sample_wavelengths_len != 1:
@@ -79,10 +79,10 @@ class InitializeImpl(
                     )
                 if (
                     reference_wavelength is not None
-                    and reference_wavelength not in supported_wavelenths
+                    and reference_wavelength not in supported_wavelengths
                 ):
                     raise ValueError(
-                        f"Reference wavelength {reference_wavelength} not supported {supported_wavelenths}"
+                        f"Reference wavelength {reference_wavelength} not supported {supported_wavelengths}"
                     )
 
             if params.measureMode == "multiMeasure":
