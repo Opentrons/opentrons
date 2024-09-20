@@ -3,9 +3,9 @@ import { MemoryRouter } from 'react-router-dom'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   AdditionalCustomLabwareSourceFolder,
   ClearUnavailableRobots,
@@ -17,19 +17,19 @@ import {
   ShowLabwareOffsetSnippets,
   U2EInformation,
   UpdatedChannel,
-} from '../../../../organisms/AdvancedSettings'
+} from '/app/organisms/AdvancedSettings'
 
 import { AdvancedSettings } from '../AdvancedSettings'
 
-vi.mock('../../../../redux/config')
-vi.mock('../../../../redux/calibration')
-vi.mock('../../../../redux/custom-labware')
-vi.mock('../../../../redux/discovery')
-vi.mock('../../../../redux/protocol-analysis')
-vi.mock('../../../../redux/system-info')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/calibration')
+vi.mock('/app/redux/custom-labware')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/protocol-analysis')
+vi.mock('/app/redux/system-info')
 vi.mock('@opentrons/components/src/hooks')
-vi.mock('../../../../redux/analytics')
-vi.mock('../../../../organisms/AdvancedSettings')
+vi.mock('/app/redux/analytics')
+vi.mock('/app/organisms/AdvancedSettings')
 
 const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(

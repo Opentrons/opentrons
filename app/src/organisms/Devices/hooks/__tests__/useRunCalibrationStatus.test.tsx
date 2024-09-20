@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react'
 import { vi, it, expect, describe, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
-import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtures__'
+import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
 
 import {
   useRunCalibrationStatus,
@@ -11,7 +11,7 @@ import {
   useIsFlex,
   useRunPipetteInfoByMount,
 } from '..'
-import { useNotifyRunQuery } from '../../../../resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
 import type { PipetteInfo } from '..'
 import { Provider } from 'react-redux'
@@ -20,7 +20,7 @@ import { createStore } from 'redux'
 vi.mock('../useDeckCalibrationStatus')
 vi.mock('../useIsFlex')
 vi.mock('../useRunPipetteInfoByMount')
-vi.mock('../../../../resources/runs')
+vi.mock('/app/resources/runs')
 
 let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 

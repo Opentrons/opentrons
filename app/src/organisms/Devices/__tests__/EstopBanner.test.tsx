@@ -2,8 +2,8 @@ import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { EstopBanner } from '../EstopBanner'
 
 const render = (props: React.ComponentProps<typeof EstopBanner>) =>

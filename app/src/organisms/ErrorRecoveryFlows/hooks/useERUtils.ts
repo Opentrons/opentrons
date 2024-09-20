@@ -10,10 +10,10 @@ import { useDeckMapUtils } from './useDeckMapUtils'
 import {
   useNotifyAllCommandsQuery,
   useNotifyRunQuery,
-} from '../../../resources/runs'
+} from '/app/resources/runs'
 import { useRecoveryOptionCopy } from './useRecoveryOptionCopy'
 import { useRecoveryActionMutation } from './useRecoveryActionMutation'
-import { useRunningStepCounts } from '../../../resources/protocols/hooks'
+import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 import { useRecoveryToasts } from './useRecoveryToasts'
 import { useRecoveryAnalytics } from './useRecoveryAnalytics'
 
@@ -31,7 +31,7 @@ import type {
   SubMapUtils,
 } from './useRecoveryRouting'
 import type { RecoveryActionMutationResult } from './useRecoveryActionMutation'
-import type { StepCounts } from '../../../resources/protocols/hooks'
+import type { StepCounts } from '/app/resources/protocols/hooks'
 import type { UseRecoveryAnalyticsResult } from './useRecoveryAnalytics'
 import type { UseRecoveryTakeoverResult } from './useRecoveryTakeover'
 import type { useRetainedFailedCommandBySource } from './useRetainedFailedCommandBySource'

@@ -4,10 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen, waitFor, renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { mockRecoveryContentProps } from '../__fixtures__'
-import { getIsOnDevice } from '../../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'
 import { StepInfo } from '../shared'
 
@@ -15,7 +15,7 @@ import type { Store } from 'redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../shared')
 
 const store: Store<any> = createStore(vi.fn(), {})

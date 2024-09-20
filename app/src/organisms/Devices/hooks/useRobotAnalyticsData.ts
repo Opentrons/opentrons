@@ -2,16 +2,16 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { useRobot } from './'
-import { getAttachedPipettes } from '../../../redux/pipettes'
-import { getRobotSettings, fetchSettings } from '../../../redux/robot-settings'
+import { getAttachedPipettes } from '/app/redux/pipettes'
+import { getRobotSettings, fetchSettings } from '/app/redux/robot-settings'
 import {
   getRobotApiVersion,
   getRobotFirmwareVersion,
   getRobotSerialNumber,
-} from '../../../redux/discovery'
+} from '/app/redux/discovery'
 
-import type { State, Dispatch } from '../../../redux/types'
-import type { RobotAnalyticsData } from '../../../redux/analytics/types'
+import type { State, Dispatch } from '/app/redux/types'
+import type { RobotAnalyticsData } from '/app/redux/analytics/types'
 
 const FF_PREFIX = 'robotFF_'
 

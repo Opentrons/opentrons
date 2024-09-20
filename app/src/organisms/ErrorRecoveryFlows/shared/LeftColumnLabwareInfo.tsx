@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { InterventionContent } from '../../../molecules/InterventionModal/InterventionContent'
+import { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
 
 import type { RecoveryContentProps } from '../types'
 

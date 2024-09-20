@@ -14,10 +14,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../atoms/buttons'
-import { InlineNotification } from '../../atoms/InlineNotification'
+import { SmallButton } from '/app/atoms/buttons'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 
-import type { InlineNotificationProps } from '../../atoms/InlineNotification'
+import type { InlineNotificationProps } from '/app/atoms/InlineNotification'
 
 interface RobotSetupHeaderProps {
   header: string

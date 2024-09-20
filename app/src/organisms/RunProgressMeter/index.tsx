@@ -7,6 +7,8 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  CURSOR_DEFAULT,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -31,14 +33,14 @@ import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostR
 import { getModalPortalEl } from '../../App/portal'
 import { useRunControls, useRunStatus } from '../RunTimeControl/hooks'
 import { InterventionModal, useInterventionModal } from '../InterventionModal'
-import { ProgressBar } from '../../atoms/ProgressBar'
+import { ProgressBar } from '/app/atoms/ProgressBar'
 import { useDownloadRunLog, useRobotType } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
 import {
   useNotifyRunQuery,
   useNotifyAllCommandsQuery,
-} from '../../resources/runs'
-import { useRunningStepCounts } from '../../resources/protocols/hooks'
+} from '/app/resources/runs'
+import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 import { useRunProgressCopy } from './hooks'
 
 interface RunProgressMeterProps {
@@ -146,7 +148,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
               &:hover {
                 color: ${downloadIsDisabled ? COLORS.grey40 : COLORS.black90};
               }
-              cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
+              cursor: ${downloadIsDisabled ? CURSOR_DEFAULT : CURSOR_POINTER};
             `}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             onClick={onDownloadClick}

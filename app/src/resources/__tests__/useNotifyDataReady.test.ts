@@ -6,10 +6,10 @@ import { when } from 'vitest-when'
 import { useHost } from '@opentrons/react-api-client'
 
 import { useNotifyDataReady } from '../useNotifyDataReady'
-import { appShellListener } from '../../redux/shell/remote'
-import { useTrackEvent } from '../../redux/analytics'
-import { notifySubscribeAction } from '../../redux/shell'
-import { useFeatureFlag } from '../../redux/config'
+import { appShellListener } from '/app/redux/shell/remote'
+import { useTrackEvent } from '/app/redux/analytics'
+import { notifySubscribeAction } from '/app/redux/shell'
+import { useFeatureFlag } from '/app/redux/config'
 
 import type { Mock } from 'vitest'
 import type { HostConfig } from '@opentrons/api-client'
@@ -18,9 +18,9 @@ import type { QueryOptionsWithPolling } from '../useNotifyDataReady'
 vi.unmock('../useNotifyDataReady')
 vi.mock('react-redux')
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../redux/analytics')
-vi.mock('../../redux/config')
-vi.mock('../../redux/shell/remote', () => ({
+vi.mock('/app/redux/analytics')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/shell/remote', () => ({
   appShellListener: vi.fn(),
 }))
 

@@ -12,6 +12,7 @@ import {
   Flex,
   Icon,
   MenuItem,
+  NO_WRAP,
   OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
@@ -24,16 +25,16 @@ import {
 } from '@opentrons/components'
 import { useDeleteRunMutation } from '@opentrons/react-api-client'
 
-import { Divider } from '../../atoms/structure'
-import { useRunControls } from '../../organisms/RunTimeControl/hooks'
+import { Divider } from '/app/atoms/structure'
+import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
-} from '../../redux/analytics'
-import { useIsRobotOnWrongVersionOfSoftware } from '../../redux/robot-update'
+} from '/app/redux/analytics'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { useDownloadRunLog, useTrackProtocolRunEvent, useRobot } from './hooks'
-import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { Run } from '@opentrons/api-client'
 
@@ -163,6 +164,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
 
   return (
     <Flex
+      whiteSpace={NO_WRAP}
       zIndex={10}
       borderRadius="4px 4px 0px 0px"
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"

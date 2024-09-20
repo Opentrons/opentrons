@@ -24,15 +24,15 @@ import {
   getDeckDefFromRobotType,
   getFixtureDisplayName,
 } from '@opentrons/shared-data'
-import { StatusLabel } from '../../../../atoms/StatusLabel'
-import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
+import { StatusLabel } from '/app/atoms/StatusLabel'
+import { TertiaryButton } from '/app/atoms/buttons/TertiaryButton'
 import { LocationConflictModal } from './LocationConflictModal'
 import { NotConfiguredModal } from './NotConfiguredModal'
 import { getFixtureImage } from './utils'
 import { DeckFixtureSetupInstructionsModal } from '../../../DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 
 import type { DeckDefinition } from '@opentrons/shared-data'
-import type { CutoutConfigAndCompatibility } from '../../../../resources/deck_configuration/hooks'
+import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
 
 interface SetupFixtureListProps {
   deckConfigCompatibility: CutoutConfigAndCompatibility[]

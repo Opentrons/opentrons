@@ -12,6 +12,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   MenuItem,
+  NO_WRAP,
   OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
@@ -21,18 +22,18 @@ import {
   useMenuHandleClickOutside,
 } from '@opentrons/components'
 
-import { CONNECTABLE, removeRobot } from '../../redux/discovery'
-import { useIsRobotOnWrongVersionOfSoftware } from '../../redux/robot-update'
-import { Divider } from '../../atoms/structure'
+import { CONNECTABLE, removeRobot } from '/app/redux/discovery'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { Divider } from '/app/atoms/structure'
 import { getTopPortalEl } from '../../App/portal'
 import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
-import { useCurrentRunId } from '../../resources/runs'
+import { useCurrentRunId } from '/app/resources/runs'
 import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
 import { useIsRobotBusy } from './hooks'
 
 import type { StyleProps } from '@opentrons/components'
-import type { DiscoveredRobot } from '../../redux/discovery/types'
-import type { Dispatch } from '../../redux/types'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
+import type { Dispatch } from '/app/redux/types'
 
 interface RobotOverflowMenuProps extends StyleProps {
   robot: DiscoveredRobot
@@ -172,7 +173,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
       />
       {showOverflowMenu && !showConnectionTroubleshootingModal ? (
         <Flex
-          whiteSpace="nowrap"
+          whiteSpace={NO_WRAP}
           zIndex={10}
           borderRadius={BORDERS.borderRadius8}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"

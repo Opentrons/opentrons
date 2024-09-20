@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Flex, DISPLAY_INLINE, StyledText } from '@opentrons/components'
 
-import { CommandText } from '../../../molecules/Command'
+import { CommandText } from '/app/molecules/Command'
 
 import type { StyleProps } from '@opentrons/components'
 import type { RecoveryContentProps } from '../types'

@@ -25,16 +25,16 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { SmallButton } from '../../../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { getModulePrepCommands } from '../../../Devices/getModulePrepCommands'
 import { getModuleTooHot } from '../../../Devices/getModuleTooHot'
 import { useRunCalibrationStatus } from '../../../Devices/hooks'
 import { LocationConflictModal } from '../../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { useToaster } from '../../../ToasterOven'
-import { getLocalRobot } from '../../../../redux/discovery'
-import { useChainLiveCommands } from '../../../../resources/runs'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
+import { getLocalRobot } from '/app/redux/discovery'
+import { useChainLiveCommands } from '/app/resources/runs'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { CommandData } from '@opentrons/api-client'
 import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'

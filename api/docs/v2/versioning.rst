@@ -137,6 +137,8 @@ Changes in API Versions
 Version 2.20
 ------------
 
+- Detect liquid presence within a well. The :py:meth:`.InstrumentContext.detect_liquid_presence()` and :py:meth:`.InstrumentContext.require_liquid_presence()` building block commands check for liquid any point in your protocol. You can also :ref:`enable liquid presence detection <lpd>` for all aspirations when loading a pipette, although this will add significant time to your protocol.
+- Define CSV runtime parameters and use their contents in a protocol with new :ref:`data manipulation methods <rtp-csv-data>`. See the :ref:`cherrypicking use case <use-case-cherrypicking>` for a full example.
 - :py:meth:`.configure_nozzle_layout` now accepts row, single, and partial column layout constants. See :ref:`partial-tip-pickup`.
 - You can now call :py:obj:`.ProtocolContext.define_liquid()` without supplying a ``description`` or ``display_color``.
 

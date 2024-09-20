@@ -12,7 +12,7 @@ import {
   useRunTimestamps,
   useRunErrors,
 } from '../hooks'
-import { useNotifyRunQuery, useCurrentRunId } from '../../../resources/runs'
+import { useNotifyRunQuery, useCurrentRunId } from '/app/resources/runs'
 
 import {
   RUN_ID_2,
@@ -39,7 +39,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
 })
 
 vi.mock('../../ProtocolUpload/hooks')
-vi.mock('../../../resources/runs')
+vi.mock('/app/resources/runs')
 
 describe('useRunControls hook', () => {
   it('returns run controls hooks', () => {

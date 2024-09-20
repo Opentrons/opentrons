@@ -29,7 +29,7 @@ import {
 import { CurrentOffsetsTable } from './CurrentOffsetsTable'
 import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
 import { getLatestCurrentOffsets } from './utils'
-import { useNotifyRunQuery } from '../../../../resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 

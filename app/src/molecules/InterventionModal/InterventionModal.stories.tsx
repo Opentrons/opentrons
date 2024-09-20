@@ -3,7 +3,7 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
 import { LegacyStyledText } from '@opentrons/components'
-import { configReducer } from '../../redux/config/reducer'
+import { configReducer } from '/app/redux/config/reducer'
 import { InterventionModal as InterventionModalComponent } from './'
 
 import type { Store, StoreEnhancer } from 'redux'

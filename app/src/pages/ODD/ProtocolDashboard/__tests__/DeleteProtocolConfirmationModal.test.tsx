@@ -4,17 +4,17 @@ import { when } from 'vitest-when'
 import { act, fireEvent, screen } from '@testing-library/react'
 
 import { getProtocol, deleteProtocol, deleteRun } from '@opentrons/api-client'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../../i18n'
-import { useToaster } from '../../../../organisms/ToasterOven'
+import { i18n } from '/app/i18n'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { DeleteProtocolConfirmationModal } from '../DeleteProtocolConfirmationModal'
 import type { HostConfig } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../organisms/ToasterOven')
+vi.mock('/app/organisms/ToasterOven')
 
 const mockFunc = vi.fn()
 const PROTOCOL_ID = 'mockProtocolId'

@@ -3,13 +3,13 @@ import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import {
   useTrackEvent,
   ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
-} from '../../../../redux/analytics'
-import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
+} from '/app/redux/analytics'
+import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import {
   useDeckCalibrationData,
   useIsFlex,
@@ -20,7 +20,7 @@ import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 
-vi.mock('../../../../redux/analytics')
+vi.mock('/app/redux/analytics')
 vi.mock('../../hooks')
 vi.mock('../SetupDeckCalibration')
 vi.mock('../SetupInstrumentCalibration')

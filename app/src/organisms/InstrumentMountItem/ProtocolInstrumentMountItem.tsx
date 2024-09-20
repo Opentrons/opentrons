@@ -18,11 +18,11 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import {
   useGripperDisplayName,
   usePipetteNameSpecs,
-} from '../../resources/instruments/hooks'
+} from '/app/resources/instruments/hooks'
 import { FLOWS } from '../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../PipetteWizardFlows'
 import { GripperWizardFlows } from '../GripperWizardFlows'
@@ -33,7 +33,7 @@ import type {
   PipetteName,
   LoadedPipette,
 } from '@opentrons/shared-data'
-import type { Mount } from '../../redux/pipettes/types'
+import type { Mount } from '/app/redux/pipettes/types'
 
 export const MountItem = styled.div<{ isReady: boolean }>`
   display: flex;

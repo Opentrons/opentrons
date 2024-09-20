@@ -2,18 +2,18 @@ import * as React from 'react'
 import { when } from 'vitest-when'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
-import { renderWithProviders } from '../../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { i18n } from '../../../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   mockMagneticModule as mockMagneticModuleFixture,
   mockHeaterShaker,
-} from '../../../../../redux/modules/__fixtures__/index'
+} from '/app/redux/modules/__fixtures__/index'
 import {
   mockMagneticModuleGen2,
   mockThermocycler,
-} from '../../../../../redux/modules/__fixtures__'
-import { useChainLiveCommands } from '../../../../../resources/runs'
+} from '/app/redux/modules/__fixtures__'
+import { useChainLiveCommands } from '/app/resources/runs'
 import { ModuleSetupModal } from '../../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
 import {
@@ -29,7 +29,7 @@ import { SetupModulesList } from '../SetupModulesList'
 import { LocationConflictModal } from '../LocationConflictModal'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
-import type { DiscoveredRobot } from '../../../../../redux/discovery/types'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../hooks')
@@ -38,8 +38,8 @@ vi.mock('../UnMatchedModuleWarning')
 vi.mock('../../../../ModuleCard/ModuleSetupModal')
 vi.mock('../../../../ModuleWizardFlows')
 vi.mock('../OT2MultipleModulesHelp')
-vi.mock('../../../../../resources/runs')
-vi.mock('../../../../../redux/config')
+vi.mock('/app/resources/runs')
+vi.mock('/app/redux/config')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'

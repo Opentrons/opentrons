@@ -8,11 +8,11 @@ import {
   LEFT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
-} from '../../../redux/pipettes/__fixtures__'
+} from '/app/redux/pipettes/__fixtures__'
 import { FLOWS } from '../constants'
 import { usePipetteFlowWizardHeaderText } from '../hooks'
 

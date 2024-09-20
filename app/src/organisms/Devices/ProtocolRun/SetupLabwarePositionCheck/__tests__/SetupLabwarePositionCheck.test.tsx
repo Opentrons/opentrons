@@ -10,12 +10,12 @@ import {
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
 import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
 import { useLaunchLPC } from '../../../../LabwarePositionCheck/useLaunchLPC'
-import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../../redux/config'
+import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import {
   useLPCDisabledReason,
   useRunCalibrationStatus,
@@ -24,18 +24,18 @@ import {
   useRobotType,
 } from '../../../hooks'
 import { SetupLabwarePositionCheck } from '..'
-import { useNotifyRunQuery } from '../../../../../resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
 import type { Mock } from 'vitest'
 
 vi.mock('../../../../LabwarePositionCheck/useLaunchLPC')
 vi.mock('../../utils/getModuleTypesThatRequireExtraAttention')
 vi.mock('../../../../RunTimeControl/hooks')
-vi.mock('../../../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../../../hooks')
 vi.mock('../../../hooks/useLPCSuccessToast')
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../../resources/runs')
+vi.mock('/app/resources/runs')
 
 const DISABLED_REASON = 'MOCK_DISABLED_REASON'
 const ROBOT_NAME = 'otie'

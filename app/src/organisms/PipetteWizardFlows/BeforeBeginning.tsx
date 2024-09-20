@@ -14,14 +14,14 @@ import {
   WEIGHT_OF_96_CHANNEL,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { Banner } from '../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '../../molecules/SimpleWizardBody'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
-import { usePipetteNameSpecs } from '../../resources/instruments/hooks'
+} from '/app/molecules/SimpleWizardBody'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
+import { usePipetteNameSpecs } from '/app/resources/instruments/hooks'
 import {
   CALIBRATION_PROBE,
   FLOWS,
@@ -32,7 +32,7 @@ import {
   BODY_STYLE,
 } from './constants'
 import { getIsGantryEmpty } from './utils'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { UseMutateFunction } from 'react-query'
 import type { AxiosError } from 'axios'

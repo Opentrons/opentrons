@@ -9,12 +9,9 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  useTrackEvent,
-  ANALYTICS_JUPYTER_OPEN,
-} from '../../../../redux/analytics'
-import { TertiaryButton } from '../../../../atoms/buttons'
-import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
+import { useTrackEvent, ANALYTICS_JUPYTER_OPEN } from '/app/redux/analytics'
+import { TertiaryButton } from '/app/atoms/buttons'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 
 const EVENT_JUPYTER_OPEN = { name: ANALYTICS_JUPYTER_OPEN, properties: {} }
 

@@ -1,6 +1,6 @@
 import { useAllPipetteOffsetCalibrationsQuery } from '@opentrons/react-api-client'
 
-import type { PipetteOffsetCalibration } from '../../../redux/calibration/types'
+import type { PipetteOffsetCalibration } from '/app/redux/calibration/types'
 
 const CALIBRATION_DATA_POLL_MS = 5000
 

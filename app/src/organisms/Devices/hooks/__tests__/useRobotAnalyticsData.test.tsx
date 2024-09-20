@@ -8,25 +8,25 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { useRobot } from '../'
 import { useRobotAnalyticsData } from '../useRobotAnalyticsData'
-import { getAttachedPipettes } from '../../../../redux/pipettes'
-import { getRobotSettings } from '../../../../redux/robot-settings'
-import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
+import { getAttachedPipettes } from '/app/redux/pipettes'
+import { getRobotSettings } from '/app/redux/robot-settings'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 
 import {
   getRobotApiVersion,
   getRobotFirmwareVersion,
   getRobotSerialNumber,
-} from '../../../../redux/discovery'
+} from '/app/redux/discovery'
 
 import type { Store } from 'redux'
-import type { DiscoveredRobot } from '../../../../redux/discovery/types'
-import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
+import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../hooks')
-vi.mock('../../../../redux/discovery')
-vi.mock('../../../../redux/pipettes')
-vi.mock('../../../../redux/robot-settings')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/pipettes')
+vi.mock('/app/redux/robot-settings')
 
 const ROBOT_SETTINGS = [
   { id: `setting1`, value: true, title: '', description: '' },

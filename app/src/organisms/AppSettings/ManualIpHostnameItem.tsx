@@ -14,7 +14,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Divider } from '../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 
 const IpItem = styled.div`
   flex: 1 1 auto;

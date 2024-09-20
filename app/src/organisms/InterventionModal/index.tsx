@@ -26,10 +26,10 @@ import {
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 
-import { SmallButton } from '../../atoms/buttons'
-import { OddModal } from '../../molecules/OddModal'
-import { InterventionModal as InterventionModalMolecule } from '../../molecules/InterventionModal'
-import { getIsOnDevice } from '../../redux/config'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+import { InterventionModal as InterventionModalMolecule } from '/app/molecules/InterventionModal'
+import { getIsOnDevice } from '/app/redux/config'
 import { PauseInterventionContent } from './PauseInterventionContent'
 import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
 import { isInterventionCommand } from './utils'

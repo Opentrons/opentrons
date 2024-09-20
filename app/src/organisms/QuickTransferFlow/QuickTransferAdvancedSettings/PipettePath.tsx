@@ -14,14 +14,14 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { getTopPortalEl } from '../../../App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
 import { useBlowOutLocationOptions } from './BlowOut'
 
 import { ACTIONS } from '../constants'
-import { i18n } from '../../../i18n'
-import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
+import { i18n } from '/app/i18n'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 
 import type {
   PathOption,

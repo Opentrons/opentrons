@@ -13,7 +13,7 @@ import {
   ALIGN_CENTER,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { Divider } from '../../../atoms/structure/Divider'
+import { Divider } from '/app/atoms/structure/Divider'
 
 import type { DeckInfoLabelProps } from '@opentrons/components'
 

@@ -11,8 +11,8 @@ import { useProtocolRunAnalyticsData } from '../useProtocolRunAnalyticsData'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_RUN_ACTION,
-} from '../../../../redux/analytics'
-import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
+} from '/app/redux/analytics'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { useRobot } from '../useRobot'
 
 import type { Store } from 'redux'
@@ -20,10 +20,10 @@ import type { Mock } from 'vitest'
 
 vi.mock('../useRobot')
 vi.mock('../useProtocolRunAnalyticsData')
-vi.mock('../../../../redux/discovery')
-vi.mock('../../../../redux/pipettes')
-vi.mock('../../../../redux/analytics')
-vi.mock('../../../../redux/robot-settings')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/pipettes')
+vi.mock('/app/redux/analytics')
+vi.mock('/app/redux/robot-settings')
 
 const RUN_ID = 'runId'
 const ROBOT_NAME = 'otie'

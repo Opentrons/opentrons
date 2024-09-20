@@ -51,8 +51,12 @@ class JiraTicket:
     def match_issues(self, issue_ids: List[List[str]], ticket_summary: str) -> List:
         """Matches related ticket ID's."""
         to_link = []
-        error = ticket_summary.split("_")[3]
-        robot = ticket_summary.split("_")[0]
+        try:
+            error = ticket_summary.split("_")[3]
+            robot = ticket_summary.split("_")[0]
+        except IndexError:
+            error = ""
+            robot = ""
         # for every issue see if both match, if yes then grab issue ID and add it to a list
         for issue in issue_ids:
             summary = issue[1]

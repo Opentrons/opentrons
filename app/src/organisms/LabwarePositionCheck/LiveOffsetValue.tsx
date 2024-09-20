@@ -14,7 +14,7 @@ import {
 
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 
 import type { StyleProps } from '@opentrons/components'
 

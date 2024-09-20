@@ -3,7 +3,7 @@ import { useRobotType } from '../../../../../hooks'
 import {
   getIsFixtureMismatch,
   useDeckConfigurationCompatibility,
-} from '../../../../../../../resources/deck_configuration'
+} from '/app/resources/deck_configuration'
 
 export function useIsFixtureMismatch(
   runId: string,

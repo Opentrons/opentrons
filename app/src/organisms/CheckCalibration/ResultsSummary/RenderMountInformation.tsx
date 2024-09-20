@@ -10,8 +10,8 @@ import {
 } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import type { Mount } from '../../../redux/pipettes/types'
-import type { CalibrationCheckInstrument } from '../../../redux/sessions/types'
+import type { Mount } from '/app/redux/pipettes/types'
+import type { CalibrationCheckInstrument } from '/app/redux/sessions/types'
 
 interface MountInformationProps {
   mount: Mount

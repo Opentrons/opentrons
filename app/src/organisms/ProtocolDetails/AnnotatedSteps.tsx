@@ -12,7 +12,7 @@ import {
   TYPOGRAPHY,
   OVERFLOW_AUTO,
 } from '@opentrons/components'
-import { CommandIcon, CommandText } from '../../molecules/Command'
+import { CommandIcon, CommandText } from '/app/molecules/Command'
 
 import type {
   CompletedProtocolAnalysis,

@@ -21,7 +21,7 @@ vi.mock('@opentrons/components', async importOriginal => {
 })
 
 const render = () => {
-  return renderWithProviders(<OffDeck />)[0]
+  return renderWithProviders(<OffDeck tab="startingDeck" />)
 }
 
 describe('OffDeck', () => {

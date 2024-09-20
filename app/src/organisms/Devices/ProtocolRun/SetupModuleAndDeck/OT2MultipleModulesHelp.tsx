@@ -16,8 +16,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
-import { Banner } from '../../../../atoms/Banner'
-import multipleModuleHelp from '../../../../assets/images/Moam_modal_image.png'
+import { Banner } from '/app/atoms/Banner'
+import multipleModuleHelp from '/app/assets/images/Moam_modal_image.png'
 
 const HOW_TO_MULTIPLE_MODULES_HREF =
   'https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2'

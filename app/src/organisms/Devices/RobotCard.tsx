@@ -31,11 +31,11 @@ import {
   useModulesQuery,
 } from '@opentrons/react-api-client'
 
-import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
-import FLEX_PNG from '../../assets/images/FLEX.png'
-import { InstrumentContainer } from '../../atoms/InstrumentContainer'
-import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
-import { ModuleIcon } from '../../molecules/ModuleIcon'
+import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
+import FLEX_PNG from '/app/assets/images/FLEX.png'
+import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
+import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
+import { ModuleIcon } from '/app/molecules/ModuleIcon'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { useIsFlex } from './hooks'
 import { ReachableBanner } from './ReachableBanner'
@@ -48,8 +48,8 @@ import {
 
 import type { GripperData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
-import type { DiscoveredRobot } from '../../redux/discovery/types'
-import type { State } from '../../redux/types'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
+import type { State } from '/app/redux/types'
 
 interface RobotCardProps {
   robot: DiscoveredRobot

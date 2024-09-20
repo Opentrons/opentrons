@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useLogger } from '../../logger'
 import { LabwarePositionCheckComponent } from './LabwarePositionCheckComponent'
 import { FatalErrorModal } from './FatalErrorModal'
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { useSelector } from 'react-redux'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'

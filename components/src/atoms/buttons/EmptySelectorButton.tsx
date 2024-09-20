@@ -4,6 +4,8 @@ import { Flex } from '../../primitives'
 import {
   BORDERS,
   COLORS,
+  CURSOR_DEFAULT,
+  CURSOR_POINTER,
   Icon,
   SPACING,
   StyledText,
@@ -41,6 +43,7 @@ export function EmptySelectorButton(
     border: none;
     width: ${buttonSizing};
     height: ${buttonSizing};
+    cursor: ${disabled ? CURSOR_DEFAULT : CURSOR_POINTER};
     &:focus-visible {
       outline: 2px solid ${COLORS.white};
       box-shadow: 0 0 0 4px ${COLORS.blue50};

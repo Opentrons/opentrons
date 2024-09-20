@@ -3,7 +3,7 @@ import {
   SECURITY_WPA_PSK,
   SECURITY_WPA_EAP,
   SECURITY_NONE,
-} from '../../../../redux/networking'
+} from '/app/redux/networking'
 
 import type { WifiNetwork } from './types'
 

@@ -19,14 +19,14 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Slideout } from '../../atoms/Slideout'
-import { SubmitPrimaryButton } from '../../atoms/buttons'
+import { Slideout } from '/app/atoms/Slideout'
+import { SubmitPrimaryButton } from '/app/atoms/buttons'
 
 import type {
   TCSetTargetBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
 } from '@opentrons/shared-data'
-import type { ThermocyclerModule } from '../../redux/modules/types'
+import type { ThermocyclerModule } from '/app/redux/modules/types'
 
 interface ThermocyclerModuleSlideoutProps {
   module: ThermocyclerModule

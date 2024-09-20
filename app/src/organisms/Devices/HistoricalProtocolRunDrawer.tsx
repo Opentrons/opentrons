@@ -27,10 +27,10 @@ import {
 } from '@opentrons/shared-data'
 import { useCsvFileQuery } from '@opentrons/react-api-client'
 import { DownloadCsvFileLink } from './DownloadCsvFileLink'
-import { Banner } from '../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useDeckCalibrationData } from './hooks'
-import { OffsetVector } from '../../molecules/OffsetVector'
+import { OffsetVector } from '/app/molecules/OffsetVector'
 import type { RunData } from '@opentrons/api-client'
 
 interface HistoricalProtocolRunDrawerProps {

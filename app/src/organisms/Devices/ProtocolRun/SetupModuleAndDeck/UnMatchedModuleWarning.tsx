@@ -7,7 +7,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Banner } from '../../../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 
 export const UnMatchedModuleWarning = (): JSX.Element | null => {
   const { t } = useTranslation('protocol_setup')

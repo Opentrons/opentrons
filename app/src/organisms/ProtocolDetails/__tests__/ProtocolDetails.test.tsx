@@ -3,38 +3,38 @@ import { act, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { ChooseRobotToRunProtocolSlideout } from '../../../organisms/ChooseRobotToRunProtocolSlideout'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { ChooseRobotToRunProtocolSlideout } from '/app/organisms/ChooseRobotToRunProtocolSlideout'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '../../../redux/analytics'
-import { getValidCustomLabwareFiles } from '../../../redux/custom-labware/selectors'
+} from '/app/redux/analytics'
+import { getValidCustomLabwareFiles } from '/app/redux/custom-labware/selectors'
 import {
   getConnectableRobots,
   getReachableRobots,
   getScanning,
   getUnreachableRobots,
-} from '../../../redux/discovery'
-import { getIsProtocolAnalysisInProgress } from '../../../redux/protocol-storage/selectors'
+} from '/app/redux/discovery'
+import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage/selectors'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
-} from '../../../redux/discovery/__fixtures__'
-import { storedProtocolData } from '../../../redux/protocol-storage/__fixtures__'
+} from '/app/redux/discovery/__fixtures__'
+import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
 import { ProtocolDetails } from '..'
 
 import type { Mock } from 'vitest'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
-vi.mock('../../../redux/analytics')
-vi.mock('../../../redux/custom-labware/selectors')
-vi.mock('../../../redux/discovery/selectors')
-vi.mock('../../../redux/protocol-storage/selectors')
-vi.mock('../../../organisms/ChooseRobotToRunProtocolSlideout')
-vi.mock('../../../organisms/SendProtocolToFlexSlideout')
+vi.mock('/app/redux/analytics')
+vi.mock('/app/redux/custom-labware/selectors')
+vi.mock('/app/redux/discovery/selectors')
+vi.mock('/app/redux/protocol-storage/selectors')
+vi.mock('/app/organisms/ChooseRobotToRunProtocolSlideout')
+vi.mock('/app/organisms/SendProtocolToFlexSlideout')
 
 const render = (
   props: Partial<React.ComponentProps<typeof ProtocolDetails>> = {}

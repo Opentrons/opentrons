@@ -3,17 +3,17 @@ import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { saveAs } from 'file-saver'
 import { fireEvent, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-import * as Fixtures from '../../../../redux/sessions/__fixtures__'
-import * as Sessions from '../../../../redux/sessions'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import * as Fixtures from '/app/redux/sessions/__fixtures__'
+import * as Sessions from '/app/redux/sessions'
 import { CalibrationHealthCheckResults } from '../CalibrationHealthCheckResults'
 import { RenderMountInformation } from '../RenderMountInformation'
 import { CalibrationResult } from '../CalibrationResult'
 
 import { ResultsSummary } from '../'
 
-import type { CalibrationPanelProps } from '../../../../organisms/CalibrationPanels/types'
+import type { CalibrationPanelProps } from '/app/organisms/CalibrationPanels/types'
 
 // file-saver has circular dep, need to mock with factory to prevent error
 vi.mock('file-saver', async importOriginal => {
@@ -23,8 +23,8 @@ vi.mock('file-saver', async importOriginal => {
     saveAs: vi.fn(),
   }
 })
-vi.mock('../../../../redux/sessions')
-vi.mock('../../../../redux/pipettes')
+vi.mock('/app/redux/sessions')
+vi.mock('/app/redux/pipettes')
 vi.mock('../CalibrationHealthCheckResults')
 vi.mock('../RenderMountInformation')
 vi.mock('../CalibrationResult')

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
   LargeButton,
@@ -45,7 +46,7 @@ export function Landing(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
       paddingTop="14.875rem"
-      height="calc(100vh - 48px)"
+      height="calc(100vh - 56px)"
       width="100%"
     >
       <img
@@ -93,7 +94,7 @@ export function Landing(): JSX.Element {
 
 const StyledLabel = styled.label`
   display: inline-block;
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   input[type='file'] {
     display: none;
   }

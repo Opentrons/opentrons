@@ -5,6 +5,7 @@ import {
   Flex,
   MenuItem,
   MenuList,
+  NO_WRAP,
   POSITION_RELATIVE,
   Tooltip,
   useHoverTooltip,
@@ -16,7 +17,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { useCurrentRunId } from '../../resources/runs'
+import { useCurrentRunId } from '/app/resources/runs'
 import {
   useIsFlex,
   useRunStatuses,
@@ -24,7 +25,7 @@ import {
 } from '../Devices/hooks'
 import { useModuleOverflowMenu } from './hooks'
 
-import type { AttachedModule } from '../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule
@@ -151,7 +152,7 @@ export const ModuleOverflowMenu = (
                 <MenuItem
                   onClick={() => item.onClick(item.isSecondary)}
                   disabled={item.disabledReason || isDisabled}
-                  whiteSpace="nowrap"
+                  whiteSpace={NO_WRAP}
                 >
                   {item.setSetting}
                 </MenuItem>

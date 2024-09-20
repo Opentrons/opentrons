@@ -8,22 +8,19 @@ import {
   parseLiquidsInLoadOrder,
 } from '@opentrons/shared-data'
 
-import {
-  nestedTextMatcher,
-  renderWithProviders,
-} from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import {
   useTrackEvent,
   ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
-} from '../../../../../redux/analytics'
+} from '/app/redux/analytics'
 import { useIsFlex } from '../../../hooks'
 import { getLocationInfoNames } from '../../utils/getLocationInfoNames'
 import { SetupLiquidsList } from '../SetupLiquidsList'
 import { getTotalVolumePerLiquidId, getVolumePerWell } from '../utils'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
-import { useNotifyRunQuery } from '../../../../../resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
 import type { Mock } from 'vitest'
 import type * as SharedData from '@opentrons/shared-data'
@@ -67,8 +64,8 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     parseLiquidsInLoadOrder: vi.fn(),
   }
 })
-vi.mock('../../../../../redux/analytics')
-vi.mock('../../../../../resources/runs')
+vi.mock('/app/redux/analytics')
+vi.mock('/app/resources/runs')
 
 const render = (props: React.ComponentProps<typeof SetupLiquidsList>) => {
   return renderWithProviders(<SetupLiquidsList {...props} />, {

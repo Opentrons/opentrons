@@ -10,9 +10,9 @@ import {
 } from '@opentrons/components'
 import uniq from 'lodash/uniq'
 
-import * as Sessions from '../../redux/sessions'
-import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
-import type { SessionCommandString } from '../../redux/sessions/types'
+import * as Sessions from '/app/redux/sessions'
+import type { CalibrationPanelProps } from '/app/organisms/CalibrationPanels/types'
+import type { SessionCommandString } from '/app/redux/sessions/types'
 import { useTranslation } from 'react-i18next'
 import { NeedHelpLink } from '../CalibrationPanels'
 

@@ -5,6 +5,8 @@ import { Flex } from '../../primitives'
 import { Icon } from '../../icons'
 import {
   ALIGN_CENTER,
+  CURSOR_AUTO,
+  CURSOR_POINTER,
   DIRECTION_ROW,
   FLEX_MAX_CONTENT,
   JUSTIFY_SPACE_BETWEEN,
@@ -46,7 +48,7 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
     border-radius: ${BORDERS.borderRadiusFull};
     padding: ${SPACING.spacing12} ${SPACING.spacing16};
     justify-content: ${JUSTIFY_SPACE_BETWEEN};
-    cursor: pointer;
+    cursor: ${CURSOR_POINTER};
 
     &:active {
       background-color: ${isChecked ? COLORS.blue55 : COLORS.blue40};
@@ -65,7 +67,7 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
       padding: ${SPACING.spacing20};
       border-radius: ${BORDERS.borderRadius16};
       width: 100%;
-      cursor: auto;
+      cursor: ${CURSOR_AUTO};
     }
   `
 

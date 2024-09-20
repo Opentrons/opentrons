@@ -22,10 +22,10 @@ import {
   useRunCalibrationStatus,
   useUnmatchedModulesForProtocol,
 } from '../../../../hooks'
-import { useCurrentRunId } from '../../../../../../resources/runs'
+import { useCurrentRunId } from '/app/resources/runs'
 import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
 import { getFallbackRobotSerialNumber, isRunAgainStatus } from '../../utils'
-import { useIsRobotOnWrongVersionOfSoftware } from '../../../../../../redux/robot-update'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 
 import type { RunHeaderContentProps } from '..'
 

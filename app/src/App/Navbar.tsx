@@ -20,8 +20,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import logoSvg from '../assets/images/logo_nav.svg'
-import logoSvgThree from '../assets/images/logo_nav_three.svg'
+import logoSvg from '/app/assets/images/logo_nav.svg'
+import logoSvgThree from '/app/assets/images/logo_nav_three.svg'
 
 import { NAV_BAR_WIDTH } from './constants'
 

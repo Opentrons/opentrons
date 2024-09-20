@@ -65,13 +65,7 @@ def create_data_dictionary(
             left_pipette = file_results.get("left", "")
             right_pipette = file_results.get("right", "")
             extension = file_results.get("extension", "")
-            (
-                num_of_errors,
-                error_type,
-                error_code,
-                error_instrument,
-                error_level,
-            ) = read_robot_logs.get_error_info(file_results)
+            error_dict = read_robot_logs.get_error_info(file_results)
 
             all_modules = get_modules(file_results)
 
@@ -99,7 +93,7 @@ def create_data_dictionary(
                 pass  # Handle datetime parsing errors if necessary
 
             if run_time_min > 0:
-                row = {
+                run_row = {
                     "Robot": robot,
                     "Run_ID": run_id,
                     "Protocol_Name": protocol_name,
@@ -108,15 +102,13 @@ def create_data_dictionary(
                     "Start_Time": start_time_str,
                     "End_Time": complete_time_str,
                     "Run_Time (min)": run_time_min,
-                    "Errors": num_of_errors,
-                    "Error_Code": error_code,
-                    "Error_Type": error_type,
-                    "Error_Instrument": error_instrument,
-                    "Error_Level": error_level,
+                }
+                instrument_row = {
                     "Left Mount": left_pipette,
                     "Right Mount": right_pipette,
                     "Extension": extension,
                 }
+                row = {**run_row, **error_dict, **instrument_row}
                 tc_dict = read_robot_logs.thermocycler_commands(file_results)
                 hs_dict = read_robot_logs.hs_commands(file_results)
                 tm_dict = read_robot_logs.temperature_module_commands(file_results)
@@ -128,7 +120,11 @@ def create_data_dictionary(
                     "Average Temp (oC)": "",
                     "Average RH(%)": "",
                 }
-                row_for_lpc = {**row, **all_modules, **notes}
+                row_for_lpc = {
+                    **row,
+                    **all_modules,
+                    **notes,
+                }
                 row_2 = {
                     **row,
                     **all_modules,

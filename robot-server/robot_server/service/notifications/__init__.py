@@ -1,12 +1,14 @@
 """Notification service creation and management."""
-from .initialize_notifications import initialize_notifications
-
 from .notification_client import (
     NotificationClient,
     get_notification_client,
-    clean_up_notification_client,
+    set_up_notification_client,
 )
-from .publisher_notifier import PublisherNotifier, get_pe_notify_publishers
+from .publisher_notifier import (
+    PublisherNotifier,
+    get_pe_notify_publishers,
+    initialize_pe_publisher_notifier,
+)
 from .publishers import (
     MaintenanceRunsPublisher,
     RunsPublisher,
@@ -24,8 +26,8 @@ __all__ = [
     "RunsPublisher",
     "DeckConfigurationPublisher",
     # initialization and teardown
-    "initialize_notifications",
-    "clean_up_notification_client",
+    "set_up_notification_client",
+    "initialize_pe_publisher_notifier",
     # for use by FastAPI
     "get_notification_client",
     "get_pe_notify_publishers",

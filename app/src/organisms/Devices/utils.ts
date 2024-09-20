@@ -4,7 +4,7 @@ import type {
   FetchPipettesResponseBody,
   FetchPipettesResponsePipette,
   Mount,
-} from '../../redux/pipettes/types'
+} from '/app/redux/pipettes/types'
 import type {
   Instruments,
   PipetteData,

@@ -13,9 +13,9 @@ import {
   ot3StandardDeckV5 as ot3StandardDeckDef,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
-import { useMostRecentCompletedAnalysis } from '../../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '..'
 import {
@@ -27,7 +27,7 @@ import {
   mockUseModulesQueryOpening,
   mockUseModulesQueryUnknown,
 } from '../__fixtures__'
-import { useNotifyDeckConfigurationQuery } from '../../../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type * as ReactApiClient from '@opentrons/react-api-client'
 
@@ -40,11 +40,9 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   }
 })
 
-vi.mock(
-  '../../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-)
+vi.mock('/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
-vi.mock('../../../../../resources/deck_configuration')
+vi.mock('/app/resources/deck_configuration')
 
 const RUN_ID = "otie's run"
 const mockSetSetupScreen = vi.fn()

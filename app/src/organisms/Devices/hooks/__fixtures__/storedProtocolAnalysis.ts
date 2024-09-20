@@ -1,4 +1,4 @@
-import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
+import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
 
 import type {
   LoadedLabware,

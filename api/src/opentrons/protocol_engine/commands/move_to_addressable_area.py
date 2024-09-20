@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from ..errors import LocationNotAccessibleByPipetteError
+from ..state import update_types
 from ..types import DeckPoint, AddressableOffsetVector
 from ..resources import fixture_validation
 from .pipetting_common import (
@@ -88,6 +89,8 @@ class MoveToAddressableAreaImplementation(
         self, params: MoveToAddressableAreaParams
     ) -> SuccessData[MoveToAddressableAreaResult, None]:
         """Move the requested pipette to the requested addressable area."""
+        state_update = update_types.StateUpdate()
+
         self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
             params.addressableAreaName
         )
@@ -106,10 +109,17 @@ class MoveToAddressableAreaImplementation(
             speed=params.speed,
             stay_at_highest_possible_z=params.stayAtHighestPossibleZ,
         )
+        deck_point = DeckPoint.construct(x=x, y=y, z=z)
+        state_update.set_pipette_location(
+            pipette_id=params.pipetteId,
+            new_addressable_area_name=params.addressableAreaName,
+            new_deck_point=deck_point,
+        )
 
         return SuccessData(
             public=MoveToAddressableAreaResult(position=DeckPoint(x=x, y=y, z=z)),
             private=None,
+            state_update=state_update,
         )
 
 

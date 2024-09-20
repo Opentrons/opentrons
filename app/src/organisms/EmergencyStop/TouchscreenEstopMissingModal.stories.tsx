@@ -4,7 +4,7 @@ import { createStore } from 'redux'
 
 import { VIEWPORT } from '@opentrons/components'
 
-import { configReducer } from '../../redux/config/reducer'
+import { configReducer } from '/app/redux/config/reducer'
 import { EstopMissingModal } from '.'
 
 import type { Store, StoreEnhancer } from 'redux'

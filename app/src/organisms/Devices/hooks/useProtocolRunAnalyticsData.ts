@@ -1,8 +1,8 @@
 import { useSelector } from 'react-redux'
 
-import { hash } from '../../../redux/analytics/hash'
-import { getStoredProtocol } from '../../../redux/protocol-storage'
-import { getRobotSerialNumber } from '../../../redux/discovery'
+import { hash } from '/app/redux/analytics/hash'
+import { getStoredProtocol } from '/app/redux/protocol-storage'
+import { getRobotSerialNumber } from '/app/redux/discovery'
 import { useStoredProtocolAnalysis, useProtocolDetailsForRun } from './'
 import { useProtocolMetadata } from './useProtocolMetadata'
 import { useRunTimestamps } from '../../RunTimeControl/hooks'
@@ -10,10 +10,10 @@ import { formatInterval } from '../../RunTimeControl/utils'
 import { EMPTY_TIMESTAMP } from '../constants'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
-import type { ProtocolAnalyticsData } from '../../../redux/analytics/types'
-import type { StoredProtocolData } from '../../../redux/protocol-storage/types'
-import type { State } from '../../../redux/types'
-import type { DiscoveredRobot } from '../../../redux/discovery/types'
+import type { ProtocolAnalyticsData } from '/app/redux/analytics/types'
+import type { StoredProtocolData } from '/app/redux/protocol-storage/types'
+import type { State } from '/app/redux/types'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
 
 export const parseProtocolRunAnalyticsData = (
   protocolAnalysis: ProtocolAnalysisOutput | null,

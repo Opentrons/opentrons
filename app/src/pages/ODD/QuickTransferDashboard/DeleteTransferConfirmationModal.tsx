@@ -15,11 +15,11 @@ import {
 } from '@opentrons/components'
 import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 
-import { SmallButton } from '../../../atoms/buttons'
-import { OddModal } from '../../../molecules/OddModal'
-import { useToaster } from '../../../organisms/ToasterOven'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+import { useToaster } from '/app/organisms/ToasterOven'
 
-import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface DeleteTransferConfirmationModalProps {
   transferId: string

@@ -3,7 +3,7 @@ import type {
   WifiNetwork,
   EapOption,
   WifiKey,
-} from '../../../../redux/networking/types'
+} from '/app/redux/networking/types'
 
 import type {
   CONNECT,
@@ -22,7 +22,7 @@ export type {
   WifiConfigureRequest,
   WifiKey,
   EapOption,
-} from '../../../../redux/networking/types'
+} from '/app/redux/networking/types'
 
 export type NetworkChangeType =
   | typeof CONNECT

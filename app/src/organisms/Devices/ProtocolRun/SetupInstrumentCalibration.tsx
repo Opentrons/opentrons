@@ -9,7 +9,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import * as PipetteConstants from '../../../redux/pipettes/constants'
+import * as PipetteConstants from '/app/redux/pipettes/constants'
 import { getShowPipetteCalibrationWarning } from '../utils'
 import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
 import {
@@ -22,10 +22,10 @@ import { SetupFlexPipetteCalibrationItem } from './SetupFlexPipetteCalibrationIt
 import { SetupGripperCalibrationItem } from './SetupGripperCalibrationItem'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { isGripperInCommands } from '../../../resources/protocols/utils'
+import { isGripperInCommands } from '/app/resources/protocols/utils'
 
 import type { GripperData } from '@opentrons/api-client'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 
 const EQUIPMENT_POLL_MS = 5000
 

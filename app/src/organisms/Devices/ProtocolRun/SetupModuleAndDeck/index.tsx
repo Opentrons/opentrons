@@ -15,12 +15,12 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
-import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
+import { useToggleGroup } from '/app/molecules/ToggleGroup/useToggleGroup'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
-} from '../../../../resources/deck_configuration/utils'
+} from '/app/resources/deck_configuration/utils'
 import {
   useRunHasStarted,
   useUnmatchedModulesForProtocol,

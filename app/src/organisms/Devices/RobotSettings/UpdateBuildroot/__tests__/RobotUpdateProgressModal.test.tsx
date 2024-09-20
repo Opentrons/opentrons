@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { i18n } from '../../../../../i18n'
+import { i18n } from '/app/i18n'
 import { act, fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   RobotUpdateProgressModal,
@@ -14,21 +14,21 @@ import { useRobotUpdateInfo } from '../useRobotUpdateInfo'
 import {
   getRobotSessionIsManualFile,
   getRobotUpdateDownloadError,
-} from '../../../../../redux/robot-update'
-import { useDispatchStartRobotUpdate } from '../../../../../redux/robot-update/hooks'
+} from '/app/redux/robot-update'
+import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 import {
   useRobotInitializationStatus,
   INIT_STATUS,
-} from '../../../../../resources/health/hooks'
+} from '/app/resources/health/hooks'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
-import type { RobotUpdateSession } from '../../../../../redux/robot-update/types'
+import type { RobotUpdateSession } from '/app/redux/robot-update/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../useRobotUpdateInfo')
-vi.mock('../../../../../redux/robot-update')
-vi.mock('../../../../../redux/robot-update/hooks')
-vi.mock('../../../../../resources/health/hooks')
+vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux/robot-update/hooks')
+vi.mock('/app/resources/health/hooks')
 
 const render = (
   props: React.ComponentProps<typeof RobotUpdateProgressModal>

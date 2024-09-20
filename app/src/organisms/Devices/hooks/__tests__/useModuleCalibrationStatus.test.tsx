@@ -10,7 +10,7 @@ import {
   useModuleRenderInfoForProtocolById,
 } from '..'
 
-import { mockMagneticModuleGen2 } from '../../../../redux/modules/__fixtures__'
+import { mockMagneticModuleGen2 } from '/app/redux/modules/__fixtures__'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 

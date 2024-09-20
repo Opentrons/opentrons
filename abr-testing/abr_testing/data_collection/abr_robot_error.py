@@ -62,7 +62,9 @@ def compare_current_trh_to_average(
     df_all_run_data["Start_Time"] = pd.to_datetime(
         df_all_run_data["Start_Time"], format="mixed", utc=True
     ).dt.tz_localize(None)
-    df_all_run_data["Errors"] = pd.to_numeric(df_all_run_data["Errors"])
+    df_all_run_data["Run Ending Error"] = pd.to_numeric(
+        df_all_run_data["Run Ending Error"]
+    )
     df_all_run_data["Average Temp (oC)"] = pd.to_numeric(
         df_all_run_data["Average Temp (oC)"]
     )
@@ -70,7 +72,7 @@ def compare_current_trh_to_average(
         (df_all_run_data["Robot"] == robot)
         & (df_all_run_data["Start_Time"] >= weeks_ago_3)
         & (df_all_run_data["Start_Time"] <= start_time)
-        & (df_all_run_data["Errors"] < 1)
+        & (df_all_run_data["Run Ending Error"] < 1)
         & (df_all_run_data["Average Temp (oC)"] > 1)
     )
 
@@ -122,7 +124,7 @@ def compare_lpc_to_historical_data(
         & (df_lpc_data["Robot"] == robot)
         & (df_lpc_data["Module"] == labware_dict["Module"])
         & (df_lpc_data["Adapter"] == labware_dict["Adapter"])
-        & (df_lpc_data["Errors"] < 1)
+        & (df_lpc_data["Run Ending Error"] < 1)
     ]
     # Converts coordinates to floats and finds averages.
     x_float = [float(value) for value in relevant_lpc["X"]]
@@ -330,18 +332,17 @@ def get_run_error_info_from_robot(
         ip, results, storage_directory
     )
     # Error Printout
-    (
-        num_of_errors,
-        error_type,
-        error_code,
-        error_instrument,
-        error_level,
-    ) = read_robot_logs.get_error_info(results)
+    error_dict = read_robot_logs.get_error_info(results)
+    error_level = error_dict["Error_Level"]
+    error_type = error_dict["Error_Type"]
+    error_code = error_dict["Error_Code"]
+    error_instrument = error_dict["Error_Instrument"]
     # JIRA Ticket Fields
+
     failure_level = "Level " + str(error_level) + " Failure"
 
     components = [failure_level, "Flex-RABR"]
-    components = match_error_to_component("RABR", error_type, components)
+    components = match_error_to_component("RABR", str(error_type), components)
     print(components)
     affects_version = results["API_Version"]
     parent = results.get("robot_name", "")

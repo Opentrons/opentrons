@@ -5,8 +5,8 @@ import { describe, it, beforeEach, vi, afterEach } from 'vitest'
 
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { PipetteWizardFlows } from '../../../PipetteWizardFlows'
 import { SetupFlexPipetteCalibrationItem } from '../SetupFlexPipetteCalibrationItem'

@@ -10,7 +10,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '../../atoms/buttons'
+import { TertiaryButton } from '/app/atoms/buttons'
 
 interface IpHostnameFieldProps {
   field: any

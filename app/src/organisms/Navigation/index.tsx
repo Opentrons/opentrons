@@ -5,30 +5,31 @@ import { useLocation, NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
-  Icon,
-  Flex,
+  ALIGN_CENTER,
+  ALIGN_FLEX_START,
+  BORDERS,
   Box,
   COLORS,
-  SPACING,
-  DIRECTION_ROW,
-  ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  truncateString,
-  TYPOGRAPHY,
+  CURSOR_DEFAULT,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   DISPLAY_FLEX,
-  ALIGN_FLEX_START,
-  POSITION_STICKY,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_SCROLL,
   POSITION_ABSOLUTE,
   POSITION_STATIC,
-  BORDERS,
+  POSITION_STICKY,
   RESPONSIVENESS,
-  OVERFLOW_SCROLL,
+  SPACING,
+  truncateString,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 
-import { useNetworkConnection } from '../../resources/networking/hooks/useNetworkConnection'
-import { getLocalRobot } from '../../redux/discovery'
+import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
+import { getLocalRobot } from '/app/redux/discovery'
 import { NavigationMenu } from './NavigationMenu'
 import type { ON_DEVICE_DISPLAY_PATHS } from '../../App/OnDeviceDisplayApp'
 
@@ -242,7 +243,7 @@ const TouchNavLink = styled(NavLink)`
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    cursor: default;
+    cursor: ${CURSOR_DEFAULT};
   }
 `
 
@@ -265,6 +266,6 @@ const IconButton = styled('button')`
     background-color: transparent;
   }
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    cursor: default;
+    cursor: ${CURSOR_DEFAULT};
   }
 `

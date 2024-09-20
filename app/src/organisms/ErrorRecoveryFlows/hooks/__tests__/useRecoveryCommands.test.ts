@@ -7,7 +7,7 @@ import {
   useUpdateErrorRecoveryPolicy,
 } from '@opentrons/react-api-client'
 
-import { useChainRunCommands } from '../../../../resources/runs'
+import { useChainRunCommands } from '/app/resources/runs'
 import {
   useRecoveryCommands,
   HOME_PIPETTE_Z_AXES,
@@ -17,7 +17,7 @@ import {
 import { RECOVERY_MAP } from '../../constants'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../resources/runs')
+vi.mock('/app/resources/runs')
 
 describe('useRecoveryCommands', () => {
   const mockFailedCommand = {

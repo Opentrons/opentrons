@@ -1,6 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import { useAtom } from 'jotai'
 
 import {
@@ -45,9 +45,7 @@ export function MainContentContainer(): JSX.Element {
         width="100%"
         overflowY={OVERFLOW_AUTO}
         flexDirection={DIRECTION_COLUMN}
-        css={css`
-          flex-grow: 1;
-        `}
+        flexGrow="1"
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
           {/* Prompt Guide remain as a reference for users. */}

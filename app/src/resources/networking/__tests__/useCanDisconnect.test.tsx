@@ -5,19 +5,19 @@ import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import { SECURITY_WPA_EAP } from '@opentrons/api-client'
 import { renderHook } from '@testing-library/react'
-import { getRobotApiVersionByName } from '../../../redux/discovery'
+import { getRobotApiVersionByName } from '/app/redux/discovery'
 
-import { useIsFlex } from '../../../organisms/Devices/hooks'
+import { useIsFlex } from '/app/organisms/Devices/hooks'
 import { useCanDisconnect } from '../hooks/useCanDisconnect'
 import { useWifiList } from '../hooks/useWifiList'
 
 import type { WifiNetwork } from '@opentrons/api-client'
 import type { Store } from 'redux'
-import type { State } from '../../../redux/types'
+import type { State } from '/app/redux/types'
 
 vi.mock('../hooks/useWifiList')
-vi.mock('../../../organisms/Devices/hooks')
-vi.mock('../../../redux/discovery')
+vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/redux/discovery')
 
 const store: Store<State> = createStore(state => state, {})
 

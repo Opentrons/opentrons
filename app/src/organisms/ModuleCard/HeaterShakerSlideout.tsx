@@ -18,10 +18,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Slideout } from '../../atoms/Slideout'
-import { SubmitPrimaryButton } from '../../atoms/buttons'
+import { Slideout } from '/app/atoms/Slideout'
+import { SubmitPrimaryButton } from '/app/atoms/buttons'
 
-import type { HeaterShakerModule } from '../../redux/modules/types'
+import type { HeaterShakerModule } from '/app/redux/modules/types'
 import type { HeaterShakerSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
 
 interface HeaterShakerSlideoutProps {

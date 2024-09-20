@@ -7,11 +7,11 @@ import {
   parsePipetteEntity,
 } from '@opentrons/shared-data'
 
-import { getStoredProtocol } from '../../../redux/protocol-storage'
-import { useNotifyRunQuery } from '../../../resources/runs'
+import { getStoredProtocol } from '/app/redux/protocol-storage'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
-import type { State } from '../../../redux/types'
+import type { State } from '/app/redux/types'
 
 export const parseProtocolAnalysisOutput = (
   storedProtocolAnalysis: ProtocolAnalysisOutput | null

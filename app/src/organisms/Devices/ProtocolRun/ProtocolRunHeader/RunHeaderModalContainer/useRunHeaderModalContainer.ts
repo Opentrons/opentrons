@@ -21,7 +21,7 @@ import { getFallbackRobotSerialNumber } from '../utils'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   useTrackEvent,
-} from '../../../../../redux/analytics'
+} from '/app/redux/analytics'
 
 import type { AttachedModule, RunStatus, Run } from '@opentrons/api-client'
 import type { UseErrorRecoveryResult } from '../../../../ErrorRecoveryFlows'

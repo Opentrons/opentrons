@@ -3,10 +3,7 @@ import pytest
 from decoy import Decoy
 
 
-from opentrons.protocol_engine.commands.pipetting_common import (
-    LiquidNotFoundError,
-    LiquidNotFoundErrorInternalData,
-)
+from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
 from opentrons.protocol_engine.commands.command import (
     DefinedErrorData,
 )
@@ -38,9 +35,7 @@ def mock_command(decoy: Decoy) -> LiquidProbe:
 @pytest.fixture
 def mock_error_data(decoy: Decoy) -> CommandDefinedErrorData:
     """Get a mock TipPhysicallyMissingError."""
-    mock = decoy.mock(
-        cls=DefinedErrorData[LiquidNotFoundError, LiquidNotFoundErrorInternalData]
-    )
+    mock = decoy.mock(cls=DefinedErrorData[LiquidNotFoundError])
     mock_lnfe = decoy.mock(cls=LiquidNotFoundError)
     decoy.when(mock.public).then_return(mock_lnfe)
     decoy.when(mock_lnfe.errorType).then_return("liquidNotFound")

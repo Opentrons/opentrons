@@ -10,18 +10,18 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
-import { LocationConflictModal } from '../../../../../organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
-import { useDeckConfigurationCompatibility } from '../../../../../resources/deck_configuration/hooks'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { LocationConflictModal } from '/app/organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { FixtureTable } from '../FixtureTable'
-import { getLocalRobot } from '../../../../../redux/discovery'
-import { mockConnectedRobot } from '../../../../../redux/discovery/__fixtures__'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 
-vi.mock('../../../../../redux/discovery')
-vi.mock('../../../../../resources/deck_configuration/hooks')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/resources/deck_configuration/hooks')
 vi.mock(
-  '../../../../../organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
+  '/app/organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 )
 
 const mockSetSetupScreen = vi.fn()

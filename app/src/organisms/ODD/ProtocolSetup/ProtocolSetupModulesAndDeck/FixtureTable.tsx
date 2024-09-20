@@ -22,9 +22,9 @@ import {
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { SmallButton } from '../../../../atoms/buttons'
-import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
-import { getRequiredDeckConfig } from '../../../../resources/deck_configuration/utils'
+import { SmallButton } from '/app/atoms/buttons'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
+import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 import { LocationConflictModal } from '../../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 
 import type {
@@ -35,9 +35,9 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { SetupScreens } from '../types'
-import type { CutoutConfigAndCompatibility } from '../../../../resources/deck_configuration/hooks'
+import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
 import { useSelector } from 'react-redux'
-import { getLocalRobot } from '../../../../redux/discovery'
+import { getLocalRobot } from '/app/redux/discovery'
 
 interface FixtureTableProps {
   robotType: RobotType

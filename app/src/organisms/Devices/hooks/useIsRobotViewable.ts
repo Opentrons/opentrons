@@ -1,6 +1,6 @@
 import { useRobot } from './useRobot'
 
-import { CONNECTABLE } from '../../../redux/discovery'
+import { CONNECTABLE } from '/app/redux/discovery'
 
 export function useIsRobotViewable(robotName: string): boolean {
   const robot = useRobot(robotName)

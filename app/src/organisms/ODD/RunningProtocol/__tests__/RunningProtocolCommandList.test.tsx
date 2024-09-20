@@ -5,9 +5,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-import { mockRobotSideAnalysis } from '../../../../molecules/Command/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import { RunningProtocolCommandList } from '../RunningProtocolCommandList'
 
 const mockPlayRun = vi.fn()

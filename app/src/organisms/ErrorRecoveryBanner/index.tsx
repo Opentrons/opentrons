@@ -9,11 +9,11 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { getUserId } from '../../redux/config'
-import { useClientDataRecovery } from '../../resources/client_data'
-import { Banner } from '../../atoms/Banner'
+import { getUserId } from '/app/redux/config'
+import { useClientDataRecovery } from '/app/resources/client_data'
+import { Banner } from '/app/atoms/Banner'
 
-import type { RecoveryIntent } from '../../resources/client_data'
+import type { RecoveryIntent } from '/app/resources/client_data'
 import type { StyleProps } from '@opentrons/components'
 
 const CLIENT_DATA_INTERVAL_MS = 5000
