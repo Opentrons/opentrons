@@ -12,7 +12,7 @@ from opentrons.protocol_engine.types import AddressableAreaLocation
 
 from opentrons.protocol_engine.resources import labware_validation
 from .types import MoveLidResult
-from ...state.update_types import StateUpdate, BaseLabwareData
+from ...state.update_types import StateUpdate
 
 
 from opentrons.drivers.types import AbsorbanceReaderLidStatus

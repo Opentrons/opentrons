@@ -15,7 +15,7 @@ from opentrons.protocol_engine.types import AddressableAreaLocation
 
 from opentrons.drivers.types import AbsorbanceReaderLidStatus
 
-from ...state.update_types import StateUpdate, BaseLabwareData
+from ...state.update_types import StateUpdate
 
 
 if TYPE_CHECKING:
@@ -55,8 +55,6 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, 
 
     async def execute(self, params: OpenLidParams) -> SuccessData[OpenLidResult, None]:
         """Move the absorbance reader lid from the module to the lid dock."""
-        state_update = StateUpdate()
-
         mod_substate = self._state_view.modules.get_absorbance_reader_substate(
             module_id=params.moduleId
         )
@@ -129,6 +127,8 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, 
                 labware_definition_uri=loaded_lid.definitionUri,
                 labware_location=new_location,
             )
+
+        state_update = StateUpdate()
 
         state_update.set_lid_status(
             labware_id=loaded_lid.id, location=new_location, offset_id=new_offset_id

@@ -4,10 +4,10 @@ from .command_executor import CommandExecutor
 from .create_queue_worker import create_queue_worker
 from .equipment import (
     EquipmentHandler,
+    LoadedLabwareData,
     LoadedPipetteData,
     LoadedModuleData,
     LoadedConfigureForVolumeData,
-    LoadedLabwareData,
     ReloadedLabwareData,
 )
 from .movement import MovementHandler
