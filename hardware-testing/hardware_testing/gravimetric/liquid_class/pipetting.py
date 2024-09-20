@@ -256,9 +256,11 @@ def _pipette_with_liquid_settings(  # noqa: C901
         callbacks.on_dispensing()
         push_out = None
         if added_blow_out:
-            push_out = min(
-                liquid_class.dispense.blow_out_submerged, _get_max_blow_out_ul()
-            )
+            _max_push = _get_max_blow_out_ul()
+            push_out = liquid_class.dispense.blow_out_submerged
+            assert (
+                push_out <= _max_push
+            ), f"push-out ({push_out}) cannot exceed {_max_push}"
         pipette.dispense(dispense, push_out=push_out)
         # update liquid-height tracker
         liquid_tracker.update_affected_wells(
