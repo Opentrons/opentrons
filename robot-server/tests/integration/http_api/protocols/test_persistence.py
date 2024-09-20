@@ -8,7 +8,7 @@ import pytest
 from robot_server.persistence.file_and_directory_names import LATEST_VERSION_DIRECTORY
 
 from tests.integration.dev_server import DevServer
-from tests.integration.robot_client import RobotClient, poll_until_all_analyses_complete
+from tests.integration.robot_client import RobotClient
 from tests.integration.protocol_files import get_py_protocol, get_json_protocol
 
 
@@ -39,7 +39,7 @@ async def test_protocols_and_analyses_persist(
                     await robot_client.post_protocol([Path(file.name)])
 
             await asyncio.wait_for(
-                poll_until_all_analyses_complete(robot_client), timeout=30
+                _wait_for_all_analyses_to_complete(robot_client), timeout=30
             )
 
             # The protocols response will include analysis statuses. Fetch it
@@ -168,3 +168,16 @@ async def _get_all_analyses(robot_client: RobotClient) -> Dict[str, List[object]
         analyses_by_protocol_id[protocol_id] = analyses_on_this_protocol
 
     return analyses_by_protocol_id
+
+
+async def _wait_for_all_analyses_to_complete(robot_client: RobotClient) -> None:
+    async def _all_analyses_are_complete() -> bool:
+        protocols = (await robot_client.get_protocols()).json()
+        for protocol in protocols["data"]:
+            for analysis_summary in protocol["analysisSummaries"]:
+                if analysis_summary["status"] != "completed":
+                    return False
+        return True
+
+    while not await _all_analyses_are_complete():
+        await asyncio.sleep(0.1)

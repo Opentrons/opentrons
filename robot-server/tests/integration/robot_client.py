@@ -14,7 +14,6 @@ _STARTUP_WAIT = 20
 _SHUTDOWN_WAIT = 20
 
 _RUN_POLL_INTERVAL = 0.1
-_ANALYSIS_POLL_INTERVAL = 0.1
 
 
 class RobotClient:
@@ -399,24 +398,3 @@ async def poll_until_run_completes(
         else:
             # The run is still ongoing. Wait a beat, then poll again.
             await asyncio.sleep(poll_interval)
-
-
-async def poll_until_all_analyses_complete(
-    robot_client: RobotClient, poll_interval: float = _ANALYSIS_POLL_INTERVAL
-) -> None:
-    """Wait until all pending analyses have completed.
-
-    You probably want to wrap this in an `anyio.fail_after()` timeout in case something causes
-    an analysis to hang forever.
-    """
-
-    async def _all_analyses_are_complete() -> bool:
-        protocols = (await robot_client.get_protocols()).json()
-        for protocol in protocols["data"]:
-            for analysis_summary in protocol["analysisSummaries"]:
-                if analysis_summary["status"] != "completed":
-                    return False
-        return True
-
-    while not await _all_analyses_are_complete():
-        await asyncio.sleep(poll_interval)
