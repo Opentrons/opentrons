@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {
-  CheckboxField,
+  Checkbox,
   Flex,
   SPACING,
   TOOLTIP_TOP,
@@ -24,7 +24,6 @@ export function CheckboxStepFormField(
     disabled,
     isIndeterminate,
     label,
-    name,
     tooltipContent,
     updateValue,
     value,
@@ -41,14 +40,15 @@ export function CheckboxStepFormField(
         <Tooltip tooltipProps={tooltipProps}>{tooltipContent}</Tooltip>
       )}
       <Flex gridGap={SPACING.spacing8} padding={SPACING.spacing16}>
-        <Flex {...targetProps}>
-          <CheckboxField
-            value={disabled ? false : Boolean(value)}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+        <Flex {...targetProps} width="100%">
+          <Checkbox
+            width="100%"
+            type="neutral"
+            isChecked={disabled ? false : Boolean(value)}
+            onClick={() => {
               updateValue(!value)
             }}
-            label={label}
-            name={name}
+            labelText={label ?? ''}
             disabled={disabled}
           />
         </Flex>
