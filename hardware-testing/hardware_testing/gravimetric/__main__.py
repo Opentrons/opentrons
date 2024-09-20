@@ -379,6 +379,7 @@ def build_gravimetric_cfg(
     protocol: ProtocolContext,
     tip_volume: int,
     increment: bool,
+    interactive: bool,
     return_tip: bool,
     blank: bool,
     mix: bool,
@@ -406,6 +407,7 @@ def build_gravimetric_cfg(
         slot_scale=run_args.protocol_cfg.SLOT_SCALE,  # type: ignore[attr-defined]
         slots_tiprack=run_args.protocol_cfg.SLOTS_TIPRACK[tip_volume],  # type: ignore[attr-defined]
         increment=increment,
+        interactive=interactive,
         return_tip=return_tip,
         blank=blank,
         mix=mix,
@@ -505,6 +507,7 @@ def _main(
             run_args.ctx,
             tip,
             args.increment,
+            args.interactive,
             args.return_tip,
             False if args.no_blank else True,
             args.mix,
@@ -563,6 +566,7 @@ if __name__ == "__main__":
     parser.add_argument("--tip", type=int, choices=[0, 50, 200, 1000], default=0)
     parser.add_argument("--trials", type=int, default=0)
     parser.add_argument("--increment", action="store_true")
+    parser.add_argument("--interactive", action="store_true")
     parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--skip-labware-offsets", action="store_true")
     parser.add_argument("--no-blank", action="store_true")
