@@ -19,6 +19,7 @@ import {
 import { getUnsavedForm } from '../../../../step-forms/selectors'
 import { getTopPortalEl } from '../../../../components/portals/TopPortal'
 import { StepOverflowMenu } from './StepOverflowMenu'
+import { capitalizeFirstLetterAfterNumber } from './utils'
 
 import type { IconName } from '@opentrons/components'
 
@@ -98,15 +99,6 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
     if (wasOutside && stepOverflowMenu) {
       setStepOverflowMenu(false)
     }
-  }
-
-  const capitalizeFirstLetterAfterNumber = (title: string): string => {
-    return title.replace(
-      /(^[\d\W]*)([a-zA-Z])/,
-      (match, prefix, firstLetter) => {
-        return prefix + firstLetter.toUpperCase()
-      }
-    )
   }
 
   return (
