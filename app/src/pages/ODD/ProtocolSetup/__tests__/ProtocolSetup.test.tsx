@@ -63,7 +63,7 @@ import { ConfirmSetupStepsCompleteModal } from '../ConfirmSetupStepsCompleteModa
 import { ProtocolSetup } from '../'
 import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import { mockRunTimeParameterData } from '/app/pages/ODD/ProtocolDetails/fixtures'
+import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
 
 import type { UseQueryResult } from 'react-query'
 import type * as SharedData from '@opentrons/shared-data'
