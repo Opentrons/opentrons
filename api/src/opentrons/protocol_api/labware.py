@@ -222,7 +222,9 @@ class Well:
         return Location(self._core.get_center(), self)
 
     @requires_version(2, 21)
-    def meniscus(self, z: float = 0.0, operation_volume: Optional[float] = None) -> Location:
+    def meniscus(
+        self, z: float = 0.0, operation_volume: Optional[float] = None
+    ) -> Location:
         """
         :param z: An offset on the z-axis, in mm. Positive offsets are higher and
             negative offsets are lower.
@@ -230,7 +232,9 @@ class Well:
             absolute position of the meniscus-center of the well, plus the ``z`` offset
             (if specified).
         """
-        return Location(self._core.get_meniscus(z_offset=z, operation_volume=operation_volume), self)
+        return Location(
+            self._core.get_meniscus(z_offset=z, operation_volume=operation_volume), self
+        )
 
     @requires_version(2, 8)
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
