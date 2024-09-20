@@ -86,7 +86,6 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
         pipette_id = params.pipetteId
         labware_id = params.labwareId
         well_name = params.wellName
-        volume = params.volume
 
         ready_to_aspirate = self._pipetting.get_is_ready_to_aspirate(
             pipette_id=pipette_id
@@ -131,7 +130,7 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
         try:
             volume_aspirated = await self._pipetting.aspirate_in_place(
                 pipette_id=pipette_id,
-                volume=volume,
+                volume=params.volume,
                 flow_rate=params.flowRate,
                 command_note_adder=self._command_note_adder,
             )
