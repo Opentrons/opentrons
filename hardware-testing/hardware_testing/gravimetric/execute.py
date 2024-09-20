@@ -639,6 +639,9 @@ def run(  # noqa: C901
         well = labware_on_scale["A1"]
         ui.print_info("moving to scale")
         if cfg.jog:
+            tip = _next_tip_for_channel(cfg, resources, 0, total_tips)
+            tip_location = tip.top()
+            _pick_up_tip(resources.ctx, resources.pipette, cfg, location=tip_location)
             _liquid_height = _get_liquid_height(resources, cfg, well)
         else:
             _liquid_height = _multi_sense(resources, cfg, total_tips, well)
