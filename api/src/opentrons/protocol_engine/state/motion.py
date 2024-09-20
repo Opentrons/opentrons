@@ -151,6 +151,7 @@ class MotionView:
         minimum_z_height: Optional[float] = None,
         stay_at_max_travel_z: bool = False,
         ignore_tip_configuration: Optional[bool] = True,
+        max_travel_z_extra_margin: Optional[float] = None,
     ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as an addressable area."""
         location = self._pipettes.get_current_location()
@@ -169,7 +170,9 @@ class MotionView:
                 # beneath max_travel_z. Investigate why motion_planning.get_waypoints() does not
                 # let us travel at max_travel_z, and whether it's safe to make it do that.
                 # Possibly related: https://github.com/Opentrons/opentrons/pull/6882#discussion_r514248062
-                max_travel_z - motion_planning.waypoints.MINIMUM_Z_MARGIN,
+                max_travel_z
+                - motion_planning.waypoints.MINIMUM_Z_MARGIN
+                - (max_travel_z_extra_margin or 0.0),
             )
             destination = base_destination_at_max_z + Point(
                 offset.x, offset.y, offset.z
