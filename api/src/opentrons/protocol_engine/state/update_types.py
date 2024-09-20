@@ -266,7 +266,7 @@ class StateUpdate:
     ) -> None:
         """Set move lid on state."""
         self.lid_status = LabwareLocationUpdate(
-            labware_id=labware_id, location=location, offset_id=offset_id
+            labware_id=labware_id, new_location=location, offset_id=offset_id
         )
 
     def set_move_labware(
