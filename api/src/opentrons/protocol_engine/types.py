@@ -240,7 +240,10 @@ class WellOffset(BaseModel):
 
 
 class WellVolumeOffset(BaseModel):
-    """A z-offset to account for volume in an operation."""
+    """A volume of liquid to account for when executing commands with an origin of WellOrigin.MENISCUS.
+
+    For example, this parameter should be used for MoveToWell commands prior to AspirateInPlace commands.
+    """
 
     volumeOffset: Union[float, Literal["operationVolume"]] = 0.0
 
