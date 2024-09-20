@@ -37,7 +37,7 @@ const TimelineAlertsComponent = (): JSX.Element => {
     <Banner
       type={alertType === 'error' ? 'error' : 'warning'}
       key={`${alertType}:${key}`}
-      width="50vw"
+      width="50%"
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}

@@ -174,7 +174,7 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
   return (
     <>
       {tab === 'protocolSteps' ? (
-        <Flex justifyContent={JUSTIFY_CENTER} width='100%'>
+        <Flex justifyContent={JUSTIFY_CENTER} width="100%">
           <TimelineAlerts />
         </Flex>
       ) : null}
