@@ -140,10 +140,13 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   }
 
   let defaultBorderColor = COLORS.grey50
+  let hoverBorderColor = COLORS.grey55
   if (showDropdownMenu) {
     defaultBorderColor = COLORS.blue50
+    hoverBorderColor = COLORS.blue50
   } else if (error) {
     defaultBorderColor = COLORS.red50
+    hoverBorderColor = COLORS.red50
   }
 
   const DROPDOWN_STYLE = css`
@@ -161,12 +164,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     height: 2.25rem;
 
     &:hover {
-      border: 1px ${BORDERS.styleSolid}
-        ${error
-          ? COLORS.red50
-          : showDropdownMenu
-          ? COLORS.blue50
-          : COLORS.grey55};
+      border: 1px ${BORDERS.styleSolid} ${hoverBorderColor};
     }
 
     &:active {
@@ -224,12 +222,10 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
               <LiquidIcon color={currentOption.liquidColor} />
             ) : null}
             <Flex
-              fontWeight={
-                dropdownType === 'rounded'
-                  ? TYPOGRAPHY.pSemiBold
-                  : TYPOGRAPHY.pRegular
-              }
               css={css`
+                font-weight: ${dropdownType === 'rounded'
+                  ? TYPOGRAPHY.pSemiBold
+                  : TYPOGRAPHY.pRegular};
                 white-space: ${NO_WRAP};
                 overflow: ${OVERFLOW_HIDDEN};
                 text-overflow: ellipsis;
