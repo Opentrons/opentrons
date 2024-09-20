@@ -43,8 +43,6 @@ vi.mock('react-router-dom', async importOriginal => {
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/atoms/Skeleton')
 vi.mock('/app/transformations/commands')
-vi.mock('/app/pages/ODD/ProtocolDetails')
-vi.mock('/app/organisms/Devices/hooks')
 vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/organisms/ProtocolUpload/hooks')
 vi.mock('/app/redux/analytics')
