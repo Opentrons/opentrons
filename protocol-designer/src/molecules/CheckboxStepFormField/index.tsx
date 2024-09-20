@@ -1,11 +1,11 @@
 import * as React from 'react'
 import {
-  useHoverTooltip,
-  TOOLTIP_TOP,
-  Tooltip,
+  CheckboxField,
   Flex,
   SPACING,
-  CheckboxField,
+  TOOLTIP_TOP,
+  Tooltip,
+  useHoverTooltip,
 } from '@opentrons/components'
 import type { Placement } from '@opentrons/components'
 import type { FieldProps } from '../../pages/Designer/ProtocolSteps/StepForm/types'
@@ -17,9 +17,9 @@ type CheckboxStepFormFieldProps = FieldProps & {
   tooltipPlacement?: Placement
 }
 
-export const CheckboxStepFormField = (
+export function CheckboxStepFormField(
   props: CheckboxStepFormFieldProps
-): JSX.Element => {
+): JSX.Element {
   const {
     disabled,
     isIndeterminate,

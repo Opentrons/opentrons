@@ -139,13 +139,19 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     setShowDropdownMenu(!showDropdownMenu)
   }
 
+  let defaultBorderColor = COLORS.grey50
+  if (showDropdownMenu) {
+    defaultBorderColor = COLORS.blue50
+  } else if (error) {
+    defaultBorderColor = COLORS.red50
+  }
+
   const DROPDOWN_STYLE = css`
     flex-direction: ${DIRECTION_ROW};
     background-color: ${COLORS.white};
     cursor: ${CURSOR_POINTER};
     padding: ${SPACING.spacing8} ${SPACING.spacing12};
-    border: 1px ${BORDERS.styleSolid}
-      ${showDropdownMenu ? COLORS.blue50 : COLORS.grey50};
+    border: 1px ${BORDERS.styleSolid} ${defaultBorderColor};
     border-radius: ${dropdownType === 'rounded'
       ? BORDERS.borderRadiusFull
       : BORDERS.borderRadius4};
@@ -156,11 +162,15 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
 
     &:hover {
       border: 1px ${BORDERS.styleSolid}
-        ${showDropdownMenu ? COLORS.blue50 : COLORS.grey55};
+        ${error
+          ? COLORS.red50
+          : showDropdownMenu
+          ? COLORS.blue50
+          : COLORS.grey55};
     }
 
     &:active {
-      border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
+      border: 1px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.blue50};
     }
 
     &:focus-visible {
@@ -175,7 +185,11 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     }
   `
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} ref={dropDownMenuWrapperRef}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      ref={dropDownMenuWrapperRef}
+      gridGap={SPACING.spacing4}
+    >
       {title !== null ? (
         <Flex gridGap={SPACING.spacing8} paddingBottom={SPACING.spacing8}>
           <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
@@ -267,22 +281,14 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         )}
       </Flex>
       {caption != null ? (
-        <LegacyStyledText
-          as="label"
-          paddingTop={SPACING.spacing4}
-          color={COLORS.grey60}
-        >
+        <LegacyStyledText as="label" color={COLORS.grey60}>
           {caption}
         </LegacyStyledText>
       ) : null}
       {error != null ? (
-        <LegacyStyledText
-          as="label"
-          paddingTop={SPACING.spacing4}
-          color={COLORS.red50}
-        >
+        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.red50}>
           {error}
-        </LegacyStyledText>
+        </StyledText>
       ) : null}
     </Flex>
   )

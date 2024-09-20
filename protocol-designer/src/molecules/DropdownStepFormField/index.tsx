@@ -8,9 +8,9 @@ export interface DropdownStepFormFieldProps extends FieldProps {
   title: string
 }
 
-export const DropdownStepFormField = (
+export function DropdownStepFormField(
   props: DropdownStepFormFieldProps
-): JSX.Element => {
+): JSX.Element {
   const { options, value, updateValue, title, errorToShow } = props
   const availableOptionId = options.find(opt => opt.value === value)
 
@@ -22,7 +22,9 @@ export const DropdownStepFormField = (
         dropdownType="neutral"
         filterOptions={options}
         title={title}
-        currentOption={availableOptionId ?? options[0]}
+        currentOption={
+          availableOptionId ?? { name: 'Choose option', value: '' }
+        }
         onClick={value => {
           updateValue(value)
         }}
