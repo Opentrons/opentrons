@@ -69,7 +69,7 @@ async def _wait_until_initialization_failed(robot_client: RobotClient) -> None:
                     False
                 ), f"Expected server to report failed initialization, but got: {response}"
         else:
-            # Server hasn't has unexpectedly reported success.
+            # The server has unexpectedly reported success.
             assert (
                 False
             ), f"Expected server to report failed initialization, but got: {response}"
@@ -83,14 +83,19 @@ async def test_upload_protocols_and_reset_persistence_dir() -> None:
 
     But after restarting the server, those resources should be gone.
     """
+    print("MAX DEBUG: Test begins")
     port = "15555"
     async with RobotClient.make(
         base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
+        print("MAX DEBUG: Made robot client")
         assert await robot_client.dead(), "Dev Robot is running and must not be."
+        print("MAX DEBUG: Asserted dead")
         with DevServer(port=port) as server:
             server.start()
+            print("MAX DEBUG: Started server")
             await robot_client.wait_until_ready()
+            print("MAX DEBUG: Waited until ready")
 
             with get_py_protocol(secrets.token_urlsafe(16)) as file:
                 await robot_client.post_protocol([Path(file.name)])
@@ -115,7 +120,11 @@ async def test_upload_protocols_and_reset_persistence_dir() -> None:
                 persistence_directory=server.persistence_directory,
             )
 
+            print("MAX DEBUG: Test ends")
             server.stop()
+            print("MAX DEBUG: Called server.stop()")
+
+        print("MAX DEBUG: Exited server context manager")
 
 
 async def test_reset_is_available_even_with_corrupt_persistence_directory() -> None:

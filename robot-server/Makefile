@@ -34,7 +34,7 @@ version_file = $(call python_get_git_version,robot-server,$(project_rs_default),
 # specified test
 tests ?= tests/integration/http_api/persistence/test_reset.py
 cov_opts ?= --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
-test_opts ?=
+test_opts ?= -s
 
 black_opts := --extend-exclude tests/integration/persistence_snapshots/
 
