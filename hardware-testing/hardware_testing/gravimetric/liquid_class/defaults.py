@@ -18,22 +18,22 @@ _ETHANOL_70 = SupportedLiquid.ETHANOL.name_with_dilution(0.7)
 
 _default_aspirate: Dict[str, AspirateSettings] = {
     _WATER: AspirateSettings(
-        plunger_flow_rate=None,
-        trailing_air_gap=None,
+        plunger_flow_rate=30,
+        trailing_air_gap=0.1,
         z_submerge_depth=1.5,
         z_retract_height=5.0,
         delay=1.0,
     ),
     _GLYCEROL_50: AspirateSettings(
-        plunger_flow_rate=None,
-        trailing_air_gap=None,
+        plunger_flow_rate=30,
+        trailing_air_gap=0.1,
         z_submerge_depth=1.5,
         z_retract_height=5.0,
         delay=1.0,
     ),
     _ETHANOL_70: AspirateSettings(
-        plunger_flow_rate=None,
-        trailing_air_gap=None,
+        plunger_flow_rate=30,
+        trailing_air_gap=0.1,
         z_submerge_depth=1.5,
         z_retract_height=5.0,
         delay=1.0,
@@ -41,22 +41,22 @@ _default_aspirate: Dict[str, AspirateSettings] = {
 }
 _default_dispense: Dict[str, DispenseSettings] = {
     _WATER: DispenseSettings(
-        plunger_flow_rate=None,
-        blow_out_submerged=None,
+        plunger_flow_rate=30,
+        blow_out_submerged=1,
         z_submerge_depth=1.5,
         z_retract_height=5.0,
         delay=0.5,
     ),
     _GLYCEROL_50: DispenseSettings(
-        plunger_flow_rate=None,
-        blow_out_submerged=None,
+        plunger_flow_rate=30,
+        blow_out_submerged=1,
         z_submerge_depth=1.5,
         z_retract_height=5.0,
         delay=0.5,
     ),
     _ETHANOL_70: DispenseSettings(
-        plunger_flow_rate=None,
-        blow_out_submerged=None,
+        plunger_flow_rate=30,
+        blow_out_submerged=1,
         z_submerge_depth=1.5,
         z_retract_height=5.0,
         delay=0.5,
@@ -307,17 +307,25 @@ _defaults: Dict[
 }
 
 
+def get_default(liquid: str, dilution: float) -> LiquidClassSettings:
+    cls_name = SupportedLiquid.from_string(liquid).name_with_dilution(dilution)
+    return LiquidClassSettings(
+        aspirate=deepcopy(_default_aspirate[cls_name]),
+        dispense=deepcopy(_default_dispense[cls_name]),
+    )
+
+
 def get_liquid_class(
     liquid: str, dilution: float, pipette: int, channels: int, tip: int, volume: int
 ) -> LiquidClassSettings:
     """Get liquid class."""
+    cls_name = SupportedLiquid.from_string(liquid).name_with_dilution(dilution)
     _cls_per_volume = _defaults[tip][pipette][channels]
     defined_volumes = list(_cls_per_volume.keys())
     defined_volumes.sort()
     assert len(defined_volumes) == 3
 
     def _build_liquid_class(vol: int) -> LiquidClassSettings:
-        cls_name = SupportedLiquid.from_string(liquid).name_with_dilution(dilution)
         _cls = deepcopy(_cls_per_volume[vol][cls_name])
         for f in fields(_cls.aspirate):
             if getattr(_cls.aspirate, f.name) is None:

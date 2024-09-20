@@ -33,6 +33,8 @@ from .liquid_class.pipetting import (
     dispense_with_liquid_class,
     PipettingCallbacks,
 )
+from .liquid_class.defaults import get_liquid_class
+from .liquid_class.interactive import interactively_build_liquid_class
 from .liquid_height.height import LiquidTracker
 from .measurement import (
     MeasurementData,
@@ -312,19 +314,33 @@ def _run_trial(
 
     ui.print_info("recorded weights:")
 
+    if trial.cfg.interactive:
+        print(f"{trial.volume}")
+        liquid_class = interactively_build_liquid_class(
+            trial.cfg.liquid, trial.cfg.dilution
+        )
+    else:
+        pip_size = 50 if "50" in trial.pipette.name else 1000
+        liquid_class = get_liquid_class(
+            trial.cfg.liquid,
+            trial.cfg.dilution,
+            pip_size,
+            trial.pipette.channels,
+            trial.tip_volume,
+            int(round(trial.volume)),
+        )
+
     # RUN MIX
     if trial.mix:
         mix_with_liquid_class(
-            trial.ctx,
-            trial.cfg.liquid,
-            trial.cfg.dilution,
-            trial.pipette,
-            trial.tip_volume,
-            max(trial.volume, 5),
-            trial.well,
-            trial.channel_offset,
-            trial.channel_count,
-            trial.liquid_tracker,
+            ctx=trial.ctx,
+            liquid_class=liquid_class,
+            pipette=trial.pipette,
+            mix_volume=max(trial.volume, 5),
+            well=trial.well,
+            channel_offset=trial.channel_offset,
+            channel_count=trial.channel_count,
+            liquid_tracker=trial.liquid_tracker,
             callbacks=pipetting_callbacks,
             blank=trial.blank,
             mode=trial.mode,
@@ -353,10 +369,8 @@ def _run_trial(
     # RUN ASPIRATE
     aspirate_with_liquid_class(
         trial.ctx,
-        trial.cfg.liquid,
-        trial.cfg.dilution,
+        liquid_class,
         trial.pipette,
-        trial.tip_volume,
         trial.volume,
         trial.well,
         trial.channel_offset,
@@ -376,16 +390,14 @@ def _run_trial(
 
     # RUN DISPENSE
     dispense_with_liquid_class(
-        trial.ctx,
-        trial.cfg.liquid,
-        trial.cfg.dilution,
-        trial.pipette,
-        trial.tip_volume,
-        trial.volume,
-        trial.well,
-        trial.channel_offset,
-        trial.channel_count,
-        trial.liquid_tracker,
+        ctx=trial.ctx,
+        liquid_class=liquid_class,
+        pipette=trial.pipette,
+        dispense_volume=trial.volume,
+        well=trial.well,
+        channel_offset=trial.channel_offset,
+        channel_count=trial.channel_count,
+        liquid_tracker=trial.liquid_tracker,
         callbacks=pipetting_callbacks,
         blank=trial.blank,
         mode=trial.mode,

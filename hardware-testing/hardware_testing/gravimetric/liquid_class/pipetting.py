@@ -12,7 +12,6 @@ from hardware_testing.opentrons_api.types import OT3Mount, Point
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
 from .definition import LiquidClassSettings
-from .defaults import get_liquid_class
 
 
 @dataclass
@@ -308,10 +307,8 @@ def _pipette_with_liquid_settings(  # noqa: C901
 
 def mix_with_liquid_class(
     ctx: ProtocolContext,
-    liquid: str,
-    dilution: float,
+    liquid_class: LiquidClassSettings,
     pipette: InstrumentContext,
-    tip_volume: int,
     mix_volume: float,
     well: Well,
     channel_offset: Point,
@@ -324,14 +321,6 @@ def mix_with_liquid_class(
     clear_accuracy_function: bool = False,
 ) -> None:
     """Mix with liquid class."""
-    liquid_class = get_liquid_class(
-        liquid,
-        dilution,
-        int(pipette.max_volume),
-        pipette.channels,
-        tip_volume,
-        int(mix_volume),
-    )
     _pipette_with_liquid_settings(
         ctx,
         pipette,
@@ -351,10 +340,8 @@ def mix_with_liquid_class(
 
 def aspirate_with_liquid_class(
     ctx: ProtocolContext,
-    liquid: str,
-    dilution: float,
+    liquid_class: LiquidClassSettings,
     pipette: InstrumentContext,
-    tip_volume: int,
     aspirate_volume: float,
     well: Well,
     channel_offset: Point,
@@ -367,10 +354,6 @@ def aspirate_with_liquid_class(
     clear_accuracy_function: bool = False,
 ) -> None:
     """Aspirate with liquid class."""
-    pip_size = 50 if "50" in pipette.name else 1000
-    liquid_class = get_liquid_class(
-        liquid, dilution, pip_size, pipette.channels, tip_volume, int(aspirate_volume)
-    )
     _pipette_with_liquid_settings(
         ctx,
         pipette,
@@ -390,10 +373,8 @@ def aspirate_with_liquid_class(
 
 def dispense_with_liquid_class(
     ctx: ProtocolContext,
-    liquid: str,
-    dilution: float,
+    liquid_class: LiquidClassSettings,
     pipette: InstrumentContext,
-    tip_volume: int,
     dispense_volume: float,
     well: Well,
     channel_offset: Point,
@@ -407,10 +388,6 @@ def dispense_with_liquid_class(
     clear_accuracy_function: bool = False,
 ) -> None:
     """Dispense with liquid class."""
-    pip_size = 50 if "50" in pipette.name else 1000
-    liquid_class = get_liquid_class(
-        liquid, dilution, pip_size, pipette.channels, tip_volume, int(dispense_volume)
-    )
     _pipette_with_liquid_settings(
         ctx,
         pipette,

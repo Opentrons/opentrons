@@ -27,6 +27,7 @@ class VolumetricConfig:
     trials: int
     slots_tiprack: List[int]
     increment: bool
+    interactive: bool
     return_tip: bool
     mix: bool
     user_volumes: bool
