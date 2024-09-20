@@ -24,7 +24,6 @@ class WellCore(AbstractWellCore):
         engine_client: Synchronous ProtocolEngine client.
     """
 
-    # get and store parent like WellCore? For InstrumentCore.aspirate work
     def __init__(self, name: str, labware_id: str, engine_client: EngineClient) -> None:
         self._labware_id = labware_id
         self._engine_client = engine_client
