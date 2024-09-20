@@ -17,7 +17,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { Skeleton } from '/app/atoms/Skeleton'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
-import { useTrackProtocolRunEvent } from '../../../Devices/hooks'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -50,6 +50,7 @@ vi.mock('/app/organisms/ProtocolUpload/hooks')
 vi.mock('/app/redux/analytics')
 vi.mock('../hooks')
 vi.mock('/app/resources/runs')
+vi.mock('/app/redux-resources/analytics')
 
 const RUN_ID = 'mockRunId'
 const ROBOT_NAME = 'otie'

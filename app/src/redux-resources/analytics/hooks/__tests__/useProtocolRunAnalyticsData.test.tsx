@@ -9,19 +9,19 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { useProtocolRunAnalyticsData } from '../useProtocolRunAnalyticsData'
 import { hash } from '/app/redux/analytics/hash'
 import { getStoredProtocol } from '/app/redux/protocol-storage'
-import { useStoredProtocolAnalysis, useProtocolDetailsForRun } from '../'
-import { useProtocolMetadata } from '../useProtocolMetadata'
-import { useRunTimestamps } from '../../../RunTimeControl/hooks'
-import { formatInterval } from '../../../RunTimeControl/utils'
+import { useProtocolDetailsForRun, useRunTimestamps } from '/app/resources/runs'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useProtocolMetadata } from '/app/resources/protocols'
+import { formatInterval } from '/app/transformations/commands'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import type { Store } from 'redux'
 
 vi.mock('/app/redux/analytics/hash')
 vi.mock('/app/redux/protocol-storage')
-vi.mock('../../hooks')
-vi.mock('../useProtocolMetadata')
-vi.mock('../../../RunTimeControl/hooks')
-vi.mock('../../../RunTimeControl/utils')
+vi.mock('/app/resources/protocols')
+vi.mock('/app/resources/analysis')
+vi.mock('/app/resources/runs')
+vi.mock('/app/transformations/commands')
 
 let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 let store: Store<any> = createStore(vi.fn(), {})

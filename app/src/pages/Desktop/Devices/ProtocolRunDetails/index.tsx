@@ -24,7 +24,6 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import {
   useModuleRenderInfoForProtocolById,
-  useRobotType,
   useRunHasStarted,
   useRunStatuses,
   useSyncRobotClock,
@@ -43,7 +42,7 @@ import { OPENTRONS_USB } from '/app/redux/discovery'
 import { fetchProtocols } from '/app/redux/protocol-storage'
 import { appShellRequestor } from '/app/redux/shell/remote'
 import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useRobot } from '/app/redux-resources/robots'
+import { useRobot, useRobotType } from '/app/redux-resources/robots'
 
 import type { ViewportListRef } from 'react-viewport-list'
 import type {

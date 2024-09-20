@@ -24,17 +24,15 @@ import {
   RunningProtocolSkeleton,
 } from '/app/organisms/ODD/RunningProtocol'
 import { mockUseAllCommandsResponseNonDeterministic } from '/app/organisms/RunProgressMeter/__fixtures__'
-import {
-  useRunStatus,
-  useRunTimestamps,
-} from '/app/organisms/RunTimeControl/hooks'
 import { getLocalRobot } from '/app/redux/discovery'
 import { CancelingRunModal } from '/app/organisms/ODD/RunningProtocol/CancelingRunModal'
-import { useTrackProtocolRunEvent } from '/app/organisms/Devices/hooks'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { OpenDoorAlertModal } from '/app/organisms/OpenDoorAlertModal'
 import { RunningProtocol } from '..'
 import {
+  useRunStatus,
+  useRunTimestamps,
   useNotifyRunQuery,
   useNotifyAllCommandsQuery,
 } from '/app/resources/runs'
@@ -53,9 +51,9 @@ import type { UseQueryResult } from 'react-query'
 import type { ProtocolAnalyses, RunCommandSummary } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/redux-resources/analytics')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/organisms/Devices/hooks/useLastRunCommandKey')
-vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/organisms/ODD/RunningProtocol')

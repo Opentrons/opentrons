@@ -40,20 +40,16 @@ import {
   useDeleteRunMutation,
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
-
-import {
-  useRunTimestamps,
-  useRunControls,
-} from '/app/organisms/RunTimeControl/hooks'
-import {
-  useRunCreatedAtTimestamp,
-  useTrackProtocolRunEvent,
-  useRobotAnalyticsData,
-} from '/app/organisms/Devices/hooks'
+import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
+import { useRunCreatedAtTimestamp } from '/app/organisms/Devices/hooks'
 import { useCloseCurrentRun } from '/app/organisms/ProtocolUpload/hooks'
 import { onDeviceDisplayFormatTimestamp } from '/app/organisms/Devices/utils'
-import { EMPTY_TIMESTAMP } from '/app/organisms/Devices/constants'
 import { RunTimer } from '/app/organisms/Devices/ProtocolRun/RunTimer'
+import {
+  useTrackProtocolRunEvent,
+  useRobotAnalyticsData,
+  useRecoveryAnalytics,
+} from '/app/redux-resources/analytics'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_RUN_ACTION,
@@ -65,12 +61,13 @@ import {
   formatTimeWithUtcLabel,
   useIsRunCurrent,
   useNotifyRunQuery,
+  useRunTimestamps,
+  EMPTY_TIMESTAMP,
 } from '/app/resources/runs'
 import {
   useTipAttachmentStatus,
   handleTipsAttachedModal,
 } from '/app/organisms/DropTipWizardFlows'
-import { useRecoveryAnalytics } from '/app/organisms/ErrorRecoveryFlows/hooks'
 
 import type { IconName } from '@opentrons/components'
 import type { OnDeviceRouteParams } from '../../../App/types'

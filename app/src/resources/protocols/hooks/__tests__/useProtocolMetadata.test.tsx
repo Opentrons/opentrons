@@ -5,13 +5,13 @@ import { when } from 'vitest-when'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
-import { useCurrentProtocol } from '../../../ProtocolUpload/hooks'
+import { useCurrentProtocol } from '../useCurrentProtocol'
 import { useProtocolMetadata } from '../useProtocolMetadata'
 
 import type { Store } from 'redux'
 import type { State } from '/app/redux/types'
 
-vi.mock('../../../ProtocolUpload/hooks')
+vi.mock('../useCurrentProtocol')
 
 describe('useProtocolMetadata', () => {
   const store: Store<State> = createStore(vi.fn(), {})

@@ -9,7 +9,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { RUN_ID_1 } from '../../../../RunTimeControl/__fixtures__'
+import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 import { getTotalVolumePerLiquidId } from '../../../../Devices/ProtocolRun/SetupLiquids/utils'
 import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { LiquidDetails } from '../LiquidDetails'

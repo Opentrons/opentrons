@@ -1,5 +1,5 @@
 import { useProtocolQuery } from '@opentrons/react-api-client'
-import { useCurrentRun } from './useCurrentRun'
+import { useCurrentRun } from '/app/resources/runs'
 
 import type { Protocol } from '@opentrons/api-client'
 

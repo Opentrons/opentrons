@@ -41,9 +41,9 @@ vi.mock('../PipetteCard')
 vi.mock('../PipetteCard/FlexPipetteCard')
 vi.mock('../PipetteCard/PipetteRecalibrationWarning')
 vi.mock('/app/resources/runs')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/atoms/Banner')
 vi.mock('../utils')
-vi.mock('../../RunTimeControl/hooks')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
 const ROBOT_NAME = 'otie'

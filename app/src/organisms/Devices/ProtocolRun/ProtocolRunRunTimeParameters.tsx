@@ -34,8 +34,7 @@ import {
 import { Banner } from '/app/atoms/Banner'
 import { Divider } from '/app/atoms/structure'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useRunStatus } from '../../RunTimeControl/hooks'
-import { useNotifyRunQuery } from '/app/resources/runs'
+import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'

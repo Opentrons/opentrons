@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react'
 import { vi, it, expect, describe, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
 
-import { mockIdleUnstartedRun } from '../../../RunTimeControl/__fixtures__'
+import { mockIdleUnstartedRun } from '/app/resources/runs/__fixtures__'
 import { formatTimestamp } from '../../utils'
 import { useRunCreatedAtTimestamp } from '../useRunCreatedAtTimestamp'
 import { useNotifyRunQuery } from '/app/resources/runs'

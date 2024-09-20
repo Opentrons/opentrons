@@ -8,7 +8,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
+import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 import { FLOWS } from '../constants'
 import { DetachProbe } from '../DetachProbe'
 

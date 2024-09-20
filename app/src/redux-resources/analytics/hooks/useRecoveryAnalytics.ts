@@ -1,5 +1,5 @@
 import { RUN_STATUS_FAILED, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
-
+import { RunCommandSummary } from '@opentrons/api-client'
 import {
   ANALYTICS_RECOVERY_ACTION_RESULT,
   ANALYTICS_RECOVERY_ACTION_SELECTED,
@@ -10,24 +10,29 @@ import {
 } from '/app/redux/analytics'
 
 import type { RunStatus } from '@opentrons/api-client'
-import type { FailedCommand, RecoveryRoute, RouteStep } from '../types'
 
 type InitialActionType = 'cancel-run' | 'launch-recovery'
 type CommandResult = 'succeeded' | 'failed'
 
-export interface UseRecoveryAnalyticsResult {
+export interface UseRecoveryAnalyticsResult<
+  RecoveryRouteType,
+  RecoveryRouteStepType
+> {
   /* Report the error which occurs error recovery is currently handling. */
   reportErrorEvent: (
-    failedCommand: FailedCommand | null,
+    failedCommand: RunCommandSummary | null,
     initialAction: InitialActionType
   ) => void
   /* Report which recovery option the user selected. */
-  reportActionSelectedEvent: (selectedRecoveryOption: RecoveryRoute) => void
+  reportActionSelectedEvent: (selectedRecoveryOption: RecoveryRouteType) => void
   /* Report when the user views the error details and where they currently are in Error Recovery. */
-  reportViewErrorDetailsEvent: (route: RecoveryRoute, step: RouteStep) => void
+  reportViewErrorDetailsEvent: (
+    route: RecoveryRouteType,
+    step: RecoveryRouteStepType
+  ) => void
   /* Report the ultimate result of a selected recovery action, ie, does it result in the run resuming or does the action fail? */
   reportActionSelectedResult: (
-    selectedRecoveryOption: RecoveryRoute | null,
+    selectedRecoveryOption: RecoveryRouteType | null,
     result: CommandResult
   ) => void
   /* Report whether the run succeeds or fails if the run entered error recovery at least once. */
@@ -37,11 +42,14 @@ export interface UseRecoveryAnalyticsResult {
   ) => void
 }
 
-export function useRecoveryAnalytics(): UseRecoveryAnalyticsResult {
+export function useRecoveryAnalytics<
+  RecoveryRouteType,
+  RecoveryRouteStepType
+>(): UseRecoveryAnalyticsResult<RecoveryRouteType, RecoveryRouteStepType> {
   const doTrackEvent = useTrackEvent()
 
   const reportErrorEvent = (
-    failedCommand: FailedCommand | null,
+    failedCommand: RunCommandSummary | null,
     initialAction: InitialActionType
   ): void => {
     if (failedCommand != null) {
@@ -57,7 +65,7 @@ export function useRecoveryAnalytics(): UseRecoveryAnalyticsResult {
   }
 
   const reportActionSelectedEvent = (
-    selectedRecoveryOption: RecoveryRoute
+    selectedRecoveryOption: RecoveryRouteType
   ): void => {
     doTrackEvent({
       name: ANALYTICS_RECOVERY_ACTION_SELECTED,
@@ -68,8 +76,8 @@ export function useRecoveryAnalytics(): UseRecoveryAnalyticsResult {
   }
 
   const reportViewErrorDetailsEvent = (
-    route: RecoveryRoute,
-    step: RouteStep
+    route: RecoveryRouteType,
+    step: RecoveryRouteStepType
   ): void => {
     doTrackEvent({
       name: ANALYTICS_RECOVERY_VIEW_ERROR_DETAILS,
@@ -81,7 +89,7 @@ export function useRecoveryAnalytics(): UseRecoveryAnalyticsResult {
   }
 
   const reportActionSelectedResult = (
-    selectedRecoveryOption: RecoveryRoute | null,
+    selectedRecoveryOption: RecoveryRouteType | null,
     result: CommandResult
   ): void => {
     if (selectedRecoveryOption != null) {

@@ -21,16 +21,16 @@ import {
   useRunCalibrationStatus,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
-  useRobotType,
 } from '../../../hooks'
 import { SetupLabwarePositionCheck } from '..'
 import { useNotifyRunQuery } from '/app/resources/runs'
+import { useRobotType } from '/app/redux-resources/robots'
 
 import type { Mock } from 'vitest'
 
 vi.mock('../../../../LabwarePositionCheck/useLaunchLPC')
 vi.mock('../../utils/getModuleTypesThatRequireExtraAttention')
-vi.mock('../../../../RunTimeControl/hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/config')
 vi.mock('../../../hooks')
 vi.mock('../../../hooks/useLPCSuccessToast')

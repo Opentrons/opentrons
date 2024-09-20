@@ -7,15 +7,15 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { useProtocolDetailsForRun } from '..'
-import { useNotifyRunQuery } from '/app/resources/runs'
-import { RUN_ID_2 } from '../../../RunTimeControl/__fixtures__'
+import { useNotifyRunQuery } from '../useNotifyRunQuery'
+import { RUN_ID_2 } from '../__fixtures__'
 
 import type { Protocol, Run } from '@opentrons/api-client'
 import type { UseQueryResult } from 'react-query'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('/app/resources/runs')
+vi.mock('../useNotifyRunQuery')
 
 const PROTOCOL_ID = 'fake_protocol_id'
 const PROTOCOL_ANALYSIS = {

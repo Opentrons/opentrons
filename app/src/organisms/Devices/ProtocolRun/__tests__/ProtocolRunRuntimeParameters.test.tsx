@@ -6,12 +6,11 @@ import { InfoScreen } from '@opentrons/components'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useRunStatus } from '../../../RunTimeControl/hooks'
-import { useNotifyRunQuery } from '/app/resources/runs'
+import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
 import {
   mockSucceededRun,
   mockIdleUnstartedRun,
-} from '../../../RunTimeControl/__fixtures__'
+} from '/app/resources/runs/__fixtures__'
 import { ProtocolRunRuntimeParameters } from '../ProtocolRunRunTimeParameters'
 
 import type { UseQueryResult } from 'react-query'
@@ -29,7 +28,6 @@ vi.mock('@opentrons/components', async importOriginal => {
   }
 })
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../../../RunTimeControl/hooks')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux/config')
 

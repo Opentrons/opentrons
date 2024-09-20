@@ -18,9 +18,10 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
 vi.mock('../useDeckCalibrationStatus')
-vi.mock('../useIsFlex')
 vi.mock('../useRunPipetteInfoByMount')
 vi.mock('/app/resources/runs')
+vi.mock('/app/resources/analysis')
+vi.mock('/app/redux-resources/robots')
 
 let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 

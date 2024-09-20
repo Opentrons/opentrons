@@ -16,13 +16,12 @@ import {
 
 import {
   useModuleCalibrationStatus,
-  useProtocolDetailsForRun,
-  useRobotAnalyticsData,
   useRunCalibrationStatus,
   useUnmatchedModulesForProtocol,
 } from '../../../../hooks'
 import { useRobot } from '/app/redux-resources/robots'
-import { useCurrentRunId } from '/app/resources/runs'
+import { useRobotAnalyticsData } from '/app/redux-resources/analytics'
+import { useCurrentRunId, useProtocolDetailsForRun } from '/app/resources/runs'
 import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
 import { getFallbackRobotSerialNumber, isRunAgainStatus } from '../../utils'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'

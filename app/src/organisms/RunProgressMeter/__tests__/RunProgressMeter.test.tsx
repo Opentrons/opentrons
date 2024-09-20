@@ -18,11 +18,12 @@ import {
   InterventionModal,
 } from '../../InterventionModal'
 import { ProgressBar } from '/app/atoms/ProgressBar'
-import { useRunControls, useRunStatus } from '../../RunTimeControl/hooks'
+import { useRunControls } from '../../RunTimeControl/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   useNotifyRunQuery,
   useNotifyAllCommandsQuery,
+  useRunStatus,
 } from '/app/resources/runs'
 import { useDownloadRunLog } from '../../Devices/hooks'
 import {
@@ -54,6 +55,7 @@ vi.mock('/app/atoms/ProgressBar')
 vi.mock('../../InterventionModal')
 vi.mock('../../Devices/hooks/useLastRunCommand')
 vi.mock('/app/resources/protocols/hooks')
+vi.mock('/app/redux-resources/robots')
 
 const render = (props: React.ComponentProps<typeof RunProgressMeter>) => {
   return renderWithProviders(<RunProgressMeter {...props} />, {

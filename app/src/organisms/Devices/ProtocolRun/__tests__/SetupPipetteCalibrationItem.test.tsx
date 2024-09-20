@@ -12,6 +12,7 @@ import { SetupPipetteCalibrationItem } from '../SetupPipetteCalibrationItem'
 import { MemoryRouter } from 'react-router-dom'
 
 vi.mock('../../hooks')
+vi.mock('/app/redux-resources/robots')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'

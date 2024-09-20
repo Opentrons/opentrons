@@ -20,7 +20,7 @@ import { useRunHasStarted } from '../hooks'
 import { SetupDeckCalibration } from './SetupDeckCalibration'
 import { SetupInstrumentCalibration } from './SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from './SetupTipLengthCalibration'
-import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useRunStatus } from '/app/resources/runs'
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import { useIsFlex } from '/app/redux-resources/robots'
 

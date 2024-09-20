@@ -1,39 +1,13 @@
 import { useSelector } from 'react-redux'
 
 import { useProtocolQuery } from '@opentrons/react-api-client'
-import {
-  parseRequiredModulesEntity,
-  parseInitialLoadedLabwareEntity,
-  parsePipetteEntity,
-} from '@opentrons/shared-data'
 
 import { getStoredProtocol } from '/app/redux/protocol-storage'
 import { useNotifyRunQuery } from '/app/resources/runs'
+import { parseProtocolAnalysisOutput } from '/app/transformations/analysis'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '/app/redux/types'
-
-export const parseProtocolAnalysisOutput = (
-  storedProtocolAnalysis: ProtocolAnalysisOutput | null
-): ProtocolAnalysisOutput | null => {
-  const pipetteEntity = parsePipetteEntity(
-    storedProtocolAnalysis?.commands ?? []
-  )
-  const moduleEntity = parseRequiredModulesEntity(
-    storedProtocolAnalysis?.commands ?? []
-  )
-  const labwareEntity = parseInitialLoadedLabwareEntity(
-    storedProtocolAnalysis?.commands ?? []
-  )
-  return storedProtocolAnalysis != null
-    ? {
-        ...storedProtocolAnalysis,
-        pipettes: storedProtocolAnalysis.pipettes ?? pipetteEntity,
-        labware: storedProtocolAnalysis.labware ?? labwareEntity,
-        modules: storedProtocolAnalysis.modules ?? moduleEntity,
-      }
-    : null
-}
 
 export function useStoredProtocolAnalysis(
   runId: string | null

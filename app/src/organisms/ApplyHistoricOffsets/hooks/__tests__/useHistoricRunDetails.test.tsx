@@ -5,7 +5,7 @@ import { renderHook, waitFor } from '@testing-library/react'
 
 import { useNotifyAllRunsQuery } from '/app/resources/runs/useNotifyAllRunsQuery'
 import { useHistoricRunDetails } from '../useHistoricRunDetails'
-import { mockRunningRun } from '../../../RunTimeControl/__fixtures__'
+import { mockRunningRun } from '/app/resources/runs/__fixtures__'
 import { mockSuccessQueryResults } from '../../../../__fixtures__'
 
 import type { RunData } from '@opentrons/api-client'

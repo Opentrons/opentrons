@@ -2,8 +2,7 @@ import { useAllSessionsQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 
-import { useCurrentRunId } from '/app/resources/runs'
-import { useRunStatus } from '../../../RunTimeControl/hooks'
+import { useCurrentRunId, useRunStatus } from '/app/resources/runs'
 import { useRunStartedOrLegacySessionInProgress } from '..'
 
 import type { UseQueryResult } from 'react-query'
@@ -11,7 +10,6 @@ import type { Sessions } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs')
-vi.mock('../../../RunTimeControl/hooks')
 
 describe('useRunStartedOrLegacySessionInProgress', () => {
   beforeEach(() => {

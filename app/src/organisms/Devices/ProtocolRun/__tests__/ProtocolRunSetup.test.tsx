@@ -22,15 +22,16 @@ import {
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { useRobot, useIsFlex } from '/app/redux-resources/robots'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
   useModuleCalibrationStatus,
   useProtocolAnalysisErrors,
   useRunCalibrationStatus,
   useRunHasStarted,
   useRunPipetteInfoByMount,
-  useStoredProtocolAnalysis,
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
+
 import { SetupLabware } from '../SetupLabware'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 import { SetupLiquids } from '../SetupLiquids'
@@ -54,6 +55,7 @@ vi.mock('/app/resources/deck_configuration/utils')
 vi.mock('/app/resources/deck_configuration/hooks')
 vi.mock('/app/resources/runs/useNotifyRunQuery')
 vi.mock('/app/redux-resources/robots')
+vi.mock('/app/resources/analysis')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
   return {

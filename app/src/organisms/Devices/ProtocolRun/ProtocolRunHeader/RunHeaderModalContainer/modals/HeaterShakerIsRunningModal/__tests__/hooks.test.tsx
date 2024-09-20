@@ -6,7 +6,7 @@ import { renderHook } from '@testing-library/react'
 
 import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 
-import { RUN_ID_1 } from '../../../../../../../RunTimeControl/__fixtures__'
+import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 import { useMostRecentCompletedAnalysis } from '../../../../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useHeaterShakerModuleIdsFromRun } from '../hooks'
 

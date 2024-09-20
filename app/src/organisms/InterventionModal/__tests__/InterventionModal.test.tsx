@@ -25,7 +25,7 @@ const ROBOT_NAME = 'Otie'
 
 const mockOnResumeHandler = vi.fn()
 
-vi.mock('../../Devices/hooks')
+vi.mock('/app/redux-resources/robots')
 
 describe('useInterventionModal', () => {
   const defaultProps = {

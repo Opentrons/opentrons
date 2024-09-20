@@ -9,7 +9,7 @@ import { IncompatibleModuleDesktopModalBody } from '../IncompatibleModuleDesktop
 import { useIsFlex } from '/app/redux-resources/robots'
 import * as Fixtures from '../__fixtures__'
 
-vi.mock('../../Devices/hooks')
+vi.mock('/app/redux-resources/robots')
 
 const getRenderer = (isFlex: boolean) => {
   when(useIsFlex).calledWith('otie').thenReturn(isFlex)

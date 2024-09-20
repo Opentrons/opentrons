@@ -20,6 +20,7 @@ import { SetupRobotCalibration } from '../SetupRobotCalibration'
 
 vi.mock('/app/redux/analytics')
 vi.mock('../../hooks')
+vi.mock('/app/resources/runs')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../SetupDeckCalibration')
 vi.mock('../SetupInstrumentCalibration')

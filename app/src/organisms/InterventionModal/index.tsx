@@ -33,7 +33,7 @@ import { getIsOnDevice } from '/app/redux/config'
 import { PauseInterventionContent } from './PauseInterventionContent'
 import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
 import { isInterventionCommand } from './utils'
-import { useRobotType } from '../Devices/hooks'
+import { useRobotType } from '/app/redux-resources/robots'
 
 import type { IconName } from '@opentrons/components'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
