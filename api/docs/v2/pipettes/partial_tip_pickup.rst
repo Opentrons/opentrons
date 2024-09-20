@@ -183,10 +183,10 @@ The ``start`` parameter sets the first and only nozzle used in the configuration
       - | Back to front, left to right
         | (A1 through H1, A2 through H2, …)
 
-Since they follow the same pickup order as a single-channel pipette, Opentrons recommends using the following configurations:
+.. warning::
+    In certain conditions, tips in adjacent columns may cling to empty nozzles during single-tip pickup. You can avoid this by overriding automatic tip tracking to pick up tips row by row, rather than column by column. The code sample below demonstrates how to pick up tips this way.
 
-- For 8-channel pipettes, ``start="H1"``.
-- For 96-channel pipettes, ``start="H12"``.
+    However, as with all partial tip layouts, be careful that you don't place the pipette in a position where it overlaps more tips than intended.
 
 Here is the start of a protocol that imports the ``SINGLE`` and ``ALL`` layout constants, loads an 8-channel pipette, and sets it to pick up a single tip.
 
@@ -210,21 +210,22 @@ Here is the start of a protocol that imports the ``SINGLE`` and ``ALL`` layout c
         )
         pipette.configure_nozzle_layout(
             style=SINGLE,
-            start="H12",
-            tip_racks=[partial_rack]
+            start="H1"
         )
 
 .. versionadded:: 2.20
 
-Since this configuration uses ``start="H12"``, it will pick up tips in the usual order::
+To pick up tips row by row, first construct a list of all wells in the tip rack ordered from A1, A2 … H11, H12. One way to do this is to use :py:func:`sum` to flatten the list of lists returned by :py:meth:`.Labware.rows`::
 
-    pipette.pick_up_tip()  # picks up A1 from tip rack
+    tips_by_row = sum(partial_rack.rows(), [])
+
+Then ``pop`` items from the front of the list (index 0) and pass them as the ``location`` of :py:meth:`.pick_up_tip`::
+
+    # pick up A1 from tip rack
+    pipette.pick_up_tip(location=tips_by_row.pop(0))
     pipette.drop_tip()
-    pipette.pick_up_tip()  # picks up B1 from tip rack
-
-.. note::
-
-    You can pick up tips row by row, rather than column by column, by specifying a location for :py:meth:`.pick_up_tip` each time you use it in ``SINGLE`` configuration. However, as with all partial tip layouts, be careful that you don't place the pipette in a position where it overlaps more tips than intended.
+    # pick up A2 from tip rack
+    pipette.pick_up_tip(location=tips_by_row.pop(0))
 
 
 Partial Column Layout
@@ -232,7 +233,7 @@ Partial Column Layout
 
 Partial column pickup is available on 8-channel pipettes only. Partial columns contain 2 to 7 consecutive tips in a single column. The pipette always picks up partial columns with its frontmost nozzles (``start="H1"``).
 
-To specify the number of tips to pick up, add the ``end`` parameter when calling :py:meth:`.configure_nozzle_layout`. Use the chart below to determine the end row (G through B) for your desired number of tips. The end column should be the same as your start column (1 or 12).
+To specify the number of tips to pick up, add the ``end`` parameter when calling :py:meth:`.configure_nozzle_layout`. Use the chart below to determine the ending nozzle (G1 through B1) for your desired number of tips.
 
 .. list-table::
     :stub-columns: 1
@@ -244,15 +245,20 @@ To specify the number of tips to pick up, add the ``end`` parameter when calling
       - 5
       - 6
       - 7
-    * - ``end`` row
-      - G
-      - F
-      - E
-      - D
-      - C
-      - B
+    * - ``end`` nozzle
+      - G1
+      - F1
+      - E1
+      - D1
+      - C1
+      - B1
 
 When picking up 3, 5, 6, or 7 tips, extra tips will be left at the front of each column. You can use these tips with a different nozzle configuration, or you can manually re-rack them at the end of your protocol for future use.
+
+.. warning::
+    In certain conditions, tips in adjacent columns may cling to empty nozzles during partial-column pickup. You can avoid this by overriding automatic tip tracking to pick up tips row by row, rather than column by column. The code sample below demonstrates how to pick up tips this way.
+
+    However, as with all partial tip layouts, be careful that you don't place the pipette in a position where it overlaps more tips than intended.
 
 Here is the start of a protocol that imports the ``PARTIAL_COLUMN`` and ``ALL`` layout constants, loads an 8-channel pipette, and sets it to pick up four tips:
 
@@ -274,21 +280,24 @@ Here is the start of a protocol that imports the ``PARTIAL_COLUMN`` and ``ALL`` 
         pipette.configure_nozzle_layout(
             style=PARTIAL_COLUMN,
             start="H1",
-            end="E1",
-            tip_racks=[partial_rack]
+            end="E1"
         )
 
 .. versionadded:: 2.20
 
-This configuration will pick up tips from the back half of column 1, then the front half of column 1, then the back half of column 2, and so on::
+When pipetting in partial column configuration, remember that *the frontmost channel of the pipette is its primary channel*. To pick up tips across the back half of the rack, then across the front half of the rack, construct a list of that includes all and only the wells in row D and row H::
 
-    pipette.pick_up_tip()  # picks up A1-D1 from tip rack
-    pipette.drop_tip()
-    pipette.pick_up_tip()  # picks up E1-H1 from tip rack
-    pipette.drop_tip()
-    pipette.pick_up_tip()  # picks up A2-D2 from tip rack
+    tips_by_row = partial_rack.rows_by_name()["D"] + partial_rack.rows_by_name()["H"]
 
-When handling liquids in partial column configuration, remember that *the frontmost channel of the pipette is its primary channel*. For example, to use the same configuration as above to transfer liquid from wells A1–D1 to wells A2–D2 on a plate, you must use the wells in row D as the source and destination targets::
+Then ``pop`` items from the front of the list (index 0) and pass them as the ``location`` of :py:meth:`.pick_up_tip`::
+
+    # pick up A1-D1 from tip rack
+    pipette.pick_up_tip(location=tips_by_row.pop(0))
+    pipette.drop_tip()
+    # pick up A2-D2 from tip rack
+    pipette.pick_up_tip(location=tips_by_row.pop(0))
+
+To use the same configuration as above to transfer liquid from wells A1–D1 to wells A2–D2 on a plate, you must use the wells in row D as the source and destination targets::
 
     # pipette in 4-nozzle partial column layout
     pipette.transfer(
