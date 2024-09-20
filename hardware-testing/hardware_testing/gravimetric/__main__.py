@@ -66,6 +66,17 @@ GRAVIMETRIC_CFG = {
         96: gravimetric_ot3_p1000_96,
     },
 }
+CAVITY_GRAVIMETRIC_CFG = {
+    50: {
+        1: {
+            20: gravimetric_cavity_ot3_p50_single,
+            50: gravimetric_cavity_ot3_p50_single
+        },
+    },
+    1000: {
+        96: gravimetric_ot3_p1000_96,
+    },
+}
 
 GRAVIMETRIC_CFG_INCREMENT = {
     50: {

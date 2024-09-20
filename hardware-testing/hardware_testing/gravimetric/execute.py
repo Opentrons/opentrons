@@ -638,7 +638,10 @@ def run(  # noqa: C901
         ui.print_title("FIND LIQUID HEIGHT")
         well = labware_on_scale["A1"]
         ui.print_info("moving to scale")
-        _liquid_height = _multi_sense(resources, cfg, total_tips, well)
+        if cfg.jog:
+            _liquid_height = _get_liquid_height(resources, cfg, well)
+        else:
+            _liquid_height = _multi_sense(resources, cfg, total_tips, well)
         height_below_top = well.depth - _liquid_height
         ui.print_info(f"liquid is {height_below_top} mm below top of vial")
         liquid_tracker.set_start_volume_from_liquid_height(

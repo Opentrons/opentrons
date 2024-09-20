@@ -86,7 +86,7 @@
       },
       "defaultFlowAcceleration": 1200.0,
       "defaultTipLength": 57.9,
-      "defaultReturnTipHeight": 0.71,
+      "defaultReturnTipHeight": 0.2,
       "aspirate": {
         "default": {
           "1": [
