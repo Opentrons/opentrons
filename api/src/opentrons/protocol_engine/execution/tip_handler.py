@@ -312,6 +312,7 @@ class HardwareTipHandler(TipHandler):
             NozzleConfigurationType.SINGLE,
             NozzleConfigurationType.COLUMN,
         ]
+        # NOTE: (09-20-2024) Current on multi-channel pipettes, utilizing less than 4 nozzles risks false positives on the tip presence sensor
         supported_partial_nozzle_minimum = 4
 
         if (
@@ -321,7 +322,9 @@ class HardwareTipHandler(TipHandler):
             and nozzle_configuration.configuration in unsupported_layout_types
             and len(nozzle_configuration.map_store) < supported_partial_nozzle_minimum
         ):
-            # Tip presence sensing is not supported for single tip pick up on the 96ch Flex Pipette, nor with single and some partial layous of the 8ch Flex Pipette
+            # Tip presence sensing is not supported for single tip pick up on the 96ch Flex Pipette, nor with single and some partial layous of the 8ch Flex Pipette.
+            # This is due in part to a press distance tolerance which creates a risk case for false positives. In the case of single tip, the mechanical tolerance
+            # for presses with 100% success is below the minimum average achieved press distance for a given multi channel pipette in that configuration.
             return
         try:
             ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
