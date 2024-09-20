@@ -56,7 +56,7 @@ import type { DeckSetupTabType } from '../types'
 import type { Fixture } from './constants'
 
 const WASTE_CHUTE_SPACE = 30
-const DETAILS_HOVER_SPACE = 50
+const DETAILS_HOVER_SPACE = 60
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',
   'fixedBase',
