@@ -32,7 +32,7 @@ version_file = $(call python_get_git_version,robot-server,$(project_rs_default),
 # behavior of pytest. For instance,
 # make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
 # specified test
-tests ?= tests/integration/http_api/persistence/test_compatibility.py
+tests ?= tests/integration
 cov_opts ?= --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 test_opts ?=
 
