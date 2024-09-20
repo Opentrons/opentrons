@@ -7,6 +7,8 @@ import {
   Box,
   Btn,
   COLORS,
+  CURSOR_DEFAULT,
+  CURSOR_POINTER,
   Flex,
   Icon,
   JUSTIFY_CENTER,
@@ -36,6 +38,8 @@ export interface StepContainerProps {
   onMouseLeave?: (event: React.MouseEvent) => void
   selected?: boolean
   hovered?: boolean
+  hasError?: boolean
+  isStepAfterError?: boolean
 }
 
 export function StepContainer(props: StepContainerProps): JSX.Element {
@@ -49,6 +53,8 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
     hovered,
     iconColor,
     title,
+    hasError = false,
+    isStepAfterError = false,
   } = props
   const formData = useSelector(getUnsavedForm)
   const [top, setTop] = React.useState<number>(0)
@@ -66,6 +72,10 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
   if (hovered && !selected) {
     backgroundColor = COLORS.blue30
     color = COLORS.black90
+  }
+  if (hasError) {
+    backgroundColor = COLORS.red50
+    color = COLORS.white
   }
 
   const handleOverflowClick = (event: React.MouseEvent): void => {
@@ -103,7 +113,13 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
 
   return (
     <>
-      <Box id={stepId} {...{ onMouseEnter, onMouseLeave }}>
+      <Box
+        id={stepId}
+        {...{
+          onMouseEnter: isStepAfterError ? undefined : onMouseEnter,
+          onMouseLeave: isStepAfterError ? undefined : onMouseLeave,
+        }}
+      >
         <Btn
           onClick={onClick}
           padding={SPACING.spacing12}
@@ -111,6 +127,8 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
           width={formData != null ? '6rem' : '100%'}
           backgroundColor={backgroundColor}
           color={color}
+          opacity={isStepAfterError ? '50%' : '100%'}
+          cursor={isStepAfterError ? CURSOR_DEFAULT : CURSOR_POINTER}
         >
           <Flex
             justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -132,10 +150,10 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
                 </StyledText>
               )}
             </Flex>
-            {hovered && !isStartingOrEndingState && formData == null ? (
+            {selected && !isStartingOrEndingState && formData == null ? (
               <OverflowBtn
                 data-testid={`StepContainer_${stepId}`}
-                fillColor={hovered && !selected ? COLORS.grey50 : COLORS.white}
+                fillColor={COLORS.white}
                 onClick={(e: React.MouseEvent) => {
                   e.preventDefault()
                   e.stopPropagation()

@@ -1,3 +1,4 @@
+export * from './Banner'
 export * from './buttons'
 export * from './Checkbox'
 export * from './CheckboxField'

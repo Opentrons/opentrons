@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
+  Banner,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
@@ -28,7 +29,6 @@ import {
 
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { ReleaseNotes } from '/app/molecules/ReleaseNotes'
-import { Banner } from '/app/atoms/Banner'
 import { ProgressBar } from '/app/atoms/ProgressBar'
 import { useRemoveActiveAppUpdateToast } from '../Alerts'
 

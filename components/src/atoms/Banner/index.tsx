@@ -1,19 +1,16 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+import { Btn, Flex } from '../../primitives'
+import { Icon } from '../../icons'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import {
   ALIGN_CENTER,
-  BORDERS,
-  Btn,
-  COLORS,
   DIRECTION_ROW,
-  Flex,
-  Icon,
   JUSTIFY_SPACE_BETWEEN,
-  RESPONSIVENESS,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
-import type { IconProps, StyleProps } from '@opentrons/components'
+} from '../../styles'
+import type { StyleProps } from '../../primitives'
+import type { IconProps } from '../../icons'
 
 export type BannerType =
   | 'success'

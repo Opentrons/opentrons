@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   Box,
+  Banner,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -15,7 +16,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Banner } from '/app/atoms/Banner'
 import {
   getU2EAdapterDevice,
   getU2EWindowsDriverStatus,

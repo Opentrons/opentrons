@@ -1,6 +1,8 @@
 import * as React from 'react'
-import { LegacyStyledText, TYPOGRAPHY } from '@opentrons/components'
+import { TYPOGRAPHY } from '../../ui-style-constants'
+import { LegacyStyledText } from '../../../lib'
 import { Banner } from './index'
+
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof Banner> = {

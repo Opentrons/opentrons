@@ -3,6 +3,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
   CURSOR_POINTER,
+  Banner,
   LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
@@ -17,7 +18,6 @@ import {
   useCurrentSubsystemUpdateQuery,
   useHost,
 } from '@opentrons/react-api-client'
-import { Banner } from '/app/atoms/Banner'
 import { InstrumentCard } from '/app/molecules/InstrumentCard'
 import { ChoosePipette } from '../../PipetteWizardFlows/ChoosePipette'
 import { FLOWS } from '../../PipetteWizardFlows/constants'

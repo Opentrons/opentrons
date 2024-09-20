@@ -29,10 +29,9 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
 import { getRobotType } from '../../../file-data/selectors'
 import { getHasGen1MultiChannelPipette } from '../../../step-forms'
-import { SlotDetailsContainer } from '../../../organisms'
+import { SlotDetailsContainer, TimelineAlerts } from '../../../organisms'
 import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
-import { Alerts } from '../../../components/alerts/Alerts'
 import { DeckSetupDetails } from './DeckSetupDetails'
 import {
   animateZoom,
@@ -174,6 +173,11 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
 
   return (
     <>
+      {tab === 'protocolSteps' ? (
+        <Flex justifyContent={JUSTIFY_CENTER} width='100%'>
+          <TimelineAlerts />
+        </Flex>
+      ) : null}
       <Flex
         backgroundColor={COLORS.white}
         borderRadius={BORDERS.borderRadius8}
@@ -181,12 +185,6 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
         height={zoomIn.slot != null ? '75vh' : '70vh'}
         flexDirection={DIRECTION_COLUMN}
       >
-        {tab === 'protocolSteps' ? (
-          <Flex justifyContent={JUSTIFY_CENTER}>
-            {/* TODO: update the alerts to match latest designs */}
-            <Alerts componentType="Timeline" />
-          </Flex>
-        ) : null}
         <Flex
           width="100%"
           height="100%"

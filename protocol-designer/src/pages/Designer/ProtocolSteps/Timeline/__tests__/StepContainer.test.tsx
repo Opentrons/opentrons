@@ -28,6 +28,8 @@ describe('StepContainer', () => {
       selected: false,
       hovered: false,
       stepId: 'mockStepId',
+      hasError: false,
+      isStepAfterError: false,
     }
     vi.mocked(StepOverflowMenu).mockReturnValue(
       <div>mock StepOverflowMenu</div>
