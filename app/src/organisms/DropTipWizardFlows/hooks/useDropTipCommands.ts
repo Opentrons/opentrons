@@ -356,8 +356,6 @@ const buildBlowoutCommands = (
         },
       ]
     : [
-        ENGAGE_AXES,
-        UPDATE_PLUNGER_ESTIMATORS,
         {
           commandType: 'blowOutInPlace',
           params: {
