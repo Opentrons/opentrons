@@ -32,7 +32,7 @@ export interface CheckboxFieldProps {
 
 const INPUT_STYLE = css`
   position: absolute;
-overflow: hidden;d
+  overflow: hidden;
   clip: rect(0 0 0 0);
   height: 1px;
   width: 1px;

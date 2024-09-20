@@ -6,6 +6,5 @@ import type { FieldProps } from '../types'
 
 export function MoveLabwareField(props: FieldProps): JSX.Element {
   const options = useSelector(getMoveLabwareOptions)
-  console.log(props.tooltipContent)
   return <StepFormDropdown {...props} options={options} />
 }
