@@ -274,6 +274,17 @@ def _run_trial(
         trial.trial,
         trial.blank,
     )
+    pip_size = 50 if "50" in trial.pipette.name else 1000
+    liquid_class = get_liquid_class(
+        trial.cfg.liquid,
+        trial.cfg.dilution,
+        pip_size,
+        trial.pipette.channels,
+        trial.tip_volume,
+        int(round(trial.volume)),
+    )
+    if trial.cfg.interactive:
+        liquid_class = interactively_build_liquid_class(liquid_class)
 
     def _tag(m_type: MeasurementType) -> str:
         tag = create_measurement_tag(
@@ -313,22 +324,6 @@ def _run_trial(
         return m_data
 
     ui.print_info("recorded weights:")
-
-    if trial.cfg.interactive:
-        print(f"{trial.volume}")
-        liquid_class = interactively_build_liquid_class(
-            trial.cfg.liquid, trial.cfg.dilution
-        )
-    else:
-        pip_size = 50 if "50" in trial.pipette.name else 1000
-        liquid_class = get_liquid_class(
-            trial.cfg.liquid,
-            trial.cfg.dilution,
-            pip_size,
-            trial.pipette.channels,
-            trial.tip_volume,
-            int(round(trial.volume)),
-        )
 
     # RUN MIX
     if trial.mix:
