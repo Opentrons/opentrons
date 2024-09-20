@@ -263,11 +263,9 @@ This example aspirates enough air to fill the remaining volume in a pipette::
 Detect Liquids
 ==============
 
-The :py:meth:`.InstrumentContext.detect_liquid_presence` method tells a Flex pipette to check for liquid in a well. It returns ``True`` if the pressure sensors in the pipette detect a liquid and ``False`` if the sensors do not. 
+The :py:meth:`.InstrumentContext.detect_liquid_presence` method tells a Flex pipette to check for liquid in a well. It returns ``True`` if the pressure sensors in the pipette detect a liquid and ``False`` if the sensors do not. When ``detect_liquid_presence()`` finds an empty well it won't raise an error or stop your protocol. 
 
-``detect_liquid_presence()`` is a standalone method that can be called when you want the robot to record the presence or absence of a liquid. You should always call :py:meth:`.pick_up_tip` immediately prior, in order to ensure that the pipette uses a clean, dry tip. 
-
-When ``detect_liquid_presence()`` finds an empty well it won't raise an error or stop your protocol. You don't have to aspirate after detecting liquid presence.
+``detect_liquid_presence()`` is a standalone method to record the presence or absence of a liquid. You don't have to aspirate after detecting liquid presence. However, you should always pick up a tip immediately prior to checking for liquid, and either aspirate or drop the tip immediately after. This ensures that the pipette uses a clean, dry tip to check for liquid, and prevents cross-contamination.
 
 A potential use of liquid detection is to try aspirating from another well if the first well is found to contain no liquid.
 
@@ -286,11 +284,9 @@ A potential use of liquid detection is to try aspirating from another well if th
 Require Liquids
 ===============
 
-The :py:meth:`.InstrumentContext.require_liquid_presence` method tells a Flex pipette to check for `and require` liquid in a well. 
+The :py:meth:`.InstrumentContext.require_liquid_presence` method tells a Flex pipette to check for `and require` liquid in a well. When ``require_liquid_presence()`` finds an empty well, it raises an error and pauses the protocol to let you resolve the problem.
 
-``require_liquid_presence()`` is a standalone method that can be called when you want the robot to react to a missing liquid or empty well. You should always call :py:meth:`.pick_up_tip` immediately prior, in order to ensure that the pipette uses a clean, dry tip. 
-
-When ``require_liquid_presence()`` finds an empty well, it raises an error and pauses the protocol to let you resolve the problem. You don't have to aspirate after requiring liquid presence.
+``require_liquid_presence()`` is a standalone method to react to a missing liquid or empty well. You don't have to aspirate after requiring liquid presence. However, you should always pick up a tip immediately prior to checking for liquid, and either aspirate or drop the tip immediately after. This ensures that the pipette uses a clean, dry tip to check for liquid, and prevents cross-contamination.
 
 .. code-block:: python
 

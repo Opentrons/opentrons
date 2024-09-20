@@ -223,7 +223,7 @@ Liquid Presence Detection
 
 Liquid presence detection is a pressure-based feature that allows Opentrons Flex pipettes to detect the presence or absence of liquids in a well, reservoir, tube, or other container. It gives you the ability to identify, avoid, and recover from liquid-related protocol errors.
 
-When detecting liquid, the pipette slowly moves a fresh, empty tip downward from the top of the well until it contacts the liquid meniscus. The downward probing motion can take anywhere from 5 to 50 seconds, depending on the depth of the well and how much liquid it contains. For example, it will take much less time to detect liquid in a full flat well plate than in an empty (or nearly empty) large tube.
+When detecting liquid, the pipette slowly moves a fresh, empty tip downward from the top of the well until it contacts the liquid. The downward probing motion can take anywhere from 5 to 50 seconds, depending on the depth of the well and how much liquid it contains. For example, it will take much less time to detect liquid in a full flat well plate than in an empty (or nearly empty) large tube.
 
 You can enable this feature for an entire protocol run or toggle it on and off as required. Consider the amount of time automatic detection will add to your protocol. If you only need to detect liquid infrequently, use the :ref:`corresponding building block commands <detect-liquid-presence>` instead. Automatic liquid presence detection is disabled by default.
 
