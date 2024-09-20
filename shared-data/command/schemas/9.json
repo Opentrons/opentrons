@@ -320,7 +320,7 @@
     },
     "WellVolumeOffset": {
       "title": "WellVolumeOffset",
-      "description": "A z-offset to account for volume in an operation.",
+      "description": "A volume of liquid to account for when executing commands with an origin of WellOrigin.MENISCUS.\n\nFor example, this parameter should be used for MoveToWell commands prior to AspirateInPlace commands.",
       "type": "object",
       "properties": {
         "volumeOffset": {
