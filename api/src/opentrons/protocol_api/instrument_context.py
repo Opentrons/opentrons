@@ -243,7 +243,7 @@ class InstrumentContext(publisher.CommandPublisher):
             command=cmds.aspirate(
                 instrument=self,
                 volume=c_vol,
-                location=move_to_location,
+                location=move_to_location, # need a Location?!
                 flow_rate=flow_rate,
                 rate=rate,
             ),
@@ -2144,6 +2144,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     move_to_location = WellLocation(
                         origin=WellOrigin.MENISCUS,
                         offset=WellOffset(x=0, y=0, z=offset_from_meniscus_mm),
+                        # volumeOffset=WellVolumeOffset(volumeOffset="operationVolume"),
                     )
         if isinstance(target, validation.PointTarget):
             move_to_location = target.location
