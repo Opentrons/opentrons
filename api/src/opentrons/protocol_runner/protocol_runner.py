@@ -1,5 +1,4 @@
 """Protocol run control and management."""
-import asyncio
 from typing import List, NamedTuple, Optional, Union
 
 from abc import ABC, abstractmethod
@@ -221,9 +220,7 @@ class PythonAndLegacyRunner(AbstractRunner):
             equipment_broker = Broker[LoadInfo]()
             self._protocol_engine.add_plugin(
                 LegacyContextPlugin(
-                    engine_loop=asyncio.get_running_loop(),
-                    broker=self._broker,
-                    equipment_broker=equipment_broker,
+                    broker=self._broker, equipment_broker=equipment_broker
                 )
             )
             self._hardware_api.should_taskify_movement_execution(taskify=True)
