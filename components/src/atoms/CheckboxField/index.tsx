@@ -4,7 +4,12 @@ import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { COLORS, BORDERS } from '../../helix-design-system'
 import { Flex, Box } from '../../primitives'
 import { Icon } from '../../icons'
-import { ALIGN_CENTER, CURSOR_POINTER, JUSTIFY_CENTER } from '../../styles'
+import {
+  ALIGN_CENTER,
+  CURSOR_AUTO,
+  CURSOR_POINTER,
+  JUSTIFY_CENTER,
+} from '../../styles'
 
 export interface CheckboxFieldProps {
   /** change handler */
@@ -27,7 +32,7 @@ export interface CheckboxFieldProps {
 
 const INPUT_STYLE = css`
   position: absolute;
-  overflow: hidden;
+overflow: hidden;d
   clip: rect(0 0 0 0);
   height: 1px;
   width: 1px;
@@ -94,7 +99,8 @@ const INNER_STYLE_NO_VALUE = css`
   }
 
   &:disabled {
-    color: ${COLORS.grey60};
+    color: ${COLORS.grey50};
+    cursor: ${CURSOR_AUTO};
   }
 `
 
