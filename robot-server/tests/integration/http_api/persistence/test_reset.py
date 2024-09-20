@@ -4,10 +4,11 @@ from pathlib import Path
 from shutil import copytree
 from tempfile import TemporaryDirectory
 
+import anyio
 import httpx
 
 from tests.integration.dev_server import DevServer
-from tests.integration.robot_client import RobotClient
+from tests.integration.robot_client import RobotClient, poll_until_all_analyses_complete
 from tests.integration.protocol_files import get_py_protocol, get_json_protocol
 
 from .persistence_snapshots_dir import PERSISTENCE_SNAPSHOTS_DIR
@@ -102,6 +103,9 @@ async def test_upload_protocols_and_reset_persistence_dir() -> None:
 
             with get_json_protocol(secrets.token_urlsafe(16)) as file:
                 await robot_client.post_protocol([Path(file.name)])
+
+            with anyio.fail_after(30):
+                await poll_until_all_analyses_complete(robot_client)
 
             await robot_client.post_setting_reset_options({"runsHistory": True})
 
