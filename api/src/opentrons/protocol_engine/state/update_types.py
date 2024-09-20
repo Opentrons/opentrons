@@ -196,6 +196,16 @@ class StateUpdate:
             id=labware_id, new_location=location, offset_id=offset_id
         )
 
+    def set_lid_status(
+        self,
+        location: LabwareLocation,
+        labware_id: str,
+        offset_id: typing.Optional[str],
+    ) -> None:
+        self.lid_status = BaseLabwareData(
+            id=labware_id, new_location=location, offset_id=offset_id
+        )
+
     def clear_all_pipette_locations(self) -> None:
         """Mark all pipettes as having an unknown location."""
         self.pipette_location = CLEAR

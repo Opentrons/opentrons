@@ -135,8 +135,8 @@ class CloseLidImpl(
             )
 
             state_update = StateUpdate()
-            state_update.lid_status = BaseLabwareData(
-                id=loaded_lid.id, new_location=new_location, offset_id=new_offset_id
+            state_update.set_lid_status(
+                labware_id=loaded_lid.id, location=new_location, offset_id=new_offset_id
             )
 
         return SuccessData(
