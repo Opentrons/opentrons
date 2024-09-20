@@ -5,11 +5,8 @@ import dataclasses
 import enum
 import typing
 
-from opentrons.protocol_engine.resources.models import (
-    LoadedLabwareData,
-    ReloadedLabwareData,
-)
 from opentrons.protocol_engine.types import DeckPoint, LabwareLocation
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 
 class _NoChangeEnum(enum.Enum):
@@ -53,8 +50,21 @@ class BaseLabwareData:
     """Base class for updating labware resutls."""
 
     id: str
-    new_location: LabwareLocation
     offset_id: typing.Optional[str]
+
+
+@dataclasses.dataclass(frozen=True)
+class UpdateLabwareDefenition(BaseLabwareData):
+    """Update labware defention from command result."""
+
+    definition: LabwareDefinition
+
+
+@dataclasses.dataclass(frozen=True)
+class UpdateLabwareLocation(BaseLabwareData):
+    """Update labware location from command result."""
+
+    location: LabwareLocation
 
 
 @dataclasses.dataclass(frozen=True)
@@ -88,15 +98,14 @@ class PipetteLocationUpdate:
     new_deck_point: DeckPoint | NoChangeType
 
 
-@dataclasses.dataclass
-class LabwareLocationUpdate:
+@dataclasses.dataclass(frozen=True)
+class UpdateLabwareDisplayNameAndLocation:
     """Represents an update to perform on a labware's location."""
 
-    labware_id: typing.Optional[str]
-
+    id: str
     display_name: typing.Optional[str]
+    location: LabwareLocation | None | NoChangeType
 
-    new_location: LabwareLocation | None | NoChangeType
     """The labware's new logical location.
 
     Note: `new_location=None` means "change the location to `None` (unknown)",
@@ -110,15 +119,15 @@ class StateUpdate:
 
     pipette_location: PipetteLocationUpdate | NoChangeType | ClearType = NO_CHANGE
 
-    labware_location: LabwareLocationUpdate | NoChangeType = NO_CHANGE
+    labware_location: UpdateLabwareDisplayNameAndLocation | NoChangeType = NO_CHANGE
 
-    loaded_labware: LoadedLabwareData | NoChangeType = NO_CHANGE
+    loaded_labware: UpdateLabwareDefenition | NoChangeType = NO_CHANGE
 
     reloaded_labware: BaseLabwareData | NoChangeType = NO_CHANGE
 
-    lid_status: BaseLabwareData | NoChangeType = NO_CHANGE
+    lid_status: UpdateLabwareLocation | NoChangeType = NO_CHANGE
 
-    move_labware: BaseLabwareData | NoChangeType = NO_CHANGE
+    move_labware: UpdateLabwareLocation | NoChangeType = NO_CHANGE
 
     # These convenience functions let the caller avoid the boilerplate of constructing a
     # complicated dataclass tree, and they give us a
@@ -173,17 +182,24 @@ class StateUpdate:
                 new_deck_point=new_deck_point,
             )
 
-    def set_loaded_labware(self, labware: LoadedLabwareData) -> None:
-        self.loaded_labware = labware
+    def set_loaded_labware(
+        self,
+        defenition: LabwareDefinition,
+        labware_id: str,
+        offset_id: typing.Optional[str],
+    ) -> None:
+        self.loaded_labware = UpdateLabwareDefenition(
+            definition=defenition, id=labware_id, offset_id=offset_id
+        )
 
     def set_location_and_display_name(
         self,
         location: LabwareLocation,
-        labware_id: typing.Optional[str],
+        labware_id: str,
         display_name: typing.Optional[str],
     ) -> None:
-        self.labware_location = LabwareLocationUpdate(
-            labware_id=labware_id, display_name=display_name, new_location=location
+        self.labware_location = UpdateLabwareDisplayNameAndLocation(
+            id=labware_id, display_name=display_name, location=location
         )
 
     def set_reloaded_labware(
@@ -192,8 +208,8 @@ class StateUpdate:
         labware_id: str,
         offset_id: typing.Optional[str],
     ) -> None:
-        self.reloaded_labware = BaseLabwareData(
-            id=labware_id, new_location=location, offset_id=offset_id
+        self.reloaded_labware = UpdateLabwareLocation(
+            id=labware_id, location=location, offset_id=offset_id
         )
 
     def set_lid_status(
@@ -202,8 +218,8 @@ class StateUpdate:
         labware_id: str,
         offset_id: typing.Optional[str],
     ) -> None:
-        self.lid_status = BaseLabwareData(
-            id=labware_id, new_location=location, offset_id=offset_id
+        self.lid_status = UpdateLabwareLocation(
+            id=labware_id, location=location, offset_id=offset_id
         )
 
     def clear_all_pipette_locations(self) -> None:

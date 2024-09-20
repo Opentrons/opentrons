@@ -143,9 +143,13 @@ class LoadLabwareImplementation(
             location=verified_location,
             labware_id=params.labwareId,
         )
-        state_update.set_loaded_labware(loaded_labware)
+        state_update.set_loaded_labware(
+            labware_id=loaded_labware.labware_id,
+            offset_id=loaded_labware.offsetId,
+            defenition=loaded_labware.definition,
+        )
         state_update.set_location_and_display_name(
-            labware_id=params.labwareId,
+            labware_id=loaded_labware.labware_id,
             location=verified_location,
             display_name=params.displayName,
         )

@@ -1,8 +1,4 @@
 """Labware state store tests."""
-from opentrons.protocol_engine.resources.models import (
-    LoadedLabwareData,
-    ReloadedLabwareData,
-)
 from opentrons.protocol_engine.state import update_types
 import pytest
 
@@ -136,15 +132,15 @@ def test_handles_load_labware(
             private_result=None,
             command=command,
             state_update=update_types.StateUpdate(
-                labware_location=update_types.LabwareLocationUpdate(
-                    labware_id="test-labware-id",
+                labware_location=update_types.UpdateLabwareDisplayNameAndLocation(
+                    id="test-labware-id",
                     display_name="display-name",
-                    new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
                 ),
-                loaded_labware=LoadedLabwareData(
-                    labware_id="test-labware-id",
+                loaded_labware=update_types.UpdateLabwareDefenition(
+                    id="test-labware-id",
                     definition=well_plate_def,
-                    offsetId="offset-id",
+                    offset_id="offset-id",
                 ),
             ),
         )
@@ -173,15 +169,15 @@ def test_handles_reload_labware(
             private_result=None,
             command=load_labware,
             state_update=update_types.StateUpdate(
-                labware_location=update_types.LabwareLocationUpdate(
-                    labware_id="test-labware-id",
+                labware_location=update_types.UpdateLabwareDisplayNameAndLocation(
+                    id="test-labware-id",
                     display_name="display-name",
-                    new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
                 ),
-                loaded_labware=LoadedLabwareData(
-                    labware_id="test-labware-id",
+                loaded_labware=update_types.UpdateLabwareDefenition(
+                    id="test-labware-id",
                     definition=well_plate_def,
-                    offsetId=None,
+                    offset_id=None,
                 ),
             ),
         )
@@ -217,8 +213,8 @@ def test_handles_reload_labware(
             private_result=None,
             command=reload_labware,
             state_update=update_types.StateUpdate(
-                reloaded_labware=update_types.BaseLabwareData(
-                    new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                reloaded_labware=update_types.UpdateLabwareLocation(
+                    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
                     offset_id="offset-id",
                     id="test-labware-id",
                 )
@@ -283,13 +279,13 @@ def test_handles_move_labware(
             private_result=None,
             command=load_labware_command,
             state_update=update_types.StateUpdate(
-                labware_location=update_types.LabwareLocationUpdate(
-                    labware_id="my-labware-id",
+                labware_location=update_types.UpdateLabwareDisplayNameAndLocation(
+                    id="my-labware-id",
                     display_name="display-name",
-                    new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
                 ),
-                loaded_labware=LoadedLabwareData(
-                    labware_id="my-labware-id", definition=well_plate_def, offsetId=None
+                loaded_labware=update_types.UpdateLabwareDefenition(
+                    id="my-labware-id", definition=well_plate_def, offset_id=None
                 ),
             ),
         )
@@ -306,10 +302,10 @@ def test_handles_move_labware(
             private_result=None,
             command=move_command,
             state_update=update_types.StateUpdate(
-                move_labware=update_types.BaseLabwareData(
+                move_labware=update_types.UpdateLabwareLocation(
                     id="my-labware-id",
                     offset_id="my-new-offset",
-                    new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
                 ),
             ),
         )
@@ -350,15 +346,15 @@ def test_handles_move_labware_off_deck(
             private_result=None,
             command=load_labware_command,
             state_update=update_types.StateUpdate(
-                labware_location=update_types.LabwareLocationUpdate(
-                    labware_id="my-labware-id",
+                labware_location=update_types.UpdateLabwareDisplayNameAndLocation(
+                    id="my-labware-id",
                     display_name="display-name",
-                    new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
                 ),
-                loaded_labware=LoadedLabwareData(
-                    labware_id="my-labware-id",
+                loaded_labware=update_types.UpdateLabwareDefenition(
+                    id="my-labware-id",
                     definition=well_plate_def,
-                    offsetId=None,
+                    offset_id=None,
                 ),
             ),
         )
@@ -374,8 +370,8 @@ def test_handles_move_labware_off_deck(
             private_result=None,
             command=move_labware_off_deck_cmd,
             state_update=update_types.StateUpdate(
-                lid_status=update_types.BaseLabwareData(
-                    id="my-labware-id", new_location=OFF_DECK_LOCATION, offset_id=None
+                lid_status=update_types.UpdateLabwareLocation(
+                    id="my-labware-id", location=OFF_DECK_LOCATION, offset_id=None
                 )
             ),
         )
