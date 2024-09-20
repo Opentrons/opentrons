@@ -99,7 +99,7 @@ class MoveLabwareImplementation(
         self, params: MoveLabwareParams
     ) -> SuccessData[MoveLabwareResult, None]:
         """Move a loaded labware to a new location."""
-        state_update = update_types.StateUpdate()
+        state_update = StateUpdate()
 
         # Allow propagation of LabwareNotLoadedError.
         current_labware = self._state_view.labware.get(labware_id=params.labwareId)
@@ -232,9 +232,10 @@ class MoveLabwareImplementation(
         ):
             state_update.clear_all_pipette_locations()
 
-        state_update = StateUpdate()
-        state_update.move_labware = UpdateLabwareLocation(
-            id=params.labwareId, location=validated_new_loc, offset_id=new_offset_id
+        state_update.set_move_labware(
+            labware_id=params.labwareId,
+            location=validated_new_loc,
+            offset_id=new_offset_id,
         )
 
         return SuccessData(

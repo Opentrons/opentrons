@@ -30,11 +30,6 @@ from opentrons.calibration_storage.helpers import uri_from_details
 
 from .. import errors
 from ..resources import DeckFixedLabware, labware_validation, fixture_validation
-from ..commands import (
-    Command,
-    absorbance_reader,
-    MoveLabwareResult,
-)
 from ..types import (
     DeckSlotLocation,
     OnLabwareLocation,

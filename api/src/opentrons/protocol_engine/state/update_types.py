@@ -188,6 +188,7 @@ class StateUpdate:
         labware_id: str,
         offset_id: typing.Optional[str],
     ) -> None:
+        """Add loaded labware to state."""
         self.loaded_labware = UpdateLabwareDefenition(
             definition=defenition, id=labware_id, offset_id=offset_id
         )
@@ -198,6 +199,7 @@ class StateUpdate:
         labware_id: str,
         display_name: typing.Optional[str],
     ) -> None:
+        """Set labware display name on state."""
         self.labware_location = UpdateLabwareDisplayNameAndLocation(
             id=labware_id, display_name=display_name, location=location
         )
@@ -208,6 +210,7 @@ class StateUpdate:
         labware_id: str,
         offset_id: typing.Optional[str],
     ) -> None:
+        """Set re-loaded labware on state."""
         self.reloaded_labware = UpdateLabwareLocation(
             id=labware_id, location=location, offset_id=offset_id
         )
@@ -218,7 +221,19 @@ class StateUpdate:
         labware_id: str,
         offset_id: typing.Optional[str],
     ) -> None:
+        """Set move lid on state."""
         self.lid_status = UpdateLabwareLocation(
+            id=labware_id, location=location, offset_id=offset_id
+        )
+
+    def set_move_labware(
+        self,
+        location: LabwareLocation,
+        labware_id: str,
+        offset_id: typing.Optional[str],
+    ) -> None:
+        """Set move labware on state."""
+        self.move_labware = UpdateLabwareLocation(
             id=labware_id, location=location, offset_id=offset_id
         )
 

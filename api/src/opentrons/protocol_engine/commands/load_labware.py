@@ -114,8 +114,6 @@ class LoadLabwareImplementation(
                 f"{params.loadName} is not allowed in slot {params.location.slotName}"
             )
 
-        state_update = StateUpdate()
-
         if isinstance(params.location, AddressableAreaLocation):
             area_name = params.location.addressableAreaName
             if not (
@@ -143,6 +141,9 @@ class LoadLabwareImplementation(
             location=verified_location,
             labware_id=params.labwareId,
         )
+
+        state_update = StateUpdate()
+
         state_update.set_loaded_labware(
             labware_id=loaded_labware.labware_id,
             offset_id=loaded_labware.offsetId,
