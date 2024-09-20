@@ -60,7 +60,7 @@ interface DeckSetupDetailsProps extends DeckSetupTabType {
   selectedZoomInSlot?: DeckSlotId
 }
 
-export const DeckSetupDetails = (props: DeckSetupDetailsProps): JSX.Element => {
+export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   const {
     activeDeckSetup,
     addEquipment,
