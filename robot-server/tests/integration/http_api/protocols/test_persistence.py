@@ -3,6 +3,7 @@ from pathlib import Path
 import secrets
 from typing import Callable, Dict, IO, List
 
+import anyio
 import pytest
 
 from robot_server.persistence.file_and_directory_names import LATEST_VERSION_DIRECTORY
@@ -107,6 +108,13 @@ async def test_protocol_labware_files_persist() -> None:
             # Since we already cover analysis persistence elsewhere in this file,
             # we can ignore the whole field in this test to avoid the nondeterminism.
             del protocol_detail["analysisSummaries"]
+
+            with anyio.fail_after(30):
+                # todo(mm, 2024-09-20): This works around a bug where robot-server
+                # shutdown will hang if there is an ongoing analysis. This slows down
+                # this test and should be removed when that bug is fixed.
+                # https://opentrons.atlassian.net/browse/EXEC-716
+                await poll_until_all_analyses_complete(robot_client)
 
             server.stop()
             assert await robot_client.dead(), "Dev Robot did not stop."
