@@ -197,8 +197,8 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             isinstance(action, SucceedCommandAction)
             and action.state_update.lid_status != update_types.NO_CHANGE
         ):
-            lid_id = action.state_update.lid_status.id
-            new_location = action.state_update.lid_status.location
+            lid_id = action.state_update.lid_status.labware_id
+            new_location = action.state_update.lid_status.new_location
             new_offset_id = action.state_update.lid_status.offset_id
 
             self._state.labware_by_id[lid_id].offsetId = new_offset_id
@@ -209,7 +209,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             isinstance(action, SucceedCommandAction)
             and action.state_update.move_labware != update_types.NO_CHANGE
         ):
-            labware_id = action.state_update.move_labware.id
+            labware_id = action.state_update.move_labware.labware_id
             new_location = action.state_update.move_labware.location
             new_offset_id = action.state_update.move_labware.offset_id
 
@@ -265,7 +265,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                     location = action.state_update.labware_location.new_location
                 else:
                     location = self._state.labware_by_id[
-                        action.state_update.loaded_labware.id
+                        action.state_update.loaded_labware.labware_id
                     ].location
 
                 display_name = None
@@ -273,13 +273,13 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                     display_name = action.state_update.labware_location.display_name
                 else:
                     display_name = self._state.labware_by_id[
-                        action.state_update.loaded_labware.id
+                        action.state_update.loaded_labware.labware_id
                     ].displayName
 
                 self._state.labware_by_id[
-                    action.state_update.loaded_labware.id
+                    action.state_update.loaded_labware.labware_id
                 ] = LoadedLabware.construct(
-                    id=action.state_update.loaded_labware.id,
+                    id=action.state_update.loaded_labware.labware_id,
                     location=location,
                     loadName=action.state_update.loaded_labware.definition.parameters.loadName,
                     definitionUri=definition_uri,

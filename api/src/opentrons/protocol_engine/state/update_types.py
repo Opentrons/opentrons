@@ -49,12 +49,12 @@ Unfortunately, mypy doesn't let us write `Literal[CLEAR]`. Use this instead.
 class BaseLabwareData:
     """Base class for updating labware resutls."""
 
-    id: str
+    labware_id: str
     offset_id: typing.Optional[str]
 
 
 @dataclasses.dataclass(frozen=True)
-class UpdateLabwareDefenition(BaseLabwareData):
+class LabwareDefinitionUpdate(BaseLabwareData):
     """Update labware defention from command result."""
 
     definition: LabwareDefinition
@@ -128,11 +128,11 @@ class StateUpdate:
 
     # labware_location: UpdateLabwareDisplayNameAndLocation | NoChangeType = NO_CHANGE
 
-    loaded_labware: UpdateLabwareDefenition | NoChangeType = NO_CHANGE
+    loaded_labware: LabwareDefinitionUpdate | NoChangeType = NO_CHANGE
 
     reloaded_labware: BaseLabwareData | NoChangeType = NO_CHANGE
 
-    lid_status: UpdateLabwareLocation | NoChangeType = NO_CHANGE
+    lid_status: LabwareLocationUpdate | NoChangeType = NO_CHANGE
 
     move_labware: UpdateLabwareLocation | NoChangeType = NO_CHANGE
 
@@ -197,12 +197,9 @@ class StateUpdate:
 
     @typing.overload
     def set_labware_location(
-        self,
-        *,
-        labware_id: str,
-        definition: LabwareDefinition,
+        self, *, labware_id: str, new_location: LabwareLocation
     ) -> None:
-        """Schedule a labware's definition to be set."""
+        """Schedule a labware's location to be set."""
 
     @typing.overload
     def set_labware_location(
@@ -222,7 +219,6 @@ class StateUpdate:
         new_location: LabwareLocation | None | NoChangeType = NO_CHANGE,
         new_offset_id: str | NoChangeType = NO_CHANGE,
         display_name: str | NoChangeType = NO_CHANGE,
-        definition: LabwareDefinition | NoChangeType = NO_CHANGE,
     ) -> None:
         if new_location != NO_CHANGE:
             self.labware_location = LabwareLocationUpdate(
@@ -238,21 +234,17 @@ class StateUpdate:
                 new_location=new_location,
             )
         else:
-            assert definition != NO_CHANGE
-
-            self.labware_location = LabwareLocationUpdate(
-                definition=definition, labware_id=labware_id
-            )
+            pass
 
     def set_loaded_labware(
         self,
-        defenition: LabwareDefinition,
+        definition: LabwareDefinition,
         labware_id: str,
         offset_id: typing.Optional[str],
     ) -> None:
         """Add loaded labware to state."""
-        self.loaded_labware = UpdateLabwareDefenition(
-            definition=defenition, id=labware_id, offset_id=offset_id
+        self.set_loaded_labware_definition = LabwareDefinitionUpdate(
+            definition=definition, labware_id=labware_id, offset_id=offset_id
         )
 
     def set_reloaded_labware(
@@ -263,7 +255,7 @@ class StateUpdate:
     ) -> None:
         """Set re-loaded labware on state."""
         self.reloaded_labware = UpdateLabwareLocation(
-            id=labware_id, location=location, offset_id=offset_id
+            labware_id=labware_id, location=location, offset_id=offset_id
         )
 
     def set_lid_status(
@@ -273,8 +265,8 @@ class StateUpdate:
         offset_id: typing.Optional[str],
     ) -> None:
         """Set move lid on state."""
-        self.lid_status = UpdateLabwareLocation(
-            id=labware_id, location=location, offset_id=offset_id
+        self.lid_status = LabwareLocationUpdate(
+            labware_id=labware_id, location=location, offset_id=offset_id
         )
 
     def set_move_labware(
@@ -285,7 +277,7 @@ class StateUpdate:
     ) -> None:
         """Set move labware on state."""
         self.move_labware = UpdateLabwareLocation(
-            id=labware_id, location=location, offset_id=offset_id
+            labware_id=labware_id, location=location, offset_id=offset_id
         )
 
     def clear_all_pipette_locations(self) -> None:
