@@ -98,19 +98,24 @@ class PipetteLocationUpdate:
     new_deck_point: DeckPoint | NoChangeType
 
 
-@dataclasses.dataclass(frozen=True)
-class UpdateLabwareDisplayNameAndLocation:
+@dataclasses.dataclass
+class LabwareLocationUpdate:
     """Represents an update to perform on a labware's location."""
 
-    id: str
-    display_name: typing.Optional[str]
-    location: LabwareLocation | None | NoChangeType
+    labware_id: str
 
+    new_location: LabwareLocation | None | NoChangeType = NO_CHANGE
     """The labware's new logical location.
 
     Note: `new_location=None` means "change the location to `None` (unknown)",
     not "do not change the location".
     """
+
+    display_name: typing.Optional[str] | NoChangeType = NO_CHANGE
+
+    definition: LabwareDefinition | NoChangeType = NO_CHANGE
+
+    offset_id: typing.Optional[str] | NoChangeType = NO_CHANGE
 
 
 @dataclasses.dataclass
@@ -119,7 +124,9 @@ class StateUpdate:
 
     pipette_location: PipetteLocationUpdate | NoChangeType | ClearType = NO_CHANGE
 
-    labware_location: UpdateLabwareDisplayNameAndLocation | NoChangeType = NO_CHANGE
+    labware_location: LabwareLocationUpdate | NoChangeType = NO_CHANGE
+
+    # labware_location: UpdateLabwareDisplayNameAndLocation | NoChangeType = NO_CHANGE
 
     loaded_labware: UpdateLabwareDefenition | NoChangeType = NO_CHANGE
 
@@ -182,6 +189,61 @@ class StateUpdate:
                 new_deck_point=new_deck_point,
             )
 
+    @typing.overload
+    def set_labware_location(
+        self, *, labware_id: str, new_location: LabwareLocation, new_offset_id: str
+    ) -> None:
+        """Schedule a labware's location to be set."""
+
+    @typing.overload
+    def set_labware_location(
+        self,
+        *,
+        labware_id: str,
+        definition: LabwareDefinition,
+    ) -> None:
+        """Schedule a labware's definition to be set."""
+
+    @typing.overload
+    def set_labware_location(
+        self,
+        *,
+        labware_id: str,
+        display_name: str,
+        new_location: LabwareLocation | None,
+    ) -> None:
+        """Schedule a labware's display name to be set."""
+        pass
+
+    def set_labware_location(  # noqa: D102
+        self,
+        *,
+        labware_id: str,
+        new_location: LabwareLocation | None | NoChangeType = NO_CHANGE,
+        new_offset_id: str | NoChangeType = NO_CHANGE,
+        display_name: str | NoChangeType = NO_CHANGE,
+        definition: LabwareDefinition | NoChangeType = NO_CHANGE,
+    ) -> None:
+        if new_location != NO_CHANGE:
+            self.labware_location = LabwareLocationUpdate(
+                labware_id=labware_id,
+                new_location=new_location,
+                offset_id=new_offset_id,
+                display_name=display_name,
+            )
+        elif display_name != NO_CHANGE:
+            self.labware_location = LabwareLocationUpdate(
+                labware_id=labware_id,
+                display_name=display_name,
+                new_location=new_location,
+            )
+        else:
+            assert definition != NO_CHANGE
+
+            self.labware_location = LabwareLocationUpdate(
+                definition=definition, labware_id=labware_id
+            )
+
     def set_loaded_labware(
         self,
         defenition: LabwareDefinition,
@@ -191,17 +253,6 @@ class StateUpdate:
         """Add loaded labware to state."""
         self.loaded_labware = UpdateLabwareDefenition(
             definition=defenition, id=labware_id, offset_id=offset_id
-        )
-
-    def set_location_and_display_name(
-        self,
-        location: LabwareLocation,
-        labware_id: str,
-        display_name: typing.Optional[str],
-    ) -> None:
-        """Set labware display name on state."""
-        self.labware_location = UpdateLabwareDisplayNameAndLocation(
-            id=labware_id, display_name=display_name, location=location
         )
 
     def set_reloaded_labware(

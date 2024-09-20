@@ -132,10 +132,10 @@ def test_handles_load_labware(
             private_result=None,
             command=command,
             state_update=update_types.StateUpdate(
-                labware_location=update_types.UpdateLabwareDisplayNameAndLocation(
-                    id="test-labware-id",
+                labware_location=update_types.LabwareLocationUpdate(
+                    labware_id="test-labware-id",
                     display_name="display-name",
-                    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                    new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
                 ),
                 loaded_labware=update_types.UpdateLabwareDefenition(
                     id="test-labware-id",
@@ -169,10 +169,10 @@ def test_handles_reload_labware(
             private_result=None,
             command=load_labware,
             state_update=update_types.StateUpdate(
-                labware_location=update_types.UpdateLabwareDisplayNameAndLocation(
-                    id="test-labware-id",
+                labware_location=update_types.LabwareLocationUpdate(
+                    labware_id="test-labware-id",
                     display_name="display-name",
-                    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                    new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
                 ),
                 loaded_labware=update_types.UpdateLabwareDefenition(
                     id="test-labware-id",
@@ -279,10 +279,10 @@ def test_handles_move_labware(
             private_result=None,
             command=load_labware_command,
             state_update=update_types.StateUpdate(
-                labware_location=update_types.UpdateLabwareDisplayNameAndLocation(
-                    id="my-labware-id",
+                labware_location=update_types.LabwareLocationUpdate(
+                    labware_id="my-labware-id",
                     display_name="display-name",
-                    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                    new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
                 ),
                 loaded_labware=update_types.UpdateLabwareDefenition(
                     id="my-labware-id", definition=well_plate_def, offset_id=None
@@ -346,10 +346,10 @@ def test_handles_move_labware_off_deck(
             private_result=None,
             command=load_labware_command,
             state_update=update_types.StateUpdate(
-                labware_location=update_types.UpdateLabwareDisplayNameAndLocation(
-                    id="my-labware-id",
+                labware_location=update_types.LabwareLocationUpdate(
+                    labware_id="my-labware-id",
                     display_name="display-name",
-                    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                    new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
                 ),
                 loaded_labware=update_types.UpdateLabwareDefenition(
                     id="my-labware-id",

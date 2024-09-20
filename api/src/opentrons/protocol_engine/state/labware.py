@@ -259,10 +259,10 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
                 location = None
                 if isinstance(
-                    action.state_update.labware_location.location,
+                    action.state_update.labware_location.new_location,
                     get_args(LabwareLocation),
                 ):
-                    location = action.state_update.labware_location.location
+                    location = action.state_update.labware_location.new_location
                 else:
                     location = self._state.labware_by_id[
                         action.state_update.loaded_labware.id
