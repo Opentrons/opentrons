@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from opentrons.types import Point
-from ..state import update_types
 from ..types import (
     CurrentWell,
     LabwareLocation,
@@ -21,7 +20,7 @@ from ..errors import LabwareMovementNotAllowedError, NotSupportedOnRobotType
 from ..resources import labware_validation, fixture_validation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
-from ..state.update_types import StateUpdate, UpdateLabwareLocation
+from ..state.update_types import StateUpdate
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
 if TYPE_CHECKING:
