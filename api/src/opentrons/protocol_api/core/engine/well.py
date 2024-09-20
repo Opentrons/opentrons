@@ -3,7 +3,7 @@ from typing import Optional
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
+from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, WellVolumeOffset
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.util import UnsupportedAPIError
@@ -126,7 +126,7 @@ class WellCore(AbstractWellCore):
             well_location=WellLocation(origin=WellOrigin.CENTER),
         )
 
-    def get_meniscus(self, z_offset: float) -> Point:
+    def get_meniscus(self, z_offset: float, operation_volume: Optional[float] = None) -> Point:
         """Get the coordinate of the well's meniscus, with a z-offset."""
         return self._engine_client.state.geometry.get_well_position(
             well_name=self._name,
@@ -134,7 +134,9 @@ class WellCore(AbstractWellCore):
             well_location=WellLocation(
                 origin=WellOrigin.MENISCUS,
                 offset=WellOffset(x=0, y=0, z=z_offset),
+                volumeOffset=WellVolumeOffset(volumeOffset="operationVolume"),
             ),
+            operational_volume=operation_volume,
         )
 
     def load_liquid(
