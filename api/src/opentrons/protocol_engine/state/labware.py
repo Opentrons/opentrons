@@ -200,7 +200,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
     def _set_move_lid_result(self, action: Action) -> None:
         if (
             isinstance(action, SucceedCommandAction)
-            and action.state_update.lid_status is not None
+            and action.state_update.lid_status != update_types.NO_CHANGE
         ):
             lid_id = action.state_update.lid_status.id
             new_location = action.state_update.lid_status.new_location
@@ -212,7 +212,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
     def _set_move_labware(self, action: Action) -> None:
         if (
             isinstance(action, SucceedCommandAction)
-            and action.state_update.move_labware is not None
+            and action.state_update.move_labware != update_types.NO_CHANGE
         ):
             labware_id = action.state_update.move_labware.id
             new_location = action.state_update.move_labware.new_location
@@ -231,17 +231,17 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
     def _set_reloaded_labware(self, action: Action) -> None:
         if (
             isinstance(action, SucceedCommandAction)
-            and action.state_update.reloaded_labware
+            and action.state_update.reloaded_labware != update_types.NO_CHANGE
         ):
             assert isinstance(action.command.params, ReloadLabwareParams)
             labware_id = action.command.params.labwareId
-            new_offset_id = action.state_update.reloaded_labware.offsetId
+            new_offset_id = action.state_update.reloaded_labware.offset_id
             self._state.labware_by_id[labware_id].offsetId = new_offset_id
 
     def _add_loaded_labware(self, action: Action) -> None:
         if (
             isinstance(action, SucceedCommandAction)
-            and action.state_update.loaded_labware
+            and action.state_update.loaded_labware != update_types.NO_CHANGE
         ):
             if action.state_update.labware_location != update_types.NO_CHANGE:
 

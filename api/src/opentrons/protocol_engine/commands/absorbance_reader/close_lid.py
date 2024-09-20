@@ -12,7 +12,7 @@ from opentrons.protocol_engine.types import AddressableAreaLocation
 
 from opentrons.protocol_engine.resources import labware_validation
 from .types import MoveLidResult
-from ...state.update_types import StateUpdate, StateDataUpdate
+from ...state.update_types import StateUpdate, BaseLabwareData
 
 
 from opentrons.drivers.types import AbsorbanceReaderLidStatus
@@ -135,7 +135,7 @@ class CloseLidImpl(
             )
 
             state_update = StateUpdate()
-            state_update.lid_status = StateDataUpdate(
+            state_update.lid_status = BaseLabwareData(
                 id=loaded_lid.id, new_location=new_location, offset_id=new_offset_id
             )
 

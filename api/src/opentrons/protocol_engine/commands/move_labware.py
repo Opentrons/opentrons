@@ -21,7 +21,7 @@ from ..errors import LabwareMovementNotAllowedError, NotSupportedOnRobotType
 from ..resources import labware_validation, fixture_validation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
-from ..state.update_types import StateDataUpdate, StateUpdate
+from ..state.update_types import BaseLabwareData, StateUpdate
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
 if TYPE_CHECKING:
@@ -233,7 +233,7 @@ class MoveLabwareImplementation(
             state_update.clear_all_pipette_locations()
 
         state_update = StateUpdate()
-        state_update.move_labware = StateDataUpdate(
+        state_update.move_labware = BaseLabwareData(
             id=params.labwareId, new_location=validated_new_loc, offset_id=new_offset_id
         )
 

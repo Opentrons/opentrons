@@ -49,8 +49,8 @@ Unfortunately, mypy doesn't let us write `Literal[CLEAR]`. Use this instead.
 
 
 @dataclasses.dataclass(frozen=True)
-class StateDataUpdate:
-    """Base class for updating results."""
+class BaseLabwareData:
+    """Base class for updating labware resutls."""
 
     id: str
     new_location: LabwareLocation
@@ -112,13 +112,13 @@ class StateUpdate:
 
     labware_location: LabwareLocationUpdate | NoChangeType = NO_CHANGE
 
-    loaded_labware: typing.Optional[LoadedLabwareData] = None
+    loaded_labware: LoadedLabwareData | NoChangeType = NO_CHANGE
 
-    reloaded_labware: typing.Optional[ReloadedLabwareData] = None
+    reloaded_labware: BaseLabwareData | NoChangeType = NO_CHANGE
 
-    lid_status: typing.Optional[StateDataUpdate] = None
+    lid_status: BaseLabwareData | NoChangeType = NO_CHANGE
 
-    move_labware: typing.Optional[StateDataUpdate] = None
+    move_labware: BaseLabwareData | NoChangeType = NO_CHANGE
 
     # These convenience functions let the caller avoid the boilerplate of constructing a
     # complicated dataclass tree, and they give us a
@@ -184,6 +184,16 @@ class StateUpdate:
     ) -> None:
         self.labware_location = LabwareLocationUpdate(
             labware_id=labware_id, display_name=display_name, new_location=location
+        )
+
+    def set_reloaded_labware(
+        self,
+        location: LabwareLocation,
+        labware_id: str,
+        offset_id: typing.Optional[str],
+    ) -> None:
+        self.reloaded_labware = BaseLabwareData(
+            id=labware_id, new_location=location, offset_id=offset_id
         )
 
     def clear_all_pipette_locations(self) -> None:

@@ -217,9 +217,10 @@ def test_handles_reload_labware(
             private_result=None,
             command=reload_labware,
             state_update=update_types.StateUpdate(
-                reloaded_labware=ReloadedLabwareData(
-                    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-                    offsetId="offset-id",
+                reloaded_labware=update_types.BaseLabwareData(
+                    new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                    offset_id="offset-id",
+                    id="test-labware-id",
                 )
             ),
         )
@@ -305,7 +306,7 @@ def test_handles_move_labware(
             private_result=None,
             command=move_command,
             state_update=update_types.StateUpdate(
-                move_labware=update_types.StateDataUpdate(
+                move_labware=update_types.BaseLabwareData(
                     id="my-labware-id",
                     offset_id="my-new-offset",
                     new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
@@ -373,7 +374,7 @@ def test_handles_move_labware_off_deck(
             private_result=None,
             command=move_labware_off_deck_cmd,
             state_update=update_types.StateUpdate(
-                lid_status=update_types.StateDataUpdate(
+                lid_status=update_types.BaseLabwareData(
                     id="my-labware-id", new_location=OFF_DECK_LOCATION, offset_id=None
                 )
             ),
