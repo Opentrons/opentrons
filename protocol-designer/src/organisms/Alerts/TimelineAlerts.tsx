@@ -13,15 +13,9 @@ import {
 import { getRobotStateTimeline } from '../../file-data/selectors'
 import { ErrorContents } from './ErrorContents'
 import type { CommandCreatorError } from '@opentrons/step-generation'
-import type { AlertData, AlertType } from './types'
+import type { MakeAlert } from './types'
 
-type MakeAlert = (
-  alertType: AlertType,
-  data: AlertData,
-  key: number | string
-) => JSX.Element
-
-const TimelineAlertsComponent = (): JSX.Element => {
+function TimelineAlertsComponent(): JSX.Element {
   const { t } = useTranslation('alert')
 
   const timeline = useSelector(getRobotStateTimeline)

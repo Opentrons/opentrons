@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { TYPOGRAPHY } from '../../ui-style-constants'
-import { LegacyStyledText } from '../../../lib'
+import { StyledText } from '../../../lib'
 import { Banner } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof Banner> = {
-  title: 'App/Atoms/Banner',
+  title: 'Library/Molecules/Banner',
   component: Banner,
 }
 
@@ -37,12 +37,12 @@ export const OverriddenExitIcon: Story = {
       console.log('close')
     },
     closeButton: (
-      <LegacyStyledText
-        as="p"
+      <StyledText
+        desktopStyle="bodyDefaultRegular"
         textDecoration={TYPOGRAPHY.textDecorationUnderline}
       >
-        {'Exit'}
-      </LegacyStyledText>
+        Exit
+      </StyledText>
     ),
   },
 }

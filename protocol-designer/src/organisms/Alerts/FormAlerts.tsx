@@ -25,20 +25,14 @@ import { WarningContents } from './WarningContents'
 import type { ProfileItem } from '@opentrons/step-generation'
 import type { StepFieldName } from '../../form-types'
 import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
-import type { AlertData, AlertType } from './types'
+import type { MakeAlert } from './types'
 
 interface FormAlertsProps {
   focusedField?: StepFieldName | null
   dirtyFields?: StepFieldName[]
 }
 
-type MakeAlert = (
-  alertType: AlertType,
-  data: AlertData,
-  key: number | string
-) => JSX.Element
-
-const FormAlertsComponent = (props: FormAlertsProps): JSX.Element => {
+function FormAlertsComponent(props: FormAlertsProps): JSX.Element {
   const { focusedField, dirtyFields } = props
   const { t } = useTranslation('alert')
   const dispatch = useDispatch()
@@ -55,6 +49,7 @@ const FormAlertsComponent = (props: FormAlertsProps): JSX.Element => {
   const dynamicFieldFormErrors = useSelector(
     stepFormSelectors.getDynamicFieldFormErrorsForUnsavedForm
   )
+  const stepId = useSelector(getSelectedStepId)
 
   const timelineWarnings = timelineWarningsForSelectedStep.map(warning => ({
     title: t(`timeline.warning.${warning.type}.title`),
@@ -74,7 +69,6 @@ const FormAlertsComponent = (props: FormAlertsProps): JSX.Element => {
     dirtyFields: dirtyFields ?? [],
     errors: formLevelErrorsForUnsavedForm,
   })
-  const stepId = useSelector(getSelectedStepId)
 
   const profileItemsById: Record<string, ProfileItem> | null | undefined =
     unsavedForm?.profileItemsById

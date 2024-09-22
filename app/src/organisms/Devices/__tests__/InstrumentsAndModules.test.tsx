@@ -30,7 +30,6 @@ vi.mock('@opentrons/components', async importOriginal => {
   return {
     ...actualComponents,
     useInterval: vi.fn(),
-    Banner: <div>mock Banner</div>,
   }
 })
 vi.mock('@opentrons/react-api-client')
@@ -121,7 +120,9 @@ describe('InstrumentsAndModules', () => {
   it('renders the protocol loaded banner when protocol is loaded and not terminal state', () => {
     vi.mocked(useCurrentRunId).mockReturnValue('RUNID')
     render()
-    screen.getByText('mock Banner')
+    screen.getByText(
+      'Robot must be on the network to see connected instruments and modules'
+    )
   })
   it('renders 1 pipette card when a 96 channel is attached', () => {
     when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)

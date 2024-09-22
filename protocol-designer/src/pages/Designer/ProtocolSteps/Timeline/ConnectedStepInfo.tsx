@@ -19,6 +19,7 @@ import {
   ConfirmDeleteModal,
 } from '../../../../components/modals/ConfirmDeleteModal'
 import { stepIconsByType } from '../../../../form-types'
+import { getOrderedStepIds } from '../../../../step-forms/selectors'
 import { StepContainer } from './StepContainer'
 
 import type { ThunkDispatch } from 'redux-thunk'
@@ -26,7 +27,6 @@ import type { HoverOnStepAction } from '../../../../ui/steps'
 import type { DeleteModalType } from '../../../../components/modals/ConfirmDeleteModal'
 import type { StepIdType } from '../../../../form-types'
 import type { BaseState, ThunkAction } from '../../../../types'
-import { getOrderedStepIds } from '../../../../step-forms/selectors'
 
 export interface ConnectedStepInfoProps {
   stepId: StepIdType
@@ -50,10 +50,10 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const hasFormLevelWarningsPerStep = useSelector(
     dismissSelectors.getHasFormLevelWarningsPerStep
   )
-  const stepListAfterError =
+  const stepListAfterErrors =
     errorStepId != null ? stepIds.slice(stepIds.indexOf(errorStepId) + 1) : []
   const stepAfterError =
-    stepId != null ? stepListAfterError.includes(stepId) : false
+    stepId != null ? stepListAfterErrors.includes(stepId) : false
 
   const hasWarnings =
     hasTimelineWarningsPerStep[stepId] || hasFormLevelWarningsPerStep[stepId]

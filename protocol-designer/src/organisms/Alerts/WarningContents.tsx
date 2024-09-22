@@ -9,9 +9,9 @@ interface WarningContentsProps {
   warningType: string
   level: AlertLevel
 }
-export const WarningContents = (
+export function WarningContents(
   props: WarningContentsProps
-): JSX.Element | null => {
+): JSX.Element | null {
   const { warningType, level } = props
   const { t } = useTranslation('alert')
 

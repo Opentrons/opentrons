@@ -13,8 +13,8 @@ interface ErrorContentsProps {
 export const ErrorContents = (
   props: ErrorContentsProps
 ): JSX.Element | null => {
-  const { t } = useTranslation('alert')
   const { errorType, level } = props
+  const { t } = useTranslation(['alert', 'shared'])
 
   if (level === 'timeline') {
     const bodyText = t(`timeline.error.${errorType}.body`, {
@@ -33,7 +33,7 @@ export const ErrorContents = (
           <>
             {bodyText}
             <KnowledgeBaseLink to="pipetteGen1MultiModuleCollision">
-              here
+              {t('shared:here')}
             </KnowledgeBaseLink>
           </>
         )
