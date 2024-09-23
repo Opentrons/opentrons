@@ -16,7 +16,6 @@ from typing import (
     get_args,
 )
 
-from opentrons.protocol_engine.commands.reload_labware import ReloadLabwareParams
 from opentrons.protocol_engine.state import update_types
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
