@@ -18,6 +18,7 @@ from opentrons.drivers.types import (
 )
 
 from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.types import ABSMeasureMode
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors.exceptions import (
@@ -525,25 +526,31 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
     """Absorbance Reader core logic implementation for Python protocols."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.AbsorbanceReader]
-    _initialized_value: Optional[int] = None
+    _initialized_value: Optional[List[int]] = None
 
-    def initialize(self, wavelength: int) -> None:
+    def initialize(
+        self,
+        mode: ABSMeasureMode,
+        wavelengths: List[int],
+        reference_wavelength: Optional[int] = None,
+    ) -> None:
         """Initialize the Absorbance Reader by taking zero reading."""
+        # TODO: check that the wavelengths are within the supported wavelengths
         self._engine_client.execute_command(
             cmd.absorbance_reader.InitializeParams(
                 moduleId=self.module_id,
-                sampleWavelength=wavelength,
+                measureMode=mode,
+                sampleWavelengths=wavelengths,
+                referenceWavelength=reference_wavelength,
             ),
         )
-        self._initialized_value = wavelength
+        self._initialized_value = wavelengths
 
-    def read(self) -> Optional[Dict[str, float]]:
+    def read(self) -> Optional[Dict[int, Dict[str, float]]]:
         """Initiate a read on the Absorbance Reader, and return the results. During Analysis, this will return None."""
         if self._initialized_value:
             self._engine_client.execute_command(
-                cmd.absorbance_reader.ReadAbsorbanceParams(
-                    moduleId=self.module_id, sampleWavelength=self._initialized_value
-                )
+                cmd.absorbance_reader.ReadAbsorbanceParams(moduleId=self.module_id)
             )
         if not self._engine_client.state.config.use_virtual_modules:
             read_result = (

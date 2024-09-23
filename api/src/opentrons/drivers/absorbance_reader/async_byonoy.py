@@ -3,18 +3,20 @@ import os
 import re
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
-from typing import Optional, List, Dict, Tuple
+from typing import Any, Optional, List, Dict, Tuple
 
 from .hid_protocol import (
     AbsorbanceHidInterface as AbsProtocol,
     ErrorCodeNames,
     DeviceStateNames,
     SlotStateNames,
+    MeasurementConfig,
 )
 from opentrons.drivers.types import (
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
     AbsorbanceReaderDeviceState,
+    ABSMeasurementMode,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnectedError
@@ -22,7 +24,7 @@ from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnect
 
 SN_PARSER = re.compile(r'ATTRS{serial}=="(?P<serial>.+?)"')
 VERSION_PARSER = re.compile(r"Absorbance (?P<version>V\d+\.\d+\.\d+)")
-SERIAL_PARSER = re.compile(r"SN: (?P<serial>BYO[A-Z]{3}[0-9]{5})")
+SERIAL_PARSER = re.compile(r"(?P<serial>BYO[A-Z]{3}[0-9]{5})")
 
 
 class AsyncByonoy:
@@ -110,7 +112,7 @@ class AsyncByonoy:
         self._loop = loop
         self._supported_wavelengths: Optional[list[int]] = None
         self._device_handle: Optional[int] = None
-        self._current_config: Optional[AbsProtocol.MeasurementConfig] = None
+        self._current_config: Optional[MeasurementConfig] = None
 
     async def open(self) -> bool:
         """
@@ -225,23 +227,25 @@ class AsyncByonoy:
         self._supported_wavelengths = wavelengths
         return wavelengths
 
-    async def get_single_measurement(self, wavelength: int) -> List[float]:
-        """Get a single measurement based on the current configuration."""
+    async def get_measurement(self) -> List[List[float]]:
+        """Gets one or more measurements based on the current configuration."""
         handle = self._verify_device_handle()
         assert (
-            self._current_config
-            and self._current_config.sample_wavelength == wavelength
-        )
+            self._current_config is not None
+        ), "Cannot get measurement without initializing."
+        measure_func: Any = self._interface.byonoy_abs96_single_measure
+        if isinstance(self._current_config, AbsProtocol.MultiMeasurementConfig):
+            measure_func = self._interface.byonoy_abs96_multiple_measure
         err, measurements = await self._loop.run_in_executor(
             executor=self._executor,
             func=partial(
-                self._interface.byonoy_abs96_single_measure,
+                measure_func,
                 handle,
                 self._current_config,
             ),
         )
-        self._raise_if_error(err.name, f"Error getting single measurement: {err}")
-        return measurements
+        self._raise_if_error(err.name, f"Error getting measurement: {err}")
+        return measurements if isinstance(measurements[0], List) else [measurements]  # type: ignore
 
     async def get_plate_presence(self) -> AbsorbanceReaderPlatePresence:
         """Get the state of the plate for the reader."""
@@ -263,33 +267,53 @@ class AsyncByonoy:
         self._supported_wavelengths = wavelengths
         return wavelengths
 
-    def _initialize_measurement(self, conf: AbsProtocol.MeasurementConfig) -> None:
+    def _initialize_measurement(self, conf: MeasurementConfig) -> None:
         handle = self._verify_device_handle()
-        err = self._interface.byonoy_abs96_initialize_single_measurement(handle, conf)
+        if isinstance(conf, AbsProtocol.SingleMeasurementConfig):
+            err = self._interface.byonoy_abs96_initialize_single_measurement(
+                handle, conf
+            )
+        else:
+            err = self._interface.byonoy_abs96_initialize_multiple_measurement(
+                handle, conf
+            )
         self._raise_if_error(err.name, f"Error initializing measurement: {err}")
         self._current_config = conf
 
-    def _set_sample_wavelength(self, wavelength: int) -> AbsProtocol.MeasurementConfig:
+    def _initialize(
+        self,
+        mode: ABSMeasurementMode,
+        wavelengths: List[int],
+        reference_wavelength: Optional[int] = None,
+    ) -> None:
         if not self._supported_wavelengths:
             self._get_supported_wavelengths()
         assert self._supported_wavelengths
-        if wavelength in self._supported_wavelengths:
-            conf = self._interface.ByonoyAbs96SingleMeasurementConfig()
-            conf.sample_wavelength = wavelength
-            return conf
+        conf: MeasurementConfig
+        if set(wavelengths).issubset(self._supported_wavelengths):
+            if mode == ABSMeasurementMode.SINGLE:
+                conf = self._interface.ByonoyAbs96SingleMeasurementConfig()
+                conf.sample_wavelength = wavelengths[0] or 0
+                conf.reference_wavelength = reference_wavelength or 0
+            else:
+                conf = self._interface.ByonoyAbs96MultipleMeasurementConfig()
+                conf.sample_wavelengths = wavelengths
         else:
             raise ValueError(
-                f"Unsupported wavelength: {wavelength}, expected: {self._supported_wavelengths}"
+                f"Unsupported wavelength: {wavelengths}, expected: {self._supported_wavelengths}"
             )
-
-    def _initialize(self, wavelength: int) -> None:
-        conf = self._set_sample_wavelength(wavelength)
         self._initialize_measurement(conf)
 
-    async def initialize(self, wavelength: int) -> None:
-        """Initialize the device so we can start reading samples from it."""
+    async def initialize(
+        self,
+        mode: ABSMeasurementMode,
+        wavelengths: List[int],
+        reference_wavelength: Optional[int] = None,
+    ) -> None:
+        """initialize the device so we can start reading samples from it."""
         await self._loop.run_in_executor(
-            executor=self._executor, func=partial(self._initialize, wavelength)
+            executor=self._executor,
+            func=partial(self._initialize, mode, wavelengths, reference_wavelength),
         )
 
     def _verify_device_handle(self) -> int:

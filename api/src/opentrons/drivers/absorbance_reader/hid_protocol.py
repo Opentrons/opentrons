@@ -1,9 +1,11 @@
 from typing import (
     Dict,
+    Optional,
     Protocol,
     List,
     Literal,
     Tuple,
+    Union,
     runtime_checkable,
     TypeVar,
 )
@@ -69,8 +71,13 @@ class AbsorbanceHidInterface(Protocol):
         value: int
 
     @runtime_checkable
-    class MeasurementConfig(Protocol):
+    class SingleMeasurementConfig(Protocol):
         sample_wavelength: int
+        reference_wavelength: Optional[int]
+
+    @runtime_checkable
+    class MultiMeasurementConfig(Protocol):
+        sample_wavelengths: List[int]
 
     @runtime_checkable
     class DeviceInfo(Protocol):
@@ -84,7 +91,10 @@ class AbsorbanceHidInterface(Protocol):
         name: DeviceStateNames
         value: int
 
-    def ByonoyAbs96SingleMeasurementConfig(self) -> MeasurementConfig:
+    def ByonoyAbs96SingleMeasurementConfig(self) -> SingleMeasurementConfig:
+        ...
+
+    def ByonoyAbs96MultipleMeasurementConfig(self) -> MultiMeasurementConfig:
         ...
 
     def byonoy_open_device(self, device: Device) -> Tuple[ErrorCode, int]:
@@ -130,14 +140,30 @@ class AbsorbanceHidInterface(Protocol):
         ...
 
     def byonoy_abs96_initialize_single_measurement(
-        self, device_handle: int, conf: MeasurementConfig
+        self, device_handle: int, conf: SingleMeasurementConfig
+    ) -> ErrorCode:
+        ...
+
+    def byonoy_abs96_initialize_multiple_measurement(
+        self, device_handle: int, conf: MultiMeasurementConfig
     ) -> ErrorCode:
         ...
 
     def byonoy_abs96_single_measure(
-        self, device_handle: int, conf: MeasurementConfig
+        self, device_handle: int, conf: SingleMeasurementConfig
     ) -> Tuple[ErrorCode, List[float]]:
+        ...
+
+    def byonoy_abs96_multiple_measure(
+        self, device_handle: int, conf: MultiMeasurementConfig
+    ) -> Tuple[ErrorCode, List[List[float]]]:
         ...
 
     def byonoy_available_devices(self) -> List[Device]:
         ...
+
+
+MeasurementConfig = Union[
+    AbsorbanceHidInterface.SingleMeasurementConfig,
+    AbsorbanceHidInterface.MultiMeasurementConfig,
+]
