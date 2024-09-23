@@ -10,7 +10,7 @@ import { useRunPipetteInfoByMount } from '../../hooks'
 import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationButton'
 import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
 
-import type { PipetteInfo } from '../../hooks'
+import type { PipetteInfo } from '/app/redux/pipettes'
 
 vi.mock('/app/redux/config')
 vi.mock('../../hooks')

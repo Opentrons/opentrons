@@ -14,25 +14,14 @@ import type {
   PickUpTipRunTimeCommand,
   LoadPipetteRunTimeCommand,
   LabwareDefinition2,
-  PipetteNameSpecs,
 } from '@opentrons/shared-data'
 import type {
   Mount,
   AttachedPipette,
-  TipRackCalibrationData,
+  PipetteInfo,
 } from '/app/redux/pipettes/types'
 
 const EMPTY_MOUNTS = { left: null, right: null }
-
-export interface PipetteInfo {
-  pipetteSpecs: PipetteNameSpecs
-  tipRacksForPipette: TipRackCalibrationData[]
-  requestedPipetteMatch:
-    | typeof MATCH
-    | typeof INEXACT_MATCH
-    | typeof INCOMPATIBLE
-  pipetteCalDate: string | null
-}
 
 export function useRunPipetteInfoByMount(
   runId: string

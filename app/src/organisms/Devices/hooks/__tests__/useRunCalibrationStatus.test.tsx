@@ -13,7 +13,7 @@ import {
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useNotifyRunQuery } from '/app/resources/runs'
 
-import type { PipetteInfo } from '..'
+import type { PipetteInfo } from '/app/redux/pipettes'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 

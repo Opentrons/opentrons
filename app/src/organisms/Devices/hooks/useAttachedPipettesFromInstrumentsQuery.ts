@@ -5,10 +5,8 @@ import { usePipetteModelSpecs } from '/app/resources/instruments/hooks'
 import type { PipetteData } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
 import type { PipetteModel } from '@opentrons/shared-data'
+import type { PipetteInformation } from '/app/redux/pipettes'
 
-export interface PipetteInformation extends PipetteData {
-  displayName: string
-}
 export type AttachedPipettesFromInstrumentsQuery = {
   [mount in Mount]: null | PipetteInformation
 }

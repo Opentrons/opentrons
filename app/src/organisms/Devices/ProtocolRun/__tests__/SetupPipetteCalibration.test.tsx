@@ -11,7 +11,7 @@ import { SetupPipetteCalibrationItem } from '../SetupPipetteCalibrationItem'
 import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
 import { useNotifyRunQuery } from '/app/resources/runs'
 
-import type { PipetteInfo } from '../../hooks'
+import type { PipetteInfo } from '/app/redux/pipettes'
 
 vi.mock('../../hooks')
 vi.mock('../SetupPipetteCalibrationItem')

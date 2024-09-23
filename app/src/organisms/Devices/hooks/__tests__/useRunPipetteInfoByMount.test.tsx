@@ -31,7 +31,7 @@ import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import _uncastedModifiedSimpleV6Protocol from '../__fixtures__/modifiedSimpleV6.json'
 
 import type * as SharedData from '@opentrons/shared-data'
-import type { PipetteInfo } from '..'
+import type { PipetteInfo } from '/app/redux/pipettes'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
