@@ -239,24 +239,34 @@ class WellOffset(BaseModel):
     z: float = 0
 
 
-class WellVolumeOffset(BaseModel):
-    """A volume of liquid to account for when executing commands with an origin of WellOrigin.MENISCUS.
-
-    Specifying `operationVolume` results in this class acting as a sentinel and should be used when
-    volume can be determined from the command parameters, for example commanding Aspirate. A volume
-    should be specified when it cannot be determined from the command parameters, for example commanding
-    MoveToWell prior to AspirateInPlace.
-    """
-
-    volumeOffset: Union[float, Literal["operationVolume"]] = 0.0
-
-
+# get rid of operationVolume below and operation_volume parameter in methods?
+# TODO(pm, 2024-09-23): PE should raise error if volumeOffset specified with a tip rack location
 class WellLocation(BaseModel):
-    """A relative location in reference to a well's location."""
+    """A relative location in reference to a well's location.""" # update
 
     origin: WellOrigin = WellOrigin.TOP
     offset: WellOffset = Field(default_factory=WellOffset)
-    volumeOffset: WellVolumeOffset = Field(default_factory=WellVolumeOffset)
+    volumeOffset: Union[float, Literal["operationVolume"]] = Field(default=0.0, description="""A volume of liquid to account for when 
+                                executing commands with an origin of WellOrigin.MENISCUS. Specifying 
+                                `operationVolume` results in this class acting as a sentinel and should 
+                                be used when volume can be determined from the command parameters, for 
+                                example commanding Aspirate. A volume should be specified when it cannot 
+                                be determined from the command parameters, for example commanding 
+                                MoveToWell prior to AspirateInPlace.""") # update comment
+
+
+class LiquidProbeWellLocation(BaseModel):
+    """A relative location in reference to a well's location.""" # update
+
+    origin: WellOrigin = WellOrigin.TOP
+    offset: WellOffset = Field(default_factory=WellOffset)
+
+
+class PickUpTipWellLocation(BaseModel):
+    """A relative location in reference to a well's location.""" # update
+
+    origin: WellOrigin = WellOrigin.TOP
+    offset: WellOffset = Field(default_factory=WellOffset)
 
 
 class DropTipWellLocation(BaseModel):

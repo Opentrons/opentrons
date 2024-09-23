@@ -9,10 +9,9 @@ from typing_extensions import Literal
 from ..errors import ErrorOccurrence, TipNotAttachedError
 from ..resources import ModelUtils
 from ..state import update_types
-from ..types import DeckPoint
+from ..types import PickUpTipWellLocation, DeckPoint
 from .pipetting_common import (
     PipetteIdMixin,
-    WellLocationMixin,
     DestinationPositionResult,
 )
 from .command import (
@@ -31,10 +30,15 @@ if TYPE_CHECKING:
 PickUpTipCommandType = Literal["pickUpTip"]
 
 
-class PickUpTipParams(PipetteIdMixin, WellLocationMixin):
+class PickUpTipParams(PipetteIdMixin):
     """Payload needed to move a pipette to a specific well."""
 
-    pass
+    labwareId: str = Field(..., description="Identifier of labware to use.")
+    wellName: str = Field(..., description="Name of well to use in labware.")
+    wellLocation: PickUpTipWellLocation = Field(
+        default_factory=PickUpTipWellLocation,
+        description="Relative well location at which to pick up the tip.",
+    )
 
 
 class PickUpTipResult(DestinationPositionResult):

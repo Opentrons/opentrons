@@ -13,11 +13,10 @@ from opentrons_shared_data.errors.exceptions import (
     PipetteLiquidNotFoundError,
 )
 
-from ..types import DeckPoint
+from ..types import LiquidProbeWellLocation, DeckPoint
 from .pipetting_common import (
     LiquidNotFoundError,
     PipetteIdMixin,
-    WellLocationMixin,
     DestinationPositionResult,
 )
 from .command import (
@@ -42,8 +41,13 @@ TryLiquidProbeCommandType = Literal["tryLiquidProbe"]
 # Both command variants should have identical parameters.
 # But we need two separate parameter model classes because
 # `command_unions.CREATE_TYPES_BY_PARAMS_TYPE` needs to be a 1:1 mapping.
-class _CommonParams(PipetteIdMixin, WellLocationMixin):
-    pass
+class _CommonParams(PipetteIdMixin):
+    labwareId: str = Field(..., description="Identifier of labware to use.")
+    wellName: str = Field(..., description="Name of well to use in labware.")
+    wellLocation: LiquidProbeWellLocation = Field(
+        default_factory=LiquidProbeWellLocation,
+        description="Relative well location at which to liquid probe.",
+    )
 
 
 class LiquidProbeParams(_CommonParams):

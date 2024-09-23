@@ -443,13 +443,7 @@ class GeometryView:
                         volume = operation_volume or 0.0
                     else:
                         volume = well_location.volumeOffset.volumeOffset
-                    # make below 3 lines their own method?
-                    # volume_at_starting_height = self.get_volume_at_height(labware_id=labware_id, well_id=well_name, target_height=starting_liquid_height) # confirm well_id=well_name
-                    # ending_volume = volume_at_starting_height + volume
-                    # height_after_operation = self.get_height_at_volume(labware_id=labware_id, well_id=well_name, target_volume=ending_volume) # confirm well_id=well_name
-                    height_after_operation = starting_liquid_height  # delete, use above method once implemented
-                    if volume:  # delete
-                        pass  # delete
+                    height_after_operation = self.get_height_after_volume(labware_id=labware_id, well_name=well_name, starting_height=starting_liquid_height, volume=volume)
                     offset = offset.copy(
                         update={"z": offset.z + height_after_operation}
                     )
@@ -1232,3 +1226,24 @@ class GeometryView:
                 message=f"No InnerWellGeometry found for well id: {well_id}"
             )
         return get_well_volumetric_capacity(well_geometry)
+    
+    def get_volume_at_height(
+        self, labware_id: str, well_id: str, target_height: float
+    ) -> float:
+        pass
+
+    def get_height_at_volume(
+        self, labware_id: str, well_id: str, target_volume: float
+    ) -> float:
+        pass
+
+    def get_height_after_volume(
+        self, labware_id: str, well_name: str, starting_height: float, volume: float
+    ) -> float:
+        well_def = self._labware.get_well_definition(labware_id, well_name)
+        well_id = well_def.geometryDefinitionId
+        starting_volume = self.get_volume_at_height(labware_id=labware_id, well_id=well_id, target_height=starting_height)
+        ending_volume = starting_volume + volume
+        ending_height = self.get_height_at_volume(labware_id=labware_id, well_id=well_id, target_volume=ending_volume)
+        # return ending_height
+        return starting_height # delete, use line above once sub-methods implemented
