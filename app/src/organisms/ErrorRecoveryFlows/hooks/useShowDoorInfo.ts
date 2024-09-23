@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import {
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
@@ -37,7 +35,7 @@ export function useShowDoorInfo(
   return { isDoorOpen, isProhibitedDoorOpen }
 }
 
-export function isDoorPermittedOpen(recoveryMap: IRecoveryMap): boolean {
+function isDoorPermittedOpen(recoveryMap: IRecoveryMap): boolean {
   const { route, step } = recoveryMap
 
   if (route in RECOVERY_MAP_METADATA) {

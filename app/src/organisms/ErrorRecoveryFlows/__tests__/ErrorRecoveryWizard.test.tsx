@@ -134,7 +134,10 @@ describe('ErrorRecoveryComponent', () => {
   })
 
   it('renders the recovery door modal when isDoorOpen is true', () => {
-    props = { ...props, isDoorOpen: true }
+    props = {
+      ...props,
+      doorStatusUtils: { isProhibitedDoorOpen: true, isDoorOpen: true },
+    }
 
     renderRecoveryComponent(props)
 
@@ -175,6 +178,7 @@ describe('ErrorRecoveryContent', () => {
     CANCEL_RUN,
     DROP_TIP_FLOWS,
     ERROR_WHILE_RECOVERING,
+    ROBOT_DOOR_OPEN,
   } = RECOVERY_MAP
 
   let props: React.ComponentProps<typeof ErrorRecoveryContent>
@@ -202,6 +206,7 @@ describe('ErrorRecoveryContent', () => {
     vi.mocked(IgnoreErrorSkipStep).mockReturnValue(
       <div>MOCK_IGNORE_ERROR_SKIP_STEP</div>
     )
+    vi.mocked(RecoveryDoorOpen).mockReturnValue(<div>MOCK_DOOR_OPEN</div>)
   })
 
   it(`returns SelectRecoveryOption when the route is ${OPTION_SELECTION.ROUTE}`, () => {
@@ -416,6 +421,19 @@ describe('ErrorRecoveryContent', () => {
     renderRecoveryContent(props)
 
     screen.getByText('MOCK_IN_PROGRESS')
+  })
+
+  it(`returns RecoveryDoorOpen when the route is ${ROBOT_DOOR_OPEN.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: ROBOT_DOOR_OPEN.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_DOOR_OPEN')
   })
 })
 
