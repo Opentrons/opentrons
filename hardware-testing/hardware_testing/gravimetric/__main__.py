@@ -231,8 +231,10 @@ class RunArgs:
                 _ctx.is_simulating(), args.tip
             )
 
-        volumes: List[Tuple[int, List[float]]] = []
+        volumes: Dict[int, List[float]] = {}
         for tip in tip_volumes:
+            if not volumes.get(tip):
+                volumes[tip] = []
             vls = helpers._get_volumes(
                 _ctx,
                 args.increment,
@@ -245,25 +247,12 @@ class RunArgs:
                 args.channels,
                 mode=args.mode,  # NOTE: only needed for increment test
             )
-            if len(vls) > 0:
-                volumes.append(
-                    (
-                        tip,
-                        vls,
-                    )
-                )
-        if args.isolate_volumes:
-            # check that all volumes passed in are actually test volumes
-            all_vols = set(
-                [vol for tip_vol_list in volumes for vol in tip_vol_list[-1]]
-            )
-            for isolated_volume in args.isolate_volumes:
-                assert isolated_volume in all_vols, (
-                    f"cannot isolate volume {isolated_volume}, " f"not a test volume"
-                )
+            volumes[tip] += vls
         if args.extra:
             # if we use extra, add those tests after
             for tip in tip_volumes:
+                if not volumes.get(tip):
+                    volumes[tip] = []
                 vls = helpers._get_volumes(
                     _ctx,
                     args.increment,
@@ -275,17 +264,20 @@ class RunArgs:
                     True,
                     args.channels,
                 )
-                if len(vls) > 0:
-                    volumes.append(
-                        (
-                            tip,
-                            vls,
-                        )
-                    )
+                volumes[tip] += vls
+        if args.isolate_volumes:
+            # check that all volumes passed in are actually test volumes
+            all_vols = set(
+                [vol for tip_vol_list in volumes.values() for vol in tip_vol_list]
+            )
+            for isolated_volume in args.isolate_volumes:
+                assert isolated_volume in all_vols, (
+                    f"cannot isolate volume {isolated_volume}, " f"not a test volume"
+                )
         if not volumes:
             raise ValueError("no volumes to test, check the configuration")
         volumes_list: List[float] = []
-        for _, vls in volumes:
+        for _, vls in volumes.items():
             volumes_list.extend(vls)
 
         if args.trials == 0:
@@ -353,7 +345,13 @@ class RunArgs:
 
         return RunArgs(
             tip_volumes=tip_volumes,
-            volumes=volumes,
+            volumes=[
+                (
+                    t,
+                    vls,
+                )
+                for t, vls in volumes.items()
+            ],
             run_id=run_id,
             pipette=pipette,
             pipette_tag=pipette_tag,
