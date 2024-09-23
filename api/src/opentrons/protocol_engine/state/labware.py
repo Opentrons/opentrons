@@ -265,10 +265,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             if new_offset_id != update_types.NO_CHANGE:
                 self._state.labware_by_id[labware_id].offsetId = new_offset_id
 
-            if (
-                action.state_update.labware_location.new_location
-                != update_types.NO_CHANGE
-            ):
+            if action.state_update.labware_location.new_location:
                 new_location = action.state_update.labware_location.new_location
 
                 if isinstance(
@@ -278,8 +275,6 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 ):
                     # If a labware has been moved into a waste chute it's been chuted away and is now technically off deck
                     new_location = OFF_DECK_LOCATION
-
-                assert new_location != update_types.NO_CHANGE
 
                 self._state.labware_by_id[labware_id].location = new_location
 

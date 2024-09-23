@@ -82,7 +82,7 @@ class LabwareLocationUpdate:
 
     labware_id: str
 
-    new_location: LabwareLocation | None | NoChangeType
+    new_location: LabwareLocation | None
     """The labware's new logical location.
 
     Note: `new_location=None` means "change the location to `None` (unknown)",
@@ -168,23 +168,14 @@ class StateUpdate:
         self,
         *,
         labware_id: str,
-        new_location: LabwareLocation | None | NoChangeType = NO_CHANGE,
-        new_offset_id: str | None | NoChangeType = NO_CHANGE,
+        new_location: LabwareLocation,
+        new_offset_id: str | None,
     ) -> None:
-        if new_location != NO_CHANGE:
-            self.labware_location = LabwareLocationUpdate(
-                labware_id=labware_id,
-                new_location=new_location,
-                offset_id=new_offset_id,
-            )
-        else:
-            assert new_offset_id != NO_CHANGE
-
-            self.labware_location = LabwareLocationUpdate(
-                labware_id=labware_id,
-                offset_id=new_offset_id,
-                new_location=_NoChangeEnum.NO_CHANGE,
-            )
+        self.labware_location = LabwareLocationUpdate(
+            labware_id=labware_id,
+            new_location=new_location,
+            offset_id=new_offset_id,
+        )
 
     def set_loaded_labware(
         self,
