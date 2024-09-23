@@ -22,7 +22,7 @@ import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '/app/redux/analytics'
-import { useCloneRun } from '../../../ProtocolUpload/hooks'
+import { useCloneRun } from '/app/resources/runs'
 import { useRerunnableStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
@@ -44,7 +44,6 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('/app/atoms/Skeleton')
 vi.mock('/app/transformations/commands')
 vi.mock('/app/organisms/RunTimeControl/hooks')
-vi.mock('/app/organisms/ProtocolUpload/hooks')
 vi.mock('/app/redux/analytics')
 vi.mock('../hooks')
 vi.mock('/app/resources/runs')

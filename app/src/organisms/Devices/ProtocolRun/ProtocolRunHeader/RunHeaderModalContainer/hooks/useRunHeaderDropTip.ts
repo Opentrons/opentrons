@@ -9,7 +9,7 @@ import {
   useTipAttachmentStatus,
 } from '../../../../../DropTipWizardFlows'
 import { useProtocolDropTipModal } from '../modals'
-import { useCloseCurrentRun } from '../../../../../ProtocolUpload/hooks'
+import { useCloseCurrentRun } from '/app/resources/runs'
 import { useIsRunCurrent } from '/app/resources/runs'
 import { isTerminalRunStatus } from '../../utils'
 

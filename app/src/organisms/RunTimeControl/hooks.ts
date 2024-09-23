@@ -1,6 +1,6 @@
 import { useRunActionMutations } from '@opentrons/react-api-client'
 
-import { useCloneRun } from '../ProtocolUpload/hooks'
+import { useCloneRun } from '/app/resources/runs'
 import {
   useNotifyRunQuery,
   useCurrentRunId,

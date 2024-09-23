@@ -1,6 +1,6 @@
 import last from 'lodash/last'
 
-import { useNotifyAllRunsQuery } from '/app/resources/runs'
+import { useNotifyAllRunsQuery } from './useNotifyAllRunsQuery'
 
 export function useMostRecentRunId(): string | null {
   const { data: allRuns } = useNotifyAllRunsQuery()

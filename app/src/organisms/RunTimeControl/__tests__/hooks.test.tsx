@@ -4,12 +4,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { useRunActionMutations } from '@opentrons/react-api-client'
 
-import { useCloneRun } from '../../ProtocolUpload/hooks'
 import { useRunControls, useCurrentRunStatus, useRunErrors } from '../hooks'
 import {
   useNotifyRunQuery,
   useCurrentRunId,
   useRunStatus,
+  useCloneRun,
 } from '/app/resources/runs'
 
 import {
@@ -30,7 +30,6 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   }
 })
 
-vi.mock('../../ProtocolUpload/hooks')
 vi.mock('/app/resources/protocols')
 vi.mock('/app/resources/runs')
 

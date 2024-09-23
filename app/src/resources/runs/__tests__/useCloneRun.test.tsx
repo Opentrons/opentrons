@@ -11,12 +11,12 @@ import {
 } from '@opentrons/react-api-client'
 
 import { useCloneRun } from '../useCloneRun'
-import { useNotifyRunQuery } from '/app/resources/runs'
+import { useNotifyRunQuery } from '../useNotifyRunQuery'
 
 import type { HostConfig } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('/app/resources/runs')
+vi.mock('/app/resources/runs/useNotifyRunQuery')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const RUN_ID_NO_RTP: string = 'run_id_no_rtp'

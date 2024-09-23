@@ -11,7 +11,7 @@ import { DeviceReset } from '../DeviceReset'
 
 const mockUpdateIsEXpanded = vi.fn()
 
-vi.mock('../../../../ProtocolUpload/hooks')
+vi.mock('/app/resources/runs')
 
 const render = (isRobotBusy = false) => {
   return renderWithProviders(

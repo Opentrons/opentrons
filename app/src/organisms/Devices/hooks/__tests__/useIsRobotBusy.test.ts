@@ -20,7 +20,6 @@ import type { Sessions, Runs } from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../ProtocolUpload/hooks')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/maintenance_runs')
