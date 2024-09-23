@@ -9,7 +9,7 @@ import {
 import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useCurrentRun } from '/app/resources/runs'
-import { getLabwareLocation } from '../utils/getLabwareLocation'
+import { getLabwareLocation } from '/app/transformations/commands'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { getLabwareDefinitionUri } from '/app/transformations/protocols'
 import { useLabwareOffsetForLabware } from '../useLabwareOffsetForLabware'
@@ -20,7 +20,7 @@ import type {
 } from '@opentrons/shared-data'
 
 vi.mock('/app/resources/runs')
-vi.mock('../utils/getLabwareLocation')
+vi.mock('/app/transformations/commands')
 vi.mock('../../hooks')
 vi.mock('/app/transformations/protocols')
 vi.mock('../useLabwareOffsetForLabware')

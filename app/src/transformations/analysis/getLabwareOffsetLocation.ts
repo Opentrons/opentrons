@@ -1,5 +1,7 @@
-import { getLabwareLocation } from './getLabwareLocation'
-import { getModuleInitialLoadInfo } from '/app/transformations/commands'
+import {
+  getModuleInitialLoadInfo,
+  getLabwareLocation,
+} from '/app/transformations/commands'
 import type { LabwareOffsetLocation } from '@opentrons/api-client'
 import type {
   LoadedModule,

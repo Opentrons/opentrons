@@ -41,7 +41,7 @@ import { useChainLiveCommands } from '/app/resources/runs'
 import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { getModulePrepCommands } from '/app/local-resources/modules'
-import { getModuleTooHot } from '../../getModuleTooHot'
+import { getModuleTooHot } from '/app/transformations/modules'
 import {
   useModuleRenderInfoForProtocolById,
   useUnmatchedModulesForProtocol,

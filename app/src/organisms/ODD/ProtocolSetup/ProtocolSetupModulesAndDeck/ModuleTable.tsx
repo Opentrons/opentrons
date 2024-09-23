@@ -26,8 +26,8 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
-import { getModulePrepCommands } from '/app/local-resources/modules/getModulePrepCommands'
-import { getModuleTooHot } from '../../../Devices/getModuleTooHot'
+import { getModulePrepCommands } from '/app/local-resources/modules'
+import { getModuleTooHot } from '/app/transformations/modules'
 import { useRunCalibrationStatus } from '../../../Devices/hooks'
 import { LocationConflictModal } from '../../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
@@ -38,7 +38,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 
 import type { CommandData } from '@opentrons/api-client'
 import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'
-import type { ModulePrepCommandsType } from '/app/local-resources/modules/getModulePrepCommands'
+import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { ProtocolCalibrationStatus } from '../../../Devices/hooks'
 import type { AttachedProtocolModuleMatch } from './utils'
 

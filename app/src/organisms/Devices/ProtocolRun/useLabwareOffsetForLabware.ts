@@ -2,7 +2,7 @@ import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 
 import { getCurrentOffsetForLabwareInLocation } from './utils/getCurrentOffsetForLabwareInLocation'
 import { getLabwareDefinitionUri } from '/app/transformations/protocols'
-import { getLabwareOffsetLocation } from './utils/getLabwareOffsetLocation'
+import { getLabwareOffsetLocation } from '/app/transformations/analysis'
 import { useNotifyRunQuery } from '/app/resources/runs'
 
 import type { LabwareOffset } from '@opentrons/api-client'
