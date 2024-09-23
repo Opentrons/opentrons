@@ -7,13 +7,13 @@ import type { RunTimeParameterValuesCreateData } from '@opentrons/api-client'
  * @returns {RunTimeParameterValuesCreateData} object mapping variable name to value
  */
 export function getRunTimeParameterValuesForRun(
-    runTimeParameters: RunTimeParameter[]
+  runTimeParameters: RunTimeParameter[]
 ): RunTimeParameterValuesCreateData {
-    return runTimeParameters.reduce((acc, param) => {
-        const { variableName } = param
-        if (param.type !== 'csv_file' && param.value !== param.default) {
-            return { ...acc, [variableName]: param.value }
-        }
-        return acc
-    }, {})
+  return runTimeParameters.reduce((acc, param) => {
+    const { variableName } = param
+    if (param.type !== 'csv_file' && param.value !== param.default) {
+      return { ...acc, [variableName]: param.value }
+    }
+    return acc
+  }, {})
 }
