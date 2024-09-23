@@ -16,8 +16,11 @@ import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { formatTimestamp } from '../../../utils'
 import { useRunControls } from '../../../../RunTimeControl/hooks'
-import { EMPTY_TIMESTAMP, useRunTimestamps } from '/app/resources/runs'
-import { useCloseCurrentRun } from '/app/resources/runs'
+import {
+  EMPTY_TIMESTAMP,
+  useRunTimestamps,
+  useCloseCurrentRun,
+} from '/app/resources/runs'
 import { LabeledValue } from './LabeledValue'
 import { isCancellableStatus } from '../utils'
 
