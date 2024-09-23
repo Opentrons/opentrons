@@ -2237,7 +2237,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         loc = well.top()
         self._96_tip_config_valid()
-        # can we make this with recovery?
         # ensure this raises LiquidPresenceNotDetectedError
         height = self._core.liquid_probe_without_recovery(well._core, loc)
         return height
