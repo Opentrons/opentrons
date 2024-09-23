@@ -12,8 +12,8 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { getLabwareRenderInfo } from '../../../../Devices/ProtocolRun/utils/getLabwareRenderInfo'
-import { getStandardDeckViewLayerBlockList } from '../../../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
+import { getLabwareRenderInfo } from '/app/organisms/Devices/ProtocolRun/utils/getLabwareRenderInfo'
+import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 import { mockProtocolModuleInfo } from '../__fixtures__'
 import { LabwareMapView } from '../LabwareMapView'
 

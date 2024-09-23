@@ -7,8 +7,8 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { getStandardDeckViewLayerBlockList } from '../../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
-import { getLabwareRenderInfo } from '../../../Devices/ProtocolRun/utils/getLabwareRenderInfo'
+import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
+import { getLabwareRenderInfo } from '/app/organisms/Devices/ProtocolRun/utils/getLabwareRenderInfo'
 
 import type {
   CompletedProtocolAnalysis,
