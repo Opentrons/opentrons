@@ -51,13 +51,13 @@ const ALL_PATH_OPTIONS: Array<{ name: PathOption; image: string }> = [
 type PathFieldProps = FieldProps & ValuesForPath
 
 interface PathButtonProps {
-  children?: React.ReactNode
   disabled: boolean
-  id?: string
   selected: boolean
   subtitle: string
   onClick: (e: React.ChangeEvent<HTMLInputElement>) => void
   path: PathOption
+  id?: string
+  children?: React.ReactNode
 }
 
 const PathButton = (props: PathButtonProps): JSX.Element => {
@@ -77,6 +77,7 @@ const PathButton = (props: PathButtonProps): JSX.Element => {
     <Flex {...targetProps} width="100%" key={id}>
       {tooltip}
       <RadioButton
+        width="100%"
         isSelected={selected}
         largeDesktopBorderRadius
         onChange={e => {
@@ -134,21 +135,24 @@ export const PathField = (props: PathFieldProps): JSX.Element => {
       padding={SPACING.spacing16}
       width="100%"
     >
-      {ALL_PATH_OPTIONS.map(option => (
-        <PathButton
-          id={`PathButton_${option.name}`}
-          key={option.name}
-          selected={option.name === value}
-          path={option.name}
-          disabled={disabledPathMap !== null && option.name in disabledPathMap}
-          subtitle={getSubtitle(option.name, disabledPathMap)}
-          onClick={() => {
-            updateValue(option.name)
-          }}
-        >
-          <img />
-        </PathButton>
-      ))}
+      {ALL_PATH_OPTIONS.map(option => {
+        const { name } = option
+        return (
+          <PathButton
+            id={`PathButton_${name}`}
+            key={name}
+            selected={name === value}
+            path={name}
+            disabled={disabledPathMap !== null && name in disabledPathMap}
+            subtitle={getSubtitle(name, disabledPathMap)}
+            onClick={() => {
+              updateValue(name)
+            }}
+          >
+            <img />
+          </PathButton>
+        )
+      })}
     </Flex>
   )
 }

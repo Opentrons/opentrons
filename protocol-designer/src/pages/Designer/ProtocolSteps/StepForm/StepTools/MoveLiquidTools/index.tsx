@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 import { getEnableReturnTip } from '../../../../../../feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
@@ -9,16 +9,18 @@ import {
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
 import { Line } from '../../../../../../atoms'
-
 import {
   ChangeTipField,
+  DropTipField,
   LabwareField,
   PartialTipField,
   PathField,
+  PickUpTipField,
   PipetteField,
   TiprackField,
-  WellSelectionField,
+  TipWellSelectionField,
   VolumeField,
+  WellSelectionField,
 } from '../../PipetteFields'
 import type { StepFormProps } from '../../types'
 
@@ -27,15 +29,15 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
   const { stepType, path } = formData
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const [collapsed, _setCollapsed] = useState<boolean>(true)
+  //  TODO: these will be used for the 2nd page advanced settings
+  // const { stepType, path } = formData
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
   const enableReturnTip = useSelector(getEnableReturnTip)
   const labwares = useSelector(getLabwareEntities)
   const pipettes = useSelector(getPipetteEntities)
-  const toggleCollapsed = (): void => {
-    _setCollapsed(!collapsed)
-  }
+
   const userSelectedPickUpTipLocation =
     labwares[String(propsForFields.pickUpTip_location.value)] != null
   const userSelectedDropTipLocation =
@@ -50,7 +52,7 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
     additionalEquipmentEntities[String(propsForFields.dispense_labware.value)]
       ?.name === 'trashBin'
 
-  return toolboxStep === 1 ? (
+  return toolboxStep === 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <PipetteField {...propsForFields.pipette} />
       <Line />
@@ -101,8 +103,40 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
         volume={formData.volume}
         tipRack={formData.tipRack}
       />
+      <Line />
+      {enableReturnTip ? (
+        <>
+          <PickUpTipField {...propsForFields.pickUpTip_location} />
+          {userSelectedPickUpTipLocation ? (
+            <>
+              <Line />
+              <TipWellSelectionField
+                {...propsForFields.pickUpTip_wellNames}
+                nozzles={String(propsForFields.nozzles.value) ?? null}
+                labwareId={propsForFields.pickUpTip_location.value}
+                pipetteId={propsForFields.pipette.value}
+              />
+            </>
+          ) : null}
+        </>
+      ) : null}
+      <Line />
+      <DropTipField {...propsForFields.dropTip_location} />
+      {userSelectedDropTipLocation && enableReturnTip ? (
+        <>
+          <Line />
+          <TipWellSelectionField
+            {...propsForFields.dropTip_wellNames}
+            nozzles={String(propsForFields.nozzles.value) ?? null}
+            labwareId={propsForFields.dropTip_location.value}
+            pipetteId={propsForFields.pipette.value}
+          />
+        </>
+      ) : null}
+      <Line />
     </Flex>
   ) : (
+    //  TODO: wire up the second page
     <div>wire this up</div>
   )
 }

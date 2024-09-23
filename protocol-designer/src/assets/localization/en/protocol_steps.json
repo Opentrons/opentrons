@@ -1,5 +1,6 @@
 {
   "change_tips": "Change tips",
+  "default_tip_option": "Default - get next tip",
   "delete": "Delete step",
   "duplicate": "Duplicate step",
   "final_deck_state": "Final deck state",
@@ -17,6 +18,7 @@
   "select_mix_labware": "Select a mix labware",
   "select_nozzles": "Select nozzles",
   "select_pipette": "Select a pipette",
+  "select_tip_location": "Select pick up tip location",
   "select_tiprack": "Select a tiprack",
   "select_volume": "Select a volume",
   "shake": "Shake",

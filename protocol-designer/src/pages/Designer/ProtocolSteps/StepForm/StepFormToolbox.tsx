@@ -9,6 +9,7 @@ import {
   Icon,
   PrimaryButton,
   SPACING,
+  SecondaryButton,
   StyledText,
   Toolbox,
 } from '@opentrons/components'
@@ -70,7 +71,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     focusedField,
   } = props
   const { t, i18n } = useTranslation(['application', 'shared'])
-  const [toolboxStep, setToolboxStep] = React.useState<number>(1)
+  const [toolboxStep, setToolboxStep] = React.useState<number>(0)
   const icon = stepIconsByType[formData.stepType]
 
   const Tools: typeof STEP_FORM_MAP[keyof typeof STEP_FORM_MAP] = get(
@@ -88,13 +89,16 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     )
   }
 
+  const isMultiStepToolbox =
+    formData.stepType === 'moveLiquid' || formData.stepType === 'mix'
+
   return (
     <>
       <Toolbox
         subHeader={
-          formData.stepType === 'moveLiquid' || formData.stepType === 'mix' ? (
+          isMultiStepToolbox ? (
             <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-              {t('shared:step', { current: toolboxStep, max: 2 })}
+              {t('shared:step', { current: toolboxStep + 1, max: 2 })}
             </StyledText>
           ) : null
         }
@@ -102,9 +106,34 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
         onCloseClick={handleClose}
         closeButtonText={t('shared:cancel')}
         confirmButton={
-          <PrimaryButton onClick={handleSave} disabled={!canSave} width="100%">
-            {t('shared:save')}
-          </PrimaryButton>
+          <Flex gridGap={SPACING.spacing8}>
+            {isMultiStepToolbox && toolboxStep === 1 ? (
+              <SecondaryButton
+                onClick={() => {
+                  setToolboxStep(0)
+                }}
+              >
+                {i18n.format(t('shared:back'), 'capitalize')}
+              </SecondaryButton>
+            ) : null}
+            <PrimaryButton
+              onClick={
+                isMultiStepToolbox && toolboxStep === 0
+                  ? () => {
+                      setToolboxStep(1)
+                    }
+                  : handleSave
+              }
+              disabled={
+                isMultiStepToolbox && toolboxStep === 0 ? false : !canSave
+              }
+              width="100%"
+            >
+              {isMultiStepToolbox && toolboxStep === 0
+                ? i18n.format(t('shared:continue'), 'capitalize')
+                : t('shared:save')}
+            </PrimaryButton>
+          </Flex>
         }
         height="calc(100vh - 64px)"
         title={
@@ -122,7 +151,6 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
             formData,
             propsForFields,
             focusHandlers,
-            setToolboxStep,
             toolboxStep,
           }}
         />

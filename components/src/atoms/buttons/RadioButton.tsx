@@ -130,7 +130,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   return (
     <Flex
       css={css`
-        width: auto;
+        width: ${props.width ?? 'auto'};
 
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
           width: 100%;
