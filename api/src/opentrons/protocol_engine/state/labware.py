@@ -195,63 +195,60 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             isinstance(action, SucceedCommandAction)
             and action.state_update.loaded_labware != update_types.NO_CHANGE
         ):
-            if action.state_update.labware_location != update_types.NO_CHANGE:
-
-                # If the labware load refers to an offset, that offset must actually exist.
-                if (
-                    action.state_update.loaded_labware.offset_id is not None
-                    and action.state_update.loaded_labware.offset_id
-                    != update_types.NO_CHANGE
-                ):
-                    assert (
-                        action.state_update.loaded_labware.offset_id
-                        in self._state.labware_offsets_by_id
-                    )
-
-                definition_uri = uri_from_details(
-                    namespace=action.state_update.loaded_labware.definition.namespace,
-                    load_name=action.state_update.loaded_labware.definition.parameters.loadName,
-                    version=action.state_update.loaded_labware.definition.version,
-                )
-
-                self._state.definitions_by_uri[
-                    definition_uri
-                ] = action.state_update.loaded_labware.definition
-
-                location = None
-                if isinstance(
-                    action.state_update.loaded_labware.new_location,
-                    get_args(LabwareLocation),
-                ):
-                    location = action.state_update.loaded_labware.new_location
-                else:
-                    location = self._state.labware_by_id[
-                        action.state_update.loaded_labware.labware_id
-                    ].location
-
-                display_name = None
-                if action.state_update.loaded_labware.display_name:
-                    display_name = action.state_update.loaded_labware.display_name
-                else:
-                    display_name = self._state.labware_by_id[
-                        action.state_update.loaded_labware.labware_id
-                    ].displayName
-
+            # If the labware load refers to an offset, that offset must actually exist.
+            if (
+                action.state_update.loaded_labware.offset_id is not None
+                and action.state_update.loaded_labware.offset_id
+                != update_types.NO_CHANGE
+            ):
                 assert (
                     action.state_update.loaded_labware.offset_id
-                    != update_types.NO_CHANGE
+                    in self._state.labware_offsets_by_id
                 )
 
-                self._state.labware_by_id[
+            definition_uri = uri_from_details(
+                namespace=action.state_update.loaded_labware.definition.namespace,
+                load_name=action.state_update.loaded_labware.definition.parameters.loadName,
+                version=action.state_update.loaded_labware.definition.version,
+            )
+
+            self._state.definitions_by_uri[
+                definition_uri
+            ] = action.state_update.loaded_labware.definition
+
+            location = None
+            if isinstance(
+                action.state_update.loaded_labware.new_location,
+                get_args(LabwareLocation),
+            ):
+                location = action.state_update.loaded_labware.new_location
+            else:
+                location = self._state.labware_by_id[
                     action.state_update.loaded_labware.labware_id
-                ] = LoadedLabware.construct(
-                    id=action.state_update.loaded_labware.labware_id,
-                    location=location,
-                    loadName=action.state_update.loaded_labware.definition.parameters.loadName,
-                    definitionUri=definition_uri,
-                    offsetId=action.state_update.loaded_labware.offset_id,
-                    displayName=display_name,
-                )
+                ].location
+
+            display_name = None
+            if action.state_update.loaded_labware.display_name:
+                display_name = action.state_update.loaded_labware.display_name
+            else:
+                display_name = self._state.labware_by_id[
+                    action.state_update.loaded_labware.labware_id
+                ].displayName
+
+            assert (
+                action.state_update.loaded_labware.offset_id != update_types.NO_CHANGE
+            )
+
+            self._state.labware_by_id[
+                action.state_update.loaded_labware.labware_id
+            ] = LoadedLabware.construct(
+                id=action.state_update.loaded_labware.labware_id,
+                location=location,
+                loadName=action.state_update.loaded_labware.definition.parameters.loadName,
+                definitionUri=definition_uri,
+                offsetId=action.state_update.loaded_labware.offset_id,
+                displayName=display_name,
+            )
 
     def _set_labware_location(self, action: Action) -> None:
         if (
