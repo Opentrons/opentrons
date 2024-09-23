@@ -240,6 +240,8 @@ data_files_table = sqlalchemy.Table(
 )
 
 run_csv_rtp_table = sqlalchemy.Table(
+    # TODO BEFORE MERGE: If we need to rename the persistence directory anyway,
+    # take the opportunity to remove "table" from these SQL names?
     "run_csv_rtp_table",
     metadata,
     sqlalchemy.Column(
@@ -260,6 +262,25 @@ run_csv_rtp_table = sqlalchemy.Table(
     sqlalchemy.Column(
         "file_id",
         sqlalchemy.ForeignKey("data_files.id"),
+        nullable=True,
+    ),
+)
+
+# Single-row table to store the boolean "enable/disable error recovery" setting.
+enable_error_recovery_table = sqlalchemy.Table(
+    "enable_error_recovery",
+    metadata,
+    sqlalchemy.Column(
+        "id",
+        sqlalchemy.Integer,
+        # This `id=0` constraint, combined with the uniqueness constraint implicit in `primary_key=True`,
+        # is a trick to make sure this table only has at most 1 row.
+        sqlalchemy.CheckConstraint("id=0"),
+        primary_key=True,
+    ),
+    sqlalchemy.Column(
+        "enable_error_recovery",
+        sqlalchemy.Boolean,
         nullable=True,
     ),
 )

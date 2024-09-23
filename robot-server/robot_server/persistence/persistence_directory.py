@@ -52,6 +52,9 @@ async def prepare_active_subdirectory(prepared_root: Path) -> Path:
             v3_to_v4.Migration3to4(subdirectory="4"),
             v4_to_v5.Migration4to5(subdirectory="5"),
             v5_to_v6.Migration5to6(subdirectory="6"),
+            # TODO BEFORE MERGE: Double-check that I can make these changes in-place
+            # without breaking the robots that are on `edge` right now. Maybe rename
+            # LATEST_VERSION_DIRECTORY to 7.1/ and abandon the current 7/ directory.
             v6_to_v7.Migration6to7(subdirectory=LATEST_VERSION_DIRECTORY),
         ],
         temp_file_prefix="temp-",
