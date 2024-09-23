@@ -24,7 +24,7 @@ import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
 import { OffsetVector } from '/app/molecules/OffsetVector'
 import { PythonLabwareOffsetSnippet } from '/app/molecules/PythonLabwareOffsetSnippet'
-import { getLatestCurrentOffsets } from '../SetupLabwarePositionCheck/utils'
+import { getLatestCurrentOffsets } from '/app/transformations/runs'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {

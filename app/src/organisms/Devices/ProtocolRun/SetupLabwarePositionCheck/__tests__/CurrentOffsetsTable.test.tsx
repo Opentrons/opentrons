@@ -12,7 +12,7 @@ import { i18n } from '/app/i18n'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
 import { useLPCDisabledReason } from '../../../hooks'
-import { getLatestCurrentOffsets } from '../utils'
+import { getLatestCurrentOffsets } from '/app/transformations/runs'
 import { CurrentOffsetsTable } from '../CurrentOffsetsTable'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
@@ -21,7 +21,7 @@ import type { LabwareOffset } from '@opentrons/api-client'
 vi.mock('../../../hooks')
 vi.mock('../../../../LabwarePositionCheck')
 vi.mock('/app/redux/config')
-vi.mock('../utils')
+vi.mock('/app/transformations/runs')
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getLoadedLabwareDefinitionsByUri>()
