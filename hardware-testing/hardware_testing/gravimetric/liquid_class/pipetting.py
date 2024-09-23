@@ -270,16 +270,17 @@ def _pipette_with_liquid_settings(  # noqa: C901
         ctx.delay(liquid_class.dispense.delay)
 
     def _dispense_on_retract() -> None:
-        if pipette.current_volume <= 0 and added_blow_out:
-            # blow-out any remaining air in pipette (any reason why not?)
-            callbacks.on_blowing_out()
-            pipette.blow_out()
+        # NOTE: both the plunger reset or tje trailing-air-gap
+        #       pull remaining droplets inside the tip upwards
+        if pipette.current_volume <= 0:
+            # if do_a_blow_out:
+            #     callbacks.on_blowing_out()
+            #     pipette.blow_out()
             pipette.prepare_to_aspirate()
+        else:
+            pipette.air_gap(liquid_class.aspirate.trailing_air_gap, height=0)
         if touch_tip:
             pipette.touch_tip(speed=config.TOUCH_TIP_SPEED)
-        # NOTE: always do a trailing-air-gap, regardless of if tip is empty or not
-        #       to avoid droplets from forming and falling off the tip
-        pipette.air_gap(liquid_class.aspirate.trailing_air_gap, height=0)
 
     # PHASE 1: APPROACH
     pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
