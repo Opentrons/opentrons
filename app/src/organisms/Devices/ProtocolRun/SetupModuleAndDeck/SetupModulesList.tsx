@@ -40,7 +40,7 @@ import { StatusLabel } from '/app/atoms/StatusLabel'
 import { useChainLiveCommands } from '/app/resources/runs'
 import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
-import { getModulePrepCommands } from '../../getModulePrepCommands'
+import { getModulePrepCommands } from '/app/local-resources/modules'
 import { getModuleTooHot } from '../../getModuleTooHot'
 import {
   useModuleRenderInfoForProtocolById,
