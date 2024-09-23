@@ -10,7 +10,7 @@ import { i18n } from '/app/i18n'
 import { getIsOnDevice } from '/app/redux/config'
 import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
-import { getLocationInfoNames } from '../../utils/getLocationInfoNames'
+import { getLocationInfoNames } from '/app/transformations/commands'
 import { getSlotLabwareDefinition } from '../../utils/getSlotLabwareDefinition'
 import {
   getLiquidsByIdForLabware,
@@ -39,7 +39,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 vi.mock('/app/redux/config')
 vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../../../Devices/hooks')
-vi.mock('../../utils/getLocationInfoNames')
+vi.mock('/app/transformations/commands')
 vi.mock('../../utils/getSlotLabwareDefinition')
 vi.mock('/app/transformations/analysis')
 vi.mock('../LiquidDetailCard')

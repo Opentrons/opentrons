@@ -16,7 +16,7 @@ import {
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
 } from '/app/redux/analytics'
 import { useIsFlex } from '/app/redux-resources/robots'
-import { getLocationInfoNames } from '../../utils/getLocationInfoNames'
+import { getLocationInfoNames } from '/app/transformations/commands'
 import { SetupLiquidsList } from '../SetupLiquidsList'
 import {
   getTotalVolumePerLiquidId,
@@ -56,7 +56,7 @@ const MOCK_LABWARE_INFO_BY_LIQUID_ID = {
 }
 
 vi.mock('/app/transformations/analysis')
-vi.mock('../../utils/getLocationInfoNames')
+vi.mock('/app/transformations/commands')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../LiquidsLabwareDetailsModal')
 vi.mock('@opentrons/shared-data', async importOriginal => {
