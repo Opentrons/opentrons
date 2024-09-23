@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
+  COLORS,
   Flex,
   Icon,
   PrimaryButton,
@@ -69,6 +70,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     focusedField,
   } = props
   const { t, i18n } = useTranslation(['application', 'shared'])
+  const [toolboxStep, setToolboxStep] = React.useState<number>(1)
   const icon = stepIconsByType[formData.stepType]
 
   const Tools: typeof STEP_FORM_MAP[keyof typeof STEP_FORM_MAP] = get(
@@ -89,6 +91,13 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   return (
     <>
       <Toolbox
+        subHeader={
+          formData.stepType === 'moveLiquid' || formData.stepType === 'mix' ? (
+            <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+              {t('shared:step', { current: toolboxStep, max: 2 })}
+            </StyledText>
+          ) : null
+        }
         childrenPadding="0"
         onCloseClick={handleClose}
         closeButtonText={t('shared:cancel')}
@@ -108,7 +117,15 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
         }
       >
         <FormAlerts focusedField={focusedField} dirtyFields={dirtyFields} />
-        <Tools {...{ formData, propsForFields, focusHandlers }} />
+        <Tools
+          {...{
+            formData,
+            propsForFields,
+            focusHandlers,
+            setToolboxStep,
+            toolboxStep,
+          }}
+        />
       </Toolbox>
     </>
   )

@@ -23,4 +23,6 @@ export interface StepFormProps {
   formData: FormData
   focusHandlers: FocusHandlers
   propsForFields: FieldPropsByName
+  setToolboxStep: React.Dispatch<React.SetStateAction<number>>
+  toolboxStep: number
 }

@@ -48,7 +48,13 @@
     "tipRack": "tip rack",
     "wellSelectionLabel": {
       "columns": "columns",
-      "wells": "wells"
+      "wells": "wells",
+      "wells_aspirate_wells": "Select source wells",
+      "wells_dispense_wells": "Select destination wells",
+      "wells_mix_wells": "Select wells",
+      "columns_aspirate_wells": "Select source columns",
+      "columns_dispense_wells": "Select destination columns",
+      "columns_mix_wells": "Select columns"
     },
     "field": {
       "nozzles": {
