@@ -10,7 +10,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import * as PipetteConstants from '/app/redux/pipettes/constants'
-import { getShowPipetteCalibrationWarning } from '../utils'
+import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useIsFlex } from '/app/redux-resources/robots'
