@@ -44,7 +44,6 @@ import type { UseQueryResult } from 'react-query'
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/modules')
 vi.mock('/app/redux/discovery')
-vi.mock('/app/organisms/Devices/hooks')
 vi.mock('/app/resources/deck_configuration')
 vi.mock('/app/transformations/analysis')
 vi.mock('../utils')
