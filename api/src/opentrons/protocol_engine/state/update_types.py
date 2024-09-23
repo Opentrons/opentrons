@@ -94,7 +94,7 @@ class LabwareLocationUpdate:
 
 @dataclasses.dataclass
 class LoadedLabwareUpdate(LabwareLocationUpdate):
-    """Update labware defention from command result."""
+    """Update loaded labware."""
 
     display_name: typing.Optional[str]
 
