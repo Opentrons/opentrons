@@ -10,11 +10,11 @@ import {
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { RIGHT, LEFT } from '@opentrons/shared-data'
-import { usePipetteSpecsV2 } from '../../resources/instruments/hooks'
+import { usePipetteSpecsV2 } from '/app/resources/instruments/hooks'
 import { ChildNavigation } from '../ChildNavigation'
 
 import type { PipetteData, Mount } from '@opentrons/api-client'
-import type { SmallButton } from '../../atoms/buttons'
+import type { SmallButton } from '/app/atoms/buttons'
 import type {
   QuickTransferWizardState,
   QuickTransferWizardAction,

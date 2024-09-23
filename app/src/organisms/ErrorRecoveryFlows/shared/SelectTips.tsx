@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { RECOVERY_MAP } from '../constants'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
-import { TwoColumn } from '../../../molecules/InterventionModal'
+import { TwoColumn } from '/app/molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
 import { TipSelectionModal } from './TipSelectionModal'

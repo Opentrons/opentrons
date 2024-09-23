@@ -6,8 +6,9 @@
 
 from __future__ import annotations
 import asyncio
+import contextlib
 from logging import getLogger
-from typing import Annotated, Any, Awaitable, Callable, Set
+from typing import Annotated, Any, AsyncGenerator, Awaitable, Callable, Set
 from fastapi import Depends
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -70,23 +71,21 @@ class TaskRunner:
         log.debug("Background tasks stopped.")
 
 
-def initialize_task_runner(app_state: AppState) -> None:
-    """Create a new `TaskRunner` and store it on `app_state`
+@contextlib.asynccontextmanager
+async def set_up_task_runner(app_state: AppState) -> AsyncGenerator[None, None]:
+    """Set up the server's global singleton `TaskRunner`.
 
-    Intended to be called just once, when the server starts up.
+    When this context manager is entered, the `TaskRunner` is set up and stored on
+    the given `AppState` for later access. When it's exited, the `TaskRunner` is
+    cleaned up.
     """
-    _task_runner_accessor.set_on(app_state, TaskRunner())
-
-
-async def clean_up_task_runner(app_state: AppState) -> None:
-    """Clean up the `TaskRunner` stored on `app_state`.
-
-    Intended to be called just once, when the server shuts down.
-    """
-    task_runner = _task_runner_accessor.get_from(app_state)
-
-    if task_runner is not None:
+    task_runner = TaskRunner()
+    try:
+        _task_runner_accessor.set_on(app_state, TaskRunner())
+        yield
+    finally:
         await task_runner.cancel_all_and_clean_up()
+        _task_runner_accessor.set_on(app_state, None)
 
 
 def get_task_runner(

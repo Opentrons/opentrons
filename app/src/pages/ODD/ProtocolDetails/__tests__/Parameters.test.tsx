@@ -2,15 +2,15 @@ import * as React from 'react'
 import { when } from 'vitest-when'
 import { it, describe, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
-import { i18n } from '../../../../i18n'
-import { useToaster } from '../../../../organisms/ToasterOven'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { useRunTimeParameters } from '../../../../pages/Desktop/Protocols/hooks'
+import { i18n } from '/app/i18n'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { useRunTimeParameters } from '/app/pages/Desktop/Protocols/hooks'
 import { Parameters } from '../Parameters'
-import { mockRunTimeParameterData } from '../fixtures'
+import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
 
-vi.mock('../../../../organisms/ToasterOven')
-vi.mock('../../../../pages/Desktop/Protocols/hooks')
+vi.mock('/app/organisms/ToasterOven')
+vi.mock('/app/pages/Desktop/Protocols/hooks')
 
 const render = (props: React.ComponentProps<typeof Parameters>) => {
   return renderWithProviders(<Parameters {...props} />, {

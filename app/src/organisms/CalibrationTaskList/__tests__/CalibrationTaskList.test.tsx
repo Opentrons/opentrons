@@ -3,8 +3,8 @@ import { MemoryRouter } from 'react-router-dom'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { CalibrationTaskList } from '..'
 import {
   mockDeckCalLauncher,
@@ -23,10 +23,10 @@ import {
   useRunHasStarted,
   useAttachedPipettes,
 } from '../../Devices/hooks'
-import { mockLeftProtoPipette } from '../../../redux/pipettes/__fixtures__'
+import { mockLeftProtoPipette } from '/app/redux/pipettes/__fixtures__'
 
 vi.mock('../../Devices/hooks')
-vi.mock('../../../resources/runs')
+vi.mock('/app/resources/runs')
 
 const render = (robotName: string = 'otie') => {
   return renderWithProviders(

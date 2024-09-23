@@ -16,7 +16,7 @@ import {
   RESPONSIVENESS,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { RecoverySingleColumnContentWrapper } from './shared'
 import {
   DESKTOP_ONLY,

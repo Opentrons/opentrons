@@ -3,8 +3,8 @@ import { when } from 'vitest-when'
 import { describe, it, beforeEach, vi, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { ProtocolRunModuleControls } from '../ProtocolRunModuleControls'
 import { ModuleCard } from '../../../ModuleCard'
@@ -14,7 +14,7 @@ import {
   mockTemperatureModuleGen2,
   mockThermocycler,
   mockHeaterShaker,
-} from '../../../../redux/modules/__fixtures__'
+} from '/app/redux/modules/__fixtures__'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from ..errors import LocationNotAccessibleByPipetteError
+from ..state import update_types
 from ..types import DeckPoint, AddressableOffsetVector
 from ..resources import fixture_validation
 from .pipetting_common import (
@@ -100,6 +101,8 @@ class MoveToAddressableAreaForDropTipImplementation(
         self, params: MoveToAddressableAreaForDropTipParams
     ) -> SuccessData[MoveToAddressableAreaForDropTipResult, None]:
         """Move the requested pipette to the requested addressable area in preperation of a drop tip."""
+        state_update = update_types.StateUpdate()
+
         self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
             params.addressableAreaName
         )
@@ -126,12 +129,19 @@ class MoveToAddressableAreaForDropTipImplementation(
             speed=params.speed,
             ignore_tip_configuration=params.ignoreTipConfiguration,
         )
+        deck_point = DeckPoint.construct(x=x, y=y, z=z)
+        state_update.set_pipette_location(
+            pipette_id=params.pipetteId,
+            new_addressable_area_name=params.addressableAreaName,
+            new_deck_point=deck_point,
+        )
 
         return SuccessData(
             public=MoveToAddressableAreaForDropTipResult(
                 position=DeckPoint(x=x, y=y, z=z)
             ),
             private=None,
+            state_update=state_update,
         )
 
 

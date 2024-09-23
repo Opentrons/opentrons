@@ -5,29 +5,29 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import {
   getConnectableRobots,
   getReachableRobots,
   getScanning,
   getUnreachableRobots,
   startDiscovery,
-} from '../../../redux/discovery'
+} from '/app/redux/discovery'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
-} from '../../../redux/discovery/__fixtures__'
-import { getNetworkInterfaces } from '../../../redux/networking'
+} from '/app/redux/discovery/__fixtures__'
+import { getNetworkInterfaces } from '/app/redux/networking'
 import { ChooseRobotSlideout } from '..'
-import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
+import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
-vi.mock('../../../redux/discovery')
-vi.mock('../../../redux/robot-update')
-vi.mock('../../../redux/networking')
-vi.mock('../../../resources/useNotifyDataReady')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux/networking')
+vi.mock('/app/resources/useNotifyDataReady')
 const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
   return renderWithProviders(
     <MemoryRouter>

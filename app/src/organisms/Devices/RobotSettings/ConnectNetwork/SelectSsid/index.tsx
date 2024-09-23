@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { CONTEXT_MENU } from '@opentrons/components'
-import { SelectField } from '../../../../../atoms/SelectField'
+import { SelectField } from '/app/atoms/SelectField'
 import * as Copy from '../i18n'
 import { NetworkOptionLabel, NetworkActionLabel } from './NetworkOptionLabel'
 

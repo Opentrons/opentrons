@@ -6,33 +6,37 @@ import { MemoryRouter } from 'react-router-dom'
 
 import { useDeleteRunMutation } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import runRecord from '../ProtocolRun/ProtocolRunHeader/RunHeaderModalContainer/modals/__fixtures__/runRecord.json'
-import { useDownloadRunLog, useTrackProtocolRunEvent, useRobot } from '../hooks'
+import { useDownloadRunLog } from '../hooks'
+import { useRobot } from '/app/redux-resources/robots'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useRunControls } from '../../RunTimeControl/hooks'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '../../../redux/analytics'
-import { useIsRobotOnWrongVersionOfSoftware } from '../../../redux/robot-update'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+} from '/app/redux/analytics'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
-import { useNotifyAllCommandsQuery } from '../../../resources/runs'
+import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
 import type { UseQueryResult } from 'react-query'
 import type { CommandsData } from '@opentrons/api-client'
 
-vi.mock('../../../redux/analytics')
-vi.mock('../../../redux/robot-update/selectors')
-vi.mock('../../Devices/hooks')
+vi.mock('/app/redux/analytics')
+vi.mock('/app/redux/robot-update/selectors')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/organisms/Devices/hooks')
 vi.mock('../../RunTimeControl/hooks')
-vi.mock('../../../redux/analytics')
-vi.mock('../../../redux/config')
-vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
-vi.mock('../../../resources/runs')
-vi.mock('../../../redux/robot-update')
+vi.mock('/app/redux/analytics')
+vi.mock('/app/redux/config')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/resources/runs')
+vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux-resources/analytics')
 vi.mock('@opentrons/react-api-client')
 
 const render = (

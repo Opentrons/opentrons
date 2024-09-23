@@ -4,23 +4,23 @@ import { screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   mockAttachedPipette,
   mockAttachedPipetteInformation,
-} from '../../../../redux/pipettes/__fixtures__'
+} from '/app/redux/pipettes/__fixtures__'
 import {
   useAttachedPipettes,
-  useIsFlex,
   useAttachedPipettesFromInstrumentsQuery,
-} from '../../../Devices/hooks'
-import { renderWithProviders } from '../../../../__testing-utils__'
+} from '/app/organisms/Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
 import { OverflowMenu } from '../OverflowMenu'
 import { formatLastCalibrated } from '../utils'
 
 import type { Mount } from '@opentrons/components'
-import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
+import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 
 const render = (
   props: React.ComponentProps<typeof PipetteOffsetCalibrationItems>
@@ -58,11 +58,12 @@ const mockPipetteOffsetCalibrationsForOt3 = [
   },
 ]
 
-vi.mock('../../../../redux/custom-labware/selectors')
-vi.mock('../../../../redux/sessions/selectors')
-vi.mock('../../../../redux/discovery')
-vi.mock('../../../../assets/labware/findLabware')
-vi.mock('../../../../organisms/Devices/hooks')
+vi.mock('/app/redux/custom-labware/selectors')
+vi.mock('/app/redux/sessions/selectors')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/assets/labware/findLabware')
+vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../OverflowMenu')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {

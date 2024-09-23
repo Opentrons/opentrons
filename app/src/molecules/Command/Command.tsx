@@ -13,7 +13,7 @@ import type { RobotType, RunTimeCommand } from '@opentrons/shared-data'
 import { CommandText } from './CommandText'
 import { CommandIcon } from './CommandIcon'
 import type { CommandTextData } from './types'
-import { Skeleton } from '../../atoms/Skeleton'
+import { Skeleton } from '/app/atoms/Skeleton'
 import type { StyleProps } from '@opentrons/components'
 import { omit } from 'lodash'
 

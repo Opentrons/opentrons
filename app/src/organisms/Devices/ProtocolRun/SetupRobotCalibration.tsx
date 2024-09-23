@@ -15,15 +15,16 @@ import {
   useTrackEvent,
   ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
   ANALYTICS_PROCEED_TO_LABWARE_SETUP_STEP,
-} from '../../../redux/analytics'
-import { useIsFlex, useRunHasStarted } from '../hooks'
+} from '/app/redux/analytics'
+import { useRunHasStarted } from '../hooks'
 import { SetupDeckCalibration } from './SetupDeckCalibration'
 import { SetupInstrumentCalibration } from './SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from './SetupTipLengthCalibration'
-import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useRunStatus } from '/app/resources/runs'
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
+import { useIsFlex } from '/app/redux-resources/robots'
 
-import type { ProtocolCalibrationStatus } from '../../../redux/calibration/types'
+import type { ProtocolCalibrationStatus } from '/app/redux/calibration/types'
 import type { StepKey } from './ProtocolRunSetup'
 
 interface SetupRobotCalibrationProps {

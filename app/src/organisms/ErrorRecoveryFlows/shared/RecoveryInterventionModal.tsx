@@ -4,10 +4,10 @@ import { css } from 'styled-components'
 
 import { Flex, RESPONSIVENESS, SPACING } from '@opentrons/components'
 
-import { InterventionModal } from '../../../molecules/InterventionModal'
+import { InterventionModal } from '/app/molecules/InterventionModal'
 import { getModalPortalEl, getTopPortalEl } from '../../../App/portal'
 
-import type { ModalType } from '../../../molecules/InterventionModal'
+import type { ModalType } from '/app/molecules/InterventionModal'
 import type { DesktopSizeType } from '../types'
 
 export type RecoveryInterventionModalProps = Omit<

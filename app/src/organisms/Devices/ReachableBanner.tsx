@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { SPACING } from '@opentrons/components'
-import { Banner } from '../../atoms/Banner'
-import { REACHABLE } from '../../redux/discovery'
+import { Banner } from '/app/atoms/Banner'
+import { REACHABLE } from '/app/redux/discovery'
 
-import type { DiscoveredRobot } from '../../redux/discovery/types'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
 
 interface ReachableBannerProps {
   robot: DiscoveredRobot

@@ -50,7 +50,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
     <Flex
       backgroundColor={COLORS.white}
       borderRadius={BORDERS.borderRadius8}
-      width="100%"
+      width={tab === 'startingDeck' ? '100%' : '90%'}
       height="70vh"
       padding={`${SPACING.spacing40} ${SPACING.spacing24}`}
       justifyContent={JUSTIFY_CENTER}
@@ -148,15 +148,17 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
               </Flex>
             )
           })}
-          <Flex width="9.5625rem" height="6.375rem">
-            <EmptySelectorButton
-              onClick={addLabware}
-              text={t('add_labware')}
-              textAlignment="middle"
-              size="large"
-              iconName="plus"
-            />
-          </Flex>
+          {tab === 'startingDeck' ? (
+            <Flex width="9.5625rem" height="6.375rem">
+              <EmptySelectorButton
+                onClick={addLabware}
+                text={t('add_labware')}
+                textAlignment="middle"
+                size="large"
+                iconName="plus"
+              />
+            </Flex>
+          ) : null}
         </Flex>
       </Flex>
     </Flex>

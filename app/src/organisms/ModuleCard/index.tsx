@@ -40,14 +40,14 @@ import {
   getErrorResponseMessage,
   dismissRequest,
   SUCCESS,
-} from '../../redux/robot-api'
-import { Banner } from '../../atoms/Banner'
-import { UpdateBanner } from '../../molecules/UpdateBanner'
-import { useChainLiveCommands } from '../../resources/runs'
-import { useCurrentRunStatus } from '../RunTimeControl/hooks'
-import { useIsFlex } from '../../organisms/Devices/hooks'
-import { getModuleTooHot } from '../Devices/getModuleTooHot'
-import { useToaster } from '../ToasterOven'
+} from '/app/redux/robot-api'
+import { Banner } from '/app/atoms/Banner'
+import { UpdateBanner } from '/app/molecules/UpdateBanner'
+import { useChainLiveCommands } from '/app/resources/runs'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { getModuleTooHot } from '/app/organisms/Devices/getModuleTooHot'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
 import { ThermocyclerModuleData } from './ThermocyclerModuleData'
@@ -60,20 +60,20 @@ import { HeaterShakerModuleData } from './HeaterShakerModuleData'
 import { HeaterShakerSlideout } from './HeaterShakerSlideout'
 import { TestShakeSlideout } from './TestShakeSlideout'
 import { ModuleWizardFlows } from '../ModuleWizardFlows'
-import { getModulePrepCommands } from '../Devices/getModulePrepCommands'
+import { getModulePrepCommands } from '/app/organisms/Devices/getModulePrepCommands'
 import { getModuleCardImage } from './utils'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
 import { ErrorInfo } from './ErrorInfo'
 import { ModuleSetupModal } from './ModuleSetupModal'
-import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { IconProps } from '@opentrons/components'
 import type {
   AttachedModule,
   HeaterShakerModule,
-} from '../../redux/modules/types'
-import type { State, Dispatch } from '../../redux/types'
-import type { RequestState } from '../../redux/robot-api/types'
+} from '/app/redux/modules/types'
+import type { State, Dispatch } from '/app/redux/types'
+import type { RequestState } from '/app/redux/robot-api/types'
 import { AbsorbanceReaderData } from './AbsorbanceReaderData'
 import { AbsorbanceReaderSlideout } from './AbsorbanceReaderSlideout'
 

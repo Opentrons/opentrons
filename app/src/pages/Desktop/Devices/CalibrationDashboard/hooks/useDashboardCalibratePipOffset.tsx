@@ -5,35 +5,25 @@ import { useTranslation } from 'react-i18next'
 import { ModalShell } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../../../App/portal'
-import { WizardHeader } from '../../../../../molecules/WizardHeader'
-import { CalibratePipetteOffset } from '../../../../../organisms/CalibratePipetteOffset'
-import { LoadingState } from '../../../../../organisms/CalibrationPanels'
-import * as RobotApi from '../../../../../redux/robot-api'
-import * as Sessions from '../../../../../redux/sessions'
-import { getPipetteOffsetCalibrationSession } from '../../../../../redux/sessions/pipette-offset-calibration/selectors'
-import { pipetteOffsetCalibrationStarted } from '../../../../../redux/analytics'
-
-import type { State } from '../../../../../redux/types'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { CalibratePipetteOffset } from '/app/organisms/CalibratePipetteOffset'
+import { LoadingState } from '/app/organisms/CalibrationPanels'
+import * as RobotApi from '/app/redux/robot-api'
+import * as Sessions from '/app/redux/sessions'
+import { getPipetteOffsetCalibrationSession } from '/app/redux/sessions/pipette-offset-calibration/selectors'
+import { pipetteOffsetCalibrationStarted } from '/app/redux/analytics'
+import type { DashboardCalOffsetInvoker } from '/app/organisms/Devices/hooks/useCalibrationTaskList'
+import type { State } from '/app/redux/types'
 import type {
   SessionCommandString,
   PipetteOffsetCalibrationSession,
-  PipetteOffsetCalibrationSessionParams,
-} from '../../../../../redux/sessions/types'
-import type { RequestState } from '../../../../../redux/robot-api/types'
+} from '/app/redux/sessions/types'
+import type { RequestState } from '/app/redux/robot-api/types'
 
 // pipette calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
-
-export interface DashboardOffsetCalInvokerProps {
-  params: Pick<PipetteOffsetCalibrationSessionParams, 'mount'> &
-    Partial<Omit<PipetteOffsetCalibrationSessionParams, 'mount'>>
-}
-
-export type DashboardCalOffsetInvoker = (
-  props: DashboardOffsetCalInvokerProps
-) => void
 
 export function useDashboardCalibratePipOffset(
   robotName: string,

@@ -4,38 +4,36 @@ import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
-import { i18n } from '../../../i18n'
-import { home } from '../../../redux/robot-controls'
-import { useIsRobotOnWrongVersionOfSoftware } from '../../../redux/robot-update'
-import { restartRobot } from '../../../redux/robot-admin'
+import { i18n } from '/app/i18n'
+import { home } from '/app/redux/robot-controls'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { restartRobot } from '/app/redux/robot-admin'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
-} from '../../../redux/discovery/__fixtures__'
-import { useCanDisconnect } from '../../../resources/networking/hooks'
-import { DisconnectModal } from '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
+} from '/app/redux/discovery/__fixtures__'
+import { useCanDisconnect } from '/app/resources/networking/hooks'
+import { DisconnectModal } from '/app/organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
-import { useCurrentRunId } from '../../../resources/runs'
+import { useCurrentRunId } from '/app/resources/runs'
 import { useIsRobotBusy } from '../hooks'
 import { handleUpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 
-vi.mock('../../../redux/robot-controls')
-vi.mock('../../../redux/robot-admin')
+vi.mock('/app/redux/robot-controls')
+vi.mock('/app/redux/robot-admin')
 vi.mock('../hooks')
-vi.mock('../../../redux/robot-update')
-vi.mock('../../../resources/networking/hooks')
-vi.mock(
-  '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
-)
+vi.mock('/app/redux/robot-update')
+vi.mock('/app/resources/networking/hooks')
+vi.mock('/app/organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal')
 vi.mock('../../ChooseProtocolSlideout')
-vi.mock('../../../resources/runs')
+vi.mock('/app/resources/runs')
 vi.mock('../RobotSettings/UpdateBuildroot')
-vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
 const render = (
   props: React.ComponentProps<typeof RobotOverviewOverflowMenu>

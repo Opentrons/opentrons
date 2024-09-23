@@ -8,7 +8,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { OT3_PIPETTES } from '@opentrons/shared-data'
-import { PipetteSelect } from '../../molecules/PipetteSelect'
+import { PipetteSelect } from '/app/molecules/PipetteSelect'
 
 export type PipetteSelectionProps = React.ComponentProps<typeof PipetteSelect>
 

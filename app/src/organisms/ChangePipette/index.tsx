@@ -15,8 +15,8 @@ import {
   useDispatchApiRequests,
   getRequestById,
   SUCCESS,
-} from '../../redux/robot-api'
-import { getCalibrationForPipette } from '../../redux/calibration'
+} from '/app/redux/robot-api'
+import { getCalibrationForPipette } from '/app/redux/calibration'
 import {
   home,
   move,
@@ -27,10 +27,10 @@ import {
   PIPETTE,
   CHANGE_PIPETTE,
   HOME,
-} from '../../redux/robot-controls'
+} from '/app/redux/robot-controls'
 
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
 import { useAttachedPipettes } from '../Devices/hooks'
 import { ExitModal } from './ExitModal'
 import { Instructions } from './Instructions'
@@ -48,8 +48,8 @@ import {
 } from './constants'
 
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
-import type { State, Dispatch } from '../../redux/types'
-import type { Mount } from '../../redux/pipettes/types'
+import type { State, Dispatch } from '/app/redux/types'
+import type { Mount } from '/app/redux/pipettes/types'
 import type { WizardStep } from './types'
 
 interface Props {

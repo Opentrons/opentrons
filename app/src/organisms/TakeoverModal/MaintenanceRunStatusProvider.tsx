@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
 interface MaintenanceRunIds {
   currentRunId: string | null

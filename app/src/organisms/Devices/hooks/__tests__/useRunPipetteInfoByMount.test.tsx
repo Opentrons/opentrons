@@ -12,22 +12,22 @@ import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
-} from '../../../../redux/calibration/pipette-offset/__fixtures__'
+} from '/app/redux/calibration/pipette-offset/__fixtures__'
 import {
   mockTipLengthCalibration1,
   mockTipLengthCalibration2,
-} from '../../../../redux/calibration/tip-length/__fixtures__'
+} from '/app/redux/calibration/tip-length/__fixtures__'
 import {
   mockLeftProtoPipette,
   mockRightProtoPipette,
-} from '../../../../redux/pipettes/__fixtures__'
+} from '/app/redux/pipettes/__fixtures__'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
   useRunPipetteInfoByMount,
-  useStoredProtocolAnalysis,
 } from '..'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import _uncastedModifiedSimpleV6Protocol from '../__fixtures__/modifiedSimpleV6.json'
 
 import type * as SharedData from '@opentrons/shared-data'
@@ -46,7 +46,7 @@ vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../useAttachedPipetteCalibrations')
 vi.mock('../useAttachedPipettes')
 vi.mock('../useTipLengthCalibrations')
-vi.mock('../useStoredProtocolAnalysis')
+vi.mock('/app/resources/analysis')
 
 const PIPETTE_CALIBRATIONS = {
   left: {

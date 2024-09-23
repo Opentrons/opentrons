@@ -21,7 +21,7 @@ import {
 
 import { useRunHasStarted } from './hooks'
 import type { ModuleModel } from '@opentrons/shared-data'
-import type { PhysicalPort } from '../../redux/modules/api-types'
+import type { PhysicalPort } from '/app/redux/modules/api-types'
 
 export interface ModuleInfoProps {
   moduleModel: ModuleModel

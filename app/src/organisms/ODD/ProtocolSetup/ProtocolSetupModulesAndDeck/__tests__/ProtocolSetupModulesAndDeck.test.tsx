@@ -11,20 +11,20 @@ import {
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
-import { useChainLiveCommands } from '../../../../../resources/runs'
-import { mockRobotSideAnalysis } from '../../../../../molecules/Command/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useChainLiveCommands, useRunStatus } from '/app/resources/runs'
+import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import {
   useAttachedModules,
   useRunCalibrationStatus,
 } from '../../../../Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { mockApiHeaterShaker } from '../../../../../redux/modules/__fixtures__'
+import { mockApiHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { mockProtocolModuleInfo } from '../../ProtocolSetupInstruments/__fixtures__'
-import { getLocalRobot } from '../../../../../redux/discovery'
-import { mockConnectedRobot } from '../../../../../redux/discovery/__fixtures__'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
@@ -35,22 +35,17 @@ import { SetupInstructionsModal } from '../SetupInstructionsModal'
 import { FixtureTable } from '../FixtureTable'
 import { ModulesAndDeckMapView } from '../ModulesAndDeckMapView'
 import { ProtocolSetupModulesAndDeck } from '..'
-import { useNotifyDeckConfigurationQuery } from '../../../../../resources/deck_configuration'
-import { useRunStatus } from '../../../../RunTimeControl/hooks'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
 import type { UseQueryResult } from 'react-query'
 
-vi.mock('../../../../../resources/runs')
-vi.mock('../../../../../redux/discovery')
-vi.mock('../../../../../organisms/Devices/hooks')
-vi.mock('../../../../../resources/deck_configuration')
-vi.mock(
-  '../../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-)
-vi.mock(
-  '../../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-)
+vi.mock('/app/resources/runs')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/resources/deck_configuration')
+vi.mock('/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('/app/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
 vi.mock('../utils')
 vi.mock('../SetupInstructionsModal')
 vi.mock('../../../../ModuleWizardFlows')
@@ -59,7 +54,6 @@ vi.mock(
   '../../../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 )
 vi.mock('../ModulesAndDeckMapView')
-vi.mock('../../../../RunTimeControl/hooks')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'

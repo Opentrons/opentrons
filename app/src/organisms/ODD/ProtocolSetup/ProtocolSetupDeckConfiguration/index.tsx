@@ -24,7 +24,7 @@ import { AddFixtureModal } from '../../../DeviceDetailsDeckConfiguration/AddFixt
 import { DeckConfigurationDiscardChangesModal } from '../../../DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getTopPortalEl } from '../../../../App/portal'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type {
   CutoutFixtureId,

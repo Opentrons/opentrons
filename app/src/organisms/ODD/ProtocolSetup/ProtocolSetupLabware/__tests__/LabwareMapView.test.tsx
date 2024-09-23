@@ -10,8 +10,8 @@ import {
   fixtureTiprack300ul,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { getLabwareRenderInfo } from '../../../../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import { getStandardDeckViewLayerBlockList } from '../../../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 import { mockProtocolModuleInfo } from '../__fixtures__'
@@ -29,8 +29,8 @@ vi.mock('../../../../Devices/ProtocolRun/utils/getLabwareRenderInfo')
 vi.mock('@opentrons/components/src/hardware-sim/Labware/LabwareRender')
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck')
 vi.mock('@opentrons/shared-data/js/helpers/getSimplestFlexDeckConfig')
-vi.mock('../../../../../resources/deck_configuration/utils')
-vi.mock('../../../../../redux/config')
+vi.mock('/app/resources/deck_configuration/utils')
+vi.mock('/app/redux/config')
 
 const MOCK_300_UL_TIPRACK_COORDS = [30, 40, 0]
 

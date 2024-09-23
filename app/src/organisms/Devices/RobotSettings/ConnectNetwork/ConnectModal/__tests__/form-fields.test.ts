@@ -1,4 +1,4 @@
-import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
+import * as Fixtures from '/app/redux/networking/__fixtures__'
 import { describe, it, expect } from 'vitest'
 
 import {
@@ -8,7 +8,7 @@ import {
   SECURITY_WPA_EAP,
   SECURITY_WPA_PSK,
   SECURITY_NONE,
-} from '../../../../../../redux/networking'
+} from '/app/redux/networking'
 
 import {
   FIELD_TYPE_TEXT,

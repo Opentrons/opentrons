@@ -14,17 +14,17 @@ import { useDeckMapUtils } from './useDeckMapUtils'
 import {
   useNotifyAllCommandsQuery,
   useNotifyRunQuery,
-} from '../../../resources/runs'
+} from '/app/resources/runs'
 import { useRecoveryOptionCopy } from './useRecoveryOptionCopy'
 import { useRecoveryActionMutation } from './useRecoveryActionMutation'
-import { useRunningStepCounts } from '../../../resources/protocols/hooks'
+import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 import { useRecoveryToasts } from './useRecoveryToasts'
-import { useRecoveryAnalytics } from './useRecoveryAnalytics'
+import { useRecoveryAnalytics } from '/app/redux-resources/analytics'
 import { useShowDoorInfo } from './useShowDoorInfo'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
-import type { IRecoveryMap } from '../types'
+import type { IRecoveryMap, RouteStep, RecoveryRoute } from '../types'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
 import type { UseRecoveryCommandsResult } from './useRecoveryCommands'
@@ -36,8 +36,8 @@ import type {
   SubMapUtils,
 } from './useRecoveryRouting'
 import type { RecoveryActionMutationResult } from './useRecoveryActionMutation'
-import type { StepCounts } from '../../../resources/protocols/hooks'
-import type { UseRecoveryAnalyticsResult } from './useRecoveryAnalytics'
+import type { StepCounts } from '/app/resources/protocols/hooks'
+import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 import type { UseRecoveryTakeoverResult } from './useRecoveryTakeover'
 import type { useRetainedFailedCommandBySource } from './useRetainedFailedCommandBySource'
 import type { UseShowDoorInfoResult } from './useShowDoorInfo'
@@ -66,7 +66,7 @@ export interface ERUtilsResults {
   stepCounts: StepCounts
   commandsAfterFailedCommand: ReturnType<typeof getNextSteps>
   subMapUtils: SubMapUtils
-  analytics: UseRecoveryAnalyticsResult
+  analytics: UseRecoveryAnalyticsResult<RecoveryRoute, RouteStep>
   doorStatusUtils: UseShowDoorInfoResult
 }
 

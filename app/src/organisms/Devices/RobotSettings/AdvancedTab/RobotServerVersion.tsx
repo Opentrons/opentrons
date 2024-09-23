@@ -13,14 +13,14 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { TertiaryButton } from '../../../../atoms/buttons'
-import { getRobotApiVersion } from '../../../../redux/discovery'
-import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
+import { TertiaryButton } from '/app/atoms/buttons'
+import { getRobotApiVersion } from '/app/redux/discovery'
+import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
-import { useIsFlex, useRobot } from '../../hooks'
 import { handleUpdateBuildroot } from '../UpdateBuildroot'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 
-import type { State } from '../../../../redux/types'
+import type { State } from '/app/redux/types'
 
 interface RobotServerVersionProps {
   robotName: string

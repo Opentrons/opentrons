@@ -25,11 +25,11 @@ import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostR
 import {
   useNotifyAllCommandsAsPreSerializedList,
   useNotifyRunQuery,
-} from '../../resources/runs'
-import { CommandText, CommandIcon } from '../../molecules/Command'
-import { Divider } from '../../atoms/structure'
+  useRunStatus,
+} from '/app/resources/runs'
+import { CommandText, CommandIcon } from '/app/molecules/Command'
+import { Divider } from '/app/atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
-import { useRunStatus } from '../RunTimeControl/hooks'
 import { useLastRunCommand } from '../Devices/hooks/useLastRunCommand'
 
 import type { RunStatus } from '@opentrons/api-client'

@@ -20,16 +20,17 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Banner } from '../../atoms/Banner'
+import { Banner } from '/app/atoms/Banner'
 import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationWarning'
-import { useCurrentRunId } from '../../resources/runs'
+import { useCurrentRunId } from '/app/resources/runs'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { ModuleCard } from '../ModuleCard'
-import { useIsFlex, useIsRobotViewable, useRunStatuses } from './hooks'
+import { useIsRobotViewable, useRunStatuses } from './hooks'
 import { getShowPipetteCalibrationWarning } from './utils'
 import { PipetteCard } from './PipetteCard'
 import { FlexPipetteCard } from './PipetteCard/FlexPipetteCard'
 import { GripperCard } from '../GripperCard'
-import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { useModuleApiRequests } from '../ModuleCard/utils'
 
 import type {

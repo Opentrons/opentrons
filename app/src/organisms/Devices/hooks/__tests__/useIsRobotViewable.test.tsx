@@ -6,16 +6,16 @@ import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
-import { getDiscoverableRobotByName } from '../../../../redux/discovery'
+import { getDiscoverableRobotByName } from '/app/redux/discovery'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
-} from '../../../../redux/discovery/__fixtures__'
+} from '/app/redux/discovery/__fixtures__'
 import { useIsRobotViewable } from '..'
 import type { Store } from 'redux'
 
-vi.mock('../../../../redux/discovery')
+vi.mock('/app/redux/discovery')
 
 const store: Store<any> = createStore(vi.fn(), {})
 

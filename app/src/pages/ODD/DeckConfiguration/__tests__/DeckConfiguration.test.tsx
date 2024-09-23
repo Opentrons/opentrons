@@ -4,18 +4,18 @@ import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
 import { DeckConfigurator } from '@opentrons/components'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 
-import { i18n } from '../../../../i18n'
-import { DeckFixtureSetupInstructionsModal } from '../../../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
+import { i18n } from '/app/i18n'
+import { DeckFixtureSetupInstructionsModal } from '/app/organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { DeckConfigurationEditor } from '..'
 import {
   useNotifyDeckConfigurationQuery,
   useDeckConfigurationEditingTools,
-} from '../../../../resources/deck_configuration'
+} from '/app/resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
@@ -48,12 +48,12 @@ const mockDeckConfig = [
 
 vi.mock('@opentrons/react-api-client')
 vi.mock(
-  '../../../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
+  '/app/organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 )
 vi.mock(
-  '../../../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
+  '/app/organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 )
-vi.mock('../../../../resources/deck_configuration')
+vi.mock('/app/resources/deck_configuration')
 
 const render = () => {
   return renderWithProviders(

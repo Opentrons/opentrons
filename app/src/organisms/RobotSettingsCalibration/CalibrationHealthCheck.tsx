@@ -17,28 +17,28 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
-import { TertiaryButton } from '../../atoms/buttons'
-import { AskForCalibrationBlockModal } from '../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
+import { TertiaryButton } from '/app/atoms/buttons'
+import { AskForCalibrationBlockModal } from '/app/organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
-} from '../../redux/analytics'
-import * as Calibration from '../../redux/calibration'
-import * as Config from '../../redux/config'
-import * as Pipettes from '../../redux/pipettes'
-import * as Sessions from '../../redux/sessions'
+} from '/app/redux/analytics'
+import * as Calibration from '/app/redux/calibration'
+import * as Config from '/app/redux/config'
+import * as Pipettes from '/app/redux/pipettes'
+import * as Sessions from '/app/redux/sessions'
 import {
   useDeckCalibrationStatus,
   useAttachedPipettes,
   useAttachedPipetteCalibrations,
   useRunStatuses,
-} from '../../organisms/Devices/hooks'
+} from '/app/organisms/Devices/hooks'
 
 import type {
   AttachedPipettesByMount,
   PipetteCalibrationsByMount,
-} from '../../redux/pipettes/types'
-import type { DispatchRequestsType } from '../../redux/robot-api'
+} from '/app/redux/pipettes/types'
+import type { DispatchRequestsType } from '/app/redux/robot-api'
 
 interface CalibrationHealthCheckProps {
   buttonDisabledReason: string | null

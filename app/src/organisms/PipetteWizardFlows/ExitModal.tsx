@@ -9,11 +9,11 @@ import {
   AlertPrimaryButton,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '../../molecules/SimpleWizardBody'
+} from '/app/molecules/SimpleWizardBody'
 import { FLOWS } from './constants'
 import type { PipetteWizardFlow } from './types'
 

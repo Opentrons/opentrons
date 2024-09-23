@@ -28,10 +28,10 @@ import {
   mockIncompleteTipLengthCalibrations,
   expectedTaskList,
 } from '../__fixtures__/taskListFixtures'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 
 import type { Store } from 'redux'
-import type { State } from '../../../../redux/types'
+import type { State } from '/app/redux/types'
 
 vi.mock('../')
 vi.mock('@opentrons/react-api-client')

@@ -3,7 +3,7 @@ import Markdown from 'react-markdown'
 
 import { Box, COLORS, SPACING, LegacyStyledText } from '@opentrons/components'
 
-import { useIsOEMMode } from '../../resources/robot-settings/hooks'
+import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
 
 import styles from './styles.module.css'
 

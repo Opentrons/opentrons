@@ -4,16 +4,16 @@ import { useTranslation } from 'react-i18next'
 import head from 'lodash/head'
 import { SUCCESS_TOAST, WARNING_TOAST } from '@opentrons/components'
 
-import * as AppAlerts from '../../redux/alerts'
-import { getHasJustUpdated, toggleConfigValue } from '../../redux/config'
-import { getAvailableShellUpdate } from '../../redux/shell'
+import * as AppAlerts from '/app/redux/alerts'
+import { getHasJustUpdated, toggleConfigValue } from '/app/redux/config'
+import { getAvailableShellUpdate } from '/app/redux/shell'
 import { useToaster } from '../ToasterOven'
 import { UpdateAppModal } from '../UpdateAppModal'
 import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
 import { useRemoveActiveAppUpdateToast } from '.'
 
-import type { State, Dispatch } from '../../redux/types'
-import type { AlertId } from '../../redux/alerts/types'
+import type { State, Dispatch } from '/app/redux/types'
+import type { AlertId } from '/app/redux/alerts/types'
 import type { MutableRefObject } from 'react'
 
 interface AlertsModalProps {

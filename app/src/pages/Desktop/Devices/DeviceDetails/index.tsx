@@ -4,13 +4,11 @@ import { Navigate, useParams } from 'react-router-dom'
 
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
-import {
-  useRobot,
-  useSyncRobotClock,
-} from '../../../../organisms/Devices/hooks'
-import { getScanning, OPENTRONS_USB } from '../../../../redux/discovery'
-import { appShellRequestor } from '../../../../redux/shell/remote'
+import { useSyncRobotClock } from '/app/organisms/Devices/hooks'
+import { getScanning, OPENTRONS_USB } from '/app/redux/discovery'
+import { appShellRequestor } from '/app/redux/shell/remote'
 import { DeviceDetailsComponent } from './DeviceDetailsComponent'
+import { useRobot } from '/app/redux-resources/robots'
 
 import type { DesktopRouteParams } from '../../../../App/types'
 

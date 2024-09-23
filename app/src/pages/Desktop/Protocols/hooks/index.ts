@@ -7,7 +7,7 @@ import {
 import {
   getLabwareSetupItemGroups,
   useRequiredProtocolHardwareFromAnalysis,
-} from '../../../../transformations/commands'
+} from '/app/transformations/commands'
 
 import type {
   CompletedProtocolAnalysis,
@@ -16,7 +16,7 @@ import type {
 import type {
   LabwareSetupItem,
   ProtocolHardware,
-} from '../../../../transformations/commands'
+} from '/app/transformations/commands'
 
 /**
  * Returns an array of RunTimeParameters objects that are optional by the given protocol ID.

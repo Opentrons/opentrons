@@ -3,10 +3,10 @@ import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import { AlertModal } from '@opentrons/components'
-import { UPGRADE } from '../../../../redux/robot-update'
+import { UPGRADE } from '/app/redux/robot-update'
 
 import type { ButtonProps } from '@opentrons/components'
-import type { RobotUpdateType } from '../../../../redux/robot-update/types'
+import type { RobotUpdateType } from '/app/redux/robot-update/types'
 
 export interface MigrationWarningModalProps {
   notNowButton: ButtonProps

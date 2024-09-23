@@ -3,17 +3,17 @@ import { vi, it, describe, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { FileCard } from '../FileCard'
 
 import type { CsvFileParameter } from '@opentrons/shared-data'
 
-vi.mock('../../../redux/discovery')
-vi.mock('../../../redux/robot-update')
-vi.mock('../../../redux/networking')
-vi.mock('../../../resources/useNotifyDataReady')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux/networking')
+vi.mock('/app/resources/useNotifyDataReady')
+vi.mock('/app/redux/config')
 
 const render = (props: React.ComponentProps<typeof FileCard>) => {
   return renderWithProviders(

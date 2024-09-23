@@ -221,14 +221,16 @@ Another example is a Flex protocol that uses a waste chute. Say you want to only
 Liquid Presence Detection
 =========================
 
-Liquid presence detection is a pressure-based feature that allows Opentrons Flex pipettes to detect the presence or absence of liquids in a well, reservoir, tube, or other container. It gives you the ability to identify, avoid, and recover from liquid-related protocol errors. You can enable this feature for an entire protocol run or toggle it on and off as required. Liquid presence detection is disabled by default.
+Liquid presence detection is a pressure-based feature that allows Opentrons Flex pipettes to detect the presence or absence of liquids in a well, reservoir, tube, or other container. It gives you the ability to identify, avoid, and recover from liquid-related protocol errors.
+
+When detecting liquid, the pipette slowly moves a fresh, empty tip downward from the top of the well until it contacts the liquid. The downward probing motion can take anywhere from 5 to 50 seconds, depending on the depth of the well and how much liquid it contains. For example, it will take much less time to detect liquid in a full flat well plate than in an empty (or nearly empty) large tube.
+
+You can enable this feature for an entire protocol run or toggle it on and off as required. Consider the amount of time automatic detection will add to your protocol. If you only need to detect liquid infrequently, use the :ref:`corresponding building block commands <detect-liquid-presence>` instead. Automatic liquid presence detection is disabled by default.
 
 Pipette Compatibility
 ---------------------
 
 Liquid presence detection works with Flex 1-, 8-, and 96-channel pipettes only. 1-channel pipettes have one pressure sensor. The 8-channel pipette pressure sensors are on channels 1 and 8 (positions A1 and H1). The 96-channel pipette pressure sensors are on channels 1 and 96 (positions A1 and H12). Other channels on multi-channel pipettes do not have sensors and cannot detect liquid.
-
-.. add text with link to revised pipette sensor section in manual?
 
 Enabling Globally
 -----------------
@@ -245,9 +247,11 @@ To automatically use liquid presence detection, add the optional Boolean argumen
     )
 
 .. note::
-    Accurate liquid detection requires fresh, dry pipette tips. Protocols using this feature must discard used tips after an aspirate/dispense cycle and pick up new tips before the next cycle. The API will raise an error if liquid detection is active and your protocol attempts to reuse a pipette tip or if the robot thinks the tip is wet.
+    Accurate liquid detection requires fresh, dry pipette tips. Protocols using this feature must discard used tips after an aspirate/dispense cycle and pick up new tips before the next cycle. :ref:`Complex commands <v2-complex-commands>` may include aspirate steps after a tip is already wet. When global liquid detection is enabled, use :ref:`building block commands <v2-atomic-commands>` to ensure that your protocol picks up a tip immediately before aspiration.
 
-Let's take a look at how all this works. First, tell the robot to pick up a clean tip, aspirate 100 µL from a reservoir, and dispense that volume into a well plate.
+    The API will not raise an error during liquid detection if a tip is empty but wet. It will raise an error if liquid detection is active and your protocol attempts to aspirate with liquid in the tip.
+
+Let's take a look at how all this works. With automatic liquid detection enabled, tell the robot to pick up a clean tip, aspirate 100 µL from a reservoir, and dispense that volume into a well plate:
 
 .. code-block:: python
     

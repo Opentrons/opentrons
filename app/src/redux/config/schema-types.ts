@@ -1,5 +1,5 @@
 import type { LogLevel } from '../../logger'
-import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
+import type { ProtocolSort } from '/app/organisms/ProtocolsLanding/hooks'
 
 export type UrlProtocol = 'file:' | 'http:'
 

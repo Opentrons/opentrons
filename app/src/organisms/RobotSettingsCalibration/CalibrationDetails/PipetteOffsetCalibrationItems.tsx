@@ -15,15 +15,15 @@ import {
 
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
-import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'
-import { LEFT } from '../../../redux/pipettes'
+import { getCustomLabwareDefinitions } from '/app/redux/custom-labware'
+import { LEFT } from '/app/redux/pipettes'
 import {
   useAttachedPipettes,
-  useIsFlex,
   useAttachedPipettesFromInstrumentsQuery,
-} from '../../../organisms/Devices/hooks'
+} from '/app/organisms/Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 
-import type { State } from '../../../redux/types'
+import type { State } from '/app/redux/types'
 import type { FormattedPipetteOffsetCalibration } from '..'
 
 const StyledTable = styled.table`

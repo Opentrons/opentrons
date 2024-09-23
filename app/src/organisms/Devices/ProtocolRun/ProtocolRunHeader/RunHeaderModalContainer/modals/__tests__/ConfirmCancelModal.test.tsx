@@ -10,10 +10,11 @@ import {
 } from '@opentrons/api-client'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../../../../../i18n'
-import { renderWithProviders } from '../../../../../../../__testing-utils__'
-import { useIsFlex, useTrackProtocolRunEvent } from '../../../../../hooks'
-import { useTrackEvent } from '../../../../../../../redux/analytics'
+import { i18n } from '/app/i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { useTrackEvent } from '/app/redux/analytics'
 import { ConfirmCancelModal } from '../ConfirmCancelModal'
 
 import type * as ApiClient from '@opentrons/react-api-client'
@@ -25,8 +26,9 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     useStopRunMutation: vi.fn(),
   }
 })
-vi.mock('../../../../../hooks')
-vi.mock('../../../../../../../redux/analytics')
+vi.mock('/app/redux/analytics')
+vi.mock('/app/redux-resources/analytics')
+vi.mock('/app/redux-resources/robots')
 
 const render = (props: React.ComponentProps<typeof ConfirmCancelModal>) => {
   return renderWithProviders(<ConfirmCancelModal {...props} />, {

@@ -6,11 +6,13 @@ from decoy import Decoy
 from opentrons_shared_data.labware.labware_definition import Parameters, Dimensions
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
+from opentrons.protocol_engine.state import update_types
 from opentrons.types import DeckSlotName, Point
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import errors, Config
 from opentrons.protocol_engine.resources import labware_validation
 from opentrons.protocol_engine.types import (
+    CurrentWell,
     DeckSlotLocation,
     ModuleLocation,
     OnLabwareLocation,
@@ -258,6 +260,65 @@ async def test_gripper_move_labware_implementation(
             offsetId="wowzers-a-new-offset-id",
         ),
         private=None,
+        state_update=update_types.StateUpdate(pipette_location=update_types.CLEAR),
+    )
+
+
+@pytest.mark.parametrize(
+    ("current_labware_id", "moved_labware_id", "expect_cleared_location"),
+    [
+        ("lw1", "lw2", False),
+        ("lw1", "lw1", True),
+    ],
+)
+async def test_clears_location_if_current_labware_moved_from_under_pipette(
+    decoy: Decoy,
+    equipment: EquipmentHandler,
+    labware_movement: LabwareMovementHandler,
+    state_view: StateView,
+    run_control: RunControlHandler,
+    current_labware_id: str,
+    moved_labware_id: str,
+    expect_cleared_location: bool,
+) -> None:
+    """If it moves the labware that the pipette is currently over, it should clear the location."""
+    subject = MoveLabwareImplementation(
+        state_view=state_view,
+        equipment=equipment,
+        labware_movement=labware_movement,
+        run_control=run_control,
+    )
+
+    from_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_A1)
+    to_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_A2)
+
+    decoy.when(state_view.labware.get(labware_id=moved_labware_id)).then_return(
+        LoadedLabware(
+            id=moved_labware_id,
+            loadName="load-name",
+            definitionUri="opentrons-test/load-name/1",
+            location=from_location,
+            offsetId=None,
+        )
+    )
+
+    decoy.when(state_view.pipettes.get_current_location()).then_return(
+        CurrentWell(
+            pipette_id="pipette-id", labware_id=current_labware_id, well_name="A1"
+        )
+    )
+
+    result = await subject.execute(
+        params=MoveLabwareParams(
+            labwareId=moved_labware_id,
+            newLocation=to_location,
+            strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
+        )
+    )
+    assert (
+        result.state_update.pipette_location == update_types.CLEAR
+        if expect_cleared_location
+        else update_types.NO_CHANGE
     )
 
 
@@ -348,6 +409,7 @@ async def test_gripper_move_to_waste_chute_implementation(
             offsetId="wowzers-a-new-offset-id",
         ),
         private=None,
+        state_update=update_types.StateUpdate(pipette_location=update_types.CLEAR),
     )
 
 

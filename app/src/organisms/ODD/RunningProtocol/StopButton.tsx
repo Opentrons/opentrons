@@ -9,7 +9,7 @@ import {
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 
-import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
+import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 
 const STOP_BUTTON_STYLE = css`
   -webkit-tap-highlight-color: transparent;

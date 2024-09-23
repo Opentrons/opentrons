@@ -17,21 +17,20 @@ import {
 } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '../../App/portal'
-import { Line } from '../../atoms/structure'
-import { CalibrateDeck } from '../../organisms/CalibrateDeck'
-import { CalibrationStatusCard } from '../../organisms/CalibrationStatusCard'
-import { CheckCalibration } from '../../organisms/CheckCalibration'
+import { Line } from '/app/atoms/structure'
+import { CalibrateDeck } from '/app/organisms/CalibrateDeck'
+import { CalibrationStatusCard } from '/app/organisms/CalibrationStatusCard'
+import { CheckCalibration } from '/app/organisms/CheckCalibration'
 import {
-  useRobot,
   useRunStatuses,
-  useIsFlex,
   useAttachedPipettesFromInstrumentsQuery,
-} from '../../organisms/Devices/hooks'
-import { HowCalibrationWorksModal } from '../../organisms/HowCalibrationWorksModal'
-import { CONNECTABLE } from '../../redux/discovery'
-import * as RobotApi from '../../redux/robot-api'
-import { getDeckCalibrationSession } from '../../redux/sessions/deck-calibration/selectors'
-import * as Sessions from '../../redux/sessions'
+} from '/app/organisms/Devices/hooks'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
+import { HowCalibrationWorksModal } from '/app/organisms/HowCalibrationWorksModal'
+import { CONNECTABLE } from '/app/redux/discovery'
+import * as RobotApi from '/app/redux/robot-api'
+import { getDeckCalibrationSession } from '/app/redux/sessions/deck-calibration/selectors'
+import * as Sessions from '/app/redux/sessions'
 import { CalibrationDataDownload } from './CalibrationDataDownload'
 import { CalibrationHealthCheck } from './CalibrationHealthCheck'
 import { RobotSettingsDeckCalibration } from './RobotSettingsDeckCalibration'
@@ -42,12 +41,12 @@ import { RobotSettingsModuleCalibration } from './RobotSettingsModuleCalibration
 
 import type { GripperData } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
-import type { RequestState } from '../../redux/robot-api/types'
+import type { RequestState } from '/app/redux/robot-api/types'
 import type {
   SessionCommandString,
   DeckCalibrationSession,
-} from '../../redux/sessions/types'
-import type { State, Dispatch } from '../../redux/types'
+} from '/app/redux/sessions/types'
+import type { State, Dispatch } from '/app/redux/types'
 
 const CALS_FETCH_MS = 5000
 

@@ -3,22 +3,22 @@ import { createStore } from 'redux'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
-import { i18n } from '../../../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   getRobotUpdateDisplayInfo,
   getRobotUpdateVersion,
-} from '../../../../../redux/robot-update'
-import { getDiscoverableRobotByName } from '../../../../../redux/discovery'
+} from '/app/redux/robot-update'
+import { getDiscoverableRobotByName } from '/app/redux/discovery'
 import { UpdateRobotModal, RELEASE_NOTES_URL_BASE } from '../UpdateRobotModal'
 import { useIsRobotBusy } from '../../../hooks'
 
 import type { Store } from 'redux'
-import type { State } from '../../../../../redux/types'
+import type { State } from '/app/redux/types'
 
-vi.mock('../../../../../redux/robot-update')
-vi.mock('../../../../../redux/discovery')
+vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux/discovery')
 vi.mock('../../../hooks')
 
 const render = (props: React.ComponentProps<typeof UpdateRobotModal>) => {

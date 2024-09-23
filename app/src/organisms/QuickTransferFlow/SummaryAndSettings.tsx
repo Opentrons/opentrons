@@ -17,7 +17,7 @@ import {
   useCreateRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { ChildNavigation } from '../ChildNavigation'
 import { Overview } from './Overview'
@@ -27,7 +27,7 @@ import { SaveOrRunModal } from './SaveOrRunModal'
 import { getInitialSummaryState, createQuickTransferFile } from './utils'
 import { quickTransferSummaryReducer } from './reducers'
 
-import type { SmallButton } from '../../atoms/buttons'
+import type { SmallButton } from '/app/atoms/buttons'
 import type { QuickTransferWizardState } from './types'
 
 interface SummaryAndSettingsProps {

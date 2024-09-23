@@ -16,7 +16,7 @@ import {
   LeftColumnLabwareInfo,
   TwoColTextAndFailedStepNextStep,
 } from '../shared'
-import { TwoColumn, DeckMapContent } from '../../../molecules/InterventionModal'
+import { TwoColumn, DeckMapContent } from '/app/molecules/InterventionModal'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'

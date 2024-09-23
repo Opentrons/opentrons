@@ -3,8 +3,8 @@ import {
   MAGNETIC_BLOCK_TYPE,
   ABSORBANCE_READER_TYPE,
 } from '@opentrons/shared-data'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useModuleRenderInfoForProtocolById } from './useModuleRenderInfoForProtocolById'
-import { useIsFlex } from './useIsFlex'
 import type { ProtocolCalibrationStatus } from './useRunCalibrationStatus'
 
 export function useModuleCalibrationStatus(

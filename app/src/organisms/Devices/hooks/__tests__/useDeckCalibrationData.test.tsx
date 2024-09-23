@@ -11,21 +11,21 @@ import {
   DECK_CAL_STATUS_OK,
   DECK_CAL_STATUS_BAD_CALIBRATION,
   DECK_CAL_STATUS_IDENTITY,
-} from '../../../../redux/calibration'
-import { getDiscoverableRobotByName } from '../../../../redux/discovery'
-import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
-import { useDispatchApiRequest } from '../../../../redux/robot-api'
+} from '/app/redux/calibration'
+import { getDiscoverableRobotByName } from '/app/redux/discovery'
+import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
+import { useDispatchApiRequest } from '/app/redux/robot-api'
 
 import type { Store } from 'redux'
-import type { DispatchApiRequestType } from '../../../../redux/robot-api'
+import type { DispatchApiRequestType } from '/app/redux/robot-api'
 
 import { useDeckCalibrationData } from '..'
-import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../redux/calibration')
-vi.mock('../../../../redux/robot-api')
-vi.mock('../../../../redux/discovery')
+vi.mock('/app/redux/calibration')
+vi.mock('/app/redux/robot-api')
+vi.mock('/app/redux/discovery')
 
 const store: Store<any> = createStore(vi.fn(), {})
 

@@ -10,11 +10,11 @@ import {
 } from '@opentrons/components'
 
 import { ChildNavigation } from '../ChildNavigation'
-import { NumericalKeyboard } from '../../atoms/SoftwareKeyboard'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { getVolumeRange } from './utils'
 import { CONSOLIDATE, DISTRIBUTE } from './constants'
 
-import type { SmallButton } from '../../atoms/buttons'
+import type { SmallButton } from '/app/atoms/buttons'
 import type {
   QuickTransferWizardState,
   QuickTransferWizardAction,

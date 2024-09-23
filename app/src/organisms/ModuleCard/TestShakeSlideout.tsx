@@ -31,11 +31,11 @@ import {
   RPM,
 } from '@opentrons/shared-data'
 
-import { getIsHeaterShakerAttached } from '../../redux/config'
+import { getIsHeaterShakerAttached } from '/app/redux/config'
 import { getTopPortalEl } from '../../App/portal'
-import { Slideout } from '../../atoms/Slideout'
-import { TertiaryButton } from '../../atoms/buttons'
-import { Divider } from '../../atoms/structure'
+import { Slideout } from '/app/atoms/Slideout'
+import { TertiaryButton } from '/app/atoms/buttons'
+import { Divider } from '/app/atoms/structure'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 import { useLatchControls } from './hooks'
 import { ModuleSetupModal } from './ModuleSetupModal'
@@ -46,7 +46,7 @@ import type {
   HeaterShakerDeactivateShakerCreateCommand,
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
 } from '@opentrons/shared-data'
-import type { HeaterShakerModule, LatchStatus } from '../../redux/modules/types'
+import type { HeaterShakerModule, LatchStatus } from '/app/redux/modules/types'
 
 interface TestShakeSlideoutProps {
   module: HeaterShakerModule

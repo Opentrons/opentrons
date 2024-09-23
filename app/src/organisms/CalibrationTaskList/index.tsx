@@ -17,19 +17,21 @@ import {
   Modal,
 } from '@opentrons/components'
 
-import { StatusLabel } from '../../atoms/StatusLabel'
+import { StatusLabel } from '/app/atoms/StatusLabel'
 import { TaskList } from '../TaskList'
 
 import {
   useAttachedPipettes,
   useCalibrationTaskList,
   useRunHasStarted,
-} from '../Devices/hooks'
-import { useCurrentRunId } from '../../resources/runs'
+} from '/app/organisms/Devices/hooks'
+import { useCurrentRunId } from '/app/resources/runs'
 
-import type { DashboardCalOffsetInvoker } from '../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
-import type { DashboardCalTipLengthInvoker } from '../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
-import type { DashboardCalDeckInvoker } from '../../pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
+import type {
+  DashboardCalOffsetInvoker,
+  DashboardCalTipLengthInvoker,
+  DashboardCalDeckInvoker,
+} from '/app/organisms/Devices/hooks'
 
 interface CalibrationTaskListProps {
   robotName: string

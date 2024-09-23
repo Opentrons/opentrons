@@ -10,16 +10,13 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { DeviceDetailsDeckConfiguration } from '../../../../organisms/DeviceDetailsDeckConfiguration'
-import { RobotOverview } from '../../../../organisms/Devices/RobotOverview'
-import { InstrumentsAndModules } from '../../../../organisms/Devices/InstrumentsAndModules'
-import { RecentProtocolRuns } from '../../../../organisms/Devices/RecentProtocolRuns'
-import { EstopBanner } from '../../../../organisms/Devices/EstopBanner'
-import {
-  DISENGAGED,
-  useEstopContext,
-} from '../../../../organisms/EmergencyStop'
-import { useIsFlex } from '../../../../organisms/Devices/hooks'
+import { DeviceDetailsDeckConfiguration } from '/app/organisms/DeviceDetailsDeckConfiguration'
+import { RobotOverview } from '/app/organisms/Devices/RobotOverview'
+import { InstrumentsAndModules } from '/app/organisms/Devices/InstrumentsAndModules'
+import { RecentProtocolRuns } from '/app/organisms/Devices/RecentProtocolRuns'
+import { EstopBanner } from '/app/organisms/Devices/EstopBanner'
+import { DISENGAGED, useEstopContext } from '/app/organisms/EmergencyStop'
+import { useIsFlex } from '/app/redux-resources/robots'
 
 interface DeviceDetailsComponentProps {
   robotName: string

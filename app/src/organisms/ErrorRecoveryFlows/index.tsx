@@ -16,7 +16,7 @@ import {
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { useHost } from '@opentrons/react-api-client'
 
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
 import { RunPausedSplash, useRunPausedSplash } from './RunPausedSplash'
 import { RecoveryTakeover } from './RecoveryTakeover'

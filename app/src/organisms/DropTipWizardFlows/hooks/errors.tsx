@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { AlertPrimaryButton, SPACING } from '@opentrons/components'
 
 import { DROP_TIP_SPECIAL_ERROR_TYPES } from '../constants'
-import { SmallButton } from '../../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 
 import type { RunCommandError } from '@opentrons/shared-data'
 import type { ErrorDetails } from '../types'

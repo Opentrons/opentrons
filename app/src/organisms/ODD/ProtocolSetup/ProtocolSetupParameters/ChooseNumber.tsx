@@ -11,9 +11,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { useToaster } from '../../../ToasterOven'
-import { ChildNavigation } from '../../../ChildNavigation'
-import { NumericalKeyboard } from '../../../../atoms/SoftwareKeyboard'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import type { NumberParameter } from '@opentrons/shared-data'
 
 interface ChooseNumberProps {

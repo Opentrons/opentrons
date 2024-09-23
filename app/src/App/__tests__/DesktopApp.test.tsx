@@ -4,35 +4,35 @@ import { screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 
-import { renderWithProviders } from '../../__testing-utils__'
-import { i18n } from '../../i18n'
-import { Breadcrumbs } from '../../organisms/Breadcrumbs'
-import { CalibrationDashboard } from '../../pages/Desktop/Devices/CalibrationDashboard'
-import { DeviceDetails } from '../../pages/Desktop/Devices/DeviceDetails'
-import { DevicesLanding } from '../../pages/Desktop/Devices/DevicesLanding'
-import { ProtocolsLanding } from '../../pages/Desktop/Protocols/ProtocolsLanding'
-import { ProtocolRunDetails } from '../../pages/Desktop/Devices/ProtocolRunDetails'
-import { RobotSettings } from '../../pages/Desktop/Devices/RobotSettings'
-import { GeneralSettings } from '../../pages/Desktop/AppSettings/GeneralSettings'
-import { AlertsModal } from '../../organisms/Alerts/AlertsModal'
-import { useFeatureFlag } from '../../redux/config'
-import { useIsFlex } from '../../organisms/Devices/hooks'
-import { ProtocolTimeline } from '../../pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { Breadcrumbs } from '/app/organisms/Breadcrumbs'
+import { CalibrationDashboard } from '/app/pages/Desktop/Devices/CalibrationDashboard'
+import { DeviceDetails } from '/app/pages/Desktop/Devices/DeviceDetails'
+import { DevicesLanding } from '/app/pages/Desktop/Devices/DevicesLanding'
+import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
+import { ProtocolRunDetails } from '/app/pages/Desktop/Devices/ProtocolRunDetails'
+import { RobotSettings } from '/app/pages/Desktop/Devices/RobotSettings'
+import { GeneralSettings } from '/app/pages/Desktop/AppSettings/GeneralSettings'
+import { AlertsModal } from '/app/organisms/Alerts/AlertsModal'
+import { useFeatureFlag } from '/app/redux/config'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { ProtocolTimeline } from '/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline'
 import { useSoftwareUpdatePoll } from '../hooks'
 import { DesktopApp } from '../DesktopApp'
 
-vi.mock('../../organisms/Breadcrumbs')
-vi.mock('../../organisms/Devices/hooks')
-vi.mock('../../pages/Desktop/AppSettings/GeneralSettings')
-vi.mock('../../pages/Desktop/Devices/CalibrationDashboard')
-vi.mock('../../pages/Desktop/Devices/DeviceDetails')
-vi.mock('../../pages/Desktop/Devices/DevicesLanding')
-vi.mock('../../pages/Desktop/Protocols/ProtocolsLanding')
-vi.mock('../../pages/Desktop/Devices/ProtocolRunDetails')
-vi.mock('../../pages/Desktop/Devices/RobotSettings')
-vi.mock('../../organisms/Alerts/AlertsModal')
-vi.mock('../../pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline')
-vi.mock('../../redux/config')
+vi.mock('/app/organisms/Breadcrumbs')
+vi.mock('/app/pages/Desktop/AppSettings/GeneralSettings')
+vi.mock('/app/pages/Desktop/Devices/CalibrationDashboard')
+vi.mock('/app/pages/Desktop/Devices/DeviceDetails')
+vi.mock('/app/pages/Desktop/Devices/DevicesLanding')
+vi.mock('/app/pages/Desktop/Protocols/ProtocolsLanding')
+vi.mock('/app/pages/Desktop/Devices/ProtocolRunDetails')
+vi.mock('/app/pages/Desktop/Devices/RobotSettings')
+vi.mock('/app/organisms/Alerts/AlertsModal')
+vi.mock('/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../hooks')
 
 const render = (path = '/') => {

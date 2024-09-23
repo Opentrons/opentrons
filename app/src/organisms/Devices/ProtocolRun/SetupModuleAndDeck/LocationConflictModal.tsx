@@ -33,9 +33,9 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../../../App/portal'
-import { OddModal } from '../../../../molecules/OddModal'
-import { SmallButton } from '../../../../atoms/buttons/SmallButton'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
+import { OddModal } from '/app/molecules/OddModal'
+import { SmallButton } from '/app/atoms/buttons/SmallButton'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type {
   CutoutConfig,

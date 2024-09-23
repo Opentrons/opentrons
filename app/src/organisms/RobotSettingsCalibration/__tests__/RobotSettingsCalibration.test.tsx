@@ -4,29 +4,28 @@ import { screen } from '@testing-library/react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { i18n } from '../../../i18n'
-import { CalibrationStatusCard } from '../../../organisms/CalibrationStatusCard'
-import { useFeatureFlag } from '../../../redux/config'
-import * as RobotApi from '../../../redux/robot-api'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '/app/i18n'
+import { CalibrationStatusCard } from '/app/organisms/CalibrationStatusCard'
+import { useFeatureFlag } from '/app/redux/config'
+import * as RobotApi from '/app/redux/robot-api'
+import { renderWithProviders } from '/app/__testing-utils__'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
-} from '../../../redux/calibration/pipette-offset/__fixtures__'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+} from '/app/redux/calibration/pipette-offset/__fixtures__'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import {
   mockAttachedPipette,
   mockAttachedPipetteInformation,
-} from '../../../redux/pipettes/__fixtures__'
+} from '/app/redux/pipettes/__fixtures__'
 import {
-  useIsFlex,
   usePipetteOffsetCalibrations,
-  useRobot,
   useAttachedPipettes,
   useRunStatuses,
   useAttachedPipettesFromInstrumentsQuery,
-} from '../../../organisms/Devices/hooks'
+} from '/app/organisms/Devices/hooks'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 
 import { CalibrationDataDownload } from '../CalibrationDataDownload'
 import { CalibrationHealthCheck } from '../CalibrationHealthCheck'
@@ -37,7 +36,7 @@ import { RobotSettingsTipLengthCalibration } from '../RobotSettingsTipLengthCali
 import { RobotSettingsModuleCalibration } from '../RobotSettingsModuleCalibration'
 import { RobotSettingsCalibration } from '..'
 import type * as ReactApiClient from '@opentrons/react-api-client'
-import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
+import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ReactApiClient>()
@@ -46,11 +45,12 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     useInstrumentsQuery: vi.fn(),
   }
 })
-vi.mock('../../../organisms/CalibrationStatusCard')
-vi.mock('../../../redux/config')
-vi.mock('../../../redux/sessions/selectors')
-vi.mock('../../../redux/robot-api/selectors')
-vi.mock('../../../organisms/Devices/hooks')
+vi.mock('/app/organisms/CalibrationStatusCard')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/sessions/selectors')
+vi.mock('/app/redux/robot-api/selectors')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/organisms/Devices/hooks')
 vi.mock('../CalibrationDataDownload')
 vi.mock('../CalibrationHealthCheck')
 vi.mock('../RobotSettingsDeckCalibration')

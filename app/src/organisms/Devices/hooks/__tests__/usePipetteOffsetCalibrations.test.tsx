@@ -8,7 +8,7 @@ import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
-} from '../../../../redux/calibration/pipette-offset/__fixtures__'
+} from '/app/redux/calibration/pipette-offset/__fixtures__'
 import { usePipetteOffsetCalibrations } from '..'
 
 vi.mock('@opentrons/react-api-client')

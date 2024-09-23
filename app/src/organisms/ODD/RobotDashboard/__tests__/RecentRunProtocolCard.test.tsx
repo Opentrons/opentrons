@@ -13,22 +13,21 @@ import {
 } from '@opentrons/react-api-client'
 import { simpleAnalysisFileFixture } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-import { Skeleton } from '../../../../atoms/Skeleton'
-import { useMissingProtocolHardware } from '../../../../transformations/commands'
-import { useTrackProtocolRunEvent } from '../../../Devices/hooks'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { Skeleton } from '/app/atoms/Skeleton'
+import { useMissingProtocolHardware } from '/app/transformations/commands'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '../../../../redux/analytics'
-import { useCloneRun } from '../../../ProtocolUpload/hooks'
+} from '/app/redux/analytics'
+import { useCloneRun, useNotifyAllRunsQuery } from '/app/resources/runs'
 import { useRerunnableStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
-import { useNotifyAllRunsQuery } from '../../../../resources/runs'
 
 import type { NavigateFunction } from 'react-router-dom'
-import type { ProtocolHardware } from '../../../../transformations/commands'
+import type { ProtocolHardware } from '/app/transformations/commands'
 
 const mockNavigate = vi.fn()
 
@@ -41,15 +40,13 @@ vi.mock('react-router-dom', async importOriginal => {
 })
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../atoms/Skeleton')
-vi.mock('../../../../transformations/commands')
-vi.mock('../../../../pages/ODD/ProtocolDetails')
-vi.mock('../../../../organisms/Devices/hooks')
-vi.mock('../../../../organisms/RunTimeControl/hooks')
-vi.mock('../../../../organisms/ProtocolUpload/hooks')
-vi.mock('../../../../redux/analytics')
+vi.mock('/app/atoms/Skeleton')
+vi.mock('/app/transformations/commands')
+vi.mock('/app/organisms/RunTimeControl/hooks')
+vi.mock('/app/redux/analytics')
 vi.mock('../hooks')
-vi.mock('../../../../resources/runs')
+vi.mock('/app/resources/runs')
+vi.mock('/app/redux-resources/analytics')
 
 const RUN_ID = 'mockRunId'
 const ROBOT_NAME = 'otie'

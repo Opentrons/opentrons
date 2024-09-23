@@ -7,9 +7,9 @@ import {
   parseLiquidsInLoadOrder,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
-import { RUN_ID_1 } from '../../../../RunTimeControl/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 import { getTotalVolumePerLiquidId } from '../../../../Devices/ProtocolRun/SetupLiquids/utils'
 import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { LiquidDetails } from '../LiquidDetails'
@@ -23,7 +23,7 @@ import { ProtocolSetupLiquids } from '..'
 import type * as SharedData from '@opentrons/shared-data'
 
 vi.mock('../../../../Devices/ProtocolRun/SetupLiquids/utils')
-vi.mock('../../../../../atoms/buttons')
+vi.mock('/app/atoms/buttons')
 vi.mock('../LiquidDetails')
 vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('@opentrons/shared-data', async importOriginal => {

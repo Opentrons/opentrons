@@ -10,7 +10,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StatusLabel } from '../../../atoms/StatusLabel'
+import { StatusLabel } from '/app/atoms/StatusLabel'
 
 interface CalibrationHealthCheckResultsProps {
   isCalibrationRecommended: boolean

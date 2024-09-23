@@ -2,8 +2,8 @@ import * as React from 'react'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { renderHook, act, screen, fireEvent } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../../../../__testing-utils__'
-import { i18n } from '../../../../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { useHomePipettes } from '../../../../../../DropTipWizardFlows'
 import {
   useProtocolDropTipModal,

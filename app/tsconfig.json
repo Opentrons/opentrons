@@ -32,7 +32,10 @@
   "compilerOptions": {
     "composite": true,
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "lib",
+    "paths": {
+      "/app/*": ["./src/*"]
+    }
   },
   "include": ["typings", "src"],
   "exclude": ["**/*.stories.tsx"]

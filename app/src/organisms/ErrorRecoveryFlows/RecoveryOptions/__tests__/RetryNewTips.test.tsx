@@ -3,8 +3,8 @@ import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
 
 import { mockRecoveryContentProps } from '../../__fixtures__'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { RetryNewTips, RetryWithNewTips } from '../RetryNewTips'
 import { RECOVERY_MAP } from '../../constants'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
@@ -12,7 +12,7 @@ import { clickButtonLabeled } from '../../__tests__/util'
 
 import type { Mock } from 'vitest'
 
-vi.mock('../../../../molecules/Command')
+vi.mock('/app/molecules/Command')
 vi.mock('../SelectRecoveryOption')
 vi.mock('../../shared', async () => {
   const actual = await vi.importActual('../../shared')

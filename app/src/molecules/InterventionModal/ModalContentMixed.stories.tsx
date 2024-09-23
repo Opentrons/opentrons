@@ -1,4 +1,4 @@
-import successIcon from '../../assets/images/icon_success.png'
+import successIcon from '/app/assets/images/icon_success.png'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import { customViewports } from '../../../../.storybook/preview'

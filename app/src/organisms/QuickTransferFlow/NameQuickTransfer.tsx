@@ -15,7 +15,7 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
-import { FullKeyboard } from '../../atoms/SoftwareKeyboard'
+import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '../ChildNavigation'
 
 interface NameQuickTransferProps {

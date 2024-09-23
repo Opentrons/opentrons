@@ -9,7 +9,7 @@ export {
   CONFIGURE_FIELD_PSK,
   CONFIGURE_FIELD_SECURITY_TYPE,
   CONFIGURE_PSK_MIN_LENGTH,
-} from '../../../../redux/networking'
+} from '/app/redux/networking'
 
 export const CONNECT: 'connect' = 'connect'
 export const DISCONNECT: 'disconnect' = 'disconnect'

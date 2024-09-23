@@ -14,7 +14,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { Mount } from '../../redux/pipettes/types'
+import type { Mount } from '/app/redux/pipettes/types'
 
 interface LevelPipetteProps {
   mount: Mount
@@ -42,7 +42,7 @@ export function LevelingVideo(props: {
       <source
         src={
           new URL(
-            `../../assets/videos/pip-leveling/${pipetteName}-${mount}.webm`,
+            `/app/assets/videos/pip-leveling/${pipetteName}-${mount}.webm`,
             import.meta.url
           ).href
         }

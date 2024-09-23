@@ -127,7 +127,6 @@ export function SetupLiquidsMap(
   })
   return (
     <Flex
-      maxHeight="80vh"
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}

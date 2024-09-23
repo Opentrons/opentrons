@@ -5,7 +5,7 @@ import {
 } from '@opentrons/react-api-client'
 import { useAttachedPipettes } from './useAttachedPipettes'
 
-import type { PipetteCalibrationsByMount } from '../../../redux/pipettes/types'
+import type { PipetteCalibrationsByMount } from '/app/redux/pipettes/types'
 import type {
   PipetteOffsetCalibration,
   TipLengthCalibration,

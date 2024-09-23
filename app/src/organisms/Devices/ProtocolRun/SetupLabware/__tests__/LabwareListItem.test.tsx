@@ -6,14 +6,14 @@ import { MemoryRouter } from 'react-router-dom'
 import { opentrons96PcrAdapterV1 } from '@opentrons/shared-data'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import {
   mockHeaterShaker,
   mockMagneticModule,
   mockTemperatureModule,
   mockThermocycler,
-} from '../../../../../redux/modules/__fixtures__'
+} from '/app/redux/modules/__fixtures__'
 import { mockLabwareDef } from '../../../../LabwarePositionCheck/__fixtures__/mockLabwareDef'
 import { SecureLabwareModal } from '../SecureLabwareModal'
 import { LabwareListItem } from '../LabwareListItem'
@@ -24,7 +24,7 @@ import type {
   LabwareDefinition2,
   LoadModuleRunTimeCommand,
 } from '@opentrons/shared-data'
-import type { AttachedModule } from '../../../../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 import type { ModuleRenderInfoForProtocol } from '../../../hooks'
 
 vi.mock('../SecureLabwareModal')

@@ -18,7 +18,7 @@ import { VolumeEntry } from './VolumeEntry'
 import { SummaryAndSettings } from './SummaryAndSettings'
 import { quickTransferWizardReducer } from './reducers'
 
-import type { SmallButton } from '../../atoms/buttons'
+import type { SmallButton } from '/app/atoms/buttons'
 import type { QuickTransferWizardState } from './types'
 
 const QUICK_TRANSFER_WIZARD_STEPS = 8

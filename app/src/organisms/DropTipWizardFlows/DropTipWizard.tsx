@@ -20,7 +20,7 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { ExitConfirmation } from './ExitConfirmation'
 import {
   BEFORE_BEGINNING,
@@ -37,7 +37,7 @@ import {
   JogToPosition,
   Success,
 } from './steps'
-import { InProgressModal } from '../../molecules/InProgressModal'
+import { InProgressModal } from '/app/molecules/InProgressModal'
 import { useDropTipErrorComponents } from './hooks'
 import { DropTipWizardHeader } from './DropTipWizardHeader'
 import { ErrorInfo } from './ErrorInfo'
