@@ -4,7 +4,7 @@ import {
 } from '/app/redux/calibration'
 
 import { useCalibrationStatusQuery } from '@opentrons/react-api-client'
-import { useRobot } from './useRobot'
+import { useRobot } from '/app/redux-resources/robots'
 import type { DeckCalibrationData } from '@opentrons/api-client'
 
 /**

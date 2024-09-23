@@ -34,6 +34,7 @@ import {
   TC_MODULE_LOCATION_OT3,
 } from '@opentrons/shared-data'
 
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { TertiaryButton } from '/app/atoms/buttons'
 import { StatusLabel } from '/app/atoms/StatusLabel'
 import { useChainLiveCommands } from '/app/resources/runs'
@@ -42,9 +43,7 @@ import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { getModulePrepCommands } from '../../getModulePrepCommands'
 import { getModuleTooHot } from '../../getModuleTooHot'
 import {
-  useIsFlex,
   useModuleRenderInfoForProtocolById,
-  useRobot,
   useUnmatchedModulesForProtocol,
   useRunCalibrationStatus,
 } from '../../hooks'

@@ -13,7 +13,8 @@ import {
 import { i18n } from '/app/i18n'
 import { Banner } from '/app/atoms/Banner'
 import { mockMagneticModule } from '/app/redux/modules/__fixtures__'
-import { useIsFlex, useIsRobotViewable, useRunStatuses } from '../hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { useIsRobotViewable, useRunStatuses } from '../hooks'
 import { ModuleCard } from '../../ModuleCard'
 import { InstrumentsAndModules } from '../InstrumentsAndModules'
 import { GripperCard } from '../../GripperCard'
@@ -40,9 +41,9 @@ vi.mock('../PipetteCard')
 vi.mock('../PipetteCard/FlexPipetteCard')
 vi.mock('../PipetteCard/PipetteRecalibrationWarning')
 vi.mock('/app/resources/runs')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/atoms/Banner')
 vi.mock('../utils')
-vi.mock('../../RunTimeControl/hooks')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
 const ROBOT_NAME = 'otie'

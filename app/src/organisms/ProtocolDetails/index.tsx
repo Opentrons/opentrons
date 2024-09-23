@@ -19,21 +19,22 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
+  DISPLAY_GRID,
   Flex,
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
+  Modal,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   PrimaryButton,
   ProtocolDeck,
-  Tabs,
   SIZE_1,
   SIZE_5,
-  Modal,
   SPACING,
-  LegacyStyledText,
+  Tabs,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -81,13 +82,13 @@ import type { StoredProtocolData } from '/app/redux/protocol-storage'
 import type { State, Dispatch } from '/app/redux/types'
 
 const GRID_STYLE = css`
-  display: grid;
+  display: ${DISPLAY_GRID};
   width: 100%;
   grid-template-columns: 26.6% 26.6% 26.6% 20.2%;
 `
 
 const TWO_COL_GRID_STYLE = css`
-  display: grid;
+  display: ${DISPLAY_GRID};
   grid-gap: ${SPACING.spacing24};
   grid-template-columns: 22.5% 77.5%;
 `
@@ -503,7 +504,7 @@ export function ProtocolDetails(
                 </Flex>
                 <Flex
                   css={css`
-                    display: grid;
+                    display: ${DISPLAY_GRID};
                     justify-self: end;
                   `}
                 >

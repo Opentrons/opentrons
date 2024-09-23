@@ -14,9 +14,9 @@ import {
   LegacyStyledText,
   CURSOR_POINTER,
 } from '@opentrons/components'
-import { formatInterval } from '../RunTimeControl/utils'
+import { formatInterval } from '/app/transformations/commands'
 import { formatTimestamp } from './utils'
-import { EMPTY_TIMESTAMP } from './constants'
+import { EMPTY_TIMESTAMP } from '/app/resources/runs'
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
 import { HistoricalProtocolRunDrawer as Drawer } from './HistoricalProtocolRunDrawer'
 import type { RunData } from '@opentrons/api-client'

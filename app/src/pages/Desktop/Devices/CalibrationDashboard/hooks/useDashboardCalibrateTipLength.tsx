@@ -22,22 +22,12 @@ import type {
   TipLengthCalibrationSessionParams,
 } from '/app/redux/sessions/types'
 import type { State } from '/app/redux/types'
+import type { DashboardCalTipLengthInvoker } from '/app/organisms/Devices/hooks/useCalibrationTaskList'
 
 // tip length calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
-
-export interface DashboardTipLengthCalInvokerProps {
-  params: Pick<TipLengthCalibrationSessionParams, 'mount'> &
-    Partial<Omit<TipLengthCalibrationSessionParams, 'mount'>>
-  hasBlockModalResponse: boolean | null
-  invalidateHandler?: () => void
-}
-
-export type DashboardCalTipLengthInvoker = (
-  props: DashboardTipLengthCalInvokerProps
-) => void
 
 export function useDashboardCalibrateTipLength(
   robotName: string

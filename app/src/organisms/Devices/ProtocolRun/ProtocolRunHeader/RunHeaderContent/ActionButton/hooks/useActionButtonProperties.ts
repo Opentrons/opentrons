@@ -13,7 +13,7 @@ import {
   ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { useTrackProtocolRunEvent } from '../../../../../hooks'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useIsHeaterShakerInProtocol } from '../../../../../../ModuleCard/hooks'
 import { isAnyHeaterShakerShaking } from '../../../RunHeaderModalContainer/modals'
 import {

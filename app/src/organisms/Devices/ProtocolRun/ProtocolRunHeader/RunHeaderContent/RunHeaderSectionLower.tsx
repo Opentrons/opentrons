@@ -6,6 +6,7 @@ import {
   BORDERS,
   Box,
   COLORS,
+  DISPLAY_GRID,
   Flex,
   JUSTIFY_FLEX_END,
   SecondaryButton,
@@ -14,12 +15,12 @@ import {
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { formatTimestamp } from '../../../utils'
-import { EMPTY_TIMESTAMP } from '../../../constants'
+import { useRunControls } from '../../../../RunTimeControl/hooks'
 import {
-  useRunControls,
+  EMPTY_TIMESTAMP,
   useRunTimestamps,
-} from '../../../../RunTimeControl/hooks'
-import { useCloseCurrentRun } from '../../../../ProtocolUpload/hooks'
+  useCloseCurrentRun,
+} from '/app/resources/runs'
 import { LabeledValue } from './LabeledValue'
 import { isCancellableStatus } from '../utils'
 
@@ -69,7 +70,7 @@ export function RunHeaderSectionLower({
 }
 
 const SECTION_STYLE = css`
-  display: grid;
+  display: ${DISPLAY_GRID};
   grid-template-columns: 4fr 6fr 4fr;
   background-color: ${COLORS.grey10};
   padding: ${SPACING.spacing8};

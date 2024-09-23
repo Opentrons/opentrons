@@ -36,10 +36,12 @@ import type { RobotType } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '.'
 import type {
   ERUtilsResults,
-  UseRecoveryAnalyticsResult,
   UseRecoveryTakeoverResult,
   useRetainedFailedCommandBySource,
 } from './hooks'
+import type { RecoveryRoute, RouteStep } from './types'
+
+import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 
 export function useRunPausedSplash(
   isOnDevice: boolean,
@@ -61,7 +63,7 @@ type RunPausedSplashProps = ERUtilsResults & {
   robotType: RobotType
   robotName: string
   toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
-  analytics: UseRecoveryAnalyticsResult
+  analytics: UseRecoveryAnalyticsResult<RecoveryRoute, RouteStep>
 }
 export function RunPausedSplash(
   props: RunPausedSplashProps

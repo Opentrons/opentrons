@@ -3,6 +3,7 @@ from decoy import Decoy
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.execution import MovementHandler
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import DeckPoint
 from opentrons.types import Point
@@ -58,4 +59,11 @@ async def test_move_to_coordinates_implementation(
     assert result == SuccessData(
         public=MoveToCoordinatesResult(position=DeckPoint(x=4.44, y=5.55, z=6.66)),
         private=None,
+        state_update=update_types.StateUpdate(
+            pipette_location=update_types.PipetteLocationUpdate(
+                pipette_id="pipette-id",
+                new_location=None,
+                new_deck_point=DeckPoint(x=4.44, y=5.55, z=6.66),
+            )
+        ),
     )

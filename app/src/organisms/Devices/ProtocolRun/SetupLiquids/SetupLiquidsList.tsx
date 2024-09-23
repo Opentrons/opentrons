@@ -32,7 +32,7 @@ import {
   ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
 } from '/app/redux/analytics'
-import { useIsFlex } from '../../hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
@@ -76,7 +76,6 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
     <Flex
       css={HIDE_SCROLLBAR}
       flexDirection={DIRECTION_COLUMN}
-      maxHeight="31.25rem"
       overflowY="auto"
       data-testid="SetupLiquidsList_ListView"
       gridGap={SPACING.spacing8}

@@ -1,9 +1,10 @@
 """An interface for managing interactions with the notification broker and relevant lifecycle utilities."""
+import contextlib
 import random
 import logging
 import paho.mqtt.client as mqtt
 from fastapi import Depends
-from typing import Annotated, Any, Dict, Optional
+from typing import Annotated, Any, Dict, Generator, Optional
 from enum import Enum
 
 
@@ -165,10 +166,15 @@ _notification_client_accessor: AppStateAccessor[NotificationClient] = AppStateAc
 ]("notification_client")
 
 
-def initialize_notification_client(app_state: AppState) -> None:
-    """Create a new `NotificationClient` and store it on `app_state`.
+@contextlib.contextmanager
+def set_up_notification_client(app_state: AppState) -> Generator[None, None, None]:
+    """Set up the server's singleton `NotificationClient`.
 
-    Intended to be called just once, when the server starts up.
+    When this context manager is entered, the `NotificationClient` is initialized
+    and placed on `app_state` for later retrieval by endpoints via
+    `get_notification_client()`.
+
+    When this context manager is exited, the `NotificationClient` is cleaned up.
     """
     notification_client: NotificationClient = NotificationClient()
     _notification_client_accessor.set_on(app_state, notification_client)
@@ -181,19 +187,9 @@ def initialize_notification_client(app_state: AppState) -> None:
             exc_info=True,
         )
 
-
-# todo(mm, 2024-08-20): When ASGI app teardown no longer uses asyncio.gather(),
-# this can be non-async.
-async def clean_up_notification_client(app_state: AppState) -> None:
-    """Clean up the `NotificationClient` stored on `app_state`.
-
-    Intended to be called just once, when the server shuts down.
-    """
-    notification_client: Optional[
-        NotificationClient
-    ] = _notification_client_accessor.get_from(app_state)
-
-    if notification_client is not None:
+    try:
+        yield
+    finally:
         notification_client.disconnect()
 
 

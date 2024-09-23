@@ -34,7 +34,7 @@ import {
 import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { appShellRequestor } from '/app/redux/shell/remote'
-import { useRobot, useIsFlex } from '/app/organisms/Devices/hooks'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { ProtocolTimeline } from '/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { DesktopAppFallback } from './DesktopAppFallback'

@@ -19,6 +19,7 @@ import {
 import { getUnsavedForm } from '../../../../step-forms/selectors'
 import { getTopPortalEl } from '../../../../components/portals/TopPortal'
 import { StepOverflowMenu } from './StepOverflowMenu'
+import { capitalizeFirstLetterAfterNumber } from './utils'
 
 import type { IconName } from '@opentrons/components'
 
@@ -99,6 +100,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
       setStepOverflowMenu(false)
     }
   }
+
   return (
     <>
       <Box id={stepId} {...{ onMouseEnter, onMouseLeave }}>
@@ -126,7 +128,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
               )}
               {formData != null ? null : (
                 <StyledText desktopStyle="bodyDefaultRegular">
-                  {title}
+                  {capitalizeFirstLetterAfterNumber(title)}
                 </StyledText>
               )}
             </Flex>

@@ -16,6 +16,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_BLOCK,
+  DISPLAY_GRID,
   DropdownMenu,
   Flex,
   Icon,
@@ -58,7 +59,7 @@ import { FileCard } from '../ChooseRobotSlideout/FileCard'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
-} from '../Devices/utils'
+} from '/app/transformations/runs'
 import { getAnalysisStatus } from '../ProtocolsLanding/utils'
 
 import type { DropdownOption } from '@opentrons/components'
@@ -754,7 +755,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 }}
               >
                 <Box
-                  display="grid"
+                  display={DISPLAY_GRID}
                   gridTemplateColumns="1fr 3fr"
                   marginRight={SPACING.spacing16}
                 >

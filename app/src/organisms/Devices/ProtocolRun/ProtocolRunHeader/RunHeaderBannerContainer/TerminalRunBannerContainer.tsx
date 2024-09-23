@@ -13,9 +13,11 @@ import {
 import { RUN_STATUS_STOPPED, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 
 import { Banner } from '/app/atoms/Banner'
-import { useCloseCurrentRun } from '../../../../ProtocolUpload/hooks'
-import { useIsRunCurrent } from '/app/resources/runs'
-import { useMostRecentRunId } from '../../../../ProtocolUpload/hooks/useMostRecentRunId'
+import {
+  useCloseCurrentRun,
+  useIsRunCurrent,
+  useMostRecentRunId,
+} from '/app/resources/runs'
 
 import type { RunHeaderBannerContainerProps } from '.'
 

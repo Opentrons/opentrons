@@ -13,7 +13,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useChainLiveCommands } from '/app/resources/runs'
+import { useChainLiveCommands, useRunStatus } from '/app/resources/runs'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import {
   useAttachedModules,
@@ -36,7 +36,6 @@ import { FixtureTable } from '../FixtureTable'
 import { ModulesAndDeckMapView } from '../ModulesAndDeckMapView'
 import { ProtocolSetupModulesAndDeck } from '..'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { useRunStatus } from '../../../../RunTimeControl/hooks'
 
 import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
 import type { UseQueryResult } from 'react-query'
@@ -55,7 +54,6 @@ vi.mock(
   '../../../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 )
 vi.mock('../ModulesAndDeckMapView')
-vi.mock('../../../../RunTimeControl/hooks')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'

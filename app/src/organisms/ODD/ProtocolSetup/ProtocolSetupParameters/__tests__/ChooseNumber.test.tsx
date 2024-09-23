@@ -4,13 +4,13 @@ import { fireEvent, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useToaster } from '../../../../ToasterOven'
-import { mockRunTimeParameterData } from '/app/pages/ODD/ProtocolDetails/fixtures'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { mockRunTimeParameterData } from '../../__fixtures__'
 import { ChooseNumber } from '../ChooseNumber'
 
 import type { NumberParameter } from '@opentrons/shared-data'
 
-vi.mock('../../../../ToasterOven')
+vi.mock('/app/organisms/ToasterOven')
 
 const mockHandleGoBack = vi.fn()
 const mockIntNumberParameterData = mockRunTimeParameterData[5] as NumberParameter

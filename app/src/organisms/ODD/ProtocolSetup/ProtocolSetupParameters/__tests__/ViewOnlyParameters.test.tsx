@@ -4,13 +4,13 @@ import { it, describe, beforeEach, vi, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useToaster } from '../../../../ToasterOven'
-import { mockRunTimeParameterData } from '/app/pages/ODD/ProtocolDetails/fixtures'
+import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { mockRunTimeParameterData } from '../../__fixtures__'
 import { ViewOnlyParameters } from '../ViewOnlyParameters'
 
-vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../../../../ToasterOven')
+vi.mock('/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('/app/organisms/ToasterOven')
 const RUN_ID = 'mockId'
 const render = (props: React.ComponentProps<typeof ViewOnlyParameters>) => {
   return renderWithProviders(<ViewOnlyParameters {...props} />, {

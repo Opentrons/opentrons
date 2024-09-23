@@ -4,7 +4,7 @@ import { describe, it, beforeEach, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { RUN_ID_1 } from '../../../../RunTimeControl/__fixtures__'
+import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 import { getLocationInfoNames } from '../../../../Devices/ProtocolRun/utils/getLocationInfoNames'
 import { getVolumePerWell } from '../../../../Devices/ProtocolRun/SetupLiquids/utils'
 import { LiquidDetails } from '../LiquidDetails'

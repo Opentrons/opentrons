@@ -19,10 +19,10 @@ import {
 } from '@opentrons/shared-data'
 import { useCurrentRunId } from '/app/resources/runs'
 import {
-  useIsFlex,
   useRunStatuses,
   useIsLegacySessionInProgress,
-} from '../Devices/hooks'
+} from '/app/organisms/Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useModuleOverflowMenu } from './hooks'
 
 import type { AttachedModule } from '/app/redux/modules/types'

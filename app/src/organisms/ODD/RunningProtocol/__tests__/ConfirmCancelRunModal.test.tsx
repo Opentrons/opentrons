@@ -13,8 +13,8 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useTrackProtocolRunEvent } from '/app/organisms/Devices/hooks'
-import { useRunStatus } from '/app/organisms/RunTimeControl/hooks'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
+import { useRunStatus } from '/app/resources/runs'
 import { useTrackEvent } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
@@ -24,10 +24,9 @@ import { CancelingRunModal } from '../CancelingRunModal'
 import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('/app/organisms/Devices/hooks')
-vi.mock('/app/organisms/RunTimeControl/hooks')
+vi.mock('/app/resources/runs')
+vi.mock('/app/redux-resources/analytics')
 vi.mock('/app/redux/analytics')
-vi.mock('../../../ProtocolUpload/hooks')
 vi.mock('../CancelingRunModal')
 vi.mock('/app/redux/discovery')
 const mockNavigate = vi.fn()

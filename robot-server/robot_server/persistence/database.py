@@ -23,6 +23,9 @@ from server_utils import sql_utils
 sqlite_rowid = sqlalchemy.column("_ROWID_")
 
 
+# todo(mm, 2024-08-07): Now that FastAPI supports a `lifespan` context manager
+# instead of separate startup/shutdown functions, we should transition to using
+# `sql_engine_ctx()` everywhere instead of using this.
 def create_sql_engine(path: Path) -> sqlalchemy.engine.Engine:
     """Return an engine for accessing the given SQLite database file.
 

@@ -17,9 +17,9 @@ import {
   useCurrentlyRecoveringFrom,
   useERUtils,
   useShowDoorInfo,
-  useRecoveryAnalytics,
   useRecoveryTakeover,
 } from '../hooks'
+import { useRecoveryAnalytics } from '/app/redux-resources/analytics'
 import { getIsOnDevice } from '/app/redux/config'
 import { useERWizard, ErrorRecoveryWizard } from '../ErrorRecoveryWizard'
 import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'
@@ -31,6 +31,7 @@ vi.mock('../hooks')
 vi.mock('../useRecoveryCommands')
 vi.mock('/app/redux/config')
 vi.mock('../RunPausedSplash')
+vi.mock('/app/redux-resources/analytics')
 vi.mock('@opentrons/react-api-client')
 vi.mock('react-redux', async () => {
   const actual = await vi.importActual('react-redux')

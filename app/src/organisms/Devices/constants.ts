@@ -3,7 +3,6 @@ import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
 import { getLatestLabwareDef } from '/app/assets/labware/getLabware'
 
 export const RUN_LOG_WINDOW_SIZE = 60 // number of command items rendered at a time
-export const EMPTY_TIMESTAMP = '--:--:--'
 
 // NOTE: this map is a duplicate of the TIP_RACK_LOOKUP_BY_MAX_VOL
 // found at robot_server/robot/calibration/constants.py
