@@ -237,27 +237,28 @@ def _next_tip_for_channel(
 
 
 def _take_photos(trial: GravimetricTrial, stage_str: str) -> None:
-    if trial.ctx.is_simulating():
-        cameras = ["/dev/video0"]
-    else:
-        cameras = glob.glob("/dev/video*")
-    for camera in cameras:
-        cam_pic_name = f"camera{camera[-1]}_channel{trial.channel}_volume{trial.volume}"
-        cam_pic_name += f"_trial{trial.trial}_{stage_str}.jpg"
-        if trial.ctx.is_simulating():
-            cam_pic_name = cam_pic_name.replace(".jpg", ".txt")
-        cam_pic_path = (
-            f"{trial.test_report.parent}/{trial.test_report._run_id}/{cam_pic_name}"
-        )
-        process_cmd = CAM_CMD_OT3.format(str(cam_pic_path), camera)
-        if trial.ctx.is_simulating():
-            with open(cam_pic_path, "w") as f:
-                f.write(str(cam_pic_name))  # create a test file
-        else:
-            try:
-                run_subprocess(process_cmd.split(" "), timeout=2)  # take a picture
-            except subprocess.TimeoutExpired:
-                os.remove(cam_pic_path)
+    return
+    # if trial.ctx.is_simulating():
+    #     cameras = ["/dev/video0"]
+    # else:
+    #     cameras = glob.glob("/dev/video*")
+    # for camera in cameras:
+    #     cam_pic_name = f"camera{camera[-1]}_channel{trial.channel}_volume{trial.volume}"
+    #     cam_pic_name += f"_trial{trial.trial}_{stage_str}.jpg"
+    #     if trial.ctx.is_simulating():
+    #         cam_pic_name = cam_pic_name.replace(".jpg", ".txt")
+    #     cam_pic_path = (
+    #         f"{trial.test_report.parent}/{trial.test_report._run_id}/{cam_pic_name}"
+    #     )
+    #     process_cmd = CAM_CMD_OT3.format(str(cam_pic_path), camera)
+    #     if trial.ctx.is_simulating():
+    #         with open(cam_pic_path, "w") as f:
+    #             f.write(str(cam_pic_name))  # create a test file
+    #     else:
+    #         try:
+    #             run_subprocess(process_cmd.split(" "), timeout=2)  # take a picture
+    #         except subprocess.TimeoutExpired:
+    #             os.remove(cam_pic_path)
 
 
 def _run_trial(
