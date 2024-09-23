@@ -4,6 +4,7 @@ import head from 'lodash/head'
 
 import { INVALID, RECOVERY_MAP, STEP_ORDER } from '../constants'
 
+import type { MutableRefObject } from 'react'
 import type {
   IRecoveryMap,
   RecoveryRoute,
@@ -40,6 +41,7 @@ export interface UseRouteUpdateActionsResult {
   /* Contains the recovery map prior to implicit redirection, if any. Example, if the user is on route A, step A, and the
   app implicitly navigates the user to route Z, step Z, the stashed map will contain route A, step A. */
   stashedMap: IRecoveryMap | null
+  stashedMapRef: MutableRefObject<IRecoveryMap | null>
 }
 
 // Utilities related to routing within the error recovery flows.
@@ -176,6 +178,7 @@ export function useRouteUpdateActions(
     proceedToRouteAndStep,
     handleMotionRouting,
     stashedMap: stashedMapRef.current,
+    stashedMapRef: stashedMapRef,
   }
 }
 

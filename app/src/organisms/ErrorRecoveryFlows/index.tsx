@@ -140,11 +140,13 @@ export function ErrorRecoveryFlows(
     toggleERWizAsActiveUser,
     isOnDevice,
     robotType,
+    showTakeover,
     failedCommand: failedCommandBySource,
   })
 
   const renderWizard =
-    isActiveUser && (showERWizard || recoveryUtils.isProhibitedDoorOpen)
+    isActiveUser &&
+    (showERWizard || recoveryUtils.doorStatusUtils.isProhibitedDoorOpen)
   const showSplash = useRunPausedSplash(isOnDevice, renderWizard)
 
   return (

@@ -94,7 +94,7 @@ export function useRecoveryCommands({
         void proceedToRouteAndStep(RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE)
         return Promise.reject(new Error(`Could not execute command: ${e}`))
       }),
-    [chainRunCommands]
+    [analytics, selectedRecoveryOption]
   )
 
   const buildRetryPrepMove = (): MoveToCoordinatesCreateCommand | null => {

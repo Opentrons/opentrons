@@ -5,7 +5,11 @@ import { useRecoveryCommands } from './useRecoveryCommands'
 import { useRecoveryTipStatus } from './useRecoveryTipStatus'
 import { useRecoveryRouting } from './useRecoveryRouting'
 import { useFailedLabwareUtils } from './useFailedLabwareUtils'
-import { getFailedCommandPipetteInfo, getNextSteps } from '../utils'
+import {
+  getFailedCommandPipetteInfo,
+  getNextSteps,
+  cleanupRecoveryState,
+} from '../utils'
 import { useDeckMapUtils } from './useDeckMapUtils'
 import {
   useNotifyAllCommandsQuery,
@@ -44,12 +48,13 @@ export type ERUtilsProps = Omit<ErrorRecoveryFlowsProps, 'failedCommand'> & {
   isOnDevice: boolean
   robotType: RobotType
   failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
+  showTakeover: boolean
 }
 
 export interface ERUtilsResults {
   recoveryMap: IRecoveryMap
   currentRecoveryOptionUtils: CurrentRecoveryOptionUtils
-  routeUpdateActions: UseRouteUpdateActionsResult
+  routeUpdateActions: Omit<UseRouteUpdateActionsResult, 'stashedMapRef'>
   recoveryCommands: UseRecoveryCommandsResult
   tipStatusUtils: RecoveryTipStatusUtils
   failedLabwareUtils: UseFailedLabwareUtilsResult
@@ -76,6 +81,7 @@ export function useERUtils({
   isOnDevice,
   robotType,
   runStatus,
+  showTakeover,
 }: ERUtilsProps): ERUtilsResults {
   const { data: attachedInstruments } = useInstrumentsQuery()
   const { data: runRecord } = useNotifyRunQuery(runId)
@@ -171,7 +177,11 @@ export function useERUtils({
     SUBSEQUENT_COMMAND_DEPTH
   )
 
-  // TOME: Cleanup util if takeover is true!!!
+  cleanupRecoveryState({
+    isTakeover: showTakeover,
+    setRM,
+    stashedMapRef: routeUpdateActions.stashedMapRef,
+  })
 
   return {
     recoveryMap,
