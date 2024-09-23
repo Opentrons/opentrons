@@ -8,18 +8,38 @@ import type {
   WaitForTemperatureArgs,
   PauseArgs,
 } from '@opentrons/step-generation'
+
+const TIME_DELIMITER = ':'
+
 export const pauseFormToArgs = (
   formData: FormData
 ): PauseArgs | WaitForTemperatureArgs | null => {
-  const hours = isNaN(parseFloat(formData.pauseHour as string))
+  let hoursFromForm
+  let minutesFromForm
+  let secondsFromForm
+
+  // importing results in stringified "null" value
+  if (formData.pauseTime != null && formData.pauseTime != 'null') {
+    const timeSplit = formData.pauseTime.split(TIME_DELIMITER)
+    ;[hoursFromForm, minutesFromForm, secondsFromForm] = timeSplit
+  } else {
+    // TODO (nd 09/23/2024): remove individual time units after redesign FF is removed
+    ;[hoursFromForm, minutesFromForm, secondsFromForm] = [
+      formData.pauseHour,
+      formData.pauseMinutes,
+      formData.pauseSeconds,
+    ]
+  }
+  const hours = isNaN(parseFloat(hoursFromForm as string))
     ? 0
-    : parseFloat(formData.pauseHour as string)
-  const minutes = isNaN(parseFloat(formData.pauseMinute as string))
+    : parseFloat(hoursFromForm as string)
+  const minutes = isNaN(parseFloat(minutesFromForm as string))
     ? 0
-    : parseFloat(formData.pauseMinute as string)
-  const seconds = isNaN(parseFloat(formData.pauseSecond as string))
+    : parseFloat(minutesFromForm as string)
+  const seconds = isNaN(parseFloat(secondsFromForm as string))
     ? 0
-    : parseFloat(formData.pauseSecond as string)
+    : parseFloat(secondsFromForm as string)
+
   const totalSeconds = hours * 3600 + minutes * 60 + seconds
   const temperature = parseFloat(formData.pauseTemperature as string)
   const message = formData.pauseMessage ?? ''

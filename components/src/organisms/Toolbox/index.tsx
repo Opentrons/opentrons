@@ -25,6 +25,7 @@ export interface ToolboxProps {
   closeButtonText?: string
   side?: 'left' | 'right'
   horizontalSide?: 'top' | 'bottom'
+  padding?: string
 }
 
 export function Toolbox(props: ToolboxProps): JSX.Element {
@@ -41,6 +42,7 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
     confirmButton,
     side = 'right',
     horizontalSide = 'bottom',
+    padding = SPACING.spacing16,
   } = props
 
   const slideOutRef = React.useRef<HTMLDivElement>(null)
@@ -108,7 +110,7 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
           ) : null}
         </Flex>
         <Box
-          padding={SPACING.spacing16}
+          padding={padding}
           flex="1 1 auto"
           overflowY="auto"
           ref={slideOutRef}

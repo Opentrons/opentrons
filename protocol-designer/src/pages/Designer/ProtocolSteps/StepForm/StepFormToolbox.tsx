@@ -101,6 +101,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
           </PrimaryButton>
         }
         height="calc(100vh - 64px)"
+        padding="0"
         title={
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
             <Icon size="1rem" name={icon} />

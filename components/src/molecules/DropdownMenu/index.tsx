@@ -4,6 +4,7 @@ import { css } from 'styled-components'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import {
   ALIGN_CENTER,
+  CURSOR_DEFAULT,
   CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -131,13 +132,15 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   }, [filterOptions.length, dropDownMenuWrapperRef])
 
   const toggleSetShowDropdownMenu = (): void => {
-    setShowDropdownMenu(!showDropdownMenu)
+    isDisabled ? null : setShowDropdownMenu(!showDropdownMenu)
   }
+
+  const isDisabled = filterOptions.length === 0
 
   const DROPDOWN_STYLE = css`
     flex-direction: ${DIRECTION_ROW};
     background-color: ${COLORS.white};
-    cursor: ${CURSOR_POINTER};
+    cursor: ${isDisabled ? CURSOR_DEFAULT : CURSOR_POINTER};
     padding: ${SPACING.spacing8} ${SPACING.spacing12};
     border: 1px ${BORDERS.styleSolid}
       ${showDropdownMenu ? COLORS.blue50 : COLORS.grey50};
@@ -155,7 +158,8 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     }
 
     &:active {
-      border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
+      border: 1px ${BORDERS.styleSolid}
+        ${isDisabled ? COLORS.grey55 : COLORS.blue50};
     }
 
     &:focus-visible {
@@ -249,6 +253,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                   onClick(option.value)
                   setShowDropdownMenu(false)
                 }}
+                border="none"
               >
                 <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
                   {option.liquidColor != null ? (
