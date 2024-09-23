@@ -10,6 +10,7 @@ import {
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
+  Banner,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -20,7 +21,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Banner } from '/app/atoms/Banner'
 import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationWarning'
 import { useCurrentRunId } from '/app/resources/runs'
 import { useIsFlex } from '/app/redux-resources/robots'

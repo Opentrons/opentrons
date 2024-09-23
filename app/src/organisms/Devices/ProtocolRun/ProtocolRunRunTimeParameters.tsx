@@ -13,6 +13,7 @@ import {
 } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
+  Banner,
   BORDERS,
   Chip,
   COLORS,
@@ -31,7 +32,6 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { Banner } from '/app/atoms/Banner'
 import { Divider } from '/app/atoms/structure'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'

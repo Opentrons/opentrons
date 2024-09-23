@@ -21,7 +21,6 @@ export function ProtocolSteps(): JSX.Element {
   const formData = useSelector(getUnsavedForm)
   const leftString = t('onDeck')
   const rightString = t('offDeck')
-
   const [deckView, setDeckView] = React.useState<
     typeof leftString | typeof rightString
   >(leftString)

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link as RRDLink } from 'react-router-dom'
 import {
+  Banner,
   Box,
   Flex,
   LegacyTooltip,
@@ -19,7 +20,6 @@ import {
   WRAP,
 } from '@opentrons/components'
 import { TertiaryButton } from '/app/atoms/buttons'
-import { Banner } from '/app/atoms/Banner'
 import * as PipetteConstants from '/app/redux/pipettes/constants'
 import { useDeckCalibrationData } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'

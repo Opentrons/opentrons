@@ -1,6 +1,3 @@
-import * as React from 'react'
-import { Link } from '@opentrons/components'
-
 export const KNOWLEDGEBASE_ROOT_URL =
   'https://support.opentrons.com/s/protocol-designer'
 
@@ -17,23 +14,3 @@ export const links = {
   magneticModuleGenerations:
     'http://support.opentrons.com/en/articles/1820112-magnetic-module',
 } as const
-
-interface Props {
-  to: keyof typeof links
-  children: React.ReactNode
-  className?: string
-}
-
-/** Link which opens a page on the knowledge base to a new tab/window */
-export function KnowledgeBaseLink(props: Props): JSX.Element {
-  return (
-    <Link
-      target="_blank"
-      rel="noopener noreferrer"
-      href={links[props.to]}
-      className={props.className}
-    >
-      {props.children}
-    </Link>
-  )
-}

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_START,
+  Banner,
   BORDERS,
   Box,
   COLORS,
@@ -41,7 +42,6 @@ import {
   dismissRequest,
   SUCCESS,
 } from '/app/redux/robot-api'
-import { Banner } from '/app/atoms/Banner'
 import { UpdateBanner } from '/app/molecules/UpdateBanner'
 import { useChainLiveCommands } from '/app/resources/runs'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'

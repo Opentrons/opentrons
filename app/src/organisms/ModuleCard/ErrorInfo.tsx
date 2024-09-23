@@ -8,6 +8,7 @@ import {
 } from '@opentrons/shared-data'
 import {
   ALIGN_START,
+  Banner,
   Btn,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -19,7 +20,6 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Banner } from '/app/atoms/Banner'
 import { getTopPortalEl } from '../../App/portal'
 
 import type { AttachedModule } from '/app/redux/modules/types'

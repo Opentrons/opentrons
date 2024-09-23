@@ -3,6 +3,7 @@ import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
 import {
   Flex,
+  Banner,
   RESPONSIVENESS,
   SPACING,
   LegacyStyledText,
@@ -20,7 +21,6 @@ import type {
   CutoutId,
   CutoutFixtureId,
 } from '@opentrons/shared-data'
-import { Banner } from '/app/atoms/Banner'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
 import type { ModuleCalibrationWizardStepProps } from './types'

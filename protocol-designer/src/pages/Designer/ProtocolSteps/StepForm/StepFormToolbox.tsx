@@ -12,6 +12,7 @@ import {
   Toolbox,
 } from '@opentrons/components'
 import { stepIconsByType } from '../../../../form-types'
+import { FormAlerts } from '../../../../organisms'
 import {
   CommentTools,
   HeaterShakerTools,
@@ -64,6 +65,8 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     handleClose,
     handleSave,
     propsForFields,
+    dirtyFields,
+    focusedField,
   } = props
   const { t, i18n } = useTranslation(['application', 'shared'])
   const icon = stepIconsByType[formData.stepType]
@@ -85,13 +88,6 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
 
   return (
     <>
-      {/* TODO: update alerts */}
-      {/* <Alerts
-        focusedField={focusedField}
-        dirtyFields={dirtyFields}
-        componentType="Form"
-      /> */}
-
       <Toolbox
         childrenPadding="0"
         onCloseClick={handleClose}
@@ -111,6 +107,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
           </Flex>
         }
       >
+        <FormAlerts focusedField={focusedField} dirtyFields={dirtyFields} />
         <Tools {...{ formData, propsForFields, focusHandlers }} />
       </Toolbox>
     </>

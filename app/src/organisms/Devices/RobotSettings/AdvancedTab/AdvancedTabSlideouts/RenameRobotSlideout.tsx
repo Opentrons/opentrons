@@ -5,6 +5,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import {
   COLORS,
+  Banner,
   DIRECTION_COLUMN,
   Flex,
   InputField,
@@ -21,7 +22,6 @@ import {
 } from '/app/redux/discovery'
 import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '/app/redux/analytics'
 import { Slideout } from '/app/atoms/Slideout'
-import { Banner } from '/app/atoms/Banner'
 import { useIsFlex } from '/app/redux-resources/robots'
 
 import type { Resolver, FieldError } from 'react-hook-form'

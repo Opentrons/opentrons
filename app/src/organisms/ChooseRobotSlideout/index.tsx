@@ -7,6 +7,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
+  Banner,
   BORDERS,
   COLORS,
   CURSOR_AUTO,
@@ -47,7 +48,6 @@ import {
   RE_ROBOT_MODEL_OT2,
   RE_ROBOT_MODEL_OT3,
 } from '/app/redux/discovery'
-import { Banner } from '/app/atoms/Banner'
 import { Slideout } from '/app/atoms/Slideout'
 import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
 import { ToggleButton } from '/app/atoms/buttons'

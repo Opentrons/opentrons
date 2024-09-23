@@ -1,10 +1,11 @@
 import * as React from 'react'
-import { LegacyStyledText, TYPOGRAPHY } from '@opentrons/components'
+import { StyledText } from '../../atoms/StyledText'
 import { Banner } from './index'
+
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof Banner> = {
-  title: 'App/Atoms/Banner',
+  title: 'Library/Molecules/Banner',
   component: Banner,
 }
 
@@ -35,12 +36,7 @@ export const OverriddenExitIcon: Story = {
       console.log('close')
     },
     closeButton: (
-      <LegacyStyledText
-        as="p"
-        textDecoration={TYPOGRAPHY.textDecorationUnderline}
-      >
-        {'Exit'}
-      </LegacyStyledText>
+      <StyledText desktopStyle="bodyDefaultRegular">{'Exit'}</StyledText>
     ),
   },
 }

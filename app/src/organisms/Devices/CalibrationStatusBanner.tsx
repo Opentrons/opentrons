@@ -4,6 +4,7 @@ import { Link as RouterLink } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
+  Banner,
   COLORS,
   DIRECTION_ROW,
   Flex,
@@ -14,7 +15,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Banner } from '/app/atoms/Banner'
 import { useCalibrationTaskList } from './hooks'
 
 interface CalibrationStatusBannerProps {

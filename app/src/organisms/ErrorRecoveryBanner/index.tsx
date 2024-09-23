@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 
 import {
   Flex,
+  Banner,
   DIRECTION_COLUMN,
   SPACING,
   StyledText,
@@ -11,7 +12,6 @@ import {
 
 import { getUserId } from '/app/redux/config'
 import { useClientDataRecovery } from '/app/resources/client_data'
-import { Banner } from '/app/atoms/Banner'
 
 import type { RecoveryIntent } from '/app/resources/client_data'
 import type { StyleProps } from '@opentrons/components'

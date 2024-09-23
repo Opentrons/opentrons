@@ -5,6 +5,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
+  Banner,
   BORDERS,
   COLORS,
   DeckConfigurator,
@@ -29,7 +30,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
-import { Banner } from '/app/atoms/Banner'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 import { useIsRobotViewable, useRunStatuses } from '../Devices/hooks'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'

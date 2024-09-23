@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import {
   COLORS,
+  Banner,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
@@ -14,7 +15,6 @@ import {
   WEIGHT_OF_96_CHANNEL,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { Banner } from '/app/atoms/Banner'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,

@@ -5,6 +5,7 @@ import head from 'lodash/head'
 import isEqual from 'lodash/isEqual'
 import {
   ALIGN_CENTER,
+  Banner,
   Box,
   COLORS,
   DIRECTION_COLUMN,
@@ -25,7 +26,6 @@ import {
   getTipLengthForPipetteAndTiprack,
 } from '/app/redux/calibration/'
 import { Select } from '/app/atoms/SelectField/Select'
-import { Banner } from '/app/atoms/Banner'
 import { Divider } from '/app/atoms/structure'
 import { NeedHelpLink } from './NeedHelpLink'
 import { ChosenTipRackRender } from './ChosenTipRackRender'

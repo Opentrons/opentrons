@@ -11,7 +11,6 @@ import {
 } from '@opentrons/react-api-client'
 
 import { i18n } from '/app/i18n'
-import { Banner } from '/app/atoms/Banner'
 import { mockMagneticModule } from '/app/redux/modules/__fixtures__'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useIsRobotViewable, useRunStatuses } from '../hooks'
@@ -42,7 +41,6 @@ vi.mock('../PipetteCard/FlexPipetteCard')
 vi.mock('../PipetteCard/PipetteRecalibrationWarning')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux-resources/robots')
-vi.mock('/app/atoms/Banner')
 vi.mock('../utils')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
@@ -122,7 +120,9 @@ describe('InstrumentsAndModules', () => {
   it('renders the protocol loaded banner when protocol is loaded and not terminal state', () => {
     vi.mocked(useCurrentRunId).mockReturnValue('RUNID')
     render()
-    expect(vi.mocked(Banner)).toHaveBeenCalled()
+    screen.getByText(
+      'Robot must be on the network to see connected instruments and modules'
+    )
   })
   it('renders 1 pipette card when a 96 channel is attached', () => {
     when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
