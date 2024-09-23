@@ -158,8 +158,8 @@ These flow rate properties operate independently. This means you can specify dif
 
 Let's tell the robot to aspirate, dispense, and blow out the liquid using default flow rates. Notice how you don't need to specify a ``flow_rate`` attribute to use the defaults::
 
-        pipette.aspirate(200, plate["A1"])  # 160 µL/s
-        pipette.dispense(200, plate["A2"])  # 160 µL/s
+        pipette.aspirate(200, plate["A1"])  # 716 µL/s
+        pipette.dispense(200, plate["A2"])  # 716 µL/s
         pipette.blow_out()                  #  80 µL/s
 
 Now let's change the flow rates for each action::
@@ -184,7 +184,7 @@ These flow rates will remain in effect until you change the ``flow_rate`` attrib
 Flex Pipette Flow Rates
 -----------------------
 
-The default flow rates for Flex pipettes depend on the maximum volume of the pipette and the capacity of the currently attached tip. For each pipette–tip configuration, the default flow rate is the same for aspirate, dispense, and blowout actions.
+Flex pipette flow rates depend on pipette volume and tip capacity. Each pipette–tip combination has a default flow rate for aspirating, dispensing, and blowing out liquid. When using a 50 µL pipette, you should only use 50 µL tips.
 
 .. list-table::
     :header-rows: 1
@@ -193,7 +193,7 @@ The default flow rates for Flex pipettes depend on the maximum volume of the pip
       - Tip Capacity (µL)
       - Flow Rate (µL/s)
     * - 50 µL (1- and 8-channel)
-      - All capacities
+      - 50
       - 57
     * - 1000 µL (1-, 8-, and 96-channel)
       - 50
