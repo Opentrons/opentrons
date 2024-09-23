@@ -111,7 +111,7 @@ vi.mock('/app/organisms/ODD/ProtocolSetup', async importOriginal => {
     )
   )
 })
-vi.mock('/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
+
 vi.mock('/app/transformations/analysis')
 vi.mock('/app/organisms/ODD/RunningProtocol')
 vi.mock('/app/organisms/RunTimeControl/hooks')

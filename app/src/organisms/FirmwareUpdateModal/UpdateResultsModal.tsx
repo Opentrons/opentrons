@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-import { usePipetteModelSpecs } from '/app/resources/instruments/hooks'
+import { usePipetteModelSpecs } from '/app/local-resources/instruments'
 
 import type { InstrumentData, PipetteData } from '@opentrons/api-client'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'

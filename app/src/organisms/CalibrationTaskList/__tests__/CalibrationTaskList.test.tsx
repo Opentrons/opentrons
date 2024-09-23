@@ -18,15 +18,13 @@ import {
   expectedIncompleteRightMountTaskList,
   expectedIncompleteLeftMountTaskList,
 } from '../../Devices/hooks/__fixtures__/taskListFixtures'
-import {
-  useCalibrationTaskList,
-  useRunHasStarted,
-  useAttachedPipettes,
-} from '../../Devices/hooks'
+import { useCalibrationTaskList, useRunHasStarted } from '../../Devices/hooks'
+import { useAttachedPipettes } from '/app/resources/instruments'
 import { mockLeftProtoPipette } from '/app/redux/pipettes/__fixtures__'
 
 vi.mock('../../Devices/hooks')
 vi.mock('/app/resources/runs')
+vi.mock('/app/resources/instruments')
 
 const render = (robotName: string = 'otie') => {
   return renderWithProviders(

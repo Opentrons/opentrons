@@ -13,11 +13,14 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useChainLiveCommands, useRunStatus } from '/app/resources/runs'
+import {
+  useChainLiveCommands,
+  useRunStatus,
+  useMostRecentCompletedAnalysis,
+  useRunCalibrationStatus,
+} from '/app/resources/runs'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
-import { useRunCalibrationStatus } from '../../../../Devices/hooks'
 import { useAttachedModules } from '/app/resources/modules'
-import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import { mockApiHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { mockProtocolModuleInfo } from '../../ProtocolSetupInstruments/__fixtures__'
@@ -43,7 +46,6 @@ vi.mock('/app/resources/modules')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/organisms/Devices/hooks')
 vi.mock('/app/resources/deck_configuration')
-vi.mock('/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('/app/transformations/analysis')
 vi.mock('../utils')
 vi.mock('../SetupInstructionsModal')

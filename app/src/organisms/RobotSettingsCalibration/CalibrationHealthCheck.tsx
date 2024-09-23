@@ -27,12 +27,12 @@ import * as Calibration from '/app/redux/calibration'
 import * as Config from '/app/redux/config'
 import * as Pipettes from '/app/redux/pipettes'
 import * as Sessions from '/app/redux/sessions'
+import { useRunStatuses } from '/app/organisms/Devices/hooks'
 import {
-  useDeckCalibrationStatus,
   useAttachedPipettes,
   useAttachedPipetteCalibrations,
-  useRunStatuses,
-} from '/app/organisms/Devices/hooks'
+} from '/app/resources/instruments'
+import { useDeckCalibrationStatus } from '/app/resources/calibration'
 
 import type {
   AttachedPipettesByMount,

@@ -21,10 +21,10 @@ import { StatusLabel } from '/app/atoms/StatusLabel'
 import { TaskList } from '../TaskList'
 
 import {
-  useAttachedPipettes,
   useCalibrationTaskList,
   useRunHasStarted,
 } from '/app/organisms/Devices/hooks'
+import { useAttachedPipettes } from '/app/resources/instruments'
 import { useCurrentRunId } from '/app/resources/runs'
 
 import type {

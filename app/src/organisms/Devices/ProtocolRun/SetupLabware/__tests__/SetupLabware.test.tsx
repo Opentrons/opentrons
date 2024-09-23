@@ -12,14 +12,13 @@ import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTy
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import {
   useLPCDisabledReason,
-  useRunCalibrationStatus,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../../../hooks'
 import { SetupLabwareList } from '../SetupLabwareList'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 import { SetupLabware } from '..'
-import { useNotifyRunQuery } from '/app/resources/runs'
+import { useNotifyRunQuery, useRunCalibrationStatus } from '/app/resources/runs'
 
 vi.mock('../SetupLabwareList')
 vi.mock('../SetupLabwareMap')

@@ -28,18 +28,20 @@ import {
 import { SmallButton } from '/app/atoms/buttons'
 import { getModulePrepCommands } from '/app/local-resources/modules'
 import { getModuleTooHot } from '/app/transformations/modules'
-import { useRunCalibrationStatus } from '../../../Devices/hooks'
 import { LocationConflictModal } from '../../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { useToaster } from '../../../ToasterOven'
 import { getLocalRobot } from '/app/redux/discovery'
-import { useChainLiveCommands } from '/app/resources/runs'
+import {
+  useChainLiveCommands,
+  useRunCalibrationStatus,
+} from '/app/resources/runs'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { CommandData } from '@opentrons/api-client'
 import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
-import type { ProtocolCalibrationStatus } from '../../../Devices/hooks'
+import type { ProtocolCalibrationStatus } from '/app/resources/runs'
 import type { AttachedProtocolModuleMatch } from './utils'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000

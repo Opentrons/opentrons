@@ -7,16 +7,14 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { CalibrationDashboard } from '..'
 
-import {
-  useCalibrationTaskList,
-  useAttachedPipettes,
-} from '/app/organisms/Devices/hooks'
+import { useCalibrationTaskList } from '/app/organisms/Devices/hooks'
 import { useDashboardCalibratePipOffset } from '../hooks/useDashboardCalibratePipOffset'
 import { useDashboardCalibrateTipLength } from '../hooks/useDashboardCalibrateTipLength'
 import { useDashboardCalibrateDeck } from '../hooks/useDashboardCalibrateDeck'
 import { expectedTaskList } from '/app/organisms/Devices/hooks/__fixtures__/taskListFixtures'
 import { mockLeftProtoPipette } from '/app/redux/pipettes/__fixtures__'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
+import { useAttachedPipettes } from '/app/resources/instruments'
 
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/organisms/Devices/hooks')
@@ -24,6 +22,7 @@ vi.mock('../hooks/useDashboardCalibratePipOffset')
 vi.mock('../hooks/useDashboardCalibrateTipLength')
 vi.mock('../hooks/useDashboardCalibrateDeck')
 vi.mock('/app/resources/runs')
+vi.mock('/app/resources/instruments')
 
 const render = (path = '/') => {
   return renderWithProviders(

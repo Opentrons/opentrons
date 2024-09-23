@@ -19,16 +19,19 @@ import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
 } from '/app/resources/deck_configuration/utils'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import {
+  useMostRecentCompletedAnalysis,
+  useRunCalibrationStatus,
+  useRunPipetteInfoByMount,
+  useNotifyRunQuery,
+} from '/app/resources/runs'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
   useModuleCalibrationStatus,
   useProtocolAnalysisErrors,
-  useRunCalibrationStatus,
   useRunHasStarted,
-  useRunPipetteInfoByMount,
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
 
@@ -39,7 +42,6 @@ import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
 import type { MissingSteps } from '../ProtocolRunSetup'
-import { useNotifyRunQuery } from '/app/resources/runs'
 
 import type * as SharedData from '@opentrons/shared-data'
 
@@ -49,11 +51,13 @@ vi.mock('../SetupRobotCalibration')
 vi.mock('../SetupModuleAndDeck')
 vi.mock('../SetupLiquids')
 vi.mock('../EmptySetupStep')
-vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('/app/resources/runs/useNotifyRunQuery')
+vi.mock('/app/resources/runs/useMostRecentCompletedAnalysis')
+vi.mock('/app/resources/runs/useRunCalibrationStatus')
+vi.mock('/app/resources/runs/useRunPipetteInfoByMount')
 vi.mock('/app/redux/config')
 vi.mock('/app/resources/deck_configuration/utils')
 vi.mock('/app/resources/deck_configuration/hooks')
-vi.mock('/app/resources/runs/useNotifyRunQuery')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/analysis')
 vi.mock('@opentrons/shared-data', async importOriginal => {

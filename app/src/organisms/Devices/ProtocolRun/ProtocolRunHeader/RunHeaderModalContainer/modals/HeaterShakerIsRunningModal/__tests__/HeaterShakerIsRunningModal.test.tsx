@@ -10,7 +10,7 @@ import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
 import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
 import { useAttachedModules } from '/app/resources/modules'
-import { useMostRecentCompletedAnalysis } from '../../../../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 
 import type * as ReactApiClient from '@opentrons/react-api-client'
 
@@ -22,9 +22,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   }
 })
 vi.mock('/app/resources/modules')
-vi.mock(
-  '../../../../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-)
+vi.mock('/app/resources/runs')
 vi.mock('../HeaterShakerModuleCard')
 
 const mockMovingHeaterShakerOne = {

@@ -22,8 +22,10 @@ import { InlineNotification } from '/app/atoms/InlineNotification'
 import { ChildNavigation } from '/app/organisms/ChildNavigation'
 import { useAttachedModules } from '/app/resources/modules'
 import { getProtocolModulesInfo } from '/app/transformations/analysis'
-import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useRunStatus } from '/app/resources/runs'
+import {
+  useRunStatus,
+  useMostRecentCompletedAnalysis,
+} from '/app/resources/runs'
 import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,

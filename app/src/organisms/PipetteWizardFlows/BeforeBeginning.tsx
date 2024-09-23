@@ -21,7 +21,7 @@ import {
 } from '/app/molecules/SimpleWizardBody'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
-import { usePipetteNameSpecs } from '/app/resources/instruments/hooks'
+import { usePipetteNameSpecs } from '/app/local-resources/instruments'
 import {
   CALIBRATION_PROBE,
   FLOWS,

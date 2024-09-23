@@ -33,7 +33,7 @@ import {
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
 } from '/app/redux/analytics'
 import { useIsFlex } from '/app/redux-resources/robots'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getLocationInfoNames } from '/app/transformations/commands'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
 import {

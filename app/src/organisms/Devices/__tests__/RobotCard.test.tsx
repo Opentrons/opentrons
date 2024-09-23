@@ -27,7 +27,7 @@ import {
   ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT3,
 } from '/app/redux/discovery/constants'
-import { useAttachedPipettes } from '../hooks'
+import { useAttachedPipettes } from '/app/resources/instruments'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotOverflowMenu } from '../RobotOverflowMenu'
 import { RobotStatusHeader } from '../RobotStatusHeader'
@@ -41,7 +41,7 @@ import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/robot-update/selectors')
 vi.mock('/app/redux/discovery/selectors')
-vi.mock('../hooks')
+vi.mock('/app/resources/instruments')
 vi.mock('/app/resources/modules')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../../UpdateRobotBanner')

@@ -14,7 +14,7 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { PipetteRecalibrationODDWarning } from '/app/pages/ODD/InstrumentsDashboard/PipetteRecalibrationODDWarning'
 import { getShowPipetteCalibrationWarning } from '../../../Devices/utils'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { ProtocolInstrumentMountItem } from '../../../InstrumentMountItem'
 
 import type { GripperData, PipetteData } from '@opentrons/api-client'

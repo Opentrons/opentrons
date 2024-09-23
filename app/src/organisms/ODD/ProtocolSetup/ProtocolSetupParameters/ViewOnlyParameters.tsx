@@ -18,7 +18,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { ChildNavigation } from '/app/organisms/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
 

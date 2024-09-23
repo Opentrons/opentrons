@@ -13,20 +13,21 @@ import {
   useSyncRobotClock,
   useRunHasStarted,
 } from '/app/organisms/Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolRunHeader } from '/app/organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { ProtocolRunModuleControls } from '/app/organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunSetup } from '/app/organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { RunPreviewComponent } from '/app/organisms/RunPreview'
 import { ProtocolRunRuntimeParameters } from '/app/organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
-import { useCurrentRunId } from '/app/resources/runs'
+import {
+  useCurrentRunId,
+  useMostRecentCompletedAnalysis,
+} from '/app/resources/runs'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import { useRobot } from '/app/redux-resources/robots'
 import { ProtocolRunDetails } from '..'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
-vi.mock('/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('/app/organisms/Devices/hooks')
 vi.mock('/app/organisms/Devices/ProtocolRun/ProtocolRunHeader')
 vi.mock('/app/organisms/Devices/ProtocolRun/ProtocolRunSetup')
