@@ -5,6 +5,9 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  CURSOR_DEFAULT,
+  CURSOR_NOT_ALLOWED,
+  CURSOR_POINTER,
   DIRECTION_ROW,
   Icon,
   RESPONSIVENESS,
@@ -80,24 +83,26 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   const DISABLED_BUTTON_STYLE = css`
     background-color: ${COLORS.grey35};
     color: ${COLORS.grey50};
-    cursor: not-allowed;
+    cursor: ${CURSOR_NOT_ALLOWED};
   `
 
   const SettingButtonLabel = styled.label`
-      border-radius: ${
-        !largeDesktopBorderRadius
-          ? BORDERS.borderRadius40
-          : BORDERS.borderRadius8
-      };
-      cursor: pointer;
-      padding: ${SPACING.spacing12} ${SPACING.spacing16};
-      width: 100%;
+    border-radius: ${
+      !largeDesktopBorderRadius ? BORDERS.borderRadius40 : BORDERS.borderRadius8
+    };
+    cursor: ${CURSOR_POINTER};
+    padding: ${SPACING.spacing12} ${SPACING.spacing16};
+    width: 100%;
 
-      ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}
-      ${disabled && DISABLED_BUTTON_STYLE}
+    ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}
+    ${disabled && DISABLED_BUTTON_STYLE}
+
+    &:focus-visible {
+      outline: 2px solid ${COLORS.blue55};
+    }
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-       cursor: default;
+       cursor: ${CURSOR_DEFAULT};
        padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
        border-radius: ${BORDERS.borderRadius16};
        display: ${maxLines != null ? '-webkit-box' : undefined};
@@ -112,6 +117,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     <Flex
       css={css`
         width: auto;
+
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
           width: 100%;
         }
@@ -126,6 +132,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
         value={buttonValue}
       />
       <SettingButtonLabel
+        tabIndex={0}
         role="label"
         htmlFor={id}
         onMouseEnter={setHovered}

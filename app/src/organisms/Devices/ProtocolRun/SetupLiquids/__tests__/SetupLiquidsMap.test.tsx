@@ -19,16 +19,16 @@ import {
   simpleAnalysisFileFixture,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { useAttachedModules } from '../../../hooks'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
 import { getLabwareRenderInfo } from '../../utils/getLabwareRenderInfo'
 import { getStandardDeckViewLayerBlockList } from '../../utils/getStandardDeckViewLayerBlockList'
-import { getAttachedProtocolModuleMatches } from '../../../../ProtocolSetupModulesAndDeck/utils'
+import { getAttachedProtocolModuleMatches } from '../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
 import { getProtocolModulesInfo } from '../../utils/getProtocolModulesInfo'
-import { mockProtocolModuleInfo } from '../../../../ProtocolSetupLabware/__fixtures__'
-import { mockFetchModulesSuccessActionPayloadModules } from '../../../../../redux/modules/__fixtures__'
+import { mockProtocolModuleInfo } from '../../../../ODD/ProtocolSetup/ProtocolSetupLabware/__fixtures__'
+import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
 
 import { SetupLiquidsMap } from '../SetupLiquidsMap'
 
@@ -52,9 +52,9 @@ vi.mock('../../LabwareInfoOverlay')
 vi.mock('../../../hooks')
 vi.mock('../utils')
 vi.mock('../../utils/getLabwareRenderInfo')
-vi.mock('../../../../ProtocolSetupModulesAndDeck/utils')
+vi.mock('../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils')
 vi.mock('../../utils/getProtocolModulesInfo')
-vi.mock('../../../../../resources/deck_configuration/utils')
+vi.mock('/app/resources/deck_configuration/utils')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getSimplestDeckConfigForProtocol>()
   return {

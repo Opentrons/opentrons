@@ -13,7 +13,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { OddModal } from '../../molecules/OddModal'
+import { OddModal } from '/app/molecules/OddModal'
 import type { Subsystem } from '@opentrons/api-client'
 
 interface UpdateInProgressModalProps {

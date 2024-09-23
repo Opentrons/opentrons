@@ -11,6 +11,7 @@ export interface ErrorDetails {
 }
 
 export type IssuedCommandsType = 'setup' | 'fixit'
+export type DropTipModalStyle = 'simple' | 'intervention'
 
 interface CopyOverrides {
   tipDropCompleteBtnCopy: string

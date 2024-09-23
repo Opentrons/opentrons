@@ -3,14 +3,14 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
-import { i18n } from '../../../../../i18n'
-import { getRobotSettings } from '../../../../../redux/robot-settings'
+import { i18n } from '/app/i18n'
+import { getRobotSettings } from '/app/redux/robot-settings'
 
 import { LegacySettings } from '../LegacySettings'
 
-vi.mock('../../../../../redux/robot-settings/selectors')
+vi.mock('/app/redux/robot-settings/selectors')
 
 const mockSettings = {
   id: 'deckCalibrationDots',

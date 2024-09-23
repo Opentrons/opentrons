@@ -24,9 +24,11 @@ import { DropTipWizardFlows } from '../../DropTipWizardFlows'
 import { DT_ROUTES } from '../../DropTipWizardFlows/constants'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
-import type { PipetteWithTip } from '../../DropTipWizardFlows'
 import type { RecoveryContentProps, RecoveryRoute, RouteStep } from '../types'
-import type { FixitCommandTypeUtils } from '../../DropTipWizardFlows/types'
+import type {
+  FixitCommandTypeUtils,
+  PipetteWithTip,
+} from '../../DropTipWizardFlows'
 
 // The Drop Tip flow entry point. Includes entry from SelectRecoveryOption and CancelRun.
 export function ManageTips(props: RecoveryContentProps): JSX.Element {
@@ -64,7 +66,7 @@ export function BeginRemoval({
   const { aPipetteWithTip } = tipStatusUtils
   const {
     proceedNextStep,
-    setRobotInMotion,
+    handleMotionRouting,
     proceedToRouteAndStep,
   } = routeUpdateActions
   const { cancelRun } = recoveryCommands
@@ -83,7 +85,7 @@ export function BeginRemoval({
         RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
       )
     } else {
-      void setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => {
+      void handleMotionRouting(true, ROBOT_CANCELING.ROUTE).then(() => {
         cancelRun()
       })
     }
@@ -151,7 +153,7 @@ function DropTipFlowsContainer(
     currentRecoveryOptionUtils,
   } = props
   const { DROP_TIP_FLOWS, ROBOT_CANCELING, RETRY_NEW_TIPS } = RECOVERY_MAP
-  const { proceedToRouteAndStep, setRobotInMotion } = routeUpdateActions
+  const { proceedToRouteAndStep, handleMotionRouting } = routeUpdateActions
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { setTipStatusResolved } = tipStatusUtils
   const { cancelRun } = recoveryCommands
@@ -170,7 +172,7 @@ function DropTipFlowsContainer(
   }
 
   const onEmptyCache = (): void => {
-    void setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => {
+    void handleMotionRouting(true, ROBOT_CANCELING.ROUTE).then(() => {
       cancelRun()
     })
   }
@@ -182,15 +184,14 @@ function DropTipFlowsContainer(
   const fixitCommandTypeUtils = useDropTipFlowUtils(props)
 
   return (
-    <RecoverySingleColumnContentWrapper>
-      <DropTipWizardFlows
-        robotType={robotType}
-        closeFlow={onCloseFlow}
-        mount={mount}
-        instrumentModelSpecs={specs}
-        fixitCommandTypeUtils={fixitCommandTypeUtils}
-      />
-    </RecoverySingleColumnContentWrapper>
+    <DropTipWizardFlows
+      robotType={robotType}
+      closeFlow={onCloseFlow}
+      mount={mount}
+      instrumentModelSpecs={specs}
+      fixitCommandTypeUtils={fixitCommandTypeUtils}
+      modalStyle="intervention"
+    />
   )
 }
 
@@ -202,7 +203,6 @@ export function useDropTipFlowUtils({
   subMapUtils,
   routeUpdateActions,
   recoveryMap,
-  failedPipetteInfo,
 }: RecoveryContentProps): FixitCommandTypeUtils {
   const { t } = useTranslation('error_recovery')
   const {

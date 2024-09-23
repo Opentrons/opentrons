@@ -16,16 +16,16 @@ import {
   ApiHostProvider,
 } from '@opentrons/react-api-client'
 
+import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 import {
-  useCreateTargetedMaintenanceRunMutation,
   useChainMaintenanceCommands,
-} from '../../resources/runs'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
+  useNotifyCurrentMaintenanceRun,
+} from '/app/resources/maintenance_runs'
 import { getTopPortalEl } from '../../App/portal'
-import { WizardHeader } from '../../molecules/WizardHeader'
+import { WizardHeader } from '/app/molecules/WizardHeader'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
-import { getIsOnDevice } from '../../redux/config'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { getIsOnDevice } from '/app/redux/config'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import { usePipetteFlowWizardHeaderText } from './hooks'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'

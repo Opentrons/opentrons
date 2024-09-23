@@ -4,9 +4,9 @@ import {
   fetchSettings,
   getRobotSettings,
   updateSetting,
-} from '../../../redux/robot-settings'
-import type { RobotSettings } from '../../../redux/robot-settings/types'
-import type { Dispatch, State } from '../../../redux/types'
+} from '/app/redux/robot-settings'
+import type { RobotSettings } from '/app/redux/robot-settings/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 // not releveant to the OT-2, this controls the front LED lights on the Flex
 export function useLEDLights(

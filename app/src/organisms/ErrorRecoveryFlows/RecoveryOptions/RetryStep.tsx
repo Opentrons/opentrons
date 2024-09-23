@@ -33,10 +33,10 @@ export function RetryStepInfo(props: RecoveryContentProps): JSX.Element {
   const { t } = useTranslation('error_recovery')
 
   const { retryFailedCommand, resumeRun } = recoveryCommands
-  const { setRobotInMotion } = routeUpdateActions
+  const { handleMotionRouting } = routeUpdateActions
 
   const primaryBtnOnClick = (): Promise<void> => {
-    return setRobotInMotion(true, ROBOT_RETRYING_STEP.ROUTE)
+    return handleMotionRouting(true, ROBOT_RETRYING_STEP.ROUTE)
       .then(() => retryFailedCommand())
       .then(() => {
         resumeRun()

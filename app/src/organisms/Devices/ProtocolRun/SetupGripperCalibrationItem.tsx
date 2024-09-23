@@ -9,7 +9,7 @@ import {
   WRAP,
 } from '@opentrons/components'
 import { getGripperDisplayName } from '@opentrons/shared-data'
-import { TertiaryButton } from '../../../atoms/buttons'
+import { TertiaryButton } from '/app/atoms/buttons'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 import { GripperWizardFlows } from '../../GripperWizardFlows'
 import { GRIPPER_FLOW_TYPES } from '../../GripperWizardFlows/constants'

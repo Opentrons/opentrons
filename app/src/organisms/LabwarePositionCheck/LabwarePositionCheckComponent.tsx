@@ -12,21 +12,23 @@ import {
 import { FIXED_TRASH_ID, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../App/portal'
-// import { useTrackEvent } from '../../redux/analytics'
+// import { useTrackEvent } from '/app/redux/analytics'
 import { IntroScreen } from './IntroScreen'
 import { ExitConfirmation } from './ExitConfirmation'
 import { CheckItem } from './CheckItem'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { getIsOnDevice } from '../../redux/config'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { getIsOnDevice } from '/app/redux/config'
 import { AttachProbe } from './AttachProbe'
 import { DetachProbe } from './DetachProbe'
 import { PickUpTip } from './PickUpTip'
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
-import { useChainMaintenanceCommands } from '../../resources/runs'
 import { FatalError } from './FatalErrorModal'
 import { RobotMotionLoader } from './RobotMotionLoader'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
+import {
+  useChainMaintenanceCommands,
+  useNotifyCurrentMaintenanceRun,
+} from '/app/resources/maintenance_runs'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 
 import type {
@@ -41,7 +43,7 @@ import type {
   LabwareOffset,
   CommandData,
 } from '@opentrons/api-client'
-import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { RegisterPositionAction, WorkingOffset } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000

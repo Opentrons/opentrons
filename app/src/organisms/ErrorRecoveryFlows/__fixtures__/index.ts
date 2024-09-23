@@ -6,7 +6,7 @@ import {
 import { RUN_STATUS_AWAITING_RECOVERY } from '@opentrons/api-client'
 
 import { RECOVERY_MAP } from '../constants'
-import { mockRobotSideAnalysis } from '../../../molecules/Command/__fixtures__'
+import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 
 import type { LoadedLabware, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { FailedCommand, RecoveryContentProps } from '../types'
@@ -61,7 +61,7 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
   errorKind: 'GENERAL_ERROR',
   robotType: FLEX_ROBOT_TYPE,
   runId: 'MOCK_RUN_ID',
-  isDoorOpen: false,
+  doorStatusUtils: { isDoorOpen: false, isProhibitedDoorOpen: false },
   isOnDevice: true,
   runStatus: RUN_STATUS_AWAITING_RECOVERY,
   recoveryMap: {

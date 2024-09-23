@@ -15,16 +15,16 @@ import {
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
-import { getTopPortalEl } from '../../App/portal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
-import { getIsOnDevice } from '../../redux/config'
 import {
   useChainMaintenanceCommands,
-  useCreateTargetedMaintenanceRunMutation,
-} from '../../resources/runs'
+  useNotifyCurrentMaintenanceRun,
+} from '/app/resources/maintenance_runs'
+import { getTopPortalEl } from '../../App/portal'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
+import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
+import { getIsOnDevice } from '/app/redux/config'
+import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 import { getGripperWizardSteps } from './getGripperWizardSteps'
 import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'

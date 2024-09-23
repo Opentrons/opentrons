@@ -16,9 +16,9 @@ import {
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { updateConfigValue } from '../../redux/config'
-import type { Dispatch } from '../../redux/types'
-import type { UpdateConfigValueAction } from '../../redux/config/types'
+import { updateConfigValue } from '/app/redux/config'
+import type { Dispatch } from '/app/redux/types'
+import type { UpdateConfigValueAction } from '/app/redux/config/types'
 
 export function setHeaterShakerAttached(
   heaterShakerAttached: boolean
@@ -28,7 +28,7 @@ export function setHeaterShakerAttached(
     heaterShakerAttached
   )
 }
-interface ConfirmAttachmentModalProps {
+export interface ConfirmAttachmentModalProps {
   onCloseClick: () => void
   isProceedToRunModal: boolean
   onConfirmClick: () => void

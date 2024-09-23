@@ -3,8 +3,8 @@ import * as React from 'react'
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
 import { MANAGED_PIPETTE_ID, POSITION_AND_BLOWOUT } from '../constants'
-import { getAddressableAreaFromConfig } from '../getAddressableAreaFromConfig'
-import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import { getAddressableAreaFromConfig } from '../utils'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import type {
   CreateCommand,
   AddressableAreaName,
@@ -14,7 +14,7 @@ import type {
 } from '@opentrons/shared-data'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import type { CommandData, PipetteData } from '@opentrons/api-client'
-import type { Axis, Sign, StepSize } from '../../../molecules/JogControls/types'
+import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { DropTipFlowsStep, FixitCommandTypeUtils } from '../types'
 import type { SetRobotErrorDetailsParams, UseDTWithTypeParams } from '.'
 import type { RunCommandByCommandTypeParams } from './useDropTipCreateCommands'
@@ -33,7 +33,6 @@ type UseDropTipSetupCommandsParams = UseDTWithTypeParams & {
   setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
   toggleIsExiting: () => void
   fixitCommandTypeUtils?: FixitCommandTypeUtils
-  toggleClientEndRun: () => void
 }
 
 export interface UseDropTipCommandsResult {
@@ -58,7 +57,6 @@ export function useDropTipCommands({
   instrumentModelSpecs,
   robotType,
   fixitCommandTypeUtils,
-  toggleClientEndRun,
 }: UseDropTipSetupCommandsParams): UseDropTipCommandsResult {
   const isFlex = robotType === FLEX_ROBOT_TYPE
   const [hasSeenClose, setHasSeenClose] = React.useState(false)
@@ -89,7 +87,6 @@ export function useDropTipCommands({
                 console.error(error.message)
               })
               .finally(() => {
-                toggleClientEndRun()
                 closeFlow()
                 deleteMaintenanceRun(activeMaintenanceRunId)
               })

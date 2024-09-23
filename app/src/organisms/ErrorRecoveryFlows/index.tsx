@@ -16,7 +16,7 @@ import {
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { useHost } from '@opentrons/react-api-client'
 
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
 import { RunPausedSplash, useRunPausedSplash } from './RunPausedSplash'
 import { RecoveryTakeover } from './RecoveryTakeover'
@@ -25,7 +25,6 @@ import {
   useERUtils,
   useRecoveryTakeover,
   useRetainedFailedCommandBySource,
-  useShowDoorInfo,
 } from './hooks'
 
 import type { RunStatus } from '@opentrons/api-client'
@@ -48,7 +47,7 @@ const INVALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_IDLE,
 ]
 
-interface UseErrorRecoveryResult {
+export interface UseErrorRecoveryResult {
   isERActive: boolean
   /* There is no FailedCommand if the run statis is not AWAITING_RECOVERY. */
   failedCommand: FailedCommand | null
@@ -128,15 +127,12 @@ export function ErrorRecoveryFlows(
   const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
   const robotName = useHost()?.robotName ?? 'robot'
 
-  const isDoorOpen = useShowDoorInfo(runStatus)
   const {
     showTakeover,
     isActiveUser,
     intent,
     toggleERWizAsActiveUser,
   } = useRecoveryTakeover(toggleERWizard)
-  const renderWizard = isActiveUser && (showERWizard || isDoorOpen)
-  const showSplash = useRunPausedSplash(isOnDevice, renderWizard)
 
   const recoveryUtils = useERUtils({
     ...props,
@@ -144,8 +140,14 @@ export function ErrorRecoveryFlows(
     toggleERWizAsActiveUser,
     isOnDevice,
     robotType,
+    showTakeover,
     failedCommand: failedCommandBySource,
   })
+
+  const renderWizard =
+    isActiveUser &&
+    (showERWizard || recoveryUtils.doorStatusUtils.isProhibitedDoorOpen)
+  const showSplash = useRunPausedSplash(isOnDevice, renderWizard)
 
   return (
     <>
@@ -163,7 +165,6 @@ export function ErrorRecoveryFlows(
           {...recoveryUtils}
           robotType={robotType}
           isOnDevice={isOnDevice}
-          isDoorOpen={isDoorOpen}
           failedCommand={failedCommandBySource}
         />
       ) : null}

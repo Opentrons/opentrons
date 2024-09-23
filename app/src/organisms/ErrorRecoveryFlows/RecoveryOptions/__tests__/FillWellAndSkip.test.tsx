@@ -3,8 +3,8 @@ import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
 
 import { mockRecoveryContentProps } from '../../__fixtures__'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { FillWellAndSkip, FillWell, SkipToNextStep } from '../FillWellAndSkip'
 import { RECOVERY_MAP } from '../../constants'
 import { CancelRun } from '../CancelRun'
@@ -25,12 +25,12 @@ vi.mock('../../shared', async () => {
     )),
   }
 })
-vi.mock('../../../../molecules/InterventionModal/DeckMapContent', () => ({
+vi.mock('/app/molecules/InterventionModal/DeckMapContent', () => ({
   DeckMapContent: vi.fn(() => <div>MOCK_RECOVERY_MAP</div>),
 }))
 vi.mock('../CancelRun')
 vi.mock('../SelectRecoveryOption')
-vi.mock('../../../../molecules/Command')
+vi.mock('/app/molecules/Command')
 
 const render = (props: React.ComponentProps<typeof FillWellAndSkip>) => {
   return renderWithProviders(<FillWellAndSkip {...props} />, {
@@ -109,7 +109,7 @@ describe('FillWellAndSkip', () => {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        step: 'UNKNOWN_STEP',
+        step: 'UNKNOWN_STEP' as any,
       },
     }
     render(props)
@@ -137,13 +137,13 @@ describe('FillWell', () => {
 
 describe('SkipToNextStep', () => {
   let props: React.ComponentProps<typeof SkipToNextStep>
-  let mockSetRobotInMotion: Mock
+  let mockhandleMotionRouting: Mock
   let mockGoBackPrevStep: Mock
   let mockProceedToRouteAndStep: Mock
   let mockSkipFailedCommand: Mock
 
   beforeEach(() => {
-    mockSetRobotInMotion = vi.fn(() => Promise.resolve())
+    mockhandleMotionRouting = vi.fn(() => Promise.resolve())
     mockGoBackPrevStep = vi.fn()
     mockProceedToRouteAndStep = vi.fn()
     mockSkipFailedCommand = vi.fn(() => Promise.resolve())
@@ -151,7 +151,7 @@ describe('SkipToNextStep', () => {
     props = {
       ...mockRecoveryContentProps,
       routeUpdateActions: {
-        setRobotInMotion: mockSetRobotInMotion,
+        handleMotionRouting: mockhandleMotionRouting,
         goBackPrevStep: mockGoBackPrevStep,
         proceedToRouteAndStep: mockProceedToRouteAndStep,
       } as any,
@@ -186,7 +186,7 @@ describe('SkipToNextStep', () => {
     renderSkipToNextStep(props)
     clickButtonLabeled('Continue run now')
     await waitFor(() => {
-      expect(mockSetRobotInMotion).toHaveBeenCalledWith(
+      expect(mockhandleMotionRouting).toHaveBeenCalledWith(
         true,
         RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE
       )
@@ -195,7 +195,7 @@ describe('SkipToNextStep', () => {
       expect(mockSkipFailedCommand).toHaveBeenCalled()
     })
 
-    expect(mockSetRobotInMotion.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(mockhandleMotionRouting.mock.invocationCallOrder[0]).toBeLessThan(
       mockSkipFailedCommand.mock.invocationCallOrder[0]
     )
   })

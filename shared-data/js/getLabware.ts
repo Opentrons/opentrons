@@ -46,14 +46,17 @@ export const LABWAREV2_DO_NOT_LIST = [
   'opentrons_flex_lid_absorbance_plate_reader_module',
 ]
 // NOTE(sa, 2020-7-14): in PD we do not want to list calibration blocks
-// but we still might want the rest of the labware in LABWAREV2_DO_NOT_LIST
-// because of legacy protocols that might use them
+// or the adapter/labware combos since we migrated to splitting them up
 export const PD_DO_NOT_LIST = [
   'opentrons_calibrationblock_short_side_left',
   'opentrons_calibrationblock_short_side_right',
   'opentrons_96_aluminumblock_biorad_wellplate_200ul',
   'opentrons_96_aluminumblock_nest_wellplate_100ul',
-  'opentrons_flex_lid_absorbance_plate_reader_module',
+  'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat',
+  'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt',
+  'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat',
+  'opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep',
+  'opentrons_96_pcr_adapter_armadillo_wellplate_200ul',
 ]
 
 export function getIsLabwareV1Tiprack(def: LabwareDefinition1): boolean {

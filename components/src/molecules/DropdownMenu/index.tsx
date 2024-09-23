@@ -4,6 +4,7 @@ import { css } from 'styled-components'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import {
   ALIGN_CENTER,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
@@ -21,6 +22,7 @@ import { useOnClickOutside } from '../../interaction-enhancers'
 import { LegacyStyledText } from '../../atoms/StyledText/LegacyStyledText'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
+import { StyledText } from '../../atoms/StyledText'
 import { LiquidIcon } from '../LiquidIcon'
 
 /** this is the max height to display 10 items */
@@ -34,6 +36,7 @@ export interface DropdownOption {
   value: string
   /** optional dropdown option for adding the liquid color icon */
   liquidColor?: string
+  disabled?: boolean
 }
 
 export type DropdownBorder = 'rounded' | 'neutral'
@@ -54,9 +57,11 @@ export interface DropdownMenuProps {
   /** dropdown item caption */
   caption?: string | null
   /** text for tooltip */
-  tooltipText?: string
+  tooltipText?: string | null
   /** html tabindex property */
   tabIndex?: number
+  /** optional error */
+  error?: string | null
 }
 
 // TODO: (smb: 4/15/22) refactor this to use html select for accessibility
@@ -72,6 +77,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     caption,
     tooltipText,
     tabIndex = 0,
+    error,
   } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   const [showDropdownMenu, setShowDropdownMenu] = React.useState<boolean>(false)
@@ -133,13 +139,22 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     setShowDropdownMenu(!showDropdownMenu)
   }
 
+  let defaultBorderColor = COLORS.grey50
+  let hoverBorderColor = COLORS.grey55
+  if (showDropdownMenu) {
+    defaultBorderColor = COLORS.blue50
+    hoverBorderColor = COLORS.blue50
+  } else if (error) {
+    defaultBorderColor = COLORS.red50
+    hoverBorderColor = COLORS.red50
+  }
+
   const DROPDOWN_STYLE = css`
     flex-direction: ${DIRECTION_ROW};
     background-color: ${COLORS.white};
-    cursor: pointer;
+    cursor: ${CURSOR_POINTER};
     padding: ${SPACING.spacing8} ${SPACING.spacing12};
-    border: 1px ${BORDERS.styleSolid}
-      ${showDropdownMenu ? COLORS.blue50 : COLORS.grey50};
+    border: 1px ${BORDERS.styleSolid} ${defaultBorderColor};
     border-radius: ${dropdownType === 'rounded'
       ? BORDERS.borderRadiusFull
       : BORDERS.borderRadius4};
@@ -149,12 +164,11 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     height: 2.25rem;
 
     &:hover {
-      border: 1px ${BORDERS.styleSolid}
-        ${showDropdownMenu ? COLORS.blue50 : COLORS.grey55};
+      border: 1px ${BORDERS.styleSolid} ${hoverBorderColor};
     }
 
     &:active {
-      border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
+      border: 1px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.blue50};
     }
 
     &:focus-visible {
@@ -169,16 +183,16 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     }
   `
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} ref={dropDownMenuWrapperRef}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      ref={dropDownMenuWrapperRef}
+      gridGap={SPACING.spacing4}
+    >
       {title !== null ? (
-        <Flex gridGap={SPACING.spacing8}>
-          <LegacyStyledText
-            as="label"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            paddingBottom={SPACING.spacing8}
-          >
+        <Flex gridGap={SPACING.spacing8} paddingBottom={SPACING.spacing8}>
+          <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
             {title}
-          </LegacyStyledText>
+          </StyledText>
           {tooltipText != null ? (
             <>
               <Flex {...targetProps}>
@@ -207,18 +221,20 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             {currentOption.liquidColor != null ? (
               <LiquidIcon color={currentOption.liquidColor} />
             ) : null}
-            <LegacyStyledText
+            <Flex
               css={css`
-                ${dropdownType === 'rounded'
+                font-weight: ${dropdownType === 'rounded'
                   ? TYPOGRAPHY.pSemiBold
-                  : TYPOGRAPHY.pRegular}
+                  : TYPOGRAPHY.pRegular};
                 white-space: ${NO_WRAP};
-                overflow: $ ${OVERFLOW_HIDDEN};
+                overflow: ${OVERFLOW_HIDDEN};
                 text-overflow: ellipsis;
               `}
             >
-              {currentOption.name}
-            </LegacyStyledText>
+              <StyledText desktopStyle="captionRegular">
+                {currentOption.name}
+              </StyledText>
+            </Flex>
           </Flex>
           {showDropdownMenu ? (
             <Icon size="0.75rem" name="menu-down" transform="rotate(180deg)" />
@@ -261,13 +277,14 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         )}
       </Flex>
       {caption != null ? (
-        <LegacyStyledText
-          as="label"
-          paddingTop={SPACING.spacing4}
-          color={COLORS.grey60}
-        >
+        <LegacyStyledText as="label" color={COLORS.grey60}>
           {caption}
         </LegacyStyledText>
+      ) : null}
+      {error != null ? (
+        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.red50}>
+          {error}
+        </StyledText>
       ) : null}
     </Flex>
   )

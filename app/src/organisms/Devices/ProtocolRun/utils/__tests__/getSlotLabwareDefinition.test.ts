@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { mockDefinition } from '../../../../../redux/custom-labware/__fixtures__'
+import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
 import { getSlotLabwareDefinition } from '../getSlotLabwareDefinition'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 

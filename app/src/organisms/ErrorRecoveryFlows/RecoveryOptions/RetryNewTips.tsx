@@ -47,12 +47,12 @@ export function RetryNewTips(props: RecoveryContentProps): JSX.Element {
 export function RetryWithNewTips(props: RecoveryContentProps): JSX.Element {
   const { recoveryCommands, routeUpdateActions } = props
   const { retryFailedCommand, resumeRun } = recoveryCommands
-  const { setRobotInMotion } = routeUpdateActions
+  const { handleMotionRouting } = routeUpdateActions
   const { ROBOT_RETRYING_STEP } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
   const primaryBtnOnClick = (): Promise<void> => {
-    return setRobotInMotion(true, ROBOT_RETRYING_STEP.ROUTE)
+    return handleMotionRouting(true, ROBOT_RETRYING_STEP.ROUTE)
       .then(() => retryFailedCommand())
       .then(() => {
         resumeRun()

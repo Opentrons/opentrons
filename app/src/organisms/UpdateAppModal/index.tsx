@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
+  Banner,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
@@ -24,15 +25,14 @@ import {
   getAvailableShellUpdate,
   downloadShellUpdate,
   applyShellUpdate,
-} from '../../redux/shell'
+} from '/app/redux/shell'
 
-import { ExternalLink } from '../../atoms/Link/ExternalLink'
-import { ReleaseNotes } from '../../molecules/ReleaseNotes'
-import { Banner } from '../../atoms/Banner'
-import { ProgressBar } from '../../atoms/ProgressBar'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { ReleaseNotes } from '/app/molecules/ReleaseNotes'
+import { ProgressBar } from '/app/atoms/ProgressBar'
 import { useRemoveActiveAppUpdateToast } from '../Alerts'
 
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 interface PlaceHolderErrorProps {
   errorMessage?: string

@@ -5,24 +5,24 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { waitFor, renderHook } from '@testing-library/react'
 
-import { STORED_PROTOCOL_ANALYSIS } from '../__fixtures__/storedProtocolAnalysis'
+import { STORED_PROTOCOL_ANALYSIS } from '/app/resources/analysis/hooks/__fixtures__/storedProtocolAnalysis'
 import { useTrackCreateProtocolRunEvent } from '../useTrackCreateProtocolRunEvent'
-import { parseProtocolRunAnalyticsData } from '../useProtocolRunAnalyticsData'
-import { parseProtocolAnalysisOutput } from '../useStoredProtocolAnalysis'
-import { useTrackEvent } from '../../../../redux/analytics'
-import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
+import { parseProtocolRunAnalyticsData } from '/app/transformations/analytics'
+import { parseProtocolAnalysisOutput } from '/app/transformations/analysis'
+import { useTrackEvent } from '/app/redux/analytics'
+import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
 
 import type { Mock } from 'vitest'
 import type { Store } from 'redux'
-import type { ProtocolAnalyticsData } from '../../../../redux/analytics/types'
+import type { ProtocolAnalyticsData } from '/app/redux/analytics/types'
 
 vi.mock('../../hooks')
-vi.mock('../useProtocolRunAnalyticsData')
-vi.mock('../useStoredProtocolAnalysis')
-vi.mock('../../../../redux/discovery')
-vi.mock('../../../../redux/pipettes')
-vi.mock('../../../../redux/analytics')
-vi.mock('../../../../redux/robot-settings')
+vi.mock('/app/transformations/analytics')
+vi.mock('/app/transformations/analysis')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/pipettes')
+vi.mock('/app/redux/analytics')
+vi.mock('/app/redux/robot-settings')
 
 const PROTOCOL_PROPERTIES = { protocolType: 'python' } as ProtocolAnalyticsData
 

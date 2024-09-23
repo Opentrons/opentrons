@@ -18,12 +18,12 @@ import {
 
 import { ManualIpHostnameForm } from './ManualIpHostnameForm'
 import { ManualIpHostnameList } from './ManualIpHostnameList'
-import { Slideout } from '../../atoms/Slideout'
-import { ExternalLink } from '../../atoms/Link/ExternalLink'
-import { Divider } from '../../atoms/structure'
-import { getScanning, startDiscovery } from '../../redux/discovery'
+import { Slideout } from '/app/atoms/Slideout'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { Divider } from '/app/atoms/structure'
+import { getScanning, startDiscovery } from '/app/redux/discovery'
 
-import type { Dispatch, State } from '../../redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 const SUPPORT_PAGE_LINK =
   'https://support.opentrons.com/s/article/Manually-adding-a-robot-s-IP-address'

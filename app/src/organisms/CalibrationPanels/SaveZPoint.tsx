@@ -13,23 +13,23 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import * as Sessions from '../../redux/sessions'
+import * as Sessions from '/app/redux/sessions'
 import {
   JogControls,
   MEDIUM_STEP_SIZE_MM,
   SMALL_STEP_SIZE_MM,
   VERTICAL_PLANE,
-} from '../../molecules/JogControls'
+} from '/app/molecules/JogControls'
 import { formatJogVector } from './utils'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { NeedHelpLink } from './NeedHelpLink'
 
-import slot5LeftMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_5_LEFT_MULTI_Z.webm'
-import slot5LeftSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_5_LEFT_SINGLE_Z.webm'
-import slot5RightMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_5_RIGHT_MULTI_Z.webm'
-import slot5RightSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_5_RIGHT_SINGLE_Z.webm'
+import slot5LeftMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_LEFT_MULTI_Z.webm'
+import slot5LeftSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_LEFT_SINGLE_Z.webm'
+import slot5RightMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_RIGHT_MULTI_Z.webm'
+import slot5RightSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_5_RIGHT_SINGLE_Z.webm'
 
-import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { CalibrationPanelProps } from './types'
 
 const assetMap = {

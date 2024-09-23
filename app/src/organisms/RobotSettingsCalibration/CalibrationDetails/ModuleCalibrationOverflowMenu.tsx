@@ -17,14 +17,14 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 
-import { useChainLiveCommands } from '../../../resources/runs'
-import { useRunStatuses } from '../../Devices/hooks'
-import { getModulePrepCommands } from '../../Devices/getModulePrepCommands'
-import { ModuleWizardFlows } from '../../ModuleWizardFlows'
-import { getModuleTooHot } from '../../Devices/getModuleTooHot'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useChainLiveCommands } from '/app/resources/runs'
+import { useRunStatuses } from '/app/organisms/Devices/hooks'
+import { getModulePrepCommands } from '/app/organisms/Devices/getModulePrepCommands'
+import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { getModuleTooHot } from '/app/organisms/Devices/getModuleTooHot'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
-import type { AttachedModule } from '../../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 import type { FormattedPipetteOffsetCalibration } from '..'
 interface ModuleCalibrationOverflowMenuProps {
   isCalibrated: boolean

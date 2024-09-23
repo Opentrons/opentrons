@@ -3,24 +3,25 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react'
 import { vi, it, expect, describe, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
-import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtures__'
+import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
 
 import {
   useRunCalibrationStatus,
   useDeckCalibrationStatus,
-  useIsFlex,
   useRunPipetteInfoByMount,
 } from '..'
-import { useNotifyRunQuery } from '../../../../resources/runs'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
 import type { PipetteInfo } from '..'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
 vi.mock('../useDeckCalibrationStatus')
-vi.mock('../useIsFlex')
 vi.mock('../useRunPipetteInfoByMount')
-vi.mock('../../../../resources/runs')
+vi.mock('/app/resources/runs')
+vi.mock('/app/resources/analysis')
+vi.mock('/app/redux-resources/robots')
 
 let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 

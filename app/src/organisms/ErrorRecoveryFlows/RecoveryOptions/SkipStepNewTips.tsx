@@ -49,12 +49,12 @@ export function SkipStepNewTips(
 export function SkipStepWithNewTips(props: RecoveryContentProps): JSX.Element {
   const { recoveryCommands, routeUpdateActions } = props
   const { skipFailedCommand } = recoveryCommands
-  const { setRobotInMotion } = routeUpdateActions
+  const { handleMotionRouting } = routeUpdateActions
   const { ROBOT_SKIPPING_STEP } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
   const primaryBtnOnClick = (): Promise<void> => {
-    return setRobotInMotion(true, ROBOT_SKIPPING_STEP.ROUTE).then(() => {
+    return handleMotionRouting(true, ROBOT_SKIPPING_STEP.ROUTE).then(() => {
       skipFailedCommand()
     })
   }

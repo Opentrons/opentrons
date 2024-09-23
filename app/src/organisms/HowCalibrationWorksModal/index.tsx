@@ -18,9 +18,9 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
-import RobotCalHelpImage from '../../assets/images/robot_calibration_help.png'
-import { ExternalLink } from '../../atoms/Link/ExternalLink'
-import { Divider } from '../../atoms/structure'
+import RobotCalHelpImage from '/app/assets/images/robot_calibration_help.png'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { Divider } from '/app/atoms/structure'
 
 const ROBOT_CAL_HELP_ARTICLE =
   'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'

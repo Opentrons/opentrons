@@ -12,18 +12,19 @@ import {
   RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   useInterventionModal,
   InterventionModal,
 } from '../../InterventionModal'
-import { ProgressBar } from '../../../atoms/ProgressBar'
-import { useRunStatus } from '../../RunTimeControl/hooks'
+import { ProgressBar } from '/app/atoms/ProgressBar'
+import { useRunControls } from '../../RunTimeControl/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   useNotifyRunQuery,
   useNotifyAllCommandsQuery,
-} from '../../../resources/runs'
+  useRunStatus,
+} from '/app/resources/runs'
 import { useDownloadRunLog } from '../../Devices/hooks'
 import {
   mockUseAllCommandsResponseNonDeterministic,
@@ -32,9 +33,9 @@ import {
 } from '../__fixtures__'
 
 import { RunProgressMeter } from '..'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { useLastRunCommand } from '../../Devices/hooks/useLastRunCommand'
-import { useRunningStepCounts } from '../../../resources/protocols/hooks'
+import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 
 import type { RunCommandSummary } from '@opentrons/api-client'
 import type * as ApiClient from '@opentrons/react-api-client'
@@ -48,12 +49,13 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
 })
 vi.mock('../../RunTimeControl/hooks')
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../../../resources/runs')
+vi.mock('/app/resources/runs')
 vi.mock('../../Devices/hooks')
-vi.mock('../../../atoms/ProgressBar')
+vi.mock('/app/atoms/ProgressBar')
 vi.mock('../../InterventionModal')
 vi.mock('../../Devices/hooks/useLastRunCommand')
-vi.mock('../../../resources/protocols/hooks')
+vi.mock('/app/resources/protocols/hooks')
+vi.mock('/app/redux-resources/robots')
 
 const render = (props: React.ComponentProps<typeof RunProgressMeter>) => {
   return renderWithProviders(<RunProgressMeter {...props} />, {
@@ -76,7 +78,10 @@ describe('RunProgressMeter', () => {
       .calledWith(NON_DETERMINISTIC_RUN_ID)
       .thenReturn(null)
     when(useNotifyAllCommandsQuery)
-      .calledWith(NON_DETERMINISTIC_RUN_ID, { cursor: null, pageLength: 1 })
+      .calledWith(NON_DETERMINISTIC_RUN_ID, {
+        cursor: null,
+        pageLength: 1,
+      })
       .thenReturn(mockUseAllCommandsResponseNonDeterministic)
     when(useCommandQuery)
       .calledWith(NON_DETERMINISTIC_RUN_ID, NON_DETERMINISTIC_COMMAND_KEY)
@@ -99,12 +104,12 @@ describe('RunProgressMeter', () => {
       showModal: false,
       modalProps: {} as any,
     })
+    vi.mocked(useRunControls).mockReturnValue({ play: vi.fn() } as any)
 
     props = {
       runId: NON_DETERMINISTIC_RUN_ID,
       robotName: ROBOT_NAME,
       makeHandleJumpToStep: vi.fn(),
-      resumeRunHandler: vi.fn(),
     }
   })
 

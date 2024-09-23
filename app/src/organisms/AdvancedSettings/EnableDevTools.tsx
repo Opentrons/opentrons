@@ -12,10 +12,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ToggleButton } from '../../atoms/buttons'
-import { getDevtoolsEnabled, toggleDevtools } from '../../redux/config'
+import { ToggleButton } from '/app/atoms/buttons'
+import { getDevtoolsEnabled, toggleDevtools } from '/app/redux/config'
 
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 export function EnableDevTools(): JSX.Element {
   const { t } = useTranslation('app_settings')

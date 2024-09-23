@@ -54,6 +54,7 @@ const FLEXBOX_PROPS = [
   'alignItems',
   'justifyContent',
   'flexDirection',
+  'flexGrow',
   'flexWrap',
   'alignSelf',
   'whiteSpace',

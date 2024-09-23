@@ -1,9 +1,18 @@
 """Basic pipette data state and store."""
 from __future__ import annotations
-from dataclasses import dataclass
-from typing import Dict, List, Mapping, Optional, Tuple, Union
+
+import dataclasses
+from typing import (
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Union,
+)
 from typing_extensions import assert_type
 
+from opentrons_shared_data.errors import EnumeratedError
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -13,13 +22,9 @@ from opentrons.hardware_control.nozzle_manager import (
 )
 from opentrons.protocol_engine.actions.actions import FailCommandAction
 from opentrons.protocol_engine.commands.command import DefinedErrorData
-from opentrons.protocol_engine.commands.pipetting_common import (
-    LiquidNotFoundError,
-    OverpressureError,
-    OverpressureErrorInternalData,
-)
 from opentrons.types import MountType, Mount as HwMount, Point
 
+from . import update_types
 from .. import commands
 from .. import errors
 from ..types import (
@@ -44,7 +49,7 @@ from ..actions import (
 from ._abstract_store import HasState, HandlesActions
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class HardwarePipette:
     """Hardware pipette data."""
 
@@ -52,7 +57,7 @@ class HardwarePipette:
     config: PipetteDict
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class CurrentDeckPoint:
     """The latest deck point and mount the robot has accessed."""
 
@@ -60,7 +65,7 @@ class CurrentDeckPoint:
     deck_point: Optional[DeckPoint]
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class BoundingNozzlesOffsets:
     """Offsets of the bounding nozzles of the pipette."""
 
@@ -68,7 +73,7 @@ class BoundingNozzlesOffsets:
     front_right_offset: Point
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class PipetteBoundingBoxOffsets:
     """Offsets of the corners of the pipette's bounding box."""
 
@@ -78,7 +83,7 @@ class PipetteBoundingBoxOffsets:
     front_left_corner: Point
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class StaticPipetteConfig:
     """Static config for a pipette."""
 
@@ -100,7 +105,7 @@ class StaticPipetteConfig:
     lld_settings: Optional[Dict[str, Dict[str, float]]]
 
 
-@dataclass
+@dataclasses.dataclass
 class PipetteState:
     """Basic pipette data state and getter methods."""
 
@@ -147,7 +152,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         self, action: Union[SucceedCommandAction, FailCommandAction]
     ) -> None:
         self._update_current_location(action)
-        self._update_deck_point(action)
         self._update_volumes(action)
 
         if not isinstance(action, SucceedCommandAction):
@@ -276,187 +280,51 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
                 )
 
-    def _update_current_location(  # noqa: C901
+    def _update_current_location(
         self, action: Union[SucceedCommandAction, FailCommandAction]
     ) -> None:
-        # These commands leave the pipette in a new location.
-        # Update current_location to reflect that.
-        if isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result,
-            (
-                commands.MoveToWellResult,
-                commands.PickUpTipResult,
-                commands.DropTipResult,
-                commands.AspirateResult,
-                commands.DispenseResult,
-                commands.BlowOutResult,
-                commands.TouchTipResult,
-                commands.LiquidProbeResult,
-                commands.TryLiquidProbeResult,
-            ),
-        ):
-            self._state.current_location = CurrentWell(
-                pipette_id=action.command.params.pipetteId,
-                labware_id=action.command.params.labwareId,
-                well_name=action.command.params.wellName,
-            )
-        elif isinstance(action, FailCommandAction) and (
-            isinstance(action.error, DefinedErrorData)
-            and (
-                (
-                    isinstance(
-                        action.running_command, (commands.Aspirate, commands.Dispense)
-                    )
-                    and isinstance(action.error.public, OverpressureError)
-                )
-                or (
-                    isinstance(action.running_command, commands.LiquidProbe)
-                    and isinstance(action.error.public, LiquidNotFoundError)
-                )
-            )
-        ):
-            self._state.current_location = CurrentWell(
-                pipette_id=action.running_command.params.pipetteId,
-                labware_id=action.running_command.params.labwareId,
-                well_name=action.running_command.params.wellName,
-            )
-        elif isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result,
-            (
-                commands.MoveToAddressableAreaResult,
-                commands.MoveToAddressableAreaForDropTipResult,
-            ),
-        ):
-            self._state.current_location = CurrentAddressableArea(
-                pipette_id=action.command.params.pipetteId,
-                addressable_area_name=action.command.params.addressableAreaName,
-            )
+        if isinstance(action, SucceedCommandAction):
+            location_update = action.state_update.pipette_location
+        elif isinstance(action.error, DefinedErrorData):
+            location_update = action.error.state_update.pipette_location
+        else:
+            # The command failed with some undefined error. We have nothing to do.
+            assert_type(action.error, EnumeratedError)
+            return
 
-        # These commands leave the pipette in a place that we can't logically associate
-        # with a well. Clear current_location to reflect the fact that it's now unknown.
-        #
-        # TODO(mc, 2021-11-12): Wipe out current_location on movement failures, too.
-        # TODO(jbl 2023-02-14): Need to investigate whether move relative should clear current location
-        elif isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result,
-            (
-                commands.HomeResult,
-                commands.RetractAxisResult,
-                commands.MoveToCoordinatesResult,
-                commands.thermocycler.OpenLidResult,
-                commands.thermocycler.CloseLidResult,
-            ),
-        ):
+        if location_update is update_types.NO_CHANGE:
+            pass
+        elif location_update is update_types.CLEAR:
             self._state.current_location = None
-
-        # Heater-Shaker commands may have left the pipette in a place that we can't
-        # associate with a logical location, depending on their result.
-        elif isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result,
-            (
-                commands.heater_shaker.SetAndWaitForShakeSpeedResult,
-                commands.heater_shaker.OpenLabwareLatchResult,
-            ),
-        ):
-            if action.command.result.pipetteRetracted:
-                self._state.current_location = None
-
-        # A moveLabware command may have moved the labware that contains the current
-        # well out from under the pipette. Clear the current location to reflect the
-        # fact that the pipette is no longer over any labware.
-        #
-        # This is necessary for safe motion planning in case the next movement
-        # goes to the same labware (now in a new place).
-        elif isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result, commands.MoveLabwareResult
-        ):
-            moved_labware_id = action.command.params.labwareId
-            if action.command.params.strategy == "usingGripper":
-                # All mounts will have been retracted.
-                self._state.current_location = None
-            elif (
-                isinstance(self._state.current_location, CurrentWell)
-                and self._state.current_location.labware_id == moved_labware_id
-            ):
-                self._state.current_location = None
-
-    def _update_deck_point(
-        self, action: Union[SucceedCommandAction, FailCommandAction]
-    ) -> None:
-        # This function mostly mirrors self._update_current_location().
-        # See there for explanations.
-
-        if isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result,
-            (
-                commands.MoveToWellResult,
-                commands.MoveToCoordinatesResult,
-                commands.MoveRelativeResult,
-                commands.MoveToAddressableAreaResult,
-                commands.MoveToAddressableAreaForDropTipResult,
-                commands.PickUpTipResult,
-                commands.DropTipResult,
-                commands.AspirateResult,
-                commands.DispenseResult,
-                commands.BlowOutResult,
-                commands.TouchTipResult,
-            ),
-        ):
-            pipette_id = action.command.params.pipetteId
-            deck_point = action.command.result.position
-            loaded_pipette = self._state.pipettes_by_id[pipette_id]
             self._state.current_deck_point = CurrentDeckPoint(
-                mount=loaded_pipette.mount, deck_point=deck_point
+                mount=None, deck_point=None
             )
-        elif (
-            isinstance(action, FailCommandAction)
-            and isinstance(
-                action.running_command,
-                (
-                    commands.Aspirate,
-                    commands.Dispense,
-                    commands.AspirateInPlace,
-                    commands.DispenseInPlace,
-                ),
-            )
-            and isinstance(action.error, DefinedErrorData)
-            and isinstance(action.error.public, OverpressureError)
-        ):
-            assert_type(action.error.private, OverpressureErrorInternalData)
-            pipette_id = action.running_command.params.pipetteId
-            deck_point = action.error.private.position
-            loaded_pipette = self._state.pipettes_by_id[pipette_id]
-            self._state.current_deck_point = CurrentDeckPoint(
-                mount=loaded_pipette.mount, deck_point=deck_point
-            )
-
-        elif isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result,
-            (
-                commands.HomeResult,
-                commands.RetractAxisResult,
-                commands.thermocycler.OpenLidResult,
-                commands.thermocycler.CloseLidResult,
-            ),
-        ):
-            self._clear_deck_point()
-
-        elif isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result,
-            (
-                commands.heater_shaker.SetAndWaitForShakeSpeedResult,
-                commands.heater_shaker.OpenLabwareLatchResult,
-            ),
-        ):
-            if action.command.result.pipetteRetracted:
-                self._clear_deck_point()
-
-        elif isinstance(action, SucceedCommandAction) and isinstance(
-            action.command.result, commands.MoveLabwareResult
-        ):
-            if action.command.params.strategy == "usingGripper":
-                # All mounts will have been retracted.
-                self._clear_deck_point()
+        else:
+            new_logical_location = location_update.new_location
+            new_deck_point = location_update.new_deck_point
+            match new_logical_location:
+                case update_types.Well(labware_id=labware_id, well_name=well_name):
+                    self._state.current_location = CurrentWell(
+                        pipette_id=location_update.pipette_id,
+                        labware_id=labware_id,
+                        well_name=well_name,
+                    )
+                case update_types.AddressableArea(
+                    addressable_area_name=addressable_area_name
+                ):
+                    self._state.current_location = CurrentAddressableArea(
+                        pipette_id=location_update.pipette_id,
+                        addressable_area_name=addressable_area_name,
+                    )
+                case None:
+                    self._state.current_location = None
+                case update_types.NO_CHANGE:
+                    pass
+            if new_deck_point is not update_types.NO_CHANGE:
+                loaded_pipette = self._state.pipettes_by_id[location_update.pipette_id]
+                self._state.current_deck_point = CurrentDeckPoint(
+                    mount=loaded_pipette.mount, deck_point=new_deck_point
+                )
 
     def _update_volumes(
         self, action: Union[SucceedCommandAction, FailCommandAction]
@@ -500,10 +368,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         ):
             pipette_id = action.command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = 0
-
-    def _clear_deck_point(self) -> None:
-        """Reset last deck point to default None value for mount and point."""
-        self._state.current_deck_point = CurrentDeckPoint(mount=None, deck_point=None)
 
 
 class PipetteView(HasState[PipetteState]):

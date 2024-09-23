@@ -1,5 +1,5 @@
 """Module identification and response data mapping."""
-from typing import Annotated, Type, cast, Optional
+from typing import Annotated, List, Type, cast, Optional
 from fastapi import Depends
 
 from opentrons_shared_data.module import load_definition
@@ -147,7 +147,13 @@ class ModuleDataMapper:
                     AbsorbanceReaderPlatePresence,
                     live_data["data"].get("platePresence"),
                 ),
-                sampleWavelength=cast(int, live_data["data"].get("sampleWavelength")),
+                measureMode=cast(str, live_data["data"].get("measureMode")),
+                sampleWavelengths=cast(
+                    List[int], live_data["data"].get("sampleWavelengths")
+                ),
+                referenceWavelength=cast(
+                    int, live_data["data"].get("referenceWavelength")
+                ),
             )
         else:
             assert False, f"Invalid module type {module_type}"

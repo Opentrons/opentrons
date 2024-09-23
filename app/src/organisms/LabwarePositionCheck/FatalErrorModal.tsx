@@ -21,8 +21,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../App/portal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { i18n } from '../../i18n'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { i18n } from '/app/i18n'
 
 const SUPPORT_EMAIL = 'support@opentrons.com'
 interface FatalErrorProps {

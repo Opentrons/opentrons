@@ -12,26 +12,26 @@ import {
   test_modules_protocol as withModulesProtocol,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
-} from '../../../../resources/deck_configuration/utils'
+} from '/app/resources/deck_configuration/utils'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
-  useIsFlex,
   useModuleCalibrationStatus,
   useProtocolAnalysisErrors,
-  useRobot,
   useRunCalibrationStatus,
   useRunHasStarted,
   useRunPipetteInfoByMount,
-  useStoredProtocolAnalysis,
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
+
 import { SetupLabware } from '../SetupLabware'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 import { SetupLiquids } from '../SetupLiquids'
@@ -39,7 +39,7 @@ import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
 import type { MissingSteps } from '../ProtocolRunSetup'
-import { useNotifyRunQuery } from '../../../../resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
 import type * as SharedData from '@opentrons/shared-data'
 
@@ -50,10 +50,12 @@ vi.mock('../SetupModuleAndDeck')
 vi.mock('../SetupLiquids')
 vi.mock('../EmptySetupStep')
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../../../../redux/config')
-vi.mock('../../../../resources/deck_configuration/utils')
-vi.mock('../../../../resources/deck_configuration/hooks')
-vi.mock('../../../../resources/runs/useNotifyRunQuery')
+vi.mock('/app/redux/config')
+vi.mock('/app/resources/deck_configuration/utils')
+vi.mock('/app/resources/deck_configuration/hooks')
+vi.mock('/app/resources/runs/useNotifyRunQuery')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/resources/analysis')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
   return {

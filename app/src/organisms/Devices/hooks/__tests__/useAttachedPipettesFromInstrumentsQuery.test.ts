@@ -5,12 +5,12 @@ import {
   instrumentsResponseLeftPipetteFixture,
   instrumentsResponseRightPipetteFixture,
 } from '@opentrons/api-client'
-import { useIsOEMMode } from '../../../../resources/robot-settings/hooks'
+import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
 import { useAttachedPipettesFromInstrumentsQuery } from '..'
 import type * as React from 'react'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../resources/robot-settings/hooks')
+vi.mock('/app/resources/robot-settings/hooks')
 
 describe('useAttachedPipettesFromInstrumentsQuery hook', () => {
   beforeEach(() => {

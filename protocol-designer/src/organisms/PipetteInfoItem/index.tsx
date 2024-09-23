@@ -13,6 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getPipetteSpecsV2 } from '@opentrons/shared-data'
+import { BUTTON_LINK_STYLE } from '../../atoms'
 import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 import type { FormPipettesByMount, PipetteOnDeck } from '../../step-forms'
@@ -79,6 +80,7 @@ export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
           <Btn
             onClick={editClick}
             textDecoration={TYPOGRAPHY.textDecorationUnderline}
+            css={BUTTON_LINK_STYLE}
           >
             <StyledText desktopStyle="bodyDefaultRegular">
               {t('edit')}
@@ -92,6 +94,7 @@ export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
                 cleanForm()
               }}
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
+              css={BUTTON_LINK_STYLE}
             >
               <StyledText desktopStyle="bodyDefaultRegular">
                 {t('remove')}

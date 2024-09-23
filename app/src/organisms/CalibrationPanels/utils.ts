@@ -1,6 +1,6 @@
 import { format } from 'date-fns'
-import type { Axis } from '../../molecules/JogControls/types'
-import type { VectorTuple } from '../../redux/sessions/types'
+import type { Axis } from '/app/molecules/JogControls/types'
+import type { VectorTuple } from '/app/redux/sessions/types'
 
 const ORDERED_AXES: [Axis, Axis, Axis] = ['x', 'y', 'z']
 

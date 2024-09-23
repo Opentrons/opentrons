@@ -1,4 +1,5 @@
 export { useLastRunProtocolCommand } from './useLastRunProtocolCommand'
 export { useRunningStepCounts } from './useRunningStepCounts'
-
+export { useCurrentProtocol } from './useCurrentProtocol'
+export { useProtocolMetadata } from './useProtocolMetadata'
 export type { StepCounts } from './useRunningStepCounts'

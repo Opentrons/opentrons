@@ -4,30 +4,36 @@ import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
+import { createPortal } from 'react-dom'
 
 import {
   ALIGN_CENTER,
   Btn,
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
   InfoScreen,
+  JUSTIFY_END,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   LargeButton,
   LiquidIcon,
   ListItem,
   ListItemDescriptor,
+  Modal,
+  NO_WRAP,
+  PrimaryButton,
+  SecondaryButton,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
   ToggleGroup,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getPipetteSpecsV2,
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+
 import {
   getAdditionalEquipmentEntities,
   getInitialDeckSetup,
@@ -41,10 +47,9 @@ import {
   getUnusedStagingAreas,
   getUnusedTrash,
 } from '../../components/FileSidebar/utils'
-import { resetScrollElements } from '../../ui/steps/utils'
-import { useBlockingHint } from '../../components/Hints/useBlockingHint'
-import { v8WarningContent } from '../../components/FileSidebar/FileSidebar'
 import { MaterialsListModal } from '../../organisms/MaterialsListModal'
+import { BUTTON_LINK_STYLE } from '../../atoms'
+import { getMainPagePortalEl } from '../../components/portals/MainPageModalPortal'
 import {
   EditProtocolMetadataModal,
   EditInstrumentsModal,
@@ -52,12 +57,13 @@ import {
 } from '../../organisms'
 import { DeckThumbnail } from './DeckThumbnail'
 import { OffDeckThumbnail } from './OffdeckThumbnail'
+import { getWarningContent } from './UnusedModalContent'
 
 import type { CreateCommand, PipetteName } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../types'
-import type { HintKey } from '../../tutorial'
 
+const REQUIRED_APP_VERSION = '8.0.0'
 const DATE_ONLY_FORMAT = 'MMMM dd, yyyy'
 const DATETIME_FORMAT = 'MMMM dd, yyyy | h:mm a'
 
@@ -68,7 +74,7 @@ const LOAD_COMMANDS: Array<CreateCommand['commandType']> = [
   'loadLiquid',
 ]
 
-interface Fixture {
+export interface Fixture {
   trashBin: boolean
   wasteChute: boolean
   stagingAreaSlots: string[]
@@ -90,6 +96,10 @@ export function ProtocolOverview(): JSX.Element {
     showEditMetadataModal,
     setShowEditMetadataModal,
   ] = React.useState<boolean>(false)
+  const [
+    showExportWarningModal,
+    setShowExportWarningModal,
+  ] = React.useState<boolean>(false)
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
   const initialDeckSetup = useSelector(getInitialDeckSetup)
@@ -98,7 +108,6 @@ export function ProtocolOverview(): JSX.Element {
   )
   const dispatch: ThunkDispatch<any> = useDispatch()
   const [hover, setHover] = React.useState<DeckSlot | string | null>(null)
-  const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
   const [
     showMaterialsListModal,
     setShowMaterialsListModal,
@@ -115,6 +124,15 @@ export function ProtocolOverview(): JSX.Element {
   const [deckView, setDeckView] = React.useState<
     typeof leftString | typeof rightString
   >(leftString)
+
+  React.useEffect(() => {
+    if (formValues?.created == null) {
+      console.warn(
+        'formValues was refreshed while on the overview page, redirecting to landing page'
+      )
+      navigate('/')
+    }
+  }, [formValues])
 
   const {
     modules: modulesOnDeck,
@@ -194,31 +212,20 @@ export function ProtocolOverview(): JSX.Element {
     fixtureWithoutStep.wasteChute ||
     fixtureWithoutStep.stagingAreaSlots.length > 0
 
-  const getExportHintContent = (): {
-    hintKey: HintKey
-    content: React.ReactNode
-  } => {
-    return {
-      hintKey: t('alert:export_v8_1_protocol_7_3'),
-      content: v8WarningContent(t),
-    }
+  const warning =
+    hasWarning &&
+    getWarningContent({
+      noCommands,
+      pipettesWithoutStep,
+      modulesWithoutStep,
+      gripperWithoutStep,
+      fixtureWithoutStep,
+      t,
+    })
+
+  const cancelModal = (): void => {
+    setShowExportWarningModal(false)
   }
-
-  const { hintKey, content } = getExportHintContent()
-
-  const blockingExportHint = useBlockingHint({
-    enabled: showBlockingHint,
-    hintKey,
-    content,
-    handleCancel: () => {
-      setShowBlockingHint(false)
-    },
-    handleContinue: () => {
-      setShowBlockingHint(false)
-      dispatch(loadFileActions.saveProtocolFile())
-    },
-  })
-
   return (
     <>
       {showEditMetadataModal ? (
@@ -235,7 +242,35 @@ export function ProtocolOverview(): JSX.Element {
           }}
         />
       ) : null}
-      {blockingExportHint}
+      {showExportWarningModal &&
+        createPortal(
+          <Modal
+            title={warning && warning.heading}
+            onClose={cancelModal}
+            footer={
+              <Flex
+                justifyContent={JUSTIFY_END}
+                gridGap={SPACING.spacing8}
+                padding={SPACING.spacing12}
+              >
+                <SecondaryButton onClick={cancelModal}>
+                  {t('shared:cancel')}
+                </SecondaryButton>
+                <PrimaryButton
+                  onClick={() => {
+                    setShowExportWarningModal(false)
+                    dispatch(loadFileActions.saveProtocolFile())
+                  }}
+                >
+                  {t('alert:continue_with_export')}
+                </PrimaryButton>
+              </Flex>
+            }
+          >
+            {warning && warning.content}
+          </Modal>,
+          getMainPagePortalEl()
+        )}
       {showMaterialsListModal ? (
         <MaterialsListModal
           hardware={Object.values(modulesOnDeck)}
@@ -283,51 +318,48 @@ export function ProtocolOverview(): JSX.Element {
               onClick={() => {
                 navigate('/designer')
               }}
-              whiteSpace="nowrap"
+              whiteSpace={NO_WRAP}
               height="3.5rem"
             />
             <LargeButton
               buttonText={t('export_protocol')}
               onClick={() => {
-                //  ToDo (kk:08/26/2024) should use hasWarning later
-                if (!hasWarning) {
-                  resetScrollElements()
-                  // ToDo (kk:08/26/2024) create warning modal
+                if (hasWarning) {
+                  setShowExportWarningModal(true)
                 } else {
-                  resetScrollElements()
-                  setShowBlockingHint(true)
+                  dispatch(loadFileActions.saveProtocolFile())
                 }
               }}
               iconName="arrow-right"
-              whiteSpace="nowrap"
+              whiteSpace={NO_WRAP}
             />
           </Flex>
         </Flex>
         <Flex gridGap={SPACING.spacing80}>
           <Flex
+            flex="1.27"
             flexDirection={DIRECTION_COLUMN}
-            width="50%"
             gridGap={SPACING.spacing40}
           >
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <Flex
-                justifyContent={JUSTIFY_SPACE_BETWEEN}
-                marginBottom={SPACING.spacing12}
-              >
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+              <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
                 <StyledText desktopStyle="headingSmallBold">
                   {t('protocol_metadata')}
                 </StyledText>
-                <Btn
-                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                  onClick={() => {
-                    setShowEditMetadataModal(true)
-                  }}
-                  data-testid="ProtocolOverview_MetadataEditButton"
-                >
-                  <StyledText desktopStyle="bodyDefaultRegular">
-                    {t('edit')}
-                  </StyledText>
-                </Btn>
+                <Flex padding={SPACING.spacing4}>
+                  <Btn
+                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                    onClick={() => {
+                      setShowEditMetadataModal(true)
+                    }}
+                    css={BUTTON_LINK_STYLE}
+                    data-testid="ProtocolOverview_MetadataEditButton"
+                  >
+                    <StyledText desktopStyle="bodyDefaultRegular">
+                      {t('edit')}
+                    </StyledText>
+                  </Btn>
+                </Flex>
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
                 {metaDataInfo.map(info => {
@@ -343,26 +375,35 @@ export function ProtocolOverview(): JSX.Element {
                     </ListItem>
                   )
                 })}
+                <ListItem type="noActive" key="ProtocolOverview_robotVersion">
+                  <ListItemDescriptor
+                    type="default"
+                    description={t('required_app_version')}
+                    content={t('app_version', {
+                      version: REQUIRED_APP_VERSION,
+                    })}
+                  />
+                </ListItem>
               </Flex>
             </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <Flex
-                justifyContent={JUSTIFY_SPACE_BETWEEN}
-                marginBottom={SPACING.spacing12}
-              >
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+              <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
                 <StyledText desktopStyle="headingSmallBold">
                   {t('instruments')}
                 </StyledText>
-                <Btn
-                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                  onClick={() => {
-                    setShowEditInstrumentsModal(true)
-                  }}
-                >
-                  <StyledText desktopStyle="bodyDefaultRegular">
-                    {t('edit')}
-                  </StyledText>
-                </Btn>
+                <Flex padding={SPACING.spacing4}>
+                  <Btn
+                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                    onClick={() => {
+                      setShowEditInstrumentsModal(true)
+                    }}
+                    css={BUTTON_LINK_STYLE}
+                  >
+                    <StyledText desktopStyle="bodyDefaultRegular">
+                      {t('edit')}
+                    </StyledText>
+                  </Btn>
+                </Flex>
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
                 <ListItem type="noActive" key={`ProtocolOverview_robotType`}>
@@ -411,12 +452,10 @@ export function ProtocolOverview(): JSX.Element {
                 ) : null}
               </Flex>
             </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <Flex marginBottom={SPACING.spacing12}>
-                <StyledText desktopStyle="headingSmallBold">
-                  {t('liquid_defs')}
-                </StyledText>
-              </Flex>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+              <StyledText desktopStyle="headingSmallBold">
+                {t('liquid_defs')}
+              </StyledText>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
                 {Object.keys(allIngredientGroupFields).length > 0 ? (
                   Object.values(allIngredientGroupFields).map(
@@ -438,31 +477,25 @@ export function ProtocolOverview(): JSX.Element {
                               </StyledText>
                             </Flex>
                           }
-                          content={liquid.description ?? t('n/a')}
+                          content={liquid.description ?? t('na')}
                         />
                       </ListItem>
                     )
                   )
                 ) : (
-                  <InfoScreen
-                    content={t('no_liquids_defined')}
-                    backgroundColor={COLORS.grey35}
-                  />
+                  <InfoScreen content={t('no_liquids_defined')} />
                 )}
               </Flex>
             </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <Flex marginBottom={SPACING.spacing12}>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+              <Flex>
                 <StyledText desktopStyle="headingSmallBold">
                   {t('step')}
                 </StyledText>
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
                 {Object.keys(savedStepForms).length <= 1 ? (
-                  <InfoScreen
-                    content={t('no_steps')}
-                    backgroundColor={COLORS.grey35}
-                  />
+                  <InfoScreen content={t('no_steps')} />
                 ) : (
                   <ListItem type="noActive" key="ProtocolOverview_Step">
                     <ListItemDescriptor
@@ -477,27 +510,33 @@ export function ProtocolOverview(): JSX.Element {
               </Flex>
             </Flex>
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} width="50%">
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            flex="1"
+            gridGap={SPACING.spacing12}
+          >
             <Flex
-              marginBottom={SPACING.spacing12}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               alignItems={ALIGN_CENTER}
             >
-              <Flex gridGap="30px" alignItems={ALIGN_CENTER}>
+              <Flex gridGap="1.875rem" alignItems={ALIGN_CENTER}>
                 <StyledText desktopStyle="headingSmallBold">
                   {t('starting_deck')}
                 </StyledText>
-                <Btn
-                  data-testid="Materials_list"
-                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                  onClick={() => {
-                    setShowMaterialsListModal(true)
-                  }}
-                >
-                  <StyledText desktopStyle="bodyDefaultRegular">
-                    {t('materials_list')}
-                  </StyledText>
-                </Btn>
+                <Flex padding={SPACING.spacing4}>
+                  <Btn
+                    data-testid="Materials_list"
+                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                    onClick={() => {
+                      setShowMaterialsListModal(true)
+                    }}
+                    css={BUTTON_LINK_STYLE}
+                  >
+                    <StyledText desktopStyle="bodyDefaultRegular">
+                      {t('materials_list')}
+                    </StyledText>
+                  </Btn>
+                </Flex>
               </Flex>
               <ToggleGroup
                 selectedValue={deckView}
@@ -511,11 +550,7 @@ export function ProtocolOverview(): JSX.Element {
                 }}
               />
             </Flex>
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing32}
-              alignItems={ALIGN_CENTER}
-            >
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
               {deckView === leftString ? (
                 <DeckThumbnail hoverSlot={hover} setHoverSlot={setHover} />
               ) : (
@@ -524,7 +559,7 @@ export function ProtocolOverview(): JSX.Element {
               <SlotDetailsContainer
                 robotType={robotType}
                 slot={isOffDeckHover ? 'offDeck' : hover}
-                offDeckLabwareId={hover ?? undefined}
+                offDeckLabwareId={isOffDeckHover ? hover : null}
               />
             </Flex>
           </Flex>

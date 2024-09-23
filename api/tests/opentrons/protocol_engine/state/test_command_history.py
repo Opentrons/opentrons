@@ -13,10 +13,14 @@ from .command_fixtures import (
 
 
 def create_queued_command_entry(
-    command_id: str = "command-id", index: int = 0
+    command_id: str = "command-id",
+    intent: CommandIntent = CommandIntent.PROTOCOL,
+    index: int = 0,
 ) -> CommandEntry:
     """Create a command entry for a queued command."""
-    return CommandEntry(create_queued_command(command_id=command_id), index)
+    return CommandEntry(
+        create_queued_command(command_id=command_id, intent=intent), index
+    )
 
 
 def create_fixit_command_entry(
@@ -262,3 +266,54 @@ def test_remove_id_from_setup_queue(command_history: CommandHistory) -> None:
     command_history._add_to_setup_queue("1")
     command_history._remove_setup_queue_id("0")
     assert command_history.get_setup_queue_ids() == OrderedSet(["1"])
+
+
+def test_get_filtered_commands(command_history: CommandHistory) -> None:
+    """It should return a list of all commands without fixit commands."""
+    assert (
+        list(command_history.get_filtered_command_ids(include_fixit_commands=False))
+        == []
+    )
+    command_entry_1 = create_queued_command(command_id="0")
+    command_entry_2 = create_queued_command(command_id="1")
+    fixit_command_entry_1 = create_queued_command(
+        intent=CommandIntent.FIXIT, command_id="fixit-1"
+    )
+    command_history.append_queued_command(command_entry_1)
+    command_history.append_queued_command(command_entry_2)
+    command_history.append_queued_command(fixit_command_entry_1)
+    assert list(
+        command_history.get_filtered_command_ids(include_fixit_commands=False)
+    ) == ["0", "1"]
+
+
+def test_get_all_filtered_commands(command_history: CommandHistory) -> None:
+    """It should return a list of all commands without fixit commands."""
+    assert (
+        list(command_history.get_filtered_command_ids(include_fixit_commands=False))
+        == []
+    )
+    command_entry_1 = create_queued_command_entry()
+    command_entry_2 = create_queued_command_entry(index=1, intent=CommandIntent.SETUP)
+    fixit_command_entry_1 = create_queued_command_entry(intent=CommandIntent.FIXIT)
+    command_history._add("0", command_entry_1)
+    command_history._add("1", command_entry_2)
+    command_history._add("fixit-1", fixit_command_entry_1)
+    assert list(
+        command_history.get_filtered_command_ids(include_fixit_commands=True)
+    ) == ["0", "1", "fixit-1"]
+
+
+def test_get_slice_with_filtered_list(command_history: CommandHistory) -> None:
+    """It should return a slice of filtered commands."""
+    assert command_history.get_slice(0, 2) == []
+    command_entry_1 = create_queued_command_entry()
+    command_entry_2 = create_queued_command_entry(index=1)
+    command_entry_3 = create_queued_command_entry(index=2)
+    command_history._add("0", command_entry_1)
+    command_history._add("1", command_entry_2)
+    command_history._add("2", command_entry_3)
+    filtered_list = ["0", "1"]
+    assert command_history.get_slice(1, 3, command_ids=filtered_list) == [
+        command_entry_2.command,
+    ]

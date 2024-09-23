@@ -59,7 +59,7 @@ class DatabaseFailedToInitialize(ErrorDetails):
 def start_initializing_persistence(  # noqa: C901
     app_state: AppState,
     persistence_directory_root: Optional[Path],
-    done_callbacks: Iterable[Callable[[AppState], Awaitable[None]]],
+    done_callbacks: Iterable[Callable[[], Awaitable[None]]],
 ) -> None:
     """Initialize the persistence layer to get it ready for use by endpoint functions.
 
@@ -143,7 +143,7 @@ def start_initializing_persistence(  # noqa: C901
             await sql_engine_init_task
         finally:
             for callback in done_callbacks:
-                await callback(app_state)
+                await callback()
 
     asyncio.create_task(wait_until_done_then_trigger_callbacks())
 

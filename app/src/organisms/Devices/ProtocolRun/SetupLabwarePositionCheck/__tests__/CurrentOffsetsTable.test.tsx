@@ -7,9 +7,9 @@ import {
   multiple_tipacks_with_tc,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
-import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../../redux/config'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
 import { useLPCDisabledReason } from '../../../hooks'
 import { getLatestCurrentOffsets } from '../utils'
@@ -20,7 +20,7 @@ import type { LabwareOffset } from '@opentrons/api-client'
 
 vi.mock('../../../hooks')
 vi.mock('../../../../LabwarePositionCheck')
-vi.mock('../../../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../utils')
 
 vi.mock('@opentrons/shared-data', async importOriginal => {

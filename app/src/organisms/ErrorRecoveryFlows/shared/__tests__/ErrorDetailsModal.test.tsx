@@ -2,12 +2,12 @@ import * as React from 'react'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { screen, act, renderHook } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { mockRecoveryContentProps } from '../../__fixtures__'
-import { InlineNotification } from '../../../../atoms/InlineNotification'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 import { StepInfo } from '../StepInfo'
-import { OddModal } from '../../../../molecules/OddModal'
+import { OddModal } from '/app/molecules/OddModal'
 import {
   useErrorDetailsModal,
   ErrorDetailsModal,
@@ -18,11 +18,11 @@ vi.mock('react-dom', () => ({
   ...vi.importActual('react-dom'),
   createPortal: vi.fn((element, container) => element),
 }))
-vi.mock('../../../../molecules/OddModal', () => ({
+vi.mock('/app/molecules/OddModal', () => ({
   OddModal: vi.fn(({ children }) => <div>{children}</div>),
 }))
 
-vi.mock('../../../../atoms/InlineNotification')
+vi.mock('/app/atoms/InlineNotification')
 vi.mock('../StepInfo')
 
 describe('useErrorDetailsModal', () => {

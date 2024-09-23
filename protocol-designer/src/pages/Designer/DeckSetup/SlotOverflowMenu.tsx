@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom'
 import {
   BORDERS,
   COLORS,
+  CURSOR_AUTO,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
   NO_WRAP,
@@ -16,6 +18,7 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+
 import { deleteModule } from '../../../step-forms/actions'
 import { EditNickNameModal } from '../../../organisms'
 import { deleteDeckFixture } from '../../../step-forms/actions/additionalItems'
@@ -24,6 +27,7 @@ import {
   duplicateLabware,
   openIngredientSelector,
 } from '../../../labware-ingred/actions'
+import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../../types'
 
@@ -78,6 +82,11 @@ export function SlotOverflowMenu(
     },
   })
   const deckSetup = useSelector(getDeckSetupForActiveItem)
+
+  const liquidLocations = useSelector(
+    labwareIngredSelectors.getLiquidsByLabwareId
+  )
+
   const {
     labware: deckSetupLabware,
     modules: deckSetupModules,
@@ -105,9 +114,7 @@ export function SlotOverflowMenu(
 
   const hasNoItems =
     moduleOnSlot == null && labwareOnSlot == null && fixturesOnSlot.length === 0
-  const hasTrashOnSlot = fixturesOnSlot.some(
-    fixture => fixture.name === 'trashBin'
-  )
+
   const handleClear = (): void => {
     //  clear module from slot
     if (moduleOnSlot != null) {
@@ -155,6 +162,12 @@ export function SlotOverflowMenu(
   } else if (isOffDeckLocation) {
     nickNameId = location
   }
+
+  const selectionHasLiquids =
+    nickNameId != null &&
+    liquidLocations[nickNameId] != null &&
+    Object.keys(liquidLocations[nickNameId]).length > 0
+
   const slotOverflowBody = (
     <>
       {showNickNameModal && nickNameId != null ? (
@@ -205,14 +218,16 @@ export function SlotOverflowMenu(
             </MenuButton>
             <MenuButton
               onClick={() => {
-                if (labwareOnSlot != null) {
+                if (nestedLabwareOnSlot != null) {
+                  dispatch(openIngredientSelector(nestedLabwareOnSlot.id))
+                } else if (labwareOnSlot != null) {
                   dispatch(openIngredientSelector(labwareOnSlot.id))
                 }
                 navigate('/liquids')
               }}
             >
               <StyledText desktopStyle="bodyDefaultRegular">
-                {t('add_liquid')}
+                {selectionHasLiquids ? t('edit_liquid') : t('add_liquid')}
               </StyledText>
             </MenuButton>
           </>
@@ -238,7 +253,7 @@ export function SlotOverflowMenu(
           </MenuButton>
         ) : null}
         <MenuButton
-          disabled={hasNoItems || hasTrashOnSlot}
+          disabled={hasNoItems}
           onClick={() => {
             handleClear()
             setShowMenuList(false)
@@ -275,7 +290,7 @@ export function SlotOverflowMenu(
 const MenuButton = styled.button`
   background-color: ${COLORS.transparent};
   border-radius: inherit;
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   padding: ${SPACING.spacing8} ${SPACING.spacing12};
   border: none;
   border-radius: inherit;
@@ -284,6 +299,6 @@ const MenuButton = styled.button`
   }
   &:disabled {
     color: ${COLORS.grey40};
-    cursor: auto;
+    cursor: ${CURSOR_AUTO};
   }
 `

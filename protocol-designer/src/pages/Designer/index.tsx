@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -19,14 +19,18 @@ import {
   ToggleGroup,
   useOnClickOutside,
 } from '@opentrons/components'
+import { selectTerminalItem } from '../../ui/steps/actions/actions'
 import { useKitchen } from '../../organisms/Kitchen/hooks'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
-import { getFileMetadata } from '../../file-data/selectors'
+import { generateNewProtocol } from '../../labware-ingred/actions'
 import { DefineLiquidsModal, ProtocolMetadataNav } from '../../organisms'
+import { SettingsIcon } from '../../molecules'
+import { getFileMetadata } from '../../file-data/selectors'
 import { DeckSetupContainer } from './DeckSetup'
 import { selectors } from '../../labware-ingred/selectors'
 import { OffDeck } from './Offdeck'
 import { LiquidsOverflowMenu } from './LiquidsOverflowMenu'
+import { ProtocolSteps } from './ProtocolSteps'
 
 import type { CutoutId } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
@@ -42,11 +46,13 @@ export function Designer(): JSX.Element {
     'protocol_steps',
     'shared',
   ])
-  const { bakeToast } = useKitchen()
+  const { bakeToast, makeSnackbar } = useKitchen()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const fileMetadata = useSelector(getFileMetadata)
   const zoomIn = useSelector(selectors.getZoomedInSlot)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
-  const metadata = useSelector(getFileMetadata)
+  const isNewProtocol = useSelector(selectors.getIsNewProtocol)
   const [liquidOverflowMenu, showLiquidOverflowMenu] = React.useState<boolean>(
     false
   )
@@ -64,6 +70,11 @@ export function Designer(): JSX.Element {
   >(leftString)
 
   const { modules, additionalEquipmentOnDeck } = deckSetup
+
+  const hasTrashEntity = Object.values(additionalEquipmentOnDeck).some(
+    ae => ae.name === 'trashBin' || ae.name === 'wasteChute'
+  )
+
   const startingDeckTab = {
     text: t('protocol_starting_deck'),
     isActive: tab === 'startingDeck',
@@ -75,7 +86,11 @@ export function Designer(): JSX.Element {
     text: t('protocol_steps:protocol_steps'),
     isActive: tab === 'protocolSteps',
     onClick: () => {
-      setTab('protocolSteps')
+      if (hasTrashEntity) {
+        setTab('protocolSteps')
+      } else {
+        makeSnackbar(t('trash_required') as string)
+      }
     },
   }
 
@@ -84,15 +99,25 @@ export function Designer(): JSX.Element {
     // greater than 1 to account for the default loaded trashBin
     Object.values(additionalEquipmentOnDeck).length > 1
 
-  // only display toast if its a newly made protocol
+  // only display toast if its a newly made protocol and has hardware
   React.useEffect(() => {
-    if (hasHardware && metadata?.lastModified == null) {
+    if (hasHardware && isNewProtocol) {
       bakeToast(t('add_rest') as string, INFO_TOAST, {
         heading: t('we_added_hardware'),
         closeButton: true,
       })
+      dispatch(generateNewProtocol({ isNewProtocol: false }))
     }
   }, [])
+
+  React.useEffect(() => {
+    if (fileMetadata?.created == null) {
+      console.warn(
+        'fileMetadata was refreshed while on the designer page, redirecting to landing page'
+      )
+      navigate('/')
+    }
+  }, [fileMetadata])
 
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
@@ -103,7 +128,18 @@ export function Designer(): JSX.Element {
   })
 
   const deckViewItems =
-    deckView === leftString ? <DeckSetupContainer /> : <OffDeck />
+    deckView === leftString ? (
+      <DeckSetupContainer tab={tab} />
+    ) : (
+      <OffDeck tab={tab} />
+    )
+
+  React.useEffect(() => {
+    if (tab === 'startingDeck') {
+      //  ensure that the starting deck page is always showing the initial deck setup
+      dispatch(selectTerminalItem('__initial_setup__'))
+    }
+  }, [tab])
 
   return (
     <>
@@ -135,7 +171,8 @@ export function Designer(): JSX.Element {
             <Tabs tabs={[startingDeckTab, protocolStepTab]} />
           )}
           <ProtocolMetadataNav />
-          <Flex gridGap={SPACING.spacing8}>
+          <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+            <SettingsIcon />
             <PrimaryButton
               onClick={() => {
                 showLiquidOverflowMenu(true)
@@ -148,27 +185,30 @@ export function Designer(): JSX.Element {
                 </StyledText>
               </Flex>
             </PrimaryButton>
-
             <SecondaryButton
               onClick={() => {
-                navigate('/overview')
+                if (hasTrashEntity) {
+                  navigate('/overview')
+                } else {
+                  makeSnackbar(t('trash_required') as string)
+                }
               }}
             >
               {t('shared:done')}
             </SecondaryButton>
           </Flex>
         </Flex>
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          backgroundColor={
-            tab === 'startingDeck' && deckView === rightString
-              ? COLORS.white
-              : COLORS.grey10
-          }
-          padding={zoomIn.slot != null ? '0' : SPACING.spacing80}
-          height="calc(100vh - 64px)"
-        >
-          {tab === 'startingDeck' ? (
+        {tab === 'startingDeck' ? (
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            backgroundColor={
+              tab === 'startingDeck' && deckView === rightString
+                ? COLORS.white
+                : COLORS.grey10
+            }
+            padding={zoomIn.slot != null ? '0' : SPACING.spacing80}
+            height="calc(100vh - 64px)"
+          >
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
               {zoomIn.slot == null ? (
                 <Flex alignSelf={ALIGN_END}>
@@ -187,10 +227,10 @@ export function Designer(): JSX.Element {
               ) : null}
               {deckViewItems}
             </Flex>
-          ) : (
-            <div>TODO wire this up</div>
-          )}
-        </Flex>
+          </Flex>
+        ) : (
+          <ProtocolSteps />
+        )}
       </Flex>
     </>
   )

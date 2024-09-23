@@ -178,6 +178,9 @@ class RunOrchestratorStore:
                     deck_type=self._deck_type,
                     block_on_door_open=False,
                 ),
+                # Error recovery mode would not make sense outside the context of a run--
+                # for example, there would be no equivalent to the `POST /runs/{id}/actions`
+                # endpoint to resume normal operation.
                 error_recovery_policy=error_recovery_policy.never_recover,
             )
             self._default_run_orchestrator = RunOrchestrator.build_orchestrator(
@@ -330,17 +333,18 @@ class RunOrchestratorStore:
         return self.run_orchestrator.get_current_command()
 
     def get_command_slice(
-        self,
-        cursor: Optional[int],
-        length: int,
+        self, cursor: Optional[int], length: int, include_fixit_commands: bool
     ) -> CommandSlice:
         """Get a slice of run commands.
 
         Args:
             cursor: Requested index of first command in the returned slice.
             length: Length of slice to return.
+            include_fixit_commands: Include fixit commands.
         """
-        return self.run_orchestrator.get_command_slice(cursor=cursor, length=length)
+        return self.run_orchestrator.get_command_slice(
+            cursor=cursor, length=length, include_fixit_commands=include_fixit_commands
+        )
 
     def get_command_error_slice(
         self,

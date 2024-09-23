@@ -62,12 +62,6 @@ interface DeckSetupToolsProps {
   } | null
 }
 
-const TRASH_TYPES: Fixture[] = [
-  'wasteChute',
-  'trashBin',
-  'wasteChuteAndStagingArea',
-]
-
 export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
   const { onCloseClick, setHoveredLabware, onDeckProps } = props
   const { t, i18n } = useTranslation(['starting_deck_state', 'shared'])
@@ -117,9 +111,6 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
   } = deckSetup
   const hasTrash = Object.values(additionalEquipmentOnDeck).some(
     ae => ae.name === 'trashBin'
-  )
-  const trashyEntities = Object.values(additionalEquipmentOnDeck).filter(
-    ae => ae.name === 'trashBin' || ae.name === 'wasteChute'
   )
 
   const {
@@ -250,6 +241,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
 
   return (
     <Toolbox
+      height="calc(100vh - 64px)"
       width="23.375rem"
       title={
         <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
@@ -267,15 +259,8 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
       }
       closeButtonText={t('clear')}
       onCloseClick={() => {
-        if (
-          trashyEntities.length === 1 &&
-          TRASH_TYPES.includes(selectedFixture as Fixture)
-        ) {
-          makeSnackbar(t('trash_required') as string)
-        } else {
-          handleClear()
-          handleResetToolbox()
-        }
+        handleClear()
+        handleResetToolbox()
       }}
       onConfirmClick={() => {
         handleConfirm()
@@ -373,11 +358,6 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
                         )
                       } else if (collisionError != null) {
                         makeSnackbar(t(`${collisionError}`) as string)
-                      } else if (
-                        trashyEntities.length === 1 &&
-                        TRASH_TYPES.includes(selectedFixture as Fixture)
-                      ) {
-                        makeSnackbar(t('trash_required') as string)
                       } else {
                         setHardware(model)
                         dispatch(selectModule({ moduleModel: model }))
@@ -427,11 +407,6 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
                             hardware: t('shared:trashBin'),
                           }) as string
                         )
-                      } else if (
-                        trashyEntities.length === 1 &&
-                        TRASH_TYPES.includes(selectedFixture as Fixture)
-                      ) {
-                        makeSnackbar(t('trash_required') as string)
                       } else {
                         setHardware(fixture)
                         dispatch(selectFixture({ fixture: fixture }))

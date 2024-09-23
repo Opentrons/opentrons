@@ -3,6 +3,7 @@ from enum import Enum
 from dataclasses import dataclass
 from typing import (
     Dict,
+    List,
     NamedTuple,
     Callable,
     Any,
@@ -46,7 +47,7 @@ ModuleDisconnectedCallback = Optional[Callable[[str, str | None], None]]
 
 class LiveData(TypedDict):
     status: str
-    data: Dict[str, Union[float, str, bool, None]]
+    data: Dict[str, Union[float, str, bool, List[int], None]]
 
 
 class ModuleType(str, Enum):

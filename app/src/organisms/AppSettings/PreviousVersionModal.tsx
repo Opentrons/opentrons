@@ -10,7 +10,7 @@ import {
   Modal,
 } from '@opentrons/components'
 
-import { ExternalLink } from '../../atoms/Link/ExternalLink'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 
 export const UNINSTALL_APP_URL =
   'https://support.opentrons.com/s/article/Uninstall-the-Opentrons-App'

@@ -6,7 +6,7 @@ import {
   StyledText,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { InlineNotification } from '../../atoms/InlineNotification'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 
 interface NotificationProps {
   notificationHeader?: string

@@ -3,28 +3,25 @@ import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { usePipetteSettingsQuery } from '@opentrons/react-api-client'
-import { i18n } from '../../../../i18n'
-import { getHasCalibrationBlock } from '../../../../redux/config'
-import { useDispatchApiRequest } from '../../../../redux/robot-api'
+import { i18n } from '/app/i18n'
+import { getHasCalibrationBlock } from '/app/redux/config'
+import { useDispatchApiRequest } from '/app/redux/robot-api'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 import { PipetteCard } from '..'
 import { useDropTipWizardFlows } from '../../../DropTipWizardFlows'
 
-import {
-  mockLeftSpecs,
-  mockRightSpecs,
-} from '../../../../redux/pipettes/__fixtures__'
+import { mockLeftSpecs, mockRightSpecs } from '/app/redux/pipettes/__fixtures__'
 
-import type { DispatchApiRequestType } from '../../../../redux/robot-api'
+import type { DispatchApiRequestType } from '/app/redux/robot-api'
 
 vi.mock('../PipetteOverflowMenu')
-vi.mock('../../../../redux/config')
-vi.mock('../../../../redux/robot-api')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/robot-api')
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../redux/pipettes')
+vi.mock('/app/redux/pipettes')
 vi.mock('../../../DropTipWizardFlows')
 
 const render = (props: React.ComponentProps<typeof PipetteCard>) => {

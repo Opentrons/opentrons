@@ -173,6 +173,11 @@ const getZoomedInSlot: Selector<
   rootState => rootState.zoomedInSlotInfo.selectedSlot
 )
 
+const getIsNewProtocol: Selector<RootSlice, boolean> = createSelector(
+  rootSelector,
+  rootState => rootState.generateNewProtocol.isNewProtocol
+)
+
 // TODO: prune selectors
 export const selectors = {
   rootSelector,
@@ -195,4 +200,5 @@ export const selectors = {
   getLiquidDisplayColors,
   getZoomedInSlotInfo,
   getZoomedInSlot,
+  getIsNewProtocol,
 }

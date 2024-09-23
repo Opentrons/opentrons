@@ -30,12 +30,12 @@ export function SkipStepSameTips(props: RecoveryContentProps): JSX.Element {
 export function SkipStepSameTipsInfo(props: RecoveryContentProps): JSX.Element {
   const { routeUpdateActions, recoveryCommands } = props
   const { skipFailedCommand } = recoveryCommands
-  const { setRobotInMotion } = routeUpdateActions
+  const { handleMotionRouting } = routeUpdateActions
   const { ROBOT_SKIPPING_STEP } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
   const primaryBtnOnClick = (): Promise<void> => {
-    return setRobotInMotion(true, ROBOT_SKIPPING_STEP.ROUTE).then(() => {
+    return handleMotionRouting(true, ROBOT_SKIPPING_STEP.ROUTE).then(() => {
       skipFailedCommand()
     })
   }

@@ -19,21 +19,22 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
+  DISPLAY_GRID,
   Flex,
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
+  Modal,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   PrimaryButton,
   ProtocolDeck,
-  Tabs,
   SIZE_1,
   SIZE_5,
-  Modal,
   SPACING,
-  LegacyStyledText,
+  Tabs,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -49,16 +50,16 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../App/portal'
-import { Divider } from '../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '../../redux/analytics'
+} from '/app/redux/analytics'
 import {
   getIsProtocolAnalysisInProgress,
   analyzeProtocol,
-} from '../../redux/protocol-storage'
-import { useFeatureFlag } from '../../redux/config'
+} from '/app/redux/protocol-storage'
+import { useFeatureFlag } from '/app/redux/config'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
@@ -67,7 +68,7 @@ import {
   getAnalysisStatus,
   getProtocolDisplayName,
 } from '../ProtocolsLanding/utils'
-import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
+import { getProtocolUsesGripper } from '/app/transformations/commands'
 import { ProtocolOverflowMenu } from '../ProtocolsLanding/ProtocolOverflowMenu'
 import { ProtocolStats } from './ProtocolStats'
 import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
@@ -77,17 +78,17 @@ import { ProtocolParameters } from './ProtocolParameters'
 import { AnnotatedSteps } from './AnnotatedSteps'
 
 import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
-import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { State, Dispatch } from '../../redux/types'
+import type { StoredProtocolData } from '/app/redux/protocol-storage'
+import type { State, Dispatch } from '/app/redux/types'
 
 const GRID_STYLE = css`
-  display: grid;
+  display: ${DISPLAY_GRID};
   width: 100%;
   grid-template-columns: 26.6% 26.6% 26.6% 20.2%;
 `
 
 const TWO_COL_GRID_STYLE = css`
-  display: grid;
+  display: ${DISPLAY_GRID};
   grid-gap: ${SPACING.spacing24};
   grid-template-columns: 22.5% 77.5%;
 `
@@ -503,7 +504,7 @@ export function ProtocolDetails(
                 </Flex>
                 <Flex
                   css={css`
-                    display: grid;
+                    display: ${DISPLAY_GRID};
                     justify-self: end;
                   `}
                 >

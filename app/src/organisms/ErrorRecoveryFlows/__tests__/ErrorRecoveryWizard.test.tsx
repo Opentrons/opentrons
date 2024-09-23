@@ -2,8 +2,8 @@ import * as React from 'react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { renderHook, act, screen, waitFor } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { mockRecoveryContentProps } from '../__fixtures__'
 import {
   ErrorRecoveryContent,
@@ -134,7 +134,10 @@ describe('ErrorRecoveryComponent', () => {
   })
 
   it('renders the recovery door modal when isDoorOpen is true', () => {
-    props = { ...props, isDoorOpen: true }
+    props = {
+      ...props,
+      doorStatusUtils: { isProhibitedDoorOpen: true, isDoorOpen: true },
+    }
 
     renderRecoveryComponent(props)
 
@@ -175,6 +178,7 @@ describe('ErrorRecoveryContent', () => {
     CANCEL_RUN,
     DROP_TIP_FLOWS,
     ERROR_WHILE_RECOVERING,
+    ROBOT_DOOR_OPEN,
   } = RECOVERY_MAP
 
   let props: React.ComponentProps<typeof ErrorRecoveryContent>
@@ -202,6 +206,7 @@ describe('ErrorRecoveryContent', () => {
     vi.mocked(IgnoreErrorSkipStep).mockReturnValue(
       <div>MOCK_IGNORE_ERROR_SKIP_STEP</div>
     )
+    vi.mocked(RecoveryDoorOpen).mockReturnValue(<div>MOCK_DOOR_OPEN</div>)
   })
 
   it(`returns SelectRecoveryOption when the route is ${OPTION_SELECTION.ROUTE}`, () => {
@@ -417,26 +422,39 @@ describe('ErrorRecoveryContent', () => {
 
     screen.getByText('MOCK_IN_PROGRESS')
   })
+
+  it(`returns RecoveryDoorOpen when the route is ${ROBOT_DOOR_OPEN.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: ROBOT_DOOR_OPEN.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_DOOR_OPEN')
+  })
 })
 
 describe('useInitialPipetteHome', () => {
   let mockZHomePipetteZAxes: Mock
-  let mockSetRobotInMotion: Mock
+  let mockhandleMotionRouting: Mock
   let mockRecoveryCommands: any
   let mockRouteUpdateActions: any
 
   beforeEach(() => {
     mockZHomePipetteZAxes = vi.fn()
-    mockSetRobotInMotion = vi.fn()
+    mockhandleMotionRouting = vi.fn()
 
-    mockSetRobotInMotion.mockResolvedValue(() => mockZHomePipetteZAxes())
-    mockZHomePipetteZAxes.mockResolvedValue(() => mockSetRobotInMotion())
+    mockhandleMotionRouting.mockResolvedValue(() => mockZHomePipetteZAxes())
+    mockZHomePipetteZAxes.mockResolvedValue(() => mockhandleMotionRouting())
 
     mockRecoveryCommands = {
       homePipetteZAxes: mockZHomePipetteZAxes,
     } as any
     mockRouteUpdateActions = {
-      setRobotInMotion: mockSetRobotInMotion,
+      handleMotionRouting: mockhandleMotionRouting,
     } as any
   })
 
@@ -449,7 +467,7 @@ describe('useInitialPipetteHome', () => {
       })
     )
 
-    expect(mockSetRobotInMotion).not.toHaveBeenCalled()
+    expect(mockhandleMotionRouting).not.toHaveBeenCalled()
   })
 
   it('sets the motion screen properly and z-homes all pipettes only on the initial render of Error Recovery', async () => {
@@ -462,26 +480,26 @@ describe('useInitialPipetteHome', () => {
     )
 
     await waitFor(() => {
-      expect(mockSetRobotInMotion).toHaveBeenCalledWith(true)
+      expect(mockhandleMotionRouting).toHaveBeenCalledWith(true)
     })
     await waitFor(() => {
       expect(mockZHomePipetteZAxes).toHaveBeenCalledTimes(1)
     })
     await waitFor(() => {
-      expect(mockSetRobotInMotion).toHaveBeenCalledWith(false)
+      expect(mockhandleMotionRouting).toHaveBeenCalledWith(false)
     })
 
-    expect(mockSetRobotInMotion.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(mockhandleMotionRouting.mock.invocationCallOrder[0]).toBeLessThan(
       mockZHomePipetteZAxes.mock.invocationCallOrder[0]
     )
     expect(mockZHomePipetteZAxes.mock.invocationCallOrder[0]).toBeLessThan(
-      mockSetRobotInMotion.mock.invocationCallOrder[1]
+      mockhandleMotionRouting.mock.invocationCallOrder[1]
     )
 
     rerender()
 
     await waitFor(() => {
-      expect(mockSetRobotInMotion).toHaveBeenCalledTimes(2)
+      expect(mockhandleMotionRouting).toHaveBeenCalledTimes(2)
     })
     await waitFor(() => {
       expect(mockZHomePipetteZAxes).toHaveBeenCalledTimes(1)

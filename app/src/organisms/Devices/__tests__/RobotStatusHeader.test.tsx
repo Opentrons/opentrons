@@ -5,31 +5,31 @@ import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { useProtocolQuery } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../i18n'
-import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
+import { i18n } from '/app/i18n'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
 import {
   getRobotAddressesByName,
   HEALTH_STATUS_OK,
   OPENTRONS_USB,
-} from '../../../redux/discovery'
-import { getNetworkInterfaces } from '../../../redux/networking'
-import { useIsFlex } from '../hooks'
+} from '/app/redux/discovery'
+import { getNetworkInterfaces } from '/app/redux/networking'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { RobotStatusHeader } from '../RobotStatusHeader'
-import { useNotifyRunQuery, useCurrentRunId } from '../../../resources/runs'
+import { useNotifyRunQuery, useCurrentRunId } from '/app/resources/runs'
 
-import type { DiscoveryClientRobotAddress } from '../../../redux/discovery/types'
-import type { SimpleInterfaceStatus } from '../../../redux/networking/types'
-import type { State } from '../../../redux/types'
+import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'
+import type { SimpleInterfaceStatus } from '/app/redux/networking/types'
+import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../organisms/RunTimeControl/hooks')
-vi.mock('../../../redux/discovery')
-vi.mock('../../../redux/networking')
-vi.mock('../hooks')
-vi.mock('../../../resources/runs')
+vi.mock('/app/organisms/RunTimeControl/hooks')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/networking')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/resources/runs')
 
 const MOCK_OTIE = {
   name: 'otie',

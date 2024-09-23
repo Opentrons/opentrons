@@ -8,9 +8,9 @@ import {
 } from '@opentrons/react-api-client'
 
 import { useProtocolAnalysisErrors } from '..'
-import { useNotifyRunQuery } from '../../../../resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
-import { RUN_ID_2 } from '../../../RunTimeControl/__fixtures__'
+import { RUN_ID_2 } from '/app/resources/runs/__fixtures__'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run, Protocol } from '@opentrons/api-client'
@@ -20,7 +20,7 @@ import type {
 } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../resources/runs')
+vi.mock('/app/resources/runs')
 
 describe('useProtocolAnalysisErrors hook', () => {
   beforeEach(() => {

@@ -4,8 +4,8 @@ import { screen } from '@testing-library/react'
 
 import { COLORS, SIZE_1 } from '@opentrons/components'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 
 import { RenderResult } from '../RenderResult'
 

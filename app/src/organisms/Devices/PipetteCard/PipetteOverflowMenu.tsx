@@ -7,16 +7,17 @@ import {
   DIRECTION_COLUMN,
   Flex,
   MenuItem,
+  NO_WRAP,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
 } from '@opentrons/components'
 
-import { Divider } from '../../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteSettingsFieldsMap } from '@opentrons/api-client'
-import type { Mount } from '../../../redux/pipettes/types'
+import type { Mount } from '/app/redux/pipettes/types'
 
 interface PipetteOverflowMenuProps {
   pipetteSpecs: PipetteModelSpecs | null
@@ -50,7 +51,7 @@ export const PipetteOverflowMenu = (
   return (
     <Flex position={POSITION_RELATIVE}>
       <Flex
-        whiteSpace="nowrap"
+        whiteSpace={NO_WRAP}
         zIndex={10}
         borderRadius={BORDERS.borderRadius8}
         boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"

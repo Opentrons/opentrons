@@ -3,8 +3,8 @@ import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { screen, fireEvent, waitFor } from '@testing-library/react'
 
 import { mockRecoveryContentProps } from '../../__fixtures__'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { SelectTips } from '../SelectTips'
 import { RECOVERY_MAP } from '../../constants'
 import { TipSelectionModal } from '../TipSelectionModal'
@@ -24,13 +24,13 @@ const render = (props: React.ComponentProps<typeof SelectTips>) => {
 describe('SelectTips', () => {
   let props: React.ComponentProps<typeof SelectTips>
   let mockGoBackPrevStep: Mock
-  let mockSetRobotInMotion: Mock
+  let mockhandleMotionRouting: Mock
   let mockProceedNextStep: Mock
   let mockPickUpTips: Mock
 
   beforeEach(() => {
     mockGoBackPrevStep = vi.fn()
-    mockSetRobotInMotion = vi.fn(() => Promise.resolve())
+    mockhandleMotionRouting = vi.fn(() => Promise.resolve())
     mockProceedNextStep = vi.fn()
     mockPickUpTips = vi.fn(() => Promise.resolve())
 
@@ -38,7 +38,7 @@ describe('SelectTips', () => {
       ...mockRecoveryContentProps,
       routeUpdateActions: {
         goBackPrevStep: mockGoBackPrevStep,
-        setRobotInMotion: mockSetRobotInMotion,
+        handleMotionRouting: mockhandleMotionRouting,
         proceedNextStep: mockProceedNextStep,
       } as any,
       recoveryCommands: {
@@ -69,7 +69,7 @@ describe('SelectTips', () => {
   })
 
   it('calls the correct routeUpdateActions and recoveryCommands in the correct order when the primary button is clicked', async () => {
-    const setRobotInMotionMock = vi.fn(() => Promise.resolve())
+    const handleMotionRoutingMock = vi.fn(() => Promise.resolve())
     const pickUpTipsMock = vi.fn(() => Promise.resolve())
     const proceedNextStepMock = vi.fn()
 
@@ -78,7 +78,7 @@ describe('SelectTips', () => {
     } as any
 
     const mockRouteUpdateActions = {
-      setRobotInMotion: setRobotInMotionMock,
+      handleMotionRouting: handleMotionRoutingMock,
       proceedNextStep: proceedNextStepMock,
     } as any
 
@@ -92,10 +92,10 @@ describe('SelectTips', () => {
     fireEvent.click(primaryBtn)
 
     await waitFor(() => {
-      expect(setRobotInMotionMock).toHaveBeenCalledTimes(1)
+      expect(handleMotionRoutingMock).toHaveBeenCalledTimes(1)
     })
     await waitFor(() => {
-      expect(setRobotInMotionMock).toHaveBeenCalledWith(
+      expect(handleMotionRoutingMock).toHaveBeenCalledWith(
         true,
         RECOVERY_MAP.ROBOT_PICKING_UP_TIPS.ROUTE
       )
@@ -107,7 +107,7 @@ describe('SelectTips', () => {
       expect(proceedNextStepMock).toHaveBeenCalledTimes(1)
     })
 
-    expect(setRobotInMotionMock.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(handleMotionRoutingMock.mock.invocationCallOrder[0]).toBeLessThan(
       pickUpTipsMock.mock.invocationCallOrder[0]
     )
 

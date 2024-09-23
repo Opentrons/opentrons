@@ -10,11 +10,11 @@ import {
   EIGHT_CHANNEL,
 } from '@opentrons/shared-data'
 import { Box, Flex } from '@opentrons/components'
-import { Select } from '../../atoms/SelectField/Select'
+import { Select } from '/app/atoms/SelectField/Select'
 
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { ActionMeta, SingleValue, MultiValue } from 'react-select'
-import type { SelectOption } from '../../atoms/SelectField/Select'
+import type { SelectOption } from '/app/atoms/SelectField/Select'
 
 export interface PipetteSelectProps {
   /** currently selected value, optional in case selecting triggers immediate action */

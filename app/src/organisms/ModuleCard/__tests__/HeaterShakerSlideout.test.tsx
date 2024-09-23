@@ -4,9 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { HeaterShakerSlideout } from '../HeaterShakerSlideout'
 
 vi.mock('@opentrons/react-api-client')

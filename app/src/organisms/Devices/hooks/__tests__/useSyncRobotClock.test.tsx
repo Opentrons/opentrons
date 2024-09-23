@@ -5,11 +5,11 @@ import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
-import { syncSystemTime } from '../../../../redux/robot-admin'
+import { syncSystemTime } from '/app/redux/robot-admin'
 import { useSyncRobotClock } from '..'
 import type { Store } from 'redux'
 
-vi.mock('../../../../redux/discovery')
+vi.mock('/app/redux/discovery')
 
 const store: Store<any> = createStore(vi.fn(), {})
 

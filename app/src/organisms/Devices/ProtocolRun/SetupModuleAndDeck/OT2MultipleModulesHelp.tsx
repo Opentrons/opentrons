@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_FLEX_END,
+  Banner,
   Box,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -16,8 +17,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
-import { Banner } from '../../../../atoms/Banner'
-import multipleModuleHelp from '../../../../assets/images/Moam_modal_image.png'
+import multipleModuleHelp from '/app/assets/images/Moam_modal_image.png'
 
 const HOW_TO_MULTIPLE_MODULES_HREF =
   'https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2'

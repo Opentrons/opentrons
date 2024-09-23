@@ -15,13 +15,17 @@ import { textDecorationUnderline } from '../../ui-style-constants/typography'
 export interface ToolboxProps {
   title: JSX.Element
   children: React.ReactNode
-  confirmButtonText: string
-  onConfirmClick: () => void
-  onCloseClick: () => void
-  closeButtonText: string
   disableCloseButton?: boolean
   width?: string
   height?: string
+  confirmButtonText?: string
+  onConfirmClick?: () => void
+  confirmButton?: JSX.Element
+  onCloseClick?: () => void
+  closeButtonText?: string
+  side?: 'left' | 'right'
+  horizontalSide?: 'top' | 'bottom'
+  childrenPadding?: string
 }
 
 export function Toolbox(props: ToolboxProps): JSX.Element {
@@ -35,6 +39,10 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
     height = '100%',
     disableCloseButton = false,
     width = '19.5rem',
+    confirmButton,
+    side = 'right',
+    horizontalSide = 'bottom',
+    childrenPadding = SPACING.spacing16,
   } = props
 
   const slideOutRef = React.useRef<HTMLDivElement>(null)
@@ -55,12 +63,19 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
     handleScroll()
   }, [slideOutRef])
 
+  const positionStyles = {
+    ...(side === 'right' && { right: '0' }),
+    ...(side === 'left' && { left: '0' }),
+    ...(horizontalSide === 'bottom' && { bottom: '0' }),
+    ...(horizontalSide === 'top' && { top: '5rem' }),
+  }
+
   return (
     <Box
+      zIndex={10}
       cursor="auto"
       position={POSITION_FIXED}
-      right="0"
-      bottom="0"
+      {...positionStyles}
       backgroundColor={COLORS.white}
       boxShadow="0px 3px 6px rgba(0, 0, 0, 0.23)"
       height={height}
@@ -80,20 +95,22 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
           gridGap={SPACING.spacing12}
         >
           {title}
-          <Btn
-            onClick={onCloseClick}
-            textDecoration={textDecorationUnderline}
-            data-testid={`Toolbox_${closeButtonText}`}
-            whiteSpace={NO_WRAP}
-            disable={disableCloseButton}
-          >
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {closeButtonText}
-            </StyledText>
-          </Btn>
+          {onCloseClick != null && closeButtonText != null ? (
+            <Btn
+              onClick={onCloseClick}
+              textDecoration={textDecorationUnderline}
+              data-testid={`Toolbox_${closeButtonText}`}
+              whiteSpace={NO_WRAP}
+              disable={disableCloseButton}
+            >
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {closeButtonText}
+              </StyledText>
+            </Btn>
+          ) : null}
         </Flex>
         <Box
-          padding={SPACING.spacing16}
+          padding={childrenPadding}
           flex="1 1 auto"
           overflowY="auto"
           ref={slideOutRef}
@@ -101,22 +118,28 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
         >
           {children}
         </Box>
-        <Box
-          padding={SPACING.spacing16}
-          boxShadow={isScrolledToBottom ? 'none' : '0px -4px 12px #0000001a'}
-          zIndex={3}
-          width="100%"
-          borderTop={`1px solid ${COLORS.grey30}`}
-          alignItems={ALIGN_CENTER}
-        >
-          <PrimaryButton
+        {(onConfirmClick != null && confirmButtonText != null) ||
+        confirmButton != null ? (
+          <Box
+            padding={SPACING.spacing16}
+            boxShadow={isScrolledToBottom ? 'none' : '0px -4px 12px #0000001a'}
+            zIndex={3}
             width="100%"
-            data-testid="Toolbox_confirmButton"
-            onClick={onConfirmClick}
+            borderTop={`1px solid ${COLORS.grey30}`}
+            alignItems={ALIGN_CENTER}
           >
-            {confirmButtonText}
-          </PrimaryButton>
-        </Box>
+            {onConfirmClick != null && confirmButtonText != null ? (
+              <PrimaryButton
+                width="100%"
+                data-testid="Toolbox_confirmButton"
+                onClick={onConfirmClick}
+              >
+                {confirmButtonText}
+              </PrimaryButton>
+            ) : null}
+            {confirmButton != null ? confirmButton : null}
+          </Box>
+        ) : null}
       </Flex>
     </Box>
   )

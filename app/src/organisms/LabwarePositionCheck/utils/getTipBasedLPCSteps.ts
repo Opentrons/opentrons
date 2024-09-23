@@ -1,6 +1,6 @@
 import { isEqual } from 'lodash'
 import { SECTIONS } from '../constants'
-import { getLabwareDefinitionsFromCommands } from '../../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
 import {
   getLabwareDefURI,
   getIsTiprack,

@@ -5,19 +5,19 @@ import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 
 import {
-  useIsFlex,
   useModuleCalibrationStatus,
   useModuleRenderInfoForProtocolById,
 } from '..'
+import { useIsFlex } from '/app/redux-resources/robots'
 
-import { mockMagneticModuleGen2 } from '../../../../redux/modules/__fixtures__'
+import { mockMagneticModuleGen2 } from '/app/redux/modules/__fixtures__'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
-vi.mock('../useIsFlex')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../useModuleRenderInfoForProtocolById')
 
 let wrapper: React.FunctionComponent<{ children: React.ReactNode }>

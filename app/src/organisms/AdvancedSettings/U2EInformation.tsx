@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   Box,
+  Banner,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -15,14 +16,13 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Banner } from '../../atoms/Banner'
 import {
   getU2EAdapterDevice,
   getU2EWindowsDriverStatus,
   OUTDATED,
-} from '../../redux/system-info'
+} from '/app/redux/system-info'
 
-import type { State } from '../../redux/types'
+import type { State } from '/app/redux/types'
 
 const REALTEK_URL = 'https://www.realtek.com/en/'
 

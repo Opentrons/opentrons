@@ -33,7 +33,7 @@ vi.mock('@opentrons/components', async importOriginal => {
 })
 
 const render = () => {
-  return renderWithProviders(<DeckSetupContainer />)[0]
+  return renderWithProviders(<DeckSetupContainer tab="startingDeck" />)[0]
 }
 
 describe('DeckSetupContainer', () => {

@@ -14,20 +14,20 @@ import {
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
-} from '../../../../redux/calibration/pipette-offset/__fixtures__'
+} from '/app/redux/calibration/pipette-offset/__fixtures__'
 import {
   mockTipLengthCalibration1,
   mockTipLengthCalibration2,
-} from '../../../../redux/calibration/tip-length/__fixtures__'
+} from '/app/redux/calibration/tip-length/__fixtures__'
 
 import { useAttachedPipetteCalibrations } from '..'
 import type { Store } from 'redux'
-import type { State } from '../../../../redux/types'
+import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../redux/calibration')
-vi.mock('../../../../redux/pipettes')
-vi.mock('../../../../redux/robot-api')
+vi.mock('/app/redux/calibration')
+vi.mock('/app/redux/pipettes')
+vi.mock('/app/redux/robot-api')
 
 const store: Store<State> = createStore(state => state, {})
 

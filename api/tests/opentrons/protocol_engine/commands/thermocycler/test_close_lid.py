@@ -3,6 +3,7 @@ from decoy import Decoy
 
 from opentrons.hardware_control.modules import Thermocycler
 
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.types import MotorAxis
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.module_substates import (
@@ -55,4 +56,8 @@ async def test_close_lid(
         await tc_hardware.close(),
         times=1,
     )
-    assert result == SuccessData(public=expected_result, private=None)
+    assert result == SuccessData(
+        public=expected_result,
+        private=None,
+        state_update=update_types.StateUpdate(pipette_location=update_types.CLEAR),
+    )

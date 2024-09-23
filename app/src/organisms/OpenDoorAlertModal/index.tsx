@@ -14,7 +14,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../App/portal'
-import { OddModal } from '../../molecules/OddModal'
+import { OddModal } from '/app/molecules/OddModal'
 
 export function OpenDoorAlertModal(): JSX.Element {
   const { t } = useTranslation('run_details')

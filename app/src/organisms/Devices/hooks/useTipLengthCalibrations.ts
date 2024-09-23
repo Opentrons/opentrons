@@ -1,6 +1,6 @@
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 
-import type { TipLengthCalibration } from '../../../redux/calibration/types'
+import type { TipLengthCalibration } from '/app/redux/calibration/types'
 
 const CALIBRATIONS_FETCH_MS = 5000
 

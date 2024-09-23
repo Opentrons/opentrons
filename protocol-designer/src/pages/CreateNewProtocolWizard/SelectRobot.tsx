@@ -23,20 +23,15 @@ export function SelectRobot(props: WizardTileProps): JSX.Element {
       <WizardBody
         stepNumber={1}
         header={t('basics')}
-        subHeader={t('questions')}
         disabled={false}
         proceed={() => {
           proceed(1)
         }}
       >
-        <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing60}>
-          <StyledText
-            desktopStyle="headingSmallBold"
-            marginBottom={SPACING.spacing16}
-          >
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+          <StyledText desktopStyle="headingSmallBold">
             {t('robot_type')}
           </StyledText>
-
           <Flex gridGap={SPACING.spacing4}>
             <RadioButton
               onChange={() => {

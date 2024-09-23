@@ -12,7 +12,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { InProgressModal } from '../../molecules/InProgressModal'
+import { InProgressModal } from '/app/molecules/InProgressModal'
 
 import type { RobotMovingRoute, RecoveryContentProps } from './types'
 

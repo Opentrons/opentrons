@@ -15,6 +15,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import temporaryImg from '../../assets/images/placeholder_image_delete.png'
+import { BUTTON_LINK_STYLE } from '../../atoms'
 
 interface WizardBodyProps {
   stepNumber: number
@@ -53,41 +54,36 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
         borderRadius={BORDERS.borderRadius16}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <StyledText
             color={COLORS.grey60}
             desktopStyle="bodyDefaultSemiBold"
-            marginBottom={SPACING.spacing8}
             textTransform={TYPOGRAPHY.textTransformUppercase}
           >
             {t('shared:step_count', { current: stepNumber })}
           </StyledText>
-          <StyledText
-            desktopStyle="displayBold"
-            marginBottom={SPACING.spacing16}
-          >
-            {header}
-          </StyledText>
-          {subHeader != null ? (
-            <StyledText
-              desktopStyle="headingLargeRegular"
-              color={COLORS.grey60}
-            >
-              {subHeader}
-            </StyledText>
-          ) : null}
-          {children}
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing60}>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+              <StyledText desktopStyle="displayBold">{header}</StyledText>
+              {subHeader != null ? (
+                <StyledText
+                  desktopStyle="headingLargeRegular"
+                  color={COLORS.grey60}
+                >
+                  {subHeader}
+                </StyledText>
+              ) : null}
+            </Flex>
+            {children}
+          </Flex>
         </Flex>
         <Flex
           alignSelf={goBack != null ? 'auto' : ALIGN_END}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           {goBack != null ? (
-            <Btn onClick={goBack}>
-              <StyledText
-                desktopStyle="bodyLargeSemiBold"
-                color={COLORS.grey60}
-              >
+            <Btn onClick={goBack} css={BUTTON_LINK_STYLE}>
+              <StyledText desktopStyle="bodyLargeSemiBold">
                 {t('go_back')}
               </StyledText>
             </Btn>

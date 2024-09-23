@@ -17,6 +17,7 @@ import {
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 import {
+  Banner,
   DeckConfigurator,
   RESPONSIVENESS,
   SIZE_1,
@@ -24,8 +25,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Banner } from '../../atoms/Banner'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import type { ModuleCalibrationWizardStepProps } from './types'
 import type {
   CutoutConfig,

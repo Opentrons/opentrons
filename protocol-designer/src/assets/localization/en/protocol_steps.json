@@ -1,3 +1,12 @@
 {
-  "protocol_steps": "Protocol steps"
+  "delete": "Delete step",
+  "duplicate": "Duplicate step",
+  "final_deck_state": "Final deck state",
+  "new_location": "New location",
+  "protocol_steps": "Protocol steps",
+  "protocol_timeline": "Protocol timeline",
+  "rename": "Rename step",
+  "select_labware": "Select labware",
+  "starting_deck_state": "Starting deck state",
+  "view_commands": "View commands"
 }

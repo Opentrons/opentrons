@@ -10,7 +10,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import * as Sessions from '../../redux/sessions'
+import * as Sessions from '/app/redux/sessions'
 import { ConfirmCrashRecovery } from './ConfirmCrashRecovery'
 
 import type { CalibrationPanelProps } from './types'
