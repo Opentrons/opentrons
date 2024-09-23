@@ -8,12 +8,13 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  DISPLAY_GRID,
   Flex,
   HandleKeypress,
   Icon,
+  LegacyStyledText,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -35,7 +36,7 @@ const stepSizeTranslationKeyByStep: { [stepSize: number]: string } = {
 }
 
 const BUTTON_WRAPPER_STYLE = css`
-  display: grid;
+  display: ${DISPLAY_GRID};
   grid-auto-flow: column;
   grid-gap: ${SPACING.spacing8};
   margin-top: ${SPACING.spacing16};

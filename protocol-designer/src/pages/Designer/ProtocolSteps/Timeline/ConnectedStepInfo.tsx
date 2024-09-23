@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { COLORS, useConditionalConfirm } from '@opentrons/components'
+import { useConditionalConfirm } from '@opentrons/components'
 import * as timelineWarningSelectors from '../../../../top-selectors/timelineWarnings'
 import { selectors as dismissSelectors } from '../../../../dismiss'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
@@ -19,6 +19,7 @@ import {
   ConfirmDeleteModal,
 } from '../../../../components/modals/ConfirmDeleteModal'
 import { stepIconsByType } from '../../../../form-types'
+import { getOrderedStepIds } from '../../../../step-forms/selectors'
 import { StepContainer } from './StepContainer'
 
 import type { ThunkDispatch } from 'redux-thunk'
@@ -36,6 +37,7 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const { stepId, stepNumber } = props
   const { t } = useTranslation('application')
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
+  const stepIds = useSelector(getOrderedStepIds)
   const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]
   const argsAndErrors = useSelector(stepFormSelectors.getArgsAndErrorsByStepId)[
     stepId
@@ -48,6 +50,10 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const hasFormLevelWarningsPerStep = useSelector(
     dismissSelectors.getHasFormLevelWarningsPerStep
   )
+  const stepListAfterErrors =
+    errorStepId != null ? stepIds.slice(stepIds.indexOf(errorStepId) + 1) : []
+  const stepAfterError =
+    stepId != null ? stepListAfterErrors.includes(stepId) : false
 
   const hasWarnings =
     hasTimelineWarningsPerStep[stepId] || hasFormLevelWarningsPerStep[stepId]
@@ -101,11 +107,12 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
         />
       )}
       <StepContainer
+        hasError={hasError}
+        isStepAfterError={stepAfterError}
         stepId={stepId}
         onMouseLeave={unhighlightStep}
         selected={selected}
         onClick={confirm}
-        iconColor={hasError ? COLORS.red50 : undefined}
         hovered={hoveredStep === stepId && !hoveredSubstep}
         onMouseEnter={highlightStep}
         iconName={hasError || hasWarnings ? 'alert-circle' : iconName}

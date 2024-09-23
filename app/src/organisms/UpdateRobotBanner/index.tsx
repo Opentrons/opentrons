@@ -5,11 +5,11 @@ import {
   Btn,
   DIRECTION_COLUMN,
   Flex,
+  Banner,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Banner } from '/app/atoms/Banner'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { handleUpdateBuildroot } from '../Devices/RobotSettings/UpdateBuildroot'
 

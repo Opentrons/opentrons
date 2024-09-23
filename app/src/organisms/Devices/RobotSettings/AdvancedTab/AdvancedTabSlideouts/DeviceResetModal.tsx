@@ -24,7 +24,7 @@ import {
   PENDING,
 } from '/app/redux/robot-api'
 import { getResetConfigOptions, resetConfig } from '/app/redux/robot-admin'
-import { useIsFlex } from '../../../hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 
 import type { State } from '/app/redux/types'
 import type { ResetConfigRequest } from '/app/redux/robot-admin/types'

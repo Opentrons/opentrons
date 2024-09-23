@@ -4,10 +4,10 @@ import { renderHook } from '@testing-library/react'
 
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { mockTemperatureModule } from '/app/redux/modules/__fixtures__'
+import { useRobot } from '/app/redux-resources/robots'
 import {
   useAttachedModules,
   useModuleRenderInfoForProtocolById,
-  useRobot,
   useUnmatchedModulesForProtocol,
 } from '..'
 
@@ -15,7 +15,7 @@ import type { ModuleDefinition } from '@opentrons/shared-data'
 
 vi.mock('../useAttachedModules')
 vi.mock('../useModuleRenderInfoForProtocolById')
-vi.mock('../useRobot')
+vi.mock('/app/redux-resources/robots')
 
 const mockMagneticBlockDef = {
   labwareOffset: { x: 5, y: 5, z: 5 },

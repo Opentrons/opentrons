@@ -16,11 +16,8 @@ import {
   mockTemperatureModuleGen2,
   mockThermocycler,
 } from '/app/redux/modules/__fixtures__'
-import {
-  useAttachedModules,
-  useModuleRenderInfoForProtocolById,
-  useStoredProtocolAnalysis,
-} from '..'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useAttachedModules, useModuleRenderInfoForProtocolById } from '..'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type {
@@ -35,7 +32,7 @@ import type { AttachedModule } from '/app/redux/modules/types'
 
 vi.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
 vi.mock('../useAttachedModules')
-vi.mock('../useStoredProtocolAnalysis')
+vi.mock('/app/resources/analysis')
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('/app/resources/deck_configuration')
 

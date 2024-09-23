@@ -15,6 +15,7 @@ import type { PipetteInfo } from '../../hooks'
 
 vi.mock('../../hooks')
 vi.mock('../SetupPipetteCalibrationItem')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/runs')
 
 const ROBOT_NAME = 'otie'

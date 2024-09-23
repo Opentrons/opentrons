@@ -30,6 +30,7 @@ vi.mock('/app/redux/config')
 vi.mock('../../../hooks')
 vi.mock('../../../hooks/useLPCSuccessToast')
 vi.mock('/app/resources/runs')
+vi.mock('/app/redux-resources/robots')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'

@@ -7,7 +7,6 @@ import { when } from 'vitest-when'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackCreateProtocolRunEvent } from '/app/organisms/Devices/hooks'
-import { useCloseCurrentRun } from '/app/organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
 import {
   getConnectableRobots,
@@ -31,7 +30,7 @@ import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 import { useOffsetCandidatesForAnalysis } from '../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotToRunProtocolSlideout } from '../'
 import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
-import { useCurrentRunId } from '/app/resources/runs'
+import { useCurrentRunId, useCloseCurrentRun } from '/app/resources/runs'
 
 import type { State } from '/app/redux/types'
 

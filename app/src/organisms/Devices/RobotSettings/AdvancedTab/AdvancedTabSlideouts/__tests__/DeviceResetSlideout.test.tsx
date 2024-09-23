@@ -6,12 +6,13 @@ import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getResetConfigOptions } from '/app/redux/robot-admin'
-import { useIsFlex } from '../../../../hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { DeviceResetSlideout } from '../DeviceResetSlideout'
 
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-admin/selectors')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../../../../hooks')
 
 const mockOnCloseClick = vi.fn()

@@ -8,7 +8,8 @@ import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getShellUpdateState } from '/app/redux/shell'
-import { useIsFlex, useIsRobotBusy } from '../../hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { useIsRobotBusy } from '../../hooks'
 import {
   DeviceReset,
   DisplayRobotName,
@@ -29,6 +30,7 @@ import { RobotSettingsAdvanced } from '../RobotSettingsAdvanced'
 import type { ShellUpdateState } from '/app/redux/shell/types'
 import type * as ShellUpdate from '/app/redux/shell/update'
 
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/robot-settings/selectors')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/shell/update', async importOriginal => {

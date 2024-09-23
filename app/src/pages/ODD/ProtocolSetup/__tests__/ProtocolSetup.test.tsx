@@ -30,10 +30,10 @@ import {
   useLPCDisabledReason,
   useModuleCalibrationStatus,
   useProtocolAnalysisErrors,
-  useRobotType,
   useRunCreatedAtTimestamp,
-  useTrackProtocolRunEvent,
 } from '/app/organisms/Devices/hooks'
+import { useRobotType } from '/app/redux-resources/robots'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { getProtocolModulesInfo } from '/app/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
@@ -54,7 +54,6 @@ import { mockProtocolModuleInfo } from '/app/organisms/ODD/ProtocolSetup/Protoco
 import {
   useProtocolHasRunTimeParameters,
   useRunControls,
-  useRunStatus,
 } from '/app/organisms/RunTimeControl/hooks'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/useNotifyDeckConfigurationQuery'
@@ -62,9 +61,9 @@ import { useDeckConfigurationCompatibility } from '/app/resources/deck_configura
 import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from '../ConfirmSetupStepsCompleteModal'
 import { ProtocolSetup } from '../'
-import { useNotifyRunQuery } from '/app/resources/runs'
+import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import { mockRunTimeParameterData } from '/app/pages/ODD/ProtocolDetails/fixtures'
+import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
 
 import type { UseQueryResult } from 'react-query'
 import type * as SharedData from '@opentrons/shared-data'
@@ -124,6 +123,8 @@ vi.mock('/app/resources/runs')
 vi.mock('/app/resources/deck_configuration/hooks')
 vi.mock('/app/resources/deck_configuration/useNotifyDeckConfigurationQuery')
 vi.mock('../ConfirmSetupStepsCompleteModal')
+vi.mock('/app/redux-resources/analytics')
+vi.mock('/app/redux-resources/robots')
 
 const render = (path = '/') => {
   return renderWithProviders(

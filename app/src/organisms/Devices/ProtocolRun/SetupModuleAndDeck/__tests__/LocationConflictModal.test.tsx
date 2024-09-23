@@ -17,7 +17,7 @@ import {
 
 import { i18n } from '/app/i18n'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
-import { useCloseCurrentRun } from '../../../../ProtocolUpload/hooks'
+import { useCloseCurrentRun } from '/app/resources/runs'
 import { LocationConflictModal } from '../LocationConflictModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
@@ -26,7 +26,7 @@ import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/deck_configuration')
-vi.mock('../../../../ProtocolUpload/hooks')
+vi.mock('/app/resources/runs')
 
 const mockFixture = {
   cutoutId: 'cutoutB3',

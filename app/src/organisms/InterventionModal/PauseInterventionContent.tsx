@@ -15,8 +15,8 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import { EMPTY_TIMESTAMP } from '../Devices/constants'
-import { formatInterval } from '../RunTimeControl/utils'
+import { EMPTY_TIMESTAMP } from '/app/resources/runs'
+import { formatInterval } from '/app/transformations/commands'
 import { InterventionCommandMessage } from './InterventionCommandMessage'
 
 const PAUSE_INTERVENTION_CONTENT_STYLE = css`

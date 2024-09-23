@@ -35,7 +35,7 @@ import {
 } from '/app/redux/analytics'
 import { Skeleton } from '/app/atoms/Skeleton'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
-import { useCloneRun } from '../../ProtocolUpload/hooks'
+import { useCloneRun } from '/app/resources/runs'
 import { useRerunnableStatusText } from './hooks'
 
 import type { RunData, RunStatus } from '@opentrons/api-client'

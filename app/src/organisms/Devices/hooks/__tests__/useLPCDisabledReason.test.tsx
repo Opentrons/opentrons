@@ -9,12 +9,13 @@ import {
   simple_v6 as _uncastedSimpleV6Protocol,
 } from '@opentrons/shared-data'
 import { i18n } from '/app/i18n'
-import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
+import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useLPCDisabledReason } from '../useLPCDisabledReason'
+
 import {
   useRunCalibrationStatus,
   useRunHasStarted,
-  useStoredProtocolAnalysis,
   useUnmatchedModulesForProtocol,
 } from '..'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -23,6 +24,7 @@ import type * as SharedData from '@opentrons/shared-data'
 import type { State } from '/app/redux/types'
 
 vi.mock('..')
+vi.mock('/app/resources/analysis')
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()

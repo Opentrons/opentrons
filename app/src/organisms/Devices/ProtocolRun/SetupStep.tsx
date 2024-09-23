@@ -8,9 +8,11 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  DISPLAY_GRID,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_HIDDEN,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -32,16 +34,14 @@ interface SetupStepProps {
 }
 
 const EXPANDED_STYLE = css`
-  transition: max-height 300ms ease-in, visibility 400ms ease;
+  transition: grid-template-rows 300ms ease-in, visibility 400ms ease;
+  grid-template-rows: 1fr;
   visibility: visible;
-  max-height: 180vh;
-  overflow: hidden;
 `
 const COLLAPSED_STYLE = css`
-  transition: max-height 500ms ease-out, visibility 600ms ease;
+  transition: grid-template-rows 500ms ease-out, visibility 600ms ease;
+  grid-template-rows: 0fr;
   visibility: hidden;
-  max-height: 0vh;
-  overflow: hidden;
 `
 const ACCORDION_STYLE = css`
   border-radius: 50%;
@@ -104,7 +104,12 @@ export function SetupStep({
           </Flex>
         </Flex>
       </Btn>
-      <Box css={expanded ? EXPANDED_STYLE : COLLAPSED_STYLE}>{children}</Box>
+      <Box
+        display={DISPLAY_GRID}
+        css={expanded ? EXPANDED_STYLE : COLLAPSED_STYLE}
+      >
+        <Box overflow={OVERFLOW_HIDDEN}>{children}</Box>
+      </Box>
     </Flex>
   )
 }

@@ -1,13 +1,11 @@
 import { MATCH, INEXACT_MATCH } from '/app/redux/pipettes'
-import {
-  useDeckCalibrationStatus,
-  useIsFlex,
-  useRunPipetteInfoByMount,
-  useStoredProtocolAnalysis,
-} from '.'
+import { useDeckCalibrationStatus, useRunPipetteInfoByMount } from '.'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { isGripperInCommands } from '/app/resources/protocols/utils'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
+
 import type {
   GripperData,
   Instruments,

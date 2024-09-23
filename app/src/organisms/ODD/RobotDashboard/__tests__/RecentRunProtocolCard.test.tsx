@@ -17,15 +17,14 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { Skeleton } from '/app/atoms/Skeleton'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
-import { useTrackProtocolRunEvent } from '../../../Devices/hooks'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '/app/redux/analytics'
-import { useCloneRun } from '../../../ProtocolUpload/hooks'
+import { useCloneRun, useNotifyAllRunsQuery } from '/app/resources/runs'
 import { useRerunnableStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
-import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import type { NavigateFunction } from 'react-router-dom'
 import type { ProtocolHardware } from '/app/transformations/commands'
@@ -43,13 +42,11 @@ vi.mock('react-router-dom', async importOriginal => {
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/atoms/Skeleton')
 vi.mock('/app/transformations/commands')
-vi.mock('/app/pages/ODD/ProtocolDetails')
-vi.mock('/app/organisms/Devices/hooks')
 vi.mock('/app/organisms/RunTimeControl/hooks')
-vi.mock('/app/organisms/ProtocolUpload/hooks')
 vi.mock('/app/redux/analytics')
 vi.mock('../hooks')
 vi.mock('/app/resources/runs')
+vi.mock('/app/redux-resources/analytics')
 
 const RUN_ID = 'mockRunId'
 const ROBOT_NAME = 'otie'

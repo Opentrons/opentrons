@@ -29,7 +29,7 @@ import { OddModal } from '/app/molecules/OddModal'
 import { FixtureOption } from '../../../DeviceDetailsDeckConfiguration/AddFixtureModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { SmallButton } from '/app/atoms/buttons'
-import { useCloseCurrentRun } from '../../../ProtocolUpload/hooks'
+import { useCloseCurrentRun } from '/app/resources/runs'
 
 import type { ModuleModel, DeckDefinition } from '@opentrons/shared-data'
 import type { AttachedModule } from '@opentrons/api-client'

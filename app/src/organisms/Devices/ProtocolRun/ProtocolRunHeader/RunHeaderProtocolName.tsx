@@ -8,7 +8,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { useProtocolDetailsForRun } from '../../hooks'
+import { useProtocolDetailsForRun } from '/app/resources/runs'
 
 interface RunHeaderProtocolNameProps {
   runId: string

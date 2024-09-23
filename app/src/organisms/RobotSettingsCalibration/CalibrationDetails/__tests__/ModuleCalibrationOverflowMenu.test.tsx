@@ -4,19 +4,19 @@ import { when } from 'vitest-when'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
+import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useChainLiveCommands } from '/app/resources/runs'
 import { mockThermocyclerGen2 } from '/app/redux/modules/__fixtures__'
-import { useRunStatuses } from '../../../Devices/hooks'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useRunStatuses } from '/app/organisms/Devices/hooks'
 
 import { ModuleCalibrationOverflowMenu } from '../ModuleCalibrationOverflowMenu'
 
 import type { Mount } from '@opentrons/components'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../ModuleWizardFlows')
-vi.mock('../../../Devices/hooks')
+vi.mock('/app/organisms/ModuleWizardFlows')
+vi.mock('/app/organisms/Devices/hooks')
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 

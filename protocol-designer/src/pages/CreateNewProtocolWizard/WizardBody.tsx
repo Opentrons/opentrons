@@ -54,30 +54,28 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
         borderRadius={BORDERS.borderRadius16}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <StyledText
             color={COLORS.grey60}
             desktopStyle="bodyDefaultSemiBold"
-            marginBottom={SPACING.spacing8}
             textTransform={TYPOGRAPHY.textTransformUppercase}
           >
             {t('shared:step_count', { current: stepNumber })}
           </StyledText>
-          <StyledText
-            desktopStyle="displayBold"
-            marginBottom={SPACING.spacing16}
-          >
-            {header}
-          </StyledText>
-          {subHeader != null ? (
-            <StyledText
-              desktopStyle="headingLargeRegular"
-              color={COLORS.grey60}
-            >
-              {subHeader}
-            </StyledText>
-          ) : null}
-          {children}
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing60}>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+              <StyledText desktopStyle="displayBold">{header}</StyledText>
+              {subHeader != null ? (
+                <StyledText
+                  desktopStyle="headingLargeRegular"
+                  color={COLORS.grey60}
+                >
+                  {subHeader}
+                </StyledText>
+              ) : null}
+            </Flex>
+            {children}
+          </Flex>
         </Flex>
         <Flex
           alignSelf={goBack != null ? 'auto' : ALIGN_END}

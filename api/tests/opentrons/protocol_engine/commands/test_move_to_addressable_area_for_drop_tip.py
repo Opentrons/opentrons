@@ -3,6 +3,7 @@ from decoy import Decoy
 
 from opentrons.protocol_engine import DeckPoint, AddressableOffsetVector
 from opentrons.protocol_engine.execution import MovementHandler
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.types import Point
 
@@ -58,4 +59,11 @@ async def test_move_to_addressable_area_for_drop_tip_implementation(
     assert result == SuccessData(
         public=MoveToAddressableAreaForDropTipResult(position=DeckPoint(x=9, y=8, z=7)),
         private=None,
+        state_update=update_types.StateUpdate(
+            pipette_location=update_types.PipetteLocationUpdate(
+                pipette_id="abc",
+                new_location=update_types.AddressableArea(addressable_area_name="123"),
+                new_deck_point=DeckPoint(x=9, y=8, z=7),
+            )
+        ),
     )

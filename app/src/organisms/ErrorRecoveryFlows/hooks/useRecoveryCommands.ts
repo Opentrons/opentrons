@@ -25,11 +25,11 @@ import type {
   RecoveryPolicyRulesParams,
 } from '@opentrons/api-client'
 import type { WellGroup } from '@opentrons/components'
-import type { FailedCommand } from '../types'
+import type { FailedCommand, RecoveryRoute, RouteStep } from '../types'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
 import type { RecoveryToasts } from './useRecoveryToasts'
-import type { UseRecoveryAnalyticsResult } from './useRecoveryAnalytics'
+import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
 import type { ErrorRecoveryFlowsProps } from '../index'
 
@@ -39,7 +39,7 @@ interface UseRecoveryCommandsParams {
   failedLabwareUtils: UseFailedLabwareUtilsResult
   routeUpdateActions: UseRouteUpdateActionsResult
   recoveryToastUtils: RecoveryToasts
-  analytics: UseRecoveryAnalyticsResult
+  analytics: UseRecoveryAnalyticsResult<RecoveryRoute, RouteStep>
   selectedRecoveryOption: CurrentRecoveryOptionUtils['selectedRecoveryOption']
 }
 export interface UseRecoveryCommandsResult {

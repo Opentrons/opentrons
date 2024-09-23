@@ -8,7 +8,7 @@ import {
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 import { DISENGAGED } from '../../EmergencyStop'
-import { useIsFlex } from './useIsFlex'
+import { useIsFlex } from '/app/redux-resources/robots'
 
 const ROBOT_STATUS_POLL_MS = 30000
 

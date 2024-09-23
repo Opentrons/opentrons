@@ -22,8 +22,9 @@ import {
 } from '@opentrons/api-client'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
-import { getTopPortalEl } from '../../../../../../App/portal'
-import { useTrackProtocolRunEvent, useIsFlex } from '../../../../hooks'
+import { getTopPortalEl } from '/app/App/portal'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 
 import type { RunStatus } from '@opentrons/api-client'

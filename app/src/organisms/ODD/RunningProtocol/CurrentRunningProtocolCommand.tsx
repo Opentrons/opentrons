@@ -35,7 +35,7 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { RunCommandSummary, RunStatus } from '@opentrons/api-client'
-import type { TrackProtocolRunEvent } from '../../Devices/hooks'
+import type { TrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import type { RobotAnalyticsData } from '/app/redux/analytics/types'
 
 const ODD_ANIMATION_OPTIMIZATIONS = `

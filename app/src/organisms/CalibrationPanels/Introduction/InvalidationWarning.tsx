@@ -1,12 +1,12 @@
 import * as React from 'react'
 import {
   Flex,
+  Banner,
   SPACING,
   TYPOGRAPHY,
   LegacyStyledText,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
-import { Banner } from '/app/atoms/Banner'
 import * as Sessions from '/app/redux/sessions'
 
 interface InvalidationWarningProps {

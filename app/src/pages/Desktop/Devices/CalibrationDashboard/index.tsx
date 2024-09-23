@@ -7,7 +7,7 @@ import { appShellRequestor } from '/app/redux/shell/remote'
 import { useDashboardCalibrateDeck } from './hooks/useDashboardCalibrateDeck'
 import { useDashboardCalibratePipOffset } from './hooks/useDashboardCalibratePipOffset'
 import { useDashboardCalibrateTipLength } from './hooks/useDashboardCalibrateTipLength'
-import { useRobot } from '/app/organisms/Devices/hooks'
+import { useRobot } from '/app/redux-resources/robots'
 
 import type { DesktopRouteParams } from '../../../../App/types'
 

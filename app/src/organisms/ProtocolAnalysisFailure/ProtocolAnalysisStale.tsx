@@ -4,6 +4,7 @@ import { useTranslation, Trans } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
+  Banner,
   Btn,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
@@ -12,8 +13,6 @@ import {
   TYPOGRAPHY,
   WRAP_REVERSE,
 } from '@opentrons/components'
-
-import { Banner } from '/app/atoms/Banner'
 
 import type { Dispatch } from '/app/redux/types'
 import { analyzeProtocol } from '/app/redux/protocol-storage'

@@ -15,7 +15,7 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import type { AttachedModule } from '@opentrons/api-client'
-import { useIsFlex } from '../Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { InterventionModal } from '/app/molecules/InterventionModal'
 export interface IncompatibleModuleDesktopModalBodyProps {
   modules: AttachedModule[]

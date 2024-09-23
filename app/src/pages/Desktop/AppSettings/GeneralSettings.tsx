@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import {
   ALIGN_CENTER,
   ALIGN_START,
+  Banner,
   Box,
   COLORS,
   DIRECTION_COLUMN,
@@ -24,7 +25,6 @@ import {
 import { TertiaryButton, ToggleButton } from '/app/atoms/buttons'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { Divider } from '/app/atoms/structure'
-import { Banner } from '/app/atoms/Banner'
 import {
   CURRENT_VERSION,
   getAvailableShellUpdate,
