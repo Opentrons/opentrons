@@ -128,6 +128,7 @@ describe('createPresavedStepForm', () => {
         pauseMessage: '',
         pauseMinute: null,
         pauseSecond: null,
+        pauseTime: null,
         pauseTemperature: null,
         stepDetails: '',
         stepName: 'pause',

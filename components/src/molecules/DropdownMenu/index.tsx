@@ -132,7 +132,9 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   }, [filterOptions.length, dropDownMenuWrapperRef])
 
   const toggleSetShowDropdownMenu = (): void => {
-    isDisabled ? null : setShowDropdownMenu(!showDropdownMenu)
+    if (!isDisabled) {
+      setShowDropdownMenu(!showDropdownMenu)
+    }
   }
 
   const isDisabled = filterOptions.length === 0

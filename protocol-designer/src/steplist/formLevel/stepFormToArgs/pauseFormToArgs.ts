@@ -19,15 +19,15 @@ export const pauseFormToArgs = (
   let secondsFromForm
 
   // importing results in stringified "null" value
-  if (formData.pauseTime != null && formData.pauseTime != 'null') {
+  if (formData.pauseTime != null && formData.pauseTime !== 'null') {
     const timeSplit = formData.pauseTime.split(TIME_DELIMITER)
     ;[hoursFromForm, minutesFromForm, secondsFromForm] = timeSplit
   } else {
     // TODO (nd 09/23/2024): remove individual time units after redesign FF is removed
     ;[hoursFromForm, minutesFromForm, secondsFromForm] = [
       formData.pauseHour,
-      formData.pauseMinutes,
-      formData.pauseSeconds,
+      formData.pauseMinute,
+      formData.pauseSecond,
     ]
   }
   const hours = isNaN(parseFloat(hoursFromForm as string))
@@ -40,6 +40,7 @@ export const pauseFormToArgs = (
     ? 0
     : parseFloat(secondsFromForm as string)
 
+  console.log({ hours, minutes, seconds })
   const totalSeconds = hours * 3600 + minutes * 60 + seconds
   const temperature = parseFloat(formData.pauseTemperature as string)
   const message = formData.pauseMessage ?? ''
