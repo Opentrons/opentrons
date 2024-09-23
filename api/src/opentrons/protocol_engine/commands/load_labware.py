@@ -148,10 +148,8 @@ class LoadLabwareImplementation(
             labware_id=loaded_labware.labware_id,
             offset_id=loaded_labware.offsetId,
             definition=loaded_labware.definition,
-        )
-        state_update.set_labware_location(
-            labware_id=loaded_labware.labware_id,
-            new_location=verified_location,
+            location=verified_location,
+            display_name=params.displayName,
         )
 
         # TODO(jbl 2023-06-23) these validation checks happen after the labware is loaded, because they rely on

@@ -67,10 +67,10 @@ class ReloadLabwareImplementation(
 
         state_update = StateUpdate()
 
-        state_update.set_reloaded_labware(
+        state_update.set_labware_location(
             labware_id=params.labwareId,
-            location=reloaded_labware.location,
-            offset_id=reloaded_labware.offsetId,
+            new_location=reloaded_labware.location,
+            new_offset_id=reloaded_labware.offsetId,
         )
 
         return SuccessData(

@@ -231,10 +231,10 @@ class MoveLabwareImplementation(
         ):
             state_update.clear_all_pipette_locations()
 
-        state_update.set_move_labware(
+        state_update.set_labware_location(
             labware_id=params.labwareId,
-            location=validated_new_loc,
-            offset_id=new_offset_id,
+            new_location=validated_new_loc,
+            new_offset_id=new_offset_id,
         )
 
         return SuccessData(

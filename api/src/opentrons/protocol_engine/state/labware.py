@@ -174,9 +174,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
     def _handle_command(self, action: Action) -> None:
         """Modify state in reaction to a command."""
         self._add_loaded_labware(action)
-        self._set_reloaded_labware(action)
-        self._set_move_lid_result(action)
-        self._set_move_labware(action)
+        self._set_labware_location(action)
 
         if not isinstance(action, SucceedCommandAction):
             return
@@ -192,47 +190,6 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
         self._state.labware_offsets_by_id[labware_offset.id] = labware_offset
 
-    def _set_move_lid_result(self, action: Action) -> None:
-        if (
-            isinstance(action, SucceedCommandAction)
-            and action.state_update.lid_status != update_types.NO_CHANGE
-        ):
-            lid_id = action.state_update.lid_status.labware_id
-            new_location = action.state_update.lid_status.new_location
-            new_offset_id = action.state_update.lid_status.offset_id
-
-            self._state.labware_by_id[lid_id].offsetId = new_offset_id
-            self._state.labware_by_id[lid_id].location = new_location
-
-    def _set_move_labware(self, action: Action) -> None:
-        if (
-            isinstance(action, SucceedCommandAction)
-            and action.state_update.move_labware != update_types.NO_CHANGE
-        ):
-            labware_id = action.state_update.move_labware.labware_id
-            new_location = action.state_update.move_labware.location
-            new_offset_id = action.state_update.move_labware.offset_id
-
-            self._state.labware_by_id[labware_id].offsetId = new_offset_id
-            if isinstance(
-                new_location, AddressableAreaLocation
-            ) and fixture_validation.is_gripper_waste_chute(
-                new_location.addressableAreaName
-            ):
-                # If a labware has been moved into a waste chute it's been chuted away and is now technically off deck
-                new_location = OFF_DECK_LOCATION
-            self._state.labware_by_id[labware_id].location = new_location
-
-    def _set_reloaded_labware(self, action: Action) -> None:
-        if (
-            isinstance(action, SucceedCommandAction)
-            and action.state_update.reloaded_labware != update_types.NO_CHANGE
-        ):
-            assert isinstance(action.command.params, ReloadLabwareParams)
-            labware_id = action.command.params.labwareId
-            new_offset_id = action.state_update.reloaded_labware.offset_id
-            self._state.labware_by_id[labware_id].offsetId = new_offset_id
-
     def _add_loaded_labware(self, action: Action) -> None:
         if (
             isinstance(action, SucceedCommandAction)
@@ -241,7 +198,11 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             if action.state_update.labware_location != update_types.NO_CHANGE:
 
                 # If the labware load refers to an offset, that offset must actually exist.
-                if action.state_update.loaded_labware.offset_id is not None:
+                if (
+                    action.state_update.loaded_labware.offset_id is not None
+                    and action.state_update.loaded_labware.offset_id
+                    != update_types.NO_CHANGE
+                ):
                     assert (
                         action.state_update.loaded_labware.offset_id
                         in self._state.labware_offsets_by_id
@@ -259,22 +220,27 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
                 location = None
                 if isinstance(
-                    action.state_update.labware_location.new_location,
+                    action.state_update.loaded_labware.new_location,
                     get_args(LabwareLocation),
                 ):
-                    location = action.state_update.labware_location.new_location
+                    location = action.state_update.loaded_labware.new_location
                 else:
                     location = self._state.labware_by_id[
                         action.state_update.loaded_labware.labware_id
                     ].location
 
                 display_name = None
-                if action.state_update.labware_location.display_name:
-                    display_name = action.state_update.labware_location.display_name
+                if action.state_update.loaded_labware.display_name:
+                    display_name = action.state_update.loaded_labware.display_name
                 else:
                     display_name = self._state.labware_by_id[
                         action.state_update.loaded_labware.labware_id
                     ].displayName
+
+                assert (
+                    action.state_update.loaded_labware.offset_id
+                    != update_types.NO_CHANGE
+                )
 
                 self._state.labware_by_id[
                     action.state_update.loaded_labware.labware_id
@@ -286,6 +252,36 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                     offsetId=action.state_update.loaded_labware.offset_id,
                     displayName=display_name,
                 )
+
+    def _set_labware_location(self, action: Action) -> None:
+        if (
+            isinstance(action, SucceedCommandAction)
+            and action.state_update.labware_location != update_types.NO_CHANGE
+        ):
+
+            labware_id = action.state_update.labware_location.labware_id
+            new_offset_id = action.state_update.labware_location.offset_id
+
+            if new_offset_id != update_types.NO_CHANGE:
+                self._state.labware_by_id[labware_id].offsetId = new_offset_id
+
+            if (
+                action.state_update.labware_location.new_location
+                != update_types.NO_CHANGE
+            ):
+                new_location = action.state_update.labware_location.new_location
+
+                if isinstance(
+                    new_location, AddressableAreaLocation
+                ) and fixture_validation.is_gripper_waste_chute(
+                    new_location.addressableAreaName
+                ):
+                    # If a labware has been moved into a waste chute it's been chuted away and is now technically off deck
+                    new_location = OFF_DECK_LOCATION
+
+                assert new_location != update_types.NO_CHANGE
+
+                self._state.labware_by_id[labware_id].location = new_location
 
 
 class LabwareView(HasState[LabwareState]):
