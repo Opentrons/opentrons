@@ -443,7 +443,10 @@ class GeometryView:
                         volume = operation_volume or 0.0
                     else:
                         volume = well_location.volumeOffset.volumeOffset
-                    # height_after_operation = self.get_ending_height(labware_id, well_name, starting_liquid_height, volume)
+                    # make below 3 lines their own method?
+                    # volume_at_starting_height = self.get_volume_at_height(labware_id=labware_id, well_id=well_name, target_height=starting_liquid_height) # confirm well_id=well_name
+                    # ending_volume = volume_at_starting_height + volume
+                    # height_after_operation = self.get_height_at_volume(labware_id=labware_id, well_id=well_name, target_volume=ending_volume) # confirm well_id=well_name
                     height_after_operation = starting_liquid_height  # delete, use above method once implemented
                     if volume:  # delete
                         pass  # delete
