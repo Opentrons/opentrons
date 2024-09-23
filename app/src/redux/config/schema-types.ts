@@ -13,6 +13,7 @@ export type DevInternalFlag =
   | 'enableRunNotes'
   | 'protocolTimeline'
   | 'enableLabwareCreator'
+  | 'enableLocalization'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
