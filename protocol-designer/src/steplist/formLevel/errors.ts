@@ -16,6 +16,7 @@ import type * as React from 'react'
 import type { StepFieldName } from '../../form-types'
 import type { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
+import { getTimeFromPauseForm } from '../utils/getTimeFromPauseForm'
 /*******************
  ** Error Messages **
  ********************/
@@ -133,7 +134,7 @@ const LID_TEMPERATURE_HOLD_REQUIRED: FormError = {
   title: 'Temperature is required',
   dependentFields: ['lidIsActiveHold', 'lidTargetTempHold'],
 }
-interface HydratedFormData {
+export interface HydratedFormData {
   [key: string]: any
 }
 
@@ -191,20 +192,11 @@ export const incompatibleAspirateLabware = (
 export const pauseForTimeOrUntilTold = (
   fields: HydratedFormData
 ): FormError | null => {
-  const {
-    pauseAction,
-    pauseHour,
-    pauseMinute,
-    pauseSecond,
-    moduleId,
-    pauseTemperature,
-  } = fields
+  const { pauseAction, moduleId, pauseTemperature } = fields
 
   if (pauseAction === PAUSE_UNTIL_TIME) {
+    const { hours, minutes, seconds } = getTimeFromPauseForm(fields)
     // user selected pause for amount of time
-    const hours = parseFloat(pauseHour as string) ?? 0
-    const minutes = parseFloat(pauseMinute as string) ?? 0
-    const seconds = parseFloat(pauseSecond as string) ?? 0
     const totalSeconds = hours * 3600 + minutes * 60 + seconds
     return totalSeconds <= 0 ? TIME_PARAM_REQUIRED : null
   } else if (pauseAction === PAUSE_UNTIL_TEMP) {
