@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { TYPOGRAPHY } from '../../ui-style-constants'
-import { StyledText } from '../../../lib'
+import { StyledText } from '../../atoms/StyledText'
 import { Banner } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
@@ -37,12 +36,7 @@ export const OverriddenExitIcon: Story = {
       console.log('close')
     },
     closeButton: (
-      <StyledText
-        desktopStyle="bodyDefaultRegular"
-        textDecoration={TYPOGRAPHY.textDecorationUnderline}
-      >
-        Exit
-      </StyledText>
+      <StyledText desktopStyle="bodyDefaultRegular">{'Exit'}</StyledText>
     ),
   },
 }
