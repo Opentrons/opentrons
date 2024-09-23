@@ -10,7 +10,7 @@ import {
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
-import { getTotalVolumePerLiquidId } from '../../../../Devices/ProtocolRun/SetupLiquids/utils'
+import { getTotalVolumePerLiquidId } from '/app/transformations/analysis'
 import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { LiquidDetails } from '../LiquidDetails'
 import {
@@ -22,7 +22,7 @@ import { ProtocolSetupLiquids } from '..'
 
 import type * as SharedData from '@opentrons/shared-data'
 
-vi.mock('../../../../Devices/ProtocolRun/SetupLiquids/utils')
+vi.mock('/app/transformations/analysis')
 vi.mock('/app/atoms/buttons')
 vi.mock('../LiquidDetails')
 vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')

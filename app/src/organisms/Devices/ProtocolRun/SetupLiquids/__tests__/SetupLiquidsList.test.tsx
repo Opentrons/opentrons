@@ -18,7 +18,10 @@ import {
 import { useIsFlex } from '/app/redux-resources/robots'
 import { getLocationInfoNames } from '../../utils/getLocationInfoNames'
 import { SetupLiquidsList } from '../SetupLiquidsList'
-import { getTotalVolumePerLiquidId, getVolumePerWell } from '../utils'
+import {
+  getTotalVolumePerLiquidId,
+  getVolumePerWell,
+} from '/app/transformations/analysis'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
 import { useNotifyRunQuery } from '/app/resources/runs'
 
@@ -52,7 +55,7 @@ const MOCK_LABWARE_INFO_BY_LIQUID_ID = {
   ],
 }
 
-vi.mock('../utils')
+vi.mock('/app/transformations/analysis')
 vi.mock('../../utils/getLocationInfoNames')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../LiquidsLabwareDetailsModal')

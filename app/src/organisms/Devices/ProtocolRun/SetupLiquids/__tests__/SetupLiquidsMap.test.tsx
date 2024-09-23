@@ -52,7 +52,6 @@ vi.mock('@opentrons/components', async importOriginal => {
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck')
 vi.mock('../../LabwareInfoOverlay')
 vi.mock('../../../hooks')
-vi.mock('../utils')
 vi.mock('../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils')
 vi.mock('/app/transformations/analysis')
 vi.mock('/app/resources/deck_configuration/utils')

@@ -16,7 +16,7 @@ import {
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { LiquidsLabwareDetailsModal } from '../../../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal'
 import { getLocationInfoNames } from '../../../Devices/ProtocolRun/utils/getLocationInfoNames'
-import { getVolumePerWell } from '../../../Devices/ProtocolRun/SetupLiquids/utils'
+import { getVolumePerWell } from '/app/transformations/analysis'
 
 import type {
   LabwareByLiquidId,

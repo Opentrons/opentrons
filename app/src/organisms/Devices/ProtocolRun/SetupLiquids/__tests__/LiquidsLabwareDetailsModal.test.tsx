@@ -15,7 +15,7 @@ import { getSlotLabwareDefinition } from '../../utils/getSlotLabwareDefinition'
 import {
   getLiquidsByIdForLabware,
   getDisabledWellFillFromLabwareId,
-} from '../utils'
+} from '/app/transformations/analysis'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
 import { LiquidDetailCard } from '../LiquidDetailCard'
 
@@ -41,7 +41,7 @@ vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../../../Devices/hooks')
 vi.mock('../../utils/getLocationInfoNames')
 vi.mock('../../utils/getSlotLabwareDefinition')
-vi.mock('../utils')
+vi.mock('/app/transformations/analysis')
 vi.mock('../LiquidDetailCard')
 
 const render = (

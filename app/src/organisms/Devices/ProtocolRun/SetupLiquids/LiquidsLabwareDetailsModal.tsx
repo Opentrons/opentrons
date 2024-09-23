@@ -31,7 +31,7 @@ import {
   getDisabledWellFillFromLabwareId,
   getWellGroupForLiquidId,
   getDisabledWellGroupForLiquidId,
-} from './utils'
+} from '/app/transformations/analysis'
 
 interface LiquidsLabwareDetailsModalProps {
   liquidId?: string
