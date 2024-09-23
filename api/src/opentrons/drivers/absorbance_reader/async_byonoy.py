@@ -228,7 +228,7 @@ class AsyncByonoy:
         return wavelengths
 
     async def get_measurement(self) -> List[List[float]]:
-        """Get a measurement based on the current configuration."""
+        """Gets one or more measurements based on the current configuration."""
         handle = self._verify_device_handle()
         assert (
             self._current_config is not None

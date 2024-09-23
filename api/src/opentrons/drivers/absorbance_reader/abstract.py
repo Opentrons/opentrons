@@ -44,7 +44,7 @@ class AbstractAbsorbanceReaderDriver(ABC):
 
     @abstractmethod
     async def get_measurement(self) -> List[List[float]]:
-        """Gets an absorbance reading with the current config."""
+        """Gets one or more measurements based on the current configuration."""
         ...
 
     @abstractmethod
