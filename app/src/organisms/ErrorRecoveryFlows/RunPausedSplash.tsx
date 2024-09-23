@@ -39,7 +39,7 @@ import type {
   UseRecoveryTakeoverResult,
   useRetainedFailedCommandBySource,
 } from './hooks'
-import { RecoveryRoute, RouteStep } from './types'
+import type { RecoveryRoute, RouteStep } from './types'
 
 import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 

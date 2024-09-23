@@ -22,10 +22,9 @@ import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '/app/redux/analytics'
-import { useCloneRun } from '/app/resources/runs'
+import { useCloneRun, useNotifyAllRunsQuery } from '/app/resources/runs'
 import { useRerunnableStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
-import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import type { NavigateFunction } from 'react-router-dom'
 import type { ProtocolHardware } from '/app/transformations/commands'

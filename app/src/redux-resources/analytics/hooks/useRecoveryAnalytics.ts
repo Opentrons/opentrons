@@ -1,5 +1,5 @@
 import { RUN_STATUS_FAILED, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
-import { RunCommandSummary } from '@opentrons/api-client'
+
 import {
   ANALYTICS_RECOVERY_ACTION_RESULT,
   ANALYTICS_RECOVERY_ACTION_SELECTED,
@@ -9,7 +9,7 @@ import {
   useTrackEvent,
 } from '/app/redux/analytics'
 
-import type { RunStatus } from '@opentrons/api-client'
+import type { RunStatus, RunCommandSummary } from '@opentrons/api-client'
 
 type InitialActionType = 'cancel-run' | 'launch-recovery'
 type CommandResult = 'succeeded' | 'failed'

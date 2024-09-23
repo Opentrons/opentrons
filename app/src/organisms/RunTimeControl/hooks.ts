@@ -1,10 +1,10 @@
 import { useRunActionMutations } from '@opentrons/react-api-client'
 
-import { useCloneRun } from '/app/resources/runs'
 import {
   useNotifyRunQuery,
   useCurrentRunId,
   useRunStatus,
+  useCloneRun,
   DEFAULT_RUN_QUERY_REFETCH_INTERVAL,
 } from '/app/resources/runs'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'

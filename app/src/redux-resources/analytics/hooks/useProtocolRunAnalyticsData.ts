@@ -2,9 +2,8 @@ import { useSelector } from 'react-redux'
 
 import { getStoredProtocol } from '/app/redux/protocol-storage'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { useProtocolDetailsForRun } from '/app/resources/runs'
 import { useProtocolMetadata } from '/app/resources/protocols'
-import { useRunTimestamps } from '/app/resources/runs'
+import { useProtocolDetailsForRun, useRunTimestamps } from '/app/resources/runs'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { ProtocolAnalyticsData } from '/app/redux/analytics/types'
