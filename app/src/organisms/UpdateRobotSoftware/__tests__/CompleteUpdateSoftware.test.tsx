@@ -2,11 +2,11 @@ import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { i18n } from '../../../i18n'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '/app/i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { CompleteUpdateSoftware } from '../CompleteUpdateSoftware'
 
-vi.mock('../../../redux/robot-admin')
+vi.mock('/app/redux/robot-admin')
 
 const render = (props: React.ComponentProps<typeof CompleteUpdateSoftware>) => {
   return renderWithProviders(<CompleteUpdateSoftware {...props} />, {

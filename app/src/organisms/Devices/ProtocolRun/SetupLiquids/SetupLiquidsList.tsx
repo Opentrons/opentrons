@@ -6,8 +6,9 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Box,
-  DeckInfoLabel,
   COLORS,
+  CURSOR_POINTER,
+  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -30,8 +31,8 @@ import {
   useTrackEvent,
   ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
-} from '../../../../redux/analytics'
-import { useIsFlex } from '../../hooks'
+} from '/app/redux/analytics'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
@@ -75,7 +76,6 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
     <Flex
       css={HIDE_SCROLLBAR}
       flexDirection={DIRECTION_COLUMN}
-      maxHeight="31.25rem"
       overflowY="auto"
       data-testid="SetupLiquidsList_ListView"
       gridGap={SPACING.spacing8}
@@ -149,14 +149,14 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
     ${CARD_OUTLINE_BORDER_STYLE}
 
     &:hover {
-      cursor: pointer;
+      cursor: ${CURSOR_POINTER};
       border: 1px solid ${COLORS.grey35};
     }
   `
   const LIQUID_CARD_ITEM_STYLE = css`
     border: 1px solid ${COLORS.white};
     &:hover {
-      cursor: pointer;
+      cursor: ${CURSOR_POINTER};
       border: 1px solid ${COLORS.grey30};
     }
   `

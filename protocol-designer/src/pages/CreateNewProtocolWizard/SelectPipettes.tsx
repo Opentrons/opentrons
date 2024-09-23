@@ -12,12 +12,16 @@ import {
   Box,
   Btn,
   Checkbox,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   DISPLAY_FLEX,
   DISPLAY_INLINE_BLOCK,
   EmptySelectorButton,
   Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_AUTO,
   PRODUCT,
   RadioButton,
   SPACING,
@@ -48,6 +52,8 @@ import type {
   WizardTileProps,
 } from './types'
 
+const MAX_TIPRACKS_ALLOWED = 3
+
 export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, setValue } = props
   const { t } = useTranslation(['create_new_protocol', 'shared'])
@@ -69,7 +75,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
   const robotType = fields.robotType
   const defaultMount = mount ?? 'left'
   const has96Channel = pipettesByMount.left.pipetteName === 'p1000_96'
-  const selectedPip =
+  const selectedPipetteName =
     pipetteType === '96' || pipetteGen === 'GEN1'
       ? `${pipetteVolume}_${pipetteType}`
       : `${pipetteVolume}_${pipetteType}_${pipetteGen.toLowerCase()}`
@@ -84,10 +90,18 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
 
   //  initialize pipette name once all fields are filled out
   React.useEffect(() => {
-    if (pipetteType != null && pipetteVolume != null) {
-      setValue(`pipettesByMount.${defaultMount}.pipetteName`, selectedPip)
+    if (
+      (pipetteType != null &&
+        pipetteVolume != null &&
+        robotType === FLEX_ROBOT_TYPE) ||
+      (robotType === OT2_ROBOT_TYPE && pipetteGen != null)
+    ) {
+      setValue(
+        `pipettesByMount.${defaultMount}.pipetteName`,
+        selectedPipetteName
+      )
     }
-  }, [pipetteType, pipetteGen, pipetteVolume, selectedPip])
+  }, [pipetteType, pipetteGen, pipetteVolume, selectedPipetteName])
 
   const isDisabled =
     page === 'add' && pipettesByMount[defaultMount].tiprackDefURI == null
@@ -113,7 +127,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
       <HandleEnter onEnter={handleProceed}>
         <WizardBody
           stepNumber={2}
-          header={page === 'add' ? t('add_pip') : t('robot_pips')}
+          header={page === 'add' ? t('add_pip') : t('robot_pipettes')}
           subHeader={page === 'add' ? t('which_pipette') : undefined}
           proceed={handleProceed}
           goBack={() => {
@@ -133,24 +147,23 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
         >
           {page === 'add' ? (
             <Flex
-              flexDirection="column"
+              flexDirection={DIRECTION_COLUMN}
               height="41.5vh"
-              overflowY="scroll"
-              marginBottom={SPACING.spacing16}
-              marginTop={SPACING.spacing60}
+              overflowY={OVERFLOW_AUTO}
+              gridGap={SPACING.spacing32}
             >
-              <>
-                <StyledText
-                  desktopStyle="headingSmallBold"
-                  marginBottom={SPACING.spacing16}
-                >
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing12}
+              >
+                <StyledText desktopStyle="headingSmallBold">
                   {t('pip_type')}
                 </StyledText>
                 <Flex gridGap={SPACING.spacing4}>
                   {PIPETTE_TYPES[robotType].map(type => {
                     return type.value === '96' &&
-                      (pipettesByMount.left.pipetteName != null ||
-                        pipettesByMount.right.pipetteName != null) ? null : (
+                      pipettesByMount.left.pipetteName != null &&
+                      pipettesByMount.right.pipetteName != null ? null : (
                       <RadioButton
                         key={`${type.label}_${type.value}`}
                         onChange={() => {
@@ -173,16 +186,14 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                     )
                   })}
                 </Flex>
-              </>
+              </Flex>
+
               {pipetteType != null && robotType === OT2_ROBOT_TYPE ? (
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  marginTop={SPACING.spacing32}
+                  gridGap={SPACING.spacing12}
                 >
-                  <StyledText
-                    desktopStyle="headingSmallBold"
-                    marginBottom={SPACING.spacing16}
-                  >
+                  <StyledText desktopStyle="headingSmallBold">
                     {t('pip_gen')}
                   </StyledText>
                   <Flex gridGap={SPACING.spacing4}>
@@ -207,12 +218,9 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                 robotType === OT2_ROBOT_TYPE) ? (
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  marginTop={SPACING.spacing32}
+                  gridGap={SPACING.spacing12}
                 >
-                  <StyledText
-                    desktopStyle="headingSmallBold"
-                    marginBottom={SPACING.spacing16}
-                  >
+                  <StyledText desktopStyle="headingSmallBold">
                     {t('pip_vol')}
                   </StyledText>
                   <Flex gridGap={SPACING.spacing4}>
@@ -260,61 +268,63 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                   </Flex>
                 </Flex>
               ) : null}
-              {allPipetteOptions.includes(selectedPip as PipetteName)
+              {allPipetteOptions.includes(selectedPipetteName as PipetteName)
                 ? (() => {
                     const tiprackOptions = getTiprackOptions({
-                      allLabware: allLabware,
-                      allowAllTipracks: allowAllTipracks,
-                      selectedPipetteName: selectedPip,
+                      allLabware,
+                      allowAllTipracks,
+                      selectedPipetteName,
                     })
                     return (
                       <Flex
                         flexDirection={DIRECTION_COLUMN}
-                        marginTop={SPACING.spacing32}
+                        gridGap={SPACING.spacing4}
                       >
-                        <StyledText
-                          desktopStyle="headingSmallBold"
-                          marginBottom={SPACING.spacing16}
-                        >
-                          {t('pip_tips')}
-                        </StyledText>
-                        <Box
-                          css={css`
-                            gap: ${SPACING.spacing4};
-                            display: ${DISPLAY_FLEX};
-                            flex-wrap: ${WRAP};
-                          `}
-                        >
-                          {Object.entries(tiprackOptions).map(
-                            ([value, name]) => (
-                              <Checkbox
-                                key={value}
-                                isChecked={selectedValues.includes(value)}
-                                labelText={name}
-                                onClick={() => {
-                                  const updatedValues = selectedValues.includes(
-                                    value
-                                  )
-                                    ? selectedValues.filter(v => v !== value)
-                                    : [...selectedValues, value]
-                                  setValue(
-                                    `pipettesByMount.${defaultMount}.tiprackDefURI`,
-                                    updatedValues.slice(0, 3)
-                                  )
-                                  if (selectedValues.length === 3) {
-                                    makeSnackbar(
-                                      t('up_to_3_tipracks') as string
-                                    )
-                                  }
-                                }}
-                              />
-                            )
-                          )}
-                        </Box>
                         <Flex
-                          gridGap={SPACING.spacing8}
-                          marginTop={SPACING.spacing4}
+                          flexDirection={DIRECTION_COLUMN}
+                          gridGap={SPACING.spacing16}
                         >
+                          <StyledText desktopStyle="headingSmallBold">
+                            {t('pip_tips')}
+                          </StyledText>
+                          <Box
+                            css={css`
+                              gap: ${SPACING.spacing4};
+                              display: ${DISPLAY_FLEX};
+                              flex-wrap: ${WRAP};
+                            `}
+                          >
+                            {Object.entries(tiprackOptions).map(
+                              ([value, name]) => (
+                                <Checkbox
+                                  key={value}
+                                  isChecked={selectedValues.includes(value)}
+                                  labelText={name}
+                                  onClick={() => {
+                                    const updatedValues = selectedValues.includes(
+                                      value
+                                    )
+                                      ? selectedValues.filter(v => v !== value)
+                                      : [...selectedValues, value]
+                                    setValue(
+                                      `pipettesByMount.${defaultMount}.tiprackDefURI`,
+                                      updatedValues.slice(0, 3)
+                                    )
+                                    if (
+                                      selectedValues.length ===
+                                      MAX_TIPRACKS_ALLOWED
+                                    ) {
+                                      makeSnackbar(
+                                        t('up_to_3_tipracks') as string
+                                      )
+                                    }
+                                  }}
+                                />
+                              )
+                            )}
+                          </Box>
+                        </Flex>
+                        <Flex gridGap={SPACING.spacing8}>
                           <StyledLabel>
                             <StyledText desktopStyle="bodyDefaultRegular">
                               {t('add_custom_tips')}
@@ -359,13 +369,9 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                 : null}
             </Flex>
           ) : (
-            <Flex
-              marginTop={SPACING.spacing60}
-              flexDirection={DIRECTION_COLUMN}
-            >
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
               <Flex
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
-                marginBottom={SPACING.spacing12}
                 alignItems={ALIGN_CENTER}
               >
                 <StyledText desktopStyle="headingSmallBold">
@@ -400,9 +406,16 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                       )
                     }}
                   >
-                    <StyledText desktopStyle="bodyDefaultRegular">
-                      {t('swap')}
-                    </StyledText>
+                    <Flex flexDirection={DIRECTION_ROW}>
+                      <Icon
+                        name="swap-horizontal"
+                        size="1rem"
+                        transform="rotate(90deg)"
+                      />
+                      <StyledText desktopStyle="captionSemiBold">
+                        {t('swap')}
+                      </StyledText>
+                    </Flex>
                   </Btn>
                 )}
               </Flex>
@@ -485,7 +498,7 @@ const StyledLabel = styled.label`
   text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
   font-size: ${PRODUCT.TYPOGRAPHY.fontSizeBodyDefaultSemiBold};
   display: ${DISPLAY_INLINE_BLOCK};
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   input[type='file'] {
     display: none;
   }

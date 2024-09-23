@@ -12,9 +12,9 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import {
   useAttachedPipettesFromInstrumentsQuery,
-  useIsFlex,
   usePipetteOffsetCalibrations,
 } from '../Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { getShowPipetteCalibrationWarning } from '../Devices/utils'
 import { PipetteRecalibrationWarning } from '../Devices/PipetteCard/PipetteRecalibrationWarning'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'

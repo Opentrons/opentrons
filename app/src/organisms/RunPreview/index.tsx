@@ -25,11 +25,11 @@ import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostR
 import {
   useNotifyAllCommandsAsPreSerializedList,
   useNotifyRunQuery,
-} from '../../resources/runs'
-import { CommandText, CommandIcon } from '../../molecules/Command'
-import { Divider } from '../../atoms/structure'
+  useRunStatus,
+} from '/app/resources/runs'
+import { CommandText, CommandIcon } from '/app/molecules/Command'
+import { Divider } from '/app/atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
-import { useRunStatus } from '../RunTimeControl/hooks'
 import { useLastRunCommand } from '../Devices/hooks/useLastRunCommand'
 
 import type { RunStatus } from '@opentrons/api-client'
@@ -64,7 +64,7 @@ export const RunPreviewComponent = (
     isLoading: isRunCommandDataLoading,
   } = useNotifyAllCommandsAsPreSerializedList(
     runId,
-    { cursor: 0, pageLength: MAX_COMMANDS },
+    { cursor: 0, pageLength: MAX_COMMANDS, includeFixitCommands: false },
     {
       enabled: isRunTerminal,
     }
@@ -78,20 +78,13 @@ export const RunPreviewComponent = (
     isCurrentCommandVisible,
     setIsCurrentCommandVisible,
   ] = React.useState<boolean>(true)
-  const filteredCommandsFromQuery = React.useMemo(
-    () =>
-      commandsFromQuery?.filter(
-        command => !('intent' in command) || command.intent !== 'fixit'
-      ),
-    [commandsFromQuery == null]
-  )
 
   if (robotSideAnalysis == null) {
     return null
   }
 
   const commands = isRunTerminal
-    ? filteredCommandsFromQuery
+    ? commandsFromQuery
     : robotSideAnalysis.commands
 
   // pass relevant data from run rather than analysis so that CommandText utilities can properly hash the entities' IDs

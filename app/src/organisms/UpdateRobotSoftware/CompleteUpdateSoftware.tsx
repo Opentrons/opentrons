@@ -14,7 +14,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ProgressBar } from '../../atoms/ProgressBar'
+import { ProgressBar } from '/app/atoms/ProgressBar'
 
 interface CompleteUpdateSoftwareProps {
   robotName: string

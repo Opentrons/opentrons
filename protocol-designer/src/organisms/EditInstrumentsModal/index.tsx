@@ -10,11 +10,14 @@ import {
   Btn,
   Checkbox,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   DISPLAY_FLEX,
   DISPLAY_INLINE_BLOCK,
   EmptySelectorButton,
   Flex,
+  Icon,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   ListItem,
@@ -58,6 +61,7 @@ import { setFeatureFlags } from '../../feature-flags/actions'
 import { createCustomTiprackDef } from '../../labware-defs/actions'
 import { deleteContainer } from '../../labware-ingred/actions'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import { BUTTON_LINK_STYLE } from '../../atoms'
 import { getSectionsFromPipetteName } from './utils'
 import { editPipettes } from './editPipettes'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
@@ -207,6 +211,7 @@ export function EditInstrumentsModal(
               </StyledText>
               {has96Channel ? null : (
                 <Btn
+                  css={BUTTON_LINK_STYLE}
                   onClick={() =>
                     dispatch(
                       changeSavedStepForm({
@@ -218,7 +223,12 @@ export function EditInstrumentsModal(
                     )
                   }
                 >
-                  <Flex color={COLORS.grey60}>
+                  <Flex flexDirection={DIRECTION_ROW}>
+                    <Icon
+                      name="swap-horizontal"
+                      size="1rem"
+                      transform="rotate(90deg)"
+                    />
                     <StyledText desktopStyle="captionSemiBold">
                       {t('swap')}
                     </StyledText>
@@ -336,17 +346,17 @@ export function EditInstrumentsModal(
                           {t('gripper')}
                         </StyledText>
                       </Flex>
-                      <Flex textDecoration={TYPOGRAPHY.textDecorationUnderline}>
-                        <Btn
-                          onClick={() => {
-                            dispatch(toggleIsGripperRequired())
-                          }}
-                        >
-                          <StyledText desktopStyle="bodyDefaultRegular">
-                            {t('remove')}
-                          </StyledText>
-                        </Btn>
-                      </Flex>
+                      <Btn
+                        css={BUTTON_LINK_STYLE}
+                        textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                        onClick={() => {
+                          dispatch(toggleIsGripperRequired())
+                        }}
+                      >
+                        <StyledText desktopStyle="bodyDefaultRegular">
+                          {t('remove')}
+                        </StyledText>
+                      </Btn>
                     </Flex>
                   </ListItem>
                 ) : (
@@ -574,7 +584,7 @@ const StyledLabel = styled.label`
   text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
   font-size: ${PRODUCT.TYPOGRAPHY.fontSizeBodyDefaultSemiBold};
   display: ${DISPLAY_INLINE_BLOCK};
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   input[type='file'] {
     display: none;
   }

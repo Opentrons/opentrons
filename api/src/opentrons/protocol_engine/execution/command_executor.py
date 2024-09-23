@@ -185,7 +185,9 @@ class CommandExecutor:
                 succeeded_command = running_command.copy(update=update)
                 self._action_dispatcher.dispatch(
                     SucceedCommandAction(
-                        command=succeeded_command, private_result=result.private
+                        command=succeeded_command,
+                        private_result=result.private,
+                        state_update=result.state_update,
                     ),
                 )
             else:

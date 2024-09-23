@@ -3,8 +3,8 @@ import * as React from 'react'
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
-} from '../../../resources/maintenance_runs'
-import { useCreateTargetedMaintenanceRunMutation } from '../../../resources/runs'
+} from '/app/resources/maintenance_runs'
+import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 import { buildLoadPipetteCommand } from './useDropTipCommands'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
@@ -62,7 +62,7 @@ export function useDropTipMaintenanceRun({
 
 type UseCreateDropTipMaintenanceRunParams = Omit<
   UseDropTipMaintenanceRunParams,
-  'robotType' | 'closeFlow'
+  'robotType' | 'closeFlow' | 'modalStyle'
 > & {
   setCreatedMaintenanceRunId: (id: string) => void
   instrumentModelName?: PipetteModelSpecs['name']

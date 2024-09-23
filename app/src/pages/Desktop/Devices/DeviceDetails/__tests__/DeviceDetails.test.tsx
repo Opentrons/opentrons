@@ -4,27 +4,26 @@ import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
-import { i18n } from '../../../../../i18n'
-import {
-  useRobot,
-  useSyncRobotClock,
-} from '../../../../../organisms/Devices/hooks'
-import { InstrumentsAndModules } from '../../../../../organisms/Devices/InstrumentsAndModules'
-import { RecentProtocolRuns } from '../../../../../organisms/Devices/RecentProtocolRuns'
-import { RobotOverview } from '../../../../../organisms/Devices/RobotOverview'
-import { getScanning } from '../../../../../redux/discovery'
-import { mockConnectableRobot } from '../../../../../redux/discovery/__fixtures__'
+import { i18n } from '/app/i18n'
+import { useSyncRobotClock } from '/app/organisms/Devices/hooks'
+import { InstrumentsAndModules } from '/app/organisms/Devices/InstrumentsAndModules'
+import { RecentProtocolRuns } from '/app/organisms/Devices/RecentProtocolRuns'
+import { RobotOverview } from '/app/organisms/Devices/RobotOverview'
+import { getScanning } from '/app/redux/discovery'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import { useRobot } from '/app/redux-resources/robots'
 import { DeviceDetails } from '..'
 
-import type { State } from '../../../../../redux/types'
+import type { State } from '/app/redux/types'
 
-vi.mock('../../../../../organisms/Devices/hooks')
-vi.mock('../../../../../organisms/Devices/InstrumentsAndModules')
-vi.mock('../../../../../organisms/Devices/RecentProtocolRuns')
-vi.mock('../../../../../organisms/Devices/RobotOverview')
-vi.mock('../../../../../redux/discovery')
+vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/organisms/Devices/InstrumentsAndModules')
+vi.mock('/app/organisms/Devices/RecentProtocolRuns')
+vi.mock('/app/organisms/Devices/RobotOverview')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux-resources/robots')
 
 const render = (path = '/') => {
   return renderWithProviders(

@@ -2,8 +2,8 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import { useTrackEvent, ANALYTICS_ODD_APP_ERROR } from '../redux/analytics'
-import { getLocalRobot, getRobotSerialNumber } from '../redux/discovery'
+import { useTrackEvent, ANALYTICS_ODD_APP_ERROR } from '/app/redux/analytics'
+import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
 
 import type { FallbackProps } from 'react-error-boundary'
 
@@ -17,12 +17,12 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import { MediumButton } from '../atoms/buttons'
-import { OddModal } from '../molecules/OddModal'
-import { appRestart, sendLog } from '../redux/shell'
+import { MediumButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+import { appRestart, sendLog } from '/app/redux/shell'
 
-import type { Dispatch } from '../redux/types'
-import type { OddModalHeaderBaseProps } from '../molecules/OddModal/types'
+import type { Dispatch } from '/app/redux/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 export function OnDeviceDisplayAppFallback({
   error,

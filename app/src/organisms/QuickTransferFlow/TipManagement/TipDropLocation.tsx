@@ -15,7 +15,7 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../App/portal'
-import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { ChildNavigation } from '../../ChildNavigation'
 
 import type {

@@ -7,6 +7,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   Btn,
+  Banner,
   Flex,
   JUSTIFY_FLEX_END,
   Modal,
@@ -18,11 +19,10 @@ import {
   WRAP_REVERSE,
 } from '@opentrons/components'
 
-import { analyzeProtocol } from '../../redux/protocol-storage'
-import { Banner } from '../../atoms/Banner'
+import { analyzeProtocol } from '/app/redux/protocol-storage'
 import { getTopPortalEl } from '../../App/portal'
 
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 interface ProtocolAnalysisFailureProps {
   errors: string[]
   protocolKey: string

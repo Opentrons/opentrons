@@ -24,33 +24,32 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import {
   useModuleRenderInfoForProtocolById,
-  useRobot,
-  useRobotType,
   useRunHasStarted,
   useRunStatuses,
   useSyncRobotClock,
-} from '../../../../organisms/Devices/hooks'
-import { ProtocolRunHeader } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
-import { RunPreview } from '../../../../organisms/RunPreview'
+} from '/app/organisms/Devices/hooks'
+import { ProtocolRunHeader } from '/app/organisms/Devices/ProtocolRun/ProtocolRunHeader'
+import { RunPreview } from '/app/organisms/RunPreview'
 import {
   ProtocolRunSetup,
   initialMissingSteps,
-} from '../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
-import { BackToTopButton } from '../../../../organisms/Devices/ProtocolRun/BackToTopButton'
-import { ProtocolRunModuleControls } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
-import { ProtocolRunRuntimeParameters } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
-import { useCurrentRunId } from '../../../../resources/runs'
-import { OPENTRONS_USB } from '../../../../redux/discovery'
-import { fetchProtocols } from '../../../../redux/protocol-storage'
-import { appShellRequestor } from '../../../../redux/shell/remote'
-import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+} from '/app/organisms/Devices/ProtocolRun/ProtocolRunSetup'
+import { BackToTopButton } from '/app/organisms/Devices/ProtocolRun/BackToTopButton'
+import { ProtocolRunModuleControls } from '/app/organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
+import { ProtocolRunRuntimeParameters } from '/app/organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
+import { useCurrentRunId } from '/app/resources/runs'
+import { OPENTRONS_USB } from '/app/redux/discovery'
+import { fetchProtocols } from '/app/redux/protocol-storage'
+import { appShellRequestor } from '/app/redux/shell/remote'
+import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useRobot, useRobotType } from '/app/redux-resources/robots'
 
 import type { ViewportListRef } from 'react-viewport-list'
 import type {
   DesktopRouteParams,
   ProtocolRunDetailsTab,
 } from '../../../../App/types'
-import type { Dispatch } from '../../../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 const baseRoundTabStyling = css`
   ${TYPOGRAPHY.pSemiBold}

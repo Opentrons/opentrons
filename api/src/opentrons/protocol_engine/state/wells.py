@@ -52,7 +52,7 @@ class WellStore(HasState[WellState], HandlesActions):
             self._set_liquid_height(
                 labware_id=action.error.private.labware_id,
                 well_name=action.error.private.well_name,
-                height=0,
+                height=None,
                 time=action.failed_at,
             )
 

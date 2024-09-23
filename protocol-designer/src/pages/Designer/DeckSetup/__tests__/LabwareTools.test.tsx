@@ -123,7 +123,7 @@ describe('LabwareTools', () => {
 
   it('renders the custom labware flow', () => {
     render(props)
-    screen.getByText('Add custom labware')
+    screen.getByText('Upload custom labware')
     fireEvent.change(screen.getByTestId('customLabwareInput'))
     expect(vi.mocked(createCustomLabwareDef)).toHaveBeenCalled()
   })

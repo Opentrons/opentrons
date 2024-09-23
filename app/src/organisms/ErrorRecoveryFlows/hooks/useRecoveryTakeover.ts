@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 
-import { getUserId } from '../../../redux/config'
+import { getUserId } from '/app/redux/config'
 import {
   useClientDataRecovery,
   useUpdateClientDataRecovery,
-} from '../../../resources/client_data'
+} from '/app/resources/client_data'
 
-import type { ClientDataRecovery } from '../../../resources/client_data'
+import type { ClientDataRecovery } from '/app/resources/client_data'
 import type { UseERWizardResult } from '../ErrorRecoveryWizard'
 
 const CLIENT_DATA_INTERVAL_MS = 5000

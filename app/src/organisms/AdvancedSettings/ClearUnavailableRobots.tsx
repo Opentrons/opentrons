@@ -23,16 +23,16 @@ import {
   Modal,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '../../atoms/buttons'
-import { useToaster } from '../../organisms/ToasterOven'
+import { TertiaryButton } from '/app/atoms/buttons'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { getTopPortalEl } from '../../App/portal'
 import {
   clearDiscoveryCache,
   getReachableRobots,
   getUnreachableRobots,
-} from '../../redux/discovery'
+} from '/app/redux/discovery'
 
-import type { Dispatch, State } from '../../redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 export function ClearUnavailableRobots(): JSX.Element {
   const { t } = useTranslation('app_settings')

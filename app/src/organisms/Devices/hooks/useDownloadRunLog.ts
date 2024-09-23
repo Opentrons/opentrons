@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { getRun, getCommands, getProtocol } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
 import { ERROR_TOAST, INFO_TOAST } from '@opentrons/components'
-import { useToaster } from '../../../organisms/ToasterOven'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { downloadFile } from '../utils'
 import type { IconProps } from '@opentrons/components'
 
@@ -29,12 +29,14 @@ export function useDownloadRunLog(
     getCommands(host, runId, {
       cursor: null,
       pageLength: 0,
+      includeFixitCommands: true,
     })
       .then(response => {
         const { totalLength } = response.data.meta
         getCommands(host, runId, {
           cursor: 0,
           pageLength: totalLength,
+          includeFixitCommands: true,
         })
           .then(response => {
             const commands = response.data

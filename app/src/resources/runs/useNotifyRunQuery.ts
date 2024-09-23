@@ -5,7 +5,7 @@ import { useNotifyDataReady } from '../useNotifyDataReady'
 import type { UseQueryResult } from 'react-query'
 import type { Run, HostConfig } from '@opentrons/api-client'
 import type { QueryOptionsWithPolling } from '../useNotifyDataReady'
-import type { NotifyTopic } from '../../redux/shell/types'
+import type { NotifyTopic } from '/app/redux/shell/types'
 
 export function useNotifyRunQuery<TError = Error>(
   runId: string | null,

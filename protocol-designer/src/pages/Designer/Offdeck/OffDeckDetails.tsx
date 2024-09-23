@@ -18,19 +18,19 @@ import {
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { wellFillFromWellContents } from '../../../components/labware'
 import { selectors } from '../../../labware-ingred/selectors'
-import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { DeckItemHover } from '../DeckSetup/DeckItemHover'
 import { SlotDetailsContainer } from '../../../organisms'
 import { getRobotType } from '../../../file-data/selectors'
 import { SlotOverflowMenu } from '../DeckSetup/SlotOverflowMenu'
 import type { DeckSlotId } from '@opentrons/shared-data'
+import type { DeckSetupTabType } from '../types'
 
-interface OffDeckDetailsProps {
+interface OffDeckDetailsProps extends DeckSetupTabType {
   addLabware: () => void
 }
 export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
-  const { addLabware } = props
+  const { addLabware, tab } = props
   const { t, i18n } = useTranslation('starting_deck_state')
   const [hoverSlot, setHoverSlot] = React.useState<DeckSlotId | null>(null)
   const [menuListId, setShowMenuListForId] = React.useState<DeckSlotId | null>(
@@ -50,7 +50,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
     <Flex
       backgroundColor={COLORS.white}
       borderRadius={BORDERS.borderRadius8}
-      width="100%"
+      width={tab === 'startingDeck' ? '100%' : '90%'}
       height="70vh"
       padding={`${SPACING.spacing40} ${SPACING.spacing24}`}
       justifyContent={JUSTIFY_CENTER}
@@ -124,7 +124,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                         slotBoundingBox={xyzDimensions}
                         slotPosition={[0, 0, 0]}
                         itemId={lw.id}
-                        selectedTerminalItemId={START_TERMINAL_ITEM_ID}
+                        tab={tab}
                       />
                     </>
                   )}
@@ -148,15 +148,17 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
               </Flex>
             )
           })}
-          <Flex width="9.5625rem" height="6.375rem">
-            <EmptySelectorButton
-              onClick={addLabware}
-              text={t('add_labware')}
-              textAlignment="middle"
-              size="large"
-              iconName="plus"
-            />
-          </Flex>
+          {tab === 'startingDeck' ? (
+            <Flex width="9.5625rem" height="6.375rem">
+              <EmptySelectorButton
+                onClick={addLabware}
+                text={t('add_labware')}
+                textAlignment="middle"
+                size="large"
+                iconName="plus"
+              />
+            </Flex>
+          ) : null}
         </Flex>
       </Flex>
     </Flex>

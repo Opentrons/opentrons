@@ -4,11 +4,8 @@ import { DndProvider } from 'react-dnd'
 import { HashRouter } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
-import {
-  getEnableRedesign,
-  getFeatureFlagData,
-} from './feature-flags/selectors'
+import { DIRECTION_COLUMN, Flex, OVERFLOW_AUTO } from '@opentrons/components'
+import { getEnableRedesign } from './feature-flags/selectors'
 import { ComputingSpinner } from './components/ComputingSpinner'
 import { ConnectedNav } from './containers/ConnectedNav'
 import { Sidebar } from './containers/ConnectedSidebar'
@@ -24,39 +21,25 @@ import { GateModal } from './components/modals/GateModal'
 import { CreateFileWizard } from './components/modals/CreateFileWizard'
 import { AnnouncementModal } from './organisms'
 import { ProtocolRoutes } from './ProtocolRoutes'
-import { Bouncing } from './Bouncing'
 
 import styles from './components/ProtocolEditor.module.css'
 import './css/reset.module.css'
 
-import type { BrowserRouterProps } from 'react-router-dom'
-
 const showGateModal =
   process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
 
-// sandbox urls get deployed to subdirectories in sandbox.designer.opentrons.com/${subFolder}
-// prod urls get deployed to designer.opentrons.com with no subdir, so we don't need to add a base name
-const routerBaseName =
-  process.env.NODE_ENV === 'production'
-    ? null
-    : `/${window.location.pathname.split('/')[1]}`
-
 function ProtocolEditorComponent(): JSX.Element {
-  const flags = useSelector(getFeatureFlagData)
   const enableRedesign = useSelector(getEnableRedesign)
 
-  const prereleaseModeEnabled = flags.PRERELEASE_MODE === true
-
-  const browserRouterProps: BrowserRouterProps =
-    routerBaseName != null ? { basename: routerBaseName } : {}
-
   return (
-    <div id="protocol-editor">
+    <div
+      id="protocol-editor"
+      style={{ width: '100%', height: '100vh', overflow: OVERFLOW_AUTO }}
+    >
       <TopPortalRoot />
       {enableRedesign ? (
         <Flex flexDirection={DIRECTION_COLUMN}>
-          {prereleaseModeEnabled ? <Bouncing /> : null}
-          <HashRouter {...browserRouterProps}>
+          <HashRouter>
             <ProtocolRoutes />
           </HashRouter>
         </Flex>

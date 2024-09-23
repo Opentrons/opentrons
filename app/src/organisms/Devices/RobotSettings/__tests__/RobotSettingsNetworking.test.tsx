@@ -4,36 +4,36 @@ import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   getRobotAddressesByName,
   HEALTH_STATUS_OK,
   HEALTH_STATUS_NOT_OK,
   OPENTRONS_USB,
-} from '../../../../redux/discovery'
-import * as Networking from '../../../../redux/networking'
-import {
-  useCanDisconnect,
-  useWifiList,
-} from '../../../../resources/networking/hooks'
-import * as Fixtures from '../../../../redux/networking/__fixtures__'
-import { useIsFlex, useIsRobotBusy } from '../../hooks'
+} from '/app/redux/discovery'
+import * as Networking from '/app/redux/networking'
+import { useCanDisconnect, useWifiList } from '/app/resources/networking/hooks'
+import * as Fixtures from '/app/redux/networking/__fixtures__'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { useIsRobotBusy } from '../../hooks'
+
 import { DisconnectModal } from '../ConnectNetwork/DisconnectModal'
-import { useIsEstopNotDisengaged } from '../../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { RobotSettingsNetworking } from '../RobotSettingsNetworking'
 
-import type { DiscoveryClientRobotAddress } from '../../../../redux/discovery/types'
-import type { State } from '../../../../redux/types'
+import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'
+import type { State } from '/app/redux/types'
 
-vi.mock('../../../../redux/discovery/selectors')
-vi.mock('../../../../redux/networking')
-vi.mock('../../../../redux/robot-api/selectors')
-vi.mock('../../../../resources/networking/hooks')
+vi.mock('/app/redux/discovery/selectors')
+vi.mock('/app/redux/networking')
+vi.mock('/app/redux/robot-api/selectors')
+vi.mock('/app/resources/networking/hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../../hooks')
 vi.mock('../ConnectNetwork/DisconnectModal')
-vi.mock('../../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
 const mockUpdateRobotStatus = vi.fn()
 

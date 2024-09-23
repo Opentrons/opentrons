@@ -5,7 +5,11 @@ import { DropTipWizard } from './DropTipWizard'
 
 import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
 import type { PipetteData } from '@opentrons/api-client'
-import type { FixitCommandTypeUtils, IssuedCommandsType } from './types'
+import type {
+  DropTipModalStyle,
+  FixitCommandTypeUtils,
+  IssuedCommandsType,
+} from './types'
 
 /** Provides the user toggle for rendering Drop Tip Wizard Flows.
  *
@@ -31,7 +35,8 @@ export interface DropTipWizardFlowsProps {
   instrumentModelSpecs: PipetteModelSpecs
   /* isTakeover allows for optionally specifying a different callback if a different client cancels the "setup" type flow. */
   closeFlow: (isTakeover?: boolean) => void
-  /* Optional. If provided, DT will issue "fixit" commands and render alternate Error Recovery compatible views. */
+  modalStyle: DropTipModalStyle
+  /* Optional. If provided, DT will issue "fixit" commands. */
   fixitCommandTypeUtils?: FixitCommandTypeUtils
 }
 

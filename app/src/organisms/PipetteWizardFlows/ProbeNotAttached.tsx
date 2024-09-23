@@ -14,8 +14,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { css } from 'styled-components'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { SmallButton } from '../../atoms/buttons'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
+import { SmallButton } from '/app/atoms/buttons'
 
 interface ProbeNotAttachedProps {
   handleOnClick: () => void

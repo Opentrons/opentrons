@@ -7,6 +7,7 @@ import { Liquids } from './pages/Liquids'
 import { Designer } from './pages/Designer'
 import { CreateNewProtocolWizard } from './pages/CreateNewProtocolWizard'
 import { NavigationBar } from './NavigationBar'
+import { Settings } from './pages/Settings'
 import {
   Kitchen,
   FileUploadMessagesModal,
@@ -40,6 +41,12 @@ const pdRoutes: RouteProps[] = [
     name: 'Create new protocol',
     navLinkTo: '/createNew',
     path: '/createNew',
+  },
+  {
+    Component: Settings,
+    name: 'Settings',
+    navLinkTo: '/settings',
+    path: '/settings',
   },
 ]
 

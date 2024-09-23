@@ -9,8 +9,8 @@ import type {
   QuickTransfersOnDeviceSortKey,
   OnDeviceDisplaySettings,
 } from './types'
-import type { SelectOption } from '../../atoms/SelectField/Select'
-import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
+import type { SelectOption } from '/app/atoms/SelectField/Select'
+import type { ProtocolSort } from '/app/organisms/ProtocolsLanding/hooks'
 
 export const getConfig = (state: State): Config | null => state.config
 

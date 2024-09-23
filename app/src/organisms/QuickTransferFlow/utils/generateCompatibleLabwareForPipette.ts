@@ -1,5 +1,5 @@
 import { makeWellSetHelpers, getLabwareDefURI } from '@opentrons/shared-data'
-import { getAllDefinitions as getAllLatestDefValues } from '../../../pages/Desktop/Labware/helpers/definitions'
+import { getAllDefinitions as getAllLatestDefValues } from '/app/local-resources/labware'
 
 import type { PipetteV2Specs, WellSetHelpers } from '@opentrons/shared-data'
 

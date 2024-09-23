@@ -9,12 +9,12 @@ import {
   SecondaryButton,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '../../molecules/SimpleWizardBody'
-import { SmallButton } from '../../atoms/buttons'
+} from '/app/molecules/SimpleWizardBody'
+import { SmallButton } from '/app/atoms/buttons'
 import { GRIPPER_FLOW_TYPES } from './constants'
 import type { GripperWizardFlowType } from './types'
 

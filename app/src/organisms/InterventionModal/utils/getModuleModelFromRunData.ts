@@ -1,4 +1,4 @@
-import { getLoadedModule } from '../../../molecules/Command/utils/accessors'
+import { getLoadedModule } from '/app/molecules/Command/utils/accessors'
 
 import type { RunData } from '@opentrons/api-client'
 import type { ModuleModel } from '@opentrons/shared-data'

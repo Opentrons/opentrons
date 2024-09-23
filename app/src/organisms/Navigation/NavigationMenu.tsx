@@ -16,12 +16,12 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { home, ROBOT } from '../../redux/robot-controls'
+import { home, ROBOT } from '/app/redux/robot-controls'
 import { useLights } from '../Devices/hooks'
 import { getTopPortalEl } from '../../App/portal'
 import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
 
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 interface NavigationMenuProps {
   onClick: React.MouseEventHandler

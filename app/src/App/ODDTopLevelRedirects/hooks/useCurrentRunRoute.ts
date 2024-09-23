@@ -6,7 +6,7 @@ import {
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 
-import { useNotifyRunQuery } from '../../../resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 import { CURRENT_RUN_POLL } from '../constants'
 
 // Returns the route to which React Router should navigate, if any.

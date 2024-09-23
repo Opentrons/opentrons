@@ -42,6 +42,7 @@ export const MediumIcon: Story = {
   args: {
     size: 'medium',
     color: 'green',
+    onClick: () => {},
   },
 }
 

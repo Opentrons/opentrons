@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link as RRDLink } from 'react-router-dom'
 import {
+  Banner,
   Box,
   Flex,
   LegacyTooltip,
@@ -18,13 +19,12 @@ import {
   JUSTIFY_FLEX_END,
   WRAP,
 } from '@opentrons/components'
-import { TertiaryButton } from '../../../atoms/buttons'
-import { Banner } from '../../../atoms/Banner'
-import * as PipetteConstants from '../../../redux/pipettes/constants'
+import { TertiaryButton } from '/app/atoms/buttons'
+import * as PipetteConstants from '/app/redux/pipettes/constants'
 import { useDeckCalibrationData } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 
-import type { Mount } from '../../../redux/pipettes/types'
+import type { Mount } from '/app/redux/pipettes/types'
 import type { PipetteInfo } from '../hooks'
 
 const inexactPipetteSupportArticle =

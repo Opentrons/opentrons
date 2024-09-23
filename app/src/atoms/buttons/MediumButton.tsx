@@ -5,12 +5,13 @@ import {
   BORDERS,
   Btn,
   COLORS,
+  CURSOR_DEFAULT,
   DIRECTION_ROW,
   DISPLAY_FLEX,
   Icon,
   JUSTIFY_CENTER,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from './constants'
@@ -111,7 +112,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       : BORDERS.borderRadius16};
     box-shadow: none;
     color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
-    cursor: default;
+    cursor: ${CURSOR_DEFAULT};
 
     &:focus {
       background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]

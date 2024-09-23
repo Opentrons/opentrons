@@ -22,8 +22,8 @@ export function LabwareLocationField(
     useGripper: boolean
   } & { canSave: boolean } & { labware: string }
 ): JSX.Element {
-  const { t } = useTranslation('form')
   const { labware, useGripper, value } = props
+  const { t } = useTranslation('form')
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )

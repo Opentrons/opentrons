@@ -40,41 +40,38 @@ import {
   useDeleteRunMutation,
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
-
+import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
+import { useRunCreatedAtTimestamp } from '/app/organisms/Devices/hooks'
+import { onDeviceDisplayFormatTimestamp } from '/app/organisms/Devices/utils'
+import { RunTimer } from '/app/organisms/Devices/ProtocolRun/RunTimer'
 import {
-  useRunTimestamps,
-  useRunControls,
-} from '../../../organisms/RunTimeControl/hooks'
-import {
-  useRunCreatedAtTimestamp,
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
-} from '../../../organisms/Devices/hooks'
-import { useCloseCurrentRun } from '../../../organisms/ProtocolUpload/hooks'
-import { onDeviceDisplayFormatTimestamp } from '../../../organisms/Devices/utils'
-import { EMPTY_TIMESTAMP } from '../../../organisms/Devices/constants'
-import { RunTimer } from '../../../organisms/Devices/ProtocolRun/RunTimer'
+  useRecoveryAnalytics,
+} from '/app/redux-resources/analytics'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_RUN_ACTION,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '../../../redux/analytics'
-import { getLocalRobot } from '../../../redux/discovery'
-import { RunFailedModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
+} from '/app/redux/analytics'
+import { getLocalRobot } from '/app/redux/discovery'
+import { RunFailedModal } from '/app/organisms/ODD/RunningProtocol'
 import {
   formatTimeWithUtcLabel,
   useIsRunCurrent,
   useNotifyRunQuery,
-} from '../../../resources/runs'
+  useRunTimestamps,
+  useCloseCurrentRun,
+  EMPTY_TIMESTAMP,
+} from '/app/resources/runs'
 import {
   useTipAttachmentStatus,
   handleTipsAttachedModal,
-} from '../../../organisms/DropTipWizardFlows'
-import { useRecoveryAnalytics } from '../../../organisms/ErrorRecoveryFlows/hooks'
+} from '/app/organisms/DropTipWizardFlows'
 
 import type { IconName } from '@opentrons/components'
 import type { OnDeviceRouteParams } from '../../../App/types'
-import type { PipetteWithTip } from '../../../organisms/DropTipWizardFlows'
+import type { PipetteWithTip } from '/app/organisms/DropTipWizardFlows'
 
 export function RunSummary(): JSX.Element {
   const { runId } = useParams<

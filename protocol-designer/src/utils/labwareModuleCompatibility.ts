@@ -67,7 +67,9 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
     'armadillo_96_wellplate_200ul_pcr_full_skirt',
     'biorad_96_wellplate_200ul_pcr',
   ],
-  [ABSORBANCE_READER_TYPE]: [],
+  [ABSORBANCE_READER_TYPE]: [
+    'opentrons_flex_lid_absorbance_plate_reader_module',
+  ],
 }
 export const getLabwareIsCompatible = (
   def: LabwareDefinition2,

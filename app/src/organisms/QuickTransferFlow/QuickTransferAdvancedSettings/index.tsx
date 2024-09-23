@@ -20,7 +20,7 @@ import {
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 import { ACTIONS } from '../constants'
-import { useToaster } from '../../../organisms/ToasterOven'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { FlowRateEntry } from './FlowRate'
 import { PipettePath } from './PipettePath'
 import { TipPositionEntry } from './TipPosition'

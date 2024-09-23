@@ -7,7 +7,7 @@ import {
   BUTTON_TYPE_SUBMIT,
   Flex,
 } from '@opentrons/components'
-import { ScrollableAlertModal } from '../../../../../molecules/modals'
+import { ScrollableAlertModal } from '/app/molecules/modals'
 import { TextField } from './TextField'
 import { KeyFileField } from './KeyFileField'
 import { SecurityField } from './SecurityField'

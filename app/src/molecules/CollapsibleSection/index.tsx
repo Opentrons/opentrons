@@ -4,6 +4,7 @@ import { css } from 'styled-components'
 import {
   Btn,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -42,7 +43,7 @@ export function CollapsibleSection(
           setIsExpanded(!isExpanded)
         }}
         css={{
-          cursor: 'pointer',
+          cursor: CURSOR_POINTER,
         }}
       >
         <LegacyStyledText

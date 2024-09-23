@@ -7,6 +7,8 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  CURSOR_DEFAULT,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -29,16 +31,18 @@ import {
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getModalPortalEl } from '../../App/portal'
-import { useRunControls, useRunStatus } from '../RunTimeControl/hooks'
+import { useRunControls } from '../RunTimeControl/hooks'
 import { InterventionModal, useInterventionModal } from '../InterventionModal'
-import { ProgressBar } from '../../atoms/ProgressBar'
-import { useDownloadRunLog, useRobotType } from '../Devices/hooks'
+import { ProgressBar } from '/app/atoms/ProgressBar'
+import { useDownloadRunLog } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
 import {
   useNotifyRunQuery,
   useNotifyAllCommandsQuery,
-} from '../../resources/runs'
-import { useRunningStepCounts } from '../../resources/protocols/hooks'
+  useRunStatus,
+} from '/app/resources/runs'
+import { useRobotType } from '/app/redux-resources/robots'
+import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 import { useRunProgressCopy } from './hooks'
 
 interface RunProgressMeterProps {
@@ -146,7 +150,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
               &:hover {
                 color: ${downloadIsDisabled ? COLORS.grey40 : COLORS.black90};
               }
-              cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
+              cursor: ${downloadIsDisabled ? CURSOR_DEFAULT : CURSOR_POINTER};
             `}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             onClick={onDownloadClick}

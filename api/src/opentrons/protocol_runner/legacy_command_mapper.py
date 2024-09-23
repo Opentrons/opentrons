@@ -34,6 +34,7 @@ from opentrons.protocol_engine.resources import (
     ModuleDataProvider,
     pipette_data_provider,
 )
+from opentrons.protocol_engine.state.update_types import StateUpdate
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors import ErrorCodes, EnumeratedError, PythonException
@@ -267,7 +268,9 @@ class LegacyCommandMapper:
                     )
                 results.append(
                     pe_actions.SucceedCommandAction(
-                        completed_command, private_result=None
+                        completed_command,
+                        private_result=None,
+                        state_update=StateUpdate(),
                     )
                 )
 
@@ -675,6 +678,7 @@ class LegacyCommandMapper:
         succeed_action = pe_actions.SucceedCommandAction(
             command=succeeded_command,
             private_result=None,
+            state_update=StateUpdate(),
         )
 
         self._command_count["LOAD_LABWARE"] = count + 1
@@ -741,6 +745,7 @@ class LegacyCommandMapper:
         succeed_action = pe_actions.SucceedCommandAction(
             command=succeeded_command,
             private_result=pipette_config_result,
+            state_update=StateUpdate(),
         )
 
         self._command_count["LOAD_PIPETTE"] = count + 1
@@ -805,8 +810,7 @@ class LegacyCommandMapper:
             started_at=succeeded_command.startedAt,  # type: ignore[arg-type]
         )
         succeed_action = pe_actions.SucceedCommandAction(
-            command=succeeded_command,
-            private_result=None,
+            command=succeeded_command, private_result=None, state_update=StateUpdate()
         )
 
         self._command_count["LOAD_MODULE"] = count + 1

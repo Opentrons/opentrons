@@ -15,13 +15,14 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  NO_WRAP,
+  OVERFLOW_HIDDEN,
   OVERFLOW_WRAP_ANYWHERE,
   OVERFLOW_WRAP_BREAK_WORD,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
   useLongPress,
-  OVERFLOW_HIDDEN,
 } from '@opentrons/components'
 import {
   useHost,
@@ -30,14 +31,14 @@ import {
 } from '@opentrons/react-api-client'
 import { deleteProtocol } from '@opentrons/api-client'
 
-import { SmallButton } from '../../../atoms/buttons'
-import { OddModal } from '../../../molecules/OddModal'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
 import { LongPressModal } from './LongPressModal'
-import { formatTimeWithUtcLabel } from '../../../resources/runs'
+import { formatTimeWithUtcLabel } from '/app/resources/runs'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
-import type { OddModalHeaderBaseProps } from '../../../molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 const REFETCH_INTERVAL = 5000
 
@@ -221,7 +222,7 @@ export function QuickTransferCard(props: {
           {transferName}
         </LegacyStyledText>
       </Flex>
-      <Flex width="12.5rem" whiteSpace="nowrap">
+      <Flex width="12.5rem" whiteSpace={NO_WRAP}>
         <LegacyStyledText as="p" color={COLORS.grey60}>
           {formatTimeWithUtcLabel(quickTransfer.createdAt)}
         </LegacyStyledText>

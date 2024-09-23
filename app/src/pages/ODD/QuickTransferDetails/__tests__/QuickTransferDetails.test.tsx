@@ -4,18 +4,18 @@ import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import {
   useCreateRunMutation,
   useHost,
   useProtocolQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
-import { i18n } from '../../../../i18n'
-import { useHardwareStatusText } from '../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
-import { useOffsetCandidatesForAnalysis } from '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { useMissingProtocolHardware } from '../../../../pages/Desktop/Protocols/hooks'
-import { formatTimeWithUtcLabel } from '../../../../resources/runs'
+import { i18n } from '/app/i18n'
+import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
+import { useOffsetCandidatesForAnalysis } from '/app/organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { useMissingProtocolHardware } from '/app/transformations/commands'
+import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { DeleteTransferConfirmationModal } from '../../QuickTransferDashboard/DeleteTransferConfirmationModal'
 import { QuickTransferDetails } from '..'
 import { Deck } from '../Deck'
@@ -36,19 +36,19 @@ Object.defineProperty(window, 'IntersectionObserver', {
   configurable: true,
   value: IntersectionObserver,
 })
-vi.mock('../../../../organisms/ProtocolSetupParameters')
+vi.mock('/app/organisms/ODD/ProtocolSetup/ProtocolSetupParameters')
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks')
+vi.mock('/app/organisms/ODD/RobotDashboard/hooks')
 vi.mock(
-  '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+  '/app/organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 )
 vi.mock('../../QuickTransferDashboard/DeleteTransferConfirmationModal')
-vi.mock('../../../../pages/Desktop/Protocols/hooks')
+vi.mock('/app/transformations/commands')
 vi.mock('../Deck')
 vi.mock('../Hardware')
 vi.mock('../Labware')
-vi.mock('../../../../redux/config')
+vi.mock('/app/redux/config')
 
 const MOCK_HOST_CONFIG = {} as HostConfig
 const mockCreateRun = vi.fn((id: string) => {})

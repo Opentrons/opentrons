@@ -5,10 +5,11 @@ import { when } from 'vitest-when'
 import { describe, it, vi, beforeEach, expect, afterEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-import { getShellUpdateState } from '../../../../redux/shell'
-import { useIsFlex, useIsRobotBusy } from '../../hooks'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getShellUpdateState } from '/app/redux/shell'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { useIsRobotBusy } from '../../hooks'
 import {
   DeviceReset,
   DisplayRobotName,
@@ -26,12 +27,13 @@ import {
 } from '../AdvancedTab'
 import { RobotSettingsAdvanced } from '../RobotSettingsAdvanced'
 
-import type { ShellUpdateState } from '../../../../redux/shell/types'
-import type * as ShellUpdate from '../../../../redux/shell/update'
+import type { ShellUpdateState } from '/app/redux/shell/types'
+import type * as ShellUpdate from '/app/redux/shell/update'
 
-vi.mock('../../../../redux/robot-settings/selectors')
-vi.mock('../../../../redux/discovery/selectors')
-vi.mock('../../../../redux/shell/update', async importOriginal => {
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/redux/robot-settings/selectors')
+vi.mock('/app/redux/discovery/selectors')
+vi.mock('/app/redux/shell/update', async importOriginal => {
   const actual = await importOriginal<typeof ShellUpdate>()
   return {
     ...actual,

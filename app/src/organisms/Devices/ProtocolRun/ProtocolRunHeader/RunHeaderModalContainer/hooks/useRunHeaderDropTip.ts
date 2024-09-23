@@ -9,8 +9,7 @@ import {
   useTipAttachmentStatus,
 } from '../../../../../DropTipWizardFlows'
 import { useProtocolDropTipModal } from '../modals'
-import { useCloseCurrentRun } from '../../../../../ProtocolUpload/hooks'
-import { useIsRunCurrent } from '../../../../../../resources/runs'
+import { useCloseCurrentRun, useIsRunCurrent } from '/app/resources/runs'
 import { isTerminalRunStatus } from '../../utils'
 
 import type { RobotType } from '@opentrons/shared-data'
@@ -20,7 +19,7 @@ import type {
   PipetteWithTip,
 } from '../../../../../DropTipWizardFlows'
 import type { UseProtocolDropTipModalResult } from '../modals'
-import type { PipetteDetails } from '../../../../../../resources/maintenance_runs'
+import type { PipetteDetails } from '/app/resources/maintenance_runs'
 
 export type RunHeaderDropTipWizProps =
   | { showDTWiz: true; dtWizProps: DropTipWizardFlowsProps }
@@ -97,6 +96,7 @@ export function useRunHeaderDropTip({
             mount: aPipetteWithTip.mount,
             instrumentModelSpecs: aPipetteWithTip.specs,
             closeFlow: onCloseFlow,
+            modalStyle: 'simple',
           },
         }
       : { showDTWiz: false, dtWizProps: null }

@@ -11,12 +11,13 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
+  DISPLAY_GRID,
   Flex,
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  MODULE_ICON_NAME_BY_TYPE,
   LabwareRender,
+  MODULE_ICON_NAME_BY_TYPE,
   SIZE_AUTO,
   SPACING,
   StyledText,
@@ -36,8 +37,8 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
-import { ToggleButton } from '../../../../atoms/buttons'
-import { Divider } from '../../../../atoms/structure'
+import { ToggleButton } from '/app/atoms/buttons'
+import { Divider } from '/app/atoms/structure'
 import { SecureLabwareModal } from './SecureLabwareModal'
 
 import type {
@@ -50,12 +51,12 @@ import type {
   LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
-import type { LabwareSetupItem } from '../../../../pages/Desktop/Protocols/utils'
+import type { LabwareSetupItem } from '/app/transformations/commands'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import type { NestedLabwareInfo } from './getNestedLabwareInfo'
 
 const LabwareRow = styled.div`
-  display: grid;
+  display: ${DISPLAY_GRID};
   grid-template-columns: 90px 12fr;
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;

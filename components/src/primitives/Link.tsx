@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { styleProps, isntStyleProp } from './style-props'
 
 import type { StyleProps, PrimitiveComponent } from './types'
+import { CURSOR_POINTER } from '../styles'
 
 export interface LinkProps extends StyleProps {
   /** render link with target="_blank" */
@@ -26,6 +27,6 @@ export const Link: PrimitiveComponent<'a', LinkProps> = styled.a
     }
   )`
   text-decoration: none;
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   ${styleProps}
 `

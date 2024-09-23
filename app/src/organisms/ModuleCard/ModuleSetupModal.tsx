@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
-import code from '../../assets/images/module_instruction_code.png'
+import code from '/app/assets/images/module_instruction_code.png'
 import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,

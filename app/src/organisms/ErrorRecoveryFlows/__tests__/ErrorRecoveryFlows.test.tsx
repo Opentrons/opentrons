@@ -9,18 +9,18 @@ import {
   RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { mockFailedCommand } from '../__fixtures__'
 import { ErrorRecoveryFlows, useErrorRecoveryFlows } from '..'
 import {
   useCurrentlyRecoveringFrom,
   useERUtils,
   useShowDoorInfo,
-  useRecoveryAnalytics,
   useRecoveryTakeover,
 } from '../hooks'
-import { getIsOnDevice } from '../../../redux/config'
+import { useRecoveryAnalytics } from '/app/redux-resources/analytics'
+import { getIsOnDevice } from '/app/redux/config'
 import { useERWizard, ErrorRecoveryWizard } from '../ErrorRecoveryWizard'
 import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'
 
@@ -29,8 +29,9 @@ import type { RunStatus } from '@opentrons/api-client'
 vi.mock('../ErrorRecoveryWizard')
 vi.mock('../hooks')
 vi.mock('../useRecoveryCommands')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../RunPausedSplash')
+vi.mock('/app/redux-resources/analytics')
 vi.mock('@opentrons/react-api-client')
 vi.mock('react-redux', async () => {
   const actual = await vi.importActual('react-redux')

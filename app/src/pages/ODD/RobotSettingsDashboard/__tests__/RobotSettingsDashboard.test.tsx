@@ -3,14 +3,14 @@ import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
-import { i18n } from '../../../../i18n'
-import { getRobotSettings } from '../../../../redux/robot-settings'
-import { getLocalRobot } from '../../../../redux/discovery'
-import { toggleDevtools, toggleHistoricOffsets } from '../../../../redux/config'
-import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
-import { Navigation } from '../../../../organisms/Navigation'
+import { i18n } from '/app/i18n'
+import { getRobotSettings } from '/app/redux/robot-settings'
+import { getLocalRobot } from '/app/redux/discovery'
+import { toggleDevtools, toggleHistoricOffsets } from '/app/redux/config'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
+import { Navigation } from '/app/organisms/Navigation'
 import {
   DeviceReset,
   TouchScreenSleep,
@@ -19,27 +19,27 @@ import {
   Privacy,
   RobotSystemVersion,
   UpdateChannel,
-} from '../../../../organisms/RobotSettingsDashboard'
-import { getRobotUpdateAvailable } from '../../../../redux/robot-update'
-import { useNetworkConnection } from '../../../../resources/networking/hooks/useNetworkConnection'
-import { useLEDLights } from '../../../../organisms/Devices/hooks'
+} from '/app/organisms/ODD/RobotSettingsDashboard'
+import { getRobotUpdateAvailable } from '/app/redux/robot-update'
+import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
+import { useLEDLights } from '/app/organisms/Devices/hooks'
 
 import { RobotSettingsDashboard } from '../'
 
-vi.mock('../../../../redux/discovery')
-vi.mock('../../../../redux/robot-update')
-vi.mock('../../../../redux/config')
-vi.mock('../../../../redux/robot-settings')
-vi.mock('../../../../resources/networking/hooks/useNetworkConnection')
-vi.mock('../../../../organisms/Navigation')
-vi.mock('../../../../organisms/RobotSettingsDashboard/TouchScreenSleep')
-vi.mock('../../../../organisms/RobotSettingsDashboard/NetworkSettings')
-vi.mock('../../../../organisms/RobotSettingsDashboard/DeviceReset')
-vi.mock('../../../../organisms/RobotSettingsDashboard/RobotSystemVersion')
-vi.mock('../../../../organisms/RobotSettingsDashboard/TouchscreenBrightness')
-vi.mock('../../../../organisms/RobotSettingsDashboard/UpdateChannel')
-vi.mock('../../../../organisms/Devices/hooks')
-vi.mock('../../../../organisms/RobotSettingsDashboard/Privacy')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/robot-settings')
+vi.mock('/app/resources/networking/hooks/useNetworkConnection')
+vi.mock('/app/organisms/Navigation')
+vi.mock('/app/organisms/ODD/RobotSettingsDashboard/TouchScreenSleep')
+vi.mock('/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings')
+vi.mock('/app/organisms/ODD/RobotSettingsDashboard/DeviceReset')
+vi.mock('/app/organisms/ODD/RobotSettingsDashboard/RobotSystemVersion')
+vi.mock('/app/organisms/ODD/RobotSettingsDashboard/TouchscreenBrightness')
+vi.mock('/app/organisms/ODD/RobotSettingsDashboard/UpdateChannel')
+vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/organisms/ODD/RobotSettingsDashboard/Privacy')
 
 const mockToggleLights = vi.fn()
 

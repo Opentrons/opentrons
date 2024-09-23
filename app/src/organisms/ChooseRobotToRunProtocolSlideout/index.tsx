@@ -21,22 +21,22 @@ import {
   ApiHostProvider,
 } from '@opentrons/react-api-client'
 
-import { useIsRobotOnWrongVersionOfSoftware } from '../../redux/robot-update'
-import { OPENTRONS_USB } from '../../redux/discovery'
-import { appShellRequestor } from '../../redux/shell/remote'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { OPENTRONS_USB } from '/app/redux/discovery'
+import { appShellRequestor } from '/app/redux/shell/remote'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
-} from '../Devices/utils'
+} from '/app/transformations/runs'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
 import type { StyleProps } from '@opentrons/components'
 import type { RunTimeParameter } from '@opentrons/shared-data'
-import type { Robot } from '../../redux/discovery/types'
-import type { StoredProtocolData } from '../../redux/protocol-storage'
+import type { Robot } from '/app/redux/discovery/types'
+import type { StoredProtocolData } from '/app/redux/protocol-storage'
 
 const _getFileBaseName = (filePath: string): string => {
   return filePath.split('/').reverse()[0]
@@ -275,7 +275,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
                 <Flex
                   gridGap={SPACING.spacing4}
                   alignItems={ALIGN_CENTER}
-                  whiteSpace="nowrap"
+                  whiteSpace={NO_WRAP}
                   marginLeft={`-${SPACING.spacing4}`}
                 >
                   <Icon name="ot-spinner" spin size="1rem" />

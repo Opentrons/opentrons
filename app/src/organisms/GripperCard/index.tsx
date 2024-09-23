@@ -1,11 +1,16 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { SPACING, TYPOGRAPHY, LegacyStyledText } from '@opentrons/components'
+import {
+  Banner,
+  CURSOR_POINTER,
+  LegacyStyledText,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import { getGripperDisplayName } from '@opentrons/shared-data'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
-import { Banner } from '../../atoms/Banner'
-import { InstrumentCard } from '../../molecules/InstrumentCard'
+import { InstrumentCard } from '/app/molecules/InstrumentCard'
 import { GripperWizardFlows } from '../GripperWizardFlows'
 import { AboutGripperSlideout } from './AboutGripperSlideout'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
@@ -22,7 +27,7 @@ interface GripperCardProps {
 }
 const BANNER_LINK_CSS = css`
   text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   margin-left: ${SPACING.spacing8};
 `
 

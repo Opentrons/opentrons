@@ -6,8 +6,10 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
+  JUSTIFY_CENTER,
   LargeButton,
   SPACING,
   StyledText,
@@ -18,6 +20,7 @@ import { actions as loadFileActions } from '../../load-file'
 import { getFileMetadata } from '../../file-data/selectors'
 import { toggleNewProtocolModal } from '../../navigation/actions'
 import welcomeImage from '../../assets/images/welcome_page.png'
+
 import type { ThunkDispatch } from '../../types'
 
 export function Landing(): JSX.Element {
@@ -44,32 +47,40 @@ export function Landing(): JSX.Element {
       backgroundColor={COLORS.grey20}
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
-      paddingTop="14.875rem"
-      height="calc(100vh - 48px)"
+      justifyContent={JUSTIFY_CENTER}
+      height="calc(100vh - 3.5rem)"
       width="100%"
+      gridGap={SPACING.spacing32}
     >
-      <img
-        src={welcomeImage}
-        height="132px"
-        width="548px"
-        aria-label="welcome image"
-      />
-      <StyledText desktopStyle="headingLargeBold" marginY={SPACING.spacing16}>
-        {t('welcome')}
-      </StyledText>
-      <StyledText
-        desktopStyle="headingSmallRegular"
-        color={COLORS.grey60}
-        maxWidth="34.25rem"
-        textAlign={TYPOGRAPHY.textAlignCenter}
-      >
-        {t('no-code-required')}
-      </StyledText>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+        <img
+          src={welcomeImage}
+          height="132px"
+          width="548px"
+          aria-label="welcome image"
+        />
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing8}
+          alignItems={ALIGN_CENTER}
+        >
+          <StyledText desktopStyle="headingLargeBold">
+            {t('welcome')}
+          </StyledText>
+          <StyledText
+            desktopStyle="headingSmallRegular"
+            color={COLORS.grey60}
+            maxWidth="34.25rem"
+            textAlign={TYPOGRAPHY.textAlignCenter}
+          >
+            {t('no-code-required')}
+          </StyledText>
+        </Flex>
+      </Flex>
       <LargeButton
         onClick={() => {
           dispatch(toggleNewProtocolModal(true))
         }}
-        marginY={SPACING.spacing32}
         buttonText={
           <StyledNavLink to={'/createNew'}>
             <StyledText desktopStyle="bodyLargeRegular">
@@ -78,7 +89,6 @@ export function Landing(): JSX.Element {
           </StyledNavLink>
         }
       />
-
       <StyledLabel>
         <Flex css={BUTTON_LINK_STYLE}>
           <StyledText desktopStyle="bodyLargeRegular">
@@ -93,7 +103,7 @@ export function Landing(): JSX.Element {
 
 const StyledLabel = styled.label`
   display: inline-block;
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   input[type='file'] {
     display: none;
   }

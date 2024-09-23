@@ -6,7 +6,7 @@ import {
 } from '../constants'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { LabwareFilter } from '../../../pages/Desktop/Labware/types'
+import type { LabwareFilter } from '/app/local-resources/labware'
 
 export function getCompatibleLabwareByCategory(
   pipetteChannels: 1 | 8 | 96,

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, renderHook, screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { NumericalKeyboard } from '..'
 
 const render = (props: React.ComponentProps<typeof NumericalKeyboard>) => {

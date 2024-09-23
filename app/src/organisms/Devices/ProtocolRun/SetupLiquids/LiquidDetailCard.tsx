@@ -6,24 +6,25 @@ import {
   BORDERS,
   Box,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
-import { Divider } from '../../../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import {
   useTrackEvent,
   ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,
-} from '../../../../redux/analytics'
-import { getIsOnDevice } from '../../../../redux/config'
+} from '/app/redux/analytics'
+import { getIsOnDevice } from '/app/redux/config'
 import { getWellRangeForLiquidLabwarePair } from './utils'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
@@ -41,7 +42,7 @@ const LIQUID_CARD_STYLE = css`
   &:hover {
     border: 1px solid ${COLORS.grey60};
     border-radius: ${BORDERS.borderRadius8};
-    cursor: pointer;
+    cursor: ${CURSOR_POINTER};
   }
 `
 const LIQUID_CARD_ODD_STYLE = css`

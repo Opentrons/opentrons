@@ -3,15 +3,15 @@ import { when } from 'vitest-when'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen, fireEvent } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 
-import { getConfig, toggleConfigValue } from '../../../redux/config'
+import { getConfig, toggleConfigValue } from '/app/redux/config'
 import { PreventRobotCaching } from '../PreventRobotCaching'
 
-import type { State } from '../../../redux/types'
+import type { State } from '/app/redux/types'
 
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 
 const MOCK_STATE: State = {
   config: {

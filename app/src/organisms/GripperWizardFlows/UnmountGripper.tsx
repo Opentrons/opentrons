@@ -16,14 +16,14 @@ import {
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
-import { getIsOnDevice } from '../../redux/config'
-import { SmallButton } from '../../atoms/buttons'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { getIsOnDevice } from '/app/redux/config'
+import { SmallButton } from '/app/atoms/buttons'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '../../molecules/SimpleWizardBody'
-import unmountGripper from '../../assets/videos/gripper-wizards/UNMOUNT_GRIPPER.webm'
+} from '/app/molecules/SimpleWizardBody'
+import unmountGripper from '/app/assets/videos/gripper-wizards/UNMOUNT_GRIPPER.webm'
 
 import type { GripperWizardStepProps } from './types'
 import type { GripperData } from '@opentrons/api-client'

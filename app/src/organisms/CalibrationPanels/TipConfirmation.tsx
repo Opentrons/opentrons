@@ -11,14 +11,14 @@ import {
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 
-import * as Sessions from '../../redux/sessions'
+import * as Sessions from '/app/redux/sessions'
 import { NeedHelpLink } from './NeedHelpLink'
 
 import type { CalibrationPanelProps } from './types'
 import type {
   SessionType,
   SessionCommandString,
-} from '../../redux/sessions/types'
+} from '/app/redux/sessions/types'
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {

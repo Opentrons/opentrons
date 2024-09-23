@@ -20,7 +20,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { startDiscovery } from '../../redux/discovery'
+import { startDiscovery } from '/app/redux/discovery'
 
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'

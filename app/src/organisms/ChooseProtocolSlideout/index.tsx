@@ -10,9 +10,13 @@ import {
   BORDERS,
   Box,
   COLORS,
+  CURSOR_AUTO,
+  CURSOR_DEFAULT,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_BLOCK,
+  DISPLAY_GRID,
   DropdownMenu,
   Flex,
   Icon,
@@ -40,13 +44,13 @@ import {
 import { sortRuntimeParameters } from '@opentrons/shared-data'
 
 import { useLogger } from '../../logger'
-import { OPENTRONS_USB } from '../../redux/discovery'
-import { getStoredProtocols } from '../../redux/protocol-storage'
-import { appShellRequestor } from '../../redux/shell/remote'
-import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
-import { ToggleButton } from '../../atoms/buttons'
-import { MiniCard } from '../../molecules/MiniCard'
-import { UploadInput } from '../../molecules/UploadInput'
+import { OPENTRONS_USB } from '/app/redux/discovery'
+import { getStoredProtocols } from '/app/redux/protocol-storage'
+import { appShellRequestor } from '/app/redux/shell/remote'
+import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
+import { ToggleButton } from '/app/atoms/buttons'
+import { MiniCard } from '/app/molecules/MiniCard'
+import { UploadInput } from '/app/molecules/UploadInput'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
@@ -55,14 +59,14 @@ import { FileCard } from '../ChooseRobotSlideout/FileCard'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
-} from '../Devices/utils'
+} from '/app/transformations/runs'
 import { getAnalysisStatus } from '../ProtocolsLanding/utils'
 
 import type { DropdownOption } from '@opentrons/components'
 import type { RunTimeParameter } from '@opentrons/shared-data'
-import type { Robot } from '../../redux/discovery/types'
-import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { State } from '../../redux/types'
+import type { Robot } from '/app/redux/discovery/types'
+import type { StoredProtocolData } from '/app/redux/protocol-storage'
+import type { State } from '/app/redux/types'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
@@ -549,7 +553,7 @@ export function ChooseProtocolSlideoutComponent(
           }}
           css={css`
             &:hover {
-              cursor: auto;
+              cursor: ${CURSOR_AUTO};
             }
           `}
         >
@@ -611,7 +615,7 @@ export function ChooseProtocolSlideoutComponent(
             <Flex
               gridGap={SPACING.spacing4}
               alignItems={ALIGN_CENTER}
-              whiteSpace="nowrap"
+              whiteSpace={NO_WRAP}
               marginLeft={`-${SPACING.spacing4}`}
             >
               <Icon name="ot-spinner" spin size="1rem" />
@@ -751,7 +755,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 }}
               >
                 <Box
-                  display="grid"
+                  display={DISPLAY_GRID}
                   gridTemplateColumns="1fr 3fr"
                   marginRight={SPACING.spacing16}
                 >
@@ -926,13 +930,13 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
 
 const ENABLED_LINK_CSS = css`
   ${TYPOGRAPHY.linkPSemiBold}
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
 `
 
 const DISABLED_LINK_CSS = css`
   ${TYPOGRAPHY.linkPSemiBold}
   color: ${COLORS.grey40};
-  cursor: default;
+  cursor: ${CURSOR_DEFAULT};
 
   &:hover {
     color: ${COLORS.grey40};

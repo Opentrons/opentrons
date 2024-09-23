@@ -4,12 +4,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import {
   mockTemperatureModule,
   mockTemperatureModuleGen2,
-} from '../../../redux/modules/__fixtures__'
+} from '/app/redux/modules/__fixtures__'
 import { TemperatureModuleSlideout } from '../TemperatureModuleSlideout'
 
 vi.mock('@opentrons/react-api-client')

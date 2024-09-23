@@ -63,6 +63,7 @@ export default defineConfig({
       '@opentrons/step-generation': path.resolve(
         './step-generation/src/index.ts'
       ),
+      '/app/': path.resolve('./app/src/') + '/',
     },
   },
 })

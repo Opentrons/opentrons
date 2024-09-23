@@ -7,8 +7,8 @@ import {
   SecondaryButton,
   AlertPrimaryButton,
 } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { SmallButton } from '/app/atoms/buttons'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
 interface UnskippableModalProps {
   goBack: () => void

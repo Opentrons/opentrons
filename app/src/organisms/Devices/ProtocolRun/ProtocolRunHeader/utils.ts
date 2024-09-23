@@ -13,10 +13,10 @@ import {
   RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
 
-import { getRobotSerialNumber } from '../../../../redux/discovery'
+import { getRobotSerialNumber } from '/app/redux/discovery'
 
 import type { RunStatus } from '@opentrons/api-client'
-import type { DiscoveredRobot } from '../../../../redux/discovery/types'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
 
 const START_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_IDLE,

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
-import { StyledText } from '@opentrons/components'
+import { CURSOR_POINTER, StyledText } from '@opentrons/components'
 
 import { RecoveryError } from './RecoveryError'
 import { RecoveryDoorOpen } from './RecoveryDoorOpen'
@@ -28,13 +28,10 @@ import { getErrorKind } from './utils'
 import { RECOVERY_MAP } from './constants'
 
 import type { RobotType } from '@opentrons/shared-data'
-import type { RecoveryContentProps } from './types'
-import type {
-  ERUtilsResults,
-  UseRecoveryAnalyticsResult,
-  useRetainedFailedCommandBySource,
-} from './hooks'
+import type { RecoveryRoute, RouteStep, RecoveryContentProps } from './types'
+import type { ERUtilsResults, useRetainedFailedCommandBySource } from './hooks'
 import type { ErrorRecoveryFlowsProps } from '.'
+import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 
 export interface UseERWizardResult {
   hasLaunchedRecovery: boolean
@@ -68,7 +65,7 @@ export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps &
     robotType: RobotType
     isOnDevice: boolean
     isDoorOpen: boolean
-    analytics: UseRecoveryAnalyticsResult
+    analytics: UseRecoveryAnalyticsResult<RecoveryRoute, RouteStep>
     failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
   }
 
@@ -129,7 +126,7 @@ export function ErrorRecoveryComponent(
       oddStyle="bodyTextSemiBold"
       desktopStyle="bodyDefaultSemiBold"
       css={css`
-        cursor: pointer;
+        cursor: ${CURSOR_POINTER};
       `}
     >
       {t('view_error_details')}

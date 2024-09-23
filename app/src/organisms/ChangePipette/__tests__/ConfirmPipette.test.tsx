@@ -2,10 +2,10 @@ import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { vi, it, describe, expect } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { LEFT } from '@opentrons/shared-data'
-import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
+import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
 import { CheckPipettesButton } from '../CheckPipettesButton'
 import { ConfirmPipette } from '../ConfirmPipette'
 
@@ -13,7 +13,7 @@ import type {
   PipetteModelSpecs,
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
-import type { PipetteOffsetCalibration } from '../../../redux/calibration/types'
+import type { PipetteOffsetCalibration } from '/app/redux/calibration/types'
 import type { LevelingVideo } from '../LevelPipette'
 
 vi.mock('../CheckPipettesButton')

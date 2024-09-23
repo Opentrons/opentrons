@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   SPACING,
   TYPOGRAPHY,
+  Banner,
   JUSTIFY_SPACE_BETWEEN,
   Flex,
   StyledText,
@@ -11,11 +12,11 @@ import {
   ALIGN_CENTER,
 } from '@opentrons/components'
 import { RUN_STATUS_STOPPED, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
-
-import { Banner } from '../../../../../atoms/Banner'
-import { useCloseCurrentRun } from '../../../../ProtocolUpload/hooks'
-import { useIsRunCurrent } from '../../../../../resources/runs'
-import { useMostRecentRunId } from '../../../../ProtocolUpload/hooks/useMostRecentRunId'
+import {
+  useCloseCurrentRun,
+  useIsRunCurrent,
+  useMostRecentRunId,
+} from '/app/resources/runs'
 
 import type { RunHeaderBannerContainerProps } from '.'
 

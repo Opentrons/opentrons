@@ -16,11 +16,11 @@ import {
   StyledText,
   Modal,
 } from '@opentrons/components'
-import { OddModal } from '../../../../molecules/OddModal'
-import { getIsOnDevice } from '../../../../redux/config'
+import { OddModal } from '/app/molecules/OddModal'
+import { getIsOnDevice } from '/app/redux/config'
 import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
-import { Divider } from '../../../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import { getModuleImage } from '../SetupModuleAndDeck/utils'
 import {
   FLEX_ROBOT_TYPE,
@@ -30,7 +30,7 @@ import {
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import tiprackAdapter from '../../../../assets/images/labware/opentrons_flex_96_tiprack_adapter.png'
+import tiprackAdapter from '/app/assets/images/labware/opentrons_flex_96_tiprack_adapter.png'
 
 import type { RobotType, RunTimeCommand } from '@opentrons/shared-data'
 

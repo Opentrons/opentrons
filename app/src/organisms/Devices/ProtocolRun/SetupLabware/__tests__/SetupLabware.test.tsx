@@ -4,12 +4,12 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 import { when } from 'vitest-when'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
 import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
 import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
-import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../../redux/config'
+import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import {
   useLPCDisabledReason,
   useRunCalibrationStatus,
@@ -19,17 +19,18 @@ import {
 import { SetupLabwareList } from '../SetupLabwareList'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 import { SetupLabware } from '..'
-import { useNotifyRunQuery } from '../../../../../resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
 vi.mock('../SetupLabwareList')
 vi.mock('../SetupLabwareMap')
 vi.mock('../../../../LabwarePositionCheck')
 vi.mock('../../utils/getModuleTypesThatRequireExtraAttention')
 vi.mock('../../../../RunTimeControl/hooks')
-vi.mock('../../../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../../../hooks')
 vi.mock('../../../hooks/useLPCSuccessToast')
-vi.mock('../../../../../resources/runs')
+vi.mock('/app/resources/runs')
+vi.mock('/app/redux-resources/robots')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'

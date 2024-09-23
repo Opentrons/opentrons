@@ -2,13 +2,13 @@ import { when } from 'vitest-when'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { SECURITY_WPA_EAP } from '@opentrons/api-client'
 import { useWifiQuery } from '@opentrons/react-api-client'
-import { useRobot } from '../../../organisms/Devices/hooks'
+import { useRobot } from '/app/redux-resources/robots'
 import { useWifiList } from '../hooks'
 import type { UseQueryResult } from 'react-query'
 import type { WifiNetwork, WifiListResponse } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../organisms/Devices/hooks')
+vi.mock('/app/redux-resources/robots')
 
 const mockWifiNetwork: WifiNetwork = {
   ssid: 'linksys',

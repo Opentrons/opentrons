@@ -8,6 +8,7 @@ from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
 from pydantic import Field
 
 from ..types import DeckPoint
+from ..state.update_types import StateUpdate
 from .pipetting_common import (
     PipetteIdMixin,
     DispenseVolumeMixin,
@@ -16,7 +17,6 @@ from .pipetting_common import (
     BaseLiquidHandlingResult,
     DestinationPositionResult,
     OverpressureError,
-    OverpressureErrorInternalData,
 )
 from .command import (
     AbstractCommandImpl,
@@ -54,7 +54,7 @@ class DispenseResult(BaseLiquidHandlingResult, DestinationPositionResult):
 
 _ExecuteReturn = Union[
     SuccessData[DispenseResult, None],
-    DefinedErrorData[OverpressureError, OverpressureErrorInternalData],
+    DefinedErrorData[OverpressureError],
 ]
 
 
@@ -74,12 +74,22 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
 
     async def execute(self, params: DispenseParams) -> _ExecuteReturn:
         """Move to and dispense to the requested well."""
+        state_update = StateUpdate()
+
         position = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.wellLocation,
         )
+        deck_point = DeckPoint.construct(x=position.x, y=position.y, z=position.z)
+        state_update.set_pipette_location(
+            pipette_id=params.pipetteId,
+            new_labware_id=params.labwareId,
+            new_well_name=params.wellName,
+            new_deck_point=deck_point,
+        )
+
         try:
             volume = await self._pipetting.dispense_in_place(
                 pipette_id=params.pipetteId,
@@ -101,19 +111,13 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
                     ],
                     errorInfo={"retryLocation": (position.x, position.y, position.z)},
                 ),
-                private=OverpressureErrorInternalData(
-                    position=DeckPoint.construct(
-                        x=position.x, y=position.y, z=position.z
-                    )
-                ),
+                state_update=state_update,
             )
         else:
             return SuccessData(
-                public=DispenseResult(
-                    volume=volume,
-                    position=DeckPoint(x=position.x, y=position.y, z=position.z),
-                ),
+                public=DispenseResult(volume=volume, position=deck_point),
                 private=None,
+                state_update=state_update,
             )
 
 

@@ -11,6 +11,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   MenuItem,
+  NO_WRAP,
   OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
@@ -21,21 +22,21 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
-import { Divider } from '../../atoms/structure'
-import { ChooseProtocolSlideout } from '../../organisms/ChooseProtocolSlideout'
-import { DisconnectModal } from '../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
-import { handleUpdateBuildroot } from '../../organisms/Devices/RobotSettings/UpdateBuildroot'
-import { useIsRobotOnWrongVersionOfSoftware } from '../../redux/robot-update'
-import { UNREACHABLE, CONNECTABLE, REACHABLE } from '../../redux/discovery'
-import { checkShellUpdate } from '../../redux/shell'
-import { restartRobot } from '../../redux/robot-admin'
-import { home, ROBOT } from '../../redux/robot-controls'
+import { Divider } from '/app/atoms/structure'
+import { ChooseProtocolSlideout } from '/app/organisms/ChooseProtocolSlideout'
+import { DisconnectModal } from '/app/organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
+import { handleUpdateBuildroot } from '/app/organisms/Devices/RobotSettings/UpdateBuildroot'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { UNREACHABLE, CONNECTABLE, REACHABLE } from '/app/redux/discovery'
+import { checkShellUpdate } from '/app/redux/shell'
+import { restartRobot } from '/app/redux/robot-admin'
+import { home, ROBOT } from '/app/redux/robot-controls'
 import { useIsRobotBusy } from './hooks'
-import { useCanDisconnect } from '../../resources/networking/hooks'
-import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
-import { useCurrentRunId } from '../../resources/runs'
-import type { DiscoveredRobot } from '../../redux/discovery/types'
-import type { Dispatch } from '../../redux/types'
+import { useCanDisconnect } from '/app/resources/networking/hooks'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useCurrentRunId } from '/app/resources/runs'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
+import type { Dispatch } from '/app/redux/types'
 
 interface RobotOverviewOverflowMenuProps {
   robot: DiscoveredRobot
@@ -115,7 +116,7 @@ export const RobotOverviewOverflowMenu = (
       <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
       {showOverflowMenu ? (
         <Flex
-          whiteSpace="nowrap"
+          whiteSpace={NO_WRAP}
           zIndex={10}
           borderRadius={BORDERS.borderRadius8}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"

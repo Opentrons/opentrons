@@ -12,6 +12,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   MenuItem,
+  NO_WRAP,
   OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
@@ -25,18 +26,18 @@ import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_DELETE_PROTOCOL_FROM_APP,
-} from '../../redux/analytics'
-import { useFeatureFlag } from '../../redux/config'
+} from '/app/redux/analytics'
+import { useFeatureFlag } from '/app/redux/config'
 import {
   analyzeProtocol,
   removeProtocol,
   viewProtocolSourceFolder,
-} from '../../redux/protocol-storage'
+} from '/app/redux/protocol-storage'
 import { ConfirmDeleteProtocolModal } from './ConfirmDeleteProtocolModal'
 
 import type { StyleProps } from '@opentrons/components'
-import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { Dispatch } from '../../redux/types'
+import type { StoredProtocolData } from '/app/redux/protocol-storage'
+import type { Dispatch } from '/app/redux/types'
 
 interface ProtocolOverflowMenuProps extends StyleProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
@@ -131,7 +132,7 @@ export function ProtocolOverflowMenu(
       />
       {showOverflowMenu ? (
         <Flex
-          whiteSpace="nowrap"
+          whiteSpace={NO_WRAP}
           zIndex={10}
           borderRadius={BORDERS.borderRadius8}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"

@@ -2,8 +2,8 @@ import React from 'react'
 import { describe, it, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { EmptySetupStep } from '../EmptySetupStep'
 
 const render = (props: React.ComponentProps<typeof EmptySetupStep>) => {

@@ -5,28 +5,23 @@ import { useTranslation } from 'react-i18next'
 import { ModalShell } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../../../App/portal'
-import { WizardHeader } from '../../../../../molecules/WizardHeader'
-import { CalibrateDeck } from '../../../../../organisms/CalibrateDeck'
-import { LoadingState } from '../../../../../organisms/CalibrationPanels'
-import * as RobotApi from '../../../../../redux/robot-api'
-import * as Sessions from '../../../../../redux/sessions'
-import { getDeckCalibrationSession } from '../../../../../redux/sessions/deck-calibration/selectors'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { CalibrateDeck } from '/app/organisms/CalibrateDeck'
+import { LoadingState } from '/app/organisms/CalibrationPanels'
+import * as RobotApi from '/app/redux/robot-api'
+import * as Sessions from '/app/redux/sessions'
+import { getDeckCalibrationSession } from '/app/redux/sessions/deck-calibration/selectors'
 
-import type { State } from '../../../../../redux/types'
-import type { DeckCalibrationSession } from '../../../../../redux/sessions'
-import type { SessionCommandString } from '../../../../../redux/sessions/types'
-import type { RequestState } from '../../../../../redux/robot-api/types'
+import type { State } from '/app/redux/types'
+import type { DashboardCalDeckInvoker } from '/app/organisms/Devices/hooks/useCalibrationTaskList'
+import type { DeckCalibrationSession } from '/app/redux/sessions'
+import type { SessionCommandString } from '/app/redux/sessions/types'
+import type { RequestState } from '/app/redux/robot-api/types'
 
 // deck calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
-export interface DashboardCalDeckInvokerProps {
-  invalidateHandler?: () => void
-}
-export type DashboardCalDeckInvoker = (
-  props?: DashboardCalDeckInvokerProps
-) => void
 
 export function useDashboardCalibrateDeck(
   robotName: string

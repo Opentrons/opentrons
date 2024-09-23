@@ -11,12 +11,12 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons'
-import { OddModal } from '../../molecules/OddModal'
-import { usePipetteModelSpecs } from '../../resources/instruments/hooks'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+import { usePipetteModelSpecs } from '/app/resources/instruments/hooks'
 
 import type { InstrumentData, PipetteData } from '@opentrons/api-client'
-import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface UpdateResultsModalProps {
   isSuccess: boolean

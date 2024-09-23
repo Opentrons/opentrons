@@ -5,17 +5,17 @@ import {
   Btn,
   DIRECTION_COLUMN,
   Flex,
+  Banner,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Banner } from '../../atoms/Banner'
-import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
+import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { handleUpdateBuildroot } from '../Devices/RobotSettings/UpdateBuildroot'
 
 import type { StyleProps } from '@opentrons/components'
-import type { State } from '../../redux/types'
-import type { DiscoveredRobot } from '../../redux/discovery/types'
+import type { State } from '/app/redux/types'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
 
 interface UpdateRobotBannerProps extends StyleProps {
   robot: DiscoveredRobot

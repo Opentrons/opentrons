@@ -184,15 +184,14 @@ function DropTipFlowsContainer(
   const fixitCommandTypeUtils = useDropTipFlowUtils(props)
 
   return (
-    <RecoverySingleColumnContentWrapper>
-      <DropTipWizardFlows
-        robotType={robotType}
-        closeFlow={onCloseFlow}
-        mount={mount}
-        instrumentModelSpecs={specs}
-        fixitCommandTypeUtils={fixitCommandTypeUtils}
-      />
-    </RecoverySingleColumnContentWrapper>
+    <DropTipWizardFlows
+      robotType={robotType}
+      closeFlow={onCloseFlow}
+      mount={mount}
+      instrumentModelSpecs={specs}
+      fixitCommandTypeUtils={fixitCommandTypeUtils}
+      modalStyle="intervention"
+    />
   )
 }
 
@@ -204,7 +203,6 @@ export function useDropTipFlowUtils({
   subMapUtils,
   routeUpdateActions,
   recoveryMap,
-  failedPipetteInfo,
 }: RecoveryContentProps): FixitCommandTypeUtils {
   const { t } = useTranslation('error_recovery')
   const {

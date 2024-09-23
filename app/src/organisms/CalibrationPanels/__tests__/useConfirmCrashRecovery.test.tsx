@@ -5,15 +5,15 @@ import { vi, it, describe, expect } from 'vitest'
 
 import { LEFT } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { useConfirmCrashRecovery } from '../useConfirmCrashRecovery'
-import { mockCalibrationCheckLabware } from '../../../redux/sessions/__fixtures__'
+import { mockCalibrationCheckLabware } from '/app/redux/sessions/__fixtures__'
 import {
   DECK_STEP_JOGGING_TO_DECK,
   SESSION_TYPE_DECK_CALIBRATION,
   sharedCalCommands,
-} from '../../../redux/sessions'
+} from '/app/redux/sessions'
 
 describe('useConfirmCrashRecovery', () => {
   const mockSendCommands = vi.fn()

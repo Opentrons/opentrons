@@ -52,6 +52,7 @@ const MODAL_STYLE = css`
   justify-content: ${JUSTIFY_CENTER};
   padding: ${SPACING.spacing32};
   height: 24.625rem;
+  width: 100%;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     max-height: 29.5rem;
     height: 100%;
