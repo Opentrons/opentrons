@@ -440,7 +440,11 @@ def _load_pipette(
     if pipette_mount in loaded_pipettes.keys():
         return loaded_pipettes[pipette_mount]
 
-    trash = ctx.load_labware("opentrons_1_trash_3200ml_fixed", "A3")
+    try:
+        trash = ctx.load_labware("opentrons_1_trash_3200ml_fixed", "A3")
+    except Exception:
+        # TODO: handle actual error for when trash is already configured for A3
+        trash = ctx.fixed_trash
     pipette = ctx.load_instrument(pip_name, pipette_mount)
     loaded_pipettes = ctx.loaded_instruments
     assert pipette.max_volume == pipette_volume, (
