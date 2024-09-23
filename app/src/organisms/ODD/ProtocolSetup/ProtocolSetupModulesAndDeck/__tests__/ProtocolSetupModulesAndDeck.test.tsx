@@ -20,7 +20,7 @@ import {
   useRunCalibrationStatus,
 } from '../../../../Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getProtocolModulesInfo } from '../../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import { mockApiHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { mockProtocolModuleInfo } from '../../ProtocolSetupInstruments/__fixtures__'
 import { getLocalRobot } from '/app/redux/discovery'
@@ -45,7 +45,7 @@ vi.mock('/app/redux/discovery')
 vi.mock('/app/organisms/Devices/hooks')
 vi.mock('/app/resources/deck_configuration')
 vi.mock('/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('/app/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
+vi.mock('/app/transformations/analysis')
 vi.mock('../utils')
 vi.mock('../SetupInstructionsModal')
 vi.mock('../../../../ModuleWizardFlows')

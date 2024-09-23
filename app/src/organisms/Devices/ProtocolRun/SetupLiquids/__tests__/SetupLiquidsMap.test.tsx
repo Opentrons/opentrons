@@ -26,7 +26,7 @@ import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
 import { getLabwareRenderInfo } from '../../utils/getLabwareRenderInfo'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 import { getAttachedProtocolModuleMatches } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
-import { getProtocolModulesInfo } from '../../utils/getProtocolModulesInfo'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import { mockProtocolModuleInfo } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupLabware/__fixtures__'
 import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
 
@@ -53,7 +53,7 @@ vi.mock('../../../hooks')
 vi.mock('../utils')
 vi.mock('../../utils/getLabwareRenderInfo')
 vi.mock('../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils')
-vi.mock('../../utils/getProtocolModulesInfo')
+vi.mock('/app/transformations/analysis')
 vi.mock('/app/resources/deck_configuration/utils')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getSimplestDeckConfigForProtocol>()

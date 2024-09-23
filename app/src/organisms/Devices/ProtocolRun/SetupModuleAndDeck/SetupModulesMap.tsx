@@ -17,7 +17,7 @@ import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCh
 import { getAttachedProtocolModuleMatches } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
 import { ModuleInfo } from '../../ModuleInfo'
 import { useAttachedModules } from '../../hooks'
-import { getProtocolModulesInfo } from '../utils/getProtocolModulesInfo'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'

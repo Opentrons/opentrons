@@ -36,7 +36,7 @@ import { useRobotType } from '/app/redux-resources/robots'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
-import { getProtocolModulesInfo } from '/app/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import {
   ProtocolSetupLabware,
   ProtocolSetupLiquids,
@@ -112,7 +112,7 @@ vi.mock('/app/organisms/ODD/ProtocolSetup', async importOriginal => {
   )
 })
 vi.mock('/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('/app/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
+vi.mock('/app/transformations/analysis')
 vi.mock('/app/organisms/ODD/RunningProtocol')
 vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/organisms/ModuleCard/hooks')

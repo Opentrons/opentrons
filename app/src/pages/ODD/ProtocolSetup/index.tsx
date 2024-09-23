@@ -45,7 +45,7 @@ import {
   useTrackProtocolRunEvent,
 } from '/app/redux-resources/analytics'
 
-import { getProtocolModulesInfo } from '/app/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import {
   AnalysisFailedModal,
   ProtocolSetupDeckConfiguration,
@@ -84,7 +84,7 @@ import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
 import type { Run } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../../App/types'
-import type { ProtocolModuleInfo } from '/app/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 import type { SetupScreens } from '/app/organisms/ODD/ProtocolSetup'
 import type {
   ProtocolHardware,

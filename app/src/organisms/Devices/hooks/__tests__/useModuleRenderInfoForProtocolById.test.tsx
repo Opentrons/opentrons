@@ -10,7 +10,7 @@ import {
 } from '@opentrons/shared-data'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
-import { getProtocolModulesInfo } from '../../ProtocolRun/utils/getProtocolModulesInfo'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
 
 import {
   mockTemperatureModuleGen2,
@@ -30,7 +30,7 @@ import type {
 import type { UseQueryResult } from 'react-query'
 import type { AttachedModule } from '/app/redux/modules/types'
 
-vi.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
+vi.mock('/app/transformations/analysis')
 vi.mock('../useAttachedModules')
 vi.mock('/app/resources/analysis')
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
