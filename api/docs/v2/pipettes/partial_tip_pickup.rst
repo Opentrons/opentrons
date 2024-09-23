@@ -361,13 +361,57 @@ This keeps tip tracking consistent across each type of pickup. And it reduces th
 Tip Pickup and Conflicts
 ========================
 
-During partial tip pickup, pipettes move into spaces above adjacent slots. To avoid crashes, the API prevents you from performing partial tip pickup when there is tall labware in these spaces. The current nozzle layout determines which labware can safely occupy adjacent slots.
+During partial tip pickup, the pipette moves into spaces above adjacent slots. To avoid crashes, the API prevents you from performing partial tip pickup in locations where the pipette could collide with the outer edges of the robot or labware in the working area. The current nozzle layout, pickup or pipetting location, and adjacent labware determine whether a particular pipetting action is safe to perform.
 
-The API will raise errors for potential labware crashes when using a partial nozzle configuration. Nevertheless, it's a good idea to do the following when working with partial tip pickup:
+The API will raise errors for potential crashes when using a partial nozzle configuration. Nevertheless, it's a good idea to do the following when working with partial tip pickup:
 
     - Plan your deck layout carefully. Make a diagram and visualize everywhere the pipette will travel.
-    - Simulate your protocol and compare the run preview to your expectations of where the pipette will travel.
+    - Simulate your protocol and compare the output to your expectations of where the pipette will travel.
     - Perform a dry run with only tip racks on the deck. Have the Emergency Stop Pendant handy in case you see an impending crash.
+
+Deck Extents
+------------
+
+When using partial nozzle configurations around the back, right, and front edges of the deck, there are limitations on how far the pipette can move beyond the outer edge of the deck slot. The API will raise an error if you try to pipette beyond these outer `extents` of the working area.
+
+.. tip::
+    There are no extents-related limitations on slots B1, B2, C1, and C2. When performing partial pickup and pipetting in these slots, you only have to consider :ref:`possible labware conflicts <partial-labware-conflicts>`.
+
+One way to think of deck extents is in terms of where you can pick up tips or pipette to a 96-well plate loaded in a given slot. These limitations only apply when using a layout that places the pipette further towards the windows of the robot than an ``ALL`` layout would. For example, using a ``ROW`` layout with the frontmost nozzles of the 96-channel pipette, it will never move farther forward than the H row of a labware in slots D1–D3. But using a ``ROW`` layout with the backmost nozzles would bring it farther forward — it could collide with the front window, except that the API prevents it.
+
+The following table summarizes the limitations in place along each side of the deck.
+
+.. list-table::
+    :header-rows: 1
+
+    * - Deck slots
+      - Nozzle configuration
+      - Inaccessible wells
+    * - A1–D1 (left edge)
+      - Rightmost column
+      - None (all wells accessible)
+    * - A1–D3 (back edge)
+      - Frontmost row
+      - Rows A–G
+    * - A3–D3 (right edge)
+      - Leftmost column
+      - Columns 11–12
+    * - D1–D3 (front edge)
+      - Backmost row
+      - Rows F–H
+
+To visualize these limitations, the below deck map shades all wells that have a single limitation in light blue, and all wells that have two limitations in dark blue.
+
+.. image:: ../../img/partial-pickup-deck-extents.png
+
+Multiple limitations occur when you use a ``SINGLE`` configuration that uses the innermost corner nozzle, with respect to the pipette's position on the deck. For example, using nozzle A1 on the 96-channel pipette has multiple limitations in slot D3.
+
+Additionally, column A of plates loaded on a Thermocycler Module is inaccessible by the rightmost nozzles of the 96-channel pipette. Although the API treats such plates as being in slot A1, the physical location of a plate on the Thermocycler is slightly further left than a plate loaded directly on the slot.
+
+.. _partial-labware-conflicts:
+
+Arranging Labware
+-----------------
 
 For column pickup, Opentrons recommends using the nozzles in column 12 of the pipette::
 
