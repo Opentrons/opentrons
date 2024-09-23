@@ -80,45 +80,40 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
         }}
         proceed={handleProceed}
       >
-        <Flex marginTop={SPACING.spacing60} flexDirection={DIRECTION_COLUMN}>
-          <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText
-              desktopStyle="headingSmallBold"
-              marginBottom={SPACING.spacing12}
-            >
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+            <StyledText desktopStyle="headingSmallBold">
               {t('which_fixtures')}
             </StyledText>
+
+            <Flex gridGap={SPACING.spacing4} flexWrap={WRAP}>
+              {filteredAdditionalEquipment.map(equipment => (
+                <EmptySelectorButton
+                  disabled={numSlotsAvailable === 0}
+                  key={equipment}
+                  textAlignment={TYPOGRAPHY.textAlignLeft}
+                  size="small"
+                  iconName="plus"
+                  text={t(`${equipment}`)}
+                  onClick={() => {
+                    if (numSlotsAvailable === 0) {
+                      makeSnackbar(t('slots_limit_reached') as string)
+                    } else {
+                      setValue('additionalEquipment', [
+                        ...additionalEquipment,
+                        equipment,
+                      ])
+                    }
+                  }}
+                />
+              ))}
+            </Flex>
           </Flex>
-          <Flex gridGap={SPACING.spacing4} flexWrap={WRAP}>
-            {filteredAdditionalEquipment.map(equipment => (
-              <EmptySelectorButton
-                disabled={numSlotsAvailable === 0}
-                key={equipment}
-                textAlignment={TYPOGRAPHY.textAlignLeft}
-                size="small"
-                iconName="plus"
-                text={t(`${equipment}`)}
-                onClick={() => {
-                  if (numSlotsAvailable === 0) {
-                    makeSnackbar(t('slots_limit_reached') as string)
-                  } else {
-                    setValue('additionalEquipment', [
-                      ...additionalEquipment,
-                      equipment,
-                    ])
-                  }
-                }}
-              />
-            ))}
-          </Flex>
-          <Flex marginTop={SPACING.spacing32} flexDirection={DIRECTION_COLUMN}>
-            <StyledText
-              desktopStyle="headingSmallBold"
-              marginBottom={SPACING.spacing12}
-            >
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+            <StyledText desktopStyle="headingSmallBold">
               {t('fixtures_added')}
             </StyledText>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               {filteredDuplicateStagingAreas.map(ae => {
                 const numStagingAreas = filteredAdditionalEquipmentWithoutGripper.filter(
                   additionalEquipment => additionalEquipment === 'stagingArea'

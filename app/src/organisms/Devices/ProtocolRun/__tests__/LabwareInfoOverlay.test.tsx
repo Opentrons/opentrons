@@ -8,7 +8,7 @@ import {
 } from '@opentrons/shared-data'
 import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useCurrentRun } from '../../../ProtocolUpload/hooks'
+import { useCurrentRun } from '/app/resources/runs'
 import { getLabwareLocation } from '../utils/getLabwareLocation'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { getLabwareDefinitionUri } from '../utils/getLabwareDefinitionUri'
@@ -19,7 +19,7 @@ import type {
   LoadedLabware,
 } from '@opentrons/shared-data'
 
-vi.mock('../../../ProtocolUpload/hooks')
+vi.mock('/app/resources/runs')
 vi.mock('../utils/getLabwareLocation')
 vi.mock('../../hooks')
 vi.mock('../utils/getLabwareDefinitionUri')

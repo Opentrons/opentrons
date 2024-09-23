@@ -17,6 +17,7 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('../../../PipetteWizardFlows')
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../hooks')
+vi.mock('/app/resources/analysis')
 
 const RUN_ID = '1'
 const modifiedSimpleV6Protocol = ({

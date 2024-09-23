@@ -12,12 +12,11 @@ import * as RobotApi from '/app/redux/robot-api'
 import * as Sessions from '/app/redux/sessions'
 import { getPipetteOffsetCalibrationSession } from '/app/redux/sessions/pipette-offset-calibration/selectors'
 import { pipetteOffsetCalibrationStarted } from '/app/redux/analytics'
-
+import type { DashboardCalOffsetInvoker } from '/app/organisms/Devices/hooks/useCalibrationTaskList'
 import type { State } from '/app/redux/types'
 import type {
   SessionCommandString,
   PipetteOffsetCalibrationSession,
-  PipetteOffsetCalibrationSessionParams,
 } from '/app/redux/sessions/types'
 import type { RequestState } from '/app/redux/robot-api/types'
 
@@ -25,15 +24,6 @@ import type { RequestState } from '/app/redux/robot-api/types'
 const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
-
-export interface DashboardOffsetCalInvokerProps {
-  params: Pick<PipetteOffsetCalibrationSessionParams, 'mount'> &
-    Partial<Omit<PipetteOffsetCalibrationSessionParams, 'mount'>>
-}
-
-export type DashboardCalOffsetInvoker = (
-  props: DashboardOffsetCalInvokerProps
-) => void
 
 export function useDashboardCalibratePipOffset(
   robotName: string,

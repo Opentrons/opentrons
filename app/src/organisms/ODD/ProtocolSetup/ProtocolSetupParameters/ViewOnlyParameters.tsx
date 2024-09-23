@@ -18,9 +18,9 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { ChildNavigation } from '../../../ChildNavigation'
-import { useToaster } from '../../../ToasterOven'
+import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { useToaster } from '/app/organisms/ToasterOven'
 
 import type { SetupScreens } from '../types'
 

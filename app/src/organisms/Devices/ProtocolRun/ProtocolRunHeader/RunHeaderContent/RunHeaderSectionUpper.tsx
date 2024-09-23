@@ -14,7 +14,7 @@ import { DisplayRunStatus } from '../DisplayRunStatus'
 import { RunTimer } from '../../RunTimer'
 import { ActionButton } from './ActionButton'
 import { useRunCreatedAtTimestamp } from '../../../hooks'
-import { useRunTimestamps } from '../../../../RunTimeControl/hooks'
+import { useRunTimestamps } from '/app/resources/runs'
 
 import type { RunHeaderContentProps } from '.'
 

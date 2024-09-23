@@ -4,6 +4,7 @@ import { css } from 'styled-components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_FINISHING } from '@opentrons/api-client'
 import {
   ALIGN_START,
+  Banner,
   Btn,
   COLORS,
   DIRECTION_COLUMN,
@@ -15,17 +16,16 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import { Slideout } from '/app/atoms/Slideout'
-import { Banner } from '/app/atoms/Banner'
+import { Slideout } from '../../atoms/Slideout'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 
 import type { AttachedModule } from '/app/redux/modules/types'
 
 interface AboutModuleSlideoutProps {
   module: AttachedModule
-  onCloseClick: () => unknown
+  onCloseClick: () => void
   isExpanded: boolean
-  firmwareUpdateClick: () => unknown
+  firmwareUpdateClick: () => void
 }
 
 const ALERT_ITEM_STYLE = css`

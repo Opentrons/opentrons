@@ -6,11 +6,9 @@ import {
 } from '@opentrons/shared-data'
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 import { MATCH, INEXACT_MATCH, INCOMPATIBLE } from '/app/redux/pipettes'
-import {
-  useAttachedPipetteCalibrations,
-  useAttachedPipettes,
-  useStoredProtocolAnalysis,
-} from '.'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useAttachedPipetteCalibrations, useAttachedPipettes } from '.'
+
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import type {
   PickUpTipRunTimeCommand,

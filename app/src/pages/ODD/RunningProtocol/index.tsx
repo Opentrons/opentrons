@@ -28,25 +28,25 @@ import {
 
 import { StepMeter } from '/app/atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useNotifyRunQuery } from '/app/resources/runs'
+import {
+  useRunStatus,
+  useRunTimestamps,
+  useNotifyRunQuery,
+} from '/app/resources/runs'
 import {
   InterventionModal,
   useInterventionModal,
 } from '/app/organisms/InterventionModal'
 import {
-  useRunStatus,
-  useRunTimestamps,
-} from '/app/organisms/RunTimeControl/hooks'
-import {
   CurrentRunningProtocolCommand,
   RunningProtocolCommandList,
   RunningProtocolSkeleton,
 } from '/app/organisms/ODD/RunningProtocol'
+import { useRobotType } from '/app/redux-resources/robots'
 import {
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
-  useRobotType,
-} from '/app/organisms/Devices/hooks'
+} from '/app/redux-resources/analytics'
 import { CancelingRunModal } from '/app/organisms/ODD/RunningProtocol/CancelingRunModal'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol/ConfirmCancelRunModal'
 import { getLocalRobot } from '/app/redux/discovery'

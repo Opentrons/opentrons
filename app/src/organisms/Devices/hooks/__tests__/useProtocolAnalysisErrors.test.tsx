@@ -10,7 +10,7 @@ import {
 import { useProtocolAnalysisErrors } from '..'
 import { useNotifyRunQuery } from '/app/resources/runs'
 
-import { RUN_ID_2 } from '../../../RunTimeControl/__fixtures__'
+import { RUN_ID_2 } from '/app/resources/runs/__fixtures__'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run, Protocol } from '@opentrons/api-client'

@@ -24,12 +24,14 @@ import {
   useAttachedPipettes,
   useCalibrationTaskList,
   useRunHasStarted,
-} from '../Devices/hooks'
+} from '/app/organisms/Devices/hooks'
 import { useCurrentRunId } from '/app/resources/runs'
 
-import type { DashboardCalOffsetInvoker } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
-import type { DashboardCalTipLengthInvoker } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
-import type { DashboardCalDeckInvoker } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
+import type {
+  DashboardCalOffsetInvoker,
+  DashboardCalTipLengthInvoker,
+  DashboardCalDeckInvoker,
+} from '/app/organisms/Devices/hooks'
 
 interface CalibrationTaskListProps {
   robotName: string

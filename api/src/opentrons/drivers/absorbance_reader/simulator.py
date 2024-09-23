@@ -2,6 +2,7 @@ from typing import Dict, List, Optional, Tuple
 from opentrons.util.async_helpers import ensure_yield
 
 from opentrons.drivers.types import (
+    ABSMeasurementMode,
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderDeviceState,
     AbsorbanceReaderPlatePresence,
@@ -54,11 +55,16 @@ class SimulatingDriver(AbstractAbsorbanceReaderDriver):
         return [450, 570, 600, 650]
 
     @ensure_yield
-    async def get_single_measurement(self, wavelength: int) -> List[float]:
-        return [0.0]
+    async def get_measurement(self) -> List[List[float]]:
+        return [[0.0]]
 
     @ensure_yield
-    async def initialize_measurement(self, wavelength: int) -> None:
+    async def initialize_measurement(
+        self,
+        wavelengths: List[int],
+        mode: ABSMeasurementMode = ABSMeasurementMode.SINGLE,
+        reference_wavelength: Optional[int] = None,
+    ) -> None:
         pass
 
     @ensure_yield

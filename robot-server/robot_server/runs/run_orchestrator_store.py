@@ -178,6 +178,9 @@ class RunOrchestratorStore:
                     deck_type=self._deck_type,
                     block_on_door_open=False,
                 ),
+                # Error recovery mode would not make sense outside the context of a run--
+                # for example, there would be no equivalent to the `POST /runs/{id}/actions`
+                # endpoint to resume normal operation.
                 error_recovery_policy=error_recovery_policy.never_recover,
             )
             self._default_run_orchestrator = RunOrchestrator.build_orchestrator(

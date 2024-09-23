@@ -23,7 +23,7 @@ import { useHost } from '@opentrons/react-api-client'
 import { TertiaryButton } from '/app/atoms/buttons'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { CONNECTABLE } from '/app/redux/discovery'
-import { useRobot } from '../../hooks'
+import { useRobot } from '/app/redux-resources/robots'
 
 import type { IconProps } from '@opentrons/components'
 

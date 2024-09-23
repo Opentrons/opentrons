@@ -32,7 +32,7 @@ import {
   ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
 } from '/app/redux/analytics'
-import { useIsFlex } from '../../hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'

@@ -1,5 +1,5 @@
 import { useEstopQuery } from '@opentrons/react-api-client'
-import { useIsFlex } from '/app/organisms/Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { DISENGAGED } from '/app/organisms/EmergencyStop'
 
 /**

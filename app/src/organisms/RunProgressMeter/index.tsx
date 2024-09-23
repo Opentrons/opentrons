@@ -31,15 +31,17 @@ import {
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getModalPortalEl } from '../../App/portal'
-import { useRunControls, useRunStatus } from '../RunTimeControl/hooks'
+import { useRunControls } from '../RunTimeControl/hooks'
 import { InterventionModal, useInterventionModal } from '../InterventionModal'
 import { ProgressBar } from '/app/atoms/ProgressBar'
-import { useDownloadRunLog, useRobotType } from '../Devices/hooks'
+import { useDownloadRunLog } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
 import {
   useNotifyRunQuery,
   useNotifyAllCommandsQuery,
+  useRunStatus,
 } from '/app/resources/runs'
+import { useRobotType } from '/app/redux-resources/robots'
 import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 import { useRunProgressCopy } from './hooks'
 

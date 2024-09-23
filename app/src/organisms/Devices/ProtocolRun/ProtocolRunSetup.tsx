@@ -29,15 +29,14 @@ import {
   getRequiredDeckConfig,
 } from '/app/resources/deck_configuration/utils'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
-  useIsFlex,
   useModuleCalibrationStatus,
   useProtocolAnalysisErrors,
-  useRobot,
   useRunCalibrationStatus,
   useRunHasStarted,
   useRunPipetteInfoByMount,
-  useStoredProtocolAnalysis,
   useUnmatchedModulesForProtocol,
 } from '../hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'

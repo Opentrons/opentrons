@@ -21,11 +21,11 @@ import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
 } from '/app/resources/deck_configuration/utils'
+import { useRobotType } from '/app/redux-resources/robots'
 import {
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
   useModuleCalibrationStatus,
-  useRobotType,
 } from '../../hooks'
 import { SetupModulesMap } from './SetupModulesMap'
 import { SetupModulesList } from './SetupModulesList'

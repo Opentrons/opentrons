@@ -6,7 +6,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getStoredProtocols } from '/app/redux/protocol-storage'
 import { storedProtocolData as storedProtocolDataFixture } from '/app/redux/protocol-storage/__fixtures__'
-import { useRunStatus, useRunTimestamps } from '../../RunTimeControl/hooks'
+import { useRunStatus, useRunTimestamps } from '/app/resources/runs'
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
 
@@ -14,7 +14,7 @@ import type { RunStatus, RunData } from '@opentrons/api-client'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
 vi.mock('/app/redux/protocol-storage')
-vi.mock('../../RunTimeControl/hooks')
+vi.mock('/app/resources/runs')
 vi.mock('../HistoricalProtocolRunOverflowMenu')
 
 const run = {

@@ -24,6 +24,7 @@ import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 import FLEX_PNG from '/app/assets/images/FLEX.png'
 import { ToggleButton } from '/app/atoms/buttons'
 import { getConfig } from '/app/redux/config'
+import { useRobot } from '/app/redux-resources/robots'
 import {
   CONNECTABLE,
   getRobotAddressesByName,
@@ -34,12 +35,7 @@ import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { RobotStatusHeader } from './RobotStatusHeader'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
-import {
-  useIsRobotBusy,
-  useIsRobotViewable,
-  useLights,
-  useRobot,
-} from './hooks'
+import { useIsRobotBusy, useIsRobotViewable, useLights } from './hooks'
 import { CalibrationStatusBanner } from './CalibrationStatusBanner'
 import {
   ErrorRecoveryBanner,

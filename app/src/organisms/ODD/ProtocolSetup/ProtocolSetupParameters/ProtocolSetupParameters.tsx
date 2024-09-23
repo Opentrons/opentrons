@@ -22,13 +22,13 @@ import {
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
-} from '../../../Devices/utils'
-import { ChildNavigation } from '../../../ChildNavigation'
+} from '/app/transformations/runs'
+import { ChildNavigation } from '/app/organisms/ChildNavigation'
 import { ResetValuesModal } from './ResetValuesModal'
 import { ChooseEnum } from './ChooseEnum'
 import { ChooseNumber } from './ChooseNumber'
 import { ChooseCsvFile } from './ChooseCsvFile'
-import { useToaster } from '../../../ToasterOven'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { ProtocolSetupStep } from '../ProtocolSetupStep'
 import type {
   CompletedProtocolAnalysis,

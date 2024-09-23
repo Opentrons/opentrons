@@ -16,6 +16,7 @@ from opentrons.hardware_control.modules.types import (
     MagneticStatus,
     SpeedStatus,
 )
+from opentrons.protocol_engine.types import ABSMeasureMode
 from opentrons.types import DeckSlotName
 
 
@@ -355,11 +356,16 @@ class AbstractAbsorbanceReaderCore(AbstractModuleCore):
         """Get the module's unique hardware serial number."""
 
     @abstractmethod
-    def initialize(self, wavelength: int) -> None:
+    def initialize(
+        self,
+        mode: ABSMeasureMode,
+        wavelengths: List[int],
+        reference_wavelength: Optional[int] = None,
+    ) -> None:
         """Initialize the Absorbance Reader by taking zero reading."""
 
     @abstractmethod
-    def read(self) -> Optional[Dict[str, float]]:
+    def read(self) -> Optional[Dict[int, Dict[str, float]]]:
         """Get an absorbance reading from the Absorbance Reader."""
 
     @abstractmethod

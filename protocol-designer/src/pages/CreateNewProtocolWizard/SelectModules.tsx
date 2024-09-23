@@ -110,13 +110,10 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
           proceed(1)
         }}
       >
-        <Flex marginTop={SPACING.spacing60} flexDirection={DIRECTION_COLUMN}>
-          <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
             {filteredSupportedModules.length > 0 ? (
-              <StyledText
-                desktopStyle="headingSmallBold"
-                marginBottom={SPACING.spacing12}
-              >
+              <StyledText desktopStyle="headingSmallBold">
                 {t('which_mods')}
               </StyledText>
             ) : null}
@@ -169,13 +166,11 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
             Object.keys(modules).length > 0 &&
             Object.keys(filteredModules).length > 0 ? (
               <Flex
-                marginTop={SPACING.spacing32}
                 flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing12}
+                paddingTop={SPACING.spacing32}
               >
-                <StyledText
-                  desktopStyle="headingSmallBold"
-                  marginBottom={SPACING.spacing12}
-                >
+                <StyledText desktopStyle="headingSmallBold">
                   {t('modules_added')}
                 </StyledText>
                 <Flex
@@ -188,7 +183,10 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                     ).length
 
                     const dropdownProps = {
-                      currentOption: { name: `${length}`, value: `${length}` },
+                      currentOption: {
+                        name: `${length}`,
+                        value: `${length}`,
+                      },
                       onClick: (value: string) => {
                         const num = parseInt(value)
                         const moamModules =

@@ -14,7 +14,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
 import { i18n } from '/app/i18n'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
+import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 import { Results } from '../Results'
 import { FLOWS } from '../constants'
 

@@ -28,8 +28,8 @@ import {
   OPENTRONS_USB,
 } from '/app/redux/discovery'
 import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
-
-import { useIsFlex, useIsRobotBusy } from '../hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { useIsRobotBusy } from '../hooks'
 import { DisconnectModal } from './ConnectNetwork/DisconnectModal'
 import { SelectNetwork } from './SelectNetwork'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'

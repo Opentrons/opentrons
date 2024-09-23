@@ -13,7 +13,7 @@ import {
   mockConnectableRobot,
   mockUnreachableRobot,
 } from '/app/redux/discovery/__fixtures__'
-import { useRobot } from '../../../hooks'
+import { useRobot } from '/app/redux-resources/robots'
 import { Troubleshooting } from '../Troubleshooting'
 
 import type { HostConfig } from '@opentrons/api-client'
@@ -22,7 +22,7 @@ import type { ToasterContextType } from '../../../../ToasterOven/ToasterContext'
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ToasterOven')
 vi.mock('/app/redux/discovery/selectors')
-vi.mock('../../../hooks')
+vi.mock('/app/redux-resources/robots')
 
 const ROBOT_NAME = 'otie'
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }

@@ -11,11 +11,9 @@ import {
 import { useToggleGroup } from '/app/molecules/ToggleGroup/useToggleGroup'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import {
-  useIsFlex,
-  useModuleRenderInfoForProtocolById,
-  useStoredProtocolAnalysis,
-} from '../../hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useModuleRenderInfoForProtocolById } from '../../hooks'
 import { SetupLabwareMap } from './SetupLabwareMap'
 import { SetupLabwareList } from './SetupLabwareList'
 

@@ -15,8 +15,8 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { ChooseEnum } from '../ChooseEnum'
 import { ChooseNumber } from '../ChooseNumber'
 import { ChooseCsvFile } from '../ChooseCsvFile'
-import { mockRunTimeParameterData } from '/app/pages/ODD/ProtocolDetails/fixtures'
-import { useToaster } from '../../../../ToasterOven'
+import { mockRunTimeParameterData } from '../../__fixtures__'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { ProtocolSetupParameters } from '..'
 
 import type { NavigateFunction } from 'react-router-dom'
@@ -29,9 +29,9 @@ vi.mock('../ChooseEnum')
 vi.mock('../ChooseNumber')
 vi.mock('../ChooseCsvFile')
 vi.mock('/app/redux/config')
-vi.mock('../../../../ToasterOven')
+vi.mock('/app/organisms/ToasterOven')
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('react-router-dom', async importOriginal => {
   const reactRouterDom = await importOriginal<NavigateFunction>()
   return {

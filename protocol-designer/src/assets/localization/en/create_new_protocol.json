@@ -25,7 +25,7 @@
   "remove": "Remove",
   "rename_error": "Labware names must be 115 characters or fewer.",
   "rename_labware": "Rename labware",
-  "robot_pips": "Robot pipettes",
+  "robot_pipettes": "Robot pipettes",
   "robot_type": "What kind of robot do you have?",
   "show_all_tips": "Show all tips",
   "show_default_tips": "Show default tips",
