@@ -17,7 +17,8 @@ import {
   mockThermocycler,
 } from '/app/redux/modules/__fixtures__'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { useAttachedModules, useModuleRenderInfoForProtocolById } from '..'
+import { useAttachedModules } from '/app/resources/modules'
+import { useModuleRenderInfoForProtocolById } from '..'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type {
@@ -31,7 +32,7 @@ import type { UseQueryResult } from 'react-query'
 import type { AttachedModule } from '/app/redux/modules/types'
 
 vi.mock('/app/transformations/analysis')
-vi.mock('../useAttachedModules')
+vi.mock('/app/resources/modules')
 vi.mock('/app/resources/analysis')
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('/app/resources/deck_configuration')

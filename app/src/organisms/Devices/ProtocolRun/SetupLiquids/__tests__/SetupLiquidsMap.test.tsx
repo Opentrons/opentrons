@@ -21,7 +21,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useAttachedModules } from '../../../hooks'
+import { useAttachedModules } from '/app/resources/modules'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 import { getAttachedProtocolModuleMatches } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
@@ -51,7 +51,7 @@ vi.mock('@opentrons/components', async importOriginal => {
 
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck')
 vi.mock('../../LabwareInfoOverlay')
-vi.mock('../../../hooks')
+vi.mock('/app/resources/modules')
 vi.mock('../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils')
 vi.mock('/app/transformations/analysis')
 vi.mock('/app/resources/deck_configuration/utils')

@@ -46,7 +46,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils')
 vi.mock('../../../ModuleInfo')
-vi.mock('../../../hooks')
+vi.mock('/app/resources/modules')
 
 const render = (props: React.ComponentProps<typeof SetupModulesMap>) => {
   return renderWithProviders(

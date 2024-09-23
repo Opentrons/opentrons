@@ -9,7 +9,7 @@ import {
 
 import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useAttachedModules } from './useAttachedModules'
+import { useAttachedModules } from '/app/resources/modules'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 

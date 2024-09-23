@@ -1,4 +1,3 @@
-export * from './useAttachedModules'
 export * from './useAttachedPipetteCalibrations'
 export * from './useAttachedPipettes'
 export * from './useDeckCalibrationData'

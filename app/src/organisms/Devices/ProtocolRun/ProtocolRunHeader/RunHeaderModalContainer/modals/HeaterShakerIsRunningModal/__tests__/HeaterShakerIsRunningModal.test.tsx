@@ -9,7 +9,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
 import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
-import { useAttachedModules } from '../../../../../../hooks'
+import { useAttachedModules } from '/app/resources/modules'
 import { useMostRecentCompletedAnalysis } from '../../../../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import type * as ReactApiClient from '@opentrons/react-api-client'
@@ -21,7 +21,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     useCreateLiveCommandMutation: vi.fn(),
   }
 })
-vi.mock('../../../../../../hooks')
+vi.mock('/app/resources/modules')
 vi.mock(
   '../../../../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )

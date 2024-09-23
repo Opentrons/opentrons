@@ -34,7 +34,6 @@ import {
 } from '@opentrons/shared-data'
 
 import {
-  useAttachedModules,
   useLPCDisabledReason,
   useModuleCalibrationStatus,
   useProtocolAnalysisErrors,
@@ -44,6 +43,7 @@ import {
   useRobotAnalyticsData,
   useTrackProtocolRunEvent,
 } from '/app/redux-resources/analytics'
+import { useAttachedModules } from '/app/resources/modules'
 
 import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import {
