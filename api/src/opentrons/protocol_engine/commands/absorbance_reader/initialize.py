@@ -67,32 +67,34 @@ class InitializeImpl(
             sample_wavelengths = set(params.sampleWavelengths)
             sample_wavelengths_len = len(params.sampleWavelengths)
             reference_wavelength = params.referenceWavelength
-            supported_wavelenths = set(abs_reader.supported_wavelengths)
-            unsuported_wavelengths = sample_wavelengths.difference(supported_wavelenths)
-            if unsuported_wavelengths:
-                raise ValueError(f"Unsuported wavelengths: {unsuported_wavelengths}")
+            supported_wavelengths = set(abs_reader.supported_wavelengths)
+            unsupported_wavelengths = sample_wavelengths.difference(
+                supported_wavelengths
+            )
+            if unsupported_wavelengths:
+                raise ValueError(f"Unsupported wavelengths: {unsupported_wavelengths}")
 
-            if params.measureMode == "singleMeasure":
+            if params.measureMode == "single":
                 if sample_wavelengths_len != 1:
                     raise ValueError(
-                        f"singleMeasure requires one sample wavelength, provided {sample_wavelengths}"
+                        f"single requires one sample wavelength, provided {sample_wavelengths}"
                     )
                 if (
                     reference_wavelength is not None
-                    and reference_wavelength not in supported_wavelenths
+                    and reference_wavelength not in supported_wavelengths
                 ):
                     raise ValueError(
-                        f"Reference wavelength {reference_wavelength} not supported {supported_wavelenths}"
+                        f"Reference wavelength {reference_wavelength} not supported {supported_wavelengths}"
                     )
 
-            if params.measureMode == "multiMeasure":
+            if params.measureMode == "multi":
                 if sample_wavelengths_len < 1 or sample_wavelengths_len > 6:
                     raise ValueError(
-                        f"multiMeasure requires 1-6 sample wavelengths, provided {sample_wavelengths}"
+                        f"multi requires 1-6 sample wavelengths, provided {sample_wavelengths}"
                     )
                 if reference_wavelength is not None:
                     raise RuntimeError(
-                        "Reference wavelength cannot be used with multiMeasure mode."
+                        "Reference wavelength cannot be used with multi mode."
                     )
 
             await abs_reader.set_sample_wavelength(

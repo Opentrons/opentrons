@@ -1010,15 +1010,19 @@ class AbsorbanceReaderContext(ModuleContext):
         wavelengths: List[int],
         reference_wavelength: Optional[int] = None,
     ) -> None:
-        """Initialize the Absorbance Reader by taking zero reading.
-        You can initialize in `singleMeasure` or `multiMeasure` modes.
+        """Take a zero reading on the Absorbance Plate Reader Module.
 
-        `singleMeasure` mode takes one sample wavelength and an optional
-        reference wavelength and performs a single read with the `read` method.
+        :param mode: Either ``"single"`` or ``"multi"``.
 
-        `multiMeasure` mode takes a list of up to 6 wavelengths and  measures the
-        absorbance on the given wavelengths when the `read` method is used.
-        Note you cannot use the `reference_wavelength` in this mode.
+             - In single measurement mode, :py:meth:`.AbsorbanceReaderContext.read` uses
+               one sample wavelength and an optional reference wavelength.
+             - In multiple measurement mode, :py:meth:`.AbsorbanceReaderContext.read` uses
+               a list of up to six sample wavelengths.
+        :param wavelengths: A list of wavelengths, in mm, to measure.
+             - Must contain only one item when initializing a single measurement.
+             - Must contain one to six items when initializing a multiple measurement.
+        :param reference_wavelength: An optional reference wavelength, in mm. Cannot be
+             used with multiple measurements.
         """
         self._core.initialize(
             mode, wavelengths, reference_wavelength=reference_wavelength
@@ -1026,6 +1030,5 @@ class AbsorbanceReaderContext(ModuleContext):
 
     @requires_version(2, 21)
     def read(self) -> Optional[Dict[int, Dict[str, float]]]:
-        """Initiate read on the Absorbance Reader. Returns a dictionary of values ordered by well name."""
-        # TODO: Update the documentation
+        """Initiate read on the Absorbance Reader. Returns a dictionary of wavelengths to dictionary of values ordered by well name."""
         return self._core.read()

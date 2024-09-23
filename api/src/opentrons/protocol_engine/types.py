@@ -1074,4 +1074,4 @@ CSVRunTimeParamFilesType = Mapping[StrictStr, StrictStr]
 CSVRuntimeParamPaths = Dict[str, Path]
 
 
-ABSMeasureMode = Literal["singleMeasure", "multiMeasure"]
+ABSMeasureMode = Literal["single", "multi"]

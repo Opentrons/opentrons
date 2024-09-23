@@ -24,7 +24,7 @@ from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnect
 
 SN_PARSER = re.compile(r'ATTRS{serial}=="(?P<serial>.+?)"')
 VERSION_PARSER = re.compile(r"Absorbance (?P<version>V\d+\.\d+\.\d+)")
-SERIAL_PARSER = re.compile(r"SN: (?P<serial>BYO[A-Z]{3}[0-9]{5})")
+SERIAL_PARSER = re.compile(r"(?P<serial>BYO[A-Z]{3}[0-9]{5})")
 
 
 class AsyncByonoy:
@@ -228,7 +228,7 @@ class AsyncByonoy:
         return wavelengths
 
     async def get_measurement(self) -> List[List[float]]:
-        """Get a measurement based on the current configuration."""
+        """Gets one or more measurements based on the current configuration."""
         handle = self._verify_device_handle()
         assert (
             self._current_config is not None

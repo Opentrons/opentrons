@@ -4006,7 +4006,7 @@
         "measureMode": {
           "title": "Measuremode",
           "description": "Initialize single or multi measurement mode.",
-          "enum": ["singleMeasure", "multiMeasure"],
+          "enum": ["single", "multi"],
           "type": "string"
         },
         "sampleWavelengths": {
