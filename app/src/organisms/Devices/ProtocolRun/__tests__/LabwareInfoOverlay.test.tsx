@@ -11,7 +11,7 @@ import { i18n } from '/app/i18n'
 import { useCurrentRun } from '/app/resources/runs'
 import { getLabwareLocation } from '../utils/getLabwareLocation'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
-import { getLabwareDefinitionUri } from '../utils/getLabwareDefinitionUri'
+import { getLabwareDefinitionUri } from '/app/transformations/protocols'
 import { useLabwareOffsetForLabware } from '../useLabwareOffsetForLabware'
 import type {
   LabwareDefinition2,
@@ -22,7 +22,7 @@ import type {
 vi.mock('/app/resources/runs')
 vi.mock('../utils/getLabwareLocation')
 vi.mock('../../hooks')
-vi.mock('../utils/getLabwareDefinitionUri')
+vi.mock('/app/transformations/protocols')
 vi.mock('../useLabwareOffsetForLabware')
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
