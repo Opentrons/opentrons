@@ -93,6 +93,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       /> */}
 
       <Toolbox
+        childrenPadding="0"
         onCloseClick={handleClose}
         closeButtonText={t('shared:cancel')}
         confirmButton={

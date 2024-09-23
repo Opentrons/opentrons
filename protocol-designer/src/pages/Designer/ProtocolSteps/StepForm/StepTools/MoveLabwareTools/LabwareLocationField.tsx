@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { getHasWasteChute } from '@opentrons/step-generation'
 import {
   WASTE_CHUTE_CUTOUT,
   getModuleDisplayName,
@@ -9,21 +10,24 @@ import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
   getModuleEntities,
-} from '../../../../step-forms/selectors'
+} from '../../../../../../step-forms/selectors'
 import {
   getRobotStateAtActiveItem,
   getUnoccupiedLabwareLocationOptions,
-} from '../../../../top-selectors/labware-locations'
-import { StepFormDropdown } from '../StepFormDropdownField'
-import { getHasWasteChute } from '../../../labware'
+} from '../../../../../../top-selectors/labware-locations'
+import { DropdownStepFormField } from '../../../../../../molecules'
+import type { FieldProps } from '../../types'
 
+interface LabwareLocationFieldProps extends FieldProps {
+  useGripper: boolean
+  canSave: boolean
+  labware: string
+}
 export function LabwareLocationField(
-  props: Omit<React.ComponentProps<typeof StepFormDropdown>, 'options'> & {
-    useGripper: boolean
-  } & { canSave: boolean } & { labware: string }
+  props: LabwareLocationFieldProps
 ): JSX.Element {
+  const { t } = useTranslation(['form', 'protocol_steps'])
   const { labware, useGripper, value } = props
-  const { t } = useTranslation('form')
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
@@ -71,8 +75,9 @@ export function LabwareLocationField(
     }
   }
   return (
-    <StepFormDropdown
+    <DropdownStepFormField
       {...props}
+      options={unoccupiedLabwareLocationsOptions}
       errorToShow={
         !props.canSave && bothFieldsSelected
           ? t('step_edit_form.labwareLabel.errors.labwareSlotIncompatible', {
@@ -81,7 +86,7 @@ export function LabwareLocationField(
             })
           : undefined
       }
-      options={unoccupiedLabwareLocationsOptions}
+      title={t('protocol_steps:new_location')}
     />
   )
 }
