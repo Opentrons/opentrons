@@ -37,6 +37,7 @@ export interface DropdownOption {
   /** optional dropdown option for adding the liquid color icon */
   liquidColor?: string
   disabled?: boolean
+  tooltipText?: string
 }
 
 export type DropdownBorder = 'rounded' | 'neutral'
@@ -80,6 +81,9 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     error,
   } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const [optionTargetProps, optionTooltipProps] = useHoverTooltip({
+    placement: 'top-end',
+  })
   const [showDropdownMenu, setShowDropdownMenu] = React.useState<boolean>(false)
 
   const [dropdownPosition, setDropdownPosition] = React.useState<
@@ -257,21 +261,33 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             maxHeight="20rem" // Set the maximum display number to 10.
           >
             {filterOptions.map((option, index) => (
-              <MenuItem
-                zIndex={3}
-                key={`${option.name}-${index}`}
-                onClick={() => {
-                  onClick(option.value)
-                  setShowDropdownMenu(false)
-                }}
-              >
-                <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-                  {option.liquidColor != null ? (
-                    <LiquidIcon color={option.liquidColor} />
-                  ) : null}
-                  {option.name}
-                </Flex>
-              </MenuItem>
+              <React.Fragment key={`${option.name}-${index}`}>
+                <MenuItem
+                  disabled={option.disabled}
+                  zIndex={3}
+                  key={`${option.name}-${index}`}
+                  onClick={() => {
+                    onClick(option.value)
+                    setShowDropdownMenu(false)
+                  }}
+                >
+                  <Flex
+                    gridGap={SPACING.spacing8}
+                    alignItems={ALIGN_CENTER}
+                    {...optionTargetProps}
+                  >
+                    {option.liquidColor != null ? (
+                      <LiquidIcon color={option.liquidColor} />
+                    ) : null}
+                    {option.name}
+                  </Flex>
+                </MenuItem>
+                {option.tooltipText != null ? (
+                  <Tooltip tooltipProps={optionTooltipProps}>
+                    {option.tooltipText}
+                  </Tooltip>
+                ) : null}
+              </React.Fragment>
             ))}
           </Flex>
         )}

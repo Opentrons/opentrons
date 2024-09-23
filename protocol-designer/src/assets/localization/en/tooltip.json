@@ -28,6 +28,7 @@
 
   "step_fields": {
     "defaults": {
+      "aspirate_labware": "Select a source labware to use",
       "aspirate_airGap_checkbox": "Aspirate air before moving to next well",
       "aspirate_delay_checkbox": "Delay pipette movement after each aspirate in this step, including any Air Gap",
       "aspirate_delay_mmFromBottom": "Distance from the bottom of the well",
@@ -39,6 +40,7 @@
       "blowout_checkbox": "Where to dispose of remaining volume in tip",
       "blowout_location": "Where to dispose of remaining volume in tip",
       "changeTip": "Choose when the robot picks up fresh tips",
+      "dispense_labware": "Select a destination labware to use",
       "dispense_airGap_checkbox": "Aspirate air before moving to Trash to dispose of tip. Tip will be disposed of at the end of steps using this setting.",
       "dispense_delay_checkbox": "Delay pipette movement after each dispense in this step",
       "dispense_delay_mmFromBottom": "Distance from the bottom of the well",
@@ -52,6 +54,7 @@
       "mix_mmFromBottom": "Adjust tip position",
       "mix_touchTip_checkbox": "Touch tip to each side of the well after mixing",
       "mix_touchTip_mmFromBottom": "Distance from the bottom of the well",
+      "pipette": "Select the pipette you want to use",
       "preWetTip": "Pre-wet pipette tip by aspirating and dispensing 2/3 of the tip's max volume",
       "volume": "Volume to dispense in each well",
       "blowout_z_offset": "The height at which blowout occurs from the top of the well",
