@@ -17,14 +17,15 @@ def reject_unacceptable_heights(
     potential_heights: List[float], max_height: float
 ) -> float:
     """Reject any solutions to a polynomial equation that cannot be the height of a frustum."""
-    valid_heights = []
+    valid_heights_set = set()
     for root in potential_heights:
         # reject any heights that are negative or greater than the max height
         if not iscomplex(root):
             # take only the real component of the root and round to 4 decimal places
             rounded_root = round(real(root), 4)
             if (rounded_root <= max_height) and (rounded_root >= 0):
-                valid_heights.append(rounded_root)
+                valid_heights_set.add(rounded_root)
+    valid_heights = [height for height in valid_heights_set]
     if len(valid_heights) != 1:
         raise InvalidLiquidHeightFound(
             message="Unable to estimate valid liquid height from volume."
