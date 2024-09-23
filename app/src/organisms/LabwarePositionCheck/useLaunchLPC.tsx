@@ -8,9 +8,9 @@ import {
 import {
   useCreateTargetedMaintenanceRunMutation,
   useNotifyRunQuery,
+  useMostRecentCompletedAnalysis,
 } from '/app/resources/runs'
 import { LabwarePositionCheck } from '.'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
 
 import type { RobotType } from '@opentrons/shared-data'

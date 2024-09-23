@@ -43,7 +43,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     inferModuleOrientationFromXCoordinate: vi.fn(),
   }
 })
-vi.mock('/app/resources/runs')
+vi.mock('/app/resources/runs/useMostRecentCompletedAnalysis')
 vi.mock('../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils')
 vi.mock('../../../ModuleInfo')
 vi.mock('/app/resources/modules')

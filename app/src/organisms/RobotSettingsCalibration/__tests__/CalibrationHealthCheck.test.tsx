@@ -38,6 +38,7 @@ vi.mock('/app/redux/config')
 vi.mock('/app/redux/pipettes')
 vi.mock('/app/organisms/Devices/hooks')
 vi.mock('/app/resources/instruments')
+vi.mock('/app/redux-resources/robots')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
