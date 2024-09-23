@@ -8,7 +8,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
-import { getLabwareRenderInfo } from '/app/organisms/Devices/ProtocolRun/utils/getLabwareRenderInfo'
+import { getLabwareRenderInfo } from '/app/transformations/analysis'
 
 import type {
   CompletedProtocolAnalysis,

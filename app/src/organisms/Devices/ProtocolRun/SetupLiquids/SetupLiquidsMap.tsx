@@ -23,9 +23,11 @@ import {
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
 import { getWellFillFromLabwareId } from './utils'
-import { getLabwareRenderInfo } from '../utils/getLabwareRenderInfo'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
-import { getProtocolModulesInfo } from '/app/transformations/analysis'
+import {
+  getProtocolModulesInfo,
+  getLabwareRenderInfo,
+} from '/app/transformations/analysis'
 
 import type {
   CompletedProtocolAnalysis,

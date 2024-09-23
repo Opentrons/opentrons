@@ -18,8 +18,10 @@ import {
 
 import { getLabwareSetupItemGroups } from '/app/transformations/commands'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
-import { getLabwareRenderInfo } from '../utils/getLabwareRenderInfo'
-import { getProtocolModulesInfo } from '/app/transformations/analysis'
+import {
+  getProtocolModulesInfo,
+  getLabwareRenderInfo,
+} from '/app/transformations/analysis'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 import { OffDeckLabwareList } from './OffDeckLabwareList'
 
