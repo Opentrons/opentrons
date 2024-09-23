@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Union
-from opentrons.protocol_engine.errors.exceptions import MustHomeError, TipNotEmptyError
+from opentrons.protocol_engine.errors.exceptions import (
+    MustHomeError,
+    PipetteNotReadyToAspirateError,
+    TipNotEmptyError,
+)
 from opentrons.types import MountType
 from opentrons_shared_data.errors.exceptions import (
     PipetteLiquidNotFoundError,
@@ -32,6 +36,7 @@ from ..errors.error_occurrence import ErrorOccurrence
 if TYPE_CHECKING:
     from ..execution import MovementHandler, PipettingHandler
     from ..resources import ModelUtils
+    from ..state import StateView
 
 
 LiquidProbeCommandType = Literal["liquidProbe"]
@@ -92,11 +97,13 @@ class LiquidProbeImplementation(
 
     def __init__(
         self,
+        state_view: StateView,
         movement: MovementHandler,
         pipetting: PipettingHandler,
         model_utils: ModelUtils,
         **kwargs: object,
     ) -> None:
+        self._state_view = state_view
         self._movement = movement
         self._pipetting = pipetting
         self._model_utils = model_utils
@@ -112,6 +119,8 @@ class LiquidProbeImplementation(
                 the pipette.
             TipNotEmptyError: as an undefined error, if the tip starts with liquid
                 in it.
+            PipetteNotReadyToAspirateError: as an undefined error, if the plunger is not
+                in a safe position to do the liquid probe.
             MustHomeError: as an undefined error, if the plunger is not in a valid
                 position.
         """
@@ -119,13 +128,21 @@ class LiquidProbeImplementation(
         labware_id = params.labwareId
         well_name = params.wellName
 
-        # _validate_tip_attached in pipetting.py is a private method so we're using
-        # get_is_ready_to_aspirate as an indirect way to throw a TipNotAttachedError if appropriate
-        self._pipetting.get_is_ready_to_aspirate(pipette_id=pipette_id)
+        # May raise TipNotAttachedError.
+        aspirated_volume = self._state_view.pipettes.get_aspirated_volume(pipette_id)
 
-        if self._pipetting.get_is_empty(pipette_id=pipette_id) is False:
+        if aspirated_volume is None:
+            # Theoretically, we could avoid raising an error by automatically preparing
+            # to aspirate above the well like AspirateImplementation does. However, the
+            # only way for this to happen is if someone tries to do a liquid probe with
+            # a tip that's previously held liquid, which they should avoid anyway.
+            raise PipetteNotReadyToAspirateError(
+                "The pipette cannot probe liquid because of a previous blow out."
+                " The plunger must be reset while the tip is somewhere away from liquid."
+            )
+        elif aspirated_volume != 0:
             raise TipNotEmptyError(
-                message="This operation requires a tip with no liquid in it."
+                message="The pipette cannot probe for liquid when the tip has liquid in it."
             )
 
         if await self._movement.check_for_valid_position(mount=MountType.LEFT) is False:
@@ -182,11 +199,13 @@ class TryLiquidProbeImplementation(
 
     def __init__(
         self,
+        state_view: StateView,
         movement: MovementHandler,
         pipetting: PipettingHandler,
         model_utils: ModelUtils,
         **kwargs: object,
     ) -> None:
+        self._state_view = state_view
         self._movement = movement
         self._pipetting = pipetting
         self._model_utils = model_utils
@@ -203,6 +222,7 @@ class TryLiquidProbeImplementation(
         # Otherwise, we return the result or propagate the exception unchanged.
 
         original_impl = LiquidProbeImplementation(
+            state_view=self._state_view,
             movement=self._movement,
             pipetting=self._pipetting,
             model_utils=self._model_utils,
