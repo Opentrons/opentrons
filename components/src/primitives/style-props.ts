@@ -181,15 +181,19 @@ const transitionStyles = (props: Types.StyleProps): CSSObject => {
 }
 
 export const styleProps = (props: Types.StyleProps): CSSObject => ({
-  ...colorStyles(props),
-  ...typographyStyles(props),
-  ...spacingStyles(props),
-  ...borderStyles(props),
-  ...flexboxStyles(props),
-  ...gridStyles(props),
-  ...layoutStyles(props),
-  ...positionStyles(props),
-  ...transitionStyles(props),
+  // the ampersands are to increase CSS specificity of inline applied styles
+  // see https://styled-components.com/docs/faqs#how-can-i-override-styles-with-higher-specificity
+  '&&&': {
+    ...colorStyles(props),
+    ...typographyStyles(props),
+    ...spacingStyles(props),
+    ...borderStyles(props),
+    ...flexboxStyles(props),
+    ...gridStyles(props),
+    ...layoutStyles(props),
+    ...positionStyles(props),
+    ...transitionStyles(props),
+  },
 })
 
 export const isntStyleProp = (prop: string | React.ReactText): boolean =>
