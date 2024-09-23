@@ -12,25 +12,23 @@ def list_ports_and_select(device_name: str = "", port_substr: str = None) -> str
     print("found ports:")
 
     idx = 0
-
+    idx_str = ""
     for i, p in enumerate(ports):
         print(f"\t{i + 1}) {p.device}")
-
+        if port_substr:
+            for i, p in enumerate(ports):
+                if port_substr in p.device:
+                    idx = i + 1
+                    break
+        else:
+            idx_str = input(
+                f"\nenter number next to {device_name} port (or ENTER to re-scan): "
+            )
+            if not idx_str:
+                return list_ports_and_select(device_name)
     if not device_name:
         device_name = "desired"
 
-    if port_substr:
-        for i, p in enumerate(ports):
-            print(f"\t{i + 1}) {p.device}")
-            if "USB" in p.device:
-                idx = i
-                break
-    else:
-        idx_str = input(
-            f"\nenter number next to {device_name} port (or ENTER to re-scan): "
-        )
-        if not idx_str:
-            return list_ports_and_select(device_name)
     try:
         try:
             idx = int(idx_str.strip())
