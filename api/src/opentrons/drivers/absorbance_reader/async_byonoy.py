@@ -74,13 +74,13 @@ class AsyncByonoy:
         loop = loop or asyncio.get_running_loop()
         executor = ThreadPoolExecutor(max_workers=1)
 
-        import pybyonoy_device_library as byonoy  # type: ignore[import-not-found]
+        import byonoy_devices as byonoy  # type: ignore[import-not-found]
 
         interface: AbsProtocol = byonoy
 
         device_sn = cls.serial_number_from_port(usb_port.name)
         found: List[AbsProtocol.Device] = await loop.run_in_executor(
-            executor=executor, func=byonoy.byonoy_available_devices
+            executor=executor, func=byonoy.available_devices
         )
         device = cls.match_device_with_sn(device_sn, found)
 
@@ -123,7 +123,7 @@ class AsyncByonoy:
 
         err, device_handle = await self._loop.run_in_executor(
             executor=self._executor,
-            func=partial(self._interface.byonoy_open_device, self._device),
+            func=partial(self._interface.open_device, self._device),
         )
         self._raise_if_error(err.name, f"Error opening device: {err}")
         self._device_handle = device_handle
@@ -134,7 +134,7 @@ class AsyncByonoy:
         handle = self._verify_device_handle()
         await self._loop.run_in_executor(
             executor=self._executor,
-            func=partial(self._interface.byonoy_free_device, handle),
+            func=partial(self._interface.free_device, handle),
         )
         self._device_handle = None
 
@@ -145,7 +145,7 @@ class AsyncByonoy:
         handle = self._verify_device_handle()
         return await self._loop.run_in_executor(
             executor=self._executor,
-            func=partial(self._interface.byonoy_device_open, handle),
+            func=partial(self._interface.device_open, handle),
         )
 
     async def get_device_information(self) -> Dict[str, str]:
@@ -153,7 +153,7 @@ class AsyncByonoy:
         handle = self._verify_device_handle()
         err, device_info = await self._loop.run_in_executor(
             executor=self._executor,
-            func=partial(self._interface.byonoy_get_device_information, handle),
+            func=partial(self._interface.get_device_information, handle),
         )
         self._raise_if_error(err.name, f"Error getting device information: {err}")
         serial_match = SERIAL_PARSER.match(device_info.sn)
@@ -172,7 +172,7 @@ class AsyncByonoy:
         handle = self._verify_device_handle()
         err, status = await self._loop.run_in_executor(
             executor=self._executor,
-            func=partial(self._interface.byonoy_get_device_status, handle),
+            func=partial(self._interface.get_device_status, handle),
         )
         self._raise_if_error(err.name, f"Error getting device status: {err}")
         return self.convert_device_state(status.name)
@@ -184,11 +184,9 @@ class AsyncByonoy:
             return False, f"Firmware file not found: {firmware_file_path}"
         err = await self._loop.run_in_executor(
             executor=self._executor,
-            func=partial(
-                self._interface.byonoy_update_device, handle, firmware_file_path
-            ),
+            func=partial(self._interface.update_device, handle, firmware_file_path),
         )
-        if err.name != "BYONOY_ERROR_NO_ERROR":
+        if err.name != "NO_ERROR":
             return False, f"Byonoy update failed with error: {err}"
         return True, ""
 
@@ -197,7 +195,7 @@ class AsyncByonoy:
         handle = self._verify_device_handle()
         err, uptime = await self._loop.run_in_executor(
             executor=self._executor,
-            func=partial(self._interface.byonoy_get_device_uptime, handle),
+            func=partial(self._interface.get_device_uptime, handle),
         )
         self._raise_if_error(err.name, "Error getting device uptime: ")
         return uptime
@@ -207,7 +205,7 @@ class AsyncByonoy:
         handle = self._verify_device_handle()
         err, lid_info = await self._loop.run_in_executor(
             executor=self._executor,
-            func=partial(self._interface.byonoy_get_device_parts_aligned, handle),
+            func=partial(self._interface.get_device_parts_aligned, handle),
         )
         self._raise_if_error(err.name, f"Error getting lid status: {err}")
         return (
@@ -219,9 +217,7 @@ class AsyncByonoy:
         handle = self._verify_device_handle()
         err, wavelengths = await self._loop.run_in_executor(
             executor=self._executor,
-            func=partial(
-                self._interface.byonoy_abs96_get_available_wavelengths, handle
-            ),
+            func=partial(self._interface.abs96_get_available_wavelengths, handle),
         )
         self._raise_if_error(err.name, "Error getting available wavelengths: ")
         self._supported_wavelengths = wavelengths
@@ -233,9 +229,9 @@ class AsyncByonoy:
         assert (
             self._current_config is not None
         ), "Cannot get measurement without initializing."
-        measure_func: Any = self._interface.byonoy_abs96_single_measure
+        measure_func: Any = self._interface.abs96_single_measure
         if isinstance(self._current_config, AbsProtocol.MultiMeasurementConfig):
-            measure_func = self._interface.byonoy_abs96_multiple_measure
+            measure_func = self._interface.abs96_multiple_measure
         err, measurements = await self._loop.run_in_executor(
             executor=self._executor,
             func=partial(
@@ -252,7 +248,7 @@ class AsyncByonoy:
         handle = self._verify_device_handle()
         err, presence = await self._loop.run_in_executor(
             executor=self._executor,
-            func=partial(self._interface.byonoy_get_device_slot_status, handle),
+            func=partial(self._interface.get_device_slot_status, handle),
         )
         self._raise_if_error(err.name, f"Error getting slot status: {err}")
         return self.convert_plate_presence(presence.name)
@@ -260,9 +256,7 @@ class AsyncByonoy:
     def _get_supported_wavelengths(self) -> List[int]:
         handle = self._verify_device_handle()
         wavelengths: List[int]
-        err, wavelengths = self._interface.byonoy_abs96_get_available_wavelengths(
-            handle
-        )
+        err, wavelengths = self._interface.abs96_get_available_wavelengths(handle)
         self._raise_if_error(err.name, f"Error getting available wavelengths: {err}")
         self._supported_wavelengths = wavelengths
         return wavelengths
@@ -270,13 +264,9 @@ class AsyncByonoy:
     def _initialize_measurement(self, conf: MeasurementConfig) -> None:
         handle = self._verify_device_handle()
         if isinstance(conf, AbsProtocol.SingleMeasurementConfig):
-            err = self._interface.byonoy_abs96_initialize_single_measurement(
-                handle, conf
-            )
+            err = self._interface.abs96_initialize_single_measurement(handle, conf)
         else:
-            err = self._interface.byonoy_abs96_initialize_multiple_measurement(
-                handle, conf
-            )
+            err = self._interface.abs96_initialize_multiple_measurement(handle, conf)
         self._raise_if_error(err.name, f"Error initializing measurement: {err}")
         self._current_config = conf
 
@@ -292,11 +282,11 @@ class AsyncByonoy:
         conf: MeasurementConfig
         if set(wavelengths).issubset(self._supported_wavelengths):
             if mode == ABSMeasurementMode.SINGLE:
-                conf = self._interface.ByonoyAbs96SingleMeasurementConfig()
+                conf = self._interface.Abs96SingleMeasurementConfig()
                 conf.sample_wavelength = wavelengths[0] or 0
                 conf.reference_wavelength = reference_wavelength or 0
             else:
-                conf = self._interface.ByonoyAbs96MultipleMeasurementConfig()
+                conf = self._interface.Abs96MultipleMeasurementConfig()
                 conf.sample_wavelengths = wavelengths
         else:
             raise ValueError(
@@ -328,12 +318,12 @@ class AsyncByonoy:
         msg: str = "Error occurred: ",
     ) -> None:
         if err_name in [
-            "BYONOY_ERROR_DEVICE_CLOSED",
-            "BYONOY_ERROR_DEVICE_COMMUNICATION_FAILURE",
-            "BYONOY_ERROR_UNSUPPORTED_OPERATION",
+            "DEVICE_CLOSED",
+            "DEVICE_COMMUNICATION_FAILURE",
+            "UNSUPPORTED_OPERATION",
         ]:
             raise AbsorbanceReaderDisconnectedError(self._device.sn)
-        if err_name != "BYONOY_ERROR_NO_ERROR":
+        if err_name != "NO_ERROR":
             raise RuntimeError(msg, err_name)
 
     @staticmethod
