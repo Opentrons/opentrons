@@ -2,11 +2,11 @@ import isEmpty from 'lodash/isEmpty'
 import some from 'lodash/some'
 import { useTranslation } from 'react-i18next'
 import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   useRunCalibrationStatus,
   useRunHasStarted,
-  useStoredProtocolAnalysis,
   useUnmatchedModulesForProtocol,
 } from '.'
 

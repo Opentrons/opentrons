@@ -1,7 +1,7 @@
 import { useRunCommandErrors } from '@opentrons/react-api-client'
 
 import { isTerminalRunStatus } from '../utils'
-import { useMostRecentRunId } from '../../../../ProtocolUpload/hooks/useMostRecentRunId'
+import { useMostRecentRunId } from '/app/resources/runs/useMostRecentRunId'
 import { getHighestPriorityError } from '../../../../ODD/RunningProtocol'
 
 import type { RunStatus, Run } from '@opentrons/api-client'

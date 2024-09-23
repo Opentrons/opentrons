@@ -13,9 +13,8 @@ import type { UseQueryResult } from 'react-query'
 import type { Runs } from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
 
-vi.mock('/app/resources/runs')
 vi.mock('../hooks')
-vi.mock('../../ProtocolUpload/hooks')
+vi.mock('/app/resources/runs')
 vi.mock('../HistoricalProtocolRun')
 
 const render = () => {

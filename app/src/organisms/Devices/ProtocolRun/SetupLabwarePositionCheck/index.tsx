@@ -21,16 +21,13 @@ import { useProtocolQuery } from '@opentrons/react-api-client'
 
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
-import {
-  useRobotType,
-  useLPCDisabledReason,
-  useStoredProtocolAnalysis,
-} from '../../hooks'
+import { useLPCDisabledReason } from '../../hooks'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { CurrentOffsetsTable } from './CurrentOffsetsTable'
 import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
 import { getLatestCurrentOffsets } from './utils'
 import { useNotifyRunQuery } from '/app/resources/runs'
-
+import { useRobotType } from '/app/redux-resources/robots'
 import type { LabwareOffset } from '@opentrons/api-client'
 
 interface SetupLabwarePositionCheckProps {

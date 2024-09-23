@@ -16,10 +16,11 @@ import {
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getAttachedProtocolModuleMatches } from '../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
 import { ModuleInfo } from '../../ModuleInfo'
-import { useAttachedModules, useStoredProtocolAnalysis } from '../../hooks'
+import { useAttachedModules } from '../../hooks'
 import { getProtocolModulesInfo } from '../utils/getProtocolModulesInfo'
 import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 
 const ATTACHED_MODULE_POLL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000

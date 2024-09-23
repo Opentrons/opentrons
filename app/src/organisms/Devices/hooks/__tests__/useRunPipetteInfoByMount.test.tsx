@@ -26,8 +26,8 @@ import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
   useRunPipetteInfoByMount,
-  useStoredProtocolAnalysis,
 } from '..'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import _uncastedModifiedSimpleV6Protocol from '../__fixtures__/modifiedSimpleV6.json'
 
 import type * as SharedData from '@opentrons/shared-data'
@@ -46,7 +46,7 @@ vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../useAttachedPipetteCalibrations')
 vi.mock('../useAttachedPipettes')
 vi.mock('../useTipLengthCalibrations')
-vi.mock('../useStoredProtocolAnalysis')
+vi.mock('/app/resources/analysis')
 
 const PIPETTE_CALIBRATIONS = {
   left: {

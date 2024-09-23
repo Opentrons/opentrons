@@ -19,9 +19,37 @@ import type {
   TaskProps,
 } from '../../TaskList/types'
 import type { AttachedPipette } from '/app/redux/pipettes/types'
-import type { DashboardCalOffsetInvoker } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
-import type { DashboardCalTipLengthInvoker } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
-import type { DashboardCalDeckInvoker } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
+import type {
+  PipetteOffsetCalibrationSessionParams,
+  TipLengthCalibrationSessionParams,
+} from '/app/redux/sessions/types'
+
+export interface DashboardOffsetCalInvokerProps {
+  params: Pick<PipetteOffsetCalibrationSessionParams, 'mount'> &
+    Partial<Omit<PipetteOffsetCalibrationSessionParams, 'mount'>>
+}
+
+export type DashboardCalOffsetInvoker = (
+  props: DashboardOffsetCalInvokerProps
+) => void
+
+export interface DashboardTipLengthCalInvokerProps {
+  params: Pick<TipLengthCalibrationSessionParams, 'mount'> &
+    Partial<Omit<TipLengthCalibrationSessionParams, 'mount'>>
+  hasBlockModalResponse: boolean | null
+  invalidateHandler?: () => void
+}
+
+export type DashboardCalTipLengthInvoker = (
+  props: DashboardTipLengthCalInvokerProps
+) => void
+
+export interface DashboardCalDeckInvokerProps {
+  invalidateHandler?: () => void
+}
+export type DashboardCalDeckInvoker = (
+  props?: DashboardCalDeckInvokerProps
+) => void
 
 const CALIBRATION_DATA_POLL_MS = 5000
 

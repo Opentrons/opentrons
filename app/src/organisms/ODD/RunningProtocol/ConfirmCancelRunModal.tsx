@@ -20,8 +20,8 @@ import {
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-import { useTrackProtocolRunEvent } from '/app/organisms/Devices/hooks'
-import { useRunStatus } from '/app/organisms/RunTimeControl/hooks'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
+import { useRunStatus } from '/app/resources/runs'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import { CancelingRunModal } from './CancelingRunModal'

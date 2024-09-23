@@ -7,7 +7,7 @@ import { SECURITY_WPA_EAP } from '@opentrons/api-client'
 import { renderHook } from '@testing-library/react'
 import { getRobotApiVersionByName } from '/app/redux/discovery'
 
-import { useIsFlex } from '/app/organisms/Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useCanDisconnect } from '../hooks/useCanDisconnect'
 import { useWifiList } from '../hooks/useWifiList'
 
@@ -16,7 +16,7 @@ import type { Store } from 'redux'
 import type { State } from '/app/redux/types'
 
 vi.mock('../hooks/useWifiList')
-vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/discovery')
 
 const store: Store<State> = createStore(state => state, {})

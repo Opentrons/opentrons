@@ -7,7 +7,7 @@ import { useToaster } from '/app/organisms/ToasterOven'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { useRunTimeParameters } from '/app/pages/Desktop/Protocols/hooks'
 import { Parameters } from '../Parameters'
-import { mockRunTimeParameterData } from '../fixtures'
+import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
 
 vi.mock('/app/organisms/ToasterOven')
 vi.mock('/app/pages/Desktop/Protocols/hooks')

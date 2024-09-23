@@ -18,6 +18,7 @@ import { expectedTaskList } from '/app/organisms/Devices/hooks/__fixtures__/task
 import { mockLeftProtoPipette } from '/app/redux/pipettes/__fixtures__'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/organisms/Devices/hooks')
 vi.mock('../hooks/useDashboardCalibratePipOffset')
 vi.mock('../hooks/useDashboardCalibrateTipLength')

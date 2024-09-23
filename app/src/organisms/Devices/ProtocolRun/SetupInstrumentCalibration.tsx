@@ -12,11 +12,9 @@ import {
 import * as PipetteConstants from '/app/redux/pipettes/constants'
 import { getShowPipetteCalibrationWarning } from '../utils'
 import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
-import {
-  useRunPipetteInfoByMount,
-  useStoredProtocolAnalysis,
-  useIsFlex,
-} from '../hooks'
+import { useRunPipetteInfoByMount } from '../hooks'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { SetupPipetteCalibrationItem } from './SetupPipetteCalibrationItem'
 import { SetupFlexPipetteCalibrationItem } from './SetupFlexPipetteCalibrationItem'
 import { SetupGripperCalibrationItem } from './SetupGripperCalibrationItem'

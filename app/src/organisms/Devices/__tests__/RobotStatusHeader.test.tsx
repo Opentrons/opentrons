@@ -16,7 +16,7 @@ import {
   OPENTRONS_USB,
 } from '/app/redux/discovery'
 import { getNetworkInterfaces } from '/app/redux/networking'
-import { useIsFlex } from '../hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { RobotStatusHeader } from '../RobotStatusHeader'
 import { useNotifyRunQuery, useCurrentRunId } from '/app/resources/runs'
 
@@ -28,7 +28,7 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/networking')
-vi.mock('../hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/runs')
 
 const MOCK_OTIE = {

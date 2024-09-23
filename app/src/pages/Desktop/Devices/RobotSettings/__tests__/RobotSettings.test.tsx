@@ -8,7 +8,7 @@ import { i18n } from '/app/i18n'
 import { RobotSettingsCalibration } from '/app/organisms/RobotSettingsCalibration'
 import { RobotSettingsNetworking } from '/app/organisms/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsAdvanced } from '/app/organisms/Devices/RobotSettings/RobotSettingsAdvanced'
-import { useRobot } from '/app/organisms/Devices/hooks'
+import { useRobot } from '/app/redux-resources/robots'
 import { RobotSettings } from '..'
 import { when } from 'vitest-when'
 import {
@@ -21,7 +21,7 @@ import { getRobotUpdateSession } from '/app/redux/robot-update'
 vi.mock('/app/organisms/RobotSettingsCalibration')
 vi.mock('/app/organisms/Devices/RobotSettings/RobotSettingsNetworking')
 vi.mock('/app/organisms/Devices/RobotSettings/RobotSettingsAdvanced')
-vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/robot-update')
 

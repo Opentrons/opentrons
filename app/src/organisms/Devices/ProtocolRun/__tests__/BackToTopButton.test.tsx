@@ -12,12 +12,12 @@ import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '/app/redux/analytics'
 import { BackToTopButton } from '../BackToTopButton'
-import { useRobot } from '../../hooks'
+import { useRobot } from '/app/redux-resources/robots'
 
 import type { Mock } from 'vitest'
 
 vi.mock('/app/redux/analytics')
-vi.mock('../../hooks')
+vi.mock('/app/redux-resources/robots')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'

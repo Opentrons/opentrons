@@ -41,6 +41,7 @@ import type { State } from '/app/redux/types'
 vi.mock('/app/redux/robot-update/selectors')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('../hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../../UpdateRobotBanner')
 vi.mock('/app/redux/config')
 vi.mock('../RobotOverflowMenu')

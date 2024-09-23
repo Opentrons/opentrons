@@ -11,7 +11,7 @@ import {
   PHYSICALLY_ENGAGED,
 } from '../../../EmergencyStop'
 import { useIsRobotBusy } from '../useIsRobotBusy'
-import { useIsFlex } from '../useIsFlex'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
@@ -20,8 +20,7 @@ import type { Sessions, Runs } from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../ProtocolUpload/hooks')
-vi.mock('../useIsFlex')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/maintenance_runs')
 

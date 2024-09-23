@@ -1,6 +1,6 @@
 import { when } from 'vitest-when'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useIsFlex } from '/app/organisms/Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useEstopQuery } from '@opentrons/react-api-client'
 import {
   DISENGAGED,
@@ -11,7 +11,7 @@ import {
 import { useIsEstopNotDisengaged } from '../hooks/useIsEstopNotDisengaged'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/redux-resources/robots')
 
 const ROBOT_NAME = 'mockRobot'
 const mockEstopStatus = {

@@ -25,7 +25,7 @@ import {
 } from '@opentrons/components'
 
 import { QuaternaryButton } from '/app/atoms/buttons'
-import { useIsFlex } from '/app/organisms/Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
 import {
   getRobotAddressesByName,

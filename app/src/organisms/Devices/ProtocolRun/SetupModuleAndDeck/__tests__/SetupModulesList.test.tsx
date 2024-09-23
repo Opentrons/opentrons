@@ -13,15 +13,14 @@ import {
   mockMagneticModuleGen2,
   mockThermocycler,
 } from '/app/redux/modules/__fixtures__'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { useChainLiveCommands } from '/app/resources/runs'
 import { ModuleSetupModal } from '../../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
 import {
-  useIsFlex,
   useModuleRenderInfoForProtocolById,
   useUnmatchedModulesForProtocol,
   useRunCalibrationStatus,
-  useRobot,
 } from '../../../hooks'
 import { OT2MultipleModulesHelp } from '../OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
@@ -33,6 +32,7 @@ import type { DiscoveredRobot } from '/app/redux/discovery/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../LocationConflictModal')
 vi.mock('../UnMatchedModuleWarning')
 vi.mock('../../../../ModuleCard/ModuleSetupModal')

@@ -10,7 +10,9 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import runRecord from '../ProtocolRun/ProtocolRunHeader/RunHeaderModalContainer/modals/__fixtures__/runRecord.json'
-import { useDownloadRunLog, useTrackProtocolRunEvent, useRobot } from '../hooks'
+import { useDownloadRunLog } from '../hooks'
+import { useRobot } from '/app/redux-resources/robots'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useRunControls } from '../../RunTimeControl/hooks'
 import {
   useTrackEvent,
@@ -26,13 +28,15 @@ import type { CommandsData } from '@opentrons/api-client'
 
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/robot-update/selectors')
-vi.mock('../../Devices/hooks')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/organisms/Devices/hooks')
 vi.mock('../../RunTimeControl/hooks')
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/config')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux-resources/analytics')
 vi.mock('@opentrons/react-api-client')
 
 const render = (

@@ -34,7 +34,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
-import type { TrackProtocolRunEvent } from '../../Devices/hooks'
+import type { TrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import type { RobotAnalyticsData } from '/app/redux/analytics/types'
 
 const TITLE_TEXT_STYLE = css`

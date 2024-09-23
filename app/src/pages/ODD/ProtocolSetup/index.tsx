@@ -38,10 +38,12 @@ import {
   useLPCDisabledReason,
   useModuleCalibrationStatus,
   useProtocolAnalysisErrors,
-  useRobotAnalyticsData,
-  useRobotType,
-  useTrackProtocolRunEvent,
 } from '/app/organisms/Devices/hooks'
+import { useRobotType } from '/app/redux-resources/robots'
+import {
+  useRobotAnalyticsData,
+  useTrackProtocolRunEvent,
+} from '/app/redux-resources/analytics'
 
 import { getProtocolModulesInfo } from '/app/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import {
@@ -61,10 +63,7 @@ import {
 } from '/app/organisms/ODD/ProtocolSetup'
 import { useLaunchLPC } from '/app/organisms/LabwarePositionCheck/useLaunchLPC'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
-import {
-  useRunControls,
-  useRunStatus,
-} from '/app/organisms/RunTimeControl/hooks'
+import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
@@ -80,7 +79,7 @@ import { getLatestCurrentOffsets } from '/app/organisms/Devices/ProtocolRun/Setu
 import { CloseButton, PlayButton } from './Buttons'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
-import { useNotifyRunQuery } from '/app/resources/runs'
+import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
 
 import type { Run } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'

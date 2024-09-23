@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { useRobot } from '../hooks'
+import { useRobot } from '/app/redux-resources/robots'
 import { getRobotSerialNumber } from '/app/redux/discovery'
 import { SecondaryButton } from '@opentrons/components'
 
