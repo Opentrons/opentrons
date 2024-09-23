@@ -37,6 +37,7 @@ from .config import (
     ConfigType,
     get_tip_volumes_for_qc,
 )
+from . import config
 from .measurement.record import GravimetricRecorder
 from .measurement import DELAY_FOR_MEASUREMENT, SupportedLiquid
 from .measurement.scale import Scale
@@ -570,6 +571,7 @@ if __name__ == "__main__":
     parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--skip-labware-offsets", action="store_true")
     parser.add_argument("--no-blank", action="store_true")
+    parser.add_argument("--blank-trials", type=int, default=10)
     parser.add_argument("--mix", action="store_true")
     parser.add_argument("--user-volumes", action="store_true")
     parser.add_argument("--gantry-speed", type=int, default=GANTRY_MAX_SPEED)
@@ -597,6 +599,7 @@ if __name__ == "__main__":
     parser.add_argument("--dilution", type=float, default=1.0)
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
+    config.NUM_BLANK_TRIALS = args.blank_trials
     if not run_args.ctx.is_simulating():
         serial_logger = subprocess.Popen(
             [
