@@ -233,7 +233,7 @@ class MoveLabwareImplementation(
 
         state_update.set_labware_location(
             labware_id=params.labwareId,
-            new_location=validated_new_loc,
+            new_location=available_new_location,
             new_offset_id=new_offset_id,
         )
 

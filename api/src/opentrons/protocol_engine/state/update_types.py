@@ -186,7 +186,7 @@ class StateUpdate:
         location: LabwareLocation,
     ) -> None:
         """Add loaded labware to state."""
-        self.set_loaded_labware_definition = LoadedLabwareUpdate(
+        self.loaded_labware = LoadedLabwareUpdate(
             definition=definition,
             labware_id=labware_id,
             offset_id=offset_id,
