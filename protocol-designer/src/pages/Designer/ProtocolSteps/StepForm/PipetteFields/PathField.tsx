@@ -1,24 +1,21 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import cx from 'classnames'
 import {
   DIRECTION_COLUMN,
   Flex,
-  FormGroup,
-  LegacyTooltip,
   RadioButton,
   SPACING,
+  Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 import { selectors as stepFormSelectors } from '../../../../../step-forms'
 import SINGLE_IMAGE from '../../../../../assets/images/path_single_transfers.svg'
 import MULTI_DISPENSE_IMAGE from '../../../../../assets/images/path_multi_dispense.svg'
 import MULTI_ASPIRATE_IMAGE from '../../../../../assets/images/path_multi_aspirate.svg'
+import { getDisabledPathMap } from './utils'
 import type { PathOption } from '../../../../../form-types'
 import type { FieldProps } from '../types'
-import { getDisabledPathMap } from './utils'
-
 import type { DisabledPathMap, ValuesForPath } from './utils'
 
 const PATH_ANIMATION_IMAGES = {
@@ -53,51 +50,41 @@ const ALL_PATH_OPTIONS: Array<{ name: PathOption; image: string }> = [
 
 type PathFieldProps = FieldProps & ValuesForPath
 
-interface ButtonProps {
+interface PathButtonProps {
   children?: React.ReactNode
   disabled: boolean
   id?: string
   selected: boolean
   subtitle: string
-  onClick: (e: React.MouseEvent) => unknown
+  onClick: (e: React.ChangeEvent<HTMLInputElement>) => void
   path: PathOption
 }
 
-const PathButton = (buttonProps: ButtonProps): JSX.Element => {
-  const {
-    children,
-    disabled,
-    onClick,
-    id,
-    path,
-    selected,
-    subtitle,
-  } = buttonProps
+const PathButton = (props: PathButtonProps): JSX.Element => {
+  const { disabled, onClick, id, path, selected, subtitle } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { t } = useTranslation('form')
+  const { t } = useTranslation(['form', 'protocol_steps'])
+  // TODO: update the tooltip and images
   const tooltip = (
-    <LegacyTooltip {...tooltipProps}>
+    <Tooltip tooltipProps={tooltipProps}>
       <div>{t(`step_edit_form.field.path.title.${path}`)}</div>
       <img src={PATH_ANIMATION_IMAGES[path]} />
       <div>{subtitle}</div>
-    </LegacyTooltip>
+    </Tooltip>
   )
 
-  const pathButtonData = `PathButton_${selected ? 'selected' : 'deselected'}_${
-    disabled ? 'disabled' : 'enabled'
-  }`
-
   return (
-    <Flex {...targetProps} width="100%">
+    <Flex {...targetProps} width="100%" key={id}>
       {tooltip}
       <RadioButton
+        isSelected={selected}
         largeDesktopBorderRadius
-        onChange={disabled ? null : onClick}
+        onChange={e => {
+          onClick(e)
+        }}
         disabled={disabled}
-        buttonLabel={path}
+        buttonLabel={t(`protocol_steps:${path}`)}
         buttonValue={path}
-        // id={id}
-        // data-test={pathButtonData}
       />
     </Flex>
   )
@@ -145,6 +132,7 @@ export const PathField = (props: PathFieldProps): JSX.Element => {
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing8}
       padding={SPACING.spacing16}
+      width="100%"
     >
       {ALL_PATH_OPTIONS.map(option => (
         <PathButton

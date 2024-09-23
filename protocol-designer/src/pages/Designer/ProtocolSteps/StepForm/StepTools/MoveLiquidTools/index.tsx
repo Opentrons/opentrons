@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { getEnableReturnTip } from '../../../../../../feature-flags/selectors'
 import {
+  getAdditionalEquipmentEntities,
   getLabwareEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
@@ -26,6 +27,9 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
   const { stepType, path } = formData
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const [collapsed, _setCollapsed] = useState<boolean>(true)
+  const additionalEquipmentEntities = useSelector(
+    getAdditionalEquipmentEntities
+  )
   const enableReturnTip = useSelector(getEnableReturnTip)
   const labwares = useSelector(getLabwareEntities)
   const pipettes = useSelector(getPipetteEntities)
@@ -40,6 +44,11 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
   const is96Channel =
     propsForFields.pipette.value != null &&
     pipettes[String(propsForFields.pipette.value)].name === 'p1000_96'
+  const isDisposalLocation =
+    additionalEquipmentEntities[String(propsForFields.dispense_labware.value)]
+      ?.name === 'wasteChute' ||
+    additionalEquipmentEntities[String(propsForFields.dispense_labware.value)]
+      ?.name === 'trashBin'
 
   return toolboxStep === 1 ? (
     <Flex flexDirection={DIRECTION_COLUMN}>
@@ -64,12 +73,14 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
       <Line />
       <LabwareField {...propsForFields.dispense_labware} />
       <Line />
-      <WellSelectionField
-        {...propsForFields.dispense_wells}
-        labwareId={String(propsForFields.dispense_labware.value)}
-        pipetteId={formData.pipette}
-        nozzles={String(propsForFields.nozzles.value) ?? null}
-      />
+      {isDisposalLocation ? null : (
+        <WellSelectionField
+          {...propsForFields.dispense_wells}
+          labwareId={String(propsForFields.dispense_labware.value)}
+          pipetteId={formData.pipette}
+          nozzles={String(propsForFields.nozzles.value) ?? null}
+        />
+      )}
       <Line />
       <ChangeTipField
         {...propsForFields.changeTip}
