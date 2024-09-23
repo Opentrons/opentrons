@@ -81,7 +81,7 @@ export function SkipToNextStep(
     currentRecoveryOptionUtils,
   } = props
   const {
-    setRobotInMotion,
+    handleMotionRouting,
     goBackPrevStep,
     proceedToRouteAndStep,
   } = routeUpdateActions
@@ -100,7 +100,7 @@ export function SkipToNextStep(
   }
 
   const primaryBtnOnClick = (): Promise<void> => {
-    return setRobotInMotion(true, ROBOT_SKIPPING_STEP.ROUTE).then(() => {
+    return handleMotionRouting(true, ROBOT_SKIPPING_STEP.ROUTE).then(() => {
       skipFailedCommand()
     })
   }

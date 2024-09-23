@@ -61,7 +61,7 @@ export const mockRecoveryContentProps: RecoveryContentProps = {
   errorKind: 'GENERAL_ERROR',
   robotType: FLEX_ROBOT_TYPE,
   runId: 'MOCK_RUN_ID',
-  isDoorOpen: false,
+  doorStatusUtils: { isDoorOpen: false, isProhibitedDoorOpen: false },
   isOnDevice: true,
   runStatus: RUN_STATUS_AWAITING_RECOVERY,
   recoveryMap: {
