@@ -222,14 +222,10 @@ class RunArgs:
                 args.pipette, args.channels, args.extra, args.photometric
             )
             for tip in tip_volumes:
-                tip_batches[f"tips_{tip}ul"] = helpers._get_tip_batch(
-                    True, tip
-                )
+                tip_batches[f"tips_{tip}ul"] = helpers._get_tip_batch(True, tip)
         else:
             tip_volumes = [args.tip]
-            tip_batches[f"tips_{args.tip}ul"] = helpers._get_tip_batch(
-                True, args.tip
-            )
+            tip_batches[f"tips_{args.tip}ul"] = helpers._get_tip_batch(True, args.tip)
 
         volumes: Dict[int, List[float]] = {}
         for tip in tip_volumes:

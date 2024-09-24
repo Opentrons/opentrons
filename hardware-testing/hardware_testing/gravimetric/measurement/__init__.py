@@ -213,6 +213,10 @@ def calculate_change_in_volume(
     rel_density_mix = (dilution * rel_density_liq) + (
         (1.0 - dilution) * rel_density_dih2o
     )
+    print(
+        f"Calculating uL of {liquid.name.upper()}-{int(dilution * 100)} "
+        f"(relative density = {round(rel_density_mix, 3)})"
+    )
     liquid_density_kg_m3 = rel_density_mix * water_density_at_this_temperature_kg_m3
     # equations in ISO use hPa, so sticking with that
     air_pressure_hpa = avg_env.pascals_air / 100
