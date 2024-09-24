@@ -374,7 +374,7 @@ def find_volume_at_well_height(
             target_volume = volume_from_height_spherical(
                 target_height=target_height, radius_of_curvature=f["radiusOfCurvature"]
             )
-        if f["topHeight"] < target_height < next_f["targetHeight"]:
+        elif f["topHeight"] < target_height < next_f["targetHeight"]:
             relative_target_height = target_height - f["topHeight"]
             frustum_height = next_f["topHeight"] - f["topHeight"]
             target_volume = volume_at_height_within_section(
@@ -414,19 +414,19 @@ def find_height_at_well_volume(
     ):
         bottom_cross_section, top_cross_section = cross_sections
         (bottom_height, bottom_volume), (top_height, top_volume) = capacity
+        relative_target_volume = target_volume - bottom_volume
+        frustum_height = top_height - bottom_height
 
         if (
             target_volume < bottom_volume
             and bottom_cross_section["shape"] == "spherical"
         ):
-            target_height = height_from_frustum_formula(
-                area_1=bottom_cross_section,
-                area_2=top_cross_section,
+            target_height = height_from_volume_spherical(
                 volume=target_volume,
+                radius_of_curvature=bottom_cross_section["radiusOfCurvature"],
+                total_frustum_height=frustum_height,
             )
-        if bottom_volume < target_volume < top_volume:
-            relative_target_volume = target_volume - bottom_volume
-            frustum_height = top_height - bottom_height
+        elif bottom_volume < target_volume < top_volume:
             target_height = height_at_volume_within_section(
                 top_cross_section=top_cross_section,
                 bottom_cross_section=bottom_cross_section,
@@ -435,4 +435,4 @@ def find_height_at_well_volume(
             )
     if not target_height:
         raise InvalidLiquidHeightFound("Unable to find height at given well-volume.")
-    return closed_section_height + target_height
+    return target_height + closed_section_height
