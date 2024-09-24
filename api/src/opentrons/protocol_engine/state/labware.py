@@ -212,13 +212,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
             location = action.state_update.loaded_labware.new_location
 
-            display_name = None
-            if action.state_update.loaded_labware.display_name:
-                display_name = action.state_update.loaded_labware.display_name
-            else:
-                display_name = self._state.labware_by_id[
-                    action.state_update.loaded_labware.labware_id
-                ].displayName
+            display_name = action.state_update.loaded_labware.display_name
 
             self._state.labware_by_id[
                 action.state_update.loaded_labware.labware_id
