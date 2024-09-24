@@ -29,7 +29,6 @@ import {
   useLPCDisabledReason,
   useModuleCalibrationStatus,
   useProtocolAnalysisErrors,
-  useRunCreatedAtTimestamp,
 } from '/app/organisms/Devices/hooks'
 import { useAttachedModules } from '/app/resources/modules'
 import { useRobotType } from '/app/redux-resources/robots'
@@ -61,7 +60,11 @@ import { useDeckConfigurationCompatibility } from '/app/resources/deck_configura
 import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from '../ConfirmSetupStepsCompleteModal'
 import { ProtocolSetup } from '../'
-import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
+import {
+  useNotifyRunQuery,
+  useRunStatus,
+  useRunCreatedAtTimestamp,
+} from '/app/resources/runs'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
 

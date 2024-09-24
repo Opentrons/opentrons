@@ -17,7 +17,7 @@ import {
 } from '@opentrons/components'
 
 import { useRunHasStarted } from '/app/resources/runs'
-import { formatTimestamp } from '../utils'
+import { formatTimestamp } from '/app/transformations/runs'
 
 interface SetupCalibrationItemProps {
   calibratedDate: string | null

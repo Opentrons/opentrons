@@ -15,7 +15,7 @@ import {
   CURSOR_POINTER,
 } from '@opentrons/components'
 import { formatInterval } from '/app/transformations/commands'
-import { formatTimestamp } from './utils'
+import { formatTimestamp } from '/app/transformations/runs'
 import { EMPTY_TIMESTAMP } from '/app/resources/runs'
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
 import { HistoricalProtocolRunDrawer as Drawer } from './HistoricalProtocolRunDrawer'
