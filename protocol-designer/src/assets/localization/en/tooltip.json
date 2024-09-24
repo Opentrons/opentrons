@@ -61,7 +61,8 @@
       "preWetTip": "Pre-wet pipette tip by aspirating and dispensing 2/3 of the tip's max volume",
       "volume": "Volume to dispense in each well",
       "blowout_z_offset": "The height at which blowout occurs from the top of the well",
-      "blowout_flowRate": "Blowout speed"
+      "blowout_flowRate": "Blowout speed",
+      "setTemperature": "Select the temperature to set your module to"
     },
     "indeterminate": {
       "aspirate_airGap_checkbox": "Not all selected steps are using this setting",
