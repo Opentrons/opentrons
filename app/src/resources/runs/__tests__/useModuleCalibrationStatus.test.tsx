@@ -4,8 +4,8 @@ import { renderHook } from '@testing-library/react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 
-import { useModuleCalibrationStatus } from '..'
-import { useModuleRenderInfoForProtocolById } from '/app/resources/runs'
+import { useModuleCalibrationStatus } from '../useModuleCalibrationStatus'
+import { useModuleRenderInfoForProtocolById } from '../useModuleRenderInfoForProtocolById'
 import { useIsFlex } from '/app/redux-resources/robots'
 
 import { mockMagneticModuleGen2 } from '/app/redux/modules/__fixtures__'
@@ -16,7 +16,7 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
 vi.mock('/app/redux-resources/robots')
-vi.mock('/app/resources/runs')
+vi.mock('../useModuleRenderInfoForProtocolById')
 
 let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 

@@ -14,7 +14,6 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { useModuleCalibrationStatus } from '../../../../hooks'
 import { useRobot } from '/app/redux-resources/robots'
 import { useRobotAnalyticsData } from '/app/redux-resources/analytics'
 import {
@@ -23,6 +22,7 @@ import {
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useUnmatchedModulesForProtocol,
+  useModuleCalibrationStatus,
 } from '/app/resources/runs'
 import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
 import { getFallbackRobotSerialNumber, isRunAgainStatus } from '../../utils'

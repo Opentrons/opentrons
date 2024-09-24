@@ -9,9 +9,9 @@ import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
 } from '/app/resources/deck_configuration/utils'
-import { useModuleCalibrationStatus } from '../../../hooks'
 import {
   useRunHasStarted,
+  useModuleCalibrationStatus,
   useUnmatchedModulesForProtocol,
 } from '/app/resources/runs'
 import { useIsFlex } from '/app/redux-resources/robots'
@@ -20,7 +20,6 @@ import { SetupModulesList } from '../SetupModulesList'
 import { SetupModulesMap } from '../SetupModulesMap'
 import { SetupFixtureList } from '../SetupFixtureList'
 
-vi.mock('../../../hooks')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../SetupModulesList')
 vi.mock('../SetupModulesMap')

@@ -25,8 +25,8 @@ import { useRobotType } from '/app/redux-resources/robots'
 import {
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
+  useModuleCalibrationStatus,
 } from '/app/resources/runs'
-import { useModuleCalibrationStatus } from '../../hooks'
 import { SetupModulesMap } from './SetupModulesMap'
 import { SetupModulesList } from './SetupModulesList'
 import { SetupFixtureList } from './SetupFixtureList'

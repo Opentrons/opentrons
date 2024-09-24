@@ -25,10 +25,7 @@ import {
 import { i18n } from '/app/i18n'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
-import {
-  useModuleCalibrationStatus,
-  useProtocolAnalysisErrors,
-} from '/app/organisms/Devices/hooks'
+import { useProtocolAnalysisErrors } from '/app/organisms/Devices/hooks'
 import { useAttachedModules } from '/app/resources/modules'
 import { useRobotType } from '/app/redux-resources/robots'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
@@ -64,6 +61,7 @@ import {
   useRunStatus,
   useRunCreatedAtTimestamp,
   useLPCDisabledReason,
+  useModuleCalibrationStatus,
 } from '/app/resources/runs'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
