@@ -28,11 +28,9 @@ def execute(client: pmk.SSHClient, command: str, args: list) -> Optional[int]:
                 )
         else:
             print(f"{args[0]} command success:", "".join(stdout_lines))
-            # client.close()
             return 0
     except Exception as e:
         print(f"Error with {args[0]}:", e)
-        # client.close()
         raise  # Re-raise the exception to propagate it up and terminate the process
     return None
 
@@ -65,8 +63,8 @@ cd = "cd /opt/opentrons-robot-server && "
 print("Executing Script on All Robots:")
 
 
-def run_command_on_ip(index : int) -> None:
-    """ Execute ssh command and start abr_asair script on the specified robot"""
+def run_command_on_ip(index: int) -> None:
+    """Execute ssh command and start abr_asair script on the specified robot"""
     curr_ip = robot_ips[index]
     try:
         ssh = connect_ssh(curr_ip)
