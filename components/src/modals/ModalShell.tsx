@@ -26,6 +26,8 @@ export interface ModalShellProps extends StyleProps {
   footer?: React.ReactNode
   /** Optional full page takeover */
   fullPage?: boolean
+  /** Optional zIndex for the overlay */
+  zIndexOverlay?: number
 }
 
 /**
@@ -46,11 +48,13 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
     footer,
     fullPage = false,
     children,
+    zIndexOverlay = 1,
     ...styleProps
   } = props
 
   return (
     <Overlay
+      zIndex={zIndexOverlay}
       aria-label="BackgroundOverlay_ModalShell"
       onClick={(e: React.MouseEvent) => {
         e.stopPropagation()
@@ -74,17 +78,17 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
     </Overlay>
   )
 }
-
-const Overlay = styled.div`
+const Overlay = styled.div<{ zIndex: string | number }>`
   position: ${POSITION_ABSOLUTE};
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
-  z-index: 1;
+  z-index: ${({ zIndex }) => zIndex};
   background-color: ${COLORS.black90}${COLORS.opacity40HexCode};
   cursor: ${CURSOR_DEFAULT};
 `
+
 const ContentArea = styled.div<{ zIndex: string | number }>`
   display: flex;
   position: ${POSITION_ABSOLUTE};

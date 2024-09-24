@@ -20,6 +20,7 @@ export interface ModalProps extends StyleProps {
   childrenPadding?: string | number
   children?: React.ReactNode
   footer?: React.ReactNode
+  zIndexOverlay?: number
 }
 
 /**
@@ -36,6 +37,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
     footer,
     titleElement1,
     titleElement2,
+    zIndexOverlay,
     ...styleProps
   } = props
 
@@ -73,6 +75,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
 
   return (
     <ModalShell
+      zIndexOverlay={zIndexOverlay}
       width={styleProps.width ?? '31.25rem'}
       header={modalHeader}
       onOutsideClick={closeOnOutsideClick ?? false ? onClose : undefined}

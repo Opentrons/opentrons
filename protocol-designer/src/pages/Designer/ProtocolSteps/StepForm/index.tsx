@@ -47,9 +47,9 @@ interface DispatchProps {
   saveStepForm: () => void
   handleChangeFormInput: (name: string, value: unknown) => void
 }
-type StepEditFormManagerProps = StateProps & DispatchProps
+type StepFormManagerProps = StateProps & DispatchProps
 
-function StepFormManager(props: StepEditFormManagerProps): JSX.Element | null {
+function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
   const {
     canSave,
     deleteStep,
@@ -181,7 +181,6 @@ function StepFormManager(props: StepEditFormManagerProps): JSX.Element | null {
           focusHandlers,
           formData,
           handleClose: confirmClose,
-          handleDelete: confirmDelete,
           handleSave,
           propsForFields,
         }}
@@ -241,10 +240,14 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DispatchProps => {
 export const StepForm: ConnectedComponent<typeof StepFormManager, {}> = connect(
   mapStateToProps,
   mapDispatchToProps
-)((props: StepEditFormManagerProps) => {
+)((props: StepFormManagerProps) => {
   const { formData } = props
   return (
     // key by ID so manager state doesn't persist across different forms
-    <StepFormManager key={formData?.id ?? 'empty'} {...props} />
+    <StepFormManager
+      key={formData?.id ?? 'empty'}
+      formData={formData}
+      {...props}
+    />
   )
 })

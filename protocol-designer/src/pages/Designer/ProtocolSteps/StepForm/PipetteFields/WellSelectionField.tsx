@@ -17,8 +17,8 @@ import {
   getWellSelectionLabwareKey,
 } from '../../../../../ui/steps'
 import { selectors as stepFormSelectors } from '../../../../../step-forms'
+import { SelectWellsModal } from '../../../../../organisms'
 import { getMainPagePortalEl } from '../../../../../components/portals/MainPageModalPortal'
-import { WellSelectionModal } from '../../../../../components/StepEditForm/fields/WellSelectionField/WellSelectionModal'
 import { getNozzleType } from '../utils'
 import type { FieldProps } from '../types'
 
@@ -104,8 +104,7 @@ export const WellSelectionField = (
         />
       </Flex>
       {createPortal(
-        //  TODO(ja): update this modal to match designs
-        <WellSelectionModal
+        <SelectWellsModal
           isOpen={wellSelectionLabwareKey === modalKey}
           key={modalKey}
           labwareId={labwareId}

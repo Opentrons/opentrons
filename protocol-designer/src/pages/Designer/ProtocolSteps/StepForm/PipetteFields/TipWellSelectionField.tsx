@@ -11,7 +11,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { getPipetteEntities } from '../../../../../step-forms/selectors'
-import { WellSelectionModal } from '../../../../../components/StepEditForm/fields/WellSelectionField/WellSelectionModal'
+import { SelectWellsModal } from '../../../../../organisms'
 import { getMainPagePortalEl } from '../../../../../components/portals/MainPageModalPortal'
 import { getNozzleType } from '../utils'
 
@@ -49,7 +49,7 @@ export function TipWellSelectionField(
   return (
     <>
       {createPortal(
-        <WellSelectionModal
+        <SelectWellsModal
           isOpen={openModal}
           key={`${labwareId}_${name}_TipField`}
           labwareId={String(labwareId)}
