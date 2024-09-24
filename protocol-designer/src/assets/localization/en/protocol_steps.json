@@ -3,6 +3,7 @@
   "duplicate": "Duplicate step",
   "final_deck_state": "Final deck state",
   "heater_shaker_settings": "Heater-shaker settings",
+  "module": "Module",
   "new_location": "New location",
   "protocol_steps": "Protocol steps",
   "protocol_timeline": "Protocol timeline",

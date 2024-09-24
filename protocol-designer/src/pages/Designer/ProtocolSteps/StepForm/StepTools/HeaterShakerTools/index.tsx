@@ -72,7 +72,7 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
         gridGap={SPACING.spacing8}
       >
         <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-          {t('heater_shaker_settings')}
+          {t('protocol_steps:heater_shaker_settings')}
         </StyledText>
         <ListItem type="noActive">
           <Flex
@@ -113,7 +113,7 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
               <InputStepFormField
                 padding="0"
                 showTooltip={false}
-                title={t('temperature')}
+                title={t('protocol_steps:temperature')}
                 {...propsForFields.targetHeaterShakerTemperature}
                 units={t('units.degrees')}
               />
@@ -155,7 +155,7 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
               <InputStepFormField
                 showTooltip={false}
                 padding="0"
-                title={t('shake')}
+                title={t('protocol_steps:shake')}
                 {...propsForFields.targetSpeed}
                 units={t('units.rpm')}
               />
@@ -228,7 +228,7 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
               <InputStepFormField
                 showTooltip={false}
                 padding="0"
-                title={t('time')}
+                title={t('protocol_steps:time')}
                 {...propsForFields.heaterShakerTimerMinutes}
                 units="HH:MM:SS"
               />
