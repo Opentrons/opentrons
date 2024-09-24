@@ -15,10 +15,12 @@ import {
   localStorageAnnouncementKey,
 } from '../../persist'
 import { useAnnouncements } from './announcements'
+import { useLocation } from 'react-router-dom'
 
 export const AnnouncementModal = (): JSX.Element => {
   const { t } = useTranslation(['modal', 'button'])
   const announcements = useAnnouncements()
+  const location = useLocation()
 
   const { announcementKey, message, heading, image } = announcements[
     announcements.length - 1
@@ -30,7 +32,9 @@ export const AnnouncementModal = (): JSX.Element => {
   const [
     showAnnouncementModal,
     setShowAnnouncementModal,
-  ] = React.useState<boolean>(userHasNotSeenAnnouncement)
+  ] = React.useState<boolean>(
+    location.pathname === '/settings' || userHasNotSeenAnnouncement
+  )
 
   const handleClick = (): void => {
     setLocalStorageItem(localStorageAnnouncementKey, announcementKey)
