@@ -375,6 +375,7 @@ def build_gravimetric_cfg(
     tip_volume: int,
     increment: bool,
     interactive: bool,
+    nominal_plunger: bool,
     return_tip: bool,
     blank: bool,
     mix: bool,
@@ -403,6 +404,7 @@ def build_gravimetric_cfg(
         slots_tiprack=run_args.protocol_cfg.SLOTS_TIPRACK[tip_volume],  # type: ignore[attr-defined]
         increment=increment,
         interactive=interactive,
+        nominal_plunger=nominal_plunger,
         return_tip=return_tip,
         blank=blank,
         mix=mix,
@@ -447,6 +449,7 @@ def build_photometric_cfg(
         pipette_volume=run_args.pipette_volume,
         pipette_channels=pipette_channels,
         increment=False,
+        nominal_plunger=False,
         tip_volume=tip_volume,
         trials=run_args.trials,
         photoplate=run_args.protocol_cfg.PHOTOPLATE_LABWARE,  # type: ignore[attr-defined]
@@ -503,6 +506,7 @@ def _main(
             tip,
             args.increment,
             args.interactive,
+            args.nominal_plunger or args.increment,
             args.return_tip,
             False if args.no_blank else True,
             args.mix,
@@ -562,6 +566,7 @@ if __name__ == "__main__":
     parser.add_argument("--trials", type=int, default=0)
     parser.add_argument("--increment", action="store_true")
     parser.add_argument("--interactive", action="store_true")
+    parser.add_argument("--nominal-plunger", action="store_true")
     parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--skip-labware-offsets", action="store_true")
     parser.add_argument("--no-blank", action="store_true")

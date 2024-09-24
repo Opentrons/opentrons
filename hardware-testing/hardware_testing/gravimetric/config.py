@@ -28,6 +28,7 @@ class VolumetricConfig:
     slots_tiprack: List[int]
     increment: bool
     interactive: bool
+    nominal_plunger: bool
     return_tip: bool
     mix: bool
     user_volumes: bool

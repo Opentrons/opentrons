@@ -212,9 +212,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
         _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
         _num_mixes = 5
         if added_blow_out:
-            push_out = min(
-                liquid_class.dispense.push_out, _get_max_blow_out_ul()
-            )
+            push_out = min(liquid_class.dispense.push_out, _get_max_blow_out_ul())
         else:
             push_out = 0
         for i in range(_num_mixes):

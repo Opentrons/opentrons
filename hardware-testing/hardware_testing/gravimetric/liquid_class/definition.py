@@ -45,33 +45,17 @@ def interpolate(
 
     return LiquidClassSettings(
         aspirate=AspirateSettings(
-            submerge_mm=_interp(
-                a.aspirate.submerge_mm, b.aspirate.submerge_mm
-            ),
-            flow_rate=_interp(
-                a.aspirate.flow_rate, b.aspirate.flow_rate
-            ),
+            submerge_mm=_interp(a.aspirate.submerge_mm, b.aspirate.submerge_mm),
+            flow_rate=_interp(a.aspirate.flow_rate, b.aspirate.flow_rate),
             delay=_interp(a.aspirate.delay, b.aspirate.delay),
-            retract_mm=_interp(
-                a.aspirate.retract_mm, b.aspirate.retract_mm
-            ),
-            air_gap=_interp(
-                a.aspirate.air_gap, b.aspirate.air_gap
-            ),
+            retract_mm=_interp(a.aspirate.retract_mm, b.aspirate.retract_mm),
+            air_gap=_interp(a.aspirate.air_gap, b.aspirate.air_gap),
         ),
         dispense=DispenseSettings(
-            submerge_mm=_interp(
-                a.dispense.submerge_mm, b.dispense.submerge_mm
-            ),
-            flow_rate=_interp(
-                a.dispense.flow_rate, b.dispense.flow_rate
-            ),
+            submerge_mm=_interp(a.dispense.submerge_mm, b.dispense.submerge_mm),
+            flow_rate=_interp(a.dispense.flow_rate, b.dispense.flow_rate),
             delay=_interp(a.dispense.delay, b.dispense.delay),
-            retract_mm=_interp(
-                a.dispense.retract_mm, b.dispense.retract_mm
-            ),
-            push_out=_interp(
-                a.dispense.push_out, b.dispense.push_out
-            ),
+            retract_mm=_interp(a.dispense.retract_mm, b.dispense.retract_mm),
+            push_out=_interp(a.dispense.push_out, b.dispense.push_out),
         ),
     )

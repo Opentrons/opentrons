@@ -340,7 +340,7 @@ def _run_trial(
             callbacks=pipetting_callbacks,
             blank=trial.blank,
             mode=trial.mode,
-            clear_accuracy_function=trial.cfg.increment,
+            clear_accuracy_function=trial.cfg.nominal_plunger,
         )
     else:
         # center channel over well
@@ -375,7 +375,7 @@ def _run_trial(
         callbacks=pipetting_callbacks,
         blank=trial.blank,
         mode=trial.mode,
-        clear_accuracy_function=trial.cfg.increment,
+        clear_accuracy_function=trial.cfg.nominal_plunger,
     )
     trial.pipette._retract()  # retract to top of gantry
 
@@ -397,7 +397,7 @@ def _run_trial(
         callbacks=pipetting_callbacks,
         blank=trial.blank,
         mode=trial.mode,
-        clear_accuracy_function=trial.cfg.increment,
+        clear_accuracy_function=trial.cfg.nominal_plunger,
     )
     trial.pipette._retract()  # retract to top of gantry
     _take_photos(trial, "dispense")
