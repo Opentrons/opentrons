@@ -185,12 +185,13 @@ export const PipetteWizardFlows = (
     }
   }
   const handleClose = (): void => {
-    if (onComplete != null) onComplete()
+    if (onComplete != null) {
+      onComplete()
+    }
     if (maintenanceRunData != null) {
       deleteMaintenanceRun(maintenanceRunData?.data.id)
-    } else {
-      closeFlow()
     }
+    closeFlow()
   }
 
   const {
@@ -213,12 +214,12 @@ export const PipetteWizardFlows = (
         [{ commandType: 'home' as const, params: {} }],
         false
       )
-        .then(() => {
-          handleClose()
-        })
         .catch(error => {
           setIsExiting(true)
           setShowErrorMessage(error.message as string)
+        })
+        .finally(() => {
+          handleClose()
         })
     }
   }

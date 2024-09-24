@@ -202,10 +202,9 @@ export function createQuickTransferFile(
       subcategory: null,
       tags: [],
     },
-    // TODO: formalize designer application data type
     designerApplication: {
-      name: 'Quick Transfer',
-      version: '0.0',
+      name: 'opentrons/quick-transfer',
+      version: '1.0.0',
       data: quickTransferState,
     },
   }
@@ -250,8 +249,6 @@ export function createQuickTransferFile(
     ...commandAnnotionaV1Mixin,
   })
 
-  // Leaving this in for debugging while work is still in flight
-  console.log('Here are the protocol contents:', protocolContents)
   return new File(
     [protocolContents],
     `${protocolBase.metadata.protocolName}.json`

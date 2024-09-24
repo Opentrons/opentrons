@@ -3,19 +3,25 @@ import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import { Route, MemoryRouter, Routes } from 'react-router-dom'
-import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
+
 import {
   useCreateRunMutation,
   useHost,
   useProtocolQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
+
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
 import { useOffsetCandidatesForAnalysis } from '/app/organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
+import {
+  ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
+  ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
+} from '/app/redux/analytics'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { DeleteTransferConfirmationModal } from '../../QuickTransferDashboard/DeleteTransferConfirmationModal'
 import { QuickTransferDetails } from '..'
 import { Deck } from '../Deck'
@@ -40,6 +46,7 @@ vi.mock('/app/organisms/ODD/ProtocolSetup/ProtocolSetupParameters')
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ODD/RobotDashboard/hooks')
+vi.mock('/app/redux-resources/analytics')
 vi.mock(
   '/app/organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 )
@@ -70,6 +77,7 @@ const MOCK_DATA = {
     key: '26ed5a82-502f-4074-8981-57cdda1d066d',
   },
 }
+let mockTrackEventWithRobotSerial: any
 
 const render = (path = '/quick-transfer/fakeTransferId') => {
   return renderWithProviders(
@@ -89,6 +97,12 @@ const render = (path = '/quick-transfer/fakeTransferId') => {
 
 describe('ODDQuickTransferDetails', () => {
   beforeEach(() => {
+    mockTrackEventWithRobotSerial = vi.fn(
+      () => new Promise(resolve => resolve({}))
+    )
+    vi.mocked(useTrackEventWithRobotSerial).mockReturnValue({
+      trackEventWithRobotSerial: mockTrackEventWithRobotSerial,
+    })
     vi.mocked(useCreateRunMutation).mockReturnValue({
       createRun: mockCreateRun,
     } as any)
@@ -128,9 +142,33 @@ describe('ODDQuickTransferDetails', () => {
     )
   })
 
+  it('calls analytics tracking event for showing a quick transfer details page', () => {
+    render()
+    expect(mockTrackEventWithRobotSerial).toHaveBeenCalledWith({
+      name: ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
+      properties: {
+        name:
+          'Nextera XT DNA Library Prep Kit Protocol: Part 1/4 - Tagment Genomic DNA and Amplify Libraries',
+      },
+    })
+  })
+
   it('renders the start setup button', () => {
     render()
     screen.getByText('Start setup')
+  })
+
+  it('fires analytics event when start setup is pressed', () => {
+    render()
+    const setupBtn = screen.getByText('Start setup')
+    fireEvent.click(setupBtn)
+    expect(mockTrackEventWithRobotSerial).toHaveBeenCalledWith({
+      name: ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
+      properties: {
+        name:
+          'Nextera XT DNA Library Prep Kit Protocol: Part 1/4 - Tagment Genomic DNA and Amplify Libraries',
+      },
+    })
   })
 
   it('renders the transfer description', () => {

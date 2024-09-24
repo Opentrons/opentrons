@@ -191,9 +191,10 @@ export const LocationConflictModal = (
     protocolSpecifiesDisplayName = getModuleDisplayName(requiredModule)
   }
 
-  const displaySlotName = isThermocyclerRequired
-    ? 'A1 + B1'
-    : getCutoutDisplayName(cutoutId)
+  const displaySlotName =
+    isThermocyclerRequired || isThermocyclerCurrentFixture
+      ? 'A1 + B1'
+      : getCutoutDisplayName(cutoutId)
 
   if (showModuleSelect && requiredModule != null) {
     return createPortal(
@@ -232,7 +233,7 @@ export const LocationConflictModal = (
             }
             values={{
               currentFixture: currentFixtureDisplayName,
-              cutout: getCutoutDisplayName(cutoutId),
+              cutout: displaySlotName,
             }}
             components={{
               block: <LegacyStyledText as="p" />,
@@ -341,7 +342,7 @@ export const LocationConflictModal = (
             }
             values={{
               currentFixture: currentFixtureDisplayName,
-              cutout: getCutoutDisplayName(cutoutId),
+              cutout: displaySlotName,
             }}
             components={{
               block: <LegacyStyledText fontSize={TYPOGRAPHY.fontSizeH4} />,

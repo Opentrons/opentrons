@@ -52,16 +52,23 @@ export const Deck = (props: { protocolId: string }): JSX.Element => {
       labware => labware.id === labwareId
     )
     if (foundLabware != null) {
+      const location = onDeckItems.find(
+        item => item.labwareId === foundLabware.id
+      )?.initialLocation
       const nickName = onDeckItems.find(
         item => getLabwareDefURI(item.definition) === foundLabware.definitionUri
       )?.nickName
-      setSelectedLabware({
-        ...labwareDef,
-        location: foundLabware.location,
-        nickName: nickName ?? null,
-        id: labwareId,
-      })
-      setShowLabwareDetailsModal(true)
+      if (location != null) {
+        setSelectedLabware({
+          ...labwareDef,
+          location: location,
+          nickName: nickName ?? null,
+          id: labwareId,
+        })
+        setShowLabwareDetailsModal(true)
+      } else {
+        console.warn('no initial labware location found')
+      }
     }
   }
 

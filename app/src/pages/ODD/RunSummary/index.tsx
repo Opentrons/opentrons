@@ -46,6 +46,7 @@ import { onDeviceDisplayFormatTimestamp } from '/app/organisms/Devices/utils'
 import { RunTimer } from '/app/organisms/Devices/ProtocolRun/RunTimer'
 import {
   useTrackProtocolRunEvent,
+  useTrackEventWithRobotSerial,
   useRobotAnalyticsData,
   useRecoveryAnalytics,
 } from '/app/redux-resources/analytics'
@@ -53,6 +54,7 @@ import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_RUN_ACTION,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  ANALYTICS_QUICK_TRANSFER_RERUN,
 } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import { RunFailedModal } from '/app/organisms/ODD/RunningProtocol'
@@ -140,7 +142,9 @@ export function RunSummary(): JSX.Element {
 
   const { reset, isResetRunLoading } = useRunControls(runId, onCloneRunSuccess)
   const trackEvent = useTrackEvent()
-  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
+
+  const { closeCurrentRun } = useCloseCurrentRun()
   // Close the current run only if it's active and then execute the onSuccess callback. Prefer this wrapper over
   // closeCurrentRun directly, since the callback is swallowed if currentRun is null.
   const closeCurrentRunIfValid = (onSuccess?: () => void): void => {
@@ -257,11 +261,20 @@ export function RunSummary(): JSX.Element {
   const runAgain = (): void => {
     setShowRunAgainSpinner(true)
     reset()
-    trackEvent({
-      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-      properties: { sourceLocation: 'RunSummary', robotSerialNumber },
-    })
-    trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN })
+    if (isQuickTransfer) {
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_RERUN,
+        properties: {
+          name: protocolName,
+        },
+      })
+    } else {
+      trackEvent({
+        name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+        properties: { sourceLocation: 'RunSummary', robotSerialNumber },
+      })
+      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN })
+    }
   }
 
   // If no pipettes have tips attached, execute the routing callback.
@@ -361,7 +374,6 @@ export function RunSummary(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
       overflow={OVERFLOW_HIDDEN}
-      disabled={isClosingCurrentRun}
       onClick={handleClickSplash}
     >
       {showSplash ? (

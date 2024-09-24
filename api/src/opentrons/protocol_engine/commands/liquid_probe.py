@@ -6,8 +6,12 @@ from typing_extensions import Literal
 
 from pydantic import Field
 
-from opentrons.protocol_engine.errors.exceptions import MustHomeError, TipNotEmptyError
 from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.errors.exceptions import (
+    MustHomeError,
+    PipetteNotReadyToAspirateError,
+    TipNotEmptyError,
+)
 from opentrons.types import MountType
 from opentrons_shared_data.errors.exceptions import (
     PipetteLiquidNotFoundError,
@@ -33,6 +37,7 @@ from ..errors.error_occurrence import ErrorOccurrence
 if TYPE_CHECKING:
     from ..execution import MovementHandler, PipettingHandler
     from ..resources import ModelUtils
+    from ..state.state import StateView
 
 
 LiquidProbeCommandType = Literal["liquidProbe"]
@@ -97,7 +102,10 @@ class _ExecuteCommonResult(NamedTuple):
 
 
 async def _execute_common(
-    movement: MovementHandler, pipetting: PipettingHandler, params: _CommonParams
+    state_view: StateView,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
+    params: _CommonParams,
 ) -> _ExecuteCommonResult:
     pipette_id = params.pipetteId
     labware_id = params.labwareId
@@ -105,13 +113,21 @@ async def _execute_common(
 
     state_update = update_types.StateUpdate()
 
-    # _validate_tip_attached in pipetting.py is a private method so we're using
-    # get_is_ready_to_aspirate as an indirect way to throw a TipNotAttachedError if appropriate
-    pipetting.get_is_ready_to_aspirate(pipette_id=pipette_id)
+    # May raise TipNotAttachedError.
+    aspirated_volume = state_view.pipettes.get_aspirated_volume(pipette_id)
 
-    if pipetting.get_is_empty(pipette_id=pipette_id) is False:
+    if aspirated_volume is None:
+        # Theoretically, we could avoid raising an error by automatically preparing
+        # to aspirate above the well like AspirateImplementation does. However, the
+        # only way for this to happen is if someone tries to do a liquid probe with
+        # a tip that's previously held liquid, which they should avoid anyway.
+        raise PipetteNotReadyToAspirateError(
+            "The pipette cannot probe liquid because of a previous blow out."
+            " The plunger must be reset while the tip is somewhere away from liquid."
+        )
+    elif aspirated_volume != 0:
         raise TipNotEmptyError(
-            message="This operation requires a tip with no liquid in it."
+            message="The pipette cannot probe for liquid when the tip has liquid in it."
         )
 
     if await movement.check_for_valid_position(mount=MountType.LEFT) is False:
@@ -158,11 +174,13 @@ class LiquidProbeImplementation(
 
     def __init__(
         self,
+        state_view: StateView,
         movement: MovementHandler,
         pipetting: PipettingHandler,
         model_utils: ModelUtils,
         **kwargs: object,
     ) -> None:
+        self._state_view = state_view
         self._movement = movement
         self._pipetting = pipetting
         self._model_utils = model_utils
@@ -178,11 +196,13 @@ class LiquidProbeImplementation(
                 the pipette.
             TipNotEmptyError: as an undefined error, if the tip starts with liquid
                 in it.
+            PipetteNotReadyToAspirateError: as an undefined error, if the plunger is not
+                in a safe position to do the liquid probe.
             MustHomeError: as an undefined error, if the plunger is not in a valid
                 position.
         """
         z_pos_or_error, state_update, deck_point = await _execute_common(
-            self._movement, self._pipetting, params
+            self._state_view, self._movement, self._pipetting, params
         )
         if isinstance(z_pos_or_error, PipetteLiquidNotFoundError):
             return DefinedErrorData(
@@ -216,10 +236,12 @@ class TryLiquidProbeImplementation(
 
     def __init__(
         self,
+        state_view: StateView,
         movement: MovementHandler,
         pipetting: PipettingHandler,
         **kwargs: object,
     ) -> None:
+        self._state_view = state_view
         self._movement = movement
         self._pipetting = pipetting
 
@@ -231,7 +253,7 @@ class TryLiquidProbeImplementation(
         of a defined error.
         """
         z_pos_or_error, state_update, deck_point = await _execute_common(
-            self._movement, self._pipetting, params
+            self._state_view, self._movement, self._pipetting, params
         )
 
         z_pos = (

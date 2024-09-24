@@ -15,8 +15,10 @@ import {
 } from '@opentrons/components'
 
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { getTopPortalEl } from '../../../App/portal'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { getTopPortalEl } from '/app/App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { useBlowOutLocationOptions } from './BlowOut'
 
 import { ACTIONS } from '../constants'
@@ -39,6 +41,7 @@ interface PipettePathProps {
 export function PipettePath(props: PipettePathProps): JSX.Element {
   const { onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = React.useRef(null)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
@@ -48,9 +51,9 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
     BlowOutLocation | undefined
   >(state.blowOut)
 
-  const [disposalVolume, setDisposalVolume] = React.useState<number>(
-    state.volume
-  )
+  const [disposalVolume, setDisposalVolume] = React.useState<
+    number | undefined
+  >(state?.disposalVolume)
   const maxPipetteVolume = Object.values(state.pipette.liquids)[0].maxVolume
   const tipVolume = Object.values(state.tipRack.wells)[0].totalLiquidVolume
 
@@ -98,6 +101,12 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
           type: ACTIONS.SET_PIPETTE_PATH,
           path: selectedPath,
         })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            setting: `PipettePath`,
+          },
+        })
         onBack()
       } else {
         setCurrentStep(2)
@@ -110,6 +119,12 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
         path: selectedPath as PathOption,
         disposalVolume,
         blowOutLocation,
+      })
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+        properties: {
+          setting: `PipettePath`,
+        },
       })
       onBack()
     }
@@ -124,7 +139,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
   const volumeRange = { min: 1, max: maxDisposalCapacity }
 
   const volumeError =
-    disposalVolume !== null &&
+    disposalVolume != null &&
     (disposalVolume < volumeRange.min || disposalVolume > volumeRange.max)
       ? t(`value_out_of_range`, {
           min: volumeRange.min,
@@ -203,7 +218,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={String(disposalVolume)}
+              initialValue={String(disposalVolume ?? '')}
               onChange={e => {
                 setDisposalVolume(Number(e))
               }}

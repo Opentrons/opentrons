@@ -232,6 +232,7 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
       <LegacyStyledText
         as="p"
         color={description === null ? COLORS.grey60 : undefined}
+        overflowWrap={OVERFLOW_WRAP_ANYWHERE}
       >
         {description ?? i18n.format(t('no_summary'), 'capitalize')}
       </LegacyStyledText>

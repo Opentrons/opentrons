@@ -23,6 +23,9 @@ import {
   getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
+  TC_MODULE_LOCATION_OT3,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
+  THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 import { StatusLabel } from '/app/atoms/StatusLabel'
 import { TertiaryButton } from '/app/atoms/buttons/TertiaryButton'
@@ -47,9 +50,32 @@ interface SetupFixtureListProps {
 export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
   const { deckConfigCompatibility, robotName } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+
+  const hasTwoLabwareThermocyclerConflicts =
+    deckConfigCompatibility.some(
+      ({ cutoutFixtureId, missingLabwareDisplayName }) =>
+        cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE &&
+        missingLabwareDisplayName != null
+    ) &&
+    deckConfigCompatibility.some(
+      ({ cutoutFixtureId, missingLabwareDisplayName }) =>
+        cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE &&
+        missingLabwareDisplayName != null
+    )
+
+  // if there are two labware conflicts with the thermocycler, don't show the conflict with the thermocycler rear fixture
+  const filteredDeckConfigCompatibility = deckConfigCompatibility.filter(
+    ({ cutoutFixtureId }) => {
+      return (
+        !hasTwoLabwareThermocyclerConflicts ||
+        !(cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE)
+      )
+    }
+  )
+
   return (
     <>
-      {deckConfigCompatibility.map(cutoutConfigAndCompatibility => {
+      {filteredDeckConfigCompatibility.map(cutoutConfigAndCompatibility => {
         // filter out all fixtures that only provide usb module addressable areas
         // (i.e. everything but MagBlockV1 and StagingAreaWithMagBlockV1)
         // as they're handled in the Modules Table
@@ -89,6 +115,11 @@ export function FixtureListItem({
   const isRequiredSingleSlotMissing = missingLabwareDisplayName != null
   const isConflictingFixtureConfigured =
     cutoutFixtureId != null && !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+
+  const isThermocyclerCurrentFixture =
+    cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE ||
+    cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE
+
   let statusLabel
   if (!isCurrentFixtureCompatible) {
     statusLabel = (
@@ -215,7 +246,9 @@ export function FixtureListItem({
             </Flex>
           </Flex>
           <LegacyStyledText as="p" width="15%">
-            {getCutoutDisplayName(cutoutId)}
+            {isThermocyclerCurrentFixture && isRequiredSingleSlotMissing
+              ? TC_MODULE_LOCATION_OT3
+              : getCutoutDisplayName(cutoutId)}
           </LegacyStyledText>
           <Flex
             width="15%"
