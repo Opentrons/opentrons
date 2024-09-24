@@ -1,12 +1,7 @@
 from typing import List, Dict, Any, Optional
-from enum import Enum
-import sys
-from datetime import datetime
 from opentrons.protocol_api import ProtocolContext, Labware
-import requests
-from opentrons.drivers.command_builder import CommandBuilder
 
-metadata = {"protocolName": "tc-lid-march-2024-v1"}
+metadata = {"protocolName": "5 Lid Stack Evap Test"}
 requirements = {"robotType": "Flex", "apiLevel": "2.16"}
 
 """
@@ -25,7 +20,7 @@ Run:
 """
 
 LID_STARTING_SLOT = "D2"
-LID_COUNT = 2
+LID_COUNT = 5
 LID_DEFINITION = "tc_lid_march_2024_v1"
 LID_BOTTOM_DEFINITION = "tc_lid_march_2024_v1"
 
@@ -112,18 +107,16 @@ def run(protocol: ProtocolContext):
         profile_TAG2 = [{'temperature': 70, 'hold_time_seconds': 30}, {'temperature': 72, 'hold_time_seconds': 30}, {'temperature': 95, 'hold_time_seconds': 10}]
         thermocycler.execute_profile(steps = profile_TAG2, repetitions = num_of_cycles,block_max_volume=50)
     
-    def move_lid():
+    def move_lid() -> None:
+        """Move lid from tc to deck """
         # Move lid from thermocycler to deck to stack to waste chute
         thermocycler.open_lid()
         # Move Lid to Deck
         _move_labware_with_offset(protocol, top_lid, "B2", pick_up_offset = OFFSET_THERMOCYCLER["pick-up"], drop_offset=OFFSET_DECK["drop"])
-        #google_sheet.update_cell("Sheet1", 2, 6, "Y")
         # Move Lid to Stack
         _move_labware_with_offset(protocol, top_lid, bottom_lid, pick_up_offset = OFFSET_THERMOCYCLER["pick-up"], drop_offset=OFFSET_DECK["drop"])
-        #google_sheet.update_cell("Sheet1", 2, 7, "Y")
         # Move Lid to Waste Chute
         _move_labware_with_offset(protocol, top_lid, wasteChute, pick_up_offset = OFFSET_DECK["pick-up"])
-        #google_sheet.update_cell("Sheet1", 2, 8, "Y")
     thermocycler.set_block_temperature(4)
     thermocycler.set_lid_temperature(105)
         
