@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
+  Box,
   DIRECTION_COLUMN,
   Flex,
   RadioButton,
@@ -60,16 +61,16 @@ interface PathButtonProps {
   children?: React.ReactNode
 }
 
-const PathButton = (props: PathButtonProps): JSX.Element => {
+function PathButton(props: PathButtonProps): JSX.Element {
   const { disabled, onClick, id, path, selected, subtitle } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { t } = useTranslation(['form', 'protocol_steps'])
   // TODO: update the tooltip and images
   const tooltip = (
     <Tooltip tooltipProps={tooltipProps}>
-      <div>{t(`step_edit_form.field.path.title.${path}`)}</div>
+      <Box>{t(`step_edit_form.field.path.title.${path}`)}</Box>
       <img src={PATH_ANIMATION_IMAGES[path]} />
-      <div>{subtitle}</div>
+      <Box>{subtitle}</Box>
     </Tooltip>
   )
 
@@ -99,7 +100,7 @@ const getSubtitle = (
   return reasonForDisabled || ''
 }
 
-export const PathField = (props: PathFieldProps): JSX.Element => {
+export function PathField(props: PathFieldProps): JSX.Element {
   const {
     aspirate_airGap_checkbox,
     aspirate_airGap_volume,
@@ -149,7 +150,7 @@ export const PathField = (props: PathFieldProps): JSX.Element => {
               updateValue(name)
             }}
           >
-            <img />
+            <img src={option.image} />
           </PathButton>
         )
       })}

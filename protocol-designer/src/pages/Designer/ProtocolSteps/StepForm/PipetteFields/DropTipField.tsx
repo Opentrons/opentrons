@@ -13,7 +13,7 @@ import type { FieldProps } from '../types'
 
 export function DropTipField(props: FieldProps): JSX.Element {
   const { value: dropdownItem, updateValue } = props
-  const { t, i18n } = useTranslation('form')
+  const { t, i18n } = useTranslation(['form', 'shared'])
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const labwareEntities = useSelector(getLabwareEntities)
   const tiprackOptions = useSelector(getAllTiprackOptions)
@@ -26,11 +26,11 @@ export function DropTipField(props: FieldProps): JSX.Element {
     aE => aE.name === 'trashBin'
   )
   const wasteChuteOption: DropdownOption = {
-    name: 'Waste Chute',
+    name: t('shared:wasteChute'),
     value: wasteChute?.id ?? '',
   }
   const trashOption: DropdownOption = {
-    name: 'Trash Bin',
+    name: t('shared:trashBin'),
     value: trashBin?.id ?? '',
   }
 

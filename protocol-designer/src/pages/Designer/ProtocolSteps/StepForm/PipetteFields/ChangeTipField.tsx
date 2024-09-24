@@ -15,7 +15,7 @@ const ALL_CHANGE_TIP_VALUES: ChangeTipOptions[] = [
 ]
 type ChangeTipFieldProps = FieldProps & DisabledChangeTipArgs
 
-export const ChangeTipField = (props: ChangeTipFieldProps): JSX.Element => {
+export function ChangeTipField(props: ChangeTipFieldProps): JSX.Element {
   const { aspirateWells, dispenseWells, path, stepType, value } = props
   const { t } = useTranslation(['protocol_steps', 'form'])
   const disabledOptions = getDisabledChangeTipOptions({

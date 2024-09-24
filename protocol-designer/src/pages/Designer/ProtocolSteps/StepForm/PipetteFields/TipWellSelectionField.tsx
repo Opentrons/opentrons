@@ -66,8 +66,12 @@ export function TipWellSelectionField(
         getMainPagePortalEl()
       )}
 
-      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
-        <Flex gridGap={SPACING.spacing8} paddingBottom={SPACING.spacing8}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        padding={SPACING.spacing16}
+        gridGap={SPACING.spacing8}
+      >
+        <Flex gridGap={SPACING.spacing8}>
           <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
             {t('tip_selection')}
           </StyledText>

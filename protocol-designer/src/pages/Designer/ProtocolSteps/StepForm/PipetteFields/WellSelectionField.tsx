@@ -31,7 +31,6 @@ export type WellSelectionFieldProps = FieldProps & {
 export const WellSelectionField = (
   props: WellSelectionFieldProps
 ): JSX.Element => {
-  const { t, i18n } = useTranslation('form')
   const {
     nozzles,
     labwareId,
@@ -44,6 +43,7 @@ export const WellSelectionField = (
     disabled,
     errorToShow,
   } = props
+  const { t, i18n } = useTranslation('form')
   const dispatch = useDispatch()
   const stepId = useSelector(getSelectedStepId)
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
@@ -51,7 +51,7 @@ export const WellSelectionField = (
   const primaryWellCount =
     Array.isArray(selectedWells) && selectedWells.length > 0
       ? selectedWells.length.toString()
-      : undefined
+      : null
   const pipette = pipetteId != null ? pipetteEntities[pipetteId] : null
   const nozzleType = getNozzleType(pipette, nozzles)
 
@@ -99,7 +99,7 @@ export const WellSelectionField = (
           readOnly
           name={name}
           error={errorToShow}
-          value={primaryWellCount ?? null}
+          value={primaryWellCount}
           onClick={handleOpen}
         />
       </Flex>

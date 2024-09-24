@@ -4,7 +4,7 @@ import { InputStepFormField } from '../../../../../molecules'
 
 import type { FieldProps } from '../types'
 
-export const VolumeField = (props: FieldProps): JSX.Element => {
+export function VolumeField(props: FieldProps): JSX.Element {
   const { t } = useTranslation(['protocol_steps', 'application'])
 
   return (

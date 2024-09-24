@@ -51,9 +51,9 @@ export const SelectWellsModal = (
     nozzleType = null,
     updateValue,
     name,
+    value: wellFieldData,
   } = props
-  const { t, i18n } = useTranslation(['shared', 'liquids', 'protocol_steps'])
-  const wellFieldData = props.value
+  const { t, i18n } = useTranslation(['liquids', 'protocol_steps', 'shared'])
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
   const allWellContentsForStep = useSelector(
     wellContentsSelectors.getAllWellContentsForActiveItem
@@ -75,6 +75,8 @@ export const SelectWellsModal = (
   ] = React.useState<WellGroup>(initialSelectedPrimaryWells)
   const [highlightedWells, setHighlightedWells] = React.useState<WellGroup>({})
 
+  if (!isOpen) return null
+
   const selectWells = (wells: WellGroup): void => {
     setSelectedPrimaryWells(prev => ({ ...prev, ...wells }))
     setHighlightedWells({})
@@ -92,9 +94,6 @@ export const SelectWellsModal = (
   }
 
   const pipetteDisplayName = pipette?.spec.displayName
-
-  if (!isOpen) return null
-
   const wellContents =
     labwareId != null && allWellContentsForStep != null
       ? allWellContentsForStep[labwareId]
@@ -102,7 +101,7 @@ export const SelectWellsModal = (
 
   return (
     <Modal
-      width="673px"
+      width="42.0625rem"
       zIndex={15}
       zIndexOverlay={11}
       onClose={onCloseClick}
@@ -121,9 +120,9 @@ export const SelectWellsModal = (
           justifyContent={JUSTIFY_END}
         >
           <SecondaryButton onClick={onCloseClick}>
-            {i18n.format(t('back'), 'capitalize')}
+            {i18n.format(t('shared:back'), 'capitalize')}
           </SecondaryButton>
-          <PrimaryButton onClick={handleSave}>{t('save')}</PrimaryButton>
+          <PrimaryButton onClick={handleSave}>{t('shared:save')}</PrimaryButton>
         </Flex>
       }
     >
@@ -134,7 +133,7 @@ export const SelectWellsModal = (
         color={COLORS.grey60}
       >
         <StyledText desktopStyle="headingSmallRegular">
-          {t('liquids:click_and_drag')}
+          {t('click_and_drag')}
         </StyledText>
       </Flex>
       {labwareDef != null ? (

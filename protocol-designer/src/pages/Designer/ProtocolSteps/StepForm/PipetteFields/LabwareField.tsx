@@ -8,7 +8,7 @@ import {
 import { DropdownStepFormField } from '../../../../../molecules'
 import type { FieldProps } from '../types'
 
-export const LabwareField = (props: FieldProps): JSX.Element => {
+export function LabwareField(props: FieldProps): JSX.Element {
   const { name } = props
   const { t } = useTranslation('protocol_steps')
   const disposalOptions = useSelector(getDisposalOptions)
