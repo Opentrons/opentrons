@@ -1,4 +1,5 @@
 """Labware state store tests."""
+from typing import Optional
 from opentrons.protocol_engine.state import update_types
 import pytest
 
@@ -83,9 +84,14 @@ def test_handles_add_labware_offset(
     assert subject.state.labware_offsets_by_id == {"offset-id": resolved_offset}
 
 
+@pytest.mark.parametrize(
+    "display_name, offset_id", [("display-name", "offset-id"), (None, None)]
+)
 def test_handles_load_labware(
     subject: LabwareStore,
     well_plate_def: LabwareDefinition,
+    display_name: Optional[str],
+    offset_id: Optional[str],
 ) -> None:
     """It should add the labware data to the state."""
     offset_request = LabwareOffsetCreate(
@@ -107,8 +113,8 @@ def test_handles_load_labware(
         loadName=well_plate_def.parameters.loadName,
         definitionUri=expected_definition_uri,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        offsetId="offset-id",
-        displayName="display-name",
+        offsetId=offset_id,
+        displayName=display_name,
     )
 
     subject.handle_action(
@@ -126,8 +132,8 @@ def test_handles_load_labware(
                 loaded_labware=update_types.LoadedLabwareUpdate(
                     labware_id="test-labware-id",
                     definition=well_plate_def,
-                    offset_id="offset-id",
-                    display_name="display-name",
+                    offset_id=offset_id,
+                    display_name=display_name,
                     new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
                 ),
             ),
