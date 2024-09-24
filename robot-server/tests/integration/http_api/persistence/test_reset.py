@@ -30,22 +30,12 @@ def _get_corrupt_persistence_dir() -> Path:
 async def _assert_reset_was_successful(
     robot_client: RobotClient, persistence_directory: Path
 ) -> None:
-    # It should have no protocols.
+    # We really want to check that the server's persistence directory has been wiped
+    # clean, but testing that directly would rely on internal implementation details
+    # of file layout and tend to be brittle.
+    # As an approximation, just check that there are no protocols or runs left.
     assert (await robot_client.get_protocols()).json()["data"] == []
-
-    # It should have no runs.
     assert (await robot_client.get_runs()).json()["data"] == []
-
-    # There should be no files except for robot_server.db
-    # and an empty protocols/ directory.
-    all_files_and_directories = set(persistence_directory.glob("**/*"))
-    expected_files_and_directories = {
-        persistence_directory / "robot_server.db",
-        persistence_directory / "7",
-        persistence_directory / "7" / "protocols",
-        persistence_directory / "7" / "robot_server.db",
-    }
-    assert all_files_and_directories == expected_files_and_directories
 
 
 async def _wait_until_initialization_failed(robot_client: RobotClient) -> None:
