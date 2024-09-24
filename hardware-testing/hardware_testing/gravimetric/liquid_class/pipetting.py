@@ -39,11 +39,11 @@ def _get_heights_in_well(
     pipetting_heights = PipettingHeights(
         start=LiquidSurfaceHeights(
             above=max(height_before + retract, config.LABWARE_BOTTOM_CLEARANCE),
-            below=max(height_before - submerge, config.LABWARE_BOTTOM_CLEARANCE),
+            below=max(height_before + submerge, config.LABWARE_BOTTOM_CLEARANCE),
         ),
         end=LiquidSurfaceHeights(
             above=max(height_after + retract, config.LABWARE_BOTTOM_CLEARANCE),
-            below=max(height_after - submerge, config.LABWARE_BOTTOM_CLEARANCE),
+            below=max(height_after + submerge, config.LABWARE_BOTTOM_CLEARANCE),
         ),
     )
     approach = max(pipetting_heights.start.above, pipetting_heights.end.above)
