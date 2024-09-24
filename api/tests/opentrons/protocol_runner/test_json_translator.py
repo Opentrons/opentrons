@@ -26,6 +26,7 @@ from opentrons_shared_data.protocol.models import (
     Location,
     ProfileStep,
     WellLocation as SD_WellLocation,
+    LiquidHandlingWellLocation as SD_LiquidHandlingWellLocation,
     OffsetVector,
     Metadata as SD_Metadata,
     Module,
@@ -40,6 +41,8 @@ from opentrons.protocol_engine import (
     DeckPoint,
     DeckSlotLocation,
     WellLocation,
+    LiquidHandlingWellLocation,
+    PickUpTipWellLocation,
     DropTipWellLocation,
     WellOrigin,
     DropTipWellOrigin,
@@ -91,7 +94,7 @@ VALID_TEST_PARAMS = [
                 volume=1.23,
                 flowRate=4.56,
                 wellName="A1",
-                wellLocation=SD_WellLocation(
+                liquidHandlingWellLocation=SD_LiquidHandlingWellLocation(
                     origin="bottom",
                     offset=OffsetVector(x=0, y=0, z=7.89),
                 ),
@@ -106,7 +109,7 @@ VALID_TEST_PARAMS = [
                 volume=1.23,
                 flowRate=4.56,
                 wellName="A1",
-                wellLocation=WellLocation(
+                wellLocation=LiquidHandlingWellLocation(
                     origin=WellOrigin.BOTTOM,
                     offset=WellOffset(x=0, y=0, z=7.89),
                 ),
@@ -153,7 +156,7 @@ VALID_TEST_PARAMS = [
                 volume=1.23,
                 flowRate=4.56,
                 wellName="A1",
-                wellLocation=SD_WellLocation(
+                liquidHandlingWellLocation=SD_LiquidHandlingWellLocation(
                     origin="bottom",
                     offset=OffsetVector(x=0, y=0, z=7.89),
                 ),
@@ -167,7 +170,7 @@ VALID_TEST_PARAMS = [
                 volume=1.23,
                 flowRate=4.56,
                 wellName="A1",
-                wellLocation=WellLocation(
+                wellLocation=LiquidHandlingWellLocation(
                     origin=WellOrigin.BOTTOM,
                     offset=WellOffset(x=0, y=0, z=7.89),
                 ),
@@ -241,7 +244,7 @@ VALID_TEST_PARAMS = [
                 pipetteId="pipette-id-1",
                 labwareId="labware-id-2",
                 wellName="A1",
-                wellLocation=WellLocation(),
+                wellLocation=PickUpTipWellLocation(),
             )
         ),
     ),
@@ -425,7 +428,7 @@ VALID_TEST_PARAMS = [
                 pipetteId="pipette-id-1",
                 labwareId="labware-id-2",
                 wellName="A1",
-                wellLocation=SD_WellLocation(
+                liquidHandlingWellLocation=SD_LiquidHandlingWellLocation(
                     origin="bottom",
                     offset=OffsetVector(x=0, y=0, z=7.89),
                 ),
@@ -437,7 +440,7 @@ VALID_TEST_PARAMS = [
                 pipetteId="pipette-id-1",
                 labwareId="labware-id-2",
                 wellName="A1",
-                wellLocation=WellLocation(
+                wellLocation=LiquidHandlingWellLocation(
                     origin=WellOrigin.BOTTOM,
                     offset=WellOffset(x=0, y=0, z=7.89),
                 ),

@@ -8,7 +8,12 @@ import pytest
 from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
 from opentrons.protocol_engine.state import update_types
 from opentrons.types import MountType, Point
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
+from opentrons.protocol_engine import (
+    LiquidHandlingWellLocation,
+    WellOrigin,
+    WellOffset,
+    DeckPoint,
+)
 
 from opentrons.protocol_engine.commands.aspirate import (
     AspirateParams,
@@ -59,7 +64,9 @@ async def test_aspirate_implementation_no_prep(
     mock_command_note_adder: CommandNoteAdder,
 ) -> None:
     """An Aspirate should have an execution implementation without preparing to aspirate."""
-    location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
+    location = LiquidHandlingWellLocation(
+        origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
+    )
 
     data = AspirateParams(
         pipetteId="abc",
@@ -117,7 +124,9 @@ async def test_aspirate_implementation_with_prep(
     subject: AspirateImplementation,
 ) -> None:
     """An Aspirate should have an execution implementation with preparing to aspirate."""
-    location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
+    location = LiquidHandlingWellLocation(
+        origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
+    )
 
     data = AspirateParams(
         pipetteId="abc",
@@ -178,7 +187,7 @@ async def test_aspirate_implementation_with_prep(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",
-            well_location=WellLocation(origin=WellOrigin.TOP),
+            well_location=LiquidHandlingWellLocation(origin=WellOrigin.TOP),
         ),
         await pipetting.prepare_for_aspirate(pipette_id="abc"),
     )
@@ -192,7 +201,9 @@ async def test_aspirate_raises_volume_error(
     subject: AspirateImplementation,
 ) -> None:
     """Should raise an assertion error for volume larger than working volume."""
-    location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
+    location = LiquidHandlingWellLocation(
+        origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
+    )
 
     data = AspirateParams(
         pipetteId="abc",
@@ -241,7 +252,7 @@ async def test_overpressure_error(
     pipette_id = "pipette-id"
     labware_id = "labware-id"
     well_name = "well-name"
-    well_location = WellLocation(
+    well_location = LiquidHandlingWellLocation(
         origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
     )
 

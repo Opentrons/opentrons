@@ -9,7 +9,7 @@ from .pipetting_common import (
     PipetteIdMixin,
     AspirateVolumeMixin,
     FlowRateMixin,
-    WellLocationMixin,
+    LiquidHandlingWellLocationMixin,
     BaseLiquidHandlingResult,
     DestinationPositionResult,
 )
@@ -38,7 +38,7 @@ AspirateCommandType = Literal["aspirate"]
 
 
 class AspirateParams(
-    PipetteIdMixin, AspirateVolumeMixin, FlowRateMixin, WellLocationMixin
+    PipetteIdMixin, AspirateVolumeMixin, FlowRateMixin, LiquidHandlingWellLocationMixin
 ):
     """Parameters required to aspirate from a specific well."""
 

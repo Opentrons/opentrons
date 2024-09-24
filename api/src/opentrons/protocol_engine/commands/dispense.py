@@ -13,7 +13,7 @@ from .pipetting_common import (
     PipetteIdMixin,
     DispenseVolumeMixin,
     FlowRateMixin,
-    WellLocationMixin,
+    LiquidHandlingWellLocationMixin,
     BaseLiquidHandlingResult,
     DestinationPositionResult,
     OverpressureError,
@@ -36,7 +36,7 @@ DispenseCommandType = Literal["dispense"]
 
 
 class DispenseParams(
-    PipetteIdMixin, DispenseVolumeMixin, FlowRateMixin, WellLocationMixin
+    PipetteIdMixin, DispenseVolumeMixin, FlowRateMixin, LiquidHandlingWellLocationMixin
 ):
     """Payload required to dispense to a specific well."""
 

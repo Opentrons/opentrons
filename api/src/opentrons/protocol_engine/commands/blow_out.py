@@ -9,7 +9,7 @@ from ..types import DeckPoint
 from .pipetting_common import (
     PipetteIdMixin,
     FlowRateMixin,
-    WellLocationMixin,
+    LiquidHandlingWellLocationMixin,
     DestinationPositionResult,
 )
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 BlowOutCommandType = Literal["blowout"]
 
 
-class BlowOutParams(PipetteIdMixin, FlowRateMixin, WellLocationMixin):
+class BlowOutParams(PipetteIdMixin, FlowRateMixin, LiquidHandlingWellLocationMixin):
     """Payload required to blow-out a specific well."""
 
     pass

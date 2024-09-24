@@ -6,7 +6,12 @@ from decoy import Decoy, matchers
 
 from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
 
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
+from opentrons.protocol_engine import (
+    LiquidHandlingWellLocation,
+    WellOrigin,
+    WellOffset,
+    DeckPoint,
+)
 from opentrons.protocol_engine.execution import MovementHandler, PipettingHandler
 from opentrons.protocol_engine.state import update_types
 from opentrons.types import Point
@@ -40,7 +45,7 @@ async def test_dispense_implementation(
     subject: DispenseImplementation,
 ) -> None:
     """It should move to the target location and then dispense."""
-    well_location = WellLocation(
+    well_location = LiquidHandlingWellLocation(
         origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
     )
 
@@ -97,7 +102,7 @@ async def test_overpressure_error(
     pipette_id = "pipette-id"
     labware_id = "labware-id"
     well_name = "well-name"
-    well_location = WellLocation(
+    well_location = LiquidHandlingWellLocation(
         origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
     )
 

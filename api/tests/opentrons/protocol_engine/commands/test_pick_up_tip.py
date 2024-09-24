@@ -5,7 +5,12 @@ from decoy import Decoy, matchers
 
 from opentrons.types import MountType, Point
 
-from opentrons.protocol_engine import WellLocation, WellOffset, DeckPoint
+from opentrons.protocol_engine import (
+    WellLocation,
+    PickUpTipWellLocation,
+    WellOffset,
+    DeckPoint,
+)
 from opentrons.protocol_engine.errors import TipNotAttachedError
 from opentrons.protocol_engine.execution import MovementHandler, TipHandler
 from opentrons.protocol_engine.resources import ModelUtils
@@ -61,7 +66,7 @@ async def test_success(
             pipetteId="pipette-id",
             labwareId="labware-id",
             wellName="A3",
-            wellLocation=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+            wellLocation=PickUpTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
         )
     )
 

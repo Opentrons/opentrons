@@ -110,10 +110,12 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
         pipette_id = params.pipetteId
         labware_id = params.labwareId
         well_name = params.wellName
-        well_location = params.wellLocation
 
         state_update = update_types.StateUpdate()
 
+        well_location = self._state_view.geometry.convert_pick_up_tip_location(
+            well_location=params.wellLocation
+        )
         position = await self._movement.move_to_well(
             pipette_id=pipette_id,
             labware_id=labware_id,

@@ -1,6 +1,6 @@
 """Motion state store and getters."""
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from opentrons.types import MountType, Point
 from opentrons.hardware_control.types import CriticalPoint
@@ -15,6 +15,7 @@ from .. import errors
 from ..types import (
     MotorAxis,
     WellLocation,
+    LiquidHandlingWellLocation,
     CurrentWell,
     CurrentPipetteLocation,
     AddressableOffsetVector,
@@ -89,7 +90,7 @@ class MotionView:
         pipette_id: str,
         labware_id: str,
         well_name: str,
-        well_location: Optional[WellLocation],
+        well_location: Optional[Union[WellLocation, LiquidHandlingWellLocation]],
         origin: Point,
         origin_cp: Optional[CriticalPoint],
         max_travel_z: float,

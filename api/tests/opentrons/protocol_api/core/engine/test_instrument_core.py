@@ -16,6 +16,8 @@ from opentrons.protocol_engine import (
     LoadedPipette,
     MotorAxis,
     WellLocation,
+    LiquidHandlingWellLocation,
+    PickUpTipWellLocation,
     WellOffset,
     WellOrigin,
     DropTipWellLocation,
@@ -290,7 +292,7 @@ def test_pick_up_tip(
                 pipetteId="abc123",
                 labwareId="labware-id",
                 wellName="well-name",
-                wellLocation=WellLocation(
+                wellLocation=PickUpTipWellLocation(
                     origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
                 ),
             )
@@ -518,7 +520,7 @@ def test_aspirate_from_well(
                 pipetteId="abc123",
                 labwareId="123abc",
                 wellName="my cool well",
-                wellLocation=WellLocation(
+                wellLocation=LiquidHandlingWellLocation(
                     origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
                 ),
                 volume=12.34,
@@ -632,7 +634,7 @@ def test_blow_out_to_well(
                 pipetteId="abc123",
                 labwareId="123abc",
                 wellName="my cool well",
-                wellLocation=WellLocation(
+                wellLocation=LiquidHandlingWellLocation(
                     origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
                 ),
                 flowRate=6.7,
@@ -743,7 +745,7 @@ def test_dispense_to_well(
                 pipetteId="abc123",
                 labwareId="123abc",
                 wellName="my cool well",
-                wellLocation=WellLocation(
+                wellLocation=LiquidHandlingWellLocation(
                     origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
                 ),
                 volume=12.34,

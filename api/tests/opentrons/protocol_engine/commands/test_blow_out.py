@@ -2,7 +2,12 @@
 from decoy import Decoy
 
 from opentrons.types import Point
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
+from opentrons.protocol_engine import (
+    LiquidHandlingWellLocation,
+    WellOrigin,
+    WellOffset,
+    DeckPoint,
+)
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.commands import (
@@ -33,7 +38,9 @@ async def test_blow_out_implementation(
         pipetting=pipetting,
     )
 
-    location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
+    location = LiquidHandlingWellLocation(
+        origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
+    )
 
     data = BlowOutParams(
         pipetteId="pipette-id",

@@ -26,7 +26,9 @@ from ..types import (
     LoadedLabware,
     LoadedModule,
     WellLocation,
+    LiquidHandlingWellLocation,
     DropTipWellLocation,
+    PickUpTipWellLocation,
     WellOrigin,
     DropTipWellOrigin,
     WellOffset,
@@ -419,7 +421,9 @@ class GeometryView:
         self,
         labware_id: str,
         well_name: str,
-        well_location: Optional[WellLocation] = None,
+        well_location: Optional[
+            Union[WellLocation, LiquidHandlingWellLocation, PickUpTipWellLocation]
+        ] = None,
         operation_volume: Optional[float] = None,
     ) -> Point:
         """Given relative well location in a labware, get absolute position."""
@@ -430,27 +434,33 @@ class GeometryView:
         offset = WellOffset(x=0, y=0, z=well_depth)
         if well_location is not None:
             offset = well_location.offset
+            starting_liquid_height: Union[float, None] = 0.0
             if well_location.origin == WellOrigin.TOP:
-                offset = offset.copy(update={"z": offset.z + well_depth})
+                starting_liquid_height = well_depth
             elif well_location.origin == WellOrigin.CENTER:
-                offset = offset.copy(update={"z": offset.z + well_depth / 2.0})
+                starting_liquid_height = well_depth / 2.0
             elif well_location.origin == WellOrigin.MENISCUS:
                 starting_liquid_height = self._wells.get_last_measured_liquid_height(
-                    labware_id, well_name
+                    labware_id=labware_id, well_name=well_name
                 )
-                if starting_liquid_height is not None:
-                    if well_location.volumeOffset.volumeOffset == "operationVolume":
-                        volume = operation_volume or 0.0
-                    else:
-                        volume = well_location.volumeOffset.volumeOffset
-                    height_after_operation = self.get_height_after_volume(labware_id=labware_id, well_name=well_name, starting_height=starting_liquid_height, volume=volume)
-                    offset = offset.copy(
-                        update={"z": offset.z + height_after_operation}
-                    )
-                else:
+                if starting_liquid_height is None:
                     raise errors.LiquidHeightUnknownError(
                         "Must liquid probe before specifying WellOrigin.MENISCUS."
                     )
+            if isinstance(well_location, PickUpTipWellLocation):
+                volume = 0.0
+            elif isinstance(well_location.volumeOffset, float):
+                volume = well_location.volumeOffset
+            elif well_location.volumeOffset == "operationVolume":
+                volume = operation_volume or 0.0
+            assert isinstance(starting_liquid_height, float)
+            height_after_operation = self.get_height_after_volume(
+                labware_id=labware_id,
+                well_name=well_name,
+                starting_height=starting_liquid_height,
+                volume=volume,
+            )
+            offset = offset.copy(update={"z": offset.z + height_after_operation})
 
         return Point(
             x=labware_pos.x + offset.x + well_def.x,
@@ -484,6 +494,32 @@ class GeometryView:
         delta = absolute_point - well_absolute_point
 
         return WellLocation(offset=WellOffset(x=delta.x, y=delta.y, z=delta.z))
+
+    def get_relative_liquid_handling_well_location(
+        self,
+        labware_id: str,
+        well_name: str,
+        absolute_point: Point,
+    ) -> LiquidHandlingWellLocation:
+        """Given absolute position, get relative location of a well in a labware."""
+        well_absolute_point = self.get_well_position(labware_id, well_name)
+        delta = absolute_point - well_absolute_point
+
+        return LiquidHandlingWellLocation(
+            offset=WellOffset(x=delta.x, y=delta.y, z=delta.z)
+        )
+
+    def get_relative_pick_up_tip_well_location(
+        self,
+        labware_id: str,
+        well_name: str,
+        absolute_point: Point,
+    ) -> PickUpTipWellLocation:
+        """Given absolute position, get relative location of a well in a labware."""
+        well_absolute_point = self.get_well_position(labware_id, well_name)
+        delta = absolute_point - well_absolute_point
+
+        return PickUpTipWellLocation(offset=WellOffset(x=delta.x, y=delta.y, z=delta.z))
 
     def get_well_height(
         self,
@@ -605,6 +641,19 @@ class GeometryView:
                 x=well_location.offset.x,
                 y=well_location.offset.y,
                 z=z_offset,
+            ),
+        )
+
+    def convert_pick_up_tip_location(
+        self, well_location: PickUpTipWellLocation
+    ) -> WellLocation:
+        """Convert PickUpTipWellLocation to WellLocation."""
+        return WellLocation(
+            origin=well_location.origin,
+            offset=WellOffset(
+                x=well_location.offset.x,
+                y=well_location.offset.y,
+                z=well_location.offset.z,
             ),
         )
 
@@ -1226,24 +1275,34 @@ class GeometryView:
                 message=f"No InnerWellGeometry found for well id: {well_id}"
             )
         return get_well_volumetric_capacity(well_geometry)
-    
+
     def get_volume_at_height(
         self, labware_id: str, well_id: str, target_height: float
     ) -> float:
-        pass
+        """Return the volume of liquid in a labware well at a given liquid height (with reference to the well bottom)."""
+        return 0.0
 
     def get_height_at_volume(
         self, labware_id: str, well_id: str, target_volume: float
     ) -> float:
-        pass
+        """Return the height of liquid in a labware well at a given liquid volume."""
+        return 0.0
 
     def get_height_after_volume(
         self, labware_id: str, well_name: str, starting_height: float, volume: float
     ) -> float:
+        """Return the height of liquid in a labware well after a given volume has been handled, given a starting liquid height (with reference to the well bottom)."""
         well_def = self._labware.get_well_definition(labware_id, well_name)
-        well_id = well_def.geometryDefinitionId
-        starting_volume = self.get_volume_at_height(labware_id=labware_id, well_id=well_id, target_height=starting_height)
+        well_id = well_def.geometryDefinitionId  # make non-optional eventually
+        assert isinstance(well_id, str)
+        starting_volume = self.get_volume_at_height(
+            labware_id=labware_id, well_id=well_id, target_height=starting_height
+        )
         ending_volume = starting_volume + volume
-        ending_height = self.get_height_at_volume(labware_id=labware_id, well_id=well_id, target_volume=ending_volume)
+        ending_height = self.get_height_at_volume(
+            labware_id=labware_id, well_id=well_id, target_volume=ending_volume
+        )
+        if ending_height:  # delete
+            pass  # delete
         # return ending_height
-        return starting_height # delete, use line above once sub-methods implemented
+        return starting_height  # delete, use line above once sub-methods implemented
