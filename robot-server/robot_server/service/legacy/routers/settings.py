@@ -1,7 +1,7 @@
 import aiohttp
 import logging
 from dataclasses import asdict
-from typing import cast, Annotated, Any, Dict, List, Optional, Union
+from typing import Final, cast, Annotated, Any, Dict, List, Optional, Union
 from starlette import status
 from fastapi import APIRouter, Depends
 
@@ -34,6 +34,10 @@ from robot_server.hardware import (
     get_hardware,
     get_robot_type_enum,
     get_ot2_hardware,
+)
+from robot_server.runs.error_recovery_setting_store import (
+    ErrorRecoverySettingStore,
+    get_error_recovery_setting_store,
 )
 from robot_server.service.legacy import reset_odd
 from robot_server.service.legacy.models import V1BasicResponse
@@ -77,11 +81,62 @@ router = APIRouter()
 async def post_settings(
     update: AdvancedSettingRequest,
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    error_recovery_setting_store: Annotated[
+        ErrorRecoverySettingStore, Depends(get_error_recovery_setting_store)
+    ],
     robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
 ) -> AdvancedSettingsResponse:
     """Update advanced setting (feature flag)"""
     try:
-        # send request to system server if this is the enableOEMMode setting
+        await _set_setting(update, hardware, error_recovery_setting_store, robot_type)
+    except ValueError as e:
+        raise LegacyErrorResponse.from_exc(e).as_error(status.HTTP_400_BAD_REQUEST)
+    return _create_settings_response(error_recovery_setting_store, robot_type)
+
+
+@router.get(
+    "/settings",
+    summary="Get settings",
+    description="Get a list of available advanced settings (feature "
+    "flags) and their values",
+    response_model=AdvancedSettingsResponse,
+    response_model_exclude_unset=True,
+)
+async def get_settings(
+    error_recovery_setting_store: Annotated[
+        ErrorRecoverySettingStore, Depends(get_error_recovery_setting_store)
+    ],
+    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
+) -> AdvancedSettingsResponse:
+    """Get advanced setting (feature flags)"""
+    return _create_settings_response(error_recovery_setting_store, robot_type)
+
+
+_DISABLE_ERROR_RECOVERY_SETTING_ID: Final = "disableErrorRecovery"
+
+
+async def _set_setting(
+    update: AdvancedSettingRequest,
+    hardware: HardwareControlAPI,
+    error_recovery_setting_store: ErrorRecoverySettingStore,
+    robot_type: RobotTypeEnum,
+) -> None:
+    """Set a single setting.
+
+    Raises:
+        ValueError: If the setting had an invalid ID.
+    """
+    # Settings defined by robot-server:
+    if update.id == _DISABLE_ERROR_RECOVERY_SETTING_ID:
+        error_recovery_setting_store.set_is_disabled(is_disabled=update.value)
+
+    # Settings defined by the `opentrons` package:
+    else:
+        # Note: we're storing the new value of enableOEMMode via
+        # `advanced_settings.set_adv_setting()` to preserve prior behavior just in
+        # case, but I'm pretty sure that that has no functional effect. The actual
+        # meaningful storage happens via `set_oem_mode_request()`. We should remove the
+        # `set_adv_setting()` call for this when we confirm that it's safe.
         if update.id == "enableOEMMode" and robot_type == RobotTypeEnum.FLEX:
             resp = await _set_oem_mode_request(
                 # Unlike opentrons.advanced_settings, system-server cannot store
@@ -95,52 +150,57 @@ async def post_settings(
                 # TODO: raise correct error here
                 raise Exception(f"Something went wrong setting OEM Mode. err: {resp}")
 
-        await advanced_settings.set_adv_setting(update.id, update.value)
-        hardware.hardware_feature_flags = HardwareFeatureFlags.build_from_ff()
-        await hardware.set_status_bar_enabled(ff.status_bar_enabled())
-    except ValueError as e:
-        raise LegacyErrorResponse.from_exc(e).as_error(status.HTTP_400_BAD_REQUEST)
-    return _create_settings_response(robot_type)
+            # May raise ValueError.
+            await advanced_settings.set_adv_setting(update.id, update.value)
+
+            hardware.hardware_feature_flags = HardwareFeatureFlags.build_from_ff()
+            await hardware.set_status_bar_enabled(ff.status_bar_enabled())
 
 
-@router.get(
-    "/settings",
-    summary="Get settings",
-    description="Get a list of available advanced settings (feature "
-    "flags) and their values",
-    response_model=AdvancedSettingsResponse,
-    response_model_exclude_unset=True,
-)
-async def get_settings(
-    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
+def _create_settings_response(
+    error_recovery_setting_store: ErrorRecoverySettingStore, robot_type: RobotTypeEnum
 ) -> AdvancedSettingsResponse:
-    """Get advanced setting (feature flags)"""
-    return _create_settings_response(robot_type)
-
-
-def _create_settings_response(robot_type: RobotTypeEnum) -> AdvancedSettingsResponse:
     """Create the feature flag settings response object"""
-    data = advanced_settings.get_all_adv_settings(robot_type)
+    settings_from_opentrons_library = [
+        AdvancedSetting(
+            id=s.definition.id,
+            old_id=s.definition.old_id,
+            title=s.definition.title,
+            description=s.definition.description,
+            restart_required=s.definition.restart_required,
+            value=s.value,
+        )
+        for s in advanced_settings.get_all_adv_settings(robot_type).values()
+        if s.definition.should_show()
+    ]
+    settings_from_this_server = [
+        _create_disable_error_recovery_setting_response(
+            value=error_recovery_setting_store.get_is_disabled()
+        )
+    ]
+    settings = settings_from_opentrons_library + settings_from_this_server
 
     if advanced_settings.is_restart_required():
         links = Links(restart="/server/restart")
     else:
         links = Links()
 
-    return AdvancedSettingsResponse(
-        links=links,
-        settings=[
-            AdvancedSetting(
-                id=s.definition.id,
-                old_id=s.definition.old_id,
-                title=s.definition.title,
-                description=s.definition.description,
-                restart_required=s.definition.restart_required,
-                value=s.value,
-            )
-            for s in data.values()
-            if s.definition.should_show()
-        ],
+    return AdvancedSettingsResponse(links=links, settings=settings)
+
+
+def _create_disable_error_recovery_setting_response(
+    value: bool | None,
+) -> AdvancedSetting:
+    return AdvancedSetting(
+        id=_DISABLE_ERROR_RECOVERY_SETTING_ID,
+        old_id=None,
+        title="Disable error recovery",
+        description=(
+            "When an error happens in a run, always fail the run"
+            " instead of potentially entering recovery mode."
+        ),
+        restart_required=False,
+        value=value,
     )
 
 
