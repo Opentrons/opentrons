@@ -49,7 +49,7 @@ export function TerminalItemStep(props: TerminalItemStepProps): JSX.Element {
     dispatch(stepsActions.hoverOnTerminalItem(null))
 
   const handleIconName = (): IconName =>
-    title === 'Starting deck state' ? 'ot-start-arrow' : 'ot-end-arrow'
+    title === 'Starting deck state' ? 'ot-start' : 'ot-end'
 
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
     selectItem,
