@@ -55,7 +55,7 @@ describe('DropTipField', () => {
   })
   it('renders the label and dropdown field with trash bin selected as default', () => {
     render(props)
-    screen.getByText('drop tip')
+    screen.getByText('drop tip location')
     screen.getByRole('combobox', { name: '' })
     screen.getByRole('option', { name: 'Trash Bin' })
     screen.getByRole('option', { name: 'mock tip' })
