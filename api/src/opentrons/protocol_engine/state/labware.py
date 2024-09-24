@@ -13,7 +13,6 @@ from typing import (
     NamedTuple,
     cast,
     Union,
-    get_args,
 )
 
 from opentrons.protocol_engine.state import update_types
@@ -195,11 +194,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             and action.state_update.loaded_labware != update_types.NO_CHANGE
         ):
             # If the labware load refers to an offset, that offset must actually exist.
-            if (
-                action.state_update.loaded_labware.offset_id is not None
-                and action.state_update.loaded_labware.offset_id
-                != update_types.NO_CHANGE
-            ):
+            if action.state_update.loaded_labware.offset_id is not None:
                 assert (
                     action.state_update.loaded_labware.offset_id
                     in self._state.labware_offsets_by_id
@@ -215,16 +210,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 definition_uri
             ] = action.state_update.loaded_labware.definition
 
-            location = None
-            if isinstance(
-                action.state_update.loaded_labware.new_location,
-                get_args(LabwareLocation),
-            ):
-                location = action.state_update.loaded_labware.new_location
-            else:
-                location = self._state.labware_by_id[
-                    action.state_update.loaded_labware.labware_id
-                ].location
+            location = action.state_update.loaded_labware.new_location
 
             display_name = None
             if action.state_update.loaded_labware.display_name:
@@ -233,10 +219,6 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 display_name = self._state.labware_by_id[
                     action.state_update.loaded_labware.labware_id
                 ].displayName
-
-            assert (
-                action.state_update.loaded_labware.offset_id != update_types.NO_CHANGE
-            )
 
             self._state.labware_by_id[
                 action.state_update.loaded_labware.labware_id
@@ -258,8 +240,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             labware_id = action.state_update.labware_location.labware_id
             new_offset_id = action.state_update.labware_location.offset_id
 
-            if new_offset_id != update_types.NO_CHANGE:
-                self._state.labware_by_id[labware_id].offsetId = new_offset_id
+            self._state.labware_by_id[labware_id].offsetId = new_offset_id
 
             if action.state_update.labware_location.new_location:
                 new_location = action.state_update.labware_location.new_location

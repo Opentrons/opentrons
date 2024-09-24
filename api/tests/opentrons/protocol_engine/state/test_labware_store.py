@@ -17,7 +17,6 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     LoadedLabware,
     OFF_DECK_LOCATION,
-    LabwareMovementStrategy,
 )
 from opentrons.protocol_engine.actions import (
     AddLabwareOffsetAction,
@@ -27,9 +26,7 @@ from opentrons.protocol_engine.actions import (
 from opentrons.protocol_engine.state.labware import LabwareStore, LabwareState
 
 from .command_fixtures import (
-    create_load_labware_command,
-    create_move_labware_command,
-    create_reload_labware_command,
+    create_comment_command,
 )
 
 
@@ -97,13 +94,7 @@ def test_handles_load_labware(
         vector=LabwareOffsetVector(x=1, y=2, z=3),
     )
 
-    command = create_load_labware_command(
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        labware_id="test-labware-id",
-        definition=well_plate_def,
-        offset_id="offset-id",
-        display_name="display-name",
-    )
+    command = create_comment_command()
 
     expected_definition_uri = uri_from_details(
         load_name=well_plate_def.parameters.loadName,
@@ -153,18 +144,12 @@ def test_handles_reload_labware(
     well_plate_def: LabwareDefinition,
 ) -> None:
     """It should override labware data in the state."""
-    load_labware = create_load_labware_command(
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A1),
-        labware_id="test-labware-id",
-        definition=well_plate_def,
-        display_name="display-name",
-        offset_id=None,
-    )
+    command = create_comment_command()
 
     subject.handle_action(
         SucceedCommandAction(
             private_result=None,
-            command=load_labware,
+            command=command,
             state_update=update_types.StateUpdate(
                 loaded_labware=update_types.LoadedLabwareUpdate(
                     labware_id="test-labware-id",
@@ -198,14 +183,13 @@ def test_handles_reload_labware(
             created_at=datetime(year=2021, month=1, day=2),
         )
     )
-    reload_labware = create_reload_labware_command(
-        labware_id="test-labware-id",
-        offset_id="offset-id",
+    comment_command_2 = create_comment_command(
+        command_id="comment-id-1",
     )
     subject.handle_action(
         SucceedCommandAction(
             private_result=None,
-            command=reload_labware,
+            command=comment_command_2,
             state_update=update_types.StateUpdate(
                 labware_location=update_types.LabwareLocationUpdate(
                     new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
@@ -249,13 +233,7 @@ def test_handles_move_labware(
     well_plate_def: LabwareDefinition,
 ) -> None:
     """It should update labware state with new location & offset."""
-    load_labware_command = create_load_labware_command(
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        labware_id="my-labware-id",
-        definition=well_plate_def,
-        offset_id="old-offset-id",
-        display_name="display-name",
-    )
+    comment_command = create_comment_command()
     offset_request = LabwareOffsetCreate(
         definitionUri="offset-definition-uri",
         location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
@@ -271,7 +249,7 @@ def test_handles_move_labware(
     subject.handle_action(
         SucceedCommandAction(
             private_result=None,
-            command=load_labware_command,
+            command=comment_command,
             state_update=update_types.StateUpdate(
                 loaded_labware=update_types.LoadedLabwareUpdate(
                     labware_id="my-labware-id",
@@ -284,16 +262,13 @@ def test_handles_move_labware(
         )
     )
 
-    move_command = create_move_labware_command(
-        labware_id="my-labware-id",
-        new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
-        offset_id="my-new-offset",
-        strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
+    comment_2 = create_comment_command(
+        command_id="my-command-id",
     )
     subject.handle_action(
         SucceedCommandAction(
             private_result=None,
-            command=move_command,
+            command=comment_2,
             state_update=update_types.StateUpdate(
                 labware_location=update_types.LabwareLocationUpdate(
                     labware_id="my-labware-id",
@@ -315,13 +290,7 @@ def test_handles_move_labware_off_deck(
     well_plate_def: LabwareDefinition,
 ) -> None:
     """It should update labware state with new location & offset."""
-    load_labware_command = create_load_labware_command(
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        labware_id="my-labware-id",
-        definition=well_plate_def,
-        offset_id="old-offset-id",
-        display_name="display-name",
-    )
+    comment_command = create_comment_command()
     offset_request = LabwareOffsetCreate(
         definitionUri="offset-definition-uri",
         location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
@@ -337,7 +306,7 @@ def test_handles_move_labware_off_deck(
     subject.handle_action(
         SucceedCommandAction(
             private_result=None,
-            command=load_labware_command,
+            command=comment_command,
             state_update=update_types.StateUpdate(
                 loaded_labware=update_types.LoadedLabwareUpdate(
                     labware_id="my-labware-id",
@@ -350,15 +319,13 @@ def test_handles_move_labware_off_deck(
         )
     )
 
-    move_labware_off_deck_cmd = create_move_labware_command(
-        labware_id="my-labware-id",
-        new_location=OFF_DECK_LOCATION,
-        strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
+    comment_2 = create_comment_command(
+        command_id="my-command-id",
     )
     subject.handle_action(
         SucceedCommandAction(
             private_result=None,
-            command=move_labware_off_deck_cmd,
+            command=comment_2,
             state_update=update_types.StateUpdate(
                 labware_location=update_types.LabwareLocationUpdate(
                     labware_id="my-labware-id",

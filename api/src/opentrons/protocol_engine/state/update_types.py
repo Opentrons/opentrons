@@ -82,14 +82,10 @@ class LabwareLocationUpdate:
 
     labware_id: str
 
-    new_location: LabwareLocation | None
-    """The labware's new logical location.
+    new_location: LabwareLocation
+    """The labware's new logical location."""
 
-    Note: `new_location=None` means "change the location to `None` (unknown)",
-    not "do not change the location".
-    """
-
-    offset_id: typing.Optional[str] | None | NoChangeType
+    offset_id: typing.Optional[str]
 
 
 @dataclasses.dataclass
