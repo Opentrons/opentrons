@@ -23,8 +23,10 @@ import {
 import { OddModal } from '/app/molecules/OddModal'
 import { getIsOnDevice } from '/app/redux/config'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
-import { getLocationInfoNames } from '/app/transformations/commands'
-import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
+import {
+  getLocationInfoNames,
+  getSlotLabwareDefinition,
+} from '/app/transformations/commands'
 import { LiquidDetailCard } from './LiquidDetailCard'
 import {
   getLiquidsByIdForLabware,

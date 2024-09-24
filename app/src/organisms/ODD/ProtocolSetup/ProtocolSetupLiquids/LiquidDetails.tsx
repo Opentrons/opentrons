@@ -14,7 +14,7 @@ import {
   WRAP,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
-import { LiquidsLabwareDetailsModal } from '../../../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal'
+import { LiquidsLabwareDetailsModal } from '/app/organisms/LiquidsLabwareDetailsModal'
 import { getLocationInfoNames } from '/app/transformations/commands'
 import { getVolumePerWell } from '/app/transformations/analysis'
 

@@ -18,8 +18,8 @@ import {
   useChainLiveCommands,
   useRunCalibrationStatus,
 } from '/app/resources/runs'
-import { ModuleSetupModal } from '../../../../ModuleCard/ModuleSetupModal'
-import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
+import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
+import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import {
   useModuleRenderInfoForProtocolById,
   useUnmatchedModulesForProtocol,
@@ -35,10 +35,10 @@ import type { DiscoveredRobot } from '/app/redux/discovery/types'
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../hooks')
 vi.mock('/app/redux-resources/robots')
-vi.mock('../LocationConflictModal')
+vi.mock('/app/organisms/LocationConflictModal')
 vi.mock('../UnMatchedModuleWarning')
-vi.mock('../../../../ModuleCard/ModuleSetupModal')
-vi.mock('../../../../ModuleWizardFlows')
+vi.mock('/app/organisms/ModuleCard/ModuleSetupModal')
+vi.mock('/app/organisms/ModuleWizardFlows')
 vi.mock('../OT2MultipleModulesHelp')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux/config')

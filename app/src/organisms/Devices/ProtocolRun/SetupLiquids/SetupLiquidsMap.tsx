@@ -21,7 +21,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
-import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
+import { LiquidsLabwareDetailsModal } from '/app/organisms/LiquidsLabwareDetailsModal'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 import {
   getProtocolModulesInfo,
