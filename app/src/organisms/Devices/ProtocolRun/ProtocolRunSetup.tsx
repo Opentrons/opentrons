@@ -31,7 +31,6 @@ import {
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { useProtocolAnalysisErrors } from '../hooks'
 import {
   useMostRecentCompletedAnalysis,
   useRunPipetteInfoByMount,
@@ -39,6 +38,7 @@ import {
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
   useModuleCalibrationStatus,
+  useProtocolAnalysisErrors,
 } from '/app/resources/runs'
 import { SetupLabware } from './SetupLabware'
 import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'

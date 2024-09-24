@@ -33,7 +33,6 @@ import {
   getFixtureDisplayName,
 } from '@opentrons/shared-data'
 
-import { useProtocolAnalysisErrors } from '/app/organisms/Devices/hooks'
 import { useRobotType } from '/app/redux-resources/robots'
 import {
   useRobotAnalyticsData,
@@ -80,6 +79,7 @@ import {
   useRunStatus,
   useLPCDisabledReason,
   useModuleCalibrationStatus,
+  useProtocolAnalysisErrors,
 } from '/app/resources/runs'
 
 import type { Run } from '@opentrons/api-client'

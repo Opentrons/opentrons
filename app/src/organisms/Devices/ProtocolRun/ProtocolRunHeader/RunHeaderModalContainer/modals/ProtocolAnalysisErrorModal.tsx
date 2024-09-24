@@ -13,8 +13,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../../../../../App/portal'
-import { useProtocolAnalysisErrors } from '../../../../hooks'
+import { getTopPortalEl } from '/app/App/portal'
+import { useProtocolAnalysisErrors } from '/app/resources/runs'
 
 import type { AnalysisError } from '@opentrons/shared-data'
 
