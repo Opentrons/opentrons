@@ -10,10 +10,10 @@ import {
   getRequiredDeckConfig,
 } from '/app/resources/deck_configuration/utils'
 import {
-  useRunHasStarted,
   useUnmatchedModulesForProtocol,
   useModuleCalibrationStatus,
 } from '../../../hooks'
+import { useRunHasStarted } from '/app/resources/runs'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { SetupModuleAndDeck } from '../index'
 import { SetupModulesList } from '../SetupModulesList'
@@ -27,6 +27,7 @@ vi.mock('../SetupModulesMap')
 vi.mock('../SetupFixtureList')
 vi.mock('/app/redux/config')
 vi.mock('/app/resources/deck_configuration/utils')
+vi.mock('/app/resources/runs')
 
 const MOCK_ROBOT_NAME = 'otie'
 const MOCK_RUN_ID = '1'

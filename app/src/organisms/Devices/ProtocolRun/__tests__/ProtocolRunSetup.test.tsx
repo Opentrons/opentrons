@@ -24,6 +24,7 @@ import {
   useRunCalibrationStatus,
   useRunPipetteInfoByMount,
   useNotifyRunQuery,
+  useRunHasStarted,
 } from '/app/resources/runs'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { useRobot, useIsFlex } from '/app/redux-resources/robots'
@@ -31,7 +32,6 @@ import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
   useModuleCalibrationStatus,
   useProtocolAnalysisErrors,
-  useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
 
@@ -55,6 +55,7 @@ vi.mock('/app/resources/runs/useNotifyRunQuery')
 vi.mock('/app/resources/runs/useMostRecentCompletedAnalysis')
 vi.mock('/app/resources/runs/useRunCalibrationStatus')
 vi.mock('/app/resources/runs/useRunPipetteInfoByMount')
+vi.mock('/app/resources/runs/useRunHasStarted')
 vi.mock('/app/redux/config')
 vi.mock('/app/resources/deck_configuration/utils')
 vi.mock('/app/resources/deck_configuration/hooks')

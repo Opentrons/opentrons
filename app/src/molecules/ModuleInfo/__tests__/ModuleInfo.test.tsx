@@ -6,10 +6,10 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { when } from 'vitest-when'
 import { i18n } from '/app/i18n'
 import { ModuleInfo } from '../ModuleInfo'
-import { useRunHasStarted } from '../hooks'
+import { useRunHasStarted } from '/app/resources/runs'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
-vi.mock('../hooks')
+vi.mock('/app/resources/runs')
 
 const render = (props: React.ComponentProps<typeof ModuleInfo>) => {
   return renderWithProviders(<ModuleInfo {...props} />, {

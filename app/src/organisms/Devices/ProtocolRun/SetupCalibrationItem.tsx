@@ -16,7 +16,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { useRunHasStarted } from '../hooks'
+import { useRunHasStarted } from '/app/resources/runs'
 import { formatTimestamp } from '../utils'
 
 interface SetupCalibrationItemProps {

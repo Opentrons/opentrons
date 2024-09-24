@@ -11,7 +11,8 @@ import {
 } from '/app/redux/analytics'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
-import { useDeckCalibrationData, useRunHasStarted } from '../../hooks'
+import { useDeckCalibrationData } from '../../hooks'
+import { useRunHasStarted } from '/app/resources/runs'
 
 import { SetupDeckCalibration } from '../SetupDeckCalibration'
 import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'

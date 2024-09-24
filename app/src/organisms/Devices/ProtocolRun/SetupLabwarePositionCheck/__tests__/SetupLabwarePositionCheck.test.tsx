@@ -18,11 +18,14 @@ import { useLaunchLPC } from '../../../../LabwarePositionCheck/useLaunchLPC'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import {
   useLPCDisabledReason,
-  useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../../../hooks'
 import { SetupLabwarePositionCheck } from '..'
-import { useNotifyRunQuery, useRunCalibrationStatus } from '/app/resources/runs'
+import {
+  useNotifyRunQuery,
+  useRunCalibrationStatus,
+  useRunHasStarted,
+} from '/app/resources/runs'
 import { useRobotType } from '/app/redux-resources/robots'
 
 import type { Mock } from 'vitest'

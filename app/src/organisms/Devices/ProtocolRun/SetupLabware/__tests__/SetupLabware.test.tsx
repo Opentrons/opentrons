@@ -7,24 +7,27 @@ import { when } from 'vitest-when'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
-import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
+import { LabwarePositionCheck } from '/app/organisms/LabwarePositionCheck'
 import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import {
   useLPCDisabledReason,
-  useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../../../hooks'
 import { SetupLabwareList } from '../SetupLabwareList'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 import { SetupLabware } from '..'
-import { useNotifyRunQuery, useRunCalibrationStatus } from '/app/resources/runs'
+import {
+  useNotifyRunQuery,
+  useRunCalibrationStatus,
+  useRunHasStarted,
+} from '/app/resources/runs'
 
 vi.mock('../SetupLabwareList')
 vi.mock('../SetupLabwareMap')
-vi.mock('../../../../LabwarePositionCheck')
+vi.mock('/app/organisms/LabwarePositionCheck')
 vi.mock('../../utils/getModuleTypesThatRequireExtraAttention')
-vi.mock('../../../../RunTimeControl/hooks')
+vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/redux/config')
 vi.mock('../../../hooks')
 vi.mock('../../../hooks/useLPCSuccessToast')

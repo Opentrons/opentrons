@@ -22,7 +22,8 @@ import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { TertiaryButton } from '/app/atoms/buttons'
 import { useAttachedPipettes } from '/app/resources/instruments'
-import { useDeckCalibrationData, useRunHasStarted } from '../hooks'
+import { useRunHasStarted } from '/app/resources/runs'
+import { useDeckCalibrationData } from '../hooks'
 import { useDashboardCalibrateTipLength } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 
 import type { Mount } from '@opentrons/components'

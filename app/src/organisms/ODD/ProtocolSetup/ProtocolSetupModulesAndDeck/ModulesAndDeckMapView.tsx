@@ -6,7 +6,7 @@ import {
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
-import { ModuleInfo } from '../../../Devices/ModuleInfo'
+import { ModuleInfo } from '/app/molecules/ModuleInfo'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'

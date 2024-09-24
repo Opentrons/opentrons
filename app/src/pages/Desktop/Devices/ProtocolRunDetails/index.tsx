@@ -24,7 +24,6 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import {
   useModuleRenderInfoForProtocolById,
-  useRunHasStarted,
   useRunStatuses,
   useSyncRobotClock,
 } from '/app/organisms/Devices/hooks'
@@ -40,6 +39,7 @@ import { ProtocolRunRuntimeParameters } from '/app/organisms/Devices/ProtocolRun
 import {
   useCurrentRunId,
   useMostRecentCompletedAnalysis,
+  useRunHasStarted,
 } from '/app/resources/runs'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { fetchProtocols } from '/app/redux/protocol-storage'

@@ -20,12 +20,9 @@ import {
 import { StatusLabel } from '/app/atoms/StatusLabel'
 import { TaskList } from '../TaskList'
 
-import {
-  useCalibrationTaskList,
-  useRunHasStarted,
-} from '/app/organisms/Devices/hooks'
+import { useCalibrationTaskList } from '/app/organisms/Devices/hooks'
 import { useAttachedPipettes } from '/app/resources/instruments'
-import { useCurrentRunId } from '/app/resources/runs'
+import { useCurrentRunId, useRunHasStarted } from '/app/resources/runs'
 
 import type {
   DashboardCalOffsetInvoker,

@@ -34,13 +34,13 @@ import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
   useModuleCalibrationStatus,
   useProtocolAnalysisErrors,
-  useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../hooks'
 import {
   useMostRecentCompletedAnalysis,
   useRunPipetteInfoByMount,
   useRunCalibrationStatus,
+  useRunHasStarted,
 } from '/app/resources/runs'
 import { SetupLabware } from './SetupLabware'
 import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'

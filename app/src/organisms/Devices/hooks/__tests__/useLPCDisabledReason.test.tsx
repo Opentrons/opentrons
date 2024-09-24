@@ -13,10 +13,11 @@ import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useLPCDisabledReason } from '../useLPCDisabledReason'
 
-import { useRunHasStarted, useUnmatchedModulesForProtocol } from '..'
+import { useUnmatchedModulesForProtocol } from '..'
 import {
   useRunCalibrationStatus,
   useMostRecentCompletedAnalysis,
+  useRunHasStarted,
 } from '/app/resources/runs'
 import type { Store } from 'redux'
 import type * as SharedData from '@opentrons/shared-data'

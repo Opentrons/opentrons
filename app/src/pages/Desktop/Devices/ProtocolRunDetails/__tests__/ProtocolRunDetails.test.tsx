@@ -11,7 +11,6 @@ import {
   useModuleRenderInfoForProtocolById,
   useRunStatuses,
   useSyncRobotClock,
-  useRunHasStarted,
 } from '/app/organisms/Devices/hooks'
 import { ProtocolRunHeader } from '/app/organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { ProtocolRunModuleControls } from '/app/organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
@@ -21,6 +20,7 @@ import { ProtocolRunRuntimeParameters } from '/app/organisms/Devices/ProtocolRun
 import {
   useCurrentRunId,
   useMostRecentCompletedAnalysis,
+  useRunHasStarted,
 } from '/app/resources/runs'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import { useRobot } from '/app/redux-resources/robots'

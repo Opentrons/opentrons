@@ -6,8 +6,9 @@ import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
   useMostRecentCompletedAnalysis,
   useRunCalibrationStatus,
+  useRunHasStarted,
 } from '/app/resources/runs'
-import { useRunHasStarted, useUnmatchedModulesForProtocol } from '.'
+import { useUnmatchedModulesForProtocol } from '.'
 
 interface LPCDisabledReasonProps {
   runId: string
