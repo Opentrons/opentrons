@@ -1,11 +1,14 @@
 """Helper functions for liquid-level related calculations inside a given frustum."""
-from typing import List, Tuple, Iterator, Sequence, Any
+from typing import List, Tuple, Iterator, Sequence, Any, Union
 from numpy import pi, iscomplex, roots, real
+from math import sqrt, isclose
 
-from ..errors.exceptions import InvalidLiquidHeightFound
+from ..errors.exceptions import InvalidLiquidHeightFound, InvalidWellDefinitionError
 from opentrons_shared_data.labware.types import (
     is_circular_frusta_list,
     is_rectangular_frusta_list,
+    CircularBoundedSection,
+    RectangularBoundedSection,
 )
 from opentrons_shared_data.labware.labware_definition import InnerWellGeometry
 
@@ -14,19 +17,53 @@ def reject_unacceptable_heights(
     potential_heights: List[float], max_height: float
 ) -> float:
     """Reject any solutions to a polynomial equation that cannot be the height of a frustum."""
-    valid_heights = []
+    valid_heights: List[float] = []
     for root in potential_heights:
         # reject any heights that are negative or greater than the max height
         if not iscomplex(root):
             # take only the real component of the root and round to 4 decimal places
             rounded_root = round(real(root), 4)
             if (rounded_root <= max_height) and (rounded_root >= 0):
-                valid_heights.append(rounded_root)
+                if not any([isclose(rounded_root, height) for height in valid_heights]):
+                    valid_heights.append(rounded_root)
     if len(valid_heights) != 1:
         raise InvalidLiquidHeightFound(
             message="Unable to estimate valid liquid height from volume."
         )
     return valid_heights[0]
+
+
+def get_cross_section_area(
+    bounded_section: Union[CircularBoundedSection, RectangularBoundedSection]
+) -> float:
+    """Find the shape of a cross-section and calculate the area appropriately."""
+    if bounded_section["shape"] == "circular":
+        cross_section_area = cross_section_area_circular(bounded_section["diameter"])
+    elif bounded_section["shape"] == "rectangular":
+        cross_section_area = cross_section_area_rectangular(
+            bounded_section["xDimension"],
+            bounded_section["yDimension"],
+        )
+    else:
+        raise InvalidWellDefinitionError(message="Invalid well volume components.")
+    return cross_section_area
+
+
+def cross_section_area_circular(diameter: float) -> float:
+    """Get the area of a circular cross-section."""
+    radius = diameter / 2
+    return pi * (radius**2)
+
+
+def cross_section_area_rectangular(x_dimension: float, y_dimension: float) -> float:
+    """Get the area of a rectangular cross-section."""
+    return x_dimension * y_dimension
+
+
+def volume_from_frustum_formula(area_1: float, area_2: float, height: float) -> float:
+    """Get the area of a section with differently shaped boundary cross-sections."""
+    area_term = area_1 + area_2 + sqrt(area_1 * area_2)
+    return (height / 3) * area_term
 
 
 def rectangular_frustum_polynomial_roots(
@@ -239,5 +276,13 @@ def get_well_volumetric_capacity(
             )
 
             well_volume.append((next_f["topHeight"], frustum_volume))
-
+    else:
+        for f, next_f in get_boundary_cross_sections(sorted_frusta):
+            bottom_cross_section_area = get_cross_section_area(f)
+            top_cross_section_area = get_cross_section_area(next_f)
+            section_height = next_f["topHeight"] - f["topHeight"]
+            bounded_volume = volume_from_frustum_formula(
+                bottom_cross_section_area, top_cross_section_area, section_height
+            )
+            well_volume.append((next_f["topHeight"], bounded_volume))
     return well_volume
