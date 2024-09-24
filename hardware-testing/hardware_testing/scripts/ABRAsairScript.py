@@ -1,36 +1,40 @@
 import subprocess as sbp
 import sys
 import paramiko as pmk
-from threading import Thread
+import time
+import multiprocessing
+from typing import Optional, List
 
 
-def execute(client: pmk.SSHClient, command: str) -> None:
-    print("Executing command:", command)
+def execute(client: pmk.SSHClient, command: str, args: list) -> Optional[int]:
+    command = command.format(name=args[0], duration=args[1], frequency=args[2])
+    print(f"{args[0]} Executing command: {command}")
+
     try:
         stdin, stdout, stderr = client.exec_command(command, get_pty=True)
-        stdout_lines = []
-        stderr_lines = []
+        stdout_lines: List[str] = []
+        stderr_lines: List[str] = []
 
-        # Reading stdout and stderr
-        while not stdout.channel.exit_status_ready():
-            if stdout.channel.recv_ready():
-                output = stdout.readline()
-                stdout_lines.append(output)
-                print(output, end="")
+        time.sleep(20)
 
-            if stderr.channel.recv_ready():
-                error_output = stderr.readline()
-                stderr_lines.append(error_output)
-                print("Error output:", error_output, end="")
-
-        client.close()
-
-        if stdout.channel.recv_exit_status() != 0:
-            print("Command failed with error:", "".join(stderr_lines))
-
+        # Check the exit status of the command
+        if stdout.channel.exit_status_ready():
+            if stdout.channel.recv_exit_status() != 0:
+                print(f"{args[0]} command failed:", "".join(stderr_lines))
+                client.close()
+                # Terminate process on failure
+                raise RuntimeError(
+                    f"{args[0]} encountered an error and the process will terminate."
+                )
+        else:
+            print(f"{args[0]} command success:", "".join(stdout_lines))
+            client.close()
+            return 0
     except Exception as e:
-        print("Error:", e)
+        print(f"Error with {args[0]}:", e)
         client.close()
+        raise  # Re-raise the exception to propagate it up and terminate the process
+    return None
 
 
 def connect_ssh(ip: str) -> pmk.SSHClient:
@@ -62,19 +66,27 @@ print("Executing Script on All Robots:")
 
 def run_command_on_ip(index):
     curr_ip = robot_ips[index]
-    ssh = connect_ssh(curr_ip)
-    execute(
-        ssh,
-        cd
-        + command_template.format(name=robot_names[index], duration=540, frequency=5),
-    )
+    try:
+        ssh = connect_ssh(curr_ip)
+        status = execute(ssh, cd + command_template, [robot_names[index], "540", "5"])
+        if status == 0:
+            print(f"Envrironmental sensors for {curr_ip}, are now running")
+    except Exception as e:
+        print(f"Error running command on {curr_ip}: {e}")
+        # Terminate this process when an error occurs
+        multiprocessing.current_process().terminate()
 
 
-threads = []
+# Launch the processes for each robot
+processes = []
 for index in range(len(robot_ips)):
-    thread = Thread(target=run_command_on_ip, args=(index,))
-    threads.append(thread)
-    thread.start()
+    process = multiprocessing.Process(target=run_command_on_ip, args=(index,))
+    processes.append(process)
 
-for thread in threads:
-    thread.join()  # Wait for all threads to finish
+
+if __name__ == "__main__":
+    # Wait for all processes to finish
+    for process in processes:
+        process.start()
+        time.sleep(25)
+        process.terminate()
