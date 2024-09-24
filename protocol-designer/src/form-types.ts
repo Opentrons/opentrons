@@ -147,8 +147,8 @@ export type StepType =
 export const stepIconsByType: Record<StepType, IconName> = {
   comment: 'comment',
   moveLabware: 'ot-move',
-  moveLiquid: 'ot-new-transfer',
-  mix: 'ot-new-mix',
+  moveLiquid: 'transfer',
+  mix: 'mix',
   pause: 'pause-circle',
   manualIntervention: 'pause-circle',
   magnet: 'ot-magnet-v2',
