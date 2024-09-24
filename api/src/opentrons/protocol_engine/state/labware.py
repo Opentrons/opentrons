@@ -378,6 +378,16 @@ class LabwareView(HasState[LabwareState]):
             return self.get_parent_location(parent.labwareId)
         return parent
 
+    def get_labware_stack(
+        self, labware_stack: List[LoadedLabware]
+    ) -> List[LoadedLabware]:
+        """Get the a stack of labware starting from a given labware or existing stack."""
+        parent = self.get_location(labware_stack[-1].id)
+        if isinstance(parent, OnLabwareLocation):
+            labware_stack.append(self.get(parent.labwareId))
+            return self.get_labware_stack(labware_stack)
+        return labware_stack
+
     def get_all(self) -> List[LoadedLabware]:
         """Get a list of all labware entries in state."""
         return list(self._state.labware_by_id.values())
@@ -401,6 +411,27 @@ class LabwareView(HasState[LabwareState]):
             len(self.get_definition(labware_id).wells) > 1
             and len(self.get_definition(labware_id).wells) < 96
         )
+
+    def get_labware_stacking_maximum(self, labware: LabwareDefinition) -> int:
+        """Returns the maximum number of labware allowed in a stack for a given labware definition.
+
+        If not defined within a labware, defaults to one.
+        """
+        stacking_quirks = {
+            "stackingMaxFive": 5,
+            "stackingMaxFour": 4,
+            "stackingMaxThree": 3,
+            "stackingMaxTwo": 2,
+            "stackingMaxOne": 1,
+            "stackingMaxZero": 0,
+        }
+        for quirk in stacking_quirks.keys():
+            if (
+                labware.parameters.quirks is not None
+                and quirk in labware.parameters.quirks
+            ):
+                return stacking_quirks[quirk]
+        return 1
 
     def get_should_center_pipette_on_target_well(self, labware_id: str) -> bool:
         """True if a pipette moving to a well of this labware should center its body on the target.
@@ -738,6 +769,7 @@ class LabwareView(HasState[LabwareState]):
         self, top_labware_definition: LabwareDefinition, bottom_labware_id: str
     ) -> None:
         """Raise if the specified labware definition cannot be placed on top of the bottom labware."""
+
         if labware_validation.validate_definition_is_adapter(top_labware_definition):
             raise errors.LabwareCannotBeStackedError(
                 f"Labware {top_labware_definition.parameters.loadName} is defined as an adapter and cannot be placed"
@@ -753,17 +785,37 @@ class LabwareView(HasState[LabwareState]):
             )
         elif isinstance(below_labware.location, ModuleLocation):
             below_definition = self.get_definition(labware_id=below_labware.id)
-            if not labware_validation.validate_definition_is_adapter(below_definition):
+            if not labware_validation.validate_definition_is_adapter(
+                below_definition
+            ) and not labware_validation.validate_definition_is_lid(
+                top_labware_definition
+            ):
                 raise errors.LabwareCannotBeStackedError(
                     f"Labware {top_labware_definition.parameters.loadName} cannot be loaded"
                     f" onto a labware on top of a module"
                 )
         elif isinstance(below_labware.location, OnLabwareLocation):
+            labware_stack = self.get_labware_stack([below_labware])
+            stack_without_adapters = []
+            for lw in labware_stack:
+                if not labware_validation.validate_definition_is_adapter(
+                    self.get_definition(lw.id)
+                ):
+                    stack_without_adapters.append(lw)
+            if len(stack_without_adapters) >= self.get_labware_stacking_maximum(
+                top_labware_definition
+            ):
+                raise errors.LabwareCannotBeStackedError(
+                    f"Labware {top_labware_definition.parameters.loadName} cannot be loaded to stack of more than {self.get_labware_stacking_maximum(top_labware_definition)} labware."
+                )
+
             further_below_definition = self.get_definition(
                 labware_id=below_labware.location.labwareId
             )
             if labware_validation.validate_definition_is_adapter(
                 further_below_definition
+            ) and not labware_validation.validate_definition_is_lid(
+                top_labware_definition
             ):
                 raise errors.LabwareCannotBeStackedError(
                     f"Labware {top_labware_definition.parameters.loadName} cannot be loaded"
