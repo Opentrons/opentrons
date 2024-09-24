@@ -144,10 +144,10 @@ EXPECTED_STATEMENTS_LATEST = [
     """,
     """
     CREATE TABLE boolean_setting (
-        "key" VARCHAR(21) NOT NULL,
+        "key" VARCHAR(22) NOT NULL,
         value BOOLEAN NOT NULL,
         PRIMARY KEY ("key"),
-        CONSTRAINT booleansettingkey CHECK ("key" IN ('enable_error_recovery'))
+        CONSTRAINT booleansettingkey CHECK ("key" IN ('disable_error_recovery'))
     )
     """,
 ]
