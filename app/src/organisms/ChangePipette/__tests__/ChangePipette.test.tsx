@@ -15,7 +15,7 @@ import {
   SUCCESS,
   useDispatchApiRequests,
 } from '/app/redux/robot-api'
-import { useAttachedPipettes } from '../../Devices/hooks'
+import { useAttachedPipettes } from '/app/resources/instruments'
 import { PipetteSelection } from '../PipetteSelection'
 import { ExitModal } from '../ExitModal'
 import { ConfirmPipette } from '../ConfirmPipette'
@@ -51,7 +51,7 @@ vi.mock('../PipetteSelection')
 vi.mock('../ExitModal')
 vi.mock('/app/molecules/InProgressModal/InProgressModal')
 vi.mock('../ConfirmPipette')
-vi.mock('../../Devices/hooks')
+vi.mock('/app/resources/instruments')
 vi.mock('/app/assets/images')
 
 const render = (props: React.ComponentProps<typeof ChangePipette>) => {

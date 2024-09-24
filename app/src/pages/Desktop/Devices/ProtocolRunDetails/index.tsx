@@ -37,11 +37,13 @@ import {
 import { BackToTopButton } from '/app/organisms/Devices/ProtocolRun/BackToTopButton'
 import { ProtocolRunModuleControls } from '/app/organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunRuntimeParameters } from '/app/organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
-import { useCurrentRunId } from '/app/resources/runs'
+import {
+  useCurrentRunId,
+  useMostRecentCompletedAnalysis,
+} from '/app/resources/runs'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { fetchProtocols } from '/app/redux/protocol-storage'
 import { appShellRequestor } from '/app/redux/shell/remote'
-import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useRobot, useRobotType } from '/app/redux-resources/robots'
 
 import type { ViewportListRef } from 'react-viewport-list'

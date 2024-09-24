@@ -22,7 +22,7 @@ import { handleInstrumentDetailOverflowMenu } from './InstrumentDetailOverflowMe
 import {
   useGripperDisplayName,
   usePipetteModelSpecs,
-} from '/app/resources/instruments/hooks'
+} from '/app/local-resources/instruments'
 
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel, PipetteModel } from '@opentrons/shared-data'

@@ -18,7 +18,7 @@ import {
 } from '@opentrons/components'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
-import { useAttachedModules } from '../../../../../hooks'
+import { useAttachedModules } from '/app/resources/modules'
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 import { getActiveHeaterShaker } from './utils'
 import { useIsHeaterShakerInProtocol } from '../../../../../../ModuleCard/hooks'

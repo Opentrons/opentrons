@@ -3,7 +3,8 @@ import reduce from 'lodash/reduce'
 import type { AttachedModule } from '/app/redux/modules/types'
 
 import { useRobot } from '/app/redux-resources/robots'
-import { useAttachedModules, useModuleRenderInfoForProtocolById } from '.'
+import { useAttachedModules } from '/app/resources/modules'
+import { useModuleRenderInfoForProtocolById } from '.'
 import {
   NON_CONNECTING_MODULE_TYPES,
   getModuleType,

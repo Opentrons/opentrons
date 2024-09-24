@@ -17,7 +17,6 @@ import { useMaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { HostConfig } from '@opentrons/api-client'
-import type { ModulePrepCommandsType } from '/app/organisms/Devices/getModulePrepCommands'
 import type {
   CreateMaintenanceRunType,
   UseCreateMaintenanceRunMutationOptions,
@@ -95,7 +94,7 @@ export function useChainRunCommands(
 
 export function useChainLiveCommands(): {
   chainLiveCommands: (
-    commands: ModulePrepCommandsType[],
+    commands: CreateCommand[],
     continuePastCommandFailure: boolean
   ) => ReturnType<typeof chainLiveCommandsRecursive>
   isCommandMutationLoading: boolean
@@ -104,7 +103,7 @@ export function useChainLiveCommands(): {
   const { createLiveCommand } = useCreateLiveCommandMutation()
   return {
     chainLiveCommands: (
-      commands: ModulePrepCommandsType[],
+      commands: CreateCommand[],
       continuePastCommandFailure: boolean
     ) =>
       chainLiveCommandsRecursive(

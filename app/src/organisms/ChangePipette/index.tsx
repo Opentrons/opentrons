@@ -31,7 +31,7 @@ import {
 
 import { WizardHeader } from '/app/molecules/WizardHeader'
 import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
-import { useAttachedPipettes } from '../Devices/hooks'
+import { useAttachedPipettes } from '/app/resources/instruments'
 import { ExitModal } from './ExitModal'
 import { Instructions } from './Instructions'
 import { ConfirmPipette } from './ConfirmPipette'

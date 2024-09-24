@@ -5,8 +5,8 @@ import { describe, it, beforeEach, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
-import { getLocationInfoNames } from '../../../../Devices/ProtocolRun/utils/getLocationInfoNames'
-import { getVolumePerWell } from '../../../../Devices/ProtocolRun/SetupLiquids/utils'
+import { getLocationInfoNames } from '/app/transformations/commands'
+import { getVolumePerWell } from '/app/transformations/analysis'
 import { LiquidDetails } from '../LiquidDetails'
 import { LiquidsLabwareDetailsModal } from '../../../../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal'
 import {
@@ -15,8 +15,8 @@ import {
 } from '../fixtures'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
-vi.mock('../../../../Devices/ProtocolRun/SetupLiquids/utils')
-vi.mock('../../../../Devices/ProtocolRun/utils/getLocationInfoNames')
+vi.mock('/app/transformations/analysis')
+vi.mock('/app/transformations/commands')
 vi.mock(
   '../../../../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal'
 )

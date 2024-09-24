@@ -10,15 +10,17 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import * as PipetteConstants from '/app/redux/pipettes/constants'
-import { getShowPipetteCalibrationWarning } from '../utils'
+import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
-import { useRunPipetteInfoByMount } from '../hooks'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { SetupPipetteCalibrationItem } from './SetupPipetteCalibrationItem'
 import { SetupFlexPipetteCalibrationItem } from './SetupFlexPipetteCalibrationItem'
 import { SetupGripperCalibrationItem } from './SetupGripperCalibrationItem'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import {
+  useRunPipetteInfoByMount,
+  useMostRecentCompletedAnalysis,
+} from '/app/resources/runs'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { isGripperInCommands } from '/app/resources/protocols/utils'
 

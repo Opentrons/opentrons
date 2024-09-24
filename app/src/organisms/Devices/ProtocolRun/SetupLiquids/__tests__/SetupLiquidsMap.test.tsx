@@ -21,13 +21,15 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useAttachedModules } from '../../../hooks'
+import { useAttachedModules } from '/app/resources/modules'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
-import { getLabwareRenderInfo } from '../../utils/getLabwareRenderInfo'
-import { getStandardDeckViewLayerBlockList } from '../../utils/getStandardDeckViewLayerBlockList'
-import { getAttachedProtocolModuleMatches } from '../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
-import { getProtocolModulesInfo } from '../../utils/getProtocolModulesInfo'
-import { mockProtocolModuleInfo } from '../../../../ODD/ProtocolSetup/ProtocolSetupLabware/__fixtures__'
+import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
+import { getAttachedProtocolModuleMatches } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
+import {
+  getProtocolModulesInfo,
+  getLabwareRenderInfo,
+} from '/app/transformations/analysis'
+import { mockProtocolModuleInfo } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupLabware/__fixtures__'
 import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
 
 import { SetupLiquidsMap } from '../SetupLiquidsMap'
@@ -49,11 +51,9 @@ vi.mock('@opentrons/components', async importOriginal => {
 
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck')
 vi.mock('../../LabwareInfoOverlay')
-vi.mock('../../../hooks')
-vi.mock('../utils')
-vi.mock('../../utils/getLabwareRenderInfo')
+vi.mock('/app/resources/modules')
 vi.mock('../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils')
-vi.mock('../../utils/getProtocolModulesInfo')
+vi.mock('/app/transformations/analysis')
 vi.mock('/app/resources/deck_configuration/utils')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getSimplestDeckConfigForProtocol>()

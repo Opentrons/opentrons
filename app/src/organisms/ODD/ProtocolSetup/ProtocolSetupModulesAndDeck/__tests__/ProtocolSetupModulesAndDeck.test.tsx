@@ -13,14 +13,15 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useChainLiveCommands, useRunStatus } from '/app/resources/runs'
-import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import {
-  useAttachedModules,
+  useChainLiveCommands,
+  useRunStatus,
+  useMostRecentCompletedAnalysis,
   useRunCalibrationStatus,
-} from '../../../../Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getProtocolModulesInfo } from '../../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+} from '/app/resources/runs'
+import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
+import { useAttachedModules } from '/app/resources/modules'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import { mockApiHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { mockProtocolModuleInfo } from '../../ProtocolSetupInstruments/__fixtures__'
 import { getLocalRobot } from '/app/redux/discovery'
@@ -41,11 +42,10 @@ import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
 import type { UseQueryResult } from 'react-query'
 
 vi.mock('/app/resources/runs')
+vi.mock('/app/resources/modules')
 vi.mock('/app/redux/discovery')
-vi.mock('/app/organisms/Devices/hooks')
 vi.mock('/app/resources/deck_configuration')
-vi.mock('/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('/app/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
+vi.mock('/app/transformations/analysis')
 vi.mock('../utils')
 vi.mock('../SetupInstructionsModal')
 vi.mock('../../../../ModuleWizardFlows')

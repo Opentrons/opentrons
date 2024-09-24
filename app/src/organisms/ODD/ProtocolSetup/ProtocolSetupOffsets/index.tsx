@@ -16,11 +16,13 @@ import { useToaster } from '/app/organisms/ToasterOven'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
 import type { SetupScreens } from '../types'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { TerseOffsetTable } from '/app/organisms/LabwarePositionCheck/ResultsSummary'
 import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
-import { useNotifyRunQuery } from '/app/resources/runs'
-import { getLatestCurrentOffsets } from '/app/organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
+import {
+  useNotifyRunQuery,
+  useMostRecentCompletedAnalysis,
+} from '/app/resources/runs'
+import { getLatestCurrentOffsets } from '/app/transformations/runs'
 
 export interface ProtocolSetupOffsetsProps {
   runId: string

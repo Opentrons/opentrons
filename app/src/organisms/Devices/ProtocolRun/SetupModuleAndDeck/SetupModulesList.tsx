@@ -37,15 +37,17 @@ import {
 import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { TertiaryButton } from '/app/atoms/buttons'
 import { StatusLabel } from '/app/atoms/StatusLabel'
-import { useChainLiveCommands } from '/app/resources/runs'
+import {
+  useChainLiveCommands,
+  useRunCalibrationStatus,
+} from '/app/resources/runs'
 import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
-import { getModulePrepCommands } from '../../getModulePrepCommands'
-import { getModuleTooHot } from '../../getModuleTooHot'
+import { getModulePrepCommands } from '/app/local-resources/modules'
+import { getModuleTooHot } from '/app/transformations/modules'
 import {
   useModuleRenderInfoForProtocolById,
   useUnmatchedModulesForProtocol,
-  useRunCalibrationStatus,
 } from '../../hooks'
 import { LocationConflictModal } from './LocationConflictModal'
 import { OT2MultipleModulesHelp } from './OT2MultipleModulesHelp'
@@ -58,10 +60,8 @@ import type {
   ModuleModel,
 } from '@opentrons/shared-data'
 import type { AttachedModule } from '/app/redux/modules/types'
-import type {
-  ModuleRenderInfoForProtocol,
-  ProtocolCalibrationStatus,
-} from '../../hooks'
+import type { ModuleRenderInfoForProtocol } from '../../hooks'
+import type { ProtocolCalibrationStatus } from '/app/resources/runs'
 
 interface SetupModulesListProps {
   robotName: string

@@ -33,8 +33,11 @@ import {
 } from '@opentrons/components'
 
 import { Divider } from '/app/atoms/structure'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
+import {
+  useMostRecentCompletedAnalysis,
+  useNotifyRunQuery,
+  useRunStatus,
+} from '/app/resources/runs'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
