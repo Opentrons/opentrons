@@ -160,16 +160,16 @@ Let's tell the robot to aspirate, dispense, and blow out the liquid using defaul
 
         pipette.aspirate(200, plate["A1"])  # 716 µL/s
         pipette.dispense(200, plate["A2"])  # 716 µL/s
-        pipette.blow_out()                  #  80 µL/s
+        pipette.blow_out()                  # 716 µL/s
 
 Now let's change the flow rates for each action::
 
         pipette.flow_rate.aspirate = 50
         pipette.flow_rate.dispense = 100
-        pipette.flow_rate.blow_out = 75
+        pipette.flow_rate.blow_out = 300
         pipette.aspirate(200, plate["A1"])  #  50 µL/s
         pipette.dispense(200, plate["A2"])  # 100 µL/s
-        pipette.blow_out()                  #  75 µL/s
+        pipette.blow_out()                  # 300 µL/s
         
 These flow rates will remain in effect until you change the ``flow_rate`` attribute again *or* call ``configure_for_volume()``. Calling ``configure_for_volume()`` always resets all pipette flow rates to the defaults for the mode that it sets.
 
