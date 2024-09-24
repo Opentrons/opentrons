@@ -33,6 +33,7 @@ import {
   useRunTimestamps,
   useNotifyRunQuery,
   useMostRecentCompletedAnalysis,
+  useLastRunCommand,
 } from '/app/resources/runs'
 import {
   InterventionModal,
@@ -56,7 +57,6 @@ import {
   useErrorRecoveryFlows,
   ErrorRecoveryFlows,
 } from '/app/organisms/ErrorRecoveryFlows'
-import { useLastRunCommand } from '/app/organisms/Devices/hooks/useLastRunCommand'
 
 import type { OnDeviceRouteParams } from '../../../App/types'
 

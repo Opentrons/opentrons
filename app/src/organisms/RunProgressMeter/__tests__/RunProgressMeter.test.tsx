@@ -24,6 +24,7 @@ import {
   useNotifyAllCommandsQuery,
   useRunStatus,
   useMostRecentCompletedAnalysis,
+  useLastRunCommand,
 } from '/app/resources/runs'
 import { useDownloadRunLog } from '../../Devices/hooks'
 import {
@@ -34,7 +35,6 @@ import {
 
 import { RunProgressMeter } from '..'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { useLastRunCommand } from '../../Devices/hooks/useLastRunCommand'
 import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 
 import type { RunCommandSummary } from '@opentrons/api-client'
@@ -49,10 +49,9 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
 })
 vi.mock('../../RunTimeControl/hooks')
 vi.mock('/app/resources/runs')
-vi.mock('../../Devices/hooks')
 vi.mock('/app/atoms/ProgressBar')
 vi.mock('../../InterventionModal')
-vi.mock('../../Devices/hooks/useLastRunCommand')
+vi.mock('../../Devices/hooks')
 vi.mock('/app/resources/protocols/hooks')
 vi.mock('/app/redux-resources/robots')
 
