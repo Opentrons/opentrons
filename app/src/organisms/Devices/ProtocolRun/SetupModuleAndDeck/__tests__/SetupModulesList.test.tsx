@@ -27,7 +27,7 @@ import {
 import { OT2MultipleModulesHelp } from '../OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 import { SetupModulesList } from '../SetupModulesList'
-import { LocationConflictModal } from '../LocationConflictModal'
+import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'

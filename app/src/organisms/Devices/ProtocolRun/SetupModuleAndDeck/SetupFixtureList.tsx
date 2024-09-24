@@ -29,7 +29,7 @@ import {
 } from '@opentrons/shared-data'
 import { StatusLabel } from '/app/atoms/StatusLabel'
 import { TertiaryButton } from '/app/atoms/buttons/TertiaryButton'
-import { LocationConflictModal } from './LocationConflictModal'
+import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { NotConfiguredModal } from './NotConfiguredModal'
 import { getFixtureImage } from './utils'
 import { DeckFixtureSetupInstructionsModal } from '../../../DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'

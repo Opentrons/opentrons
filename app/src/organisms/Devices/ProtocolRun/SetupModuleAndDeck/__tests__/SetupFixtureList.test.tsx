@@ -13,7 +13,7 @@ import {
 import { i18n } from '/app/i18n'
 import { SetupFixtureList } from '../SetupFixtureList'
 import { NotConfiguredModal } from '../NotConfiguredModal'
-import { LocationConflictModal } from '../LocationConflictModal'
+import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { DeckFixtureSetupInstructionsModal } from '../../../../DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 
 import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'

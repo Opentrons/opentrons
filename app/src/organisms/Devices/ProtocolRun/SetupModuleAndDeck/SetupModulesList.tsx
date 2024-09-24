@@ -49,7 +49,7 @@ import {
   useModuleRenderInfoForProtocolById,
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
-import { LocationConflictModal } from './LocationConflictModal'
+import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { OT2MultipleModulesHelp } from './OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getModuleImage } from './utils'

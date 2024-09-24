@@ -28,7 +28,7 @@ import {
 import { SmallButton } from '/app/atoms/buttons'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
-import { LocationConflictModal } from '../../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
+import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 
 import type {
   CompletedProtocolAnalysis,
