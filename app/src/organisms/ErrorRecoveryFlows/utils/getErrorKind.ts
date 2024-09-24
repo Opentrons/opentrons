@@ -8,7 +8,6 @@ import type { ErrorKind } from '../types'
  * decide which UI flow to present to recover from it.
  */
 export function getErrorKind(failedCommand: RunTimeCommand | null): ErrorKind {
-  console.log('=>(getErrorKind.ts:11) failedCommand', failedCommand)
   const commandType = failedCommand?.commandType
   const errorIsDefined = failedCommand?.error?.isDefined ?? false
   const errorType = failedCommand?.error?.errorType

@@ -12,6 +12,7 @@ import {
   useErrorDetailsModal,
   ErrorDetailsModal,
   OverpressureBanner,
+  TipNotDetectedBanner,
 } from '../ErrorDetailsModal'
 
 vi.mock('react-dom', () => ({
@@ -92,7 +93,7 @@ describe('ErrorDetailsModal', () => {
   })
 
   IS_ODD.forEach(isOnDevice => {
-    it('renders the OverpressureBanner when the error kind is an overpressure error', () => {
+    it('renders an inline banner when the error kind is an overpressure error', () => {
       props.failedCommand = {
         ...props.failedCommand,
         byRunRecord: {
@@ -106,8 +107,22 @@ describe('ErrorDetailsModal', () => {
       screen.getByText('MOCK_INLINE_NOTIFICATION')
     })
 
-    it('does not render the OverpressureBanner when the error kind is not an overpressure error', () => {
+    it('renders an inline banner when the error kind is a tip not detected error', () => {
+      props.failedCommand = {
+        ...props.failedCommand,
+        byRunRecord: {
+          ...props.failedCommand?.byRunRecord,
+          commandType: 'pickUpTip',
+          error: { isDefined: true, errorType: 'tipPhysicallyMissing' },
+        },
+      } as any
       render({ ...props, isOnDevice })
+
+      screen.getByText('MOCK_INLINE_NOTIFICATION')
+    })
+
+    it('does not render a banner when the error kind is not explicitly handled', () => {
+      render({ ...props, isOnDevice, failedCommand: {} as any })
 
       expect(screen.queryByText('MOCK_INLINE_NOTIFICATION')).toBeNull()
     })
@@ -132,6 +147,30 @@ describe('OverpressureBanner', () => {
           'Overpressure is usually caused by a tip contacting labware, a clog, or moving viscous liquid too quickly',
         message:
           ' If the issue persists, cancel the run and make the necessary changes to the protocol',
+      }),
+      {}
+    )
+  })
+})
+
+describe('TipNotDetectedBanner', () => {
+  beforeEach(() => {
+    vi.mocked(InlineNotification).mockReturnValue(
+      <div>MOCK_INLINE_NOTIFICATION</div>
+    )
+  })
+
+  it('renders the InlineNotification', () => {
+    renderWithProviders(<TipNotDetectedBanner />, {
+      i18nInstance: i18n,
+    })
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading:
+          'Tip presence errors are usually caused by improperly placed labware or inaccurate labware offsets',
+        message:
+          ' If the issue persists, cancel the run and initiate Labware Position Check',
       }),
       {}
     )
