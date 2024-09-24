@@ -11,7 +11,7 @@ from opentrons.protocol_engine.state.frustum_helpers import (
     cross_section_area_rectangular,
     cross_section_area_circular,
     reject_unacceptable_heights,
-    get_boundary_cross_sections,
+    get_boundary_pairs,
     get_cross_section_area,
     volume_from_frustum_formula,
     circular_frustum_polynomial_roots,
@@ -138,7 +138,7 @@ def test_cross_section_area_rectangular(x_dimension: float, y_dimension: float) 
 def test_get_cross_section_boundaries(well: List[List[Any]]) -> None:
     """Make sure get_cross_section_boundaries returns the expected list indices."""
     i = 0
-    for f, next_f in get_boundary_cross_sections(well):
+    for f, next_f in get_boundary_pairs(well):
         assert f == well[i]
         assert next_f == well[i + 1]
         i += 1
@@ -147,7 +147,7 @@ def test_get_cross_section_boundaries(well: List[List[Any]]) -> None:
 @pytest.mark.parametrize("well", fake_frusta())
 def test_frustum_formula_volume(well: List[Any]) -> None:
     """Test volume-of-a-frustum formula calculation."""
-    for f, next_f in get_boundary_cross_sections(well):
+    for f, next_f in get_boundary_pairs(well):
         if f["shape"] == "spherical" or next_f["shape"] == "spherical":
             # not going to use formula on spherical segments
             continue
@@ -169,7 +169,7 @@ def test_volume_and_height_circular(well: List[Any]) -> None:
     if well[-1]["shape"] == "spherical":
         return
     total_height = well[0]["topHeight"]
-    for f, next_f in get_boundary_cross_sections(well):
+    for f, next_f in get_boundary_pairs(well):
         if f["shape"] == next_f["shape"] == "circular":
             top_radius = next_f["diameter"] / 2
             bottom_radius = f["diameter"] / 2
@@ -211,7 +211,7 @@ def test_volume_and_height_rectangular(well: List[Any]) -> None:
     if well[-1]["shape"] == "spherical":
         return
     total_height = well[0]["topHeight"]
-    for f, next_f in get_boundary_cross_sections(well):
+    for f, next_f in get_boundary_pairs(well):
         if f["shape"] == next_f["shape"] == "rectangular":
             top_length = next_f["yDimension"]
             top_width = next_f["xDimension"]
@@ -284,3 +284,8 @@ def test_volume_and_height_spherical(well: List[Any]) -> None:
                 total_frustum_height=well[0]["depth"],
             )
             assert isclose(found_height, target_height)
+
+
+# test that volumetric capacity is always sorted
+# test that errors are raised every time and only when given invalid height values for volume_from_height
+# test that errors are raised every time and only when given invalid volume values for height_from_volume

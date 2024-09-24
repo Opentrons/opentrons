@@ -66,6 +66,12 @@ def volume_from_frustum_formula(area_1: float, area_2: float, height: float) -> 
     return (height / 3) * area_term
 
 
+def height_from_frustum_formula(area_1: float, area_2: float, volume: float) -> float:
+    """Get the volume within a section with differently shaped boundary cross-sections."""
+    area_term = area_1 + area_2 + sqrt(area_1 * area_2)
+    return 3 * volume / area_term
+
+
 def rectangular_frustum_polynomial_roots(
     bottom_length: float,
     bottom_width: float,
@@ -218,7 +224,7 @@ def height_from_volume_spherical(
     return height
 
 
-def get_boundary_cross_sections(frusta: Sequence[Any]) -> Iterator[Tuple[Any, Any]]:
+def get_boundary_pairs(frusta: Sequence[Any]) -> Iterator[Tuple[Any, Any]]:
     """Yield tuples representing two cross-section boundaries of a segment of a well."""
     iter_f = iter(frusta)
     el = next(iter_f)
@@ -247,7 +253,7 @@ def get_well_volumetric_capacity(
     sorted_frusta = sorted(well_geometry.frusta, key=lambda section: section.topHeight)
 
     if is_rectangular_frusta_list(sorted_frusta):
-        for f, next_f in get_boundary_cross_sections(sorted_frusta):
+        for f, next_f in get_boundary_pairs(sorted_frusta):
             top_cross_section_width = next_f["xDimension"]
             top_cross_section_length = next_f["yDimension"]
             bottom_cross_section_width = f["xDimension"]
@@ -264,7 +270,7 @@ def get_well_volumetric_capacity(
 
             well_volume.append((next_f["topHeight"], frustum_volume))
     elif is_circular_frusta_list(sorted_frusta):
-        for f, next_f in get_boundary_cross_sections(sorted_frusta):
+        for f, next_f in get_boundary_pairs(sorted_frusta):
             top_cross_section_radius = next_f["diameter"] / 2.0
             bottom_cross_section_radius = f["diameter"] / 2.0
             frustum_height = next_f["topHeight"] - f["topHeight"]
@@ -277,7 +283,7 @@ def get_well_volumetric_capacity(
 
             well_volume.append((next_f["topHeight"], frustum_volume))
     else:
-        for f, next_f in get_boundary_cross_sections(sorted_frusta):
+        for f, next_f in get_boundary_pairs(sorted_frusta):
             bottom_cross_section_area = get_cross_section_area(f)
             top_cross_section_area = get_cross_section_area(next_f)
             section_height = next_f["topHeight"] - f["topHeight"]
@@ -286,6 +292,32 @@ def get_well_volumetric_capacity(
             )
             well_volume.append((next_f["topHeight"], bounded_volume))
     return well_volume
+
+
+def height_at_volume_within_section(
+    top_cross_section: Union[CircularBoundedSection, RectangularBoundedSection],
+    bottom_cross_section: Union[CircularBoundedSection, RectangularBoundedSection],
+    target_volume_relative: float,
+    frustum_height: float,
+) -> float:
+    """Calculate a height within a bounded section according to geometry."""
+    if top_cross_section["shape"] == bottom_cross_section["shape"] == "circular":
+        frustum_height = height_from_volume_circular(
+            volume=target_volume_relative,
+            top_radius=(top_cross_section["diameter"] / 2),
+            bottom_radius=(bottom_cross_section["diameter"] / 2),
+            total_frustum_height=frustum_height,
+        )
+    elif top_cross_section["shape"] == bottom_cross_section["shape"] == "rectangular":
+        frustum_height = height_from_volume_rectangular(
+            volume=target_volume_relative,
+            total_frustum_height=frustum_height,
+            bottom_width=bottom_cross_section["xDimension"],
+            bottom_length=bottom_cross_section["yDimension"],
+            top_width=top_cross_section["xDimension"],
+            top_length=top_cross_section["yDimension"],
+        )
+    return frustum_height
 
 
 def volume_at_height_within_section(
@@ -312,27 +344,36 @@ def volume_at_height_within_section(
             top_length=top_cross_section["yDimension"],
         )
     # else:
-    # add volume of a frustum calculation when it gets merged
+    # TODO(cm): this would be the NEST-96 2uL wells referenced in EXEC-712
+    # we need to input the math attached to that issue
     return frustum_volume
 
 
-def find_volume_at_non_boundary_height(
+def find_volume_at_well_height(
     target_height: float, well_geometry: InnerWellGeometry
 ) -> float:
-    """Find the volume within a frustum, at a known height."""
+    """Find the volume within a well, at a known height."""
     volumetric_capacity = get_well_volumetric_capacity(well_geometry)
-    # throw an error if height > well height
+    max_height = volumetric_capacity[-1][0]
+    if target_height < 0 or target_height > max_height:
+        raise InvalidLiquidHeightFound("Invalid target height.")
 
     closed_section_volume = 0.0
-    for current_height, current_volume in volumetric_capacity:
-        if current_height > target_height:
+    for boundary_height, section_volume in volumetric_capacity:
+        if boundary_height > target_height:
             break
-        closed_section_volume += current_volume
-    # find the boundary frusta:
+        closed_section_volume += section_volume
+        # if target height is a boundary cross-section, we already know the volume
+        if target_height == boundary_height:
+            return closed_section_volume
     sorted_frusta = sorted(well_geometry.frusta, key=lambda section: section.topHeight)
-    # case: if target height is within list of frusta
     target_volume: Optional[float] = None
-    for f, next_f in get_boundary_cross_sections(sorted_frusta):
+    # find the section the target height is in and compute the volume
+    for f, next_f in get_boundary_pairs(sorted_frusta):
+        if target_height < f["topHeight"] and f["shape"] == "spherical":
+            target_volume = volume_from_height_spherical(
+                target_height=target_height, radius_of_curvature=f["radiusOfCurvature"]
+            )
         if f["topHeight"] < target_height < next_f["targetHeight"]:
             relative_target_height = target_height - f["topHeight"]
             frustum_height = next_f["topHeight"] - f["topHeight"]
@@ -343,7 +384,55 @@ def find_volume_at_non_boundary_height(
                 frustum_height=frustum_height,
             )
     if not target_volume:
-        raise InvalidLiquidHeightFound()
+        raise InvalidLiquidHeightFound("Unable to find volume at given well-height.")
     return target_volume + closed_section_volume
 
-    # case: if target height is between spherical bottom and frusta[0]
+
+def find_height_at_well_volume(
+    target_volume: float, well_geometry: InnerWellGeometry
+) -> float:
+    """Find the height within a well, at a known volume."""
+    volumetric_capacity = get_well_volumetric_capacity(well_geometry)
+    max_volume = volumetric_capacity[-1][1]
+    if target_volume < 0 or target_volume > max_volume:
+        raise InvalidLiquidHeightFound("Invalid target height.")
+
+    closed_section_height = 0.0
+    for boundary_height, section_volume in volumetric_capacity:
+        if section_volume > target_volume:
+            break
+        closed_section_height = boundary_height
+        # if target height is a boundary cross-section, we already know the volume
+        if target_volume == section_volume:
+            return boundary_height
+    sorted_frusta = sorted(well_geometry.frusta, key=lambda section: section.topHeight)
+    target_height: Optional[float] = None
+    # find the section the target volume is in and compute the height
+    for cross_sections, capacity in zip(
+        get_boundary_pairs(sorted_frusta),
+        get_boundary_pairs(volumetric_capacity),
+    ):
+        bottom_cross_section, top_cross_section = cross_sections
+        (bottom_height, bottom_volume), (top_height, top_volume) = capacity
+
+        if (
+            target_volume < bottom_volume
+            and bottom_cross_section["shape"] == "spherical"
+        ):
+            target_height = height_from_frustum_formula(
+                area_1=bottom_cross_section,
+                area_2=top_cross_section,
+                volume=target_volume,
+            )
+        if bottom_volume < target_volume < top_volume:
+            relative_target_volume = target_volume - bottom_volume
+            frustum_height = top_height - bottom_height
+            target_height = height_at_volume_within_section(
+                top_cross_section=top_cross_section,
+                bottom_cross_section=bottom_cross_section,
+                target_volume_relative=relative_target_volume,
+                frustum_height=frustum_height,
+            )
+    if not target_height:
+        raise InvalidLiquidHeightFound("Unable to find height at given well-volume.")
+    return closed_section_height + target_height

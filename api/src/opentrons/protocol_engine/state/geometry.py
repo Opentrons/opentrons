@@ -55,7 +55,8 @@ from .pipettes import PipetteView
 from .addressable_areas import AddressableAreaView
 from .frustum_helpers import (
     get_well_volumetric_capacity,
-    find_volume_at_non_boundary_height,
+    find_volume_at_well_height,
+    find_height_at_well_volume,
 )
 
 
@@ -1225,7 +1226,7 @@ class GeometryView:
     def get_volume_at_height(
         self, labware_id: str, well_id: str, target_height: float
     ) -> float:
-        """Find the volume at any known height within a well."""
+        """Find the volume at any height within a well."""
         labware_def = self._labware.get_definition(labware_id)
         if labware_def.innerLabwareGeometry is None:
             raise InvalidWellDefinitionError(message="No InnerLabwareGeometry found.")
@@ -1234,6 +1235,22 @@ class GeometryView:
             raise InvalidWellDefinitionError(
                 message=f"No InnerWellGeometry found for well id: {well_id}"
             )
-        return find_volume_at_non_boundary_height(
+        return find_volume_at_well_height(
             target_height=target_height, well_geometry=well_geometry
+        )
+
+    def get_height_at_volume(
+        self, labware_id: str, well_id: str, target_volume: float
+    ) -> float:
+        """Find the height from any volume in a well."""
+        labware_def = self._labware.get_definition(labware_id)
+        if labware_def.innerLabwareGeometry is None:
+            raise InvalidWellDefinitionError(message="No InnerLabwareGeometry found.")
+        well_geometry = labware_def.innerLabwareGeometry.get(well_id)
+        if well_geometry is None:
+            raise InvalidWellDefinitionError(
+                message=f"No InnerWellGeometry found for well id: {well_id}"
+            )
+        return find_height_at_well_volume(
+            target_volume=target_volume, well_geometry=well_geometry
         )
