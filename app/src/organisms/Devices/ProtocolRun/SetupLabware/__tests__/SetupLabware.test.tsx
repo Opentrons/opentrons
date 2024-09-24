@@ -10,10 +10,6 @@ import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
 import { LabwarePositionCheck } from '/app/organisms/LabwarePositionCheck'
 import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
-import {
-  useLPCDisabledReason,
-  useUnmatchedModulesForProtocol,
-} from '../../../hooks'
 import { SetupLabwareList } from '../SetupLabwareList'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 import { SetupLabware } from '..'
@@ -21,6 +17,8 @@ import {
   useNotifyRunQuery,
   useRunCalibrationStatus,
   useRunHasStarted,
+  useLPCDisabledReason,
+  useUnmatchedModulesForProtocol,
 } from '/app/resources/runs'
 
 vi.mock('../SetupLabwareList')
@@ -29,7 +27,6 @@ vi.mock('/app/organisms/LabwarePositionCheck')
 vi.mock('../../utils/getModuleTypesThatRequireExtraAttention')
 vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/redux/config')
-vi.mock('../../../hooks')
 vi.mock('../../../hooks/useLPCSuccessToast')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux-resources/robots')

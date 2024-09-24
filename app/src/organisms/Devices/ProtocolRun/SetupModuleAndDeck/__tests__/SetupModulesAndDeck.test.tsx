@@ -9,11 +9,11 @@ import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
 } from '/app/resources/deck_configuration/utils'
+import { useModuleCalibrationStatus } from '../../../hooks'
 import {
+  useRunHasStarted,
   useUnmatchedModulesForProtocol,
-  useModuleCalibrationStatus,
-} from '../../../hooks'
-import { useRunHasStarted } from '/app/resources/runs'
+} from '/app/resources/runs'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { SetupModuleAndDeck } from '../index'
 import { SetupModulesList } from '../SetupModulesList'

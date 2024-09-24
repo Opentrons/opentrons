@@ -3,12 +3,10 @@ import some from 'lodash/some'
 import { useTranslation } from 'react-i18next'
 import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import {
-  useMostRecentCompletedAnalysis,
-  useRunCalibrationStatus,
-  useRunHasStarted,
-} from '/app/resources/runs'
-import { useUnmatchedModulesForProtocol } from '.'
+import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
+import { useRunCalibrationStatus } from './useRunCalibrationStatus'
+import { useRunHasStarted } from './useRunHasStarted'
+import { useUnmatchedModulesForProtocol } from './useUnmatchedModulesForProtocol'
 
 interface LPCDisabledReasonProps {
   runId: string

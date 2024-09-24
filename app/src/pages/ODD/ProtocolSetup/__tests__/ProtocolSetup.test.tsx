@@ -26,7 +26,6 @@ import { i18n } from '/app/i18n'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import {
-  useLPCDisabledReason,
   useModuleCalibrationStatus,
   useProtocolAnalysisErrors,
 } from '/app/organisms/Devices/hooks'
@@ -64,6 +63,7 @@ import {
   useNotifyRunQuery,
   useRunStatus,
   useRunCreatedAtTimestamp,
+  useLPCDisabledReason,
 } from '/app/resources/runs'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'

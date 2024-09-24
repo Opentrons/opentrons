@@ -32,8 +32,8 @@ import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
   useModuleCalibrationStatus,
   useProtocolAnalysisErrors,
-  useUnmatchedModulesForProtocol,
 } from '../../hooks'
+import { useUnmatchedModulesForProtocol } from '/app/resources/runs'
 
 import { SetupLabware } from '../SetupLabware'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
@@ -56,6 +56,7 @@ vi.mock('/app/resources/runs/useMostRecentCompletedAnalysis')
 vi.mock('/app/resources/runs/useRunCalibrationStatus')
 vi.mock('/app/resources/runs/useRunPipetteInfoByMount')
 vi.mock('/app/resources/runs/useRunHasStarted')
+vi.mock('/app/resources/runs/useUnmatchedModulesForProtocol')
 vi.mock('/app/redux/config')
 vi.mock('/app/resources/deck_configuration/utils')
 vi.mock('/app/resources/deck_configuration/hooks')

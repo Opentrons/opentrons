@@ -4,7 +4,7 @@ import {
   ABSORBANCE_READER_TYPE,
 } from '@opentrons/shared-data'
 import { useIsFlex } from '/app/redux-resources/robots'
-import { useModuleRenderInfoForProtocolById } from './useModuleRenderInfoForProtocolById'
+import { useModuleRenderInfoForProtocolById } from '/app/resources/runs'
 import type { ProtocolCalibrationStatus } from '/app/resources/runs'
 
 export function useModuleCalibrationStatus(

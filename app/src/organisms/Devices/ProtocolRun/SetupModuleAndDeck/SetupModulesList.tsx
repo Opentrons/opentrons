@@ -40,6 +40,8 @@ import { StatusLabel } from '/app/atoms/StatusLabel'
 import {
   useChainLiveCommands,
   useRunCalibrationStatus,
+  useModuleRenderInfoForProtocolById,
+  useUnmatchedModulesForProtocol,
 } from '/app/resources/runs'
 import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
@@ -48,10 +50,7 @@ import {
   getModuleImage,
 } from '/app/local-resources/modules'
 import { getModuleTooHot } from '/app/transformations/modules'
-import {
-  useModuleRenderInfoForProtocolById,
-  useUnmatchedModulesForProtocol,
-} from '../../hooks'
+
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { OT2MultipleModulesHelp } from './OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
@@ -62,8 +61,10 @@ import type {
   ModuleModel,
 } from '@opentrons/shared-data'
 import type { AttachedModule } from '/app/redux/modules/types'
-import type { ModuleRenderInfoForProtocol } from '../../hooks'
-import type { ProtocolCalibrationStatus } from '/app/resources/runs'
+import type {
+  ProtocolCalibrationStatus,
+  ModuleRenderInfoForProtocol,
+} from '/app/resources/runs'
 
 interface SetupModulesListProps {
   robotName: string

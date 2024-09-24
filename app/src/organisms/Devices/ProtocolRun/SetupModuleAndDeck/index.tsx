@@ -22,11 +22,11 @@ import {
   getRequiredDeckConfig,
 } from '/app/resources/deck_configuration/utils'
 import { useRobotType } from '/app/redux-resources/robots'
-import { useRunHasStarted } from '/app/resources/runs'
 import {
+  useRunHasStarted,
   useUnmatchedModulesForProtocol,
-  useModuleCalibrationStatus,
-} from '../../hooks'
+} from '/app/resources/runs'
+import { useModuleCalibrationStatus } from '../../hooks'
 import { SetupModulesMap } from './SetupModulesMap'
 import { SetupModulesList } from './SetupModulesList'
 import { SetupFixtureList } from './SetupFixtureList'

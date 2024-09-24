@@ -17,13 +17,11 @@ import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import {
   useChainLiveCommands,
   useRunCalibrationStatus,
+  useModuleRenderInfoForProtocolById,
+  useUnmatchedModulesForProtocol,
 } from '/app/resources/runs'
 import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import {
-  useModuleRenderInfoForProtocolById,
-  useUnmatchedModulesForProtocol,
-} from '../../../hooks'
 import { OT2MultipleModulesHelp } from '../OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 import { SetupModulesList } from '../SetupModulesList'
@@ -33,7 +31,6 @@ import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../hooks')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/organisms/LocationConflictModal')
 vi.mock('../UnMatchedModuleWarning')

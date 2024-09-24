@@ -9,23 +9,23 @@ import {
   simple_v6 as _uncastedSimpleV6Protocol,
 } from '@opentrons/shared-data'
 import { i18n } from '/app/i18n'
-import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
+import { RUN_ID_1 } from '..//__fixtures__'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useLPCDisabledReason } from '../useLPCDisabledReason'
+import { useUnmatchedModulesForProtocol } from '../useUnmatchedModulesForProtocol'
+import { useRunCalibrationStatus } from '../useRunCalibrationStatus'
+import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
+import { useRunHasStarted } from '../useRunHasStarted'
 
-import { useUnmatchedModulesForProtocol } from '..'
-import {
-  useRunCalibrationStatus,
-  useMostRecentCompletedAnalysis,
-  useRunHasStarted,
-} from '/app/resources/runs'
 import type { Store } from 'redux'
 import type * as SharedData from '@opentrons/shared-data'
 import type { State } from '/app/redux/types'
 
-vi.mock('..')
+vi.mock('../useUnmatchedModulesForProtocol')
+vi.mock('../useRunCalibrationStatus')
+vi.mock('../useMostRecentCompletedAnalysis')
+vi.mock('../useRunHasStarted')
 vi.mock('/app/resources/analysis')
-vi.mock('/app/resources/runs')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
   return {

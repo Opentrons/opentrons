@@ -5,8 +5,8 @@ import { format, parseISO } from 'date-fns'
  * @returns {string} formatted date string
  */
 export function formatTimestamp(timestamp: string): string {
-    // eslint-disable-next-line eqeqeq
-    return (parseISO(timestamp) as Date | string) != 'Invalid Date'
-        ? format(parseISO(timestamp), 'MM/dd/yyyy HH:mm:ss')
-        : timestamp
+  // eslint-disable-next-line eqeqeq
+  return (parseISO(timestamp) as Date | string) != 'Invalid Date'
+    ? format(parseISO(timestamp), 'MM/dd/yyyy HH:mm:ss')
+    : timestamp
 }
