@@ -241,8 +241,6 @@ data_files_table = sqlalchemy.Table(
 )
 
 run_csv_rtp_table = sqlalchemy.Table(
-    # TODO BEFORE MERGE: If we need to rename the persistence directory anyway,
-    # take the opportunity to remove "table" from these SQL names?
     "run_csv_rtp_table",
     metadata,
     sqlalchemy.Column(
