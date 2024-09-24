@@ -387,31 +387,31 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 module_id=MagneticBlockId(module_id)
             )
         elif ModuleModel.is_absorbance_reader(actual_model):
+            lid_labware_id = None
             slot = self._state.slot_by_module_id[module_id]
             if slot is not None:
                 reader_addressable_area = f"absorbanceReaderV1{slot.value}"
-                lid_labware_id = None
                 for labware in self._state.deck_fixed_labware:
                     if labware.location == AddressableAreaLocation(
                         addressableAreaName=reader_addressable_area
                     ):
                         lid_labware_id = labware.labware_id
                         break
-                self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
-                    module_id=AbsorbanceReaderId(module_id),
-                    configured=False,
-                    measured=False,
-                    is_lid_on=True,
-                    data=None,
-                    measure_mode=None,
-                    configured_wavelengths=None,
-                    reference_wavelength=None,
-                    lid_id=lid_labware_id,
-                )
-            else:
-                raise errors.ModuleNotOnDeckError(
-                    "Opentrons Plate Reader location did not return a valid Deck Slot."
-                )
+                else:
+                    raise errors.AreaNotInDeckConfigurationError(
+                        "Opentrons Plate Reader lid location not found."
+                    )
+            self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
+                module_id=AbsorbanceReaderId(module_id),
+                configured=False,
+                measured=False,
+                is_lid_on=True,
+                data=None,
+                measure_mode=None,
+                configured_wavelengths=None,
+                reference_wavelength=None,
+                lid_id=lid_labware_id,
+            )
 
     def _update_additional_slots_occupied_by_thermocycler(
         self,
