@@ -2199,12 +2199,12 @@ class AutoProbeDisable:
         self.instrument = instrument
 
     def __enter__(self) -> None:
-        if self.instrument.api_version >= APIVersion(2, 20):
+        if self.instrument.api_version >= APIVersion(2, 21):
             self.auto_presence = self.instrument.liquid_presence_detection
             self.instrument.liquid_presence_detection = False
 
     def __exit__(self, *args: Any, **kwargs: Any) -> None:
-        if self.instrument.api_version >= APIVersion(2, 20):
+        if self.instrument.api_version >= APIVersion(2, 21):
             self.instrument.liquid_presence_detection = self.auto_presence
 
 
