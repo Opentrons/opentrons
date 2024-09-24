@@ -3,7 +3,7 @@
 
 import sqlalchemy
 
-from robot_server.persistence.tables import enable_error_recovery_table
+from robot_server.persistence.tables import boolean_setting_table, BooleanSettingKey
 
 
 class ErrorRecoverySettingStore:
@@ -19,16 +19,24 @@ class ErrorRecoverySettingStore:
         """
         with self._sql_engine.begin() as transaction:
             return transaction.execute(
-                sqlalchemy.select(enable_error_recovery_table.c.enable_error_recovery)
+                sqlalchemy.select(boolean_setting_table.c.value).where(
+                    boolean_setting_table.c.key
+                    == BooleanSettingKey.ENABLE_ERROR_RECOVERY
+                )
             ).scalar_one_or_none()
 
     def set_is_enabled(self, is_enabled: bool) -> None:
         """Set the value of the "error recovery enabled" setting."""
         with self._sql_engine.begin() as transaction:
-            transaction.execute(sqlalchemy.delete(enable_error_recovery_table))
             transaction.execute(
-                sqlalchemy.insert(enable_error_recovery_table).values(
-                    id=0,  # id=0 to match the single-row constraint trick in the table declaration.
-                    enable_error_recovery=is_enabled,
+                sqlalchemy.delete(boolean_setting_table).where(
+                    boolean_setting_table.c.key
+                    == BooleanSettingKey.ENABLE_ERROR_RECOVERY
+                )
+            )
+            transaction.execute(
+                sqlalchemy.insert(boolean_setting_table).values(
+                    key=BooleanSettingKey.ENABLE_ERROR_RECOVERY,
+                    value=is_enabled,
                 )
             )

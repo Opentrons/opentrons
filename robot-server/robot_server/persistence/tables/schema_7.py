@@ -266,21 +266,29 @@ run_csv_rtp_table = sqlalchemy.Table(
     ),
 )
 
-# Single-row table to store the boolean "enable/disable error recovery" setting.
-enable_error_recovery_table = sqlalchemy.Table(
-    "enable_error_recovery",
+
+class BooleanSettingKey(enum.Enum):
+    """Keys for boolean settings."""
+
+    ENABLE_ERROR_RECOVERY = "enable_error_recovery"
+
+
+boolean_setting_table = sqlalchemy.Table(
+    "boolean_setting",
     metadata,
     sqlalchemy.Column(
-        "id",
-        sqlalchemy.Integer,
-        # This `id=0` constraint, combined with the uniqueness constraint implicit in `primary_key=True`,
-        # is a trick to make sure this table only has at most 1 row.
-        sqlalchemy.CheckConstraint("id=0"),
+        "key",
+        sqlalchemy.Enum(
+            BooleanSettingKey,
+            values_callable=lambda obj: [e.value for e in obj],
+            validate_strings=True,
+            create_constraint=True,
+        ),
         primary_key=True,
     ),
     sqlalchemy.Column(
-        "enable_error_recovery",
+        "value",
         sqlalchemy.Boolean,
-        nullable=True,
+        nullable=False,
     ),
 )
