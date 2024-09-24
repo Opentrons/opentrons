@@ -10,6 +10,7 @@ import {
   FlexTrash,
   JUSTIFY_CENTER,
   RobotCoordinateSpaceWithRef,
+  SPACING,
   SingleSlotFixture,
   SlotLabels,
   StagingAreaFixture,
@@ -54,6 +55,7 @@ import type { DeckSetupTabType } from '../types'
 import type { Fixture } from './constants'
 
 const WASTE_CHUTE_SPACE = 30
+const DETAILS_HOVER_SPACE = 60
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',
   'fixedBase',
@@ -99,11 +101,16 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
   const hasWasteChute =
     wasteChuteFixtures.length > 0 || wasteChuteStagingAreaFixtures.length > 0
 
-  const initialViewBox = `${deckDef.cornerOffsetFromOrigin[0]} ${
-    hasWasteChute
-      ? deckDef.cornerOffsetFromOrigin[1] - WASTE_CHUTE_SPACE
-      : deckDef.cornerOffsetFromOrigin[1]
-  } ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`
+  const viewBoxX = deckDef.cornerOffsetFromOrigin[0]
+  const viewBoxY = hasWasteChute
+    ? deckDef.cornerOffsetFromOrigin[1] -
+      WASTE_CHUTE_SPACE -
+      DETAILS_HOVER_SPACE
+    : deckDef.cornerOffsetFromOrigin[1]
+  const viewBoxWidth = deckDef.dimensions[0]
+  const viewBoxHeight = deckDef.dimensions[1] + DETAILS_HOVER_SPACE
+
+  const initialViewBox = `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`
 
   const [viewBox, setViewBox] = React.useState<string>(initialViewBox)
   const [hoveredLabware, setHoveredLabware] = React.useState<string | null>(
@@ -180,10 +187,11 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
       ) : null}
       <Flex
         backgroundColor={COLORS.white}
-        borderRadius={BORDERS.borderRadius8}
+        borderRadius={BORDERS.borderRadius12}
         width="100%"
         height={zoomIn.slot != null ? '75vh' : '70vh'}
         flexDirection={DIRECTION_COLUMN}
+        padding={SPACING.spacing40}
       >
         <Flex
           width="100%"
@@ -192,10 +200,11 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
           justifyContent={JUSTIFY_CENTER}
         >
           <RobotCoordinateSpaceWithRef
-            height={zoomIn.slot != null ? '100%' : '70%'}
+            height={zoomIn.slot != null ? '100%' : '80%'}
             width="100%"
             deckDef={deckDef}
             viewBox={viewBox}
+            outline="auto"
           >
             {() => (
               <>
