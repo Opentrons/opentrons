@@ -368,7 +368,7 @@ def _find_liquid_height(
             )
         else:
             _liquid_height = _sense_liquid_height(
-                resources.ctx, resources.pipette, reservoir, cfg
+                resources.ctx, resources.pipette, reservoir
             )
         height_below_top = reservoir.depth - _liquid_height
         ui.print_info(f"liquid is {height_below_top} mm below top of reservoir")

@@ -578,7 +578,7 @@ def _get_liquid_height(
         )
     else:
         _liquid_height = _sense_liquid_height(
-            resources.ctx, resources.pipette, well, cfg
+            resources.ctx, resources.pipette, well
         )
     resources.pipette.move_to(well.top().move(Point(0, 0, _minimum_z_height(cfg))))
     return _liquid_height
