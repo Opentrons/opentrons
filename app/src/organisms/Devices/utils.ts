@@ -5,11 +5,7 @@ import type {
   FetchPipettesResponsePipette,
   Mount,
 } from '/app/redux/pipettes/types'
-import type {
-  Instruments,
-  PipetteData,
-  PipetteOffsetCalibration,
-} from '@opentrons/api-client'
+import type { PipetteOffsetCalibration } from '@opentrons/api-client'
 
 /**
  * formats a string if it is in ISO 8601 date format
