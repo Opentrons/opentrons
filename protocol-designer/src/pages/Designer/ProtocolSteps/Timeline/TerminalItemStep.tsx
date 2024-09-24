@@ -18,7 +18,6 @@ import {
 } from '../../../../components/modals/ConfirmDeleteModal'
 import { StepContainer } from './StepContainer'
 
-import type { IconName } from '@opentrons/components'
 import type {
   SelectTerminalItemAction,
   HoverOnTerminalItemAction,
@@ -48,9 +47,6 @@ export function TerminalItemStep(props: TerminalItemStepProps): JSX.Element {
   const onMouseLeave = (): HoverOnTerminalItemAction =>
     dispatch(stepsActions.hoverOnTerminalItem(null))
 
-  const handleIconName = (): IconName =>
-    title === 'Starting deck state' ? 'ot-start' : 'ot-end'
-
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
     selectItem,
     currentFormIsPresaved || formHasChanges
@@ -74,7 +70,7 @@ export function TerminalItemStep(props: TerminalItemStepProps): JSX.Element {
       <StepContainer
         {...{
           stepId: `TerminalItem_${id}`,
-          iconName: handleIconName(),
+          iconName: title === 'Starting deck state' ? 'ot-start' : 'ot-end',
           hovered,
           selected,
           title,
