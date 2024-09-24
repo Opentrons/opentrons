@@ -264,10 +264,12 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                           header={getModuleDisplayName(module.model)}
                           leftHeaderItem={
                             <Flex
+                              padding={SPACING.spacing2}
                               backgroundColor={COLORS.white}
                               borderRadius={BORDERS.borderRadius8}
                               alignItems={ALIGN_CENTER}
                               width="3.75rem"
+                              height="3.625rem"
                             >
                               <ModuleDiagram
                                 type={module.type}

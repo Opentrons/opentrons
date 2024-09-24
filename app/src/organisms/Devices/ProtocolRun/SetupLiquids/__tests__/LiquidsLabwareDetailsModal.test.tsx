@@ -8,14 +8,14 @@ import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
 import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getIsOnDevice } from '/app/redux/config'
-import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
-import { getLocationInfoNames } from '../../utils/getLocationInfoNames'
+import { getLocationInfoNames } from '/app/transformations/commands'
 import { getSlotLabwareDefinition } from '../../utils/getSlotLabwareDefinition'
 import {
   getLiquidsByIdForLabware,
   getDisabledWellFillFromLabwareId,
-} from '../utils'
+} from '/app/transformations/analysis'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
 import { LiquidDetailCard } from '../LiquidDetailCard'
 
@@ -37,11 +37,11 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
   }
 })
 vi.mock('/app/redux/config')
-vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('/app/resources/runs')
 vi.mock('../../../../Devices/hooks')
-vi.mock('../../utils/getLocationInfoNames')
+vi.mock('/app/transformations/commands')
 vi.mock('../../utils/getSlotLabwareDefinition')
-vi.mock('../utils')
+vi.mock('/app/transformations/analysis')
 vi.mock('../LiquidDetailCard')
 
 const render = (

@@ -19,11 +19,11 @@ import {
 } from '../../InterventionModal'
 import { ProgressBar } from '/app/atoms/ProgressBar'
 import { useRunControls } from '../../RunTimeControl/hooks'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   useNotifyRunQuery,
   useNotifyAllCommandsQuery,
   useRunStatus,
+  useMostRecentCompletedAnalysis,
 } from '/app/resources/runs'
 import { useDownloadRunLog } from '../../Devices/hooks'
 import {
@@ -48,7 +48,6 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   }
 })
 vi.mock('../../RunTimeControl/hooks')
-vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('/app/resources/runs')
 vi.mock('../../Devices/hooks')
 vi.mock('/app/atoms/ProgressBar')

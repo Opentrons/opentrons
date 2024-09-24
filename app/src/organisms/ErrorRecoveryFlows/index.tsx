@@ -25,7 +25,6 @@ import {
   useERUtils,
   useRecoveryTakeover,
   useRetainedFailedCommandBySource,
-  useShowDoorInfo,
 } from './hooks'
 
 import type { RunStatus } from '@opentrons/api-client'
@@ -128,15 +127,12 @@ export function ErrorRecoveryFlows(
   const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
   const robotName = useHost()?.robotName ?? 'robot'
 
-  const isDoorOpen = useShowDoorInfo(runStatus)
   const {
     showTakeover,
     isActiveUser,
     intent,
     toggleERWizAsActiveUser,
   } = useRecoveryTakeover(toggleERWizard)
-  const renderWizard = isActiveUser && (showERWizard || isDoorOpen)
-  const showSplash = useRunPausedSplash(isOnDevice, renderWizard)
 
   const recoveryUtils = useERUtils({
     ...props,
@@ -144,8 +140,14 @@ export function ErrorRecoveryFlows(
     toggleERWizAsActiveUser,
     isOnDevice,
     robotType,
+    showTakeover,
     failedCommand: failedCommandBySource,
   })
+
+  const renderWizard =
+    isActiveUser &&
+    (showERWizard || recoveryUtils.doorStatusUtils.isProhibitedDoorOpen)
+  const showSplash = useRunPausedSplash(isOnDevice, renderWizard)
 
   return (
     <>
@@ -163,7 +165,6 @@ export function ErrorRecoveryFlows(
           {...recoveryUtils}
           robotType={robotType}
           isOnDevice={isOnDevice}
-          isDoorOpen={isDoorOpen}
           failedCommand={failedCommandBySource}
         />
       ) : null}

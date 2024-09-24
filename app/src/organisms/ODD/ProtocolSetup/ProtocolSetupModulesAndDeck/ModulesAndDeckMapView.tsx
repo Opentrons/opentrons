@@ -7,7 +7,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { ModuleInfo } from '../../../Devices/ModuleInfo'
-import { getStandardDeckViewLayerBlockList } from '../../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
+import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { AttachedProtocolModuleMatch } from './utils'

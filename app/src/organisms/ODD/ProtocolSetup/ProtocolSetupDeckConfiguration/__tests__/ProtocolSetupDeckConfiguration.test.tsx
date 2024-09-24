@@ -11,9 +11,9 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { ProtocolSetupDeckConfiguration } from '..'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { ProtocolSetupDeckConfiguration } from '..'
 
 import type { UseQueryResult } from 'react-query'
 import type {
@@ -24,7 +24,7 @@ import type { Modules } from '@opentrons/api-client'
 
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck/index')
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('/app/resources/runs')
 vi.mock('/app/resources/deck_configuration')
 
 const mockSetSetupScreen = vi.fn()

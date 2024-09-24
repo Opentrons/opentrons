@@ -25,7 +25,7 @@ import {
   ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,
 } from '/app/redux/analytics'
 import { getIsOnDevice } from '/app/redux/config'
-import { getWellRangeForLiquidLabwarePair } from './utils'
+import { getWellRangeForLiquidLabwarePair } from '/app/transformations/analysis'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};

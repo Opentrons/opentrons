@@ -14,7 +14,7 @@ import {
   mockThermocycler as mockThermocyclerFixture,
   mockMagneticModule as mockMagneticModuleFixture,
 } from '/app/redux/modules/__fixtures__/index'
-import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getAttachedProtocolModuleMatches } from '../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
 import { ModuleInfo } from '../../../ModuleInfo'
 import { SetupModulesMap } from '../SetupModulesMap'
@@ -43,10 +43,10 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     inferModuleOrientationFromXCoordinate: vi.fn(),
   }
 })
-vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('/app/resources/runs/useMostRecentCompletedAnalysis')
 vi.mock('../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils')
 vi.mock('../../../ModuleInfo')
-vi.mock('../../../hooks')
+vi.mock('/app/resources/modules')
 
 const render = (props: React.ComponentProps<typeof SetupModulesMap>) => {
   return renderWithProviders(

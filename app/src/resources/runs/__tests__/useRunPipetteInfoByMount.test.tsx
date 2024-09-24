@@ -21,17 +21,18 @@ import {
   mockLeftProtoPipette,
   mockRightProtoPipette,
 } from '/app/redux/pipettes/__fixtures__'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
+
+import { useRunPipetteInfoByMount } from '../useRunPipetteInfoByMount'
 import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
-  useRunPipetteInfoByMount,
-} from '..'
+} from '/app/resources/instruments'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import _uncastedModifiedSimpleV6Protocol from '../__fixtures__/modifiedSimpleV6.json'
+import { modifiedSimpleV6Protocol as _uncastedModifiedSimpleV6Protocol } from '../__fixtures__'
 
 import type * as SharedData from '@opentrons/shared-data'
-import type { PipetteInfo } from '..'
+import type { PipetteInfo } from '/app/redux/pipettes'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
@@ -42,10 +43,8 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
   }
 })
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../useAttachedPipetteCalibrations')
-vi.mock('../useAttachedPipettes')
-vi.mock('../useTipLengthCalibrations')
+vi.mock('../useMostRecentCompletedAnalysis')
+vi.mock('/app/resources/instruments')
 vi.mock('/app/resources/analysis')
 
 const PIPETTE_CALIBRATIONS = {

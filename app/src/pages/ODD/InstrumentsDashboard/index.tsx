@@ -5,7 +5,7 @@ import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { Navigation } from '/app/organisms/Navigation'
 import { AttachedInstrumentMountItem } from '/app/organisms/InstrumentMountItem'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
-import { getShowPipetteCalibrationWarning } from '/app/organisms/Devices/utils'
+import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 import { PipetteRecalibrationODDWarning } from './PipetteRecalibrationODDWarning'
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 

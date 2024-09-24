@@ -24,8 +24,7 @@ import * as PipetteConstants from '/app/redux/pipettes/constants'
 import { useDeckCalibrationData } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 
-import type { Mount } from '/app/redux/pipettes/types'
-import type { PipetteInfo } from '../hooks'
+import type { Mount, PipetteInfo } from '/app/redux/pipettes'
 
 const inexactPipetteSupportArticle =
   'https://support.opentrons.com/s/article/GEN2-pipette-compatibility'

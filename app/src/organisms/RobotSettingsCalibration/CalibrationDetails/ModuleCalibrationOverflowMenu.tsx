@@ -19,9 +19,9 @@ import {
 
 import { useChainLiveCommands } from '/app/resources/runs'
 import { useRunStatuses } from '/app/organisms/Devices/hooks'
-import { getModulePrepCommands } from '/app/organisms/Devices/getModulePrepCommands'
+import { getModulePrepCommands } from '/app/local-resources/modules'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import { getModuleTooHot } from '/app/organisms/Devices/getModuleTooHot'
+import { getModuleTooHot } from '/app/transformations/modules'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { AttachedModule } from '/app/redux/modules/types'

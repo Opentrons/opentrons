@@ -11,7 +11,7 @@ import { InstrumentDetail } from '..'
 import {
   useGripperDisplayName,
   usePipetteModelSpecs,
-} from '/app/resources/instruments/hooks'
+} from '/app/local-resources/instruments'
 import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
 
 import type { Instruments } from '@opentrons/api-client'
@@ -21,7 +21,7 @@ vi.mock('react-router-dom', () => ({
   useParams: vi.fn(),
   useNavigate: vi.fn(),
 }))
-vi.mock('/app/resources/instruments/hooks')
+vi.mock('/app/local-resources/instruments')
 vi.mock('/app/resources/robot-settings/hooks')
 
 const render = () => {

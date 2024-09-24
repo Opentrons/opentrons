@@ -7,19 +7,19 @@ import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
 
 import {
   useRunCalibrationStatus,
-  useDeckCalibrationStatus,
   useRunPipetteInfoByMount,
+  useNotifyRunQuery,
 } from '..'
+import { useDeckCalibrationStatus } from '/app/resources/calibration'
 import { useIsFlex } from '/app/redux-resources/robots'
-import { useNotifyRunQuery } from '/app/resources/runs'
 
-import type { PipetteInfo } from '..'
+import type { PipetteInfo } from '/app/redux/pipettes'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
-vi.mock('../useDeckCalibrationStatus')
 vi.mock('../useRunPipetteInfoByMount')
-vi.mock('/app/resources/runs')
+vi.mock('../useNotifyRunQuery')
+vi.mock('/app/resources/calibration')
 vi.mock('/app/resources/analysis')
 vi.mock('/app/redux-resources/robots')
 

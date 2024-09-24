@@ -7,8 +7,10 @@ import {
   opentrons96PcrAdapterV1,
 } from '@opentrons/shared-data'
 import { getLabwareOffsetLocation } from '../getLabwareOffsetLocation'
-import { getLabwareLocation } from '../getLabwareLocation'
-import { getModuleInitialLoadInfo } from '../getModuleInitialLoadInfo'
+import {
+  getModuleInitialLoadInfo,
+  getLabwareLocation,
+} from '/app/transformations/commands'
 import type {
   LoadedLabware,
   LoadedModule,
@@ -16,8 +18,7 @@ import type {
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
 
-vi.mock('../getLabwareLocation')
-vi.mock('../getModuleInitialLoadInfo')
+vi.mock('/app/transformations/commands')
 
 const protocolWithTC = (multiple_tipacks_with_tc as unknown) as CompletedProtocolAnalysis
 const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition2

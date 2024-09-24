@@ -33,10 +33,13 @@ import {
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
 } from '/app/redux/analytics'
 import { useIsFlex } from '/app/redux-resources/robots'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getLocationInfoNames } from '../utils/getLocationInfoNames'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import { getLocationInfoNames } from '/app/transformations/commands'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
-import { getTotalVolumePerLiquidId, getVolumePerWell } from './utils'
+import {
+  getTotalVolumePerLiquidId,
+  getVolumePerWell,
+} from '/app/transformations/analysis'
 
 import type { LabwareByLiquidId } from '@opentrons/shared-data'
 

@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 
 import * as PipetteConstants from '/app/redux/pipettes/constants'
-import { useRunPipetteInfoByMount } from '../hooks'
+import { useRunPipetteInfoByMount } from '/app/resources/runs'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 import { SetupTipLengthCalibrationButton } from './SetupTipLengthCalibrationButton'
 interface SetupTipLengthCalibrationProps {

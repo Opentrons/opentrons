@@ -7,32 +7,24 @@ import {
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 import { MATCH, INEXACT_MATCH, INCOMPATIBLE } from '/app/redux/pipettes'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { useAttachedPipetteCalibrations, useAttachedPipettes } from '.'
+import {
+  useAttachedPipetteCalibrations,
+  useAttachedPipettes,
+} from '/app/resources/instruments'
 
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 import type {
   PickUpTipRunTimeCommand,
   LoadPipetteRunTimeCommand,
   LabwareDefinition2,
-  PipetteNameSpecs,
 } from '@opentrons/shared-data'
 import type {
   Mount,
   AttachedPipette,
-  TipRackCalibrationData,
+  PipetteInfo,
 } from '/app/redux/pipettes/types'
 
 const EMPTY_MOUNTS = { left: null, right: null }
-
-export interface PipetteInfo {
-  pipetteSpecs: PipetteNameSpecs
-  tipRacksForPipette: TipRackCalibrationData[]
-  requestedPipetteMatch:
-    | typeof MATCH
-    | typeof INEXACT_MATCH
-    | typeof INCOMPATIBLE
-  pipetteCalDate: string | null
-}
 
 export function useRunPipetteInfoByMount(
   runId: string

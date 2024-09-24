@@ -16,10 +16,9 @@ vi.mock('@opentrons/components/src/hardware-sim/BaseDeck')
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/shared-data/js/helpers/getSimplestFlexDeckConfig')
 vi.mock('/app/redux/config')
-vi.mock('../../../../Devices/hooks')
 vi.mock('/app/resources/deck_configuration/utils')
 vi.mock('../../../../Devices/ModuleInfo')
-vi.mock('../../../../Devices/ProtocolRun/utils/getLabwareRenderInfo')
+vi.mock('/app/transformations/analysis')
 
 const mockRunId = 'mockRunId'
 const PROTOCOL_ANALYSIS = {

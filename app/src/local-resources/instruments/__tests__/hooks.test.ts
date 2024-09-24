@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useIsOEMMode } from '../../robot-settings/hooks'
+import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
 
 import {
   useGripperDisplayName,
@@ -11,7 +11,7 @@ import {
 
 import type { PipetteV2Specs } from '@opentrons/shared-data'
 
-vi.mock('../../robot-settings/hooks')
+vi.mock('/app/resources/robot-settings/hooks')
 
 const BRANDED_P1000_FLEX_DISPLAY_NAME = 'Flex 1-Channel 1000 μL'
 const ANONYMOUS_P1000_FLEX_DISPLAY_NAME = '1-Channel 1000 μL'

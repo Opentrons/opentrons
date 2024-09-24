@@ -4,7 +4,7 @@ import {
   getLoadedLabwareDefinitionsByUri,
   getPositionFromSlotId,
 } from '@opentrons/shared-data'
-import { getModuleInitialLoadInfo } from './getModuleInitialLoadInfo'
+import { getModuleInitialLoadInfo } from '../commands'
 import type {
   CompletedProtocolAnalysis,
   DeckDefinition,

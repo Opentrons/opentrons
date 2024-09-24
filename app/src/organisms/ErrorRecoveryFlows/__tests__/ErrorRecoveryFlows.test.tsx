@@ -16,7 +16,6 @@ import { ErrorRecoveryFlows, useErrorRecoveryFlows } from '..'
 import {
   useCurrentlyRecoveringFrom,
   useERUtils,
-  useShowDoorInfo,
   useRecoveryTakeover,
 } from '../hooks'
 import { useRecoveryAnalytics } from '/app/redux-resources/analytics'
@@ -153,8 +152,10 @@ describe('ErrorRecoveryFlows', () => {
       showERWizard: true,
     })
     vi.mocked(useRunPausedSplash).mockReturnValue(true)
-    vi.mocked(useERUtils).mockReturnValue({ routeUpdateActions: {} } as any)
-    vi.mocked(useShowDoorInfo).mockReturnValue(false)
+    vi.mocked(useERUtils).mockReturnValue({
+      routeUpdateActions: {},
+      doorStatusUtils: { isDoorOpen: false, isProhibitedDoorOpen: false },
+    } as any)
     vi.mocked(useRecoveryAnalytics).mockReturnValue({
       reportErrorEvent: vi.fn(),
     } as any)
@@ -174,12 +175,16 @@ describe('ErrorRecoveryFlows', () => {
   })
 
   it('renders the wizard when isDoorOpen is true', () => {
-    vi.mocked(useShowDoorInfo).mockReturnValue(true)
     vi.mocked(useERWizard).mockReturnValue({
       hasLaunchedRecovery: false,
       toggleERWizard: () => Promise.resolve(),
       showERWizard: false,
     })
+
+    vi.mocked(useERUtils).mockReturnValue({
+      routeUpdateActions: {},
+      doorStatusUtils: { isDoorOpen: true, isProhibitedDoorOpen: true },
+    } as any)
 
     render(props)
     screen.getByText('MOCK WIZARD')
@@ -191,7 +196,10 @@ describe('ErrorRecoveryFlows', () => {
       toggleERWizard: () => Promise.resolve(),
       showERWizard: false,
     })
-    vi.mocked(useShowDoorInfo).mockReturnValue(false)
+    vi.mocked(useERUtils).mockReturnValue({
+      routeUpdateActions: {},
+      doorStatusUtils: { isDoorOpen: false, isProhibitedDoorOpen: false },
+    } as any)
 
     render(props)
     expect(screen.queryByText('MOCK WIZARD')).not.toBeInTheDocument()

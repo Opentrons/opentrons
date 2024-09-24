@@ -5,7 +5,7 @@ import {
   getPipetteSpecsV2,
   GRIPPER_MODELS,
 } from '@opentrons/shared-data'
-import { useIsOEMMode } from '../robot-settings/hooks'
+import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
 
 import type {
   GripperModel,

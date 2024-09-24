@@ -22,7 +22,7 @@ import { SmallButton } from '/app/atoms/buttons'
 import {
   useGripperDisplayName,
   usePipetteNameSpecs,
-} from '/app/resources/instruments/hooks'
+} from '/app/local-resources/instruments'
 import { FLOWS } from '../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../PipetteWizardFlows'
 import { GripperWizardFlows } from '../GripperWizardFlows'

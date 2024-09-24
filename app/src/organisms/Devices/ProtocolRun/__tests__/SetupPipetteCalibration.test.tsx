@@ -6,14 +6,15 @@ import { screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
-import { useRunPipetteInfoByMount } from '../../hooks'
 import { SetupPipetteCalibrationItem } from '../SetupPipetteCalibrationItem'
 import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
-import { useNotifyRunQuery } from '/app/resources/runs'
+import {
+  useNotifyRunQuery,
+  useRunPipetteInfoByMount,
+} from '/app/resources/runs'
 
-import type { PipetteInfo } from '../../hooks'
+import type { PipetteInfo } from '/app/redux/pipettes'
 
-vi.mock('../../hooks')
 vi.mock('../SetupPipetteCalibrationItem')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/runs')

@@ -11,13 +11,13 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
 import { mockRecentAnalysis } from '../__fixtures__'
 import { ProtocolSetupInstruments } from '..'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('/app/resources/runs')
 vi.mock('/app/resources/robot-settings/hooks')
 
 const mockGripperData = {

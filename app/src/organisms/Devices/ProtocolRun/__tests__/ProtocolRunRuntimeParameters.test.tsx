@@ -5,8 +5,11 @@ import { when } from 'vitest-when'
 import { InfoScreen } from '@opentrons/components'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
+import {
+  useMostRecentCompletedAnalysis,
+  useNotifyRunQuery,
+  useRunStatus,
+} from '/app/resources/runs'
 import {
   mockSucceededRun,
   mockIdleUnstartedRun,
@@ -27,7 +30,6 @@ vi.mock('@opentrons/components', async importOriginal => {
     InfoScreen: vi.fn(),
   }
 })
-vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux/config')
 

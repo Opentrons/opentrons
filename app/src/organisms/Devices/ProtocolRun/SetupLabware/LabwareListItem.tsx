@@ -51,9 +51,11 @@ import type {
   LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
-import type { LabwareSetupItem } from '/app/transformations/commands'
+import type {
+  LabwareSetupItem,
+  NestedLabwareInfo,
+} from '/app/transformations/commands'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
-import type { NestedLabwareInfo } from './getNestedLabwareInfo'
 
 const LabwareRow = styled.div`
   display: ${DISPLAY_GRID};

@@ -22,8 +22,8 @@ import {
 
 import { OddModal } from '/app/molecules/OddModal'
 import { getIsOnDevice } from '/app/redux/config'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getLocationInfoNames } from '../utils/getLocationInfoNames'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import { getLocationInfoNames } from '/app/transformations/commands'
 import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
 import { LiquidDetailCard } from './LiquidDetailCard'
 import {
@@ -31,7 +31,7 @@ import {
   getDisabledWellFillFromLabwareId,
   getWellGroupForLiquidId,
   getDisabledWellGroupForLiquidId,
-} from './utils'
+} from '/app/transformations/analysis'
 
 interface LiquidsLabwareDetailsModalProps {
   liquidId?: string

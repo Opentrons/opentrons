@@ -6,7 +6,7 @@ import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import {
   useGripperDisplayName,
   usePipetteModelSpecs,
-} from '/app/resources/instruments/hooks'
+} from '/app/local-resources/instruments'
 import { ChoosePipette } from '../PipetteWizardFlows/ChoosePipette'
 import { FLOWS } from '../PipetteWizardFlows/constants'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'

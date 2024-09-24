@@ -13,19 +13,18 @@ import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useLPCDisabledReason } from '../useLPCDisabledReason'
 
+import { useRunHasStarted, useUnmatchedModulesForProtocol } from '..'
 import {
   useRunCalibrationStatus,
-  useRunHasStarted,
-  useUnmatchedModulesForProtocol,
-} from '..'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+  useMostRecentCompletedAnalysis,
+} from '/app/resources/runs'
 import type { Store } from 'redux'
 import type * as SharedData from '@opentrons/shared-data'
 import type { State } from '/app/redux/types'
 
 vi.mock('..')
 vi.mock('/app/resources/analysis')
-vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('/app/resources/runs')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
   return {

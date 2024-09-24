@@ -21,11 +21,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   useNotifyAllCommandsAsPreSerializedList,
   useNotifyRunQuery,
   useRunStatus,
+  useMostRecentCompletedAnalysis,
 } from '/app/resources/runs'
 import { CommandText, CommandIcon } from '/app/molecules/Command'
 import { Divider } from '/app/atoms/structure'

@@ -8,7 +8,7 @@ import {
   getWellGroupForLiquidId,
   getWellRangeForLiquidLabwarePair,
   getDisabledWellGroupForLiquidId,
-} from '../utils'
+} from '../liquids'
 import type { LabwareByLiquidId, Liquid } from '@opentrons/shared-data'
 
 const LABWARE_ID =

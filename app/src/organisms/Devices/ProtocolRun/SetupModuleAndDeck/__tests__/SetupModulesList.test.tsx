@@ -14,13 +14,15 @@ import {
   mockThermocycler,
 } from '/app/redux/modules/__fixtures__'
 import { useRobot, useIsFlex } from '/app/redux-resources/robots'
-import { useChainLiveCommands } from '/app/resources/runs'
+import {
+  useChainLiveCommands,
+  useRunCalibrationStatus,
+} from '/app/resources/runs'
 import { ModuleSetupModal } from '../../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
 import {
   useModuleRenderInfoForProtocolById,
   useUnmatchedModulesForProtocol,
-  useRunCalibrationStatus,
 } from '../../../hooks'
 import { OT2MultipleModulesHelp } from '../OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'

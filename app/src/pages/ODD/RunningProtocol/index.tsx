@@ -27,11 +27,12 @@ import {
 } from '@opentrons/api-client'
 
 import { StepMeter } from '/app/atoms/StepMeter'
-import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+
 import {
   useRunStatus,
   useRunTimestamps,
   useNotifyRunQuery,
+  useMostRecentCompletedAnalysis,
 } from '/app/resources/runs'
 import {
   InterventionModal,

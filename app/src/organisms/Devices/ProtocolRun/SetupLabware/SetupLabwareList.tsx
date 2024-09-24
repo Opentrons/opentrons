@@ -7,9 +7,11 @@ import {
   StyledText,
   COLORS,
 } from '@opentrons/components'
-import { getLabwareSetupItemGroups } from '/app/transformations/commands'
+import {
+  getLabwareSetupItemGroups,
+  getNestedLabwareInfo,
+} from '/app/transformations/commands'
 import { LabwareListItem } from './LabwareListItem'
-import { getNestedLabwareInfo } from './getNestedLabwareInfo'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
