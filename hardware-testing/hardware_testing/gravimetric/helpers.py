@@ -172,11 +172,11 @@ def gantry_position_as_point(position: Dict[Axis, float]) -> Point:
 def _jog_to_find_liquid_height(
     ctx: ProtocolContext, pipette: InstrumentContext, well: Well
 ) -> float:
+    if ctx.is_simulating():
+        return well.depth - 1
     _well_depth = well.depth
     _liquid_height = _well_depth + 2
     _jog_size = -1.0
-    if ctx.is_simulating():
-        return _liquid_height - 1
     while True:
         pipette.move_to(well.bottom(_liquid_height))
         inp = input(
