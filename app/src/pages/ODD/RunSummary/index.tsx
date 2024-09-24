@@ -43,7 +43,7 @@ import {
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import { useRunCreatedAtTimestamp } from '/app/organisms/Devices/hooks'
 import { onDeviceDisplayFormatTimestamp } from '/app/organisms/Devices/utils'
-import { RunTimer } from '/app/organisms/Devices/ProtocolRun/RunTimer'
+import { RunTimer } from '/app/molecules/RunTimer'
 import {
   useTrackProtocolRunEvent,
   useTrackEventWithRobotSerial,
