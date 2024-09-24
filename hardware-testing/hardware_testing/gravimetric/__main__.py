@@ -193,10 +193,10 @@ class RunArgs:
     def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":  # noqa: C901
         """Build."""
         _ctx = RunArgs._get_protocol_context(args)
-        operator_name = helpers._get_operator_name(_ctx.is_simulating())
-        robot_serial = helpers._get_robot_serial(_ctx.is_simulating())
+        operator_name = helpers._get_operator_name(True)
+        robot_serial = helpers._get_robot_serial(True)
         run_id, start_time = create_run_id_and_start_time()
-        environment_sensor = asair_sensor.BuildAsairSensor(_ctx.is_simulating())
+        environment_sensor = asair_sensor.BuildAsairSensor(True)
         git_description = get_git_description()
         if not args.photometric:
             scale = Scale.build(simulate=_ctx.is_simulating())
@@ -223,12 +223,12 @@ class RunArgs:
             )
             for tip in tip_volumes:
                 tip_batches[f"tips_{tip}ul"] = helpers._get_tip_batch(
-                    _ctx.is_simulating(), tip
+                    True, tip
                 )
         else:
             tip_volumes = [args.tip]
             tip_batches[f"tips_{args.tip}ul"] = helpers._get_tip_batch(
-                _ctx.is_simulating(), args.tip
+                True, args.tip
             )
 
         volumes: Dict[int, List[float]] = {}
@@ -608,7 +608,7 @@ if __name__ == "__main__":
         sleep(1)
     hw = workarounds.get_sync_hw_api(run_args.ctx)
     try:
-        if not run_args.ctx.is_simulating() and not args.photometric:
+        if not True and not args.photometric:
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         ui.print_info("homing...")
         run_args.ctx.home()
