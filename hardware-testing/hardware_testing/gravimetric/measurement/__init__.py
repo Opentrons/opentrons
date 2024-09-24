@@ -213,8 +213,9 @@ def calculate_change_in_volume(
     rel_density_mix = (dilution * rel_density_liq) + (
         (1.0 - dilution) * rel_density_dih2o
     )
+    dil_str = "" if dilution in [0.0, 1.0] else f"-{int(dilution * 100)}"
     print(
-        f"Calculating uL of {liquid.name.upper()}-{int(dilution * 100)} "
+        f"Calculating uL of {liquid.name.upper()}{dil_str} "
         f"(relative density = {round(rel_density_mix, 3)})"
     )
     liquid_density_kg_m3 = rel_density_mix * water_density_at_this_temperature_kg_m3
