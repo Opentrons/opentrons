@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useLocation } from 'react-router-dom'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -15,9 +16,15 @@ import {
   localStorageAnnouncementKey,
 } from '../../persist'
 import { useAnnouncements } from './announcements'
-import { useLocation } from 'react-router-dom'
 
-export const AnnouncementModal = (): JSX.Element => {
+interface AnnouncementModalProp {
+  onClose?: () => void
+}
+
+export const AnnouncementModal = (
+  props: AnnouncementModalProp
+): JSX.Element => {
+  const { onClose } = props
   const { t } = useTranslation(['modal', 'button'])
   const announcements = useAnnouncements()
   const location = useLocation()
@@ -37,6 +44,7 @@ export const AnnouncementModal = (): JSX.Element => {
   )
 
   const handleClick = (): void => {
+    if (onClose != null) onClose()
     setLocalStorageItem(localStorageAnnouncementKey, announcementKey)
     setShowAnnouncementModal(false)
   }

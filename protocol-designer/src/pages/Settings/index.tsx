@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { useLocation } from 'react-router-dom'
 import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
@@ -25,15 +24,14 @@ import {
   actions as tutorialActions,
   selectors as tutorialSelectors,
 } from '../../tutorial'
+import { BUTTON_LINK_STYLE } from '../../atoms'
 import { actions as featureFlagActions } from '../../feature-flags'
 import { getFeatureFlagData } from '../../feature-flags/selectors'
 import type { FlagTypes } from '../../feature-flags'
-import { BUTTON_LINK_STYLE } from '../../atoms'
 
 export function Settings(): JSX.Element {
   const dispatch = useDispatch()
   const { t } = useTranslation(['feature_flags', 'shared'])
-  const location = useLocation()
   const [
     showAnnouncementModal,
     setShowAnnouncementModal,
@@ -104,7 +102,13 @@ export function Settings(): JSX.Element {
 
   return (
     <>
-      {showAnnouncementModal ? <AnnouncementModal /> : null}
+      {showAnnouncementModal ? (
+        <AnnouncementModal
+          onClose={() => {
+            setShowAnnouncementModal(false)
+          }}
+        />
+      ) : null}
       <Flex
         backgroundColor={COLORS.grey10}
         width="100%"
@@ -136,20 +140,22 @@ export function Settings(): JSX.Element {
               <StyledText desktopStyle="bodyDefaultSemiBold">
                 {t('shared:pd_version')}
               </StyledText>
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {process.env.OT_PD_VERSION}
-              </StyledText>
-              <Btn
-                css={BUTTON_LINK_STYLE}
-                textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                onClick={() => {
-                  setShowAnnouncementModal(true)
-                }}
-              >
+              <Flex gridGap={SPACING.spacing12}>
                 <StyledText desktopStyle="bodyDefaultRegular">
-                  {t('shared:view_release_notes')}
+                  {process.env.OT_PD_VERSION}
                 </StyledText>
-              </Btn>
+                <Btn
+                  css={BUTTON_LINK_STYLE}
+                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                  onClick={() => {
+                    setShowAnnouncementModal(true)
+                  }}
+                >
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('shared:view_release_notes')}
+                  </StyledText>
+                </Btn>
+              </Flex>
             </Flex>
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
