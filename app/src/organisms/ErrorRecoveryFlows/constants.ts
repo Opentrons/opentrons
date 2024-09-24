@@ -112,8 +112,8 @@ export const RECOVERY_MAP = {
     STEPS: { MANUALLY_FILL: 'manually-fill', SKIP: 'skip' },
   },
   REFILL_AND_RESUME: { ROUTE: 'refill-and-resume', STEPS: {} },
-  RETRY_FAILED_COMMAND: {
-    ROUTE: 'retry-failed-command',
+  RETRY_STEP: {
+    ROUTE: 'retry-step',
     STEPS: { CONFIRM_RETRY: 'confirm-retry' },
   },
   RETRY_NEW_TIPS: {
@@ -150,7 +150,7 @@ export const RECOVERY_MAP = {
 
 const {
   OPTION_SELECTION,
-  RETRY_FAILED_COMMAND,
+  RETRY_STEP,
   ROBOT_CANCELING,
   ROBOT_PICKING_UP_TIPS,
   ROBOT_RESUMING,
@@ -173,7 +173,7 @@ const {
 // The deterministic ordering of steps for a given route.
 export const STEP_ORDER: StepOrder = {
   [OPTION_SELECTION.ROUTE]: [OPTION_SELECTION.STEPS.SELECT],
-  [RETRY_FAILED_COMMAND.ROUTE]: [RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY],
+  [RETRY_STEP.ROUTE]: [RETRY_STEP.STEPS.CONFIRM_RETRY],
   [RETRY_NEW_TIPS.ROUTE]: [
     RETRY_NEW_TIPS.STEPS.DROP_TIPS,
     RETRY_NEW_TIPS.STEPS.REPLACE_TIPS,
@@ -285,8 +285,8 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
     [FILL_MANUALLY_AND_SKIP.STEPS.SKIP]: { allowDoorOpen: true },
   },
   [REFILL_AND_RESUME.ROUTE]: {},
-  [RETRY_FAILED_COMMAND.ROUTE]: {
-    [RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY]: {
+  [RETRY_STEP.ROUTE]: {
+    [RETRY_STEP.STEPS.CONFIRM_RETRY]: {
       allowDoorOpen: false,
     },
   },

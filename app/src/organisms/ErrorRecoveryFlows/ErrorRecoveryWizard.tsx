@@ -227,7 +227,7 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildSelectRecoveryOption()
     case RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE:
       return buildRecoveryError()
-    case RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE:
+    case RECOVERY_MAP.RETRY_STEP.ROUTE:
       return buildResumeRun()
     case RECOVERY_MAP.CANCEL_RUN.ROUTE:
       return buildCancelRun()

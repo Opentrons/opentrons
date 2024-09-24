@@ -50,7 +50,7 @@ const renderDesktopRecoveryOptions = (
 }
 
 describe('SelectRecoveryOption', () => {
-  const { RETRY_FAILED_COMMAND, RETRY_NEW_TIPS } = RECOVERY_MAP
+  const { RETRY_STEP, RETRY_NEW_TIPS } = RECOVERY_MAP
   let props: React.ComponentProps<typeof SelectRecoveryOption>
   let mockProceedToRouteAndStep: Mock
   let mockSetSelectedRecoveryOption: Mock
@@ -68,8 +68,8 @@ describe('SelectRecoveryOption', () => {
       ...mockRecoveryContentProps,
       routeUpdateActions: mockRouteUpdateActions,
       recoveryMap: {
-        route: RETRY_FAILED_COMMAND.ROUTE,
-        step: RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
+        route: RETRY_STEP.ROUTE,
+        step: RETRY_STEP.STEPS.CONFIRM_RETRY,
       },
       tipStatusUtils: { determineTipStatus: vi.fn() } as any,
       currentRecoveryOptionUtils: {
@@ -79,7 +79,7 @@ describe('SelectRecoveryOption', () => {
     }
 
     when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE)
+      .calledWith(RECOVERY_MAP.RETRY_STEP.ROUTE)
       .thenReturn('Retry step')
     when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.CANCEL_RUN.ROUTE)
@@ -103,9 +103,7 @@ describe('SelectRecoveryOption', () => {
 
     clickButtonLabeled('Continue')
 
-    expect(mockSetSelectedRecoveryOption).toHaveBeenCalledWith(
-      RETRY_FAILED_COMMAND.ROUTE
-    )
+    expect(mockSetSelectedRecoveryOption).toHaveBeenCalledWith(RETRY_STEP.ROUTE)
   })
 
   it('renders appropriate "General Error" copy and click behavior', () => {
@@ -122,9 +120,7 @@ describe('SelectRecoveryOption', () => {
     fireEvent.click(retryStepOption[0])
     clickButtonLabeled('Continue')
 
-    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
-      RETRY_FAILED_COMMAND.ROUTE
-    )
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(RETRY_STEP.ROUTE)
   })
 
   it('renders appropriate "Overpressure while aspirating" copy and click behavior', () => {
@@ -239,7 +235,7 @@ describe('SelectRecoveryOption', () => {
       }
 
       when(mockGetRecoveryOptionCopy)
-        .calledWith(RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE)
+        .calledWith(RECOVERY_MAP.RETRY_STEP.ROUTE)
         .thenReturn('Retry step')
       when(mockGetRecoveryOptionCopy)
         .calledWith(RECOVERY_MAP.CANCEL_RUN.ROUTE)

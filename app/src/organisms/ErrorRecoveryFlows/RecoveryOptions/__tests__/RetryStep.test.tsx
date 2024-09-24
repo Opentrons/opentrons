@@ -47,12 +47,12 @@ describe('RetryStep', () => {
     vi.resetAllMocks()
   })
 
-  it(`renders RetryStepInfo when step is ${RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY}`, () => {
+  it(`renders RetryStepInfo when step is ${RECOVERY_MAP.RETRY_STEP.STEPS.CONFIRM_RETRY}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        step: RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
+        step: RECOVERY_MAP.RETRY_STEP.STEPS.CONFIRM_RETRY,
       },
     }
     render(props)
