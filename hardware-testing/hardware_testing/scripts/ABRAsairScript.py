@@ -1,4 +1,3 @@
-import subprocess as sbp
 import sys
 import paramiko as pmk
 import time
@@ -7,6 +6,7 @@ from typing import Optional, List
 
 
 def execute(client: pmk.SSHClient, command: str, args: list) -> Optional[int]:
+    """Execute given command on a remote client, returns 1 if command fails"""
     command = command.format(name=args[0], duration=args[1], frequency=args[2])
     print(f"{args[0]} Executing command: {command}")
 
@@ -15,7 +15,7 @@ def execute(client: pmk.SSHClient, command: str, args: list) -> Optional[int]:
         stdout_lines: List[str] = []
         stderr_lines: List[str] = []
 
-        time.sleep(20)
+        time.sleep(30)
 
         # Check the exit status of the command
         if stdout.channel.exit_status_ready():
@@ -28,16 +28,17 @@ def execute(client: pmk.SSHClient, command: str, args: list) -> Optional[int]:
                 )
         else:
             print(f"{args[0]} command success:", "".join(stdout_lines))
-            client.close()
+            # client.close()
             return 0
     except Exception as e:
         print(f"Error with {args[0]}:", e)
-        client.close()
+        # client.close()
         raise  # Re-raise the exception to propagate it up and terminate the process
     return None
 
 
 def connect_ssh(ip: str) -> pmk.SSHClient:
+    """Connect to given ip address through SSH"""
     print("Connecting to:", ip)
     client = pmk.SSHClient()
     client.set_missing_host_key_policy(pmk.AutoAddPolicy())
@@ -64,7 +65,8 @@ cd = "cd /opt/opentrons-robot-server && "
 print("Executing Script on All Robots:")
 
 
-def run_command_on_ip(index):
+def run_command_on_ip(index : int) -> None:
+    """ Execute ssh command and start abr_asair script on the specified robot"""
     curr_ip = robot_ips[index]
     try:
         ssh = connect_ssh(curr_ip)
@@ -88,5 +90,5 @@ if __name__ == "__main__":
     # Wait for all processes to finish
     for process in processes:
         process.start()
-        time.sleep(25)
+        time.sleep(35)
         process.terminate()

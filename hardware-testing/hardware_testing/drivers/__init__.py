@@ -32,7 +32,7 @@ def list_ports_and_select(device_name: str = "", port_substr: str = None) -> str
     try:
         try:
             idx = int(idx_str.strip())
-        except:
+        except TypeError:
             pass
         return ports[idx - 1].device
     except (ValueError, IndexError):
