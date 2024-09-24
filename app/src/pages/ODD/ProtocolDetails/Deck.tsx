@@ -8,7 +8,7 @@ import {
 } from '@opentrons/react-api-client'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
-import { LabwareStackModal } from '/app/organisms/Devices/ProtocolRun/SetupLabware/LabwareStackModal'
+import { LabwareStackModal } from '/app/molecules/LabwareStackModal'
 import { SingleLabwareModal } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupLabware/SingleLabwareModal'
 import { getLabwareSetupItemGroups } from '/app/transformations/commands'
 

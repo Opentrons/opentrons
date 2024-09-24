@@ -23,7 +23,7 @@ import {
   getSlotLabwareDefinition,
 } from '/app/transformations/commands'
 import { Divider } from '/app/atoms/structure'
-import { getModuleImage } from '../SetupModuleAndDeck/utils'
+import { getModuleImage } from '/app/local-resources/modules'
 import {
   FLEX_ROBOT_TYPE,
   getModuleDisplayName,

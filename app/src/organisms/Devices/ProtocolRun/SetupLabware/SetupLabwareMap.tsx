@@ -29,7 +29,7 @@ import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import { LabwareStackModal } from './LabwareStackModal'
+import { LabwareStackModal } from '/app/molecules/LabwareStackModal'
 
 interface SetupLabwareMapProps {
   runId: string
