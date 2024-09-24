@@ -120,12 +120,13 @@ export function GripperWizardFlows(
   const [errorMessage, setErrorMessage] = React.useState<null | string>(null)
 
   const handleClose = (): void => {
-    if (props?.onComplete != null) props.onComplete()
+    if (props?.onComplete != null) {
+      props.onComplete()
+    }
     if (maintenanceRunData != null) {
       deleteMaintenanceRun(maintenanceRunData?.data.id)
-    } else {
-      closeFlow()
     }
+    closeFlow()
   }
 
   const {
@@ -141,19 +142,20 @@ export function GripperWizardFlows(
   })
 
   const handleCleanUpAndClose = (): void => {
-    if (maintenanceRunData?.data.id == null) handleClose()
-    else {
+    if (maintenanceRunData?.data.id == null) {
+      handleClose()
+    } else {
       chainRunCommands(
         maintenanceRunData?.data.id,
         [{ commandType: 'home' as const, params: {} }],
         false
       )
-        .then(() => {
-          handleClose()
-        })
         .catch(error => {
           setIsExiting(true)
           setErrorMessage(error.message as string)
+        })
+        .finally(() => {
+          handleClose()
         })
     }
   }

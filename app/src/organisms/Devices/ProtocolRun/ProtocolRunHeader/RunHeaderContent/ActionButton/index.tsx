@@ -21,6 +21,7 @@ import {
 import { useRobot } from '/app/redux-resources/robots'
 import { useRobotAnalyticsData } from '/app/redux-resources/analytics'
 import {
+  useCloseCurrentRun,
   useCurrentRunId,
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
@@ -74,6 +75,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   const isOtherRunCurrent = currentRunId != null && currentRunId !== runId
   const isProtocolNotReady = protocolData == null || !!isProtocolAnalyzing
   const isValidRunAgain = isRunAgainStatus(runStatus)
+  const { isClosingCurrentRun } = useCloseCurrentRun()
 
   const { isDisabled, disabledReason } = useActionBtnDisabledUtils({
     isCurrentRun,
@@ -82,6 +84,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     isProtocolNotReady,
     isRobotOnWrongVersionOfSoftware,
     isValidRunAgain,
+    isClosingCurrentRun,
     ...props,
   })
 
@@ -105,6 +108,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     isValidRunAgain,
     isOtherRunCurrent,
     isRobotOnWrongVersionOfSoftware,
+    isClosingCurrentRun,
     ...props,
   })
 
@@ -129,7 +133,8 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
             spin={
               isProtocolNotReady ||
               runStatus === RUN_STATUS_STOP_REQUESTED ||
-              isResetRunLoadingRef.current
+              isResetRunLoadingRef.current ||
+              isClosingCurrentRun
             }
           />
         ) : null}

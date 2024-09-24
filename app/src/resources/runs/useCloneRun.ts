@@ -36,13 +36,12 @@ export function useCloneRun(
         'protocols',
         protocolKey,
       ])
-      Promise.all([invalidateRuns, invalidateProtocols])
-        .then(() => {
-          onSuccessCallback?.(response)
-        })
-        .catch((e: Error) => {
-          console.error(`error invalidating runs query: ${e.message}`)
-        })
+      Promise.all([invalidateRuns, invalidateProtocols]).catch((e: Error) => {
+        console.error(`error invalidating runs query: ${e.message}`)
+      })
+      // The onSuccess callback is not awaited until query invalidation, because currently, in every instance this
+      // onSuccessCallback is utilized, we only use it for navigating. We may need to revisit this.
+      onSuccessCallback?.(response)
     },
   })
   const { createProtocolAnalysis } = useCreateProtocolAnalysisMutation(

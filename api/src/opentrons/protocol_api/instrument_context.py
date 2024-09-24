@@ -261,6 +261,7 @@ class InstrumentContext(publisher.CommandPublisher):
             and well is not None
             and self.liquid_presence_detection
             and self._96_tip_config_valid()
+            and self._core.get_current_volume() == 0
         ):
             self.require_liquid_presence(well=well)
 

@@ -30,7 +30,7 @@ import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
+import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
 import { MediumButton, SmallButton } from '/app/atoms/buttons'
 import {
   ProtocolDetailsHeaderChipSkeleton,
@@ -45,6 +45,11 @@ import {
   getPinnedQuickTransferIds,
   updateConfigValue,
 } from '/app/redux/config'
+import {
+  ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
+  ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
+} from '/app/redux/analytics'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { useOffsetCandidatesForAnalysis } from '/app/organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { DeleteTransferConfirmationModal } from '../QuickTransferDashboard/DeleteTransferConfirmationModal'
@@ -55,7 +60,7 @@ import { formatTimeWithUtcLabel } from '/app/resources/runs'
 
 import type { Protocol } from '@opentrons/api-client'
 import type { Dispatch } from '/app/redux/types'
-import type { OnDeviceRouteParams } from '../../../App/types'
+import type { OnDeviceRouteParams } from '/app/App/types'
 
 interface QuickTransferHeaderProps {
   title?: string | null
@@ -73,6 +78,7 @@ const QuickTransferHeader = ({
   isTransferFetching,
 }: QuickTransferHeaderProps): JSX.Element => {
   const navigate = useNavigate()
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const { t } = useTranslation('protocol_details')
   const [truncate, setTruncate] = React.useState<boolean>(true)
   const [startSetup, setStartSetup] = React.useState<boolean>(false)
@@ -84,6 +90,15 @@ const QuickTransferHeader = ({
   if (displayedTitle !== null && displayedTitle.length > 92 && truncate) {
     displayedTitle = truncateString(displayedTitle, 80, 60)
   }
+
+  React.useEffect(() => {
+    trackEventWithRobotSerial({
+      name: ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
+      properties: {
+        name: title,
+      },
+    })
+  }, [])
 
   return (
     <Flex
@@ -147,6 +162,12 @@ const QuickTransferHeader = ({
         onClick={() => {
           setStartSetup(true)
           handleRunTransfer()
+          trackEventWithRobotSerial({
+            name: ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
+            properties: {
+              name: title,
+            },
+          })
         }}
         buttonText={t('start_setup')}
         disabled={isTransferFetching}

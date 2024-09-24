@@ -21,7 +21,7 @@ import {
 import { useRecoveryAnalytics } from '/app/redux-resources/analytics'
 import { getIsOnDevice } from '/app/redux/config'
 import { useERWizard, ErrorRecoveryWizard } from '../ErrorRecoveryWizard'
-import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'
+import { useRecoverySplash, RecoverySplash } from '../RecoverySplash'
 
 import type { RunStatus } from '@opentrons/api-client'
 
@@ -29,7 +29,7 @@ vi.mock('../ErrorRecoveryWizard')
 vi.mock('../hooks')
 vi.mock('../useRecoveryCommands')
 vi.mock('/app/redux/config')
-vi.mock('../RunPausedSplash')
+vi.mock('../RecoverySplash')
 vi.mock('/app/redux-resources/analytics')
 vi.mock('@opentrons/react-api-client')
 vi.mock('react-redux', async () => {
@@ -143,15 +143,13 @@ describe('ErrorRecoveryFlows', () => {
       protocolAnalysis: {} as any,
     }
     vi.mocked(ErrorRecoveryWizard).mockReturnValue(<div>MOCK WIZARD</div>)
-    vi.mocked(RunPausedSplash).mockReturnValue(
-      <div>MOCK RUN PAUSED SPLASH</div>
-    )
+    vi.mocked(RecoverySplash).mockReturnValue(<div>MOCK RUN PAUSED SPLASH</div>)
     vi.mocked(useERWizard).mockReturnValue({
       hasLaunchedRecovery: true,
       toggleERWizard: () => Promise.resolve(),
       showERWizard: true,
     })
-    vi.mocked(useRunPausedSplash).mockReturnValue(true)
+    vi.mocked(useRecoverySplash).mockReturnValue(true)
     vi.mocked(useERUtils).mockReturnValue({
       routeUpdateActions: {},
       doorStatusUtils: { isDoorOpen: false, isProhibitedDoorOpen: false },
@@ -211,7 +209,7 @@ describe('ErrorRecoveryFlows', () => {
   })
 
   it('does not render the splash when showSplash is false', () => {
-    vi.mocked(useRunPausedSplash).mockReturnValue(false)
+    vi.mocked(useRecoverySplash).mockReturnValue(false)
     render(props)
     expect(screen.queryByText('MOCK RUN PAUSED SPLASH')).not.toBeInTheDocument()
   })
