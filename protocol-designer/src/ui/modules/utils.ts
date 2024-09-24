@@ -105,8 +105,9 @@ export function getModuleLabwareOptions(
     options = modulesOnDeck.map(moduleOnDeck => {
       const labware = getLabwareOnModule(initialDeckSetup, moduleOnDeck.id)
       if (labware) {
-        const labwareOnAdapterId =
-          labwares[labware.id] != null ? labwares[labware.id].id : null
+        const labwareOnAdapterId = Object.values(labwares).find(
+          lw => lw.slot === labware.id
+        )?.id
         if (labwareOnAdapterId != null) {
           return {
             name: `${nicknamesById[labwareOnAdapterId]} in ${
