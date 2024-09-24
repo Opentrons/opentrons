@@ -95,11 +95,11 @@ def _get_approach_submerge_retract_heights(
         liquid_before = well.depth + (well.depth - liquid_before)
         liquid_after = well.depth + (well.depth - liquid_after)
     if aspirate:
-        liq_submerge = liquid_class.aspirate.z_submerge_depth
-        liq_retract = liquid_class.aspirate.z_retract_height
+        liq_submerge = liquid_class.aspirate.submerge_mm
+        liq_retract = liquid_class.aspirate.retract_mm
     else:
-        liq_submerge = liquid_class.dispense.z_submerge_depth
-        liq_retract = liquid_class.dispense.z_retract_height
+        liq_submerge = liquid_class.dispense.submerge_mm
+        liq_retract = liquid_class.dispense.retract_mm
     approach_mm, submerge_mm, retract_mm = _get_heights_in_well(
         liquid_before, liquid_after, liq_submerge, liq_retract
     )
@@ -213,7 +213,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
         _num_mixes = 5
         if added_blow_out:
             push_out = min(
-                liquid_class.dispense.blow_out_submerged, _get_max_blow_out_ul()
+                liquid_class.dispense.push_out, _get_max_blow_out_ul()
             )
         else:
             push_out = 0
@@ -245,19 +245,19 @@ def _pipette_with_liquid_settings(  # noqa: C901
     def _aspirate_on_retract() -> None:
         # add trailing-air-gap
         if not blank:
-            pipette.air_gap(liquid_class.aspirate.trailing_air_gap, height=0)
+            pipette.air_gap(liquid_class.aspirate.air_gap, height=0)
 
     def _dispense_on_approach() -> None:
         # remove trailing-air-gap
         if not blank:
-            pipette.dispense(liquid_class.aspirate.trailing_air_gap)
+            pipette.dispense(liquid_class.aspirate.air_gap)
 
     def _dispense_on_submerge() -> None:
         callbacks.on_dispensing()
         push_out = None
         if added_blow_out:
             _max_push = _get_max_blow_out_ul()
-            push_out = liquid_class.dispense.blow_out_submerged
+            push_out = liquid_class.dispense.push_out
             assert (
                 push_out <= _max_push
             ), f"push-out ({push_out}) cannot exceed {_max_push}"
@@ -278,14 +278,14 @@ def _pipette_with_liquid_settings(  # noqa: C901
             #     pipette.blow_out()
             pipette.prepare_to_aspirate()
         else:
-            pipette.air_gap(liquid_class.aspirate.trailing_air_gap, height=0)
+            pipette.air_gap(liquid_class.aspirate.air_gap, height=0)
         if touch_tip:
             pipette.touch_tip(speed=config.TOUCH_TIP_SPEED)
 
     # PHASE 1: APPROACH
-    pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
-    pipette.flow_rate.dispense = liquid_class.dispense.plunger_flow_rate
-    pipette.flow_rate.blow_out = liquid_class.dispense.plunger_flow_rate
+    pipette.flow_rate.aspirate = liquid_class.aspirate.flow_rate
+    pipette.flow_rate.dispense = liquid_class.dispense.flow_rate
+    pipette.flow_rate.blow_out = liquid_class.dispense.flow_rate
     pipette.move_to(well.bottom(approach_mm).move(channel_offset))
     _aspirate_on_approach() if aspirate or mix else _dispense_on_approach()
 
