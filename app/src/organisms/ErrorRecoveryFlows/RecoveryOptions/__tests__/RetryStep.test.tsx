@@ -6,7 +6,7 @@ import { mockRecoveryContentProps } from '../../__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { RetryStep, RetryStepInfo } from '../RetryStep'
-import { RECOVERY_MAP } from '../../constants'
+import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
 
 import { clickButtonLabeled } from '../../__tests__/util'
@@ -99,7 +99,16 @@ describe('RetryStepInfo', () => {
     vi.resetAllMocks()
   })
 
-  it('renders the component with the correct text', () => {
+  it(`renders the component with the correct text for ${ERROR_KINDS.TIP_NOT_DETECTED} `, () => {
+    renderRetryStepInfo({ ...props, errorKind: ERROR_KINDS.TIP_NOT_DETECTED })
+    screen.getByText('Retry step')
+    screen.queryByText(
+      'First, take any necessary actions to prepare the robot to retry the failed tip pickup.'
+    )
+    screen.queryByText('Then, close the robot door before proceeding.')
+  })
+
+  it('renders the component with the correct text for not specifically handled error kinds', () => {
     renderRetryStepInfo(props)
     screen.getByText('Retry step')
     screen.queryByText(
