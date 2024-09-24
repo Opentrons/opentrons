@@ -243,7 +243,7 @@ class LogListener:
 
     async def __aenter__(self) -> None:
         """Create a csv heading for logging pressure readings."""
-        self.data_file = open(self.data_file, "a")
+        self.data_file = open(self.data_file, "w")
         self.csv_writer = csv.writer(self.data_file)
         self.csv_writer.writerows([self.file_heading, self.sensor_metadata])
 
