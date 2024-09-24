@@ -35,7 +35,6 @@ from opentrons.protocol_engine.resources import (
     pipette_data_provider,
 )
 from opentrons.protocol_engine.state.update_types import (
-    LoadedLabwareUpdate,
     StateUpdate,
 )
 
