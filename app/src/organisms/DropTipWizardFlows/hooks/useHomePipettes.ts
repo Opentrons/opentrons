@@ -38,7 +38,6 @@ export function useHomePipettes(
   // Home the pipette after user click once a maintenance run has been created.
   React.useEffect(() => {
     if (isMaintenanceRunActive && isHomingPipettes && props.isRunCurrent) {
-      console.log('HITTING HERE!!!')
       void homePipettesCmd().finally(() => {
         props.onHome()
         deleteMaintenanceRun(activeMaintenanceRunId)

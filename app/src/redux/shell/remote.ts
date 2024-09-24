@@ -56,8 +56,15 @@ export async function appShellRequestor<Data>(
       ? { proxiedFormData: await proxyFormData(data) }
       : data
   const configProxy = { ...config, data: formDataProxy }
-
+  let isEstop = false
+  if (configProxy.url === '/robot/control/estopStatus') {
+    console.log('=>(remote.ts:59) configProxy', configProxy)
+    isEstop = true
+  }
   const result = await remote.ipcRenderer.invoke('usb:request', configProxy)
+  if (isEstop) {
+    console.log('=>(remote.ts:61) result', result)
+  }
   if (result?.error != null) {
     throw result.error
   }

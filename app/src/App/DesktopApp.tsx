@@ -161,7 +161,9 @@ function RobotControlTakeover(): JSX.Element | null {
   const deviceRouteMatch = useMatch('/devices/:robotName/*')
   const params = deviceRouteMatch?.params
   const robotName = params?.robotName ?? null
+  console.log('=>(DesktopApp.tsx:167) robotName', robotName)
   const robot = useRobot(robotName)
+  console.log('=>(DesktopApp.tsx:166) robot', robot)
   if (deviceRouteMatch == null || robot == null || robotName == null)
     return null
 
@@ -195,5 +197,6 @@ function FlexOnlyRobotControlTakeover({
   if (!isFlex) {
     return null
   }
+  console.log('HITTING RENDERING ESTOP TAKEOVER LOGIC.')
   return <EstopTakeover robotName={robotName} />
 }
