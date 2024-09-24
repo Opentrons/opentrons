@@ -44,12 +44,12 @@ describe('ManageTips', () => {
   let props: React.ComponentProps<typeof ManageTips>
   let mockProceedNextStep: Mock
   let mockProceedToRouteAndStep: Mock
-  let mockSetRobotInMotion: Mock
+  let mockhandleMotionRouting: Mock
 
   beforeEach(() => {
     mockProceedNextStep = vi.fn()
     mockProceedToRouteAndStep = vi.fn(() => Promise.resolve())
-    mockSetRobotInMotion = vi.fn(() => Promise.resolve())
+    mockhandleMotionRouting = vi.fn(() => Promise.resolve())
 
     props = {
       ...mockRecoveryContentProps,
@@ -62,7 +62,7 @@ describe('ManageTips', () => {
       } as any,
       routeUpdateActions: {
         proceedNextStep: mockProceedNextStep,
-        setRobotInMotion: mockSetRobotInMotion,
+        handleMotionRouting: mockhandleMotionRouting,
         proceedToRouteAndStep: mockProceedToRouteAndStep,
       } as any,
       recoveryCommands: { cancelRun: vi.fn() } as any,
@@ -82,7 +82,10 @@ describe('ManageTips', () => {
   })
 
   it('renders SelectRecoveryOption when the route is unknown', () => {
-    props = { ...props, recoveryMap: { ...props.recoveryMap, step: 'UNKNOWN' } }
+    props = {
+      ...props,
+      recoveryMap: { ...props.recoveryMap, step: 'UNKNOWN' as any },
+    }
     render(props)
 
     screen.getByText('MOCK SELECT RECOVERY OPTION')
@@ -113,7 +116,7 @@ describe('ManageTips', () => {
     fireEvent.click(skipBtn)
     clickButtonLabeled('Skip and home pipette')
 
-    expect(mockSetRobotInMotion).toHaveBeenCalled()
+    expect(mockhandleMotionRouting).toHaveBeenCalled()
   })
 
   it(`handles special routing for ${RETRY_NEW_TIPS.ROUTE} when skipping tip drop`, () => {

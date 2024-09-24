@@ -2,14 +2,14 @@ import * as React from 'react'
 
 import { RECOVERY_MAP } from '../constants'
 
-import type { IRecoveryMap, RecoveryRoute, ValidSubMap } from '../types'
+import type { IRecoveryMap, RecoveryRoute, ValidDropTipSubMap } from '../types'
 
 // Utils for getting/setting the current submap. See useRecoveryRouting.
 export interface SubMapUtils {
   /* See useRecoveryRouting. */
-  updateSubMap: (subMap: ValidSubMap | null) => void
+  updateSubMap: (subMap: ValidDropTipSubMap | null) => void
   /* See useRecoveryRouting. */
-  subMap: ValidSubMap | null
+  subMap: ValidDropTipSubMap | null
 }
 
 export interface UseRecoveryRoutingResult {
@@ -33,7 +33,7 @@ export function useRecoveryRouting(): UseRecoveryRoutingResult {
     step: RECOVERY_MAP.OPTION_SELECTION.STEPS.SELECT,
   })
 
-  const [subMap, setSubMap] = React.useState<ValidSubMap | null>(null)
+  const [subMap, setSubMap] = React.useState<ValidDropTipSubMap | null>(null)
 
   const currentRecoveryOptionUtils = useSelectedRecoveryOption()
 
