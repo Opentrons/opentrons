@@ -21,21 +21,21 @@ _default_aspirate: Dict[str, AspirateSettings] = {
         plunger_flow_rate=None,
         trailing_air_gap=None,
         z_submerge_depth=-1.5,
-        z_retract_height=5.0,
+        z_retract_height=3.0,
         delay=1.0,
     ),
     _GLYCEROL_50: AspirateSettings(
         plunger_flow_rate=None,
         trailing_air_gap=None,
         z_submerge_depth=-1.5,
-        z_retract_height=5.0,
-        delay=1.5,  # 1.0 second was barely enough time
+        z_retract_height=3.0,
+        delay=1.5,  # 1.0 second was barely enough time (b/c viscosity)
     ),
     _ETHANOL_70: AspirateSettings(
         plunger_flow_rate=None,
         trailing_air_gap=None,
         z_submerge_depth=-1.5,
-        z_retract_height=5.0,
+        z_retract_height=3.0,
         delay=1.0,
     ),
 }
@@ -43,22 +43,22 @@ _default_dispense: Dict[str, DispenseSettings] = {
     _WATER: DispenseSettings(
         plunger_flow_rate=None,
         blow_out_submerged=None,
-        z_submerge_depth=-1.5,  # contact dispense
-        z_retract_height=5.0,
+        z_submerge_depth=3.0,  # NON-contact dispense
+        z_retract_height=3.0,
         delay=0.5,
     ),
     _GLYCEROL_50: DispenseSettings(
         plunger_flow_rate=None,
         blow_out_submerged=None,
         z_submerge_depth=3.0,  # NON-contact dispense
-        z_retract_height=5.0,
+        z_retract_height=3.0,
         delay=0.5,
     ),
     _ETHANOL_70: DispenseSettings(
         plunger_flow_rate=None,
         blow_out_submerged=None,
-        z_submerge_depth=3.0,
-        z_retract_height=5.0,
+        z_submerge_depth=3.0,  # NON-contact dispense
+        z_retract_height=3.0,
         delay=0.5,
     ),
 }
