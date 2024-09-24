@@ -8,6 +8,7 @@ import type { ErrorKind } from '../types'
  * decide which UI flow to present to recover from it.
  */
 export function getErrorKind(failedCommand: RunTimeCommand | null): ErrorKind {
+  console.log('=>(getErrorKind.ts:11) failedCommand', failedCommand)
   const commandType = failedCommand?.commandType
   const errorIsDefined = failedCommand?.error?.isDefined ?? false
   const errorType = failedCommand?.error?.errorType
@@ -16,18 +17,24 @@ export function getErrorKind(failedCommand: RunTimeCommand | null): ErrorKind {
     if (
       commandType === 'aspirate' &&
       errorType === DEFINED_ERROR_TYPES.OVERPRESSURE
-    )
+    ) {
       return ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING
-    else if (
+    } else if (
       commandType === 'dispense' &&
       errorType === DEFINED_ERROR_TYPES.OVERPRESSURE
-    )
+    ) {
       return ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING
-    else if (
+    } else if (
       commandType === 'liquidProbe' &&
       errorType === DEFINED_ERROR_TYPES.LIQUID_NOT_FOUND
-    )
+    ) {
       return ERROR_KINDS.NO_LIQUID_DETECTED
+    } else if (
+      commandType === 'pickUpTip' &&
+      errorType === DEFINED_ERROR_TYPES.TIP_PHYSICALLY_MISSING
+    ) {
+      return ERROR_KINDS.TIP_NOT_DETECTED
+    }
     // todo(mm, 2024-07-02): Also handle aspirateInPlace and dispenseInPlace.
     // https://opentrons.atlassian.net/browse/EXEC-593
   }

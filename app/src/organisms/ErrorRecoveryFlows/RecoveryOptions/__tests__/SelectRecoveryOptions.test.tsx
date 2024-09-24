@@ -16,6 +16,7 @@ import {
   OVERPRESSURE_PREPARE_TO_ASPIRATE,
   OVERPRESSURE_WHILE_DISPENSING_OPTIONS,
   NO_LIQUID_DETECTED_OPTIONS,
+  TIP_NOT_DETECTED_OPTIONS,
 } from '../SelectRecoveryOption'
 import { RECOVERY_MAP, ERROR_KINDS } from '../../constants'
 import { clickButtonLabeled } from '../../__tests__/util'
@@ -371,5 +372,12 @@ describe('getRecoveryOptions', () => {
     expect(overpressureWhileDispensingOptions).toBe(
       OVERPRESSURE_WHILE_DISPENSING_OPTIONS
     )
+  })
+
+  it(`returns valid options when the errorKind is ${ERROR_KINDS.TIP_NOT_DETECTED}`, () => {
+    const overpressureWhileDispensingOptions = getRecoveryOptions(
+      ERROR_KINDS.TIP_NOT_DETECTED
+    )
+    expect(overpressureWhileDispensingOptions).toBe(TIP_NOT_DETECTED_OPTIONS)
   })
 })

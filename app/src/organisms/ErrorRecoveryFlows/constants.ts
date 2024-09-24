@@ -17,6 +17,7 @@ import type { RecoveryRouteStepMetadata, StepOrder } from './types'
 export const DEFINED_ERROR_TYPES = {
   OVERPRESSURE: 'overpressure',
   LIQUID_NOT_FOUND: 'liquidNotFound',
+  TIP_PHYSICALLY_MISSING: 'tipPhysicallyMissing',
 }
 
 // Client-defined error-handling flows.
@@ -26,6 +27,7 @@ export const ERROR_KINDS = {
   OVERPRESSURE_PREPARE_TO_ASPIRATE: 'OVERPRESSURE_PREPARE_TO_ASPIRATE',
   OVERPRESSURE_WHILE_ASPIRATING: 'OVERPRESSURE_WHILE_ASPIRATING',
   OVERPRESSURE_WHILE_DISPENSING: 'OVERPRESSURE_WHILE_DISPENSING',
+  TIP_NOT_DETECTED: 'TIP_NOT_DETECTED',
 } as const
 
 // TODO(jh, 05-09-24): Refactor to a directed graph. EXEC-430.
