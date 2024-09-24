@@ -102,6 +102,7 @@ analysis_primitive_type_rtp_table = sqlalchemy.Table(
             PrimitiveParamSQLEnum,
             values_callable=lambda obj: [e.value for e in obj],
             create_constraint=True,
+            # todo(mm, 2024-09-24): Can we add validate_strings=True here?
         ),
         nullable=False,
     ),
