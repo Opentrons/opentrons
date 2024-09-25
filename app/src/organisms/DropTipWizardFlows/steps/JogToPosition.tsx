@@ -11,11 +11,11 @@ import {
 } from '@opentrons/components'
 
 import { POSITION_AND_BLOWOUT } from '../constants'
-import { JogControls } from '../../../molecules/JogControls'
+import { JogControls } from '/app/molecules/JogControls'
 import { DropTipFooterButtons } from '../shared'
 
 import type { DropTipWizardContainerProps } from '../types'
-import type { UseConfirmPositionResult } from '../ConfirmPosition'
+import type { UseConfirmPositionResult } from './ConfirmPosition'
 
 type JogToPositionProps = DropTipWizardContainerProps & UseConfirmPositionResult
 
@@ -24,8 +24,8 @@ export const JogToPosition = ({
   dropTipCommands,
   currentStep,
   isOnDevice,
-  toggleShowConfirmPosition,
   modalStyle,
+  proceed,
 }: JogToPositionProps): JSX.Element | null => {
   const { handleJog } = dropTipCommands
   const { t } = useTranslation('drop_tip_wizard')
@@ -58,7 +58,7 @@ export const JogToPosition = ({
           height={isOnDevice ? '80%' : '100%'}
         />
         <DropTipFooterButtons
-          primaryBtnOnClick={toggleShowConfirmPosition}
+          primaryBtnOnClick={proceed}
           primaryBtnTextOverride={t('shared:confirm_position')}
           secondaryBtnOnClick={goBackRunValid}
         />

@@ -27,6 +27,7 @@ import {
   BLOWOUT_SUCCESS,
   CHOOSE_BLOWOUT_LOCATION,
   CHOOSE_DROP_TIP_LOCATION,
+  CONFIRM_POSITION,
   DROP_TIP_SUCCESS,
   POSITION_AND_BLOWOUT,
   POSITION_AND_DROP_TIP,
@@ -36,12 +37,13 @@ import {
   ChooseLocation,
   JogToPosition,
   Success,
+  ConfirmPosition,
+  useConfirmPosition,
 } from './steps'
 import { InProgressModal } from '/app/molecules/InProgressModal'
 import { useDropTipErrorComponents } from './hooks'
 import { DropTipWizardHeader } from './DropTipWizardHeader'
 import { ErrorInfo } from './ErrorInfo'
-import { ConfirmPosition, useConfirmPosition } from './ConfirmPosition'
 
 import type { DropTipWizardFlowsProps } from '.'
 import type { DropTipWizardContainerProps, IssuedCommandsType } from './types'
@@ -239,8 +241,6 @@ export const DropTipWizardContent = (
       return buildGettingReady()
     } else if (isCommandInProgress || isExiting) {
       return buildRobotInMotion()
-    } else if (confirmPositionUtils.showConfirmPosition) {
-      return buildConfirmPosition()
     } else if (showConfirmExit) {
       return buildShowExitConfirmation()
     } else if (errorDetails != null) {
@@ -257,6 +257,8 @@ export const DropTipWizardContent = (
       currentStep === POSITION_AND_DROP_TIP
     ) {
       return buildJogToPosition()
+    } else if (currentStep === CONFIRM_POSITION) {
+      return buildConfirmPosition()
     } else if (
       currentStep === BLOWOUT_SUCCESS ||
       currentStep === DROP_TIP_SUCCESS

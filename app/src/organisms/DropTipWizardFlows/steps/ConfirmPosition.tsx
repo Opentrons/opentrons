@@ -16,15 +16,13 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { POSITION_AND_BLOWOUT, POSITION_AND_DROP_TIP } from './constants'
-import { DropTipFooterButtons } from './shared'
+import { POSITION_AND_BLOWOUT, CONFIRM_POSITION } from '../constants'
+import { DropTipFooterButtons } from '../shared'
 
-import type { DropTipWizardContainerProps } from './types'
+import type { DropTipWizardContainerProps } from '../types'
 
 export interface UseConfirmPositionResult {
-  showConfirmPosition: boolean
   isRobotPipetteMoving: boolean
-  toggleShowConfirmPosition: () => void
   toggleIsRobotPipetteMoving: () => void
 }
 
@@ -34,33 +32,19 @@ export interface UseConfirmPositionResult {
 export function useConfirmPosition(
   currentStep: DropTipWizardContainerProps['currentStep']
 ): UseConfirmPositionResult {
-  const [showConfirmPosition, setShowConfirmPosition] = useState(false)
   const [isRobotPipetteMoving, setIsRobotPipetteMoving] = useState(false)
-
-  const toggleShowConfirmPosition = (): void => {
-    setShowConfirmPosition(!showConfirmPosition)
-  }
 
   const toggleIsRobotPipetteMoving = (): void => {
     setIsRobotPipetteMoving(!isRobotPipetteMoving)
   }
 
-  // NOTE: The useEffect logic is potentially problematic on views that are not steps, but it is not currently.
   useEffect(() => {
-    if (
-      currentStep !== POSITION_AND_BLOWOUT &&
-      currentStep !== POSITION_AND_DROP_TIP &&
-      isRobotPipetteMoving &&
-      showConfirmPosition
-    ) {
-      toggleShowConfirmPosition()
+    if (isRobotPipetteMoving && currentStep !== CONFIRM_POSITION) {
       toggleIsRobotPipetteMoving()
     }
   }, [currentStep, isRobotPipetteMoving])
 
   return {
-    showConfirmPosition,
-    toggleShowConfirmPosition,
     toggleIsRobotPipetteMoving,
     isRobotPipetteMoving,
   }
@@ -70,8 +54,8 @@ type ConfirmPositionProps = DropTipWizardContainerProps &
   UseConfirmPositionResult
 
 export function ConfirmPosition({
-  toggleShowConfirmPosition,
   toggleIsRobotPipetteMoving,
+  goBackRunValid,
   currentStep,
   dropTipCommands,
   proceed,
@@ -107,7 +91,7 @@ export function ConfirmPosition({
       <DropTipFooterButtons
         primaryBtnOnClick={handleProceed}
         primaryBtnTextOverride={buildPrimaryBtnText()}
-        secondaryBtnOnClick={toggleShowConfirmPosition}
+        secondaryBtnOnClick={goBackRunValid}
       />
     </>
   )
