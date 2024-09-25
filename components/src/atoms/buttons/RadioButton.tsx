@@ -66,7 +66,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
 
     &:hover,
     &:active {
-      background-color: ${COLORS.blue40};
+      background-color: ${disabled ? COLORS.grey35 : COLORS.blue40};
     }
   `
 
@@ -76,7 +76,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
 
     &:hover,
     &:active {
-      background-color: ${COLORS.blue55};
+      background-color: ${disabled ? COLORS.grey35 : COLORS.blue60};
     }
   `
 

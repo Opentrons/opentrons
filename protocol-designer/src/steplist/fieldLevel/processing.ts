@@ -12,6 +12,13 @@ export const maskToInteger = (rawValue: unknown): string => {
       : String(rawValue)
   return rawNumericValue
 }
+export const maskToTime = (rawValue: unknown): string => {
+  const rawTimeValue =
+    typeof rawValue === 'string'
+      ? rawValue.replace(/[^-0-9:]/g, '')
+      : String(rawValue)
+  return rawTimeValue
+}
 const DEFAULT_DECIMAL_PLACES: number = 1
 export const maskToFloat = (rawValue: unknown): string =>
   typeof rawValue === 'string'

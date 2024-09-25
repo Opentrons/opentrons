@@ -58,6 +58,7 @@ describe('pauseFormToArgs', () => {
       pauseHour: 1,
       pauseMinute: 20,
       pauseSecond: 5,
+      pauseTime: null,
     }
     const expected = {
       commandCreatorFnName: 'delay',

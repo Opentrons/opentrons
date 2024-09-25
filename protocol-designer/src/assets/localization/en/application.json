@@ -41,6 +41,8 @@
     "profile_steps": "profile steps",
     "ending_hold": "ending hold"
   },
+  "temperature": "Temperature (˚C)",
+  "time": "Time (hh:mm:ss)",
   "units": {
     "millimeter": "mm",
     "microliter": "μL",
