@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { SECURITY_WPA_EAP } from '@opentrons/api-client'
 import { useWifiQuery } from '@opentrons/react-api-client'
 import { useRobot } from '/app/redux-resources/robots'
-import { useWifiList } from '../hooks'
+import { useWifiList } from '../useWifiList'
 import type { UseQueryResult } from 'react-query'
 import type { WifiNetwork, WifiListResponse } from '@opentrons/api-client'
 

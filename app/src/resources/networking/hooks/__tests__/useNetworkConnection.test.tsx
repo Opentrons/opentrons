@@ -13,11 +13,11 @@ import * as Networking from '/app/redux/networking'
 import * as Fixtures from '/app/redux/networking/__fixtures__'
 import { getNetworkInterfaces } from '/app/redux/networking'
 
-import { useNetworkConnection } from '../hooks/useNetworkConnection'
+import { useNetworkConnection } from '../useNetworkConnection'
 import type { Store } from 'redux'
 
-vi.mock('/app/resources/networking/hooks')
 vi.mock('/app/redux/networking/selectors')
+vi.mock('../useWifiList')
 
 const mockRobotName = 'robot-name'
 const mockWifiList = [
