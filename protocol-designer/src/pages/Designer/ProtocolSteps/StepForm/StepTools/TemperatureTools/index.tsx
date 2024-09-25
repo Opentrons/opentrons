@@ -22,12 +22,11 @@ import {
 import type { StepFormProps } from '../../types'
 
 export function TemperatureTools(props: StepFormProps): JSX.Element {
+  const { propsForFields, formData } = props
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const moduleLabwareOptions = useSelector(getTemperatureLabwareOptions)
   const temperatureModuleIds = useSelector(getTemperatureModuleIds)
-
-  const { propsForFields } = props
-  const { setTemperature, moduleId } = props.formData
+  const { setTemperature, moduleId } = formData
 
   useEffect(() => {
     if (moduleLabwareOptions.length === 1) {
@@ -70,10 +69,7 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing4}
               >
-                <Flex
-                  padding={`${SPACING.spacing16} ${SPACING.spacing16} 0`}
-                  width="100%"
-                >
+                <Flex padding={`${SPACING.spacing16} ${SPACING.spacing16} 0`}>
                   <RadioButton
                     width="100%"
                     largeDesktopBorderRadius
