@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 
 import {
@@ -16,10 +16,9 @@ import type { Subsystem, InstrumentData } from '@opentrons/api-client'
 const POLL_INTERVAL_MS = 5000
 
 export function FirmwareUpdateTakeover(): JSX.Element {
-  const [
-    showUpdateNeededModal,
-    setShowUpdateNeededModal,
-  ] = useState<boolean>(false)
+  const [showUpdateNeededModal, setShowUpdateNeededModal] = useState<boolean>(
+    false
+  )
   const [
     initiatedSubsystemUpdate,
     setInitiatedSubsystemUpdate,

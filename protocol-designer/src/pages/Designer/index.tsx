@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -53,12 +53,8 @@ export function Designer(): JSX.Element {
   const zoomIn = useSelector(selectors.getZoomedInSlot)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const isNewProtocol = useSelector(selectors.getIsNewProtocol)
-  const [liquidOverflowMenu, showLiquidOverflowMenu] = useState<boolean>(
-    false
-  )
-  const [showDefineLiquidModal, setDefineLiquidModal] = useState<boolean>(
-    false
-  )
+  const [liquidOverflowMenu, showLiquidOverflowMenu] = useState<boolean>(false)
+  const [showDefineLiquidModal, setDefineLiquidModal] = useState<boolean>(false)
   const [tab, setTab] = useState<'startingDeck' | 'protocolSteps'>(
     'startingDeck'
   )

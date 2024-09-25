@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react'
 import capitalize from 'lodash/capitalize'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -91,9 +91,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     wrongWantedPipette,
     setWrongWantedPipette,
   ] = useState<PipetteNameSpecs | null>(wantedPipette)
-  const [confirmPipetteLevel, setConfirmPipetteLevel] = useState<boolean>(
-    false
-  )
+  const [confirmPipetteLevel, setConfirmPipetteLevel] = useState<boolean>(false)
 
   const movementStatus = useSelector((state: State) => {
     return getMovementStatus(state, robotName)

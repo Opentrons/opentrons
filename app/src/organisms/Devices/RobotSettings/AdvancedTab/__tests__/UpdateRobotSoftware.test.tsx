@@ -1,5 +1,5 @@
 /* eslint-disable testing-library/no-node-access */
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'

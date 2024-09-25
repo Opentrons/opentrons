@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'

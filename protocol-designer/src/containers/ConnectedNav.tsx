@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { KNOWLEDGEBASE_ROOT_URL } from '../components/KnowledgeBaseLink'

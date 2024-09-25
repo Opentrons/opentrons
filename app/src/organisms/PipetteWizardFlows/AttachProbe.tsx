@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
 import {
@@ -58,9 +58,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   } = props
   const { t, i18n } = useTranslation('pipette_wizard_flows')
   const pipetteWizardStep = { mount, flowType, section: SECTIONS.ATTACH_PROBE }
-  const [showUnableToDetect, setShowUnableToDetect] = useState<boolean>(
-    false
-  )
+  const [showUnableToDetect, setShowUnableToDetect] = useState<boolean>(false)
 
   const pipetteId = attachedPipettes[mount]?.serialNumber
   const displayName = attachedPipettes[mount]?.displayName

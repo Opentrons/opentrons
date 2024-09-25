@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import {
   ALIGN_CENTER,

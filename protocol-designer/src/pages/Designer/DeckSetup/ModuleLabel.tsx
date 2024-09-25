@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react'
 import { DeckLabelSet } from '@opentrons/components'
 import {
   HEATERSHAKER_MODULE_TYPE,

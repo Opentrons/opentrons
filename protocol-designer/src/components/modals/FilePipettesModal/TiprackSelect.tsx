@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect } from 'react'
 import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 import { TiprackOption } from './TiprackOption'
 import type { Mount } from '@opentrons/components'

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -46,10 +46,9 @@ export const FilePage = (): JSX.Element => {
   )
   const modules = useSelector(stepFormSelectors.getModulesForEditModulesCard)
   const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
-  const [
-    isEditPipetteModalOpen,
-    setEditPipetteModalOpen,
-  ] = useState<boolean>(false)
+  const [isEditPipetteModalOpen, setEditPipetteModalOpen] = useState<boolean>(
+    false
+  )
   const [moduleToEdit, setModuleToEdit] = useState<{
     moduleType: ModuleType
     moduleId?: string | null

@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -31,9 +31,7 @@ export function ChooseNumber({
 
   const { i18n, t } = useTranslation(['protocol_setup', 'shared'])
   const keyboardRef = useRef(null)
-  const [paramValue, setParamValue] = useState<string>(
-    String(parameter.value)
-  )
+  const [paramValue, setParamValue] = useState<string>(String(parameter.value))
 
   // We need to arbitrarily set the value of the keyboard to a string the
   // same length as the initial parameter value (as string) when the component mounts

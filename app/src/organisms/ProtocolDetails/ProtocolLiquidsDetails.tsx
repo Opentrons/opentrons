@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -79,7 +79,7 @@ export const ProtocolLiquidsDetails = (
               </Flex>
               {index < liquidsInLoadOrder.length - 1 && <Divider />}
             </Fragment>
-          );
+          )
         })
       ) : (
         <Flex
@@ -102,5 +102,5 @@ export const ProtocolLiquidsDetails = (
         </Flex>
       )}
     </Flex>
-  );
+  )
 }

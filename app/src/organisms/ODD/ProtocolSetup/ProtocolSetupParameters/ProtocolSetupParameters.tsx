@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react';
+import { useState, Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -71,14 +71,11 @@ export function ProtocolSetupParameters({
     chooseCsvFileScreen,
     setChooseCsvFileScreen,
   ] = useState<CsvFileParameter | null>(null)
-  const [resetValuesModal, showResetValuesModal] = useState<boolean>(
-    false
-  )
+  const [resetValuesModal, showResetValuesModal] = useState<boolean>(false)
   const [startSetup, setStartSetup] = useState<boolean>(false)
-  const [
-    runTimeParametersOverrides,
-    setRunTimeParametersOverrides,
-  ] = useState<RunTimeParameter[]>(
+  const [runTimeParametersOverrides, setRunTimeParametersOverrides] = useState<
+    RunTimeParameter[]
+  >(
     runTimeParameters.map(parameter =>
       parameter.type === 'csv_file'
         ? { ...parameter, file: null }
@@ -317,7 +314,7 @@ export function ProtocolSetupParameters({
                   disabled={startSetup}
                 />
               </Fragment>
-            );
+            )
           }
         )}
       </Flex>

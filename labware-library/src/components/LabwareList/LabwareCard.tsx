@@ -1,5 +1,5 @@
 // labware display card
-import uniq from 'lodash/uniq';
+import uniq from 'lodash/uniq'
 import { Icon } from '@opentrons/components'
 import { getPublicPath } from '../../public-path'
 import { isNewLabware } from '../../definitions'

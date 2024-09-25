@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -30,9 +30,7 @@ const STANDARD_Y_HEIGHT = '85.48px'
 export function OffDeck(props: DeckSetupTabType): JSX.Element {
   const { tab } = props
   const { t, i18n } = useTranslation('starting_deck_state')
-  const [hoveredLabware, setHoveredLabware] = useState<string | null>(
-    null
-  )
+  const [hoveredLabware, setHoveredLabware] = useState<string | null>(null)
   const dispatch = useDispatch()
 
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)

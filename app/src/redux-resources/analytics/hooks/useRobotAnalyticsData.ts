@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { useRobot } from '/app/redux-resources/robots'
@@ -59,5 +59,5 @@ export function useRobotAnalyticsData(
     }
 
     return null
-  }, [pipettes, robot, settings]);
+  }, [pipettes, robot, settings])
 }

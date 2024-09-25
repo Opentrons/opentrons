@@ -1,5 +1,5 @@
 /* eslint-disable no-return-assign */
-import { useMemo } from 'react';
+import { useMemo } from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {

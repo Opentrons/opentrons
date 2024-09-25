@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
@@ -237,10 +237,7 @@ export const GripperWizard = (
   const { t } = useTranslation('gripper_wizard_flows')
   const gripperWizardSteps = getGripperWizardSteps(flowType)
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
-  const [
-    frontJawOffset,
-    setFrontJawOffset,
-  ] = useState<Coordinates | null>(null)
+  const [frontJawOffset, setFrontJawOffset] = useState<Coordinates | null>(null)
 
   const totalStepCount = gripperWizardSteps.length - 1
   const currentStep = gripperWizardSteps?.[currentStepIndex]

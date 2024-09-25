@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react';
+import { useState, Fragment } from 'react'
 import { createPortal } from 'react-dom'
 import map from 'lodash/map'
 import omit from 'lodash/omit'
@@ -152,10 +152,10 @@ function MetadataDetails({
               </LegacyStyledText>
               <LegacyStyledText as="p">{item.value}</LegacyStyledText>
             </Fragment>
-          );
+          )
         })}
       </Flex>
-    );
+    )
   }
 }
 

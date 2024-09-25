@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -158,15 +158,9 @@ export function RunSummary(): JSX.Element {
       onSuccess?.()
     }
   }
-  const [showRunFailedModal, setShowRunFailedModal] = useState<boolean>(
-    false
-  )
-  const [showRunAgainSpinner, setShowRunAgainSpinner] = useState<boolean>(
-    false
-  )
-  const [showReturnToSpinner, setShowReturnToSpinner] = useState<boolean>(
-    false
-  )
+  const [showRunFailedModal, setShowRunFailedModal] = useState<boolean>(false)
+  const [showRunAgainSpinner, setShowRunAgainSpinner] = useState<boolean>(false)
+  const [showReturnToSpinner, setShowReturnToSpinner] = useState<boolean>(false)
 
   const robotSerialNumber =
     localRobot?.health?.robot_serial ??

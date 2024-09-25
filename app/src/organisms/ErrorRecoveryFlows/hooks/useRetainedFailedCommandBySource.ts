@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '..'

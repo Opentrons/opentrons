@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useDrop } from 'react-dnd'
 import cx from 'classnames'

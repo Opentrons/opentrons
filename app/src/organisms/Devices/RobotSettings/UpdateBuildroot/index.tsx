@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 

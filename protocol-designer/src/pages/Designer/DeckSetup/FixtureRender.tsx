@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment } from 'react'
 import {
   COLORS,
   FlexTrash,
@@ -53,7 +53,7 @@ export const FixtureRender = (props: FixtureRenderProps): JSX.Element => {
             backgroundColor={COLORS.grey50}
           />
         </Fragment>
-      );
+      )
     }
     case 'wasteChute': {
       return (

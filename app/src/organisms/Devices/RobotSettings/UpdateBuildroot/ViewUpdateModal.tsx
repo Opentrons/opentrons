@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 
@@ -44,10 +44,9 @@ export function ViewUpdateModal(
     useSelector(getAvailableShellUpdate)
   )
 
-  const [
-    showMigrationWarning,
-    setShowMigrationWarning,
-  ] = useState<boolean>(robotSystemType === OT2_BALENA)
+  const [showMigrationWarning, setShowMigrationWarning] = useState<boolean>(
+    robotSystemType === OT2_BALENA
+  )
 
   const notNowButton = {
     onClick: closeModal,

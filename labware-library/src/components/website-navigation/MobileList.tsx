@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { Component } from 'react'
 import styles from './styles.module.css'
 import { MobileMenu } from './MobileMenu'
 import { MobileContent } from './MobileContent'

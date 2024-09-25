@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -73,9 +73,9 @@ export const MagneticModuleSlideout = (
   const { module, isExpanded, onCloseClick } = props
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const [engageHeightValue, setEngageHeightValue] = useState<
-    string | null
-  >(null)
+  const [engageHeightValue, setEngageHeightValue] = useState<string | null>(
+    null
+  )
 
   const moduleName = getModuleDisplayName(module.moduleModel)
   const info = getInfoByModel(module.moduleModel)

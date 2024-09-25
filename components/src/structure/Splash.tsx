@@ -1,5 +1,5 @@
 /** A full-page icon in a muted color */
-import cx from 'classnames';
+import cx from 'classnames'
 
 import { Icon } from '../icons'
 import styles from './Splash.module.css'

@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react'
 import head from 'lodash/head'
 import last from 'lodash/last'
 
@@ -49,13 +49,11 @@ export function useDropTipRouting(
     []
   )
 
-  const [dropTipFlowsMap, setDropTipFlowsMap] = useState<DropTipFlowsMap>(
-    {
-      currentRoute: initialRoute as DropTipFlowsRoute,
-      currentStep: initialStep,
-      currentStepIdx: 0,
-    }
-  )
+  const [dropTipFlowsMap, setDropTipFlowsMap] = useState<DropTipFlowsMap>({
+    currentRoute: initialRoute as DropTipFlowsRoute,
+    currentStep: initialStep,
+    currentStepIdx: 0,
+  })
 
   useReportMap(dropTipFlowsMap, fixitUtils)
 

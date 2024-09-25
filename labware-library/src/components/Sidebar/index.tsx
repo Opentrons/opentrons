@@ -1,5 +1,5 @@
 // main application sidebar
-import { LabwareGuide } from './LabwareGuide';
+import { LabwareGuide } from './LabwareGuide'
 import { FilterManufacturer } from './FilterManufacturer'
 import { FilterCategory } from './FilterCategory'
 import { FilterReset } from './FilterReset'

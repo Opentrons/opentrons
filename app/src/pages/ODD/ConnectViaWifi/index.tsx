@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import last from 'lodash/last'
 
@@ -28,10 +28,9 @@ export type WifiScreenOption =
 
 export function ConnectViaWifi(): JSX.Element {
   const [selectedSsid, setSelectedSsid] = useState<string>('')
-  const [
-    selectedAuthType,
-    setSelectedAuthType,
-  ] = useState<WifiSecurityType>('wpa-psk')
+  const [selectedAuthType, setSelectedAuthType] = useState<WifiSecurityType>(
+    'wpa-psk'
+  )
 
   const [currentOption, setCurrentOption] = useState<WifiScreenOption>(
     'WifiList'

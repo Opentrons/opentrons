@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { css } from 'styled-components'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
@@ -83,9 +83,9 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const [showDropdownMenu, setShowDropdownMenu] = useState<boolean>(false)
 
-  const [dropdownPosition, setDropdownPosition] = useState<
-    'top' | 'bottom'
-  >('bottom')
+  const [dropdownPosition, setDropdownPosition] = useState<'top' | 'bottom'>(
+    'bottom'
+  )
   const dropDownMenuWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
       setShowDropdownMenu(false)

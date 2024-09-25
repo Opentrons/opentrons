@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, Fragment } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -243,7 +243,7 @@ export function DeviceReset({
                   </Flex>
                 </OptionLabel>
               </Fragment>
-            );
+            )
           })}
 
           <OptionButton
@@ -313,7 +313,7 @@ export function DeviceReset({
         />
       </Flex>
     </Flex>
-  );
+  )
 }
 
 interface ConfirmClearDataModalProps {

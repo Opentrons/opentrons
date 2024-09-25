@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {

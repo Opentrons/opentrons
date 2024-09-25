@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { FormGroup } from '@opentrons/components'
@@ -80,5 +80,5 @@ export function TemperatureForm(props: StepFormProps): JSX.Element {
           : null}
       </div>
     </div>
-  );
+  )
 }

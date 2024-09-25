@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react';
+import { useState, Fragment } from 'react'
 import { Navigate, Route, Routes, useMatch } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
 import { I18nextProvider } from 'react-i18next'
@@ -145,7 +145,7 @@ export const DesktopApp = (): JSX.Element => {
                           }
                           path={path}
                         />
-                      );
+                      )
                     })}
                     <Route path="*" element={<Navigate to="/protocols" />} />
                   </Routes>
@@ -157,7 +157,7 @@ export const DesktopApp = (): JSX.Element => {
         </ErrorBoundary>
       </I18nextProvider>
     </NiceModal.Provider>
-  );
+  )
 }
 
 function RobotControlTakeover(): JSX.Element | null {

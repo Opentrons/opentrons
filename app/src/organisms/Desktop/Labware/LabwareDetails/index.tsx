@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
@@ -246,12 +246,12 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
                   labelSuffix={groupDisplaySuffix}
                 />
               </Fragment>
-            );
+            )
           })}
         </Box>
         <ManufacturerDetails brand={brand} />
       </Box>
       {hasInserts && <InsertDetails definition={definition} />}
     </Slideout>
-  );
+  )
 }

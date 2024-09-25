@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
@@ -149,10 +149,9 @@ export function FixtureListItem({
     showLocationConflictModal,
     setShowLocationConflictModal,
   ] = useState<boolean>(false)
-  const [
-    showNotConfiguredModal,
-    setShowNotConfiguredModal,
-  ] = useState<boolean>(false)
+  const [showNotConfiguredModal, setShowNotConfiguredModal] = useState<boolean>(
+    false
+  )
 
   const [
     showSetupInstructionsModal,

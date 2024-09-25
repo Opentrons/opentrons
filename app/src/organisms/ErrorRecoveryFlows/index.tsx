@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import {
@@ -59,9 +59,7 @@ export function useErrorRecoveryFlows(
 ): UseErrorRecoveryResult {
   const [isERActive, setIsERActive] = useState(false)
   // If client accesses a valid ER runs status besides AWAITING_RECOVERY but accesses it outside of Error Recovery flows, don't show ER.
-  const [hasSeenAwaitingRecovery, setHasSeenAwaitingRecovery] = useState(
-    false
-  )
+  const [hasSeenAwaitingRecovery, setHasSeenAwaitingRecovery] = useState(false)
   const failedCommand = useCurrentlyRecoveringFrom(runId, runStatus)
 
   if (

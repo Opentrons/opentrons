@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 
 import { useDropTipRouting, useDropTipWithType } from './hooks'
 import { DropTipWizard } from './DropTipWizard'

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
@@ -161,9 +161,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   const pipettesByMount = watch('pipettesByMount')
   const allowAllTipracks = useSelector(getAllowAllTipracks)
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
-  const [showCustomTipracks, setShowCustomTipracks] = useState<boolean>(
-    false
-  )
+  const [showCustomTipracks, setShowCustomTipracks] = useState<boolean>(false)
   const allLabware = useSelector(getLabwareDefsByURI)
   const selectedPipetteName = pipettesByMount[mount].pipetteName
   const selectedPipetteDefaultTipracks =

@@ -1,4 +1,4 @@
-import { memo, Fragment } from 'react';
+import { memo, Fragment } from 'react'
 import { useSelector } from 'react-redux'
 import map from 'lodash/map'
 import noop from 'lodash/noop'
@@ -90,7 +90,7 @@ export const PillTooltipContents = (
         </Fragment>
       )}
     </div>
-  );
+  )
 }
 
 function SubstepRowComponent(props: SubstepRowProps): JSX.Element {

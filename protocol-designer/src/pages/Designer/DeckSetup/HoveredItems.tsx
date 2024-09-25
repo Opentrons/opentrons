@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment } from 'react'
 import { useSelector } from 'react-redux'
 import { LabwareRender, Module } from '@opentrons/components'
 import {
@@ -76,56 +76,58 @@ export const HoveredItems = (
         ]
       : []
 
-  return <>
-    {hoveredFixture != null && selectedSlot.cutout != null ? (
-      <FixtureRender
-        fixture={hoveredFixture}
-        cutout={selectedSlot.cutout}
-        robotType={robotType}
-        deckDef={deckDef}
-      />
-    ) : null}
-    {hoveredModuleDef != null &&
-    hoveredSlotPosition != null &&
-    orientation != null ? (
-      <>
-        <Module
-          key={`${hoveredModuleDef.model}_${selectedSlot.slot}_hover`}
-          x={hoveredSlotPosition[0]}
-          y={hoveredSlotPosition[1]}
-          def={hoveredModuleDef}
-          orientation={orientation}
+  return (
+    <>
+      {hoveredFixture != null && selectedSlot.cutout != null ? (
+        <FixtureRender
+          fixture={hoveredFixture}
+          cutout={selectedSlot.cutout}
+          robotType={robotType}
+          deckDef={deckDef}
         />
-        {hoveredModule != null ? (
-          <ModuleLabel
-            moduleModel={hoveredModule}
-            position={hoveredSlotPosition}
+      ) : null}
+      {hoveredModuleDef != null &&
+      hoveredSlotPosition != null &&
+      orientation != null ? (
+        <>
+          <Module
+            key={`${hoveredModuleDef.model}_${selectedSlot.slot}_hover`}
+            x={hoveredSlotPosition[0]}
+            y={hoveredSlotPosition[1]}
+            def={hoveredModuleDef}
             orientation={orientation}
-            isSelected={false}
-            isLast={true}
           />
-        ) : null}
-      </>
-    ) : null}
+          {hoveredModule != null ? (
+            <ModuleLabel
+              moduleModel={hoveredModule}
+              position={hoveredSlotPosition}
+              orientation={orientation}
+              isSelected={false}
+              isLast={true}
+            />
+          ) : null}
+        </>
+      ) : null}
 
-    {hoveredLabwareDef != null &&
-    hoveredSlotPosition != null &&
-    hoveredLabware != null &&
-    selectedModuleModel == null ? (
-      <Fragment key={`${hoveredLabwareDef.parameters.loadName}_hover`}>
-        <g
-          transform={`translate(${hoveredSlotPosition[0]}, ${hoveredSlotPosition[1]})`}
-        >
-          <LabwareRender definition={hoveredLabwareDef} />
-        </g>
-        <LabwareLabel
-          isLast={true}
-          isSelected={false}
-          labwareDef={hoveredLabwareDef}
-          position={hoveredSlotPosition}
-          nestedLabwareInfo={nestedInfo}
-        />
-      </Fragment>
-    ) : null}
-  </>;
+      {hoveredLabwareDef != null &&
+      hoveredSlotPosition != null &&
+      hoveredLabware != null &&
+      selectedModuleModel == null ? (
+        <Fragment key={`${hoveredLabwareDef.parameters.loadName}_hover`}>
+          <g
+            transform={`translate(${hoveredSlotPosition[0]}, ${hoveredSlotPosition[1]})`}
+          >
+            <LabwareRender definition={hoveredLabwareDef} />
+          </g>
+          <LabwareLabel
+            isLast={true}
+            isSelected={false}
+            labwareDef={hoveredLabwareDef}
+            position={hoveredSlotPosition}
+            nestedLabwareInfo={nestedInfo}
+          />
+        </Fragment>
+      ) : null}
+    </>
+  )
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import map from 'lodash/map'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
@@ -171,10 +171,9 @@ export function ModulesListItem({
     attachedModuleMatch != null
       ? t('module_connected')
       : t('module_not_connected')
-  const [
-    showModuleSetupModal,
-    setShowModuleSetupModal,
-  ] = useState<Boolean>(false)
+  const [showModuleSetupModal, setShowModuleSetupModal] = useState<Boolean>(
+    false
+  )
   const [
     showLocationConflictModal,
     setShowLocationConflictModal,

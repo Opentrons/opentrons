@@ -1,4 +1,4 @@
-import { useState, useReducer, useEffect, Fragment } from 'react';
+import { useState, useReducer, useEffect, Fragment } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { NavLink } from 'react-router-dom'
@@ -332,7 +332,7 @@ export function ChooseRobotSlideout(
                 </LegacyStyledText>
               )}
             </Fragment>
-          );
+          )
         })
       )}
       {!isScanning && unavailableCount > 0 ? (

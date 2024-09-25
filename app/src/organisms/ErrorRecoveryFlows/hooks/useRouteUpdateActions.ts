@@ -1,5 +1,5 @@
-import type { MutableRefObject } from 'react';
-import { useRef, useCallback } from 'react';
+import type { MutableRefObject } from 'react'
+import { useRef, useCallback } from 'react'
 import last from 'lodash/last'
 
 import head from 'lodash/head'

@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -72,9 +72,9 @@ export function SetupTipLengthCalibration({
                 )
               })}
             </Fragment>
-          );
+          )
         }
       })}
     </Flex>
-  );
+  )
 }

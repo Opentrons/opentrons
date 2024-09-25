@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment } from 'react'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -69,5 +69,5 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
         ))}
       </Flex>
     </Flex>
-  );
+  )
 }

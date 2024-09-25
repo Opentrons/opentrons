@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 

@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext } from 'react'
 import { KitchenContext } from './KitchenContext'
 import type { KitchenContextType } from './KitchenContext'
 

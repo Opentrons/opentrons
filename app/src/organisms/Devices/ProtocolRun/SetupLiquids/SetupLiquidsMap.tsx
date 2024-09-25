@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react';
+import { useState, Fragment } from 'react'
 import map from 'lodash/map'
 import isEmpty from 'lodash/isEmpty'
 
@@ -159,9 +159,7 @@ export function SetupLiquidsMap(
             )
             const labwareHasLiquid = !isEmpty(wellFill)
             return (
-              <Fragment
-                key={`LabwareSetup_Labware_${topLabwareId}_${x}${y}`}
-              >
+              <Fragment key={`LabwareSetup_Labware_${topLabwareId}_${x}${y}`}>
                 <g
                   transform={`translate(${x},${y})`}
                   onMouseEnter={() => {
@@ -192,7 +190,7 @@ export function SetupLiquidsMap(
                   />
                 </g>
               </Fragment>
-            );
+            )
           }
         )}
       </BaseDeck>
@@ -206,5 +204,5 @@ export function SetupLiquidsMap(
         />
       )}
     </Flex>
-  );
+  )
 }

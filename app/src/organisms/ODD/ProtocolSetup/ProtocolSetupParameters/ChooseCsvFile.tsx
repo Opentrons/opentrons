@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
@@ -93,93 +93,95 @@ export function ChooseCsvFile({
     }
   }, [csvFilesOnUSB])
 
-  return <>
-    <ChildNavigation
-      header={t('choose_csv_file')}
-      onClickBack={handleBackButton}
-      inlineNotification={{
-        type: 'neutral',
-        heading: t('usb_drive_notification'),
-      }}
-    />
-    <Flex
-      marginTop="7.75rem"
-      alignSelf={ALIGN_CENTER}
-      gridGap={SPACING.spacing8}
-      paddingX={SPACING.spacing40}
-      flexDirection={DIRECTION_COLUMN}
-      paddingBottom={SPACING.spacing40}
-    >
-      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing48}>
-        <Flex css={CONTAINER_STYLE}>
-          <LegacyStyledText css={HEADER_TEXT_STYLE}>
-            {t('csv_files_on_robot')}
-          </LegacyStyledText>
-          <Flex css={LIST_CONTAINER_STYLE}>
-            {csvFilesOnRobot.length !== 0 ? (
-              csvFilesOnRobot.map((csv: CsvFileData) => (
-                <Fragment key={csv.id}>
-                  <RadioButton
-                    buttonLabel={truncateString(
-                      csv.name,
-                      MAX_CHARS,
-                      CSV_FILENAME_BREAK_POINT
-                    )}
-                    buttonValue={csv.id}
-                    onChange={() => {
-                      setCsvFileSelected({ id: csv.id, fileName: csv.name })
-                    }}
-                    id={`${csv.id}-on-robot`}
-                    isSelected={csvFileSelected?.id === csv.id}
-                    maxLines={3}
-                  />
-                </Fragment>
-              ))
-            ) : (
-              <EmptyFile />
-            )}
-          </Flex>
-        </Flex>
-        <Flex css={CONTAINER_STYLE}>
-          <LegacyStyledText css={HEADER_TEXT_STYLE}>
-            {t('csv_files_on_usb')}
-          </LegacyStyledText>
-          <Flex css={LIST_CONTAINER_STYLE}>
-            {sortedCsvFilesOnUSB.length !== 0 ? (
-              sortedCsvFilesOnUSB.map(csvFilePath => {
-                const fileName = last(csvFilePath.split('/'))
-                return (
-                  <Fragment key={fileName}>
-                    {csvFilePath.length !== 0 && fileName !== undefined ? (
-                      <RadioButton
-                        buttonLabel={truncateString(
-                          fileName,
-                          MAX_CHARS,
-                          CSV_FILENAME_BREAK_POINT
-                        )}
-                        buttonValue={csvFilePath}
-                        onChange={() => {
-                          setCsvFileSelected({
-                            filePath: csvFilePath,
-                            fileName,
-                          })
-                        }}
-                        id={`${csvFilePath.replace('/', '-')}}-on-usb`}
-                        isSelected={csvFileSelected?.filePath === csvFilePath}
-                        maxLines={3}
-                      />
-                    ) : null}
+  return (
+    <>
+      <ChildNavigation
+        header={t('choose_csv_file')}
+        onClickBack={handleBackButton}
+        inlineNotification={{
+          type: 'neutral',
+          heading: t('usb_drive_notification'),
+        }}
+      />
+      <Flex
+        marginTop="7.75rem"
+        alignSelf={ALIGN_CENTER}
+        gridGap={SPACING.spacing8}
+        paddingX={SPACING.spacing40}
+        flexDirection={DIRECTION_COLUMN}
+        paddingBottom={SPACING.spacing40}
+      >
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing48}>
+          <Flex css={CONTAINER_STYLE}>
+            <LegacyStyledText css={HEADER_TEXT_STYLE}>
+              {t('csv_files_on_robot')}
+            </LegacyStyledText>
+            <Flex css={LIST_CONTAINER_STYLE}>
+              {csvFilesOnRobot.length !== 0 ? (
+                csvFilesOnRobot.map((csv: CsvFileData) => (
+                  <Fragment key={csv.id}>
+                    <RadioButton
+                      buttonLabel={truncateString(
+                        csv.name,
+                        MAX_CHARS,
+                        CSV_FILENAME_BREAK_POINT
+                      )}
+                      buttonValue={csv.id}
+                      onChange={() => {
+                        setCsvFileSelected({ id: csv.id, fileName: csv.name })
+                      }}
+                      id={`${csv.id}-on-robot`}
+                      isSelected={csvFileSelected?.id === csv.id}
+                      maxLines={3}
+                    />
                   </Fragment>
-                );
-              })
-            ) : (
-              <EmptyFile />
-            )}
+                ))
+              ) : (
+                <EmptyFile />
+              )}
+            </Flex>
+          </Flex>
+          <Flex css={CONTAINER_STYLE}>
+            <LegacyStyledText css={HEADER_TEXT_STYLE}>
+              {t('csv_files_on_usb')}
+            </LegacyStyledText>
+            <Flex css={LIST_CONTAINER_STYLE}>
+              {sortedCsvFilesOnUSB.length !== 0 ? (
+                sortedCsvFilesOnUSB.map(csvFilePath => {
+                  const fileName = last(csvFilePath.split('/'))
+                  return (
+                    <Fragment key={fileName}>
+                      {csvFilePath.length !== 0 && fileName !== undefined ? (
+                        <RadioButton
+                          buttonLabel={truncateString(
+                            fileName,
+                            MAX_CHARS,
+                            CSV_FILENAME_BREAK_POINT
+                          )}
+                          buttonValue={csvFilePath}
+                          onChange={() => {
+                            setCsvFileSelected({
+                              filePath: csvFilePath,
+                              fileName,
+                            })
+                          }}
+                          id={`${csvFilePath.replace('/', '-')}}-on-usb`}
+                          isSelected={csvFileSelected?.filePath === csvFilePath}
+                          maxLines={3}
+                        />
+                      ) : null}
+                    </Fragment>
+                  )
+                })
+              ) : (
+                <EmptyFile />
+              )}
+            </Flex>
           </Flex>
         </Flex>
       </Flex>
-    </Flex>
-  </>;
+    </>
+  )
 }
 
 const HEADER_TEXT_STYLE = css`

@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -46,13 +46,10 @@ export function CalibrationTaskList({
   exitBeforeDeckConfigCompletion,
 }: CalibrationTaskListProps): JSX.Element {
   const prevActiveIndex = useRef<[number, number] | null>(null)
-  const [hasLaunchedWizard, setHasLaunchedWizard] = useState<boolean>(
+  const [hasLaunchedWizard, setHasLaunchedWizard] = useState<boolean>(false)
+  const [showCompletionScreen, setShowCompletionScreen] = useState<boolean>(
     false
   )
-  const [
-    showCompletionScreen,
-    setShowCompletionScreen,
-  ] = useState<boolean>(false)
   const { t } = useTranslation(['robot_calibration', 'device_settings'])
   const navigate = useNavigate()
   const { activeIndex, taskList, taskListStatus } = useCalibrationTaskList(

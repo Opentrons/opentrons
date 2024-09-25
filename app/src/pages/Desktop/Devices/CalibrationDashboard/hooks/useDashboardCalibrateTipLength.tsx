@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -86,9 +86,9 @@ export function useDashboardCalibrateTipLength(
   )
 
   const configHasCalibrationBlock = useSelector(getHasCalibrationBlock)
-  const [showCalBlockModal, setShowCalBlockModal] = useState<
-    boolean | null
-  >(null)
+  const [showCalBlockModal, setShowCalBlockModal] = useState<boolean | null>(
+    null
+  )
 
   const handleStartDashboardTipLengthCalSession: DashboardCalTipLengthInvoker = props => {
     const { params, hasBlockModalResponse, invalidateHandler } = props

@@ -1,5 +1,5 @@
 // full-width labware details
-import { Fragment } from 'react';
+import { Fragment } from 'react'
 import { getUniqueWellProperties } from '@opentrons/shared-data'
 import {
   getWellLabel,
@@ -96,11 +96,11 @@ export function LabwareDetailsBox(props: LabwareDetailsBoxProps): JSX.Element {
                   className={styles.details_table}
                 />
               </Fragment>
-            );
+            )
           })}
         </div>
       </DetailsBox>
       {hasInserts && <InsertDetails definition={definition} />}
     </div>
-  );
+  )
 }

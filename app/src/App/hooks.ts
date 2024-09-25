@@ -1,4 +1,4 @@
-import { useCallback, useRef, useEffect } from 'react';
+import { useCallback, useRef, useEffect } from 'react'
 import difference from 'lodash/difference'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'

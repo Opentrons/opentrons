@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef } from 'react'
 
 import { SelectField } from '@opentrons/components'
 import { FormRow } from './FormRow'

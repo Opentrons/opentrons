@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, Fragment } from 'react'
 
 import {
   ALIGN_CENTER,
@@ -180,12 +180,12 @@ function ProgressTrackerItem({
                   height="100%"
                 />
               </Fragment>
-            );
+            )
           })}
         </>
       )}
     </Flex>
-  );
+  )
 }
 
 function SubTask({

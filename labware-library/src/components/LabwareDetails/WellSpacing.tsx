@@ -1,5 +1,5 @@
 // well dimensions and spacing for details page
-import round from 'lodash/round';
+import round from 'lodash/round'
 import { getSpacingDiagram } from '@opentrons/components'
 import {
   SPACING,

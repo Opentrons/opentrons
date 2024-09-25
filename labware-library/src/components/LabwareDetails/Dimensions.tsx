@@ -1,5 +1,5 @@
 // labware dimensions for details page
-import round from 'lodash/round';
+import round from 'lodash/round'
 import { getFootprintDiagram } from '@opentrons/components'
 import {
   FOOTPRINT,

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -36,9 +36,7 @@ export function SetupFlexPipetteCalibrationItem({
   instrumentsRefetch,
 }: SetupInstrumentCalibrationItemProps): JSX.Element | null {
   const { t } = useTranslation(['protocol_setup', 'devices_landing'])
-  const [showFlexPipetteFlow, setShowFlexPipetteFlow] = useState<boolean>(
-    false
-  )
+  const [showFlexPipetteFlow, setShowFlexPipetteFlow] = useState<boolean>(false)
   const { data: attachedInstruments } = useInstrumentsQuery()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)

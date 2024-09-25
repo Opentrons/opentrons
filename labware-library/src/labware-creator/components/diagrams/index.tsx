@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import heightPlateAndReservoirImage from '../../images/height_plate-and-reservoir.svg';
+import heightPlateAndReservoirImage from '../../images/height_plate-and-reservoir.svg'
 import heightTubeRackImage from '../../images/height_tubeRack.svg'
 import heightAluminumBlockTubesImage from '../../images/height_aluminumBlock_tubes.svg'
 import heightAluminumBlockPlateImage from '../../images/height_aluminumBlock_plate.svg'

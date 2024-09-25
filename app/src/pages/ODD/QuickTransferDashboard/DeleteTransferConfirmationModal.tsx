@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from 'react-query'
 import { Trans, useTranslation } from 'react-i18next'

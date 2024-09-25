@@ -1,5 +1,5 @@
 // app info card with version and updated
-import { useState } from 'react';
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
@@ -65,10 +65,9 @@ export function GeneralSettings(): JSX.Element {
   const [showUpdateBanner, setShowUpdateBanner] = useState<boolean>(
     updateAvailable
   )
-  const [
-    showConnectRobotSlideout,
-    setShowConnectRobotSlideout,
-  ] = useState(false)
+  const [showConnectRobotSlideout, setShowConnectRobotSlideout] = useState(
+    false
+  )
 
   // may be enabled, disabled, or unknown (because config is loading)
   const updateAlertEnabled = useSelector((s: State) => {

@@ -1,5 +1,5 @@
 // top nav bar logo image
-import logoSrc from './images/ot-logo-full.png';
+import logoSrc from './images/ot-logo-full.png'
 import styles from './styles.module.css'
 
 export function Logo(): JSX.Element {

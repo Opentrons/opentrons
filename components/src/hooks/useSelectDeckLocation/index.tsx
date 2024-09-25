@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react';
+import { useState, Fragment } from 'react'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import {
@@ -59,10 +59,7 @@ export function useDeckLocationSelect(
   theme?: DeckLocationSelectThemes
 ): { DeckLocationSelect: JSX.Element; selectedLocation: ModuleLocation } {
   const deckDef = getDeckDefFromRobotType(robotType)
-  const [
-    selectedLocation,
-    setSelectedLocation,
-  ] = useState<ModuleLocation>({
+  const [selectedLocation, setSelectedLocation] = useState<ModuleLocation>({
     slotName: deckDef.locations.addressableAreas[0].id,
   })
   return {
@@ -267,7 +264,7 @@ export function DeckLocationSelect({
                 </RobotCoordsForeignDiv>
               ) : null}
             </Fragment>
-          );
+          )
         })}
       {robotType === OT2_ROBOT_TYPE ? (
         <DeckFromLayers
@@ -322,7 +319,7 @@ export function DeckLocationSelect({
           </RobotCoordsForeignDiv>
         )}
     </RobotCoordinateSpace>
-  );
+  )
 }
 
 const INNER_DIV_PROPS = {

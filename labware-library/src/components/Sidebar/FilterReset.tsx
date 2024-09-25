@@ -1,5 +1,5 @@
 // reset all filters button
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'
 import { Icon } from '@opentrons/components'
 import { buildFiltersUrl, FILTER_OFF } from '../../filters'
 import { CLEAR_FILTERS } from '../../localization'

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
@@ -56,9 +56,7 @@ export function RobotSettingsNetworking({
   const isRobotBusy = useIsRobotBusy({ poll: true })
   const isFlex = useIsFlex(robotName)
 
-  const [showDisconnectModal, setShowDisconnectModal] = useState<boolean>(
-    false
-  )
+  const [showDisconnectModal, setShowDisconnectModal] = useState<boolean>(false)
 
   const canDisconnect = useCanDisconnect(robotName)
 

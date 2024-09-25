@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -92,14 +92,12 @@ export function ProtocolOverview(): JSX.Element {
     showEditInstrumentsModal,
     setShowEditInstrumentsModal,
   ] = useState<boolean>(false)
-  const [
-    showEditMetadataModal,
-    setShowEditMetadataModal,
-  ] = useState<boolean>(false)
-  const [
-    showExportWarningModal,
-    setShowExportWarningModal,
-  ] = useState<boolean>(false)
+  const [showEditMetadataModal, setShowEditMetadataModal] = useState<boolean>(
+    false
+  )
+  const [showExportWarningModal, setShowExportWarningModal] = useState<boolean>(
+    false
+  )
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
   const initialDeckSetup = useSelector(getInitialDeckSetup)
@@ -108,10 +106,9 @@ export function ProtocolOverview(): JSX.Element {
   )
   const dispatch: ThunkDispatch<any> = useDispatch()
   const [hover, setHover] = useState<DeckSlot | string | null>(null)
-  const [
-    showMaterialsListModal,
-    setShowMaterialsListModal,
-  ] = useState<boolean>(false)
+  const [showMaterialsListModal, setShowMaterialsListModal] = useState<boolean>(
+    false
+  )
   const fileData = useSelector(fileSelectors.createFile)
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)

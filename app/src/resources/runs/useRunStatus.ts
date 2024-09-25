@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef } from 'react'
 import {
   RUN_ACTION_TYPE_PLAY,
   RUN_STATUS_IDLE,

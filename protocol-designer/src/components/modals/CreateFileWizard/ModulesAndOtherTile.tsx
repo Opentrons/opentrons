@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect } from 'react'
 import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 import without from 'lodash/without'

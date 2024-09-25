@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchProtocols, getStoredProtocols } from '/app/redux/protocol-storage'
 import { ProtocolsEmptyState } from '/app/organisms/ProtocolsLanding/ProtocolsEmptyState'

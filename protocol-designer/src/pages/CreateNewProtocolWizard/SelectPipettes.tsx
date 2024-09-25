@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
@@ -65,9 +65,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
   const [mount, setMount] = useState<PipetteMount | null>(null)
   const [page, setPage] = useState<'add' | 'overview'>('add')
   const [pipetteType, setPipetteType] = useState<PipetteType | null>(null)
-  const [showIncompatibleTip, setIncompatibleTip] = useState<boolean>(
-    false
-  )
+  const [showIncompatibleTip, setIncompatibleTip] = useState<boolean>(false)
   const [pipetteGen, setPipetteGen] = useState<Gen | 'flex'>('flex')
   const [pipetteVolume, setPipetteVolume] = useState<string | null>(null)
   const allowAllTipracks = useSelector(getAllowAllTipracks)

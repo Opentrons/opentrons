@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import map from 'lodash/map'
 
 import {
@@ -45,9 +45,7 @@ export function SetupLabwareMap({
     labwareStackDetailsLabwareId,
     setLabwareStackDetailsLabwareId,
   ] = useState<string | null>(null)
-  const [hoverLabwareId, setHoverLabwareId] = useState<string | null>(
-    null
-  )
+  const [hoverLabwareId, setHoverLabwareId] = useState<string | null>(null)
 
   if (protocolAnalysis == null) return null
 

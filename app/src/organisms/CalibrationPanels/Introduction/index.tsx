@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import {
@@ -40,10 +40,9 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')
 
   const [showChooseTipRack, setShowChooseTipRack] = useState(false)
-  const [
-    chosenTipRack,
-    setChosenTipRack,
-  ] = useState<LabwareDefinition2 | null>(null)
+  const [chosenTipRack, setChosenTipRack] = useState<LabwareDefinition2 | null>(
+    null
+  )
 
   const handleChosenTipRack = (value: LabwareDefinition2 | null): void => {
     value != null && setChosenTipRack(value)

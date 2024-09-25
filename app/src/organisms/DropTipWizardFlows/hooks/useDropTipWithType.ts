@@ -1,5 +1,5 @@
 // This is the main unifying function for maintenanceRun and fixit type flows.
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 
 import { useDropTipCommandErrors } from '.'
 import { useDropTipMaintenanceRun } from './useDropTipMaintenanceRun'
@@ -78,9 +78,7 @@ function useErrorDetails(): {
   errorDetails: ErrorDetails | null
   setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
 } {
-  const [errorDetails, setErrorDetails] = useState<null | ErrorDetails>(
-    null
-  )
+  const [errorDetails, setErrorDetails] = useState<null | ErrorDetails>(null)
   const setRobustErrorDetails = useDropTipCommandErrors(setErrorDetails)
 
   return { errorDetails, setErrorDetails: setRobustErrorDetails }

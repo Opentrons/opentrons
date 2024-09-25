@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import head from 'lodash/head'
 import { useTranslation } from 'react-i18next'
 

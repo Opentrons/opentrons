@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getRun, getCommands, getProtocol } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'

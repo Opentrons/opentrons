@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import last from 'lodash/last'
@@ -67,10 +67,9 @@ export function RobotSettingsDashboard(): JSX.Element {
 
   // LOCAL STATE MANAGEMENT for wi-fi user input
   const [selectedSsid, setSelectedSsid] = useState<string>('')
-  const [
-    selectedAuthType,
-    setSelectedAuthType,
-  ] = useState<WifiSecurityType>('wpa-psk')
+  const [selectedAuthType, setSelectedAuthType] = useState<WifiSecurityType>(
+    'wpa-psk'
+  )
   const [password, setPassword] = useState<string>('')
 
   // REQUESTS
@@ -98,10 +97,7 @@ export function RobotSettingsDashboard(): JSX.Element {
   }, [robotName, dispatch])
 
   // PAGE-LEVEL SWITCH MANAGEMENT
-  const [
-    currentOption,
-    setCurrentOption,
-  ] = useState<SettingOption | null>(null)
+  const [currentOption, setCurrentOption] = useState<SettingOption | null>(null)
 
   switch (currentOption) {
     case 'RobotName':

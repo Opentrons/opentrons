@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { css } from 'styled-components'
 import {
   ALIGN_CENTER,

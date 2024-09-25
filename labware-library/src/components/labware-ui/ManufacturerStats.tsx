@@ -1,5 +1,9 @@
 // labware details page title and category
-import { MANUFACTURER, MANUFACTURER_NO, MANUFACTURER_VALUES } from '../../localization';
+import {
+  MANUFACTURER,
+  MANUFACTURER_NO,
+  MANUFACTURER_VALUES,
+} from '../../localization'
 import { ExternalLink, LabelText, Value, LABEL_TOP } from '../ui'
 import type { LabwareBrand } from '../../types'
 import styles from './styles.module.css'

@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -95,9 +95,7 @@ export const PipetteWizardFlows = (
   const totalStepCount =
     pipetteWizardSteps != null ? pipetteWizardSteps.length - 1 : 0
   const currentStep = pipetteWizardSteps?.[currentStepIndex] ?? null
-  const [isFetchingPipettes, setIsFetchingPipettes] = useState<boolean>(
-    false
-  )
+  const [isFetchingPipettes, setIsFetchingPipettes] = useState<boolean>(false)
   const memoizedAttachedPipettes = useMemo(() => attachedPipettes, [])
   const hasCalData =
     memoizedAttachedPipettes[mount]?.data.calibratedOffset?.last_modified !=
@@ -171,9 +169,7 @@ export const PipetteWizardFlows = (
     closeFlow,
   ])
 
-  const [errorMessage, setShowErrorMessage] = useState<null | string>(
-    null
-  )
+  const [errorMessage, setShowErrorMessage] = useState<null | string>(null)
   const [isExiting, setIsExiting] = useState<boolean>(false)
   const proceed = (): void => {
     if (!isCommandMutationLoading) {

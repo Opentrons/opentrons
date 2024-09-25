@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
@@ -37,9 +37,9 @@ export function ConnectRobotSlideout({
   isExpanded,
   onCloseClick,
 }: ConnectRobotSlideoutProps): JSX.Element | null {
-  const [mostRecentAddition, setMostRecentAddition] = useState<
-    string | null
-  >(null)
+  const [mostRecentAddition, setMostRecentAddition] = useState<string | null>(
+    null
+  )
   const [mostRecentDiscovered, setMostRecentDiscovered] = useState<
     boolean | null
   >(null)

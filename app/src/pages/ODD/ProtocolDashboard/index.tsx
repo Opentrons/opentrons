@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
@@ -40,10 +40,9 @@ export function ProtocolDashboard(): JSX.Element {
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
   const [navMenuIsOpened, setNavMenuIsOpened] = useState<boolean>(false)
-  const [
-    longPressModalIsOpened,
-    setLongPressModalOpened,
-  ] = useState<boolean>(false)
+  const [longPressModalIsOpened, setLongPressModalOpened] = useState<boolean>(
+    false
+  )
   const [
     showDeleteConfirmationModal,
     setShowDeleteConfirmationModal,

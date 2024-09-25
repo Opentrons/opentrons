@@ -1,5 +1,5 @@
 // main application wrapper component
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react'
 import cx from 'classnames'
 import { useLocation } from 'react-router-dom'
 import { DefinitionRoute } from '../../definitions'

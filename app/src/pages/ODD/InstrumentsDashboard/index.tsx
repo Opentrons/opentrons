@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react'
 import last from 'lodash/last'
 
 import { useDispatchApiRequest } from '/app/redux/robot-api'

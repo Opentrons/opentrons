@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { AlertItem } from '@opentrons/components'
 import styles from './styles.module.css'
 

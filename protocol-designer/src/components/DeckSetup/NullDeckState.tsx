@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo } from 'react'
 import { getDeckDefinitions } from '@opentrons/shared-data'
 import { useTranslation } from 'react-i18next'
 import {

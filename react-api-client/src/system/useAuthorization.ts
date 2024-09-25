@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react'
 import { createAuthorization, createRegistration } from '@opentrons/api-client'
 import { useHost } from '../api'
 

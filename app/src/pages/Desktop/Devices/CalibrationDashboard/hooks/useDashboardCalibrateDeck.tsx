@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'

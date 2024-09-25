@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment } from 'react'
 import { getAllLabwareDefs, getAllPipetteNames } from '@opentrons/shared-data'
 import { LabwareRender } from '../Labware'
 import { RobotWorkSpace } from '../Deck'
@@ -47,7 +47,7 @@ const Template: Story<{
         </Fragment>
       )}
     </RobotWorkSpace>
-  );
+  )
 }
 export const Pipette = Template.bind({})
 

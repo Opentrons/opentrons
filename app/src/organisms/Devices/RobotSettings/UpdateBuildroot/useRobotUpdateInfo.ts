@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef } from 'react';
+import { useMemo, useState, useRef } from 'react'
 import { useSelector } from 'react-redux'
 
 import { getRobotUpdateDownloadProgress } from '/app/redux/robot-update'
@@ -12,9 +12,7 @@ export function useRobotUpdateInfo(
 ): { updateStep: UpdateStep | null; progressPercent: number } {
   const progressPercent = useFindProgressPercentFrom(robotName, session)
 
-  const updateStep = useMemo(() => determineUpdateStepFrom(session), [
-    session,
-  ])
+  const updateStep = useMemo(() => determineUpdateStepFrom(session), [session])
 
   return {
     updateStep,

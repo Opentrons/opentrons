@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 

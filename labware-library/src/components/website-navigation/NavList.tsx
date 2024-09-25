@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { Component } from 'react'
 import cx from 'classnames'
 import { ClickOutside } from '@opentrons/components'
 import { aboutLinkProps, applicationLinkProps } from './nav-data'

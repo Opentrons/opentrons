@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -63,10 +63,9 @@ export const UnmountGripper = (
     (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
   )
 
-  const [
-    showGripperStillDetected,
-    setShowGripperStillDetected,
-  ] = useState(false)
+  const [showGripperStillDetected, setShowGripperStillDetected] = useState(
+    false
+  )
   const handleContinue = (): void => {
     setIsPending(true)
     refetch()

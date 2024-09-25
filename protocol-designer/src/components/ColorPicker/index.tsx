@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import cx from 'classnames'
 import { TwitterPicker } from 'react-color'
 import { DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'

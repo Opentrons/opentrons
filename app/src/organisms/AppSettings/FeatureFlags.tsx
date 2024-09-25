@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import {
@@ -57,5 +57,5 @@ export function FeatureFlags(): JSX.Element {
         </Fragment>
       ))}
     </Flex>
-  );
+  )
 }

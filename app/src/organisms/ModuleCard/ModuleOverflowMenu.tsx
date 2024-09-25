@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -158,10 +158,10 @@ export const ModuleOverflowMenu = (
                 </MenuItem>
                 {item.menuButtons}
               </Fragment>
-            );
+            )
           }
         )}
       </MenuList>
     </Flex>
-  );
+  )
 }

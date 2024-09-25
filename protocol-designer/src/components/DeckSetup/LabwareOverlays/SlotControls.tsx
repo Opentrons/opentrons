@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import noop from 'lodash/noop'

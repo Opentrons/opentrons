@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useEstopQuery } from '@opentrons/react-api-client'
 

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef } from 'react'
 import { css } from 'styled-components'
 import {
   Box,

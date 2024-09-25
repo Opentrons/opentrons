@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   fetchSettings,
@@ -15,9 +15,7 @@ export function useLEDLights(
   lightsEnabled: boolean
   toggleLights: () => void
 } {
-  const [lightsEnabledCache, setLightsEnabledCache] = useState<boolean>(
-    true
-  )
+  const [lightsEnabledCache, setLightsEnabledCache] = useState<boolean>(true)
 
   const dispatch = useDispatch<Dispatch>()
 

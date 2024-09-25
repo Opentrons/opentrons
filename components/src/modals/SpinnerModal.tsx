@@ -1,5 +1,5 @@
 // titled modal page component
-import cx from 'classnames';
+import cx from 'classnames'
 import { Overlay } from './Overlay'
 import { Icon } from '../icons'
 

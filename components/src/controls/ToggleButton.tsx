@@ -1,5 +1,5 @@
 // reusable toggle button with on off styling for connect to robot and opt in/out
-import cx from 'classnames';
+import cx from 'classnames'
 import { IconButton } from '../buttons'
 import styles from './styles.module.css'
 

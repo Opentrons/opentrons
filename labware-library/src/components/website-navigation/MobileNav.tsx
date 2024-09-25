@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { Component } from 'react'
 import { MenuButton } from './MenuButton'
 import { MobileList } from './MobileList'
 

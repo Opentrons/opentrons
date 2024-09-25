@@ -1,5 +1,5 @@
 // labware filters
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'
 import { Icon } from '@opentrons/components'
 import {
   LABWARE_GUIDE,

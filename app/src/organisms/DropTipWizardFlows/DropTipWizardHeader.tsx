@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { BEFORE_BEGINNING, BLOWOUT_SUCCESS, DT_ROUTES } from './constants'
@@ -70,9 +70,7 @@ export function useSeenBlowoutSuccess({
   currentRoute,
   currentStepIdx,
 }: UseSeenBlowoutSuccessProps): UseSeenBlowoutSuccessResult {
-  const [hasSeenBlowoutSuccess, setHasSeenBlowoutSuccess] = useState(
-    false
-  )
+  const [hasSeenBlowoutSuccess, setHasSeenBlowoutSuccess] = useState(false)
 
   useEffect(() => {
     if (currentStep === BLOWOUT_SUCCESS) {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import {
@@ -27,10 +27,7 @@ export const ChooseLocation = ({
 }: DropTipWizardContainerProps): JSX.Element | null => {
   const { moveToAddressableArea } = dropTipCommands
   const { t } = useTranslation('drop_tip_wizard')
-  const [
-    selectedLocation,
-    setSelectedLocation,
-  ] = useState<ModuleLocation>()
+  const [selectedLocation, setSelectedLocation] = useState<ModuleLocation>()
   const deckDef = getDeckDefFromRobotType(robotType)
 
   const handleConfirmPosition = (): void => {

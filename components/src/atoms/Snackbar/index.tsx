@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { css } from 'styled-components'
 import { ALIGN_CENTER } from '../../styles'
 import { Flex } from '../../primitives'

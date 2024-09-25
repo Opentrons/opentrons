@@ -1,4 +1,4 @@
-import { useMemo, Fragment } from 'react';
+import { useMemo, Fragment } from 'react'
 import styled, { css } from 'styled-components'
 import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
@@ -339,11 +339,11 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                 )}
               </TableDatum>
             </TableRow>
-          );
+          )
         })}
       </tbody>
     </Table>
-  );
+  )
 }
 
 // Very similar to the OffsetTable, but abbreviates certain things to be optimized
@@ -420,11 +420,11 @@ export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
                 )}
               </TerseTableDatum>
             </TerseTableRow>
-          );
+          )
         })}
       </tbody>
     </TerseTable>
-  );
+  )
 }
 
 const TerseTable = styled('table')`

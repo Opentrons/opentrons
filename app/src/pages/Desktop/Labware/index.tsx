@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
 import { css } from 'styled-components'
@@ -98,9 +98,7 @@ export function Labware(): JSX.Element {
   const labware = useAllLabware(sortBy, filterBy)
   const { labwareFailureMessage, clearLabwareFailure } = useLabwareFailure()
   const { newLabwareName, clearLabwareName } = useNewLabwareName()
-  const [showAddLabwareSlideout, setShowAddLabwareSlideout] = useState(
-    false
-  )
+  const [showAddLabwareSlideout, setShowAddLabwareSlideout] = useState(false)
 
   const [
     currentLabwareDef,

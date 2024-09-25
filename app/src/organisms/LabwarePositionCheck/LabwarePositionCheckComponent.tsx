@@ -1,4 +1,4 @@
-import { useState, useEffect, useReducer } from 'react';
+import { useState, useEffect, useReducer } from 'react'
 import { createPortal } from 'react-dom'
 import isEqual from 'lodash/isEqual'
 import { useSelector } from 'react-redux'
@@ -115,13 +115,8 @@ export const LabwarePositionCheckComponent = (
   ])
 
   const [fatalError, setFatalError] = useState<string | null>(null)
-  const [isApplyingOffsets, setIsApplyingOffsets] = useState<boolean>(
-    false
-  )
-  const [
-    { workingOffsets, tipPickUpOffset },
-    registerPosition,
-  ] = useReducer(
+  const [isApplyingOffsets, setIsApplyingOffsets] = useState<boolean>(false)
+  const [{ workingOffsets, tipPickUpOffset }, registerPosition] = useReducer(
     (
       state: {
         workingOffsets: WorkingOffset[]

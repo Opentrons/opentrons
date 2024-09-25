@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { css } from 'styled-components'

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { COLORS, LegacyStyledText } from '@opentrons/components'
 import { EXTENSION } from '@opentrons/shared-data'

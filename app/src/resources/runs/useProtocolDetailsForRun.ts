@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import last from 'lodash/last'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {

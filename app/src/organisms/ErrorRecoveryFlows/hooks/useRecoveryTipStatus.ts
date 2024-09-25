@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import head from 'lodash/head'
 
 import { useHost } from '@opentrons/react-api-client'

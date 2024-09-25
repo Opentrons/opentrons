@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback } from 'react'
 import head from 'lodash/head'
 
 import {

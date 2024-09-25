@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect } from 'react'
 import { useQueryClient } from 'react-query'
 
 import {

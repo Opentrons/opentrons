@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef } from 'react'
 
 import { useHealthQuery } from '@opentrons/react-api-client'
 

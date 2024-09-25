@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation, Trans } from 'react-i18next'
 import capitalize from 'lodash/capitalize'

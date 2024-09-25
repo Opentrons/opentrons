@@ -14,7 +14,7 @@ import {
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
-import { useState } from 'react';
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getIsOnDevice } from '/app/redux/config'
 import { SmallButton } from '/app/atoms/buttons'

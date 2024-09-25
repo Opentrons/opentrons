@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react'
 import head from 'lodash/head'
 
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
@@ -45,9 +45,7 @@ export interface TipAttachmentStatusResult {
 export function useTipAttachmentStatus(
   params: Omit<GetPipettesWithTipAttached, 'attachedInstruments'>
 ): TipAttachmentStatusResult {
-  const [pipettesWithTip, setPipettesWithTip] = useState<
-    PipetteWithTip[]
-  >([])
+  const [pipettesWithTip, setPipettesWithTip] = useState<PipetteWithTip[]>([])
   const [initialPipettesCount, setInitialPipettesCount] = useState<
     number | null
   >(null)
@@ -59,9 +57,7 @@ export function useTipAttachmentStatus(
   const areTipsAttached =
     pipettesWithTip.length > 0 && head(pipettesWithTip)?.specs != null
 
-  const determineTipStatus = useCallback((): Promise<
-    PipetteWithTip[]
-  > => {
+  const determineTipStatus = useCallback((): Promise<PipetteWithTip[]> => {
     return getPipettesWithTipAttached({
       ...params,
       attachedInstruments: attachedInstruments ?? null,
