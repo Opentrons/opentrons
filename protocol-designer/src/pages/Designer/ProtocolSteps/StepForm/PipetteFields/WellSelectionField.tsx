@@ -6,9 +6,12 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  Icon,
   InputField,
   SPACING,
   StyledText,
+  Tooltip,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { COLUMN } from '@opentrons/shared-data'
 import {
@@ -42,8 +45,9 @@ export const WellSelectionField = (
     name,
     disabled,
     errorToShow,
+    tooltipContent,
   } = props
-  const { t, i18n } = useTranslation('form')
+  const { t, i18n } = useTranslation(['form', 'tooltip'])
   const dispatch = useDispatch()
   const stepId = useSelector(getSelectedStepId)
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
@@ -85,15 +89,26 @@ export const WellSelectionField = (
     nozzleType === '8-channel' || nozzleType === COLUMN
       ? t(`step_edit_form.wellSelectionLabel.columns_${name}`)
       : t(`step_edit_form.wellSelectionLabel.wells_${name}`)
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
   return (
     <>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
-        <Flex gridGap={SPACING.spacing8} paddingBottom={SPACING.spacing8}>
+        <Flex gridGap={SPACING.spacing8}>
           <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
             {i18n.format(label, 'capitalize')}
           </StyledText>
+          <Flex {...targetProps}>
+            <Icon
+              name="information"
+              size={SPACING.spacing12}
+              color={COLORS.grey60}
+            />
+          </Flex>
         </Flex>
+        <Tooltip tooltipProps={tooltipProps}>
+          {t(`tooltip:${tooltipContent}`)}
+        </Tooltip>
         <InputField
           disabled={disabled}
           readOnly

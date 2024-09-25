@@ -28,6 +28,7 @@
 
   "step_fields": {
     "defaults": {
+      "aspirate_wells": "Selected source wells",
       "aspirate_labware": "Select a source labware to use",
       "aspirate_airGap_checkbox": "Aspirate air before moving to next well",
       "aspirate_delay_checkbox": "Delay pipette movement after each aspirate in this step, including any Air Gap",
@@ -40,6 +41,7 @@
       "blowout_checkbox": "Where to dispose of remaining volume in tip",
       "blowout_location": "Where to dispose of remaining volume in tip",
       "changeTip": "Choose when the robot picks up fresh tips",
+      "dispense_wells": "Selected destination wells",
       "dispense_labware": "Select a destination labware to use",
       "dispense_airGap_checkbox": "Aspirate air before moving to Trash to dispose of tip. Tip will be disposed of at the end of steps using this setting.",
       "dispense_delay_checkbox": "Delay pipette movement after each dispense in this step",
@@ -83,10 +85,12 @@
     "moveLiquid": {
       "disabled": {
         "$generic": "Incompatible with current path",
+        "aspirate_wells": "Select a source labware in order to select wells",
         "aspirate_touchTip_checkbox": "Touch tip is not supported",
         "blowout_checkbox": "Redundant with disposal volume",
         "dispense_mix_checkbox": "Unable to mix in a waste chute or trash bin",
         "dropTip_location": "Choose where you would like to drop tip",
+        "dispense_wells": "Select a destination labware in order to select wells",
         "aspirate_mmFromBottom": "Tip position adjustment is not supported",
         "dispense_mmFromBottom": "Tip position adjustment is not supported",
         "dispense_touchTip_checkbox": "Touch tip is not supported",

@@ -10,8 +10,6 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { getFieldDefaultTooltip } from '../../components/StepEditForm/utils'
-
 import type { FieldProps } from '../../components/StepEditForm/types'
 
 interface InputStepFormFieldProps extends FieldProps {
@@ -35,9 +33,10 @@ export function InputStepFormField(
     units,
     showTooltip = true,
     padding = SPACING.spacing16,
+    tooltipContent,
     ...otherProps
   } = props
-  const { t } = useTranslation(['tooltip', 'application'])
+  const { t } = useTranslation('tooltip')
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   return (
@@ -57,7 +56,7 @@ export function InputStepFormField(
               />
             </Flex>
             <Tooltip tooltipProps={tooltipProps}>
-              {getFieldDefaultTooltip(name, t)}
+              {t(`${tooltipContent}`)}
             </Tooltip>
           </>
         ) : null}
