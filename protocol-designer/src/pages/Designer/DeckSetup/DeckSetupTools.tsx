@@ -84,8 +84,6 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
     ModuleModel | Fixture | null
   >(null)
 
-  console.log('selectedHardware', selectedHardware)
-
   //  initialize the previously selected hardware because for some reason it does not
   //  work initiating it in the above useState
   React.useEffect(() => {
