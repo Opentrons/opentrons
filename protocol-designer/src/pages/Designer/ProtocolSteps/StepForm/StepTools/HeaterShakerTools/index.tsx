@@ -2,36 +2,28 @@ import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
-  ALIGN_CENTER,
   Box,
-  Btn,
   COLORS,
-  Check,
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_SPACE_BETWEEN,
   ListItem,
   SPACING,
   StyledText,
-  TOOLTIP_BOTTOM,
-  Tooltip,
-  useHoverTooltip,
 } from '@opentrons/components'
 import { getHeaterShakerLabwareOptions } from '../../../../../../ui/modules/selectors'
 import {
+  CheckboxExpandStepFormField,
   DropdownStepFormField,
   InputStepFormField,
+  ToggleExpandStepFormField,
+  ToggleStepFormField,
 } from '../../../../../../molecules'
-import { Toggle } from '../../../../../../atoms'
 import type { StepFormProps } from '../../types'
 
 export function HeaterShakerTools(props: StepFormProps): JSX.Element {
   const { propsForFields, formData } = props
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const moduleLabwareOptions = useSelector(getHeaterShakerLabwareOptions)
-  const [targetLatchProps, tooltipLatchProps] = useHoverTooltip({
-    placement: TOOLTIP_BOTTOM,
-  })
 
   useEffect(() => {
     if (moduleLabwareOptions.length === 1) {
@@ -74,172 +66,70 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
         <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
           {t('protocol_steps:heater_shaker_settings')}
         </StyledText>
-        <ListItem type="noActive">
-          <Flex
-            padding={SPACING.spacing12}
-            width="100%"
-            flexDirection={DIRECTION_COLUMN}
-          >
-            <Flex
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              alignItems={ALIGN_CENTER}
-            >
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {t(
-                  'form:step_edit_form.field.heaterShaker.temperature.setTemperature'
-                )}
-              </StyledText>
-              <Toggle
-                onClick={() => {
-                  propsForFields.setHeaterShakerTemperature.updateValue(
-                    !propsForFields.setHeaterShakerTemperature.value
-                  )
-                }}
-                label={
-                  propsForFields.setHeaterShakerTemperature.value === true
-                    ? t(
-                        'form:step_edit_form.field.heaterShaker.temperature.toggleOn'
-                      )
-                    : t(
-                        'form:step_edit_form.field.heaterShaker.temperature.toggleOff'
-                      )
-                }
-                isSelected={
-                  propsForFields.setHeaterShakerTemperature.value === true
-                }
-              />
-            </Flex>
-            {formData.setHeaterShakerTemperature === true ? (
-              <InputStepFormField
-                padding="0"
-                showTooltip={false}
-                title={t('protocol_steps:temperature')}
-                {...propsForFields.targetHeaterShakerTemperature}
-                units={t('units.degrees')}
-              />
-            ) : null}
-          </Flex>
-        </ListItem>
-        <ListItem type="noActive">
-          <Flex
-            padding={SPACING.spacing12}
-            width="100%"
-            flexDirection={DIRECTION_COLUMN}
-          >
-            <Flex
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              alignItems={ALIGN_CENTER}
-            >
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {t('form:step_edit_form.field.heaterShaker.shaker.setShake')}
-              </StyledText>
-              <Toggle
-                onClick={() => {
-                  propsForFields.setShake.updateValue(
-                    !propsForFields.setShake.value
-                  )
-                }}
-                label={
-                  propsForFields.setShake.value === true
-                    ? t(
-                        'form:step_edit_form.field.heaterShaker.shaker.toggleOn'
-                      )
-                    : t(
-                        'form:step_edit_form.field.heaterShaker.shaker.toggleOff'
-                      )
-                }
-                isSelected={propsForFields.setShake.value === true}
-              />
-            </Flex>
-            {formData.setShake === true ? (
-              <InputStepFormField
-                showTooltip={false}
-                padding="0"
-                title={t('protocol_steps:shake')}
-                {...propsForFields.targetSpeed}
-                units={t('units.rpm')}
-              />
-            ) : null}
-          </Flex>
-        </ListItem>
-        <ListItem type="noActive">
-          <Flex
-            padding={SPACING.spacing12}
-            width="100%"
-            flexDirection={DIRECTION_COLUMN}
-          >
-            <Flex
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              alignItems={ALIGN_CENTER}
-              {...targetLatchProps}
-            >
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {t('form:step_edit_form.field.heaterShaker.latch.setLatch')}
-              </StyledText>
-              <Toggle
-                disabled={propsForFields.latchOpen.disabled}
-                onClick={() => {
-                  propsForFields.latchOpen.updateValue(
-                    !propsForFields.latchOpen.value
-                  )
-                }}
-                label={
-                  propsForFields.latchOpen.value === true
-                    ? t('form:step_edit_form.field.heaterShaker.latch.toggleOn')
-                    : t(
-                        'form:step_edit_form.field.heaterShaker.latch.toggleOff'
-                      )
-                }
-                isSelected={propsForFields.latchOpen.value === true}
-              />
-            </Flex>
-          </Flex>
-        </ListItem>
-        <ListItem type="noActive">
-          <Flex
-            padding={SPACING.spacing12}
-            width="100%"
-            flexDirection={DIRECTION_COLUMN}
-          >
-            <Flex
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              alignItems={ALIGN_CENTER}
-            >
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {t(
-                  'form:step_edit_form.field.heaterShaker.timer.heaterShakerSetTimer'
-                )}
-              </StyledText>
-              <Btn
-                onClick={() => {
-                  propsForFields.heaterShakerSetTimer.updateValue(
-                    !propsForFields.heaterShakerSetTimer.value
-                  )
-                }}
-              >
-                <Check
-                  color={COLORS.blue50}
-                  isChecked={propsForFields.heaterShakerSetTimer.value === true}
-                />
-              </Btn>
-            </Flex>
-            {/* TODO: wire up the new timer with the combined field */}
-            {formData.heaterShakerSetTimer === true ? (
-              <InputStepFormField
-                showTooltip={false}
-                padding="0"
-                title={t('protocol_steps:time')}
-                {...propsForFields.heaterShakerTimerMinutes}
-                units="HH:MM:SS"
-              />
-            ) : null}
-          </Flex>
-        </ListItem>
-        {propsForFields.latchOpen.disabled && (
-          <Tooltip tooltipProps={tooltipLatchProps}>
-            {propsForFields.latchOpen.tooltipContent}
-          </Tooltip>
-        )}
+        <ToggleExpandStepFormField
+          {...propsForFields.targetHeaterShakerTemperature}
+          toggleValue={propsForFields.setHeaterShakerTemperature.value}
+          toggleUpdateValue={
+            propsForFields.setHeaterShakerTemperature.updateValue
+          }
+          title={t(
+            'form:step_edit_form.field.heaterShaker.temperature.setTemperature'
+          )}
+          fieldTitle={t('protocol_steps:temperature')}
+          isSelected={formData.setHeaterShakerTemperature === true}
+          units={t('units.degrees')}
+          onLabel={t(
+            'form:step_edit_form.field.heaterShaker.temperature.toggleOn'
+          )}
+          offLabel={t(
+            'form:step_edit_form.field.heaterShaker.temperature.toggleOff'
+          )}
+        />
+        <ToggleExpandStepFormField
+          {...propsForFields.targetSpeed}
+          toggleValue={propsForFields.setShake.value}
+          toggleUpdateValue={propsForFields.setShake.updateValue}
+          title={t('form:step_edit_form.field.heaterShaker.shaker.setShake')}
+          fieldTitle={t('protocol_steps:shake')}
+          isSelected={formData.setShake === true}
+          units={t('units.rpm')}
+          onLabel={t('form:step_edit_form.field.heaterShaker.shaker.toggleOn')}
+          offLabel={t(
+            'form:step_edit_form.field.heaterShaker.shaker.toggleOff'
+          )}
+        />
+        <ToggleStepFormField
+          isDisabled={propsForFields.latchOpen.disabled}
+          title={t('form:step_edit_form.field.heaterShaker.latch.setLatch')}
+          isSelected={propsForFields.latchOpen.value === true}
+          onLabel={t('form:step_edit_form.field.heaterShaker.latch.toggleOn')}
+          offLabel={t('form:step_edit_form.field.heaterShaker.latch.toggleOff')}
+          toggleUpdateValue={propsForFields.latchOpen.updateValue}
+          toggleValue={propsForFields.latchOpen.value}
+          tooltipContent={
+            propsForFields.latchOpen.disabled
+              ? propsForFields.latchOpen.tooltipContent ?? null
+              : null
+          }
+        />
+        <CheckboxExpandStepFormField
+          title={t(
+            'form:step_edit_form.field.heaterShaker.timer.heaterShakerSetTimer'
+          )}
+          checkboxValue={propsForFields.heaterShakerSetTimer.value}
+          isChecked={propsForFields.heaterShakerSetTimer.value === true}
+          checkboxUpdateValue={propsForFields.heaterShakerSetTimer.updateValue}
+        >
+          {formData.heaterShakerSetTimer === true ? (
+            <InputStepFormField
+              showTooltip={false}
+              padding="0"
+              title={t('protocol_steps:time')}
+              {...propsForFields.heaterShakerTimerMinutes}
+              units="HH:MM:SS"
+            />
+          ) : null}
+        </CheckboxExpandStepFormField>
       </Flex>
     </Flex>
   )
