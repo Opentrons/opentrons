@@ -104,7 +104,7 @@ export function Settings(): JSX.Element {
     <>
       {showAnnouncementModal ? (
         <AnnouncementModal
-          isViewReleaseNotes = {showAnnouncementModal}
+          isViewReleaseNotes={showAnnouncementModal}
           onClose={() => {
             setShowAnnouncementModal(false)
           }}
