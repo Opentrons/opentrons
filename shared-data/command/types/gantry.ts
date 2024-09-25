@@ -126,12 +126,13 @@ export interface MoveToWellParams {
   labwareId: string
   wellName: string
   wellLocation?: {
-    origin?: 'top' | 'bottom'
+    origin?: 'top' | 'center' | 'bottom' | 'meniscus'
     offset?: {
       x?: number
       y?: number
       z?: number
     }
+    volumeOffset?: number
   }
   minimumZHeight?: number
   forceDirect?: boolean
