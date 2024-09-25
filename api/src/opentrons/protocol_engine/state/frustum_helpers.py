@@ -317,6 +317,10 @@ def height_at_volume_within_section(
             top_width=top_cross_section["xDimension"],
             top_length=top_cross_section["yDimension"],
         )
+    else:
+        raise NotImplementedError(
+            "Height from volume calculation not yet implemented for this well shape."
+        )
     return frustum_height
 
 
@@ -343,9 +347,12 @@ def volume_at_height_within_section(
             top_width=top_cross_section["xDimension"],
             top_length=top_cross_section["yDimension"],
         )
-    # else:
     # TODO(cm): this would be the NEST-96 2uL wells referenced in EXEC-712
     # we need to input the math attached to that issue
+    else:
+        raise NotImplementedError(
+            "Height from volume calculation not yet implemented for this well shape."
+        )
     return frustum_volume
 
 
@@ -406,6 +413,7 @@ def find_volume_at_well_height(
                 radius_of_curvature=well_geometry.bottomShape.radiusOfCurvature,
             )
     sorted_frusta = sorted(well_geometry.frusta, key=lambda section: section.topHeight)
+    # TODO(cm): handle non-frustum section that is not at the bottom.
     partial_volume = _find_volume_in_partial_frustum(
         sorted_frusta=sorted_frusta,
         target_height=target_height,
