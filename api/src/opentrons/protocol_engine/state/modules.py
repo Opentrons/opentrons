@@ -397,10 +397,6 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                     ):
                         lid_labware_id = labware.labware_id
                         break
-                else:
-                    raise errors.AreaNotInDeckConfigurationError(
-                        "Opentrons Plate Reader lid location not found."
-                    )
             self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
                 module_id=AbsorbanceReaderId(module_id),
                 configured=False,
