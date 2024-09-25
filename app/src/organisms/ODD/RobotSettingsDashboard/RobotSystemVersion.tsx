@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -42,7 +42,7 @@ export function RobotSystemVersion({
     'app_settings',
     'branded',
   ])
-  const [showModal, setShowModal] = React.useState<boolean>(isUpdateAvailable)
+  const [showModal, setShowModal] = useState<boolean>(isUpdateAvailable)
 
   return (
     <>

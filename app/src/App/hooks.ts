@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useCallback, useRef, useEffect } from 'react';
 import difference from 'lodash/difference'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
@@ -23,7 +23,7 @@ const PROTOCOL_IDS_RECHECK_INTERVAL_MS = 3000
 
 export function useSoftwareUpdatePoll(): void {
   const dispatch = useDispatch<Dispatch>()
-  const checkAppUpdate = React.useCallback(() => dispatch(checkShellUpdate()), [
+  const checkAppUpdate = useCallback(() => dispatch(checkShellUpdate()), [
     dispatch,
   ])
   useInterval(checkAppUpdate, UPDATE_RECHECK_INTERVAL_MS)
@@ -41,8 +41,8 @@ export function useProtocolReceiptToast(): void {
     true
   )
   const protocolIds = protocolIdsQuery.data?.data ?? []
-  const protocolIdsRef = React.useRef(protocolIds)
-  const hasRefetched = React.useRef(true)
+  const protocolIdsRef = useRef(protocolIds)
+  const hasRefetched = useRef(true)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const animationCommand: SetStatusBarCreateCommand = {
     commandType: 'setStatusBar',
@@ -53,7 +53,7 @@ export function useProtocolReceiptToast(): void {
     hasRefetched.current = false
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     const newProtocolIds = difference(protocolIds, protocolIdsRef.current)
     if (!hasRefetched.current && newProtocolIds.length > 0) {
       Promise.all(

@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { BaseDeck, Flex } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 
 import {
   Box,
@@ -34,7 +34,7 @@ export function Gallery(props: GalleryProps): JSX.Element {
       ? 127.4
       : dims.xDimension
 
-  const [currentImage, setCurrentImage] = React.useState<number>(0)
+  const [currentImage, setCurrentImage] = useState<number>(0)
   const render = (
     <Box width="100%">
       <RobotWorkSpace

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom'
 
 import {
@@ -19,16 +19,16 @@ export function FirmwareUpdateTakeover(): JSX.Element {
   const [
     showUpdateNeededModal,
     setShowUpdateNeededModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const [
     initiatedSubsystemUpdate,
     setInitiatedSubsystemUpdate,
-  ] = React.useState<Subsystem | null>(null)
+  ] = useState<Subsystem | null>(null)
 
   const instrumentsData = useInstrumentsQuery({
     refetchInterval: POLL_INTERVAL_MS,
   }).data?.data
-  const [instrumentsToUpdate, setInstrumentsToUpdate] = React.useState<
+  const [instrumentsToUpdate, setInstrumentsToUpdate] = useState<
     InstrumentData[]
   >([])
   instrumentsData?.forEach(instrument => {
@@ -41,7 +41,7 @@ export function FirmwareUpdateTakeover(): JSX.Element {
       setInstrumentsToUpdate([...instrumentsToUpdate, instrument])
     }
   })
-  const [indexToUpdate, setIndexToUpdate] = React.useState(0)
+  const [indexToUpdate, setIndexToUpdate] = useState(0)
 
   const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: POLL_INTERVAL_MS,
@@ -63,7 +63,7 @@ export function FirmwareUpdateTakeover(): JSX.Element {
     externalSubsystemUpdate?.id ?? null
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     // in case instruments are updated elsewhere in the app, clear update needed list
     // when all instruments are ok but array has elements
     if (

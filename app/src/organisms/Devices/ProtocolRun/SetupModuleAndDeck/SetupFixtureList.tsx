@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
@@ -148,16 +148,16 @@ export function FixtureListItem({
   const [
     showLocationConflictModal,
     setShowLocationConflictModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const [
     showNotConfiguredModal,
     setShowNotConfiguredModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
   const [
     showSetupInstructionsModal,
     setShowSetupInstructionsModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
   return (
     <>

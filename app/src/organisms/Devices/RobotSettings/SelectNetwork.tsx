@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
@@ -35,7 +35,7 @@ export const SelectNetwork = ({
   const eapOptions = useSelector((state: State) =>
     Networking.getEapOptions(state, robotName)
   )
-  const [changeState, setChangeState] = React.useState<NetworkChangeState>({
+  const [changeState, setChangeState] = useState<NetworkChangeState>({
     type: null,
   })
   const dispatch = useDispatch<Dispatch>()
@@ -53,7 +53,7 @@ export const SelectNetwork = ({
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     // if we're connecting to a network, ensure we get the info needed to
     // populate the configuration forms
     if (changeState.type === CONNECT || changeState.type === JOIN_OTHER) {

@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { Flex } from '@opentrons/components'
 
 import { useTranslation } from 'react-i18next'

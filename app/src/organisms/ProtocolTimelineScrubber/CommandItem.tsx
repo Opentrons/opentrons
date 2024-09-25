@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -28,7 +28,7 @@ interface CommandItemProps {
   robotType: RobotType
 }
 export function CommandItem(props: CommandItemProps): JSX.Element {
-  const [showDetails, setShowDetails] = React.useState(false)
+  const [showDetails, setShowDetails] = useState(false)
   const {
     index,
     command,

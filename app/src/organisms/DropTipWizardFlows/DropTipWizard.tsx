@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
@@ -278,7 +278,7 @@ function useInitiateExit(): {
   isExitInitiated: boolean
   toggleExitInitiated: () => void
 } {
-  const [isExitInitiated, setIsExitInitiated] = React.useState(false)
+  const [isExitInitiated, setIsExitInitiated] = useState(false)
 
   const toggleExitInitiated = (): void => {
     setIsExitInitiated(true)

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect, Fragment } from 'react';
 
 import {
   ALIGN_CENTER,
@@ -134,7 +134,7 @@ function ProgressTrackerItem({
             const isFinalSubTaskOfTaskList = isLastSubTask && isLastTask
 
             return (
-              <React.Fragment key={subTask.title}>
+              <Fragment key={subTask.title}>
                 {/* subtask circle icon component */}
                 <Flex
                   flex={FLEX_NONE}
@@ -179,13 +179,13 @@ function ProgressTrackerItem({
                   }
                   height="100%"
                 />
-              </React.Fragment>
-            )
+              </Fragment>
+            );
           })}
         </>
       )}
     </Flex>
-  )
+  );
 }
 
 function SubTask({
@@ -342,11 +342,11 @@ function Task({
   const hasSubTasks = subTasks.length > 0
   const isDisabled = generalTaskDisabledReason != null
 
-  const [isTaskOpen, setIsTaskOpen] = React.useState<boolean>(
+  const [isTaskOpen, setIsTaskOpen] = useState<boolean>(
     hasSubTasks && isActiveTask
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     setIsTaskOpen(hasSubTasks && isActiveTask)
   }, [isActiveTask, hasSubTasks])
 

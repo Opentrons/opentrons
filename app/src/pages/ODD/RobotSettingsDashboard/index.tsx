@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import last from 'lodash/last'
@@ -66,12 +66,12 @@ export function RobotSettingsDashboard(): JSX.Element {
     ?.securityType
 
   // LOCAL STATE MANAGEMENT for wi-fi user input
-  const [selectedSsid, setSelectedSsid] = React.useState<string>('')
+  const [selectedSsid, setSelectedSsid] = useState<string>('')
   const [
     selectedAuthType,
     setSelectedAuthType,
-  ] = React.useState<WifiSecurityType>('wpa-psk')
-  const [password, setPassword] = React.useState<string>('')
+  ] = useState<WifiSecurityType>('wpa-psk')
+  const [password, setPassword] = useState<string>('')
 
   // REQUESTS
   const dispatch = useDispatch<Dispatch>()
@@ -93,7 +93,7 @@ export function RobotSettingsDashboard(): JSX.Element {
     setPassword('')
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(fetchStatus(robotName))
   }, [robotName, dispatch])
 
@@ -101,7 +101,7 @@ export function RobotSettingsDashboard(): JSX.Element {
   const [
     currentOption,
     setCurrentOption,
-  ] = React.useState<SettingOption | null>(null)
+  ] = useState<SettingOption | null>(null)
 
   switch (currentOption) {
     case 'RobotName':

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { useSelector } from 'react-redux'
 import { useEstopQuery } from '@opentrons/react-api-client'
 
@@ -22,11 +22,11 @@ interface EstopTakeoverProps {
 }
 
 export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
-  const [estopEngaged, setEstopEngaged] = React.useState<boolean>(false)
+  const [estopEngaged, setEstopEngaged] = useState<boolean>(false)
   const [
     isWaitingForLogicalDisengage,
     setIsWaitingForLogicalDisengage,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const { data: estopStatus } = useEstopQuery({
     refetchInterval: estopEngaged
       ? ESTOP_CURRENTLY_ENGAGED_REFETCH_INTERVAL_MS

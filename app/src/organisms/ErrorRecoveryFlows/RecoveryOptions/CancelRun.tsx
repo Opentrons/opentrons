@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -121,11 +121,11 @@ export function useOnCancelRun({
   const { handleMotionRouting, proceedToRouteAndStep } = routeUpdateActions
   const { cancelRun } = recoveryCommands
 
-  const [hasUserClicked, setHasUserClicked] = React.useState(false)
+  const [hasUserClicked, setHasUserClicked] = useState(false)
 
   const showBtnLoadingState = hasUserClicked && isLoadingTipStatus
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (hasUserClicked) {
       if (!isLoadingTipStatus) {
         if (areTipsAttached) {

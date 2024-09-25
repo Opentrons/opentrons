@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 
@@ -28,7 +28,7 @@ export function ViewUpdateModal(
   props: ViewUpdateModalProps
 ): JSX.Element | null {
   const { robotName, robot, closeModal } = props
-  const [showAppUpdateModal, setShowAppUpdateModal] = React.useState(true)
+  const [showAppUpdateModal, setShowAppUpdateModal] = useState(true)
 
   const updateInfo = useSelector((state: State) =>
     getRobotUpdateInfo(state, robotName)
@@ -47,7 +47,7 @@ export function ViewUpdateModal(
   const [
     showMigrationWarning,
     setShowMigrationWarning,
-  ] = React.useState<boolean>(robotSystemType === OT2_BALENA)
+  ] = useState<boolean>(robotSystemType === OT2_BALENA)
 
   const notNowButton = {
     onClick: closeModal,

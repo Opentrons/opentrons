@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react';
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
@@ -34,8 +34,8 @@ export interface UseConfirmPositionResult {
 export function useConfirmPosition(
   currentStep: DropTipWizardContainerProps['currentStep']
 ): UseConfirmPositionResult {
-  const [showConfirmPosition, setShowConfirmPosition] = React.useState(false)
-  const [isRobotPipetteMoving, setIsRobotPipetteMoving] = React.useState(false)
+  const [showConfirmPosition, setShowConfirmPosition] = useState(false)
+  const [isRobotPipetteMoving, setIsRobotPipetteMoving] = useState(false)
 
   const toggleShowConfirmPosition = (): void => {
     setShowConfirmPosition(!showConfirmPosition)
@@ -46,7 +46,7 @@ export function useConfirmPosition(
   }
 
   // NOTE: The useEffect logic is potentially problematic on views that are not steps, but it is not currently.
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       currentStep !== POSITION_AND_BLOWOUT &&
       currentStep !== POSITION_AND_DROP_TIP &&

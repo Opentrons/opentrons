@@ -1,4 +1,3 @@
-import * as React from 'react'
 import map from 'lodash/map'
 import { NavLink } from './NavLink'
 import styles from './styles.module.css'

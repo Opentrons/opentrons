@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect, useRef } from 'react';
 import last from 'lodash/last'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
@@ -80,8 +80,8 @@ const QuickTransferHeader = ({
   const navigate = useNavigate()
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const { t } = useTranslation('protocol_details')
-  const [truncate, setTruncate] = React.useState<boolean>(true)
-  const [startSetup, setStartSetup] = React.useState<boolean>(false)
+  const [truncate, setTruncate] = useState<boolean>(true)
+  const [startSetup, setStartSetup] = useState<boolean>(false)
   const toggleTruncate = (): void => {
     setTruncate(value => !value)
   }
@@ -91,7 +91,7 @@ const QuickTransferHeader = ({
     displayedTitle = truncateString(displayedTitle, 80, 60)
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     trackEventWithRobotSerial({
       name: ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
       properties: {
@@ -308,11 +308,11 @@ export function QuickTransferDetails(): JSX.Element | null {
   const host = useHost()
   const { makeSnackbar } = useToaster()
   const queryClient = useQueryClient()
-  const [currentOption, setCurrentOption] = React.useState<TabOption>(
+  const [currentOption, setCurrentOption] = useState<TabOption>(
     transferSectionTabOptions[0]
   )
 
-  const [showMaxPinsAlert, setShowMaxPinsAlert] = React.useState<boolean>(false)
+  const [showMaxPinsAlert, setShowMaxPinsAlert] = useState<boolean>(false)
   const {
     data: protocolRecord,
     isLoading: isTransferFetching,
@@ -321,8 +321,8 @@ export function QuickTransferDetails(): JSX.Element | null {
   })
 
   // Watch for scrolling to toggle dropshadow
-  const scrollRef = React.useRef<HTMLDivElement>(null)
-  const [isScrolled, setIsScrolled] = React.useState<boolean>(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [isScrolled, setIsScrolled] = useState<boolean>(false)
   const observer = new IntersectionObserver(([entry]) => {
     setIsScrolled(!entry.isIntersecting)
   })
@@ -384,7 +384,7 @@ export function QuickTransferDetails(): JSX.Element | null {
   const [
     showConfirmDeleteTransfer,
     setShowConfirmationDeleteTransfer,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
   const displayName =
     !isTransferFetching && protocolRecord != null

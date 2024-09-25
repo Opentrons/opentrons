@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
 import { selectors as stepFormSelectors } from '../../step-forms'
@@ -12,7 +12,7 @@ import { StepSelectionBannerComponent } from './StepSelectionBannerComponent'
 import type { ThunkDispatch } from 'redux-thunk'
 import type { BaseState } from '../../types'
 
-const MemoizedStepSelectionBannerComponent = React.memo(
+const MemoizedStepSelectionBannerComponent = memo(
   StepSelectionBannerComponent
 )
 

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,

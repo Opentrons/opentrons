@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
@@ -91,7 +91,7 @@ export function UpdateRobotModal({
     disabledReason = updateFromFileDisabledReason
   else if (isRobotBusy) disabledReason = t('robot_busy_protocol')
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(robotUpdateChangelogSeen(robotName))
   }, [robotName])
 

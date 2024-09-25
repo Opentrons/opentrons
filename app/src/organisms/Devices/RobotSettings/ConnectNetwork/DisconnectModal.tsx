@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
@@ -113,7 +113,7 @@ export const DisconnectModal = ({
     disconnectModalBody = t('disconnect_from_wifi_network_failure', { ssid })
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isDisconnected) {
       dispatch(clearWifiStatus(robotName))
     }

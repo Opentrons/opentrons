@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useCallback } from 'react';
 
 import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 import { useCurrentRunId } from '/app/resources/runs'
@@ -31,7 +31,7 @@ export function useCloseCurrentRun(): {
     }
   }
 
-  const closeCurrentRunCallback = React.useCallback(closeCurrentRun, [
+  const closeCurrentRunCallback = useCallback(closeCurrentRun, [
     dismissCurrentRun,
     currentRunId,
   ])

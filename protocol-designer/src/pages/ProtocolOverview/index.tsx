@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -91,15 +91,15 @@ export function ProtocolOverview(): JSX.Element {
   const [
     showEditInstrumentsModal,
     setShowEditInstrumentsModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const [
     showEditMetadataModal,
     setShowEditMetadataModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const [
     showExportWarningModal,
     setShowExportWarningModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
   const initialDeckSetup = useSelector(getInitialDeckSetup)
@@ -107,11 +107,11 @@ export function ProtocolOverview(): JSX.Element {
     labwareIngredSelectors.allIngredientGroupFields
   )
   const dispatch: ThunkDispatch<any> = useDispatch()
-  const [hover, setHover] = React.useState<DeckSlot | string | null>(null)
+  const [hover, setHover] = useState<DeckSlot | string | null>(null)
   const [
     showMaterialsListModal,
     setShowMaterialsListModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const fileData = useSelector(fileSelectors.createFile)
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
@@ -121,11 +121,11 @@ export function ProtocolOverview(): JSX.Element {
   const leftString = t('starting_deck_state:onDeck')
   const rightString = t('starting_deck_state:offDeck')
 
-  const [deckView, setDeckView] = React.useState<
+  const [deckView, setDeckView] = useState<
     typeof leftString | typeof rightString
   >(leftString)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (formValues?.created == null) {
       console.warn(
         'formValues was refreshed while on the overview page, redirecting to landing page'

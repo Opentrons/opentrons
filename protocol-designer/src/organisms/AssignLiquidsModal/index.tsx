@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -29,7 +29,7 @@ import type { WellGroup } from '@opentrons/components'
 
 export function AssignLiquidsModal(): JSX.Element | null {
   const { t } = useTranslation('liquids')
-  const [highlightedWells, setHighlightedWells] = React.useState<
+  const [highlightedWells, setHighlightedWells] = useState<
     WellGroup | {}
   >({})
   const navigate = useNavigate()

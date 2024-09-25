@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchProtocols, getStoredProtocols } from '/app/redux/protocol-storage'
 import { ProtocolsEmptyState } from '/app/organisms/ProtocolsLanding/ProtocolsEmptyState'
@@ -11,7 +11,7 @@ export function ProtocolsLanding(): JSX.Element {
   const storedProtocols = useSelector((state: State) =>
     getStoredProtocols(state)
   )
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(fetchProtocols())
   }, [dispatch])
 

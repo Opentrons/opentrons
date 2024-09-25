@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, Fragment } from 'react';
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import {
@@ -62,7 +62,7 @@ export function useDeckLocationSelect(
   const [
     selectedLocation,
     setSelectedLocation,
-  ] = React.useState<ModuleLocation>({
+  ] = useState<ModuleLocation>({
     slotName: deckDef.locations.addressableAreas[0].id,
   })
   return {
@@ -100,7 +100,7 @@ export function DeckLocationSelect({
 
   const { t } = useTranslation('module_wizard_flows')
 
-  const [hoveredData, setHoveredData] = React.useState<{
+  const [hoveredData, setHoveredData] = useState<{
     slot: AddressableArea
     slotPosition: CoordinateTuple | null
     isDisabled: boolean
@@ -193,7 +193,7 @@ export function DeckLocationSelect({
           const cutoutId = FLEX_CUTOUT_BY_SLOT_ID[slot.id]
 
           return (
-            <React.Fragment key={slot.id}>
+            <Fragment key={slot.id}>
               {robotType === FLEX_ROBOT_TYPE ? (
                 <>
                   <SingleSlotFixture
@@ -266,8 +266,8 @@ export function DeckLocationSelect({
                   </Text>
                 </RobotCoordsForeignDiv>
               ) : null}
-            </React.Fragment>
-          )
+            </Fragment>
+          );
         })}
       {robotType === OT2_ROBOT_TYPE ? (
         <DeckFromLayers
@@ -322,7 +322,7 @@ export function DeckLocationSelect({
           </RobotCoordsForeignDiv>
         )}
     </RobotCoordinateSpace>
-  )
+  );
 }
 
 const INNER_DIV_PROPS = {

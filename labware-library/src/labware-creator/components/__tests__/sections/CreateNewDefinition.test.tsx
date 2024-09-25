@@ -1,4 +1,3 @@
-import React from 'react'
 import { vi, describe, it, expect } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'

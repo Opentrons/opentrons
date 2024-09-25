@@ -1,5 +1,5 @@
 /* eslint-disable no-return-assign */
-import * as React from 'react'
+import { useMemo } from 'react';
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
@@ -82,7 +82,7 @@ export function MeasureNozzle(props: CalibrationPanelProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')
   const { sendCommands, calBlock, mount, isMulti, sessionType } = props
 
-  const demoAsset = React.useMemo(
+  const demoAsset = useMemo(
     () =>
       calBlock != null
         ? assetMapBlock[sessionType]?.[mount]?.[isMulti ? 'multi' : 'single']

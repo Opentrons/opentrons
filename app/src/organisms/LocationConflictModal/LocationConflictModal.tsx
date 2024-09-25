@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
@@ -72,7 +72,7 @@ export const LocationConflictModal = (
   } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
 
-  const [showModuleSelect, setShowModuleSelect] = React.useState(false)
+  const [showModuleSelect, setShowModuleSelect] = useState(false)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const deckConfigurationAtLocationFixtureId = deckConfig.find(

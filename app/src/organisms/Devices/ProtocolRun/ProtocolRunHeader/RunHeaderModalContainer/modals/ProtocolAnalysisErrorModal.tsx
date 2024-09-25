@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -34,9 +34,9 @@ export function useProtocolAnalysisErrorsModal({
   runId,
 }: UseAnalysisErrorsModalProps): UseAnalysisErrorsModalResult {
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
-  const [showModal, setShowModal] = React.useState(false)
+  const [showModal, setShowModal] = useState(false)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (analysisErrors != null && analysisErrors?.length > 0) {
       setShowModal(true)
     }

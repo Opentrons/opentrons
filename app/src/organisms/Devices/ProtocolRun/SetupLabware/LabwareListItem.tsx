@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
@@ -97,11 +97,11 @@ export function LabwareListItem(
   const [
     secureLabwareModalType,
     setSecureLabwareModalType,
-  ] = React.useState<ModuleType | null>(null)
+  ] = useState<ModuleType | null>(null)
   const labwareDisplayName = getLabwareDisplayName(definition)
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const [isLatchLoading, setIsLatchLoading] = React.useState<boolean>(false)
-  const [isLatchClosed, setIsLatchClosed] = React.useState<boolean>(false)
+  const [isLatchLoading, setIsLatchLoading] = useState<boolean>(false)
+  const [isLatchClosed, setIsLatchClosed] = useState<boolean>(false)
 
   let slotInfo: string | null = null
 

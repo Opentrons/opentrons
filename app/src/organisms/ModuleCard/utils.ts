@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useCallback } from 'react';
 import last from 'lodash/last'
 
 import { useDispatchApiRequest } from '/app/redux/robot-api'
@@ -55,7 +55,7 @@ export function useModuleApiRequests(): [
   const [
     requestIdsBySerial,
     setRequestIdsBySerial,
-  ] = React.useState<RequestIdsBySerialNumber>({})
+  ] = useState<RequestIdsBySerialNumber>({})
 
   const handleModuleApiRequests = (
     robotName: string,
@@ -84,7 +84,7 @@ export function useModuleApiRequests(): [
     }
   }
 
-  const getLatestRequestId = React.useCallback(
+  const getLatestRequestId = useCallback(
     (serialNumber: string): string | null => {
       if (serialNumber in requestIdsBySerial) {
         return last(requestIdsBySerial[serialNumber]) ?? null

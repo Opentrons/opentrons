@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import map from 'lodash/map'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
@@ -174,18 +174,18 @@ export function ModulesListItem({
   const [
     showModuleSetupModal,
     setShowModuleSetupModal,
-  ] = React.useState<Boolean>(false)
+  ] = useState<Boolean>(false)
   const [
     showLocationConflictModal,
     setShowLocationConflictModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
-  const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
+  const [showModuleWizard, setShowModuleWizard] = useState<boolean>(false)
   const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
   const [
     prepCommandErrorMessage,
     setPrepCommandErrorMessage,
-  ] = React.useState<string>('')
+  ] = useState<string>('')
 
   const handleCalibrateClick = (): void => {
     if (attachedModuleMatch != null) {

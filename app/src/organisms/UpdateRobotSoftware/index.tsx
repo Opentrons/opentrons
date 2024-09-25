@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import type { Dispatch } from '/app/redux/types'
 
@@ -41,9 +41,9 @@ export function UpdateRobotSoftware(
     step: null,
     error: null,
   }
-  const [isDownloading, setIsDownloading] = React.useState<boolean>(false)
+  const [isDownloading, setIsDownloading] = useState<boolean>(false)
 
-  React.useEffect(() => {
+  useEffect(() => {
     // check isDownloading to avoid dispatching again
     if (!isDownloading) {
       setIsDownloading(true)

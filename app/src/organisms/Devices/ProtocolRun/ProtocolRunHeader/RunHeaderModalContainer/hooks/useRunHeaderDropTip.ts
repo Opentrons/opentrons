@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react';
 
 import { useHost } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
@@ -103,7 +103,7 @@ export function useRunHeaderDropTip({
   }
 
   // Manage tip checking
-  React.useEffect(() => {
+  useEffect(() => {
     // If a user begins a new run without navigating away from the run page, reset tip status.
     if (robotType === FLEX_ROBOT_TYPE) {
       if (runStatus === RUN_STATUS_IDLE) {
@@ -122,7 +122,7 @@ export function useRunHeaderDropTip({
 
   // If the run terminates with a "stopped" status, close the run if no tips are attached after running tip check at least once.
   // This marks the robot as "not busy" if drop tip CTAs are unnecessary.
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       runStatus === RUN_STATUS_STOPPED &&
       isRunCurrent &&

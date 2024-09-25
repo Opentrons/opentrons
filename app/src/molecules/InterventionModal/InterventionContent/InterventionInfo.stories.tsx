@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { Box, ICON_DATA_BY_NAME } from '@opentrons/components'
 
 import { InterventionInfo } from './InterventionInfo'

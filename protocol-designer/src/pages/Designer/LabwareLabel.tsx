@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useState, useEffect } from 'react';
 import { DeckLabelSet } from '@opentrons/components'
 import type { DeckLabelProps } from '@opentrons/components'
 import type {
@@ -21,8 +21,8 @@ export const LabwareLabel = (props: ModuleLabelProps): JSX.Element => {
     isLast,
     nestedLabwareInfo = [],
   } = props
-  const labelContainerRef = React.useRef<HTMLDivElement>(null)
-  const [labelContainerHeight, setLabelContainerHeight] = React.useState(0)
+  const labelContainerRef = useRef<HTMLDivElement>(null)
+  const [labelContainerHeight, setLabelContainerHeight] = useState(0)
 
   const deckLabels = [
     ...nestedLabwareInfo,
@@ -33,7 +33,7 @@ export const LabwareLabel = (props: ModuleLabelProps): JSX.Element => {
     },
   ]
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (labelContainerRef.current) {
       setLabelContainerHeight(labelContainerRef.current.offsetHeight)
     }

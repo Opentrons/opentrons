@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { COLORS, Flex, SPACING } from '@opentrons/components'
 import { ExternalLink as ExternalLinkComponent } from './ExternalLink'
 

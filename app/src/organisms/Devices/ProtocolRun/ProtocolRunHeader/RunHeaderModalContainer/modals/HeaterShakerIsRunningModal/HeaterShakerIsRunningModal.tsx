@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -34,7 +34,7 @@ export type UseHeaterShakerIsRunningModalResult =
 export function useHeaterShakerIsRunningModal(
   attachedModules: AttachedModule[]
 ): UseHeaterShakerIsRunningModalResult {
-  const [showIsShakingModal, setShowIsShakingModal] = React.useState(false)
+  const [showIsShakingModal, setShowIsShakingModal] = useState(false)
 
   const activeHeaterShaker = getActiveHeaterShaker(attachedModules)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()

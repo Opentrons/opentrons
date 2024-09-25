@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux'
 import cx from 'classnames'
@@ -21,7 +21,7 @@ import styles from './LiquidPlacementModal.module.css'
 import type { WellGroup } from '@opentrons/components'
 
 export function LiquidPlacementModal(): JSX.Element | null {
-  const [highlightedWells, setHighlightedWells] = React.useState<
+  const [highlightedWells, setHighlightedWells] = useState<
     WellGroup | {}
   >({})
   const labwareId = useSelector(selectors.getSelectedLabwareId)

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 
 import { useCreateMaintenanceCommandMutation } from '@opentrons/react-api-client'
 
@@ -14,7 +14,7 @@ export function useChainMaintenanceCommands(): {
   ) => ReturnType<typeof chainMaintenanceCommandsRecursive>
   isCommandMutationLoading: boolean
 } {
-  const [isLoading, setIsLoading] = React.useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const { createMaintenanceCommand } = useCreateMaintenanceCommandMutation()
   return {
     chainRunCommands: (

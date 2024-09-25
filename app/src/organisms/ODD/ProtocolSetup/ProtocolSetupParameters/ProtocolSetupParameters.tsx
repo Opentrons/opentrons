@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, Fragment } from 'react';
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -62,23 +62,23 @@ export function ProtocolSetupParameters({
   const [
     chooseValueScreen,
     setChooseValueScreen,
-  ] = React.useState<ChoiceParameter | null>(null)
+  ] = useState<ChoiceParameter | null>(null)
   const [
     showNumericalInputScreen,
     setShowNumericalInputScreen,
-  ] = React.useState<NumberParameter | null>(null)
+  ] = useState<NumberParameter | null>(null)
   const [
     chooseCsvFileScreen,
     setChooseCsvFileScreen,
-  ] = React.useState<CsvFileParameter | null>(null)
-  const [resetValuesModal, showResetValuesModal] = React.useState<boolean>(
+  ] = useState<CsvFileParameter | null>(null)
+  const [resetValuesModal, showResetValuesModal] = useState<boolean>(
     false
   )
-  const [startSetup, setStartSetup] = React.useState<boolean>(false)
+  const [startSetup, setStartSetup] = useState<boolean>(false)
   const [
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
-  ] = React.useState<RunTimeParameter[]>(
+  ] = useState<RunTimeParameter[]>(
     runTimeParameters.map(parameter =>
       parameter.type === 'csv_file'
         ? { ...parameter, file: null }
@@ -296,7 +296,7 @@ export function ProtocolSetupParameters({
               setupStatus = 'inform'
             }
             return (
-              <React.Fragment key={`${parameter.displayName}_${index}`}>
+              <Fragment key={`${parameter.displayName}_${index}`}>
                 <ProtocolSetupStep
                   hasRightIcon={!(parameter.type === 'bool')}
                   hasLeftIcon={false}
@@ -316,8 +316,8 @@ export function ProtocolSetupParameters({
                   fontSize="h4"
                   disabled={startSetup}
                 />
-              </React.Fragment>
-            )
+              </Fragment>
+            );
           }
         )}
       </Flex>

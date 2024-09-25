@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
@@ -62,14 +62,14 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
   const { makeSnackbar } = useKitchen()
   const allLabware = useSelector(getLabwareDefsByURI)
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
-  const [mount, setMount] = React.useState<PipetteMount | null>(null)
-  const [page, setPage] = React.useState<'add' | 'overview'>('add')
-  const [pipetteType, setPipetteType] = React.useState<PipetteType | null>(null)
-  const [showIncompatibleTip, setIncompatibleTip] = React.useState<boolean>(
+  const [mount, setMount] = useState<PipetteMount | null>(null)
+  const [page, setPage] = useState<'add' | 'overview'>('add')
+  const [pipetteType, setPipetteType] = useState<PipetteType | null>(null)
+  const [showIncompatibleTip, setIncompatibleTip] = useState<boolean>(
     false
   )
-  const [pipetteGen, setPipetteGen] = React.useState<Gen | 'flex'>('flex')
-  const [pipetteVolume, setPipetteVolume] = React.useState<string | null>(null)
+  const [pipetteGen, setPipetteGen] = useState<Gen | 'flex'>('flex')
+  const [pipetteVolume, setPipetteVolume] = useState<string | null>(null)
   const allowAllTipracks = useSelector(getAllowAllTipracks)
   const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
   const robotType = fields.robotType
@@ -89,7 +89,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
   }
 
   //  initialize pipette name once all fields are filled out
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       (pipetteType != null &&
         pipetteVolume != null &&

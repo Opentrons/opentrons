@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { useQueryClient } from 'react-query'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -34,7 +34,7 @@ export function DeleteProtocolConfirmationModal({
 }: DeleteProtocolConfirmationModalProps): JSX.Element {
   const { i18n, t } = useTranslation(['protocol_list', 'shared'])
   const { makeSnackbar } = useToaster()
-  const [showIcon, setShowIcon] = React.useState<boolean>(false)
+  const [showIcon, setShowIcon] = useState<boolean>(false)
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('delete_this_protocol'),
     iconName: 'ot-alert',

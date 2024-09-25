@@ -1,4 +1,3 @@
-import * as React from 'react'
 import last from 'lodash/last'
 import { Tick } from './Tick'
 import type { RunTimeCommand } from '@opentrons/shared-data'

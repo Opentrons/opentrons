@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -37,7 +37,7 @@ export const TemperatureModuleSlideout = (
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const name = getModuleDisplayName(module.moduleModel)
-  const [temperatureValue, setTemperatureValue] = React.useState<number | null>(
+  const [temperatureValue, setTemperatureValue] = useState<number | null>(
     null
   )
   const handleSubmitTemperature = (): void => {

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 
 import { getConfig, removeManualIp } from '/app/redux/config'
@@ -26,31 +26,29 @@ export function ManualIpHostnameList({
   const robots = useSelector((state: State) => getViewableRobots(state))
   const dispatch = useDispatch<Dispatch>()
 
-  return (
-    <>
-      {candidates != null && candidates.length > 0
-        ? candidates
-            .map<[string, boolean]>(candidate => {
-              const discovered = robots.some(robot => robot.ip === candidate)
-              return [candidate, discovered]
-            })
-            .sort(([_candidateA, aDiscovered], [_candidateB, bDiscovered]) =>
-              bDiscovered && !aDiscovered ? -1 : 1
-            )
-            .map(([candidate, discovered], index) => (
-              <React.Fragment key={index}>
-                <ManualIpHostnameItem
-                  candidate={candidate}
-                  removeIp={() => dispatch(removeManualIp(candidate))}
-                  discovered={discovered}
-                  mostRecentAddition={mostRecentAddition}
-                  setMostRecentAddition={setMostRecentAddition}
-                  setMostRecentDiscovered={setMostRecentDiscovered}
-                  isLast={index === candidates.length - 1}
-                />
-              </React.Fragment>
-            ))
-        : null}
-    </>
-  )
+  return <>
+    {candidates != null && candidates.length > 0
+      ? candidates
+          .map<[string, boolean]>(candidate => {
+            const discovered = robots.some(robot => robot.ip === candidate)
+            return [candidate, discovered]
+          })
+          .sort(([_candidateA, aDiscovered], [_candidateB, bDiscovered]) =>
+            bDiscovered && !aDiscovered ? -1 : 1
+          )
+          .map(([candidate, discovered], index) => (
+            <Fragment key={index}>
+              <ManualIpHostnameItem
+                candidate={candidate}
+                removeIp={() => dispatch(removeManualIp(candidate))}
+                discovered={discovered}
+                mostRecentAddition={mostRecentAddition}
+                setMostRecentAddition={setMostRecentAddition}
+                setMostRecentDiscovered={setMostRecentDiscovered}
+                isLast={index === candidates.length - 1}
+              />
+            </Fragment>
+          ))
+      : null}
+  </>;
 }

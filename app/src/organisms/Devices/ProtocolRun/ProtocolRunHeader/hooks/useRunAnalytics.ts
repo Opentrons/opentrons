@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react';
 import {
   useRobotAnalyticsData,
   useTrackProtocolRunEvent,
@@ -26,7 +26,7 @@ export function useRunAnalytics({
   const runStatus = useRunStatus(runId)
   const isRunCurrent = useIsRunCurrent(runId)
 
-  React.useEffect(() => {
+  useEffect(() => {
     const areReportConditionsValid =
       isRunCurrent &&
       runId != null &&
@@ -42,7 +42,7 @@ export function useRunAnalytics({
   }, [runStatus, isRunCurrent, runId, robotAnalyticsData])
 
   const { reportRecoveredRunResult } = useRecoveryAnalytics()
-  React.useEffect(() => {
+  useEffect(() => {
     if (isRunCurrent) {
       reportRecoveredRunResult(runStatus, enteredER)
     }

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
@@ -47,7 +47,7 @@ export function OnDeviceDisplayAppFallback({
   }
 
   // immediately report to robot logs that something fatal happened
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(sendLog(`ODD app encountered a fatal error: ${error.message}`))
   }, [])
 

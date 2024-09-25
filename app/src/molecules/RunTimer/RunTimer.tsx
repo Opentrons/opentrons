@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 
 import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
 import {
@@ -24,7 +24,7 @@ export function RunTimer({
   completedAt: string | null
   style?: CSSProp
 }): JSX.Element {
-  const [now, setNow] = React.useState(Date())
+  const [now, setNow] = useState(Date())
   useInterval(
     () => {
       setNow(Date())

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
@@ -39,7 +39,7 @@ export const BeforeBeginning = ({
   modalStyle,
 }: DropTipWizardContainerProps): JSX.Element | null => {
   const { t } = useTranslation('drop_tip_wizard')
-  const [flowType, setFlowType] = React.useState<FlowType>(null)
+  const [flowType, setFlowType] = useState<FlowType>(null)
 
   const handleProceed = (): void => {
     if (flowType === 'blowout') {

@@ -1,5 +1,5 @@
 // app info card with version and updated
-import * as React from 'react'
+import { useState } from 'react';
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
@@ -60,22 +60,22 @@ export function GeneralSettings(): JSX.Element {
   const [
     showPreviousVersionModal,
     setShowPreviousVersionModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const updateAvailable = Boolean(useSelector(getAvailableShellUpdate))
-  const [showUpdateBanner, setShowUpdateBanner] = React.useState<boolean>(
+  const [showUpdateBanner, setShowUpdateBanner] = useState<boolean>(
     updateAvailable
   )
   const [
     showConnectRobotSlideout,
     setShowConnectRobotSlideout,
-  ] = React.useState(false)
+  ] = useState(false)
 
   // may be enabled, disabled, or unknown (because config is loading)
   const updateAlertEnabled = useSelector((s: State) => {
     const ignored = getAlertIsPermanentlyIgnored(s, ALERT_APP_UPDATE_AVAILABLE)
     return ignored !== null ? !ignored : null
   })
-  const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(false)
+  const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false)
   const handleToggle = (): void => {
     if (updateAlertEnabled !== null) {
       dispatch(

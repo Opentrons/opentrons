@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react';
 import { Trans, useTranslation } from 'react-i18next'
 import {
   COLORS,
@@ -79,7 +79,7 @@ export const BeforeBeginning = (
     createdMaintenanceRunId,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-  React.useEffect(() => {
+  useEffect(() => {
     if (createdMaintenanceRunId == null) {
       createMaintenanceRun({})
     }

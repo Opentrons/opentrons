@@ -1,6 +1,5 @@
 // top subdomain nav bar component
-import * as React from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
 import { getPublicPath } from '../../public-path'
 import styles from './styles.module.css'
 

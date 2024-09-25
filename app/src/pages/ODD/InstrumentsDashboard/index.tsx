@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
@@ -15,7 +15,7 @@ export const InstrumentsDashboard = (): JSX.Element => {
   const { data: attachedInstruments } = useInstrumentsQuery({
     refetchInterval: FETCH_PIPETTE_CAL_POLL,
   })
-  const [wizardProps, setWizardProps] = React.useState<
+  const [wizardProps, setWizardProps] = useState<
     | React.ComponentProps<typeof GripperWizardFlows>
     | React.ComponentProps<typeof PipetteWizardFlows>
     | null

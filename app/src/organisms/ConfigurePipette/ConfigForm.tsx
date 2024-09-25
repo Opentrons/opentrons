@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import startCase from 'lodash/startCase'
 import mapValues from 'lodash/mapValues'
 import forOwn from 'lodash/forOwn'

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react';
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -52,7 +52,7 @@ export function useProtocolDropTipModal({
   onSkipAndHome,
   pipetteInfo,
 }: UseProtocolDropTipModalProps): UseProtocolDropTipModalResult {
-  const [showModal, setShowModal] = React.useState(areTipsAttached)
+  const [showModal, setShowModal] = useState(areTipsAttached)
 
   const { homePipettes, isHoming } = useHomePipettes({
     pipetteInfo,
@@ -62,7 +62,7 @@ export function useProtocolDropTipModal({
   })
 
   // Close the modal if a different app closes the run context.
-  React.useEffect(() => {
+  useEffect(() => {
     if (isRunCurrent && !isHoming) {
       setShowModal(areTipsAttached)
     } else if (!isRunCurrent) {

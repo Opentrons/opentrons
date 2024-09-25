@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -68,9 +68,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       setShowOverflowMenu(false)
     },
   })
-  const [showChangePipette, setChangePipette] = React.useState(false)
-  const [showSlideout, setShowSlideout] = React.useState(false)
-  const [showAboutSlideout, setShowAboutSlideout] = React.useState(false)
+  const [showChangePipette, setChangePipette] = useState(false)
+  const [showSlideout, setShowSlideout] = useState(false)
+  const [showAboutSlideout, setShowAboutSlideout] = useState(false)
 
   const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
 

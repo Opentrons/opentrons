@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import head from 'lodash/head'
 
 import { useHost } from '@opentrons/react-api-client'
@@ -28,11 +28,11 @@ export type RecoveryTipStatusUtils = TipAttachmentStatusResult & {
 export function useRecoveryTipStatus(
   props: UseRecoveryTipStatusProps
 ): RecoveryTipStatusUtils {
-  const [isLoadingTipStatus, setIsLoadingTipStatus] = React.useState(false)
+  const [isLoadingTipStatus, setIsLoadingTipStatus] = useState(false)
   const [
     failedCommandPipette,
     setFailedCommandPipette,
-  ] = React.useState<PipetteWithTip | null>(null)
+  ] = useState<PipetteWithTip | null>(null)
   const host = useHost()
 
   const tipAttachmentStatusUtils = useTipAttachmentStatus({

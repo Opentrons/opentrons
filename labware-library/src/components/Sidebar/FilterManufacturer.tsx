@@ -1,6 +1,5 @@
 // filter labware by manufacturer
-import * as React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
 import { SelectField } from '@opentrons/components'
 import { getAllManufacturers, buildFiltersUrl } from '../../filters'
 import styles from './styles.module.css'

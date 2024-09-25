@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef } from 'react';
 import {
   RUN_ACTION_TYPE_PLAY,
   RUN_STATUS_IDLE,
@@ -15,7 +15,7 @@ export function useRunStatus(
   runId: string | null,
   options?: UseQueryOptions<Run>
 ): RunStatus | null {
-  const lastRunStatus = React.useRef<RunStatus | null>(null)
+  const lastRunStatus = useRef<RunStatus | null>(null)
 
   const { data } = useNotifyRunQuery(runId ?? null, {
     refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,

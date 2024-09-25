@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom'
 
 import { useDispatch, useSelector } from 'react-redux'
@@ -18,7 +18,7 @@ export function ProtocolDetails(): JSX.Element {
     getStoredProtocol(state, protocolKey)
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(fetchProtocols())
   }, [dispatch])
 

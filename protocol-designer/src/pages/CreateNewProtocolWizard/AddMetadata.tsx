@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'

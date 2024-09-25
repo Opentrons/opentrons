@@ -1,6 +1,5 @@
 // filter labware by category
-import * as React from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
 import cx from 'classnames'
 import { getAllCategories, buildFiltersUrl } from '../../filters'
 import {

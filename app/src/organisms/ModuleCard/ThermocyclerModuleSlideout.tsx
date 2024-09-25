@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next'
 import {
   CELSIUS,
@@ -40,7 +40,7 @@ export const ThermocyclerModuleSlideout = (
 ): JSX.Element | null => {
   const { module, onCloseClick, isExpanded, isSecondaryTemp } = props
   const { t } = useTranslation('device_details')
-  const [tempValue, setTempValue] = React.useState<number | null>(null)
+  const [tempValue, setTempValue] = useState<number | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const moduleName = getModuleDisplayName(module.moduleModel)
   const modulePart = isSecondaryTemp ? 'Lid' : 'Block'

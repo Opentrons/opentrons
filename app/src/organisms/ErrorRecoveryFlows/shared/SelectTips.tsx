@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next'
 
 import { RECOVERY_MAP } from '../constants'
@@ -27,7 +27,7 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
     proceedNextStep,
   } = routeUpdateActions
   const { t } = useTranslation('error_recovery')
-  const [showTipSelectModal, setShowTipSelectModal] = React.useState(false)
+  const [showTipSelectModal, setShowTipSelectModal] = useState(false)
 
   const primaryBtnOnClick = (): Promise<void> => {
     return handleMotionRouting(true, ROBOT_PICKING_UP_TIPS.ROUTE)

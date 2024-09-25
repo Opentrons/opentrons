@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -27,7 +27,7 @@ export function OT2MultipleModulesHelp(): JSX.Element {
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
   const onCloseClick = (): void => {
     setShowMultipleModulesModal(false)

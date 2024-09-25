@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo } from 'react';
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
@@ -143,7 +143,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
   const { slotNumber, moveCommand } =
     contentsBySessionTypeByCurrentStep[sessionType]?.[currentStep] ?? {}
 
-  const demoAsset = React.useMemo(
+  const demoAsset = useMemo(
     () =>
       slotNumber != null
         ? assetMap[slotNumber][mount][isMulti ? 'multi' : 'single']

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
@@ -26,7 +26,7 @@ export function RobotSettingsDeckCalibration({
   robotName,
 }: RobotSettingsDeckCalibrationProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const createRequestId = React.useRef<string | null>(null)
+  const createRequestId = useRef<string | null>(null)
 
   const robot = useRobot(robotName)
   const deckCalibrationData = useDeckCalibrationData(robot?.name)
@@ -47,7 +47,7 @@ export function RobotSettingsDeckCalibration({
       })
     : t('not_calibrated')
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {
       createRequestId.current = null
     }

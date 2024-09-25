@@ -1,4 +1,3 @@
-import * as React from 'react'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { ViewportList } from 'react-viewport-list'
@@ -102,14 +102,14 @@ export function RunningProtocolCommandList({
   currentRunCommandIndex,
 }: RunningProtocolCommandListProps): JSX.Element {
   const { t } = useTranslation('run_details')
-  const viewPortRef = React.useRef<HTMLDivElement | null>(null)
-  const ref = React.useRef<ViewportListRef>(null)
+  const viewPortRef = useRef<HTMLDivElement | null>(null)
+  const ref = useRef<ViewportListRef>(null)
   const currentRunStatus = t(`status_${runStatus}`)
   const onStop = (): void => {
     if (runStatus === RUN_STATUS_RUNNING) pauseRun()
     setShowConfirmCancelRunModal(true)
   }
-  const [visibleRange, setVisibleRange] = React.useState<VisibleIndexRange>({
+  const [visibleRange, setVisibleRange] = useState<VisibleIndexRange>({
     lowestVisibleIndex: 0,
     highestVisibleIndex: 0,
   })
@@ -133,7 +133,7 @@ export function RunningProtocolCommandList({
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Note (kk:09/25/2023) Need -1 because the element of highestVisibleIndex cannot really readable
     // due to limited space
     const isCurrentCommandVisible =

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -58,7 +58,7 @@ export function DeviceDetailsDeckConfiguration({
   const [
     showSetupInstructionsModal,
     setShowSetupInstructionsModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
   const { data: modulesData } = useModulesQuery()
   const deckConfig =

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -41,7 +41,7 @@ export function SetupTipLengthCalibration({
           return null
         } else {
           return (
-            <React.Fragment key={mount}>
+            <Fragment key={mount}>
               {pipetteInfo.tipRacksForPipette.map((tipRackInfo, index) => {
                 const pipetteNotAttached =
                   pipetteInfo.requestedPipetteMatch === 'incompatible'
@@ -71,10 +71,10 @@ export function SetupTipLengthCalibration({
                   />
                 )
               })}
-            </React.Fragment>
-          )
+            </Fragment>
+          );
         }
       })}
     </Flex>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
@@ -68,9 +68,9 @@ const StepEditFormManager = (
   const [
     showMoreOptionsModal,
     setShowMoreOptionsModal,
-  ] = React.useState<boolean>(false)
-  const [focusedField, setFocusedField] = React.useState<string | null>(null)
-  const [dirtyFields, setDirtyFields] = React.useState<StepFieldName[]>(
+  ] = useState<boolean>(false)
+  const [focusedField, setFocusedField] = useState<string | null>(null)
+  const [dirtyFields, setDirtyFields] = useState<StepFieldName[]>(
     getDirtyFields(isNewStep, formData)
   )
   const toggleMoreOptionsModal = (): void => {

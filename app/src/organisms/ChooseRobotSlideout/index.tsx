@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useReducer, useEffect, Fragment } from 'react';
 import { useTranslation, Trans } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { NavLink } from 'react-router-dom'
@@ -162,8 +162,8 @@ export function ChooseRobotSlideout(
   const [
     showRestoreValuesTooltip,
     setShowRestoreValuesTooltip,
-  ] = React.useState<boolean>(false)
-  const [isInputFocused, setIsInputFocused] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
+  const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
 
   const unhealthyReachableRobots = useSelector((state: State) =>
     getReachableRobots(state)
@@ -199,7 +199,7 @@ export function ChooseRobotSlideout(
     }
   })
 
-  const [robotBusyStatusByName, registerRobotBusyStatus] = React.useReducer(
+  const [robotBusyStatusByName, registerRobotBusyStatus] = useReducer(
     robotBusyStatusByNameReducer,
     {}
   )
@@ -212,7 +212,7 @@ export function ChooseRobotSlideout(
   ).length
 
   // this useEffect sets the default selection to the first robot in the list. state is managed by the caller
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       (selectedRobot == null ||
         !reducerAvailableRobots.some(
@@ -284,7 +284,7 @@ export function ChooseRobotSlideout(
           const isSelected =
             selectedRobot != null && selectedRobot.ip === robot.ip
           return (
-            <React.Fragment key={robot.ip}>
+            <Fragment key={robot.ip}>
               <AvailableRobotOption
                 robot={robot}
                 onClick={() => {
@@ -331,8 +331,8 @@ export function ChooseRobotSlideout(
                   )}
                 </LegacyStyledText>
               )}
-            </React.Fragment>
-          )
+            </Fragment>
+          );
         })
       )}
       {!isScanning && unavailableCount > 0 ? (

@@ -1,6 +1,5 @@
 /* eslint-disable storybook/prefer-pascal-case */
-import * as React from 'react'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants';
 import { Flex } from '../../primitives'
 import { LegacyStyledText } from './index'
 import type { Meta, StoryObj } from '@storybook/react'

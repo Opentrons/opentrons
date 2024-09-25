@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { FormGroup, SPACING } from '@opentrons/components'
 import { TextField } from '../../fields'

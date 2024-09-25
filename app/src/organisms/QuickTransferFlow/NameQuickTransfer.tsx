@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 
@@ -25,9 +25,9 @@ interface NameQuickTransferProps {
 export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
   const { onSave } = props
   const { t } = useTranslation('quick_transfer')
-  const [name, setName] = React.useState('')
-  const keyboardRef = React.useRef(null)
-  const [isSaving, setIsSaving] = React.useState<boolean>(false)
+  const [name, setName] = useState('')
+  const keyboardRef = useRef(null)
+  const [isSaving, setIsSaving] = useState<boolean>(false)
 
   let error: string | null = null
   if (name.length > 60) {

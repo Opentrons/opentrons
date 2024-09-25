@@ -1,5 +1,5 @@
 // This is the main unifying function for maintenanceRun and fixit type flows.
-import * as React from 'react'
+import { useState, useEffect } from 'react';
 
 import { useDropTipCommandErrors } from '.'
 import { useDropTipMaintenanceRun } from './useDropTipMaintenanceRun'
@@ -78,7 +78,7 @@ function useErrorDetails(): {
   errorDetails: ErrorDetails | null
   setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
 } {
-  const [errorDetails, setErrorDetails] = React.useState<null | ErrorDetails>(
+  const [errorDetails, setErrorDetails] = useState<null | ErrorDetails>(
     null
   )
   const setRobustErrorDetails = useDropTipCommandErrors(setErrorDetails)
@@ -98,7 +98,7 @@ function useIsExitingDT(
   isExiting: boolean
   toggleIsExiting: () => void
 } {
-  const [isExiting, setIsExiting] = React.useState<boolean>(false)
+  const [isExiting, setIsExiting] = useState<boolean>(false)
 
   const toggleIsExiting = (): void => {
     setIsExiting(!isExiting)
@@ -120,7 +120,7 @@ function useRegisterPipetteFixitType({
   chainRunCommands,
   fixitCommandTypeUtils,
 }: UseRegisterPipetteFixitType): void {
-  React.useEffect(() => {
+  useEffect(() => {
     if (issuedCommandsType === 'fixit') {
       const command = buildLoadPipetteCommand(
         instrumentModelSpecs.name,

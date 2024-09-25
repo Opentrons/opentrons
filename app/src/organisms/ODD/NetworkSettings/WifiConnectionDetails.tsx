@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -53,9 +53,9 @@ export function WifiConnectionDetails({
   const [
     showNetworkDetailsModal,
     setShowNetworkDetailsModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(fetchStatus(robotName))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

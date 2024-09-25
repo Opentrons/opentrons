@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import last from 'lodash/last'
 
 import { Flex, ProtocolDeck, SPACING } from '@opentrons/components'
@@ -30,8 +30,8 @@ export const Deck = (props: { protocolId: string }): JSX.Element => {
   const [
     showLabwareDetailsModal,
     setShowLabwareDetailsModal,
-  ] = React.useState<boolean>(false)
-  const [selectedLabware, setSelectedLabware] = React.useState<
+  ] = useState<boolean>(false)
+  const [selectedLabware, setSelectedLabware] = useState<
     | (LabwareDefinition2 & {
         location: LabwareLocation
         nickName: string | null

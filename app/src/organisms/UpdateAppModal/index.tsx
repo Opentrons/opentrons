@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import styled, { css } from 'styled-components'
 import { useNavigate } from 'react-router-dom'

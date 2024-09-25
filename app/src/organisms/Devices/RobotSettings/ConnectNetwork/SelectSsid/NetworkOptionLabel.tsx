@@ -1,4 +1,3 @@
-import * as React from 'react'
 import styled from 'styled-components'
 import { Icon, FONT_BODY_1_DARK, SPACING } from '@opentrons/components'
 import { SECURITY_NONE } from '/app/redux/networking'

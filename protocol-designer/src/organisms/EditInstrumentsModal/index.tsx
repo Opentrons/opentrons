@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
@@ -87,12 +87,12 @@ export function EditInstrumentsModal(
     'protocol_overview',
     'shared',
   ])
-  const [page, setPage] = React.useState<'add' | 'overview'>('overview')
-  const [mount, setMount] = React.useState<PipetteMount>('left')
-  const [pipetteType, setPipetteType] = React.useState<PipetteType | null>(null)
-  const [pipetteGen, setPipetteGen] = React.useState<Gen | 'flex'>('flex')
-  const [pipetteVolume, setPipetteVolume] = React.useState<string | null>(null)
-  const [selectedTips, setSelectedTips] = React.useState<string[]>([])
+  const [page, setPage] = useState<'add' | 'overview'>('overview')
+  const [mount, setMount] = useState<PipetteMount>('left')
+  const [pipetteType, setPipetteType] = useState<PipetteType | null>(null)
+  const [pipetteGen, setPipetteGen] = useState<Gen | 'flex'>('flex')
+  const [pipetteVolume, setPipetteVolume] = useState<string | null>(null)
+  const [selectedTips, setSelectedTips] = useState<string[]>([])
   const allowAllTipracks = useSelector(getAllowAllTipracks)
   const robotType = useSelector(getRobotType)
   const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)

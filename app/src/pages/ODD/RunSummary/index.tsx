@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -114,7 +114,7 @@ export function RunSummary(): JSX.Element {
       ? onDeviceDisplayFormatTimestamp(completedAt)
       : EMPTY_TIMESTAMP
 
-  const [showSplash, setShowSplash] = React.useState(
+  const [showSplash, setShowSplash] = useState(
     runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED
   )
   const localRobot = useSelector(getLocalRobot)
@@ -134,7 +134,7 @@ export function RunSummary(): JSX.Element {
   const { reportRecoveredRunResult } = useRecoveryAnalytics()
 
   const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
-  React.useEffect(() => {
+  useEffect(() => {
     if (isRunCurrent && typeof enteredER === 'boolean') {
       reportRecoveredRunResult(runStatus, enteredER)
     }
@@ -158,13 +158,13 @@ export function RunSummary(): JSX.Element {
       onSuccess?.()
     }
   }
-  const [showRunFailedModal, setShowRunFailedModal] = React.useState<boolean>(
+  const [showRunFailedModal, setShowRunFailedModal] = useState<boolean>(
     false
   )
-  const [showRunAgainSpinner, setShowRunAgainSpinner] = React.useState<boolean>(
+  const [showRunAgainSpinner, setShowRunAgainSpinner] = useState<boolean>(
     false
   )
-  const [showReturnToSpinner, setShowReturnToSpinner] = React.useState<boolean>(
+  const [showReturnToSpinner, setShowReturnToSpinner] = useState<boolean>(
     false
   )
 
@@ -244,7 +244,7 @@ export function RunSummary(): JSX.Element {
   })
 
   // Determine tip status on initial render only. Error Recovery always handles tip status, so don't show it twice.
-  React.useEffect(() => {
+  useEffect(() => {
     if (isRunCurrent && enteredER === false) {
       void determineTipStatus()
     }

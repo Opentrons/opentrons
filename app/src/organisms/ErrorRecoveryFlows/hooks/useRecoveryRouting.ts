@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 
 import { RECOVERY_MAP } from '../constants'
 
@@ -28,12 +28,12 @@ export interface UseRecoveryRoutingResult {
  *
  */
 export function useRecoveryRouting(): UseRecoveryRoutingResult {
-  const [recoveryMap, setRecoveryMap] = React.useState<IRecoveryMap>({
+  const [recoveryMap, setRecoveryMap] = useState<IRecoveryMap>({
     route: RECOVERY_MAP.OPTION_SELECTION.ROUTE,
     step: RECOVERY_MAP.OPTION_SELECTION.STEPS.SELECT,
   })
 
-  const [subMap, setSubMap] = React.useState<ValidDropTipSubMap | null>(null)
+  const [subMap, setSubMap] = useState<ValidDropTipSubMap | null>(null)
 
   const currentRecoveryOptionUtils = useSelectedRecoveryOption()
 
@@ -56,7 +56,7 @@ export function useSelectedRecoveryOption(): CurrentRecoveryOptionUtils {
   const [
     selectedRecoveryOption,
     setSelectedRecoveryOption,
-  ] = React.useState<RecoveryRoute | null>(null)
+  ] = useState<RecoveryRoute | null>(null)
 
   return {
     selectedRecoveryOption,

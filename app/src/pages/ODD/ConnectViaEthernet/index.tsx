@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -28,7 +28,7 @@ export function ConnectViaEthernet(): JSX.Element {
   const [
     showNetworkDetailsModal,
     setShowNetworkDetailsModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
   const { ethernet } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)

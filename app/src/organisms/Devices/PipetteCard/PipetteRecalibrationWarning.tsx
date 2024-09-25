@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next'
 import {
   Box,
@@ -12,7 +12,7 @@ import {
 
 export const PipetteRecalibrationWarning = (): JSX.Element | null => {
   const { t } = useTranslation('device_details')
-  const [showBanner, setShowBanner] = React.useState<boolean>(true)
+  const [showBanner, setShowBanner] = useState<boolean>(true)
   if (!showBanner) return null
 
   return (

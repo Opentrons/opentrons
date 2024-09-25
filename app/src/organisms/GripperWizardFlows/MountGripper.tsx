@@ -14,7 +14,7 @@ import {
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
-import * as React from 'react'
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next'
 import { getIsOnDevice } from '/app/redux/config'
 import { SmallButton } from '/app/atoms/buttons'
@@ -62,8 +62,8 @@ export const MountGripper = (
   const { proceed, isRobotMoving } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared', 'branded'])
   const isOnDevice = useSelector(getIsOnDevice)
-  const [showUnableToDetect, setShowUnableToDetect] = React.useState(false)
-  const [isPending, setIsPending] = React.useState(false)
+  const [showUnableToDetect, setShowUnableToDetect] = useState(false)
+  const [isPending, setIsPending] = useState(false)
   const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
     refetchInterval: QUICK_GRIPPER_POLL_MS,
   })

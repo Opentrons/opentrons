@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { PDListItem } from '../lists'
 import { START_TERMINAL_TITLE } from '../../constants'

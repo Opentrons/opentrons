@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -31,7 +31,7 @@ export function SetupGripperCalibrationItem({
   const [
     openWizardFlowType,
     setOpenWizardFlowType,
-  ] = React.useState<GripperWizardFlowType | null>(null)
+  ] = useState<GripperWizardFlowType | null>(null)
 
   const gripperCalLastModified =
     gripperData != null

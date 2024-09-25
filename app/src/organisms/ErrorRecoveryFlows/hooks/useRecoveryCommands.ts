@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useCallback } from 'react';
 import head from 'lodash/head'
 
 import {
@@ -82,7 +82,7 @@ export function useRecoveryCommands({
   const { updateErrorRecoveryPolicy } = useUpdateErrorRecoveryPolicy(runId)
   const { makeSuccessToast } = recoveryToastUtils
 
-  const chainRunRecoveryCommands = React.useCallback(
+  const chainRunRecoveryCommands = useCallback(
     (
       commands: CreateCommand[],
       continuePastFailure: boolean = false
@@ -142,7 +142,7 @@ export function useRecoveryCommands({
       : null
   }
 
-  const retryFailedCommand = React.useCallback((): Promise<CommandData[]> => {
+  const retryFailedCommand = useCallback((): Promise<CommandData[]> => {
     const { commandType, params } = failedCommandByRunRecord as FailedCommand // Null case is handled before command could be issued.
     return chainRunRecoveryCommands(
       [
@@ -154,12 +154,12 @@ export function useRecoveryCommands({
   }, [chainRunRecoveryCommands, failedCommandByRunRecord?.key])
 
   // Homes the Z-axis of all attached pipettes.
-  const homePipetteZAxes = React.useCallback((): Promise<CommandData[]> => {
+  const homePipetteZAxes = useCallback((): Promise<CommandData[]> => {
     return chainRunRecoveryCommands([HOME_PIPETTE_Z_AXES])
   }, [chainRunRecoveryCommands])
 
   // Pick up the user-selected tips
-  const pickUpTips = React.useCallback((): Promise<CommandData[]> => {
+  const pickUpTips = useCallback((): Promise<CommandData[]> => {
     const { selectedTipLocations, failedLabware } = failedLabwareUtils
 
     const pickUpTipCmd = buildPickUpTips(
@@ -175,26 +175,26 @@ export function useRecoveryCommands({
     }
   }, [chainRunRecoveryCommands, failedCommandByRunRecord, failedLabwareUtils])
 
-  const resumeRun = React.useCallback((): void => {
+  const resumeRun = useCallback((): void => {
     void resumeRunFromRecovery(runId).then(() => {
       analytics.reportActionSelectedResult(selectedRecoveryOption, 'succeeded')
       makeSuccessToast()
     })
   }, [runId, resumeRunFromRecovery, makeSuccessToast])
 
-  const cancelRun = React.useCallback((): void => {
+  const cancelRun = useCallback((): void => {
     analytics.reportActionSelectedResult(selectedRecoveryOption, 'succeeded')
     stopRun(runId)
   }, [runId])
 
-  const skipFailedCommand = React.useCallback((): void => {
+  const skipFailedCommand = useCallback((): void => {
     void resumeRunFromRecovery(runId).then(() => {
       analytics.reportActionSelectedResult(selectedRecoveryOption, 'succeeded')
       makeSuccessToast()
     })
   }, [runId, resumeRunFromRecovery, makeSuccessToast])
 
-  const ignoreErrorKindThisRun = React.useCallback((): Promise<void> => {
+  const ignoreErrorKindThisRun = useCallback((): Promise<void> => {
     if (failedCommandByRunRecord?.error != null) {
       const ignorePolicyRules = buildIgnorePolicyRules(
         failedCommandByRunRecord.commandType,

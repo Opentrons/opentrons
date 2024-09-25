@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react';
 import { useDispatch } from 'react-redux'
 import { syncSystemTime } from '/app/redux/robot-admin'
 
@@ -12,7 +12,7 @@ import type { Dispatch } from '/app/redux/types'
 export function useSyncRobotClock(robotName: string | null): void {
   const dispatch = useDispatch<Dispatch>()
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (robotName != null) {
       dispatch(syncSystemTime(robotName))
     }

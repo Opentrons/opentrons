@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { AlertItem } from '@opentrons/components'
 import styles from './styles.module.css'
 
@@ -10,7 +10,7 @@ const TITLE = 'Error updating pipette settings'
 
 export function ConfigErrorBanner(props: Props): JSX.Element | null {
   const { message } = props
-  const [dismissed, setDismissed] = React.useState(false)
+  const [dismissed, setDismissed] = useState(false)
   if (message == null || dismissed) return null
 
   return (

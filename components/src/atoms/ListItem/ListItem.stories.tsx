@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { DIRECTION_COLUMN } from '../../styles'
 import { Flex } from '../../primitives'

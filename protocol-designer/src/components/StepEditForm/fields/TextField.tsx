@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { LegacyInputField } from '@opentrons/components'
 import type { FieldProps } from '../types'
 

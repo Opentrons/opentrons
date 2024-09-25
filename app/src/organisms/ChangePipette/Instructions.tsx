@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react';
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
 import {
@@ -69,7 +69,7 @@ export function Instructions(props: Props): JSX.Element {
   } = props
   const { t } = useTranslation('change_pipette')
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (direction === 'detach' && currentStepCount === 0) {
       nextStep()
     }

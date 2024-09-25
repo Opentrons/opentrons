@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -90,7 +90,7 @@ export function ProtocolWithLastRun({
   // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
   // const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runData.id)
   const { cloneRun } = useCloneRun(runData.id)
-  const [showSpinner, setShowSpinner] = React.useState<boolean>(false)
+  const [showSpinner, setShowSpinner] = useState<boolean>(false)
 
   const protocolName =
     protocolData.metadata.protocolName ?? protocolData.files[0].name

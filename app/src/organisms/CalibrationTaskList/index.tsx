@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useState, useEffect } from 'react';
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -45,14 +45,14 @@ export function CalibrationTaskList({
   deckCalLauncher,
   exitBeforeDeckConfigCompletion,
 }: CalibrationTaskListProps): JSX.Element {
-  const prevActiveIndex = React.useRef<[number, number] | null>(null)
-  const [hasLaunchedWizard, setHasLaunchedWizard] = React.useState<boolean>(
+  const prevActiveIndex = useRef<[number, number] | null>(null)
+  const [hasLaunchedWizard, setHasLaunchedWizard] = useState<boolean>(
     false
   )
   const [
     showCompletionScreen,
     setShowCompletionScreen,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const { t } = useTranslation(['robot_calibration', 'device_settings'])
   const navigate = useNavigate()
   const { activeIndex, taskList, taskListStatus } = useCalibrationTaskList(
@@ -77,7 +77,7 @@ export function CalibrationTaskList({
       'device_settings:some_robot_controls_are_not_available'
     )
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       prevActiveIndex.current !== null &&
       activeIndex === null &&

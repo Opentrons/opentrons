@@ -1,6 +1,5 @@
 // client entry point and application manifest
-import React from 'react'
-import ReactDom from 'react-dom/client'
+import ReactDom from 'react-dom/client';
 import { Provider } from 'react-redux'
 import { HashRouter } from 'react-router-dom'
 

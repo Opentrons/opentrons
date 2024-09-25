@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -99,7 +99,7 @@ export function RecoveryTakeoverODD({
   clearClientData,
   isRunStatusAwaitingRecovery,
 }: RecoveryTakeoverProps): JSX.Element {
-  const [showConfirmation, setShowConfirmation] = React.useState(false)
+  const [showConfirmation, setShowConfirmation] = useState(false)
 
   return (
     <TakeoverModal

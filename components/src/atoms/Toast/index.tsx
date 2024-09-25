@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { css } from 'styled-components'
 
 import { Btn, Flex, Link } from '../../primitives'
@@ -71,7 +71,7 @@ export function Toast(props: ToastProps): JSX.Element {
     onLinkClick = () => null,
     ...styleProps
   } = props
-  const [isClosed, setIsClosed] = React.useState<boolean>(exitNow)
+  const [isClosed, setIsClosed] = useState<boolean>(exitNow)
 
   // We want to be able to storybook both the ODD and the Desktop versions,
   // so let it (and unit tests, for that matter) be able to pass in a parameter

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { memo } from 'react';
 
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
@@ -51,4 +51,4 @@ function TimelineAlertsComponent(): JSX.Element {
   )
 }
 
-export const TimelineAlerts = React.memo(TimelineAlertsComponent)
+export const TimelineAlerts = memo(TimelineAlertsComponent)

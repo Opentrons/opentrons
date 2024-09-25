@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
@@ -37,10 +37,10 @@ export function ConnectRobotSlideout({
   isExpanded,
   onCloseClick,
 }: ConnectRobotSlideoutProps): JSX.Element | null {
-  const [mostRecentAddition, setMostRecentAddition] = React.useState<
+  const [mostRecentAddition, setMostRecentAddition] = useState<
     string | null
   >(null)
-  const [mostRecentDiscovered, setMostRecentDiscovered] = React.useState<
+  const [mostRecentDiscovered, setMostRecentDiscovered] = useState<
     boolean | null
   >(null)
   const { t } = useTranslation(['app_settings', 'shared', 'branded'])
@@ -62,7 +62,7 @@ export function ConnectRobotSlideout({
     )
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(startDiscovery())
   }, [dispatch])
 

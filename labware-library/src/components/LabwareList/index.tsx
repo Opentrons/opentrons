@@ -1,6 +1,5 @@
 // main LabwareList component
-import * as React from 'react'
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import { getLabwareDefURI } from '@opentrons/shared-data';
 import { getFilteredDefinitions } from '../../filters'
 import { LabwareCard } from './LabwareCard'
 import { CustomLabwareCard } from './CustomLabwareCard'

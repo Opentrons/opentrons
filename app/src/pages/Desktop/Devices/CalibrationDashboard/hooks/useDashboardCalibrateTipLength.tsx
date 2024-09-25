@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useState } from 'react';
 import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -32,15 +32,15 @@ const spinnerCommandBlockList: SessionCommandString[] = [
 export function useDashboardCalibrateTipLength(
   robotName: string
 ): [DashboardCalTipLengthInvoker, JSX.Element | null] {
-  const createRequestId = React.useRef<string | null>(null)
-  const trackedRequestId = React.useRef<string | null>(null)
-  const jogRequestId = React.useRef<string | null>(null)
-  const sessionParams = React.useRef<
+  const createRequestId = useRef<string | null>(null)
+  const trackedRequestId = useRef<string | null>(null)
+  const jogRequestId = useRef<string | null>(null)
+  const sessionParams = useRef<
     | (Pick<TipLengthCalibrationSessionParams, 'mount'> &
         Partial<Omit<TipLengthCalibrationSessionParams, 'mount'>>)
     | null
   >(null)
-  const invalidateHandlerRef = React.useRef<(() => void) | undefined>()
+  const invalidateHandlerRef = useRef<(() => void) | undefined>()
   const dispatch = useDispatch()
   const { t } = useTranslation('robot_calibration')
 
@@ -86,7 +86,7 @@ export function useDashboardCalibrateTipLength(
   )
 
   const configHasCalibrationBlock = useSelector(getHasCalibrationBlock)
-  const [showCalBlockModal, setShowCalBlockModal] = React.useState<
+  const [showCalBlockModal, setShowCalBlockModal] = useState<
     boolean | null
   >(null)
 

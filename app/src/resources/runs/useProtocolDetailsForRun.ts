@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react';
 import last from 'lodash/last'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
@@ -32,7 +32,7 @@ export function useProtocolDetailsForRun(
   const [
     isPollingProtocolAnalyses,
     setIsPollingProtocolAnalyses,
-  ] = React.useState<boolean>(true)
+  ] = useState<boolean>(true)
 
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
@@ -46,7 +46,7 @@ export function useProtocolDetailsForRun(
     }
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {
       setIsPollingProtocolAnalyses(false)
     } else {

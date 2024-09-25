@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -52,7 +52,7 @@ export function SendProtocolToFlexSlideout(
   } = storedProtocolData
   const { t } = useTranslation(['protocol_details', 'protocol_list'])
 
-  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
+  const [selectedRobot, setSelectedRobot] = useState<Robot | null>(null)
 
   const isSelectedRobotOnDifferentSoftwareVersion = useIsRobotOnWrongVersionOfSoftware(
     selectedRobot?.name ?? ''

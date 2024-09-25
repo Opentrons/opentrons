@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next'
 
 import {
@@ -30,7 +30,7 @@ export const ChooseLocation = ({
   const [
     selectedLocation,
     setSelectedLocation,
-  ] = React.useState<ModuleLocation>()
+  ] = useState<ModuleLocation>()
   const deckDef = getDeckDefFromRobotType(robotType)
 
   const handleConfirmPosition = (): void => {

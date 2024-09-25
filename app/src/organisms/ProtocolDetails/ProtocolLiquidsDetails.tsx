@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -50,7 +50,7 @@ export const ProtocolLiquidsDetails = (
       {liquidsInLoadOrder.length > 0 ? (
         liquidsInLoadOrder?.map((liquid, index) => {
           return (
-            <React.Fragment key={liquid.id}>
+            <Fragment key={liquid.id}>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 marginY={SPACING.spacing16}
@@ -78,8 +78,8 @@ export const ProtocolLiquidsDetails = (
                 </Flex>
               </Flex>
               {index < liquidsInLoadOrder.length - 1 && <Divider />}
-            </React.Fragment>
-          )
+            </Fragment>
+          );
         })
       ) : (
         <Flex
@@ -102,5 +102,5 @@ export const ProtocolLiquidsDetails = (
         </Flex>
       )}
     </Flex>
-  )
+  );
 }
