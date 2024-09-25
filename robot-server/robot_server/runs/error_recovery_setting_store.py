@@ -1,8 +1,12 @@
 # noqa: D100
 
 
+from typing import Annotated
+
+import fastapi
 import sqlalchemy
 
+from robot_server.persistence.fastapi_dependencies import get_sql_engine
 from robot_server.persistence.tables import boolean_setting_table, BooleanSettingKey
 
 
@@ -44,3 +48,13 @@ class ErrorRecoverySettingStore:
                         value=is_disabled,
                     )
                 )
+
+
+async def get_error_recovery_setting_store(
+    sql_engine: Annotated[sqlalchemy.engine.Engine, fastapi.Depends(get_sql_engine)]
+) -> ErrorRecoverySettingStore:
+    """A FastAPI dependency to return the server's ErrorRecoverySettingStore."""
+    # Since the store itself has no state, and no asyncio.Locks or anything,
+    # instances are fungible and disposable, and we can use a fresh one for each
+    # request instead of having to maintain a global singleton.
+    return ErrorRecoverySettingStore(sql_engine)
