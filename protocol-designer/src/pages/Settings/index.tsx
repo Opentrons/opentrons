@@ -151,6 +151,7 @@ export function Settings(): JSX.Element {
                   onClick={() => {
                     setShowAnnouncementModal(true)
                   }}
+                  data-testid="AnnouncementModal_viewReleaseNotesButton"
                 >
                   <StyledText desktopStyle="bodyDefaultRegular">
                     {t('shared:view_release_notes')}
