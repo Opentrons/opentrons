@@ -1,7 +1,6 @@
 import pytest
-from math import pi, sqrt, isclose
+from math import pi, isclose
 from typing import Any, List
-from hypothesis import given, strategies
 
 from opentrons_shared_data.labware.types import (
     RectangularBoundedSection,
@@ -13,8 +12,6 @@ from opentrons.protocol_engine.state.frustum_helpers import (
     cross_section_area_circular,
     reject_unacceptable_heights,
     get_boundary_pairs,
-    get_cross_section_area,
-    volume_from_frustum_formula,
     circular_frustum_polynomial_roots,
     rectangular_frustum_polynomial_roots,
     volume_from_height_rectangular,
@@ -23,7 +20,6 @@ from opentrons.protocol_engine.state.frustum_helpers import (
     height_from_volume_circular,
     height_from_volume_rectangular,
     height_from_volume_spherical,
-    height_from_frustum_formula,
 )
 from opentrons.protocol_engine.errors.exceptions import InvalidLiquidHeightFound
 
@@ -144,49 +140,6 @@ def test_get_cross_section_boundaries(well: List[List[Any]]) -> None:
         assert f == well[i]
         assert next_f == well[i + 1]
         i += 1
-
-
-@pytest.mark.parametrize("well", fake_frusta())
-def test_frustum_formula_volume(well: List[Any]) -> None:
-    """Test volume-of-a-frustum formula calculation."""
-    for f, next_f in get_boundary_pairs(well):
-        if f["shape"] == "spherical" or next_f["shape"] == "spherical":
-            # not going to use formula on spherical segments
-            continue
-        f_area = get_cross_section_area(f)
-        next_f_area = get_cross_section_area(next_f)
-        frustum_height = next_f["topHeight"] - f["topHeight"]
-        expected_volume = (f_area + next_f_area + sqrt(f_area * next_f_area)) * (
-            frustum_height / 3
-        )
-        found_volume = volume_from_frustum_formula(
-            area_1=f_area, area_2=next_f_area, height=frustum_height
-        )
-        assert found_volume == expected_volume
-
-
-@pytest.mark.parametrize("well", fake_frusta())
-@given(target_volume=strategies.floats(min_value=0, max_value=10))
-def test_frustum_formula_height(well: List[Any], target_volume: float) -> None:
-    """Test volume-of-a-frustum formula calculation for height."""
-    for f, next_f in get_boundary_pairs(well):
-        if f["shape"] == "spherical" or next_f["shape"] == "spherical":
-            # not going to use formula on spherical segments
-            continue
-        f_area = get_cross_section_area(f)
-        next_f_area = get_cross_section_area(next_f)
-        area_term = f_area + next_f_area + sqrt(f_area * next_f_area)
-        expected_height = 3 * target_volume / area_term
-        found_height = height_from_frustum_formula(
-            area_1=f_area,
-            area_2=next_f_area,
-            volume=target_volume,
-        )
-        assert found_height == expected_height
-        found_volume = volume_from_frustum_formula(
-            area_1=f_area, area_2=next_f_area, height=found_height
-        )
-        assert isclose(round(found_volume, 4), round(target_volume, 4))
 
 
 @pytest.mark.parametrize("well", fake_frusta())

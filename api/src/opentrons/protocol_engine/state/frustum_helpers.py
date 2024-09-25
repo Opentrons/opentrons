@@ -1,7 +1,7 @@
 """Helper functions for liquid-level related calculations inside a given frustum."""
 from typing import List, Tuple, Iterator, Sequence, Any, Union, Optional
 from numpy import pi, iscomplex, roots, real
-from math import sqrt, isclose
+from math import isclose
 
 from ..errors.exceptions import InvalidLiquidHeightFound, InvalidWellDefinitionError
 from opentrons_shared_data.labware.types import (
@@ -58,18 +58,6 @@ def cross_section_area_circular(diameter: float) -> float:
 def cross_section_area_rectangular(x_dimension: float, y_dimension: float) -> float:
     """Get the area of a rectangular cross-section."""
     return x_dimension * y_dimension
-
-
-def volume_from_frustum_formula(area_1: float, area_2: float, height: float) -> float:
-    """Get the area of a section with differently shaped boundary cross-sections."""
-    area_term = area_1 + area_2 + sqrt(area_1 * area_2)
-    return (height / 3) * area_term
-
-
-def height_from_frustum_formula(area_1: float, area_2: float, volume: float) -> float:
-    """Get the volume within a section with differently shaped boundary cross-sections."""
-    area_term = area_1 + area_2 + sqrt(area_1 * area_2)
-    return 3 * volume / area_term
 
 
 def rectangular_frustum_polynomial_roots(
@@ -283,14 +271,9 @@ def get_well_volumetric_capacity(
 
             well_volume.append((next_f["topHeight"], frustum_volume))
     else:
-        for f, next_f in get_boundary_pairs(sorted_frusta):
-            bottom_cross_section_area = get_cross_section_area(f)
-            top_cross_section_area = get_cross_section_area(next_f)
-            section_height = next_f["topHeight"] - f["topHeight"]
-            bounded_volume = volume_from_frustum_formula(
-                bottom_cross_section_area, top_cross_section_area, section_height
-            )
-            well_volume.append((next_f["topHeight"], bounded_volume))
+        raise NotImplementedError(
+            "Well section with differing boundary shapes not yet implemented."
+        )
     return well_volume
 
 
