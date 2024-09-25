@@ -355,13 +355,19 @@ def _find_volume_in_partial_frustum(
 ) -> Optional[float]:
     """Look through a sorted list of frusta for a target height, and find the volume at that height."""
     partial_volume: Optional[float] = None
-    for f, next_f in get_boundary_pairs(sorted_frusta):
-        if f["topHeight"] < target_height < next_f["targetHeight"]:
-            relative_target_height = target_height - f["topHeight"]
-            frustum_height = next_f["topHeight"] - f["topHeight"]
+    for bottom_cross_section, top_cross_section in get_boundary_pairs(sorted_frusta):
+        if (
+            bottom_cross_section["topHeight"]
+            < target_height
+            < top_cross_section["targetHeight"]
+        ):
+            relative_target_height = target_height - bottom_cross_section["topHeight"]
+            frustum_height = (
+                top_cross_section["topHeight"] - bottom_cross_section["topHeight"]
+            )
             partial_volume = volume_at_height_within_section(
-                top_cross_section=next_f,
-                bottom_cross_section=f,
+                top_cross_section=top_cross_section,
+                bottom_cross_section=bottom_cross_section,
                 target_height_relative=relative_target_height,
                 frustum_height=frustum_height,
             )
@@ -420,10 +426,10 @@ def _find_height_in_partial_frustum(
     ):
         bottom_cross_section, top_cross_section = cross_sections
         (bottom_height, bottom_volume), (top_height, top_volume) = capacity
-        relative_target_volume = target_volume - bottom_volume
-        frustum_height = top_height - bottom_height
 
         if bottom_volume < target_volume < top_volume:
+            relative_target_volume = target_volume - bottom_volume
+            frustum_height = top_height - bottom_height
             partial_height = height_at_volume_within_section(
                 top_cross_section=top_cross_section,
                 bottom_cross_section=bottom_cross_section,
