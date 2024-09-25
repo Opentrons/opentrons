@@ -101,6 +101,16 @@ class LiquidHandlingWellLocation(BaseModel):
     volumeOffset: Optional[Union[float, Literal["operationVolume"]]]
 
 
+class DropTipWellLocation(BaseModel):
+    origin: Optional[str]
+    offset: Optional[OffsetVector]
+
+
+class PickUpTipWellLocation(BaseModel):
+    origin: Optional[str]
+    offset: Optional[OffsetVector]
+
+
 class Liquid(BaseModel):
     displayName: str
     description: str

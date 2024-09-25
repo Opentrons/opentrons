@@ -10,6 +10,8 @@ from .shared_models import (
     ProfileStep,
     WellLocation,
     LiquidHandlingWellLocation,
+    DropTipWellLocation,
+    PickUpTipWellLocation,
     OffsetVector,
     Metadata,
     DesignerApplication,
@@ -33,8 +35,7 @@ class Params(BaseModel):
     wellName: Optional[str]
     volume: Optional[float]
     flowRate: Optional[float]
-    wellLocation: Optional[WellLocation]
-    liquidHandlingWellLocation: Optional[LiquidHandlingWellLocation]
+    wellLocation: Optional[Union[WellLocation, LiquidHandlingWellLocation, DropTipWellLocation, PickUpTipWellLocation]]
     waitForResume: Optional[Literal[True]]
     seconds: Optional[float]
     minimumZHeight: Optional[float]

@@ -94,7 +94,7 @@ VALID_TEST_PARAMS = [
                 volume=1.23,
                 flowRate=4.56,
                 wellName="A1",
-                liquidHandlingWellLocation=SD_LiquidHandlingWellLocation(
+                wellLocation=SD_LiquidHandlingWellLocation(
                     origin="bottom",
                     offset=OffsetVector(x=0, y=0, z=7.89),
                 ),
@@ -156,7 +156,7 @@ VALID_TEST_PARAMS = [
                 volume=1.23,
                 flowRate=4.56,
                 wellName="A1",
-                liquidHandlingWellLocation=SD_LiquidHandlingWellLocation(
+                wellLocation=SD_LiquidHandlingWellLocation(
                     origin="bottom",
                     offset=OffsetVector(x=0, y=0, z=7.89),
                 ),
@@ -428,7 +428,7 @@ VALID_TEST_PARAMS = [
                 pipetteId="pipette-id-1",
                 labwareId="labware-id-2",
                 wellName="A1",
-                liquidHandlingWellLocation=SD_LiquidHandlingWellLocation(
+                wellLocation=SD_LiquidHandlingWellLocation(
                     origin="bottom",
                     offset=OffsetVector(x=0, y=0, z=7.89),
                 ),
@@ -850,9 +850,7 @@ def test_load_command(
     )
     assert v6_output == [expected_output]
     assert v7_output == [expected_output]
-    assert v8_output == [
-        expected_output
-    ]  # origin.TOP, offset.z=0 != origin.BOTTOM, offset.z=7.89
+    assert v8_output == [expected_output]
 
 
 def test_load_liquid(
