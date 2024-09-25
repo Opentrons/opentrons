@@ -174,9 +174,6 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         self._add_loaded_labware(action)
         self._set_labware_location(action)
 
-        if not isinstance(action, SucceedCommandAction):
-            return
-
     def _add_labware_offset(self, labware_offset: LabwareOffset) -> None:
         """Add a new labware offset to state.
 
