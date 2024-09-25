@@ -12,7 +12,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-interface CheckboxExpandStepFormField {
+interface CheckboxExpandStepFormFieldProps {
   title: string
   checkboxUpdateValue: (value: unknown) => void
   checkboxValue: unknown
@@ -20,7 +20,7 @@ interface CheckboxExpandStepFormField {
   children: React.ReactNode
 }
 export function CheckboxExpandStepFormField(
-  props: CheckboxExpandStepFormField
+  props: CheckboxExpandStepFormFieldProps
 ): JSX.Element {
   const {
     checkboxUpdateValue,
