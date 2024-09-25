@@ -131,6 +131,11 @@ class LoadPipetteImplementation(
             mount=params.mount,
             liquid_presence_detection=params.liquidPresenceDetection,
         )
+        state_update.update_pipette_config(
+            pipette_id=loaded_pipette.pipette_id,
+            serial_number=loaded_pipette.serial_number,
+            config=loaded_pipette.static_config,
+        )
 
         return SuccessData(
             public=LoadPipetteResult(pipetteId=loaded_pipette.pipette_id),
@@ -139,6 +144,7 @@ class LoadPipetteImplementation(
                 serial_number=loaded_pipette.serial_number,
                 config=loaded_pipette.static_config,
             ),
+            state_update=state_update,
         )
 
 

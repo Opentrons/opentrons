@@ -154,6 +154,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
     ) -> None:
         self._set_load_pipette(action)
         self._update_current_location(action)
+        self._update_pipette_config(action)
         self._update_volumes(action)
 
         if not isinstance(action, SucceedCommandAction):
@@ -161,47 +162,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
         command, private_result = action.command, action.private_result
 
-        if isinstance(private_result, PipetteConfigUpdateResultMixin):
-            config = private_result.config
-            self._state.static_config_by_id[
-                private_result.pipette_id
-            ] = StaticPipetteConfig(
-                serial_number=private_result.serial_number,
-                model=config.model,
-                display_name=config.display_name,
-                min_volume=config.min_volume,
-                max_volume=config.max_volume,
-                channels=config.channels,
-                tip_configuration_lookup_table=config.tip_configuration_lookup_table,
-                nominal_tip_overlap=config.nominal_tip_overlap,
-                home_position=config.home_position,
-                nozzle_offset_z=config.nozzle_offset_z,
-                pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
-                    back_left_corner=config.back_left_corner_offset,
-                    front_right_corner=config.front_right_corner_offset,
-                    back_right_corner=Point(
-                        config.front_right_corner_offset.x,
-                        config.back_left_corner_offset.y,
-                        config.back_left_corner_offset.z,
-                    ),
-                    front_left_corner=Point(
-                        config.back_left_corner_offset.x,
-                        config.front_right_corner_offset.y,
-                        config.back_left_corner_offset.z,
-                    ),
-                ),
-                bounding_nozzle_offsets=BoundingNozzlesOffsets(
-                    back_left_offset=config.nozzle_map.back_left_nozzle_offset,
-                    front_right_offset=config.nozzle_map.front_right_nozzle_offset,
-                ),
-                default_nozzle_map=config.nozzle_map,
-                lld_settings=config.pipette_lld_settings,
-            )
-            self._state.flow_rates_by_id[private_result.pipette_id] = config.flow_rates
-            self._state.nozzle_configuration_by_id[
-                private_result.pipette_id
-            ] = config.nozzle_map
-        elif isinstance(private_result, PipetteNozzleLayoutResultMixin):
+        if isinstance(private_result, PipetteNozzleLayoutResultMixin):
             self._state.nozzle_configuration_by_id[
                 private_result.pipette_id
             ] = private_result.nozzle_map
@@ -333,6 +294,55 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 self._state.current_deck_point = CurrentDeckPoint(
                     mount=loaded_pipette.mount, deck_point=new_deck_point
                 )
+
+    def _update_pipette_config(
+        self, action: Union[SucceedCommandAction, FailCommandAction]
+    ) -> None:
+        if (
+            isinstance(action, SucceedCommandAction)
+            and action.state_update.pipette_config != update_types.NO_CHANGE
+        ):
+            config = action.state_update.pipette_config.config
+            self._state.static_config_by_id[
+                action.state_update.pipette_config.pipette_id
+            ] = StaticPipetteConfig(
+                serial_number=action.state_update.pipette_config.serial_number,
+                model=config.model,
+                display_name=config.display_name,
+                min_volume=config.min_volume,
+                max_volume=config.max_volume,
+                channels=config.channels,
+                tip_configuration_lookup_table=config.tip_configuration_lookup_table,
+                nominal_tip_overlap=config.nominal_tip_overlap,
+                home_position=config.home_position,
+                nozzle_offset_z=config.nozzle_offset_z,
+                pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
+                    back_left_corner=config.back_left_corner_offset,
+                    front_right_corner=config.front_right_corner_offset,
+                    back_right_corner=Point(
+                        config.front_right_corner_offset.x,
+                        config.back_left_corner_offset.y,
+                        config.back_left_corner_offset.z,
+                    ),
+                    front_left_corner=Point(
+                        config.back_left_corner_offset.x,
+                        config.front_right_corner_offset.y,
+                        config.back_left_corner_offset.z,
+                    ),
+                ),
+                bounding_nozzle_offsets=BoundingNozzlesOffsets(
+                    back_left_offset=config.nozzle_map.back_left_nozzle_offset,
+                    front_right_offset=config.nozzle_map.front_right_nozzle_offset,
+                ),
+                default_nozzle_map=config.nozzle_map,
+                lld_settings=config.pipette_lld_settings,
+            )
+            self._state.flow_rates_by_id[
+                action.state_update.pipette_config.pipette_id
+            ] = config.flow_rates
+            self._state.nozzle_configuration_by_id[
+                action.state_update.pipette_config.pipette_id
+            ] = config.nozzle_map
 
     def _update_volumes(
         self, action: Union[SucceedCommandAction, FailCommandAction]

@@ -5,6 +5,7 @@ import dataclasses
 import enum
 import typing
 
+from opentrons.protocol_engine.resources import pipette_data_provider
 from opentrons.protocol_engine.types import DeckPoint, LabwareLocation
 from opentrons.types import MountType
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -110,12 +111,21 @@ class LoadPipetteUpdate:
 
 
 @dataclasses.dataclass
+class PipetteConfigUpdate:
+    pipette_id: str
+    serial_number: str
+    config: pipette_data_provider.LoadedStaticPipetteData
+
+
+@dataclasses.dataclass
 class StateUpdate:
     """Represents an update to perform on engine state."""
 
     pipette_location: PipetteLocationUpdate | NoChangeType | ClearType = NO_CHANGE
 
     loaded_pipette: LoadPipetteUpdate | NoChangeType = NO_CHANGE
+
+    pipette_config: PipetteConfigUpdate | NoChangeType = NO_CHANGE
 
     labware_location: LabwareLocationUpdate | NoChangeType = NO_CHANGE
 
@@ -220,4 +230,14 @@ class StateUpdate:
             pipette_name=pipette_name,
             mount=mount,
             liquid_presence_detection=liquid_presence_detection,
+        )
+
+    def update_pipette_config(
+        self,
+        pipette_id: str,
+        config: pipette_data_provider.LoadedStaticPipetteData,
+        serial_number: str,
+    ) -> None:
+        self.pipette_config = PipetteConfigUpdate(
+            pipette_id=pipette_id, config=config, serial_number=serial_number
         )
