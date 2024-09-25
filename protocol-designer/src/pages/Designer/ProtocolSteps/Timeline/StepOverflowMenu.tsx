@@ -129,9 +129,8 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
           <MenuButton onClick={confirm}>{t('edit_step')}</MenuButton>
         )}
         <MenuButton
-          disabled={formData != null}
           onClick={() => {
-            console.log('wire this up')
+            dispatch(stepsActions.toggleStepCollapsed(stepId))
           }}
         >
           {t('view_commands')}

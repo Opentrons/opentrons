@@ -15,12 +15,15 @@ import { DeckSetupContainer } from '../DeckSetup'
 import { OffDeck } from '../Offdeck'
 import { TimelineToolbox } from './Timeline'
 import { StepForm } from './StepForm'
+import { getCollapsedSteps } from '../../../ui/steps'
+import { SubstepsToolbox } from './Timeline/SubstepsToolbox'
 
 export function ProtocolSteps(): JSX.Element {
   const { t } = useTranslation(['starting_deck_state'])
   const formData = useSelector(getUnsavedForm)
   const leftString = t('onDeck')
   const rightString = t('offDeck')
+  const collapsed = useSelector(getCollapsedSteps)
   const [deckView, setDeckView] = useState<
     typeof leftString | typeof rightString
   >(leftString)
@@ -35,6 +38,9 @@ export function ProtocolSteps(): JSX.Element {
 
   return (
     <>
+      {Object.keys(collapsed).length > 0 ? (
+        <SubstepsToolbox stepId={Object.keys(collapsed)[0]} />
+      ) : null}
       <StepForm />
       <Flex
         backgroundColor={COLORS.grey10}
