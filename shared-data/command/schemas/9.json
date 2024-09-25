@@ -318,28 +318,8 @@
         }
       }
     },
-    "WellVolumeOffset": {
-      "title": "WellVolumeOffset",
-      "description": "A volume of liquid to account for when executing commands with an origin of WellOrigin.MENISCUS.\n\nSpecifying `operationVolume` results in this class acting as a sentinel and should be used when\nvolume can be determined from the command parameters, for example commanding Aspirate. A volume\nshould be specified when it cannot be determined from the command parameters, for example commanding\nMoveToWell prior to AspirateInPlace.",
-      "type": "object",
-      "properties": {
-        "volumeOffset": {
-          "title": "Volumeoffset",
-          "default": 0.0,
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "enum": ["operationVolume"],
-              "type": "string"
-            }
-          ]
-        }
-      }
-    },
-    "WellLocation": {
-      "title": "WellLocation",
+    "LiquidHandlingWellLocation": {
+      "title": "LiquidHandlingWellLocation",
       "description": "A relative location in reference to a well's location.",
       "type": "object",
       "properties": {
@@ -355,7 +335,18 @@
           "$ref": "#/definitions/WellOffset"
         },
         "volumeOffset": {
-          "$ref": "#/definitions/WellVolumeOffset"
+          "title": "Volumeoffset",
+          "description": "A volume of liquid to account for when\n                                executing commands with an origin of WellOrigin.MENISCUS. Specifying\n                                `operationVolume` results in this class acting as a sentinel and should\n                                be used when volume can be determined from the command parameters, for\n                                example commanding Aspirate. A volume should be specified when it cannot\n                                be determined from the command parameters, for example commanding\n                                MoveToWell prior to AspirateInPlace.",
+          "default": 0.0,
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "enum": ["operationVolume"],
+              "type": "string"
+            }
+          ]
         }
       }
     },
@@ -379,7 +370,7 @@
           "description": "Relative well location at which to perform the operation",
           "allOf": [
             {
-              "$ref": "#/definitions/WellLocation"
+              "$ref": "#/definitions/LiquidHandlingWellLocation"
             }
           ]
         },
@@ -815,7 +806,7 @@
           "description": "Relative well location at which to perform the operation",
           "allOf": [
             {
-              "$ref": "#/definitions/WellLocation"
+              "$ref": "#/definitions/LiquidHandlingWellLocation"
             }
           ]
         },
@@ -954,7 +945,7 @@
           "description": "Relative well location at which to perform the operation",
           "allOf": [
             {
-              "$ref": "#/definitions/WellLocation"
+              "$ref": "#/definitions/LiquidHandlingWellLocation"
             }
           ]
         },
@@ -2020,6 +2011,30 @@
       },
       "required": ["params"]
     },
+    "WellLocation": {
+      "title": "WellLocation",
+      "description": "A relative location in reference to a well's location.",
+      "type": "object",
+      "properties": {
+        "origin": {
+          "default": "top",
+          "allOf": [
+            {
+              "$ref": "#/definitions/WellOrigin"
+            }
+          ]
+        },
+        "offset": {
+          "$ref": "#/definitions/WellOffset"
+        },
+        "volumeOffset": {
+          "title": "Volumeoffset",
+          "description": "A volume of liquid to account for when\n                                executing commands with an origin of WellOrigin.MENISCUS. Specifying\n                                `operationVolume` results in this class acting as a sentinel and should\n                                be used when volume can be determined from the command parameters, for\n                                example commanding Aspirate. A volume should be specified when it cannot\n                                be determined from the command parameters, for example commanding\n                                MoveToWell prior to AspirateInPlace.",
+          "default": 0.0,
+          "type": "number"
+        }
+      }
+    },
     "MoveToWellParams": {
       "title": "MoveToWellParams",
       "description": "Payload required to move a pipette to a specific well.",
@@ -2425,11 +2440,34 @@
       },
       "required": ["params"]
     },
+    "PickUpTipWellLocation": {
+      "title": "PickUpTipWellLocation",
+      "description": "A relative location in reference to a well's location.",
+      "type": "object",
+      "properties": {
+        "origin": {
+          "default": "top",
+          "allOf": [
+            {
+              "$ref": "#/definitions/WellOrigin"
+            }
+          ]
+        },
+        "offset": {
+          "$ref": "#/definitions/WellOffset"
+        }
+      }
+    },
     "PickUpTipParams": {
       "title": "PickUpTipParams",
       "description": "Payload needed to move a pipette to a specific well.",
       "type": "object",
       "properties": {
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        },
         "labwareId": {
           "title": "Labwareid",
           "description": "Identifier of labware to use.",
@@ -2442,20 +2480,15 @@
         },
         "wellLocation": {
           "title": "Welllocation",
-          "description": "Relative well location at which to perform the operation",
+          "description": "Relative well location at which to pick up the tip.",
           "allOf": [
             {
-              "$ref": "#/definitions/WellLocation"
+              "$ref": "#/definitions/PickUpTipWellLocation"
             }
           ]
-        },
-        "pipetteId": {
-          "title": "Pipetteid",
-          "description": "Identifier of pipette to use for liquid handling.",
-          "type": "string"
         }
       },
-      "required": ["labwareId", "wellName", "pipetteId"]
+      "required": ["pipetteId", "labwareId", "wellName"]
     },
     "PickUpTipCreate": {
       "title": "PickUpTipCreate",

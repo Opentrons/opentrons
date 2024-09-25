@@ -113,7 +113,7 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
 
         state_update = update_types.StateUpdate()
 
-        well_location = self._state_view.geometry.convert_pick_up_tip_location(
+        well_location = self._state_view.geometry.convert_pick_up_tip_well_location(
             well_location=params.wellLocation
         )
         position = await self._movement.move_to_well(

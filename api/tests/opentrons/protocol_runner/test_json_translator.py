@@ -850,7 +850,9 @@ def test_load_command(
     )
     assert v6_output == [expected_output]
     assert v7_output == [expected_output]
-    assert v8_output == [expected_output]
+    assert v8_output == [
+        expected_output
+    ]  # origin.TOP, offset.z=0 != origin.BOTTOM, offset.z=7.89
 
 
 def test_load_liquid(

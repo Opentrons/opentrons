@@ -45,6 +45,12 @@ async def test_success(
     decoy.when(state_view.pipettes.get_mount("pipette-id")).then_return(MountType.LEFT)
 
     decoy.when(
+        state_view.geometry.convert_pick_up_tip_well_location(
+            well_location=PickUpTipWellLocation(offset=WellOffset(x=1, y=2, z=3))
+        )
+    ).then_return(WellLocation(offset=WellOffset(x=1, y=2, z=3)))
+
+    decoy.when(
         await movement.move_to_well(
             pipette_id="pipette-id",
             labware_id="labware-id",
@@ -108,6 +114,12 @@ async def test_tip_physically_missing_error(
     well_name = "well-name"
     error_id = "error-id"
     error_created_at = datetime(1234, 5, 6)
+
+    decoy.when(
+        state_view.geometry.convert_pick_up_tip_well_location(
+            well_location=PickUpTipWellLocation(offset=WellOffset())
+        )
+    ).then_return(WellLocation(offset=WellOffset()))
 
     decoy.when(
         await movement.move_to_well(

@@ -627,18 +627,11 @@ class GeometryView:
             ),
         )
 
-    def convert_pick_up_tip_location(
+    def convert_pick_up_tip_well_location(
         self, well_location: PickUpTipWellLocation
     ) -> WellLocation:
         """Convert PickUpTipWellLocation to WellLocation."""
-        return WellLocation(
-            origin=well_location.origin,
-            offset=WellOffset(
-                x=well_location.offset.x,
-                y=well_location.offset.y,
-                z=well_location.offset.z,
-            ),
-        )
+        return WellLocation(origin=well_location.origin, offset=well_location.offset)
 
     # TODO(jbl 11-30-2023) fold this function into get_ancestor_slot_name see RSS-411
     def _get_staging_slot_name(self, labware_id: str) -> str:
@@ -1282,21 +1275,22 @@ class GeometryView:
         well_depth: float,
     ) -> float:
         """Return the handling height for a labware well (with reference to the well bottom)."""
-        handling_height: Union[float, None] = 0.0
+        handling_height = 0.0
         if well_location.origin == WellOrigin.TOP:
             handling_height = well_depth
         elif well_location.origin == WellOrigin.CENTER:
             handling_height = well_depth / 2.0
         elif well_location.origin == WellOrigin.MENISCUS:
-            handling_height = self._wells.get_last_measured_liquid_height(
+            liquid_height = self._wells.get_last_measured_liquid_height(
                 labware_id=labware_id, well_name=well_name
             )
-            if handling_height is None:
+            if liquid_height is None:
                 raise errors.LiquidHeightUnknownError(
                     "Must liquid probe before specifying WellOrigin.MENISCUS."
                 )
-        assert isinstance(handling_height, float)
-        return handling_height
+            else:
+                handling_height = liquid_height
+        return float(handling_height)
 
     def get_well_volumetric_capacity(
         self, labware_id: str, well_id: str
@@ -1330,15 +1324,15 @@ class GeometryView:
         """Return the height of liquid in a labware well after a given volume has been handled, given an initial handling height (with reference to the well bottom)."""
         well_def = self._labware.get_well_definition(labware_id, well_name)
         well_id = well_def.geometryDefinitionId  # make non-optional eventually
-        assert isinstance(well_id, str)
-        initial_volume = self.get_well_volume_at_height(
-            labware_id=labware_id, well_id=well_id, target_height=initial_height
-        )
-        final_volume = initial_volume + volume
-        final_height = self.get_well_height_at_volume(  # just return this method call
-            labware_id=labware_id, well_id=well_id, target_volume=final_volume
-        )
-        if final_height:  # delete
-            pass  # delete
-        # return final_height
-        return initial_height  # delete, use line above once sub-methods implemented
+        if well_id is not None:
+            initial_volume = self.get_well_volume_at_height(
+                labware_id=labware_id, well_id=well_id, target_height=initial_height
+            )
+            final_volume = initial_volume + volume
+            if final_volume:  # delete
+                pass  # delete
+            # return self.get_well_height_at_volume(labware_id=labware_id, well_id=well_id, target_volume=final_volume)
+            return initial_height  # delete, use line above once sub-methods implemented
+        else:
+            # raise exception?!
+            return initial_height
