@@ -63,17 +63,6 @@ log = logging.getLogger(__name__)
 router = APIRouter()
 
 
-# TODO: (ba, 2024-04-11): We should have a proper IPC mechanism to talk between
-# the servers instead of one off endpoint calls like these.
-async def set_oem_mode_request(enable):
-    """PUT request to set the OEM Mode for the system server."""
-    async with aiohttp.ClientSession() as session:
-        async with session.put(
-            "http://127.0.0.1:31950/system/oem_mode/enable", json={"enable": enable}
-        ) as resp:
-            return resp.status
-
-
 @router.post(
     path="/settings",
     summary="Change a setting",
@@ -94,7 +83,14 @@ async def post_settings(
     try:
         # send request to system server if this is the enableOEMMode setting
         if update.id == "enableOEMMode" and robot_type == RobotTypeEnum.FLEX:
-            resp = await set_oem_mode_request(update.value)
+            resp = await _set_oem_mode_request(
+                # Unlike opentrons.advanced_settings, system-server cannot store
+                # `None`/`null` to restore to default. Storing `False` instead is close
+                # enough.
+                update.value
+                if update.value is not None
+                else False
+            )
             if resp != 200:
                 # TODO: raise correct error here
                 raise Exception(f"Something went wrong setting OEM Mode. err: {resp}")
@@ -146,6 +142,17 @@ def _create_settings_response(robot_type: RobotTypeEnum) -> AdvancedSettingsResp
             if s.definition.should_show()
         ],
     )
+
+
+# TODO: (ba, 2024-04-11): We should have a proper IPC mechanism to talk between
+# the servers instead of one off endpoint calls like these.
+async def _set_oem_mode_request(enable: bool) -> int:
+    """PUT request to set the OEM Mode for the system server."""
+    async with aiohttp.ClientSession() as session:
+        async with session.put(
+            "http://127.0.0.1:31950/system/oem_mode/enable", json={"enable": enable}
+        ) as resp:
+            return resp.status
 
 
 @router.post(
