@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
@@ -23,6 +23,7 @@ import { makeSingleEditFieldProps } from './fields/makeSingleEditFieldProps'
 import { StepEditFormComponent } from './StepEditFormComponent'
 import { getDirtyFields } from './utils'
 
+import type { ConnectedComponent } from 'react-redux'
 import type { InvariantContext } from '@opentrons/step-generation'
 import type { BaseState, ThunkDispatch } from '../../types'
 import type { FormData, StepFieldName, StepIdType } from '../../form-types'
@@ -65,10 +66,9 @@ const StepEditFormManager = (
     invariantContext,
   } = props
   const { t } = useTranslation('tooltip')
-  const [
-    showMoreOptionsModal,
-    setShowMoreOptionsModal,
-  ] = useState<boolean>(false)
+  const [showMoreOptionsModal, setShowMoreOptionsModal] = useState<boolean>(
+    false
+  )
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [dirtyFields, setDirtyFields] = useState<StepFieldName[]>(
     getDirtyFields(isNewStep, formData)
@@ -247,7 +247,10 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DP => {
 // It doesn't matter if the children are using connect or useSelector,
 // only the parent matters.)
 // https://react-redux.js.org/api/hooks#stale-props-and-zombie-children
-export const StepEditForm = connect(
+export const StepEditForm: ConnectedComponent<
+  typeof StepEditFormManager,
+  {}
+> = connect(
   mapStateToProps,
   mapDispatchToProps
 )((props: StepEditFormManagerProps) => (
