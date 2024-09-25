@@ -356,11 +356,7 @@ def _find_volume_in_partial_frustum(
     """Look through a sorted list of frusta for a target height, and find the volume at that height."""
     partial_volume: Optional[float] = None
     for f, next_f in get_boundary_pairs(sorted_frusta):
-        if target_height < f["topHeight"] and f["shape"] == "spherical":
-            partial_volume = volume_from_height_spherical(
-                target_height=target_height, radius_of_curvature=f["radiusOfCurvature"]
-            )
-        elif f["topHeight"] < target_height < next_f["targetHeight"]:
+        if f["topHeight"] < target_height < next_f["targetHeight"]:
             relative_target_height = target_height - f["topHeight"]
             frustum_height = next_f["topHeight"] - f["topHeight"]
             partial_volume = volume_at_height_within_section(
