@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useSelector } from 'react-redux'
 
 import { Flex, POSITION_FIXED, DIRECTION_ROW } from '@opentrons/components'

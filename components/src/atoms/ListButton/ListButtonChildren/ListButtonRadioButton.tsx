@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import styled, { css } from 'styled-components'
 import { SPACING } from '../../../ui-style-constants'
 import { BORDERS, COLORS } from '../../../helix-design-system'

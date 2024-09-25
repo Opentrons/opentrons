@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Link } from '@opentrons/components'
 
 export const KNOWLEDGEBASE_ROOT_URL =

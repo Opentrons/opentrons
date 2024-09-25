@@ -1,5 +1,5 @@
 // tests for the HostConfig context and hook
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, expect } from 'vitest'
 import { renderHook } from '@testing-library/react'
 

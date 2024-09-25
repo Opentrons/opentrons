@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Controller } from 'react-hook-form'
 import {
   CheckboxField,

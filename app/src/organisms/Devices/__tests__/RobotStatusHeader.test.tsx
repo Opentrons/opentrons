@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { when } from 'vitest-when'

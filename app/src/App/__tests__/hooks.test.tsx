@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
