@@ -436,7 +436,7 @@ def _find_height_in_partial_frustum(
             )
     return partial_height
 
-    
+
 def find_height_at_well_volume(
     target_volume: float, well_geometry: InnerWellGeometry
 ) -> float:
