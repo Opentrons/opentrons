@@ -87,9 +87,9 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   `
 
   const SettingButtonLabel = styled.label`
-    border-radius: ${
-      !largeDesktopBorderRadius ? BORDERS.borderRadius40 : BORDERS.borderRadius8
-    };
+    border-radius: ${!largeDesktopBorderRadius
+      ? BORDERS.borderRadius40
+      : BORDERS.borderRadius8};
     cursor: ${CURSOR_POINTER};
     padding: ${SPACING.spacing12} ${SPACING.spacing16};
     width: 100%;
@@ -102,14 +102,13 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     }
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-       cursor: ${CURSOR_DEFAULT};
-       padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
-       border-radius: ${BORDERS.borderRadius16};
-       display: ${maxLines != null ? '-webkit-box' : undefined};
-        -webkit-line-clamp: ${maxLines ?? undefined};
-        -webkit-box-orient: ${maxLines != null ? 'vertical' : undefined};
-        word-wrap: break-word;
-      }
+      cursor: ${CURSOR_DEFAULT};
+      padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
+      border-radius: ${BORDERS.borderRadius16};
+      display: ${maxLines != null ? '-webkit-box' : undefined};
+      -webkit-line-clamp: ${maxLines ?? undefined};
+      -webkit-box-orient: ${maxLines != null ? 'vertical' : undefined};
+      word-wrap: break-word;
     }
   `
 
