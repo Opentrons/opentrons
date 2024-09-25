@@ -17,7 +17,7 @@ import type {
 import type { Protocol } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/organisms/Desktop/Devices/hooks')
 
 const PROTOCOL_ID = 'fake_protocol_id'
 const mockRTPData = [

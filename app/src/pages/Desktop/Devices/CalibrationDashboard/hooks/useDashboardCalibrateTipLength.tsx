@@ -22,7 +22,7 @@ import type {
   TipLengthCalibrationSessionParams,
 } from '/app/redux/sessions/types'
 import type { State } from '/app/redux/types'
-import type { DashboardCalTipLengthInvoker } from '/app/organisms/Devices/hooks/useCalibrationTaskList'
+import type { DashboardCalTipLengthInvoker } from '/app/organisms/Desktop/Devices/hooks/useCalibrationTaskList'
 
 // tip length calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: SessionCommandString[] = [

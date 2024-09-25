@@ -13,7 +13,7 @@ import * as Sessions from '/app/redux/sessions'
 import { getDeckCalibrationSession } from '/app/redux/sessions/deck-calibration/selectors'
 
 import type { State } from '/app/redux/types'
-import type { DashboardCalDeckInvoker } from '/app/organisms/Devices/hooks/useCalibrationTaskList'
+import type { DashboardCalDeckInvoker } from '/app/organisms/Desktop/Devices/hooks/useCalibrationTaskList'
 import type { DeckCalibrationSession } from '/app/redux/sessions'
 import type { SessionCommandString } from '/app/redux/sessions/types'
 import type { RequestState } from '/app/redux/robot-api/types'

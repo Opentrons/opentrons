@@ -30,10 +30,10 @@ import { useRobot } from '/app/redux-resources/robots'
 import { Line } from '/app/atoms/structure'
 import { NavTab } from '/app/molecules/NavTab'
 import { RobotSettingsCalibration } from '/app/organisms/RobotSettingsCalibration'
-import { RobotSettingsAdvanced } from '/app/organisms/Devices/RobotSettings/RobotSettingsAdvanced'
-import { RobotSettingsNetworking } from '/app/organisms/Devices/RobotSettings/RobotSettingsNetworking'
-import { RobotSettingsFeatureFlags } from '/app/organisms/Devices/RobotSettings/RobotSettingsFeatureFlags'
-import { ReachableBanner } from '/app/organisms/Devices/ReachableBanner'
+import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
+import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
+import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFeatureFlags'
+import { ReachableBanner } from '/app/organisms/Desktop/Devices/ReachableBanner'
 
 import type {
   DesktopRouteParams,

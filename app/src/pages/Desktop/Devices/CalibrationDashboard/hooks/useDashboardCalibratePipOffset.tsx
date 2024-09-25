@@ -12,7 +12,7 @@ import * as RobotApi from '/app/redux/robot-api'
 import * as Sessions from '/app/redux/sessions'
 import { getPipetteOffsetCalibrationSession } from '/app/redux/sessions/pipette-offset-calibration/selectors'
 import { pipetteOffsetCalibrationStarted } from '/app/redux/analytics'
-import type { DashboardCalOffsetInvoker } from '/app/organisms/Devices/hooks/useCalibrationTaskList'
+import type { DashboardCalOffsetInvoker } from '/app/organisms/Desktop/Devices/hooks/useCalibrationTaskList'
 import type { State } from '/app/redux/types'
 import type {
   SessionCommandString,

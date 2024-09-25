@@ -22,16 +22,16 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import { useRunStatuses, useSyncRobotClock } from '/app/organisms/Devices/hooks'
-import { ProtocolRunHeader } from '/app/organisms/Devices/ProtocolRun/ProtocolRunHeader'
+import { useRunStatuses, useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
+import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader'
 import { RunPreview } from '/app/organisms/RunPreview'
 import {
   ProtocolRunSetup,
   initialMissingSteps,
-} from '/app/organisms/Devices/ProtocolRun/ProtocolRunSetup'
-import { BackToTopButton } from '/app/organisms/Devices/ProtocolRun/BackToTopButton'
-import { ProtocolRunModuleControls } from '/app/organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
-import { ProtocolRunRuntimeParameters } from '/app/organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
+} from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup'
+import { BackToTopButton } from '/app/organisms/Desktop/Devices/ProtocolRun/BackToTopButton'
+import { ProtocolRunModuleControls } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunModuleControls'
+import { ProtocolRunRuntimeParameters } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 import {
   useCurrentRunId,
   useMostRecentCompletedAnalysis,
