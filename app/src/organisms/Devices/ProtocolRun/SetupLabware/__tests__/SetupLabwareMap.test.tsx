@@ -13,9 +13,11 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { getAttachedProtocolModuleMatches } from '../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
-import { getLabwareRenderInfo } from '/app/transformations/analysis'
+import {
+  getLabwareRenderInfo,
+  getAttachedProtocolModuleMatches,
+} from '/app/transformations/analysis'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 
 import type {
@@ -40,9 +42,9 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
   }
 })
 
-vi.mock('../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils')
 vi.mock('../../LabwareInfoOverlay')
 vi.mock('/app/transformations/analysis/getLabwareRenderInfo')
+vi.mock('/app/transformations/analysis/getAttachedProtocolModuleMatches')
 vi.mock('../../utils/getModuleTypesThatRequireExtraAttention')
 vi.mock('../../../../RunTimeControl/hooks')
 vi.mock('../../../hooks')

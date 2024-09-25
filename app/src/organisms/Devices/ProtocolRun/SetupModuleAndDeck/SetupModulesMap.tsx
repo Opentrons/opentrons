@@ -12,10 +12,12 @@ import {
 } from '@opentrons/shared-data'
 
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
-import { getAttachedProtocolModuleMatches } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
 import { ModuleInfo } from '/app/molecules/ModuleInfo'
 import { useAttachedModules } from '/app/resources/modules'
-import { getProtocolModulesInfo } from '/app/transformations/analysis'
+import {
+  getProtocolModulesInfo,
+  getAttachedProtocolModuleMatches,
+} from '/app/transformations/analysis'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'

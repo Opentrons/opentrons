@@ -15,10 +15,9 @@ import {
   mockMagneticModule as mockMagneticModuleFixture,
 } from '/app/redux/modules/__fixtures__/index'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
-import { getAttachedProtocolModuleMatches } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
 import { ModuleInfo } from '/app/molecules/ModuleInfo'
 import { SetupModulesMap } from '../SetupModulesMap'
-
+import { getAttachedProtocolModuleMatches } from '/app/transformations/analysis'
 import type {
   CompletedProtocolAnalysis,
   ModuleModel,
@@ -44,7 +43,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
   }
 })
 vi.mock('/app/resources/runs/useMostRecentCompletedAnalysis')
-vi.mock('/app/organisms/ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils')
+vi.mock('/app/transformations/analysis')
 vi.mock('/app/molecules/ModuleInfo')
 vi.mock('/app/resources/modules')
 

@@ -22,15 +22,15 @@ import { FloatingActionButton } from '/app/atoms/buttons'
 import { InlineNotification } from '/app/atoms/InlineNotification'
 import { ChildNavigation } from '/app/organisms/ChildNavigation'
 import { useAttachedModules } from '/app/resources/modules'
-import { getProtocolModulesInfo } from '/app/transformations/analysis'
+import {
+  getProtocolModulesInfo,
+  getAttachedProtocolModuleMatches,
+} from '/app/transformations/analysis'
 import {
   useRunStatus,
   useMostRecentCompletedAnalysis,
 } from '/app/resources/runs'
-import {
-  getAttachedProtocolModuleMatches,
-  getUnmatchedModulesForProtocol,
-} from './utils'
+import { getUnmatchedModulesForProtocol } from './utils'
 import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { FixtureTable } from './FixtureTable'
 import { ModuleTable } from './ModuleTable'
