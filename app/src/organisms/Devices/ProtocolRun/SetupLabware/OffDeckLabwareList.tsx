@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { SPACING, TYPOGRAPHY, LegacyStyledText } from '@opentrons/components'
 import { LabwareListItem } from './LabwareListItem'

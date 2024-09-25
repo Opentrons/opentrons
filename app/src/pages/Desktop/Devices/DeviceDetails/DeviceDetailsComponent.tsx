@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useEstopQuery } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,

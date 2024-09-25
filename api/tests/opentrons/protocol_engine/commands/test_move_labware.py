@@ -107,6 +107,13 @@ async def test_manual_move_labware_implementation(
             offsetId="wowzers-a-new-offset-id",
         ),
         private=None,
+        state_update=update_types.StateUpdate(
+            labware_location=update_types.LabwareLocationUpdate(
+                labware_id="my-cool-labware-id",
+                offset_id="wowzers-a-new-offset-id",
+                new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+            )
+        ),
     )
 
 
@@ -173,6 +180,13 @@ async def test_move_labware_implementation_on_labware(
             offsetId="wowzers-a-new-offset-id",
         ),
         private=None,
+        state_update=update_types.StateUpdate(
+            labware_location=update_types.LabwareLocationUpdate(
+                labware_id="my-cool-labware-id",
+                offset_id="wowzers-a-new-offset-id",
+                new_location=OnLabwareLocation(labwareId="my-even-cooler-labware-id"),
+            )
+        ),
     )
 
 
@@ -260,7 +274,14 @@ async def test_gripper_move_labware_implementation(
             offsetId="wowzers-a-new-offset-id",
         ),
         private=None,
-        state_update=update_types.StateUpdate(pipette_location=update_types.CLEAR),
+        state_update=update_types.StateUpdate(
+            pipette_location=update_types.CLEAR,
+            labware_location=update_types.LabwareLocationUpdate(
+                labware_id="my-cool-labware-id",
+                new_location=new_location,
+                offset_id="wowzers-a-new-offset-id",
+            ),
+        ),
     )
 
 
@@ -409,7 +430,14 @@ async def test_gripper_move_to_waste_chute_implementation(
             offsetId="wowzers-a-new-offset-id",
         ),
         private=None,
-        state_update=update_types.StateUpdate(pipette_location=update_types.CLEAR),
+        state_update=update_types.StateUpdate(
+            pipette_location=update_types.CLEAR,
+            labware_location=update_types.LabwareLocationUpdate(
+                labware_id="my-cool-labware-id",
+                new_location=new_location,
+                offset_id="wowzers-a-new-offset-id",
+            ),
+        ),
     )
 
 

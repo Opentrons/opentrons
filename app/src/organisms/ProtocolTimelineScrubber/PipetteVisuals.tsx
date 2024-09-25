@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import {
   Flex,
   Box,
@@ -32,7 +32,7 @@ export function PipetteMountViz(
   props: PipetteMountVizProps
 ): JSX.Element | null {
   const { mount, pipetteEntity, pipetteId, timelineFrame, analysis } = props
-  const [showPipetteDetails, setShowPipetteDetails] = React.useState(false)
+  const [showPipetteDetails, setShowPipetteDetails] = useState(false)
 
   return pipetteEntity == null ? null : (
     <Flex

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import {
   useLightsQuery,
   useSetLightsMutation,
@@ -9,13 +9,13 @@ export function useLights(): {
   lightsOn: boolean | null
   toggleLights: () => void
 } {
-  const [lightsOnCache, setLightsOnCache] = React.useState(false)
+  const [lightsOnCache, setLightsOnCache] = useState(false)
   const { setLights, data: setLightsData } = useSetLightsMutation()
   const { data: lightsData } = useLightsQuery({
     refetchInterval: LIGHTS_POLL_MS,
   })
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (setLightsData != null) {
       setLightsOnCache(setLightsData.on)
     } else if (lightsData != null) {

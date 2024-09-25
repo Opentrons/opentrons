@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Box } from '../primitives'
 import { SPACING } from '../ui-style-constants'
 import { COLORS } from '../helix-design-system'

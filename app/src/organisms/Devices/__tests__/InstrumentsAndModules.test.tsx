@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'

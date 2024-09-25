@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useRef } from 'react'
 import last from 'lodash/last'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
@@ -79,8 +79,8 @@ const ProtocolHeader = ({
 }: ProtocolHeaderProps): JSX.Element => {
   const navigate = useNavigate()
   const { t } = useTranslation(['protocol_info, protocol_details', 'shared'])
-  const [truncate, setTruncate] = React.useState<boolean>(true)
-  const [startSetup, setStartSetup] = React.useState<boolean>(false)
+  const [truncate, setTruncate] = useState<boolean>(true)
+  const [startSetup, setStartSetup] = useState<boolean>(false)
   const toggleTruncate = (): void => {
     setTruncate(value => !value)
   }
@@ -320,13 +320,13 @@ export function ProtocolDetails(): JSX.Element | null {
   const navigate = useNavigate()
   const host = useHost()
   const { makeSnackbar } = useToaster()
-  const [showParameters, setShowParameters] = React.useState<boolean>(false)
+  const [showParameters, setShowParameters] = useState<boolean>(false)
   const queryClient = useQueryClient()
-  const [currentOption, setCurrentOption] = React.useState<TabOption>(
+  const [currentOption, setCurrentOption] = useState<TabOption>(
     protocolSectionTabOptions[0]
   )
 
-  const [showMaxPinsAlert, setShowMaxPinsAlert] = React.useState<boolean>(false)
+  const [showMaxPinsAlert, setShowMaxPinsAlert] = useState<boolean>(false)
   const {
     data: protocolRecord,
     isLoading: isProtocolFetching,
@@ -335,8 +335,8 @@ export function ProtocolDetails(): JSX.Element | null {
   })
 
   // Watch for scrolling to toggle dropshadow
-  const scrollRef = React.useRef<HTMLDivElement>(null)
-  const [isScrolled, setIsScrolled] = React.useState<boolean>(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [isScrolled, setIsScrolled] = useState<boolean>(false)
   const observer = new IntersectionObserver(([entry]) => {
     setIsScrolled(!entry.isIntersecting)
   })
@@ -410,7 +410,7 @@ export function ProtocolDetails(): JSX.Element | null {
   const [
     showConfirmDeleteProtocol,
     setShowConfirmationDeleteProtocol,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
   const handleDeleteClick = (): void => {
     setShowConfirmationDeleteProtocol(false)

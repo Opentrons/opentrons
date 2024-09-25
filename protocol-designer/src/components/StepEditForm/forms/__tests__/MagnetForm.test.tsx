@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, afterEach, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { cleanup, fireEvent, screen } from '@testing-library/react'

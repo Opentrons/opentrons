@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 
 import { useDropTipRouting, useDropTipWithType } from './hooks'
 import { DropTipWizard } from './DropTipWizard'
@@ -20,7 +20,7 @@ export function useDropTipWizardFlows(): {
   showDTWiz: boolean
   toggleDTWiz: () => void
 } {
-  const [showDTWiz, setShowDTWiz] = React.useState(false)
+  const [showDTWiz, setShowDTWiz] = useState(false)
 
   const toggleDTWiz = (): void => {
     setShowDTWiz(!showDTWiz)

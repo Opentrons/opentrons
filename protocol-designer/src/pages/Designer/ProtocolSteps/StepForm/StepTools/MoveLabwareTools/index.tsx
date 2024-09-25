@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Box, COLORS, DIRECTION_COLUMN, Flex } from '@opentrons/components'

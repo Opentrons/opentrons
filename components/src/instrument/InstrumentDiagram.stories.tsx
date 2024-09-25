@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import keyBy from 'lodash/keyBy'
 import { getAllPipetteNames, getPipetteNameSpecs } from '@opentrons/shared-data'
 

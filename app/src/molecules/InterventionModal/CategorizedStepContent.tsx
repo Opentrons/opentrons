@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 import { Command, CommandIndex } from '../Command'
 import type { NonSkeletonCommandState, CommandTextData } from '../Command'

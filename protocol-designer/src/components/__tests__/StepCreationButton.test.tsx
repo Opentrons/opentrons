@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { vi, describe, beforeEach, it } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../__testing-utils__'

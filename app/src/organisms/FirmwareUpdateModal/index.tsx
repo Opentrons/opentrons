@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
@@ -73,8 +73,8 @@ export const FirmwareUpdateModal = (
     description,
     isOnDevice,
   } = props
-  const [updateId, setUpdateId] = React.useState<string | null>(null)
-  const [firmwareText, setFirmwareText] = React.useState<string | null>(null)
+  const [updateId, setUpdateId] = useState<string | null>(null)
+  const [firmwareText, setFirmwareText] = useState<string | null>(null)
   const {
     data: attachedInstruments,
     refetch: refetchInstruments,
@@ -92,7 +92,7 @@ export const FirmwareUpdateModal = (
       (i): i is BadGripper | BadPipette => !i.ok && i.subsystem === subsystem
     ) ?? false
 
-  React.useEffect(() => {
+  useEffect(() => {
     setTimeout(() => {
       if (!updateNeeded) {
         setFirmwareText(proceedDescription)
@@ -107,7 +107,7 @@ export const FirmwareUpdateModal = (
   const { data: updateData } = useSubsystemUpdateQuery(updateId)
   const status = updateData?.data.updateStatus
 
-  React.useEffect(() => {
+  useEffect(() => {
     if ((status != null || updateNeeded) && firmwareText !== description) {
       setFirmwareText(description)
     }

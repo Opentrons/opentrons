@@ -1,5 +1,4 @@
 // main application sidebar
-import * as React from 'react'
 import { LabwareGuide } from './LabwareGuide'
 import { FilterManufacturer } from './FilterManufacturer'
 import { FilterCategory } from './FilterCategory'

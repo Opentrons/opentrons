@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { DropdownMenu, Flex, SPACING } from '@opentrons/components'
 import type { Options } from '@opentrons/components'
 import type { FieldProps } from '../../pages/Designer/ProtocolSteps/StepForm/types'

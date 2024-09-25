@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { CommandIcon as CommandIconComponent } from './CommandIcon'
 import type { ICON_BY_COMMAND_TYPE } from './CommandIcon'
 

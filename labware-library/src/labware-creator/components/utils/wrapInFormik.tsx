@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Formik } from 'formik'
 import type { FormikConfig } from 'formik'
 

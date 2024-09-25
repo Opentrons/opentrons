@@ -1,9 +1,10 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { css } from 'styled-components'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import {
   ALIGN_CENTER,
+  CURSOR_DEFAULT,
   CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -80,18 +81,18 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     error,
   } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const [showDropdownMenu, setShowDropdownMenu] = React.useState<boolean>(false)
+  const [showDropdownMenu, setShowDropdownMenu] = useState<boolean>(false)
 
-  const [dropdownPosition, setDropdownPosition] = React.useState<
-    'top' | 'bottom'
-  >('bottom')
+  const [dropdownPosition, setDropdownPosition] = useState<'top' | 'bottom'>(
+    'bottom'
+  )
   const dropDownMenuWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
       setShowDropdownMenu(false)
     },
   })
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handlePositionCalculation = (): void => {
       const dropdownRect = dropDownMenuWrapperRef.current?.getBoundingClientRect()
       if (dropdownRect != null) {
@@ -136,8 +137,12 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   }, [filterOptions.length, dropDownMenuWrapperRef])
 
   const toggleSetShowDropdownMenu = (): void => {
-    setShowDropdownMenu(!showDropdownMenu)
+    if (!isDisabled) {
+      setShowDropdownMenu(!showDropdownMenu)
+    }
   }
+
+  const isDisabled = filterOptions.length === 0
 
   let defaultBorderColor = COLORS.grey50
   let hoverBorderColor = COLORS.grey55
@@ -152,7 +157,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   const DROPDOWN_STYLE = css`
     flex-direction: ${DIRECTION_ROW};
     background-color: ${COLORS.white};
-    cursor: ${CURSOR_POINTER};
+    cursor: ${isDisabled ? CURSOR_DEFAULT : CURSOR_POINTER};
     padding: ${SPACING.spacing8} ${SPACING.spacing12};
     border: 1px ${BORDERS.styleSolid} ${defaultBorderColor};
     border-radius: ${dropdownType === 'rounded'
@@ -264,6 +269,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                   onClick(option.value)
                   setShowDropdownMenu(false)
                 }}
+                border="none"
               >
                 <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
                   {option.liquidColor != null ? (

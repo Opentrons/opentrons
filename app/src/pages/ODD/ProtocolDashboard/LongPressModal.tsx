@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -44,7 +44,7 @@ export function LongPressModal({
 
   const pinned = pinnedProtocolIds.includes(protocolId)
 
-  const [showMaxPinsAlert, setShowMaxPinsAlert] = React.useState<boolean>(false)
+  const [showMaxPinsAlert, setShowMaxPinsAlert] = useState<boolean>(false)
 
   // This looks totally bonkers, and it is. This construction is to make
   // it easier to use in unit tests, where we have to mock both the mutation

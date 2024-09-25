@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useFormikContext } from 'formik'
 import capitalize from 'lodash/capitalize'
 import { makeMaskToDecimal } from '../../fieldMasks'

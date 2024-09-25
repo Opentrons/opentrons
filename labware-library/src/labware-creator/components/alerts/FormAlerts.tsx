@@ -1,4 +1,3 @@
-import * as React from 'react'
 import toPairs from 'lodash/toPairs'
 import pick from 'lodash/pick'
 import { AlertItem } from '@opentrons/components'

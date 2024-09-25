@@ -1,4 +1,3 @@
-import * as React from 'react'
 import round from 'lodash/round'
 
 import PIPETTE_TIP_IMAGE from '../../../../assets/images/pipette_tip.svg'

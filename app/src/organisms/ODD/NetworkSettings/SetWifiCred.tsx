@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useState, memo, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -31,16 +31,16 @@ export function SetWifiCred({
   setPassword,
 }: SetWifiCredProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
-  const keyboardRef = React.useRef(null)
-  const [showPassword, setShowPassword] = React.useState<boolean>(false)
-  const inputRef = React.useRef<HTMLInputElement>(null)
+  const keyboardRef = useRef(null)
+  const [showPassword, setShowPassword] = useState<boolean>(false)
+  const inputRef = useRef<HTMLInputElement>(null)
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
-  const MemoizedInput = React.memo(InputField)
+  const MemoizedInput = memo(InputField)
   const handleBlur = (): void => {
     if (inputRef.current != null) inputRef.current?.focus()
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (inputRef.current != null) {
       inputRef.current.focus()
     }

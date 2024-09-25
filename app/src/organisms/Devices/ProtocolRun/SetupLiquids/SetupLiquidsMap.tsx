@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, Fragment } from 'react'
 import map from 'lodash/map'
 import isEmpty from 'lodash/isEmpty'
 
@@ -43,8 +43,8 @@ export function SetupLiquidsMap(
   props: SetupLiquidsMapProps
 ): JSX.Element | null {
   const { runId, protocolAnalysis } = props
-  const [hoverLabwareId, setHoverLabwareId] = React.useState<string>('')
-  const [liquidDetailsLabwareId, setLiquidDetailsLabwareId] = React.useState<
+  const [hoverLabwareId, setHoverLabwareId] = useState<string>('')
+  const [liquidDetailsLabwareId, setLiquidDetailsLabwareId] = useState<
     string | null
   >(null)
 
@@ -159,9 +159,7 @@ export function SetupLiquidsMap(
             )
             const labwareHasLiquid = !isEmpty(wellFill)
             return (
-              <React.Fragment
-                key={`LabwareSetup_Labware_${topLabwareId}_${x}${y}`}
-              >
+              <Fragment key={`LabwareSetup_Labware_${topLabwareId}_${x}${y}`}>
                 <g
                   transform={`translate(${x},${y})`}
                   onMouseEnter={() => {
@@ -191,7 +189,7 @@ export function SetupLiquidsMap(
                     labwareHasLiquid={labwareHasLiquid}
                   />
                 </g>
-              </React.Fragment>
+              </Fragment>
             )
           }
         )}

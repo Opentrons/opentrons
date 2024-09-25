@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
@@ -59,9 +59,9 @@ export function useDropTipCommands({
   fixitCommandTypeUtils,
 }: UseDropTipSetupCommandsParams): UseDropTipCommandsResult {
   const isFlex = robotType === FLEX_ROBOT_TYPE
-  const [hasSeenClose, setHasSeenClose] = React.useState(false)
-  const [jogQueue, setJogQueue] = React.useState<Array<() => Promise<void>>>([])
-  const [isJogging, setIsJogging] = React.useState(false)
+  const [hasSeenClose, setHasSeenClose] = useState(false)
+  const [jogQueue, setJogQueue] = useState<Array<() => Promise<void>>>([])
+  const [isJogging, setIsJogging] = useState(false)
   const pipetteId = fixitCommandTypeUtils?.pipetteId ?? null
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
@@ -189,7 +189,7 @@ export function useDropTipCommands({
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     processJogQueue()
   }, [jogQueue.length, isJogging])
 

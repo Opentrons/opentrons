@@ -1,4 +1,3 @@
-import * as React from 'react'
 import groupBy from 'lodash/groupBy'
 import { useTranslation } from 'react-i18next'
 import {

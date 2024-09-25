@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 
 import { useDispatch } from 'react-redux'
 
@@ -56,9 +56,9 @@ export function useNotifyDataReady<TData, TError = Error>({
   const hostname = host?.hostname ?? null
   const doTrackEvent = useTrackEvent()
   const forcePollingFF = useFeatureFlag('forceHttpPolling')
-  const seenHostname = React.useRef<string | null>(null)
-  const [refetch, setRefetch] = React.useState<HTTPRefetchFrequency>(null)
-  const [isNotifyEnabled, setIsNotifyEnabled] = React.useState(true)
+  const seenHostname = useRef<string | null>(null)
+  const [refetch, setRefetch] = useState<HTTPRefetchFrequency>(null)
+  const [isNotifyEnabled, setIsNotifyEnabled] = useState(true)
 
   const { enabled, staleTime, forceHttpPolling } = options
 
@@ -69,7 +69,7 @@ export function useNotifyDataReady<TData, TError = Error>({
     staleTime !== Infinity &&
     !forcePollingFF
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (shouldUseNotifications) {
       // Always fetch on initial mount to keep latency as low as possible.
       setRefetch('once')
@@ -96,7 +96,7 @@ export function useNotifyDataReady<TData, TError = Error>({
     }
   }, [topic, hostname, shouldUseNotifications])
 
-  const onDataEvent = React.useCallback((data: NotifyResponseData): void => {
+  const onDataEvent = useCallback((data: NotifyResponseData): void => {
     if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
       setIsNotifyEnabled(false)
       if (data === 'ECONNREFUSED') {
@@ -110,7 +110,7 @@ export function useNotifyDataReady<TData, TError = Error>({
     }
   }, [])
 
-  const notifyOnSettled = React.useCallback(
+  const notifyOnSettled = useCallback(
     (data: TData | undefined, error: TError | null) => {
       if (refetch === 'once') {
         setRefetch(null)

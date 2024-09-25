@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 
-import * as React from 'react'
+import type * as React from 'react'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'

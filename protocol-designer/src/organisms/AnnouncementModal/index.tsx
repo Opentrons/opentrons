@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
@@ -27,10 +27,9 @@ export const AnnouncementModal = (): JSX.Element => {
   const userHasNotSeenAnnouncement =
     getLocalStorageItem(localStorageAnnouncementKey) !== announcementKey
 
-  const [
-    showAnnouncementModal,
-    setShowAnnouncementModal,
-  ] = React.useState<boolean>(userHasNotSeenAnnouncement)
+  const [showAnnouncementModal, setShowAnnouncementModal] = useState<boolean>(
+    userHasNotSeenAnnouncement
+  )
 
   const handleClick = (): void => {
     setLocalStorageItem(localStorageAnnouncementKey, announcementKey)

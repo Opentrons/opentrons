@@ -1,5 +1,5 @@
 // internal link that preserves query parameters
-import * as React from 'react'
+import type * as React from 'react'
 import { Link as BaseLink, useLocation } from 'react-router-dom'
 
 export interface LinkProps {

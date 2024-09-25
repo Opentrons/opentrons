@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { Flex } from '../../primitives'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { Tag as TagComponent } from './index'

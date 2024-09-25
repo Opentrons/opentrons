@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation, Trans } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
@@ -34,9 +34,9 @@ interface UpdateNeededModalProps {
 export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
   const { onClose, shouldExit, subsystem, setInitiatedSubsystemUpdate } = props
   const { t } = useTranslation('firmware_update')
-  const [updateId, setUpdateId] = React.useState<string | null>(null)
+  const [updateId, setUpdateId] = useState<string | null>(null)
   // when we move to the next subsystem to update, set updateId back to null
-  React.useEffect(() => {
+  useEffect(() => {
     setUpdateId(null)
   }, [subsystem])
 
@@ -58,7 +58,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
   const status = updateData?.data.updateStatus
   const ongoingUpdateId = updateData?.data.id
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (status === 'done') {
       setInitiatedSubsystemUpdate(null)
     }

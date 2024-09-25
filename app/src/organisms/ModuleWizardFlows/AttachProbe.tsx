@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
 import {

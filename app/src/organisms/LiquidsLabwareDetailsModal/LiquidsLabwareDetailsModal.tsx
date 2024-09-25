@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
@@ -48,7 +48,7 @@ export const LiquidsLabwareDetailsModal = (
   const { liquidId, labwareId, runId, closeModal } = props
   const { t } = useTranslation('protocol_setup')
   const isOnDevice = useSelector(getIsOnDevice)
-  const currentLiquidRef = React.useRef<HTMLDivElement>(null)
+  const currentLiquidRef = useRef<HTMLDivElement>(null)
   const protocolData = useMostRecentCompletedAnalysis(runId)
   const commands = protocolData?.commands ?? []
   const liquids = parseLiquidsInLoadOrder(
@@ -65,7 +65,7 @@ export const LiquidsLabwareDetailsModal = (
   const filteredLiquidsInLoadOrder = liquids.filter(liquid => {
     return Object.keys(labwareInfo).some(key => key === liquid.id)
   })
-  const [selectedValue, setSelectedValue] = React.useState<typeof liquidId>(
+  const [selectedValue, setSelectedValue] = useState<typeof liquidId>(
     liquidId ?? filteredLiquidsInLoadOrder[0].id
   )
 
@@ -79,7 +79,7 @@ export const LiquidsLabwareDetailsModal = (
   const scrollToCurrentItem = (): void => {
     currentLiquidRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
-  React.useEffect(() => {
+  useEffect(() => {
     scrollToCurrentItem()
   }, [])
   const HIDE_SCROLLBAR = css`

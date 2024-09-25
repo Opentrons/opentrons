@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'

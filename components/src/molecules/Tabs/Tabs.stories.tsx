@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useArgs } from '@storybook/preview-api'
 import { VIEWPORT } from '../../ui-style-constants'
 import { Tabs as TabsComponent } from '.'

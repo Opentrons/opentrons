@@ -5,7 +5,8 @@ import dataclasses
 import enum
 import typing
 
-from opentrons.protocol_engine.types import DeckPoint
+from opentrons.protocol_engine.types import DeckPoint, LabwareLocation
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 
 class _NoChangeEnum(enum.Enum):
@@ -76,10 +77,35 @@ class PipetteLocationUpdate:
 
 
 @dataclasses.dataclass
+class LabwareLocationUpdate:
+    """Represents an update to perform on a labware's location."""
+
+    labware_id: str
+
+    new_location: LabwareLocation
+    """The labware's new logical location."""
+
+    offset_id: typing.Optional[str]
+
+
+@dataclasses.dataclass
+class LoadedLabwareUpdate(LabwareLocationUpdate):
+    """Update loaded labware."""
+
+    display_name: typing.Optional[str]
+
+    definition: LabwareDefinition
+
+
+@dataclasses.dataclass
 class StateUpdate:
     """Represents an update to perform on engine state."""
 
     pipette_location: PipetteLocationUpdate | NoChangeType | ClearType = NO_CHANGE
+
+    labware_location: LabwareLocationUpdate | NoChangeType = NO_CHANGE
+
+    loaded_labware: LoadedLabwareUpdate | NoChangeType = NO_CHANGE
 
     # These convenience functions let the caller avoid the boilerplate of constructing a
     # complicated dataclass tree, and they give us a
@@ -133,6 +159,36 @@ class StateUpdate:
                 new_location=Well(labware_id=new_labware_id, well_name=new_well_name),
                 new_deck_point=new_deck_point,
             )
+
+    def set_labware_location(  # noqa: D102
+        self,
+        *,
+        labware_id: str,
+        new_location: LabwareLocation,
+        new_offset_id: str | None,
+    ) -> None:
+        self.labware_location = LabwareLocationUpdate(
+            labware_id=labware_id,
+            new_location=new_location,
+            offset_id=new_offset_id,
+        )
+
+    def set_loaded_labware(
+        self,
+        definition: LabwareDefinition,
+        labware_id: str,
+        offset_id: typing.Optional[str],
+        display_name: typing.Optional[str],
+        location: LabwareLocation,
+    ) -> None:
+        """Add loaded labware to state."""
+        self.loaded_labware = LoadedLabwareUpdate(
+            definition=definition,
+            labware_id=labware_id,
+            offset_id=offset_id,
+            new_location=location,
+            display_name=display_name,
+        )
 
     def clear_all_pipette_locations(self) -> None:
         """Mark all pipettes as having an unknown location."""

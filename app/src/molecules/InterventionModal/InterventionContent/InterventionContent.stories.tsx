@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { ICON_DATA_BY_NAME } from '@opentrons/components'
 import { InterventionContent } from '.'
 import { TwoColumn } from '../TwoColumn'

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams, Navigate } from 'react-router-dom'
 
@@ -48,9 +48,7 @@ export function RobotSettings(): JSX.Element | null {
   const robot = useRobot(robotName)
   const isCalibrationDisabled = robot?.status !== CONNECTABLE
   const isNetworkingDisabled = robot?.status === UNREACHABLE
-  const [showRobotBusyBanner, setShowRobotBusyBanner] = React.useState<boolean>(
-    false
-  )
+  const [showRobotBusyBanner, setShowRobotBusyBanner] = useState<boolean>(false)
   const robotUpdateSession = useSelector(getRobotUpdateSession)
 
   const updateRobotStatus = (isRobotBusy: boolean): void => {
