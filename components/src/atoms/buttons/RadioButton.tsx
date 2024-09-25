@@ -13,7 +13,6 @@ import {
   RESPONSIVENESS,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '../..'
 import type { IconName } from '../..'
 import type { StyleProps } from '../../primitives'
@@ -83,7 +82,15 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   const DISABLED_BUTTON_STYLE = css`
     background-color: ${COLORS.grey35};
     color: ${COLORS.grey50};
-    cursor: ${CURSOR_NOT_ALLOWED};
+
+    &:hover,
+    &:active {
+      background-color: ${COLORS.grey35};
+    }
+
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      cursor: ${CURSOR_NOT_ALLOWED};
+    }
   `
 
   const SettingButtonLabel = styled.label`
@@ -110,6 +117,14 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
       -webkit-box-orient: ${maxLines != null ? 'vertical' : undefined};
       word-wrap: break-word;
     }
+  `
+
+  const SUBBUTTON_LABEL_STYLE = css`
+    color: ${disabled
+      ? COLORS.grey50
+      : isSelected
+      ? COLORS.white
+      : COLORS.grey60};
   `
 
   return (
@@ -153,7 +168,9 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
           {typeof buttonLabel === 'string' ? (
             <StyledText
               oddStyle={isLarge ? 'level4HeaderSemiBold' : 'bodyTextRegular'}
-              desktopStyle="bodyDefaultRegular"
+              desktopStyle={
+                isLarge ? 'bodyDefaultSemiBold' : 'bodyDefaultRegular'
+              }
             >
               {buttonLabel}
             </StyledText>
@@ -162,12 +179,14 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
           )}
         </Flex>
         {subButtonLabel != null ? (
-          <StyledText
-            oddStyle="level4HeaderRegular"
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-          >
-            {subButtonLabel}
-          </StyledText>
+          <Flex css={SUBBUTTON_LABEL_STYLE}>
+            <StyledText
+              oddStyle={isLarge ? 'level4HeaderRegular' : 'bodyTextRegular'}
+              desktopStyle="bodyDefaultRegular"
+            >
+              {subButtonLabel}
+            </StyledText>
+          </Flex>
         ) : null}
       </SettingButtonLabel>
     </Flex>
