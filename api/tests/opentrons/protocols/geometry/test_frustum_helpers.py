@@ -284,8 +284,3 @@ def test_volume_and_height_spherical(well: List[Any]) -> None:
                 total_frustum_height=well[0]["depth"],
             )
             assert isclose(found_height, target_height)
-
-
-# test that volumetric capacity is always sorted
-# test that errors are raised every time and only when given invalid height values for volume_from_height
-# test that errors are raised every time and only when given invalid volume values for height_from_volume
