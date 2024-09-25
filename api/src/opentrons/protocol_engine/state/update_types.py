@@ -6,7 +6,9 @@ import enum
 import typing
 
 from opentrons.protocol_engine.types import DeckPoint, LabwareLocation
+from opentrons.types import MountType
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 
 class _NoChangeEnum(enum.Enum):
@@ -98,10 +100,22 @@ class LoadedLabwareUpdate(LabwareLocationUpdate):
 
 
 @dataclasses.dataclass
+class LoadPipetteUpdate:
+    """Update loaded pipette."""
+
+    pipette_id: str
+    pipette_name: PipetteNameType
+    mount: MountType
+    liquid_presence_detection: typing.Optional[bool]
+
+
+@dataclasses.dataclass
 class StateUpdate:
     """Represents an update to perform on engine state."""
 
     pipette_location: PipetteLocationUpdate | NoChangeType | ClearType = NO_CHANGE
+
+    loaded_pipette: LoadPipetteUpdate | NoChangeType = NO_CHANGE
 
     labware_location: LabwareLocationUpdate | NoChangeType = NO_CHANGE
 
@@ -193,3 +207,17 @@ class StateUpdate:
     def clear_all_pipette_locations(self) -> None:
         """Mark all pipettes as having an unknown location."""
         self.pipette_location = CLEAR
+
+    def set_load_pipette(
+        self,
+        pipette_id: str,
+        pipette_name: PipetteNameType,
+        mount: MountType,
+        liquid_presence_detection: typing.Optional[bool],
+    ) -> None:
+        self.loaded_pipette = LoadPipetteUpdate(
+            pipette_id=pipette_id,
+            pipette_name=pipette_name,
+            mount=mount,
+            liquid_presence_detection=liquid_presence_detection,
+        )

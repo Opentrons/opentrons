@@ -152,6 +152,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
     def _handle_command(  # noqa: C901
         self, action: Union[SucceedCommandAction, FailCommandAction]
     ) -> None:
+        self._set_load_pipette(action)
         self._update_current_location(action)
         self._update_volumes(action)
 
@@ -204,26 +205,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.nozzle_configuration_by_id[
                 private_result.pipette_id
             ] = private_result.nozzle_map
-
-        if isinstance(command.result, commands.LoadPipetteResult):
-            pipette_id = command.result.pipetteId
-
-            self._state.pipettes_by_id[pipette_id] = LoadedPipette(
-                id=pipette_id,
-                pipetteName=command.params.pipetteName,
-                mount=command.params.mount,
-            )
-            self._state.liquid_presence_detection_by_id[pipette_id] = (
-                command.params.liquidPresenceDetection or False
-            )
-            self._state.aspirated_volume_by_id[pipette_id] = None
-            self._state.movement_speed_by_id[pipette_id] = None
-            self._state.attached_tip_by_id[pipette_id] = None
-            static_config = self._state.static_config_by_id.get(pipette_id)
-            if static_config:
-                self._state.nozzle_configuration_by_id[
-                    pipette_id
-                ] = static_config.default_nozzle_map
 
         elif isinstance(command.result, commands.PickUpTipResult):
             pipette_id = command.params.pipetteId
@@ -280,6 +261,32 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
                     default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
                 )
+
+    def _set_load_pipette(
+        self, action: Union[SucceedCommandAction, FailCommandAction]
+    ) -> None:
+        if (
+            isinstance(action, SucceedCommandAction)
+            and action.state_update.loaded_pipette != update_types.NO_CHANGE
+        ):
+            pipette_id = action.state_update.loaded_pipette.pipette_id
+
+            self._state.pipettes_by_id[pipette_id] = LoadedPipette(
+                id=pipette_id,
+                pipetteName=action.state_update.loaded_pipette.pipette_name,
+                mount=action.state_update.loaded_pipette.mount,
+            )
+            self._state.liquid_presence_detection_by_id[pipette_id] = (
+                action.state_update.loaded_pipette.liquid_presence_detection or False
+            )
+            self._state.aspirated_volume_by_id[pipette_id] = None
+            self._state.movement_speed_by_id[pipette_id] = None
+            self._state.attached_tip_by_id[pipette_id] = None
+            static_config = self._state.static_config_by_id.get(pipette_id)
+            if static_config:
+                self._state.nozzle_configuration_by_id[
+                    pipette_id
+                ] = static_config.default_nozzle_map
 
     def _update_current_location(
         self, action: Union[SucceedCommandAction, FailCommandAction]

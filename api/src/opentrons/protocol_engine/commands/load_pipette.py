@@ -1,6 +1,7 @@
 """Load pipette command request, result, and implementation models."""
 from __future__ import annotations
 
+from opentrons.protocol_engine.state.update_types import StateUpdate
 from opentrons_shared_data.pipette.pipette_load_name_conversions import (
     convert_to_pipette_name_type,
 )
@@ -121,6 +122,14 @@ class LoadPipetteImplementation(
             mount=params.mount,
             pipette_id=params.pipetteId,
             tip_overlap_version=params.tipOverlapNotAfterVersion,
+        )
+
+        state_update = StateUpdate()
+        state_update.set_load_pipette(
+            pipette_id=loaded_pipette.pipette_id,
+            pipette_name=params.pipetteName,
+            mount=params.mount,
+            liquid_presence_detection=params.liquidPresenceDetection,
         )
 
         return SuccessData(
