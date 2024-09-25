@@ -239,7 +239,6 @@ class WellOffset(BaseModel):
     z: float = 0
 
 
-# TODO(pm, 2024-09-23): PE should raise error if volumeOffset or WellOrigin.MENISCUS specified with a tip rack location
 class WellLocation(BaseModel):
     """A relative location in reference to a well's location."""
 
