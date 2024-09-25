@@ -172,7 +172,6 @@ async def test_load_labware_on_labware(
     ).then_return(True)
 
     result = await subject.execute(data)
-
     assert result == SuccessData(
         public=LoadLabwareResult(
             labwareId="labware-id",
@@ -180,6 +179,15 @@ async def test_load_labware_on_labware(
             offsetId="labware-offset-id",
         ),
         private=None,
+        state_update=StateUpdate(
+            loaded_labware=LoadedLabwareUpdate(
+                labware_id="labware-id",
+                definition=well_plate_def,
+                offset_id="labware-offset-id",
+                new_location=OnLabwareLocation(labwareId="another-labware-id"),
+                display_name="My custom display name",
+            )
+        ),
     )
 
     decoy.verify(
