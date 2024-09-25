@@ -26,11 +26,14 @@ import { useLEDLights } from '/app/resources/robot-settings'
 
 import { RobotSettingsDashboard } from '../'
 
+vi.mock('/app/resources/networking', async () => {
+  const actual = await vi.importActual('/app/resources/networking')
+  return { ...actual, useNetworkConnection: vi.fn() }
+})
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/robot-settings')
-vi.mock('/app/resources/networking')
 vi.mock('/app/resources/robot-settings')
 vi.mock('/app/organisms/Navigation')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/TouchScreenSleep')
