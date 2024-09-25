@@ -382,7 +382,9 @@ def find_volume_at_well_height(
     max_height = volumetric_capacity[-1][0]
     if target_height < 0 or target_height > max_height:
         raise InvalidLiquidHeightFound("Invalid target height.")
-
+    # volumes in volumetric_capacity are relative to each frustum,
+    # so we have to find the volume of all the full sections enclosed
+    # beneath the target height
     closed_section_volume = 0.0
     for boundary_height, section_volume in volumetric_capacity:
         if boundary_height > target_height:
@@ -419,7 +421,7 @@ def _find_height_in_partial_frustum(
     target_volume: float,
 ) -> Optional[float]:
     """Look through a sorted list of frusta for a target volume, and find the height at that volume."""
-    partial_height: Optional[float] = None
+    well_height: Optional[float] = None
     for cross_sections, capacity in zip(
         get_boundary_pairs(sorted_frusta),
         get_boundary_pairs(volumetric_capacity),
@@ -436,7 +438,8 @@ def _find_height_in_partial_frustum(
                 target_volume_relative=relative_target_volume,
                 frustum_height=frustum_height,
             )
-    return partial_height
+            well_height = partial_height + bottom_height
+    return well_height
 
 
 def find_height_at_well_volume(
@@ -446,16 +449,8 @@ def find_height_at_well_volume(
     volumetric_capacity = get_well_volumetric_capacity(well_geometry)
     max_volume = volumetric_capacity[-1][1]
     if target_volume < 0 or target_volume > max_volume:
-        raise InvalidLiquidHeightFound("Invalid target height.")
+        raise InvalidLiquidHeightFound("Invalid target volume.")
 
-    closed_section_height = 0.0
-    for boundary_height, section_volume in volumetric_capacity:
-        if section_volume > target_volume:
-            break
-        closed_section_height = boundary_height
-        # if target height is a boundary cross-section, we already know the volume
-        if target_volume == section_volume:
-            return boundary_height
     sorted_frusta = sorted(well_geometry.frusta, key=lambda section: section.topHeight)
     # find the section the target volume is in and compute the height
     # since bottomShape is not in list of frusta, check here first
@@ -470,13 +465,15 @@ def find_height_at_well_volume(
                 radius_of_curvature=well_geometry.bottomShape.radiusOfCurvature,
                 total_frustum_height=well_geometry.bottomShape.depth,
             )
-        # we need to look through the volumetric capacity list without the bottom shape
+        # if bottom shape is present but doesn't contain the target volume,
+        #   then we need to look through the volumetric capacity list without the bottom shape
+        #   so volumetric_capacity and sorted_frusta will be aligned
         volumetric_capacity.pop(0)
-    partial_height = _find_height_in_partial_frustum(
+    well_height = _find_height_in_partial_frustum(
         sorted_frusta=sorted_frusta,
         volumetric_capacity=volumetric_capacity,
         target_volume=target_volume,
     )
-    if not partial_height:
+    if not well_height:
         raise InvalidLiquidHeightFound("Unable to find height at given well-volume.")
-    return partial_height + closed_section_height
+    return well_height
