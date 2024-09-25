@@ -68,7 +68,7 @@ div.document {
 }
 
 div.document [id] {
-    scroll-margin-top: 150px;
+    scroll-margin-top: 110px;
 }
 
 @media only screen and (min-device-width: 768px) and (min-width: 768px) and (max-width: 1023px) {
@@ -86,7 +86,8 @@ div.document p {
     line-height: 20pt;
 }
 
-div.document section > p {
+div.document section > p,
+div.document dl p {
     margin: 1em 0;
 }
 
@@ -97,7 +98,11 @@ div.document code {
     font-family: "Reddit Mono", "Consolas", "Lucida Console", monospace;
 }
 
-/* classes for API Reference docstring signatures */
+div.document dl {
+    margin-bottom: 15px;
+}
+
+/* API Reference */
 div.document .sig,
 div.document .sig-name,
 div.document code.descname,
@@ -107,6 +112,22 @@ div.document .sig-paren {
     font-size: 1em;
     font-family: "Reddit Mono", "Consolas", "Lucida Console", monospace;
 }
+
+div.document dt.field-even,
+div.document dt.field-odd {
+    margin-top: 1em;
+    line-height: 20pt;
+}
+
+div.document dd ul {
+    margin-top: 1em;
+}
+
+span.colon {
+    display: none;
+}
+
+/* all article pages */
 
 div.document h1 {
     margin-top: 0;
