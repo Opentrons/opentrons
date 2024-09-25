@@ -73,14 +73,14 @@ _defaults: Dict[
                     _WATER: LiquidClassSettings(  # water
                         aspirate=AspirateSettings(
                             flow_rate=35,
-                            air_gap=0.1,
+                            air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
                         ),
                         dispense=DispenseSettings(
                             flow_rate=57,
-                            push_out=7,
+                            push_out=10,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -107,14 +107,14 @@ _defaults: Dict[
                     _WATER: LiquidClassSettings(  # water
                         aspirate=AspirateSettings(
                             flow_rate=23.5,
-                            air_gap=0.1,
+                            air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
                         ),
                         dispense=DispenseSettings(
                             flow_rate=57,
-                            push_out=2,
+                            push_out=3.9,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -130,7 +130,7 @@ _defaults: Dict[
                         ),
                         dispense=DispenseSettings(
                             flow_rate=40.0,
-                            push_out=30.0,
+                            push_out=3.9,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -141,14 +141,14 @@ _defaults: Dict[
                     _WATER: LiquidClassSettings(  # water
                         aspirate=AspirateSettings(
                             flow_rate=35,
-                            air_gap=0.1,
+                            air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
                         ),
                         dispense=DispenseSettings(
                             flow_rate=57,
-                            push_out=2,
+                            push_out=3.9,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -164,7 +164,7 @@ _defaults: Dict[
                         ),
                         dispense=DispenseSettings(
                             flow_rate=40.0,
-                            push_out=20.0,
+                            push_out=3.9,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -287,7 +287,7 @@ _defaults: Dict[
                     _WATER: LiquidClassSettings(  # water
                         aspirate=AspirateSettings(
                             flow_rate=716,
-                            air_gap=5,
+                            air_gap=0,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -321,7 +321,7 @@ _defaults: Dict[
                     _WATER: LiquidClassSettings(  # water
                         aspirate=AspirateSettings(
                             flow_rate=716,
-                            air_gap=3.5,
+                            air_gap=0,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -355,7 +355,7 @@ _defaults: Dict[
                     _WATER: LiquidClassSettings(  # water
                         aspirate=AspirateSettings(
                             flow_rate=716,
-                            air_gap=2,
+                            air_gap=0,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -395,7 +395,7 @@ _defaults: Dict[
                     _WATER: LiquidClassSettings(  # water
                         aspirate=AspirateSettings(
                             flow_rate=160,
-                            air_gap=10,
+                            air_gap=0,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -429,7 +429,7 @@ _defaults: Dict[
                     _WATER: LiquidClassSettings(  # water
                         aspirate=AspirateSettings(
                             flow_rate=716,
-                            air_gap=10,
+                            air_gap=0,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -463,7 +463,7 @@ _defaults: Dict[
                     _WATER: LiquidClassSettings(  # water
                         aspirate=AspirateSettings(
                             flow_rate=716,
-                            air_gap=10,
+                            air_gap=0,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
