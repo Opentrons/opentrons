@@ -221,10 +221,10 @@ export interface TryLiquidProbeRunTimeCommand
 export type AspDispAirgapParams = FlowRateParams &
   PipetteAccessParams &
   VolumeParams &
-  LiquidHandlingWellLocationParam
+  WellLocationParam
 export type BlowoutParams = FlowRateParams &
   PipetteAccessParams &
-  LiquidHandlingWellLocationParam
+  WellLocationParam
 export type TouchTipParams = PipetteAccessParams & WellLocationParam
 export type DropTipParams = PipetteAccessParams & {
   wellLocation?: {
@@ -237,17 +237,7 @@ export type DropTipParams = PipetteAccessParams & {
     }
   }
 }
-export type PickUpTipParams = PipetteAccessParams & {
-  wellLocation?: {
-    origin?: 'top' | 'center' | 'bottom' | 'meniscus'
-    offset?: {
-      // mm values all default to 0
-      x?: number
-      y?: number
-      z?: number
-    }
-  }
-}
+export type PickUpTipParams = TouchTipParams
 
 interface AddressableOffsetVector {
   x: number
@@ -304,7 +294,7 @@ interface VolumeParams {
 interface WellLocationParam {
   wellLocation?: {
     // default value is 'top'
-    origin?: 'top' | 'center' | 'bottom' | 'meniscus'
+    origin?: 'top' | 'center' | 'bottom'
     offset?: {
       // mm
       // all values default to 0
@@ -312,26 +302,6 @@ interface WellLocationParam {
       y?: number
       z?: number
     }
-    // µL
-    // default is 0
-    volumeOffset?: number
-  }
-}
-
-interface LiquidHandlingWellLocationParam {
-  wellLocation?: {
-    // default value is 'top'
-    origin?: 'top' | 'center' | 'bottom' | 'meniscus'
-    offset?: {
-      // mm
-      // all values default to 0
-      x?: number
-      y?: number
-      z?: number
-    }
-    // µL
-    // default is 0
-    volumeOffset?: number | 'operationVolume'
   }
 }
 
