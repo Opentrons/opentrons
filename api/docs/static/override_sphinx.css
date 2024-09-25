@@ -19,6 +19,12 @@ body {
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
+/* hack out search button */
+
+div.flex.gap-4 div.text-white.flex.items-center.h-full > button {
+    display: none;
+}
+
 /* use Akko from docs site instead of from main site */
 header a.button-sm {
     font-family: "AkkoPro-Regular", "Akko Pro", "Open Sans", sans-serif !important;
