@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { HandleKeypress } from '@opentrons/components'
 
 interface HandleEnterProps {

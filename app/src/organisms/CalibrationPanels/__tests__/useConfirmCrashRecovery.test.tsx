@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { fireEvent, renderHook, screen } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
 import { vi, it, describe, expect } from 'vitest'

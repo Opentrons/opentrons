@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from 'react-query'
 import { Trans, useTranslation } from 'react-i18next'
@@ -33,7 +33,7 @@ export function DeleteTransferConfirmationModal({
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const navigate = useNavigate()
   const { makeSnackbar } = useToaster()
-  const [showIcon, setShowIcon] = React.useState<boolean>(false)
+  const [showIcon, setShowIcon] = useState<boolean>(false)
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('delete_this_transfer'),
     iconName: 'ot-alert',

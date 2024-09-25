@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
 import head from 'lodash/head'
@@ -153,7 +153,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
         ]
       : [...opentronsTipRacksOptions]
 
-  const [selectedValue, setSelectedValue] = React.useState<
+  const [selectedValue, setSelectedValue] = useState<
     SingleValue<SelectOption> | MultiValue<SelectOption>
   >(
     chosenTipRack != null

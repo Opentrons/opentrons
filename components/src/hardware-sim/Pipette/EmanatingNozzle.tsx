@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment } from 'react'
 import { C_SELECTED_DARK, C_TRANSPARENT } from '../../styles'
 import { SINGLE_CHANNEL_PIPETTE_HEIGHT } from './constants'
 
@@ -8,7 +8,7 @@ export const EmanatingNozzle = (props: {
 }): JSX.Element => {
   const { cx, cy } = props
   return (
-    <React.Fragment>
+    <Fragment>
       <circle
         data-testid="origin_circle"
         cx={cx}
@@ -47,6 +47,6 @@ export const EmanatingNozzle = (props: {
           repeatCount="indefinite"
         />
       </circle>
-    </React.Fragment>
+    </Fragment>
   )
 }

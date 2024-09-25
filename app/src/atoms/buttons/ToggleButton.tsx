@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { css } from 'styled-components'
 
 import { Btn, Icon, COLORS, SIZE_1, SIZE_2 } from '@opentrons/components'

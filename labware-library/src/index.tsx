@@ -1,5 +1,4 @@
 // labware library entry
-import * as React from 'react'
 import { hydrate, render } from 'react-dom'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 

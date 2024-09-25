@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
 import {

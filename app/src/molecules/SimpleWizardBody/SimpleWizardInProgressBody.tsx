@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import type { StyleProps } from '@opentrons/components'
 import { InProgressModal } from '../InProgressModal/InProgressModal'
 import { SimpleWizardBodyContainer } from './SimpleWizardBodyContainer'

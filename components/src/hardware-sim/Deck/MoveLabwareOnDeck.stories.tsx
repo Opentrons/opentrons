@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import {
   fixture96Plate,
   FLEX_ROBOT_TYPE,

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment } from 'react'
 import { action } from '@storybook/addon-actions'
 import {
   COLORS,
@@ -24,7 +24,7 @@ export default meta
 type Story = StoryObj<typeof SlideoutComponent>
 
 const Children = (
-  <React.Fragment>
+  <Fragment>
     <LegacyStyledText
       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       fontSize={TYPOGRAPHY.fontSizeP}
@@ -45,7 +45,7 @@ const Children = (
         {'btn text'}
       </LegacyStyledText>
     </PrimaryBtn>
-  </React.Fragment>
+  </Fragment>
 )
 
 export const Slideout: Story = {

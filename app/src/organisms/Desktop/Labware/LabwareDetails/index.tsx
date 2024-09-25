@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
@@ -78,7 +78,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   const irregular = wellGroups.length > 1
   const isMultiRow = ordering.some(row => row.length > 1)
   const isCustomDefinition = definition.namespace !== 'opentrons'
-  const [showToolTip, setShowToolTip] = React.useState<boolean>(false)
+  const [showToolTip, setShowToolTip] = useState<boolean>(false)
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP_START,
   })
@@ -88,7 +88,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
     setShowToolTip(true)
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     const timer = setTimeout(() => {
       setShowToolTip(false)
     }, 2000)
@@ -216,7 +216,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
                 : ''
 
             return (
-              <React.Fragment key={index}>
+              <Fragment key={index}>
                 {groupMetadata.displayCategory == null && irregular && (
                   <>
                     <WellCount
@@ -245,7 +245,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
                   isMultiRow={isMultiRow}
                   labelSuffix={groupDisplaySuffix}
                 />
-              </React.Fragment>
+              </Fragment>
             )
           })}
         </Box>

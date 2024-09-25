@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
@@ -21,6 +21,7 @@ import { AutoAddPauseUntilHeaterShakerTempStepModal } from '../../../../componen
 import { getDirtyFields, makeSingleEditFieldProps } from './utils'
 import { StepFormToolbox } from './StepFormToolbox'
 
+import type { ConnectedComponent } from 'react-redux'
 import type { InvariantContext } from '@opentrons/step-generation'
 import type { BaseState, ThunkDispatch } from '../../../../types'
 import type {
@@ -65,8 +66,8 @@ function StepFormManager(props: StepEditFormManagerProps): JSX.Element | null {
     invariantContext,
   } = props
   const { t } = useTranslation('tooltip')
-  const [focusedField, setFocusedField] = React.useState<string | null>(null)
-  const [dirtyFields, setDirtyFields] = React.useState<StepFieldName[]>(
+  const [focusedField, setFocusedField] = useState<string | null>(null)
+  const [dirtyFields, setDirtyFields] = useState<StepFieldName[]>(
     getDirtyFields(isNewStep, formData)
   )
   const handleBlur = (fieldName: StepFieldName): void => {
@@ -237,7 +238,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DispatchProps => {
 // It doesn't matter if the children are using connect or useSelector,
 // only the parent matters.)
 // https://react-redux.js.org/api/hooks#stale-props-and-zombie-children
-export const StepForm = connect(
+export const StepForm: ConnectedComponent<typeof StepFormManager, {}> = connect(
   mapStateToProps,
   mapDispatchToProps
 )((props: StepEditFormManagerProps) => {

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
@@ -70,9 +70,7 @@ interface LiquidDetailsProps {
 export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
   const { liquid, labwareByLiquidId, runId, commands } = props
   const { t } = useTranslation('protocol_setup')
-  const [labwareIdModal, setLabwareIdModal] = React.useState<string | null>(
-    null
-  )
+  const [labwareIdModal, setLabwareIdModal] = useState<string | null>(null)
 
   return (
     <Flex marginTop={SPACING.spacing24}>

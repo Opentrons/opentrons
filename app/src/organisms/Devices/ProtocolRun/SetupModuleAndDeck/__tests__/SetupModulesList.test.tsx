@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { when } from 'vitest-when'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, it, beforeEach, expect, vi } from 'vitest'

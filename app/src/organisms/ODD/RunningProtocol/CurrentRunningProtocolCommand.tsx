@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css, keyframes } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 

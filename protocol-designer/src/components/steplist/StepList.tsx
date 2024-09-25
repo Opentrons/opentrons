@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { SidePanel } from '@opentrons/components'
 
@@ -47,7 +47,7 @@ export const StepList = (): JSX.Element => {
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     const onKeyDown = (e: KeyboardEvent): void => {
       handleKeyDown(e)
     }

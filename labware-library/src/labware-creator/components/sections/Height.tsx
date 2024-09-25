@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { isEveryFieldHidden } from '../../utils'
 import { makeMaskToDecimal } from '../../fieldMasks'

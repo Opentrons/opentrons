@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { when } from 'vitest-when'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createStore } from 'redux'

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import {
   COLORS,
   DIRECTION_COLUMN,

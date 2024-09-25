@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Icon, SPACING_3 } from '@opentrons/components'
 import collisionImage from '../../assets/images/modules/module_pipette_collision_warning.png'

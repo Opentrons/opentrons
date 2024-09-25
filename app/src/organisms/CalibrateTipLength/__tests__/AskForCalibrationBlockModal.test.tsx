@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { vi, it, describe, expect } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'

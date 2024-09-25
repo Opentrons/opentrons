@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'

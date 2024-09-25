@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { createContext } from 'react'
 
 import type {
   SnackbarProps,
@@ -25,7 +25,7 @@ export interface KitchenContextType {
   makeSnackbar: MakeSnackbar
 }
 
-export const KitchenContext = React.createContext<KitchenContextType>({
+export const KitchenContext = createContext<KitchenContextType>({
   eatToast: () => {},
   bakeToast: () => '',
   makeSnackbar: () => {},

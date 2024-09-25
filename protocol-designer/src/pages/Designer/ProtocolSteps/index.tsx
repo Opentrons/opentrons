@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -21,13 +21,13 @@ export function ProtocolSteps(): JSX.Element {
   const formData = useSelector(getUnsavedForm)
   const leftString = t('onDeck')
   const rightString = t('offDeck')
-  const [deckView, setDeckView] = React.useState<
+  const [deckView, setDeckView] = useState<
     typeof leftString | typeof rightString
   >(leftString)
 
   const formType = formData?.stepType
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (formData != null && formType !== 'moveLabware') {
       setDeckView(leftString)
     }

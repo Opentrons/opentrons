@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { when } from 'vitest-when'

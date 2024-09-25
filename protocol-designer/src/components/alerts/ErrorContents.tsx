@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import { START_TERMINAL_ITEM_ID } from '../../steplist'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
@@ -50,11 +50,11 @@ export const ErrorContents = (
     }
   } else if (props.level === 'form') {
     return (
-      <React.Fragment>
+      <Fragment>
         {t(`form.error.${props.errorType}.body`, {
           defaultValue: '',
         })}
-      </React.Fragment>
+      </Fragment>
     )
   } else {
     return null

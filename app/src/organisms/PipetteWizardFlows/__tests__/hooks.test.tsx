@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 import { I18nextProvider } from 'react-i18next'
 import { renderHook } from '@testing-library/react'

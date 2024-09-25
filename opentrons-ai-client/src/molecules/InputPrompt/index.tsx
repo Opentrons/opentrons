@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 import { useFormContext } from 'react-hook-form'
@@ -33,7 +33,7 @@ export function InputPrompt(): JSX.Element {
   const [, setChatData] = useAtom(chatDataAtom)
   const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom)
   const [token] = useAtom(tokenAtom)
-  const [submitted, setSubmitted] = React.useState<boolean>(false)
+  const [submitted, setSubmitted] = useState<boolean>(false)
   const userPrompt = watch('userPrompt') ?? ''
   const { data, isLoading, callApi } = useApiCall()
 
@@ -86,7 +86,7 @@ export function InputPrompt(): JSX.Element {
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (submitted && data != null && !isLoading) {
       const { role, reply } = data as ChatData
       const assistantResponse: ChatData = {

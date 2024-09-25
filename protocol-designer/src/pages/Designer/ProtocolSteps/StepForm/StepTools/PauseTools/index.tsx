@@ -1,7 +1,8 @@
-import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+
+import type { ChangeEvent } from 'react'
 
 import {
   BORDERS,
@@ -85,7 +86,7 @@ export function PauseTools(props: StepFormProps): JSX.Element {
             padding={`${SPACING.spacing16} ${SPACING.spacing16} 0 ${SPACING.spacing16}`}
           >
             <RadioButton
-              onChange={(e: React.ChangeEvent<any>) => {
+              onChange={(e: ChangeEvent<any>) => {
                 propsForFields.pauseAction.updateValue(e.currentTarget.value)
               }}
               buttonLabel={t(
@@ -98,7 +99,7 @@ export function PauseTools(props: StepFormProps): JSX.Element {
               largeDesktopBorderRadius
             />
             <RadioButton
-              onChange={(e: React.ChangeEvent<any>) => {
+              onChange={(e: ChangeEvent<any>) => {
                 propsForFields.pauseAction.updateValue(e.currentTarget.value)
               }}
               buttonLabel={t(
@@ -109,7 +110,7 @@ export function PauseTools(props: StepFormProps): JSX.Element {
               largeDesktopBorderRadius
             />
             <RadioButton
-              onChange={(e: React.ChangeEvent<any>) => {
+              onChange={(e: ChangeEvent<any>) => {
                 propsForFields.pauseAction.updateValue(e.currentTarget.value)
               }}
               buttonLabel={t(
@@ -141,7 +142,7 @@ export function PauseTools(props: StepFormProps): JSX.Element {
                   </StyledText>
                   <StyledTextArea
                     value={propsForFields.pauseTime.value as string}
-                    onChange={(e: React.ChangeEvent<any>) => {
+                    onChange={(e: ChangeEvent<any>) => {
                       propsForFields.pauseTime.updateValue(
                         e.currentTarget.value
                       )
@@ -191,7 +192,7 @@ export function PauseTools(props: StepFormProps): JSX.Element {
                   </StyledText>
                   <StyledTextArea
                     value={propsForFields.pauseTemperature.value as string}
-                    onChange={(e: React.ChangeEvent<any>) => {
+                    onChange={(e: ChangeEvent<any>) => {
                       propsForFields.pauseTemperature.updateValue(
                         e.currentTarget.value
                       )
@@ -224,7 +225,7 @@ export function PauseTools(props: StepFormProps): JSX.Element {
             </StyledText>
             <StyledTextArea
               value={propsForFields.pauseMessage.value as string}
-              onChange={(e: React.ChangeEvent<any>) => {
+              onChange={(e: ChangeEvent<any>) => {
                 propsForFields.pauseMessage.updateValue(e.currentTarget.value)
               }}
               height="7rem"

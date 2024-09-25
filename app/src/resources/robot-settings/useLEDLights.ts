@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   fetchSettings,
@@ -15,9 +15,7 @@ export function useLEDLights(
   lightsEnabled: boolean
   toggleLights: () => void
 } {
-  const [lightsEnabledCache, setLightsEnabledCache] = React.useState<boolean>(
-    true
-  )
+  const [lightsEnabledCache, setLightsEnabledCache] = useState<boolean>(true)
 
   const dispatch = useDispatch<Dispatch>()
 
@@ -26,11 +24,11 @@ export function useLEDLights(
       getRobotSettings(state, robotName)
     ).find(setting => setting.id === 'disableStatusBar')?.value !== true
 
-  React.useEffect(() => {
+  useEffect(() => {
     setLightsEnabledCache(isStatusBarEnabled)
   }, [isStatusBarEnabled])
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(fetchSettings(robotName))
   }, [dispatch, robotName])
 

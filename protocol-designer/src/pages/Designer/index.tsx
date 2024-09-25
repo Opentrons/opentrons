@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -53,19 +53,15 @@ export function Designer(): JSX.Element {
   const zoomIn = useSelector(selectors.getZoomedInSlot)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const isNewProtocol = useSelector(selectors.getIsNewProtocol)
-  const [liquidOverflowMenu, showLiquidOverflowMenu] = React.useState<boolean>(
-    false
-  )
-  const [showDefineLiquidModal, setDefineLiquidModal] = React.useState<boolean>(
-    false
-  )
-  const [tab, setTab] = React.useState<'startingDeck' | 'protocolSteps'>(
+  const [liquidOverflowMenu, showLiquidOverflowMenu] = useState<boolean>(false)
+  const [showDefineLiquidModal, setDefineLiquidModal] = useState<boolean>(false)
+  const [tab, setTab] = useState<'startingDeck' | 'protocolSteps'>(
     'startingDeck'
   )
   const leftString = t('onDeck')
   const rightString = t('offDeck')
 
-  const [deckView, setDeckView] = React.useState<
+  const [deckView, setDeckView] = useState<
     typeof leftString | typeof rightString
   >(leftString)
 
@@ -100,7 +96,7 @@ export function Designer(): JSX.Element {
     Object.values(additionalEquipmentOnDeck).length > 1
 
   // only display toast if its a newly made protocol and has hardware
-  React.useEffect(() => {
+  useEffect(() => {
     if (hasHardware && isNewProtocol) {
       bakeToast(t('add_rest') as string, INFO_TOAST, {
         heading: t('we_added_hardware'),
@@ -110,7 +106,7 @@ export function Designer(): JSX.Element {
     }
   }, [])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (fileMetadata?.created == null) {
       console.warn(
         'fileMetadata was refreshed while on the designer page, redirecting to landing page'
@@ -134,7 +130,7 @@ export function Designer(): JSX.Element {
       <OffDeck tab={tab} />
     )
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (tab === 'startingDeck') {
       //  ensure that the starting deck page is always showing the initial deck setup
       dispatch(selectTerminalItem('__initial_setup__'))

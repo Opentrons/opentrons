@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { renderHook } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { I18nextProvider } from 'react-i18next'

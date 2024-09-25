@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import cx from 'classnames'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
@@ -39,7 +39,7 @@ import type { StepFormProps } from '../types'
 import styles from '../StepEditForm.module.css'
 
 export const MixForm = (props: StepFormProps): JSX.Element => {
-  const [collapsed, setCollapsed] = React.useState(true)
+  const [collapsed, setCollapsed] = useState(true)
   const pipettes = useSelector(getPipetteEntities)
   const enableReturnTip = useSelector(getEnableReturnTip)
   const labwares = useSelector(getLabwareEntities)

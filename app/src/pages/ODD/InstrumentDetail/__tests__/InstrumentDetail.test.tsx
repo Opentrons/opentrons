@@ -1,4 +1,3 @@
-import React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
 import { useParams } from 'react-router-dom'

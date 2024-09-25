@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import without from 'lodash/without'
 import { THERMOCYCLER_MODULE_V2 } from '@opentrons/shared-data'

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'

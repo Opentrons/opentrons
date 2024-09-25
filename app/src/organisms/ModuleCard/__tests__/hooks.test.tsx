@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Provider } from 'react-redux'
 import { when } from 'vitest-when'
 import { createStore } from 'redux'

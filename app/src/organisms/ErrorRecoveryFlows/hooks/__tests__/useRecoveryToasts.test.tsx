@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { I18nextProvider } from 'react-i18next'
 import { i18n } from '/app/i18n'

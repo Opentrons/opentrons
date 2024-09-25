@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect, useRef, useState } from 'react'
 import isEmpty from 'lodash/isEmpty'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
@@ -136,7 +136,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
 
   const robot = useRobot(robotName)
   useSyncRobotClock(robotName)
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(fetchProtocols())
   }, [dispatch])
   return robot != null ? (
@@ -177,11 +177,11 @@ interface PageContentsProps {
 function PageContents(props: PageContentsProps): JSX.Element {
   const { runId, robotName, protocolRunDetailsTab } = props
   const robotType = useRobotType(robotName)
-  const protocolRunHeaderRef = React.useRef<HTMLDivElement>(null)
-  const listRef = React.useRef<ViewportListRef | null>(null)
-  const [jumpedIndex, setJumpedIndex] = React.useState<number | null>(null)
+  const protocolRunHeaderRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<ViewportListRef | null>(null)
+  const [jumpedIndex, setJumpedIndex] = useState<number | null>(null)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (jumpedIndex != null) {
       setTimeout(() => {
         setJumpedIndex(null)
@@ -189,7 +189,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
     }
   }, [jumpedIndex])
 
-  const [missingSteps, setMissingSteps] = React.useState<
+  const [missingSteps, setMissingSteps] = useState<
     ReturnType<typeof initialMissingSteps>
   >(initialMissingSteps())
 
@@ -322,7 +322,7 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
 
   // On the initial render or when a run first begins, navigate to "run preview" if the run has started.
   // If "run again" is clicked, the user should NOT be directed back to the "setup" tab.
-  React.useEffect(() => {
+  useEffect(() => {
     if (runHasStarted && protocolRunDetailsTab !== 'run-preview') {
       navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
     }
@@ -351,7 +351,7 @@ const ParametersTab = (props: ParametersTabProps): JSX.Element | null => {
   const navigate = useNavigate()
   const disabled = mostRecentAnalysis == null
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (disabled && protocolRunDetailsTab === 'runtime-parameters') {
       navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`, {
         replace: true,
@@ -393,7 +393,7 @@ const ModuleControlsTab = (
       : 'not_available_for_a_run_in_progress'
   )}`
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (disabled && protocolRunDetailsTab === 'module-controls')
       navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
   }, [disabled, navigate, protocolRunDetailsTab, robotName, runId])

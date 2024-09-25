@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect, useLayoutEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -40,11 +40,11 @@ export interface UseERWizardResult {
 }
 
 export function useERWizard(): UseERWizardResult {
-  const [showERWizard, setShowERWizard] = React.useState(false)
+  const [showERWizard, setShowERWizard] = useState(false)
   // Because RunPausedSplash has access to some ER Wiz routes but is not a part of the ER wizard, the splash screen
   // is the "home" route as opposed to SelectRecoveryOption (accessed by pressing "go back" or "continue" enough times)
   // when recovery mode has not been launched.
-  const [hasLaunchedRecovery, setHasLaunchedRecovery] = React.useState(false)
+  const [hasLaunchedRecovery, setHasLaunchedRecovery] = useState(false)
 
   const toggleERWizard = (
     isActive: boolean,
@@ -103,7 +103,7 @@ export function ErrorRecoveryComponent(
   const { t } = useTranslation('error_recovery')
   const { showModal, toggleModal } = useErrorDetailsModal()
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (showModal) {
       analytics.reportViewErrorDetailsEvent(route, step)
     }
@@ -273,7 +273,7 @@ export function useInitialPipetteHome({
   const { handleMotionRouting } = routeUpdateActions
 
   // Synchronously set the recovery route to "robot in motion" before initial render to prevent screen flicker on ER launch.
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (hasLaunchedRecovery) {
       void handleMotionRouting(true)
         .then(() => homePipetteZAxes())

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import head from 'lodash/head'
 import { useTranslation } from 'react-i18next'
 
@@ -59,7 +59,7 @@ export function SelectRecoveryOptionHome({
   const { determineTipStatus } = tipStatusUtils
   const { setSelectedRecoveryOption } = currentRecoveryOptionUtils
   const validRecoveryOptions = getRecoveryOptions(errorKind)
-  const [selectedRoute, setSelectedRoute] = React.useState<RecoveryRoute>(
+  const [selectedRoute, setSelectedRoute] = useState<RecoveryRoute>(
     head(validRecoveryOptions) as RecoveryRoute
   )
 
@@ -178,7 +178,7 @@ export function DesktopRecoveryOptions({
 export function useCurrentTipStatus(
   determineTipStatus: () => Promise<PipetteWithTip[]>
 ): void {
-  React.useEffect(() => {
+  useEffect(() => {
     void determineTipStatus()
   }, [])
 }
