@@ -16,7 +16,7 @@ interface ToggleProps {
   label: string
   disabled?: boolean
 }
-export const Toggle = (props: ToggleProps): JSX.Element => {
+export function Toggle(props: ToggleProps): JSX.Element {
   const { isSelected, onClick, label, disabled = false } = props
   return (
     <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
@@ -31,7 +31,7 @@ export const Toggle = (props: ToggleProps): JSX.Element => {
       >
         <Icon
           name={isSelected ? 'ot-toggle-input-on' : 'ot-toggle-input-off'}
-          height="1rem"
+          size="1rem"
         />
       </Btn>
     </Flex>

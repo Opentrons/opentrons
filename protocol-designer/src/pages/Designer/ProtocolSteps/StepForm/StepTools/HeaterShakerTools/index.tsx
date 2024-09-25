@@ -120,6 +120,7 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
           isChecked={propsForFields.heaterShakerSetTimer.value === true}
           checkboxUpdateValue={propsForFields.heaterShakerSetTimer.updateValue}
         >
+          {/* TODO: wire up the new timer with the combined field */}
           {formData.heaterShakerSetTimer === true ? (
             <InputStepFormField
               showTooltip={false}
