@@ -237,7 +237,7 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildRetryNewTips()
     case RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE:
       return buildRetrySameTips()
-    case RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE:
+    case RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE:
       return buildFillWellAndSkip()
     case RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE:
       return buildSkipStepSameTips()

@@ -146,7 +146,7 @@ function handleRecoveryOptionAction<T>(
   nextStepReturnVal: T
 ): T | string {
   switch (selectedRecoveryOption) {
-    case RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE:
+    case RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE:
     case RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE:
     case RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE:
     case RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE:

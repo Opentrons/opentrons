@@ -34,6 +34,8 @@
   "launch_recovery_mode": "Launch Recovery Mode",
   "manually_fill_liquid_in_well": "Manually fill liquid in well {{well}}",
   "manually_fill_well_and_skip": "Manually fill well and skip to next step",
+  "manually_move_lw_and_skip": "Manually move labware and skip to next step",
+  "manually_replace_lw_and_retry": "Manually replace labware on deck and retry step",
   "next_step": "Next step",
   "next_try_another_action": "Next, you can try another recovery action or cancel the run.",
   "no_liquid_detected": "No liquid detected",

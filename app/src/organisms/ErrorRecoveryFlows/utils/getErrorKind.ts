@@ -2,6 +2,7 @@ import { ERROR_KINDS, DEFINED_ERROR_TYPES } from '../constants'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { ErrorKind } from '../types'
+import { ERROR } from '/app/redux/robot-update'
 
 /**
  * Given server-side information about a failed command,
@@ -13,6 +14,8 @@ export function getErrorKind(failedCommand: RunTimeCommand | null): ErrorKind {
   const errorType = failedCommand?.error?.errorType
 
   if (errorIsDefined) {
+    // todo(mm, 2024-07-02): Also handle aspirateInPlace and dispenseInPlace.
+    // https://opentrons.atlassian.net/browse/EXEC-593
     if (
       commandType === 'aspirate' &&
       errorType === DEFINED_ERROR_TYPES.OVERPRESSURE
@@ -34,8 +37,13 @@ export function getErrorKind(failedCommand: RunTimeCommand | null): ErrorKind {
     ) {
       return ERROR_KINDS.TIP_NOT_DETECTED
     }
-    // todo(mm, 2024-07-02): Also handle aspirateInPlace and dispenseInPlace.
-    // https://opentrons.atlassian.net/browse/EXEC-593
+    // TODO(jh 09-25-24): Update the error to match what the server actually sends when available.
+    else if (
+      commandType === 'moveLabware' &&
+      errorType === DEFINED_ERROR_TYPES.GRIPPER_PLACEHOLDER_ERROR
+    ) {
+      return ERROR_KINDS.GRIPPER_ERROR
+    }
   }
 
   return ERROR_KINDS.GENERAL_ERROR

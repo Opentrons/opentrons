@@ -13,8 +13,8 @@ describe('cleanupRecoveryState', () => {
       isTakeover: false,
       stashedMapRef: {
         current: {
-          route: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE,
-          step: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.STEPS.SKIP,
+          route: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
+          step: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP,
         },
       },
       setRM: mockSetRM,
@@ -25,8 +25,8 @@ describe('cleanupRecoveryState', () => {
     cleanupRecoveryState(props)
 
     expect(props.stashedMapRef.current).toEqual({
-      route: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE,
-      step: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.STEPS.SKIP,
+      route: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
+      step: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP,
     })
     expect(mockSetRM).not.toHaveBeenCalled()
   })

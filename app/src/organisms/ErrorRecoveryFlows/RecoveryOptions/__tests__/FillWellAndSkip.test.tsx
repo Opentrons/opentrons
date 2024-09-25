@@ -66,12 +66,12 @@ describe('FillWellAndSkip', () => {
     )
   })
 
-  it(`renders FillWell when step is ${RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.STEPS.MANUALLY_FILL}`, () => {
+  it(`renders FillWell when step is ${RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.MANUAL_FILL}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        step: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.STEPS.MANUALLY_FILL,
+        step: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.MANUAL_FILL,
       },
     }
     render(props)
@@ -80,12 +80,12 @@ describe('FillWellAndSkip', () => {
     )
   })
 
-  it(`renders SkipToNextStep when step is ${RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.STEPS.SKIP}`, () => {
+  it(`renders SkipToNextStep when step is ${RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        step: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.STEPS.SKIP,
+        step: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP,
       },
     }
     render(props)

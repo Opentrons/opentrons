@@ -171,7 +171,7 @@ describe('ErrorRecoveryContent', () => {
     ROBOT_SKIPPING_STEP,
     RETRY_NEW_TIPS,
     RETRY_SAME_TIPS,
-    FILL_MANUALLY_AND_SKIP,
+    MANUAL_FILL_AND_SKIP,
     SKIP_STEP_WITH_SAME_TIPS,
     SKIP_STEP_WITH_NEW_TIPS,
     IGNORE_AND_SKIP,
@@ -280,12 +280,12 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_RETRY_SAME_TIPS')
   })
 
-  it(`returns RetrySameTips when the route is ${FILL_MANUALLY_AND_SKIP.ROUTE}`, () => {
+  it(`returns RetrySameTips when the route is ${MANUAL_FILL_AND_SKIP.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        route: FILL_MANUALLY_AND_SKIP.ROUTE,
+        route: MANUAL_FILL_AND_SKIP.ROUTE,
       },
     }
     renderRecoveryContent(props)
