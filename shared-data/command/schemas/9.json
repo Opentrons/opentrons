@@ -320,7 +320,7 @@
     },
     "LiquidHandlingWellLocation": {
       "title": "LiquidHandlingWellLocation",
-      "description": "A relative location in reference to a well's location.",
+      "description": "A relative location in reference to a well's location. To be used with commands that handle liquids.",
       "type": "object",
       "properties": {
         "origin": {
@@ -336,7 +336,7 @@
         },
         "volumeOffset": {
           "title": "Volumeoffset",
-          "description": "A volume of liquid to account for when\n                                executing commands with an origin of WellOrigin.MENISCUS. Specifying\n                                `operationVolume` results in this class acting as a sentinel and should\n                                be used when volume can be determined from the command parameters, for\n                                example commanding Aspirate. A volume should be specified when it cannot\n                                be determined from the command parameters, for example commanding\n                                MoveToWell prior to AspirateInPlace.",
+          "description": "A volume of liquid, in \u00b5L, to offset the z-axis offset. When \"operationVolume\" is specified, this volume is pulled from the volume command parameter.",
           "default": 0.0,
           "anyOf": [
             {
@@ -2029,7 +2029,7 @@
         },
         "volumeOffset": {
           "title": "Volumeoffset",
-          "description": "A volume of liquid to account for when\n                                executing commands with an origin of WellOrigin.MENISCUS. Specifying\n                                `operationVolume` results in this class acting as a sentinel and should\n                                be used when volume can be determined from the command parameters, for\n                                example commanding Aspirate. A volume should be specified when it cannot\n                                be determined from the command parameters, for example commanding\n                                MoveToWell prior to AspirateInPlace.",
+          "description": "A volume of liquid, in \u00b5L, to offset the z-axis offset.",
           "default": 0.0,
           "type": "number"
         }
@@ -2442,7 +2442,7 @@
     },
     "PickUpTipWellLocation": {
       "title": "PickUpTipWellLocation",
-      "description": "A relative location in reference to a well's location.",
+      "description": "A relative location in reference to a well's location. To be used for picking up tips.",
       "type": "object",
       "properties": {
         "origin": {

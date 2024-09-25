@@ -35,7 +35,14 @@ class Params(BaseModel):
     wellName: Optional[str]
     volume: Optional[float]
     flowRate: Optional[float]
-    wellLocation: Optional[Union[WellLocation, LiquidHandlingWellLocation, DropTipWellLocation, PickUpTipWellLocation]]
+    wellLocation: Optional[
+        Union[
+            WellLocation,
+            LiquidHandlingWellLocation,
+            DropTipWellLocation,
+            PickUpTipWellLocation,
+        ]
+    ]
     waitForResume: Optional[Literal[True]]
     seconds: Optional[float]
     minimumZHeight: Optional[float]
