@@ -18,10 +18,12 @@ import {
 } from '@opentrons/components'
 import { OddModal } from '/app/molecules/OddModal'
 import { getIsOnDevice } from '/app/redux/config'
-import { getLocationInfoNames } from '/app/transformations/commands'
-import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
+import {
+  getLocationInfoNames,
+  getSlotLabwareDefinition,
+} from '/app/transformations/commands'
 import { Divider } from '/app/atoms/structure'
-import { getModuleImage } from '../SetupModuleAndDeck/utils'
+import { getModuleImage } from '/app/local-resources/modules'
 import {
   FLEX_ROBOT_TYPE,
   getModuleDisplayName,

@@ -35,7 +35,7 @@ import {
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getLocationInfoNames } from '/app/transformations/commands'
-import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
+import { LiquidsLabwareDetailsModal } from '/app/organisms/LiquidsLabwareDetailsModal'
 import {
   getTotalVolumePerLiquidId,
   getVolumePerWell,

@@ -16,13 +16,14 @@ import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
 import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
 import { useLaunchLPC } from '../../../../LabwarePositionCheck/useLaunchLPC'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
-import {
-  useLPCDisabledReason,
-  useRunHasStarted,
-  useUnmatchedModulesForProtocol,
-} from '../../../hooks'
 import { SetupLabwarePositionCheck } from '..'
-import { useNotifyRunQuery, useRunCalibrationStatus } from '/app/resources/runs'
+import {
+  useNotifyRunQuery,
+  useRunCalibrationStatus,
+  useRunHasStarted,
+  useLPCDisabledReason,
+  useUnmatchedModulesForProtocol,
+} from '/app/resources/runs'
 import { useRobotType } from '/app/redux-resources/robots'
 
 import type { Mock } from 'vitest'
@@ -31,7 +32,6 @@ vi.mock('../../../../LabwarePositionCheck/useLaunchLPC')
 vi.mock('../../utils/getModuleTypesThatRequireExtraAttention')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/config')
-vi.mock('../../../hooks')
 vi.mock('../../../hooks/useLPCSuccessToast')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs')

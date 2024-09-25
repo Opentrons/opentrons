@@ -5,12 +5,12 @@ import { describe, it, beforeEach, vi, afterEach } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useRunHasStarted } from '../../hooks'
-import { formatTimestamp } from '../../utils'
+import { useRunHasStarted } from '/app/resources/runs'
+import { formatTimestamp } from '/app/transformations/runs'
 import { SetupCalibrationItem } from '../SetupCalibrationItem'
 
-vi.mock('../../hooks')
-vi.mock('../../utils')
+vi.mock('/app/resources/runs')
+vi.mock('/app/transformations/runs')
 
 const RUN_ID = '1'
 

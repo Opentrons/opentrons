@@ -21,7 +21,7 @@ import {
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { CommandText } from '/app/molecules/Command'
-import { RunTimer } from '../../Devices/ProtocolRun/RunTimer'
+import { RunTimer } from '/app/molecules/RunTimer'
 import { getCommandTextData } from '/app/molecules/Command/utils/getCommandTextData'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'

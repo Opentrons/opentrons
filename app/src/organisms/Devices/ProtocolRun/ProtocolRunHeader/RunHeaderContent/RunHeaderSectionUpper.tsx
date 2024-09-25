@@ -11,10 +11,9 @@ import {
 
 import { LabeledValue } from './LabeledValue'
 import { DisplayRunStatus } from '../DisplayRunStatus'
-import { RunTimer } from '../../RunTimer'
+import { RunTimer } from '/app/molecules/RunTimer'
 import { ActionButton } from './ActionButton'
-import { useRunCreatedAtTimestamp } from '../../../hooks'
-import { useRunTimestamps } from '/app/resources/runs'
+import { useRunTimestamps, useRunCreatedAtTimestamp } from '/app/resources/runs'
 
 import type { RunHeaderContentProps } from '.'
 

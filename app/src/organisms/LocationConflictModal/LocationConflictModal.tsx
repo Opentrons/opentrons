@@ -32,7 +32,7 @@ import {
   THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
-import { getTopPortalEl } from '../../../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { OddModal } from '/app/molecules/OddModal'
 import { SmallButton } from '/app/atoms/buttons/SmallButton'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'

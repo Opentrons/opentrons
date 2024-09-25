@@ -36,8 +36,8 @@ import { InlineNotification } from '/app/atoms/InlineNotification'
 import { getRobotSettings, updateSetting } from '/app/redux/robot-settings'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
 import { Navigation } from '/app/organisms/Navigation'
-import { useLEDLights } from '/app/organisms/Devices/hooks'
-import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
+import { useLEDLights } from '/app/resources/robot-settings'
+import { useNetworkConnection } from '/app/resources/networking'
 import {
   RobotSettingButton,
   OnOffToggle,

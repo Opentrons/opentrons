@@ -24,9 +24,9 @@ import {
   MAGNETIC_BLOCK_V1,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
-import { getTopPortalEl } from '../../../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { OddModal } from '/app/molecules/OddModal'
-import { FixtureOption } from '../../../DeviceDetailsDeckConfiguration/AddFixtureModal'
+import { FixtureOption } from '/app/organisms/DeviceDetailsDeckConfiguration/AddFixtureModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { SmallButton } from '/app/atoms/buttons'
 import { useCloseCurrentRun } from '/app/resources/runs'

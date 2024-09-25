@@ -8,11 +8,11 @@ import {
   TEMPERATURE_MODULE_V2_FIXTURE,
   heater_shaker_commands_with_results_key,
 } from '@opentrons/shared-data'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useAttachedModules } from '/app/resources/modules'
-import { useModuleRenderInfoForProtocolById } from '..'
+import { useModuleRenderInfoForProtocolById } from '../useModuleRenderInfoForProtocolById'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
   mockTemperatureModuleGen2,
@@ -31,7 +31,7 @@ import type { AttachedModule } from '/app/redux/modules/types'
 vi.mock('/app/transformations/analysis')
 vi.mock('/app/resources/modules')
 vi.mock('/app/resources/analysis')
-vi.mock('/app/resources/runs')
+vi.mock('../useMostRecentCompletedAnalysis')
 vi.mock('/app/resources/deck_configuration')
 
 const heaterShakerCommandsWithResultsKey = (heater_shaker_commands_with_results_key as unknown) as ProtocolAnalysisOutput

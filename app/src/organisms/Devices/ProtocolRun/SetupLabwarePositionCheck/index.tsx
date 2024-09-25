@@ -20,7 +20,6 @@ import {
 import { useProtocolQuery } from '@opentrons/react-api-client'
 
 import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
-import { useLPCDisabledReason } from '../../hooks'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { CurrentOffsetsTable } from './CurrentOffsetsTable'
 import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
@@ -28,6 +27,7 @@ import { getLatestCurrentOffsets } from '/app/transformations/runs'
 import {
   useNotifyRunQuery,
   useMostRecentCompletedAnalysis,
+  useLPCDisabledReason,
 } from '/app/resources/runs'
 import { useRobotType } from '/app/redux-resources/robots'
 import type { LabwareOffset } from '@opentrons/api-client'

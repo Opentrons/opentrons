@@ -5,10 +5,10 @@ import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 
 import { i18n } from '/app/i18n'
-import { useLEDLights } from '../../../hooks'
+import { useLEDLights } from '/app/resources/robot-settings'
 import { EnableStatusLight } from '../EnableStatusLight'
 
-vi.mock('../../../hooks')
+vi.mock('/app/resources/robot-settings')
 
 const ROBOT_NAME = 'otie'
 const mockToggleLights = vi.fn()

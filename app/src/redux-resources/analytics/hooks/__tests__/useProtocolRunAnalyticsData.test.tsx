@@ -69,7 +69,7 @@ const ROBOT_PROTOCOL_ANALYSIS = {
   runTimeParameters: RUNTIME_PARAMETERS,
 }
 
-describe('useProtocolAnalysisErrors hook', () => {
+describe('useProtocolRunAnalyticsData hook', () => {
   beforeEach(() => {
     store = createStore(vi.fn(), {})
     const queryClient = new QueryClient()

@@ -4,7 +4,7 @@ import type { AttachedModule } from '/app/redux/modules/types'
 
 import { useRobot } from '/app/redux-resources/robots'
 import { useAttachedModules } from '/app/resources/modules'
-import { useModuleRenderInfoForProtocolById } from '.'
+import { useModuleRenderInfoForProtocolById } from './useModuleRenderInfoForProtocolById'
 import {
   NON_CONNECTING_MODULE_TYPES,
   getModuleType,

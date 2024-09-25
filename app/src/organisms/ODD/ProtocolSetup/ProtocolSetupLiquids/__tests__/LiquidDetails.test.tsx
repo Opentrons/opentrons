@@ -8,7 +8,7 @@ import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 import { getLocationInfoNames } from '/app/transformations/commands'
 import { getVolumePerWell } from '/app/transformations/analysis'
 import { LiquidDetails } from '../LiquidDetails'
-import { LiquidsLabwareDetailsModal } from '../../../../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal'
+import { LiquidsLabwareDetailsModal } from '/app/organisms/LiquidsLabwareDetailsModal'
 import {
   MOCK_LABWARE_INFO_BY_LIQUID_ID,
   MOCK_PROTOCOL_ANALYSIS,
@@ -17,9 +17,7 @@ import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 vi.mock('/app/transformations/analysis')
 vi.mock('/app/transformations/commands')
-vi.mock(
-  '../../../../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal'
-)
+vi.mock('/app/organisms/LiquidsLabwareDetailsModal')
 
 const render = (props: React.ComponentProps<typeof LiquidDetails>) => {
   return renderWithProviders(<LiquidDetails {...props} />, {

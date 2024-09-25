@@ -14,8 +14,8 @@ import {
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
-import { formatTimestamp } from '../../../utils'
-import { useRunControls } from '../../../../RunTimeControl/hooks'
+import { formatTimestamp } from '/app/transformations/runs'
+import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import {
   EMPTY_TIMESTAMP,
   useRunTimestamps,

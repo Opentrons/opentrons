@@ -35,13 +35,13 @@ import {
   useNotifyRunQuery,
   useNotifyAllCommandsQuery,
   useMostRecentCompletedAnalysis,
+  useLastRunCommand,
 } from '/app/resources/runs'
 import { useFeatureFlag } from '/app/redux/config'
 import {
   ErrorRecoveryFlows,
   useErrorRecoveryFlows,
 } from '/app/organisms/ErrorRecoveryFlows'
-import { useLastRunCommand } from '/app/organisms/Devices/hooks/useLastRunCommand'
 import {
   useInterventionModal,
   InterventionModal,
@@ -53,7 +53,6 @@ import type { ProtocolAnalyses, RunCommandSummary } from '@opentrons/api-client'
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/analytics')
 vi.mock('/app/redux-resources/robots')
-vi.mock('/app/organisms/Devices/hooks/useLastRunCommandKey')
 vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/organisms/ODD/RunningProtocol')
 vi.mock('/app/redux/discovery')
@@ -62,7 +61,6 @@ vi.mock('/app/organisms/OpenDoorAlertModal')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux/config')
 vi.mock('/app/organisms/ErrorRecoveryFlows')
-vi.mock('/app/organisms/Devices/hooks/useLastRunCommand')
 vi.mock('/app/organisms/InterventionModal')
 
 const RUN_ID = 'run_id'

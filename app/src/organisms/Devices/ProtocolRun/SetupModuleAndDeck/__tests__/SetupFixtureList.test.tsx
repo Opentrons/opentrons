@@ -13,16 +13,16 @@ import {
 import { i18n } from '/app/i18n'
 import { SetupFixtureList } from '../SetupFixtureList'
 import { NotConfiguredModal } from '../NotConfiguredModal'
-import { LocationConflictModal } from '../LocationConflictModal'
-import { DeckFixtureSetupInstructionsModal } from '../../../../DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
+import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
+import { DeckFixtureSetupInstructionsModal } from '/app/organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 
 import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
 
 vi.mock('/app/resources/deck_configuration/hooks')
-vi.mock('../LocationConflictModal')
+vi.mock('/app/organisms/LocationConflictModal')
 vi.mock('../NotConfiguredModal')
 vi.mock(
-  '../../../../DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
+  '/app/organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 )
 
 const mockDeckConfigCompatibility: CutoutConfigAndCompatibility[] = [

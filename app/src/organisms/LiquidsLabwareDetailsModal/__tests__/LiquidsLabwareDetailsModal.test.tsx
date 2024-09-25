@@ -10,8 +10,10 @@ import { i18n } from '/app/i18n'
 import { getIsOnDevice } from '/app/redux/config'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
-import { getLocationInfoNames } from '/app/transformations/commands'
-import { getSlotLabwareDefinition } from '../../utils/getSlotLabwareDefinition'
+import {
+  getLocationInfoNames,
+  getSlotLabwareDefinition,
+} from '/app/transformations/commands'
 import {
   getLiquidsByIdForLabware,
   getDisabledWellFillFromLabwareId,
@@ -38,9 +40,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 })
 vi.mock('/app/redux/config')
 vi.mock('/app/resources/runs')
-vi.mock('../../../../Devices/hooks')
 vi.mock('/app/transformations/commands')
-vi.mock('../../utils/getSlotLabwareDefinition')
 vi.mock('/app/transformations/analysis')
 vi.mock('../LiquidDetailCard')
 

@@ -41,9 +41,8 @@ import {
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
-import { useRunCreatedAtTimestamp } from '/app/organisms/Devices/hooks'
-import { onDeviceDisplayFormatTimestamp } from '/app/organisms/Devices/utils'
-import { RunTimer } from '/app/organisms/Devices/ProtocolRun/RunTimer'
+import { onDeviceDisplayFormatTimestamp } from '/app/transformations/runs'
+import { RunTimer } from '/app/molecules/RunTimer'
 import {
   useTrackProtocolRunEvent,
   useTrackEventWithRobotSerial,
@@ -63,6 +62,7 @@ import {
   useIsRunCurrent,
   useNotifyRunQuery,
   useRunTimestamps,
+  useRunCreatedAtTimestamp,
   useCloseCurrentRun,
   EMPTY_TIMESTAMP,
 } from '/app/resources/runs'

@@ -43,7 +43,7 @@ import {
 } from '/app/transformations/commands'
 import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { LabwareStackModal } from '../../../Devices/ProtocolRun/SetupLabware/LabwareStackModal'
+import { LabwareStackModal } from '/app/molecules/LabwareStackModal'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModulesAndDeck/utils'
 import { LabwareMapView } from './LabwareMapView'

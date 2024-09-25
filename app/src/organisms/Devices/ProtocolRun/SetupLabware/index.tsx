@@ -10,10 +10,12 @@ import {
 } from '@opentrons/components'
 import { useToggleGroup } from '/app/molecules/ToggleGroup/useToggleGroup'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import {
+  useMostRecentCompletedAnalysis,
+  useModuleRenderInfoForProtocolById,
+} from '/app/resources/runs'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { useModuleRenderInfoForProtocolById } from '../../hooks'
 import { SetupLabwareMap } from './SetupLabwareMap'
 import { SetupLabwareList } from './SetupLabwareList'
 

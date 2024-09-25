@@ -50,7 +50,7 @@ import type {
   LoadModuleRunTimeCommand,
   LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
-import type { ModuleRenderInfoForProtocol } from '../../hooks'
+import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 import type {
   LabwareSetupItem,
   NestedLabwareInfo,

@@ -8,14 +8,14 @@ import { renderHook } from '@testing-library/react'
 import { getRobotApiVersionByName } from '/app/redux/discovery'
 
 import { useIsFlex } from '/app/redux-resources/robots'
-import { useCanDisconnect } from '../hooks/useCanDisconnect'
-import { useWifiList } from '../hooks/useWifiList'
+import { useCanDisconnect } from '../useCanDisconnect'
+import { useWifiList } from '../useWifiList'
 
 import type { WifiNetwork } from '@opentrons/api-client'
 import type { Store } from 'redux'
 import type { State } from '/app/redux/types'
 
-vi.mock('../hooks/useWifiList')
+vi.mock('../useWifiList')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/discovery')
 

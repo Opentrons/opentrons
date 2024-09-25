@@ -19,7 +19,7 @@ import {
   MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
 
-import { useRunHasStarted } from './hooks'
+import { useRunHasStarted } from '/app/resources/runs'
 import type { ModuleModel } from '@opentrons/shared-data'
 import type { PhysicalPort } from '/app/redux/modules/api-types'
 

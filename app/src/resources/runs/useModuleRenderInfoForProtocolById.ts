@@ -8,10 +8,10 @@ import {
 } from '@opentrons/shared-data'
 
 import { getProtocolModulesInfo } from '/app/transformations/analysis'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { useAttachedModules } from '/app/resources/modules'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 
 import type { CutoutConfig } from '@opentrons/shared-data'
 import type { AttachedModule } from '/app/redux/modules/types'

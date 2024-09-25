@@ -4,10 +4,8 @@ import { renderHook } from '@testing-library/react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 
-import {
-  useModuleCalibrationStatus,
-  useModuleRenderInfoForProtocolById,
-} from '..'
+import { useModuleCalibrationStatus } from '../useModuleCalibrationStatus'
+import { useModuleRenderInfoForProtocolById } from '../useModuleRenderInfoForProtocolById'
 import { useIsFlex } from '/app/redux-resources/robots'
 
 import { mockMagneticModuleGen2 } from '/app/redux/modules/__fixtures__'

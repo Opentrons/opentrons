@@ -14,7 +14,7 @@ import {
 import { LabwareListItem } from './LabwareListItem'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
-import type { ModuleRenderInfoForProtocol } from '../../hooks'
+import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import type { LabwareSetupItem } from '/app/transformations/commands'
 
