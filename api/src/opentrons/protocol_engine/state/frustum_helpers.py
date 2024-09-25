@@ -436,7 +436,7 @@ def _find_height_in_partial_frustum(
             )
     return partial_height
 
-
+    
 def find_height_at_well_volume(
     target_volume: float, well_geometry: InnerWellGeometry
 ) -> float:
@@ -468,6 +468,8 @@ def find_height_at_well_volume(
                 radius_of_curvature=well_geometry.bottomShape.radiusOfCurvature,
                 total_frustum_height=well_geometry.bottomShape.depth,
             )
+        # we need to look through the volumetric capacity list without the bottom shape
+        volumetric_capacity.pop(0)
     partial_height = _find_height_in_partial_frustum(
         sorted_frusta=sorted_frusta,
         volumetric_capacity=volumetric_capacity,
