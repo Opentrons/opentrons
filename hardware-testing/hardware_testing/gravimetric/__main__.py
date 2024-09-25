@@ -47,7 +47,7 @@ from hardware_testing.drivers import asair_sensor
 from opentrons.protocol_api import InstrumentContext
 from opentrons.protocol_engine.types import LabwareOffset
 
-API_LEVEL = "2.18"
+API_LEVEL = "2.20"
 
 LABWARE_OFFSETS: List[LabwareOffset] = []
 
@@ -231,35 +231,39 @@ class RunArgs:
         for tip in tip_volumes:
             if not volumes.get(tip):
                 volumes[tip] = []
-            vls = helpers._get_volumes(
-                _ctx,
-                args.increment,
-                args.channels,
-                args.pipette,
-                tip,
-                args.user_volumes,
-                kind,
-                False,  # set extra to false so we always do the normal tests first
-                args.channels,
-                mode=args.mode,  # NOTE: only needed for increment test
-            )
-            volumes[tip] += vls
-        if args.extra:
-            # if we use extra, add those tests after
-            for tip in tip_volumes:
-                if not volumes.get(tip):
-                    volumes[tip] = []
+            if args.user_volumes:
+                vls = [float(v) for v in args.user_volumes]
+            else:
                 vls = helpers._get_volumes(
                     _ctx,
                     args.increment,
                     args.channels,
                     args.pipette,
                     tip,
-                    args.user_volumes,
                     kind,
-                    True,
-                    args.channels,
+                    extra=False,  # set extra to false so we always do the normal tests first
+                    channels=args.channels,
+                    mode=args.mode,  # NOTE: only needed for increment test
                 )
+            volumes[tip] += vls
+        if args.extra:
+            # if we use extra, add those tests after
+            for tip in tip_volumes:
+                if not volumes.get(tip):
+                    volumes[tip] = []
+                if args.user_volumes:
+                    vls = [float(v) for v in args.user_volumes]
+                else:
+                    vls = helpers._get_volumes(
+                        _ctx,
+                        args.increment,
+                        args.channels,
+                        args.pipette,
+                        tip,
+                        kind,
+                        True,
+                        args.channels,
+                    )
                 volumes[tip] += vls
         if args.isolate_volumes:
             # check that all volumes passed in are actually test volumes
@@ -379,7 +383,7 @@ def build_gravimetric_cfg(
     return_tip: bool,
     blank: bool,
     mix: bool,
-    user_volumes: bool,
+    user_volumes: List[float],
     gantry_speed: int,
     scale_delay: int,
     isolate_channels: List[int],
@@ -429,7 +433,7 @@ def build_photometric_cfg(
     tip_volume: int,
     return_tip: bool,
     mix: bool,
-    user_volumes: bool,
+    user_volumes: List[float],
     touch_tip: bool,
     refill: bool,
     extra: bool,
@@ -572,7 +576,7 @@ if __name__ == "__main__":
     parser.add_argument("--no-blank", action="store_true")
     parser.add_argument("--blank-trials", type=int, default=10)
     parser.add_argument("--mix", action="store_true")
-    parser.add_argument("--user-volumes", action="store_true")
+    parser.add_argument("--user-volumes", nargs="+", type=float, default=[])
     parser.add_argument("--gantry-speed", type=int, default=GANTRY_MAX_SPEED)
     parser.add_argument("--scale-delay", type=int, default=DELAY_FOR_MEASUREMENT)
     parser.add_argument("--photometric", action="store_true")

@@ -31,7 +31,7 @@ class VolumetricConfig:
     nominal_plunger: bool
     return_tip: bool
     mix: bool
-    user_volumes: bool
+    user_volumes: List[float]
     kind: ConfigType
     extra: bool
     jog: bool

@@ -381,7 +381,6 @@ def _get_volumes(
     pipette_channels: int,
     pipette_volume: int,
     tip_volume: int,
-    user_volumes: bool,
     kind: config.ConfigType,
     extra: bool,
     channels: int,
@@ -391,17 +390,6 @@ def _get_volumes(
         test_volumes = get_volume_increments(
             pipette_channels, pipette_volume, tip_volume, mode=mode
         )
-    elif user_volumes:
-        if ctx.is_simulating():
-            rand_vols = [round(random() * tip_volume, 1) for _ in range(randint(1, 3))]
-            _inp = ",".join([str(r) for r in rand_vols])
-        else:
-            _inp = input(
-                f'Enter desired volumes for tip{tip_volume}, comma separated (eg: "10,100,1000") :'
-            )
-        test_volumes = [
-            float(vol_str) for vol_str in _inp.strip().split(",") if vol_str
-        ]
     else:
         test_volumes = get_test_volumes(
             kind, channels, pipette_volume, tip_volume, extra
@@ -462,7 +450,7 @@ def _load_pipette(
 
 
 def _get_tag_from_pipette(
-    pipette: InstrumentContext, increment: bool, user_volumes: bool
+    pipette: InstrumentContext, increment: bool, user_volumes: List[float]
 ) -> str:
     pipette_tag = get_pipette_unique_name(pipette)
     ui.print_info(f'found pipette "{pipette_tag}"')
