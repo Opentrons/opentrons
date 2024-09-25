@@ -78,6 +78,7 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
   const deckDef = React.useMemo(() => getDeckDefFromRobotType(robotType), [
     robotType,
   ])
+  console.log('deckDef', deckDef)
   const [hoverSlot, setHoverSlot] = React.useState<DeckSlot | null>(null)
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
