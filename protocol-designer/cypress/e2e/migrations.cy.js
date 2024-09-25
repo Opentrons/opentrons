@@ -11,6 +11,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
     cy.closeAnnouncementModal()
   })
 
+  // TODO (nd 09/25/2024): update fixtures and uncomment test cases once migration work is complete
   const testCases = [
     // {
     //   title: 'example_1_1_0 (schema 1, PD version 1.1.1) -> PD 8.1.x, schema 8',
