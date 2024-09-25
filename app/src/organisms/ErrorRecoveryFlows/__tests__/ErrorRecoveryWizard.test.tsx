@@ -162,7 +162,7 @@ const renderRecoveryContent = (
 describe('ErrorRecoveryContent', () => {
   const {
     OPTION_SELECTION,
-    RETRY_FAILED_COMMAND,
+    RETRY_STEP,
     ROBOT_CANCELING,
     ROBOT_RESUMING,
     ROBOT_IN_MOTION,
@@ -215,12 +215,12 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_SELECT_RECOVERY_OPTION')
   })
 
-  it(`returns ResumeRun when the route is ${RETRY_FAILED_COMMAND.ROUTE}`, () => {
+  it(`returns ResumeRun when the route is ${RETRY_STEP.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        route: RETRY_FAILED_COMMAND.ROUTE,
+        route: RETRY_STEP.ROUTE,
       },
     }
     renderRecoveryContent(props)
