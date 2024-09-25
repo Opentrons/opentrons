@@ -90,6 +90,8 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
       return CLOSE_STEP_FORM_WITH_CHANGES
     }
   }
+  const isPipetteStep =
+    formData?.stepType === 'moveLiquid' || formData?.stepType === 'mix'
 
   return (
     <>

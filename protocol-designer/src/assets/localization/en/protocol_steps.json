@@ -33,7 +33,8 @@
   "shake": "Shake",
   "single": "Single path",
   "starting_deck_state": "Starting deck state",
+  "step_substeps": "{{stepType}} substeps",
   "temperature": "Temperature",
   "time": "Time",
-  "view_commands": "View commands"
+  "view_substeps": "View substeps"
 }
