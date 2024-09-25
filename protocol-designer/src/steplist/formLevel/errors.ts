@@ -1,7 +1,7 @@
-import { getWellRatio } from '../utils'
-import { canPipetteUseLabware } from '../../utils'
+import type * as React from 'react'
+
 import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
-import { getPipetteCapacity } from '../../pipettes/pipetteData'
+
 import {
   MIN_ENGAGE_HEIGHT_V1,
   MAX_ENGAGE_HEIGHT_V1,
@@ -12,11 +12,14 @@ import {
   PAUSE_UNTIL_TEMP,
   THERMOCYCLER_PROFILE,
 } from '../../constants'
-import type * as React from 'react'
-import type { StepFieldName } from '../../form-types'
-import type { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
-import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
+import { getPipetteCapacity } from '../../pipettes/pipetteData'
+import { canPipetteUseLabware } from '../../utils'
+import { getWellRatio } from '../utils'
 import { getTimeFromPauseForm } from '../utils/getTimeFromPauseForm'
+
+import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
+import type { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
+import type { StepFieldName } from '../../form-types'
 /*******************
  ** Error Messages **
  ********************/

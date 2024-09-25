@@ -1,6 +1,10 @@
 import * as React from 'react'
 import styled from 'styled-components'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+
 import {
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Divider,
@@ -11,23 +15,21 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-
-import { selectors as uiModuleSelectors } from '../../../../../../ui/modules'
-import {
-  PAUSE_UNTIL_RESUME,
-  PAUSE_UNTIL_TEMP,
-  PAUSE_UNTIL_TIME,
-} from '../../../../../../constants'
-
-import type { StepFormProps } from '../../types'
-import { getInitialDeckSetup } from '../../../../../../step-forms/selectors'
 import {
   HEATERSHAKER_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
+
+import {
+  PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TEMP,
+  PAUSE_UNTIL_TIME,
+} from '../../../../../../constants'
+import { selectors as uiModuleSelectors } from '../../../../../../ui/modules'
+import { getInitialDeckSetup } from '../../../../../../step-forms/selectors'
+
+import type { StepFormProps } from '../../types'
 
 export function PauseTools(props: StepFormProps): JSX.Element {
   const { propsForFields } = props
@@ -144,15 +146,9 @@ export function PauseTools(props: StepFormProps): JSX.Element {
                         e.currentTarget.value
                       )
                     }}
-                    error={
-                      propsForFields.pauseTime.errorToShow != null &&
-                      propsForFields.pauseTime.value != null &&
-                      propsForFields.pauseTime.value !== ''
-                    }
+                    error={propsForFields.pauseTime.errorToShow != null}
                   />
-                  {propsForFields.pauseTime.value !== '' &&
-                  propsForFields.pauseTime.value != null &&
-                  propsForFields.pauseTime.errorToShow != null ? (
+                  {propsForFields.pauseTime.errorToShow != null ? (
                     <StyledText
                       desktopStyle="captionRegular"
                       color={COLORS.red50}
@@ -247,8 +243,8 @@ const StyledTextArea = styled.textarea<{ height?: string; error?: boolean }>`
   border: 1px solid
     ${props =>
       props.error != null && props.error ? COLORS.red50 : COLORS.grey50};
-  border-radius: 4px;
-  padding: 8px;
+  border-radius: ${BORDERS.borderRadius4};
+  padding: ${SPACING.spacing8};
   font-size: ${TYPOGRAPHY.fontSizeH4};
   line-height: ${TYPOGRAPHY.lineHeight16};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
