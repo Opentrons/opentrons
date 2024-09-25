@@ -24,7 +24,9 @@ import type {
   ClearWellSelectionLabwareKeyAction,
   SelectStepAction,
   SelectMultipleStepsAction,
+  ToggleViewSubstepAction,
 } from './types'
+
 // adds an incremental integer ID for Step reducers.
 // NOTE: if this is an "add step" directly performed by the user,
 // addAndSelectStepWithHints is probably what you want
@@ -229,3 +231,10 @@ export const deselectAllSteps = (
     dispatch(analyticsEvent(deselectAllStepsEvent))
   }
 }
+
+export const toggleViewSubstep = (
+  stepId: StepIdType | null
+): ToggleViewSubstepAction => ({
+  type: 'TOGGLE_VIEW_SUBSTEP',
+  payload: stepId,
+})

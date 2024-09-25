@@ -1,33 +1,18 @@
 import * as React from 'react'
-import get from 'lodash/get'
 import { useTranslation } from 'react-i18next'
 
-import {
-  ALIGN_CENTER,
-  Flex,
-  Icon,
-  PrimaryButton,
-  SPACING,
-  StyledText,
-  Toolbox,
-} from '@opentrons/components'
+import { PrimaryButton, StyledText, Toolbox } from '@opentrons/components'
 
 import { SourceDestSubstep } from '../../../../components/steplist/SourceDestSubstep'
-import {
-  SubstepIdentifier,
-  SubstepItemData,
-  WellIngredientNames,
-} from '../../../../steplist'
+import { SubstepIdentifier } from '../../../../steplist'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
 import { getSubsteps } from '../../../../file-data/selectors'
+import { HoverOnSubstepAction, getHoveredSubstep } from '../../../../ui/steps'
 import {
-  HoverOnSubstepAction,
-  getHoveredStepId,
-  getHoveredSubstep,
-} from '../../../../ui/steps'
-import { hoverOnSubstep } from '../../../../ui/steps/actions/actions'
-import { actions as stepsActions } from '../../../../ui/steps'
+  hoverOnSubstep,
+  toggleViewSubstep,
+} from '../../../../ui/steps/actions/actions'
 
 interface SubstepsToolboxProps {
   stepId: string
@@ -56,7 +41,7 @@ export function SubstepsToolbox(
         confirmButton={
           <PrimaryButton
             onClick={() => {
-              dispatch(stepsActions.toggleStepCollapsed(stepId))
+              dispatch(toggleViewSubstep(null))
             }}
             width="100%"
           >
