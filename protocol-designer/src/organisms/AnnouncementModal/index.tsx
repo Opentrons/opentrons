@@ -18,13 +18,14 @@ import {
 import { useAnnouncements } from './announcements'
 
 interface AnnouncementModalProp {
+  isViewReleaseNotes?: boolean
   onClose?: () => void
 }
 
 export const AnnouncementModal = (
   props: AnnouncementModalProp
 ): JSX.Element => {
-  const { onClose } = props
+  const { onClose, isViewReleaseNotes } = props
   const { t } = useTranslation(['modal', 'button'])
   const announcements = useAnnouncements()
   const location = useLocation()
@@ -36,11 +37,14 @@ export const AnnouncementModal = (
   const userHasNotSeenAnnouncement =
     getLocalStorageItem(localStorageAnnouncementKey) !== announcementKey
 
+  const userClickViewReleaseNotes =
+    location.pathname === '/settings' && isViewReleaseNotes === true
+
   const [
     showAnnouncementModal,
     setShowAnnouncementModal,
   ] = React.useState<boolean>(
-    location.pathname === '/settings' || userHasNotSeenAnnouncement
+    userClickViewReleaseNotes || userHasNotSeenAnnouncement
   )
 
   const handleClick = (): void => {
