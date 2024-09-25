@@ -4023,12 +4023,7 @@
           "type": "integer"
         }
       },
-      "required": [
-        "moduleId",
-        "measureMode",
-        "sampleWavelengths",
-        "referenceWavelength"
-      ]
+      "required": ["moduleId", "measureMode", "sampleWavelengths"]
     },
     "InitializeCreate": {
       "title": "InitializeCreate",

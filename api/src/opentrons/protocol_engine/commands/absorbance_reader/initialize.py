@@ -28,7 +28,7 @@ class InitializeParams(BaseModel):
     )
     sampleWavelengths: List[int] = Field(..., description="Sample wavelengths in nm.")
     referenceWavelength: Optional[int] = Field(
-        ..., description="Optional reference wavelength in nm."
+        None, description="Optional reference wavelength in nm."
     )
 
 
