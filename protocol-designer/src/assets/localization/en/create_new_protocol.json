@@ -40,7 +40,7 @@
   "vol_label": "{{volume}} uL",
   "wasteChute": "Waste Chute",
   "which_fixtures": "Which fixtures will you be using?",
-  "which_mods": "Select modules to use in your protocol.",
+  "which_modules": "Select modules to use in your protocol.",
   "which_pipette": "Pick your first pipette. If you need a second pipette, you can add it next.",
   "your_pips": "Your pipettes"
 }
