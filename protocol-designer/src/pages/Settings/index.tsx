@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
@@ -34,7 +35,7 @@ export function Settings(): JSX.Element {
   const [
     showAnnouncementModal,
     setShowAnnouncementModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const hasOptedIn = useSelector(analyticsSelectors.getHasOptedIn)
   const flags = useSelector(getFeatureFlagData)
   const canClearHintDismissals = useSelector(
