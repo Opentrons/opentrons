@@ -16,13 +16,13 @@ import {
 } from '../../persist'
 import { useAnnouncements } from './announcements'
 
-interface AnnouncementModalProp {
+interface AnnouncementModalProps {
   isViewReleaseNotes?: boolean
   onClose?: () => void
 }
 
 export const AnnouncementModal = (
-  props: AnnouncementModalProp
+  props: AnnouncementModalProps
 ): JSX.Element => {
   const { onClose, isViewReleaseNotes = false } = props
   const { t } = useTranslation(['modal', 'button'])
