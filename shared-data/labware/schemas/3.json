@@ -1,5 +1,5 @@
 {
-  "$id": "opentronsLabwareSchemaV2",
+  "$id": "opentronsLabwareSchemaV3",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
     "positiveNumber": {
@@ -64,6 +64,85 @@
           "type": "number"
         }
       }
+    },
+    "SphericalSegment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["shape", "radiusOfCurvature", "depth"],
+      "properties": {
+        "shape": {
+          "type": "string",
+          "enum": ["spherical"]
+        },
+        "radiusOfCurvature": {
+          "type": "number"
+        },
+        "depth": {
+          "type": "number"
+        }
+      }
+    },
+    "CircularBoundedSection": {
+      "type": "object",
+      "required": ["shape", "diameter", "topHeight"],
+      "properties": {
+        "shape": {
+          "type": "string",
+          "enum": ["circular"]
+        },
+        "diameter": {
+          "type": "number"
+        },
+        "topHeight": {
+          "type": "number",
+          "description": "The height at the top of a bounded subsection of a well, relative to the bottom"
+        }
+      }
+    },
+    "RectangularBoundedSection": {
+      "type": "object",
+      "required": ["shape", "xDimension", "yDimension", "topHeight"],
+      "properties": {
+        "shape": {
+          "type": "string",
+          "enum": ["rectangular"]
+        },
+        "xDimension": {
+          "type": "number"
+        },
+        "yDimension": {
+          "type": "number"
+        },
+        "topHeight": {
+          "type": "number",
+          "description": "The height at the top of a bounded subsection of a well, relative to the bottom"
+        }
+      }
+    },
+    "InnerWellGeometry": {
+      "type": "object",
+      "required": ["frusta"],
+      "properties": {
+        "frusta": {
+          "description": "A list of all of the sections of the well that have a contiguous shape",
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/CircularBoundedSection"
+              },
+              {
+                "$ref": "#/definitions/RectangularBoundedSection"
+              }
+            ]
+          }
+        },
+        "bottomShape": {
+          "type": "object",
+          "description": "The shape at the bottom of the well: either a spherical segment or a cross-section",
+          "$ref": "#/definitions/SphericalSegment"
+        }
+      }
     }
   },
   "type": "object",
@@ -85,7 +164,7 @@
     "schemaVersion": {
       "description": "Which schema version a labware is using",
       "type": "number",
-      "enum": [2]
+      "enum": [3]
     },
     "version": {
       "description": "Version of the labware definition itself (eg myPlate v1/v2/v3). An incrementing integer",
@@ -270,6 +349,10 @@
               "description": "If 'rectangular', use xDimension and yDimension; if 'circular' use diameter",
               "type": "string",
               "enum": ["rectangular", "circular"]
+            },
+            "geometryDefinitionId": {
+              "description": "string id of the well's corresponding innerWellGeometry",
+              "type": ["string", "null"]
             }
           }
         }
@@ -367,6 +450,13 @@
     "gripHeightFromLabwareBottom": {
       "type": "number",
       "description": "Recommended Z-height, from labware bottom to the center of gripper pads, when gripping the labware."
+    },
+    "innerLabwareGeometry": {
+      "type": ["object", "null"],
+      "description": "A dictionary holding all unique inner well geometries in a labware.",
+      "additionalProperties": {
+        "$ref": "#/definitions/InnerWellGeometry"
+      }
     }
   }
 }
