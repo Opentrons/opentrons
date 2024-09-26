@@ -24,6 +24,7 @@ describe('StepOverflowMenu', () => {
       stepId: 'mockId',
       top: 0,
       menuRootRef: { current: null },
+      setStepOverflowMenu: vi.fn(),
     }
   })
 

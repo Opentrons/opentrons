@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
@@ -15,7 +15,6 @@ import { DeckSetupContainer } from '../DeckSetup'
 import { OffDeck } from '../Offdeck'
 import { TimelineToolbox } from './Timeline'
 import { StepForm } from './StepForm'
-import { selectStep } from '../../../ui/steps/actions/actions'
 
 export function ProtocolSteps(): JSX.Element {
   const { t } = useTranslation(['starting_deck_state'])
