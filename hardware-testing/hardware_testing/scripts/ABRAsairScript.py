@@ -15,14 +15,27 @@ def execute(client: pmk.SSHClient, command: str, args: list) -> Optional[int]:
         stdin, stdout, stderr = client.exec_command(command, get_pty=True)
         stdout_lines: List[str] = []
         stderr_lines: List[str] = []
+        time.sleep(15)
 
-        time.sleep(30)
+        # check stdout, stderr
 
         # Check the exit status of the command.
+        # while not stdout.channel.exit_status_ready():
+        #     if stdout.channel.recv_ready():
+        #         stdout_lines = stdout.readlines()
+        #         print(f"{args[0]} output:", "".join(stdout_lines))
+        # if stderr.channel.recv_ready():
+        #     stderr_lines = stderr.readlines()
+        #     print(f"{args[0]} ERROR:", "".join(stdout_lines))
+        #     return 1
+        if stderr.channel.recv_ready:
+            stderr_lines = stderr.readlines()
+            if stderr_lines != []:
+                print(f"{args[0]} ERROR: ", stderr_lines)
+                return 1
         if stdout.channel.exit_status_ready():
             if stdout.channel.recv_exit_status() != 0:
                 print(f"{args[0]} command failed:", "".join(stderr_lines))
-                client.close()
                 # Terminate process on failure.
                 raise RuntimeError(
                     f"{args[0]} encountered an error and the process will terminate."
@@ -57,9 +70,7 @@ with open(file_name) as file:
             robot_ips.append(info[0])
             robot_names.append(info[1])
 
-command_template = (
-    "python3 -m hardware_testing.scripts.abr_asair_sensor {name} {duration} {frequency}"
-)
+command_template = " nohup python3 -m hardware_testing.scripts.abr_asair_sensor {name} {duration} {frequency}"
 cd = "cd /opt/opentrons-robot-server && "
 print("Executing Script on All Robots:")
 
@@ -89,5 +100,7 @@ if __name__ == "__main__":
     # Wait for all processes to finish.
     for process in processes:
         process.start()
-        time.sleep(35)
-        process.terminate()
+        time.sleep(20)
+
+    for process in processes:
+        process.join()
