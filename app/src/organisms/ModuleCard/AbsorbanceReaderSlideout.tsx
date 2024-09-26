@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { SPACING, LegacyStyledText, TYPOGRAPHY } from '@opentrons/components'

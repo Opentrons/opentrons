@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import { formatTimestamp } from '../../utils'
+import { formatTimestamp } from '/app/transformations/runs'
 import type { Mock } from 'vitest'
 
 import type {

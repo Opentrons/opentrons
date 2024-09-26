@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { AlertItem } from '@opentrons/components'
 import { MAX_SUGGESTED_Z } from '../../fields'
 import type { FormikTouched } from 'formik'

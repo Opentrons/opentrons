@@ -1,6 +1,4 @@
 // labware details page title and category
-import * as React from 'react'
-
 import { LabelText, Value, LABEL_LEFT } from '../ui'
 
 import { CATEGORY, CATEGORY_LABELS_BY_CATEGORY } from '../../localization'

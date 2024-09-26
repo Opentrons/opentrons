@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import isEqual from 'lodash/isEqual'
@@ -28,7 +27,7 @@ import {
 } from '@opentrons/shared-data'
 import { useCsvFileQuery } from '@opentrons/react-api-client'
 import { DownloadCsvFileLink } from './DownloadCsvFileLink'
-import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { useDeckCalibrationData } from './hooks'
 import { OffsetVector } from '/app/molecules/OffsetVector'
 import type { RunData } from '@opentrons/api-client'

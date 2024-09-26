@@ -1,5 +1,5 @@
 // tests for the HostConfig context and hook
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { Provider } from 'react-redux'

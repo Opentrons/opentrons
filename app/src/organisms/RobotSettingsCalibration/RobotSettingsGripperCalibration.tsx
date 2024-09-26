@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
@@ -71,7 +71,7 @@ export function RobotSettingsGripperCalibration(
       setShowOverflowMenu(false)
     },
   })
-  const [showWizardFlow, setShowWizardFlow] = React.useState<boolean>(false)
+  const [showWizardFlow, setShowWizardFlow] = useState<boolean>(false)
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   const gripperCalibrationLastModified =

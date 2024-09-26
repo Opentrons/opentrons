@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 
 import { useTranslation } from 'react-i18next'
 
@@ -19,9 +19,9 @@ import {
 
 import { useChainLiveCommands } from '/app/resources/runs'
 import { useRunStatuses } from '/app/organisms/Devices/hooks'
-import { getModulePrepCommands } from '/app/organisms/Devices/getModulePrepCommands'
+import { getModulePrepCommands } from '/app/local-resources/modules'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import { getModuleTooHot } from '/app/organisms/Devices/getModuleTooHot'
+import { getModuleTooHot } from '/app/transformations/modules'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { AttachedModule } from '/app/redux/modules/types'
@@ -54,7 +54,7 @@ export function ModuleCalibrationOverflowMenu({
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
 
-  const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
+  const [showModuleWizard, setShowModuleWizard] = useState<boolean>(false)
   const { isRunRunning: isRunning } = useRunStatuses()
   const [targetProps, tooltipProps] = useHoverTooltip()
 
@@ -73,7 +73,7 @@ export function ModuleCalibrationOverflowMenu({
   const [
     prepCommandErrorMessage,
     setPrepCommandErrorMessage,
-  ] = React.useState<string>('')
+  ] = useState<string>('')
 
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
@@ -87,7 +87,7 @@ export function ModuleCalibrationOverflowMenu({
     setShowModuleWizard(true)
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isRunning) {
       updateRobotStatus(true)
     }

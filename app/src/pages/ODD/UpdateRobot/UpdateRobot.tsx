@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -35,7 +35,7 @@ export function UpdateRobot(): JSX.Element {
   const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
   const dispatch = useDispatch<Dispatch>()
 
-  const [errorString, setErrorString] = React.useState<string | null>(null)
+  const [errorString, setErrorString] = useState<string | null>(null)
 
   return (
     <Flex padding={SPACING.spacing40}>

@@ -5,6 +5,7 @@ import isArray from 'lodash/isArray'
  ********************/
 // TODO: reconcile difference between returning error string and key
 export type FieldError =
+  | 'BAD_TIME'
   | 'REQUIRED'
   | 'UNDER_WELL_MINIMUM'
   | 'NON_ZERO'
@@ -13,6 +14,7 @@ export type FieldError =
   | 'NOT_A_REAL_NUMBER'
   | 'OUTSIDE_OF_RANGE'
 const FIELD_ERRORS: Record<FieldError, string> = {
+  BAD_TIME: 'Must be a valid time (hh:mm:ss)',
   REQUIRED: 'This field is required',
   UNDER_WELL_MINIMUM: 'or more wells are required',
   NON_ZERO: 'Must be greater than zero',
@@ -29,6 +31,12 @@ const FIELD_ERRORS: Record<FieldError, string> = {
 export type ErrorChecker = (value: unknown) => string | null
 export const requiredField: ErrorChecker = (value: unknown) =>
   !value ? FIELD_ERRORS.REQUIRED : null
+export const isTimeFormat: ErrorChecker = (value: unknown): string | null => {
+  const timeRegex = new RegExp(/^\d{1,2}:\d{1,2}:\d{1,2}$/g)
+  return (typeof value === 'string' && timeRegex.test(value)) || value == null
+    ? null
+    : FIELD_ERRORS.BAD_TIME
+}
 export const nonZero: ErrorChecker = (value: unknown) =>
   value && Number(value) === 0 ? FIELD_ERRORS.NON_ZERO : null
 export const minimumWellCount = (minimum: number): ErrorChecker => (

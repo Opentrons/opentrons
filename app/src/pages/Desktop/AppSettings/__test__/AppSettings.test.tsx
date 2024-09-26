@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { vi, describe, beforeEach, it, expect, afterEach } from 'vitest'
 import { Route } from 'react-router'
 import { MemoryRouter, Routes } from 'react-router-dom'

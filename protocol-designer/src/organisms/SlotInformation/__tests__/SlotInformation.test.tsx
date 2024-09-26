@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'

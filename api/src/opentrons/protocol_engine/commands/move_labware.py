@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from opentrons.types import Point
-from ..state import update_types
 from ..types import (
     CurrentWell,
     LabwareLocation,
@@ -21,6 +20,7 @@ from ..errors import LabwareMovementNotAllowedError, NotSupportedOnRobotType
 from ..resources import labware_validation, fixture_validation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
+from ..state.update_types import StateUpdate
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
 if TYPE_CHECKING:
@@ -98,7 +98,7 @@ class MoveLabwareImplementation(
         self, params: MoveLabwareParams
     ) -> SuccessData[MoveLabwareResult, None]:
         """Move a loaded labware to a new location."""
-        state_update = update_types.StateUpdate()
+        state_update = StateUpdate()
 
         # Allow propagation of LabwareNotLoadedError.
         current_labware = self._state_view.labware.get(labware_id=params.labwareId)
@@ -230,6 +230,12 @@ class MoveLabwareImplementation(
             and pipette_location.labware_id == params.labwareId
         ):
             state_update.clear_all_pipette_locations()
+
+        state_update.set_labware_location(
+            labware_id=params.labwareId,
+            new_location=available_new_location,
+            new_offset_id=new_offset_id,
+        )
 
         return SuccessData(
             public=MoveLabwareResult(offsetId=new_offset_id),

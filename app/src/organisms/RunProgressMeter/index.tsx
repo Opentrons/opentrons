@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
@@ -29,7 +29,6 @@ import {
   RUN_STATUS_RUNNING,
 } from '@opentrons/api-client'
 
-import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getModalPortalEl } from '../../App/portal'
 import { useRunControls } from '../RunTimeControl/hooks'
 import { InterventionModal, useInterventionModal } from '../InterventionModal'
@@ -40,6 +39,7 @@ import {
   useNotifyRunQuery,
   useNotifyAllCommandsQuery,
   useRunStatus,
+  useMostRecentCompletedAnalysis,
 } from '/app/resources/runs'
 import { useRobotType } from '/app/redux-resources/robots'
 import { useRunningStepCounts } from '/app/resources/protocols/hooks'

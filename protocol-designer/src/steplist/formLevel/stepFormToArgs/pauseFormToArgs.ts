@@ -1,3 +1,4 @@
+import { getTimeFromPauseForm } from '../../utils/getTimeFromPauseForm'
 import {
   PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
@@ -8,18 +9,11 @@ import type {
   WaitForTemperatureArgs,
   PauseArgs,
 } from '@opentrons/step-generation'
+
 export const pauseFormToArgs = (
   formData: FormData
 ): PauseArgs | WaitForTemperatureArgs | null => {
-  const hours = isNaN(parseFloat(formData.pauseHour as string))
-    ? 0
-    : parseFloat(formData.pauseHour as string)
-  const minutes = isNaN(parseFloat(formData.pauseMinute as string))
-    ? 0
-    : parseFloat(formData.pauseMinute as string)
-  const seconds = isNaN(parseFloat(formData.pauseSecond as string))
-    ? 0
-    : parseFloat(formData.pauseSecond as string)
+  const { hours, minutes, seconds } = getTimeFromPauseForm(formData)
   const totalSeconds = hours * 3600 + minutes * 60 + seconds
   const temperature = parseFloat(formData.pauseTemperature as string)
   const message = formData.pauseMessage ?? ''

@@ -1,4 +1,4 @@
-import { useMostRecentCompletedAnalysis } from '../../../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { useRobotType } from '/app/redux-resources/robots'
 import {
   getIsFixtureMismatch,

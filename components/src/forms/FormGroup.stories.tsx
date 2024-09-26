@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 import { FormGroup as FormGroupComponent } from './FormGroup'
 import { DeprecatedCheckboxField } from './DeprecatedCheckboxField.stories'

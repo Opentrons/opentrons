@@ -1,4 +1,3 @@
-import React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import * as auth0 from '@auth0/auth0-react'

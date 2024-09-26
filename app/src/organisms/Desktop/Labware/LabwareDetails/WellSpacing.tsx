@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import round from 'lodash/round'
 import { getSpacingDiagram } from '@opentrons/components'

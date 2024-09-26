@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+
 import {
   Flex,
   SPACING,
@@ -9,7 +10,10 @@ import {
   COLORS,
   RadioButton,
 } from '@opentrons/components'
-import { getTopPortalEl } from '../../../App/portal'
+
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { getTopPortalEl } from '/app/App/portal'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ChildNavigation } from '../../ChildNavigation'
 
 import type {
@@ -27,6 +31,7 @@ interface ChangeTipProps {
 export function ChangeTip(props: ChangeTipProps): JSX.Element {
   const { onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
   const allowedChangeTipOptions: ChangeTipOptions[] = ['once']
   if (
@@ -55,6 +60,12 @@ export function ChangeTip(props: ChangeTipProps): JSX.Element {
       dispatch({
         type: 'SET_CHANGE_TIP',
         changeTip: selectedChangeTipOption,
+      })
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+        properties: {
+          setting: 'ChangeTip',
+        },
       })
     }
     onBack()

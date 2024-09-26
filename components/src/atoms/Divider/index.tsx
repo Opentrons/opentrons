@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Box, COLORS, SPACING } from '../..'
 
 type Props = React.ComponentProps<typeof Box>

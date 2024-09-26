@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -15,7 +15,7 @@ import {
 } from '@opentrons/shared-data'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { TertiaryButton } from '/app/atoms/buttons'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
@@ -36,9 +36,7 @@ export function SetupFlexPipetteCalibrationItem({
   instrumentsRefetch,
 }: SetupInstrumentCalibrationItemProps): JSX.Element | null {
   const { t } = useTranslation(['protocol_setup', 'devices_landing'])
-  const [showFlexPipetteFlow, setShowFlexPipetteFlow] = React.useState<boolean>(
-    false
-  )
+  const [showFlexPipetteFlow, setShowFlexPipetteFlow] = useState<boolean>(false)
   const { data: attachedInstruments } = useInstrumentsQuery()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)

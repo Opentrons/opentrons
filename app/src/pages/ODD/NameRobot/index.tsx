@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useRef } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
@@ -53,12 +53,11 @@ export function NameRobot(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const ipAddress = localRobot?.ip
   const previousName = localRobot?.name != null ? localRobot.name : null
-  const [newName, setNewName] = React.useState<string>('')
-  const [
-    isShowConfirmRobotName,
-    setIsShowConfirmRobotName,
-  ] = React.useState<boolean>(false)
-  const keyboardRef = React.useRef(null)
+  const [newName, setNewName] = useState<string>('')
+  const [isShowConfirmRobotName, setIsShowConfirmRobotName] = useState<boolean>(
+    false
+  )
+  const keyboardRef = useRef(null)
   const dispatch = useDispatch<Dispatch>()
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
 

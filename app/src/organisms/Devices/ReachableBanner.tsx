@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { SPACING, Banner } from '@opentrons/components'
 import { REACHABLE } from '/app/redux/discovery'

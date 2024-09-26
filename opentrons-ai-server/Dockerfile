@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 python:3.12.4-slim
+FROM --platform=linux/amd64 python:3.12-slim
 
 ENV PYTHONUNBUFFERED True
 ENV DOCKER_RUNNING True

@@ -25,8 +25,8 @@ describe('useRouteUpdateActions', () => {
       hasLaunchedRecovery: true,
       toggleERWizAsActiveUser: mockToggleERWizard,
       recoveryMap: {
-        route: RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
-        step: RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
+        route: RECOVERY_MAP.RETRY_STEP.ROUTE,
+        step: RECOVERY_MAP.RETRY_STEP.STEPS.CONFIRM_RETRY,
       },
       setRecoveryMap: mockSetRecoveryMap,
       doorStatusUtils: { isProhibitedDoorOpen: false, isDoorOpen: false },
@@ -162,8 +162,8 @@ describe('useRouteUpdateActions', () => {
     void handleMotionRouting(false)
     rerender()
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
-      route: RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
-      step: RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
+      route: RECOVERY_MAP.RETRY_STEP.ROUTE,
+      step: RECOVERY_MAP.RETRY_STEP.STEPS.CONFIRM_RETRY,
     })
   })
 
@@ -187,12 +187,12 @@ describe('useRouteUpdateActions', () => {
     const { proceedToRouteAndStep } = result.current
 
     void proceedToRouteAndStep(
-      RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
-      RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY
+      RECOVERY_MAP.RETRY_STEP.ROUTE,
+      RECOVERY_MAP.RETRY_STEP.STEPS.CONFIRM_RETRY
     )
     expect(mockSetRecoveryMap).toHaveBeenCalledWith({
-      route: RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
-      step: RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
+      route: RECOVERY_MAP.RETRY_STEP.ROUTE,
+      step: RECOVERY_MAP.RETRY_STEP.STEPS.CONFIRM_RETRY,
     })
   })
 

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, beforeEach, vi } from 'vitest'
 import { screen, fireEvent } from '@testing-library/react'
 
@@ -10,8 +10,8 @@ import {
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
-import { getTotalVolumePerLiquidId } from '../../../../Devices/ProtocolRun/SetupLiquids/utils'
-import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { getTotalVolumePerLiquidId } from '/app/transformations/analysis'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { LiquidDetails } from '../LiquidDetails'
 import {
   MOCK_LABWARE_INFO_BY_LIQUID_ID,
@@ -22,10 +22,10 @@ import { ProtocolSetupLiquids } from '..'
 
 import type * as SharedData from '@opentrons/shared-data'
 
-vi.mock('../../../../Devices/ProtocolRun/SetupLiquids/utils')
+vi.mock('/app/transformations/analysis')
 vi.mock('/app/atoms/buttons')
 vi.mock('../LiquidDetails')
-vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('/app/resources/runs')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
   return {

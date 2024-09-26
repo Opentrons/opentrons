@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
@@ -28,7 +27,7 @@ import {
 import {
   useGripperDisplayName,
   usePipetteNameSpecs,
-} from '/app/resources/instruments/hooks'
+} from '/app/local-resources/instruments'
 import { useRequiredProtocolHardware } from '/app/pages/Desktop/Protocols/hooks'
 import { EmptySection } from './EmptySection'
 

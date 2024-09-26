@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { COLORS } from '@opentrons/components'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { screen, fireEvent } from '@testing-library/react'

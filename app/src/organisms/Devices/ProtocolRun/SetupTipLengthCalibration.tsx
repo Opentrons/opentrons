@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 
 import * as PipetteConstants from '/app/redux/pipettes/constants'
-import { useRunPipetteInfoByMount } from '../hooks'
+import { useRunPipetteInfoByMount } from '/app/resources/runs'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 import { SetupTipLengthCalibrationButton } from './SetupTipLengthCalibrationButton'
 interface SetupTipLengthCalibrationProps {
@@ -41,7 +41,7 @@ export function SetupTipLengthCalibration({
           return null
         } else {
           return (
-            <React.Fragment key={mount}>
+            <Fragment key={mount}>
               {pipetteInfo.tipRacksForPipette.map((tipRackInfo, index) => {
                 const pipetteNotAttached =
                   pipetteInfo.requestedPipetteMatch === 'incompatible'
@@ -71,7 +71,7 @@ export function SetupTipLengthCalibration({
                   />
                 )
               })}
-            </React.Fragment>
+            </Fragment>
           )
         }
       })}

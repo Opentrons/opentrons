@@ -1,5 +1,5 @@
 // tests for the useLights hooks
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 
 import { QueryClient, QueryClientProvider } from 'react-query'

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
@@ -20,7 +19,7 @@ import { GripperCard } from '../../GripperCard'
 import { PipetteCard } from '../PipetteCard'
 import { FlexPipetteCard } from '../PipetteCard/FlexPipetteCard'
 import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
-import { getShowPipetteCalibrationWarning } from '../utils'
+import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { useCurrentRunId } from '/app/resources/runs'
 import type * as Components from '@opentrons/components'
@@ -41,7 +40,7 @@ vi.mock('../PipetteCard/FlexPipetteCard')
 vi.mock('../PipetteCard/PipetteRecalibrationWarning')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux-resources/robots')
-vi.mock('../utils')
+vi.mock('/app/transformations/instruments')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
 const ROBOT_NAME = 'otie'

@@ -1,5 +1,5 @@
 // mock portal for enzyme tests
-import * as React from 'react'
+import type * as React from 'react'
 
 interface Props {
   children: React.ReactNode

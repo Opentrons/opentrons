@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -80,13 +80,13 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
     selectedNestedLabwareDefUri,
   } = selectedSlotInfo
   const { slot, cutout } = selectedSlot
-  const [selectedHardware, setHardware] = React.useState<
+  const [selectedHardware, setHardware] = useState<
     ModuleModel | Fixture | null
   >(null)
 
   //  initialize the previously selected hardware because for some reason it does not
   //  work initiating it in the above useState
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedModuleModel || selectedFixture) {
       setHardware(selectedModuleModel ?? selectedFixture ?? null)
     }
@@ -96,7 +96,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
     slot != null
       ? getModuleModelsBySlot(enableAbsorbanceReader, robotType, slot)
       : null
-  const [tab, setTab] = React.useState<'hardware' | 'labware'>(
+  const [tab, setTab] = useState<'hardware' | 'labware'>(
     moduleModels?.length === 0 || slot === 'offDeck' ? 'labware' : 'hardware'
   )
 

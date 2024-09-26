@@ -16,6 +16,7 @@ from opentrons_shared_data.errors import EnumeratedError
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control import CriticalPoint
 from opentrons.hardware_control.nozzle_manager import (
     NozzleConfigurationType,
     NozzleMap,
@@ -474,7 +475,7 @@ class PipetteView(HasState[PipetteState]):
 
         Returns:
             The volume the pipette has aspirated.
-            None, after blow-out and the plunger is in an unsafe position or drop-tip and there is no tip attached.
+            None, after blow-out and the plunger is in an unsafe position.
 
         Raises:
             PipetteNotLoadedError: pipette ID does not exist.
@@ -659,17 +660,27 @@ class PipetteView(HasState[PipetteState]):
         nozzle_map = self._state.nozzle_configuration_by_id.get(pipette_id)
         return nozzle_map.starting_nozzle if nozzle_map else None
 
-    def get_primary_nozzle_offset(self, pipette_id: str) -> Point:
-        """Get the pipette's current primary nozzle's offset."""
+    def _get_critical_point_offset_without_tip(
+        self, pipette_id: str, critical_point: Optional[CriticalPoint]
+    ) -> Point:
+        """Get the offset of the specified critical point from pipette's mount position."""
         nozzle_map = self._state.nozzle_configuration_by_id.get(pipette_id)
-        if nozzle_map:
-            primary_nozzle_offset = nozzle_map.starting_nozzle_offset
-        else:
-            # When not in partial configuration, back-left nozzle is the primary
-            primary_nozzle_offset = self.get_config(
-                pipette_id
-            ).bounding_nozzle_offsets.back_left_offset
-        return primary_nozzle_offset
+        # Nozzle map is unavailable only when there's no pipette loaded
+        # so this is merely for satisfying the type checker
+        assert (
+            nozzle_map is not None
+        ), "Error getting critical point offset. Nozzle map not found."
+        match critical_point:
+            case CriticalPoint.INSTRUMENT_XY_CENTER:
+                return nozzle_map.instrument_xy_center_offset
+            case CriticalPoint.XY_CENTER:
+                return nozzle_map.xy_center_offset
+            case CriticalPoint.Y_CENTER:
+                return nozzle_map.y_center_offset
+            case CriticalPoint.FRONT_NOZZLE:
+                return nozzle_map.front_nozzle_offset
+            case _:
+                return nozzle_map.starting_nozzle_offset
 
     def get_pipette_bounding_nozzle_offsets(
         self, pipette_id: str
@@ -681,32 +692,46 @@ class PipetteView(HasState[PipetteState]):
         """Get the bounding box of the pipette."""
         return self.get_config(pipette_id).pipette_bounding_box_offsets
 
+    # TODO (spp, 2024-09-17): in order to find the position of pipette at destination,
+    #  this method repeats the same steps that waypoints builder does while finding
+    #  waypoints to move to. We should consolidate these steps into a shared entity
+    #  so that the deck conflict checker and movement plan builder always remain in sync.
     def get_pipette_bounds_at_specified_move_to_position(
         self,
         pipette_id: str,
         destination_position: Point,
+        critical_point: Optional[CriticalPoint],
     ) -> Tuple[Point, Point, Point, Point]:
-        """Get the pipette's bounding offsets when primary nozzle is at the given position."""
-        primary_nozzle_offset = self.get_primary_nozzle_offset(pipette_id)
+        """Get the pipette's bounding box position when critical point is at the destination position.
+
+        Returns a tuple of the pipette's bounding box position in deck coordinates as-
+            (back_left_bound, front_right_bound, back_right_bound, front_left_bound)
+        Bounding box of the pipette includes the pipette's outer casing as well as nozzles.
+        """
         tip = self.get_attached_tip(pipette_id)
-        # TODO update this for pipette robot stackup
-        # Primary nozzle position at destination, in deck coordinates
-        primary_nozzle_position = destination_position + Point(
+
+        # *Offset* of pipette's critical point w.r.t pipette mount
+        critical_point_offset = self._get_critical_point_offset_without_tip(
+            pipette_id, critical_point
+        )
+
+        # Position of the above critical point at destination, in deck coordinates
+        critical_point_position = destination_position + Point(
             x=0, y=0, z=tip.length if tip else 0
         )
 
-        # Get the pipette bounding box based on total nozzles
+        # Get the pipette bounding box coordinates
         pipette_bounds_offsets = self.get_config(
             pipette_id
         ).pipette_bounding_box_offsets
         pip_back_left_bound = (
-            primary_nozzle_position
-            - primary_nozzle_offset
+            critical_point_position
+            - critical_point_offset
             + pipette_bounds_offsets.back_left_corner
         )
         pip_front_right_bound = (
-            primary_nozzle_position
-            - primary_nozzle_offset
+            critical_point_position
+            - critical_point_offset
             + pipette_bounds_offsets.front_right_corner
         )
         pip_back_right_bound = Point(

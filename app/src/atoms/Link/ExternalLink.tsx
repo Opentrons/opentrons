@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 import { Link, Icon, TYPOGRAPHY, SPACING } from '@opentrons/components'
 import type { LinkProps } from '@opentrons/components'

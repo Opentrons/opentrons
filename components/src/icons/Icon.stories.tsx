@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Flex } from '../primitives'
 import { SPACING } from '../ui-style-constants'
 import { ICON_DATA_BY_NAME } from './icon-data'

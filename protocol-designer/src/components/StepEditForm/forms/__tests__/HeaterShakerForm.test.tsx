@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, beforeEach, afterEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Box } from '@opentrons/components'
 
 const PORTAL_ROOT_ID = 'top-portal-root'

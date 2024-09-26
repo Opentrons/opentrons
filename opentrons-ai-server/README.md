@@ -13,10 +13,10 @@ The Opentrons AI application's server.
 1. clone the repository `gh repo clone Opentrons/opentrons`
 1. `cd opentrons/opentrons-ai-server`
 1. Have pyenv installed per [DEV_SETUP.md](../DEV_SETUP.md)
-1. Use pyenv to install python `pyenv install 3.12.4` or latest 3.12.\*
+1. Use pyenv to install python `pyenv install 3.12.6` or latest 3.12.\*
 1. Have nodejs and yarn installed per [DEV_SETUP.md](../DEV_SETUP.md)
    1. This allows formatting of of `.md` and `.json` files
-1. select the python version `pyenv local 3.12.4`
+1. select the python version `pyenv local 3.12.6`
    1. This will create a `.python-version` file in this directory
 1. select the node version with `nvs` or `nvm` currently 18.19\*
 1. Install pipenv and python dependencies `make setup`

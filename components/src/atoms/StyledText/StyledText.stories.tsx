@@ -1,5 +1,4 @@
 /* eslint-disable storybook/prefer-pascal-case */
-import * as React from 'react'
 import { SPACING } from '../../ui-style-constants'
 import { Flex } from '../../primitives'
 import { StyledText, ODD_STYLES, HELIX_STYLES } from './index'

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import {
   ALIGN_CENTER,
@@ -15,7 +15,7 @@ import {
 
 export const PipetteRecalibrationODDWarning = (): JSX.Element | null => {
   const { t } = useTranslation('instruments_dashboard')
-  const [showBanner, setShowBanner] = React.useState<boolean>(true)
+  const [showBanner, setShowBanner] = useState<boolean>(true)
   if (!showBanner) return null
 
   return (

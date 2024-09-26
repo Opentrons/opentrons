@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 import SuccessIcon from '/app/assets/images/icon_success.png'
 

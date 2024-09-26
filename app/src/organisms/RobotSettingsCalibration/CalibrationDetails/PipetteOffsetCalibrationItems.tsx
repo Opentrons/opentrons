@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
@@ -17,10 +16,8 @@ import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
 import { getCustomLabwareDefinitions } from '/app/redux/custom-labware'
 import { LEFT } from '/app/redux/pipettes'
-import {
-  useAttachedPipettes,
-  useAttachedPipettesFromInstrumentsQuery,
-} from '/app/organisms/Devices/hooks'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/organisms/Devices/hooks'
+import { useAttachedPipettes } from '/app/resources/instruments'
 import { useIsFlex } from '/app/redux-resources/robots'
 
 import type { State } from '/app/redux/types'

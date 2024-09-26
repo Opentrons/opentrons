@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { FormGroup } from '@opentrons/components'
@@ -40,7 +40,7 @@ export function TemperatureForm(props: StepFormProps): JSX.Element {
         {temperatureModuleIds != null
           ? temperatureModuleIds.map(id =>
               id === moduleId ? (
-                <React.Fragment key={id}>
+                <Fragment key={id}>
                   <div className={styles.checkbox_row}>
                     <RadioGroupField
                       {...propsForFields.setTemperature}
@@ -74,7 +74,7 @@ export function TemperatureForm(props: StepFormProps): JSX.Element {
                       ]}
                     />
                   </div>
-                </React.Fragment>
+                </Fragment>
               ) : null
             )
           : null}

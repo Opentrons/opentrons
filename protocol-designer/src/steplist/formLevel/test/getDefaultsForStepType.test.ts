@@ -118,6 +118,7 @@ describe('getDefaultsForStepType', () => {
         pauseHour: null,
         pauseMinute: null,
         pauseSecond: null,
+        pauseTime: null,
         pauseMessage: '',
         moduleId: null,
         pauseTemperature: null,

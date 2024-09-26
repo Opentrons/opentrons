@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
@@ -25,7 +25,7 @@ import type {
   LoadModuleRunTimeCommand,
 } from '@opentrons/shared-data'
 import type { AttachedModule } from '/app/redux/modules/types'
-import type { ModuleRenderInfoForProtocol } from '../../../hooks'
+import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 
 vi.mock('../SecureLabwareModal')
 vi.mock('@opentrons/react-api-client')

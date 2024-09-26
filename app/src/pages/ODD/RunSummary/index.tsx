@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -41,11 +41,11 @@ import {
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
-import { useRunCreatedAtTimestamp } from '/app/organisms/Devices/hooks'
-import { onDeviceDisplayFormatTimestamp } from '/app/organisms/Devices/utils'
-import { RunTimer } from '/app/organisms/Devices/ProtocolRun/RunTimer'
+import { onDeviceDisplayFormatTimestamp } from '/app/transformations/runs'
+import { RunTimer } from '/app/molecules/RunTimer'
 import {
   useTrackProtocolRunEvent,
+  useTrackEventWithRobotSerial,
   useRobotAnalyticsData,
   useRecoveryAnalytics,
 } from '/app/redux-resources/analytics'
@@ -53,6 +53,7 @@ import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_RUN_ACTION,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  ANALYTICS_QUICK_TRANSFER_RERUN,
 } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import { RunFailedModal } from '/app/organisms/ODD/RunningProtocol'
@@ -61,6 +62,7 @@ import {
   useIsRunCurrent,
   useNotifyRunQuery,
   useRunTimestamps,
+  useRunCreatedAtTimestamp,
   useCloseCurrentRun,
   EMPTY_TIMESTAMP,
 } from '/app/resources/runs'
@@ -112,7 +114,7 @@ export function RunSummary(): JSX.Element {
       ? onDeviceDisplayFormatTimestamp(completedAt)
       : EMPTY_TIMESTAMP
 
-  const [showSplash, setShowSplash] = React.useState(
+  const [showSplash, setShowSplash] = useState(
     runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED
   )
   const localRobot = useSelector(getLocalRobot)
@@ -132,7 +134,7 @@ export function RunSummary(): JSX.Element {
   const { reportRecoveredRunResult } = useRecoveryAnalytics()
 
   const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
-  React.useEffect(() => {
+  useEffect(() => {
     if (isRunCurrent && typeof enteredER === 'boolean') {
       reportRecoveredRunResult(runStatus, enteredER)
     }
@@ -140,7 +142,9 @@ export function RunSummary(): JSX.Element {
 
   const { reset, isResetRunLoading } = useRunControls(runId, onCloneRunSuccess)
   const trackEvent = useTrackEvent()
-  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
+
+  const { closeCurrentRun } = useCloseCurrentRun()
   // Close the current run only if it's active and then execute the onSuccess callback. Prefer this wrapper over
   // closeCurrentRun directly, since the callback is swallowed if currentRun is null.
   const closeCurrentRunIfValid = (onSuccess?: () => void): void => {
@@ -154,15 +158,9 @@ export function RunSummary(): JSX.Element {
       onSuccess?.()
     }
   }
-  const [showRunFailedModal, setShowRunFailedModal] = React.useState<boolean>(
-    false
-  )
-  const [showRunAgainSpinner, setShowRunAgainSpinner] = React.useState<boolean>(
-    false
-  )
-  const [showReturnToSpinner, setShowReturnToSpinner] = React.useState<boolean>(
-    false
-  )
+  const [showRunFailedModal, setShowRunFailedModal] = useState<boolean>(false)
+  const [showRunAgainSpinner, setShowRunAgainSpinner] = useState<boolean>(false)
+  const [showReturnToSpinner, setShowReturnToSpinner] = useState<boolean>(false)
 
   const robotSerialNumber =
     localRobot?.health?.robot_serial ??
@@ -240,7 +238,7 @@ export function RunSummary(): JSX.Element {
   })
 
   // Determine tip status on initial render only. Error Recovery always handles tip status, so don't show it twice.
-  React.useEffect(() => {
+  useEffect(() => {
     if (isRunCurrent && enteredER === false) {
       void determineTipStatus()
     }
@@ -257,11 +255,20 @@ export function RunSummary(): JSX.Element {
   const runAgain = (): void => {
     setShowRunAgainSpinner(true)
     reset()
-    trackEvent({
-      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-      properties: { sourceLocation: 'RunSummary', robotSerialNumber },
-    })
-    trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN })
+    if (isQuickTransfer) {
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_RERUN,
+        properties: {
+          name: protocolName,
+        },
+      })
+    } else {
+      trackEvent({
+        name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+        properties: { sourceLocation: 'RunSummary', robotSerialNumber },
+      })
+      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN })
+    }
   }
 
   // If no pipettes have tips attached, execute the routing callback.
@@ -361,7 +368,6 @@ export function RunSummary(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
       overflow={OVERFLOW_HIDDEN}
-      disabled={isClosingCurrentRun}
       onClick={handleClickSplash}
     >
       {showSplash ? (

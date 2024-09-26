@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 import { VIEWPORT } from '../../../../../../components/src/ui-style-constants'
 import { AnalysisFailedModal } from './AnalysisFailedModal'

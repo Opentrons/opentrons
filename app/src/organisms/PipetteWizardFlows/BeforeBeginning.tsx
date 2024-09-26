@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import {
   COLORS,
@@ -21,7 +21,7 @@ import {
 } from '/app/molecules/SimpleWizardBody'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
-import { usePipetteNameSpecs } from '/app/resources/instruments/hooks'
+import { usePipetteNameSpecs } from '/app/local-resources/instruments'
 import {
   CALIBRATION_PROBE,
   FLOWS,
@@ -79,7 +79,7 @@ export const BeforeBeginning = (
     createdMaintenanceRunId,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-  React.useEffect(() => {
+  useEffect(() => {
     if (createdMaintenanceRunId == null) {
       createMaintenanceRun({})
     }

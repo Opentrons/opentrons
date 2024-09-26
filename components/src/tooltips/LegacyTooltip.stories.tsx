@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { LegacyTooltip } from './LegacyTooltip'
 import { useTooltip } from './useTooltip'
 import { useHoverTooltip } from './useHoverTooltip'
