@@ -155,10 +155,10 @@ def run(protocol: ProtocolContext) -> None:
     tiprack_50_1 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "C3")
     reservoir = protocol.load_labware("nest_12_reservoir_15ml", "A2")
     lids: List[Labware] = [
-        protocol.load_labware("opentrons_tough_auto_sealing_lid", "D2")
+        protocol.load_labware("opentrons_tough_pcr_auto_sealing_lid", "D2")
     ]
     for i in range(4):
-        lids.append(lids[-1].load_labware("opentrons_tough_auto_sealing_lid"))
+        lids.append(lids[-1].load_labware("opentrons_tough_pcr_auto_sealing_lid"))
     lids.reverse()
     top_lid = lids[0]
     bottom_lid = lids[1]
