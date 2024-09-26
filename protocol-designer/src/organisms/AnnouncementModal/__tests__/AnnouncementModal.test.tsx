@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -12,12 +11,7 @@ vi.mock('../../../persist')
 vi.mock('../announcements')
 
 const render = () => {
-  return renderWithProviders(
-    <MemoryRouter>
-      <AnnouncementModal />
-    </MemoryRouter>,
-    { i18nInstance: i18n }
-  )[0]
+  return renderWithProviders(<AnnouncementModal />, { i18nInstance: i18n })[0]
 }
 
 describe('AnnouncementModal', () => {

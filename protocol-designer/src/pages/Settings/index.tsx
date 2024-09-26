@@ -118,7 +118,7 @@ export function Settings(): JSX.Element {
         padding={`${SPACING.spacing80} 17rem`}
       >
         <Flex
-          borderRadius={BORDERS.borderRadius4}
+          borderRadius={BORDERS.borderRadius8}
           backgroundColor={COLORS.white}
           padding={SPACING.spacing40}
           flexDirection={DIRECTION_COLUMN}

@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useLocation } from 'react-router-dom'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -25,10 +24,9 @@ interface AnnouncementModalProp {
 export const AnnouncementModal = (
   props: AnnouncementModalProp
 ): JSX.Element => {
-  const { onClose, isViewReleaseNotes } = props
+  const { onClose, isViewReleaseNotes = false } = props
   const { t } = useTranslation(['modal', 'button'])
   const announcements = useAnnouncements()
-  const location = useLocation()
 
   const { announcementKey, message, heading, image } = announcements[
     announcements.length - 1
@@ -37,15 +35,10 @@ export const AnnouncementModal = (
   const userHasNotSeenAnnouncement =
     getLocalStorageItem(localStorageAnnouncementKey) !== announcementKey
 
-  const userClickViewReleaseNotes =
-    location.pathname === '/settings' && isViewReleaseNotes === true
-
   const [
     showAnnouncementModal,
     setShowAnnouncementModal,
-  ] = React.useState<boolean>(
-    userClickViewReleaseNotes || userHasNotSeenAnnouncement
-  )
+  ] = React.useState<boolean>(isViewReleaseNotes || userHasNotSeenAnnouncement)
 
   const handleClick = (): void => {
     if (onClose != null) onClose()
