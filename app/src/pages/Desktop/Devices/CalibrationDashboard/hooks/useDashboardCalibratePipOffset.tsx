@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -12,12 +12,11 @@ import * as RobotApi from '/app/redux/robot-api'
 import * as Sessions from '/app/redux/sessions'
 import { getPipetteOffsetCalibrationSession } from '/app/redux/sessions/pipette-offset-calibration/selectors'
 import { pipetteOffsetCalibrationStarted } from '/app/redux/analytics'
-
+import type { DashboardCalOffsetInvoker } from '/app/organisms/Devices/hooks/useCalibrationTaskList'
 import type { State } from '/app/redux/types'
 import type {
   SessionCommandString,
   PipetteOffsetCalibrationSession,
-  PipetteOffsetCalibrationSessionParams,
 } from '/app/redux/sessions/types'
 import type { RequestState } from '/app/redux/robot-api/types'
 
@@ -26,23 +25,14 @@ const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
 
-export interface DashboardOffsetCalInvokerProps {
-  params: Pick<PipetteOffsetCalibrationSessionParams, 'mount'> &
-    Partial<Omit<PipetteOffsetCalibrationSessionParams, 'mount'>>
-}
-
-export type DashboardCalOffsetInvoker = (
-  props: DashboardOffsetCalInvokerProps
-) => void
-
 export function useDashboardCalibratePipOffset(
   robotName: string,
   onComplete: (() => unknown) | null = null
 ): [DashboardCalOffsetInvoker, JSX.Element | null] {
-  const createRequestId = React.useRef<string | null>(null)
-  const deleteRequestId = React.useRef<string | null>(null)
-  const jogRequestId = React.useRef<string | null>(null)
-  const spinnerRequestId = React.useRef<string | null>(null)
+  const createRequestId = useRef<string | null>(null)
+  const deleteRequestId = useRef<string | null>(null)
+  const jogRequestId = useRef<string | null>(null)
+  const spinnerRequestId = useRef<string | null>(null)
   const dispatch = useDispatch()
   const { t } = useTranslation('robot_calibration')
 
@@ -122,7 +112,7 @@ export function useDashboardCalibratePipOffset(
         : null
     )?.status === RobotApi.PENDING
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (shouldClose) {
       onComplete?.()
       deleteRequestId.current = null

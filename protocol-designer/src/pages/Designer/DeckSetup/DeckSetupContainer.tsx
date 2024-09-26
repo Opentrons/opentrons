@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo, useState, Fragment } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
@@ -10,6 +10,7 @@ import {
   FlexTrash,
   JUSTIFY_CENTER,
   RobotCoordinateSpaceWithRef,
+  SPACING,
   SingleSlotFixture,
   SlotLabels,
   StagingAreaFixture,
@@ -29,10 +30,9 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
 import { getRobotType } from '../../../file-data/selectors'
 import { getHasGen1MultiChannelPipette } from '../../../step-forms'
-import { SlotDetailsContainer } from '../../../organisms'
+import { SlotDetailsContainer, TimelineAlerts } from '../../../organisms'
 import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
-import { Alerts } from '../../../components/alerts/Alerts'
 import { DeckSetupDetails } from './DeckSetupDetails'
 import {
   animateZoom,
@@ -55,6 +55,7 @@ import type { DeckSetupTabType } from '../types'
 import type { Fixture } from './constants'
 
 const WASTE_CHUTE_SPACE = 30
+const DETAILS_HOVER_SPACE = 60
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',
   'fixedBase',
@@ -74,10 +75,8 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
   const zoomIn = useSelector(selectors.getZoomedInSlot)
   const _disableCollisionWarnings = useSelector(getDisableModuleRestrictions)
   const robotType = useSelector(getRobotType)
-  const deckDef = React.useMemo(() => getDeckDefFromRobotType(robotType), [
-    robotType,
-  ])
-  const [hoverSlot, setHoverSlot] = React.useState<DeckSlot | null>(null)
+  const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
+  const [hoverSlot, setHoverSlot] = useState<DeckSlot | null>(null)
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
   )
@@ -100,22 +99,21 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
   const hasWasteChute =
     wasteChuteFixtures.length > 0 || wasteChuteStagingAreaFixtures.length > 0
 
-  const initialViewBox = `${deckDef.cornerOffsetFromOrigin[0]} ${
-    hasWasteChute
-      ? deckDef.cornerOffsetFromOrigin[1] - WASTE_CHUTE_SPACE
-      : deckDef.cornerOffsetFromOrigin[1]
-  } ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`
+  const viewBoxX = deckDef.cornerOffsetFromOrigin[0]
+  const viewBoxY = hasWasteChute
+    ? deckDef.cornerOffsetFromOrigin[1] -
+      WASTE_CHUTE_SPACE -
+      DETAILS_HOVER_SPACE
+    : deckDef.cornerOffsetFromOrigin[1]
+  const viewBoxWidth = deckDef.dimensions[0]
+  const viewBoxHeight = deckDef.dimensions[1] + DETAILS_HOVER_SPACE
 
-  const [viewBox, setViewBox] = React.useState<string>(initialViewBox)
-  const [hoveredLabware, setHoveredLabware] = React.useState<string | null>(
-    null
-  )
-  const [hoveredModule, setHoveredModule] = React.useState<ModuleModel | null>(
-    null
-  )
-  const [hoveredFixture, setHoveredFixture] = React.useState<Fixture | null>(
-    null
-  )
+  const initialViewBox = `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`
+
+  const [viewBox, setViewBox] = useState<string>(initialViewBox)
+  const [hoveredLabware, setHoveredLabware] = useState<string | null>(null)
+  const [hoveredModule, setHoveredModule] = useState<ModuleModel | null>(null)
+  const [hoveredFixture, setHoveredFixture] = useState<Fixture | null>(null)
 
   const addEquipment = (slotId: string): void => {
     const cutoutId =
@@ -147,7 +145,7 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
     }
   }
 
-  const _hasGen1MultichannelPipette = React.useMemo(
+  const _hasGen1MultichannelPipette = useMemo(
     () => getHasGen1MultiChannelPipette(activeDeckSetup.pipettes),
     [activeDeckSetup.pipettes]
   )
@@ -174,19 +172,19 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
 
   return (
     <>
+      {tab === 'protocolSteps' ? (
+        <Flex justifyContent={JUSTIFY_CENTER} width="100%">
+          <TimelineAlerts />
+        </Flex>
+      ) : null}
       <Flex
         backgroundColor={COLORS.white}
-        borderRadius={BORDERS.borderRadius8}
+        borderRadius={BORDERS.borderRadius12}
         width="100%"
         height={zoomIn.slot != null ? '75vh' : '70vh'}
         flexDirection={DIRECTION_COLUMN}
+        padding={SPACING.spacing40}
       >
-        {tab === 'protocolSteps' ? (
-          <Flex justifyContent={JUSTIFY_CENTER}>
-            {/* TODO: update the alerts to match latest designs */}
-            <Alerts componentType="Timeline" />
-          </Flex>
-        ) : null}
         <Flex
           width="100%"
           height="100%"
@@ -194,10 +192,11 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
           justifyContent={JUSTIFY_CENTER}
         >
           <RobotCoordinateSpaceWithRef
-            height={zoomIn.slot != null ? '100%' : '70%'}
+            height={zoomIn.slot != null ? '100%' : '80%'}
             width="100%"
             deckDef={deckDef}
             viewBox={viewBox}
+            outline="auto"
           >
             {() => (
               <>
@@ -243,7 +242,7 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
                           cutoutId != null &&
                           (zoomIn.cutout == null ||
                             zoomIn.cutout !== cutoutId) ? (
-                            <React.Fragment key={cutoutId}>
+                            <Fragment key={cutoutId}>
                               <SingleSlotFixture
                                 cutoutId={cutoutId}
                                 deckDefinition={deckDef}
@@ -256,7 +255,7 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
                                 trashCutoutId={cutoutId as TrashCutoutId}
                                 backgroundColor={COLORS.grey50}
                               />
-                            </React.Fragment>
+                            </Fragment>
                           ) : null
                         )
                       : null}

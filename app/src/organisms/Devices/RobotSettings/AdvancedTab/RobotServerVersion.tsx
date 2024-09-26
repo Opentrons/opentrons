@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -17,8 +16,8 @@ import { TertiaryButton } from '/app/atoms/buttons'
 import { getRobotApiVersion } from '/app/redux/discovery'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
-import { useIsFlex, useRobot } from '../../hooks'
 import { handleUpdateBuildroot } from '../UpdateBuildroot'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 
 import type { State } from '/app/redux/types'
 

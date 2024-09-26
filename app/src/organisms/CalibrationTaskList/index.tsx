@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -20,16 +20,15 @@ import {
 import { StatusLabel } from '/app/atoms/StatusLabel'
 import { TaskList } from '../TaskList'
 
-import {
-  useAttachedPipettes,
-  useCalibrationTaskList,
-  useRunHasStarted,
-} from '../Devices/hooks'
-import { useCurrentRunId } from '/app/resources/runs'
+import { useCalibrationTaskList } from '/app/organisms/Devices/hooks'
+import { useAttachedPipettes } from '/app/resources/instruments'
+import { useCurrentRunId, useRunHasStarted } from '/app/resources/runs'
 
-import type { DashboardCalOffsetInvoker } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
-import type { DashboardCalTipLengthInvoker } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
-import type { DashboardCalDeckInvoker } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
+import type {
+  DashboardCalOffsetInvoker,
+  DashboardCalTipLengthInvoker,
+  DashboardCalDeckInvoker,
+} from '/app/organisms/Devices/hooks'
 
 interface CalibrationTaskListProps {
   robotName: string
@@ -46,14 +45,11 @@ export function CalibrationTaskList({
   deckCalLauncher,
   exitBeforeDeckConfigCompletion,
 }: CalibrationTaskListProps): JSX.Element {
-  const prevActiveIndex = React.useRef<[number, number] | null>(null)
-  const [hasLaunchedWizard, setHasLaunchedWizard] = React.useState<boolean>(
+  const prevActiveIndex = useRef<[number, number] | null>(null)
+  const [hasLaunchedWizard, setHasLaunchedWizard] = useState<boolean>(false)
+  const [showCompletionScreen, setShowCompletionScreen] = useState<boolean>(
     false
   )
-  const [
-    showCompletionScreen,
-    setShowCompletionScreen,
-  ] = React.useState<boolean>(false)
   const { t } = useTranslation(['robot_calibration', 'device_settings'])
   const navigate = useNavigate()
   const { activeIndex, taskList, taskListStatus } = useCalibrationTaskList(
@@ -78,7 +74,7 @@ export function CalibrationTaskList({
       'device_settings:some_robot_controls_are_not_available'
     )
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       prevActiveIndex.current !== null &&
       activeIndex === null &&

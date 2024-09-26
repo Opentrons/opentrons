@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { when } from 'vitest-when'
 import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
@@ -12,8 +12,8 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { getLabwareRenderInfo } from '../../../../Devices/ProtocolRun/utils/getLabwareRenderInfo'
-import { getStandardDeckViewLayerBlockList } from '../../../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
+import { getLabwareRenderInfo } from '/app/transformations/analysis'
+import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 import { mockProtocolModuleInfo } from '../__fixtures__'
 import { LabwareMapView } from '../LabwareMapView'
 
@@ -25,7 +25,7 @@ import type {
   ModuleModel,
 } from '@opentrons/shared-data'
 
-vi.mock('../../../../Devices/ProtocolRun/utils/getLabwareRenderInfo')
+vi.mock('/app/transformations/analysis')
 vi.mock('@opentrons/components/src/hardware-sim/Labware/LabwareRender')
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck')
 vi.mock('@opentrons/shared-data/js/helpers/getSimplestFlexDeckConfig')

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -14,13 +13,13 @@ import {
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
-import { formatTimestamp } from '../../../utils'
-import { EMPTY_TIMESTAMP } from '../../../constants'
+import { formatTimestamp } from '/app/transformations/runs'
+import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import {
-  useRunControls,
+  EMPTY_TIMESTAMP,
   useRunTimestamps,
-} from '../../../../RunTimeControl/hooks'
-import { useCloseCurrentRun } from '../../../../ProtocolUpload/hooks'
+  useCloseCurrentRun,
+} from '/app/resources/runs'
 import { LabeledValue } from './LabeledValue'
 import { isCancellableStatus } from '../utils'
 

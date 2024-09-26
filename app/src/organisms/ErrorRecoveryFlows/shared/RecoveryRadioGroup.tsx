@@ -1,6 +1,4 @@
-import * as React from 'react'
-
-import type { ChangeEventHandler } from 'react'
+import type { ChangeEventHandler, ReactNode, ComponentProps } from 'react'
 import { RadioGroup, SPACING, Flex } from '@opentrons/components'
 
 // note: this typescript stuff is so that e.currentTarget.value in the ChangeEventHandler
@@ -12,12 +10,12 @@ export interface Target<T> extends Omit<HTMLInputElement, 'value'> {
 
 export type Options<T extends string = never> = Array<{
   value: T
-  children: React.ReactNode
+  children: ReactNode
 }>
 
 export interface RecoveryRadioGroupProps<T extends string>
   extends Omit<
-    React.ComponentProps<typeof RadioGroup>,
+    ComponentProps<typeof RadioGroup>,
     'labelTextClassName' | 'options' | 'onchange'
   > {
   options: Options<T>

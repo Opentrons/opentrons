@@ -8,7 +8,7 @@
   "closing_tc_lid": "Closing Thermocycler lid",
   "comment": "Comment",
   "configure_for_volume": "Configure {{pipette}} to aspirate {{volume}} µL",
-  "configure_nozzle_layout": "Configure {{pipette}} to use {{amount}} nozzles",
+  "configure_nozzle_layout": "Configure {{pipette}} to use {{layout}}",
   "confirm_and_resume": "Confirm and resume",
   "deactivate_hs_shake": "Deactivating shaker",
   "deactivate_temperature_module": "Deactivating Temperature Module",

@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { BORDERS } from '@opentrons/components'
 
 import { Skeleton } from '/app/atoms/Skeleton'

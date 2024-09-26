@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
@@ -16,7 +15,9 @@ import {
 import * as Networking from '/app/redux/networking'
 import { useCanDisconnect, useWifiList } from '/app/resources/networking/hooks'
 import * as Fixtures from '/app/redux/networking/__fixtures__'
-import { useIsFlex, useIsRobotBusy } from '../../hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { useIsRobotBusy } from '../../hooks'
+
 import { DisconnectModal } from '../ConnectNetwork/DisconnectModal'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { RobotSettingsNetworking } from '../RobotSettingsNetworking'
@@ -28,6 +29,7 @@ vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/networking')
 vi.mock('/app/redux/robot-api/selectors')
 vi.mock('/app/resources/networking/hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../../hooks')
 vi.mock('../ConnectNetwork/DisconnectModal')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')

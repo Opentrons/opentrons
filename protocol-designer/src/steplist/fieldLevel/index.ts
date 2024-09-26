@@ -7,10 +7,12 @@ import {
   maxFieldValue,
   temperatureRangeFieldValue,
   realNumber,
+  isTimeFormat,
 } from './errors'
 import {
   maskToInteger,
   maskToFloat,
+  maskToTime,
   numberOrNull,
   onlyPositiveNumbers,
   defaultTo,
@@ -345,6 +347,11 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   pauseAction: {
     getErrors: composeErrors(requiredField),
+  },
+  pauseTime: {
+    maskValue: composeMaskers(maskToTime),
+    getErrors: composeErrors(isTimeFormat),
+    castValue: String,
   },
   pauseTemperature: {
     getErrors: composeErrors(

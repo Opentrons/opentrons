@@ -59,7 +59,7 @@ import { FileCard } from '../ChooseRobotSlideout/FileCard'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
-} from '../Devices/utils'
+} from '/app/transformations/runs'
 import { getAnalysisStatus } from '../ProtocolsLanding/utils'
 
 import type { DropdownOption } from '@opentrons/components'

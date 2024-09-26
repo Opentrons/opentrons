@@ -19,6 +19,7 @@ interface UseActionButtonDisabledUtilsProps extends BaseActionButtonProps {
   isOtherRunCurrent: boolean
   isProtocolNotReady: boolean
   isRobotOnWrongVersionOfSoftware: boolean
+  isClosingCurrentRun: boolean
 }
 
 type UseActionButtonDisabledUtilsResult =
@@ -41,6 +42,7 @@ export function useActionBtnDisabledUtils(
     robotName,
     runId,
     isResetRunLoadingRef,
+    isClosingCurrentRun,
   } = props
 
   const { t } = useTranslation('shared')
@@ -57,6 +59,7 @@ export function useActionBtnDisabledUtils(
     isPlayRunActionLoading ||
     isPauseRunActionLoading ||
     isResetRunLoading ||
+    isClosingCurrentRun ||
     isOtherRunCurrent ||
     isProtocolNotReady ||
     isFixtureMismatch ||
@@ -82,6 +85,7 @@ type UseDisabledReasonProps = UseActionButtonDisabledUtilsProps & {
   isDoorOpen: boolean
   isFixtureMismatch: boolean
   isResetRunLoading: boolean
+  isClosingCurrentRun: boolean
 }
 
 // The user-facing disabled explanation for why the ActionButton is disabled, if any.
@@ -95,6 +99,7 @@ function useDisabledReason({
   isDoorOpen,
   runStatus,
   isResetRunLoading,
+  isClosingCurrentRun,
 }: UseDisabledReasonProps): string | null {
   const { t } = useTranslation(['run_details', 'shared'])
 
@@ -110,6 +115,8 @@ function useDisabledReason({
     return t('shared:a_software_update_is_available')
   } else if (isDoorOpen && isStartRunStatus(runStatus)) {
     return t('close_door')
+  } else if (isClosingCurrentRun) {
+    return t('shared:robot_is_busy')
   } else {
     return null
   }

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { COLORS } from '../../../helix-design-system'
 interface ThermocyclerGEN1Props {
   lidMotorState: 'open' | 'closed'

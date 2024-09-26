@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Flex, SPACING, WRAP, ALIGN_CENTER } from '@opentrons/components'
 import {
   HEATERSHAKER_MODULE_TYPE,

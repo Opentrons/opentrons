@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useDrop, useDrag } from 'react-dnd'
@@ -27,7 +27,7 @@ interface DropType {
 
 const DragDropStepItem = (props: DragDropStepItemProps): JSX.Element => {
   const { stepId, moveStep, findStepIndex, orderedStepIds } = props
-  const ref = React.useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLDivElement>(null)
 
   const [{ isDragging }, drag] = useDrag(
     () => ({

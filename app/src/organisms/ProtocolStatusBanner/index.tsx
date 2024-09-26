@@ -1,7 +1,5 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { SPACING, LegacyStyledText } from '@opentrons/components'
-import { Banner } from '/app/atoms/Banner'
+import { SPACING, Banner, LegacyStyledText } from '@opentrons/components'
 
 import type { IconProps } from '@opentrons/components'
 

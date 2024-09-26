@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
@@ -62,14 +62,12 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
   const { makeSnackbar } = useKitchen()
   const allLabware = useSelector(getLabwareDefsByURI)
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
-  const [mount, setMount] = React.useState<PipetteMount | null>(null)
-  const [page, setPage] = React.useState<'add' | 'overview'>('add')
-  const [pipetteType, setPipetteType] = React.useState<PipetteType | null>(null)
-  const [showIncompatibleTip, setIncompatibleTip] = React.useState<boolean>(
-    false
-  )
-  const [pipetteGen, setPipetteGen] = React.useState<Gen | 'flex'>('flex')
-  const [pipetteVolume, setPipetteVolume] = React.useState<string | null>(null)
+  const [mount, setMount] = useState<PipetteMount | null>(null)
+  const [page, setPage] = useState<'add' | 'overview'>('add')
+  const [pipetteType, setPipetteType] = useState<PipetteType | null>(null)
+  const [showIncompatibleTip, setIncompatibleTip] = useState<boolean>(false)
+  const [pipetteGen, setPipetteGen] = useState<Gen | 'flex'>('flex')
+  const [pipetteVolume, setPipetteVolume] = useState<string | null>(null)
   const allowAllTipracks = useSelector(getAllowAllTipracks)
   const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
   const robotType = fields.robotType
@@ -89,12 +87,12 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
   }
 
   //  initialize pipette name once all fields are filled out
-  React.useEffect(() => {
+  useEffect(() => {
     if (
-      pipetteType != null &&
-      pipetteVolume != null &&
-      robotType === OT2_ROBOT_TYPE &&
-      pipetteGen != null
+      (pipetteType != null &&
+        pipetteVolume != null &&
+        robotType === FLEX_ROBOT_TYPE) ||
+      (robotType === OT2_ROBOT_TYPE && pipetteGen != null)
     ) {
       setValue(
         `pipettesByMount.${defaultMount}.pipetteName`,
@@ -127,7 +125,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
       <HandleEnter onEnter={handleProceed}>
         <WizardBody
           stepNumber={2}
-          header={page === 'add' ? t('add_pip') : t('robot_pips')}
+          header={page === 'add' ? t('add_pip') : t('robot_pipettes')}
           subHeader={page === 'add' ? t('which_pipette') : undefined}
           proceed={handleProceed}
           goBack={() => {
@@ -150,12 +148,11 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
               flexDirection={DIRECTION_COLUMN}
               height="41.5vh"
               overflowY={OVERFLOW_AUTO}
-              marginBottom={SPACING.spacing16}
-              marginTop={SPACING.spacing60}
+              gridGap={SPACING.spacing32}
             >
               <Flex
                 flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing16}
+                gridGap={SPACING.spacing12}
               >
                 <StyledText desktopStyle="headingSmallBold">
                   {t('pip_type')}
@@ -192,29 +189,24 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
               {pipetteType != null && robotType === OT2_ROBOT_TYPE ? (
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  marginTop={SPACING.spacing32}
+                  gridGap={SPACING.spacing12}
                 >
-                  <Flex
-                    flexDirection={DIRECTION_COLUMN}
-                    gridGap={SPACING.spacing16}
-                  >
-                    <StyledText desktopStyle="headingSmallBold">
-                      {t('pip_gen')}
-                    </StyledText>
-                    <Flex gridGap={SPACING.spacing4}>
-                      {PIPETTE_GENS.map(gen => (
-                        <RadioButton
-                          key={gen}
-                          onChange={() => {
-                            setPipetteGen(gen)
-                            setPipetteVolume(null)
-                          }}
-                          buttonLabel={gen}
-                          buttonValue={gen}
-                          isSelected={pipetteGen === gen}
-                        />
-                      ))}
-                    </Flex>
+                  <StyledText desktopStyle="headingSmallBold">
+                    {t('pip_gen')}
+                  </StyledText>
+                  <Flex gridGap={SPACING.spacing4}>
+                    {PIPETTE_GENS.map(gen => (
+                      <RadioButton
+                        key={gen}
+                        onChange={() => {
+                          setPipetteGen(gen)
+                          setPipetteVolume(null)
+                        }}
+                        buttonLabel={gen}
+                        buttonValue={gen}
+                        isSelected={pipetteGen === gen}
+                      />
+                    ))}
                   </Flex>
                 </Flex>
               ) : null}
@@ -224,12 +216,9 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                 robotType === OT2_ROBOT_TYPE) ? (
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  marginTop={SPACING.spacing32}
+                  gridGap={SPACING.spacing12}
                 >
-                  <StyledText
-                    desktopStyle="headingSmallBold"
-                    marginBottom={SPACING.spacing16}
-                  >
+                  <StyledText desktopStyle="headingSmallBold">
                     {t('pip_vol')}
                   </StyledText>
                   <Flex gridGap={SPACING.spacing4}>
@@ -287,7 +276,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                     return (
                       <Flex
                         flexDirection={DIRECTION_COLUMN}
-                        marginTop={SPACING.spacing32}
+                        gridGap={SPACING.spacing4}
                       >
                         <Flex
                           flexDirection={DIRECTION_COLUMN}
@@ -333,10 +322,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                             )}
                           </Box>
                         </Flex>
-                        <Flex
-                          gridGap={SPACING.spacing8}
-                          marginTop={SPACING.spacing4}
-                        >
+                        <Flex gridGap={SPACING.spacing8}>
                           <StyledLabel>
                             <StyledText desktopStyle="bodyDefaultRegular">
                               {t('add_custom_tips')}
@@ -381,13 +367,9 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                 : null}
             </Flex>
           ) : (
-            <Flex
-              marginTop={SPACING.spacing60}
-              flexDirection={DIRECTION_COLUMN}
-            >
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
               <Flex
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
-                marginBottom={SPACING.spacing12}
                 alignItems={ALIGN_CENTER}
               >
                 <StyledText desktopStyle="headingSmallBold">

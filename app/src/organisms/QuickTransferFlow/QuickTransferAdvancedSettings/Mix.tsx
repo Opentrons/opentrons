@@ -13,8 +13,10 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../../App/portal'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { getTopPortalEl } from '/app/App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ACTIONS } from '../constants'
 
 import type {
@@ -35,6 +37,7 @@ interface MixProps {
 export function Mix(props: MixProps): JSX.Element {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = React.useRef(null)
 
   const [mixIsEnabled, setMixIsEnabled] = React.useState<boolean>(
@@ -87,6 +90,12 @@ export function Mix(props: MixProps): JSX.Element {
           type: mixAction,
           mixSettings: undefined,
         })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            setting: `Mix_${kind}`,
+          },
+        })
         onBack()
       } else {
         setCurrentStep(2)
@@ -98,6 +107,12 @@ export function Mix(props: MixProps): JSX.Element {
         dispatch({
           type: mixAction,
           mixSettings: { mixVolume, repititions: mixReps },
+        })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            setting: `Mix_${kind}`,
+          },
         })
       }
       onBack()
@@ -204,7 +219,7 @@ export function Mix(props: MixProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={String(mixVolume)}
+              initialValue={String(mixVolume ?? '')}
               onChange={e => {
                 setMixVolume(Number(e))
               }}

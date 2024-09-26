@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
@@ -15,11 +15,14 @@ import {
   ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
 } from '/app/redux/analytics'
-import { useIsFlex } from '../../../hooks'
-import { getLocationInfoNames } from '../../utils/getLocationInfoNames'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { getLocationInfoNames } from '/app/transformations/commands'
 import { SetupLiquidsList } from '../SetupLiquidsList'
-import { getTotalVolumePerLiquidId, getVolumePerWell } from '../utils'
-import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
+import {
+  getTotalVolumePerLiquidId,
+  getVolumePerWell,
+} from '/app/transformations/analysis'
+import { LiquidsLabwareDetailsModal } from '/app/organisms/LiquidsLabwareDetailsModal'
 import { useNotifyRunQuery } from '/app/resources/runs'
 
 import type { Mock } from 'vitest'
@@ -52,10 +55,10 @@ const MOCK_LABWARE_INFO_BY_LIQUID_ID = {
   ],
 }
 
-vi.mock('../utils')
-vi.mock('../../utils/getLocationInfoNames')
-vi.mock('../../../hooks')
-vi.mock('../LiquidsLabwareDetailsModal')
+vi.mock('/app/transformations/analysis')
+vi.mock('/app/transformations/commands')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/organisms/LiquidsLabwareDetailsModal')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
   return {

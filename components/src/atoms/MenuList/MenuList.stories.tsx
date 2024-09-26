@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { action } from '@storybook/addon-actions'
 import { MenuList as MenuListComponent } from './index'
 import { MenuItem } from './MenuItem'

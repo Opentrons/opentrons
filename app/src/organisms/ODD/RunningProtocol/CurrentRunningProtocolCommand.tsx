@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css, keyframes } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
@@ -21,7 +20,7 @@ import {
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { CommandText } from '/app/molecules/Command'
-import { RunTimer } from '../../Devices/ProtocolRun/RunTimer'
+import { RunTimer } from '/app/molecules/RunTimer'
 import { getCommandTextData } from '/app/molecules/Command/utils/getCommandTextData'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
@@ -35,7 +34,7 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { RunCommandSummary, RunStatus } from '@opentrons/api-client'
-import type { TrackProtocolRunEvent } from '../../Devices/hooks'
+import type { TrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import type { RobotAnalyticsData } from '/app/redux/analytics/types'
 
 const ODD_ANIMATION_OPTIMIZATIONS = `

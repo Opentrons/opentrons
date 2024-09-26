@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -18,9 +18,9 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { ChildNavigation } from '../../../ChildNavigation'
-import { useToaster } from '../../../ToasterOven'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { useToaster } from '/app/organisms/ToasterOven'
 
 import type { SetupScreens } from '../types'
 

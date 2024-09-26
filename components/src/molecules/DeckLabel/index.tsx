@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 import { getModuleType } from '@opentrons/shared-data'
 import { Flex } from '../../primitives'

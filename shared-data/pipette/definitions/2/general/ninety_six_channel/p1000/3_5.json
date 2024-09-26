@@ -147,7 +147,7 @@
         "SingleA1": {
           "default": {
             "speed": 10.0,
-            "distance": 12,
+            "distance": 10.5,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {
@@ -172,7 +172,7 @@
           },
           "t1000": {
             "speed": 10.0,
-            "distance": 12,
+            "distance": 10.5,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {
@@ -189,7 +189,7 @@
           },
           "t200": {
             "speed": 10.0,
-            "distance": 11,
+            "distance": 10.5,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {
@@ -206,7 +206,7 @@
           },
           "t50": {
             "speed": 10.0,
-            "distance": 10.85,
+            "distance": 10.5,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {
@@ -225,7 +225,7 @@
         "SingleH1": {
           "default": {
             "speed": 10.0,
-            "distance": 12,
+            "distance": 10.5,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {
@@ -250,7 +250,7 @@
           },
           "t1000": {
             "speed": 10.0,
-            "distance": 12,
+            "distance": 10.5,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {
@@ -267,7 +267,7 @@
           },
           "t200": {
             "speed": 10.0,
-            "distance": 11,
+            "distance": 10.5,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {
@@ -284,7 +284,7 @@
           },
           "t50": {
             "speed": 10.0,
-            "distance": 10.85,
+            "distance": 10.5,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {
@@ -303,7 +303,7 @@
         "SingleA12": {
           "default": {
             "speed": 10.0,
-            "distance": 12,
+            "distance": 10.5,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {
@@ -328,7 +328,7 @@
           },
           "t1000": {
             "speed": 10.0,
-            "distance": 12,
+            "distance": 10.5,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {
@@ -345,7 +345,7 @@
           },
           "t200": {
             "speed": 10.0,
-            "distance": 11,
+            "distance": 10.5,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {
@@ -362,7 +362,7 @@
           },
           "t50": {
             "speed": 10.0,
-            "distance": 10.85,
+            "distance": 10.5,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {
@@ -381,7 +381,7 @@
         "SingleH12": {
           "default": {
             "speed": 10.0,
-            "distance": 12,
+            "distance": 10.5,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {
@@ -406,7 +406,7 @@
           },
           "t1000": {
             "speed": 10.0,
-            "distance": 12,
+            "distance": 10.5,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {
@@ -423,7 +423,7 @@
           },
           "t200": {
             "speed": 10.0,
-            "distance": 11,
+            "distance": 10.5,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {
@@ -440,7 +440,7 @@
           },
           "t50": {
             "speed": 10.0,
-            "distance": 10.85,
+            "distance": 10.5,
             "current": 0.4,
             "tipOverlaps": {
               "v0": {

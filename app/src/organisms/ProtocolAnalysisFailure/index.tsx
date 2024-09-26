@@ -7,6 +7,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   Btn,
+  Banner,
   Flex,
   JUSTIFY_FLEX_END,
   Modal,
@@ -19,7 +20,6 @@ import {
 } from '@opentrons/components'
 
 import { analyzeProtocol } from '/app/redux/protocol-storage'
-import { Banner } from '/app/atoms/Banner'
 import { getTopPortalEl } from '../../App/portal'
 
 import type { Dispatch } from '/app/redux/types'

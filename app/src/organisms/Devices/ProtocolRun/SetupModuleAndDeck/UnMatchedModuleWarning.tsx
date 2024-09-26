@@ -1,17 +1,17 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
+  Banner,
   Flex,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Banner } from '/app/atoms/Banner'
 
 export const UnMatchedModuleWarning = (): JSX.Element | null => {
   const { t } = useTranslation('protocol_setup')
-  const [showBanner, setShowBanner] = React.useState<boolean>(true)
+  const [showBanner, setShowBanner] = useState<boolean>(true)
   if (!showBanner) return null
 
   return (

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import map from 'lodash/map'
 
 import {
@@ -18,16 +18,18 @@ import {
 
 import { getLabwareSetupItemGroups } from '/app/transformations/commands'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
-import { getLabwareRenderInfo } from '../utils/getLabwareRenderInfo'
-import { getProtocolModulesInfo } from '../utils/getProtocolModulesInfo'
-import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
+import {
+  getProtocolModulesInfo,
+  getLabwareRenderInfo,
+} from '/app/transformations/analysis'
+import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 import { OffDeckLabwareList } from './OffDeckLabwareList'
 
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import { LabwareStackModal } from './LabwareStackModal'
+import { LabwareStackModal } from '/app/molecules/LabwareStackModal'
 
 interface SetupLabwareMapProps {
   runId: string
@@ -42,10 +44,8 @@ export function SetupLabwareMap({
   const [
     labwareStackDetailsLabwareId,
     setLabwareStackDetailsLabwareId,
-  ] = React.useState<string | null>(null)
-  const [hoverLabwareId, setHoverLabwareId] = React.useState<string | null>(
-    null
-  )
+  ] = useState<string | null>(null)
+  const [hoverLabwareId, setHoverLabwareId] = useState<string | null>(null)
 
   if (protocolAnalysis == null) return null
 

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import last from 'lodash/last'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'

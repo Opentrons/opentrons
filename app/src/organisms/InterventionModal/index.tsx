@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -33,7 +32,7 @@ import { getIsOnDevice } from '/app/redux/config'
 import { PauseInterventionContent } from './PauseInterventionContent'
 import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
 import { isInterventionCommand } from './utils'
-import { useRobotType } from '../Devices/hooks'
+import { useRobotType } from '/app/redux-resources/robots'
 
 import type { IconName } from '@opentrons/components'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
@@ -112,7 +111,8 @@ export function InterventionModal({
   const isOnDevice = useSelector(getIsOnDevice)
 
   const robotType = useRobotType(robotName)
-  const childContent = React.useMemo(() => {
+  // TODO(jh 09-19-24): Make this into its own component.
+  const childContent = (() => {
     switch (command.commandType) {
       case 'waitForResume':
       case 'pause': // legacy pause command
@@ -136,12 +136,7 @@ export function InterventionModal({
         )
         return null
     }
-  }, [
-    command.id,
-    analysis?.status,
-    run.labware.map(l => l.id).join(),
-    run.modules.map(m => m.id).join(),
-  ])
+  })()
 
   const { iconName, headerTitle, headerTitleOnDevice } = (() => {
     switch (command.commandType) {

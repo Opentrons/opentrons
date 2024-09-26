@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
@@ -14,9 +14,9 @@ import {
   LegacyStyledText,
   CURSOR_POINTER,
 } from '@opentrons/components'
-import { formatInterval } from '../RunTimeControl/utils'
-import { formatTimestamp } from './utils'
-import { EMPTY_TIMESTAMP } from './constants'
+import { formatInterval } from '/app/transformations/commands'
+import { formatTimestamp } from '/app/transformations/runs'
+import { EMPTY_TIMESTAMP } from '/app/resources/runs'
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
 import { HistoricalProtocolRunDrawer as Drawer } from './HistoricalProtocolRunDrawer'
 import type { RunData } from '@opentrons/api-client'
@@ -40,7 +40,7 @@ export function HistoricalProtocolRun(
 ): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const { run, protocolName, robotIsBusy, robotName, protocolKey } = props
-  const [drawerOpen, setDrawerOpen] = React.useState(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const countRunDataFiles =
     'runTimeParameters' in run
       ? run?.runTimeParameters.filter(

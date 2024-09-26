@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -12,10 +11,10 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import {
   useAttachedPipettesFromInstrumentsQuery,
-  useIsFlex,
   usePipetteOffsetCalibrations,
 } from '../Devices/hooks'
-import { getShowPipetteCalibrationWarning } from '../Devices/utils'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 import { PipetteRecalibrationWarning } from '../Devices/PipetteCard/PipetteRecalibrationWarning'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 

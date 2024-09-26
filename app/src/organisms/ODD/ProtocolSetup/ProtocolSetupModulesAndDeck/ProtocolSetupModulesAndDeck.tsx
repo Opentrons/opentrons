@@ -6,8 +6,9 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
+  JUSTIFY_CENTER,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -20,10 +21,12 @@ import { getTopPortalEl } from '../../../../App/portal'
 import { FloatingActionButton } from '/app/atoms/buttons'
 import { InlineNotification } from '/app/atoms/InlineNotification'
 import { ChildNavigation } from '/app/organisms/ChildNavigation'
-import { useAttachedModules } from '/app/organisms/Devices/hooks'
-import { getProtocolModulesInfo } from '/app/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useRunStatus } from '../../../RunTimeControl/hooks'
+import { useAttachedModules } from '/app/resources/modules'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
+import {
+  useRunStatus,
+  useMostRecentCompletedAnalysis,
+} from '/app/resources/runs'
 import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
@@ -136,11 +139,13 @@ export function ProtocolSetupModulesAndDeck({
         marginBottom={SPACING.spacing80}
       >
         {showMapView ? (
-          <ModulesAndDeckMapView
-            attachedProtocolModuleMatches={attachedProtocolModuleMatches}
-            runId={runId}
-            protocolAnalysis={mostRecentAnalysis}
-          />
+          <Flex height="55vh" justifyContent={JUSTIFY_CENTER}>
+            <ModulesAndDeckMapView
+              attachedProtocolModuleMatches={attachedProtocolModuleMatches}
+              runId={runId}
+              protocolAnalysis={mostRecentAnalysis}
+            />
+          </Flex>
         ) : (
           <>
             {isModuleMismatch && !clearModuleMismatchBanner ? (

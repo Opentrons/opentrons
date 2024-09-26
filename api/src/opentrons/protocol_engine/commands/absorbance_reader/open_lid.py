@@ -15,6 +15,9 @@ from opentrons.protocol_engine.types import AddressableAreaLocation
 
 from opentrons.drivers.types import AbsorbanceReaderLidStatus
 
+from ...state.update_types import StateUpdate
+
+
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import (
@@ -125,6 +128,14 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, 
                 labware_location=new_location,
             )
 
+        state_update = StateUpdate()
+
+        state_update.set_labware_location(
+            labware_id=loaded_lid.id,
+            new_location=new_location,
+            new_offset_id=new_offset_id,
+        )
+
         return SuccessData(
             public=OpenLidResult(
                 lidId=loaded_lid.id,
@@ -132,6 +143,7 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, 
                 offsetId=new_offset_id,
             ),
             private=None,
+            state_update=state_update,
         )
 
 

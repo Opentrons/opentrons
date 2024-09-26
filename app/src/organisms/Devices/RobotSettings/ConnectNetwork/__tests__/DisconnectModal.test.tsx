@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
@@ -6,7 +5,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { when } from 'vitest-when'
 
 import { i18n } from '/app/i18n'
-import { useRobot } from '/app/organisms/Devices/hooks'
+import { useRobot } from '/app/redux-resources/robots'
 import { useWifiList } from '/app/resources/networking/hooks'
 import {
   mockConnectableRobot,
@@ -34,7 +33,7 @@ import type { RequestState } from '/app/redux/robot-api/types'
 import type { State } from '/app/redux/types'
 
 vi.mock('/app/resources/networking/hooks')
-vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/networking')
 vi.mock('/app/redux/robot-api')
 

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import isEmpty from 'lodash/isEmpty'
@@ -63,7 +63,7 @@ export function PipetteFields(props: PipetteFieldsProps): JSX.Element {
   const initialTabIndex = 1
   const has96Channel = values.left.pipetteName === 'p1000_96'
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (has96Channel) {
       values.right = { pipetteName: null, tiprackDefURI: null }
     }

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'

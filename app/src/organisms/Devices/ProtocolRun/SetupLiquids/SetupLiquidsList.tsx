@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -32,11 +32,14 @@ import {
   ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
 } from '/app/redux/analytics'
-import { useIsFlex } from '../../hooks'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getLocationInfoNames } from '../utils/getLocationInfoNames'
-import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
-import { getTotalVolumePerLiquidId, getVolumePerWell } from './utils'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import { getLocationInfoNames } from '/app/transformations/commands'
+import { LiquidsLabwareDetailsModal } from '/app/organisms/LiquidsLabwareDetailsModal'
+import {
+  getTotalVolumePerLiquidId,
+  getVolumePerWell,
+} from '/app/transformations/analysis'
 
 import type { LabwareByLiquidId } from '@opentrons/shared-data'
 
@@ -136,8 +139,8 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
     isFlex,
   } = props
   const { t } = useTranslation('protocol_setup')
-  const [openItem, setOpenItem] = React.useState(false)
-  const [liquidDetailsLabwareId, setLiquidDetailsLabwareId] = React.useState<
+  const [openItem, setOpenItem] = useState(false)
+  const [liquidDetailsLabwareId, setLiquidDetailsLabwareId] = useState<
     string | null
   >(null)
   const commands = useMostRecentCompletedAnalysis(runId)?.commands

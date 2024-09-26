@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -22,35 +22,25 @@ import type {
   TipLengthCalibrationSessionParams,
 } from '/app/redux/sessions/types'
 import type { State } from '/app/redux/types'
+import type { DashboardCalTipLengthInvoker } from '/app/organisms/Devices/hooks/useCalibrationTaskList'
 
 // tip length calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
 
-export interface DashboardTipLengthCalInvokerProps {
-  params: Pick<TipLengthCalibrationSessionParams, 'mount'> &
-    Partial<Omit<TipLengthCalibrationSessionParams, 'mount'>>
-  hasBlockModalResponse: boolean | null
-  invalidateHandler?: () => void
-}
-
-export type DashboardCalTipLengthInvoker = (
-  props: DashboardTipLengthCalInvokerProps
-) => void
-
 export function useDashboardCalibrateTipLength(
   robotName: string
 ): [DashboardCalTipLengthInvoker, JSX.Element | null] {
-  const createRequestId = React.useRef<string | null>(null)
-  const trackedRequestId = React.useRef<string | null>(null)
-  const jogRequestId = React.useRef<string | null>(null)
-  const sessionParams = React.useRef<
+  const createRequestId = useRef<string | null>(null)
+  const trackedRequestId = useRef<string | null>(null)
+  const jogRequestId = useRef<string | null>(null)
+  const sessionParams = useRef<
     | (Pick<TipLengthCalibrationSessionParams, 'mount'> &
         Partial<Omit<TipLengthCalibrationSessionParams, 'mount'>>)
     | null
   >(null)
-  const invalidateHandlerRef = React.useRef<(() => void) | undefined>()
+  const invalidateHandlerRef = useRef<(() => void) | undefined>()
   const dispatch = useDispatch()
   const { t } = useTranslation('robot_calibration')
 
@@ -96,9 +86,9 @@ export function useDashboardCalibrateTipLength(
   )
 
   const configHasCalibrationBlock = useSelector(getHasCalibrationBlock)
-  const [showCalBlockModal, setShowCalBlockModal] = React.useState<
-    boolean | null
-  >(null)
+  const [showCalBlockModal, setShowCalBlockModal] = useState<boolean | null>(
+    null
+  )
 
   const handleStartDashboardTipLengthCalSession: DashboardCalTipLengthInvoker = props => {
     const { params, hasBlockModalResponse, invalidateHandler } = props

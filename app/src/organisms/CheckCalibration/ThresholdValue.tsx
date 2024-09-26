@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 interface Props {
   thresholdVector: [number, number, number]
 }

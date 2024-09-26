@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
@@ -25,7 +25,7 @@ import {
 } from '@opentrons/components'
 
 import { QuaternaryButton } from '/app/atoms/buttons'
-import { useIsFlex } from '/app/organisms/Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
 import {
   getRobotAddressesByName,

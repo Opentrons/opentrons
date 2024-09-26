@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useFormikContext } from 'formik'
 import {
   MAGNETIC_BLOCK_V1,

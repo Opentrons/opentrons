@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { C_SELECTED_DARK, C_TRANSPARENT } from '../../../styles'

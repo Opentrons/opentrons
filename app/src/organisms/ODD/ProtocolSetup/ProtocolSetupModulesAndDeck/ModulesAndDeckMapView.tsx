@@ -1,13 +1,11 @@
-import React from 'react'
-
 import { BaseDeck, Flex } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
-import { ModuleInfo } from '../../../Devices/ModuleInfo'
-import { getStandardDeckViewLayerBlockList } from '../../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
+import { ModuleInfo } from '/app/molecules/ModuleInfo'
+import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { AttachedProtocolModuleMatch } from './utils'

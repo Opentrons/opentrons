@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { COLORS, VIEWPORT } from '@opentrons/components'
 import { OddModalHeader } from './OddModalHeader'
 import type { Story, Meta } from '@storybook/react'

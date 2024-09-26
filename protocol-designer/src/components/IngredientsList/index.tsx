@@ -1,5 +1,5 @@
 // TODO: Ian 2018-10-09 figure out what belongs in LiquidsSidebar vs IngredientsList after #2427
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { IconButton, SidePanel, truncateString } from '@opentrons/components'
@@ -45,7 +45,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
   const { t } = useTranslation(['card', 'application'])
   const showName = ingredGroup.serialize
 
-  const [expanded, setExpanded] = React.useState(true)
+  const [expanded, setExpanded] = useState(true)
 
   const toggleAccordion = (): void => {
     setExpanded(!expanded)

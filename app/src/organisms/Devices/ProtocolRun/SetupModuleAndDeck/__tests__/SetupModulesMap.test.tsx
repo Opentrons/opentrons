@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 
-import * as React from 'react'
+import type * as React from 'react'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
@@ -14,9 +14,9 @@ import {
   mockThermocycler as mockThermocyclerFixture,
   mockMagneticModule as mockMagneticModuleFixture,
 } from '/app/redux/modules/__fixtures__/index'
-import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getAttachedProtocolModuleMatches } from '../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
-import { ModuleInfo } from '../../../ModuleInfo'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import { getAttachedProtocolModuleMatches } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
+import { ModuleInfo } from '/app/molecules/ModuleInfo'
 import { SetupModulesMap } from '../SetupModulesMap'
 
 import type {
@@ -43,10 +43,10 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     inferModuleOrientationFromXCoordinate: vi.fn(),
   }
 })
-vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils')
-vi.mock('../../../ModuleInfo')
-vi.mock('../../../hooks')
+vi.mock('/app/resources/runs/useMostRecentCompletedAnalysis')
+vi.mock('/app/organisms/ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils')
+vi.mock('/app/molecules/ModuleInfo')
+vi.mock('/app/resources/modules')
 
 const render = (props: React.ComponentProps<typeof SetupModulesMap>) => {
   return renderWithProviders(

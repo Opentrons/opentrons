@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { i18n } from '/app/i18n'

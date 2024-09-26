@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
 import { numericalKeyboardLayout, numericalCustom } from '../constants'
 

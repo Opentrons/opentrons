@@ -1,10 +1,8 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Box, SPACING } from '@opentrons/components'
+import { Box, SPACING, Banner } from '@opentrons/components'
 
 import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
-import { Banner } from '/app/atoms/Banner'
 import {
   TerminalRunBannerContainer,
   useTerminalRunBannerContainer,

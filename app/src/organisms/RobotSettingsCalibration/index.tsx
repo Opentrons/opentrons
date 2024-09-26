@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -22,11 +22,10 @@ import { CalibrateDeck } from '/app/organisms/CalibrateDeck'
 import { CalibrationStatusCard } from '/app/organisms/CalibrationStatusCard'
 import { CheckCalibration } from '/app/organisms/CheckCalibration'
 import {
-  useRobot,
   useRunStatuses,
-  useIsFlex,
   useAttachedPipettesFromInstrumentsQuery,
 } from '/app/organisms/Devices/hooks'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { HowCalibrationWorksModal } from '/app/organisms/HowCalibrationWorksModal'
 import { CONNECTABLE } from '/app/redux/discovery'
 import * as RobotApi from '/app/redux/robot-api'
@@ -78,21 +77,21 @@ export function RobotSettingsCalibration({
     'robot_calibration',
     'shared',
   ])
-  const trackedRequestId = React.useRef<string | null>(null)
-  const createRequestId = React.useRef<string | null>(null)
-  const jogRequestId = React.useRef<string | null>(null)
+  const trackedRequestId = useRef<string | null>(null)
+  const createRequestId = useRef<string | null>(null)
+  const jogRequestId = useRef<string | null>(null)
 
   const [
     showHowCalibrationWorksModal,
     setShowHowCalibrationWorksModal,
-  ] = React.useState(false)
+  ] = useState(false)
 
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
   const isFlex = useIsFlex(robotName)
   const dispatch = useDispatch<Dispatch>()
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(Sessions.fetchAllSessions(robotName))
   }, [dispatch, robotName])
 
@@ -250,7 +249,7 @@ export function RobotSettingsCalibration({
     })
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {
       createRequestId.current = null
     }

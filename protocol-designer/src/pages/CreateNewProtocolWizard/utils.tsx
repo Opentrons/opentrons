@@ -1,4 +1,3 @@
-import * as React from 'react'
 import {
   MAGNETIC_BLOCK_TYPE,
   STAGING_AREA_CUTOUTS,

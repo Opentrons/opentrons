@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, expect } from 'vitest'
@@ -11,7 +10,7 @@ import { DeviceReset } from '../DeviceReset'
 
 const mockUpdateIsEXpanded = vi.fn()
 
-vi.mock('../../../../ProtocolUpload/hooks')
+vi.mock('/app/resources/runs')
 
 const render = (isRobotBusy = false) => {
   return renderWithProviders(

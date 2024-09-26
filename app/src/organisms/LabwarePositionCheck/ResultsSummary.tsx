@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo, Fragment } from 'react'
 import styled, { css } from 'styled-components'
 import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
@@ -84,7 +84,7 @@ export const ResultsSummary = (
   )
   const isOnDevice = useSelector(getIsOnDevice)
 
-  const offsetsToApply = React.useMemo(() => {
+  const offsetsToApply = useMemo(() => {
     return workingOffsets.map<LabwareOffsetCreateData>(
       ({ initialPosition, finalPosition, labwareId, location }) => {
         const definitionUri =
@@ -321,7 +321,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                 ) : (
                   <Flex>
                     {[vector.x, vector.y, vector.z].map((axis, index) => (
-                      <React.Fragment key={index}>
+                      <Fragment key={index}>
                         <LegacyStyledText
                           as="p"
                           marginLeft={index > 0 ? SPACING.spacing8 : 0}
@@ -333,7 +333,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                         <LegacyStyledText as="p">
                           {axis.toFixed(1)}
                         </LegacyStyledText>
-                      </React.Fragment>
+                      </Fragment>
                     ))}
                   </Flex>
                 )}
@@ -398,7 +398,7 @@ export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
                 ) : (
                   <Flex>
                     {[vector.x, vector.y, vector.z].map((axis, index) => (
-                      <React.Fragment key={index}>
+                      <Fragment key={index}>
                         <LegacyStyledText
                           fontSize={TYPOGRAPHY.fontSize20}
                           lineHeight={TYPOGRAPHY.lineHeight24}
@@ -414,7 +414,7 @@ export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
                         >
                           {axis.toFixed(1)}
                         </LegacyStyledText>
-                      </React.Fragment>
+                      </Fragment>
                     ))}
                   </Flex>
                 )}

@@ -1,4 +1,4 @@
-import React from 'react'
+import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 
 import {
@@ -6,7 +6,7 @@ import {
   fetchPipetteOffsetCalibrations,
 } from '/app/redux/calibration'
 import { useDispatchApiRequest } from '/app/redux/robot-api'
-import { useRobot } from '.'
+import { useRobot } from '/app/redux-resources/robots'
 
 import type { PipetteOffsetCalibration } from '/app/redux/calibration/types'
 import type { State } from '/app/redux/types'
@@ -29,7 +29,7 @@ export function usePipetteOffsetCalibration(
     )
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (robotName != null) {
       dispatchRequest(fetchPipetteOffsetCalibrations(robotName))
     }

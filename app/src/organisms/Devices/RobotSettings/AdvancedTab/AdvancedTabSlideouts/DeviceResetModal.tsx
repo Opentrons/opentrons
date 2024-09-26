@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import last from 'lodash/last'
@@ -24,7 +24,7 @@ import {
   PENDING,
 } from '/app/redux/robot-api'
 import { getResetConfigOptions, resetConfig } from '/app/redux/robot-admin'
-import { useIsFlex } from '../../../hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 
 import type { State } from '/app/redux/types'
 import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
@@ -80,7 +80,7 @@ export function DeviceResetModal({
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (resetRequestStatus === SUCCESS) closeModal()
   }, [resetRequestStatus, closeModal])
 

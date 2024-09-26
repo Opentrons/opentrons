@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
@@ -10,11 +9,11 @@ import {
   getRobotFirmwareVersion,
   getRobotProtocolApiVersion,
 } from '/app/redux/discovery'
-import { useRobot } from '../../../hooks'
+import { useRobot } from '/app/redux-resources/robots'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { RobotInformation } from '../RobotInformation'
 
-vi.mock('../../../hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/discovery/selectors')
 
 const MOCK_ROBOT_SERIAL_NUMBER = '0.0.0'

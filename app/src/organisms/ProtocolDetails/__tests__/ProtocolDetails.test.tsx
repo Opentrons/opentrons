@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { act, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'

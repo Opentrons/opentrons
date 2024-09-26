@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
@@ -9,11 +9,9 @@ import {
   mockAttachedPipette,
   mockAttachedPipetteInformation,
 } from '/app/redux/pipettes/__fixtures__'
-import {
-  useAttachedPipettes,
-  useIsFlex,
-  useAttachedPipettesFromInstrumentsQuery,
-} from '../../../Devices/hooks'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/organisms/Devices/hooks'
+import { useAttachedPipettes } from '/app/resources/instruments'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
 import { OverflowMenu } from '../OverflowMenu'
@@ -63,6 +61,8 @@ vi.mock('/app/redux/sessions/selectors')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/assets/labware/findLabware')
 vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/resources/instruments')
 vi.mock('../OverflowMenu')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {

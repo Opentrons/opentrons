@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, Fragment } from 'react'
 import { createPortal } from 'react-dom'
 import map from 'lodash/map'
 import omit from 'lodash/omit'
@@ -142,7 +142,7 @@ function MetadataDetails({
         </LegacyStyledText>
         {filteredMetaData.map((item, index) => {
           return (
-            <React.Fragment key={index}>
+            <Fragment key={index}>
               <LegacyStyledText
                 as="h6"
                 marginTop={SPACING.spacing8}
@@ -151,7 +151,7 @@ function MetadataDetails({
                 {startCase(item.label)}
               </LegacyStyledText>
               <LegacyStyledText as="p">{item.value}</LegacyStyledText>
-            </React.Fragment>
+            </Fragment>
           )
         })}
       </Flex>
@@ -167,7 +167,7 @@ interface ReadMoreContentProps {
 const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
   const { metadata, protocolType } = props
   const { t, i18n } = useTranslation('protocol_details')
-  const [isReadMore, setIsReadMore] = React.useState(true)
+  const [isReadMore, setIsReadMore] = useState(true)
 
   const description = isEmpty(metadata.description)
     ? t('shared:no_data')
@@ -217,18 +217,18 @@ export function ProtocolDetails(
   const enableProtocolTimeline = useFeatureFlag('protocolTimeline')
   const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
   const hasRunTimeParameters = runTimeParameters.length > 0
-  const [currentTab, setCurrentTab] = React.useState<
+  const [currentTab, setCurrentTab] = useState<
     'robot_config' | 'labware' | 'liquids' | 'stats' | 'parameters' | 'timeline'
   >(hasRunTimeParameters ? 'parameters' : 'robot_config')
   const [
     showChooseRobotToRunProtocolSlideout,
     setShowChooseRobotToRunProtocolSlideout,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const [
     showSendProtocolToFlexSlideout,
     setShowSendProtocolToFlexSlideout,
-  ] = React.useState<boolean>(false)
-  const [showDeckViewModal, setShowDeckViewModal] = React.useState(false)
+  ] = useState<boolean>(false)
+  const [showDeckViewModal, setShowDeckViewModal] = useState(false)
 
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)

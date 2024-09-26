@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import cx from 'classnames'
 
 import { Icon } from '@opentrons/components'
@@ -27,9 +27,7 @@ interface MultiChannelSubstepProps {
 export function MultiChannelSubstep(
   props: MultiChannelSubstepProps
 ): JSX.Element {
-  const [collapsed, setCollapsed] = React.useState<Boolean>(
-    DEFAULT_COLLAPSED_STATE
-  )
+  const [collapsed, setCollapsed] = useState<Boolean>(DEFAULT_COLLAPSED_STATE)
 
   const {
     rowGroup,

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink, useNavigate } from 'react-router-dom'
 
@@ -33,8 +33,10 @@ import {
   ANALYTICS_PROTOCOL_RUN_ACTION,
 } from '/app/redux/analytics'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { useDownloadRunLog, useTrackProtocolRunEvent, useRobot } from './hooks'
+import { useDownloadRunLog } from './hooks'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
+import { useRobot } from '/app/redux-resources/robots'
 
 import type { Run } from '@opentrons/api-client'
 
@@ -132,7 +134,10 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   }
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
-  const { reset, isRunControlLoading } = useRunControls(runId, onResetSuccess)
+  const { reset, isResetRunLoading, isRunControlLoading } = useRunControls(
+    runId,
+    onResetSuccess
+  )
   const { deleteRun } = useDeleteRunMutation()
   const robot = useRobot(robotName)
   const robotSerialNumber =
@@ -188,7 +193,18 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
         }
         data-testid="RecentProtocolRun_OverflowMenu_rerunNow"
       >
-        {t('rerun_now')}
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+          {t('rerun_now')}
+          {isResetRunLoading ? (
+            <Icon
+              name="ot-spinner"
+              size={SIZE_1}
+              color={COLORS.grey50}
+              aria-label="spinner"
+              spin
+            />
+          ) : null}
+        </Flex>
       </MenuItem>
       {isRobotOnWrongVersionOfSoftware && (
         <Tooltip tooltipProps={tooltipProps}>

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -11,10 +10,9 @@ import {
 
 import { LabeledValue } from './LabeledValue'
 import { DisplayRunStatus } from '../DisplayRunStatus'
-import { RunTimer } from '../../RunTimer'
+import { RunTimer } from '/app/molecules/RunTimer'
 import { ActionButton } from './ActionButton'
-import { useRunCreatedAtTimestamp } from '../../../hooks'
-import { useRunTimestamps } from '../../../../RunTimeControl/hooks'
+import { useRunTimestamps, useRunCreatedAtTimestamp } from '/app/resources/runs'
 
 import type { RunHeaderContentProps } from '.'
 

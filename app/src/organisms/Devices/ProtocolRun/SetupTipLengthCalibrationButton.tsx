@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -21,11 +20,9 @@ import {
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { TertiaryButton } from '/app/atoms/buttons'
-import {
-  useAttachedPipettes,
-  useDeckCalibrationData,
-  useRunHasStarted,
-} from '../hooks'
+import { useAttachedPipettes } from '/app/resources/instruments'
+import { useRunHasStarted } from '/app/resources/runs'
+import { useDeckCalibrationData } from '../hooks'
 import { useDashboardCalibrateTipLength } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 
 import type { Mount } from '@opentrons/components'

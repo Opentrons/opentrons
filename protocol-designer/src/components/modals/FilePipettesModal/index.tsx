@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -318,7 +318,7 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
   const [
     showEditPipetteConfirmation,
     setShowEditPipetteConfirmation,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const { t } = useTranslation(['modal', 'button', 'form'])
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch()

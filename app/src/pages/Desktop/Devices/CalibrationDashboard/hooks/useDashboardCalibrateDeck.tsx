@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -13,6 +13,7 @@ import * as Sessions from '/app/redux/sessions'
 import { getDeckCalibrationSession } from '/app/redux/sessions/deck-calibration/selectors'
 
 import type { State } from '/app/redux/types'
+import type { DashboardCalDeckInvoker } from '/app/organisms/Devices/hooks/useCalibrationTaskList'
 import type { DeckCalibrationSession } from '/app/redux/sessions'
 import type { SessionCommandString } from '/app/redux/sessions/types'
 import type { RequestState } from '/app/redux/robot-api/types'
@@ -21,21 +22,15 @@ import type { RequestState } from '/app/redux/robot-api/types'
 const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
-export interface DashboardCalDeckInvokerProps {
-  invalidateHandler?: () => void
-}
-export type DashboardCalDeckInvoker = (
-  props?: DashboardCalDeckInvokerProps
-) => void
 
 export function useDashboardCalibrateDeck(
   robotName: string
 ): [DashboardCalDeckInvoker, JSX.Element | null, boolean] {
-  const trackedRequestId = React.useRef<string | null>(null)
-  const createRequestId = React.useRef<string | null>(null)
-  const jogRequestId = React.useRef<string | null>(null)
-  const exitBeforeDeckConfigCompletion = React.useRef<boolean>(false)
-  const invalidateHandlerRef = React.useRef<(() => void) | undefined>()
+  const trackedRequestId = useRef<string | null>(null)
+  const createRequestId = useRef<string | null>(null)
+  const jogRequestId = useRef<string | null>(null)
+  const exitBeforeDeckConfigCompletion = useRef<boolean>(false)
+  const invalidateHandlerRef = useRef<(() => void) | undefined>()
   const { t } = useTranslation('robot_calibration')
 
   const deckCalSession: DeckCalibrationSession | null = useSelector(

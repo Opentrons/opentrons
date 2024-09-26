@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -17,9 +17,9 @@ import {
 import { mockRobot } from '/app/redux/robot-api/__fixtures__'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { FAILURE, getRequestById, PENDING, SUCCESS } from '/app/redux/robot-api'
-import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
-import { useToaster } from '../../ToasterOven'
-import { useIsFlex } from '../../Devices/hooks'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { MagneticModuleData } from '../MagneticModuleData'
 import { TemperatureModuleData } from '../TemperatureModuleData'
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
@@ -47,6 +47,7 @@ vi.mock('../ModuleOverflowMenu')
 vi.mock('../../RunTimeControl/hooks')
 vi.mock('../FirmwareUpdateFailedModal')
 vi.mock('/app/redux/robot-api')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/organisms/ToasterOven')
 vi.mock('/app/organisms/Devices/hooks')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')

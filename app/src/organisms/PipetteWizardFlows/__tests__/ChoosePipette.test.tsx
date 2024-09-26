@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,

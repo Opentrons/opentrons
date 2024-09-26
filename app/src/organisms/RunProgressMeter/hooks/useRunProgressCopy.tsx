@@ -2,7 +2,7 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_IDLE,
 } from '@opentrons/api-client'
-import * as React from 'react'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getCommandTextData } from '/app/molecules/Command/utils/getCommandTextData'
 import { LegacyStyledText } from '@opentrons/components'

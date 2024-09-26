@@ -1,8 +1,9 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_FLEX_END,
+  Banner,
   Box,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -16,7 +17,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
-import { Banner } from '/app/atoms/Banner'
 import multipleModuleHelp from '/app/assets/images/Moam_modal_image.png'
 
 const HOW_TO_MULTIPLE_MODULES_HREF =
@@ -27,7 +27,7 @@ export function OT2MultipleModulesHelp(): JSX.Element {
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
   const onCloseClick = (): void => {
     setShowMultipleModulesModal(false)

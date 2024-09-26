@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { FlowRateInput } from './FlowRateInput'
 import { useSelector } from 'react-redux'
 import { selectors as stepFormSelectors } from '../../../../step-forms'

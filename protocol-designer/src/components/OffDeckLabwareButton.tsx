@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -14,7 +14,7 @@ import { OffDeckLabwareSlideout } from './OffDeckLabwareSlideout'
 export const OffDeckLabwareButton = (): JSX.Element => {
   const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)
   const { t } = useTranslation('button')
-  const [showSlideout, setShowSlideout] = React.useState<boolean>(false)
+  const [showSlideout, setShowSlideout] = useState<boolean>(false)
 
   return (
     <Flex position={POSITION_ABSOLUTE} right={SPACING.spacing16} zIndex={2}>

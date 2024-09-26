@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { useSelector, useDispatch } from 'react-redux'

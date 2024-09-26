@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'

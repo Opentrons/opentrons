@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -91,15 +91,13 @@ export function ProtocolOverview(): JSX.Element {
   const [
     showEditInstrumentsModal,
     setShowEditInstrumentsModal,
-  ] = React.useState<boolean>(false)
-  const [
-    showEditMetadataModal,
-    setShowEditMetadataModal,
-  ] = React.useState<boolean>(false)
-  const [
-    showExportWarningModal,
-    setShowExportWarningModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
+  const [showEditMetadataModal, setShowEditMetadataModal] = useState<boolean>(
+    false
+  )
+  const [showExportWarningModal, setShowExportWarningModal] = useState<boolean>(
+    false
+  )
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
   const initialDeckSetup = useSelector(getInitialDeckSetup)
@@ -107,11 +105,10 @@ export function ProtocolOverview(): JSX.Element {
     labwareIngredSelectors.allIngredientGroupFields
   )
   const dispatch: ThunkDispatch<any> = useDispatch()
-  const [hover, setHover] = React.useState<DeckSlot | string | null>(null)
-  const [
-    showMaterialsListModal,
-    setShowMaterialsListModal,
-  ] = React.useState<boolean>(false)
+  const [hover, setHover] = useState<DeckSlot | string | null>(null)
+  const [showMaterialsListModal, setShowMaterialsListModal] = useState<boolean>(
+    false
+  )
   const fileData = useSelector(fileSelectors.createFile)
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
@@ -121,11 +118,11 @@ export function ProtocolOverview(): JSX.Element {
   const leftString = t('starting_deck_state:onDeck')
   const rightString = t('starting_deck_state:offDeck')
 
-  const [deckView, setDeckView] = React.useState<
+  const [deckView, setDeckView] = useState<
     typeof leftString | typeof rightString
   >(leftString)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (formValues?.created == null) {
       console.warn(
         'formValues was refreshed while on the overview page, redirecting to landing page'
@@ -337,36 +334,31 @@ export function ProtocolOverview(): JSX.Element {
         </Flex>
         <Flex gridGap={SPACING.spacing80}>
           <Flex
+            flex="1.27"
             flexDirection={DIRECTION_COLUMN}
-            width="50%"
             gridGap={SPACING.spacing40}
           >
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <Flex
-                justifyContent={JUSTIFY_SPACE_BETWEEN}
-                marginBottom={SPACING.spacing12}
-              >
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+              <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
                 <StyledText desktopStyle="headingSmallBold">
                   {t('protocol_metadata')}
                 </StyledText>
-                <Btn
-                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                  onClick={() => {
-                    setShowEditMetadataModal(true)
-                  }}
-                  css={BUTTON_LINK_STYLE}
-                  data-testid="ProtocolOverview_MetadataEditButton"
-                >
-                  <StyledText desktopStyle="bodyDefaultRegular">
-                    {t('edit')}
-                  </StyledText>
-                </Btn>
+                <Flex padding={SPACING.spacing4}>
+                  <Btn
+                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                    onClick={() => {
+                      setShowEditMetadataModal(true)
+                    }}
+                    css={BUTTON_LINK_STYLE}
+                    data-testid="ProtocolOverview_MetadataEditButton"
+                  >
+                    <StyledText desktopStyle="bodyDefaultRegular">
+                      {t('edit')}
+                    </StyledText>
+                  </Btn>
+                </Flex>
               </Flex>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing4}
-                marginBottom={SPACING.spacing4}
-              >
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
                 {metaDataInfo.map(info => {
                   const [title, value] = Object.entries(info)[0]
 
@@ -380,36 +372,35 @@ export function ProtocolOverview(): JSX.Element {
                     </ListItem>
                   )
                 })}
+                <ListItem type="noActive" key="ProtocolOverview_robotVersion">
+                  <ListItemDescriptor
+                    type="default"
+                    description={t('required_app_version')}
+                    content={t('app_version', {
+                      version: REQUIRED_APP_VERSION,
+                    })}
+                  />
+                </ListItem>
               </Flex>
-              <ListItem type="noActive" key="ProtocolOverview_robotVersion">
-                <ListItemDescriptor
-                  type="default"
-                  description={t('required_app_version')}
-                  content={t('app_version', {
-                    version: REQUIRED_APP_VERSION,
-                  })}
-                />
-              </ListItem>
             </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <Flex
-                justifyContent={JUSTIFY_SPACE_BETWEEN}
-                marginBottom={SPACING.spacing12}
-              >
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+              <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
                 <StyledText desktopStyle="headingSmallBold">
                   {t('instruments')}
                 </StyledText>
-                <Btn
-                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                  onClick={() => {
-                    setShowEditInstrumentsModal(true)
-                  }}
-                  css={BUTTON_LINK_STYLE}
-                >
-                  <StyledText desktopStyle="bodyDefaultRegular">
-                    {t('edit')}
-                  </StyledText>
-                </Btn>
+                <Flex padding={SPACING.spacing4}>
+                  <Btn
+                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                    onClick={() => {
+                      setShowEditInstrumentsModal(true)
+                    }}
+                    css={BUTTON_LINK_STYLE}
+                  >
+                    <StyledText desktopStyle="bodyDefaultRegular">
+                      {t('edit')}
+                    </StyledText>
+                  </Btn>
+                </Flex>
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
                 <ListItem type="noActive" key={`ProtocolOverview_robotType`}>
@@ -458,12 +449,10 @@ export function ProtocolOverview(): JSX.Element {
                 ) : null}
               </Flex>
             </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <Flex marginBottom={SPACING.spacing12}>
-                <StyledText desktopStyle="headingSmallBold">
-                  {t('liquid_defs')}
-                </StyledText>
-              </Flex>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+              <StyledText desktopStyle="headingSmallBold">
+                {t('liquid_defs')}
+              </StyledText>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
                 {Object.keys(allIngredientGroupFields).length > 0 ? (
                   Object.values(allIngredientGroupFields).map(
@@ -495,8 +484,8 @@ export function ProtocolOverview(): JSX.Element {
                 )}
               </Flex>
             </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <Flex marginBottom={SPACING.spacing12}>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+              <Flex>
                 <StyledText desktopStyle="headingSmallBold">
                   {t('step')}
                 </StyledText>
@@ -518,28 +507,33 @@ export function ProtocolOverview(): JSX.Element {
               </Flex>
             </Flex>
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} width="50%">
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            flex="1"
+            gridGap={SPACING.spacing12}
+          >
             <Flex
-              marginBottom={SPACING.spacing12}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               alignItems={ALIGN_CENTER}
             >
-              <Flex gridGap="30px" alignItems={ALIGN_CENTER}>
+              <Flex gridGap="1.875rem" alignItems={ALIGN_CENTER}>
                 <StyledText desktopStyle="headingSmallBold">
                   {t('starting_deck')}
                 </StyledText>
-                <Btn
-                  data-testid="Materials_list"
-                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                  onClick={() => {
-                    setShowMaterialsListModal(true)
-                  }}
-                  css={BUTTON_LINK_STYLE}
-                >
-                  <StyledText desktopStyle="bodyDefaultRegular">
-                    {t('materials_list')}
-                  </StyledText>
-                </Btn>
+                <Flex padding={SPACING.spacing4}>
+                  <Btn
+                    data-testid="Materials_list"
+                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                    onClick={() => {
+                      setShowMaterialsListModal(true)
+                    }}
+                    css={BUTTON_LINK_STYLE}
+                  >
+                    <StyledText desktopStyle="bodyDefaultRegular">
+                      {t('materials_list')}
+                    </StyledText>
+                  </Btn>
+                </Flex>
               </Flex>
               <ToggleGroup
                 selectedValue={deckView}
@@ -553,11 +547,7 @@ export function ProtocolOverview(): JSX.Element {
                 }}
               />
             </Flex>
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing32}
-              alignItems={ALIGN_CENTER}
-            >
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
               {deckView === leftString ? (
                 <DeckThumbnail hoverSlot={hover} setHoverSlot={setHover} />
               ) : (

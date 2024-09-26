@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
@@ -50,10 +50,12 @@ import type {
   LoadModuleRunTimeCommand,
   LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
-import type { ModuleRenderInfoForProtocol } from '../../hooks'
-import type { LabwareSetupItem } from '/app/transformations/commands'
+import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
+import type {
+  LabwareSetupItem,
+  NestedLabwareInfo,
+} from '/app/transformations/commands'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
-import type { NestedLabwareInfo } from './getNestedLabwareInfo'
 
 const LabwareRow = styled.div`
   display: ${DISPLAY_GRID};
@@ -95,11 +97,11 @@ export function LabwareListItem(
   const [
     secureLabwareModalType,
     setSecureLabwareModalType,
-  ] = React.useState<ModuleType | null>(null)
+  ] = useState<ModuleType | null>(null)
   const labwareDisplayName = getLabwareDisplayName(definition)
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const [isLatchLoading, setIsLatchLoading] = React.useState<boolean>(false)
-  const [isLatchClosed, setIsLatchClosed] = React.useState<boolean>(false)
+  const [isLatchLoading, setIsLatchLoading] = useState<boolean>(false)
+  const [isLatchClosed, setIsLatchClosed] = useState<boolean>(false)
 
   let slotInfo: string | null = null
 
