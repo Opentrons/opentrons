@@ -4,16 +4,8 @@ from opentrons.protocol_api import (
     ParameterContext,
     ProtocolContext,
     Labware,
-    WasteChute,
 )
-from opentrons.protocol_api.module_contexts import (
-    ThermocyclerContext,
-    TemperatureModuleContext,
-    MagneticModuleContext,
-    HeaterShakerContext,
-    MagneticBlockContext,
-    AbsorbanceReaderContext,
-)
+from opentrons.protocol_api.module_contexts import ThermocyclerContext
 
 
 metadata = {"protocolName": "Tough Auto Seal Lid Stacking Test"}
