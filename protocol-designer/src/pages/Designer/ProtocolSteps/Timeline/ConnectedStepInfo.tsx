@@ -26,6 +26,7 @@ import type { HoverOnStepAction } from '../../../../ui/steps'
 import type { DeleteModalType } from '../../../../components/modals/ConfirmDeleteModal'
 import type { StepIdType } from '../../../../form-types'
 import type { BaseState, ThunkAction } from '../../../../types'
+import { Dispatch, SetStateAction } from 'react'
 
 export interface ConnectedStepInfoProps {
   stepId: StepIdType
@@ -82,10 +83,10 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
     selectStep()
   }
 
-  const { confirm, showConfirmation, cancel } = useConditionalConfirm(
-    handleStepItemSelection,
-    currentFormIsPresaved || singleEditFormHasUnsavedChanges
-  )
+  // const { confirm, showConfirmation, cancel } = useConditionalConfirm(
+  //   handleStepItemSelection,
+  //   currentFormIsPresaved || singleEditFormHasUnsavedChanges
+  // )
 
   const getModalType = (): DeleteModalType => {
     if (currentFormIsPresaved) {
@@ -98,20 +99,23 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
 
   return (
     <>
-      {showConfirmation && (
+      {/* {showConfirmation && (
         <ConfirmDeleteModal
           modalType={getModalType()}
           onContinueClick={confirm}
           onCancelClick={cancel}
         />
-      )}
+      )} */}
       <StepContainer
         hasError={hasError}
         isStepAfterError={stepAfterError}
         stepId={stepId}
         onMouseLeave={unhighlightStep}
         selected={selected}
-        onClick={confirm}
+        // setSelectedStep={setSelectedStep}
+        onClick={() => {
+          selectStep()
+        }}
         hovered={hoveredStep === stepId && !hoveredSubstep}
         onMouseEnter={highlightStep}
         iconName={hasError || hasWarnings ? 'alert-circle' : iconName}

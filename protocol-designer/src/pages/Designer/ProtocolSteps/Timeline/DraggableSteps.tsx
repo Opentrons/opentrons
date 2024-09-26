@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { Dispatch, SetStateAction, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useDrop, useDrag } from 'react-dnd'
@@ -30,7 +30,14 @@ interface DropType {
 }
 
 function DragDropStep(props: DragDropStepProps): JSX.Element {
-  const { stepId, moveStep, findStepIndex, orderedStepIds, stepNumber } = props
+  const {
+    stepId,
+    moveStep,
+    findStepIndex,
+    orderedStepIds,
+    stepNumber,
+
+  } = props
   const stepRef = useRef<HTMLDivElement>(null)
 
   const [{ isDragging }, drag] = useDrag(
@@ -71,7 +78,10 @@ function DragDropStep(props: DragDropStepProps): JSX.Element {
       style={{ opacity: isDragging ? 0.3 : 1 }}
       data-handler-id={handlerId}
     >
-      <ConnectedStepInfo stepNumber={stepNumber} stepId={stepId} />
+      <ConnectedStepInfo
+        stepNumber={stepNumber}
+        stepId={stepId}
+      />
     </Box>
   )
 }
@@ -81,7 +91,7 @@ interface DraggableStepsProps {
   reorderSteps: (steps: StepIdType[]) => void
 }
 export function DraggableSteps(props: DraggableStepsProps): JSX.Element | null {
-  const { orderedStepIds, reorderSteps } = props
+  const { orderedStepIds, reorderSteps} = props
   const { t } = useTranslation('shared')
 
   const findStepIndex = (stepId: StepIdType): number =>

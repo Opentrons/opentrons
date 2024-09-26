@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
@@ -15,12 +15,15 @@ import { DeckSetupContainer } from '../DeckSetup'
 import { OffDeck } from '../Offdeck'
 import { TimelineToolbox } from './Timeline'
 import { StepForm } from './StepForm'
+import { selectStep } from '../../../ui/steps/actions/actions'
 
 export function ProtocolSteps(): JSX.Element {
   const { t } = useTranslation(['starting_deck_state'])
   const formData = useSelector(getUnsavedForm)
+  // const dispatch = useDispatch<any>()
   const leftString = t('onDeck')
   const rightString = t('offDeck')
+  // const [selectAStep, setSelectedStep] = useState<string | null>(null)
   const [deckView, setDeckView] = useState<
     typeof leftString | typeof rightString
   >(leftString)
@@ -33,6 +36,11 @@ export function ProtocolSteps(): JSX.Element {
     }
   }, [formData, formType, deckView])
 
+  // useEffect(() => {
+  //   if (selectAStep != null) {
+  //     dispatch(selectStep(selectAStep))
+  //   }
+  // })
   return (
     <>
       <StepForm />

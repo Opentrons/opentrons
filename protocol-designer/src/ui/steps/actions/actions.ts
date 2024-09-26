@@ -110,6 +110,24 @@ export const selectStep = (stepId: StepIdType): ThunkAction<any> => (
     payload: stepId,
   }
   dispatch(selectStepAction)
+  // const state = getState()
+  // const formData = { ...stepFormSelectors.getSavedStepForms(state)[stepId] }
+  // dispatch({
+  //   type: 'POPULATE_FORM',
+  //   payload: formData,
+  // })
+  resetScrollElements()
+}
+
+export const populateForm = (stepId: StepIdType): ThunkAction<any> => (
+  dispatch: ThunkDispatch<any>,
+  getState: GetState
+) => {
+  // const selectStepAction: SelectStepAction = {
+  //   type: 'SELECT_STEP',
+  //   payload: stepId,
+  // }
+  // dispatch(selectStepAction)
   const state = getState()
   const formData = { ...stepFormSelectors.getSavedStepForms(state)[stepId] }
   dispatch({

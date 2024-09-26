@@ -20,15 +20,17 @@ import { actions as stepsActions } from '../../../../ui/steps'
 import type { ThunkDispatch } from 'redux-thunk'
 import type { BaseState } from '../../../../types'
 import type { StepIdType } from '../../../../form-types'
+import { populateForm } from '../../../../ui/steps/actions/actions'
 
 interface StepOverflowMenuProps {
   stepId: string
   menuRootRef: React.MutableRefObject<HTMLDivElement | null>
   top: number
+  setStepOverflowMenu: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
-  const { stepId, menuRootRef, top } = props
+  const { stepId, menuRootRef, top, setStepOverflowMenu } = props
   const { t } = useTranslation('protocol_steps')
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const deleteStep = (stepId: StepIdType): void => {
@@ -58,10 +60,11 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
     >
       <MenuButton
         onClick={() => {
-          console.log('wire this up')
+          dispatch(populateForm(stepId))
+          setStepOverflowMenu(false)
         }}
       >
-        {t('rename')}
+        {'Edit step'}
       </MenuButton>
       <MenuButton
         onClick={() => {

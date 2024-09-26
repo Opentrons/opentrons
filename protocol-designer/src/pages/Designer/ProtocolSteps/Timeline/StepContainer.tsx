@@ -110,7 +110,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
       setStepOverflowMenu(false)
     }
   }
-
+console.log(formData)
   return (
     <>
       <Box
@@ -168,6 +168,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
       {stepOverflowMenu && stepId != null
         ? createPortal(
             <StepOverflowMenu
+              setStepOverflowMenu={setStepOverflowMenu}
               stepId={stepId}
               menuRootRef={menuRootRef}
               top={top}
