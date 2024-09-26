@@ -1328,9 +1328,12 @@ class GeometryView:
                 labware_id=labware_id, well_id=well_id, target_height=initial_height
             )
             final_volume = initial_volume + volume
-            return self.get_well_height_at_volume(labware_id=labware_id, well_id=well_id, target_volume=final_volume)
+            return self.get_well_height_at_volume(
+                labware_id=labware_id, well_id=well_id, target_volume=final_volume
+            )
         else:
-            # raise InvalidWellDefinitionError(message=f"No geometryDefinitionId found for well: {well_name} in labware_id: {labware_id}") # use this
+            # TODO (pbm, 09-26-2024): implement below line once more well definitions are implemented
+            # raise InvalidWellDefinitionError(message=f"No geometryDefinitionId found for well: {well_name} in labware_id: {labware_id}")
             return initial_height
 
     def get_well_volume_at_height(
