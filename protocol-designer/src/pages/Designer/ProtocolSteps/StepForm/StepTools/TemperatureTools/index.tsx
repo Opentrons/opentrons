@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import {
@@ -28,7 +28,7 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
   const temperatureModuleIds = useSelector(getTemperatureModuleIds)
   const { setTemperature, moduleId } = formData
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (moduleLabwareOptions.length === 1) {
       propsForFields.moduleId.updateValue(moduleLabwareOptions[0].value)
     }
