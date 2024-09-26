@@ -134,12 +134,12 @@ class CloseLidImpl(
                 labware_location=new_location,
             )
 
-            state_update = StateUpdate()
-            state_update.set_labware_location(
-                labware_id=loaded_lid.id,
-                new_location=new_location,
-                new_offset_id=new_offset_id,
-            )
+        state_update = StateUpdate()
+        state_update.set_labware_location(
+            labware_id=loaded_lid.id,
+            new_location=new_location,
+            new_offset_id=new_offset_id,
+        )
 
         return SuccessData(
             public=CloseLidResult(
