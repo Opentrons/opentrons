@@ -1,5 +1,7 @@
 """Drop tip in place command request, result, and implementation models."""
 from __future__ import annotations
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.types import TipGeometry
 from pydantic import Field, BaseModel
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
@@ -54,7 +56,13 @@ class DropTipInPlaceImplementation(
             pipette_id=params.pipetteId, home_after=params.homeAfter
         )
 
-        return SuccessData(public=DropTipInPlaceResult(), private=None)
+        state_update = update_types.StateUpdate()
+
+        state_update.update_tip_state(pipette_id=params.pipetteId, tip_geometry=None)
+
+        return SuccessData(
+            public=DropTipInPlaceResult(), private=None, state_update=state_update
+        )
 
 
 class DropTipInPlace(

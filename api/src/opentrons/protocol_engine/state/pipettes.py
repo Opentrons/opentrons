@@ -155,68 +155,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         self._update_current_location(action)
         self._update_pipette_config(action)
         self._update_pipette_nozzle_map(action)
+        self._update_tip_state(action)
         self._update_volumes(action)
-
-        if not isinstance(action, SucceedCommandAction):
-            return
-
-        command = action.command
-
-        if isinstance(command.result, commands.PickUpTipResult):
-            pipette_id = command.params.pipetteId
-            attached_tip = TipGeometry(
-                length=command.result.tipLength,
-                volume=command.result.tipVolume,
-                diameter=command.result.tipDiameter,
-            )
-
-            self._state.attached_tip_by_id[pipette_id] = attached_tip
-            self._state.aspirated_volume_by_id[pipette_id] = 0
-
-            static_config = self._state.static_config_by_id.get(pipette_id)
-            if static_config:
-                try:
-                    tip_configuration = static_config.tip_configuration_lookup_table[
-                        attached_tip.volume
-                    ]
-                except KeyError:
-                    # TODO(seth,9/11/2023): this is a bad way of doing defaults but better than max volume.
-                    # we used to look up a default tip config via the pipette max volume, but if that isn't
-                    # tip volume (as it isn't when we're in low-volume mode) then that lookup fails. Using
-                    # the first entry in the table is ok I guess but we really need to generally rethink how
-                    # we identify tip classes - looking things up by volume is not enough.
-                    tip_configuration = list(
-                        static_config.tip_configuration_lookup_table.values()
-                    )[0]
-                self._state.flow_rates_by_id[pipette_id] = FlowRates(
-                    default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
-                    default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
-                    default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
-                )
-
-        elif isinstance(
-            command.result,
-            (
-                commands.DropTipResult,
-                commands.DropTipInPlaceResult,
-                commands.unsafe.UnsafeDropTipInPlaceResult,
-            ),
-        ):
-            pipette_id = command.params.pipetteId
-            self._state.aspirated_volume_by_id[pipette_id] = None
-            self._state.attached_tip_by_id[pipette_id] = None
-
-            static_config = self._state.static_config_by_id.get(pipette_id)
-            if static_config:
-                # TODO(seth,9/11/2023): bad way to do defaulting, see above.
-                tip_configuration = list(
-                    static_config.tip_configuration_lookup_table.values()
-                )[0]
-                self._state.flow_rates_by_id[pipette_id] = FlowRates(
-                    default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
-                    default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
-                    default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
-                )
 
     def _set_load_pipette(
         self, action: Union[SucceedCommandAction, FailCommandAction]
@@ -243,6 +183,61 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 self._state.nozzle_configuration_by_id[
                     pipette_id
                 ] = static_config.default_nozzle_map
+
+    def _update_tip_state(
+        self, action: Union[SucceedCommandAction, FailCommandAction]
+    ) -> None:
+
+        if (
+            isinstance(action, SucceedCommandAction)
+            and action.state_update.pipette_tip_state != update_types.NO_CHANGE
+        ):
+            pipette_id = action.state_update.pipette_tip_state.pipette_id
+            if action.state_update.pipette_tip_state.tip_geometry:
+                attached_tip = action.state_update.pipette_tip_state.tip_geometry
+
+                self._state.attached_tip_by_id[pipette_id] = attached_tip
+                self._state.aspirated_volume_by_id[pipette_id] = 0
+
+                static_config = self._state.static_config_by_id.get(pipette_id)
+                if static_config:
+                    try:
+                        tip_configuration = (
+                            static_config.tip_configuration_lookup_table[
+                                attached_tip.volume
+                            ]
+                        )
+                    except KeyError:
+                        # TODO(seth,9/11/2023): this is a bad way of doing defaults but better than max volume.
+                        # we used to look up a default tip config via the pipette max volume, but if that isn't
+                        # tip volume (as it isn't when we're in low-volume mode) then that lookup fails. Using
+                        # the first entry in the table is ok I guess but we really need to generally rethink how
+                        # we identify tip classes - looking things up by volume is not enough.
+                        tip_configuration = list(
+                            static_config.tip_configuration_lookup_table.values()
+                        )[0]
+                    self._state.flow_rates_by_id[pipette_id] = FlowRates(
+                        default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
+                        default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
+                        default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
+                    )
+
+            else:
+                pipette_id = action.state_update.pipette_tip_state.pipette_id
+                self._state.aspirated_volume_by_id[pipette_id] = None
+                self._state.attached_tip_by_id[pipette_id] = None
+
+                static_config = self._state.static_config_by_id.get(pipette_id)
+                if static_config:
+                    # TODO(seth,9/11/2023): bad way to do defaulting, see above.
+                    tip_configuration = list(
+                        static_config.tip_configuration_lookup_table.values()
+                    )[0]
+                    self._state.flow_rates_by_id[pipette_id] = FlowRates(
+                        default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
+                        default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
+                        default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
+                    )
 
     def _update_current_location(
         self, action: Union[SucceedCommandAction, FailCommandAction]

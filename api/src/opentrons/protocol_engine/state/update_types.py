@@ -7,7 +7,7 @@ import typing
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine.resources import pipette_data_provider
-from opentrons.protocol_engine.types import DeckPoint, LabwareLocation
+from opentrons.protocol_engine.types import DeckPoint, LabwareLocation, TipGeometry
 from opentrons.types import MountType
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.pipette.types import PipetteNameType
@@ -129,6 +129,14 @@ class PipetteNozzleMapUpdate:
 
 
 @dataclasses.dataclass
+class PipetteTipStateUpdate:
+    """Update pipette tip state."""
+
+    pipette_id: str
+    tip_geometry: typing.Optional[TipGeometry]
+
+
+@dataclasses.dataclass
 class StateUpdate:
     """Represents an update to perform on engine state."""
 
@@ -139,6 +147,8 @@ class StateUpdate:
     pipette_config: PipetteConfigUpdate | NoChangeType = NO_CHANGE
 
     pipette_nozzle_map: PipetteNozzleMapUpdate | NoChangeType = NO_CHANGE
+
+    pipette_tip_state: PipetteTipStateUpdate | NoChangeType = NO_CHANGE
 
     labware_location: LabwareLocationUpdate | NoChangeType = NO_CHANGE
 
@@ -258,4 +268,11 @@ class StateUpdate:
     def update_pipette_nozzle(self, pipette_id: str, nozzle_map: NozzleMap) -> None:
         self.pipette_nozzle_map = PipetteNozzleMapUpdate(
             pipette_id=pipette_id, nozzle_map=nozzle_map
+        )
+
+    def update_tip_state(
+        self, pipette_id: str, tip_geometry: typing.Optional[TipGeometry]
+    ) -> None:
+        self.pipette_tip_state = PipetteTipStateUpdate(
+            pipette_id=pipette_id, tip_geometry=tip_geometry
         )
