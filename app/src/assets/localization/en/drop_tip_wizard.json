@@ -5,6 +5,7 @@
   "blowout_liquid": "Blow out liquid",
   "cant_safely_drop_tips": "Can't safely drop tips",
   "choose_blowout_location": "Choose blowout location",
+  "choose_deck_location": "Choose deck location",
   "choose_drop_tip_location": "Choose tip-drop location",
   "confirm_blowout_location": "Is the pipette positioned where the liquids should be blown out?",
   "confirm_drop_tip_location": "Is the pipette positioned where the tips should be dropped?",
@@ -41,5 +42,7 @@
   "stand_back_dropping_tips": "Stand back, robot is dropping tips",
   "stand_back_robot_in_motion": "Stand back, robot is in motion",
   "start_over": "Start over",
+  "trash_bin_in_slot": "Trash bin in {{slot}}",
+  "waste_chute_in_slot:": "Waste chute in {{slot}}",
   "yes_blow_out_liquid": "Yes, blow out liquid in labware"
 }

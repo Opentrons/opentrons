@@ -47,12 +47,17 @@ import { ErrorInfo } from './ErrorInfo'
 
 import type { DropTipWizardFlowsProps } from '.'
 import type { DropTipWizardContainerProps, IssuedCommandsType } from './types'
-import type { UseDropTipRoutingResult, UseDropTipWithTypeResult } from './hooks'
+import type {
+  UseDropTipRoutingResult,
+  UseDropTipWithTypeResult,
+  DropTipBlowoutLocationDetails,
+} from './hooks'
 
 export type DropTipWizardProps = DropTipWizardFlowsProps &
   UseDropTipWithTypeResult &
   UseDropTipRoutingResult & {
     issuedCommandsType: IssuedCommandsType
+    dropTipCommandLocations: DropTipBlowoutLocationDetails[]
   }
 
 export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
