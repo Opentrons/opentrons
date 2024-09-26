@@ -24,14 +24,14 @@ import {
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { appShellRequestor } from '/app/redux/shell/remote'
-import { useTrackCreateProtocolRunEvent } from '../Desktop/Devices/hooks'
+import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/hooks'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
 } from '/app/transformations/runs'
-import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
-import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
+import { ApplyHistoricOffsets } from '/app/organisms/ApplyHistoricOffsets'
+import { useOffsetCandidatesForAnalysis } from '/app/organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { ChooseRobotSlideout } from '/app/organisms/ChooseRobotSlideout'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
 import type { StyleProps } from '@opentrons/components'
 import type { RunTimeParameter } from '@opentrons/shared-data'

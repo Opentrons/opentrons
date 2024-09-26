@@ -58,7 +58,7 @@ import { FileCard } from './FileCard'
 import type { RobotType, RunTimeParameter } from '@opentrons/shared-data'
 import type { DropdownOption } from '@opentrons/components'
 import type { SlideoutProps } from '/app/atoms/Slideout'
-import type { UseCreateRun } from '/app/organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
+import type { UseCreateRun } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import type { State, Dispatch } from '/app/redux/types'
 import type { Robot } from '/app/redux/discovery/types'
 
