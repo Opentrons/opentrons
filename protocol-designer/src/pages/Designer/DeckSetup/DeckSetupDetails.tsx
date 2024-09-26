@@ -45,6 +45,7 @@ import type {
 } from '../../../step-forms'
 import type { DeckSetupTabType } from '../types'
 import type { Fixture } from './constants'
+import { LabwareControls } from '../../../components/DeckSetup/LabwareOverlays'
 
 interface DeckSetupDetailsProps extends DeckSetupTabType {
   activeDeckSetup: InitialDeckSetup
@@ -205,6 +206,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                     y={0}
                     labwareOnDeck={labwareLoadedOnModule}
                   />
+
                   <DeckItemHover
                     isSelected={selectedZoomInSlot != null}
                     hover={hover}
@@ -313,6 +315,10 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               x={slotPosition[0]}
               y={slotPosition[1]}
               labwareOnDeck={labware}
+            />
+            <LabwareControls
+              labwareOnDeck={labware}
+              slotPosition={slotPosition}
             />
             <DeckItemHover
               isSelected={selectedZoomInSlot != null}

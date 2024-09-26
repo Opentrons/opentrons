@@ -12,6 +12,7 @@ import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/
 import { getSubsteps } from '../../../../file-data/selectors'
 import { HoverOnSubstepAction, getHoveredSubstep } from '../../../../ui/steps'
 import {
+  hoverOnStep,
   hoverOnSubstep,
   toggleViewSubstep,
 } from '../../../../ui/steps/actions/actions'
@@ -37,6 +38,7 @@ export function SubstepsToolbox(
   const formData = useSelector(getSavedStepForms)[stepId]
   const highlightSubstep = (payload: SubstepIdentifier): HoverOnSubstepAction =>
     dispatch(hoverOnSubstep(payload))
+
   const hoveredSubstep = useSelector(getHoveredSubstep)
   const ingredNames = useSelector(labwareIngredSelectors.getLiquidNamesById)
 
@@ -57,6 +59,7 @@ export function SubstepsToolbox(
         <PrimaryButton
           onClick={() => {
             dispatch(toggleViewSubstep(null))
+            dispatch(hoverOnStep(null))
           }}
           width="100%"
         >

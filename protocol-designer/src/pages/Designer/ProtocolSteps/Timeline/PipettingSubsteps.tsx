@@ -5,7 +5,6 @@ import {
   WellIngredientNames,
 } from '../../../../steplist'
 import { MultiChannelSubstep } from '../../../../components/steplist/MultiChannelSubstep'
-import { SubstepRow } from '../../../../components/steplist/SubstepRow'
 import { Substep } from './Substep'
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
@@ -46,7 +45,7 @@ export function PipettingSubsteps(props: PipettingSubstepsProps): JSX.Element {
       width="100%"
     >
       {substeps.rows.map((row, substepIndex) => (
-        <SubstepRow
+        <Substep
           key={substepIndex}
           selectSubstep={selectSubstep}
           stepId={substeps.parentStepId}

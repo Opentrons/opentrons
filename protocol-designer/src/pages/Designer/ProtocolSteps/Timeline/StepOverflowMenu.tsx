@@ -24,6 +24,10 @@ import {
   DELETE_STEP_FORM,
 } from '../../../../components/modals/ConfirmDeleteModal'
 import {
+  hoverOnStep,
+  toggleViewSubstep,
+} from '../../../../ui/steps/actions/actions'
+import {
   getCurrentFormHasUnsavedChanges,
   getCurrentFormIsPresaved,
   getUnsavedForm,
@@ -132,7 +136,8 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
         )}
         <MenuButton
           onClick={() => {
-            dispatch(stepsActions.toggleStepCollapsed(stepId))
+            dispatch(hoverOnStep(stepId))
+            dispatch(toggleViewSubstep(stepId))
           }}
         >
           {t('view_commands')}
