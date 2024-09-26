@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import styles from './SectionBody.module.css'
 
 interface Props {

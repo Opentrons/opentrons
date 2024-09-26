@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Text as TextComponent } from './Text'
 
 import type { Story, Meta } from '@storybook/react'

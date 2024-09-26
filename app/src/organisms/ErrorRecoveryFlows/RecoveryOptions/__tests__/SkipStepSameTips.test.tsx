@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
 
@@ -60,7 +60,7 @@ describe('SkipStepSameTips', () => {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        step: 'UNKNOWN_STEP',
+        step: 'UNKNOWN_STEP' as any,
       },
     }
     render(props)
@@ -70,17 +70,17 @@ describe('SkipStepSameTips', () => {
 
 describe('SkipStepSameTipsInfo', () => {
   let props: React.ComponentProps<typeof SkipStepSameTipsInfo>
-  let mockSetRobotInMotion: Mock
+  let mockhandleMotionRouting: Mock
   let mockSkipFailedCommand: Mock
 
   beforeEach(() => {
-    mockSetRobotInMotion = vi.fn(() => Promise.resolve())
+    mockhandleMotionRouting = vi.fn(() => Promise.resolve())
     mockSkipFailedCommand = vi.fn(() => Promise.resolve())
 
     props = {
       ...mockRecoveryContentProps,
       routeUpdateActions: {
-        setRobotInMotion: mockSetRobotInMotion,
+        handleMotionRouting: mockhandleMotionRouting,
       } as any,
       recoveryCommands: {
         skipFailedCommand: mockSkipFailedCommand,
@@ -106,7 +106,7 @@ describe('SkipStepSameTipsInfo', () => {
     clickButtonLabeled('Continue run now')
 
     await waitFor(() => {
-      expect(mockSetRobotInMotion).toHaveBeenCalledWith(
+      expect(mockhandleMotionRouting).toHaveBeenCalledWith(
         true,
         RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE
       )
@@ -116,7 +116,7 @@ describe('SkipStepSameTipsInfo', () => {
       expect(mockSkipFailedCommand).toHaveBeenCalled()
     })
 
-    expect(mockSetRobotInMotion.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(mockhandleMotionRouting.mock.invocationCallOrder[0]).toBeLessThan(
       mockSkipFailedCommand.mock.invocationCallOrder[0]
     )
   })

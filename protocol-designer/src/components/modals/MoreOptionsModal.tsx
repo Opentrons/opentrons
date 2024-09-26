@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {

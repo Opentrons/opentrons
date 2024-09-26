@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { AlertModal } from '@opentrons/components'
 import styles from '../styles.module.css'
 import type { ImportError, ImportErrorKey } from '../fields'

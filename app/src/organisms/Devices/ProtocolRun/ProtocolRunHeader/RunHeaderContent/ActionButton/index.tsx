@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
 import {
@@ -14,14 +14,16 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import {
-  useModuleCalibrationStatus,
-  useRunCalibrationStatus,
-  useUnmatchedModulesForProtocol,
-} from '../../../../hooks'
 import { useRobot } from '/app/redux-resources/robots'
 import { useRobotAnalyticsData } from '/app/redux-resources/analytics'
-import { useCurrentRunId, useProtocolDetailsForRun } from '/app/resources/runs'
+import {
+  useCloseCurrentRun,
+  useCurrentRunId,
+  useProtocolDetailsForRun,
+  useRunCalibrationStatus,
+  useUnmatchedModulesForProtocol,
+  useModuleCalibrationStatus,
+} from '/app/resources/runs'
 import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
 import { getFallbackRobotSerialNumber, isRunAgainStatus } from '../../utils'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
@@ -71,6 +73,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   const isOtherRunCurrent = currentRunId != null && currentRunId !== runId
   const isProtocolNotReady = protocolData == null || !!isProtocolAnalyzing
   const isValidRunAgain = isRunAgainStatus(runStatus)
+  const { isClosingCurrentRun } = useCloseCurrentRun()
 
   const { isDisabled, disabledReason } = useActionBtnDisabledUtils({
     isCurrentRun,
@@ -79,6 +82,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     isProtocolNotReady,
     isRobotOnWrongVersionOfSoftware,
     isValidRunAgain,
+    isClosingCurrentRun,
     ...props,
   })
 
@@ -102,6 +106,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     isValidRunAgain,
     isOtherRunCurrent,
     isRobotOnWrongVersionOfSoftware,
+    isClosingCurrentRun,
     ...props,
   })
 
@@ -126,7 +131,8 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
             spin={
               isProtocolNotReady ||
               runStatus === RUN_STATUS_STOP_REQUESTED ||
-              isResetRunLoadingRef.current
+              isResetRunLoadingRef.current ||
+              isClosingCurrentRun
             }
           />
         ) : null}

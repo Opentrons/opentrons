@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { SelectField } from '@opentrons/components'
 
 import { SECURITY_NONE, SECURITY_WPA_PSK } from '../constants'

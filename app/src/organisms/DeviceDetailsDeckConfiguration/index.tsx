@@ -1,10 +1,11 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
+  Banner,
   BORDERS,
   COLORS,
   DeckConfigurator,
@@ -29,7 +30,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
-import { Banner } from '/app/atoms/Banner'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 import { useIsRobotViewable, useRunStatuses } from '../Devices/hooks'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
@@ -58,7 +58,7 @@ export function DeviceDetailsDeckConfiguration({
   const [
     showSetupInstructionsModal,
     setShowSetupInstructionsModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
   const { data: modulesData } = useModulesQuery()
   const deckConfig =

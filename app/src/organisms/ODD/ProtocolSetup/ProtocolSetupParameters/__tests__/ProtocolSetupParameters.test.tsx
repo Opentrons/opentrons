@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { when } from 'vitest-when'
 import { it, describe, beforeEach, vi, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
@@ -31,7 +31,7 @@ vi.mock('../ChooseCsvFile')
 vi.mock('/app/redux/config')
 vi.mock('/app/organisms/ToasterOven')
 vi.mock('@opentrons/react-api-client')
-vi.mock('/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('/app/resources/runs')
 vi.mock('react-router-dom', async importOriginal => {
   const reactRouterDom = await importOriginal<NavigateFunction>()
   return {

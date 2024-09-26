@@ -1,9 +1,10 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_START,
+  Banner,
   BORDERS,
   Box,
   COLORS,
@@ -41,12 +42,11 @@ import {
   dismissRequest,
   SUCCESS,
 } from '/app/redux/robot-api'
-import { Banner } from '/app/atoms/Banner'
 import { UpdateBanner } from '/app/molecules/UpdateBanner'
 import { useChainLiveCommands } from '/app/resources/runs'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
 import { useIsFlex } from '/app/redux-resources/robots'
-import { getModuleTooHot } from '/app/organisms/Devices/getModuleTooHot'
+import { getModuleTooHot } from '/app/transformations/modules'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
@@ -60,7 +60,7 @@ import { HeaterShakerModuleData } from './HeaterShakerModuleData'
 import { HeaterShakerSlideout } from './HeaterShakerSlideout'
 import { TestShakeSlideout } from './TestShakeSlideout'
 import { ModuleWizardFlows } from '../ModuleWizardFlows'
-import { getModulePrepCommands } from '/app/organisms/Devices/getModulePrepCommands'
+import { getModulePrepCommands } from '/app/local-resources/modules'
 import { getModuleCardImage } from './utils'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
 import { ErrorInfo } from './ErrorInfo'
@@ -116,13 +116,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       setShowOverflowMenu(false)
     },
   })
-  const [showSlideout, setShowSlideout] = React.useState(false)
-  const [hasSecondary, setHasSecondary] = React.useState(false)
-  const [showAboutModule, setShowAboutModule] = React.useState(false)
-  const [showTestShake, setShowTestShake] = React.useState(false)
-  const [showHSWizard, setShowHSWizard] = React.useState(false)
-  const [showFWBanner, setShowFWBanner] = React.useState(true)
-  const [showCalModal, setShowCalModal] = React.useState(false)
+  const [showSlideout, setShowSlideout] = useState(false)
+  const [hasSecondary, setHasSecondary] = useState(false)
+  const [showAboutModule, setShowAboutModule] = useState(false)
+  const [showTestShake, setShowTestShake] = useState(false)
+  const [showHSWizard, setShowHSWizard] = useState(false)
+  const [showFWBanner, setShowFWBanner] = useState(true)
+  const [showCalModal, setShowCalModal] = useState(false)
 
   const [targetProps, tooltipProps] = useHoverTooltip()
 
@@ -143,7 +143,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
   const hasUpdated =
     !module.hasAvailableUpdate && latestRequest?.status === SUCCESS
-  const [showFirmwareToast, setShowFirmwareToast] = React.useState(hasUpdated)
+  const [showFirmwareToast, setShowFirmwareToast] = useState(hasUpdated)
   const { makeToast } = useToaster()
   if (showFirmwareToast) {
     makeToast(t('firmware_updated_successfully') as string, SUCCESS_TOAST)
@@ -240,7 +240,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [
     prepCommandErrorMessage,
     setPrepCommandErrorMessage,
-  ] = React.useState<string>('')
+  ] = useState<string>('')
   const handleCalibrateClick = (): void => {
     if (getModulePrepCommands(module).length > 0) {
       chainLiveCommands(getModulePrepCommands(module), false).catch(

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE, fixtureTiprack300ul } from '@opentrons/shared-data'

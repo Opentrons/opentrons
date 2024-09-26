@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import {
@@ -32,7 +32,7 @@ export function FeatureFlags(): JSX.Element {
       paddingY={SPACING.spacing24}
     >
       {Config.DEV_INTERNAL_FLAGS.map((flag, index) => (
-        <React.Fragment key={flag}>
+        <Fragment key={flag}>
           <Flex
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -54,7 +54,7 @@ export function FeatureFlags(): JSX.Element {
           {index !== Config.DEV_INTERNAL_FLAGS.length - 1 && (
             <Divider marginY={SPACING.spacing24} />
           )}
-        </React.Fragment>
+        </Fragment>
       ))}
     </Flex>
   )

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
@@ -40,7 +40,7 @@ export const WellOrderField = (props: WellOrderFieldProps): JSX.Element => {
     updateSecondWellOrder,
   } = props
   const { t } = useTranslation(['form', 'modal'])
-  const [isModalOpen, setModalOpen] = React.useState(false)
+  const [isModalOpen, setModalOpen] = useState(false)
 
   const handleOpen = (): void => {
     setModalOpen(true)

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { COLORS, TYPOGRAPHY, LegacyStyledText } from '@opentrons/components'
 import { MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'

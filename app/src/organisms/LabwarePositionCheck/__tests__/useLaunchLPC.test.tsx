@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
 import { when } from 'vitest-when'
@@ -22,8 +22,8 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import {
   useCreateTargetedMaintenanceRunMutation,
   useNotifyRunQuery,
+  useMostRecentCompletedAnalysis,
 } from '/app/resources/runs'
-import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
 import { useLaunchLPC } from '../useLaunchLPC'
 import { LabwarePositionCheck } from '..'
 
@@ -33,7 +33,6 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../')
 vi.mock('@opentrons/react-api-client')
-vi.mock('../useMostRecentCompletedAnalysis')
 vi.mock('/app/resources/runs')
 
 const MOCK_RUN_ID = 'mockRunId'

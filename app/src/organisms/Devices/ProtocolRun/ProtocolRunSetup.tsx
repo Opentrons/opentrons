@@ -32,14 +32,14 @@ import { useDeckConfigurationCompatibility } from '/app/resources/deck_configura
 import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
-  useModuleCalibrationStatus,
-  useProtocolAnalysisErrors,
+  useMostRecentCompletedAnalysis,
+  useRunPipetteInfoByMount,
   useRunCalibrationStatus,
   useRunHasStarted,
-  useRunPipetteInfoByMount,
   useUnmatchedModulesForProtocol,
-} from '../hooks'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+  useModuleCalibrationStatus,
+  useProtocolAnalysisErrors,
+} from '/app/resources/runs'
 import { SetupLabware } from './SetupLabware'
 import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
@@ -184,8 +184,13 @@ export function ProtocolRunSetup({
     setLabwareSetupComplete,
   ] = React.useState<boolean>(false)
   const [liquidSetupComplete, setLiquidSetupComplete] = React.useState<boolean>(
-    !hasLiquids
+    false
   )
+  React.useEffect(() => {
+    if ((robotProtocolAnalysis || storedProtocolAnalysis) && !hasLiquids) {
+      setLiquidSetupComplete(true)
+    }
+  }, [robotProtocolAnalysis, storedProtocolAnalysis, hasLiquids])
   if (
     !hasLiquids &&
     protocolAnalysis != null &&

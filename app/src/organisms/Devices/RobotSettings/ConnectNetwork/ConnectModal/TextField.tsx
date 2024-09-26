@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useReducer } from 'react'
 
 import {
   LegacyInputField,
@@ -32,7 +32,7 @@ export const TextField = (props: TextFieldProps): JSX.Element => {
     field,
     fieldState
   )
-  const [showPw, toggleShowPw] = React.useReducer(show => !show, false)
+  const [showPw, toggleShowPw] = useReducer(show => !show, false)
   const type = isPassword && !showPw ? INPUT_TYPE_PASSWORD : INPUT_TYPE_TEXT
 
   return (

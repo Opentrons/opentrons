@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -27,12 +27,12 @@ import * as Calibration from '/app/redux/calibration'
 import * as Config from '/app/redux/config'
 import * as Pipettes from '/app/redux/pipettes'
 import * as Sessions from '/app/redux/sessions'
+import { useRunStatuses } from '/app/organisms/Devices/hooks'
 import {
-  useDeckCalibrationStatus,
   useAttachedPipettes,
   useAttachedPipetteCalibrations,
-  useRunStatuses,
-} from '/app/organisms/Devices/hooks'
+} from '/app/resources/instruments'
+import { useDeckCalibrationStatus } from '/app/resources/calibration'
 
 import type {
   AttachedPipettesByMount,
@@ -74,7 +74,7 @@ export function CalibrationHealthCheck({
     placement: TOOLTIP_LEFT,
   })
 
-  const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
+  const [showCalBlockModal, setShowCalBlockModal] = useState(false)
 
   const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
   const attachedPipettes = useAttachedPipettes()

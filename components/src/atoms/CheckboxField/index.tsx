@@ -1,10 +1,15 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { css } from 'styled-components'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { COLORS, BORDERS } from '../../helix-design-system'
 import { Flex, Box } from '../../primitives'
 import { Icon } from '../../icons'
-import { ALIGN_CENTER, CURSOR_POINTER, JUSTIFY_CENTER } from '../../styles'
+import {
+  ALIGN_CENTER,
+  CURSOR_AUTO,
+  CURSOR_POINTER,
+  JUSTIFY_CENTER,
+} from '../../styles'
 
 export interface CheckboxFieldProps {
   /** change handler */
@@ -94,7 +99,8 @@ const INNER_STYLE_NO_VALUE = css`
   }
 
   &:disabled {
-    color: ${COLORS.grey60};
+    color: ${COLORS.grey50};
+    cursor: ${CURSOR_AUTO};
   }
 `
 

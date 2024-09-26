@@ -21,16 +21,16 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   useNotifyAllCommandsAsPreSerializedList,
   useNotifyRunQuery,
   useRunStatus,
+  useMostRecentCompletedAnalysis,
+  useLastRunCommand,
 } from '/app/resources/runs'
 import { CommandText, CommandIcon } from '/app/molecules/Command'
 import { Divider } from '/app/atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
-import { useLastRunCommand } from '../Devices/hooks/useLastRunCommand'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 import { ControlInfo } from './ControlInfo'
 import styles from './styles.module.css'

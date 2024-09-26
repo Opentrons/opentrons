@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useDrop } from 'react-dnd'
 import cx from 'classnames'
@@ -55,7 +55,7 @@ export const AdapterControls = (
   const customLabwareDefs = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
   )
-  const ref = React.useRef(null)
+  const ref = useRef(null)
   const dispatch = useDispatch()
 
   const adapterName =

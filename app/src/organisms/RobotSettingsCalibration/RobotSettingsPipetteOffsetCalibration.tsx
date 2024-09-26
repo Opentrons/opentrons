@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -15,7 +14,7 @@ import {
   usePipetteOffsetCalibrations,
 } from '../Devices/hooks'
 import { useIsFlex } from '/app/redux-resources/robots'
-import { getShowPipetteCalibrationWarning } from '../Devices/utils'
+import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 import { PipetteRecalibrationWarning } from '../Devices/PipetteCard/PipetteRecalibrationWarning'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 

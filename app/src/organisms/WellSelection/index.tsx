@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import reduce from 'lodash/reduce'
 
 import { COLORS, Labware, RobotCoordinateSpace } from '@opentrons/components'
@@ -33,7 +33,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
     selectWells,
     channels,
   } = props
-  const [highlightedWells, setHighlightedWells] = React.useState<WellGroup>({})
+  const [highlightedWells, setHighlightedWells] = useState<WellGroup>({})
 
   const _wellsFromSelected: (
     selectedWells: WellGroup

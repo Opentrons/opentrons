@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, Fragment } from 'react'
 import { Navigate, Route, Routes, useMatch } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
 import { I18nextProvider } from 'react-i18next'
@@ -46,7 +46,7 @@ export const DesktopApp = (): JSX.Element => {
   const [
     isEmergencyStopModalDismissed,
     setIsEmergencyStopModalDismissed,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
   const desktopRoutes: RouteProps[] = [
     {
@@ -124,7 +124,7 @@ export const DesktopApp = (): JSX.Element => {
                         <Route
                           key={path}
                           element={
-                            <React.Fragment key={Component.name}>
+                            <Fragment key={Component.name}>
                               <Breadcrumbs />
                               <Box
                                 position={POSITION_RELATIVE}
@@ -141,7 +141,7 @@ export const DesktopApp = (): JSX.Element => {
                                   <Component />
                                 </Box>
                               </Box>
-                            </React.Fragment>
+                            </Fragment>
                           }
                           path={path}
                         />

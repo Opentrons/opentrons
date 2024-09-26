@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef } from 'react'
 
 import { SelectField } from '@opentrons/components'
 import { FormRow } from './FormRow'
@@ -53,7 +53,7 @@ export const KeyFileField = (props: KeyFileFieldProps): JSX.Element => {
     fieldState
   )
   const options = [makeKeyOptions(wifiKeys), ADD_NEW_KEY_OPTION_GROUP]
-  const uploadKeyRef = React.useRef<HTMLInputElement>(null)
+  const uploadKeyRef = useRef<HTMLInputElement>(null)
 
   const handleValueChange = (_: string, value: string): void => {
     if (value === ADD_NEW_KEY_VALUE) {

@@ -4,6 +4,7 @@ import { Trans, useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
+  Banner,
   Btn,
   Flex,
   JUSTIFY_FLEX_END,
@@ -16,7 +17,6 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../../../App/portal'
-import { Banner } from '/app/atoms/Banner'
 
 import type { AnalysisError } from '@opentrons/shared-data'
 

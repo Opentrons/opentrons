@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { Toolbox as ToolboxComponent } from './index'
 import type { Meta, StoryObj } from '@storybook/react'
 

@@ -1,18 +1,18 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Box,
+  Banner,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Banner } from '/app/atoms/Banner'
 
 export const PipetteRecalibrationWarning = (): JSX.Element | null => {
   const { t } = useTranslation('device_details')
-  const [showBanner, setShowBanner] = React.useState<boolean>(true)
+  const [showBanner, setShowBanner] = useState<boolean>(true)
   if (!showBanner) return null
 
   return (

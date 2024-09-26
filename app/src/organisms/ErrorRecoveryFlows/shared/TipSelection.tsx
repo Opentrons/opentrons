@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { WellSelection } from '../../WellSelection'
 
 import type { WellGroup } from '@opentrons/components'

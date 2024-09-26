@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 import { useSelector } from 'react-redux'
@@ -27,11 +27,13 @@ import {
 } from '@opentrons/api-client'
 
 import { StepMeter } from '/app/atoms/StepMeter'
-import { useMostRecentCompletedAnalysis } from '/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+
 import {
   useRunStatus,
   useRunTimestamps,
   useNotifyRunQuery,
+  useMostRecentCompletedAnalysis,
+  useLastRunCommand,
 } from '/app/resources/runs'
 import {
   InterventionModal,
@@ -55,7 +57,6 @@ import {
   useErrorRecoveryFlows,
   ErrorRecoveryFlows,
 } from '/app/organisms/ErrorRecoveryFlows'
-import { useLastRunCommand } from '/app/organisms/Devices/hooks/useLastRunCommand'
 
 import type { OnDeviceRouteParams } from '../../../App/types'
 
@@ -83,14 +84,14 @@ export function RunningProtocol(): JSX.Element {
   const { runId } = useParams<
     keyof OnDeviceRouteParams
   >() as OnDeviceRouteParams
-  const [currentOption, setCurrentOption] = React.useState<ScreenOption>(
+  const [currentOption, setCurrentOption] = useState<ScreenOption>(
     'CurrentRunningProtocolCommand'
   )
   const [
     showConfirmCancelRunModal,
     setShowConfirmCancelRunModal,
-  ] = React.useState<boolean>(false)
-  const lastAnimatedCommand = React.useRef<string | null>(null)
+  ] = useState<boolean>(false)
+  const lastAnimatedCommand = useRef<string | null>(null)
   const { ref, style, swipeType, setSwipeType } = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const lastRunCommand = useLastRunCommand(runId, {
@@ -132,7 +133,7 @@ export function RunningProtocol(): JSX.Element {
     analysis: robotSideAnalysis,
   })
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       currentOption === 'CurrentRunningProtocolCommand' &&
       swipeType === 'swipe-left'

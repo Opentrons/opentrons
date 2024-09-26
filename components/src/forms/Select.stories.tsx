@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 import { Select } from './Select'
 import styles from './Select.module.css'

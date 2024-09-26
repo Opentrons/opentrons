@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { LabeledValue as LabeledValueComponent } from './LabeledValue'
 
 import type { Story, Meta } from '@storybook/react'

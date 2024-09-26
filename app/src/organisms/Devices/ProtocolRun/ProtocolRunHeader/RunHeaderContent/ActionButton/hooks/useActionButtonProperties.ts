@@ -35,6 +35,7 @@ interface UseButtonPropertiesProps extends BaseActionButtonProps {
   isValidRunAgain: boolean
   isOtherRunCurrent: boolean
   isRobotOnWrongVersionOfSoftware: boolean
+  isClosingCurrentRun: boolean
 }
 
 // Returns ActionButton properties.
@@ -52,6 +53,7 @@ export function useActionButtonProperties({
   attachedModules,
   runHeaderModalContainerUtils,
   isResetRunLoadingRef,
+  isClosingCurrentRun,
 }: UseButtonPropertiesProps): {
   buttonText: string
   handleButtonClick: () => void
@@ -72,6 +74,9 @@ export function useActionButtonProperties({
   if (isProtocolNotReady) {
     buttonIconName = 'ot-spinner'
     buttonText = t('analyzing_on_robot')
+  } else if (isClosingCurrentRun) {
+    buttonIconName = 'ot-spinner'
+    buttonText = t('canceling_run')
   } else if (runStatus === RUN_STATUS_RUNNING || isRecoveryStatus(runStatus)) {
     buttonIconName = 'pause'
     buttonText = t('pause_run')

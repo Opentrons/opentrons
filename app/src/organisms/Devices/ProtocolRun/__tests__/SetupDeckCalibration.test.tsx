@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, it, beforeEach, afterEach, vi, expect } from 'vitest'

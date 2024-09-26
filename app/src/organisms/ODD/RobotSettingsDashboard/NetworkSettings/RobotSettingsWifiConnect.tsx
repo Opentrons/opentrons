@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'

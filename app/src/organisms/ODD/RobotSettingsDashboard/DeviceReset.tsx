@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -57,7 +57,7 @@ export function DeviceReset({
   setCurrentOption,
 }: DeviceResetProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
+  const [resetOptions, setResetOptions] = useState<ResetConfigRequest>({})
   const options = useSelector((state: State) =>
     getResetConfigOptions(state, robotName)
   )
@@ -141,11 +141,11 @@ export function DeviceReset({
       subText,
     }
   }
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(fetchResetConfigOptions(robotName))
   }, [dispatch, robotName])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       isEveryOptionSelected(resetOptions) &&
       (!resetOptions.authorizedKeys ||
@@ -161,7 +161,7 @@ export function DeviceReset({
     }
   }, [resetOptions])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       !isEveryOptionSelected(resetOptions) &&
       resetOptions.authorizedKeys &&
@@ -205,7 +205,7 @@ export function DeviceReset({
           {availableOptionsToDisplay.map(option => {
             const { optionText, subText } = renderText(option.id)
             return (
-              <React.Fragment key={option.id}>
+              <Fragment key={option.id}>
                 <OptionButton
                   id={option.id}
                   type="checkbox"
@@ -242,7 +242,7 @@ export function DeviceReset({
                     ) : null}
                   </Flex>
                 </OptionLabel>
-              </React.Fragment>
+              </Fragment>
             )
           })}
 

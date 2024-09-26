@@ -1,5 +1,4 @@
 // full-width labware details
-import * as React from 'react'
 import { isNewLabware } from '../../definitions'
 import { Gallery, Tags, LoadName, NewLabwareAlert } from '../labware-ui'
 import { LabwareTitle } from './LabwareTitle'

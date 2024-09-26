@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -42,10 +42,9 @@ export function WifiConnectionDetails({
   handleJoinAnotherNetwork,
 }: WifiConnectionDetailsProps): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
-  const [
-    showNetworkDetailModal,
-    setShowNetworkDetailModal,
-  ] = React.useState<boolean>(false)
+  const [showNetworkDetailModal, setShowNetworkDetailModal] = useState<boolean>(
+    false
+  )
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const list = useWifiList(robotName, FETCH_WIFI_LIST_MS)

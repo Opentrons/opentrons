@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import without from 'lodash/without'
 import { THERMOCYCLER_MODULE_V2 } from '@opentrons/shared-data'
@@ -167,10 +166,12 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
                       header={t(`${ae}`)}
                       leftHeaderItem={
                         <Flex
+                          padding={SPACING.spacing2}
                           backgroundColor={COLORS.white}
                           borderRadius={BORDERS.borderRadius8}
                           alignItems={ALIGN_CENTER}
                           width="3.75rem"
+                          height="3.625rem"
                         >
                           <AdditionalEquipmentDiagram
                             additionalEquipment={ae}

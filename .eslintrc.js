@@ -13,6 +13,7 @@ module.exports = {
     'prettier',
     'plugin:json/recommended',
     'plugin:storybook/recommended',
+    'plugin:react/jsx-runtime',
   ],
 
   plugins: ['react', 'react-hooks', 'json', 'testing-library'],

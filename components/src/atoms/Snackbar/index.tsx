@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { css } from 'styled-components'
 import { ALIGN_CENTER } from '../../styles'
 import { Flex } from '../../primitives'
@@ -56,7 +56,7 @@ const CLOSE_STYLE = css`
 
 export function Snackbar(props: SnackbarProps): JSX.Element {
   const { message, onClose, duration = 4000, ...styleProps } = props
-  const [isClosed, setIsClosed] = React.useState<boolean>(false)
+  const [isClosed, setIsClosed] = useState<boolean>(false)
 
   const animationStyle = isClosed ? CLOSE_STYLE : OPEN_STYLE
 

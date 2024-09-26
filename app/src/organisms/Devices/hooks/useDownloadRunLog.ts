@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getRun, getCommands, getProtocol } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
@@ -13,7 +13,7 @@ export function useDownloadRunLog(
 ): { downloadRunLog: () => void; isRunLogLoading: boolean } {
   const { t } = useTranslation('run_details')
   const host = useHost()
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const { makeToast } = useToaster()
 

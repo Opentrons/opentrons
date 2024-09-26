@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -20,7 +20,7 @@ export function useConfirmCrashRecovery(
 ): [link: JSX.Element, confirmation: JSX.Element | null] {
   const { t } = useTranslation('robot_calibration')
   const { sendCommands } = props
-  const [showModal, setShowModal] = React.useState(false)
+  const [showModal, setShowModal] = useState(false)
 
   const doStartOver = (): void => {
     sendCommands({ command: Sessions.sharedCalCommands.INVALIDATE_LAST_ACTION })

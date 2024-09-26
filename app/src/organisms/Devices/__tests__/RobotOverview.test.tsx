@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { when } from 'vitest-when'
 import { screen, fireEvent } from '@testing-library/react'

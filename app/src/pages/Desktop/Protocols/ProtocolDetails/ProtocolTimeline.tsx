@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { Icon, Box, SPACING } from '@opentrons/components'
@@ -17,7 +17,7 @@ export function ProtocolTimeline(): JSX.Element {
     getStoredProtocol(state, protocolKey)
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(fetchProtocols())
   }, [])
 

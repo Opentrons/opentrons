@@ -17,6 +17,7 @@ from ..types import (
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
+from ..state.update_types import StateUpdate
 
 if TYPE_CHECKING:
     from ..state.state import StateView
@@ -141,6 +142,16 @@ class LoadLabwareImplementation(
             labware_id=params.labwareId,
         )
 
+        state_update = StateUpdate()
+
+        state_update.set_loaded_labware(
+            labware_id=loaded_labware.labware_id,
+            offset_id=loaded_labware.offsetId,
+            definition=loaded_labware.definition,
+            location=verified_location,
+            display_name=params.displayName,
+        )
+
         # TODO(jbl 2023-06-23) these validation checks happen after the labware is loaded, because they rely on
         #   on the definition. In practice this will not cause any issues since they will raise protocol ending
         #   exception, but for correctness should be refactored to do this check beforehand.
@@ -157,6 +168,7 @@ class LoadLabwareImplementation(
                 offsetId=loaded_labware.offsetId,
             ),
             private=None,
+            state_update=state_update,
         )
 
 

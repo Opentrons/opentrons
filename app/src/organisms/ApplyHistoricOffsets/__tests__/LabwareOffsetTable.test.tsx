@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { fixture96Plate, fixtureTiprackAdapter } from '@opentrons/shared-data'

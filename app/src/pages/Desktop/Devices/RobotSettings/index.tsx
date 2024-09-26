@@ -1,8 +1,9 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams, Navigate } from 'react-router-dom'
 
 import {
+  Banner,
   BORDERS,
   Box,
   COLORS,
@@ -25,7 +26,6 @@ import {
 import { appShellRequestor } from '/app/redux/shell/remote'
 import { getRobotUpdateSession } from '/app/redux/robot-update'
 import { getDevtoolsEnabled } from '/app/redux/config'
-import { Banner } from '/app/atoms/Banner'
 import { useRobot } from '/app/redux-resources/robots'
 import { Line } from '/app/atoms/structure'
 import { NavTab } from '/app/molecules/NavTab'
@@ -48,9 +48,7 @@ export function RobotSettings(): JSX.Element | null {
   const robot = useRobot(robotName)
   const isCalibrationDisabled = robot?.status !== CONNECTABLE
   const isNetworkingDisabled = robot?.status === UNREACHABLE
-  const [showRobotBusyBanner, setShowRobotBusyBanner] = React.useState<boolean>(
-    false
-  )
+  const [showRobotBusyBanner, setShowRobotBusyBanner] = useState<boolean>(false)
   const robotUpdateSession = useSelector(getRobotUpdateSession)
 
   const updateRobotStatus = (isRobotBusy: boolean): void => {

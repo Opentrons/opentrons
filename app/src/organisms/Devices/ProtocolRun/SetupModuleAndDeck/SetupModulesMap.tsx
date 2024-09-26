@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import {
   BaseDeck,
   Box,
@@ -13,12 +11,12 @@ import {
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getAttachedProtocolModuleMatches } from '../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
-import { ModuleInfo } from '../../ModuleInfo'
-import { useAttachedModules } from '../../hooks'
-import { getProtocolModulesInfo } from '../utils/getProtocolModulesInfo'
-import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import { getAttachedProtocolModuleMatches } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
+import { ModuleInfo } from '/app/molecules/ModuleInfo'
+import { useAttachedModules } from '/app/resources/modules'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
+import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 
