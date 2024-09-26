@@ -98,9 +98,6 @@ class GripperMovementError(ErrorOccurrence):
 
     errorType: Literal["gripperMovement"] = "gripperMovement"
 
-    errorCode: str = ErrorCodes.FAILED_GRIPPER_PICKUP_ERROR.value.code
-    detail: str = ErrorCodes.FAILED_GRIPPER_PICKUP_ERROR.value.detail
-
 
 _ExecuteReturn = (
     SuccessData[MoveLabwareResult, None] | DefinedErrorData[GripperMovementError]
@@ -266,6 +263,8 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     GripperMovementError(
                         id=self._model_utils.generate_id(),
                         createdAt=self._model_utils.get_timestamp(),
+                        errorCode=exception.code.value.code,
+                        detail=exception.code.value.detail,
                         wrappedErrors=[
                             ErrorOccurrence.from_failed(
                                 id=self._model_utils.generate_id(),
