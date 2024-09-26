@@ -1082,3 +1082,16 @@ class InvalidWellDefinitionError(ProtocolEngineError):
     ) -> None:
         """Build an InvalidWellDefinitionError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class OperationLocationNotInWellError(ProtocolEngineError):
+    """Raised when a calculated operation location is not within a well."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an OperationLocationNotInWellError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)

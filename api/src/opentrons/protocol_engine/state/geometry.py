@@ -19,6 +19,7 @@ from ..errors import (
     LabwareNotLoadedOnModuleError,
     LabwareMovementNotAllowedError,
     InvalidWellDefinitionError,
+    OperationLocationNotInWellError,
 )
 from ..resources import fixture_validation
 from ..types import (
@@ -421,6 +422,23 @@ class GeometryView:
         WellLocation, LiquidHandlingWellLocation, PickUpTipWellLocation
     ]
 
+    def validate_well_position(
+        self,
+        well_location: WellLocations,
+        well_depth: float,
+        z_offset: float,
+    ) -> None:
+        """Raise exception if operation location is not within well. Primarily this checks if there is not enough liquid in a well to do meniscus-relative static aspiration."""
+        if z_offset < 0:
+            if isinstance(well_location, PickUpTipWellLocation):
+                raise OperationLocationNotInWellError(
+                    f"Specifying {well_location.origin} with an offset of {well_location.offset} results in an operation location below the bottom of the well"
+                )
+            else:
+                raise OperationLocationNotInWellError(
+                    f"Specifying {well_location.origin} with an offset of {well_location.offset} and a volume offset of {well_location.volumeOffset} results in an operation location below the bottom of the well"
+                )
+
     def get_well_position(
         self,
         labware_id: str,
@@ -444,6 +462,9 @@ class GeometryView:
                 operation_volume=operation_volume,
             )
             offset = offset.copy(update={"z": offset.z + offset_adjustment})
+            self.validate_well_position(
+                well_location=well_location, well_depth=well_depth, z_offset=offset.z
+            )
 
         return Point(
             x=labware_pos.x + offset.x + well_def.x,
@@ -1323,7 +1344,7 @@ class GeometryView:
     ) -> float:
         """Return the height of liquid in a labware well after a given volume has been handled, given an initial handling height (with reference to the well bottom)."""
         well_def = self._labware.get_well_definition(labware_id, well_name)
-        well_id = well_def.geometryDefinitionId  # make non-optional eventually
+        well_id = well_def.geometryDefinitionId
         if well_id is not None:
             initial_volume = self.get_well_volume_at_height(
                 labware_id=labware_id, well_id=well_id, target_height=initial_height
@@ -1334,5 +1355,5 @@ class GeometryView:
             # return self.get_well_height_at_volume(labware_id=labware_id, well_id=well_id, target_volume=final_volume)
             return initial_height  # delete, use line above once sub-methods implemented
         else:
-            # raise exception?!
+            # raise InvalidWellDefinitionError(message=f"No geometryDefinitionId found for well: {well_name} in labware_id: {labware_id}") # use this
             return initial_height
