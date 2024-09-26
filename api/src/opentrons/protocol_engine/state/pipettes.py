@@ -39,7 +39,6 @@ from ..types import (
     TipGeometry,
 )
 from ..commands.configuring_common import (
-    PipetteConfigUpdateResultMixin,
     PipetteNozzleLayoutResultMixin,
 )
 from ..actions import (
@@ -155,19 +154,15 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         self._set_load_pipette(action)
         self._update_current_location(action)
         self._update_pipette_config(action)
+        self._update_pipette_nozzle_map(action)
         self._update_volumes(action)
 
         if not isinstance(action, SucceedCommandAction):
             return
 
-        command, private_result = action.command, action.private_result
+        command = action.command
 
-        if isinstance(private_result, PipetteNozzleLayoutResultMixin):
-            self._state.nozzle_configuration_by_id[
-                private_result.pipette_id
-            ] = private_result.nozzle_map
-
-        elif isinstance(command.result, commands.PickUpTipResult):
+        if isinstance(command.result, commands.PickUpTipResult):
             pipette_id = command.params.pipetteId
             attached_tip = TipGeometry(
                 length=command.result.tipLength,
@@ -343,6 +338,17 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.nozzle_configuration_by_id[
                 action.state_update.pipette_config.pipette_id
             ] = config.nozzle_map
+
+    def _update_pipette_nozzle_map(
+        self, action: Union[SucceedCommandAction, FailCommandAction]
+    ) -> None:
+        if (
+            isinstance(action, SucceedCommandAction)
+            and action.state_update.pipette_nozzle_map != update_types.NO_CHANGE
+        ):
+            self._state.nozzle_configuration_by_id[
+                action.state_update.pipette_nozzle_map.pipette_id
+            ] = action.state_update.pipette_nozzle_map.nozzle_map
 
     def _update_volumes(
         self, action: Union[SucceedCommandAction, FailCommandAction]

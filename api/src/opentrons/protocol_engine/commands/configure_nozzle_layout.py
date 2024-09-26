@@ -1,5 +1,6 @@
 """Configure nozzle layout command request, result, and implementation models."""
 from __future__ import annotations
+from opentrons.protocol_engine.state.update_types import StateUpdate
 from pydantic import BaseModel
 from typing import TYPE_CHECKING, Optional, Type, Union
 from typing_extensions import Literal
@@ -83,6 +84,11 @@ class ConfigureNozzleLayoutImplementation(
         nozzle_map = await self._equipment.configure_nozzle_layout(
             pipette_id=params.pipetteId,
             **nozzle_params,
+        )
+
+        update_state = StateUpdate()
+        update_state.update_pipette_nozzle(
+            pipette_id=params.pipetteId, nozzle_map=nozzle_map
         )
 
         return SuccessData(

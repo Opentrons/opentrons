@@ -5,6 +5,7 @@ import dataclasses
 import enum
 import typing
 
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine.resources import pipette_data_provider
 from opentrons.protocol_engine.types import DeckPoint, LabwareLocation
 from opentrons.types import MountType
@@ -112,9 +113,19 @@ class LoadPipetteUpdate:
 
 @dataclasses.dataclass
 class PipetteConfigUpdate:
+    """Update pipette config."""
+
     pipette_id: str
     serial_number: str
     config: pipette_data_provider.LoadedStaticPipetteData
+
+
+@dataclasses.dataclass
+class PipetteNozzleMapUpdate:
+    """Update pipette nozzle map."""
+
+    pipette_id: str
+    nozzle_map: NozzleMap
 
 
 @dataclasses.dataclass
@@ -126,6 +137,8 @@ class StateUpdate:
     loaded_pipette: LoadPipetteUpdate | NoChangeType = NO_CHANGE
 
     pipette_config: PipetteConfigUpdate | NoChangeType = NO_CHANGE
+
+    pipette_nozzle_map: PipetteNozzleMapUpdate | NoChangeType = NO_CHANGE
 
     labware_location: LabwareLocationUpdate | NoChangeType = NO_CHANGE
 
@@ -240,4 +253,9 @@ class StateUpdate:
     ) -> None:
         self.pipette_config = PipetteConfigUpdate(
             pipette_id=pipette_id, config=config, serial_number=serial_number
+        )
+
+    def update_pipette_nozzle(self, pipette_id: str, nozzle_map: NozzleMap) -> None:
+        self.pipette_nozzle_map = PipetteNozzleMapUpdate(
+            pipette_id=pipette_id, nozzle_map=nozzle_map
         )
