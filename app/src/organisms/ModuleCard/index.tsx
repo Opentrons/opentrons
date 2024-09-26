@@ -44,7 +44,7 @@ import {
 } from '/app/redux/robot-api'
 import { UpdateBanner } from '/app/molecules/UpdateBanner'
 import { useChainLiveCommands } from '/app/resources/runs'
-import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { getModuleTooHot } from '/app/transformations/modules'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -65,7 +65,7 @@ import { getModuleCardImage } from './utils'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
 import { ErrorInfo } from './ErrorInfo'
 import { ModuleSetupModal } from './ModuleSetupModal'
-import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices'
 
 import type { IconProps } from '@opentrons/components'
 import type {

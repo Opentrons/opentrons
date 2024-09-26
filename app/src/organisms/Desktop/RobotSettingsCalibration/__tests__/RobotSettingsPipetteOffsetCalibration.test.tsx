@@ -21,6 +21,7 @@ import { PipetteOffsetCalibrationItems } from '../CalibrationDetails/PipetteOffs
 import type { FormattedPipetteOffsetCalibration } from '..'
 
 vi.mock('/app/organisms/Desktop/Devices/hooks')
+vi.mock('/app/resources/instruments')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')
 

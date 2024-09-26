@@ -71,7 +71,7 @@ vi.mock('/app/redux-resources/robots')
 vi.mock('../RobotStatusHeader')
 vi.mock('../../UpdateRobotBanner')
 vi.mock('../RobotOverviewOverflowMenu')
-vi.mock('../../ErrorRecoveryBanner')
+vi.mock('/app/organisms/ErrorRecoveryBanner')
 
 const OT2_PNG_FILE_NAME = '/app/src/assets/images/OT2-R_HERO.png'
 const FLEX_PNG_FILE_NAME = '/app/src/assets/images/FLEX.png'

@@ -26,7 +26,7 @@ import {
 import { useDeleteRunMutation } from '@opentrons/react-api-client'
 
 import { Divider } from '/app/atoms/structure'
-import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
+import { useRunControls } from '/app/organisms/RunTimeControl'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -34,7 +34,7 @@ import {
 } from '/app/redux/analytics'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { useDownloadRunLog } from './hooks'
-import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useRobot } from '/app/redux-resources/robots'
 

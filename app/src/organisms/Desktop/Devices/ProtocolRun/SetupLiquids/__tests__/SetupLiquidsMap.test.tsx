@@ -24,8 +24,8 @@ import { i18n } from '/app/i18n'
 import { useAttachedModules } from '/app/resources/modules'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
-import { getAttachedProtocolModuleMatches } from '/app/transformations/analysis'
 import {
+  getAttachedProtocolModuleMatches,
   getProtocolModulesInfo,
   getLabwareRenderInfo,
 } from '/app/transformations/analysis'

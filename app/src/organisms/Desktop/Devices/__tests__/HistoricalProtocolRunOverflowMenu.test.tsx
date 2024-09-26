@@ -19,7 +19,7 @@ import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '/app/redux/analytics'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
 import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
@@ -33,7 +33,7 @@ vi.mock('../hooks')
 vi.mock('/app/organisms/RunTimeControl')
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/config')
-vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/resources/devices')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux-resources/analytics')
