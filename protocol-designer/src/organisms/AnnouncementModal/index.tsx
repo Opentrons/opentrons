@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
@@ -38,7 +38,7 @@ export const AnnouncementModal = (
   const [
     showAnnouncementModal,
     setShowAnnouncementModal,
-  ] = React.useState<boolean>(isViewReleaseNotes || userHasNotSeenAnnouncement)
+  ] = useState<boolean>(isViewReleaseNotes || userHasNotSeenAnnouncement)
 
   const handleClick = (): void => {
     if (onClose != null) onClose()

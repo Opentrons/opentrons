@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Box, AlertItem } from '@opentrons/components'
 import { NEW_LABWARE_MESSAGE } from '../../localization'
 

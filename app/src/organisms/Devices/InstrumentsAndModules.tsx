@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
 import {

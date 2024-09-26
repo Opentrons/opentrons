@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import cx from 'classnames'
 import { TwitterPicker } from 'react-color'
 import { DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
@@ -13,7 +13,7 @@ interface ColorPickerProps {
 
 export function ColorPicker(props: ColorPickerProps): JSX.Element {
   const { value, onChange } = props
-  const [showColorPicker, setShowColorPicker] = React.useState<boolean>(false)
+  const [showColorPicker, setShowColorPicker] = useState<boolean>(false)
 
   return (
     <>

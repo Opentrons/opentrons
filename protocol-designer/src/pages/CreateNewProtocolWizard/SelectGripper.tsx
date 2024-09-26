@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import without from 'lodash/without'
 import {
@@ -16,9 +16,7 @@ import type { WizardTileProps } from './types'
 export function SelectGripper(props: WizardTileProps): JSX.Element | null {
   const { goBack, setValue, proceed, watch } = props
   const { t } = useTranslation(['create_new_protocol', 'shared'])
-  const [gripperStatus, setGripperStatus] = React.useState<'yes' | 'no' | null>(
-    null
-  )
+  const [gripperStatus, setGripperStatus] = useState<'yes' | 'no' | null>(null)
   const additionalEquipment = watch('additionalEquipment')
 
   const handleGripperSelection = (status: 'yes' | 'no'): void => {

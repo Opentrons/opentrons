@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import last from 'lodash/last'
@@ -80,7 +80,7 @@ export function DeviceResetModal({
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (resetRequestStatus === SUCCESS) closeModal()
   }, [resetRequestStatus, closeModal])
 

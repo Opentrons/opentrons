@@ -28,9 +28,9 @@ import {
 import { SmallButton } from '/app/atoms/buttons'
 import { getModulePrepCommands } from '/app/local-resources/modules'
 import { getModuleTooHot } from '/app/transformations/modules'
-import { LocationConflictModal } from '../../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
-import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
-import { useToaster } from '../../../ToasterOven'
+import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
+import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { getLocalRobot } from '/app/redux/discovery'
 import {
   useChainLiveCommands,

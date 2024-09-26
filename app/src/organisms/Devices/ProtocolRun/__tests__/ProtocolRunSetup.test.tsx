@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
@@ -24,16 +23,14 @@ import {
   useRunCalibrationStatus,
   useRunPipetteInfoByMount,
   useNotifyRunQuery,
+  useRunHasStarted,
+  useUnmatchedModulesForProtocol,
+  useModuleCalibrationStatus,
+  useProtocolAnalysisErrors,
 } from '/app/resources/runs'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import {
-  useModuleCalibrationStatus,
-  useProtocolAnalysisErrors,
-  useRunHasStarted,
-  useUnmatchedModulesForProtocol,
-} from '../../hooks'
 
 import { SetupLabware } from '../SetupLabware'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
@@ -45,7 +42,6 @@ import type { MissingSteps } from '../ProtocolRunSetup'
 
 import type * as SharedData from '@opentrons/shared-data'
 
-vi.mock('../../hooks')
 vi.mock('../SetupLabware')
 vi.mock('../SetupRobotCalibration')
 vi.mock('../SetupModuleAndDeck')
@@ -55,6 +51,10 @@ vi.mock('/app/resources/runs/useNotifyRunQuery')
 vi.mock('/app/resources/runs/useMostRecentCompletedAnalysis')
 vi.mock('/app/resources/runs/useRunCalibrationStatus')
 vi.mock('/app/resources/runs/useRunPipetteInfoByMount')
+vi.mock('/app/resources/runs/useRunHasStarted')
+vi.mock('/app/resources/runs/useUnmatchedModulesForProtocol')
+vi.mock('/app/resources/runs/useModuleCalibrationStatus')
+vi.mock('/app/resources/runs/useProtocolAnalysisErrors')
 vi.mock('/app/redux/config')
 vi.mock('/app/resources/deck_configuration/utils')
 vi.mock('/app/resources/deck_configuration/hooks')

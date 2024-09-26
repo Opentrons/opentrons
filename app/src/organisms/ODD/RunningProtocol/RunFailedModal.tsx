@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
@@ -46,7 +46,7 @@ export function RunFailedModal({
   const { t, i18n } = useTranslation(['run_details', 'shared', 'branded'])
   const navigate = useNavigate()
   const { stopRun } = useStopRunMutation()
-  const [isCanceling, setIsCanceling] = React.useState(false)
+  const [isCanceling, setIsCanceling] = useState(false)
 
   if (
     (errors == null || errors.length === 0) &&

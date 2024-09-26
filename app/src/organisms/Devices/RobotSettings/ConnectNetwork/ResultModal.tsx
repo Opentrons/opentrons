@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { AlertModal, SpinnerModal } from '@opentrons/components'
 
 import * as Copy from './i18n'

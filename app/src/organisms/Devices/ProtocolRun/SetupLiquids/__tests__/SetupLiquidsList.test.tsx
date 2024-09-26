@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
@@ -22,7 +22,7 @@ import {
   getTotalVolumePerLiquidId,
   getVolumePerWell,
 } from '/app/transformations/analysis'
-import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
+import { LiquidsLabwareDetailsModal } from '/app/organisms/LiquidsLabwareDetailsModal'
 import { useNotifyRunQuery } from '/app/resources/runs'
 
 import type { Mock } from 'vitest'
@@ -58,7 +58,7 @@ const MOCK_LABWARE_INFO_BY_LIQUID_ID = {
 vi.mock('/app/transformations/analysis')
 vi.mock('/app/transformations/commands')
 vi.mock('/app/redux-resources/robots')
-vi.mock('../LiquidsLabwareDetailsModal')
+vi.mock('/app/organisms/LiquidsLabwareDetailsModal')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
   return {

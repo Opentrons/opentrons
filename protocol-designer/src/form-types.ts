@@ -192,6 +192,7 @@ export type PauseForm = AnnotationFields & {
   pauseSecond?: string
   pauseMessage?: string
   pauseTemperature?: string
+  pauseTime?: string
 }
 // TODO: separate field values from from metadata
 export interface FormData {

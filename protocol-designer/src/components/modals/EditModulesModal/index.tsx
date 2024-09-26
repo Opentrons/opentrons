@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import some from 'lodash/some'
@@ -292,7 +292,7 @@ const EditModulesModalComponent = (
 
   const prevSelectedModel = usePrevious(selectedModel)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       prevSelectedModel &&
       prevSelectedModel !== selectedModel &&

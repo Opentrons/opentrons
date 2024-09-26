@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Field } from 'formik'
 import { LegacyInputField } from '@opentrons/components'
 import { reportFieldEdit } from '../analyticsUtils'

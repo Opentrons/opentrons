@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import {
@@ -71,7 +71,7 @@ export function useChainRunCommands(
   ) => ReturnType<typeof chainRunCommandsRecursive>
   isCommandMutationLoading: boolean
 } {
-  const [isLoading, setIsLoading] = React.useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const { createRunCommand } = useCreateRunCommandMutation(
     runId,
@@ -99,7 +99,7 @@ export function useChainLiveCommands(): {
   ) => ReturnType<typeof chainLiveCommandsRecursive>
   isCommandMutationLoading: boolean
 } {
-  const [isLoading, setIsLoading] = React.useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   return {
     chainLiveCommands: (

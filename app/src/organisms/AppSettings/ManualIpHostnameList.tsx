@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { getConfig, removeManualIp } from '/app/redux/config'
@@ -38,7 +38,7 @@ export function ManualIpHostnameList({
               bDiscovered && !aDiscovered ? -1 : 1
             )
             .map(([candidate, discovered], index) => (
-              <React.Fragment key={index}>
+              <Fragment key={index}>
                 <ManualIpHostnameItem
                   candidate={candidate}
                   removeIp={() => dispatch(removeManualIp(candidate))}
@@ -48,7 +48,7 @@ export function ManualIpHostnameList({
                   setMostRecentDiscovered={setMostRecentDiscovered}
                   isLast={index === candidates.length - 1}
                 />
-              </React.Fragment>
+              </Fragment>
             ))
         : null}
     </>

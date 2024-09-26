@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_FINISHING } from '@opentrons/api-client'
@@ -40,7 +40,7 @@ export const AboutModuleSlideout = (
   const { i18n, t } = useTranslation(['device_details', 'shared'])
   const moduleName = getModuleDisplayName(module.moduleModel)
   const runStatus = useCurrentRunStatus()
-  const [showBanner, setShowBanner] = React.useState<boolean>(true)
+  const [showBanner, setShowBanner] = useState<boolean>(true)
   const isDisabled =
     runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
 

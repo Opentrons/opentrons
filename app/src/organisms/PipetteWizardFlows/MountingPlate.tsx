@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { LEFT } from '@opentrons/shared-data'
 import { COLORS, SPACING, LegacyStyledText } from '@opentrons/components'

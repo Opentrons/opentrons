@@ -1,4 +1,3 @@
-import * as React from 'react'
 import cx from 'classnames'
 import { DndProvider } from 'react-dnd'
 import { HashRouter } from 'react-router-dom'

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { saveAs } from 'file-saver'
 import { useTranslation, Trans } from 'react-i18next'
 

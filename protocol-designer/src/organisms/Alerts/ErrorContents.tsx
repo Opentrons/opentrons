@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { START_TERMINAL_ITEM_ID } from '../../steplist'
 import { KnowledgeBaseLink } from '../../components/KnowledgeBaseLink'

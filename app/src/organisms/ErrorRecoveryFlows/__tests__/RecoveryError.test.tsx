@@ -1,5 +1,5 @@
 /* eslint-disable testing-library/prefer-presence-queries */
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { screen, fireEvent, waitFor } from '@testing-library/react'
 

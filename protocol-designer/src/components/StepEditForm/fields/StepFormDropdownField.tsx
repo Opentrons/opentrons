@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { DropdownField } from '@opentrons/components'
 import cx from 'classnames'
 import styles from '../StepEditForm.module.css'

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo, useState, Fragment } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
@@ -75,10 +75,8 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
   const zoomIn = useSelector(selectors.getZoomedInSlot)
   const _disableCollisionWarnings = useSelector(getDisableModuleRestrictions)
   const robotType = useSelector(getRobotType)
-  const deckDef = React.useMemo(() => getDeckDefFromRobotType(robotType), [
-    robotType,
-  ])
-  const [hoverSlot, setHoverSlot] = React.useState<DeckSlot | null>(null)
+  const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
+  const [hoverSlot, setHoverSlot] = useState<DeckSlot | null>(null)
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
   )
@@ -112,16 +110,10 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
 
   const initialViewBox = `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`
 
-  const [viewBox, setViewBox] = React.useState<string>(initialViewBox)
-  const [hoveredLabware, setHoveredLabware] = React.useState<string | null>(
-    null
-  )
-  const [hoveredModule, setHoveredModule] = React.useState<ModuleModel | null>(
-    null
-  )
-  const [hoveredFixture, setHoveredFixture] = React.useState<Fixture | null>(
-    null
-  )
+  const [viewBox, setViewBox] = useState<string>(initialViewBox)
+  const [hoveredLabware, setHoveredLabware] = useState<string | null>(null)
+  const [hoveredModule, setHoveredModule] = useState<ModuleModel | null>(null)
+  const [hoveredFixture, setHoveredFixture] = useState<Fixture | null>(null)
 
   const addEquipment = (slotId: string): void => {
     const cutoutId =
@@ -153,7 +145,7 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
     }
   }
 
-  const _hasGen1MultichannelPipette = React.useMemo(
+  const _hasGen1MultichannelPipette = useMemo(
     () => getHasGen1MultiChannelPipette(activeDeckSetup.pipettes),
     [activeDeckSetup.pipettes]
   )
@@ -250,7 +242,7 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
                           cutoutId != null &&
                           (zoomIn.cutout == null ||
                             zoomIn.cutout !== cutoutId) ? (
-                            <React.Fragment key={cutoutId}>
+                            <Fragment key={cutoutId}>
                               <SingleSlotFixture
                                 cutoutId={cutoutId}
                                 deckDefinition={deckDef}
@@ -263,7 +255,7 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
                                 trashCutoutId={cutoutId as TrashCutoutId}
                                 backgroundColor={COLORS.grey50}
                               />
-                            </React.Fragment>
+                            </Fragment>
                           ) : null
                         )
                       : null}

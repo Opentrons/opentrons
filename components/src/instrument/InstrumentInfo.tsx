@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { Flex } from '../primitives'

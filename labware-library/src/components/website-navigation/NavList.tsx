@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Component } from 'react'
 import cx from 'classnames'
 import { ClickOutside } from '@opentrons/components'
 import { aboutLinkProps, applicationLinkProps } from './nav-data'
@@ -15,7 +15,7 @@ interface State {
 
 type Props = Record<string, never>
 
-export class NavList extends React.Component<Props, State> {
+export class NavList extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = { menu: null }

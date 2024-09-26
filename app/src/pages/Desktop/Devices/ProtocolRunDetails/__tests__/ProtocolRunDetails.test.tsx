@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
@@ -7,12 +6,7 @@ import { when } from 'vitest-when'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import {
-  useModuleRenderInfoForProtocolById,
-  useRunStatuses,
-  useSyncRobotClock,
-  useRunHasStarted,
-} from '/app/organisms/Devices/hooks'
+import { useRunStatuses, useSyncRobotClock } from '/app/organisms/Devices/hooks'
 import { ProtocolRunHeader } from '/app/organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { ProtocolRunModuleControls } from '/app/organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunSetup } from '/app/organisms/Devices/ProtocolRun/ProtocolRunSetup'
@@ -21,6 +15,8 @@ import { ProtocolRunRuntimeParameters } from '/app/organisms/Devices/ProtocolRun
 import {
   useCurrentRunId,
   useMostRecentCompletedAnalysis,
+  useRunHasStarted,
+  useModuleRenderInfoForProtocolById,
 } from '/app/resources/runs'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import { useRobot } from '/app/redux-resources/robots'

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import {
@@ -18,7 +18,7 @@ import { useHost } from '@opentrons/react-api-client'
 
 import { getIsOnDevice } from '/app/redux/config'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
-import { RunPausedSplash, useRunPausedSplash } from './RunPausedSplash'
+import { RecoverySplash, useRecoverySplash } from './RecoverySplash'
 import { RecoveryTakeover } from './RecoveryTakeover'
 import {
   useCurrentlyRecoveringFrom,
@@ -57,11 +57,9 @@ export function useErrorRecoveryFlows(
   runId: string,
   runStatus: RunStatus | null
 ): UseErrorRecoveryResult {
-  const [isERActive, setIsERActive] = React.useState(false)
+  const [isERActive, setIsERActive] = useState(false)
   // If client accesses a valid ER runs status besides AWAITING_RECOVERY but accesses it outside of Error Recovery flows, don't show ER.
-  const [hasSeenAwaitingRecovery, setHasSeenAwaitingRecovery] = React.useState(
-    false
-  )
+  const [hasSeenAwaitingRecovery, setHasSeenAwaitingRecovery] = useState(false)
   const failedCommand = useCurrentlyRecoveringFrom(runId, runStatus)
 
   if (
@@ -147,7 +145,7 @@ export function ErrorRecoveryFlows(
   const renderWizard =
     isActiveUser &&
     (showERWizard || recoveryUtils.doorStatusUtils.isProhibitedDoorOpen)
-  const showSplash = useRunPausedSplash(isOnDevice, renderWizard)
+  const showSplash = useRecoverySplash(isOnDevice, renderWizard as boolean)
 
   return (
     <>
@@ -169,7 +167,7 @@ export function ErrorRecoveryFlows(
         />
       ) : null}
       {showSplash ? (
-        <RunPausedSplash
+        <RecoverySplash
           {...props}
           {...recoveryUtils}
           robotType={robotType}
@@ -177,6 +175,7 @@ export function ErrorRecoveryFlows(
           isOnDevice={isOnDevice}
           toggleERWizAsActiveUser={toggleERWizAsActiveUser}
           failedCommand={failedCommandBySource}
+          resumePausedRecovery={!renderWizard && !showTakeover}
         />
       ) : null}
     </>

@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState } from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import Markdown from 'react-markdown'
@@ -29,7 +29,7 @@ interface ChatDisplayProps {
 
 export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   const { t } = useTranslation('protocol_generator')
-  const [isCopied, setIsCopied] = React.useState<boolean>(false)
+  const [isCopied, setIsCopied] = useState<boolean>(false)
   const { role, reply } = chat
   const isUser = role === 'user'
 

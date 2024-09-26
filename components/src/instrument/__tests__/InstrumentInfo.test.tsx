@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, beforeEach, it, vi } from 'vitest'
 import { LEFT, RIGHT, fixtureP1000SingleV2Specs } from '@opentrons/shared-data'

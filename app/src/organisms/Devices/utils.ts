@@ -1,30 +1,9 @@
-import { format, parseISO } from 'date-fns'
-
 import type {
   FetchPipettesResponseBody,
   FetchPipettesResponsePipette,
   Mount,
 } from '/app/redux/pipettes/types'
 import type { PipetteOffsetCalibration } from '@opentrons/api-client'
-
-/**
- * formats a string if it is in ISO 8601 date format
- * @param {string} timestamp ISO date string
- * @returns {string} formatted date string
- */
-export function formatTimestamp(timestamp: string): string {
-  // eslint-disable-next-line eqeqeq
-  return (parseISO(timestamp) as Date | string) != 'Invalid Date'
-    ? format(parseISO(timestamp), 'MM/dd/yyyy HH:mm:ss')
-    : timestamp
-}
-
-export function onDeviceDisplayFormatTimestamp(timestamp: string): string {
-  // eslint-disable-next-line eqeqeq
-  return (parseISO(timestamp) as Date | string) != 'Invalid Date'
-    ? format(parseISO(timestamp), 'HH:mm:ss')
-    : timestamp
-}
 
 export function downloadFile(data: object | string, fileName: string): void {
   // Create a blob with the data we want to download as a file

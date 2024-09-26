@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { THERMOCYCLER_STATE, THERMOCYCLER_PROFILE } from '../../../../constants'

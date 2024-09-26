@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -47,7 +47,7 @@ export function WelcomeModal({
     setShowWelcomeModal(false)
   }
 
-  React.useEffect(startDiscoAnimation, [])
+  useEffect(startDiscoAnimation, [])
 
   return (
     <OddModal modalSize="small" onOutsideClick={handleCloseModal}>

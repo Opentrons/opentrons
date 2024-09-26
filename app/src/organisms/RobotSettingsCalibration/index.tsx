@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -77,21 +77,21 @@ export function RobotSettingsCalibration({
     'robot_calibration',
     'shared',
   ])
-  const trackedRequestId = React.useRef<string | null>(null)
-  const createRequestId = React.useRef<string | null>(null)
-  const jogRequestId = React.useRef<string | null>(null)
+  const trackedRequestId = useRef<string | null>(null)
+  const createRequestId = useRef<string | null>(null)
+  const jogRequestId = useRef<string | null>(null)
 
   const [
     showHowCalibrationWorksModal,
     setShowHowCalibrationWorksModal,
-  ] = React.useState(false)
+  ] = useState(false)
 
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
   const isFlex = useIsFlex(robotName)
   const dispatch = useDispatch<Dispatch>()
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(Sessions.fetchAllSessions(robotName))
   }, [dispatch, robotName])
 
@@ -249,7 +249,7 @@ export function RobotSettingsCalibration({
     })
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {
       createRequestId.current = null
     }

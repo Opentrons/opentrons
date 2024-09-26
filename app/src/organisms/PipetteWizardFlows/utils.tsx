@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { SPACING } from '@opentrons/components'

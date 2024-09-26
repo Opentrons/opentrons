@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import last from 'lodash/last'
 
@@ -27,16 +27,15 @@ export type WifiScreenOption =
   | 'WifiConnectStatus'
 
 export function ConnectViaWifi(): JSX.Element {
-  const [selectedSsid, setSelectedSsid] = React.useState<string>('')
-  const [
-    selectedAuthType,
-    setSelectedAuthType,
-  ] = React.useState<WifiSecurityType>('wpa-psk')
+  const [selectedSsid, setSelectedSsid] = useState<string>('')
+  const [selectedAuthType, setSelectedAuthType] = useState<WifiSecurityType>(
+    'wpa-psk'
+  )
 
-  const [currentOption, setCurrentOption] = React.useState<WifiScreenOption>(
+  const [currentOption, setCurrentOption] = useState<WifiScreenOption>(
     'WifiList'
   )
-  const [password, setPassword] = React.useState<string>('')
+  const [password, setPassword] = useState<string>('')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const list = useWifiList(robotName, WIFI_LIST_POLL_MS)

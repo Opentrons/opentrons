@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -55,7 +55,7 @@ export const UnmountGripper = (
   const { proceed, isRobotMoving, goBack, chainRunCommands } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared', 'branded'])
   const isOnDevice = useSelector(getIsOnDevice)
-  const [isPending, setIsPending] = React.useState<boolean>(false)
+  const [isPending, setIsPending] = useState<boolean>(false)
   const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
     refetchInterval: QUICK_GRIPPER_POLL_MS,
   })
@@ -63,10 +63,9 @@ export const UnmountGripper = (
     (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
   )
 
-  const [
-    showGripperStillDetected,
-    setShowGripperStillDetected,
-  ] = React.useState(false)
+  const [showGripperStillDetected, setShowGripperStillDetected] = useState(
+    false
+  )
   const handleContinue = (): void => {
     setIsPending(true)
     refetch()

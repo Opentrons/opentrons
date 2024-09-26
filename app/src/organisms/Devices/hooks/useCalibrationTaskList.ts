@@ -10,7 +10,7 @@ import { getLabwareDefURI } from '@opentrons/shared-data'
 import { useAttachedPipettes } from '/app/resources/instruments'
 import { getDefaultTiprackDefForPipetteName } from '../constants'
 import { DECK_CAL_STATUS_OK } from '/app/redux/calibration/constants'
-import { formatTimestamp } from '../utils'
+import { formatTimestamp } from '/app/transformations/runs'
 
 import type { PipetteName } from '@opentrons/shared-data'
 import type {

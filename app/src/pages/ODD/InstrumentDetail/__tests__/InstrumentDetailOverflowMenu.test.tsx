@@ -1,4 +1,3 @@
-import React from 'react'
 import NiceModal from '@ebay/nice-modal-react'
 import { fireEvent, screen } from '@testing-library/react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
@@ -11,9 +10,7 @@ import { handleInstrumentDetailOverflowMenu } from '../InstrumentDetailOverflowM
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
-import { useDropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
 
-import type { Mock } from 'vitest'
 import type {
   PipetteData,
   GripperData,
@@ -31,7 +28,6 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 vi.mock('/app/resources/maintenance_runs')
 vi.mock('/app/organisms/PipetteWizardFlows')
 vi.mock('/app/organisms/GripperWizardFlows')
-vi.mock('/app/organisms/DropTipWizardFlows')
 
 const MOCK_PIPETTE = {
   mount: 'left',
@@ -103,13 +99,18 @@ const MOCK_GRIPPER = {
 } as GripperData
 
 const MOCK_HOST: HostConfig = { hostname: 'TEST_HOST' }
+const mockToggleDTWiz = vi.fn()
 
 const render = (pipetteOrGripper: PipetteData | GripperData) => {
   return renderWithProviders(
     <NiceModal.Provider>
       <button
         onClick={() =>
-          handleInstrumentDetailOverflowMenu(pipetteOrGripper, MOCK_HOST)
+          handleInstrumentDetailOverflowMenu(
+            pipetteOrGripper,
+            MOCK_HOST,
+            mockToggleDTWiz
+          )
         }
         data-testid="testButton"
       />
@@ -120,11 +121,7 @@ const render = (pipetteOrGripper: PipetteData | GripperData) => {
   )
 }
 
-let mockToggleDTWiz: Mock
-
-describe('UpdateBuildroot', () => {
-  mockToggleDTWiz = vi.fn()
-
+describe('InstrumentDetailOverFlowMenu', () => {
   beforeEach(() => {
     vi.mocked(getPipetteModelSpecs).mockReturnValue({
       displayName: 'mockPipette',
@@ -136,10 +133,6 @@ describe('UpdateBuildroot', () => {
         },
       },
     } as any)
-    vi.mocked(useDropTipWizardFlows).mockReturnValue({
-      showDTWiz: false,
-      toggleDTWiz: mockToggleDTWiz,
-    })
   })
 
   afterEach(() => {
@@ -181,13 +174,15 @@ describe('UpdateBuildroot', () => {
     expect(vi.mocked(PipetteWizardFlows)).toHaveBeenCalled()
   })
 
-  it('renders the drop tip wizard  when Drop tips is clicked', () => {
+  it('toggles the drop tip wizard toggle when Drop tips is clicked', () => {
     render(MOCK_PIPETTE)
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
-    fireEvent.click(screen.getByText('Drop tips'))
 
-    expect(vi.mocked(mockToggleDTWiz)).toHaveBeenCalled()
+    const dtBtn = screen.getByRole('button', { name: /Drop tips/ })
+    fireEvent.click(dtBtn)
+
+    expect(mockToggleDTWiz).toHaveBeenCalled()
   })
 
   it('renders the gripper calibration wizard when recalibrate is clicked', () => {

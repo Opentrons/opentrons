@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import {
   BaseDeck,
   Box,
@@ -15,7 +13,7 @@ import {
 
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getAttachedProtocolModuleMatches } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
-import { ModuleInfo } from '../../ModuleInfo'
+import { ModuleInfo } from '/app/molecules/ModuleInfo'
 import { useAttachedModules } from '/app/resources/modules'
 import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'

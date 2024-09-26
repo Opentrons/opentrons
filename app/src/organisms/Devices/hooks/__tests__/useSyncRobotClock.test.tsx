@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'

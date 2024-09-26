@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -148,7 +148,7 @@ export const ModuleOverflowMenu = (
         {menuOverflowItemsByModuleType[module.moduleType].map(
           (item: any, index: number) => {
             return (
-              <React.Fragment key={`${index}_${String(module.moduleType)}`}>
+              <Fragment key={`${index}_${String(module.moduleType)}`}>
                 <MenuItem
                   onClick={() => item.onClick(item.isSecondary)}
                   disabled={item.disabledReason || isDisabled}
@@ -157,7 +157,7 @@ export const ModuleOverflowMenu = (
                   {item.setSetting}
                 </MenuItem>
                 {item.menuButtons}
-              </React.Fragment>
+              </Fragment>
             )
           }
         )}

@@ -20,13 +20,13 @@ export const mockFailedCommand: FailedCommand = {
   error: {
     createdAt: '2024-05-24T13:55:32.595751+00:00',
     detail: 'No tip detected.',
-    isDefined: false,
+    isDefined: true,
     errorCode: '3003',
     errorType: 'tipPhysicallyMissing',
     errorInfo: {},
     wrappedErrors: [],
     id: '123',
-  },
+  } as any,
   startedAt: '2024-05-24T13:55:19.016799+00:00',
   id: '1',
   params: {

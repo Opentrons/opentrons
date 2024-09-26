@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 
 import {
   useChainMaintenanceCommands,
@@ -32,7 +32,7 @@ export function useDropTipMaintenanceRun({
 }: UseDropTipMaintenanceRunParams): string | null {
   const isMaintenanceRunType = issuedCommandsType === 'setup'
 
-  const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
+  const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = useState<
     string | null
   >(null)
 
@@ -101,7 +101,7 @@ function useCreateDropTipMaintenanceRun({
     },
   })
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       issuedCommandsType === 'setup' &&
       mount != null &&
@@ -140,10 +140,10 @@ function useMonitorMaintenanceRunForDeletion({
   const [
     monitorMaintenanceRunForDeletion,
     setMonitorMaintenanceRunForDeletion,
-  ] = React.useState<boolean>(false)
-  const [closedOnce, setClosedOnce] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
+  const [closedOnce, setClosedOnce] = useState<boolean>(false)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isMaintenanceRunType && !closedOnce) {
       if (
         createdMaintenanceRunId !== null &&

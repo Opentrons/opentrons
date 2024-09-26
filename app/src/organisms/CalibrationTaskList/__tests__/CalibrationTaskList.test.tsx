@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
@@ -18,9 +17,10 @@ import {
   expectedIncompleteRightMountTaskList,
   expectedIncompleteLeftMountTaskList,
 } from '../../Devices/hooks/__fixtures__/taskListFixtures'
-import { useCalibrationTaskList, useRunHasStarted } from '../../Devices/hooks'
+import { useCalibrationTaskList } from '../../Devices/hooks'
 import { useAttachedPipettes } from '/app/resources/instruments'
 import { mockLeftProtoPipette } from '/app/redux/pipettes/__fixtures__'
+import { useRunHasStarted } from '/app/resources/runs'
 
 vi.mock('../../Devices/hooks')
 vi.mock('/app/resources/runs')

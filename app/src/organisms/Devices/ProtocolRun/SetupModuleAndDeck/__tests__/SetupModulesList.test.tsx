@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { when } from 'vitest-when'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
@@ -17,28 +17,25 @@ import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import {
   useChainLiveCommands,
   useRunCalibrationStatus,
-} from '/app/resources/runs'
-import { ModuleSetupModal } from '../../../../ModuleCard/ModuleSetupModal'
-import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
-import {
   useModuleRenderInfoForProtocolById,
   useUnmatchedModulesForProtocol,
-} from '../../../hooks'
+} from '/app/resources/runs'
+import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
+import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { OT2MultipleModulesHelp } from '../OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 import { SetupModulesList } from '../SetupModulesList'
-import { LocationConflictModal } from '../LocationConflictModal'
+import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../hooks')
 vi.mock('/app/redux-resources/robots')
-vi.mock('../LocationConflictModal')
+vi.mock('/app/organisms/LocationConflictModal')
 vi.mock('../UnMatchedModuleWarning')
-vi.mock('../../../../ModuleCard/ModuleSetupModal')
-vi.mock('../../../../ModuleWizardFlows')
+vi.mock('/app/organisms/ModuleCard/ModuleSetupModal')
+vi.mock('/app/organisms/ModuleWizardFlows')
 vi.mock('../OT2MultipleModulesHelp')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux/config')

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo } from 'react'
 import { getDeckDefinitions } from '@opentrons/shared-data'
 import { useTranslation } from 'react-i18next'
 import {
@@ -19,7 +19,7 @@ import { DECK_LAYER_BLOCKLIST } from './index'
 import styles from './DeckSetup.module.css'
 
 export const NullDeckState = (): JSX.Element => {
-  const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
+  const deckDef = useMemo(() => getDeckDefinitions().ot2_standard, [])
   const { t } = useTranslation('deck')
   return (
     <div className={styles.deck_row}>

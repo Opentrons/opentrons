@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
@@ -30,8 +29,8 @@ import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
 } from '../utils'
-import { LocationConflictModal } from '../../../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
-import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
+import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
+import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { SetupInstructionsModal } from '../SetupInstructionsModal'
 import { FixtureTable } from '../FixtureTable'
 import { ModulesAndDeckMapView } from '../ModulesAndDeckMapView'
@@ -48,11 +47,9 @@ vi.mock('/app/resources/deck_configuration')
 vi.mock('/app/transformations/analysis')
 vi.mock('../utils')
 vi.mock('../SetupInstructionsModal')
-vi.mock('../../../../ModuleWizardFlows')
+vi.mock('/app/organisms/ModuleWizardFlows')
 vi.mock('../FixtureTable')
-vi.mock(
-  '../../../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
-)
+vi.mock('/app/organisms/LocationConflictModal')
 vi.mock('../ModulesAndDeckMapView')
 
 const ROBOT_NAME = 'otie'

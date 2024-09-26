@@ -1,4 +1,3 @@
-import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { InProgressModal as InProgressModalComponent } from './'
 import { SimpleWizardInProgressBody } from '../SimpleWizardBody'

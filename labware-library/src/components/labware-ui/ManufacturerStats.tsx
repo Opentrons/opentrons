@@ -1,5 +1,4 @@
 // labware details page title and category
-import * as React from 'react'
 import {
   MANUFACTURER,
   MANUFACTURER_NO,

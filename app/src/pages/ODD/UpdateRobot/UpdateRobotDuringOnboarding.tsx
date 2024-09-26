@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -30,10 +30,9 @@ import type { Dispatch, State } from '/app/redux/types'
 const CHECK_UPDATES_DURATION = 10000 // Note: kj 1/10/2023 Currently set 10 sec later we may use a status from state
 
 export function UpdateRobotDuringOnboarding(): JSX.Element {
-  const [
-    isShowCheckingUpdates,
-    setIsShowCheckingUpdates,
-  ] = React.useState<boolean>(true)
+  const [isShowCheckingUpdates, setIsShowCheckingUpdates] = useState<boolean>(
+    true
+  )
   const navigate = useNavigate()
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
@@ -50,7 +49,7 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
     getOnDeviceDisplaySettings
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (robotUpdateType !== 'upgrade') {
       const checkUpdateTimer = setTimeout(() => {
         setIsShowCheckingUpdates(false)
@@ -63,7 +62,7 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
     }
   }, [])
 
-  const [errorString, setErrorString] = React.useState<string | null>(null)
+  const [errorString, setErrorString] = useState<string | null>(null)
   const handleSuccessfulUpdate = (): void => {
     if (unfinishedUnboxingFlowRoute === '/welcome') {
       dispatch(

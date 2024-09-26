@@ -4,6 +4,7 @@ import { css } from 'styled-components'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import {
   ALIGN_CENTER,
+  CURSOR_DEFAULT,
   CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -37,6 +38,7 @@ export interface DropdownOption {
   /** optional dropdown option for adding the liquid color icon */
   liquidColor?: string
   disabled?: boolean
+  tooltipText?: string
 }
 
 export type DropdownBorder = 'rounded' | 'neutral'
@@ -81,6 +83,9 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   const [showDropdownMenu, setShowDropdownMenu] = React.useState<boolean>(false)
+  const [optionTargetProps, optionTooltipProps] = useHoverTooltip({
+    placement: 'top-end',
+  })
 
   const [dropdownPosition, setDropdownPosition] = React.useState<
     'top' | 'bottom'
@@ -136,8 +141,12 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   }, [filterOptions.length, dropDownMenuWrapperRef])
 
   const toggleSetShowDropdownMenu = (): void => {
-    setShowDropdownMenu(!showDropdownMenu)
+    if (!isDisabled) {
+      setShowDropdownMenu(!showDropdownMenu)
+    }
   }
+
+  const isDisabled = filterOptions.length === 0
 
   let defaultBorderColor = COLORS.grey50
   let hoverBorderColor = COLORS.grey55
@@ -152,7 +161,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   const DROPDOWN_STYLE = css`
     flex-direction: ${DIRECTION_ROW};
     background-color: ${COLORS.white};
-    cursor: ${CURSOR_POINTER};
+    cursor: ${isDisabled ? CURSOR_DEFAULT : CURSOR_POINTER};
     padding: ${SPACING.spacing8} ${SPACING.spacing12};
     border: 1px ${BORDERS.styleSolid} ${defaultBorderColor};
     border-radius: ${dropdownType === 'rounded'
@@ -257,21 +266,34 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             maxHeight="20rem" // Set the maximum display number to 10.
           >
             {filterOptions.map((option, index) => (
-              <MenuItem
-                zIndex={3}
-                key={`${option.name}-${index}`}
-                onClick={() => {
-                  onClick(option.value)
-                  setShowDropdownMenu(false)
-                }}
-              >
-                <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-                  {option.liquidColor != null ? (
-                    <LiquidIcon color={option.liquidColor} />
-                  ) : null}
-                  {option.name}
-                </Flex>
-              </MenuItem>
+              <React.Fragment key={`${option.name}-${index}`}>
+                <MenuItem
+                  disabled={option.disabled}
+                  zIndex={3}
+                  key={`${option.name}-${index}`}
+                  onClick={() => {
+                    onClick(option.value)
+                    setShowDropdownMenu(false)
+                  }}
+                  border="none"
+                >
+                  <Flex
+                    gridGap={SPACING.spacing8}
+                    alignItems={ALIGN_CENTER}
+                    {...optionTargetProps}
+                  >
+                    {option.liquidColor != null ? (
+                      <LiquidIcon color={option.liquidColor} />
+                    ) : null}
+                    {option.name}
+                  </Flex>
+                </MenuItem>
+                {option.tooltipText != null ? (
+                  <Tooltip tooltipProps={optionTooltipProps}>
+                    {option.tooltipText}
+                  </Tooltip>
+                ) : null}
+              </React.Fragment>
             ))}
           </Flex>
         )}

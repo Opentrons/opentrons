@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation, Trans } from 'react-i18next'
 import {

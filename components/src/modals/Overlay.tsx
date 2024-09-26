@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Flex, POSITION_FIXED } from '..'
 
 export interface OverlayProps extends React.ComponentProps<typeof Flex> {

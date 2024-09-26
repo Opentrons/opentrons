@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -19,9 +19,7 @@ export function FeatureFlagCard(): JSX.Element {
   const flags = useSelector(featureFlagSelectors.getFeatureFlagData)
   const dispatch = useDispatch()
 
-  const [modalFlagName, setModalFlagName] = React.useState<FlagTypes | null>(
-    null
-  )
+  const [modalFlagName, setModalFlagName] = useState<FlagTypes | null>(null)
   const { t } = useTranslation(['modal', 'card', 'feature_flags'])
 
   const setFeatureFlags = (

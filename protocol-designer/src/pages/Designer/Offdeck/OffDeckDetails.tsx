@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import {
@@ -32,10 +32,8 @@ interface OffDeckDetailsProps extends DeckSetupTabType {
 export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
   const { addLabware, tab } = props
   const { t, i18n } = useTranslation('starting_deck_state')
-  const [hoverSlot, setHoverSlot] = React.useState<DeckSlotId | null>(null)
-  const [menuListId, setShowMenuListForId] = React.useState<DeckSlotId | null>(
-    null
-  )
+  const [hoverSlot, setHoverSlot] = useState<DeckSlotId | null>(null)
+  const [menuListId, setShowMenuListForId] = useState<DeckSlotId | null>(null)
   const robotType = useSelector(getRobotType)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const offDeckLabware = Object.values(deckSetup.labware).filter(

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
 import {
@@ -9,9 +8,9 @@ import {
   InfoScreen,
   SPACING,
 } from '@opentrons/components'
-import { ModuleCard } from '../../ModuleCard'
-import { useModuleRenderInfoForProtocolById } from '../hooks'
-import { useModuleApiRequests } from '../../ModuleCard/utils'
+import { ModuleCard } from '/app/organisms/ModuleCard'
+import { useModuleRenderInfoForProtocolById } from '/app/resources/runs'
+import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
 
 import type { BadPipette, PipetteData } from '@opentrons/api-client'
 

@@ -13,8 +13,10 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../../App/portal'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { getTopPortalEl } from '/app/App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ACTIONS } from '../constants'
 
 import type {
@@ -35,6 +37,7 @@ interface AirGapProps {
 export function AirGap(props: AirGapProps): JSX.Element {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = React.useRef(null)
 
   const [airGapEnabled, setAirGapEnabled] = React.useState<boolean>(
@@ -81,10 +84,22 @@ export function AirGap(props: AirGapProps): JSX.Element {
         setCurrentStep(currentStep + 1)
       } else {
         dispatch({ type: action, volume: undefined })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            setting: `AirGap_${kind}`,
+          },
+        })
         onBack()
       }
     } else if (currentStep === 2) {
       dispatch({ type: action, volume: volume ?? undefined })
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+        properties: {
+          setting: `AirGap_${kind}`,
+        },
+      })
       onBack()
     }
   }
@@ -207,7 +222,7 @@ export function AirGap(props: AirGapProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={String(volume)}
+              initialValue={String(volume ?? '')}
               onChange={e => {
                 setVolume(Number(e))
               }}

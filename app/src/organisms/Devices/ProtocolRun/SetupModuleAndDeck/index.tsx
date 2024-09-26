@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -26,7 +25,7 @@ import {
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
   useModuleCalibrationStatus,
-} from '../../hooks'
+} from '/app/resources/runs'
 import { SetupModulesMap } from './SetupModulesMap'
 import { SetupModulesList } from './SetupModulesList'
 import { SetupFixtureList } from './SetupFixtureList'

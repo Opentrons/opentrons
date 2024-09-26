@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { renderHook } from '@testing-library/react'
@@ -44,7 +44,7 @@ const ROBOT_SERIAL_NUMBER = 'OT123'
 let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 let store: Store<any> = createStore(vi.fn(), {})
 
-describe('useProtocolAnalysisErrors hook', () => {
+describe('useRobotAnalyticsData hook', () => {
   beforeEach(() => {
     store = createStore(vi.fn(), {})
     store.dispatch = vi.fn()
