@@ -1,7 +1,6 @@
 """Models and implementation for the ``moveLabware`` command."""
 
 from __future__ import annotations
-from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.errors.exceptions import (
     FailedGripperPickupError,
     LabwareDroppedError,

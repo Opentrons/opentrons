@@ -1,8 +1,15 @@
 """Test the ``moveLabware`` command."""
+from datetime import datetime
 import inspect
 import pytest
-from decoy import Decoy
+from decoy import Decoy, matchers
 
+from opentrons_shared_data.errors.exceptions import (
+    EnumeratedError,
+    FailedGripperPickupError,
+    LabwareDroppedError,
+    StallOrCollisionDetectedError,
+)
 from opentrons_shared_data.labware.labware_definition import Parameters, Dimensions
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
@@ -25,8 +32,9 @@ from opentrons.protocol_engine.types import (
     AddressableAreaLocation,
 )
 from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
 from opentrons.protocol_engine.commands.move_labware import (
+    GripperMovementError,
     MoveLabwareParams,
     MoveLabwareResult,
     MoveLabwareImplementation,
@@ -280,6 +288,101 @@ async def test_gripper_move_labware_implementation(
                 new_location=new_location,
                 offset_id="wowzers-a-new-offset-id",
             ),
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    "underlying_exception",
+    [
+        FailedGripperPickupError(),
+        LabwareDroppedError(),
+        StallOrCollisionDetectedError(),
+    ],
+)
+async def test_gripper_error(
+    decoy: Decoy,
+    subject: MoveLabwareImplementation,
+    state_view: StateView,
+    model_utils: ModelUtils,
+    labware_movement: LabwareMovementHandler,
+    underlying_exception: EnumeratedError,
+) -> None:
+    """Test the handling of errors during a gripper movement."""
+    labware_id = "labware-id"
+    labware_namespace = "labware-namespace"
+    labware_load_name = "load-name"
+    labware_definition_uri = "opentrons-test/load-name/1"
+    labware_def = LabwareDefinition.construct(  # type: ignore[call-arg]
+        namespace=labware_namespace,
+    )
+    original_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_A1)
+    new_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_A2)
+    error_id = "error-id"
+    error_created_at = datetime.now()
+
+    # Common MoveLabwareImplementation boilerplate:
+    decoy.when(state_view.labware.get_definition(labware_id=labware_id)).then_return(
+        LabwareDefinition.construct(namespace=labware_namespace)  # type: ignore[call-arg]
+    )
+    decoy.when(state_view.labware.get(labware_id=labware_id)).then_return(
+        LoadedLabware(
+            id=labware_id,
+            loadName=labware_load_name,
+            definitionUri=labware_definition_uri,
+            location=original_location,
+            offsetId=None,
+        )
+    )
+    decoy.when(
+        state_view.geometry.ensure_valid_gripper_location(original_location)
+    ).then_return(original_location)
+    decoy.when(
+        state_view.geometry.ensure_valid_gripper_location(new_location)
+    ).then_return(new_location)
+    decoy.when(
+        state_view.geometry.ensure_location_not_occupied(
+            location=new_location,
+        )
+    ).then_return(new_location)
+    decoy.when(labware_validation.validate_gripper_compatible(labware_def)).then_return(
+        True
+    )
+    params = MoveLabwareParams(
+        labwareId=labware_id,
+        newLocation=new_location,
+        strategy=LabwareMovementStrategy.USING_GRIPPER,
+    )
+
+    # Actual setup for this test:
+    decoy.when(
+        await labware_movement.move_labware_with_gripper(
+            labware_id=labware_id,
+            current_location=original_location,
+            new_location=new_location,
+            user_offset_data=LabwareMovementOffsetData(
+                pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
+                dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
+            ),
+            post_drop_slide_offset=None,
+        )
+    ).then_raise(underlying_exception)
+    decoy.when(model_utils.get_timestamp()).then_return(error_created_at)
+    decoy.when(model_utils.generate_id()).then_return(error_id)
+
+    result = await subject.execute(params)
+
+    assert result == DefinedErrorData(
+        public=GripperMovementError.construct(
+            id=error_id,
+            createdAt=error_created_at,
+            errorCode=underlying_exception.code.value.code,
+            detail=underlying_exception.code.value.detail,
+            wrappedErrors=[matchers.Anything()],
+        ),
+        state_update=update_types.StateUpdate(
+            labware_location=update_types.NO_CHANGE,
+            pipette_location=update_types.CLEAR,
         ),
     )
 
