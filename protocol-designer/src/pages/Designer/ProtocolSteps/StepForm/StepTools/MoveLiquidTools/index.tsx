@@ -84,14 +84,6 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
         />
       )}
       <Divider marginY="0" />
-      <ChangeTipField
-        {...propsForFields.changeTip}
-        aspirateWells={formData.aspirate_wells}
-        dispenseWells={formData.dispense_wells}
-        path={formData.path}
-        stepType={formData.stepType}
-      />
-      <Divider marginY="0" />
       <PathField
         {...propsForFields.path}
         aspirate_airGap_checkbox={formData.aspirate_airGap_checkbox}
@@ -102,6 +94,14 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
         pipette={formData.pipette}
         volume={formData.volume}
         tipRack={formData.tipRack}
+      />
+      <Divider marginY="0" />
+      <ChangeTipField
+        {...propsForFields.changeTip}
+        aspirateWells={formData.aspirate_wells}
+        dispenseWells={formData.dispense_wells}
+        path={formData.path}
+        stepType={formData.stepType}
       />
       <Divider marginY="0" />
       {enableReturnTip ? (
