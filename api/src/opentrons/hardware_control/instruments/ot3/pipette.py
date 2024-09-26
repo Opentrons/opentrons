@@ -530,21 +530,21 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @functools.lru_cache(maxsize=100)
     def ul_per_mm(self, ul: float, action: UlPerMmAction) -> float:
         if action == "aspirate":
-            fallback = self._active_tip_settings.aspirate.default[
-                PIPETTING_FUNCTION_FALLBACK_VERSION
+            # fallback = self._active_tip_settings.aspirate.default[
+            #     PIPETTING_FUNCTION_FALLBACK_VERSION
+            # ]
+            sequence = self._active_tip_settings.aspirate.default[
+                self._pipetting_function_version
             ]
-            sequence = self._active_tip_settings.aspirate.default.get(
-                self._pipetting_function_version, fallback
-            )
         elif action == "blowout":
             return self._config.shaft_ul_per_mm
         else:
-            fallback = self._active_tip_settings.dispense.default[
-                PIPETTING_FUNCTION_FALLBACK_VERSION
+            # fallback = self._active_tip_settings.dispense.default[
+            #     PIPETTING_FUNCTION_FALLBACK_VERSION
+            # ]
+            sequence = self._active_tip_settings.dispense.default[
+                self._pipetting_function_version
             ]
-            sequence = self._active_tip_settings.dispense.default.get(
-                self._pipetting_function_version, fallback
-            )
         return piecewise_volume_conversion(ul, sequence)
 
     def __str__(self) -> str:

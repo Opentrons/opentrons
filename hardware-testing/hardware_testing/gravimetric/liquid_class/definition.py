@@ -33,6 +33,7 @@ class LiquidClassSettings:
 
     aspirate: AspirateSettings
     dispense: DispenseSettings
+    volume_correction_version: Optional[str]
 
 
 def interpolate(
