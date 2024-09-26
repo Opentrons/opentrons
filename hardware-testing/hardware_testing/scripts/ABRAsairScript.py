@@ -70,9 +70,7 @@ with open(file_name) as file:
             robot_ips.append(info[0])
             robot_names.append(info[1])
 
-command_template = (
-"nohup python3 -m hardware_testing.scripts.abr_asair_sensor {name} {duration} {frequency}"
-)
+cmd = "nohup python3 -m hardware_testing.scripts.abr_asair_sensor {name} {duration} {frequency}"
 cd = "cd /opt/opentrons-robot-server && "
 print("Executing Script on All Robots:")
 
@@ -82,13 +80,11 @@ def run_command_on_ip(index: int) -> None:
     curr_ip = robot_ips[index]
     try:
         ssh = connect_ssh(curr_ip)
-        status = execute(ssh, cd + command_template, [robot_names[index], "540", "5"])
+        status = execute(ssh, cd + cmd, [robot_names[index], "540", "5"])
         if status == 0:
             print(f"Envrironmental sensors for {curr_ip}, are now running")
     except Exception as e:
         print(f"Error running command on {curr_ip}: {e}")
-        # Terminate this process when an error occurs.
-        multiprocessing.current_process().terminate()
 
 
 # Launch the processes for each robot.
