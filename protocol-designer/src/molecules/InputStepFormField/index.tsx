@@ -10,8 +10,6 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { getFieldDefaultTooltip } from '../../components/StepEditForm/utils'
-
 import type { FieldProps } from '../../components/StepEditForm/types'
 
 interface InputStepFormFieldProps extends FieldProps {
@@ -35,35 +33,34 @@ export function InputStepFormField(
     units,
     showTooltip = true,
     padding = SPACING.spacing16,
+    tooltipContent,
     ...otherProps
   } = props
-  const { t } = useTranslation(['tooltip', 'application'])
+  const { t } = useTranslation('tooltip')
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} padding={padding}>
-      {title !== null ? (
-        <Flex gridGap={SPACING.spacing8} paddingBottom={SPACING.spacing8}>
-          <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
-            {title}
-          </StyledText>
-          {showTooltip ? (
-            <>
-              <Flex {...targetProps}>
-                <Icon
-                  name="information"
-                  size={SPACING.spacing12}
-                  color={COLORS.grey60}
-                  data-testid="information_icon"
-                />
-              </Flex>
-              <Tooltip tooltipProps={tooltipProps}>
-                {getFieldDefaultTooltip(name, t)}
-              </Tooltip>
-            </>
-          ) : null}
-        </Flex>
-      ) : null}
+      <Flex gridGap={SPACING.spacing8} paddingBottom={SPACING.spacing8}>
+        <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
+          {title}
+        </StyledText>
+        {showTooltip ? (
+          <>
+            <Flex {...targetProps}>
+              <Icon
+                name="information"
+                size={SPACING.spacing12}
+                color={COLORS.grey60}
+                data-testid="information_icon"
+              />
+            </Flex>
+            <Tooltip tooltipProps={tooltipProps}>
+              {t(`${tooltipContent}`)}
+            </Tooltip>
+          </>
+        ) : null}
+      </Flex>
       <InputField
         {...otherProps}
         name={name}

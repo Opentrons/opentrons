@@ -26,7 +26,7 @@ export function LabwareLocationField(
   props: LabwareLocationFieldProps
 ): JSX.Element {
   const { t } = useTranslation(['form', 'protocol_steps'])
-  const { labware, useGripper, value } = props
+  const { labware, useGripper, value, canSave } = props
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
@@ -78,12 +78,12 @@ export function LabwareLocationField(
       {...props}
       options={unoccupiedLabwareLocationsOptions}
       errorToShow={
-        !props.canSave && bothFieldsSelected
+        !canSave && bothFieldsSelected
           ? t('step_edit_form.labwareLabel.errors.labwareSlotIncompatible', {
               labwareName: labwareDisplayName,
               slot: locationString,
             })
-          : undefined
+          : null
       }
       title={t('protocol_steps:new_location')}
     />
