@@ -70,7 +70,7 @@ with open(file_name) as file:
             robot_ips.append(info[0])
             robot_names.append(info[1])
 
-command_template = " nohup python3 -m hardware_testing.scripts.abr_asair_sensor {name} {duration} {frequency}"
+command_template = "nohup python3 -m hardware_testing.scripts.abr_asair_sensor {name} {duration} {frequency}"
 cd = "cd /opt/opentrons-robot-server && "
 print("Executing Script on All Robots:")
 
