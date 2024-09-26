@@ -1,4 +1,3 @@
-"""Protocol to Test Evaporation % of the Tough Auto Seal Lid."""
 from typing import List
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 from opentrons.protocol_api import (
@@ -60,7 +59,7 @@ def _fill_with_liquid_and_measure(
 
 
 def _pcr_cycle(thermocycler: ThermocyclerContext) -> None:
-    """30x cycles of: 70° for 30s 72° for 30s 95° for 10s."""
+    "30x cycles of: 70° for 30s 72° for 30s 95° for 10s."
     profile_TAG2: List[ThermocyclerStep] = [
         {"temperature": 70, "hold_time_seconds": 30},
         {"temperature": 72, "hold_time_seconds": 30},
@@ -78,7 +77,7 @@ def _move_lid(
     bottom_lid: Labware,
     wasteChute: WasteChute,
 ) -> None:
-    """Move lid from tc to deck."""
+    """Move lid from tc to deck"""
     # Move lid from thermocycler to deck to stack to waste chute
     thermocycler.open_lid()
     # Move Lid to Deck
@@ -135,7 +134,7 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 
 def run(protocol: ProtocolContext) -> None:
-    """Run protocol."""
+    """Run protocol"""
     # LOAD PARAMETERS
     pipette_type = protocol.params.pipette_type  # type: ignore[attr-defined]
     mount_position = protocol.params.mount_pos  # type: ignore[attr-defined]
@@ -155,10 +154,10 @@ def run(protocol: ProtocolContext) -> None:
     tiprack_50_1 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "C3")
     reservoir = protocol.load_labware("nest_12_reservoir_15ml", "A2")
     lids: List[Labware] = [
-        protocol.load_labware("opentrons_tough_pcr_auto_sealing_lid", "D2")
+        protocol.load_labware("opentrons_tough_auto_sealing_lid", "D2")
     ]
     for i in range(4):
-        lids.append(lids[-1].load_labware("opentrons_tough_pcr_auto_sealing_lid"))
+        lids.append(lids[-1].load_labware("opentrons_tough_auto_sealing_lid"))
     lids.reverse()
     top_lid = lids[0]
     bottom_lid = lids[1]

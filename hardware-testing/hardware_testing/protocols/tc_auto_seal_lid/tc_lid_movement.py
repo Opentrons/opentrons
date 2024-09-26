@@ -4,8 +4,16 @@ from opentrons.protocol_api import (
     ParameterContext,
     ProtocolContext,
     Labware,
+    WasteChute,
 )
-from opentrons.protocol_api.module_contexts import ThermocyclerContext
+from opentrons.protocol_api.module_contexts import (
+    ThermocyclerContext,
+    TemperatureModuleContext,
+    MagneticModuleContext,
+    HeaterShakerContext,
+    MagneticBlockContext,
+    AbsorbanceReaderContext,
+)
 
 
 metadata = {"protocolName": "Tough Auto Seal Lid Stacking Test"}
@@ -42,10 +50,10 @@ def run(protocol: ProtocolContext) -> None:
     thermocycler.open_lid()
 
     lids: List[Labware] = [
-        protocol.load_labware("opentrons_tough_pcr_auto_sealing_lid", "D2")
+        protocol.load_labware("opentrons_tough_auto_sealing_lid", "D2")
     ]
     for i in range(4):
-        lids.append(lids[-1].load_labware("opentrons_tough_pcr_auto_sealing_lid"))
+        lids.append(lids[-1].load_labware("opentrons_tough_auto_sealing_lid"))
     lids.reverse()
     stack_locations = ["C2", "D2"]
     slot = 0
