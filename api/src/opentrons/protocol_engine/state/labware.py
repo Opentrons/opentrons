@@ -734,7 +734,7 @@ class LabwareView(HasState[LabwareState]):
                     f"Labware {labware.loadName} is already present at {location}."
                 )
 
-    def raise_if_labware_cannot_be_stacked(
+    def raise_if_labware_cannot_be_stacked(  # noqa: C901
         self, top_labware_definition: LabwareDefinition, bottom_labware_id: str
     ) -> None:
         """Raise if the specified labware definition cannot be placed on top of the bottom labware."""
