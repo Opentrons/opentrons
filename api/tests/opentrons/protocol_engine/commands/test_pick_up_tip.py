@@ -81,8 +81,8 @@ async def test_success(
             ),
             pipette_tip_state=update_types.PipetteTipStateUpdate(
                 pipette_id="pipette-id",
-                tip_geometry=TipGeometry(length=42, diameter=5, volume=300)
-            )
+                tip_geometry=TipGeometry(length=42, diameter=5, volume=300),
+            ),
         ),
     )
 

@@ -1,5 +1,9 @@
 """Test load pipette commands."""
-from opentrons.protocol_engine.state.update_types import LoadPipetteUpdate, StateUpdate
+from opentrons.protocol_engine.state.update_types import (
+    LoadPipetteUpdate,
+    PipetteConfigUpdate,
+    StateUpdate,
+)
 import pytest
 from decoy import Decoy
 
@@ -94,10 +98,14 @@ async def test_load_pipette_implementation(
                 pipette_name=PipetteNameType.P300_SINGLE,
                 mount=MountType.LEFT,
                 pipette_id="some id",
-                liquid_presence_detection=None
+                liquid_presence_detection=None,
             ),
-            pipette_config=config_data
-        )
+            pipette_config=PipetteConfigUpdate(
+                pipette_id="some id",
+                serial_number="some-serial-number",
+                config=config_data,
+            ),
+        ),
     )
 
 
@@ -153,15 +161,19 @@ async def test_load_pipette_implementation_96_channel(
         private=LoadPipettePrivateResult(
             pipette_id="pipette-id", serial_number="some id", config=config_data
         ),
-                state_update=StateUpdate(
+        state_update=StateUpdate(
             loaded_pipette=LoadPipetteUpdate(
-                pipette_name=PipetteNameType.P300_SINGLE,
+                pipette_name=PipetteNameType.P1000_96,
                 mount=MountType.LEFT,
-                pipette_id="some id",
-                liquid_presence_detection=None
+                pipette_id="pipette-id",
+                liquid_presence_detection=None,
             ),
-            pipette_config=config_data
-        )
+            pipette_config=PipetteConfigUpdate(
+                pipette_id="pipette-id",
+                serial_number="some id",
+                config=config_data,
+            ),
+        ),
     )
 
 
