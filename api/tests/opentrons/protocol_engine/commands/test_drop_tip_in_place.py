@@ -1,4 +1,5 @@
 """Test drop tip in place commands."""
+from opentrons.protocol_engine.state.update_types import PipetteTipStateUpdate, StateUpdate
 import pytest
 from decoy import Decoy
 
@@ -29,7 +30,13 @@ async def test_drop_tip_implementation(
 
     result = await subject.execute(params)
 
-    assert result == SuccessData(public=DropTipInPlaceResult(), private=None)
+    assert result == SuccessData(public=DropTipInPlaceResult(), private=None,
+                                 state_update=StateUpdate(
+                                     pipette_tip_state=PipetteTipStateUpdate(
+                                         pipette_id="abc",
+                                         tip_geometry=None
+                                     )
+                                 ))
 
     decoy.verify(
         await mock_tip_handler.drop_tip(pipette_id="abc", home_after=False),
