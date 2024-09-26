@@ -796,11 +796,10 @@ class LabwareView(HasState[LabwareState]):
                     f"Labware {labware.loadName} is already present at {location}."
                 )
 
-    def raise_if_labware_cannot_be_stacked(
+    def raise_if_labware_cannot_be_stacked(  # noqa: C901
         self, top_labware_definition: LabwareDefinition, bottom_labware_id: str
     ) -> None:
         """Raise if the specified labware definition cannot be placed on top of the bottom labware."""
-
         if labware_validation.validate_definition_is_adapter(top_labware_definition):
             raise errors.LabwareCannotBeStackedError(
                 f"Labware {top_labware_definition.parameters.loadName} is defined as an adapter and cannot be placed"

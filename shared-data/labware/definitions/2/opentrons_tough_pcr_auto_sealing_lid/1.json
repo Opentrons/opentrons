@@ -6,7 +6,7 @@
     "brandId": []
   },
   "metadata": {
-    "displayName": "Opentrons Tough Auto-Sealing Lid",
+    "displayName": "Opentrons Tough PCR Auto-Sealing Lid",
     "displayCategory": "other",
     "displayVolumeUnits": "\u00b5L",
     "tags": []
@@ -17,8 +17,7 @@
     "zDimension": 12.8
   },
   "wells": {},
-  "groups": [
-  ],
+  "groups": [],
   "cornerOffsetFromSlot": {
     "x": 0,
     "y": 0,
@@ -29,9 +28,9 @@
     "quirks": ["stackingMaxFive"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_tough_auto_sealing_lid"
+    "loadName": "opentrons_tough_pcr_auto_sealing_lid"
   },
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
   "stackingOffsetWithModule": {
@@ -42,7 +41,7 @@
     }
   },
   "stackingOffsetWithLabware": {
-    "opentrons_tough_auto_sealing_lid": {
+    "opentrons_tough_pcr_auto_sealing_lid": {
       "x": 0,
       "y": 0,
       "z": 6.492
@@ -69,8 +68,8 @@
       },
       "dropOffset": {
         "x": 0,
-        "y": 0,
-        "z": 0
+        "y": 0.52,
+        "z": -6
       }
     },
     "lidOffsets": {
@@ -82,7 +81,7 @@
       "dropOffset": {
         "x": 1.0,
         "y": 0,
-        "z": -5
+        "z": 0
       }
     }
   }

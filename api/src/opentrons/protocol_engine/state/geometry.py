@@ -12,7 +12,6 @@ from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.pipette import PIPETTE_X_SPAN
 from opentrons_shared_data.pipette.types import ChannelCount
-from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons.protocols.models import LabwareDefinition
 
 from .. import errors
