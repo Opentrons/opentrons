@@ -30,7 +30,7 @@
     "isMagneticModuleCompatible": false,
     "loadName": "opentrons_tough_pcr_auto_sealing_lid"
   },
-  "namespace": "opentrons",
+  "namespace": "custom_beta", 
   "version": 1,
   "schemaVersion": 2,
   "stackingOffsetWithModule": {
