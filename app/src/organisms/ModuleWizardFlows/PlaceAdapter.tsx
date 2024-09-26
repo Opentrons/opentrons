@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
@@ -79,7 +79,7 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
     createdMaintenanceRunId,
   } = props
   const { t } = useTranslation('module_wizard_flows')
-  React.useEffect(() => {
+  useEffect(() => {
     if (createdMaintenanceRunId == null) {
       createMaintenanceRun({})
     }

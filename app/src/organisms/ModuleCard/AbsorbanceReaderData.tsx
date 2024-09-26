@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { TYPOGRAPHY, LegacyStyledText } from '@opentrons/components'
 import type { AbsorbanceReaderModule } from '/app/redux/modules/types'

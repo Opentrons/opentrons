@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, Fragment } from 'react'
 import map from 'lodash/map'
 import isEmpty from 'lodash/isEmpty'
 
@@ -21,11 +21,13 @@ import {
 } from '@opentrons/shared-data'
 
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
-import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
-import { getWellFillFromLabwareId } from './utils'
-import { getLabwareRenderInfo } from '../utils/getLabwareRenderInfo'
-import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
-import { getProtocolModulesInfo } from '../utils/getProtocolModulesInfo'
+import { LiquidsLabwareDetailsModal } from '/app/organisms/LiquidsLabwareDetailsModal'
+import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
+import {
+  getProtocolModulesInfo,
+  getLabwareRenderInfo,
+  getWellFillFromLabwareId,
+} from '/app/transformations/analysis'
 
 import type {
   CompletedProtocolAnalysis,
@@ -41,8 +43,8 @@ export function SetupLiquidsMap(
   props: SetupLiquidsMapProps
 ): JSX.Element | null {
   const { runId, protocolAnalysis } = props
-  const [hoverLabwareId, setHoverLabwareId] = React.useState<string>('')
-  const [liquidDetailsLabwareId, setLiquidDetailsLabwareId] = React.useState<
+  const [hoverLabwareId, setHoverLabwareId] = useState<string>('')
+  const [liquidDetailsLabwareId, setLiquidDetailsLabwareId] = useState<
     string | null
   >(null)
 
@@ -127,7 +129,6 @@ export function SetupLiquidsMap(
   })
   return (
     <Flex
-      maxHeight="80vh"
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
@@ -158,9 +159,7 @@ export function SetupLiquidsMap(
             )
             const labwareHasLiquid = !isEmpty(wellFill)
             return (
-              <React.Fragment
-                key={`LabwareSetup_Labware_${topLabwareId}_${x}${y}`}
-              >
+              <Fragment key={`LabwareSetup_Labware_${topLabwareId}_${x}${y}`}>
                 <g
                   transform={`translate(${x},${y})`}
                   onMouseEnter={() => {
@@ -190,7 +189,7 @@ export function SetupLiquidsMap(
                     labwareHasLiquid={labwareHasLiquid}
                   />
                 </g>
-              </React.Fragment>
+              </Fragment>
             )
           }
         )}

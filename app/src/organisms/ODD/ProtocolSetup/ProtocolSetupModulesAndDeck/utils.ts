@@ -10,7 +10,7 @@ import {
 } from '@opentrons/shared-data'
 
 import type { DeckConfiguration, RobotType } from '@opentrons/shared-data'
-import type { ProtocolModuleInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 import type { AttachedModule } from '/app/redux/modules/types'
 
 export type AttachedProtocolModuleMatch = ProtocolModuleInfo & {

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
 import { css } from 'styled-components'
@@ -35,16 +35,20 @@ import {
   ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
 } from '/app/redux/analytics'
 import { addCustomLabwareFileFromCreator } from '/app/redux/custom-labware'
-import { LabwareCard } from '/app/organisms/LabwareCard'
-import { AddCustomLabwareSlideout } from '/app/organisms/AddCustomLabwareSlideout'
-import { LabwareDetails } from '/app/organisms/LabwareDetails'
+import { LabwareCard } from '/app/organisms/Desktop/Labware/LabwareCard'
+import { AddCustomLabwareSlideout } from '/app/organisms/Desktop/Labware/AddCustomLabwareSlideout'
+import { LabwareDetails } from '/app/organisms/Desktop/Labware/LabwareDetails'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useFeatureFlag } from '/app/redux/config'
-import { useAllLabware, useLabwareFailure, useNewLabwareName } from './hooks'
+import { useLabwareFailure, useNewLabwareName } from './hooks'
+import { useAllLabware } from '/app/local-resources/labware'
 
 import type { DropdownOption } from '@opentrons/components'
-import type { LabwareFilter, LabwareSort } from './types'
-import type { LabwareDefAndDate } from './hooks'
+import type {
+  LabwareFilter,
+  LabwareSort,
+  LabwareDefAndDate,
+} from '/app/local-resources/labware'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
 const labwareDisplayCategoryFilters: LabwareFilter[] = [
@@ -80,35 +84,33 @@ const SORT_BY_BUTTON_STYLE = css`
 export function Labware(): JSX.Element {
   const { t } = useTranslation(['labware_landing', 'shared'])
   const enableLabwareCreator = useFeatureFlag('enableLabwareCreator')
-  const [sortBy, setSortBy] = React.useState<LabwareSort>('alphabetical')
-  const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
+  const [sortBy, setSortBy] = useState<LabwareSort>('alphabetical')
+  const [showSortByMenu, setShowSortByMenu] = useState<boolean>(false)
   const toggleSetShowSortByMenu = (): void => {
     setShowSortByMenu(!showSortByMenu)
   }
   const dispatch = useDispatch()
-  const [showLC, setShowLC] = React.useState<boolean>(false)
+  const [showLC, setShowLC] = useState<boolean>(false)
   const trackEvent = useTrackEvent()
-  const [filterBy, setFilterBy] = React.useState<LabwareFilter>('all')
+  const [filterBy, setFilterBy] = useState<LabwareFilter>('all')
   const { makeToast } = useToaster()
 
   const labware = useAllLabware(sortBy, filterBy)
   const { labwareFailureMessage, clearLabwareFailure } = useLabwareFailure()
   const { newLabwareName, clearLabwareName } = useNewLabwareName()
-  const [showAddLabwareSlideout, setShowAddLabwareSlideout] = React.useState(
-    false
-  )
+  const [showAddLabwareSlideout, setShowAddLabwareSlideout] = useState(false)
 
   const [
     currentLabwareDef,
     setCurrentLabwareDef,
-  ] = React.useState<null | LabwareDefAndDate>(null)
+  ] = useState<null | LabwareDefAndDate>(null)
 
   const sortOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
       setShowSortByMenu(false)
     },
   })
-  React.useEffect(() => {
+  useEffect(() => {
     if (labwareFailureMessage != null) {
       setShowAddLabwareSlideout(false)
       makeToast(labwareFailureMessage, ERROR_TOAST, {

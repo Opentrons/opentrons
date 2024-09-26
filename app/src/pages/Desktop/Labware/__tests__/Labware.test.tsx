@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
@@ -8,18 +7,20 @@ import {
   useTrackEvent,
   ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
 } from '/app/redux/analytics'
-import { LabwareCard } from '/app/organisms/LabwareCard'
-import { AddCustomLabwareSlideout } from '/app/organisms/AddCustomLabwareSlideout'
+import { LabwareCard } from '/app/organisms/Desktop/Labware/LabwareCard'
+import { AddCustomLabwareSlideout } from '/app/organisms/Desktop/Labware/AddCustomLabwareSlideout'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
+import { useLabwareFailure, useNewLabwareName } from '../hooks'
 import { Labware } from '..'
+import { useAllLabware } from '/app/local-resources/labware'
 import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
 
-vi.mock('/app/organisms/LabwareCard')
-vi.mock('/app/organisms/AddCustomLabwareSlideout')
+vi.mock('/app/organisms/Desktop/Labware/LabwareCard')
+vi.mock('/app/organisms/Desktop/Labware/AddCustomLabwareSlideout')
 vi.mock('/app/organisms/ToasterOven')
 vi.mock('../hooks')
 vi.mock('/app/redux/analytics')
+vi.mock('/app/local-resources/labware')
 
 const mockTrackEvent = vi.fn()
 const mockMakeSnackbar = vi.fn()

@@ -1,5 +1,5 @@
-import { useMostRecentCompletedAnalysis } from '../../../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useRobotType } from '../../../../../hooks'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import { useRobotType } from '/app/redux-resources/robots'
 import {
   getIsFixtureMismatch,
   useDeckConfigurationCompatibility,

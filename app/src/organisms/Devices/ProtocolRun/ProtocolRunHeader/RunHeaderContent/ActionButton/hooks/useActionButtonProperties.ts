@@ -13,7 +13,7 @@ import {
   ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { useTrackProtocolRunEvent } from '../../../../../hooks'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useIsHeaterShakerInProtocol } from '../../../../../../ModuleCard/hooks'
 import { isAnyHeaterShakerShaking } from '../../../RunHeaderModalContainer/modals'
 import {
@@ -35,6 +35,7 @@ interface UseButtonPropertiesProps extends BaseActionButtonProps {
   isValidRunAgain: boolean
   isOtherRunCurrent: boolean
   isRobotOnWrongVersionOfSoftware: boolean
+  isClosingCurrentRun: boolean
 }
 
 // Returns ActionButton properties.
@@ -52,6 +53,7 @@ export function useActionButtonProperties({
   attachedModules,
   runHeaderModalContainerUtils,
   isResetRunLoadingRef,
+  isClosingCurrentRun,
 }: UseButtonPropertiesProps): {
   buttonText: string
   handleButtonClick: () => void
@@ -72,6 +74,9 @@ export function useActionButtonProperties({
   if (isProtocolNotReady) {
     buttonIconName = 'ot-spinner'
     buttonText = t('analyzing_on_robot')
+  } else if (isClosingCurrentRun) {
+    buttonIconName = 'ot-spinner'
+    buttonText = t('canceling_run')
   } else if (runStatus === RUN_STATUS_RUNNING || isRecoveryStatus(runStatus)) {
     buttonIconName = 'pause'
     buttonText = t('pause_run')

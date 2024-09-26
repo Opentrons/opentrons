@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
@@ -21,11 +21,9 @@ const HINT_IS_ALERT: HintKey[] = ['add_liquids_and_labware']
 
 export const Hints = (): JSX.Element | null => {
   const { t } = useTranslation(['alert', 'nav', 'button'])
-  const [rememberDismissal, setRememberDismissal] = React.useState<boolean>(
-    false
-  )
+  const [rememberDismissal, setRememberDismissal] = useState<boolean>(false)
 
-  const toggleRememberDismissal = React.useCallback(() => {
+  const toggleRememberDismissal = useCallback(() => {
     setRememberDismissal(prevDismissal => !prevDismissal)
   }, [])
   const hintKey = useSelector(selectors.getHint)

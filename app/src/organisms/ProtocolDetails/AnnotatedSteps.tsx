@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {

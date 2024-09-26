@@ -20,11 +20,11 @@ import {
 } from '@opentrons/components'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import { Divider } from '/app/atoms/structure'
-import { getTopPortalEl } from '../../App/portal'
-import { LabwareDetails } from '../LabwareDetails'
+import { getTopPortalEl } from '/app/App/portal'
+import { LabwareDetails } from '../Desktop/Labware/LabwareDetails'
 
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
-import type { LabwareDefAndDate } from '/app/pages/Desktop/Labware/hooks'
+import type { LabwareDefAndDate } from '/app/local-resources/labware'
 
 interface ProtocolLabwareDetailsProps {
   requiredLabwareDetails: LoadLabwareRunTimeCommand[] | null

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -19,10 +19,10 @@ import {
 } from '@opentrons/shared-data'
 import { useCurrentRunId } from '/app/resources/runs'
 import {
-  useIsFlex,
   useRunStatuses,
   useIsLegacySessionInProgress,
-} from '../Devices/hooks'
+} from '/app/organisms/Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useModuleOverflowMenu } from './hooks'
 
 import type { AttachedModule } from '/app/redux/modules/types'
@@ -148,7 +148,7 @@ export const ModuleOverflowMenu = (
         {menuOverflowItemsByModuleType[module.moduleType].map(
           (item: any, index: number) => {
             return (
-              <React.Fragment key={`${index}_${String(module.moduleType)}`}>
+              <Fragment key={`${index}_${String(module.moduleType)}`}>
                 <MenuItem
                   onClick={() => item.onClick(item.isSecondary)}
                   disabled={item.disabledReason || isDisabled}
@@ -157,7 +157,7 @@ export const ModuleOverflowMenu = (
                   {item.setSetting}
                 </MenuItem>
                 {item.menuButtons}
-              </React.Fragment>
+              </Fragment>
             )
           }
         )}

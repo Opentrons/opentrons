@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, renderHook, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
@@ -16,7 +16,7 @@ import {
   truncatedCommandMessage,
 } from '../__fixtures__'
 import { InterventionModal, useInterventionModal } from '..'
-import { useIsFlex } from '../../Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { RunData } from '@opentrons/api-client'
@@ -25,7 +25,7 @@ const ROBOT_NAME = 'Otie'
 
 const mockOnResumeHandler = vi.fn()
 
-vi.mock('../../Devices/hooks')
+vi.mock('/app/redux-resources/robots')
 
 describe('useInterventionModal', () => {
   const defaultProps = {

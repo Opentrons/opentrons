@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -23,11 +23,7 @@ import {
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
-import type {
-  RecoveryTipStatusUtils,
-  UseRecoveryCommandsResult,
-  UseRouteUpdateActionsResult,
-} from '../hooks'
+import type { ERUtilsResults } from '../hooks'
 
 export function CancelRun(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props
@@ -104,9 +100,9 @@ function CancelRunConfirmation({
 }
 
 interface OnCancelRunProps {
-  tipStatusUtils: RecoveryTipStatusUtils
-  recoveryCommands: UseRecoveryCommandsResult
-  routeUpdateActions: UseRouteUpdateActionsResult
+  tipStatusUtils: ERUtilsResults['tipStatusUtils']
+  recoveryCommands: ERUtilsResults['recoveryCommands']
+  routeUpdateActions: ERUtilsResults['routeUpdateActions']
 }
 
 // Manages routing to cancel route or drop tip route, depending on tip attachment status.
@@ -122,20 +118,20 @@ export function useOnCancelRun({
 } {
   const { ROBOT_CANCELING, DROP_TIP_FLOWS } = RECOVERY_MAP
   const { isLoadingTipStatus, areTipsAttached } = tipStatusUtils
-  const { setRobotInMotion, proceedToRouteAndStep } = routeUpdateActions
+  const { handleMotionRouting, proceedToRouteAndStep } = routeUpdateActions
   const { cancelRun } = recoveryCommands
 
-  const [hasUserClicked, setHasUserClicked] = React.useState(false)
+  const [hasUserClicked, setHasUserClicked] = useState(false)
 
   const showBtnLoadingState = hasUserClicked && isLoadingTipStatus
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (hasUserClicked) {
       if (!isLoadingTipStatus) {
         if (areTipsAttached) {
           void proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)
         } else {
-          void setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => {
+          void handleMotionRouting(true, ROBOT_CANCELING.ROUTE).then(() => {
             cancelRun()
           })
         }

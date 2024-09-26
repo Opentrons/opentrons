@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { Provider } from 'react-redux'
@@ -12,7 +12,7 @@ import {
 } from '/app/redux/calibration'
 import { mockPipetteOffsetCalibration1 } from '/app/redux/calibration/pipette-offset/__fixtures__'
 import { useDispatchApiRequest } from '/app/redux/robot-api'
-import { useRobot } from '../useRobot'
+import { useRobot } from '/app/redux-resources/robots'
 import { usePipetteOffsetCalibration } from '..'
 
 import type { Store } from 'redux'
@@ -22,7 +22,7 @@ import type { AttachedPipette, Mount } from '/app/redux/pipettes/types'
 
 vi.mock('/app/redux/calibration')
 vi.mock('/app/redux/robot-api')
-vi.mock('../useRobot')
+vi.mock('/app/redux-resources/robots')
 
 const store: Store<any> = createStore(vi.fn(), {})
 

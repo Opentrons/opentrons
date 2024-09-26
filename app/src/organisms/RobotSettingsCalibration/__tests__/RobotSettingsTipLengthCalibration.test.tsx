@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi } from 'vitest'
 import { i18n } from '/app/i18n'
@@ -10,10 +9,8 @@ import {
   mockTipLengthCalibration3,
 } from '/app/redux/calibration/tip-length/__fixtures__'
 import { mockAttachedPipette } from '/app/redux/pipettes/__fixtures__'
-import {
-  useAttachedPipettes,
-  useTipLengthCalibrations,
-} from '/app/organisms/Devices/hooks'
+import { useTipLengthCalibrations } from '/app/organisms/Devices/hooks'
+import { useAttachedPipettes } from '/app/resources/instruments'
 
 import { RobotSettingsTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
 import { TipLengthCalibrationItems } from '../CalibrationDetails/TipLengthCalibrationItems'
@@ -24,6 +21,7 @@ import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 vi.mock('/app/redux/config')
 vi.mock('/app/organisms/Devices/hooks')
 vi.mock('../CalibrationDetails/TipLengthCalibrationItems')
+vi.mock('/app/resources/instruments')
 
 const mockFormattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] = []
 

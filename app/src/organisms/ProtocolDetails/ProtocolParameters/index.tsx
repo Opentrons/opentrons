@@ -1,7 +1,7 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
+  Banner,
   DIRECTION_COLUMN,
   Flex,
   InfoScreen,
@@ -9,7 +9,6 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { Banner } from '/app/atoms/Banner'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 

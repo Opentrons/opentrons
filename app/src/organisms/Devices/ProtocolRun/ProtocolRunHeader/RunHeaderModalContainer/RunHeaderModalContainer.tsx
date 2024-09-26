@@ -1,8 +1,6 @@
-import * as React from 'react'
-
 import { ErrorRecoveryFlows } from '../../../../ErrorRecoveryFlows'
 import { DropTipWizardFlows } from '../../../../DropTipWizardFlows'
-import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import {
   ConfirmCancelModal,
   HeaterShakerIsRunningModal,

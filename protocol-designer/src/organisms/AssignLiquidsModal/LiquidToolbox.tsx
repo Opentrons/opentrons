@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'

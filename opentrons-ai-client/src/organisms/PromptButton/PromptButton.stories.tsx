@@ -1,4 +1,3 @@
-import React from 'react'
 import { PromptButton as PromptButtonComponent } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import {
   Flex,
   ICON_DATA_BY_NAME,

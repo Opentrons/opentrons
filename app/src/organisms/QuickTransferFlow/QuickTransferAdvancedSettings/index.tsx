@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -19,6 +20,9 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
+
+import { ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB } from '/app/redux/analytics'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ACTIONS } from '../constants'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { FlowRateEntry } from './FlowRate'
@@ -47,7 +51,15 @@ export function QuickTransferAdvancedSettings(
   const [selectedSetting, setSelectedSetting] = React.useState<string | null>(
     null
   )
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const { makeSnackbar } = useToaster()
+
+  React.useEffect(() => {
+    trackEventWithRobotSerial({
+      name: ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB,
+      properties: {},
+    })
+  }, [])
 
   function getBlowoutValueCopy(): string | undefined {
     if (state.blowOut === 'dest_well') {

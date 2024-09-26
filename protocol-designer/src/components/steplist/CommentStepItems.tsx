@@ -1,4 +1,3 @@
-import * as React from 'react'
 import type { CommentArgs } from '@opentrons/step-generation'
 
 import styles from './StepItem.module.css'

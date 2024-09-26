@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, afterEach, vi, expect } from 'vitest'
 
@@ -12,7 +12,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { LocationConflictModal } from '/app/organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
+import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { FixtureTable } from '../FixtureTable'
 import { getLocalRobot } from '/app/redux/discovery'
@@ -20,9 +20,7 @@ import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/resources/deck_configuration/hooks')
-vi.mock(
-  '/app/organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
-)
+vi.mock('/app/organisms/LocationConflictModal')
 
 const mockSetSetupScreen = vi.fn()
 const mockSetCutoutId = vi.fn()

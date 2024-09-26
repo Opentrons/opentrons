@@ -13,8 +13,10 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../../App/portal'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { getTopPortalEl } from '/app/App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ACTIONS } from '../constants'
 
 import type {
@@ -35,6 +37,7 @@ interface DelayProps {
 export function Delay(props: DelayProps): JSX.Element {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = React.useRef(null)
 
   const [currentStep, setCurrentStep] = React.useState<number>(1)
@@ -87,6 +90,12 @@ export function Delay(props: DelayProps): JSX.Element {
           type: action,
           delaySettings: undefined,
         })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            settting: `Delay_${kind}`,
+          },
+        })
         onBack()
       } else {
         setCurrentStep(2)
@@ -100,6 +109,12 @@ export function Delay(props: DelayProps): JSX.Element {
           delaySettings: {
             delayDuration,
             positionFromBottom: position,
+          },
+        })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            settting: `Delay_${kind}`,
           },
         })
       }
@@ -224,6 +239,7 @@ export function Delay(props: DelayProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              initialValue={String(delayDuration ?? '')}
               onChange={e => {
                 setDelayDuration(Number(e))
               }}
@@ -264,7 +280,7 @@ export function Delay(props: DelayProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={String(position)}
+              initialValue={String(position ?? '')}
               onChange={e => {
                 setPosition(Number(e))
               }}

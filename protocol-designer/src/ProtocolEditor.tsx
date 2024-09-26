@@ -1,10 +1,9 @@
-import * as React from 'react'
 import cx from 'classnames'
 import { DndProvider } from 'react-dnd'
 import { HashRouter } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
+import { DIRECTION_COLUMN, Flex, OVERFLOW_AUTO } from '@opentrons/components'
 import { getEnableRedesign } from './feature-flags/selectors'
 import { ComputingSpinner } from './components/ComputingSpinner'
 import { ConnectedNav } from './containers/ConnectedNav'
@@ -32,7 +31,10 @@ function ProtocolEditorComponent(): JSX.Element {
   const enableRedesign = useSelector(getEnableRedesign)
 
   return (
-    <div id="protocol-editor">
+    <div
+      id="protocol-editor"
+      style={{ width: '100%', height: '100vh', overflow: OVERFLOW_AUTO }}
+    >
       <TopPortalRoot />
       {enableRedesign ? (
         <Flex flexDirection={DIRECTION_COLUMN}>

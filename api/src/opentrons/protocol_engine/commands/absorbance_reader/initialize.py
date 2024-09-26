@@ -1,9 +1,12 @@
 """Command models to initialize an Absorbance Reader."""
 from __future__ import annotations
-from typing import Optional, Literal, TYPE_CHECKING
+from typing import List, Optional, Literal, TYPE_CHECKING
 from typing_extensions import Type
 
 from pydantic import BaseModel, Field
+
+from opentrons.drivers.types import ABSMeasurementMode
+from opentrons.protocol_engine.types import ABSMeasureMode
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
@@ -20,7 +23,13 @@ class InitializeParams(BaseModel):
     """Input parameters to initialize an absorbance reading."""
 
     moduleId: str = Field(..., description="Unique ID of the absorbance reader.")
-    sampleWavelength: int = Field(..., description="Sample wavelength in nm.")
+    measureMode: ABSMeasureMode = Field(
+        ..., description="Initialize single or multi measurement mode."
+    )
+    sampleWavelengths: List[int] = Field(..., description="Sample wavelengths in nm.")
+    referenceWavelength: Optional[int] = Field(
+        None, description="Optional reference wavelength in nm."
+    )
 
 
 class InitializeResult(BaseModel):
@@ -54,7 +63,45 @@ class InitializeImpl(
         )
 
         if abs_reader is not None:
-            await abs_reader.set_sample_wavelength(wavelength=params.sampleWavelength)
+            # Validate the parameters before initializing.
+            sample_wavelengths = set(params.sampleWavelengths)
+            sample_wavelengths_len = len(params.sampleWavelengths)
+            reference_wavelength = params.referenceWavelength
+            supported_wavelengths = set(abs_reader.supported_wavelengths)
+            unsupported_wavelengths = sample_wavelengths.difference(
+                supported_wavelengths
+            )
+            if unsupported_wavelengths:
+                raise ValueError(f"Unsupported wavelengths: {unsupported_wavelengths}")
+
+            if params.measureMode == "single":
+                if sample_wavelengths_len != 1:
+                    raise ValueError(
+                        f"single requires one sample wavelength, provided {sample_wavelengths}"
+                    )
+                if (
+                    reference_wavelength is not None
+                    and reference_wavelength not in supported_wavelengths
+                ):
+                    raise ValueError(
+                        f"Reference wavelength {reference_wavelength} not supported {supported_wavelengths}"
+                    )
+
+            if params.measureMode == "multi":
+                if sample_wavelengths_len < 1 or sample_wavelengths_len > 6:
+                    raise ValueError(
+                        f"multi requires 1-6 sample wavelengths, provided {sample_wavelengths}"
+                    )
+                if reference_wavelength is not None:
+                    raise RuntimeError(
+                        "Reference wavelength cannot be used with multi mode."
+                    )
+
+            await abs_reader.set_sample_wavelength(
+                ABSMeasurementMode(params.measureMode),
+                params.sampleWavelengths,
+                reference_wavelength=params.referenceWavelength,
+            )
 
         return SuccessData(
             public=InitializeResult(),

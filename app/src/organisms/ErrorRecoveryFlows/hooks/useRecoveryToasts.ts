@@ -154,7 +154,7 @@ function handleRecoveryOptionAction<T>(
     case RECOVERY_MAP.CANCEL_RUN.ROUTE:
     case RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE:
     case RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE:
-    case RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE:
+    case RECOVERY_MAP.RETRY_STEP.ROUTE:
       return currentStepReturnVal
     default:
       return 'HANDLE RECOVERY TOAST OPTION EXPLICITLY.'

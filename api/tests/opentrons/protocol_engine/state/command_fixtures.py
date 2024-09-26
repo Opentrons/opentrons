@@ -114,6 +114,22 @@ def create_succeeded_command(
     )
 
 
+def create_comment_command(command_id: str = "command-id") -> cmd.Comment:
+    """Create a completed LoadLabware command."""
+    params = cmd.CommentParams(message="hello world!")
+
+    result = cmd.CommentResult()
+
+    return cmd.Comment(
+        id=command_id,
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
 def create_load_labware_command(
     labware_id: str,
     location: LabwareLocation,

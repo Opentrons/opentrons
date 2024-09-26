@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -22,13 +22,13 @@ import {
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
-} from '../../../Devices/utils'
-import { ChildNavigation } from '../../../ChildNavigation'
+} from '/app/transformations/runs'
+import { ChildNavigation } from '/app/organisms/ChildNavigation'
 import { ResetValuesModal } from './ResetValuesModal'
 import { ChooseEnum } from './ChooseEnum'
 import { ChooseNumber } from './ChooseNumber'
 import { ChooseCsvFile } from './ChooseCsvFile'
-import { useToaster } from '../../../ToasterOven'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { ProtocolSetupStep } from '../ProtocolSetupStep'
 import type {
   CompletedProtocolAnalysis,
@@ -62,23 +62,20 @@ export function ProtocolSetupParameters({
   const [
     chooseValueScreen,
     setChooseValueScreen,
-  ] = React.useState<ChoiceParameter | null>(null)
+  ] = useState<ChoiceParameter | null>(null)
   const [
     showNumericalInputScreen,
     setShowNumericalInputScreen,
-  ] = React.useState<NumberParameter | null>(null)
+  ] = useState<NumberParameter | null>(null)
   const [
     chooseCsvFileScreen,
     setChooseCsvFileScreen,
-  ] = React.useState<CsvFileParameter | null>(null)
-  const [resetValuesModal, showResetValuesModal] = React.useState<boolean>(
-    false
-  )
-  const [startSetup, setStartSetup] = React.useState<boolean>(false)
-  const [
-    runTimeParametersOverrides,
-    setRunTimeParametersOverrides,
-  ] = React.useState<RunTimeParameter[]>(
+  ] = useState<CsvFileParameter | null>(null)
+  const [resetValuesModal, showResetValuesModal] = useState<boolean>(false)
+  const [startSetup, setStartSetup] = useState<boolean>(false)
+  const [runTimeParametersOverrides, setRunTimeParametersOverrides] = useState<
+    RunTimeParameter[]
+  >(
     runTimeParameters.map(parameter =>
       parameter.type === 'csv_file'
         ? { ...parameter, file: null }
@@ -296,7 +293,7 @@ export function ProtocolSetupParameters({
               setupStatus = 'inform'
             }
             return (
-              <React.Fragment key={`${parameter.displayName}_${index}`}>
+              <Fragment key={`${parameter.displayName}_${index}`}>
                 <ProtocolSetupStep
                   hasRightIcon={!(parameter.type === 'bool')}
                   hasLeftIcon={false}
@@ -316,7 +313,7 @@ export function ProtocolSetupParameters({
                   fontSize="h4"
                   disabled={startSetup}
                 />
-              </React.Fragment>
+              </Fragment>
             )
           }
         )}

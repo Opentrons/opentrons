@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
 import {
@@ -13,8 +12,11 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useCurrentRunId } from '/app/resources/runs'
+
+import {
+  useCurrentRunId,
+  useMostRecentCompletedAnalysis,
+} from '/app/resources/runs'
 
 import type {
   HeaterShakerCloseLatchCreateCommand,

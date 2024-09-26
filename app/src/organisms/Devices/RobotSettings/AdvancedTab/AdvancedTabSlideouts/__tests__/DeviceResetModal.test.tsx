@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
@@ -11,7 +11,7 @@ import { DeviceResetModal } from '../DeviceResetModal'
 
 import type { DispatchApiRequestType } from '/app/redux/robot-api'
 
-vi.mock('../../../../hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/robot-admin')
 vi.mock('/app/redux/robot-api')
 

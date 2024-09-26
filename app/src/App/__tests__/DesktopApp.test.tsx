@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { when } from 'vitest-when'
@@ -16,13 +15,12 @@ import { RobotSettings } from '/app/pages/Desktop/Devices/RobotSettings'
 import { GeneralSettings } from '/app/pages/Desktop/AppSettings/GeneralSettings'
 import { AlertsModal } from '/app/organisms/Alerts/AlertsModal'
 import { useFeatureFlag } from '/app/redux/config'
-import { useIsFlex } from '/app/organisms/Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { ProtocolTimeline } from '/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline'
 import { useSoftwareUpdatePoll } from '../hooks'
 import { DesktopApp } from '../DesktopApp'
 
 vi.mock('/app/organisms/Breadcrumbs')
-vi.mock('/app/organisms/Devices/hooks')
 vi.mock('/app/pages/Desktop/AppSettings/GeneralSettings')
 vi.mock('/app/pages/Desktop/Devices/CalibrationDashboard')
 vi.mock('/app/pages/Desktop/Devices/DeviceDetails')
@@ -33,6 +31,7 @@ vi.mock('/app/pages/Desktop/Devices/RobotSettings')
 vi.mock('/app/organisms/Alerts/AlertsModal')
 vi.mock('/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline')
 vi.mock('/app/redux/config')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../hooks')
 
 const render = (path = '/') => {

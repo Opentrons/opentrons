@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
@@ -32,7 +32,7 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
   const { propsForFields, formData } = props
   const { stepType, path } = formData
   const { t } = useTranslation(['application', 'form'])
-  const [collapsed, _setCollapsed] = React.useState<boolean>(true)
+  const [collapsed, _setCollapsed] = useState<boolean>(true)
   const enableReturnTip = useSelector(getEnableReturnTip)
   const labwares = useSelector(getLabwareEntities)
   const pipettes = useSelector(getPipetteEntities)

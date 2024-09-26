@@ -115,10 +115,11 @@
   "user_settings": "User settings",
   "uses_standard_namespace": "Opentrons verified labware",
   "version": "Version # {{version}}",
+  "view_release_notes": "View release notes",
   "warning": "WARNING:",
   "wasteChute": "Waste chute",
   "wasteChuteAndStagingArea": "Waste chute and staging area slot",
   "we_are_improving": "We’re working to improve Protocol Designer. Part of the process involves watching real user sessions to understand which parts of the interface are working and which could use improvement. We never share sessions outside of Opentrons.",
-  "welcome": "Welcome to Protocol Designer",
+  "welcome": "Welcome to Protocol Designer!",
   "yes": "Yes"
 }

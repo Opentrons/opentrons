@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
@@ -7,12 +6,14 @@ import {
   StyledText,
   COLORS,
 } from '@opentrons/components'
-import { getLabwareSetupItemGroups } from '/app/transformations/commands'
+import {
+  getLabwareSetupItemGroups,
+  getNestedLabwareInfo,
+} from '/app/transformations/commands'
 import { LabwareListItem } from './LabwareListItem'
-import { getNestedLabwareInfo } from './getNestedLabwareInfo'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
-import type { ModuleRenderInfoForProtocol } from '../../hooks'
+import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import type { LabwareSetupItem } from '/app/transformations/commands'
 

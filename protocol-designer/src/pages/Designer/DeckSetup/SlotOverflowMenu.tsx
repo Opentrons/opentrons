@@ -18,6 +18,7 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+
 import { deleteModule } from '../../../step-forms/actions'
 import { EditNickNameModal } from '../../../organisms'
 import { deleteDeckFixture } from '../../../step-forms/actions/additionalItems'
@@ -26,6 +27,7 @@ import {
   duplicateLabware,
   openIngredientSelector,
 } from '../../../labware-ingred/actions'
+import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../../types'
 
@@ -80,6 +82,11 @@ export function SlotOverflowMenu(
     },
   })
   const deckSetup = useSelector(getDeckSetupForActiveItem)
+
+  const liquidLocations = useSelector(
+    labwareIngredSelectors.getLiquidsByLabwareId
+  )
+
   const {
     labware: deckSetupLabware,
     modules: deckSetupModules,
@@ -155,6 +162,12 @@ export function SlotOverflowMenu(
   } else if (isOffDeckLocation) {
     nickNameId = location
   }
+
+  const selectionHasLiquids =
+    nickNameId != null &&
+    liquidLocations[nickNameId] != null &&
+    Object.keys(liquidLocations[nickNameId]).length > 0
+
   const slotOverflowBody = (
     <>
       {showNickNameModal && nickNameId != null ? (
@@ -214,7 +227,7 @@ export function SlotOverflowMenu(
               }}
             >
               <StyledText desktopStyle="bodyDefaultRegular">
-                {t('add_liquid')}
+                {selectionHasLiquids ? t('edit_liquid') : t('add_liquid')}
               </StyledText>
             </MenuButton>
           </>

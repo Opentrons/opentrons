@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { CONTEXT_MENU } from '@opentrons/components'
 import { SelectField } from '/app/atoms/SelectField'
 import * as Copy from '../i18n'

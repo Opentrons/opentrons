@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Route, Navigate, Routes } from 'react-router-dom'
 import { Box } from '@opentrons/components'
 import { Landing } from './pages/Landing'

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
@@ -33,9 +33,7 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
   const { handleAttachment, stagingAreas } = props
   const { t } = useTranslation(['modules', 'shared'])
   const hasStagingAreas = stagingAreas.length > 0
-  const [stagingAreaModal, openStagingAreaModal] = React.useState<boolean>(
-    false
-  )
+  const [stagingAreaModal, openStagingAreaModal] = useState<boolean>(false)
   const stagingAreaLocations = getStagingAreaSlots(stagingAreas)
 
   return (

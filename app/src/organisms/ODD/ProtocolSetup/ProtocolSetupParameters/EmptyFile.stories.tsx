@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Flex, SPACING, VIEWPORT } from '@opentrons/components'
 import { EmptyFile as EmptyFileComponent } from './EmptyFile'
 

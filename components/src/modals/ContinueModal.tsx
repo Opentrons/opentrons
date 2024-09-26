@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { AlertModal } from './AlertModal'
 
 import type { AlertModalProps } from './AlertModal'

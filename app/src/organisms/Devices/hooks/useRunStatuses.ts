@@ -10,8 +10,7 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
-import { useCurrentRunId } from '/app/resources/runs'
-import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useCurrentRunId, useRunStatus } from '/app/resources/runs'
 
 import type { RunStatus } from '@opentrons/api-client'
 

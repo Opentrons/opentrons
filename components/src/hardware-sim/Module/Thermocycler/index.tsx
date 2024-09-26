@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { THERMOCYCLER_MODULE_V1, getModuleDef2 } from '@opentrons/shared-data'
 
 import { C_MED_LIGHT_GRAY } from '../../../styles'

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
@@ -13,11 +12,13 @@ import {
 } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
+  Banner,
   BORDERS,
   Chip,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  DISPLAY_GRID,
   DISPLAY_INLINE,
   Flex,
   Icon,
@@ -30,11 +31,12 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { Banner } from '/app/atoms/Banner'
 import { Divider } from '/app/atoms/structure'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useRunStatus } from '../../RunTimeControl/hooks'
-import { useNotifyRunQuery } from '/app/resources/runs'
+import {
+  useMostRecentCompletedAnalysis,
+  useNotifyRunQuery,
+  useRunStatus,
+} from '/app/resources/runs'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
@@ -259,7 +261,7 @@ const StyledTable = styled.table`
   text-align: left;
 `
 const StyledTableHeaderContainer = styled.thead`
-  display: grid;
+  display: ${DISPLAY_GRID};
   grid-template-columns: 0.35fr 0.35fr;
   grid-gap: ${SPACING.spacing48};
   border-bottom: ${BORDERS.lineBorder};
@@ -275,7 +277,7 @@ interface StyledTableRowProps {
 }
 
 const StyledTableRow = styled.tr<StyledTableRowProps>`
-  display: grid;
+  display: ${DISPLAY_GRID};
   grid-template-columns: 0.35fr 0.35fr;
   grid-gap: ${SPACING.spacing48};
   border-bottom: ${props => (props.isLast ? 'none' : BORDERS.lineBorder)};

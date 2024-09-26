@@ -50,11 +50,7 @@ def default_error_recovery_policy(
     failed_command: Command,
     defined_error_data: Optional[CommandDefinedErrorData],
 ) -> ErrorRecoveryType:
-    """The `ErrorRecoveryPolicy` to use when none has been set on a run.
-
-    This is only appropriate for normal protocol runs, not maintenance runs,
-    since it assumes
-    """
+    """The `ErrorRecoveryPolicy` to use when none has been set on a run."""
     # Although error recovery can theoretically work on OT-2s, we haven't tested it,
     # and it's generally scarier because the OT-2 has much less hardware feedback.
     robot_is_flex = config.robot_type == "OT-3 Standard"

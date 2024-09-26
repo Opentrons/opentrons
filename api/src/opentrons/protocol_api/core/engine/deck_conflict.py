@@ -16,6 +16,7 @@ from typing import (
 from opentrons_shared_data.errors.exceptions import MotionPlanningFailureError
 from opentrons_shared_data.module import FLEX_TC_LID_COLLISION_ZONE
 
+from opentrons.hardware_control import CriticalPoint
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
 from opentrons.motion_planning import adjacent_slots_getters
@@ -235,9 +236,13 @@ def check_safe_for_pipette_movement(
     )
     primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
 
+    destination_cp = _get_critical_point_to_use(engine_state, labware_id)
+
     pipette_bounds_at_well_location = (
         engine_state.pipettes.get_pipette_bounds_at_specified_move_to_position(
-            pipette_id=pipette_id, destination_position=well_location_point
+            pipette_id=pipette_id,
+            destination_position=well_location_point,
+            critical_point=destination_cp,
         )
     )
     if not _is_within_pipette_extents(
@@ -289,6 +294,21 @@ def check_safe_for_pipette_movement(
                 f" {labware_slot} with {primary_nozzle} nozzle partial configuration"
                 f" will result in collision with items in staging slot {staging_slot}."
             )
+
+
+def _get_critical_point_to_use(
+    engine_state: StateView, labware_id: str
+) -> Optional[CriticalPoint]:
+    """Return the critical point to use when accessing the given labware."""
+    # TODO (spp, 2024-09-17): looks like Y_CENTER of column is the same as its XY_CENTER.
+    #   I'm using this if-else ladder to be consistent with what we do in
+    #   `MotionPlanning.get_movement_waypoints_to_well()`.
+    #   We should probably use only XY_CENTER in both places.
+    if engine_state.labware.get_should_center_column_on_target_well(labware_id):
+        return CriticalPoint.Y_CENTER
+    elif engine_state.labware.get_should_center_pipette_on_target_well(labware_id):
+        return CriticalPoint.XY_CENTER
+    return None
 
 
 def _slot_has_potential_colliding_object(

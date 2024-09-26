@@ -4059,13 +4059,27 @@
           "description": "Unique ID of the absorbance reader.",
           "type": "string"
         },
-        "sampleWavelength": {
-          "title": "Samplewavelength",
-          "description": "Sample wavelength in nm.",
+        "measureMode": {
+          "title": "Measuremode",
+          "description": "Initialize single or multi measurement mode.",
+          "enum": ["single", "multi"],
+          "type": "string"
+        },
+        "sampleWavelengths": {
+          "title": "Samplewavelengths",
+          "description": "Sample wavelengths in nm.",
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "referenceWavelength": {
+          "title": "Referencewavelength",
+          "description": "Optional reference wavelength in nm.",
           "type": "integer"
         }
       },
-      "required": ["moduleId", "sampleWavelength"]
+      "required": ["moduleId", "measureMode", "sampleWavelengths"]
     },
     "InitializeCreate": {
       "title": "InitializeCreate",
@@ -4099,21 +4113,16 @@
     },
     "ReadAbsorbanceParams": {
       "title": "ReadAbsorbanceParams",
-      "description": "Input parameters for a single absorbance reading.",
+      "description": "Input parameters for an absorbance reading.",
       "type": "object",
       "properties": {
         "moduleId": {
           "title": "Moduleid",
           "description": "Unique ID of the Absorbance Reader.",
           "type": "string"
-        },
-        "sampleWavelength": {
-          "title": "Samplewavelength",
-          "description": "Sample wavelength in nm.",
-          "type": "integer"
         }
       },
-      "required": ["moduleId", "sampleWavelength"]
+      "required": ["moduleId"]
     },
     "ReadAbsorbanceCreate": {
       "title": "ReadAbsorbanceCreate",

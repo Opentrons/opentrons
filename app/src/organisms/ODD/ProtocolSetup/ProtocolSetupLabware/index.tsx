@@ -37,12 +37,14 @@ import {
 
 import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
-import { getLabwareSetupItemGroups } from '/app/transformations/commands'
+import {
+  getLabwareSetupItemGroups,
+  getNestedLabwareInfo,
+} from '/app/transformations/commands'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { getProtocolModulesInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { getNestedLabwareInfo } from '../../../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
-import { LabwareStackModal } from '../../../Devices/ProtocolRun/SetupLabware/LabwareStackModal'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { LabwareStackModal } from '/app/molecules/LabwareStackModal'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModulesAndDeck/utils'
 import { LabwareMapView } from './LabwareMapView'
 import { SingleLabwareModal } from './SingleLabwareModal'
@@ -57,9 +59,11 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
-import type { LabwareSetupItem } from '/app/transformations/commands'
+import type {
+  LabwareSetupItem,
+  NestedLabwareInfo,
+} from '/app/transformations/commands'
 import type { SetupScreens } from '../types'
-import type { NestedLabwareInfo } from '../../../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
 
 const MODULE_REFETCH_INTERVAL_MS = 5000

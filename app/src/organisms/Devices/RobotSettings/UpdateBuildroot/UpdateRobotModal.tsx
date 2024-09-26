@@ -1,10 +1,11 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
+  Banner,
   BORDERS,
   DIRECTION_COLUMN,
   Flex,
@@ -30,7 +31,6 @@ import {
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { ReleaseNotes } from '/app/molecules/ReleaseNotes'
 import { useIsRobotBusy } from '../../hooks'
-import { Banner } from '/app/atoms/Banner'
 import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 
 import type { State, Dispatch } from '/app/redux/types'
@@ -91,7 +91,7 @@ export function UpdateRobotModal({
     disabledReason = updateFromFileDisabledReason
   else if (isRobotBusy) disabledReason = t('robot_busy_protocol')
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(robotUpdateChangelogSeen(robotName))
   }, [robotName])
 

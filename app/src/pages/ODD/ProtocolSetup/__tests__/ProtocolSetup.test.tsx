@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
@@ -25,18 +24,12 @@ import {
 import { i18n } from '/app/i18n'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
-import {
-  useAttachedModules,
-  useLPCDisabledReason,
-  useModuleCalibrationStatus,
-  useProtocolAnalysisErrors,
-  useRobotType,
-  useRunCreatedAtTimestamp,
-  useTrackProtocolRunEvent,
-} from '/app/organisms/Devices/hooks'
+import { useAttachedModules } from '/app/resources/modules'
+import { useRobotType } from '/app/redux-resources/robots'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
-import { getProtocolModulesInfo } from '/app/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import {
   ProtocolSetupLabware,
   ProtocolSetupLiquids,
@@ -54,7 +47,6 @@ import { mockProtocolModuleInfo } from '/app/organisms/ODD/ProtocolSetup/Protoco
 import {
   useProtocolHasRunTimeParameters,
   useRunControls,
-  useRunStatus,
 } from '/app/organisms/RunTimeControl/hooks'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/useNotifyDeckConfigurationQuery'
@@ -62,9 +54,16 @@ import { useDeckConfigurationCompatibility } from '/app/resources/deck_configura
 import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from '../ConfirmSetupStepsCompleteModal'
 import { ProtocolSetup } from '../'
-import { useNotifyRunQuery } from '/app/resources/runs'
+import {
+  useNotifyRunQuery,
+  useRunStatus,
+  useRunCreatedAtTimestamp,
+  useLPCDisabledReason,
+  useModuleCalibrationStatus,
+  useProtocolAnalysisErrors,
+} from '/app/resources/runs'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import { mockRunTimeParameterData } from '/app/pages/ODD/ProtocolDetails/fixtures'
+import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
 
 import type { UseQueryResult } from 'react-query'
 import type * as SharedData from '@opentrons/shared-data'
@@ -102,7 +101,6 @@ vi.mock('react-router-dom', async importOriginal => {
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/LabwarePositionCheck/useLaunchLPC')
-vi.mock('/app/organisms/Devices/hooks')
 vi.mock('/app/organisms/ODD/ProtocolSetup', async importOriginal => {
   const ACTUALS = ['ProtocolSetupStep']
   const actual = await importOriginal<object>()
@@ -112,8 +110,8 @@ vi.mock('/app/organisms/ODD/ProtocolSetup', async importOriginal => {
     )
   )
 })
-vi.mock('/app/organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('/app/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
+
+vi.mock('/app/transformations/analysis')
 vi.mock('/app/organisms/ODD/RunningProtocol')
 vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/organisms/ModuleCard/hooks')
@@ -124,6 +122,9 @@ vi.mock('/app/resources/runs')
 vi.mock('/app/resources/deck_configuration/hooks')
 vi.mock('/app/resources/deck_configuration/useNotifyDeckConfigurationQuery')
 vi.mock('../ConfirmSetupStepsCompleteModal')
+vi.mock('/app/redux-resources/analytics')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/resources/modules')
 
 const render = (path = '/') => {
   return renderWithProviders(

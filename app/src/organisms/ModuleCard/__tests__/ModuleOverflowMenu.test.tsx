@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -14,15 +14,15 @@ import {
 import {
   useRunStatuses,
   useIsLegacySessionInProgress,
-  useIsFlex,
-} from '../../Devices/hooks'
+} from '/app/organisms/Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useCurrentRunId } from '/app/resources/runs'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 
 import type { TemperatureStatus } from '@opentrons/api-client'
 
 vi.mock('../../Devices/hooks')
-vi.mock('../../RunTimeControl/hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/runs')
 
 const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {

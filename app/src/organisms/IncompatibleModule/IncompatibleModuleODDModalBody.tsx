@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
 import {

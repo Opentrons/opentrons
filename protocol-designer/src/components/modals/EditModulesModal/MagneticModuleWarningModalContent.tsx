@@ -1,4 +1,3 @@
-import * as React from 'react'
 import styles from './MagneticModuleWarningModalContent.module.css'
 import { KnowledgeBaseLink } from '../../KnowledgeBaseLink'
 

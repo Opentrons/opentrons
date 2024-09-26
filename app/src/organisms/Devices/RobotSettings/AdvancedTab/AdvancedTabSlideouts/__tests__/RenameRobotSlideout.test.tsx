@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
@@ -17,11 +16,11 @@ import {
 } from '/app/redux/discovery/__fixtures__'
 
 import { RenameRobotSlideout } from '../RenameRobotSlideout'
-import { useIsFlex } from '../../../../hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/analytics')
-vi.mock('../../../../hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/discovery', async importOriginal => {
   const actual = await importOriginal<typeof getUnreachableRobots>()
   return {

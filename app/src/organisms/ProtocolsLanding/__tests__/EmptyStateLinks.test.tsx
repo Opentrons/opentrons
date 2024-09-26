@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { describe, it, expect, afterEach, vi } from 'vitest'

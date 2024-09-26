@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import {
@@ -32,10 +32,8 @@ interface OffDeckDetailsProps extends DeckSetupTabType {
 export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
   const { addLabware, tab } = props
   const { t, i18n } = useTranslation('starting_deck_state')
-  const [hoverSlot, setHoverSlot] = React.useState<DeckSlotId | null>(null)
-  const [menuListId, setShowMenuListForId] = React.useState<DeckSlotId | null>(
-    null
-  )
+  const [hoverSlot, setHoverSlot] = useState<DeckSlotId | null>(null)
+  const [menuListId, setShowMenuListForId] = useState<DeckSlotId | null>(null)
   const robotType = useSelector(getRobotType)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const offDeckLabware = Object.values(deckSetup.labware).filter(
@@ -50,7 +48,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
     <Flex
       backgroundColor={COLORS.white}
       borderRadius={BORDERS.borderRadius8}
-      width="100%"
+      width={tab === 'startingDeck' ? '100%' : '90%'}
       height="70vh"
       padding={`${SPACING.spacing40} ${SPACING.spacing24}`}
       justifyContent={JUSTIFY_CENTER}
@@ -148,15 +146,17 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
               </Flex>
             )
           })}
-          <Flex width="9.5625rem" height="6.375rem">
-            <EmptySelectorButton
-              onClick={addLabware}
-              text={t('add_labware')}
-              textAlignment="middle"
-              size="large"
-              iconName="plus"
-            />
-          </Flex>
+          {tab === 'startingDeck' ? (
+            <Flex width="9.5625rem" height="6.375rem">
+              <EmptySelectorButton
+                onClick={addLabware}
+                text={t('add_labware')}
+                textAlignment="middle"
+                size="large"
+                iconName="plus"
+              />
+            </Flex>
+          ) : null}
         </Flex>
       </Flex>
     </Flex>

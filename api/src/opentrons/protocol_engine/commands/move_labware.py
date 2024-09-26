@@ -7,6 +7,7 @@ from typing_extensions import Literal
 
 from opentrons.types import Point
 from ..types import (
+    CurrentWell,
     LabwareLocation,
     DeckSlotLocation,
     OnLabwareLocation,
@@ -19,6 +20,7 @@ from ..errors import LabwareMovementNotAllowedError, NotSupportedOnRobotType
 from ..resources import labware_validation, fixture_validation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
+from ..state.update_types import StateUpdate
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
 if TYPE_CHECKING:
@@ -96,6 +98,8 @@ class MoveLabwareImplementation(
         self, params: MoveLabwareParams
     ) -> SuccessData[MoveLabwareResult, None]:
         """Move a loaded labware to a new location."""
+        state_update = StateUpdate()
+
         # Allow propagation of LabwareNotLoadedError.
         current_labware = self._state_view.labware.get(labware_id=params.labwareId)
         current_labware_definition = self._state_view.labware.get_definition(
@@ -209,12 +213,34 @@ class MoveLabwareImplementation(
                 user_offset_data=user_offset_data,
                 post_drop_slide_offset=post_drop_slide_offset,
             )
+            # All mounts will have been retracted as part of the gripper move.
+            state_update.clear_all_pipette_locations()
         elif params.strategy == LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE:
             # Pause to allow for manual labware movement
             await self._run_control.wait_for_resume()
 
+        # We may have just moved the labware that contains the current well out from
+        # under the pipette. Clear the current location to reflect the fact that the
+        # pipette is no longer over any labware. This is necessary for safe path
+        # planning in case the next movement goes to the same labware (now in a new
+        # place).
+        pipette_location = self._state_view.pipettes.get_current_location()
+        if (
+            isinstance(pipette_location, CurrentWell)
+            and pipette_location.labware_id == params.labwareId
+        ):
+            state_update.clear_all_pipette_locations()
+
+        state_update.set_labware_location(
+            labware_id=params.labwareId,
+            new_location=available_new_location,
+            new_offset_id=new_offset_id,
+        )
+
         return SuccessData(
-            public=MoveLabwareResult(offsetId=new_offset_id), private=None
+            public=MoveLabwareResult(offsetId=new_offset_id),
+            private=None,
+            state_update=state_update,
         )
 
 

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { vi, it, describe } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 

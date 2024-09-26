@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { ClickableIcon } from '../ui'
 import styles from './styles.module.css'
 

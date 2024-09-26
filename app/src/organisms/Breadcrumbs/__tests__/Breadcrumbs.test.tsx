@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { when } from 'vitest-when'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
@@ -6,10 +5,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
 import { i18n } from '/app/i18n'
-import {
-  useRobot,
-  useRunCreatedAtTimestamp,
-} from '/app/organisms/Devices/hooks'
+import { useRunCreatedAtTimestamp } from '/app/resources/runs'
+import { useRobot } from '/app/redux-resources/robots'
 import { getProtocolDisplayName } from '/app/organisms/ProtocolsLanding/utils'
 import { getIsOnDevice } from '/app/redux/config'
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -20,7 +17,8 @@ import { Breadcrumbs } from '..'
 
 import type { State } from '/app/redux/types'
 
-vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/resources/runs')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/organisms/ProtocolsLanding/utils')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/protocol-storage')

@@ -1,20 +1,20 @@
-import * as React from 'react'
+import type { MutableRefObject } from 'react'
+import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import head from 'lodash/head'
-import { SUCCESS_TOAST, WARNING_TOAST } from '@opentrons/components'
 
+import { SUCCESS_TOAST, WARNING_TOAST } from '@opentrons/components'
 import * as AppAlerts from '/app/redux/alerts'
 import { getHasJustUpdated, toggleConfigValue } from '/app/redux/config'
 import { getAvailableShellUpdate } from '/app/redux/shell'
 import { useToaster } from '../ToasterOven'
 import { UpdateAppModal } from '../UpdateAppModal'
 import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
-import { useRemoveActiveAppUpdateToast } from '.'
 
+import { useRemoveActiveAppUpdateToast } from '.'
 import type { State, Dispatch } from '/app/redux/types'
 import type { AlertId } from '/app/redux/alerts/types'
-import type { MutableRefObject } from 'react'
 
 interface AlertsModalProps {
   toastIdRef: MutableRefObject<string | null>
@@ -22,7 +22,7 @@ interface AlertsModalProps {
 
 export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
-  const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(false)
+  const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false)
   const { t } = useTranslation(['app_settings', 'branded'])
   const { makeToast } = useToaster()
   const { removeActiveAppUpdateToast } = useRemoveActiveAppUpdateToast()
@@ -51,7 +51,7 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
     isAppUpdateAvailable && !isAppUpdateIgnored
 
   // Only run this hook on app startup
-  React.useEffect(() => {
+  useEffect(() => {
     if (hasJustUpdated) {
       makeToast(
         t('branded:opentrons_app_successfully_updated') as string,
@@ -65,7 +65,7 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
     }
   }, [])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (createAppUpdateAvailableToast) {
       toastIdRef.current = makeToast(
         t('branded:opentrons_app_update_available_variation') as string,

@@ -96,7 +96,7 @@
   "pipette_path": "Pipette path",
   "pipette_path_multi_aspirate": "Multi-aspirate",
   "pipette_path_multi_dispense": "Multi-dispense",
-  "pipette_path_multi_dispense_volume_blowout": "Multi-dispense, {{volume}} disposal volume, blowout {{blowOutLocation}}",
+  "pipette_path_multi_dispense_volume_blowout": "Multi-dispense, {{volume}} µL disposal volume, blowout {{blowOutLocation}}",
   "pipette_path_single": "Single transfers",
   "pre_wet_tip": "Pre-wet tip",
   "quick_transfer": "Quick transfer",

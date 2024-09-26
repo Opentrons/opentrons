@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { TaskList as TaskListComponent } from './'
 
 import type { Story, Meta } from '@storybook/react'

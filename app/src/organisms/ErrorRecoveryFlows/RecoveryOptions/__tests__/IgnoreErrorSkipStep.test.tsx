@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { screen, fireEvent, waitFor } from '@testing-library/react'
 
@@ -71,7 +71,7 @@ describe('IgnoreErrorSkipStep', () => {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        step: 'UNKNOWN_STEP',
+        step: 'UNKNOWN_STEP' as any,
       },
     }
     render(props)

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -21,8 +21,13 @@ import {
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 
+import {
+  ANALYTICS_QUICK_TRANSFER_TAB_SELECTED,
+  ANALYTICS_QUICK_TRANSFER_FLOW_STARTED,
+} from '/app/redux/analytics'
 import { SmallButton, FloatingActionButton } from '/app/atoms/buttons'
 import { Navigation } from '/app/organisms/Navigation'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import {
   getPinnedQuickTransferIds,
   getQuickTransfersOnDeviceSortKey,
@@ -49,26 +54,33 @@ export function QuickTransferDashboard(): JSX.Element {
   const navigate = useNavigate()
   const { t } = useTranslation(['quick_transfer', 'protocol_info'])
   const dispatch = useDispatch<Dispatch>()
-  const [navMenuIsOpened, setNavMenuIsOpened] = React.useState<boolean>(false)
-  const [
-    longPressModalIsOpened,
-    setLongPressModalOpened,
-  ] = React.useState<boolean>(false)
+  const [navMenuIsOpened, setNavMenuIsOpened] = useState<boolean>(false)
+  const [longPressModalIsOpened, setLongPressModalOpened] = useState<boolean>(
+    false
+  )
   const [
     showDeleteConfirmationModal,
     setShowDeleteConfirmationModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const [
     showPipetteNotAttachedModal,
     setShowPipetteNotAttaachedModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const [
     showStorageLimitReachedModal,
     setShowStorageLimitReachedModal,
-  ] = React.useState<boolean>(false)
-  const [targetTransferId, setTargetTransferId] = React.useState<string>('')
+  ] = useState<boolean>(false)
+  const [targetTransferId, setTargetTransferId] = useState<string>('')
   const sortBy = useSelector(getQuickTransfersOnDeviceSortKey) ?? 'alphabetical'
   const hasDismissedIntro = useSelector(getHasDismissedQuickTransferIntro)
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
+
+  useEffect(() => {
+    trackEventWithRobotSerial({
+      name: ANALYTICS_QUICK_TRANSFER_TAB_SELECTED,
+      properties: {},
+    })
+  }, [])
 
   const pipetteIsAttached = attachedInstruments?.data.some(
     (i): i is PipetteData => i.ok && i.instrumentType === 'pipette'
@@ -151,6 +163,10 @@ export function QuickTransferDashboard(): JSX.Element {
     } else if (quickTransfersData.length >= 20) {
       setShowStorageLimitReachedModal(true)
     } else {
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_FLOW_STARTED,
+        properties: {},
+      })
       navigate('/quick-transfer/new')
     }
   }
@@ -229,6 +245,7 @@ export function QuickTransferDashboard(): JSX.Element {
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 backgroundColor={COLORS.white}
                 flexDirection={DIRECTION_ROW}
+                paddingTop={SPACING.spacing16}
                 paddingBottom={SPACING.spacing16}
                 position={
                   navMenuIsOpened || longPressModalIsOpened
@@ -236,7 +253,7 @@ export function QuickTransferDashboard(): JSX.Element {
                     : POSITION_STICKY
                 }
                 top="7.75rem"
-                zIndex={navMenuIsOpened || longPressModalIsOpened ? 0 : 3}
+                zIndex={navMenuIsOpened || longPressModalIsOpened ? 0 : 2.5}
                 width="100%"
               >
                 <Flex width="32.3125rem">

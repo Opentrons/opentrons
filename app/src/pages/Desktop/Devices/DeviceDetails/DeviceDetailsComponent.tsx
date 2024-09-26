@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useEstopQuery } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
@@ -16,7 +15,7 @@ import { InstrumentsAndModules } from '/app/organisms/Devices/InstrumentsAndModu
 import { RecentProtocolRuns } from '/app/organisms/Devices/RecentProtocolRuns'
 import { EstopBanner } from '/app/organisms/Devices/EstopBanner'
 import { DISENGAGED, useEstopContext } from '/app/organisms/EmergencyStop'
-import { useIsFlex } from '/app/organisms/Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 
 interface DeviceDetailsComponentProps {
   robotName: string

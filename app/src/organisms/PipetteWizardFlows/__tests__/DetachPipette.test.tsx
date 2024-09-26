@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 
@@ -15,7 +15,7 @@ import {
   mockAttachedPipetteInformation,
 } from '/app/redux/pipettes/__fixtures__'
 import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
+import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 import { FLOWS } from '../constants'
 import { DetachPipette } from '../DetachPipette'
 

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Box,
@@ -9,7 +8,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useRobot } from '/app/organisms/Devices/hooks'
+import { useRobot } from '/app/redux-resources/robots'
 import {
   getRobotSerialNumber,
   getRobotFirmwareVersion,

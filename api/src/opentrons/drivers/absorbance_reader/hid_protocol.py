@@ -1,9 +1,11 @@
 from typing import (
     Dict,
+    Optional,
     Protocol,
     List,
     Literal,
     Tuple,
+    Union,
     runtime_checkable,
     TypeVar,
 )
@@ -11,28 +13,28 @@ from typing import (
 Response = TypeVar("Response")
 
 ErrorCodeNames = Literal[
-    "BYONOY_ERROR_NO_ERROR",
-    "BYONOY_ERROR_UNKNOWN_ERROR",
-    "BYONOY_ERROR_DEVICE_CLOSED",
-    "BYONOY_ERROR_INVALID_ARGUMENT",
-    "BYONOY_ERROR_NO_MEMORY",
-    "BYONOY_ERROR_UNSUPPORTED_OPERATION",
-    "BYONOY_ERROR_DEVICE_COMMUNICATION_FAILURE",
-    "BYONOY_ERROR_DEVICE_OPERATION_FAILED",
-    "BYONOY_ERROR_DEVICE_OPEN_PREFIX",
-    "BYONOY_ERROR_DEVICE_NOT_FOUND",
-    "BYONOY_ERROR_DEVICE_TOO_NEW",
-    "BYONOY_ERROR_DEVICE_ALREADY_OPEN",
-    "BYONOY_ERROR_FIRMWARE_UPDATE_ERROR_PREFIX",
-    "BYONOY_ERROR_FIRMWARE_UPDATE_FILE_NOT_FOUND",
-    "BYONOY_ERROR_FIRMWARE_UPDATE_FILE_NOT_VALID",
-    "BYONOY_ERROR_FIRMWARE_UPDATE_FAILED",
-    "BYONOY_ERROR_FILE_ERROR_PREFIX",
-    "BYONOY_ERROR_FILE_WRITE_ERROR",
-    "BYONOY_ERROR_MEASUTEMNT_ERROR_PREFIX",
-    "BYONOY_ERROR_MEASUTEMNT_SLOT_NOT_EMPTY",
-    "BYONOY_ERROR_NOT_INITIALIZED",
-    "BYONOY_ERROR_INTERNAL",
+    "NO_ERROR",
+    "UNKNOWN_ERROR",
+    "DEVICE_CLOSED",
+    "INVALID_ARGUMENT",
+    "NO_MEMORY",
+    "UNSUPPORTED_OPERATION",
+    "DEVICE_COMMUNICATION_FAILURE",
+    "DEVICE_OPERATION_FAILED",
+    "DEVICE_OPEN_PREFIX",
+    "DEVICE_NOT_FOUND",
+    "DEVICE_TOO_NEW",
+    "DEVICE_ALREADY_OPEN",
+    "FIRMWARE_UPDATE_ERROR_PREFIX",
+    "FIRMWARE_UPDATE_FILE_NOT_FOUND",
+    "FIRMWARE_UPDATE_FILE_NOT_VALID",
+    "FIRMWARE_UPDATE_FAILED",
+    "FILE_ERROR_PREFIX",
+    "FILE_WRITE_ERROR",
+    "MEASUTEMNT_ERROR_PREFIX",
+    "MEASUTEMNT_SLOT_NOT_EMPTY",
+    "NOT_INITIALIZED",
+    "INTERNAL",
 ]
 
 SlotStateNames = Literal[
@@ -69,8 +71,13 @@ class AbsorbanceHidInterface(Protocol):
         value: int
 
     @runtime_checkable
-    class MeasurementConfig(Protocol):
+    class SingleMeasurementConfig(Protocol):
         sample_wavelength: int
+        reference_wavelength: Optional[int]
+
+    @runtime_checkable
+    class MultiMeasurementConfig(Protocol):
+        sample_wavelengths: List[int]
 
     @runtime_checkable
     class DeviceInfo(Protocol):
@@ -84,60 +91,71 @@ class AbsorbanceHidInterface(Protocol):
         name: DeviceStateNames
         value: int
 
-    def ByonoyAbs96SingleMeasurementConfig(self) -> MeasurementConfig:
+    def Abs96SingleMeasurementConfig(self) -> SingleMeasurementConfig:
         ...
 
-    def byonoy_open_device(self, device: Device) -> Tuple[ErrorCode, int]:
+    def Abs96MultipleMeasurementConfig(self) -> MultiMeasurementConfig:
         ...
 
-    def byonoy_free_device(self, device_handle: int) -> Tuple[ErrorCode, bool]:
+    def open_device(self, device: Device) -> Tuple[ErrorCode, int]:
         ...
 
-    def byonoy_device_open(self, device_handle: int) -> bool:
+    def free_device(self, device_handle: int) -> Tuple[ErrorCode, bool]:
         ...
 
-    def byonoy_get_device_information(
+    def device_open(self, device_handle: int) -> bool:
+        ...
+
+    def get_device_information(
         self, device_handle: int
     ) -> Tuple[ErrorCode, DeviceInfo]:
         ...
 
-    def byonoy_update_device(
-        self, device_handle: int, firmware_file_path: str
-    ) -> ErrorCode:
+    def update_device(self, device_handle: int, firmware_file_path: str) -> ErrorCode:
         ...
 
-    def byonoy_get_device_status(
-        self, device_handle: int
-    ) -> Tuple[ErrorCode, DeviceState]:
+    def get_device_status(self, device_handle: int) -> Tuple[ErrorCode, DeviceState]:
         ...
 
-    def byonoy_get_device_uptime(self, device_handle: int) -> Tuple[ErrorCode, int]:
+    def get_device_uptime(self, device_handle: int) -> Tuple[ErrorCode, int]:
         ...
 
-    def byonoy_get_device_slot_status(
-        self, device_handle: int
-    ) -> Tuple[ErrorCode, SlotState]:
+    def get_device_slot_status(self, device_handle: int) -> Tuple[ErrorCode, SlotState]:
         ...
 
-    def byonoy_get_device_parts_aligned(
-        self, device_handle: int
-    ) -> Tuple[ErrorCode, bool]:
+    def get_device_parts_aligned(self, device_handle: int) -> Tuple[ErrorCode, bool]:
         ...
 
-    def byonoy_abs96_get_available_wavelengths(
+    def abs96_get_available_wavelengths(
         self, device_handle: int
     ) -> Tuple[ErrorCode, List[int]]:
         ...
 
-    def byonoy_abs96_initialize_single_measurement(
-        self, device_handle: int, conf: MeasurementConfig
+    def abs96_initialize_single_measurement(
+        self, device_handle: int, conf: SingleMeasurementConfig
     ) -> ErrorCode:
         ...
 
-    def byonoy_abs96_single_measure(
-        self, device_handle: int, conf: MeasurementConfig
+    def abs96_initialize_multiple_measurement(
+        self, device_handle: int, conf: MultiMeasurementConfig
+    ) -> ErrorCode:
+        ...
+
+    def abs96_single_measure(
+        self, device_handle: int, conf: SingleMeasurementConfig
     ) -> Tuple[ErrorCode, List[float]]:
         ...
 
-    def byonoy_available_devices(self) -> List[Device]:
+    def abs96_multiple_measure(
+        self, device_handle: int, conf: MultiMeasurementConfig
+    ) -> Tuple[ErrorCode, List[List[float]]]:
         ...
+
+    def available_devices(self) -> List[Device]:
+        ...
+
+
+MeasurementConfig = Union[
+    AbsorbanceHidInterface.SingleMeasurementConfig,
+    AbsorbanceHidInterface.MultiMeasurementConfig,
+]

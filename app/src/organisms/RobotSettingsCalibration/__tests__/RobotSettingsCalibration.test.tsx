@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
@@ -20,13 +19,12 @@ import {
   mockAttachedPipetteInformation,
 } from '/app/redux/pipettes/__fixtures__'
 import {
-  useIsFlex,
   usePipetteOffsetCalibrations,
-  useRobot,
-  useAttachedPipettes,
   useRunStatuses,
   useAttachedPipettesFromInstrumentsQuery,
 } from '/app/organisms/Devices/hooks'
+import { useAttachedPipettes } from '/app/resources/instruments'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 
 import { CalibrationDataDownload } from '../CalibrationDataDownload'
 import { CalibrationHealthCheck } from '../CalibrationHealthCheck'
@@ -50,6 +48,8 @@ vi.mock('/app/organisms/CalibrationStatusCard')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/sessions/selectors')
 vi.mock('/app/redux/robot-api/selectors')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/resources/instruments')
 vi.mock('/app/organisms/Devices/hooks')
 vi.mock('../CalibrationDataDownload')
 vi.mock('../CalibrationHealthCheck')

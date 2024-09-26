@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, it, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { renderWithProviders } from '/app/__testing-utils__'

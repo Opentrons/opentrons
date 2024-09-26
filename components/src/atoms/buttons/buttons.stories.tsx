@@ -1,10 +1,11 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { SPACING } from '../../ui-style-constants'
 import { DIRECTION_ROW } from '../../styles'
 import { Flex } from '../../primitives'
 import { PrimaryButton } from './PrimaryButton'
 import { SecondaryButton } from './SecondaryButton'
 import { AlertPrimaryButton } from './AlertPrimaryButton'
+import { AltPrimaryButton } from './AltPrimaryButton'
 
 import type { Story, Meta } from '@storybook/react'
 
@@ -58,4 +59,20 @@ const AlertPrimaryButtonTemplate: Story<
 export const AlertPrimary = AlertPrimaryButtonTemplate.bind({})
 AlertPrimary.args = {
   children: 'alert tertiary button',
+}
+
+const AltPrimaryButtonTemplate: Story<
+  React.ComponentProps<typeof AltPrimaryButton>
+> = args => {
+  const { children } = args
+  return (
+    <Flex>
+      <AltPrimaryButton>{children}</AltPrimaryButton>
+    </Flex>
+  )
+}
+
+export const AltPrimary = AltPrimaryButtonTemplate.bind({})
+AltPrimary.args = {
+  children: 'alt primary button',
 }

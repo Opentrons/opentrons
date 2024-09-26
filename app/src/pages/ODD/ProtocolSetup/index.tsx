@@ -33,17 +33,14 @@ import {
   getFixtureDisplayName,
 } from '@opentrons/shared-data'
 
+import { useRobotType } from '/app/redux-resources/robots'
 import {
-  useAttachedModules,
-  useLPCDisabledReason,
-  useModuleCalibrationStatus,
-  useProtocolAnalysisErrors,
   useRobotAnalyticsData,
-  useRobotType,
   useTrackProtocolRunEvent,
-} from '/app/organisms/Devices/hooks'
+} from '/app/redux-resources/analytics'
+import { useAttachedModules } from '/app/resources/modules'
 
-import { getProtocolModulesInfo } from '/app/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import {
   AnalysisFailedModal,
   ProtocolSetupDeckConfiguration,
@@ -61,10 +58,7 @@ import {
 } from '/app/organisms/ODD/ProtocolSetup'
 import { useLaunchLPC } from '/app/organisms/LabwarePositionCheck/useLaunchLPC'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
-import {
-  useRunControls,
-  useRunStatus,
-} from '/app/organisms/RunTimeControl/hooks'
+import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
@@ -76,16 +70,22 @@ import {
 import { getIsHeaterShakerAttached } from '/app/redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal'
-import { getLatestCurrentOffsets } from '/app/organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
+import { getLatestCurrentOffsets } from '/app/transformations/runs'
 import { CloseButton, PlayButton } from './Buttons'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
-import { useNotifyRunQuery } from '/app/resources/runs'
+import {
+  useNotifyRunQuery,
+  useRunStatus,
+  useLPCDisabledReason,
+  useModuleCalibrationStatus,
+  useProtocolAnalysisErrors,
+} from '/app/resources/runs'
 
 import type { Run } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../../App/types'
-import type { ProtocolModuleInfo } from '/app/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 import type { SetupScreens } from '/app/organisms/ODD/ProtocolSetup'
 import type {
   ProtocolHardware,
