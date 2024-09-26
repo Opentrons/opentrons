@@ -1,4 +1,4 @@
-import head from 'lodash/head'
+import { useMemo } from 'react'
 
 import {
   getDeckDefFromRobotType,
@@ -31,53 +31,49 @@ export interface DropTipBlowoutLocationDetails {
 export function useDropTipLocations(
   robotType: RobotType
 ): DropTipBlowoutLocationDetails[] {
-  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
-  const deckDef = getDeckDefFromRobotType(robotType)
+  const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery()
+  const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
 
-  const createLocation = (
-    cutoutConfig: CutoutConfig,
-    validLocation: ValidDropTipBlowoutLocation
-  ): DropTipBlowoutLocationDetails => {
-    const cutoutAAs = deckDef.cutoutFixtures.find(
-      fixture => cutoutConfig.cutoutId in fixture.providesAddressableAreas
-    )?.providesAddressableAreas
-    const slotName =
-      cutoutAAs != null ? head(cutoutAAs[cutoutConfig.cutoutId]) ?? null : null
+  return useMemo(() => {
+    const createLocation = (
+      cutoutConfig: CutoutConfig,
+      validLocation: ValidDropTipBlowoutLocation
+    ): DropTipBlowoutLocationDetails => {
+      const cutoutAAs = deckDef.cutoutFixtures.find(
+        fixture => cutoutConfig.cutoutId in fixture.providesAddressableAreas
+      )?.providesAddressableAreas
+      const slotName =
+        cutoutAAs?.[cutoutConfig.cutoutId]?.[0] ??
+        (robotType === OT2_ROBOT_TYPE ? '1' : 'A1')
 
-    if (slotName == null) {
-      console.error(
-        'Could not get correct slot location from deck definition and active deck config. Defaulting to A1.'
-      )
+      if (!cutoutAAs?.[cutoutConfig.cutoutId]?.[0]) {
+        console.error(
+          'Could not get correct slot location from deck definition and active deck config. Defaulting to A1.'
+        )
+      }
+
+      return {
+        location: validLocation,
+        slotName,
+      }
     }
-    const validSlotName: AddressableAreaName =
-      slotName != null ? slotName : robotType === OT2_ROBOT_TYPE ? '1' : 'A1'
 
-    return {
-      location: validLocation,
-      slotName: validSlotName,
-    }
-  }
+    const filterAndMap = (
+      fixtureIds: string | string[],
+      validLocation: ValidDropTipBlowoutLocation
+    ): DropTipBlowoutLocationDetails[] =>
+      deckConfig
+        .filter(config =>
+          Array.isArray(fixtureIds)
+            ? fixtureIds.includes(config.cutoutFixtureId)
+            : fixtureIds === config.cutoutFixtureId
+        )
+        .map(config => createLocation(config, validLocation))
 
-  const filterAndMap = (
-    fixtureIds: string | string[],
-    validLocation: ValidDropTipBlowoutLocation
-  ): DropTipBlowoutLocationDetails[] =>
-    deckConfig
-      .filter(config =>
-        Array.isArray(fixtureIds)
-          ? fixtureIds.includes(config.cutoutFixtureId)
-          : fixtureIds === config.cutoutFixtureId
-      )
-      .map(config => createLocation(config, validLocation))
-
-  const chooseDeckLocationOption: DropTipBlowoutLocationDetails = {
-    location: 'deck',
-    slotName: 'CHOOSE_DECK_LOCATION',
-  }
-
-  return [
-    ...filterAndMap(TRASH_BIN_ADAPTER_FIXTURE, 'trash-bin'),
-    ...filterAndMap(WASTE_CHUTE_FIXTURES, 'waste-chute'),
-    chooseDeckLocationOption,
-  ]
+    return [
+      ...filterAndMap(TRASH_BIN_ADAPTER_FIXTURE, 'trash-bin'),
+      ...filterAndMap(WASTE_CHUTE_FIXTURES, 'waste-chute'),
+      { location: 'deck', slotName: 'CHOOSE_DECK_LOCATION' },
+    ]
+  }, [deckConfig, deckDef, robotType])
 }
