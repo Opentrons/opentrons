@@ -23,14 +23,14 @@ import {
 import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationWarning'
 import { useCurrentRunId } from '/app/resources/runs'
 import { useIsFlex } from '/app/redux-resources/robots'
-import { ModuleCard } from '../ModuleCard'
+import { ModuleCard } from '/app/organisms/ModuleCard'
 import { useIsRobotViewable, useRunStatuses } from './hooks'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 import { PipetteCard } from './PipetteCard'
 import { FlexPipetteCard } from './PipetteCard/FlexPipetteCard'
-import { GripperCard } from '../GripperCard'
+import { GripperCard } from '/app/organisms/GripperCard'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
-import { useModuleApiRequests } from '../ModuleCard/utils'
+import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
 
 import type {
   BadGripper,

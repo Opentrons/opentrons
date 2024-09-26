@@ -1,6 +1,6 @@
 import { getIsTiprack } from '@opentrons/shared-data'
-import { getPickUpTipCommandsWithPipette } from '../../Devices/ProtocolRun/utils/getPickUpTipCommandsWithPipette'
-import { getTipracksVisited } from '../../Devices/ProtocolRun/utils/getTipracksVisited'
+import { getPickUpTipCommandsWithPipette } from '../../Desktop/Devices/ProtocolRun/utils/getPickUpTipCommandsWithPipette'
+import { getTipracksVisited } from '../../Desktop/Devices/ProtocolRun/utils/getTipracksVisited'
 import type {
   LoadedLabware,
   RunTimeCommand,

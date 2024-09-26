@@ -47,7 +47,7 @@ import type { ViewportListRef } from 'react-viewport-list'
 import type {
   DesktopRouteParams,
   ProtocolRunDetailsTab,
-} from '../../../../App/types'
+} from '/app/App/types'
 import type { Dispatch } from '/app/redux/types'
 
 const baseRoundTabStyling = css`

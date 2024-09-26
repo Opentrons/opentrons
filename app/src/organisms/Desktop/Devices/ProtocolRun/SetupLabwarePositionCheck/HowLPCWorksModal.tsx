@@ -12,7 +12,7 @@ import {
   TYPOGRAPHY,
   Modal,
 } from '@opentrons/components'
-import { getTopPortalEl } from '../../../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 
 const OFFSET_DATA_HELP_ARTICLE =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'

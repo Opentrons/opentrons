@@ -6,7 +6,7 @@ import { fetchProtocols, getStoredProtocol } from '/app/redux/protocol-storage'
 import { ProtocolDetails as ProtocolDetailsContents } from '/app/organisms/ProtocolDetails'
 
 import type { Dispatch, State } from '/app/redux/types'
-import type { DesktopRouteParams } from '../../../../App/types'
+import type { DesktopRouteParams } from '/app/App/types'
 
 export function ProtocolDetails(): JSX.Element {
   const { protocolKey } = useParams<

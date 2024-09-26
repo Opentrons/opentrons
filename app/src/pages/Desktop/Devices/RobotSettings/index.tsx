@@ -29,16 +29,13 @@ import { getDevtoolsEnabled } from '/app/redux/config'
 import { useRobot } from '/app/redux-resources/robots'
 import { Line } from '/app/atoms/structure'
 import { NavTab } from '/app/molecules/NavTab'
-import { RobotSettingsCalibration } from '/app/organisms/RobotSettingsCalibration'
+import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
 import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
 import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFeatureFlags'
 import { ReachableBanner } from '/app/organisms/Desktop/Devices/ReachableBanner'
 
-import type {
-  DesktopRouteParams,
-  RobotSettingsTab,
-} from '../../../../App/types'
+import type { DesktopRouteParams, RobotSettingsTab } from '/app/App/types'
 
 export function RobotSettings(): JSX.Element | null {
   const { t } = useTranslation('device_settings')

@@ -16,15 +16,13 @@ import {
   useModulesQuery,
 } from '@opentrons/react-api-client'
 
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { Line } from '/app/atoms/structure'
 import { CalibrateDeck } from '/app/organisms/CalibrateDeck'
 import { CalibrationStatusCard } from '/app/organisms/CalibrationStatusCard'
 import { CheckCalibration } from '/app/organisms/CheckCalibration'
-import {
-  useRunStatuses,
-  useAttachedPipettesFromInstrumentsQuery,
-} from '/app/organisms/Devices/hooks'
+import { useRunStatuses } from '/app/organisms/Desktop/Devices/hooks'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { HowCalibrationWorksModal } from '/app/organisms/HowCalibrationWorksModal'
 import { CONNECTABLE } from '/app/redux/discovery'

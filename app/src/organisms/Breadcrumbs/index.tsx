@@ -25,7 +25,7 @@ import { getStoredProtocol } from '/app/redux/protocol-storage'
 import { appShellRequestor } from '/app/redux/shell/remote'
 import { useRobot } from '/app/redux-resources/robots'
 
-import type { DesktopRouteParams } from '../../App/types'
+import type { DesktopRouteParams } from '/app/App/types'
 import type { State } from '/app/redux/types'
 
 interface CrumbNameProps {

@@ -1,5 +1,5 @@
-import { ErrorRecoveryFlows } from '../../../../ErrorRecoveryFlows'
-import { DropTipWizardFlows } from '../../../../DropTipWizardFlows'
+import { ErrorRecoveryFlows } from '/app/organisms/ErrorRecoveryFlows'
+import { DropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import {
   ConfirmCancelModal,
@@ -9,10 +9,10 @@ import {
   RunFailedModal,
   ConfirmMissingStepsModal,
 } from './modals'
-import { ConfirmAttachmentModal } from '../../../../ModuleCard/ConfirmAttachmentModal'
+import { ConfirmAttachmentModal } from '/app/organisms/ModuleCard/ConfirmAttachmentModal'
 
 import type { RunStatus } from '@opentrons/api-client'
-import type { RunControls } from '../../../../RunTimeControl/hooks'
+import type { RunControls } from '/app/organisms/RunTimeControl'
 import type { UseRunErrorsResult } from '../hooks'
 import type { UseRunHeaderModalContainerResult } from '.'
 

@@ -30,7 +30,7 @@ import {
 } from '/app/resources/runs'
 import { CommandText, CommandIcon } from '/app/molecules/Command'
 import { Divider } from '/app/atoms/structure'
-import { NAV_BAR_WIDTH } from '../../App/constants'
+import { NAV_BAR_WIDTH } from '/app/App/constants'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'

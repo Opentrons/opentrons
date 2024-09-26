@@ -46,7 +46,7 @@ vi.mock('../../LabwareInfoOverlay')
 vi.mock('/app/transformations/analysis/getLabwareRenderInfo')
 vi.mock('/app/transformations/analysis/getAttachedProtocolModuleMatches')
 vi.mock('../../utils/getModuleTypesThatRequireExtraAttention')
-vi.mock('../../../../RunTimeControl/hooks')
+vi.mock('/app/organisms/RunTimeControl')
 vi.mock('../../../hooks')
 
 // TODO(jh 03-06-24): We need to rethink this test as we are testing components several layers deep across top-level imports.

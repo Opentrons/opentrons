@@ -10,7 +10,7 @@ import {
   mockOT2ServerHealthResponse,
   mockOT3HealthResponse,
   mockOT3ServerHealthResponse,
-} from '../../../../../discovery-client/src/fixtures'
+} from '../../../../../../discovery-client/src/fixtures'
 
 import { i18n } from '/app/i18n'
 import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
@@ -35,7 +35,7 @@ import { RobotCard } from '../RobotCard'
 import {
   ErrorRecoveryBanner,
   useErrorRecoveryBanner,
-} from '../../ErrorRecoveryBanner'
+} from '/app/organisms/ErrorRecoveryBanner'
 
 import type { State } from '/app/redux/types'
 
@@ -48,7 +48,7 @@ vi.mock('../../UpdateRobotBanner')
 vi.mock('/app/redux/config')
 vi.mock('../RobotOverflowMenu')
 vi.mock('../RobotStatusHeader')
-vi.mock('../../ErrorRecoveryBanner')
+vi.mock('/app/organisms/ErrorRecoveryBanner')
 
 const OT2_PNG_FILE_NAME = '/app/src/assets/images/OT2-R_HERO.png'
 const FLEX_PNG_FILE_NAME = '/app/src/assets/images/FLEX.png'

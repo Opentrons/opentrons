@@ -4,12 +4,12 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { LEFT } from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '/app/i18n'
-import { PipetteWizardFlows } from '../../PipetteWizardFlows'
-import { GripperWizardFlows } from '../../GripperWizardFlows'
+import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import { ProtocolInstrumentMountItem } from '..'
 
-vi.mock('../../PipetteWizardFlows')
-vi.mock('../../GripperWizardFlows')
+vi.mock('/app/organisms/PipetteWizardFlows')
+vi.mock('/app/organisms/GripperWizardFlows')
 vi.mock('../../TakeoverModal')
 
 const mockGripperData = {

@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import { SLEEP_NEVER_MS } from '../../App/constants'
+import { SLEEP_NEVER_MS } from '/app/App/constants'
 import type { State } from '../types'
 import type {
   Config,

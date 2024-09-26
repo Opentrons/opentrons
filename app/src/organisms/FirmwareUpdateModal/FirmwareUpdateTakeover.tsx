@@ -7,7 +7,7 @@ import {
   useSubsystemUpdateQuery,
 } from '@opentrons/react-api-client'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { useIsUnboxingFlowOngoing } from '../ODD/hooks'
 import { UpdateInProgressModal } from './UpdateInProgressModal'
 import { UpdateNeededModal } from './UpdateNeededModal'

@@ -5,7 +5,7 @@ import { RunHeaderSectionLower } from './RunHeaderSectionLower'
 
 import type { ProtocolRunHeaderProps } from '..'
 import type { AttachedModule, RunStatus } from '@opentrons/api-client'
-import type { RunControls } from '../../../../RunTimeControl/hooks'
+import type { RunControls } from '/app/organisms/RunTimeControl'
 import type { UseRunHeaderModalContainerResult } from '../RunHeaderModalContainer'
 
 export type RunHeaderContentProps = ProtocolRunHeaderProps & {

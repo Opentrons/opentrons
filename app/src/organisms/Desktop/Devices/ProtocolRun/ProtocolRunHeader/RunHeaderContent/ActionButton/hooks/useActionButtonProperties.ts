@@ -14,7 +14,7 @@ import {
   useTrackEvent,
 } from '/app/redux/analytics'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
-import { useIsHeaterShakerInProtocol } from '../../../../../../ModuleCard/hooks'
+import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import { isAnyHeaterShakerShaking } from '../../../RunHeaderModalContainer/modals'
 import {
   isRecoveryStatus,

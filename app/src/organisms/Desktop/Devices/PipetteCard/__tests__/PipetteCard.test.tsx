@@ -11,7 +11,7 @@ import { getHasCalibrationBlock } from '/app/redux/config'
 import { useDispatchApiRequest } from '/app/redux/robot-api'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 import { PipetteCard } from '..'
-import { useDropTipWizardFlows } from '../../../DropTipWizardFlows'
+import { useDropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
 
 import { mockLeftSpecs, mockRightSpecs } from '/app/redux/pipettes/__fixtures__'
 
@@ -22,7 +22,7 @@ vi.mock('/app/redux/config')
 vi.mock('/app/redux/robot-api')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/pipettes')
-vi.mock('../../../DropTipWizardFlows')
+vi.mock('/app/organisms/DropTipWizardFlows')
 
 const render = (props: React.ComponentProps<typeof PipetteCard>) => {
   return renderWithProviders(<PipetteCard {...props} />, {

@@ -16,9 +16,9 @@ import { i18n } from '/app/i18n'
 import {
   useInterventionModal,
   InterventionModal,
-} from '../../InterventionModal'
+} from '/app/organisms/InterventionModal'
 import { ProgressBar } from '/app/atoms/ProgressBar'
-import { useRunControls } from '../../RunTimeControl/hooks'
+import { useRunControls } from '/app/organisms/RunTimeControl'
 import {
   useNotifyRunQuery,
   useNotifyAllCommandsQuery,
@@ -47,10 +47,10 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     useCommandQuery: vi.fn(),
   }
 })
-vi.mock('../../RunTimeControl/hooks')
+vi.mock('/app/organisms/RunTimeControl')
 vi.mock('/app/resources/runs')
 vi.mock('/app/atoms/ProgressBar')
-vi.mock('../../InterventionModal')
+vi.mock('/app/organisms/InterventionModal')
 vi.mock('../../Devices/hooks')
 vi.mock('/app/resources/protocols/hooks')
 vi.mock('/app/redux-resources/robots')

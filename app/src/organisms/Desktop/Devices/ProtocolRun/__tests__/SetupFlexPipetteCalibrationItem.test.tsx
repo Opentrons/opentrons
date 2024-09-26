@@ -8,13 +8,13 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
-import { PipetteWizardFlows } from '../../../PipetteWizardFlows'
+import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { SetupFlexPipetteCalibrationItem } from '../SetupFlexPipetteCalibrationItem'
 import { modifiedSimpleV6Protocol as _uncastedModifiedSimpleV6Protocol } from '/app/resources/runs/__fixtures__'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../PipetteWizardFlows')
+vi.mock('/app/organisms/PipetteWizardFlows')
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/analysis')
 

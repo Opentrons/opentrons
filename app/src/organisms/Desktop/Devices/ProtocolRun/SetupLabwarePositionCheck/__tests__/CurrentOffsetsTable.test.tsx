@@ -10,7 +10,7 @@ import {
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
-import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
+import { LabwarePositionCheck } from '/app/organisms/LabwarePositionCheck'
 import { useLPCDisabledReason } from '/app/resources/runs'
 import { getLatestCurrentOffsets } from '/app/transformations/runs'
 import { CurrentOffsetsTable } from '../CurrentOffsetsTable'
@@ -19,7 +19,7 @@ import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 
 vi.mock('/app/resources/runs')
-vi.mock('../../../../LabwarePositionCheck')
+vi.mock('/app/organisms/LabwarePositionCheck')
 vi.mock('/app/redux/config')
 vi.mock('/app/transformations/runs')
 

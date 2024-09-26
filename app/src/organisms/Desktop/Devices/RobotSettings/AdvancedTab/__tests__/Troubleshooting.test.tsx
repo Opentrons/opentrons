@@ -17,7 +17,7 @@ import { useRobot } from '/app/redux-resources/robots'
 import { Troubleshooting } from '../Troubleshooting'
 
 import type { HostConfig } from '@opentrons/api-client'
-import type { ToasterContextType } from '../../../../ToasterOven/ToasterContext'
+import type { ToasterContextType } from '/app/organisms/ToasterOven/ToasterContext'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ToasterOven')

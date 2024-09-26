@@ -16,7 +16,7 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '../../../redux/analytics'
-import { getTopPortalEl } from '../../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ChildNavigation } from '../../ChildNavigation'

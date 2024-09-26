@@ -14,14 +14,14 @@ import {
 import {
   useRunStatuses,
   useIsLegacySessionInProgress,
-} from '/app/organisms/Devices/hooks'
+} from '/app/organisms/Desktop/Devices/hooks'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useCurrentRunId } from '/app/resources/runs'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 
 import type { TemperatureStatus } from '@opentrons/api-client'
 
-vi.mock('../../Devices/hooks')
+vi.mock('../../Desktop/Devices/hooks')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/runs')
 

@@ -14,7 +14,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
 
 vi.mock('/app/redux/config')
-vi.mock('../../LabwarePositionCheck/utils/labware')
+vi.mock('/app/organisms/LabwarePositionCheck/utils/labware')
 vi.mock('/app/molecules/Command/utils/getLabwareDefinitionsFromCommands')
 
 const mockLabwareDef = fixture96Plate as LabwareDefinition2

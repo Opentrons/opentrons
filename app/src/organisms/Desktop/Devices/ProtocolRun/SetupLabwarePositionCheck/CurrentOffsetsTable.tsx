@@ -19,10 +19,10 @@ import {
 } from '@opentrons/components'
 
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
-import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
+import { LabwareOffsetTabs } from '/app/organisms/LabwareOffsetTabs'
 import { OffsetVector } from '/app/molecules/OffsetVector'
 import { PythonLabwareOffsetSnippet } from '/app/molecules/PythonLabwareOffsetSnippet'
-import { getDisplayLocation } from '../../../LabwarePositionCheck/utils/getDisplayLocation'
+import { getDisplayLocation } from '/app/organisms/LabwarePositionCheck/utils/getDisplayLocation'
 import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {

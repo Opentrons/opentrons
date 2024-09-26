@@ -5,7 +5,7 @@ import { useConditionalConfirm } from '@opentrons/components'
 import { getIsHeaterShakerAttached } from '/app/redux/config'
 
 import type { UseConditionalConfirmResult } from '@opentrons/components'
-import type { ConfirmAttachmentModalProps } from '../../../../../ModuleCard/ConfirmAttachmentModal'
+import type { ConfirmAttachmentModalProps } from '/app/organisms/ModuleCard/ConfirmAttachmentModal'
 
 export type UseHeaterShakerConfirmationModalResult =
   | {

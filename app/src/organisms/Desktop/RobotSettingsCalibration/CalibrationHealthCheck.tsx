@@ -16,7 +16,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { TertiaryButton } from '/app/atoms/buttons'
 import { AskForCalibrationBlockModal } from '/app/organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import {
@@ -27,7 +27,7 @@ import * as Calibration from '/app/redux/calibration'
 import * as Config from '/app/redux/config'
 import * as Pipettes from '/app/redux/pipettes'
 import * as Sessions from '/app/redux/sessions'
-import { useRunStatuses } from '/app/organisms/Devices/hooks'
+import { useRunStatuses } from '/app/organisms/Desktop/Devices/hooks'
 import {
   useAttachedPipettes,
   useAttachedPipetteCalibrations,

@@ -14,7 +14,7 @@ import {
   PHYSICALLY_ENGAGED,
   LOGICALLY_ENGAGED,
   useEstopContext,
-} from '../EmergencyStop'
+} from '/app/organisms/EmergencyStop'
 
 import type { EstopState } from '@opentrons/api-client'
 

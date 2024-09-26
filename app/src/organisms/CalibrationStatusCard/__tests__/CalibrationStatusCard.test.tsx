@@ -6,7 +6,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { CalibrationStatusCard } from '..'
-import { useCalibrationTaskList } from '../../Devices/hooks'
+import { useCalibrationTaskList } from '../../Desktop/Devices/hooks'
 import {
   expectedBadDeckTaskList,
   expectedBadDeckAndPipetteOffsetTaskList,
@@ -16,9 +16,9 @@ import {
   expectedBadTipLengthAndOffsetTaskList,
   expectedIncompleteDeckCalTaskList,
   expectedTaskList,
-} from '../../Devices/hooks/__fixtures__/taskListFixtures'
+} from '../../Desktop/Devices/hooks/__fixtures__/taskListFixtures'
 
-vi.mock('../../Devices/hooks')
+vi.mock('../../Desktop/Devices/hooks')
 
 const render = (props: React.ComponentProps<typeof CalibrationStatusCard>) => {
   return renderWithProviders(

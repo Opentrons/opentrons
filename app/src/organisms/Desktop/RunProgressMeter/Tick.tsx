@@ -14,7 +14,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { getModalPortalEl } from '../../App/portal'
+import { getModalPortalEl } from '/app/App/portal'
 
 import type { IconName } from '@opentrons/components'
 import type { RunTimeCommand } from '@opentrons/shared-data'

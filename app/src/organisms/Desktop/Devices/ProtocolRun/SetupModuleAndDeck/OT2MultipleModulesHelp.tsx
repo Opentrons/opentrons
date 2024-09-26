@@ -16,7 +16,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getTopPortalEl } from '../../../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import multipleModuleHelp from '/app/assets/images/Moam_modal_image.png'
 
 const HOW_TO_MULTIPLE_MODULES_HREF =

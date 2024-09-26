@@ -12,20 +12,17 @@ import {
 
 import { i18n } from '/app/i18n'
 import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
-import { PipetteWizardFlows } from '../../../PipetteWizardFlows'
-import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
-import {
-  useDeckCalibrationData,
-  useRunStatuses,
-  useAttachedPipettesFromInstrumentsQuery,
-} from '../../../Devices/hooks'
+import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { useCalibratePipetteOffset } from '/app/organisms/CalibratePipetteOffset/useCalibratePipetteOffset'
+import { useDeckCalibrationData, useRunStatuses } from '../../../Devices/hooks'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import {
   mockPipetteOffsetCalibrationsResponse,
   mockTipLengthCalibrationResponse,
 } from '../__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices'
 import { OverflowMenu } from '../OverflowMenu'
 
 import type { Mount } from '@opentrons/components'
@@ -65,10 +62,10 @@ vi.mock('/app/redux/sessions/selectors')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-api/selectors')
 vi.mock('/app/organisms/CalibratePipetteOffset/useCalibratePipetteOffset')
-vi.mock('/app/organisms/ProtocolUpload/hooks')
-vi.mock('/app/organisms/Devices/hooks')
-vi.mock('../../../PipetteWizardFlows')
-vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('../../../Devices/hooks')
+vi.mock('/app/organisms/PipetteWizardFlows')
+vi.mock('/app/resources/devices')
+vi.mock('/app/resources/instruments')
 
 const RUN_STATUSES = {
   isRunRunning: false,

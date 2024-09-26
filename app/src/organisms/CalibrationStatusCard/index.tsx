@@ -19,7 +19,7 @@ import {
 import { TertiaryButton } from '/app/atoms/buttons'
 import { StatusLabel } from '/app/atoms/StatusLabel'
 
-import { useCalibrationTaskList } from '../Devices/hooks'
+import { useCalibrationTaskList } from '../Desktop/Devices/hooks'
 
 export interface CalibrationStatusCardProps {
   robotName: string

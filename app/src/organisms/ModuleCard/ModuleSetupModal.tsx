@@ -14,7 +14,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 
 const MODULE_SETUP_URL = 'https://support.opentrons.com/s/modules'
 

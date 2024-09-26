@@ -9,10 +9,8 @@ import {
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
 } from '/app/redux/calibration/pipette-offset/__fixtures__'
-import {
-  usePipetteOffsetCalibrations,
-  useAttachedPipettesFromInstrumentsQuery,
-} from '/app/organisms/Devices/hooks'
+import { usePipetteOffsetCalibrations } from '/app/organisms/Desktop/Devices/hooks'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import { useIsFlex } from '/app/redux-resources/robots'
@@ -22,7 +20,7 @@ import { PipetteOffsetCalibrationItems } from '../CalibrationDetails/PipetteOffs
 
 import type { FormattedPipetteOffsetCalibration } from '..'
 
-vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/organisms/Desktop/Devices/hooks')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')
 

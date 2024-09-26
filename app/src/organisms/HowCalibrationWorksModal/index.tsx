@@ -16,7 +16,7 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import RobotCalHelpImage from '/app/assets/images/robot_calibration_help.png'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { Divider } from '/app/atoms/structure'

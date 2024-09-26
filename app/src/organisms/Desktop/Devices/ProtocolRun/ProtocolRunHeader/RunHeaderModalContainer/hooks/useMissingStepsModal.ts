@@ -1,7 +1,7 @@
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import { useConditionalConfirm } from '@opentrons/components'
 
-import { useIsHeaterShakerInProtocol } from '../../../../../ModuleCard/hooks'
+import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import { isAnyHeaterShakerShaking } from '../modals'
 
 import type { UseConditionalConfirmResult } from '@opentrons/components'

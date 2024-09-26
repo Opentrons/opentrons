@@ -10,7 +10,7 @@ import {
 } from '/app/redux/calibration/__fixtures__'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { mockAttachedPipette } from '/app/redux/pipettes/__fixtures__'
-import { useDeckCalibrationData } from '/app/organisms/Devices/hooks'
+import { useDeckCalibrationData } from '/app/organisms/Desktop/Devices/hooks'
 import { useAttachedPipettes } from '/app/resources/instruments'
 import { useRobot } from '/app/redux-resources/robots'
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -22,7 +22,7 @@ import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 vi.mock('/app/organisms/CalibrationStatusCard')
 vi.mock('/app/redux/robot-api/selectors')
 vi.mock('/app/redux-resources/robots')
-vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/organisms/Desktop/Devices/hooks')
 vi.mock('/app/resources/instruments')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {

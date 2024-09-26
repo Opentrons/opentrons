@@ -24,7 +24,7 @@ import {
 
 import { TertiaryButton } from '/app/atoms/buttons'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import {
   clearDiscoveryCache,
   getReachableRobots,

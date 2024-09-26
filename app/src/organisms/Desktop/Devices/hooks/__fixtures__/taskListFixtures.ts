@@ -7,7 +7,7 @@ import type {
   PipetteOffsetCalibration,
 } from '/app/redux/calibration/api-types'
 import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
-import type { TaskListProps } from '../../../TaskList/types'
+import type { TaskListProps } from '/app/organisms/TaskList/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 export const TASK_COUNT = 3

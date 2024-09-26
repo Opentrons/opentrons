@@ -18,9 +18,9 @@ import {
 } from '@opentrons/components'
 
 import { StatusLabel } from '/app/atoms/StatusLabel'
-import { TaskList } from '../TaskList'
+import { TaskList } from '/app/organisms/TaskList'
 
-import { useCalibrationTaskList } from '/app/organisms/Devices/hooks'
+import { useCalibrationTaskList } from '/app/organisms/Desktop/Devices/hooks'
 import { useAttachedPipettes } from '/app/resources/instruments'
 import { useCurrentRunId, useRunHasStarted } from '/app/resources/runs'
 
@@ -28,7 +28,7 @@ import type {
   DashboardCalOffsetInvoker,
   DashboardCalTipLengthInvoker,
   DashboardCalDeckInvoker,
-} from '/app/organisms/Devices/hooks'
+} from '/app/organisms/Desktop/Devices/hooks'
 
 interface CalibrationTaskListProps {
   robotName: string

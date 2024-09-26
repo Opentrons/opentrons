@@ -20,7 +20,7 @@ import {
 } from '@opentrons/components'
 
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
-import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
+import { LabwareOffsetTabs } from '/app/organisms/LabwareOffsetTabs'
 import { OffsetVector } from '/app/molecules/OffsetVector'
 import { PythonLabwareOffsetSnippet } from '/app/molecules/PythonLabwareOffsetSnippet'
 import { getLatestCurrentOffsets } from '/app/transformations/runs'

@@ -13,7 +13,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
 import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
-import { useLaunchLPC } from '../../../../LabwarePositionCheck/useLaunchLPC'
+import { useLaunchLPC } from '/app/organisms/LabwarePositionCheck/useLaunchLPC'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import { SetupLabwarePositionCheck } from '..'
 import {
@@ -27,7 +27,7 @@ import { useRobotType } from '/app/redux-resources/robots'
 
 import type { Mock } from 'vitest'
 
-vi.mock('../../../../LabwarePositionCheck/useLaunchLPC')
+vi.mock('/app/organisms/LabwarePositionCheck/useLaunchLPC')
 vi.mock('../../utils/getModuleTypesThatRequireExtraAttention')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/config')

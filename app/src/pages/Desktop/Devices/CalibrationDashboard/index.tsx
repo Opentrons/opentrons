@@ -8,7 +8,7 @@ import { useDashboardCalibratePipOffset } from './hooks/useDashboardCalibratePip
 import { useDashboardCalibrateTipLength } from './hooks/useDashboardCalibrateTipLength'
 import { useRobot } from '/app/redux-resources/robots'
 
-import type { DesktopRouteParams } from '../../../../App/types'
+import type { DesktopRouteParams } from '/app/App/types'
 
 export function CalibrationDashboard(): JSX.Element {
   const { robotName } = useParams<

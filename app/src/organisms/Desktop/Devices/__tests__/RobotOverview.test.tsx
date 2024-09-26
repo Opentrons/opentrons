@@ -5,7 +5,7 @@ import { screen, fireEvent } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
-import * as DiscoveryClientFixtures from '../../../../../discovery-client/src/fixtures'
+import * as DiscoveryClientFixtures from '../../../../../../discovery-client/src/fixtures'
 import { useAuthorization } from '@opentrons/react-api-client'
 
 import { i18n } from '/app/i18n'
@@ -47,7 +47,7 @@ import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 import {
   ErrorRecoveryBanner,
   useErrorRecoveryBanner,
-} from '../../ErrorRecoveryBanner'
+} from '/app/organisms/ErrorRecoveryBanner'
 
 import type { Config } from '/app/redux/config/types'
 import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'

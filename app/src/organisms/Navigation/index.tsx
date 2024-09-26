@@ -31,7 +31,7 @@ import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
 import { getLocalRobot } from '/app/redux/discovery'
 import { NavigationMenu } from './NavigationMenu'
-import type { ON_DEVICE_DISPLAY_PATHS } from '../../App/OnDeviceDisplayApp'
+import type { ON_DEVICE_DISPLAY_PATHS } from '/app/App/OnDeviceDisplayApp'
 
 const NAV_LINKS: Array<typeof ON_DEVICE_DISPLAY_PATHS[number]> = [
   '/protocols',

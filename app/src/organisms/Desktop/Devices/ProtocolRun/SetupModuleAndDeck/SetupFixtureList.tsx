@@ -32,7 +32,7 @@ import { TertiaryButton } from '/app/atoms/buttons/TertiaryButton'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { NotConfiguredModal } from './NotConfiguredModal'
 import { getFixtureImage } from './utils'
-import { DeckFixtureSetupInstructionsModal } from '../../../DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
+import { DeckFixtureSetupInstructionsModal } from '/app/organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 
 import type { DeckDefinition } from '@opentrons/shared-data'
 import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'

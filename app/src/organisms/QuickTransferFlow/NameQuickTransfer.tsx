@@ -14,7 +14,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '../ChildNavigation'
 

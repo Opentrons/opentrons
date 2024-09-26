@@ -16,7 +16,7 @@ import type {
 } from '/app/redux/sessions/types'
 import type { RequestState } from '/app/redux/robot-api/types'
 
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { CalibratePipetteOffset } from '.'
 import { pipetteOffsetCalibrationStarted } from '/app/redux/analytics'
 import { useTranslation } from 'react-i18next'

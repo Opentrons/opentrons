@@ -20,7 +20,7 @@ import {
 } from '@opentrons/components'
 
 import { analyzeProtocol } from '/app/redux/protocol-storage'
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 
 import type { Dispatch } from '/app/redux/types'
 interface ProtocolAnalysisFailureProps {

@@ -21,11 +21,11 @@ import {
   useMountEffect,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
 import { ChooseProtocolSlideout } from '/app/organisms/ChooseProtocolSlideout'
-import { DisconnectModal } from '/app/organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
-import { handleUpdateBuildroot } from '/app/organisms/Devices/RobotSettings/UpdateBuildroot'
+import { DisconnectModal } from './RobotSettings/ConnectNetwork/DisconnectModal'
+import { handleUpdateBuildroot } from './RobotSettings/UpdateBuildroot'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { UNREACHABLE, CONNECTABLE, REACHABLE } from '/app/redux/discovery'
 import { checkShellUpdate } from '/app/redux/shell'

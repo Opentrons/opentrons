@@ -24,7 +24,7 @@ import {
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { appShellRequestor } from '/app/redux/shell/remote'
-import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
+import { useTrackCreateProtocolRunEvent } from '../Desktop/Devices/hooks'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,

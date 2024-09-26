@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { home } from '/app/redux/robot-controls'
-import { useLights } from '../../Devices/hooks'
+import { useLights } from '../../Desktop/Devices/hooks'
 import { RestartRobotConfirmationModal } from '../RestartRobotConfirmationModal'
 import { NavigationMenu } from '../NavigationMenu'
 
@@ -13,7 +13,7 @@ import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('/app/redux/robot-admin')
 vi.mock('/app/redux/robot-controls')
-vi.mock('../../Devices/hooks')
+vi.mock('../../Desktop/Devices/hooks')
 vi.mock('../RestartRobotConfirmationModal')
 
 const mockNavigate = vi.fn()

@@ -38,7 +38,7 @@ import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
-} from '/app/organisms/Devices/hooks'
+} from '/app/organisms/Desktop/Devices/hooks'
 import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
@@ -54,7 +54,7 @@ vi.mock('file-saver', async importOriginal => {
 })
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/analytics')
-vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/organisms/Desktop/Devices/hooks')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 

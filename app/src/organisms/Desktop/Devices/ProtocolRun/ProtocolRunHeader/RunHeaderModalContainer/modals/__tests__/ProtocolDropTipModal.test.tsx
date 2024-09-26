@@ -4,7 +4,7 @@ import { renderHook, act, screen, fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useHomePipettes } from '../../../../../../DropTipWizardFlows'
+import { useHomePipettes } from '/app/organisms/DropTipWizardFlows'
 import {
   useProtocolDropTipModal,
   ProtocolDropTipModal,
@@ -12,7 +12,7 @@ import {
 
 import type { Mock } from 'vitest'
 
-vi.mock('../../../../../../DropTipWizardFlows')
+vi.mock('/app/organisms/DropTipWizardFlows')
 
 describe('useProtocolDropTipModal', () => {
   let props: Parameters<typeof useProtocolDropTipModal>[0]

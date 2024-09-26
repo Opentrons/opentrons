@@ -13,9 +13,9 @@ import { i18n } from '/app/i18n'
 import { mockMagneticModule } from '/app/redux/modules/__fixtures__'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useIsRobotViewable, useRunStatuses } from '../hooks'
-import { ModuleCard } from '../../ModuleCard'
+import { ModuleCard } from '/app/organisms/ModuleCard'
 import { InstrumentsAndModules } from '../InstrumentsAndModules'
-import { GripperCard } from '../../GripperCard'
+import { GripperCard } from '/app/organisms/GripperCard'
 import { PipetteCard } from '../PipetteCard'
 import { FlexPipetteCard } from '../PipetteCard/FlexPipetteCard'
 import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
@@ -33,8 +33,8 @@ vi.mock('@opentrons/components', async importOriginal => {
 })
 vi.mock('@opentrons/react-api-client')
 vi.mock('../hooks')
-vi.mock('../../GripperCard')
-vi.mock('../../ModuleCard')
+vi.mock('/app/organisms/GripperCard')
+vi.mock('/app/organisms/ModuleCard')
 vi.mock('../PipetteCard')
 vi.mock('../PipetteCard/FlexPipetteCard')
 vi.mock('../PipetteCard/PipetteRecalibrationWarning')

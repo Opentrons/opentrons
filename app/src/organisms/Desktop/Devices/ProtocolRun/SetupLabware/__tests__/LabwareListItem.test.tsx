@@ -14,7 +14,7 @@ import {
   mockTemperatureModule,
   mockThermocycler,
 } from '/app/redux/modules/__fixtures__'
-import { mockLabwareDef } from '../../../../LabwarePositionCheck/__fixtures__/mockLabwareDef'
+import { mockLabwareDef } from '/app/organisms/LabwarePositionCheck/__fixtures__/mockLabwareDef'
 import { SecureLabwareModal } from '../SecureLabwareModal'
 import { LabwareListItem } from '../LabwareListItem'
 import type {

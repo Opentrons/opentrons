@@ -17,7 +17,7 @@ import type {
   SubTaskProps,
   TaskListProps,
   TaskProps,
-} from '../../TaskList/types'
+} from '/app/organisms/TaskList/types'
 import type { AttachedPipette } from '/app/redux/pipettes/types'
 import type {
   PipetteOffsetCalibrationSessionParams,

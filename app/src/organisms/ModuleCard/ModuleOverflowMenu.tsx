@@ -21,7 +21,7 @@ import { useCurrentRunId } from '/app/resources/runs'
 import {
   useRunStatuses,
   useIsLegacySessionInProgress,
-} from '/app/organisms/Devices/hooks'
+} from '/app/organisms/Desktop/Devices/hooks'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useModuleOverflowMenu } from './hooks'
 

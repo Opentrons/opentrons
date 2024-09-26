@@ -9,7 +9,7 @@ import { appShellRequestor } from '/app/redux/shell/remote'
 import { DeviceDetailsComponent } from './DeviceDetailsComponent'
 import { useRobot } from '/app/redux-resources/robots'
 
-import type { DesktopRouteParams } from '../../../../App/types'
+import type { DesktopRouteParams } from '/app/App/types'
 
 export function DeviceDetails(): JSX.Element | null {
   const { robotName } = useParams<

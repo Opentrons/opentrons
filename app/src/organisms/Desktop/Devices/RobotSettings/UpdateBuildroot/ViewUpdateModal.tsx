@@ -10,7 +10,7 @@ import {
   getRobotUpdateAvailable,
 } from '/app/redux/robot-update'
 import { getAvailableShellUpdate } from '/app/redux/shell'
-import { getTopPortalEl } from '../../../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { UpdateAppModal } from '/app/organisms/UpdateAppModal'
 import { MigrationWarningModal } from './MigrationWarningModal'
 import { UpdateRobotModal } from './UpdateRobotModal'

@@ -9,8 +9,10 @@ import {
   mockAttachedPipette,
   mockAttachedPipetteInformation,
 } from '/app/redux/pipettes/__fixtures__'
-import { useAttachedPipettesFromInstrumentsQuery } from '/app/organisms/Devices/hooks'
-import { useAttachedPipettes } from '/app/resources/instruments'
+import {
+  useAttachedPipettes,
+  useAttachedPipettesFromInstrumentsQuery,
+} from '/app/resources/instruments'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
@@ -60,7 +62,6 @@ vi.mock('/app/redux/custom-labware/selectors')
 vi.mock('/app/redux/sessions/selectors')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/assets/labware/findLabware')
-vi.mock('/app/organisms/Devices/hooks')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/instruments')
 vi.mock('../OverflowMenu')

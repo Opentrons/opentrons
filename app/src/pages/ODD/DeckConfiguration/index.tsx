@@ -14,7 +14,7 @@ import {
 import { ChildNavigation } from '/app/organisms/ChildNavigation'
 import { DeckFixtureSetupInstructionsModal } from '/app/organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { DeckConfigurationDiscardChangesModal } from '/app/organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
-import { getTopPortalEl } from '../../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import {
   useDeckConfigurationEditingTools,
   useNotifyDeckConfigurationQuery,

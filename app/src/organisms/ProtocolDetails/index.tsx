@@ -49,7 +49,7 @@ import {
   parseInitialPipetteNamesByMount,
 } from '@opentrons/shared-data'
 
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
 import {
   useTrackEvent,

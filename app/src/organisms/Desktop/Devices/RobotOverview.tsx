@@ -39,7 +39,7 @@ import { CalibrationStatusBanner } from './CalibrationStatusBanner'
 import {
   ErrorRecoveryBanner,
   useErrorRecoveryBanner,
-} from '../ErrorRecoveryBanner'
+} from '/app/organisms/ErrorRecoveryBanner'
 
 import type { State } from '/app/redux/types'
 

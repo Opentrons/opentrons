@@ -9,7 +9,7 @@ import {
   DISENGAGED,
   NOT_PRESENT,
   PHYSICALLY_ENGAGED,
-} from '../../../EmergencyStop'
+} from '/app/organisms/EmergencyStop'
 import { useIsRobotBusy } from '../useIsRobotBusy'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'

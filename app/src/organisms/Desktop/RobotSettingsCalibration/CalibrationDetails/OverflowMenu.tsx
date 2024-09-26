@@ -29,18 +29,16 @@ import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
 } from '/app/redux/analytics'
-import {
-  useRunStatuses,
-  useAttachedPipettesFromInstrumentsQuery,
-} from '/app/organisms/Devices/hooks'
-import { PipetteWizardFlows } from '../../PipetteWizardFlows'
-import { FLOWS } from '../../PipetteWizardFlows/constants'
-import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useRunStatuses } from '/app/organisms/Desktop/Devices/hooks'
+import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
+import { useIsEstopNotDisengaged } from '/app/resources/devices'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 
 import type { Mount } from '@opentrons/components'
 import type { PipetteName } from '@opentrons/shared-data'
 import type { DeleteCalRequestParams } from '@opentrons/api-client'
-import type { SelectablePipettes } from '../../PipetteWizardFlows/types'
+import type { SelectablePipettes } from '/app/organisms/PipetteWizardFlows/types'
 
 interface OverflowMenuProps {
   calType: 'pipetteOffset' | 'tipLength'

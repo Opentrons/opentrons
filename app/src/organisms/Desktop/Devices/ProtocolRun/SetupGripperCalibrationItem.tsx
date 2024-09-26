@@ -11,12 +11,12 @@ import {
 import { getGripperDisplayName } from '@opentrons/shared-data'
 import { TertiaryButton } from '/app/atoms/buttons'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
-import { GripperWizardFlows } from '../../GripperWizardFlows'
-import { GRIPPER_FLOW_TYPES } from '../../GripperWizardFlows/constants'
+import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
+import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
 
 import type { GripperData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
-import type { GripperWizardFlowType } from '../../GripperWizardFlows/types'
+import type { GripperWizardFlowType } from '/app/organisms/GripperWizardFlows/types'
 
 interface SetupGripperCalibrationItemProps {
   gripperData: GripperData | null

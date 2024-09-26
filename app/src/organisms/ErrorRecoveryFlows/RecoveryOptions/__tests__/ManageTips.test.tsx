@@ -13,15 +13,15 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ManageTips, useDropTipFlowUtils } from '../ManageTips'
 import { RECOVERY_MAP } from '../../constants'
-import { DropTipWizardFlows } from '../../../DropTipWizardFlows'
-import { DT_ROUTES } from '../../../DropTipWizardFlows/constants'
+import { DropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
+import { DT_ROUTES } from '/app/organisms/DropTipWizardFlows/constants'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
 import { clickButtonLabeled } from '../../__tests__/util'
 
 import type { Mock } from 'vitest'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
-vi.mock('../../../DropTipWizardFlows')
+vi.mock('/app/organisms/DropTipWizardFlows')
 vi.mock('../SelectRecoveryOption')
 
 const { DROP_TIP_FLOWS, RETRY_NEW_TIPS } = RECOVERY_MAP

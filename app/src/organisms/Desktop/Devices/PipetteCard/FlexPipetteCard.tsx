@@ -19,13 +19,13 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 import { InstrumentCard } from '/app/molecules/InstrumentCard'
-import { ChoosePipette } from '../../PipetteWizardFlows/ChoosePipette'
-import { FLOWS } from '../../PipetteWizardFlows/constants'
-import { handlePipetteWizardFlows } from '../../PipetteWizardFlows'
+import { ChoosePipette } from '/app/organisms/PipetteWizardFlows/ChoosePipette'
+import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
+import { handlePipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import {
   DropTipWizardFlows,
   useDropTipWizardFlows,
-} from '../../DropTipWizardFlows'
+} from '/app/organisms/DropTipWizardFlows'
 
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 
@@ -39,7 +39,7 @@ import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type {
   PipetteWizardFlow,
   SelectablePipettes,
-} from '../../PipetteWizardFlows/types'
+} from '/app/organisms/PipetteWizardFlows/types'
 
 interface FlexPipetteCardProps {
   attachedPipette: PipetteData | BadPipette | null

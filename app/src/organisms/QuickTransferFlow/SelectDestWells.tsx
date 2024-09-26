@@ -14,7 +14,7 @@ import { getAllDefinitions } from '@opentrons/shared-data'
 import { ANALYTICS_QUICK_TRANSFER_WELL_SELECTION_DURATION } from '../../redux/analytics'
 
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { OddModal } from '/app/molecules/OddModal'
 import { ChildNavigation } from '/app/organisms/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'

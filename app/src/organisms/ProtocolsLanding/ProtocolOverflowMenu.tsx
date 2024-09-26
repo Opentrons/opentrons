@@ -21,7 +21,7 @@ import {
 } from '@opentrons/components'
 import { FLEX_DISPLAY_NAME, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,

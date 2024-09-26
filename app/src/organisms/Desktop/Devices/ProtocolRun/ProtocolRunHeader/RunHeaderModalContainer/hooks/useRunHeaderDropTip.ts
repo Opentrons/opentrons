@@ -7,7 +7,7 @@ import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   useDropTipWizardFlows,
   useTipAttachmentStatus,
-} from '../../../../../DropTipWizardFlows'
+} from '/app/organisms/DropTipWizardFlows'
 import { useProtocolDropTipModal } from '../modals'
 import { useCloseCurrentRun, useIsRunCurrent } from '/app/resources/runs'
 import { isTerminalRunStatus } from '../../utils'
@@ -17,7 +17,7 @@ import type { Run, RunStatus } from '@opentrons/api-client'
 import type {
   DropTipWizardFlowsProps,
   PipetteWithTip,
-} from '../../../../../DropTipWizardFlows'
+} from '/app/organisms/DropTipWizardFlows'
 import type { UseProtocolDropTipModalResult } from '../modals'
 import type { PipetteDetails } from '/app/resources/maintenance_runs'
 

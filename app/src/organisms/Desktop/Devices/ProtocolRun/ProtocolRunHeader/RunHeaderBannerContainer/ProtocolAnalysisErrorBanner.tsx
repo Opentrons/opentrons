@@ -16,7 +16,7 @@ import {
   Modal,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../../../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 
 import type { AnalysisError } from '@opentrons/shared-data'
 

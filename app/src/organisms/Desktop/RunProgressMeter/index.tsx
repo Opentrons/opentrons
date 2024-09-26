@@ -29,9 +29,12 @@ import {
   RUN_STATUS_RUNNING,
 } from '@opentrons/api-client'
 
-import { getModalPortalEl } from '../../App/portal'
-import { useRunControls } from '../RunTimeControl/hooks'
-import { InterventionModal, useInterventionModal } from '../InterventionModal'
+import { getModalPortalEl } from '/app/App/portal'
+import { useRunControls } from '/app/organisms/RunTimeControl'
+import {
+  InterventionModal,
+  useInterventionModal,
+} from '/app/organisms/InterventionModal'
 import { ProgressBar } from '/app/atoms/ProgressBar'
 import { useDownloadRunLog } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'

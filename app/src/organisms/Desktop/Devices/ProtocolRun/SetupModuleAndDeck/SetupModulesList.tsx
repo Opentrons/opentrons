@@ -43,8 +43,8 @@ import {
   useModuleRenderInfoForProtocolById,
   useUnmatchedModulesForProtocol,
 } from '/app/resources/runs'
-import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
-import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
+import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
+import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import {
   getModulePrepCommands,
   getModuleImage,

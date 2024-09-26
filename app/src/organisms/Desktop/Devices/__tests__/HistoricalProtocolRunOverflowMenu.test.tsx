@@ -13,7 +13,7 @@ import runRecord from '../ProtocolRun/ProtocolRunHeader/RunHeaderModalContainer/
 import { useDownloadRunLog } from '../hooks'
 import { useRobot } from '/app/redux-resources/robots'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
-import { useRunControls } from '../../RunTimeControl/hooks'
+import { useRunControls } from '/app/organisms/RunTimeControl'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -29,8 +29,8 @@ import type { CommandsData } from '@opentrons/api-client'
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/robot-update/selectors')
 vi.mock('/app/redux-resources/robots')
-vi.mock('/app/organisms/Devices/hooks')
-vi.mock('../../RunTimeControl/hooks')
+vi.mock('../hooks')
+vi.mock('/app/organisms/RunTimeControl')
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/config')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')

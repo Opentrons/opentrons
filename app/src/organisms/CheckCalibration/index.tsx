@@ -19,7 +19,7 @@ import {
   ConfirmExit,
 } from '/app/organisms/CalibrationPanels'
 import { WizardHeader } from '/app/molecules/WizardHeader'
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
 

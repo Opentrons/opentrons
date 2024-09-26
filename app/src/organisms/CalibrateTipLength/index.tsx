@@ -22,7 +22,7 @@ import {
   CompleteConfirmation,
 } from '/app/organisms/CalibrationPanels'
 import { WizardHeader } from '/app/molecules/WizardHeader'
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 
 import slotOneRemoveBlockAsset from '/app/assets/videos/tip-length-cal/Slot_1_Remove_CalBlock_(330x260)REV1.webm'
 import slotThreeRemoveBlockAsset from '/app/assets/videos/tip-length-cal/Slot_3_Remove_CalBlock_(330x260)REV1.webm'

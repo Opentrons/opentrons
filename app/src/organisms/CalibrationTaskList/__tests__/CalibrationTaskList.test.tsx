@@ -16,13 +16,13 @@ import {
   expectedIncompleteDeckCalTaskList,
   expectedIncompleteRightMountTaskList,
   expectedIncompleteLeftMountTaskList,
-} from '../../Devices/hooks/__fixtures__/taskListFixtures'
-import { useCalibrationTaskList } from '../../Devices/hooks'
+} from '../../Desktop/Devices/hooks/__fixtures__/taskListFixtures'
+import { useCalibrationTaskList } from '../../Desktop/Devices/hooks'
 import { useAttachedPipettes } from '/app/resources/instruments'
 import { mockLeftProtoPipette } from '/app/redux/pipettes/__fixtures__'
 import { useRunHasStarted } from '/app/resources/runs'
 
-vi.mock('../../Devices/hooks')
+vi.mock('../../Desktop/Devices/hooks')
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/instruments')
 

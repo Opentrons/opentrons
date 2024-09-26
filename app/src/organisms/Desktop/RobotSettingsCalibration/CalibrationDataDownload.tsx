@@ -22,7 +22,7 @@ import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
-} from '/app/organisms/Devices/hooks'
+} from '/app/organisms/Desktop/Devices/hooks'
 import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,

@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { ModalShell } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../../../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { WizardHeader } from '/app/molecules/WizardHeader'
 import { CalibrateDeck } from '/app/organisms/CalibrateDeck'
 import { LoadingState } from '/app/organisms/CalibrationPanels'

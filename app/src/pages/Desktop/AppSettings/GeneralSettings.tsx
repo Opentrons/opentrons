@@ -43,7 +43,7 @@ import {
 import { UpdateAppModal } from '/app/organisms/UpdateAppModal'
 import { PreviousVersionModal } from '/app/organisms/AppSettings/PreviousVersionModal'
 import { ConnectRobotSlideout } from '/app/organisms/AppSettings/ConnectRobotSlideout'
-import { getTopPortalEl } from '../../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 
 import type { Dispatch, State } from '/app/redux/types'
 

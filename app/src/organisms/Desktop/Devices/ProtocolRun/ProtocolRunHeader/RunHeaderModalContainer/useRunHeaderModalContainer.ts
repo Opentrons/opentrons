@@ -11,7 +11,7 @@ import {
   useMissingStepsModal,
   useRunHeaderDropTip,
 } from './hooks'
-import { useErrorRecoveryFlows } from '../../../../ErrorRecoveryFlows'
+import { useErrorRecoveryFlows } from '/app/organisms/ErrorRecoveryFlows'
 import { useProtocolDetailsForRun } from '/app/resources/runs'
 import { getFallbackRobotSerialNumber } from '../utils'
 import {
@@ -20,7 +20,7 @@ import {
 } from '/app/redux/analytics'
 import { useRobot, useRobotType } from '/app/redux-resources/robots'
 import type { AttachedModule, RunStatus, Run } from '@opentrons/api-client'
-import type { UseErrorRecoveryResult } from '../../../../ErrorRecoveryFlows'
+import type { UseErrorRecoveryResult } from '/app/organisms/ErrorRecoveryFlows'
 import type {
   UseRunHeaderDropTipResult,
   UseMissingStepsModalResult,
@@ -33,7 +33,7 @@ import type {
   UseRunFailedModalResult,
 } from './modals'
 import type { ProtocolRunHeaderProps } from '..'
-import type { RunControls } from '../../../../RunTimeControl/hooks'
+import type { RunControls } from '/app/organisms/RunTimeControl'
 import type { UseRunErrorsResult } from '../hooks'
 
 interface UseRunHeaderModalContainerProps extends ProtocolRunHeaderProps {

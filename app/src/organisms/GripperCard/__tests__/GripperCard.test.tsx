@@ -4,12 +4,12 @@ import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
 import { i18n } from '/app/i18n'
-import { GripperWizardFlows } from '../../GripperWizardFlows'
+import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import { AboutGripperSlideout } from '../AboutGripperSlideout'
 import { GripperCard } from '../'
 import type { GripperData } from '@opentrons/api-client'
 
-vi.mock('../../GripperWizardFlows')
+vi.mock('/app/organisms/GripperWizardFlows')
 vi.mock('../AboutGripperSlideout')
 vi.mock('@opentrons/react-api-client')
 

@@ -35,7 +35,7 @@ import { SelectNetwork } from './SelectNetwork'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { State, Dispatch } from '/app/redux/types'
-import { getModalPortalEl } from '../../../App/portal'
+import { getModalPortalEl } from '/app/App/portal'
 interface NetworkingProps {
   robotName: string
   updateRobotStatus: (isRobotBusy: boolean) => void

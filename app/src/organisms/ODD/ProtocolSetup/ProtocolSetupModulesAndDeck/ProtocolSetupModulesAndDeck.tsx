@@ -17,7 +17,7 @@ import {
 } from '@opentrons/shared-data'
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 
-import { getTopPortalEl } from '../../../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { FloatingActionButton } from '/app/atoms/buttons'
 import { InlineNotification } from '/app/atoms/InlineNotification'
 import { ChildNavigation } from '/app/organisms/ChildNavigation'

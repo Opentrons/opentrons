@@ -21,7 +21,7 @@ import { useProtocolQuery } from '@opentrons/react-api-client'
 import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { CurrentOffsetsTable } from './CurrentOffsetsTable'
-import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
+import { useLaunchLPC } from '/app/organisms/LabwarePositionCheck/useLaunchLPC'
 import { getLatestCurrentOffsets } from '/app/transformations/runs'
 import {
   useNotifyRunQuery,

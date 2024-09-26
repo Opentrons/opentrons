@@ -6,9 +6,9 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { i18n } from '/app/i18n'
 import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
-import { HeaterShakerModuleData } from '../../../../../../../ModuleCard/HeaterShakerModuleData'
+import { HeaterShakerModuleData } from '/app/organisms/ModuleCard/HeaterShakerModuleData'
 
-vi.mock('../../../../../../../ModuleCard/HeaterShakerModuleData')
+vi.mock('/app/organisms/ModuleCard/HeaterShakerModuleData')
 
 const render = (props: React.ComponentProps<typeof HeaterShakerModuleCard>) => {
   return renderWithProviders(<HeaterShakerModuleCard {...props} />, {

@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 
 import { formatLastModified } from '/app/organisms/CalibrationPanels/utils'
-import { useDeckCalibrationData } from '/app/organisms/Devices/hooks'
+import { useDeckCalibrationData } from '/app/organisms/Desktop/Devices/hooks'
 import { useRobot } from '/app/redux-resources/robots'
 import * as RobotApi from '/app/redux/robot-api'
 

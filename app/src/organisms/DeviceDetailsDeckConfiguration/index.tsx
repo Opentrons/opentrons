@@ -31,7 +31,7 @@ import {
 
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
-import { useIsRobotViewable, useRunStatuses } from '../Devices/hooks'
+import { useIsRobotViewable, useRunStatuses } from '../Desktop/Devices/hooks'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import {
   useDeckConfigurationEditingTools,

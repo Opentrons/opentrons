@@ -12,7 +12,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { OddModal } from '/app/molecules/OddModal'
 
 export function OpenDoorAlertModal(): JSX.Element {

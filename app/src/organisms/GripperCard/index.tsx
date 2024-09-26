@@ -11,13 +11,13 @@ import {
 import { getGripperDisplayName } from '@opentrons/shared-data'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
 import { InstrumentCard } from '/app/molecules/InstrumentCard'
-import { GripperWizardFlows } from '../GripperWizardFlows'
+import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import { AboutGripperSlideout } from './AboutGripperSlideout'
-import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
+import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
 
 import type { BadGripper, GripperData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
-import type { GripperWizardFlowType } from '../GripperWizardFlows/types'
+import type { GripperWizardFlowType } from '/app/organisms/GripperWizardFlows/types'
 
 interface GripperCardProps {
   attachedGripper: GripperData | BadGripper | null

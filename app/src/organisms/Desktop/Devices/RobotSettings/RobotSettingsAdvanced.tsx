@@ -43,7 +43,7 @@ import { DeviceResetModal } from './AdvancedTab/AdvancedTabSlideouts/DeviceReset
 import { FactoryModeSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryModeSlideout'
 import { handleUpdateBuildroot } from './UpdateBuildroot'
 import { getRobotSerialNumber, UNREACHABLE } from '/app/redux/discovery'
-import { getTopPortalEl } from '../../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { State, Dispatch } from '/app/redux/types'

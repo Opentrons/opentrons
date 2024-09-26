@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { ModalShell } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../../../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { WizardHeader } from '/app/molecules/WizardHeader'
 import { CalibrateTipLength } from '/app/organisms/CalibrateTipLength'
 import { AskForCalibrationBlockModal } from '/app/organisms/CalibrateTipLength/AskForCalibrationBlockModal'
