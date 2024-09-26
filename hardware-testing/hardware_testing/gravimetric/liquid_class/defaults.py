@@ -80,7 +80,7 @@ _defaults: Dict[
                         ),
                         dispense=DispenseSettings(
                             flow_rate=57,
-                            push_out=10,
+                            push_out=11,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -96,7 +96,7 @@ _defaults: Dict[
                         ),
                         dispense=DispenseSettings(
                             flow_rate=40.0,
-                            push_out=10.0,  # NOTE: Tecan is 40uL
+                            push_out=11.0,  # NOTE: Tecan is 40uL
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -114,7 +114,7 @@ _defaults: Dict[
                         ),
                         dispense=DispenseSettings(
                             flow_rate=57,
-                            push_out=3.9,
+                            push_out=11,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -130,7 +130,7 @@ _defaults: Dict[
                         ),
                         dispense=DispenseSettings(
                             flow_rate=40.0,
-                            push_out=3.9,
+                            push_out=11,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -148,7 +148,7 @@ _defaults: Dict[
                         ),
                         dispense=DispenseSettings(
                             flow_rate=57,
-                            push_out=3.9,
+                            push_out=11,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -164,7 +164,7 @@ _defaults: Dict[
                         ),
                         dispense=DispenseSettings(
                             flow_rate=40.0,
-                            push_out=3.9,
+                            push_out=11,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -344,7 +344,7 @@ _defaults: Dict[
                         ),
                         dispense=DispenseSettings(
                             flow_rate=500.0,
-                            push_out=10.0,
+                            push_out=11.0,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -378,7 +378,7 @@ _defaults: Dict[
                         ),
                         dispense=DispenseSettings(
                             flow_rate=500.0,
-                            push_out=10.0,
+                            push_out=11.0,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
@@ -486,7 +486,7 @@ _defaults: Dict[
                         ),
                         dispense=DispenseSettings(
                             flow_rate=600,
-                            push_out=10.0,
+                            push_out=11.0,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
