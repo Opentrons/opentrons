@@ -16,12 +16,14 @@ import {
   storedProtocolDataWithoutRunTimeParameters,
 } from '/app/redux/protocol-storage/__fixtures__'
 import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/hooks'
-import { useCreateRunFromProtocol } from '../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
+import { useCreateRunFromProtocol } from '/app/organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ChooseProtocolSlideout } from '../'
 import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
-vi.mock('../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol')
+vi.mock(
+  '/app/organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
+)
 vi.mock('/app/redux/protocol-storage')
 vi.mock('/app/organisms/Desktop/Devices/hooks')
 vi.mock('/app/redux/config')

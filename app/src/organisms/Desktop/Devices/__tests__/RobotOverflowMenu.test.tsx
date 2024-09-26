@@ -6,7 +6,7 @@ import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useCurrentRunId } from '/app/resources/runs'
-import { ChooseProtocolSlideout } from '/app/organisms/ChooseProtocolSlideout'
+import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
 import { RobotOverflowMenu } from '../RobotOverflowMenu'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { useIsRobotBusy } from '../hooks'
@@ -18,7 +18,7 @@ import {
 
 vi.mock('/app/redux/robot-update/hooks')
 vi.mock('/app/resources/runs')
-vi.mock('/app/organisms/ChooseProtocolSlideout')
+vi.mock('/app/organisms/Desktop/ChooseProtocolSlideout')
 vi.mock('../hooks')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 

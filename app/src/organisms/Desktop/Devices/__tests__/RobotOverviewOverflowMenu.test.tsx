@@ -17,7 +17,7 @@ import {
 } from '/app/redux/discovery/__fixtures__'
 import { useCanDisconnect } from '/app/resources/networking/hooks'
 import { DisconnectModal } from '../RobotSettings/ConnectNetwork/DisconnectModal'
-import { ChooseProtocolSlideout } from '/app/organisms/ChooseProtocolSlideout'
+import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
 import { useCurrentRunId } from '/app/resources/runs'
 import { useIsRobotBusy } from '../hooks'
 import { handleUpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
@@ -30,7 +30,7 @@ vi.mock('../hooks')
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/resources/networking/hooks')
 vi.mock('../RobotSettings/ConnectNetwork/DisconnectModal')
-vi.mock('/app/organisms/ChooseProtocolSlideout')
+vi.mock('/app/organisms/Desktop/ChooseProtocolSlideout')
 vi.mock('/app/resources/runs')
 vi.mock('../RobotSettings/UpdateBuildroot')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')

@@ -43,7 +43,7 @@ import {
 } from '@opentrons/react-api-client'
 import { sortRuntimeParameters } from '@opentrons/shared-data'
 
-import { useLogger } from '../../logger'
+import { useLogger } from '/app/logger'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getStoredProtocols } from '/app/redux/protocol-storage'
 import { appShellRequestor } from '/app/redux/shell/remote'
@@ -51,16 +51,16 @@ import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
 import { ToggleButton } from '/app/atoms/buttons'
 import { MiniCard } from '/app/molecules/MiniCard'
 import { UploadInput } from '/app/molecules/UploadInput'
-import { useTrackCreateProtocolRunEvent } from '../Desktop/Devices/hooks'
-import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
-import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
-import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { FileCard } from '../ChooseRobotSlideout/FileCard'
+import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/hooks'
+import { useCreateRunFromProtocol } from '/app/organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
+import { ApplyHistoricOffsets } from '/app/organisms/ApplyHistoricOffsets'
+import { useOffsetCandidatesForAnalysis } from '/app/organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { FileCard } from '/app/organisms/ChooseRobotSlideout/FileCard'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
 } from '/app/transformations/runs'
-import { getAnalysisStatus } from '../ProtocolsLanding/utils'
+import { getAnalysisStatus } from '/app/organisms/ProtocolsLanding/utils'
 
 import type { DropdownOption } from '@opentrons/components'
 import type { RunTimeParameter } from '@opentrons/shared-data'

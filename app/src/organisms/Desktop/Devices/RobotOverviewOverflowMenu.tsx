@@ -23,7 +23,7 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
-import { ChooseProtocolSlideout } from '/app/organisms/ChooseProtocolSlideout'
+import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
 import { DisconnectModal } from './RobotSettings/ConnectNetwork/DisconnectModal'
 import { handleUpdateBuildroot } from './RobotSettings/UpdateBuildroot'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
