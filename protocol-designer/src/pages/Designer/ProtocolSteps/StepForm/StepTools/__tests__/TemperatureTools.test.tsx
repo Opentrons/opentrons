@@ -40,6 +40,7 @@ describe('TemperatureTools', () => {
         dirtyFields: [],
         focusedField: null,
       },
+      toolboxStep: 1,
       propsForFields: {
         moduleId: {
           onFieldFocus: vi.fn(),
