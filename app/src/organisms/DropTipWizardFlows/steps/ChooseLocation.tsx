@@ -1,4 +1,4 @@
-import { useState, useLayoutEffect } from 'react'
+import { useState, useLayoutEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -9,6 +9,7 @@ import {
   SPACING,
   StyledText,
   RadioButton,
+  OVERFLOW_AUTO,
 } from '@opentrons/components'
 
 import { BLOWOUT_SUCCESS, DROP_TIP_SUCCESS, DT_ROUTES } from '../constants'
@@ -44,11 +45,13 @@ export function ChooseLocation({
   const [
     selectedLocation,
     setSelectedLocation,
-  ] = useState<DropTipBlowoutLocationDetails>()
+  ] = useState<DropTipBlowoutLocationDetails | null>(null)
 
-  // On initial render, synchronously set the first option as the selected option.
+  // On initial render with values, synchronously set the first option as the selected option.
   useLayoutEffect(() => {
-    setSelectedLocation(dropTipCommandLocations[0])
+    if (dropTipCommandLocations.length > 0) {
+      setSelectedLocation(dropTipCommandLocations[0])
+    }
   }, [dropTipCommandLocations.length])
 
   const buildTitleCopy = (): string => {
@@ -79,11 +82,12 @@ export function ChooseLocation({
     }
   }
 
-  const handleChange = (
-    locationDetails: DropTipBlowoutLocationDetails
-  ): void => {
-    setSelectedLocation(locationDetails)
-  }
+  const handleChange = useCallback(
+    (locationDetails: DropTipBlowoutLocationDetails) => {
+      setSelectedLocation(locationDetails)
+    },
+    []
+  )
 
   const executeCommands = (): void => {
     toggleIsRobotPipetteMoving()
@@ -119,43 +123,47 @@ export function ChooseLocation({
   }
 
   return (
-    <>
-      <Flex css={CONTAINER_STYLE}>
-        <StyledText
-          oddStyle="level4HeaderSemiBold"
-          desktopStyle="headingSmallBold"
-        >
-          {buildTitleCopy()}
-        </StyledText>
-        <Flex css={OPTION_CONTAINER_STYLE}>
-          {dropTipCommandLocations.map(ld => {
-            const label = buildLocationCopy(ld.location, ld.slotName)
-            return (
-              <RadioButton
-                key={label}
-                buttonLabel={label}
-                buttonValue={ld.location}
-                onChange={() => {
-                  handleChange(ld)
-                }}
-                isSelected={ld.location === selectedLocation?.location}
-                largeDesktopBorderRadius={true}
-              />
-            )
-          })}
-        </Flex>
+    <Flex css={CONTAINER_STYLE}>
+      <StyledText
+        oddStyle="level4HeaderSemiBold"
+        desktopStyle="headingSmallBold"
+      >
+        {buildTitleCopy()}
+      </StyledText>
+      <Flex css={OPTION_CONTAINER_STYLE}>
+        {dropTipCommandLocations.map(ld => {
+          const label = buildLocationCopy(ld.location, ld.slotName)
+          return (
+            <RadioButton
+              key={label}
+              buttonLabel={label}
+              buttonValue={ld.slotName}
+              onChange={() => {
+                handleChange(ld)
+              }}
+              isSelected={ld.slotName === selectedLocation?.slotName}
+              largeDesktopBorderRadius={true}
+            />
+          )
+        })}
       </Flex>
       <DropTipFooterButtons
         primaryBtnOnClick={primaryOnClick}
         secondaryBtnOnClick={goBackRunValid}
       />
-    </>
+    </Flex>
   )
 }
 
 const CONTAINER_STYLE = css`
+  overflow: ${OVERFLOW_AUTO};
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing16};
+  height: 100%;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: 80%;
+  }
 `
 
 const OPTION_CONTAINER_STYLE = css`
