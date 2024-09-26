@@ -97,7 +97,6 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
           <Flex
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             alignItems={ALIGN_CENTER}
-            borderBottom={`1px solid ${COLORS.grey30}`}
             gridGap={SPACING.spacing12}
           >
             {title}
@@ -116,6 +115,7 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
             ) : null}
           </Flex>
         </Flex>
+        <Box borderBottom={`1px solid ${COLORS.grey30}`} />
         <Box
           padding={childrenPadding}
           flex="1 1 auto"
