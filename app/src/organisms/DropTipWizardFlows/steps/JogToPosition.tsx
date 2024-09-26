@@ -10,7 +10,7 @@ import {
   RESPONSIVENESS,
 } from '@opentrons/components'
 
-import { POSITION_AND_BLOWOUT } from '../constants'
+import { DT_ROUTES } from '../constants'
 import { JogControls } from '/app/molecules/JogControls'
 import { DropTipFooterButtons } from '../shared'
 
@@ -22,7 +22,7 @@ type JogToPositionProps = DropTipWizardContainerProps & UseConfirmPositionResult
 export const JogToPosition = ({
   goBackRunValid,
   dropTipCommands,
-  currentStep,
+  currentRoute,
   isOnDevice,
   modalStyle,
   proceed,
@@ -40,7 +40,7 @@ export const JogToPosition = ({
           {t('position_the_pipette')}
         </StyledText>
         <LegacyStyledText as="p">
-          {currentStep === POSITION_AND_BLOWOUT
+          {currentRoute === DT_ROUTES.BLOWOUT
             ? t('position_and_blowout')
             : t('position_and_drop_tip')}
         </LegacyStyledText>

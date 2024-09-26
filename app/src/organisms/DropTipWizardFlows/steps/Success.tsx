@@ -12,14 +12,14 @@ import {
 } from '@opentrons/components'
 
 import { DropTipFooterButtons } from '../shared'
-import { BLOWOUT_SUCCESS, DROP_TIP_SUCCESS, DT_ROUTES } from '../constants'
+import { DT_ROUTES } from '../constants'
 
 import SuccessIcon from '../../../assets/images/icon_success.png'
 
 import type { DropTipWizardContainerProps } from '../types'
 
 export const Success = ({
-  currentStep,
+  currentRoute,
   proceedToRouteAndStep,
   fixitCommandTypeUtils,
   proceedWithConditionalClose,
@@ -30,7 +30,7 @@ export const Success = ({
 
   // Route to the drop tip route if user is at the blowout success screen, otherwise proceed conditionally.
   const handleProceed = (): void => {
-    if (currentStep === BLOWOUT_SUCCESS) {
+    if (currentRoute === DT_ROUTES.BLOWOUT) {
       void proceedToRouteAndStep(DT_ROUTES.DROP_TIP)
     } else {
       // Clear the error recovery submap upon completion of drop tip wizard.
@@ -45,10 +45,10 @@ export const Success = ({
   }
 
   const buildProceedText = (): string => {
-    if (fixitCommandTypeUtils != null && currentStep === DROP_TIP_SUCCESS) {
+    if (fixitCommandTypeUtils != null && currentRoute === DT_ROUTES.DROP_TIP) {
       return fixitCommandTypeUtils.copyOverrides.tipDropCompleteBtnCopy
     } else {
-      return currentStep === BLOWOUT_SUCCESS ? t('continue') : t('exit')
+      return currentRoute === DT_ROUTES.BLOWOUT ? t('continue') : t('exit')
     }
   }
 
@@ -65,7 +65,7 @@ export const Success = ({
           }
         />
         <StyledText desktopStyle="headingSmallBold" oddStyle="level3HeaderBold">
-          {currentStep === BLOWOUT_SUCCESS
+          {currentRoute === DT_ROUTES.BLOWOUT
             ? t('blowout_complete')
             : t('drop_tip_complete')}
         </StyledText>
