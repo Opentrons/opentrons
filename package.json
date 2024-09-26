@@ -27,7 +27,7 @@
   },
   "packageManager": "yarn@1.22.19",
   "engines": {
-    "node": "^18.19.0"
+    "node": ">=18.19.0"
   },
   "resolutions": {
     "@storybook/react-docgen-typescript-plugin": "1.0.6--canary.9.cd77847.0"
@@ -38,7 +38,7 @@
     "@aws-sdk/client-dynamodb": "^3.582.0",
     "@aws-sdk/credential-provider-ini": "^3.582.0",
     "@cypress/webpack-preprocessor": "^5.1.2",
-    "@electron/rebuild": "3.2.10",
+    "@electron/rebuild": "3.6.0",
     "@octokit/rest": "^19.0.5",
     "@rollup/plugin-alias": "^3.1.2",
     "@rollup/plugin-babel": "^5.3.0",
@@ -83,8 +83,8 @@
     "cz-conventional-changelog": "2.1.0",
     "decompress": "4.2.1",
     "download": "8.0.0",
-    "electron": "27.0.0",
-    "electron-builder": "24.0.0",
+    "electron": "31.3.1",
+    "electron-builder": "24.13.3",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-config-standard": "^16.0.2",
