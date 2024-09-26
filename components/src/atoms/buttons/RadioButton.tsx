@@ -32,6 +32,8 @@ interface RadioButtonProps extends StyleProps {
   //  used for mouseEnter and mouseLeave
   setNoHover?: () => void
   setHovered?: () => void
+  // TODO wire up the error state for the radio button
+  error?: string | null
 }
 
 //  used for ODD and helix
@@ -130,7 +132,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   return (
     <Flex
       css={css`
-        width: auto;
+        width: ${props.width ?? 'auto'};
 
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
           width: 100%;

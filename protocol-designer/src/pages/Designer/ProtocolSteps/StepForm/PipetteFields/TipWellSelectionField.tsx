@@ -2,19 +2,22 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { createPortal } from 'react-dom'
-import { FormGroup, LegacyInputField } from '@opentrons/components'
-import { getPipetteEntities } from '../../../../step-forms/selectors'
-import { getNozzleType } from '../../utils'
-import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
-import { WellSelectionModal } from '../WellSelectionField/WellSelectionModal'
-import type { StepFormDropdown } from '../StepFormDropdownField'
+import {
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  InputField,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
+import { getPipetteEntities } from '../../../../../step-forms/selectors'
+import { SelectWellsModal } from '../../../../../organisms'
+import { getMainPagePortalEl } from '../../../../../components/portals/MainPageModalPortal'
+import { getNozzleType } from '../utils'
 
-import styles from '../../StepEditForm.module.css'
+import type { FieldProps } from '../types'
 
-type TipWellSelectionFieldProps = Omit<
-  React.ComponentProps<typeof StepFormDropdown>,
-  'options'
-> & {
+type TipWellSelectionFieldProps = FieldProps & {
   pipetteId: unknown
   labwareId: unknown
   nozzles: string | null
@@ -33,7 +36,7 @@ export function TipWellSelectionField(
     labwareId,
     nozzles,
   } = props
-  const { t } = useTranslation('form')
+  const { t } = useTranslation('protocol_steps')
   const pipetteEntities = useSelector(getPipetteEntities)
   const primaryWellCount =
     Array.isArray(selectedWells) && selectedWells.length > 0
@@ -46,7 +49,7 @@ export function TipWellSelectionField(
   return (
     <>
       {createPortal(
-        <WellSelectionModal
+        <SelectWellsModal
           isOpen={openModal}
           key={`${labwareId}_${name}_TipField`}
           labwareId={String(labwareId)}
@@ -63,21 +66,27 @@ export function TipWellSelectionField(
         getMainPagePortalEl()
       )}
 
-      <FormGroup
-        disabled={disabled}
-        label={t('step_edit_form.wellSelectionLabel.wells')}
-        className={styles.small_field}
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        padding={SPACING.spacing16}
+        gridGap={SPACING.spacing8}
       >
-        <LegacyInputField
+        <Flex gridGap={SPACING.spacing8}>
+          <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
+            {t('tip_selection')}
+          </StyledText>
+        </Flex>
+        <InputField
+          disabled={disabled}
           readOnly
-          error={errorToShow}
           name={name}
+          error={errorToShow}
           value={primaryWellCount}
           onClick={() => {
             setOpenModal(true)
           }}
         />
-      </FormGroup>
+      </Flex>
     </>
   )
 }

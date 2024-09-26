@@ -98,11 +98,13 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
 
 interface CheckProps {
   isChecked: boolean
+  color?: string
 }
-function Check(props: CheckProps): JSX.Element {
-  return props.isChecked ? (
+export function Check(props: CheckProps): JSX.Element {
+  const { isChecked, color = COLORS.white } = props
+  return isChecked ? (
     <Flex css={CHECK_STYLE}>
-      <Icon name="ot-checkbox" color={COLORS.white} />
+      <Icon name="ot-checkbox" color={color} />
     </Flex>
   ) : (
     <Flex
