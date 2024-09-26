@@ -1,10 +1,11 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { renderHook } from '@testing-library/react'
 
-import { cleanupRecoveryState } from '../cleanupRecoveryState'
+import { useCleanupRecoveryState } from '../useCleanupRecoveryState'
 import { RECOVERY_MAP } from '../../constants'
 
-describe('cleanupRecoveryState', () => {
-  let props: Parameters<typeof cleanupRecoveryState>[0]
+describe('useCleanupRecoveryState', () => {
+  let props: Parameters<typeof useCleanupRecoveryState>[0]
   let mockSetRM: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
@@ -22,7 +23,7 @@ describe('cleanupRecoveryState', () => {
   })
 
   it('does not modify state when isTakeover is false', () => {
-    cleanupRecoveryState(props)
+    renderHook(() => useCleanupRecoveryState(props))
 
     expect(props.stashedMapRef.current).toEqual({
       route: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE,
@@ -33,7 +34,7 @@ describe('cleanupRecoveryState', () => {
 
   it('resets state when isTakeover is true', () => {
     props.isTakeover = true
-    cleanupRecoveryState(props)
+    renderHook(() => useCleanupRecoveryState(props))
 
     expect(props.stashedMapRef.current).toBeNull()
     expect(mockSetRM).toHaveBeenCalledWith({
@@ -45,12 +46,34 @@ describe('cleanupRecoveryState', () => {
   it('handles case when stashedMapRef.current is already null', () => {
     props.isTakeover = true
     props.stashedMapRef.current = null
-    cleanupRecoveryState(props)
+    renderHook(() => useCleanupRecoveryState(props))
 
     expect(props.stashedMapRef.current).toBeNull()
     expect(mockSetRM).toHaveBeenCalledWith({
       route: RECOVERY_MAP.OPTION_SELECTION.ROUTE,
       step: RECOVERY_MAP.OPTION_SELECTION.STEPS.SELECT,
     })
+  })
+
+  it('does not reset state when isTakeover changes from true to false', () => {
+    const { rerender } = renderHook(
+      ({ isTakeover }) => useCleanupRecoveryState({ ...props, isTakeover }),
+      { initialProps: { isTakeover: true } }
+    )
+
+    // Reset mockSetRM and stashedMapRef
+    mockSetRM.mockClear()
+    props.stashedMapRef.current = {
+      route: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE,
+      step: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.STEPS.SKIP,
+    }
+
+    rerender({ isTakeover: false })
+
+    expect(props.stashedMapRef.current).toEqual({
+      route: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE,
+      step: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.STEPS.SKIP,
+    })
+    expect(mockSetRM).not.toHaveBeenCalled()
   })
 })
