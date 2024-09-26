@@ -43,6 +43,8 @@
   "stand_back_robot_in_motion": "Stand back, robot is in motion",
   "start_over": "Start over",
   "trash_bin_in_slot": "Trash bin in {{slot}}",
-  "waste_chute_in_slot:": "Waste chute in {{slot}}",
+  "waste_chute_in_slot": "Waste chute in {{slot}}",
+  "where_to_blowout": "Where do you want to blow out the aspirated liquid?",
+  "where_to_drop_tips": "Where do you want to drop the attached tips?",
   "yes_blow_out_liquid": "Yes, blow out liquid in labware"
 }

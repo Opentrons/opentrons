@@ -16,7 +16,11 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { POSITION_AND_BLOWOUT, CONFIRM_POSITION } from '../constants'
+import {
+  CHOOSE_LOCATION_OPTION,
+  CONFIRM_POSITION,
+  DT_ROUTES,
+} from '../constants'
 import { DropTipFooterButtons } from '../shared'
 
 import type { DropTipWizardContainerProps } from '../types'
@@ -39,7 +43,11 @@ export function useConfirmPosition(
   }
 
   useEffect(() => {
-    if (isRobotPipetteMoving && currentStep !== CONFIRM_POSITION) {
+    if (
+      isRobotPipetteMoving &&
+      currentStep !== CONFIRM_POSITION &&
+      currentStep !== CHOOSE_LOCATION_OPTION
+    ) {
       toggleIsRobotPipetteMoving()
     }
   }, [currentStep, isRobotPipetteMoving])
@@ -56,7 +64,7 @@ type ConfirmPositionProps = DropTipWizardContainerProps &
 export function ConfirmPosition({
   toggleIsRobotPipetteMoving,
   goBackRunValid,
-  currentStep,
+  currentRoute,
   dropTipCommands,
   proceed,
   modalStyle,
@@ -65,11 +73,11 @@ export function ConfirmPosition({
   const { t } = useTranslation('drop_tip_wizard')
 
   const buildPrimaryBtnText = (): string =>
-    currentStep === POSITION_AND_BLOWOUT ? t('blowout_liquid') : t('drop_tips')
+    currentRoute === DT_ROUTES.BLOWOUT ? t('blowout_liquid') : t('drop_tips')
 
   const handleProceed = (): void => {
     toggleIsRobotPipetteMoving()
-    void blowoutOrDropTip(currentStep, proceed)
+    void blowoutOrDropTip(currentRoute, proceed)
   }
 
   return (
@@ -83,7 +91,7 @@ export function ConfirmPosition({
       >
         <Icon name="alert-circle" css={ICON_STYLE} />
         <StyledText oddStyle="level3HeaderBold" desktopStyle="headingSmallBold">
-          {currentStep === POSITION_AND_BLOWOUT
+          {currentRoute === DT_ROUTES.BLOWOUT
             ? t('confirm_blowout_location')
             : t('confirm_drop_tip_location')}
         </StyledText>

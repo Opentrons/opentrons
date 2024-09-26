@@ -20,7 +20,7 @@ import type { DropTipWizardContainerProps } from '../types'
 
 export const Success = ({
   currentStep,
-  proceedToRoute,
+  proceedToRouteAndStep,
   fixitCommandTypeUtils,
   proceedWithConditionalClose,
   modalStyle,
@@ -31,7 +31,7 @@ export const Success = ({
   // Route to the drop tip route if user is at the blowout success screen, otherwise proceed conditionally.
   const handleProceed = (): void => {
     if (currentStep === BLOWOUT_SUCCESS) {
-      void proceedToRoute(DT_ROUTES.DROP_TIP)
+      void proceedToRouteAndStep(DT_ROUTES.DROP_TIP)
     } else {
       // Clear the error recovery submap upon completion of drop tip wizard.
       fixitCommandTypeUtils?.reportMap(null)
