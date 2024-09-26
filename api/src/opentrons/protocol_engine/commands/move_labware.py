@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 from opentrons_shared_data.errors import ErrorCodes
-from opentrons_shared_data.errors.exceptions import FailedGripperPickupError
+from opentrons_shared_data.errors.exceptions import (
+    FailedGripperPickupError,
+    LabwareDroppedError,
+    StallOrCollisionDetectedError,
+)
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
@@ -85,17 +89,23 @@ class MoveLabwareResult(BaseModel):
     )
 
 
-# TODO
-class GripError(ErrorOccurrence):
+class GripperMovementError(ErrorOccurrence):
+    """Returned when something physically goes wrong when the gripper moves labware.
+
+    When this error happens, the engine will leave the labware in its original place.
+    """
+
     isDefined: bool = True
 
-    errorType: Literal["grip"] = "grip"
+    errorType: Literal["gripperMovement"] = "gripperMovement"
 
     errorCode: str = ErrorCodes.FAILED_GRIPPER_PICKUP_ERROR.value.code
     detail: str = ErrorCodes.FAILED_GRIPPER_PICKUP_ERROR.value.detail
 
 
-_ExecuteReturn = SuccessData[MoveLabwareResult, None] | DefinedErrorData[GripError]
+_ExecuteReturn = (
+    SuccessData[MoveLabwareResult, None] | DefinedErrorData[GripperMovementError]
+)
 
 
 class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteReturn]):
@@ -246,27 +256,35 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     user_offset_data=user_offset_data,
                     post_drop_slide_offset=post_drop_slide_offset,
                 )
-            except FailedGripperPickupError as exception:
-                grip_error: GripError | None = GripError(
-                    id=self._model_utils.generate_id(),
-                    createdAt=self._model_utils.get_timestamp(),
-                    wrappedErrors=[
-                        ErrorOccurrence.from_failed(
-                            id=self._model_utils.generate_id(),
-                            createdAt=self._model_utils.get_timestamp(),
-                            error=exception,
-                        )
-                    ],
+            except (
+                FailedGripperPickupError,
+                LabwareDroppedError,
+                StallOrCollisionDetectedError,
+                # todo(mm, 2024-09-26): Catch LabwareNotPickedUpError when that exists and
+                # move_labware_with_gripper() raises it.
+            ) as exception:
+                gripper_movement_error: GripperMovementError | None = (
+                    GripperMovementError(
+                        id=self._model_utils.generate_id(),
+                        createdAt=self._model_utils.get_timestamp(),
+                        wrappedErrors=[
+                            ErrorOccurrence.from_failed(
+                                id=self._model_utils.generate_id(),
+                                createdAt=self._model_utils.get_timestamp(),
+                                error=exception,
+                            )
+                        ],
+                    )
                 )
             else:
-                grip_error = None
+                gripper_movement_error = None
 
             # All mounts will have been retracted as part of the gripper move.
             state_update.clear_all_pipette_locations()
 
-            if grip_error:
+            if gripper_movement_error:
                 return DefinedErrorData(
-                    public=grip_error,
+                    public=gripper_movement_error,
                     state_update=state_update,
                 )
 
@@ -299,7 +317,9 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
         )
 
 
-class MoveLabware(BaseCommand[MoveLabwareParams, MoveLabwareResult, GripError]):
+class MoveLabware(
+    BaseCommand[MoveLabwareParams, MoveLabwareResult, GripperMovementError]
+):
     """A ``moveLabware`` command."""
 
     commandType: MoveLabwareCommandType = "moveLabware"
