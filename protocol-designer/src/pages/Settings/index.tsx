@@ -32,10 +32,9 @@ import type { FlagTypes } from '../../feature-flags'
 export function Settings(): JSX.Element {
   const dispatch = useDispatch()
   const { t } = useTranslation(['feature_flags', 'shared'])
-  const [
-    showAnnouncementModal,
-    setShowAnnouncementModal,
-  ] = useState<boolean>(false)
+  const [showAnnouncementModal, setShowAnnouncementModal] = useState<boolean>(
+    false
+  )
   const hasOptedIn = useSelector(analyticsSelectors.getHasOptedIn)
   const flags = useSelector(getFeatureFlagData)
   const canClearHintDismissals = useSelector(

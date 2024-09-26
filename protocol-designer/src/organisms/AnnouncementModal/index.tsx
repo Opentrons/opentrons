@@ -35,10 +35,9 @@ export const AnnouncementModal = (
   const userHasNotSeenAnnouncement =
     getLocalStorageItem(localStorageAnnouncementKey) !== announcementKey
 
-  const [
-    showAnnouncementModal,
-    setShowAnnouncementModal,
-  ] = useState<boolean>(isViewReleaseNotes || userHasNotSeenAnnouncement)
+  const [showAnnouncementModal, setShowAnnouncementModal] = useState<boolean>(
+    isViewReleaseNotes || userHasNotSeenAnnouncement
+  )
 
   const handleClick = (): void => {
     if (onClose != null) onClose()
