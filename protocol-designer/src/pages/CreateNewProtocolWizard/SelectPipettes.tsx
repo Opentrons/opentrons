@@ -160,8 +160,8 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                 <Flex gridGap={SPACING.spacing4}>
                   {PIPETTE_TYPES[robotType].map(type => {
                     return type.value === '96' &&
-                      pipettesByMount.left.pipetteName != null &&
-                      pipettesByMount.right.pipetteName != null ? null : (
+                      (pipettesByMount.left.pipetteName != null ||
+                        pipettesByMount.right.pipetteName != null) ? null : (
                       <RadioButton
                         key={`${type.label}_${type.value}`}
                         onChange={() => {
@@ -373,7 +373,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                 alignItems={ALIGN_CENTER}
               >
                 <StyledText desktopStyle="headingSmallBold">
-                  {t('your_pips')}
+                  {t('your_pipettes')}
                 </StyledText>
                 {has96Channel ? null : (
                   <Btn

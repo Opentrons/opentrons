@@ -207,7 +207,7 @@ export function EditInstrumentsModal(
               alignItems={ALIGN_CENTER}
             >
               <StyledText desktopStyle="bodyLargeSemiBold">
-                {t('your_pips')}
+                {t('your_pipettes')}
               </StyledText>
               {has96Channel ? null : (
                 <Btn
