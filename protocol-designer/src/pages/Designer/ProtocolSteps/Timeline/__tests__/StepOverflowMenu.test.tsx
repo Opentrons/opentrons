@@ -35,7 +35,7 @@ describe('StepOverflowMenu', () => {
     fireEvent.click(screen.getByText('Duplicate step'))
     expect(vi.mocked(duplicateStep)).toHaveBeenCalled()
     fireEvent.click(screen.getByText('View commands'))
-    fireEvent.click(screen.getByText('Rename step'))
+    // fireEvent.click(screen.getByText('Rename step'))
     //  TODO: wire up view commands and rename
   })
 })

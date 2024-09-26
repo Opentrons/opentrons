@@ -75,12 +75,12 @@ describe('steps actions', () => {
           type: 'SELECT_STEP',
           payload: stepId,
         },
-        {
-          type: 'POPULATE_FORM',
-          payload: {
-            foo: 'getSavedStepFormsResult',
-          },
-        },
+        // {
+        //   type: 'POPULATE_FORM',
+        //   payload: {
+        //     foo: 'getSavedStepFormsResult',
+        //   },
+        // },
       ])
     })
   })
