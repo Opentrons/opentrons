@@ -1,3 +1,4 @@
+import { useContext } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { I18nContext, useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
@@ -273,7 +274,7 @@ function FeatureFlags(): JSX.Element {
 function LanguageToggle(): JSX.Element | null {
   const enableLocalization = useFeatureFlag('enableLocalization')
 
-  const { i18n } = React.useContext(I18nContext)
+  const { i18n } = useContext(I18nContext)
 
   return enableLocalization ? (
     <RobotSettingButton
