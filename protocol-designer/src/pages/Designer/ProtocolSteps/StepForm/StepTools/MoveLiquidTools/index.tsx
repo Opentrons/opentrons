@@ -1,5 +1,3 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { DIRECTION_COLUMN, Divider, Flex } from '@opentrons/components'
 import { getEnableReturnTip } from '../../../../../../feature-flags/selectors'
@@ -25,9 +23,6 @@ import type { StepFormProps } from '../../types'
 
 export function MoveLiquidTools(props: StepFormProps): JSX.Element {
   const { toolboxStep, propsForFields, formData } = props
-  const { stepType, path } = formData
-  const { t } = useTranslation(['application', 'form', 'protocol_steps'])
-  const [collapsed, _setCollapsed] = useState<boolean>(true)
   //  TODO: these will be used for the 2nd page advanced settings
   // const { stepType, path } = formData
   const additionalEquipmentEntities = useSelector(

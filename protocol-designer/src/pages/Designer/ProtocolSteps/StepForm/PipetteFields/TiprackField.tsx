@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { getPipetteEntities } from '../../../../../step-forms/selectors'
@@ -20,7 +20,7 @@ export function TiprackField(props: TiprackFieldProps): JSX.Element {
     defaultTiprackUris.includes(option.value)
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     //  if default value is not included in the pipette's tiprack uris then
     //  change it so it is
     if (!defaultTiprackUris.includes(value as string)) {

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { ALL, COLUMN } from '@opentrons/shared-data'
@@ -31,10 +31,10 @@ export function PartialTipField(props: FieldProps): JSX.Element {
     },
   ]
 
-  const [selectedValue, setSelectedValue] = React.useState(
+  const [selectedValue, setSelectedValue] = useState(
     dropdownItem || options[0].value
   )
-  React.useEffect(() => {
+  useEffect(() => {
     updateValue(selectedValue)
   }, [selectedValue])
 

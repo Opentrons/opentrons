@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import {
@@ -38,7 +38,7 @@ export function DropTipField(props: FieldProps): JSX.Element {
   if (wasteChute != null) options.push(wasteChuteOption)
   if (trashBin != null) options.push(trashOption)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       additionalEquipment[String(dropdownItem)] == null &&
       labwareEntities[String(dropdownItem)] == null

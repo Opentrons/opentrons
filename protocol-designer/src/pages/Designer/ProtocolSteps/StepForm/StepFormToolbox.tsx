@@ -1,4 +1,4 @@
-import type * as React from 'react'
+import { useState } from 'react'
 import get from 'lodash/get'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
@@ -87,7 +87,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     getTimelineWarningsForSelectedStep
   )
   const timeline = useSelector(getRobotStateTimeline)
-  const [toolboxStep, setToolboxStep] = React.useState<number>(0)
+  const [toolboxStep, setToolboxStep] = useState<number>(0)
   const icon = stepIconsByType[formData.stepType]
 
   const ToolsComponent: typeof STEP_FORM_MAP[keyof typeof STEP_FORM_MAP] = get(

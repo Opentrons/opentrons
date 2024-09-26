@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { DropdownStepFormField } from '../../../../../molecules'
 import { getDisabledChangeTipOptions } from './utils'
