@@ -150,7 +150,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
                 </StyledText>
               )}
             </Flex>
-            {selected && !isStartingOrEndingState && formData == null ? (
+            {hovered && !isStartingOrEndingState && formData == null ? (
               <OverflowBtn
                 data-testid={`StepContainer_${stepId}`}
                 fillColor={COLORS.white}
