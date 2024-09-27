@@ -8,6 +8,7 @@ from .pipetting_common import PipetteIdMixin
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
 from .configuring_common import PipetteConfigUpdateResultMixin
+from ..state.update_types import StateUpdate
 
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler
@@ -67,6 +68,13 @@ class ConfigureForVolumeImplementation(
             tip_overlap_version=params.tipOverlapNotAfterVersion,
         )
 
+        state_update = StateUpdate()
+        state_update.update_pipette_config(
+            pipette_id=pipette_result.pipette_id,
+            config=pipette_result.static_config,
+            serial_number=pipette_result.serial_number,
+        )
+
         return SuccessData(
             public=ConfigureForVolumeResult(),
             private=ConfigureForVolumePrivateResult(
@@ -74,6 +82,7 @@ class ConfigureForVolumeImplementation(
                 serial_number=pipette_result.serial_number,
                 config=pipette_result.static_config,
             ),
+            state_update=state_update,
         )
 
 
