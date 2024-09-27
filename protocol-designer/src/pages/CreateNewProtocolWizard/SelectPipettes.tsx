@@ -155,13 +155,13 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                 gridGap={SPACING.spacing12}
               >
                 <StyledText desktopStyle="headingSmallBold">
-                  {t('pip_type')}
+                  {t('pipette_type')}
                 </StyledText>
                 <Flex gridGap={SPACING.spacing4}>
                   {PIPETTE_TYPES[robotType].map(type => {
                     return type.value === '96' &&
-                      pipettesByMount.left.pipetteName != null &&
-                      pipettesByMount.right.pipetteName != null ? null : (
+                      (pipettesByMount.left.pipetteName != null ||
+                        pipettesByMount.right.pipetteName != null) ? null : (
                       <RadioButton
                         key={`${type.label}_${type.value}`}
                         onChange={() => {
@@ -192,7 +192,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                   gridGap={SPACING.spacing12}
                 >
                   <StyledText desktopStyle="headingSmallBold">
-                    {t('pip_gen')}
+                    {t('pipette_gen')}
                   </StyledText>
                   <Flex gridGap={SPACING.spacing4}>
                     {PIPETTE_GENS.map(gen => (
@@ -219,7 +219,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                   gridGap={SPACING.spacing12}
                 >
                   <StyledText desktopStyle="headingSmallBold">
-                    {t('pip_vol')}
+                    {t('pipette_vol')}
                   </StyledText>
                   <Flex gridGap={SPACING.spacing4}>
                     {PIPETTE_VOLUMES[robotType]?.map(volume => {
@@ -283,7 +283,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                           gridGap={SPACING.spacing16}
                         >
                           <StyledText desktopStyle="headingSmallBold">
-                            {t('pip_tips')}
+                            {t('pipette_tips')}
                           </StyledText>
                           <Box
                             css={css`
@@ -373,7 +373,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                 alignItems={ALIGN_CENTER}
               >
                 <StyledText desktopStyle="headingSmallBold">
-                  {t('your_pips')}
+                  {t('your_pipettes')}
                 </StyledText>
                 {has96Channel ? null : (
                   <Btn
