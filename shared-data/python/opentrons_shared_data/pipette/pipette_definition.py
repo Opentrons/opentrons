@@ -527,7 +527,8 @@ def liquid_class_for_volume_between_default_and_defaultlowvolume(
 
     if not has_lvd:
         return pip_types.LiquidClasses.default
-    if volume >= available_liquid_classes[pip_types.LiquidClasses.default].min_volume:
+    lvd_max_vol = available_liquid_classes[pip_types.LiquidClasses.lowVolumeDefault].max_volume
+    if volume > lvd_max_vol:
         return pip_types.LiquidClasses.default
     return pip_types.LiquidClasses.lowVolumeDefault
 
