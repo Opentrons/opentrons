@@ -92,14 +92,16 @@ def mock_instrument_core(decoy: Decoy) -> InstrumentCore:
 
     # we need to add this for the mock of liquid_presence detection to actually work
     # this replaces the mock with a a property again
-    def _setter(enable) -> None:
-        instrument_core._liquid_presence_detection = enable
-    def _getter() -> bool:
-        return instrument_core._liquid_presence_detection
+    instrument_core._liquid_presence_detection = False  # type: ignore[attr-defined]
 
-    instrument_core._liquid_presence_detection = False
-    instrument_core.get_liquid_presence_detection = _getter
-    instrument_core.set_liquid_presence_detection = _setter
+    def _setter(enable: bool) -> None:
+        instrument_core._liquid_presence_detection = enable  # type: ignore[attr-defined]
+
+    def _getter() -> bool:
+        return instrument_core._liquid_presence_detection  # type: ignore[attr-defined, no-any-return]
+
+    instrument_core.get_liquid_presence_detection = _getter  # type: ignore[method-assign]
+    instrument_core.set_liquid_presence_detection = _setter  # type: ignore[method-assign]
 
     return instrument_core
 
@@ -1513,9 +1515,7 @@ def test_mix_no_lpd(
         )
     ).then_return(WellTarget(well=mock_well, location=None, in_place=False))
     decoy.when(
-        mock_validation.validate_location(
-            location=None, last_location=last_location
-        )
+        mock_validation.validate_location(location=None, last_location=last_location)
     ).then_return(WellTarget(well=mock_well, location=None, in_place=False))
     decoy.when(mock_well.bottom(z=1.0)).then_return(bottom_location)
     decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
@@ -1524,18 +1524,18 @@ def test_mix_no_lpd(
 
     subject.mix(repetitions=10, volume=10.0, location=input_location, rate=1.23)
     decoy.verify(
-        mock_instrument_core.aspirate(),
+        mock_instrument_core.aspirate(),  # type: ignore[call-arg]
         ignore_extra_args=True,
         times=10,
     )
     decoy.verify(
-        mock_instrument_core.dispense(),
+        mock_instrument_core.dispense(),  # type: ignore[call-arg]
         ignore_extra_args=True,
         times=10,
     )
 
     decoy.verify(
-        mock_instrument_core.liquid_probe_with_recovery(),
+        mock_instrument_core.liquid_probe_with_recovery(),  # type: ignore[call-arg]
         ignore_extra_args=True,
         times=0,
     )
@@ -1563,9 +1563,7 @@ def test_mix_with_lpd(
         )
     ).then_return(WellTarget(well=mock_well, location=None, in_place=False))
     decoy.when(
-        mock_validation.validate_location(
-            location=None, last_location=last_location
-        )
+        mock_validation.validate_location(location=None, last_location=last_location)
     ).then_return(WellTarget(well=mock_well, location=None, in_place=False))
     decoy.when(mock_well.bottom(z=1.0)).then_return(bottom_location)
     decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
@@ -1575,18 +1573,18 @@ def test_mix_with_lpd(
     subject.liquid_presence_detection = True
     subject.mix(repetitions=10, volume=10.0, location=input_location, rate=1.23)
     decoy.verify(
-        mock_instrument_core.aspirate(),
+        mock_instrument_core.aspirate(),  # type: ignore[call-arg]
         ignore_extra_args=True,
         times=10,
     )
     decoy.verify(
-        mock_instrument_core.dispense(),
+        mock_instrument_core.dispense(),  # type: ignore[call-arg]
         ignore_extra_args=True,
         times=10,
     )
 
     decoy.verify(
-        mock_instrument_core.liquid_probe_with_recovery(),
+        mock_instrument_core.liquid_probe_with_recovery(),  # type: ignore[call-arg]
         ignore_extra_args=True,
         times=1,
     )
