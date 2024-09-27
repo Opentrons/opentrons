@@ -28,7 +28,7 @@ import { useIsRobotViewable, useRunStatuses } from './hooks'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 import { PipetteCard } from './PipetteCard'
 import { FlexPipetteCard } from './PipetteCard/FlexPipetteCard'
-import { GripperCard } from '/app/organisms/GripperCard'
+import { GripperCard } from './GripperCard'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
 

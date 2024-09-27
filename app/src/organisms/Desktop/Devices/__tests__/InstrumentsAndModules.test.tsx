@@ -15,7 +15,7 @@ import { useIsFlex } from '/app/redux-resources/robots'
 import { useIsRobotViewable, useRunStatuses } from '../hooks'
 import { ModuleCard } from '/app/organisms/ModuleCard'
 import { InstrumentsAndModules } from '../InstrumentsAndModules'
-import { GripperCard } from '/app/organisms/GripperCard'
+import { GripperCard } from '../GripperCard'
 import { PipetteCard } from '../PipetteCard'
 import { FlexPipetteCard } from '../PipetteCard/FlexPipetteCard'
 import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
@@ -33,7 +33,7 @@ vi.mock('@opentrons/components', async importOriginal => {
 })
 vi.mock('@opentrons/react-api-client')
 vi.mock('../hooks')
-vi.mock('/app/organisms/GripperCard')
+vi.mock('../GripperCard')
 vi.mock('/app/organisms/ModuleCard')
 vi.mock('../PipetteCard')
 vi.mock('../PipetteCard/FlexPipetteCard')
