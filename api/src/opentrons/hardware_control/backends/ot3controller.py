@@ -161,6 +161,7 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_pass,
     liquid_probe,
     check_overpressure,
+    grab_pressure,
 )
 from opentrons_hardware.hardware_control.rear_panel_settings import (
     get_door_state,
@@ -370,53 +371,12 @@ class OT3Controller(FlexBackend):
             log.debug(f"Restore previous system constraints: {old_system_constraints}")
 
     @asynccontextmanager
-    async def grab_pressure(self,instrument: Pipette, mount: OT3Mount) -> AsyncIterator[None]:
+    async def grab_pressure(
+        self, channels: int, mount: OT3Mount
+    ) -> AsyncIterator[None]:
         tool = axis_to_node(Axis.of_main_tool_actuator(mount))
-        sensor_driver = SensorDriver()
-        sensor_id = SensorId.BOTH if instrument.channels > 1 else SensorId.S0
-        sensors: List[SensorId] = []
-        if sensor_id == SensorId.BOTH:
-            sensors.append(SensorId.S0)
-            sensors.append(SensorId.S1)
-        else:
-            sensors.append(sensor_id)
-
-        for sensor in sensors:
-            pressure_sensor = PressureSensor.build(
-                sensor_id=sensor,
-                node_id=tool,
-            )
-            num_baseline_reads = 10
-            pressure_baseline = await sensor_driver.get_baseline(
-                messenger, pressure_sensor, num_baseline_reads
-            )
-            await messenger.ensure_send(
-                node_id=tool,
-                message=BindSensorOutputRequest(
-                    payload=BindSensorOutputRequestPayload(
-                        sensor=SensorTypeField(SensorType.pressure),
-                        sensor_id=SensorIdField(sensor),
-                        binding=SensorOutputBindingField(SensorOutputBinding.report),
-                    )
-                ),
-                expected_nodes=[tool],
-            )
-        try:
+        async with grab_pressure(channels, tool, self._messenger):
             yield
-        finally:
-            for sensor in sensors:
-                await messenger.ensure_send(
-                    node_id=tool,
-                    message=BindSensorOutputRequest(
-                        payload=BindSensorOutputRequestPayload(
-                            sensor=SensorTypeField(SensorType.pressure),
-                            sensor_id=SensorIdField(sensor),
-                            binding=SensorOutputBindingField(SensorOutputBinding.none),
-                        )
-                    ),
-                    expected_nodes=[tool],
-                )
-                #TODO grab the data after
 
     def update_constraints_for_calibration_with_gantry_load(
         self,
