@@ -11,6 +11,7 @@ import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import { mockTipLengthCalLauncher } from '../../hooks/__fixtures__/taskListFixtures'
 import { useDeckCalibrationData } from '../../hooks'
 import { useRunHasStarted } from '/app/resources/runs'
+// eslint-disable-next-line opentrons/no-imports-up-the-tree-of-life
 import { useDashboardCalibrateTipLength } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationButton'
 

@@ -23,6 +23,7 @@ import { TertiaryButton } from '/app/atoms/buttons'
 import { useAttachedPipettes } from '/app/resources/instruments'
 import { useRunHasStarted } from '/app/resources/runs'
 import { useDeckCalibrationData } from '../hooks'
+// eslint-disable-next-line opentrons/no-imports-up-the-tree-of-life
 import { useDashboardCalibrateTipLength } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 
 import type { Mount } from '@opentrons/components'
