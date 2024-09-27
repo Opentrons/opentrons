@@ -59,8 +59,8 @@ export function App(): JSX.Element {
           <DefinitionRoute render={props => <AppComponent {...props} />} />
         }
       />
-      <Route path="/labware" element={<AppComponent definition={null} />} />
-      <Route path="*" element={<Navigate to="/labware" />} />
+      <Route path="/" element={<AppComponent definition={null} />} />
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   )
 }
