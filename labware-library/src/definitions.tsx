@@ -84,6 +84,7 @@ export interface DefinitionRouteProps {
 
 export const DefinitionRoute: React.FC<DefinitionRouteProps> = ({ render }) => {
   const location = useLocation()
+  console.log('=>(definitions.tsx:87) location', location)
   const loadName = location.pathname.split('/')[1]
   const definition = getDefinition(loadName)
 
