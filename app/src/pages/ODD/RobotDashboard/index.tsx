@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
-import { Navigation } from '/app/organisms/Navigation'
+import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
   EmptyRecentRun,
   RecentRunProtocolCarousel,

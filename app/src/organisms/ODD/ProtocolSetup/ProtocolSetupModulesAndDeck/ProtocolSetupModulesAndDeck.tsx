@@ -20,7 +20,7 @@ import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import { getTopPortalEl } from '/app/App/portal'
 import { FloatingActionButton } from '/app/atoms/buttons'
 import { InlineNotification } from '/app/atoms/InlineNotification'
-import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useAttachedModules } from '/app/resources/modules'
 import {
   getProtocolModulesInfo,
