@@ -12,11 +12,11 @@ from datetime import datetime
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='Opentrons Temperature Kit Driver')
-    arg_parser.add_argument('-t', '--test', action="store_true", required=False, help='Gets sample data from the sensor')
+    arg_parser.add_argument('-t', '--test', action="store_true", required=False, help='Gets sample histogram data from the sensor')
     arg_parser.add_argument('-w', '--labware', action="store_true", required=False, help='Measures the sensor for different labware quantity')
     arg_parser.add_argument('-m', '--labware_max', type=int, required=False, help='Sets the maximum number of labware', default=3)
-    arg_parser.add_argument('-z', '--zone', type=int, required=False, help='Sets the zone number for histgram data (0-9)', default=1)
-    arg_parser.add_argument('-l', '--log', type=float, required=False, help='Logs histogram data for a given duration (min)', default=0.1)
+    arg_parser.add_argument('-z', '--zone', type=int, required=False, help='Sets the zone number for histogram data (0-9)', default=1)
+    arg_parser.add_argument('-l', '--log', type=float, required=False, help='Sets the log duration (min)', default=0.1)
     arg_parser.add_argument('-p', '--port_name', type=str, required=False, help='Sets serial connection port, ex: -p COM5')
     return arg_parser
 
