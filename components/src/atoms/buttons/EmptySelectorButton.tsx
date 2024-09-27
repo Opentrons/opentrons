@@ -40,7 +40,7 @@ export function EmptySelectorButton(
 
   const StyledButton = styled.button`
     border: none;
-    width: ${buttonSizing};
+    width: ${FLEX_MAX_CONTENT};
     height: ${buttonSizing};
     cursor: ${disabled ? CURSOR_DEFAULT : CURSOR_POINTER};
     &:focus-visible {
