@@ -1,6 +1,5 @@
 // labware definition helpers
 // TODO(mc, 2019-03-18): move to shared-data?
-import type * as React from 'react'
 import { useLocation } from 'react-router-dom'
 import groupBy from 'lodash/groupBy'
 import uniq from 'lodash/uniq'
@@ -8,8 +7,8 @@ import {
   LABWAREV2_DO_NOT_LIST,
   getAllDefinitions as _getAllDefinitions,
 } from '@opentrons/shared-data'
-import { getLoadnamePath } from './public-path'
 
+import type * as React from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareList, LabwareDefinition } from './types'
 
@@ -85,7 +84,8 @@ export interface DefinitionRouteProps {
 
 export const DefinitionRoute: React.FC<DefinitionRouteProps> = ({ render }) => {
   const location = useLocation()
-  const loadName = getLoadnamePath(location.pathname)
+  const searchParams = new URLSearchParams(location.search)
+  const loadName = searchParams.get('loadName')
   const definition = getDefinition(loadName)
 
   // TODO: handle 404 if loadName exists but definition isn't found
