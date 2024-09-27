@@ -12,8 +12,11 @@ from datetime import datetime
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='Opentrons Temperature Kit Driver')
-    arg_parser.add_argument('-z', '--zone', type=int, required=False, help='Sets the zone number for histgram data (0-9)', default=5)
-    arg_parser.add_argument('-l', '--log', type=float, required=False, help='Logs histogram data for a given duration (min)', default=1)
+    arg_parser.add_argument('-t', '--test', action="store_true", required=False, help='Gets sample data from the sensor')
+    arg_parser.add_argument('-w', '--labware', action="store_true", required=False, help='Measures the sensor for different labware quantity')
+    arg_parser.add_argument('-m', '--labware_max', type=int, required=False, help='Sets the maximum number of labware', default=3)
+    arg_parser.add_argument('-z', '--zone', type=int, required=False, help='Sets the zone number for histgram data (0-9)', default=1)
+    arg_parser.add_argument('-l', '--log', type=float, required=False, help='Logs histogram data for a given duration (min)', default=0.1)
     arg_parser.add_argument('-p', '--port_name', type=str, required=False, help='Sets serial connection port, ex: -p COM5')
     return arg_parser
 
@@ -95,9 +98,12 @@ class TOFSensor():
         hist_list = histogram.split(":")[1].split(",")
         return hist_list
 
-    def log_histogram(self, duration):
+    def log_histogram(self, duration, labware = 0):
         self.create_folder(self.log_folder)
-        self.create_file()
+        if labware > 0:
+            self.create_file(labware)
+        else:
+            self.create_file()
         filename = f"{self.log_folder}/{self.log_file}"
         self.start_time = time.time()
         with open(filename, 'w') as f:
@@ -122,7 +128,7 @@ class TOFSensor():
         df.name = file
         return df
 
-    def plot_log(self):
+    def plot_log(self, labware = 0):
         zone = args.zone
         filename = f"{self.log_folder}/{self.log_file}"
         self.create_folder(self.plot_folder)
@@ -132,9 +138,15 @@ class TOFSensor():
         for col in cols:
             file_suffix = col.lower().replace(" ","")
             fig = px.line(df, y=col)
+            if labware > 0:
+                filename = f"tof_histogram_zone{zone}_{file_suffix}_lab{labware}"
+                title = f"TOF Histogram - Zone {zone} ({col}) [Labware = {labware}]"
+            else:
+                filename = f"tof_histogram_zone{zone}_{file_suffix}"
+                title = f"TOF Histogram - Zone {zone} ({col})"
             self.plot_param["figure"] = fig
-            self.plot_param["filename"] = f"tof_histogram_zone{zone}_{file_suffix}"
-            self.plot_param["title"] = f"TOF Histogram - Zone {zone} ({col})"
+            self.plot_param["filename"] = filename
+            self.plot_param["title"] = title
             self.plot_param["x_title"] = "Bin Number"
             self.plot_param["y_title"] = "Number of Photons"
             self.plot_param["x_range"] = [0, 127]
@@ -146,9 +158,15 @@ class TOFSensor():
         df["Average"] = df.mean(axis=1)
         print(df)
         fig = px.line(df, y="Average")
+        if labware > 0:
+            filename = f"tof_histogram_zone{zone}_average_lab{labware}"
+            title = f"TOF Histogram - Zone {zone} (Average) [Labware = {labware}]"
+        else:
+            filename = f"tof_histogram_zone{zone}_{file_suffix}"
+            title = f"TOF Histogram - Zone {zone} ({col})"
         self.plot_param["figure"] = fig
-        self.plot_param["filename"] = f"tof_histogram_zone{zone}_average"
-        self.plot_param["title"] = f"TOF Histogram - Zone {zone} (Average)"
+        self.plot_param["filename"] = filename
+        self.plot_param["title"] = title
         self.plot_param["x_title"] = "Bin Number"
         self.plot_param["y_title"] = "Number of Photons"
         self.plot_param["x_range"] = [0, 127]
@@ -215,12 +233,15 @@ class TOFSensor():
         if not os.path.exists(folder):
             os.makedirs(folder)
 
-    def create_file(self):
+    def create_file(self, labware = 0):
         current_datetime = self.datetime.strftime("%m-%d-%y_%H-%M")
         port = self.PORT
         if "dev" in port:
             port = port.replace('/dev/tty','')
-        filename = f"TOF_{port}_ZONE{args.zone}_{current_datetime}.csv"
+        if labware > 0:
+            filename = f"TOF_{port}_ZONE{args.zone}_LAB{labware}_{current_datetime}.csv"
+        else:
+            filename = f"TOF_{port}_ZONE{args.zone}_{current_datetime}.csv"
         self.log_file = filename
         print(f"File Name: {self.log_file}")
 
@@ -233,9 +254,16 @@ if __name__ == '__main__':
     else:
         sensor = TOFSensor(port="/dev/ttyACM0", baudrate=115200)
     sensor.connect()
-    if args.log:
+    if args.test:
         sensor.log_histogram(args.log)
         sensor.plot_log()
+    elif args.labware:
+        print(f"Testing TOF Sensor from 1 to {args.labware_max} labware.\n")
+        for i in range(args.labware_max):
+            input(f"Measure for Labware = {i+1} [Press ENTER to continue]")
+            sensor.log_histogram(args.log, i+1)
+            sensor.plot_log(i+1)
+        print("Test Completed!")
     else:
         while True:
             sensor.get_histogram_zone(args.zone)
