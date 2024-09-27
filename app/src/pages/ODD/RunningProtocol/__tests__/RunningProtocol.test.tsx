@@ -22,7 +22,7 @@ import {
   CurrentRunningProtocolCommand,
   RunningProtocolSkeleton,
 } from '/app/organisms/ODD/RunningProtocol'
-/* eslint-disable: opentrons/no-imports-across-applications */
+/* eslint-disable-next-line opentrons/no-imports-across-applications */
 import { mockUseAllCommandsResponseNonDeterministic } from '/app/organisms/Desktop/RunProgressMeter/__fixtures__'
 import { getLocalRobot } from '/app/redux/discovery'
 import { CancelingRunModal } from '/app/organisms/ODD/RunningProtocol/CancelingRunModal'

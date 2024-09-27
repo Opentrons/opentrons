@@ -1,7 +1,7 @@
 import last from 'lodash/last'
 import {
-    useProtocolQuery,
-    useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
+  useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 import { useRequiredProtocolHardwareFromAnalysis } from '/app/transformations/commands'
 import type { ProtocolHardware } from '/app/transformations/commands'
@@ -14,14 +14,14 @@ import type { ProtocolHardware } from '/app/transformations/commands'
  */
 
 export const useRequiredProtocolHardware = (
-    protocolId: string
+  protocolId: string
 ): { requiredProtocolHardware: ProtocolHardware[]; isLoading: boolean } => {
-    const { data: protocolData } = useProtocolQuery(protocolId)
-    const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
-        protocolId,
-        last(protocolData?.data.analysisSummaries)?.id ?? null,
-        { enabled: protocolData != null }
-    )
+  const { data: protocolData } = useProtocolQuery(protocolId)
+  const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
+    protocolId,
+    last(protocolData?.data.analysisSummaries)?.id ?? null,
+    { enabled: protocolData != null }
+  )
 
-    return useRequiredProtocolHardwareFromAnalysis(analysis ?? null)
+  return useRequiredProtocolHardwareFromAnalysis(analysis ?? null)
 }

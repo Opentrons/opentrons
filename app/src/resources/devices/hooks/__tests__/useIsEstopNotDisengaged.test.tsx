@@ -2,13 +2,7 @@ import { when } from 'vitest-when'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useEstopQuery } from '@opentrons/react-api-client'
-import {
-  DISENGAGED,
-  NOT_PRESENT,
-  PHYSICALLY_ENGAGED,
-  LOGICALLY_ENGAGED,
-} from '/app/organisms/EmergencyStop'
-import { useIsEstopNotDisengaged } from '../hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '../useIsEstopNotDisengaged'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/robots')
@@ -16,27 +10,27 @@ vi.mock('/app/redux-resources/robots')
 const ROBOT_NAME = 'mockRobot'
 const mockEstopStatus = {
   data: {
-    status: DISENGAGED,
-    leftEstopPhysicalStatus: DISENGAGED,
-    rightEstopPhysicalStatus: NOT_PRESENT,
+    status: 'disengaged',
+    leftEstopPhysicalStatus: 'disengaged',
+    rightEstopPhysicalStatus: 'notPresent',
   },
 }
 const mockPhysicallyEngagedStatus = {
   data: {
     ...mockEstopStatus.data,
-    status: PHYSICALLY_ENGAGED,
+    status: 'physicallyEngaged',
   },
 }
 const mockLogicallyEngagedStatus = {
   data: {
     ...mockEstopStatus.data,
-    status: LOGICALLY_ENGAGED,
+    status: 'logicallyEngaged',
   },
 }
 const mockNotPresentStatus = {
   data: {
     ...mockEstopStatus.data,
-    status: NOT_PRESENT,
+    status: 'notPresent',
   },
 }
 

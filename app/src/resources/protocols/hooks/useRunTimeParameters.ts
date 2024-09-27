@@ -4,11 +4,7 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 
-
-import type {
-  RunTimeParameter,
-} from '@opentrons/shared-data'
-
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
 /**
  * Returns an array of RunTimeParameters objects that are optional by the given protocol ID.
