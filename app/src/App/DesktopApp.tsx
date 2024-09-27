@@ -14,7 +14,7 @@ import NiceModal from '@ebay/nice-modal-react'
 
 import { i18n } from '/app/i18n'
 import { Alerts } from '/app/organisms/Alerts'
-import { Breadcrumbs } from '/app/organisms/Breadcrumbs'
+import { Breadcrumbs } from '/app/organisms/Desktop/Breadcrumbs'
 import { ToasterOven } from '/app/organisms/ToasterOven'
 import { CalibrationDashboard } from '/app/pages/Desktop/Devices/CalibrationDashboard'
 import { DeviceDetails } from '/app/pages/Desktop/Devices/DeviceDetails'

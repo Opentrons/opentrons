@@ -5,7 +5,7 @@ import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { Breadcrumbs } from '/app/organisms/Breadcrumbs'
+import { Breadcrumbs } from '/app/organisms/Desktop/Breadcrumbs'
 import { CalibrationDashboard } from '/app/pages/Desktop/Devices/CalibrationDashboard'
 import { DeviceDetails } from '/app/pages/Desktop/Devices/DeviceDetails'
 import { DevicesLanding } from '/app/pages/Desktop/Devices/DevicesLanding'
