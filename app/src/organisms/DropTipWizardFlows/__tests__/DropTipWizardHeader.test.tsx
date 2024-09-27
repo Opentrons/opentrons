@@ -31,7 +31,7 @@ describe('DropTipWizardHeader', () => {
   it('renders appropriate copy and onClick behavior', () => {
     render(props)
     screen.getByText('Drop tips')
-    screen.getByText('Step 1 / 3')
+    screen.getByText('Step 1 / 5')
   })
 })
 
