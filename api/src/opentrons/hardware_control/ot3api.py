@@ -2031,12 +2031,11 @@ class OT3API(
                 await self.set_system_constraints_for_plunger_acceleration(
                     realmount, aspirate_spec.acceleration
                 )
-                async with self.grab_pressure(realmount):
-                    await self._move(
-                        target_pos,
-                        speed=aspirate_spec.speed,
-                        home_flagged_axes=False,
-                    )
+                await self._move(
+                    target_pos,
+                    speed=aspirate_spec.speed,
+                    home_flagged_axes=False,
+                )
         except Exception:
             self._log.exception("Aspirate failed")
             aspirate_spec.instr.set_current_volume(0)
