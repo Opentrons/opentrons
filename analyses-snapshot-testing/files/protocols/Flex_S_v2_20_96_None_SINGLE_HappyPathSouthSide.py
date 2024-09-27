@@ -2,7 +2,7 @@ from opentrons.protocol_api import SINGLE
 
 metadata = {
     "protocolName": "96Channel SINGLE Happy Path A1 or A12",
-    "description": "Tip Rack South Clearance for the 96 channel pipette and a SINGLE partial tip configuration.",
+    "description": "Unsafe protocol ❗❗❗❗❗❗❗❗❗❗❗ will collide with tube.",
 }
 
 requirements = {

@@ -4,7 +4,7 @@ from opentrons import protocol_api
 
 # metadata
 metadata = {
-    "protocolName": "Test LPD",
+    "protocolName": "Wet test for LPD",
     "author": "Josh McVey",
     "description": "http://sandbox.docs.opentrons.com/edge/v2/pipettes/loading.html#liquid-presence-detection",
 }
@@ -34,8 +34,8 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # liquids
     waterButMoreBlue = protocol.define_liquid(
-        name="Water but more blue",
-        description="Water for ER testing",
+        name="H20",
+        description="Test this wet!!!",
         display_color="#0077b6",
     )
 
@@ -55,6 +55,7 @@ def run(protocol: protocol_api.ProtocolContext):
     pipette.dispense(volume, sample_plate.well(well))
     pipette.drop_tip()
 
+    # reuse a tip with liquid_presence_detection=True
     # we do NOT get an error if we reuse a tip
     # but it is not recommended
     well = "A2"
@@ -85,6 +86,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): TipNotEmptyError:
     # This operation requires a tip with no liquid in it.
     # https://opentrons.atlassian.net/browse/RQA-3171
+    pipette.prepare_to_aspirate()  # This removes the error
     is_liquid_in_reservoir = pipette.detect_liquid_presence(reservoir["A1"])
     protocol.comment(f"Is there liquid in the reservoir? {is_liquid_in_reservoir}")
     if not protocol.is_simulating():

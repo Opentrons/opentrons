@@ -131,23 +131,13 @@ ninety_six_row_front = PartialTipConfig(
 )
 
 # 8 channel SINGLE
-eight_single_back = PartialTipConfig(
-    key="eight_single_back",
+eight_single = PartialTipConfig(
+    key="eight_single",
     description="8 channel single picking up from the back left of the tiprack",
     starting_tip="A1",
     starting_nozzle="H1",
     api_tip_config=SINGLE,
     api_start="H1",
-    api_end=None,
-)
-
-eight_single_front = PartialTipConfig(
-    key="eight_single_front",
-    description="8 channel single picking up from the front left of the tiprack",
-    starting_tip="H1",
-    starting_nozzle="A1",
-    api_tip_config=SINGLE,
-    api_start="A1",
     api_end=None,
 )
 
@@ -230,8 +220,7 @@ all_partial_configs = [
     ninety_six_column_right,
     ninety_six_row_back,
     ninety_six_row_front,
-    eight_single_back,
-    eight_single_front,
+    eight_single,
     eight_partial_back_2_tips,
     eight_partial_back_3_tips,
     eight_partial_back_4_tips,
@@ -250,29 +239,71 @@ def find_partial_tip_config(key: str) -> Optional[PartialTipConfig]:
     raise ValueError(f"Could not find partial tip config with key {key}")
 
 
+reservoir_choices = [
+    {
+        "display_name": "Agilent Reservoir 290 mL",
+        "value": "agilent_1_reservoir_290ml",
+    },
+    {
+        "display_name": "Axygen Reservoir 90 mL",
+        "value": "axygen_1_reservoir_90ml",
+    },
+    {
+        "display_name": "nest_12_reservoir_15ml",
+        "value": "nest_12_reservoir_15ml",
+    },
+    {
+        "display_name": "Nest Reservoir 195 mL",
+        "value": "nest_1_reservoir_195ml",
+    },
+    {
+        "display_name": "Nest Reservoir 290 mL",
+        "value": "nest_1_reservoir_290ml",
+    },
+    {
+        "display_name": "usa..._12_reservoir_22ml",
+        "value": "usascientific_12_reservoir_22ml",
+    },
+]
+
+position_choices = [
+    {"display_name": "A1", "value": "A1"},
+    {"display_name": "A2", "value": "A2"},
+    {"display_name": "A3", "value": "A3"},
+    {"display_name": "B1", "value": "B1"},
+    {"display_name": "B2", "value": "B2"},
+    {"display_name": "B3", "value": "B3"},
+    {"display_name": "C1", "value": "C1"},
+    {"display_name": "C2", "value": "C2"},
+    {"display_name": "C3", "value": "C3"},
+    {"display_name": "D1", "value": "D1"},
+    {"display_name": "D2", "value": "D2"},
+    {"display_name": "D3", "value": "D3"},
+]
+
+
 def add_parameters(parameters):
     parameters.add_str(
         display_name="Partial Tip Configuration",
         variable_name="partial_tip_config_key",
-        default="no_tip_config",
-        description="Partial tip configurations described relative to the tiprack.",
+        default="ninety_six_single_back_left",
+        description="Partial tip configurations described by pickup nozzle and tip count",
         choices=[  # value of each choice maps to the key of the partial tip config dataclass we defined
-            {"display_name": "96 SINGLE back left", "value": "ninety_six_single_back_left"},
-            {"display_name": "96 SINGLE back right", "value": "ninety_six_single_back_right"},
-            {"display_name": "96 SINGLE front left", "value": "ninety_six_single_front_left"},
-            {"display_name": "96 SINGLE front right", "value": "ninety_six_single_front_right"},
-            {"display_name": "96 COLUMN left", "value": "ninety_six_column_left"},
-            {"display_name": "96 COLUMN right", "value": "ninety_six_column_right"},
-            {"display_name": "96 ROW back", "value": "ninety_six_row_back"},
-            {"display_name": "96 ROW front", "value": "ninety_six_row_front"},
-            {"display_name": "8 SINGLE back left", "value": "eight_single_back"},
-            {"display_name": "8 SINGLE front left", "value": "eight_single_front"},
-            {"display_name": "8 PARTIAL back left - 2 tips", "value": "eight_partial_back_2_tips"},
-            {"display_name": "8 PARTIAL back left - 3 tips", "value": "eight_partial_back_3_tips"},
-            {"display_name": "8 PARTIAL back left - 4 tips", "value": "eight_partial_back_4_tips"},
-            {"display_name": "8 PARTIAL back left - 5 tips", "value": "eight_partial_back_5_tips"},
-            {"display_name": "8 PARTIAL back left - 6 tips", "value": "eight_partial_back_6_tips"},
-            {"display_name": "8 PARTIAL back left - 7 tips", "value": "eight_partial_back_7_tips"},
+            {"display_name": "96 SINGLE nozzle H12", "value": "ninety_six_single_back_left"},
+            {"display_name": "96 SINGLE nozzle H1", "value": "ninety_six_single_back_right"},
+            {"display_name": "96 SINGLE nozzle A12", "value": "ninety_six_single_front_left"},
+            {"display_name": "96 SINGLE nozzle A1", "value": "ninety_six_single_front_right"},
+            {"display_name": "96 COLUMN 1", "value": "ninety_six_column_left"},
+            {"display_name": "96 COLUMN 12", "value": "ninety_six_column_right"},
+            {"display_name": "96 ROW A", "value": "ninety_six_row_back"},
+            {"display_name": "96 ROW H", "value": "ninety_six_row_front"},
+            {"display_name": "8 SINGLE", "value": "eight_single"},
+            {"display_name": "8 PARTIAL 2 tips", "value": "eight_partial_back_2_tips"},
+            {"display_name": "8 PARTIAL 3 tips", "value": "eight_partial_back_3_tips"},
+            {"display_name": "8 PARTIAL 4 tips", "value": "eight_partial_back_4_tips"},
+            {"display_name": "8 PARTIAL 5 tips", "value": "eight_partial_back_5_tips"},
+            {"display_name": "8 PARTIAL 6 tips", "value": "eight_partial_back_6_tips"},
+            {"display_name": "8 PARTIAL 7 tips", "value": "eight_partial_back_7_tips"},
             {"display_name": "No Partial tip config", "value": "no_tip_config"},
         ],
     )
@@ -319,12 +350,12 @@ def add_parameters(parameters):
                 "value": "opentrons_flex_96_tiprack_1000ul",
             },
             {
-                "display_name": "300µl Standard Tip Rack",
-                "value": "opentrons_flex_96_tiprack_300ul",
+                "display_name": "200µl Standard Tip Rack",
+                "value": "opentrons_flex_96_tiprack_200ul",
             },
             {
-                "display_name": "300µl Filter Tip Rack",
-                "value": "opentrons_flex_96_filtertiprack_300ul",
+                "display_name": "200µl Filter Tip Rack",
+                "value": "opentrons_flex_96_filtertiprack_200ul",
             },
             {
                 "display_name": "50µl Filter Tip Rack",
@@ -348,6 +379,46 @@ def add_parameters(parameters):
         ],
         default="left",
         description="Select the pipette mount.",
+    )
+
+    parameters.add_str(
+        display_name="Reservoir A",
+        variable_name="reservoir_a_load_name",
+        choices=reservoir_choices,
+        default="nest_1_reservoir_290ml",
+        description="Select the reservoir type",
+    )
+
+    parameters.add_str(
+        display_name="Reservoir B",
+        variable_name="reservoir_b_load_name",
+        choices=reservoir_choices,
+        default="nest_1_reservoir_290ml",
+        description="Select the reservoir type",
+    )
+
+    parameters.add_str(
+        display_name="Tiprack Position",
+        variable_name="tiprack_position",
+        default="B2",
+        description="Select the position of the tiprack",
+        choices=position_choices,
+    )
+
+    parameters.add_str(
+        display_name="Reservoir A Position",
+        variable_name="reservoir_a_position",
+        default="C1",
+        description="Select the position of reservoir A",
+        choices=position_choices,
+    )
+
+    parameters.add_str(
+        display_name="Reservoir B Position",
+        variable_name="reservoir_b_position",
+        default="D1",
+        description="Select the position of reservoir B",
+        choices=position_choices,
     )
 
 
@@ -391,24 +462,61 @@ def comment_tip_rack_status(ctx, tip_rack):
 
 
 def run(ctx):
+    trash = ctx.load_trash_bin("A3")  # must load trash bin
     # get the key from the parameters
     tip_config = find_partial_tip_config(ctx.params.partial_tip_config_key)
     pipette_load_name = ctx.params.pipette_load_name
     tiprack_load_name = ctx.params.tiprack_load_name
+    tip_rack_position = ctx.params.tiprack_position
     pipette_mount = ctx.params.pipette_mount
+    reservoir_a_load_name = ctx.params.reservoir_a_load_name
+    reservoir_b_load_name = ctx.params.reservoir_b_load_name
+    reservoir_a_position = ctx.params.reservoir_a_position
+    reservoir_b_position = ctx.params.reservoir_b_position
     # print out the tip config
     ctx.comment(f"Running with {tip_config}")
     ctx.comment(f"Using pipette {pipette_load_name}")
     ctx.comment(f"Using tip rack {tiprack_load_name}")
     ctx.comment(f"Using pipette mount {pipette_mount}")
+    ctx.comment(f"Using reservoir A {reservoir_a_load_name}")
+    ctx.comment(f"Using reservoir B {reservoir_b_load_name}")
+    ctx.comment(f"Using reservoir A position {reservoir_a_position}")
+    ctx.comment(f"Using reservoir B position {reservoir_b_position}")
+    # load the labware
+    reservoir_a = ctx.load_labware(reservoir_a_load_name, reservoir_a_position)
+    reservoir_b = ctx.load_labware(reservoir_b_load_name, reservoir_b_position)
     # example code on Flex for a pipette
     # comment shows we picked up the tips we expected
     if tip_config.key == "no_tip_config" and pipette_load_name == "flex_96channel_1000":
-        tip_rack = ctx.load_labware(tiprack_load_name, "B2", adapter="opentrons_flex_96_tiprack_adapter")
+        tip_rack = ctx.load_labware(tiprack_load_name, tip_rack_position, adapter="opentrons_flex_96_tiprack_adapter")
     else:
-        tip_rack = ctx.load_labware(tiprack_load_name, "B2")
+        tip_rack = ctx.load_labware(tiprack_load_name, tip_rack_position)
     pipette = ctx.load_instrument(pipette_load_name, pipette_mount)
     # use this convenience function to set the nozzle layout
     set_configure_nozzle_layout(ctx=ctx, pipette=pipette, tipracks=[tip_rack], tip_config=tip_config)
+
+    def how_much_to_pipette(tiprack_load_name):
+        if "50" in tiprack_load_name:
+            return 20
+        else:
+            return 100
+
+    volume = how_much_to_pipette(tiprack_load_name)
+
     pipette.pick_up_tip()
     comment_tip_rack_status(ctx=ctx, tip_rack=tip_rack)
+    ctx.comment("aspirate from reservoir A")
+    pipette.aspirate(volume=volume, location=reservoir_a.wells()[0])
+    ctx.comment("dispense to reservoir B")
+    pipette.dispense(volume=volume, location=reservoir_b.wells()[0])
+    ctx.comment("mixing in reservoir B")
+    pipette.mix(repetitions=3, volume=volume / 2)
+    ctx.comment("Aspirate from reservoir A")
+    pipette.aspirate(volume=volume, location=reservoir_a.wells()[0])
+    ctx.comment("Blow out in reservoir A")
+    pipette.blow_out()
+    ctx.comment("Aspirate from reservoir B")
+    pipette.aspirate(volume=volume, location=reservoir_b.wells()[0])
+    ctx.comment("air_gap with no argument in reservoir B")
+    pipette.air_gap()
+    pipette.drop_tip()
