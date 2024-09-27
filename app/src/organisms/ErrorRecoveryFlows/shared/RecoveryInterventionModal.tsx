@@ -2,7 +2,12 @@ import type * as React from 'react'
 import { createPortal } from 'react-dom'
 import { css } from 'styled-components'
 
-import { Flex, RESPONSIVENESS, SPACING } from '@opentrons/components'
+import {
+  Flex,
+  OVERFLOW_HIDDEN,
+  RESPONSIVENESS,
+  SPACING,
+} from '@opentrons/components'
 
 import { InterventionModal } from '/app/molecules/InterventionModal'
 import { getModalPortalEl, getTopPortalEl } from '../../../App/portal'
@@ -51,6 +56,7 @@ const SMALL_MODAL_STYLE = css`
   height: 22rem;
   padding: ${SPACING.spacing32};
   width: 100%;
+  overflow: ${OVERFLOW_HIDDEN};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     padding: ${SPACING.spacing32};
@@ -60,6 +66,7 @@ const SMALL_MODAL_STYLE = css`
 const LARGE_MODAL_STYLE = css`
   height: 26.75rem;
   width: 100%;
+  overflow: ${OVERFLOW_HIDDEN};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     height: 100%;

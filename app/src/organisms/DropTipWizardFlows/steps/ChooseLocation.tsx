@@ -10,6 +10,7 @@ import {
   StyledText,
   RadioButton,
   OVERFLOW_AUTO,
+  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
 import { BLOWOUT_SUCCESS, DROP_TIP_SUCCESS, DT_ROUTES } from '../constants'
@@ -38,6 +39,7 @@ export function ChooseLocation({
   proceed,
   proceedToRouteAndStep,
   toggleIsRobotPipetteMoving,
+  modalStyle,
 }: ChooseLocationProps): JSX.Element {
   const { t } = useTranslation('drop_tip_wizard')
   const { moveToAddressableArea, blowoutOrDropTip } = dropTipCommands
@@ -123,29 +125,37 @@ export function ChooseLocation({
   }
 
   return (
-    <Flex css={CONTAINER_STYLE}>
-      <StyledText
-        oddStyle="level4HeaderSemiBold"
-        desktopStyle="headingSmallBold"
-      >
-        {buildTitleCopy()}
-      </StyledText>
+    <Flex
+      css={
+        modalStyle === 'simple'
+          ? CONTAINER_STYLE_SIMPLE
+          : CONTAINER_STYLE_INTERVENTION
+      }
+    >
       <Flex css={OPTION_CONTAINER_STYLE}>
-        {dropTipCommandLocations.map(ld => {
-          const label = buildLocationCopy(ld.location, ld.slotName)
-          return (
-            <RadioButton
-              key={label}
-              buttonLabel={label}
-              buttonValue={ld.slotName}
-              onChange={() => {
-                handleChange(ld)
-              }}
-              isSelected={ld.slotName === selectedLocation?.slotName}
-              largeDesktopBorderRadius={true}
-            />
-          )
-        })}
+        <StyledText
+          oddStyle="level4HeaderSemiBold"
+          desktopStyle="headingSmallBold"
+        >
+          {buildTitleCopy()}
+        </StyledText>
+        <Flex css={BUTTON_CONTAINER_STYLE}>
+          {dropTipCommandLocations.map(ld => {
+            const label = buildLocationCopy(ld.location, ld.slotName)
+            return (
+              <RadioButton
+                key={label}
+                buttonLabel={label}
+                buttonValue={ld.slotName}
+                onChange={() => {
+                  handleChange(ld)
+                }}
+                isSelected={ld.slotName === selectedLocation?.slotName}
+                largeDesktopBorderRadius={true}
+              />
+            )
+          })}
+        </Flex>
       </Flex>
       <DropTipFooterButtons
         primaryBtnOnClick={primaryOnClick}
@@ -155,18 +165,35 @@ export function ChooseLocation({
   )
 }
 
-const CONTAINER_STYLE = css`
+const CONTAINER_STYLE_BASE = `
   overflow: ${OVERFLOW_AUTO};
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing16};
   height: 100%;
+  width: 100%;
+  flex-grow: 1;
+`
+
+const CONTAINER_STYLE_INTERVENTION = css`
+  ${CONTAINER_STYLE_BASE}
+`
+
+const CONTAINER_STYLE_SIMPLE = css`
+  ${CONTAINER_STYLE_BASE}
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     height: 80%;
+    flex-grow: 0;
   }
 `
 
 const OPTION_CONTAINER_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  grid-gap: ${SPACING.spacing16};
+`
+
+const BUTTON_CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing4};
 
