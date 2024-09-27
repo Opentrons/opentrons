@@ -20,7 +20,7 @@ import { ProtocolTimeline } from '/app/pages/Desktop/Protocols/ProtocolDetails/P
 import { useSoftwareUpdatePoll } from '../hooks'
 import { DesktopApp } from '../DesktopApp'
 
-vi.mock('/app/organisms/Breadcrumbs')
+vi.mock('/app/organisms/Desktop/Breadcrumbs')
 vi.mock('/app/pages/Desktop/AppSettings/GeneralSettings')
 vi.mock('/app/pages/Desktop/Devices/CalibrationDashboard')
 vi.mock('/app/pages/Desktop/Devices/DeviceDetails')
@@ -28,7 +28,7 @@ vi.mock('/app/pages/Desktop/Devices/DevicesLanding')
 vi.mock('/app/pages/Desktop/Protocols/ProtocolsLanding')
 vi.mock('/app/pages/Desktop/Devices/ProtocolRunDetails')
 vi.mock('/app/pages/Desktop/Devices/RobotSettings')
-vi.mock('/app/organisms/Alerts/AlertsModal')
+vi.mock('/app/organisms/Desktop/Alerts/AlertsModal')
 vi.mock('/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux-resources/robots')
