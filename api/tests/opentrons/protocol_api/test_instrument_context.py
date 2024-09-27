@@ -1541,6 +1541,7 @@ def test_mix_no_lpd(
     )
 
 
+@pytest.mark.ot3_only
 @pytest.mark.parametrize("api_version", [APIVersion(2, 21)])
 def test_mix_with_lpd(
     decoy: Decoy,
