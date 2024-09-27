@@ -43,8 +43,10 @@ import { HandleEnter } from './HandleEnter'
 
 import type { DropdownBorder } from '@opentrons/components'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
-import type { FormModules } from '../../step-forms'
+import type { FormModule, FormModules } from '../../step-forms'
 import type { WizardTileProps } from './types'
+
+const MAX_MAGNETIC_BLOCKS = 4
 
 export function SelectModules(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, setValue } = props
@@ -84,16 +86,73 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
     ? [TEMPERATURE_MODULE_TYPE, HEATERSHAKER_MODULE_TYPE, MAGNETIC_BLOCK_TYPE]
     : [TEMPERATURE_MODULE_TYPE]
 
-  const filteredModules: FormModules = {}
-  const seenModels = new Set<ModuleModel>()
+  const handleAddModule = (moduleModel: ModuleModel): void => {
+    if (hasNoAvailableSlots) {
+      makeSnackbar(t('slots_limit_reached') as string)
+    } else {
+      setValue('modules', {
+        ...modules,
+        [uuid()]: {
+          model: moduleModel,
+          type: getModuleType(moduleModel),
+          slot:
+            robotType === FLEX_ROBOT_TYPE
+              ? DEFAULT_SLOT_MAP_FLEX[moduleModel]
+              : DEFAULT_SLOT_MAP_OT2[getModuleType(moduleModel)],
+        },
+      })
+    }
+  }
 
-  if (modules != null) {
-    Object.entries(modules).forEach(([key, mod]) => {
-      if (!seenModels.has(mod.model)) {
-        seenModels.add(mod.model)
-        filteredModules[parseInt(key)] = mod
+  const handleRemoveModule = (moduleType: ModuleType): void => {
+    const updatedModules =
+      modules != null
+        ? Object.fromEntries(
+            Object.entries(modules).filter(
+              ([key, value]) => value.type !== moduleType
+            )
+          )
+        : {}
+    setValue('modules', updatedModules)
+  }
+
+  const handleQuantityChange = (
+    modules: FormModules,
+    module: FormModule,
+    newQuantity: number
+  ): void => {
+    const moamModules =
+      modules != null
+        ? Object.entries(modules).filter(
+            ([key, mod]) => mod.type === module.type
+          )
+        : []
+    if (newQuantity > moamModules.length) {
+      const newModules = { ...modules }
+      for (let i = 0; i < newQuantity - moamModules.length; i++) {
+        //  @ts-expect-error: TS can't determine modules's type correctly
+        newModules[uuid()] = {
+          model: module.model,
+          type: module.type,
+          slot: null,
+        }
       }
-    })
+      setValue('modules', newModules)
+    } else if (newQuantity < moamModules.length) {
+      const modulesToRemove = moamModules.length - newQuantity
+      const remainingModules: FormModules = {}
+
+      Object.entries(modules).forEach(([key, mod]) => {
+        const shouldRemove = moamModules
+          .slice(-modulesToRemove)
+          .some(([removeKey]) => removeKey === key)
+        if (!shouldRemove) {
+          remainingModules[parseInt(key)] = mod
+        }
+      })
+
+      setValue('modules', remainingModules)
+    }
   }
 
   return (
@@ -138,41 +197,28 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                         numSlotsAvailable <= 1) ||
                       (moduleModel === 'magneticBlockV1' &&
                         hasNoAvailableSlots &&
-                        numMagneticBlocks === 4)
+                        numMagneticBlocks === MAX_MAGNETIC_BLOCKS)
                     }
                     textAlignment={TYPOGRAPHY.textAlignLeft}
                     size="small"
                     iconName="plus"
                     text={getModuleDisplayName(moduleModel)}
                     onClick={() => {
-                      if (hasNoAvailableSlots) {
-                        makeSnackbar(t('slots_limit_reached') as string)
-                      } else {
-                        setValue('modules', {
-                          ...modules,
-                          [uuid()]: {
-                            model: moduleModel,
-                            type: getModuleType(moduleModel),
-                            slot:
-                              robotType === FLEX_ROBOT_TYPE
-                                ? DEFAULT_SLOT_MAP_FLEX[moduleModel]
-                                : DEFAULT_SLOT_MAP_OT2[
-                                    getModuleType(moduleModel)
-                                  ],
-                          },
-                        })
-                      }
+                      handleAddModule(moduleModel)
                     }}
                   />
                 ))}
             </Flex>
-            {modules != null &&
-            Object.keys(modules).length > 0 &&
-            Object.keys(filteredModules).length > 0 ? (
+            {modules != null && Object.keys(modules).length > 0 ? (
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing12}
-                paddingTop={SPACING.spacing32}
+                paddingTop={
+                  filteredSupportedModules.length === 1 &&
+                  filteredSupportedModules[0] === 'absorbanceReaderV1'
+                    ? 0
+                    : SPACING.spacing32
+                }
               >
                 <StyledText desktopStyle="headingSmallBold">
                   {t('modules_added')}
@@ -181,110 +227,80 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing4}
                 >
-                  {Object.values(filteredModules).map((module, index) => {
-                    const length = Object.values(modules).filter(
-                      mod => module.type === mod.type
-                    ).length
-
-                    const dropdownProps = {
-                      currentOption: {
-                        name: `${length}`,
-                        value: `${length}`,
-                      },
-                      onClick: (value: string) => {
-                        const num = parseInt(value)
-                        const moamModules =
-                          modules != null
-                            ? Object.entries(modules).filter(
-                                ([key, mod]) => mod.type === module.type
-                              )
-                            : []
-
-                        if (num > moamModules.length) {
-                          const newModules = { ...modules }
-                          for (let i = 0; i < num - moamModules.length; i++) {
-                            //  @ts-expect-error: TS can't determine modules's type correctly
-                            newModules[uuid()] = {
-                              model: module.model,
-                              type: module.type,
-                              slot: null,
-                            }
-                          }
-                          setValue('modules', newModules)
-                        } else if (num < moamModules.length) {
-                          const modulesToRemove = moamModules.length - num
-                          const remainingModules: FormModules = {}
-
-                          Object.entries(modules).forEach(([key, mod]) => {
-                            const shouldRemove = moamModules
-                              .slice(-modulesToRemove)
-                              .some(([removeKey]) => removeKey === key)
-                            if (!shouldRemove) {
-                              remainingModules[parseInt(key)] = mod
-                            }
-                          })
-
-                          setValue('modules', remainingModules)
+                  {Object.entries(modules)
+                    .reduce<Array<FormModule & { count: number; key: string }>>(
+                      (acc, [key, module]) => {
+                        const existingModule = acc.find(
+                          m => m.type === module.type
+                        )
+                        if (existingModule != null) {
+                          existingModule.count++
+                        } else {
+                          acc.push({ ...module, count: 1, key })
                         }
+                        return acc
                       },
-                      dropdownType: 'neutral' as DropdownBorder,
-                      filterOptions: getNumOptions(
-                        module.model === 'magneticBlockV1'
-                          ? numSlotsAvailable + 3 + length
-                          : numSlotsAvailable + length
-                      ),
-                    }
-                    return (
-                      <ListItem
-                        type="noActive"
-                        key={`${module.model}_${index}`}
-                      >
-                        <ListItemCustomize
-                          dropdown={
-                            MOAM_MODULE_TYPES.includes(module.type) &&
-                            robotType === FLEX_ROBOT_TYPE
-                              ? dropdownProps
-                              : undefined
-                          }
-                          label={
-                            MOAM_MODULE_TYPES.includes(module.type) &&
-                            robotType === FLEX_ROBOT_TYPE
-                              ? t('quantity')
-                              : null
-                          }
-                          linkText={t('remove')}
-                          onClick={() => {
-                            const updatedModules =
-                              modules != null
-                                ? Object.fromEntries(
-                                    Object.entries(modules).filter(
-                                      ([key, value]) =>
-                                        value.type !== module.type
-                                    )
-                                  )
-                                : {}
-                            setValue('modules', updatedModules)
-                          }}
-                          header={getModuleDisplayName(module.model)}
-                          leftHeaderItem={
-                            <Flex
-                              padding={SPACING.spacing2}
-                              backgroundColor={COLORS.white}
-                              borderRadius={BORDERS.borderRadius8}
-                              alignItems={ALIGN_CENTER}
-                              width="3.75rem"
-                              height="3.625rem"
-                            >
-                              <ModuleDiagram
-                                type={module.type}
-                                model={module.model}
-                              />
-                            </Flex>
-                          }
-                        />
-                      </ListItem>
+                      []
                     )
-                  })}
+                    .map(module => {
+                      const dropdownProps = {
+                        currentOption: {
+                          name: `${module.count}`,
+                          value: `${module.count}`,
+                        },
+                        onClick: (value: string) => {
+                          handleQuantityChange(
+                            modules,
+                            module as FormModule,
+                            parseInt(value)
+                          )
+                        },
+                        dropdownType: 'neutral' as DropdownBorder,
+                        filterOptions: getNumOptions(
+                          module.model === 'magneticBlockV1'
+                            ? numSlotsAvailable + 3 + module.count
+                            : numSlotsAvailable + module.count
+                        ),
+                      }
+                      return (
+                        <ListItem type="noActive" key={`${module.model}`}>
+                          <ListItemCustomize
+                            dropdown={
+                              MOAM_MODULE_TYPES.includes(module.type) &&
+                              robotType === FLEX_ROBOT_TYPE
+                                ? dropdownProps
+                                : undefined
+                            }
+                            label={
+                              MOAM_MODULE_TYPES.includes(module.type) &&
+                              robotType === FLEX_ROBOT_TYPE
+                                ? t('quantity')
+                                : null
+                            }
+                            linkText={t('remove')}
+                            onClick={() => {
+                              handleRemoveModule(module.type)
+                            }}
+                            header={getModuleDisplayName(module.model)}
+                            leftHeaderItem={
+                              <Flex
+                                padding={SPACING.spacing2}
+                                backgroundColor={COLORS.white}
+                                borderRadius={BORDERS.borderRadius8}
+                                alignItems={ALIGN_CENTER}
+                                width="3.75rem"
+                                height="3.625rem"
+                              >
+                                <ModuleDiagram
+                                  type={module.type}
+                                  model={module.model}
+                                />
+                              </Flex>
+                            }
+                          />
+                        </ListItem>
+                      )
+                    })}
                 </Flex>
               </Flex>
             ) : null}
