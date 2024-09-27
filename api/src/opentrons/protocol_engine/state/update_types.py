@@ -207,7 +207,7 @@ class StateUpdate:
                 new_deck_point=new_deck_point,
             )
 
-    def set_labware_location(  # noqa: D102
+    def set_labware_location(
         self,
         *,
         labware_id: str,

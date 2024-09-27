@@ -1,6 +1,5 @@
 """Test load pipette commands."""
 from opentrons.protocol_engine.state.update_types import (
-    LoadPipetteUpdate,
     PipetteConfigUpdate,
     StateUpdate,
 )
