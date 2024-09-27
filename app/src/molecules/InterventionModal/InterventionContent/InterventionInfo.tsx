@@ -1,8 +1,7 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 
 import {
-  LocationIcon,
+  DeckInfoLabel,
   Flex,
   Icon,
   COLORS,
@@ -13,16 +12,16 @@ import {
   ALIGN_CENTER,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { Divider } from '../../../atoms/structure/Divider'
+import { Divider } from '/app/atoms/structure/Divider'
 
-import type { LocationIconProps } from '@opentrons/components'
+import type { DeckInfoLabelProps } from '@opentrons/components'
 
 export interface InterventionInfoProps {
   type: 'location-arrow-location' | 'location-colon-location' | 'location'
   labwareName: string
   labwareNickname?: string
-  currentLocationProps: LocationIconProps
-  newLocationProps?: LocationIconProps
+  currentLocationProps: DeckInfoLabelProps
+  newLocationProps?: DeckInfoLabelProps
 }
 
 export function InterventionInfo(props: InterventionInfoProps): JSX.Element {
@@ -96,9 +95,9 @@ const buildLocArrowLoc = (props: InterventionInfoProps): JSX.Element => {
           }
         `}
       >
-        <LocationIcon {...currentLocationProps} />
+        <DeckInfoLabel {...currentLocationProps} />
         <Icon name="arrow-right" css={ICON_STYLE} />
-        <LocationIcon {...newLocationProps} />
+        <DeckInfoLabel {...newLocationProps} />
       </Flex>
     )
   } else {
@@ -111,7 +110,7 @@ const buildLoc = ({
 }: InterventionInfoProps): JSX.Element => {
   return (
     <Flex gridGap={SPACING.spacing8}>
-      <LocationIcon {...currentLocationProps} />
+      <DeckInfoLabel {...currentLocationProps} />
     </Flex>
   )
 }
@@ -130,9 +129,9 @@ const buildLocColonLoc = (props: InterventionInfoProps): JSX.Element => {
           }
         `}
       >
-        <LocationIcon {...currentLocationProps} />
+        <DeckInfoLabel {...currentLocationProps} />
         <Icon name="colon" css={ICON_STYLE} />
-        <LocationIcon {...newLocationProps} />
+        <DeckInfoLabel {...newLocationProps} />
       </Flex>
     )
   } else {

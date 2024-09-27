@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useDispatch } from 'react-redux'
 
 import {
@@ -11,10 +11,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ToggleButton } from '../../../atoms/buttons'
-import { updateSetting } from '../../../redux/robot-settings'
-import type { Dispatch } from '../../../redux/types'
-import type { RobotSettingsField } from '../../../redux/robot-settings/types'
+import { ToggleButton } from '/app/atoms/buttons'
+import { updateSetting } from '/app/redux/robot-settings'
+import type { Dispatch } from '/app/redux/types'
+import type { RobotSettingsField } from '/app/redux/robot-settings/types'
 
 interface SettingToggleProps extends RobotSettingsField {
   robotName: string

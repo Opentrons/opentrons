@@ -6,7 +6,7 @@ import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import {
   useGripperDisplayName,
   usePipetteModelSpecs,
-} from '../../resources/instruments/hooks'
+} from '/app/local-resources/instruments'
 import { ChoosePipette } from '../PipetteWizardFlows/ChoosePipette'
 import { FLOWS } from '../PipetteWizardFlows/constants'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
@@ -14,7 +14,7 @@ import { LabeledMount } from './LabeledMount'
 
 import type { InstrumentData } from '@opentrons/api-client'
 import type { GripperModel, PipetteModel } from '@opentrons/shared-data'
-import type { Mount } from '../../redux/pipettes/types'
+import type { Mount } from '/app/redux/pipettes/types'
 import type { SelectablePipettes } from '../PipetteWizardFlows/types'
 import type { GripperWizardFlows } from '../GripperWizardFlows'
 import type { PipetteWizardFlows } from '../PipetteWizardFlows'

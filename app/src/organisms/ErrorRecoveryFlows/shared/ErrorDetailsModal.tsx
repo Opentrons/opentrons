@@ -8,28 +8,26 @@ import {
   StyledText,
   SPACING,
   COLORS,
+  ModalShell,
+  ModalHeader,
   BORDERS,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 
 import { useErrorName } from '../hooks'
-import { Modal } from '../../../molecules/Modal'
+import { OddModal } from '/app/molecules/OddModal'
 import { getModalPortalEl, getTopPortalEl } from '../../../App/portal'
 import { ERROR_KINDS } from '../constants'
-import { InlineNotification } from '../../../atoms/InlineNotification'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 import { StepInfo } from './StepInfo'
 import { getErrorKind } from '../utils'
-import {
-  LegacyModalShell,
-  LegacyModalHeader,
-} from '../../../molecules/LegacyModal'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { IconProps } from '@opentrons/components'
-import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
-import type { ERUtilsResults } from '../hooks'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { ERUtilsResults, useRetainedFailedCommandBySource } from '../hooks'
 import type { ErrorRecoveryFlowsProps } from '..'
-import type { DesktopSizeType } from '../types'
+import type { DesktopSizeType, ErrorKind } from '../types'
 
 export function useErrorDetailsModal(): {
   showModal: boolean
@@ -44,31 +42,36 @@ export function useErrorDetailsModal(): {
   return { showModal, toggleModal }
 }
 
-type ErrorDetailsModalProps = ErrorRecoveryFlowsProps &
+type ErrorDetailsModalProps = Omit<
+  ErrorRecoveryFlowsProps,
+  'failedCommandByRunRecord'
+> &
   ERUtilsResults & {
     toggleModal: () => void
     isOnDevice: boolean
     robotType: RobotType
     desktopType: DesktopSizeType
+    failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
   }
 
 export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
   const { failedCommand, toggleModal, isOnDevice } = props
-  const errorKind = getErrorKind(failedCommand)
+  const errorKind = getErrorKind(failedCommand?.byRunRecord ?? null)
   const errorName = useErrorName(errorKind)
 
-  const getIsOverpressureErrorKind = (): boolean => {
+  const isNotificationErrorKind = (): boolean => {
     switch (errorKind) {
       case ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE:
       case ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING:
       case ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING:
+      case ERROR_KINDS.TIP_NOT_DETECTED:
         return true
       default:
         return false
     }
   }
 
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: errorName,
     hasExitIcon: true,
   }
@@ -81,7 +84,9 @@ export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
           toggleModal={toggleModal}
           modalHeader={modalHeader}
         >
-          {getIsOverpressureErrorKind() ? <OverpressureBanner /> : null}
+          {isNotificationErrorKind() ? (
+            <NotificationBanner errorKind={errorKind} />
+          ) : null}
         </ErrorDetailsModalODD>,
         getTopPortalEl()
       )
@@ -92,7 +97,9 @@ export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
           toggleModal={toggleModal}
           modalHeader={modalHeader}
         >
-          {getIsOverpressureErrorKind() ? <OverpressureBanner /> : null}
+          {isNotificationErrorKind() ? (
+            <NotificationBanner errorKind={errorKind} />
+          ) : null}
         </ErrorDetailsModalDesktop>,
         getModalPortalEl()
       )
@@ -104,7 +111,7 @@ export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
 
 type ErrorDetailsModalType = ErrorDetailsModalProps & {
   children: React.ReactNode
-  modalHeader: ModalHeaderBaseProps
+  modalHeader: OddModalHeaderBaseProps
   toggleModal: () => void
   desktopType: DesktopSizeType
 }
@@ -126,7 +133,7 @@ export function ErrorDetailsModalDesktop(
 
   const buildHeader = (): JSX.Element => {
     return (
-      <LegacyModalHeader
+      <ModalHeader
         onClose={toggleModal}
         title={t('error_details')}
         icon={buildIcon()}
@@ -137,7 +144,7 @@ export function ErrorDetailsModalDesktop(
   }
 
   return (
-    <LegacyModalShell
+    <ModalShell
       header={buildHeader()}
       css={
         desktopType === 'desktop-small'
@@ -158,7 +165,7 @@ export function ErrorDetailsModalDesktop(
           <StepInfo {...props} desktopStyle="bodyDefaultRegular" />
         </Flex>
       </Flex>
-    </LegacyModalShell>
+    </ModalShell>
   )
 }
 
@@ -168,7 +175,7 @@ export function ErrorDetailsModalODD(
   const { children, modalHeader, toggleModal } = props
 
   return (
-    <Modal
+    <OddModal
       header={modalHeader}
       onOutsideClick={toggleModal}
       zIndex={15}
@@ -185,17 +192,52 @@ export function ErrorDetailsModalODD(
           <StepInfo {...props} desktopStyle="bodyDefaultRegular" />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }
 
-export function OverpressureBanner(): JSX.Element | null {
+export function NotificationBanner({
+  errorKind,
+}: {
+  errorKind: ErrorKind
+}): JSX.Element {
+  const buildContent = (): JSX.Element => {
+    switch (errorKind) {
+      case ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE:
+      case ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING:
+      case ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING:
+        return <OverpressureBanner />
+      case ERROR_KINDS.TIP_NOT_DETECTED:
+        return <TipNotDetectedBanner />
+      default:
+        console.error('Handle error kind notification banners explicitly.')
+        return <div />
+    }
+  }
+
+  return buildContent()
+}
+
+export function OverpressureBanner(): JSX.Element {
   const { t } = useTranslation('error_recovery')
 
   return (
     <InlineNotification
       type="alert"
       heading={t('overpressure_is_usually_caused')}
+      message={t('if_issue_persists_overpressure')}
+    />
+  )
+}
+
+export function TipNotDetectedBanner(): JSX.Element {
+  const { t } = useTranslation('error_recovery')
+
+  return (
+    <InlineNotification
+      type="alert"
+      heading={t('tip_presence_errors_are_caused')}
+      message={t('if_issue_persists_tip_not_detected')}
     />
   )
 }

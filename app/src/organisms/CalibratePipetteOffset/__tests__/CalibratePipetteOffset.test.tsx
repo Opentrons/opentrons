@@ -1,15 +1,15 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
 import { getDeckDefinitions } from '@opentrons/shared-data'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import * as Sessions from '../../../redux/sessions'
-import { mockPipetteOffsetCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import * as Sessions from '/app/redux/sessions'
+import { mockPipetteOffsetCalibrationSessionAttributes } from '/app/redux/sessions/__fixtures__'
 import { CalibratePipetteOffset } from '../index'
-import type { PipetteOffsetCalibrationStep } from '../../../redux/sessions/types'
-import type { DispatchRequestsType } from '../../../redux/robot-api'
+import type { PipetteOffsetCalibrationStep } from '/app/redux/sessions/types'
+import type { DispatchRequestsType } from '/app/redux/robot-api'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getDeckDefinitions>()
@@ -18,9 +18,9 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     getDeckDefinitions: vi.fn(),
   }
 })
-vi.mock('../../../redux/sessions/selectors')
-vi.mock('../../../redux/robot-api/selectors')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/sessions/selectors')
+vi.mock('/app/redux/robot-api/selectors')
+vi.mock('/app/redux/config')
 
 interface CalibratePipetteOffsetSpec {
   heading: string

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Splash } from '@opentrons/components'
 import { START_TERMINAL_ITEM_ID } from '../steplist'

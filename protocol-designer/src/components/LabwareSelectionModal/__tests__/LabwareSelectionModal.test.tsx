@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import {
@@ -14,7 +13,7 @@ import {
   ADAPTER_96_CHANNEL,
   getLabwareCompatibleWithAdapter,
 } from '../../../utils/labwareModuleCompatibility'
-import { i18n } from '../../../localization'
+import { i18n } from '../../../assets/localization'
 import { LabwareSelectionModal } from '../LabwareSelectionModal'
 import {
   getInitialDeckSetup,

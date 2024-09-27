@@ -1,18 +1,18 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { home } from '../../../redux/robot-controls'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { home } from '/app/redux/robot-controls'
 import { useLights } from '../../Devices/hooks'
 import { RestartRobotConfirmationModal } from '../RestartRobotConfirmationModal'
 import { NavigationMenu } from '../NavigationMenu'
 
 import type { NavigateFunction } from 'react-router-dom'
 
-vi.mock('../../../redux/robot-admin')
-vi.mock('../../../redux/robot-controls')
+vi.mock('/app/redux/robot-admin')
+vi.mock('/app/redux/robot-controls')
 vi.mock('../../Devices/hooks')
 vi.mock('../RestartRobotConfirmationModal')
 

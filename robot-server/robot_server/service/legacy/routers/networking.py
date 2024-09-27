@@ -1,10 +1,10 @@
 import logging
 import os
 import subprocess
+from typing import Annotated, Optional
 
 from starlette import status
 from starlette.responses import JSONResponse
-from typing import Optional
 from fastapi import APIRouter, HTTPException, File, Path, UploadFile, Query
 
 from opentrons_shared_data.errors import ErrorCodes
@@ -45,8 +45,20 @@ router = APIRouter()
 async def get_networking_status() -> NetworkingStatus:
     try:
         connectivity = await nmcli.is_connected()
-        # TODO(mc, 2020-09-17): interfaces should be typed
-        interfaces = {i.value: await nmcli.iface_info(i) for i in nmcli.NETWORK_IFACES}
+
+        async def _permissive_get_iface(
+            i: nmcli.NETWORK_IFACES,
+        ) -> dict[str, dict[str, str | None]]:
+            try:
+                return {i.value: await nmcli.iface_info(i)}
+            except ValueError:
+                log.warning(f"Could not get state of iface {i.value}")
+                return {}
+
+        interfaces: dict[str, dict[str, str | None]] = {}
+        for interface in nmcli.NETWORK_IFACES:
+            this_iface = await _permissive_get_iface(interface)
+            interfaces.update(this_iface)
         log.debug(f"Connectivity: {connectivity}")
         log.debug(f"Interfaces: {interfaces}")
         return NetworkingStatus(
@@ -66,17 +78,19 @@ async def get_networking_status() -> NetworkingStatus:
     response_model=WifiNetworks,
 )
 async def get_wifi_networks(
-    rescan: Optional[bool] = Query(
-        default=False,
-        description=(
-            "If `true`, forces a rescan for beaconing Wi-Fi networks. "
-            "This is an expensive operation that can take ~10 seconds, "
-            'so only do it based on user needs like clicking a "scan network" '
-            "button, not just to poll. "
-            "If `false`, returns the cached Wi-Fi networks, "
-            "letting the system decide when to do a rescan."
+    rescan: Annotated[
+        Optional[bool],
+        Query(
+            description=(
+                "If `true`, forces a rescan for beaconing Wi-Fi networks. "
+                "This is an expensive operation that can take ~10 seconds, "
+                'so only do it based on user needs like clicking a "scan network" '
+                "button, not just to poll. "
+                "If `false`, returns the cached Wi-Fi networks, "
+                "letting the system decide when to do a rescan."
+            ),
         ),
-    )
+    ] = False
 ) -> WifiNetworks:
     networks = await nmcli.available_ssids(rescan)
     return WifiNetworks(list=[WifiNetworkFull(**n) for n in networks])
@@ -189,11 +203,14 @@ async def post_wifi_key(key: UploadFile = File(...)):
     },
 )
 async def delete_wifi_key(
-    key_uuid: str = Path(
-        ...,
-        description="The ID of key to delete, as determined by a previous"
-        " call to GET /wifi/keys",
-    )
+    key_uuid: Annotated[
+        str,
+        Path(
+            ...,
+            description="The ID of key to delete, as determined by a previous"
+            " call to GET /wifi/keys",
+        ),
+    ]
 ) -> V1BasicResponse:
     """Delete wifi key handler"""
     deleted_file = wifi.remove_key(key_uuid)

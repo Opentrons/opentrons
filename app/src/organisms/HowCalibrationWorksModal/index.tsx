@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
@@ -13,14 +12,14 @@ import {
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
+  Modal,
   LegacyStyledText,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
-import RobotCalHelpImage from '../../assets/images/robot_calibration_help.png'
-import { ExternalLink } from '../../atoms/Link/ExternalLink'
-import { Divider } from '../../atoms/structure'
-import { LegacyModal } from '../../molecules/LegacyModal'
+import RobotCalHelpImage from '/app/assets/images/robot_calibration_help.png'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { Divider } from '/app/atoms/structure'
 
 const ROBOT_CAL_HELP_ARTICLE =
   'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
@@ -33,7 +32,7 @@ export function HowCalibrationWorksModal({
 }: HowCalibrationWorksModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'shared'])
   return createPortal(
-    <LegacyModal
+    <Modal
       title={t('robot_cal_help_title')}
       onClose={onCloseClick}
       maxHeight="28.125rem"
@@ -109,7 +108,7 @@ export function HowCalibrationWorksModal({
           {t('shared:close')}
         </PrimaryButton>
       </Flex>
-    </LegacyModal>,
+    </Modal>,
     getTopPortalEl()
   )
 }

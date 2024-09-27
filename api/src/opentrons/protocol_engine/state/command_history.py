@@ -24,6 +24,9 @@ class CommandHistory:
     _all_command_ids: List[str]
     """All command IDs, in insertion order."""
 
+    _all_command_ids_but_fixit_command_ids: List[str]
+    """All command IDs besides fixit command intents, in insertion order."""
+
     _commands_by_id: Dict[str, CommandEntry]
     """All command resources, in insertion order, mapped by their unique IDs."""
 
@@ -44,6 +47,7 @@ class CommandHistory:
 
     def __init__(self) -> None:
         self._all_command_ids = []
+        self._all_command_ids_but_fixit_command_ids = []
         self._queued_command_ids = OrderedSet()
         self._queued_setup_command_ids = OrderedSet()
         self._queued_fixit_command_ids = OrderedSet()
@@ -97,13 +101,26 @@ class CommandHistory:
             for command_id in self._all_command_ids
         ]
 
+    def get_filtered_command_ids(self, include_fixit_commands: bool) -> List[str]:
+        """Get all fixit command IDs."""
+        if include_fixit_commands:
+            return self._all_command_ids
+        else:
+            return self._all_command_ids_but_fixit_command_ids
+
     def get_all_ids(self) -> List[str]:
         """Get all command IDs."""
         return self._all_command_ids
 
-    def get_slice(self, start: int, stop: int) -> List[Command]:
-        """Get a list of commands between start and stop."""
+    def get_slice(
+        self, start: int, stop: int, command_ids: Optional[list[str]] = None
+    ) -> List[Command]:
+        """Get a list of commands between start and stop.""" """Get a list of commands between start and stop."""
         commands = self._all_command_ids[start:stop]
+        selected_command_ids = (
+            command_ids if command_ids is not None else self._all_command_ids
+        )
+        commands = selected_command_ids[start:stop]
         return [self._commands_by_id[command].command for command in commands]
 
     def get_tail_command(self) -> Optional[CommandEntry]:
@@ -230,6 +247,8 @@ class CommandHistory:
         """Create or update a command entry."""
         if command_id not in self._commands_by_id:
             self._all_command_ids.append(command_id)
+            if command_entry.command.intent != CommandIntent.FIXIT:
+                self._all_command_ids_but_fixit_command_ids.append(command_id)
         self._commands_by_id[command_id] = command_entry
 
     def _add_to_queue(self, command_id: str) -> None:

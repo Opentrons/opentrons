@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
@@ -12,7 +12,7 @@ import {
   useCalibrationStatusQuery,
 } from '@opentrons/react-api-client'
 import { useCalibrationTaskList } from '../useCalibrationTaskList'
-import { useAttachedPipettes } from '..'
+import { useAttachedPipettes } from '/app/resources/instruments'
 import {
   TASK_COUNT,
   mockAttachedPipettesResponse,
@@ -28,12 +28,12 @@ import {
   mockIncompleteTipLengthCalibrations,
   expectedTaskList,
 } from '../__fixtures__/taskListFixtures'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 
 import type { Store } from 'redux'
-import type { State } from '../../../../redux/types'
+import type { State } from '/app/redux/types'
 
-vi.mock('../')
+vi.mock('/app/resources/instruments')
 vi.mock('@opentrons/react-api-client')
 
 const mockPipOffsetCalLauncher = vi.fn()

@@ -14,17 +14,17 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  ModalShell,
 } from '@opentrons/components'
 import { useDispatch } from 'react-redux'
 
 import styles from './styles.module.css'
-import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
-import { WizardHeader } from '../../molecules/WizardHeader'
+import { labwareImages } from '/app/organisms/CalibrationPanels/labwareImages'
+import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getTopPortalEl } from '../../App/portal'
-import { setUseTrashSurfaceForTipCal } from '../../redux/calibration'
+import { setUseTrashSurfaceForTipCal } from '/app/redux/calibration'
 
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 const BLOCK_REQUEST_EMAIL_BODY =
   '• Full name\n• Company or institution name\n• Shipping address\n• VAT ID (if outside the US)'
@@ -54,7 +54,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
   }
 
   return createPortal(
-    <LegacyModalShell
+    <ModalShell
       width="47rem"
       header={
         <WizardHeader
@@ -127,7 +127,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
           </Flex>
         </Flex>
       </Flex>
-    </LegacyModalShell>,
+    </ModalShell>,
     getTopPortalEl()
   )
 }

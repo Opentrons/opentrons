@@ -1,19 +1,19 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
 
-import { useWifiList } from '../../../resources/networking/hooks'
-import * as RobotApi from '../../../redux/robot-api'
-import * as Networking from '../../../redux/networking'
+import { useWifiList } from '/app/resources/networking/hooks'
+import * as RobotApi from '/app/redux/robot-api'
+import * as Networking from '/app/redux/networking'
 import { getModalPortalEl } from '../../../App/portal'
 import { SelectSsid } from './ConnectNetwork/SelectSsid'
 import { ConnectModal } from './ConnectNetwork/ConnectModal'
 import { ResultModal } from './ConnectNetwork/ResultModal'
 import { CONNECT, JOIN_OTHER } from './ConnectNetwork/constants'
 
-import type { State, Dispatch } from '../../../redux/types'
-import type { WifiNetwork } from '../../../redux/networking/types'
+import type { State, Dispatch } from '/app/redux/types'
+import type { WifiNetwork } from '/app/redux/networking/types'
 import type {
   WifiConfigureRequest,
   NetworkChangeState,
@@ -35,7 +35,7 @@ export const SelectNetwork = ({
   const eapOptions = useSelector((state: State) =>
     Networking.getEapOptions(state, robotName)
   )
-  const [changeState, setChangeState] = React.useState<NetworkChangeState>({
+  const [changeState, setChangeState] = useState<NetworkChangeState>({
     type: null,
   })
   const dispatch = useDispatch<Dispatch>()
@@ -53,7 +53,7 @@ export const SelectNetwork = ({
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     // if we're connecting to a network, ensure we get the info needed to
     // populate the configuration forms
     if (changeState.type === CONNECT || changeState.type === JOIN_OTHER) {

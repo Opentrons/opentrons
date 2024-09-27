@@ -1,34 +1,44 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, describe, expect, it, beforeEach } from 'vitest'
 import { screen, renderHook } from '@testing-library/react'
 
+import { useHost } from '@opentrons/react-api-client'
 import {
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_RUNNING,
   RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { mockFailedCommand } from '../__fixtures__'
 import { ErrorRecoveryFlows, useErrorRecoveryFlows } from '..'
 import {
   useCurrentlyRecoveringFrom,
   useERUtils,
-  useShowDoorInfo,
-  useRecoveryAnalytics,
+  useRecoveryTakeover,
 } from '../hooks'
-import { useFeatureFlag } from '../../../redux/config'
+import { useRecoveryAnalytics } from '/app/redux-resources/analytics'
+import { getIsOnDevice } from '/app/redux/config'
 import { useERWizard, ErrorRecoveryWizard } from '../ErrorRecoveryWizard'
-import { useRunPausedSplash, RunPausedSplash } from '../RunPausedSplash'
+import { useRecoverySplash, RecoverySplash } from '../RecoverySplash'
 
 import type { RunStatus } from '@opentrons/api-client'
 
 vi.mock('../ErrorRecoveryWizard')
 vi.mock('../hooks')
 vi.mock('../useRecoveryCommands')
-vi.mock('../../../redux/config')
-vi.mock('../RunPausedSplash')
+vi.mock('/app/redux/config')
+vi.mock('../RecoverySplash')
+vi.mock('/app/redux-resources/analytics')
+vi.mock('@opentrons/react-api-client')
+vi.mock('react-redux', async () => {
+  const actual = await vi.importActual('react-redux')
+  return {
+    ...actual,
+    useSelector: vi.fn(),
+  }
+})
 
 describe('useErrorRecoveryFlows', () => {
   beforeEach(() => {
@@ -122,69 +132,84 @@ const render = (props: React.ComponentProps<typeof ErrorRecoveryFlows>) => {
   })[0]
 }
 
-describe('ErrorRecovery', () => {
+describe('ErrorRecoveryFlows', () => {
   let props: React.ComponentProps<typeof ErrorRecoveryFlows>
 
   beforeEach(() => {
     props = {
       runStatus: RUN_STATUS_AWAITING_RECOVERY,
-      failedCommand: mockFailedCommand,
+      failedCommandByRunRecord: mockFailedCommand,
       runId: 'MOCK_RUN_ID',
       protocolAnalysis: {} as any,
     }
     vi.mocked(ErrorRecoveryWizard).mockReturnValue(<div>MOCK WIZARD</div>)
-    vi.mocked(RunPausedSplash).mockReturnValue(
-      <div>MOCK RUN PAUSED SPLASH</div>
-    )
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    vi.mocked(RecoverySplash).mockReturnValue(<div>MOCK RUN PAUSED SPLASH</div>)
     vi.mocked(useERWizard).mockReturnValue({
       hasLaunchedRecovery: true,
       toggleERWizard: () => Promise.resolve(),
       showERWizard: true,
     })
-    vi.mocked(useRunPausedSplash).mockReturnValue(true)
-    vi.mocked(useERUtils).mockReturnValue({ routeUpdateActions: {} } as any)
-    vi.mocked(useShowDoorInfo).mockReturnValue(false)
+    vi.mocked(useRecoverySplash).mockReturnValue(true)
+    vi.mocked(useERUtils).mockReturnValue({
+      routeUpdateActions: {},
+      doorStatusUtils: { isDoorOpen: false, isProhibitedDoorOpen: false },
+    } as any)
     vi.mocked(useRecoveryAnalytics).mockReturnValue({
       reportErrorEvent: vi.fn(),
     } as any)
+    vi.mocked(useHost).mockReturnValue({ robotName: 'MockRobot' } as any)
+    vi.mocked(getIsOnDevice).mockReturnValue(false)
+    vi.mocked(useRecoveryTakeover).mockReturnValue({
+      toggleERWizAsActiveUser: vi.fn(),
+      isActiveUser: true,
+      intent: 'recovering',
+      showTakeover: false,
+    })
   })
 
-  it('renders the wizard when the wizard is toggled on', () => {
+  it('renders the wizard when showERWizard is true', () => {
     render(props)
     screen.getByText('MOCK WIZARD')
   })
 
   it('renders the wizard when isDoorOpen is true', () => {
-    vi.mocked(useShowDoorInfo).mockReturnValue(true)
     vi.mocked(useERWizard).mockReturnValue({
       hasLaunchedRecovery: false,
       toggleERWizard: () => Promise.resolve(),
       showERWizard: false,
     })
 
+    vi.mocked(useERUtils).mockReturnValue({
+      routeUpdateActions: {},
+      doorStatusUtils: { isDoorOpen: true, isProhibitedDoorOpen: true },
+    } as any)
+
     render(props)
     screen.getByText('MOCK WIZARD')
   })
 
-  it('does not render the wizard when the wizard is toggled off', () => {
+  it('does not render the wizard when showERWizard is false and isDoorOpen is false', () => {
     vi.mocked(useERWizard).mockReturnValue({
       hasLaunchedRecovery: true,
       toggleERWizard: () => Promise.resolve(),
       showERWizard: false,
     })
+    vi.mocked(useERUtils).mockReturnValue({
+      routeUpdateActions: {},
+      doorStatusUtils: { isDoorOpen: false, isProhibitedDoorOpen: false },
+    } as any)
 
     render(props)
     expect(screen.queryByText('MOCK WIZARD')).not.toBeInTheDocument()
   })
 
-  it('renders the splash when the showSplash is true', () => {
+  it('renders the splash when showSplash is true', () => {
     render(props)
     screen.getByText('MOCK RUN PAUSED SPLASH')
   })
 
-  it('does not render the splash when the showSplash is false', () => {
-    vi.mocked(useRunPausedSplash).mockReturnValue(false)
+  it('does not render the splash when showSplash is false', () => {
+    vi.mocked(useRecoverySplash).mockReturnValue(false)
     render(props)
     expect(screen.queryByText('MOCK RUN PAUSED SPLASH')).not.toBeInTheDocument()
   })

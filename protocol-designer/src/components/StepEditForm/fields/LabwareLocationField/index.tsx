@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -22,8 +22,8 @@ export function LabwareLocationField(
     useGripper: boolean
   } & { canSave: boolean } & { labware: string }
 ): JSX.Element {
-  const { t } = useTranslation('form')
   const { labware, useGripper, value } = props
+  const { t } = useTranslation('form')
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )

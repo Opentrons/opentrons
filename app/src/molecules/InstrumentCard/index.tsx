@@ -1,8 +1,8 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 import {
-  ALIGN_FLEX_START,
   ALIGN_CENTER,
+  ALIGN_FLEX_START,
   BORDERS,
   Box,
   COLORS,
@@ -10,16 +10,16 @@ import {
   Flex,
   InstrumentDiagram,
   JUSTIFY_CENTER,
+  LegacyStyledText,
+  OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
+  useMenuHandleClickOutside,
 } from '@opentrons/components'
-import flexGripper from '../../assets/images/flex_gripper.png'
+import flexGripper from '/app/assets/images/flex_gripper.png'
 
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuOverlay } from './MenuOverlay'
 
 import type { InstrumentDiagramProps, StyleProps } from '@opentrons/components'

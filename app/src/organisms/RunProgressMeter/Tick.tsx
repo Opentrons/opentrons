@@ -1,6 +1,6 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -8,12 +8,12 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  SPACING,
   LegacyStyledText,
+  SPACING,
+  Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { Tooltip } from '../../atoms/Tooltip'
 import { getModalPortalEl } from '../../App/portal'
 
 import type { IconName } from '@opentrons/components'

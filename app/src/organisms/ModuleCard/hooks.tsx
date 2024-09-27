@@ -1,17 +1,22 @@
-import * as React from 'react'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
-import { useHoverTooltip } from '@opentrons/components'
+import {
+  MenuItem,
+  NO_WRAP,
+  Tooltip,
+  useHoverTooltip,
+} from '@opentrons/components'
 import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { Tooltip } from '../../atoms/Tooltip'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
+
+import {
+  useCurrentRunId,
+  useMostRecentCompletedAnalysis,
+} from '/app/resources/runs'
 
 import type {
   HeaterShakerCloseLatchCreateCommand,
@@ -26,7 +31,7 @@ import type {
   TemperatureModuleDeactivateCreateCommand,
 } from '@opentrons/shared-data'
 
-import type { AttachedModule } from '../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()
@@ -155,7 +160,7 @@ export function useModuleOverflowMenu(
       onClick={() => {
         handleInstructionsClick()
       }}
-      whiteSpace="nowrap"
+      whiteSpace={NO_WRAP}
     >
       {t('heater_shaker:show_attachment_instructions')}
     </MenuItem>
@@ -246,7 +251,7 @@ export function useModuleOverflowMenu(
       key={`thermocycler_block_temp_command_btn_${String(module.moduleModel)}`}
       onClick={sendBlockTempCommand}
       disabled={isDisabled}
-      whiteSpace="nowrap"
+      whiteSpace={NO_WRAP}
     >
       {module.data.status !== 'idle'
         ? t('overflow_menu_deactivate_block')

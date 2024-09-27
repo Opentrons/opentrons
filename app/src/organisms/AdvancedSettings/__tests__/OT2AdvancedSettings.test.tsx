@@ -1,19 +1,18 @@
-import * as React from 'react'
 import { screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 
 import {
   resetUseTrashSurfaceForTipCal,
   setUseTrashSurfaceForTipCal,
-} from '../../../redux/calibration'
-import { getUseTrashSurfaceForTipCal } from '../../../redux/config'
-import { renderWithProviders } from '../../../__testing-utils__'
+} from '/app/redux/calibration'
+import { getUseTrashSurfaceForTipCal } from '/app/redux/config'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { OT2AdvancedSettings } from '../OT2AdvancedSettings'
 
-vi.mock('../../../redux/calibration')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/calibration')
+vi.mock('/app/redux/config')
 
 const render = () => {
   return renderWithProviders(<OT2AdvancedSettings />, {

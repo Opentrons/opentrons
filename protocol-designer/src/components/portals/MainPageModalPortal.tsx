@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 const PORTAL_ROOT_ID = 'main-page-modal-portal-root'
 
 export const getMainPagePortalEl = (): HTMLElement =>

@@ -68,7 +68,7 @@ The maximum supported API version for your robot is listed in the Opentrons App 
 
 If you upload a protocol that specifies a higher API level than the maximum supported, your robot won't be able to analyze or run your protocol. You can increase the maximum supported version by updating your robot software and Opentrons App. 
 
-Opentrons robots running the latest software (7.3.0) support the following version ranges: 
+Opentrons robots running the latest software (8.0.0) support the following version ranges: 
 
     * **Flex:** version 2.15–|apiLevel|.
     * **OT-2:** versions 2.0–|apiLevel|.
@@ -84,6 +84,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+------------------------------+
 | API Version | Introduced in Robot Software |
 +=============+==============================+
+|     2.20    |          8.0.0               |
++-------------+------------------------------+
 |     2.19    |          7.3.1               |
 +-------------+------------------------------+
 |     2.18    |          7.3.0               |
@@ -131,6 +133,14 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 Changes in API Versions
 =======================
+
+Version 2.20
+------------
+
+- Detect liquid presence within a well. The :py:meth:`.InstrumentContext.detect_liquid_presence()` and :py:meth:`.InstrumentContext.require_liquid_presence()` building block commands check for liquid any point in your protocol. You can also :ref:`enable liquid presence detection <lpd>` for all aspirations when loading a pipette, although this will add significant time to your protocol.
+- Define CSV runtime parameters and use their contents in a protocol with new :ref:`data manipulation methods <rtp-csv-data>`. See the :ref:`cherrypicking use case <use-case-cherrypicking>` for a full example.
+- :py:meth:`.configure_nozzle_layout` now accepts row, single, and partial column layout constants. See :ref:`partial-tip-pickup`.
+- You can now call :py:obj:`.ProtocolContext.define_liquid()` without supplying a ``description`` or ``display_color``.
 
 Version 2.19
 ------------

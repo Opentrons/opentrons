@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Box,
@@ -7,10 +6,10 @@ import {
   PrimaryButton,
   SPACING,
   LegacyStyledText,
+  Modal,
 } from '@opentrons/components'
 
-import { LegacyModal } from '../../molecules/LegacyModal'
-import { ExternalLink } from '../../atoms/Link/ExternalLink'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 
 export const UNINSTALL_APP_URL =
   'https://support.opentrons.com/s/article/Uninstall-the-Opentrons-App'
@@ -27,7 +26,7 @@ export function PreviousVersionModal(
   const { t } = useTranslation(['app_settings', 'branded'])
 
   return (
-    <LegacyModal onClose={props.closeModal} title={t('how_to_restore')}>
+    <Modal onClose={props.closeModal} title={t('how_to_restore')}>
       <Box>
         <LegacyStyledText as="p" paddingBottom={SPACING.spacing8}>
           {t('branded:restore_description')}
@@ -55,6 +54,6 @@ export function PreviousVersionModal(
           {t('close')}
         </PrimaryButton>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

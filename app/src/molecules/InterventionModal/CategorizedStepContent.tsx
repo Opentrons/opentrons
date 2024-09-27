@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 import { Command, CommandIndex } from '../Command'
 import type { NonSkeletonCommandState, CommandTextData } from '../Command'
@@ -111,35 +110,42 @@ export function CategorizedStepContent(
         justifyContent={JUSTIFY_FLEX_START}
         gap={SPACING.spacing4}
       >
-        <StyledText oddStyle="bodyTextSemiBold" desktopStyle="captionSemiBold">
-          {props.bottomCategoryHeadline}
-        </StyledText>
-        {props.bottomCategoryCommands.map((command, idx) => (
-          <Flex
-            gap={SPACING.spacing8}
-            key={`${props.bottomCategory}${
-              command?.command?.commandType ?? 'unknown'
-            }${idx}`}
-            css={idx > 0 ? HIDE_ON_TOUCHSCREEN_STYLE : undefined}
+        {props.bottomCategoryCommands[0] != null ? (
+          <StyledText
+            oddStyle="bodyTextSemiBold"
+            desktopStyle="captionSemiBold"
           >
-            <CommandIndex
-              index={`${
-                command?.index == null ? '' : command.index.toString()
-              }`}
-              allowSpaceForNDigits={maxIndexLength}
-            />
-            <Command
-              {...commandAndState(
-                command,
-                props.bottomCategory,
-                props.commandTextData
-              )}
-              robotType={props.robotType}
-              aligned="left"
-              forceTwoLineClip
-            />
-          </Flex>
-        ))}
+            {props.bottomCategoryHeadline}
+          </StyledText>
+        ) : null}
+        {props.bottomCategoryCommands.map((command, idx) => {
+          return command != null ? (
+            <Flex
+              gap={SPACING.spacing8}
+              key={`${props.bottomCategory}${
+                command?.command?.commandType ?? 'unknown'
+              }${idx}`}
+              css={idx > 0 ? HIDE_ON_TOUCHSCREEN_STYLE : undefined}
+            >
+              <CommandIndex
+                index={`${
+                  command?.index == null ? '' : command.index.toString()
+                }`}
+                allowSpaceForNDigits={maxIndexLength}
+              />
+              <Command
+                {...commandAndState(
+                  command,
+                  props.bottomCategory,
+                  props.commandTextData
+                )}
+                robotType={props.robotType}
+                aligned="left"
+                forceTwoLineClip
+              />
+            </Flex>
+          ) : null
+        })}
       </Flex>
     </Flex>
   )

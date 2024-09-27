@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { createPortal } from 'react-dom'
 import snakeCase from 'lodash/snakeCase'
 import { Trans, useTranslation } from 'react-i18next'
@@ -12,11 +11,11 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  Modal,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
-import { LegacyModal } from '../../../../molecules/LegacyModal'
-import secureMagModBracketImage from '../../../../assets/images/secure_mag_mod_bracket.png'
-import secureTCLatchImage from '../../../../assets/images/secure_tc_latch.png'
+import secureMagModBracketImage from '/app/assets/images/secure_mag_mod_bracket.png'
+import secureTCLatchImage from '/app/assets/images/secure_tc_latch.png'
 import { getModuleName } from '../utils/getModuleName'
 
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
@@ -32,7 +31,7 @@ export const SecureLabwareModal = (
   const { t } = useTranslation(['protocol_setup', 'shared', 'branded'])
   const moduleName = getModuleName(props.type)
   return createPortal(
-    <LegacyModal
+    <Modal
       title={t(`secure_labware_modal`, {
         name: moduleName,
       })}
@@ -94,7 +93,7 @@ export const SecureLabwareModal = (
           {t('shared:close')}
         </PrimaryButton>
       </Flex>
-    </LegacyModal>,
+    </Modal>,
     getTopPortalEl()
   )
 }

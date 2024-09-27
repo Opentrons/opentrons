@@ -4,10 +4,11 @@ from pathlib import Path
 from shutil import copytree
 from tempfile import TemporaryDirectory
 
+import anyio
 import httpx
 
 from tests.integration.dev_server import DevServer
-from tests.integration.robot_client import RobotClient
+from tests.integration.robot_client import RobotClient, poll_until_all_analyses_complete
 from tests.integration.protocol_files import get_py_protocol, get_json_protocol
 
 from .persistence_snapshots_dir import PERSISTENCE_SNAPSHOTS_DIR
@@ -40,9 +41,9 @@ async def _assert_reset_was_successful(
     all_files_and_directories = set(persistence_directory.glob("**/*"))
     expected_files_and_directories = {
         persistence_directory / "robot_server.db",
-        persistence_directory / "5",
-        persistence_directory / "5" / "protocols",
-        persistence_directory / "5" / "robot_server.db",
+        persistence_directory / "7",
+        persistence_directory / "7" / "protocols",
+        persistence_directory / "7" / "robot_server.db",
     }
     assert all_files_and_directories == expected_files_and_directories
 
@@ -97,6 +98,13 @@ async def test_upload_protocols_and_reset_persistence_dir() -> None:
 
             with get_json_protocol(secrets.token_urlsafe(16)) as file:
                 await robot_client.post_protocol([Path(file.name)])
+
+            with anyio.fail_after(30):
+                # todo(mm, 2024-09-20): This works around a bug where robot-server
+                # shutdown will hang if there is an ongoing analysis. This slows down
+                # this test and should be removed when that bug is fixed.
+                # https://opentrons.atlassian.net/browse/EXEC-716
+                await poll_until_all_analyses_complete(robot_client)
 
             await robot_client.post_setting_reset_options({"runsHistory": True})
 

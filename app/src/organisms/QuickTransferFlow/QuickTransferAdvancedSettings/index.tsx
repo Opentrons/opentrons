@@ -1,27 +1,30 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
   ALIGN_CENTER,
   COLORS,
-  TEXT_ALIGN_RIGHT,
-  StyledText,
+  DIRECTION_COLUMN,
+  Flex,
   Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  ListItem,
   SIZE_2,
+  SPACING,
+  StyledText,
   TEXT_ALIGN_LEFT,
+  TEXT_ALIGN_RIGHT,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+import {
+  TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_FIXTURES,
+} from '@opentrons/shared-data'
 
-import type {
-  QuickTransferSummaryAction,
-  QuickTransferSummaryState,
-} from '../types'
+import { ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB } from '/app/redux/analytics'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ACTIONS } from '../constants'
-import { useToaster } from '../../../organisms/ToasterOven'
-import { ListItem } from '../../../atoms/ListItem'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { FlowRateEntry } from './FlowRate'
 import { PipettePath } from './PipettePath'
 import { TipPositionEntry } from './TipPosition'
@@ -30,11 +33,11 @@ import { Delay } from './Delay'
 import { TouchTip } from './TouchTip'
 import { AirGap } from './AirGap'
 import { BlowOut } from './BlowOut'
-import {
-  TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_FIXTURES,
-} from '@opentrons/shared-data'
 
+import type {
+  QuickTransferSummaryAction,
+  QuickTransferSummaryState,
+} from '../types'
 interface QuickTransferAdvancedSettingsProps {
   state: QuickTransferSummaryState
   dispatch: React.Dispatch<QuickTransferSummaryAction>
@@ -48,7 +51,15 @@ export function QuickTransferAdvancedSettings(
   const [selectedSetting, setSelectedSetting] = React.useState<string | null>(
     null
   )
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const { makeSnackbar } = useToaster()
+
+  React.useEffect(() => {
+    trackEventWithRobotSerial({
+      name: ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB,
+      properties: {},
+    })
+  }, [])
 
   function getBlowoutValueCopy(): string | undefined {
     if (state.blowOut === 'dest_well') {
@@ -74,7 +85,7 @@ export function QuickTransferAdvancedSettings(
   } else if (state.path === 'multiAspirate') {
     pipettePathValue = t('pipette_path_multi_aspirate')
   } else if (state.path === 'multiDispense') {
-    pipettePathValue = t('pipette_path_multi_dispense', {
+    pipettePathValue = t('pipette_path_multi_dispense_volume_blowout', {
       volume: state.disposalVolume,
       blowOutLocation: getBlowoutValueCopy(),
     })
@@ -156,9 +167,14 @@ export function QuickTransferAdvancedSettings(
               reps: state.mixOnAspirate?.repititions,
             })
           : '',
-      enabled: state.transferType === 'transfer',
+      enabled:
+        state.transferType === 'transfer' ||
+        state.transferType === 'distribute',
       onClick: () => {
-        if (state.transferType === 'transfer') {
+        if (
+          state.transferType === 'transfer' ||
+          state.transferType === 'distribute'
+        ) {
           setSelectedSetting('aspirate_mix')
         } else {
           makeSnackbar(t('advanced_setting_disabled') as string)
@@ -234,9 +250,14 @@ export function QuickTransferAdvancedSettings(
               reps: state.mixOnDispense?.repititions,
             })
           : '',
-      enabled: state.transferType === 'transfer',
+      enabled:
+        state.transferType === 'transfer' ||
+        state.transferType === 'consolidate',
       onClick: () => {
-        if (state.transferType === 'transfer') {
+        if (
+          state.transferType === 'transfer' ||
+          state.transferType === 'consolidate'
+        ) {
           setSelectedSetting('dispense_mix')
         } else {
           makeSnackbar(t('advanced_setting_disabled') as string)
@@ -289,7 +310,10 @@ export function QuickTransferAdvancedSettings(
     {
       option: 'dispense_blow_out',
       copy: t('blow_out'),
-      value: i18n.format(getBlowoutValueCopy(), 'capitalize'),
+      value:
+        state.transferType === 'distribute'
+          ? t('disabled')
+          : i18n.format(getBlowoutValueCopy(), 'capitalize'),
       enabled: state.transferType !== 'distribute',
       onClick: () => {
         if (state.transferType === 'distribute') {

@@ -1,27 +1,28 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import {
   useTrackEvent,
   ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
-} from '../../../../redux/analytics'
-import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
-import {
-  useDeckCalibrationData,
-  useIsFlex,
-  useRunHasStarted,
-} from '../../hooks'
+} from '/app/redux/analytics'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
+import { useDeckCalibrationData } from '../../hooks'
+import { useRunHasStarted } from '/app/resources/runs'
+
 import { SetupDeckCalibration } from '../SetupDeckCalibration'
 import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 
-vi.mock('../../../../redux/analytics')
+vi.mock('/app/redux/analytics')
 vi.mock('../../hooks')
+vi.mock('/app/resources/runs')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../SetupDeckCalibration')
 vi.mock('../SetupInstrumentCalibration')
 vi.mock('../SetupTipLengthCalibration')

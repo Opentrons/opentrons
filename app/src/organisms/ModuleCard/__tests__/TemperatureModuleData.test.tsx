@@ -1,14 +1,14 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { StatusLabel } from '../../../atoms/StatusLabel'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { StatusLabel } from '/app/atoms/StatusLabel'
 import { TemperatureModuleData } from '../TemperatureModuleData'
-import { mockTemperatureModuleGen2 } from '../../../redux/modules/__fixtures__'
+import { mockTemperatureModuleGen2 } from '/app/redux/modules/__fixtures__'
 
-vi.mock('../../../atoms/StatusLabel')
+vi.mock('/app/atoms/StatusLabel')
 
 const render = (props: React.ComponentProps<typeof TemperatureModuleData>) => {
   return renderWithProviders(<TemperatureModuleData {...props} />, {

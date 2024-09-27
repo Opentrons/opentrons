@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import {
@@ -26,6 +25,7 @@ const fontStyles = {
     ['BodyLarge', 'Regular'],
     ['BodyDefault', 'SemiBold'],
     ['BodyDefault', 'Regular'],
+    ['Caption', 'Bold'],
     ['Caption', 'SemiBold'],
     ['Caption', 'Regular'],
     ['Code', 'Regular'],

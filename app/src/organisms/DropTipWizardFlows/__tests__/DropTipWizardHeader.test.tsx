@@ -1,9 +1,9 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderHook, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { mockDropTipWizardContainerProps } from '../__fixtures__'
 import {
   useWizardExitHeader,
@@ -39,7 +39,7 @@ describe('useSeenBlowoutSuccess', () => {
   it('should not render step counter when currentRoute is BEFORE_BEGINNING', () => {
     const { result } = renderHook(() =>
       useSeenBlowoutSuccess({
-        currentStep: 'SOME_STEP',
+        currentStep: 'SOME_STEP' as any,
         currentRoute: DT_ROUTES.BEFORE_BEGINNING,
         currentStepIdx: 0,
       })

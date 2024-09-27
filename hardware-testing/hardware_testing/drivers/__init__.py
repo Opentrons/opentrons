@@ -4,23 +4,36 @@ from serial.tools.list_ports import comports  # type: ignore[import]
 from .radwag import RadwagScaleBase, RadwagScale, SimRadwagScale
 
 
-def list_ports_and_select(device_name: str = "") -> str:
+def list_ports_and_select(device_name: str = "", port_substr: str = None) -> str:
     """List serial ports and display list for user to select from."""
     ports = comports()
     assert ports, "no serial ports found"
     ports.sort(key=lambda p: p.device)
     print("found ports:")
+
+    idx = 0
+    idx_str = ""
     for i, p in enumerate(ports):
         print(f"\t{i + 1}) {p.device}")
+        if port_substr:
+            for i, p in enumerate(ports):
+                if port_substr in p.device:
+                    idx = i + 1
+                    break
+        else:
+            idx_str = input(
+                f"\nenter number next to {device_name} port (or ENTER to re-scan): "
+            )
+            if not idx_str:
+                return list_ports_and_select(device_name)
     if not device_name:
         device_name = "desired"
-    idx_str = input(
-        f"\nenter number next to {device_name} port (or ENTER to re-scan): "
-    )
-    if not idx_str:
-        return list_ports_and_select(device_name)
+
     try:
-        idx = int(idx_str.strip())
+        try:
+            idx = int(idx_str.strip())
+        except TypeError:
+            pass
         return ports[idx - 1].device
     except (ValueError, IndexError):
         return list_ports_and_select()

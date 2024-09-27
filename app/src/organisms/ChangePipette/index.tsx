@@ -1,17 +1,22 @@
-import * as React from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import capitalize from 'lodash/capitalize'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { SPACING, TYPOGRAPHY, LegacyStyledText } from '@opentrons/components'
+import {
+  SPACING,
+  TYPOGRAPHY,
+  LegacyStyledText,
+  ModalShell,
+} from '@opentrons/components'
 
 import {
   useDispatchApiRequests,
   getRequestById,
   SUCCESS,
-} from '../../redux/robot-api'
-import { getCalibrationForPipette } from '../../redux/calibration'
+} from '/app/redux/robot-api'
+import { getCalibrationForPipette } from '/app/redux/calibration'
 import {
   home,
   move,
@@ -22,12 +27,11 @@ import {
   PIPETTE,
   CHANGE_PIPETTE,
   HOME,
-} from '../../redux/robot-controls'
+} from '/app/redux/robot-controls'
 
-import { LegacyModalShell } from '../../molecules/LegacyModal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { useAttachedPipettes } from '../Devices/hooks'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
+import { useAttachedPipettes } from '/app/resources/instruments'
 import { ExitModal } from './ExitModal'
 import { Instructions } from './Instructions'
 import { ConfirmPipette } from './ConfirmPipette'
@@ -44,8 +48,8 @@ import {
 } from './constants'
 
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
-import type { State, Dispatch } from '../../redux/types'
-import type { Mount } from '../../redux/pipettes/types'
+import type { State, Dispatch } from '/app/redux/types'
+import type { Mount } from '/app/redux/pipettes/types'
 import type { WizardStep } from './types'
 
 interface Props {
@@ -59,7 +63,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
   const { t } = useTranslation(['change_pipette', 'shared'])
   const navigate = useNavigate()
   const dispatch = useDispatch<Dispatch>()
-  const finalRequestId = React.useRef<string | null | undefined>(null)
+  const finalRequestId = useRef<string | null | undefined>(null)
   const [dispatchApiRequests] = useDispatchApiRequests(dispatchedAction => {
     if (
       dispatchedAction.type === HOME &&
@@ -70,10 +74,10 @@ export function ChangePipette(props: Props): JSX.Element | null {
       finalRequestId.current = dispatchedAction.meta.requestId
     }
   })
-  const [wizardStep, setWizardStep] = React.useState<WizardStep>(CLEAR_DECK)
-  const [wantedName, setWantedName] = React.useState<string | null>(null)
-  const [confirmExit, setConfirmExit] = React.useState(false)
-  const [currentStepCount, setCurrentStepCount] = React.useState(0)
+  const [wizardStep, setWizardStep] = useState<WizardStep>(CLEAR_DECK)
+  const [wantedName, setWantedName] = useState<string | null>(null)
+  const [confirmExit, setConfirmExit] = useState(false)
+  const [currentStepCount, setCurrentStepCount] = useState(0)
   // @ts-expect-error(sa, 2021-05-27): avoiding src code change, use in operator to type narrow
   const wantedPipette = wantedName ? getPipetteNameSpecs(wantedName) : null
   const attachedPipette = useAttachedPipettes()[mount]
@@ -86,10 +90,8 @@ export function ChangePipette(props: Props): JSX.Element | null {
   const [
     wrongWantedPipette,
     setWrongWantedPipette,
-  ] = React.useState<PipetteNameSpecs | null>(wantedPipette)
-  const [confirmPipetteLevel, setConfirmPipetteLevel] = React.useState<boolean>(
-    false
-  )
+  ] = useState<PipetteNameSpecs | null>(wantedPipette)
+  const [confirmPipetteLevel, setConfirmPipetteLevel] = useState<boolean>(false)
 
   const movementStatus = useSelector((state: State) => {
     return getMovementStatus(state, robotName)
@@ -101,11 +103,11 @@ export function ChangePipette(props: Props): JSX.Element | null {
       : null
   })?.status
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (homePipStatus === SUCCESS) closeModal()
   }, [homePipStatus, closeModal])
 
-  const homePipAndExit = React.useCallback(() => {
+  const homePipAndExit = useCallback(() => {
     dispatchApiRequests(home(robotName, PIPETTE, mount))
   }, [dispatchApiRequests, robotName, mount])
 
@@ -322,7 +324,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     )
   }
   return (
-    <LegacyModalShell width="42.375rem">
+    <ModalShell width="42.375rem">
       <WizardHeader
         totalSteps={eightChannel ? EIGHT_CHANNEL_STEPS : SINGLE_CHANNEL_STEPS}
         currentStep={currentStepCount}
@@ -330,6 +332,6 @@ export function ChangePipette(props: Props): JSX.Element | null {
         onExit={exitWizardHeader}
       />
       {contents}
-    </LegacyModalShell>
+    </ModalShell>
   )
 }

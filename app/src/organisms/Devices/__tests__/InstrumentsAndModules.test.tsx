@@ -1,28 +1,27 @@
-import * as React from 'react'
 import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import {
   useModulesQuery,
   useInstrumentsQuery,
   usePipettesQuery,
 } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../i18n'
-import { Banner } from '../../../atoms/Banner'
-import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useIsFlex, useIsRobotViewable, useRunStatuses } from '../hooks'
+import { i18n } from '/app/i18n'
+import { mockMagneticModule } from '/app/redux/modules/__fixtures__'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { useIsRobotViewable, useRunStatuses } from '../hooks'
 import { ModuleCard } from '../../ModuleCard'
 import { InstrumentsAndModules } from '../InstrumentsAndModules'
 import { GripperCard } from '../../GripperCard'
 import { PipetteCard } from '../PipetteCard'
 import { FlexPipetteCard } from '../PipetteCard/FlexPipetteCard'
 import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
-import { getShowPipetteCalibrationWarning } from '../utils'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useCurrentRunId } from '/app/resources/runs'
 import type * as Components from '@opentrons/components'
 
 vi.mock('@opentrons/components', async importOriginal => {
@@ -39,11 +38,10 @@ vi.mock('../../ModuleCard')
 vi.mock('../PipetteCard')
 vi.mock('../PipetteCard/FlexPipetteCard')
 vi.mock('../PipetteCard/PipetteRecalibrationWarning')
-vi.mock('../../ProtocolUpload/hooks')
-vi.mock('../../../atoms/Banner')
-vi.mock('../utils')
-vi.mock('../../RunTimeControl/hooks')
-vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/resources/runs')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/transformations/instruments')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
 const ROBOT_NAME = 'otie'
 
@@ -121,7 +119,9 @@ describe('InstrumentsAndModules', () => {
   it('renders the protocol loaded banner when protocol is loaded and not terminal state', () => {
     vi.mocked(useCurrentRunId).mockReturnValue('RUNID')
     render()
-    expect(vi.mocked(Banner)).toHaveBeenCalled()
+    screen.getByText(
+      'Robot must be on the network to see connected instruments and modules'
+    )
   })
   it('renders 1 pipette card when a 96 channel is attached', () => {
     when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)

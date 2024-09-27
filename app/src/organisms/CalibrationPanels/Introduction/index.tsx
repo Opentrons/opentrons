@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import {
@@ -12,12 +12,12 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import * as Sessions from '../../../redux/sessions'
+import * as Sessions from '/app/redux/sessions'
 import { NeedHelpLink } from '../NeedHelpLink'
 import { ChooseTipRack } from '../ChooseTipRack'
 
 import { TRASH_BIN_LOAD_NAME } from '../constants'
-import { WizardRequiredEquipmentList } from '../../../molecules/WizardRequiredEquipmentList'
+import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 import { Body } from './Body'
 import { InvalidationWarning } from './InvalidationWarning'
 
@@ -39,11 +39,10 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
   } = props
   const { t } = useTranslation('robot_calibration')
 
-  const [showChooseTipRack, setShowChooseTipRack] = React.useState(false)
-  const [
-    chosenTipRack,
-    setChosenTipRack,
-  ] = React.useState<LabwareDefinition2 | null>(null)
+  const [showChooseTipRack, setShowChooseTipRack] = useState(false)
+  const [chosenTipRack, setChosenTipRack] = useState<LabwareDefinition2 | null>(
+    null
+  )
 
   const handleChosenTipRack = (value: LabwareDefinition2 | null): void => {
     value != null && setChosenTipRack(value)

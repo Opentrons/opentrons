@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
@@ -10,9 +9,9 @@ import {
   SPACING,
   LegacyStyledText,
 } from '@opentrons/components'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { UploadInput } from '..'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
 describe('UploadInput', () => {
   let onUpload: any

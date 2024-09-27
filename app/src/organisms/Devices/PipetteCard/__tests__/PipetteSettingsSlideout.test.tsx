@@ -1,20 +1,20 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { when } from 'vitest-when'
 import { fireEvent, waitFor, screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import {
   useHost,
   useUpdatePipetteSettingsMutation,
 } from '@opentrons/react-api-client'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { PipetteSettingsSlideout } from '../PipetteSettingsSlideout'
 
 import {
   mockLeftSpecs,
   mockPipetteSettingsFieldsMap,
-} from '../../../../redux/pipettes/__fixtures__'
+} from '/app/redux/pipettes/__fixtures__'
 
 import type { Mock } from 'vitest'
 

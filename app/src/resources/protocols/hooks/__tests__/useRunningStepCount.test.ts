@@ -1,14 +1,12 @@
 import { describe, it, expect, vi } from 'vitest'
 import { renderHook } from '@testing-library/react'
 
-import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { useRunningStepCounts } from '../useRunningStepCounts'
 import { useLastRunProtocolCommand } from '../useLastRunProtocolCommand'
 
 vi.mock('../useLastRunProtocolCommand')
-vi.mock(
-  '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-)
+vi.mock('/app/resources/runs')
 
 const mockRunId = 'mock-run-id'
 const mockCommandsData = {

@@ -1,10 +1,8 @@
-import * as React from 'react'
-
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
+  DeckInfoLabel,
   Flex,
   JUSTIFY_CENTER,
-  LocationIcon,
   RobotCoordsForeignObject,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -44,16 +42,16 @@ export const SlotLabels = ({
           width="2.5rem"
         >
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <LocationIcon slotName="A" height="max-content" width="100%" />
+            <DeckInfoLabel deckLabel="A" height="max-content" width="100%" />
           </Flex>
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <LocationIcon slotName="B" height="max-content" width="100%" />
+            <DeckInfoLabel deckLabel="B" height="max-content" width="100%" />
           </Flex>
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <LocationIcon slotName="C" height="max-content" width="100%" />
+            <DeckInfoLabel deckLabel="C" height="max-content" width="100%" />
           </Flex>
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <LocationIcon slotName="D" height="max-content" width="100%" />
+            <DeckInfoLabel deckLabel="D" height="max-content" width="100%" />
           </Flex>
         </Flex>
       </RobotCoordsForeignObject>
@@ -74,21 +72,21 @@ export const SlotLabels = ({
             justifyContent={JUSTIFY_CENTER}
             flex="1"
           >
-            <LocationIcon slotName="1" height="100%" />
+            <DeckInfoLabel deckLabel="1" height="100%" />
           </Flex>
           <Flex
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
             flex="1"
           >
-            <LocationIcon slotName="2" height="100%" />
+            <DeckInfoLabel deckLabel="2" height="100%" />
           </Flex>
           <Flex
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
             flex="1"
           >
-            <LocationIcon slotName="3" height="100%" />
+            <DeckInfoLabel deckLabel="3" height="100%" />
           </Flex>
           {hasStagingAreas ? (
             <Flex
@@ -96,7 +94,7 @@ export const SlotLabels = ({
               justifyContent={JUSTIFY_CENTER}
               flex="1"
             >
-              <LocationIcon slotName="4" height="100%" />
+              <DeckInfoLabel deckLabel="4" height="100%" />
             </Flex>
           ) : null}
         </Flex>

@@ -8,12 +8,13 @@ from typing_extensions import ParamSpec
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.robot.types import RobotDefinition
 
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.protocol_engine.types import ModuleOffsetData
 from opentrons.util.change_notifier import ChangeNotifier
 
 from ..resources import DeckFixedLabware
 from ..actions import Action, ActionHandler
-from .abstract_store import HasState, HandlesActions
+from ._abstract_store import HasState, HandlesActions
 from .commands import CommandState, CommandStore, CommandView
 from .addressable_areas import (
     AddressableAreaState,
@@ -25,6 +26,7 @@ from .pipettes import PipetteState, PipetteStore, PipetteView
 from .modules import ModuleState, ModuleStore, ModuleView
 from .liquids import LiquidState, LiquidView, LiquidStore
 from .tips import TipState, TipView, TipStore
+from .wells import WellState, WellView, WellStore
 from .geometry import GeometryView
 from .motion import MotionView
 from .config import Config
@@ -47,6 +49,7 @@ class State:
     modules: ModuleState
     liquids: LiquidState
     tips: TipState
+    wells: WellState
 
 
 class StateView(HasState[State]):
@@ -60,6 +63,7 @@ class StateView(HasState[State]):
     _modules: ModuleView
     _liquid: LiquidView
     _tips: TipView
+    _wells: WellView
     _geometry: GeometryView
     _motion: MotionView
     _config: Config
@@ -100,6 +104,11 @@ class StateView(HasState[State]):
         return self._tips
 
     @property
+    def wells(self) -> WellView:
+        """Get state view selectors for well state."""
+        return self._wells
+
+    @property
     def geometry(self) -> GeometryView:
         """Get state view selectors for derived geometry state."""
         return self._geometry
@@ -128,6 +137,8 @@ class StateView(HasState[State]):
             completedAt=self._state.commands.run_completed_at,
             startedAt=self._state.commands.run_started_at,
             liquids=self._liquid.get_all(),
+            wells=self._wells.get_all(),
+            hasEverEnteredErrorRecovery=self._commands.get_has_entered_recovery_mode(),
         )
 
 
@@ -147,6 +158,7 @@ class StateStore(StateView, ActionHandler):
         deck_fixed_labware: Sequence[DeckFixedLabware],
         robot_definition: RobotDefinition,
         is_door_open: bool,
+        error_recovery_policy: ErrorRecoveryPolicy,
         change_notifier: Optional[ChangeNotifier] = None,
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
         deck_configuration: Optional[DeckConfigurationType] = None,
@@ -161,13 +173,18 @@ class StateStore(StateView, ActionHandler):
             deck_fixed_labware: Labware definitions from the deck
                 definition to preload into labware state.
             is_door_open: Whether the robot's door is currently open.
+            error_recovery_policy: The run's initial error recovery policy.
             change_notifier: Internal state change notifier.
             module_calibration_offsets: Module offsets to preload.
             deck_configuration: The initial deck configuration the addressable area store will be instantiated with.
             robot_definition: Static information about the robot type being used.
             notify_publishers: Notifies robot server publishers of internal state change.
         """
-        self._command_store = CommandStore(config=config, is_door_open=is_door_open)
+        self._command_store = CommandStore(
+            config=config,
+            is_door_open=is_door_open,
+            error_recovery_policy=error_recovery_policy,
+        )
         self._pipette_store = PipetteStore()
         if deck_configuration is None:
             deck_configuration = []
@@ -183,10 +200,12 @@ class StateStore(StateView, ActionHandler):
         )
         self._module_store = ModuleStore(
             config=config,
+            deck_fixed_labware=deck_fixed_labware,
             module_calibration_offsets=module_calibration_offsets,
         )
         self._liquid_store = LiquidStore()
         self._tip_store = TipStore()
+        self._well_store = WellStore()
 
         self._substores: List[HandlesActions] = [
             self._command_store,
@@ -196,6 +215,7 @@ class StateStore(StateView, ActionHandler):
             self._module_store,
             self._liquid_store,
             self._tip_store,
+            self._well_store,
         ]
         self._config = config
         self._change_notifier = change_notifier or ChangeNotifier()
@@ -312,6 +332,7 @@ class StateStore(StateView, ActionHandler):
             modules=self._module_store.state,
             liquids=self._liquid_store.state,
             tips=self._tip_store.state,
+            wells=self._well_store.state,
         )
 
     def _initialize_state(self) -> None:
@@ -327,11 +348,13 @@ class StateStore(StateView, ActionHandler):
         self._modules = ModuleView(state.modules)
         self._liquid = LiquidView(state.liquids)
         self._tips = TipView(state.tips)
+        self._wells = WellView(state.wells)
 
         # Derived states
         self._geometry = GeometryView(
             config=self._config,
             labware_view=self._labware,
+            well_view=self._wells,
             module_view=self._modules,
             pipette_view=self._pipettes,
             addressable_area_view=self._addressable_areas,
@@ -356,6 +379,7 @@ class StateStore(StateView, ActionHandler):
         self._modules._state = next_state.modules
         self._liquid._state = next_state.liquids
         self._tips._state = next_state.tips
+        self._wells._state = next_state.wells
         self._change_notifier.notify()
         if self._notify_robot_server is not None:
             self._notify_robot_server()

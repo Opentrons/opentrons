@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 import {
   DIRECTION_COLUMN,
@@ -9,7 +8,7 @@ import {
 } from '@opentrons/components'
 
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
-import { TwoColumn } from '../../../molecules/InterventionModal'
+import { TwoColumn } from '/app/molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { FailedStepNextStep } from './FailedStepNextStep'
 
@@ -46,9 +45,9 @@ export function TwoColTextAndFailedStepNextStep(
         <Flex
           flexDirection={DIRECTION_COLUMN}
           css={css`
-            gap: ${SPACING.spacing16};
+            gap: ${SPACING.spacing8};
             @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-              gap: ${SPACING.spacing8};
+              gap: ${SPACING.spacing12};
             }
           `}
         >
@@ -58,12 +57,16 @@ export function TwoColTextAndFailedStepNextStep(
           >
             {leftColTitle}
           </StyledText>
-          <StyledText
-            oddStyle="bodyTextRegular"
-            desktopStyle="bodyDefaultRegular"
-          >
-            {leftColBodyText}
-          </StyledText>
+          {typeof leftColBodyText === 'string' ? (
+            <StyledText
+              oddStyle="bodyTextRegular"
+              desktopStyle="bodyDefaultRegular"
+            >
+              {leftColBodyText}
+            </StyledText>
+          ) : (
+            leftColBodyText
+          )}
         </Flex>
         <FailedStepNextStep {...props} />
       </TwoColumn>

@@ -1,42 +1,44 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink, useNavigate } from 'react-router-dom'
 
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  FLEX_MAX_CONTENT,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
+  MenuItem,
+  NO_WRAP,
+  OverflowBtn,
   POSITION_ABSOLUTE,
-  ALIGN_FLEX_END,
-  DIRECTION_COLUMN,
   POSITION_RELATIVE,
-  COLORS,
-  useOnClickOutside,
-  useHoverTooltip,
-  Box,
-  SPACING,
   SIZE_1,
-  ALIGN_CENTER,
+  SPACING,
+  Tooltip,
+  useHoverTooltip,
+  useMenuHandleClickOutside,
+  useOnClickOutside,
 } from '@opentrons/components'
 import { useDeleteRunMutation } from '@opentrons/react-api-client'
 
-import { Divider } from '../../atoms/structure'
-import { Tooltip } from '../../atoms/Tooltip'
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { useRunControls } from '../../organisms/RunTimeControl/hooks'
+import { Divider } from '/app/atoms/structure'
+import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
-} from '../../redux/analytics'
-import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
-import { useDownloadRunLog, useTrackProtocolRunEvent, useRobot } from './hooks'
-import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+} from '/app/redux/analytics'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { useDownloadRunLog } from './hooks'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
+import { useRobot } from '/app/redux-resources/robots'
 
 import type { Run } from '@opentrons/api-client'
-import type { State } from '../../redux/types'
 
 export interface HistoricalProtocolRunOverflowMenuProps {
   runId: string
@@ -114,11 +116,10 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     isRunLogLoading,
   } = props
 
-  const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
-    useSelector((state: State) => {
-      return getRobotUpdateDisplayInfo(state, robotName)
-    })?.autoUpdateAction
+  const isRobotOnWrongVersionOfSoftware = useIsRobotOnWrongVersionOfSoftware(
+    robotName
   )
+
   const [targetProps, tooltipProps] = useHoverTooltip()
   const onResetSuccess = (createRunResponse: Run): void => {
     navigate(
@@ -133,7 +134,10 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   }
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
-  const { reset } = useRunControls(runId, onResetSuccess)
+  const { reset, isResetRunLoading, isRunControlLoading } = useRunControls(
+    runId,
+    onResetSuccess
+  )
   const { deleteRun } = useDeleteRunMutation()
   const robot = useRobot(robotName)
   const robotSerialNumber =
@@ -165,7 +169,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
 
   return (
     <Flex
-      whiteSpace="nowrap"
+      whiteSpace={NO_WRAP}
       zIndex={10}
       borderRadius="4px 4px 0px 0px"
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
@@ -174,6 +178,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       top="2.3rem"
       right={0}
       flexDirection={DIRECTION_COLUMN}
+      width={FLEX_MAX_CONTENT}
     >
       <NavLink to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}>
         <MenuItem data-testid="RecentProtocolRun_OverflowMenu_viewRunRecord">
@@ -183,14 +188,32 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       <MenuItem
         {...targetProps}
         onClick={handleResetClick}
-        disabled={robotIsBusy || isRobotOnWrongVersionOfSoftware}
+        disabled={
+          robotIsBusy || isRobotOnWrongVersionOfSoftware || isRunControlLoading
+        }
         data-testid="RecentProtocolRun_OverflowMenu_rerunNow"
       >
-        {t('rerun_now')}
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+          {t('rerun_now')}
+          {isResetRunLoading ? (
+            <Icon
+              name="ot-spinner"
+              size={SIZE_1}
+              color={COLORS.grey50}
+              aria-label="spinner"
+              spin
+            />
+          ) : null}
+        </Flex>
       </MenuItem>
       {isRobotOnWrongVersionOfSoftware && (
         <Tooltip tooltipProps={tooltipProps}>
           {t('shared:a_software_update_is_available')}
+        </Tooltip>
+      )}
+      {isRunControlLoading && (
+        <Tooltip whiteSpace="normal" tooltipProps={tooltipProps}>
+          {t('rerun_loading')}
         </Tooltip>
       )}
       <MenuItem

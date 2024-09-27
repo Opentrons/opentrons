@@ -1,6 +1,5 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -10,10 +9,13 @@ import {
   Icon,
   SPACING,
   StyledText,
-  RESPONSIVENESS,
 } from '@opentrons/components'
 
-import { RECOVERY_MAP } from '../constants'
+import {
+  FLEX_WIDTH_ALERT_INFO_STYLE,
+  ICON_SIZE_ALERT_INFO_STYLE,
+  RECOVERY_MAP,
+} from '../constants'
 import {
   RecoveryFooterButtons,
   RecoverySingleColumnContentWrapper,
@@ -21,11 +23,7 @@ import {
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
-import type {
-  RecoveryTipStatusUtils,
-  UseRecoveryCommandsResult,
-  UseRouteUpdateActionsResult,
-} from '../hooks'
+import type { ERUtilsResults } from '../hooks'
 
 export function CancelRun(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props
@@ -71,11 +69,11 @@ function CancelRunConfirmation({
         gridGap={SPACING.spacing16}
         padding={`${SPACING.spacing32} ${SPACING.spacing16}`}
         height="100%"
-        css={FLEX_WIDTH}
+        css={FLEX_WIDTH_ALERT_INFO_STYLE}
       >
         <Icon
           name="ot-alert"
-          css={ICON_SIZE}
+          css={ICON_SIZE_ALERT_INFO_STYLE}
           marginTop={SPACING.spacing24}
           color={COLORS.red50}
         />
@@ -102,9 +100,9 @@ function CancelRunConfirmation({
 }
 
 interface OnCancelRunProps {
-  tipStatusUtils: RecoveryTipStatusUtils
-  recoveryCommands: UseRecoveryCommandsResult
-  routeUpdateActions: UseRouteUpdateActionsResult
+  tipStatusUtils: ERUtilsResults['tipStatusUtils']
+  recoveryCommands: ERUtilsResults['recoveryCommands']
+  routeUpdateActions: ERUtilsResults['routeUpdateActions']
 }
 
 // Manages routing to cancel route or drop tip route, depending on tip attachment status.
@@ -120,20 +118,20 @@ export function useOnCancelRun({
 } {
   const { ROBOT_CANCELING, DROP_TIP_FLOWS } = RECOVERY_MAP
   const { isLoadingTipStatus, areTipsAttached } = tipStatusUtils
-  const { setRobotInMotion, proceedToRouteAndStep } = routeUpdateActions
+  const { handleMotionRouting, proceedToRouteAndStep } = routeUpdateActions
   const { cancelRun } = recoveryCommands
 
-  const [hasUserClicked, setHasUserClicked] = React.useState(false)
+  const [hasUserClicked, setHasUserClicked] = useState(false)
 
   const showBtnLoadingState = hasUserClicked && isLoadingTipStatus
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (hasUserClicked) {
       if (!isLoadingTipStatus) {
         if (areTipsAttached) {
           void proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)
         } else {
-          void setRobotInMotion(true, ROBOT_CANCELING.ROUTE).then(() => {
+          void handleMotionRouting(true, ROBOT_CANCELING.ROUTE).then(() => {
             cancelRun()
           })
         }
@@ -147,19 +145,3 @@ export function useOnCancelRun({
 
   return { showBtnLoadingState, handleCancelRunClick }
 }
-
-const FLEX_WIDTH = css`
-  width: 41.625rem;
-  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-    width: 53rem;
-  }
-`
-
-const ICON_SIZE = css`
-  width: ${SPACING.spacing40};
-  height: ${SPACING.spacing40};
-  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-    width: ${SPACING.spacing60};
-    height: ${SPACING.spacing60};
-  }
-`

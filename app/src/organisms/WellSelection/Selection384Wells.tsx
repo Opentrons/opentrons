@@ -3,18 +3,17 @@ import { useTranslation } from 'react-i18next'
 import flatten from 'lodash/flatten'
 
 import {
-  Box,
   Checkbox,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  RadioButton,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { IconButton } from '../../atoms/buttons/IconButton'
-import { RadioButton } from '../../atoms/buttons/RadioButton'
+import { IconButton } from '/app/atoms/buttons/IconButton'
 
 import type { WellGroup } from '@opentrons/components'
 import type {
@@ -98,8 +97,7 @@ export function Selection384Wells({
 
     if (selectBy === 'columns') {
       if (channels === 8) {
-        // for 8-channel, select first and second member of column (all rows) unless only one starting well option is selected
-        if (startingWellState.A1 === startingWellState.B1) {
+        if (startingWellState.A1 && startingWellState.B1) {
           selectWells({
             [columns[nextIndex][0]]: null,
             [columns[nextIndex][1]]: null,
@@ -132,16 +130,17 @@ export function Selection384Wells({
     )
   }
   return (
-    <Flex
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      gridGap={SPACING.spacing40}
-      width="100%"
-    >
-      <Box flex="2 0 0">{labwareRender}</Box>
+    <Flex width="100%">
+      {labwareRender}
       <Flex
         flex="1 0 0"
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
+        height="100%"
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        marginLeft={`-${SPACING.spacing12}`}
+        paddingTop={SPACING.spacing24}
+        paddingBottom={SPACING.spacing40}
       >
         {channels === 1 ? (
           <SelectBy
@@ -152,19 +151,27 @@ export function Selection384Wells({
         ) : (
           <StartingWell
             channels={channels}
-            columns={columns}
             deselectWells={deselectWells}
             selectWells={selectWells}
             startingWellState={startingWellState}
             setStartingWellState={setStartingWellState}
+            wells={wells}
           />
         )}
         <ButtonControls
           channels={channels}
           handleMinus={handleMinus}
           handlePlus={handlePlus}
-          lastSelectedIndex={lastSelectedIndex}
-          selectBy={selectBy}
+          minusDisabled={lastSelectedIndex == null}
+          plusDisabled={
+            // disable 8-channel plus if no starting well selected
+            (channels === 8 &&
+              !startingWellState.A1 &&
+              !startingWellState.B1) ||
+            (selectBy === 'columns'
+              ? lastSelectedIndex === COLUMN_COUNT_384 - 1
+              : lastSelectedIndex === WELL_COUNT_384 - 1)
+          }
         />
       </Flex>
     </Flex>
@@ -189,34 +196,36 @@ function SelectBy({
       <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {i18n.format(t('select_by'), 'capitalize')}
       </LegacyStyledText>
-      <RadioButton
-        buttonLabel={i18n.format(t('columns'), 'capitalize')}
-        buttonValue="columns"
-        isSelected={selectBy === 'columns'}
-        onChange={() => {
-          setSelectBy('columns')
-          setLastSelectedIndex(lastSelectedIndex =>
-            lastSelectedIndex != null
-              ? Math.floor(lastSelectedIndex / ROW_COUNT_384)
-              : lastSelectedIndex
-          )
-        }}
-        radioButtonType="small"
-      />
-      <RadioButton
-        buttonLabel={i18n.format(t('wells'), 'capitalize')}
-        buttonValue="wells"
-        isSelected={selectBy === 'wells'}
-        onChange={() => {
-          setSelectBy('wells')
-          setLastSelectedIndex(lastSelectedIndex =>
-            lastSelectedIndex != null
-              ? (lastSelectedIndex + 1) * ROW_COUNT_384 - 1
-              : lastSelectedIndex
-          )
-        }}
-        radioButtonType="small"
-      />
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+        <RadioButton
+          buttonLabel={i18n.format(t('columns'), 'capitalize')}
+          buttonValue="columns"
+          isSelected={selectBy === 'columns'}
+          onChange={() => {
+            setSelectBy('columns')
+            setLastSelectedIndex(lastSelectedIndex =>
+              lastSelectedIndex != null
+                ? Math.floor(lastSelectedIndex / ROW_COUNT_384)
+                : lastSelectedIndex
+            )
+          }}
+          radioButtonType="small"
+        />
+        <RadioButton
+          buttonLabel={i18n.format(t('wells'), 'capitalize')}
+          buttonValue="wells"
+          isSelected={selectBy === 'wells'}
+          onChange={() => {
+            setSelectBy('wells')
+            setLastSelectedIndex(lastSelectedIndex =>
+              lastSelectedIndex != null
+                ? (lastSelectedIndex + 1) * ROW_COUNT_384 - 1
+                : lastSelectedIndex
+            )
+          }}
+          radioButtonType="small"
+        />
+      </Flex>
     </Flex>
   )
 }
@@ -225,20 +234,20 @@ type StartingWellOption = 'A1' | 'B1' | 'A2' | 'B2'
 
 function StartingWell({
   channels,
-  columns,
   deselectWells,
   selectWells,
   startingWellState,
   setStartingWellState,
+  wells,
 }: {
   channels: PipetteChannels
-  columns: string[][]
   deselectWells: (wells: string[]) => void
   selectWells: (wellGroup: WellGroup) => void
   startingWellState: Record<StartingWellOption, boolean>
   setStartingWellState: React.Dispatch<
     React.SetStateAction<Record<StartingWellOption, boolean>>
   >
+  wells: string[]
 }): JSX.Element {
   const { t, i18n } = useTranslation('quick_transfer')
 
@@ -247,6 +256,9 @@ function StartingWell({
 
   // on mount, select A1 well group for 96-channel
   React.useEffect(() => {
+    // deselect all wells on mount; clears well selection when navigating back within quick transfer flow
+    // otherwise, selected wells and lastSelectedIndex pointer will be out of sync
+    deselectWells(wells)
     if (channels === 96) {
       selectWells({ A1: null })
     }
@@ -259,27 +271,29 @@ function StartingWell({
       <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {i18n.format(t('starting_well'), 'capitalize')}
       </LegacyStyledText>
-      {checkboxWellOptions.map(well => (
-        <Checkbox
-          key={well}
-          isChecked={startingWellState[well]}
-          labelText={well}
-          onClick={() => {
-            if (channels === 96) {
-              if (startingWellState[well]) {
-                deselectWells([well])
-              } else {
-                selectWells({ [well]: null })
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+        {checkboxWellOptions.map(well => (
+          <Checkbox
+            key={well}
+            isChecked={startingWellState[well]}
+            labelText={well}
+            onClick={() => {
+              if (channels === 96) {
+                if (startingWellState[well]) {
+                  deselectWells([well])
+                } else {
+                  selectWells({ [well]: null })
+                }
               }
-            }
 
-            setStartingWellState(startingWellState => ({
-              ...startingWellState,
-              [well]: !startingWellState[well],
-            }))
-          }}
-        />
-      ))}
+              setStartingWellState(startingWellState => ({
+                ...startingWellState,
+                [well]: !startingWellState[well],
+              }))
+            }}
+          />
+        ))}
+      </Flex>
     </Flex>
   )
 }
@@ -288,8 +302,8 @@ interface ButtonControlsProps {
   channels: PipetteChannels
   handleMinus: () => void
   handlePlus: () => void
-  lastSelectedIndex: number | null
-  selectBy: 'columns' | 'wells'
+  minusDisabled: boolean
+  plusDisabled: boolean
 }
 
 function ButtonControls(props: ButtonControlsProps): JSX.Element {
@@ -297,8 +311,8 @@ function ButtonControls(props: ButtonControlsProps): JSX.Element {
     channels,
     handleMinus,
     handlePlus,
-    lastSelectedIndex,
-    selectBy,
+    minusDisabled,
+    plusDisabled,
   } = props
   const { t, i18n } = useTranslation('quick_transfer')
 
@@ -311,20 +325,16 @@ function ButtonControls(props: ButtonControlsProps): JSX.Element {
             'capitalize'
           )}
         </LegacyStyledText>
-        <Flex gridGap={SPACING.spacing16}>
+        <Flex gridGap={SPACING.spacing16} height="6.5rem">
           <IconButton
-            disabled={lastSelectedIndex == null}
+            disabled={minusDisabled}
             onClick={handleMinus}
             iconName="minus"
             hasBackground
             flex="1"
           />
           <IconButton
-            disabled={
-              selectBy === 'columns'
-                ? lastSelectedIndex === COLUMN_COUNT_384 - 1
-                : lastSelectedIndex === WELL_COUNT_384 - 1
-            }
+            disabled={plusDisabled}
             onClick={handlePlus}
             iconName="plus"
             hasBackground

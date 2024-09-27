@@ -1,16 +1,16 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../i18n'
-import { useIsFlex } from '../../../organisms/Devices/hooks'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { i18n } from '/app/i18n'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { UpdateBanner } from '..'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
-vi.mock('../../../organisms/Devices/hooks')
-vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
 const render = (props: React.ComponentProps<typeof UpdateBanner>) => {
   return renderWithProviders(<UpdateBanner {...props} />, {

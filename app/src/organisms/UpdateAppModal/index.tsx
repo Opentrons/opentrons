@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import styled, { css } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
@@ -6,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
+  Banner,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
@@ -16,6 +16,7 @@ import {
   SecondaryButton,
   SPACING,
   LegacyStyledText,
+  Modal,
 } from '@opentrons/components'
 
 import {
@@ -23,16 +24,14 @@ import {
   getAvailableShellUpdate,
   downloadShellUpdate,
   applyShellUpdate,
-} from '../../redux/shell'
+} from '/app/redux/shell'
 
-import { ExternalLink } from '../../atoms/Link/ExternalLink'
-import { ReleaseNotes } from '../../molecules/ReleaseNotes'
-import { LegacyModal } from '../../molecules/LegacyModal'
-import { Banner } from '../../atoms/Banner'
-import { ProgressBar } from '../../atoms/ProgressBar'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { ReleaseNotes } from '/app/molecules/ReleaseNotes'
+import { ProgressBar } from '/app/atoms/ProgressBar'
 import { useRemoveActiveAppUpdateToast } from '../Alerts'
 
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 interface PlaceHolderErrorProps {
   errorMessage?: string
@@ -148,7 +147,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   return (
     <>
       {error != null ? (
-        <LegacyModal
+        <Modal
           title={UPDATE_ERROR}
           onClose={() => {
             closeModal(true)
@@ -156,10 +155,10 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
           css={LEGACY_MODAL_STYLE}
         >
           <PlaceholderError errorMessage={error.message} />
-        </LegacyModal>
+        </Modal>
       ) : null}
       {(downloading || downloaded) && error == null ? (
-        <LegacyModal
+        <Modal
           title={t('branded:opentrons_app_update')}
           css={LEGACY_MODAL_STYLE}
         >
@@ -176,10 +175,10 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
               outerStyles={UPDATE_PROGRESS_BAR_STYLE}
             />
           </Flex>
-        </LegacyModal>
+        </Modal>
       ) : null}
       {!downloading && !downloaded && error == null ? (
-        <LegacyModal
+        <Modal
           title={t('branded:opentrons_app_update_available')}
           onClose={() => {
             closeModal(true)
@@ -195,7 +194,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
             </UpdateAppBanner>
             <ReleaseNotes source={releaseNotes} />
           </Flex>
-        </LegacyModal>
+        </Modal>
       ) : null}
     </>
   )

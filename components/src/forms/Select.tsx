@@ -1,4 +1,3 @@
-import * as React from 'react'
 import ReactSelect, { components as reactSelectComponents } from 'react-select'
 
 import cx from 'classnames'

@@ -1,29 +1,29 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach } from 'vitest'
 
-import { i18n } from '../../../i18n'
-import * as RobotApi from '../../../redux/robot-api'
+import { i18n } from '/app/i18n'
+import * as RobotApi from '/app/redux/robot-api'
 import {
   mockDeckCalData,
   mockWarningDeckCalData,
-} from '../../../redux/calibration/__fixtures__'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { mockAttachedPipette } from '../../../redux/pipettes/__fixtures__'
-import {
-  useDeckCalibrationData,
-  useRobot,
-  useAttachedPipettes,
-} from '../../../organisms/Devices/hooks'
-import { renderWithProviders } from '../../../__testing-utils__'
+} from '/app/redux/calibration/__fixtures__'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import { mockAttachedPipette } from '/app/redux/pipettes/__fixtures__'
+import { useDeckCalibrationData } from '/app/organisms/Devices/hooks'
+import { useAttachedPipettes } from '/app/resources/instruments'
+import { useRobot } from '/app/redux-resources/robots'
+import { renderWithProviders } from '/app/__testing-utils__'
 
 import { RobotSettingsDeckCalibration } from '../RobotSettingsDeckCalibration'
 
-import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
+import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 
-vi.mock('../../../organisms/CalibrationStatusCard')
-vi.mock('../../../redux/robot-api/selectors')
-vi.mock('../../../organisms/Devices/hooks')
+vi.mock('/app/organisms/CalibrationStatusCard')
+vi.mock('/app/redux/robot-api/selectors')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/resources/instruments')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,

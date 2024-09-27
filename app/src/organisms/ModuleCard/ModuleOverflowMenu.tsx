@@ -1,7 +1,15 @@
-import * as React from 'react'
+import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Flex, POSITION_RELATIVE, useHoverTooltip } from '@opentrons/components'
+import {
+  Flex,
+  MenuItem,
+  MenuList,
+  NO_WRAP,
+  POSITION_RELATIVE,
+  Tooltip,
+  useHoverTooltip,
+} from '@opentrons/components'
 
 import {
   HEATERSHAKER_MODULE_TYPE,
@@ -9,18 +17,15 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { MenuList } from '../../atoms/MenuList'
-import { Tooltip } from '../../atoms/Tooltip'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { useCurrentRunId } from '/app/resources/runs'
 import {
-  useIsFlex,
   useRunStatuses,
   useIsLegacySessionInProgress,
-} from '../Devices/hooks'
+} from '/app/organisms/Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useModuleOverflowMenu } from './hooks'
 
-import type { AttachedModule } from '../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule
@@ -143,16 +148,16 @@ export const ModuleOverflowMenu = (
         {menuOverflowItemsByModuleType[module.moduleType].map(
           (item: any, index: number) => {
             return (
-              <React.Fragment key={`${index}_${String(module.moduleType)}`}>
+              <Fragment key={`${index}_${String(module.moduleType)}`}>
                 <MenuItem
                   onClick={() => item.onClick(item.isSecondary)}
                   disabled={item.disabledReason || isDisabled}
-                  whiteSpace="nowrap"
+                  whiteSpace={NO_WRAP}
                 >
                   {item.setSetting}
                 </MenuItem>
                 {item.menuButtons}
-              </React.Fragment>
+              </Fragment>
             )
           }
         )}

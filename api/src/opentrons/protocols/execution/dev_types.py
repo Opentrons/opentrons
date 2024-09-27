@@ -1,4 +1,4 @@
-from typing import Callable, Dict, TYPE_CHECKING
+from typing import Callable, Dict, TYPE_CHECKING, Any
 
 from typing_extensions import Protocol, TypedDict
 
@@ -45,7 +45,7 @@ if Protocol is not None:
         not a type (https://github.com/python/mypy/issues/3915)
         """
 
-        async def _asdict(self):
+        async def _asdict(self) -> Dict[Any, Any]:
             ...
 
 

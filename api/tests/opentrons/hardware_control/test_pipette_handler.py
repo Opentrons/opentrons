@@ -1,12 +1,13 @@
 """Tests for the HardwareApi class."""
+from _pytest.fixtures import FixtureRequest
 import pytest
-
 from decoy import Decoy
 from typing import Optional, Tuple, Dict, List
 
 from opentrons import types
 from opentrons.hardware_control.types import OT3Mount, Axis
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette
+from opentrons_shared_data.pipette.types import PipetteChannelType
 from opentrons.hardware_control.instruments.ot2.pipette_handler import (
     PipetteHandlerProvider,
 )
@@ -39,7 +40,7 @@ def mock_pipettes_ot3(decoy: Decoy) -> Tuple[OT3Pipette, OT3Pipette]:
 
 
 @pytest.fixture
-def subject(decoy: Decoy, mock_pipette: Pipette) -> PipetteHandlerProvider:
+def subject(decoy: Decoy, mock_pipette: Pipette) -> PipetteHandlerProvider[types.Mount]:
     inst_by_mount = {types.Mount.LEFT: mock_pipette, types.Mount.RIGHT: None}
     subject = PipetteHandlerProvider(attached_instruments=inst_by_mount)
     return subject
@@ -99,7 +100,7 @@ def mock_pickup_list() -> List[TipActionMoveSpec]:
 )
 def test_plan_check_pick_up_tip_with_presses_argument(
     decoy: Decoy,
-    subject: PipetteHandlerProvider,
+    subject: PipetteHandlerProvider[types.Mount],
     mock_pipette: Pipette,
     presses_input: int,
     expected_array_length: int,
@@ -153,13 +154,13 @@ def test_plan_check_pick_up_tip_with_presses_argument(
 )
 def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     decoy: Decoy,
-    subject_ot3: PipetteHandlerProvider,
+    subject_ot3: PipetteHandlerProvider[types.Mount],
     mock_pipette_ot3: OT3Pipette,
     presses_input: int,
     expected_array_length: int,
     channels: int,
     expected_pick_up_motor_actions: Optional[List[TipActionMoveSpec]],
-    request,
+    request: FixtureRequest,
 ) -> None:
     """Should return an array with expected length."""
     mount = OT3Mount.LEFT
@@ -201,10 +202,12 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     ).then_return(1.0)
     decoy.when(mock_pipette_ot3.plunger_motor_current.run).then_return(1)
     decoy.when(mock_pipette_ot3.config.quirks).then_return([])
-    decoy.when(mock_pipette_ot3.channels).then_return(channels)
+    decoy.when(mock_pipette_ot3.channels).then_return(PipetteChannelType(channels))
     decoy.when(mock_pipette_ot3.config.end_tip_action_retract_distance_mm).then_return(
         2
     )
+
+    assert isinstance(subject_ot3, OT3PipetteHandler)
 
     if channels == 96:
         spec = subject_ot3.plan_ht_pick_up_tip(96)
@@ -216,7 +219,9 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     )
 
 
-def test_get_pipette_fails(decoy: Decoy, subject: PipetteHandlerProvider):
+def test_get_pipette_fails(
+    decoy: Decoy, subject: PipetteHandlerProvider[types.Mount]
+) -> None:
     with pytest.raises(types.PipetteNotAttachedError):
         subject.get_pipette(types.Mount.RIGHT)
 
@@ -233,12 +238,12 @@ def test_ot3_pipette_handler_gives_checks_with_different_pipettes(
     left_offset: Optional[types.Point],
     right_offset: Optional[types.Point],
     ok: bool,
-    mock_pipettes_ot3: Tuple[OT3Pipette],
+    mock_pipettes_ot3: Tuple[OT3Pipette, OT3Pipette],
     decoy: Decoy,
 ) -> None:
     """Should give you reasonable results with one or two pipettes attached."""
     # with a left and not right pipette, we should be able to pass our checks
-    inst_by_mount: Dict[OT3Mount, OT3Pipette] = {}
+    inst_by_mount: Dict[OT3Mount, OT3Pipette | None] = {}
     if left_offset is not None:
         inst_by_mount[OT3Mount.LEFT] = mock_pipettes_ot3[0]
         decoy.when(mock_pipettes_ot3[0].pipette_offset.offset).then_return(left_offset)
@@ -248,6 +253,7 @@ def test_ot3_pipette_handler_gives_checks_with_different_pipettes(
     subject = OT3PipetteHandler(attached_instruments=inst_by_mount)
     if left_offset is not None:
         left_result = subject.get_instrument_offset(OT3Mount.LEFT)
+        assert left_result is not None
         assert left_result.offset == left_offset
         if ok:
             assert left_result.reasonability_check_failures == []
@@ -255,6 +261,7 @@ def test_ot3_pipette_handler_gives_checks_with_different_pipettes(
             assert len(left_result.reasonability_check_failures) == 1
     if right_offset is not None:
         right_result = subject.get_instrument_offset(OT3Mount.RIGHT)
+        assert right_result is not None
         assert right_result.offset == right_offset
         if ok:
             assert right_result.reasonability_check_failures == []

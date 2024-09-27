@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
 import { customViewports } from '../../../../.storybook/preview'
@@ -42,6 +41,7 @@ export const MediumIcon: Story = {
   args: {
     size: 'medium',
     color: 'green',
+    onClick: () => {},
   },
 }
 

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
 import {
@@ -10,6 +9,7 @@ import {
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
+  Banner,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -20,16 +20,16 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Banner } from '../../atoms/Banner'
 import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationWarning'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { useCurrentRunId } from '/app/resources/runs'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { ModuleCard } from '../ModuleCard'
-import { useIsFlex, useIsRobotViewable, useRunStatuses } from './hooks'
-import { getShowPipetteCalibrationWarning } from './utils'
+import { useIsRobotViewable, useRunStatuses } from './hooks'
+import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 import { PipetteCard } from './PipetteCard'
 import { FlexPipetteCard } from './PipetteCard/FlexPipetteCard'
 import { GripperCard } from '../GripperCard'
-import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { useModuleApiRequests } from '../ModuleCard/utils'
 
 import type {

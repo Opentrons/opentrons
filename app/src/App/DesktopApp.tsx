@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, Fragment } from 'react'
 import { Navigate, Route, Routes, useMatch } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
 import { I18nextProvider } from 'react-i18next'
@@ -12,38 +12,41 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import NiceModal from '@ebay/nice-modal-react'
 
-import { i18n } from '../i18n'
-import { Alerts } from '../organisms/Alerts'
-import { Breadcrumbs } from '../organisms/Breadcrumbs'
-import { ToasterOven } from '../organisms/ToasterOven'
-import { CalibrationDashboard } from '../pages/Devices/CalibrationDashboard'
-import { DeviceDetails } from '../pages/Devices/DeviceDetails'
-import { DevicesLanding } from '../pages/Devices/DevicesLanding'
-import { ProtocolRunDetails } from '../pages/Devices/ProtocolRunDetails'
-import { RobotSettings } from '../pages/Devices/RobotSettings'
-import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
-import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
-import { AppSettings } from '../pages/AppSettings'
-import { Labware } from '../pages/Labware'
+import { i18n } from '/app/i18n'
+import { Alerts } from '/app/organisms/Alerts'
+import { Breadcrumbs } from '/app/organisms/Breadcrumbs'
+import { ToasterOven } from '/app/organisms/ToasterOven'
+import { CalibrationDashboard } from '/app/pages/Desktop/Devices/CalibrationDashboard'
+import { DeviceDetails } from '/app/pages/Desktop/Devices/DeviceDetails'
+import { DevicesLanding } from '/app/pages/Desktop/Devices/DevicesLanding'
+import { ProtocolRunDetails } from '/app/pages/Desktop/Devices/ProtocolRunDetails'
+import { RobotSettings } from '/app/pages/Desktop/Devices/RobotSettings'
+import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
+import { ProtocolDetails } from '/app/pages/Desktop/Protocols/ProtocolDetails'
+import { AppSettings } from '/app/pages/Desktop/AppSettings'
+import { Labware } from '/app/pages/Desktop/Labware'
 import { useSoftwareUpdatePoll } from './hooks'
 import { Navbar } from './Navbar'
-import { EstopTakeover, EmergencyStopContext } from '../organisms/EmergencyStop'
-import { IncompatibleModuleTakeover } from '../organisms/IncompatibleModule'
-import { OPENTRONS_USB } from '../redux/discovery'
-import { appShellRequestor } from '../redux/shell/remote'
-import { useRobot, useIsFlex } from '../organisms/Devices/hooks'
-import { ProtocolTimeline } from '../pages/Protocols/ProtocolDetails/ProtocolTimeline'
+import {
+  EstopTakeover,
+  EmergencyStopContext,
+} from '/app/organisms/EmergencyStop'
+import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
+import { OPENTRONS_USB } from '/app/redux/discovery'
+import { appShellRequestor } from '/app/redux/shell/remote'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
+import { ProtocolTimeline } from '/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { DesktopAppFallback } from './DesktopAppFallback'
 
-import type { RouteProps, DesktopRouteParams } from './types'
+import type { RouteProps } from './types'
 
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
   const [
     isEmergencyStopModalDismissed,
     setIsEmergencyStopModalDismissed,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
   const desktopRoutes: RouteProps[] = [
     {
@@ -121,7 +124,7 @@ export const DesktopApp = (): JSX.Element => {
                         <Route
                           key={path}
                           element={
-                            <>
+                            <Fragment key={Component.name}>
                               <Breadcrumbs />
                               <Box
                                 position={POSITION_RELATIVE}
@@ -138,13 +141,13 @@ export const DesktopApp = (): JSX.Element => {
                                   <Component />
                                 </Box>
                               </Box>
-                            </>
+                            </Fragment>
                           }
                           path={path}
                         />
                       )
                     })}
-                    <Route path="/" element={<Navigate to="/protocols" />} />
+                    <Route path="*" element={<Navigate to="/protocols" />} />
                   </Routes>
                   <RobotControlTakeover />
                 </Alerts>
@@ -158,11 +161,10 @@ export const DesktopApp = (): JSX.Element => {
 }
 
 function RobotControlTakeover(): JSX.Element | null {
-  const deviceRouteMatch = useMatch('/devices/:robotName')
-  const params = deviceRouteMatch?.params as DesktopRouteParams
-  const robotName = params?.robotName
+  const deviceRouteMatch = useMatch('/devices/:robotName/*')
+  const params = deviceRouteMatch?.params
+  const robotName = params?.robotName ?? null
   const robot = useRobot(robotName)
-
   if (deviceRouteMatch == null || robot == null || robotName == null)
     return null
 

@@ -1,21 +1,18 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { getLocalRobot } from '../../../redux/discovery'
-import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
-import { useFeatureFlag } from '../../../redux/config'
-import { useNetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
+import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
 import { NavigationMenu } from '../NavigationMenu'
 import { Navigation } from '..'
 
-vi.mock('../../../resources/networking/hooks/useNetworkConnection')
-vi.mock('../../../redux/discovery')
-vi.mock('../../../redux/config')
+vi.mock('/app/resources/networking/hooks/useNetworkConnection')
+vi.mock('/app/redux/discovery')
 vi.mock('../NavigationMenu')
 
 mockConnectedRobot.name = '12345678901234567'
@@ -66,6 +63,9 @@ describe('Navigation', () => {
     const allProtocols = screen.getByRole('link', { name: 'Protocols' })
     expect(allProtocols).toHaveAttribute('href', '/protocols')
 
+    const quickTransfer = screen.getByRole('link', { name: 'Quick Transfer' })
+    expect(quickTransfer).toHaveAttribute('href', '/quick-transfer')
+
     const instruments = screen.getByRole('link', { name: 'Instruments' })
     expect(instruments).toHaveAttribute('href', '/instruments')
 
@@ -74,15 +74,6 @@ describe('Navigation', () => {
 
     expect(screen.queryByText('Get started')).not.toBeInTheDocument()
     expect(screen.queryByLabelText('network icon')).not.toBeInTheDocument()
-  })
-  it('should render quick transfer tab if feature flag is on', () => {
-    when(vi.mocked(useFeatureFlag))
-      .calledWith('enableQuickTransfer')
-      .thenReturn(true)
-    render(props)
-    screen.getByRole('link', { name: '123456789012...' }) // because of the truncate function
-    const quickTransfer = screen.getByRole('link', { name: 'Quick Transfer' })
-    expect(quickTransfer).toHaveAttribute('href', '/quick-transfer')
   })
   it('should render a network icon', () => {
     vi.mocked(useNetworkConnection).mockReturnValue({

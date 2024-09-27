@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
@@ -11,12 +10,12 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
-import { restartRobot } from '../../redux/robot-admin'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+import { restartRobot } from '/app/redux/robot-admin'
 
-import type { Dispatch } from '../../redux/types'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { Dispatch } from '/app/redux/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface RestartRobotConfirmationModalProps {
   robotName: string
@@ -29,7 +28,7 @@ export function RestartRobotConfirmationModal({
   setShowRestartRobotConfirmationModal,
 }: RestartRobotConfirmationModalProps): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('restart_now'),
     iconName: 'ot-alert',
     iconColor: COLORS.yellow50,
@@ -37,7 +36,7 @@ export function RestartRobotConfirmationModal({
   const dispatch = useDispatch<Dispatch>()
 
   return (
-    <Modal header={modalHeader}>
+    <OddModal header={modalHeader}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
@@ -73,6 +72,6 @@ export function RestartRobotConfirmationModal({
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

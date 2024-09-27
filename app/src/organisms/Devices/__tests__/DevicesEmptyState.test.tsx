@@ -1,17 +1,16 @@
-import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
-import { i18n } from '../../../i18n'
-import { startDiscovery } from '../../../redux/discovery'
+import { i18n } from '/app/i18n'
+import { startDiscovery } from '/app/redux/discovery'
 import {
   DevicesEmptyState,
   TROUBLESHOOTING_CONNECTION_PROBLEMS_URL,
 } from '../DevicesEmptyState'
 
-vi.mock('../../../redux/discovery')
+vi.mock('/app/redux/discovery')
 
 const render = () => {
   return renderWithProviders(<DevicesEmptyState />, {

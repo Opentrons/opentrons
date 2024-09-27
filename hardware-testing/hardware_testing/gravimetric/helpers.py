@@ -109,6 +109,11 @@ def get_api_context(
             extra_labware=extra_labware,
             hardware_simulator=ThreadManager(_thread_manager_build_hw_api),
             robot_type="Flex",
+            # use_virtual_hardware=False makes this simulation work unlike
+            # opentrons_simulate, app-side analysis, and server-side analysis.
+            # We need to do this because some of our hardware testing scripts still
+            # interact directly with the OT3API and there is no way to tell Protocol
+            # Engine's hardware virtualization about those updates.
             use_virtual_hardware=False,
         )
     else:

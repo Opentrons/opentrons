@@ -1,7 +1,8 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import {
   COLORS,
+  Banner,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
@@ -14,12 +15,13 @@ import {
   WEIGHT_OF_96_CHANNEL,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { Banner } from '../../atoms/Banner'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
-import { usePipetteNameSpecs } from '../../resources/instruments/hooks'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
+import { usePipetteNameSpecs } from '/app/local-resources/instruments'
 import {
   CALIBRATION_PROBE,
   FLOWS,
@@ -30,7 +32,7 @@ import {
   BODY_STYLE,
 } from './constants'
 import { getIsGantryEmpty } from './utils'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { UseMutateFunction } from 'react-query'
 import type { AxiosError } from 'axios'
@@ -77,7 +79,7 @@ export const BeforeBeginning = (
     createdMaintenanceRunId,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-  React.useEffect(() => {
+  useEffect(() => {
     if (createdMaintenanceRunId == null) {
       createMaintenanceRun({})
     }
@@ -231,7 +233,8 @@ export const BeforeBeginning = (
       })
   }
 
-  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
+  if (isRobotMoving)
+    return <SimpleWizardInProgressBody description={t('stand_back')} />
 
   return errorMessage != null ? (
     <SimpleWizardBody

@@ -1,18 +1,20 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { getStoredProtocols } from '../../../redux/protocol-storage'
-import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
-import { useRunStatus, useRunTimestamps } from '../../RunTimeControl/hooks'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getStoredProtocols } from '/app/redux/protocol-storage'
+import { storedProtocolData as storedProtocolDataFixture } from '/app/redux/protocol-storage/__fixtures__'
+import { useRunStatus, useRunTimestamps } from '/app/resources/runs'
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
-import type { RunStatus, RunData } from '@opentrons/api-client'
 
-vi.mock('../../../redux/protocol-storage')
-vi.mock('../../RunTimeControl/hooks')
+import type { RunStatus, RunData } from '@opentrons/api-client'
+import type { RunTimeParameter } from '@opentrons/shared-data'
+
+vi.mock('/app/redux/protocol-storage')
+vi.mock('/app/resources/runs')
 vi.mock('../HistoricalProtocolRunOverflowMenu')
 
 const run = {
@@ -20,6 +22,7 @@ const run = {
   id: 'test_id',
   protocolId: 'test_protocol_id',
   status: 'succeeded' as RunStatus,
+  runTimeParameters: [] as RunTimeParameter[],
 } as RunData
 
 const render = (props: React.ComponentProps<typeof HistoricalProtocolRun>) => {

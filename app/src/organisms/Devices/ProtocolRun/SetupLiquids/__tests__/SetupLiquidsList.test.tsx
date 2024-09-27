@@ -1,33 +1,32 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 
 import {
-  parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
-} from '@opentrons/api-client'
+  parseLiquidsInLoadOrder,
+} from '@opentrons/shared-data'
 
-import {
-  nestedTextMatcher,
-  renderWithProviders,
-} from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import {
   useTrackEvent,
   ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
-} from '../../../../../redux/analytics'
-import { getLocationInfoNames } from '../../utils/getLocationInfoNames'
+} from '/app/redux/analytics'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { getLocationInfoNames } from '/app/transformations/commands'
 import { SetupLiquidsList } from '../SetupLiquidsList'
 import {
   getTotalVolumePerLiquidId,
-  getTotalVolumePerLiquidLabwarePair,
-} from '../utils'
-import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
-import { useNotifyRunQuery } from '../../../../../resources/runs'
+  getVolumePerWell,
+} from '/app/transformations/analysis'
+import { LiquidsLabwareDetailsModal } from '/app/organisms/LiquidsLabwareDetailsModal'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
 import type { Mock } from 'vitest'
+import type * as SharedData from '@opentrons/shared-data'
 
 const MOCK_LIQUIDS_IN_LOAD_ORDER = [
   {
@@ -56,12 +55,20 @@ const MOCK_LABWARE_INFO_BY_LIQUID_ID = {
   ],
 }
 
-vi.mock('../utils')
-vi.mock('../../utils/getLocationInfoNames')
-vi.mock('../LiquidsLabwareDetailsModal')
-vi.mock('@opentrons/api-client')
-vi.mock('../../../../../redux/analytics')
-vi.mock('../../../../../resources/runs')
+vi.mock('/app/transformations/analysis')
+vi.mock('/app/transformations/commands')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/organisms/LiquidsLabwareDetailsModal')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actualSharedData = await importOriginal<typeof SharedData>()
+  return {
+    ...actualSharedData,
+    parseLabwareInfoByLiquidId: vi.fn(),
+    parseLiquidsInLoadOrder: vi.fn(),
+  }
+})
+vi.mock('/app/redux/analytics')
+vi.mock('/app/resources/runs')
 
 const render = (props: React.ComponentProps<typeof SetupLiquidsList>) => {
   return renderWithProviders(<SetupLiquidsList {...props} />, {
@@ -73,9 +80,10 @@ let mockTrackEvent: Mock
 describe('SetupLiquidsList', () => {
   let props: React.ComponentProps<typeof SetupLiquidsList>
   beforeEach(() => {
-    props = { runId: '123' }
+    props = { runId: '123', robotName: 'test_flex' }
     vi.mocked(getTotalVolumePerLiquidId).mockReturnValue(400)
-    vi.mocked(getTotalVolumePerLiquidLabwarePair).mockReturnValue(200)
+    vi.mocked(useIsFlex).mockReturnValue(false)
+    vi.mocked(getVolumePerWell).mockReturnValue(200)
     vi.mocked(getLocationInfoNames).mockReturnValue({
       labwareName: 'mock labware name',
       slotName: '4',
@@ -98,6 +106,11 @@ describe('SetupLiquidsList', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
   })
 
+  it('renders the table headers', () => {
+    render(props)
+    screen.getByText('Liquid information')
+    screen.getByText('Total volume')
+  })
   it('renders the total volume of the liquid, sample display name, and description', () => {
     render(props)
     screen.getAllByText(nestedTextMatcher('400.0 µL'))
@@ -117,8 +130,8 @@ describe('SetupLiquidsList', () => {
     })
     screen.getByText('Location')
     screen.getByText('Labware name')
-    screen.getByText('Volume')
-    screen.getAllByText(nestedTextMatcher('200.0 µL'))
+    screen.getByText('Individual well volume')
+    screen.getByText('200 µL')
     screen.getByText('4')
     screen.getByText('mock labware name')
   })

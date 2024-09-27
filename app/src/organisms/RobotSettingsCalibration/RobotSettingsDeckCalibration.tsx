@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
@@ -11,11 +11,12 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import { formatLastModified } from '../../organisms/CalibrationPanels/utils'
-import { useDeckCalibrationData, useRobot } from '../../organisms/Devices/hooks'
-import * as RobotApi from '../../redux/robot-api'
+import { formatLastModified } from '/app/organisms/CalibrationPanels/utils'
+import { useDeckCalibrationData } from '/app/organisms/Devices/hooks'
+import { useRobot } from '/app/redux-resources/robots'
+import * as RobotApi from '/app/redux/robot-api'
 
-import type { State } from '../../redux/types'
+import type { State } from '/app/redux/types'
 
 interface RobotSettingsDeckCalibrationProps {
   robotName: string
@@ -25,7 +26,7 @@ export function RobotSettingsDeckCalibration({
   robotName,
 }: RobotSettingsDeckCalibrationProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const createRequestId = React.useRef<string | null>(null)
+  const createRequestId = useRef<string | null>(null)
 
   const robot = useRobot(robotName)
   const deckCalibrationData = useDeckCalibrationData(robot?.name)
@@ -46,7 +47,7 @@ export function RobotSettingsDeckCalibration({
       })
     : t('not_calibrated')
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {
       createRequestId.current = null
     }

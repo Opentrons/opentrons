@@ -1,32 +1,32 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { when } from 'vitest-when'
 import { screen, fireEvent } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import * as DiscoveryClientFixtures from '../../../../../discovery-client/src/fixtures'
 import { useAuthorization } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../i18n'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
-import { getConfig, useFeatureFlag } from '../../../redux/config'
+import { i18n } from '/app/i18n'
+import { useCurrentRunId } from '/app/resources/runs'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
+import { getConfig, useFeatureFlag } from '/app/redux/config'
 import {
   getRobotAddressesByName,
   getRobotModelByName,
-} from '../../../redux/discovery'
+} from '/app/redux/discovery'
 import {
   HEALTH_STATUS_OK,
   OPENTRONS_USB,
   ROBOT_MODEL_OT3,
-} from '../../../redux/discovery/constants'
+} from '/app/redux/discovery/constants'
+import { useRobot } from '/app/redux-resources/robots'
 import {
   useCalibrationTaskList,
   useIsRobotBusy,
   useLights,
-  useRobot,
   useRunStatuses,
   useIsRobotViewable,
 } from '../hooks'
@@ -44,10 +44,14 @@ import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusHeader } from '../RobotStatusHeader'
 import { RobotOverview } from '../RobotOverview'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
+import {
+  ErrorRecoveryBanner,
+  useErrorRecoveryBanner,
+} from '../../ErrorRecoveryBanner'
 
-import type { Config } from '../../../redux/config/types'
-import type { DiscoveryClientRobotAddress } from '../../../redux/discovery/types'
-import type { State } from '../../../redux/types'
+import type { Config } from '/app/redux/config/types'
+import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'
+import type { State } from '/app/redux/types'
 import type * as ReactApiClient from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
@@ -57,15 +61,17 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     useAuthorization: vi.fn(),
   }
 })
-vi.mock('../../../redux/robot-controls')
-vi.mock('../../../redux/robot-update/selectors')
-vi.mock('../../../redux/config')
-vi.mock('../../../redux/discovery/selectors')
-vi.mock('../../ProtocolUpload/hooks')
+vi.mock('/app/redux/robot-controls')
+vi.mock('/app/redux/robot-update/selectors')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/discovery/selectors')
+vi.mock('/app/resources/runs')
 vi.mock('../hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../RobotStatusHeader')
 vi.mock('../../UpdateRobotBanner')
 vi.mock('../RobotOverviewOverflowMenu')
+vi.mock('../../ErrorRecoveryBanner')
 
 const OT2_PNG_FILE_NAME = '/app/src/assets/images/OT2-R_HERO.png'
 const FLEX_PNG_FILE_NAME = '/app/src/assets/images/FLEX.png'
@@ -164,6 +170,13 @@ describe('RobotOverview', () => {
         registrationToken: { token: 'my.registration.jwt' },
       })
     vi.mocked(useIsRobotViewable).mockReturnValue(true)
+    vi.mocked(ErrorRecoveryBanner).mockReturnValue(
+      <div>MOCK_RECOVERY_BANNER</div>
+    )
+    vi.mocked(useErrorRecoveryBanner).mockReturnValue({
+      showRecoveryBanner: false,
+      recoveryIntent: 'recovering',
+    })
   })
 
   it('renders an OT-2 image', () => {
@@ -366,5 +379,16 @@ describe('RobotOverview', () => {
       agent: 'com.opentrons.app.usb',
       agentId: 'opentrons-robot-user',
     })
+  })
+
+  it('renders the error recovery banner when another user is performing error recovery', () => {
+    vi.mocked(useErrorRecoveryBanner).mockReturnValue({
+      showRecoveryBanner: true,
+      recoveryIntent: 'recovering',
+    })
+
+    render(props)
+
+    screen.getByText('MOCK_RECOVERY_BANNER')
   })
 })

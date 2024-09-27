@@ -1,5 +1,4 @@
 import { useSelector } from 'react-redux'
-import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
@@ -9,10 +8,12 @@ import {
   JUSTIFY_FLEX_END,
   Flex,
 } from '@opentrons/components'
-import { getIsOnDevice } from '../../redux/config'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { SmallButton } from '../../atoms/buttons'
+import { getIsOnDevice } from '/app/redux/config'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
+import { SmallButton } from '/app/atoms/buttons'
 import {
   SUCCESSFULLY_ATTACHED,
   SUCCESSFULLY_ATTACHED_AND_CALIBRATED,
@@ -70,7 +71,7 @@ export const Success = (
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )

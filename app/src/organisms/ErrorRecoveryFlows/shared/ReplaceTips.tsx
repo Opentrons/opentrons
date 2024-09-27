@@ -1,10 +1,8 @@
-import * as React from 'react'
-
 import { Flex } from '@opentrons/components'
 
 import { useTranslation } from 'react-i18next'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
-import { TwoColumn, DeckMapContent } from '../../../molecules/InterventionModal'
+import { TwoColumn, DeckMapContent } from '/app/molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
 import { getSlotNameAndLwLocFrom } from '../hooks/useDeckMapUtils'

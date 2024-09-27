@@ -1,4 +1,3 @@
-import * as React from 'react'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
@@ -17,6 +16,7 @@ import {
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 import {
+  Banner,
   DeckConfigurator,
   RESPONSIVENESS,
   SIZE_1,
@@ -24,8 +24,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Banner } from '../../atoms/Banner'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import type { ModuleCalibrationWizardStepProps } from './types'
 import type {
   CutoutConfig,
@@ -47,6 +46,7 @@ interface SelectLocationProps extends ModuleCalibrationWizardStepProps {
   occupiedCutouts: CutoutConfig[]
   deckConfig: DeckConfiguration
   configuredFixtureIdByCutoutId: { [cutoutId in CutoutId]?: CutoutFixtureId }
+  isLoadedInRun: boolean
 }
 export const SelectLocation = (
   props: SelectLocationProps
@@ -56,6 +56,7 @@ export const SelectLocation = (
     attachedModule,
     deckConfig,
     configuredFixtureIdByCutoutId,
+    isLoadedInRun,
   } = props
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
@@ -93,6 +94,8 @@ export const SelectLocation = (
           cutoutFixtureId
         ) && attachedModule.serialNumber === opentronsModuleSerialNumber
       if (
+        // in run setup, module calibration only available when module location is already correctly configured
+        !isLoadedInRun &&
         mayMountToCutoutIds.includes(cutoutId) &&
         (isCurrentConfiguration ||
           SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId))

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
@@ -14,10 +14,10 @@ import {
 import {
   resetUseTrashSurfaceForTipCal,
   setUseTrashSurfaceForTipCal,
-} from '../../redux/calibration'
-import { getUseTrashSurfaceForTipCal } from '../../redux/config'
+} from '/app/redux/calibration'
+import { getUseTrashSurfaceForTipCal } from '/app/redux/config'
 
-import type { Dispatch, State } from '../../redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 const ALWAYS_BLOCK: 'always-block' = 'always-block'
 const ALWAYS_TRASH: 'always-trash' = 'always-trash'

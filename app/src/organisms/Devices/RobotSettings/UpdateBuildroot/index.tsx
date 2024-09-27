@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useEffect, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
@@ -8,14 +8,14 @@ import {
   setRobotUpdateSeen,
   robotUpdateIgnored,
   getRobotUpdateSession,
-} from '../../../../redux/robot-update'
+} from '/app/redux/robot-update'
 import { ViewUpdateModal } from './ViewUpdateModal'
 import { RobotUpdateProgressModal } from './RobotUpdateProgressModal'
-import { UNREACHABLE, OPENTRONS_USB } from '../../../../redux/discovery'
-import { appShellRequestor } from '../../../../redux/shell/remote'
+import { UNREACHABLE, OPENTRONS_USB } from '/app/redux/discovery'
+import { appShellRequestor } from '/app/redux/shell/remote'
 
-import type { Dispatch } from '../../../../redux/types'
-import type { DiscoveredRobot } from '../../../../redux/discovery/types'
+import type { Dispatch } from '/app/redux/types'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
 
 interface UpdateBuildrootProps {
   robot: DiscoveredRobot | null
@@ -30,21 +30,21 @@ export const handleUpdateBuildroot = (
 const UpdateBuildroot = NiceModal.create(
   (props: UpdateBuildrootProps): JSX.Element | null => {
     const { robot } = props
-    const hasSeenSessionOnce = React.useRef<boolean>(false)
+    const hasSeenSessionOnce = useRef<boolean>(false)
     const modal = useModal()
-    const robotName = React.useRef<string>(robot?.name ?? '')
+    const robotName = useRef<string>(robot?.name ?? '')
     const dispatch = useDispatch<Dispatch>()
     const session = useSelector(getRobotUpdateSession)
     if (!hasSeenSessionOnce.current && session)
       hasSeenSessionOnce.current = true
 
-    React.useEffect(() => {
+    useEffect(() => {
       if (robotName.current) {
         dispatch(setRobotUpdateSeen(robotName.current))
       }
     }, [robotName])
 
-    const ignoreUpdate = React.useCallback(() => {
+    const ignoreUpdate = useCallback(() => {
       if (robotName.current) {
         dispatch(robotUpdateIgnored(robotName.current))
       }

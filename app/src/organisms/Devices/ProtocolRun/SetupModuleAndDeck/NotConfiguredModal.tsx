@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
@@ -11,16 +10,16 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   LegacyStyledText,
+  Modal,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getCutoutDisplayName,
   getFixtureDisplayName,
 } from '@opentrons/shared-data'
-import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
+import { TertiaryButton } from '/app/atoms/buttons/TertiaryButton'
 import { getTopPortalEl } from '../../../../App/portal'
-import { LegacyModal } from '../../../../molecules/LegacyModal'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 
@@ -50,7 +49,7 @@ export const NotConfiguredModal = (
   }
   const cutoutDisplayName = getCutoutDisplayName(cutoutId)
   return createPortal(
-    <LegacyModal
+    <Modal
       title={t('add_fixture', {
         fixtureName: getFixtureDisplayName(requiredFixtureId),
         locationName: cutoutDisplayName,
@@ -79,7 +78,7 @@ export const NotConfiguredModal = (
           </Flex>
         </Flex>
       </Flex>
-    </LegacyModal>,
+    </Modal>,
     getTopPortalEl()
   )
 }

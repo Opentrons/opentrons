@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useReducer, useEffect, Fragment } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { NavLink } from 'react-router-dom'
@@ -7,22 +7,29 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
+  Banner,
   BORDERS,
   COLORS,
+  CURSOR_AUTO,
+  CURSOR_DEFAULT,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_INLINE_BLOCK,
+  DropdownMenu,
   Flex,
   Icon,
+  InputField,
   JUSTIFY_CENTER,
   JUSTIFY_END,
   JUSTIFY_FLEX_START,
+  LegacyStyledText,
   Link,
   OVERFLOW_WRAP_ANYWHERE,
   SIZE_1,
   SIZE_4,
   SPACING,
-  LegacyStyledText,
+  Tooltip,
   TYPOGRAPHY,
   useTooltip,
 } from '@opentrons/components'
@@ -32,7 +39,6 @@ import {
   OT2_ROBOT_TYPE,
   sortRuntimeParameters,
 } from '@opentrons/shared-data'
-import { useFeatureFlag } from '../../redux/config'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -41,24 +47,20 @@ import {
   startDiscovery,
   RE_ROBOT_MODEL_OT2,
   RE_ROBOT_MODEL_OT3,
-} from '../../redux/discovery'
-import { Banner } from '../../atoms/Banner'
-import { Slideout } from '../../atoms/Slideout'
-import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
-import { ToggleButton } from '../../atoms/buttons'
+} from '/app/redux/discovery'
+import { Slideout } from '/app/atoms/Slideout'
+import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
+import { ToggleButton } from '/app/atoms/buttons'
 import { AvailableRobotOption } from './AvailableRobotOption'
-import { InputField } from '../../atoms/InputField'
-import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
-import { Tooltip } from '../../atoms/Tooltip'
-import { UploadInput } from '../../molecules/UploadInput'
+import { UploadInput } from '/app/molecules/UploadInput'
 import { FileCard } from './FileCard'
 
 import type { RobotType, RunTimeParameter } from '@opentrons/shared-data'
-import type { SlideoutProps } from '../../atoms/Slideout'
-import type { UseCreateRun } from '../../organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
-import type { State, Dispatch } from '../../redux/types'
-import type { Robot } from '../../redux/discovery/types'
-import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
+import type { DropdownOption } from '@opentrons/components'
+import type { SlideoutProps } from '/app/atoms/Slideout'
+import type { UseCreateRun } from '/app/organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
+import type { State, Dispatch } from '/app/redux/types'
+import type { Robot } from '/app/redux/discovery/types'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
@@ -153,7 +155,6 @@ export function ChooseRobotSlideout(
     resetRunTimeParameters,
     setHasMissingFileParam,
   } = props
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
@@ -161,8 +162,8 @@ export function ChooseRobotSlideout(
   const [
     showRestoreValuesTooltip,
     setShowRestoreValuesTooltip,
-  ] = React.useState<boolean>(false)
-  const [isInputFocused, setIsInputFocused] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
+  const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
 
   const unhealthyReachableRobots = useSelector((state: State) =>
     getReachableRobots(state)
@@ -198,7 +199,7 @@ export function ChooseRobotSlideout(
     }
   })
 
-  const [robotBusyStatusByName, registerRobotBusyStatus] = React.useReducer(
+  const [robotBusyStatusByName, registerRobotBusyStatus] = useReducer(
     robotBusyStatusByNameReducer,
     {}
   )
@@ -211,7 +212,7 @@ export function ChooseRobotSlideout(
   ).length
 
   // this useEffect sets the default selection to the first robot in the list. state is managed by the caller
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       (selectedRobot == null ||
         !reducerAvailableRobots.some(
@@ -283,7 +284,7 @@ export function ChooseRobotSlideout(
           const isSelected =
             selectedRobot != null && selectedRobot.ip === robot.ip
           return (
-            <React.Fragment key={robot.ip}>
+            <Fragment key={robot.ip}>
               <AvailableRobotOption
                 robot={robot}
                 onClick={() => {
@@ -330,7 +331,7 @@ export function ChooseRobotSlideout(
                   )}
                 </LegacyStyledText>
               )}
-            </React.Fragment>
+            </Fragment>
           )
         })
       )}
@@ -530,8 +531,9 @@ export function ChooseRobotSlideout(
               if (error != null) {
                 errors.push(error as string)
               }
-              return !enableCsvFile ? null : (
+              return (
                 <Flex
+                  key={runtimeParam.variableName}
                   flexDirection={DIRECTION_COLUMN}
                   alignItems={ALIGN_CENTER}
                   gridgap={SPACING.spacing8}
@@ -547,9 +549,6 @@ export function ChooseRobotSlideout(
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     >
                       {t('csv_file')}
-                    </LegacyStyledText>
-                    <LegacyStyledText as="p">
-                      {t('csv_required')}
                     </LegacyStyledText>
                   </Flex>
                   {runtimeParam.file == null ? (
@@ -648,7 +647,7 @@ export function ChooseRobotSlideout(
             }}
             css={css`
               &:hover {
-                cursor: auto;
+                cursor: ${CURSOR_AUTO};
               }
             `}
           >
@@ -686,13 +685,13 @@ export function ChooseRobotSlideout(
 
 const ENABLED_LINK_CSS = css`
   ${TYPOGRAPHY.linkPSemiBold}
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
 `
 
 const DISABLED_LINK_CSS = css`
   ${TYPOGRAPHY.linkPSemiBold}
   color: ${COLORS.grey40};
-  cursor: default;
+  cursor: ${CURSOR_DEFAULT};
 
   &:hover {
     color: ${COLORS.grey40};

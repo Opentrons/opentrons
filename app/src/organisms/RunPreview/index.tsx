@@ -13,28 +13,28 @@ import {
   DISPLAY_NONE,
   Flex,
   InfoScreen,
+  LegacyStyledText,
+  OVERFLOW_SCROLL,
   POSITION_FIXED,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   useNotifyAllCommandsAsPreSerializedList,
   useNotifyRunQuery,
-} from '../../resources/runs'
-import { CommandText, CommandIcon } from '../../molecules/Command'
-import { Divider } from '../../atoms/structure'
+  useRunStatus,
+  useMostRecentCompletedAnalysis,
+  useLastRunCommand,
+} from '/app/resources/runs'
+import { CommandText, CommandIcon } from '/app/molecules/Command'
+import { Divider } from '/app/atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
-import { useRunStatus } from '../RunTimeControl/hooks'
-import { useLastRunCommand } from '../Devices/hooks/useLastRunCommand'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
 import type { ViewportListRef } from 'react-viewport-list'
-
 const COLOR_FADE_MS = 500
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
 // arbitrary large number of commands
@@ -50,7 +50,7 @@ export const RunPreviewComponent = (
   { runId, jumpedIndex, makeHandleScrollToStep, robotType }: RunPreviewProps,
   ref: React.ForwardedRef<ViewportListRef>
 ): JSX.Element | null => {
-  const { t } = useTranslation('run_details')
+  const { t } = useTranslation(['run_details', 'protocol_setup'])
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const runStatus = useRunStatus(runId)
   const { data: runRecord } = useNotifyRunQuery(runId)
@@ -64,10 +64,8 @@ export const RunPreviewComponent = (
     isLoading: isRunCommandDataLoading,
   } = useNotifyAllCommandsAsPreSerializedList(
     runId,
-    { cursor: 0, pageLength: MAX_COMMANDS },
+    { cursor: 0, pageLength: MAX_COMMANDS, includeFixitCommands: false },
     {
-      staleTime: Infinity,
-      cacheTime: Infinity,
       enabled: isRunTerminal,
     }
   )
@@ -80,10 +78,15 @@ export const RunPreviewComponent = (
     isCurrentCommandVisible,
     setIsCurrentCommandVisible,
   ] = React.useState<boolean>(true)
-  if (robotSideAnalysis == null) return null
+
+  if (robotSideAnalysis == null) {
+    return null
+  }
+
   const commands = isRunTerminal
     ? commandsFromQuery
     : robotSideAnalysis.commands
+
   // pass relevant data from run rather than analysis so that CommandText utilities can properly hash the entities' IDs
   // TODO (nd:05/02/2024, AUTH-380): update name and types for CommandText (and children/utilities) use of analysis.
   // We should ideally pass only subset of analysis/run data required by these children and utilities
@@ -102,7 +105,6 @@ export const RunPreviewComponent = (
     commands != null
       ? commands.findIndex(c => c.key === currentRunCommandKey)
       : 0
-
   if (isRunCommandDataLoading || commands == null) {
     return (
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
@@ -114,15 +116,15 @@ export const RunPreviewComponent = (
   }
   return commands.length === 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
-      <InfoScreen contentType="runNotStarted" />
+      <InfoScreen content={t('protocol_setup:run_never_started')} />
     </Flex>
   ) : (
     <Flex
       ref={viewPortRef}
       flexDirection={DIRECTION_COLUMN}
-      height="28rem"
+      height="65vh"
       width="100%"
-      overflowY="scroll"
+      overflowY={OVERFLOW_SCROLL}
       gridGap={SPACING.spacing8}
       padding={SPACING.spacing16}
     >

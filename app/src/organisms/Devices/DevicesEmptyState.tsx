@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
@@ -20,7 +19,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { startDiscovery } from '../../redux/discovery'
+import { startDiscovery } from '/app/redux/discovery'
 
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'

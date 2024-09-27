@@ -1,9 +1,9 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import { useTrackEvent, ANALYTICS_ODD_APP_ERROR } from '../redux/analytics'
-import { getLocalRobot, getRobotSerialNumber } from '../redux/discovery'
+import { useTrackEvent, ANALYTICS_ODD_APP_ERROR } from '/app/redux/analytics'
+import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
 
 import type { FallbackProps } from 'react-error-boundary'
 
@@ -17,12 +17,12 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import { MediumButton } from '../atoms/buttons'
-import { Modal } from '../molecules/Modal'
-import { appRestart, sendLog } from '../redux/shell'
+import { MediumButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+import { appRestart, sendLog } from '/app/redux/shell'
 
-import type { Dispatch } from '../redux/types'
-import type { ModalHeaderBaseProps } from '../molecules/Modal/types'
+import type { Dispatch } from '/app/redux/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 export function OnDeviceDisplayAppFallback({
   error,
@@ -40,19 +40,19 @@ export function OnDeviceDisplayAppFallback({
     })
     dispatch(appRestart(error.message as string))
   }
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('error_boundary_title'),
     iconName: 'ot-alert',
     iconColor: COLORS.red50,
   }
 
   // immediately report to robot logs that something fatal happened
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(sendLog(`ODD app encountered a fatal error: ${error.message}`))
   }, [])
 
   return (
-    <Modal header={modalHeader}>
+    <OddModal header={modalHeader}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
@@ -69,6 +69,6 @@ export function OnDeviceDisplayAppFallback({
           onClick={handleRestartClick}
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

@@ -1,9 +1,9 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link as RouterLink } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
+  Banner,
   COLORS,
   DIRECTION_ROW,
   Flex,
@@ -14,7 +14,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Banner } from '../../atoms/Banner'
 import { useCalibrationTaskList } from './hooks'
 
 interface CalibrationStatusBannerProps {

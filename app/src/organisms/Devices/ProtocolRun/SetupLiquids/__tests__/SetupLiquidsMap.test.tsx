@@ -1,10 +1,11 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
 import { BaseDeck, LabwareRender } from '@opentrons/components'
 import {
+  fixtureTiprack300ul,
   FLEX_ROBOT_TYPE,
   FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC,
   getDeckDefFromRobotType,
@@ -12,25 +13,24 @@ import {
   OT2_ROBOT_TYPE,
   ot2StandardDeckV4 as ot2StandardDeckDef,
   ot3StandardDeckV4 as ot3StandardDeckDef,
-  fixtureTiprack300ul,
-} from '@opentrons/shared-data'
-import {
   parseInitialLoadedLabwareByAdapter,
   parseLabwareInfoByLiquidId,
   parseLiquidsInLoadOrder,
   simpleAnalysisFileFixture,
-} from '@opentrons/api-client'
+} from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
-import { useAttachedModules } from '../../../hooks'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useAttachedModules } from '/app/resources/modules'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
-import { getLabwareRenderInfo } from '../../utils/getLabwareRenderInfo'
-import { getStandardDeckViewLayerBlockList } from '../../utils/getStandardDeckViewLayerBlockList'
-import { getAttachedProtocolModuleMatches } from '../../../../ProtocolSetupModulesAndDeck/utils'
-import { getProtocolModulesInfo } from '../../utils/getProtocolModulesInfo'
-import { mockProtocolModuleInfo } from '../../../../ProtocolSetupLabware/__fixtures__'
-import { mockFetchModulesSuccessActionPayloadModules } from '../../../../../redux/modules/__fixtures__'
+import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
+import { getAttachedProtocolModuleMatches } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
+import {
+  getProtocolModulesInfo,
+  getLabwareRenderInfo,
+} from '/app/transformations/analysis'
+import { mockProtocolModuleInfo } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupLabware/__fixtures__'
+import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
 
 import { SetupLiquidsMap } from '../SetupLiquidsMap'
 
@@ -50,21 +50,20 @@ vi.mock('@opentrons/components', async importOriginal => {
 })
 
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck')
-vi.mock('@opentrons/api-client')
-vi.mock('@opentrons/shared-data/js/helpers')
 vi.mock('../../LabwareInfoOverlay')
-vi.mock('../../../hooks')
-vi.mock('../utils')
-vi.mock('../../utils/getLabwareRenderInfo')
-vi.mock('../../../../ProtocolSetupModulesAndDeck/utils')
-vi.mock('../../utils/getProtocolModulesInfo')
-vi.mock('../../../../../resources/deck_configuration/utils')
+vi.mock('/app/resources/modules')
+vi.mock('../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils')
+vi.mock('/app/transformations/analysis')
+vi.mock('/app/resources/deck_configuration/utils')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getSimplestDeckConfigForProtocol>()
   return {
     ...actual,
     getSimplestDeckConfigForProtocol: vi.fn(),
     getDeckDefFromRobotType: vi.fn(),
+    parseInitialLoadedLabwareByAdapter: vi.fn(),
+    parseLabwareInfoByLiquidId: vi.fn(),
+    parseLiquidsInLoadOrder: vi.fn(),
   }
 })
 vi.mock('@opentrons/components', async importOriginal => {

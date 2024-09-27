@@ -3,10 +3,7 @@ import pytest
 from decoy import Decoy
 
 
-from opentrons.protocol_engine.commands.pipetting_common import (
-    LiquidNotFoundError,
-    LiquidNotFoundErrorInternalData,
-)
+from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
 from opentrons.protocol_engine.commands.command import (
     DefinedErrorData,
 )
@@ -38,9 +35,7 @@ def mock_command(decoy: Decoy) -> LiquidProbe:
 @pytest.fixture
 def mock_error_data(decoy: Decoy) -> CommandDefinedErrorData:
     """Get a mock TipPhysicallyMissingError."""
-    mock = decoy.mock(
-        cls=DefinedErrorData[LiquidNotFoundError, LiquidNotFoundErrorInternalData]
-    )
+    mock = decoy.mock(cls=DefinedErrorData[LiquidNotFoundError])
     mock_lnfe = decoy.mock(cls=LiquidNotFoundError)
     decoy.when(mock.public).then_return(mock_lnfe)
     decoy.when(mock_lnfe.errorType).then_return("liquidNotFound")
@@ -81,8 +76,10 @@ def test_create_error_recovery_policy_with_rules(
         robot_type="OT-3 Standard",
         deck_type=DeckType.OT3_STANDARD,
     )
-    with pytest.raises(NotImplementedError):
+    assert (
         policy(exampleConfig, mock_command, mock_error_data)
+        == ErrorRecoveryType.IGNORE_AND_CONTINUE
+    )
 
 
 def test_create_error_recovery_policy_undefined_error(

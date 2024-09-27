@@ -14,7 +14,7 @@ export function useRecoveryOptionCopy(): (
     recoveryOption: RecoveryRoute | null
   ): string => {
     switch (recoveryOption) {
-      case RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE:
+      case RECOVERY_MAP.RETRY_STEP.ROUTE:
         return t('retry_step')
       case RECOVERY_MAP.CANCEL_RUN.ROUTE:
         return t('cancel_run')

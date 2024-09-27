@@ -1,17 +1,14 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
-import {
-  nestedTextMatcher,
-  renderWithProviders,
-} from '../../../__testing-utils__'
+import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
 import { LEFT } from '@opentrons/shared-data'
 import { fixtureP10Multi } from '@opentrons/shared-data/pipette/fixtures/name'
-import { i18n } from '../../../i18n'
-import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
+import { i18n } from '/app/i18n'
+import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
 import { Instructions } from '../Instructions'
 import { CheckPipettesButton } from '../CheckPipettesButton'
 

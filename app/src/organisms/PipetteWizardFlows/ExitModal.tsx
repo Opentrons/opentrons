@@ -1,4 +1,3 @@
-import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 import { useTranslation } from 'react-i18next'
 import {
@@ -9,9 +8,11 @@ import {
   AlertPrimaryButton,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { SmallButton } from '/app/atoms/buttons'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
 import { FLOWS } from './constants'
 import type { PipetteWizardFlow } from './types'
 
@@ -39,7 +40,7 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
     }
   }
   if (Boolean(isRobotMoving))
-    return <InProgressModal description={t('stand_back')} />
+    return <SimpleWizardInProgressBody description={t('stand_back')} />
 
   return (
     <SimpleWizardBody

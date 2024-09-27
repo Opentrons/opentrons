@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Command as CommandComponent } from '.'
 import type { CommandState } from './Command'
 import * as Fixtures from './__fixtures__'

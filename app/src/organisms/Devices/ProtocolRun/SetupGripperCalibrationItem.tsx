@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -9,7 +9,7 @@ import {
   WRAP,
 } from '@opentrons/components'
 import { getGripperDisplayName } from '@opentrons/shared-data'
-import { TertiaryButton } from '../../../atoms/buttons'
+import { TertiaryButton } from '/app/atoms/buttons'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 import { GripperWizardFlows } from '../../GripperWizardFlows'
 import { GRIPPER_FLOW_TYPES } from '../../GripperWizardFlows/constants'
@@ -31,7 +31,7 @@ export function SetupGripperCalibrationItem({
   const [
     openWizardFlowType,
     setOpenWizardFlowType,
-  ] = React.useState<GripperWizardFlowType | null>(null)
+  ] = useState<GripperWizardFlowType | null>(null)
 
   const gripperCalLastModified =
     gripperData != null

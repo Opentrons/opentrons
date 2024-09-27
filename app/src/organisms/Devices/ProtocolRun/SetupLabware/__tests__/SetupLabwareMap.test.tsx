@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
@@ -11,11 +11,11 @@ import {
   fixtureTiprack300ul,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
-import { getAttachedProtocolModuleMatches } from '../../../../ProtocolSetupModulesAndDeck/utils'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getAttachedProtocolModuleMatches } from '../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
-import { getLabwareRenderInfo } from '../../utils/getLabwareRenderInfo'
+import { getLabwareRenderInfo } from '/app/transformations/analysis'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 
 import type {
@@ -40,9 +40,9 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
   }
 })
 
-vi.mock('../../../../ProtocolSetupModulesAndDeck/utils')
+vi.mock('../../../../ODD/ProtocolSetup/ProtocolSetupModulesAndDeck/utils')
 vi.mock('../../LabwareInfoOverlay')
-vi.mock('../../utils/getLabwareRenderInfo')
+vi.mock('/app/transformations/analysis/getLabwareRenderInfo')
 vi.mock('../../utils/getModuleTypesThatRequireExtraAttention')
 vi.mock('../../../../RunTimeControl/hooks')
 vi.mock('../../../hooks')

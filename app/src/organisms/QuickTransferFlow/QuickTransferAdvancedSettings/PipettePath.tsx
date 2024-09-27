@@ -1,20 +1,29 @@
 import * as React from 'react'
+import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+
 import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
-  POSITION_FIXED,
-  COLORS,
   ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  InputField,
+  RadioButton,
+  POSITION_FIXED,
+  SPACING,
 } from '@opentrons/components'
-import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
-import { getTopPortalEl } from '../../../App/portal'
-import { LargeButton } from '../../../atoms/buttons'
+
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { getTopPortalEl } from '/app/App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { useBlowOutLocationOptions } from './BlowOut'
-import { getVolumeRange } from '../utils'
+
+import { ACTIONS } from '../constants'
+import { i18n } from '/app/i18n'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 
 import type {
   PathOption,
@@ -22,10 +31,6 @@ import type {
   QuickTransferSummaryAction,
   BlowOutLocation,
 } from '../types'
-import { ACTIONS } from '../constants'
-import { i18n } from '../../../i18n'
-import { InputField } from '../../../atoms/InputField'
-import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
 
 interface PipettePathProps {
   onBack: () => void
@@ -36,6 +41,7 @@ interface PipettePathProps {
 export function PipettePath(props: PipettePathProps): JSX.Element {
   const { onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = React.useRef(null)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
@@ -45,10 +51,14 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
     BlowOutLocation | undefined
   >(state.blowOut)
 
-  const [disposalVolume, setDisposalVolume] = React.useState<number>(
-    state.volume
-  )
-  const volumeLimits = getVolumeRange(state)
+  const [disposalVolume, setDisposalVolume] = React.useState<
+    number | undefined
+  >(state?.disposalVolume)
+  const maxPipetteVolume = Object.values(state.pipette.liquids)[0].maxVolume
+  const tipVolume = Object.values(state.tipRack.wells)[0].totalLiquidVolume
+
+  // this is the max amount of liquid that can be held in the tip at any time
+  const maxTipCapacity = Math.min(maxPipetteVolume, tipVolume)
 
   const allowedPipettePathOptions: Array<{
     pathOption: PathOption
@@ -56,7 +66,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
   }> = [{ pathOption: 'single', description: t('pipette_path_single') }]
   if (
     state.transferType === 'distribute' &&
-    volumeLimits.max >= state.volume * 3
+    maxTipCapacity >= state.volume * 3
   ) {
     // we have the capacity for a multi dispense if we can fit at least 2x the volume per well
     // for aspiration plus 1x the volume per well for disposal volume
@@ -67,7 +77,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
     // for multi aspirate we only need at least 2x the volume per well
   } else if (
     state.transferType === 'consolidate' &&
-    volumeLimits.max >= state.volume * 2
+    maxTipCapacity >= state.volume * 2
   ) {
     allowedPipettePathOptions.push({
       pathOption: 'multiAspirate',
@@ -91,6 +101,12 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
           type: ACTIONS.SET_PIPETTE_PATH,
           path: selectedPath,
         })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            setting: `PipettePath`,
+          },
+        })
         onBack()
       } else {
         setCurrentStep(2)
@@ -104,6 +120,12 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
         disposalVolume,
         blowOutLocation,
       })
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+        properties: {
+          setting: `PipettePath`,
+        },
+      })
       onBack()
     }
   }
@@ -113,11 +135,11 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
       ? t('shared:continue')
       : t('shared:save')
 
-  const maxVolumeCapacity = volumeLimits.max - state.volume * 2
-  const volumeRange = { min: 1, max: maxVolumeCapacity }
+  const maxDisposalCapacity = maxTipCapacity - state.volume * 2
+  const volumeRange = { min: 1, max: maxDisposalCapacity }
 
   const volumeError =
-    disposalVolume !== null &&
+    disposalVolume != null &&
     (disposalVolume < volumeRange.min || disposalVolume > volumeRange.max)
       ? t(`value_out_of_range`, {
           min: volumeRange.min,
@@ -150,15 +172,15 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
           width="100%"
         >
           {allowedPipettePathOptions.map(option => (
-            <LargeButton
-              key={option.pathOption}
-              buttonType={
-                selectedPath === option.pathOption ? 'primary' : 'secondary'
-              }
-              onClick={() => {
+            <RadioButton
+              key={option.description}
+              isSelected={selectedPath === option.pathOption}
+              onChange={() => {
                 setSelectedPath(option.pathOption)
               }}
-              buttonText={option.description}
+              buttonValue={option.description}
+              buttonLabel={option.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>
@@ -196,6 +218,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              initialValue={String(disposalVolume ?? '')}
               onChange={e => {
                 setDisposalVolume(Number(e))
               }}
@@ -212,15 +235,18 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
           width="100%"
         >
           {blowOutLocationItems.map(option => (
-            <LargeButton
+            <RadioButton
               key={option.description}
-              buttonType={
-                blowOutLocation === option.location ? 'primary' : 'secondary'
+              isSelected={
+                isEqual(blowOutLocation, option.location) ||
+                blowOutLocation === option.location
               }
-              onClick={() => {
+              onChange={() => {
                 setBlowOutLocation(option.location)
               }}
-              buttonText={option.description}
+              buttonValue={option.description}
+              buttonLabel={option.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>

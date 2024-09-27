@@ -1,8 +1,9 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_FLEX_END,
+  Banner,
   Box,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -11,13 +12,12 @@ import {
   Link,
   PrimaryButton,
   SPACING,
+  Modal,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
-import { Banner } from '../../../../atoms/Banner'
-import { LegacyModal } from '../../../../molecules/LegacyModal'
-import multipleModuleHelp from '../../../../assets/images/Moam_modal_image.png'
+import multipleModuleHelp from '/app/assets/images/Moam_modal_image.png'
 
 const HOW_TO_MULTIPLE_MODULES_HREF =
   'https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2'
@@ -27,7 +27,7 @@ export function OT2MultipleModulesHelp(): JSX.Element {
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
   const onCloseClick = (): void => {
     setShowMultipleModulesModal(false)
@@ -63,7 +63,7 @@ export function OT2MultipleModulesHelp(): JSX.Element {
       </Box>
       {showMultipleModulesModal
         ? createPortal(
-            <LegacyModal
+            <Modal
               title={t('multiple_modules_modal')}
               onClose={onCloseClick}
               width="44.75rem"
@@ -116,7 +116,7 @@ export function OT2MultipleModulesHelp(): JSX.Element {
                   {t('shared:close')}
                 </PrimaryButton>
               </Flex>
-            </LegacyModal>,
+            </Modal>,
             getTopPortalEl()
           )
         : null}

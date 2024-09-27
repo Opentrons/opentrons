@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
 
@@ -18,7 +18,7 @@ import {
   getLabwareDisplayName,
   getPositionFromSlotId,
 } from '@opentrons/shared-data'
-import * as Sessions from '../../redux/sessions'
+import * as Sessions from '/app/redux/sessions'
 import { NeedHelpLink } from './NeedHelpLink'
 import { CalibrationLabwareRender } from './CalibrationLabwareRender'
 
@@ -28,7 +28,7 @@ import type { CalibrationPanelProps } from './types'
 const TIPRACK = 'tip rack'
 
 export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
-  const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
+  const deckDef = useMemo(() => getDeckDefinitions().ot2_standard, [])
 
   const { t } = useTranslation('robot_calibration')
 

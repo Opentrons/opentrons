@@ -1,5 +1,5 @@
 // "table" of data, usually filled with LabelText and Value children
-import * as React from 'react'
+import type * as React from 'react'
 import cx from 'classnames'
 
 import styles from './styles.module.css'

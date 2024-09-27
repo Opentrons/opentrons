@@ -1,31 +1,31 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
   JUSTIFY_CENTER,
-  SPACING,
-  useHoverTooltip,
-  PrimaryButton,
-  DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
+  PrimaryButton,
+  SPACING,
+  Tooltip,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 
-import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
-import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
+import { useToggleGroup } from '/app/molecules/ToggleGroup/useToggleGroup'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
-} from '../../../../resources/deck_configuration/utils'
-import { Tooltip } from '../../../../atoms/Tooltip'
+} from '/app/resources/deck_configuration/utils'
+import { useRobotType } from '/app/redux-resources/robots'
 import {
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
   useModuleCalibrationStatus,
-  useRobotType,
-} from '../../hooks'
+} from '/app/resources/runs'
 import { SetupModulesMap } from './SetupModulesMap'
 import { SetupModulesList } from './SetupModulesList'
 import { SetupFixtureList } from './SetupFixtureList'

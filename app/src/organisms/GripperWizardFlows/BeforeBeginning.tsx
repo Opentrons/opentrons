@@ -1,11 +1,13 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { COLORS, LegacyStyledText } from '@opentrons/components'
 import { EXTENSION } from '@opentrons/shared-data'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
+import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 import {
   GRIPPER_FLOW_TYPES,
   SCREWDRIVER_LOADNAME,
@@ -74,7 +76,7 @@ export const BeforeBeginning = (
     createdMaintenanceRunId,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared', 'branded'])
-  React.useEffect(() => {
+  useEffect(() => {
     if (createdMaintenanceRunId == null) {
       createMaintenanceRun({})
     }
@@ -119,7 +121,7 @@ export const BeforeBeginning = (
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )

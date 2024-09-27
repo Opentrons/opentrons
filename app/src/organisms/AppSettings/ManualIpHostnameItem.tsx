@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
@@ -14,7 +14,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Divider } from '../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 
 const IpItem = styled.div`
   flex: 1 1 auto;
@@ -68,7 +68,7 @@ export function ManualIpHostnameItem({
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (justAdded) {
       setMostRecentDiscovered(discovered)
       // Note this is to avoid the case that not found but not display the message

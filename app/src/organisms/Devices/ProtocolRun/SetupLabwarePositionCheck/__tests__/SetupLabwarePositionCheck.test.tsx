@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 import { screen, fireEvent } from '@testing-library/react'
@@ -10,42 +9,46 @@ import {
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
 import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
 import { useLaunchLPC } from '../../../../LabwarePositionCheck/useLaunchLPC'
-import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../../redux/config'
+import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
+import { SetupLabwarePositionCheck } from '..'
 import {
-  useLPCDisabledReason,
+  useNotifyRunQuery,
   useRunCalibrationStatus,
   useRunHasStarted,
+  useLPCDisabledReason,
   useUnmatchedModulesForProtocol,
-  useRobotType,
-} from '../../../hooks'
-import { SetupLabwarePositionCheck } from '..'
-import { useNotifyRunQuery } from '../../../../../resources/runs'
+} from '/app/resources/runs'
+import { useRobotType } from '/app/redux-resources/robots'
 
 import type { Mock } from 'vitest'
 
 vi.mock('../../../../LabwarePositionCheck/useLaunchLPC')
 vi.mock('../../utils/getModuleTypesThatRequireExtraAttention')
-vi.mock('../../../../RunTimeControl/hooks')
-vi.mock('../../../../../redux/config')
-vi.mock('../../../hooks')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/redux/config')
 vi.mock('../../../hooks/useLPCSuccessToast')
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../../resources/runs')
+vi.mock('/app/resources/runs')
 
 const DISABLED_REASON = 'MOCK_DISABLED_REASON'
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 
 const render = () => {
+  let areOffsetsConfirmed = false
+  const confirmOffsets = vi.fn((offsetsConfirmed: boolean) => {
+    areOffsetsConfirmed = offsetsConfirmed
+  })
   return renderWithProviders(
     <MemoryRouter>
       <SetupLabwarePositionCheck
-        expandLabwareStep={vi.fn()}
+        offsetsConfirmed={areOffsetsConfirmed}
+        setOffsetsConfirmed={confirmOffsets}
         robotName={ROBOT_NAME}
         runId={RUN_ID}
       />

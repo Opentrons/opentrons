@@ -2,6 +2,8 @@ import * as React from 'react'
 import { useLogger } from '../../logger'
 import { LabwarePositionCheckComponent } from './LabwarePositionCheckComponent'
 import { FatalErrorModal } from './FatalErrorModal'
+import { getIsOnDevice } from '/app/redux/config'
+import { useSelector } from 'react-redux'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import type {
@@ -31,12 +33,14 @@ export const LabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element => {
   const logger = useLogger(new URL('', import.meta.url).pathname)
+  const isOnDevice = useSelector(getIsOnDevice)
   return (
     <ErrorBoundary
       logger={logger}
       ErrorComponent={FatalErrorModal}
       shouldUseMetalProbe={props.robotType === FLEX_ROBOT_TYPE}
       onClose={props.onCloseClick}
+      isOnDevice={isOnDevice}
     >
       <LabwarePositionCheckComponent {...props} />
     </ErrorBoundary>
@@ -52,7 +56,9 @@ interface ErrorBoundaryProps {
     errorMessage: string
     shouldUseMetalProbe: boolean
     onClose: () => void
+    isOnDevice: boolean
   }) => JSX.Element
+  isOnDevice: boolean
 }
 class ErrorBoundary extends React.Component<
   ErrorBoundaryProps,
@@ -74,7 +80,12 @@ class ErrorBoundary extends React.Component<
   }
 
   render(): ErrorBoundaryProps['children'] | JSX.Element {
-    const { ErrorComponent, children, shouldUseMetalProbe } = this.props
+    const {
+      ErrorComponent,
+      children,
+      shouldUseMetalProbe,
+      isOnDevice,
+    } = this.props
     const { error } = this.state
     if (error != null)
       return (
@@ -82,6 +93,7 @@ class ErrorBoundary extends React.Component<
           errorMessage={error.message}
           shouldUseMetalProbe={shouldUseMetalProbe}
           onClose={this.props.onClose}
+          isOnDevice={isOnDevice}
         />
       )
     // Normally, just render children

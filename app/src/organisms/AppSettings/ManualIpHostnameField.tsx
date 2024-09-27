@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -10,7 +9,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '../../atoms/buttons'
+import { TertiaryButton } from '/app/atoms/buttons'
 
 interface IpHostnameFieldProps {
   field: any

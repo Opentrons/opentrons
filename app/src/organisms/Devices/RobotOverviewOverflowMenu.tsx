@@ -3,40 +3,40 @@ import { css } from 'styled-components'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  MenuItem,
+  NO_WRAP,
+  OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
+  Tooltip,
   useHoverTooltip,
+  useMenuHandleClickOutside,
   useMountEffect,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { Divider } from '../../atoms/structure'
-import { Tooltip } from '../../atoms/Tooltip'
-import { ChooseProtocolSlideout } from '../../organisms/ChooseProtocolSlideout'
-import { DisconnectModal } from '../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
-import { handleUpdateBuildroot } from '../../organisms/Devices/RobotSettings/UpdateBuildroot'
-import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
-import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
-import { UNREACHABLE, CONNECTABLE, REACHABLE } from '../../redux/discovery'
-import { checkShellUpdate } from '../../redux/shell'
-import { restartRobot } from '../../redux/robot-admin'
-import { home, ROBOT } from '../../redux/robot-controls'
+import { Divider } from '/app/atoms/structure'
+import { ChooseProtocolSlideout } from '/app/organisms/ChooseProtocolSlideout'
+import { DisconnectModal } from '/app/organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
+import { handleUpdateBuildroot } from '/app/organisms/Devices/RobotSettings/UpdateBuildroot'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { UNREACHABLE, CONNECTABLE, REACHABLE } from '/app/redux/discovery'
+import { checkShellUpdate } from '/app/redux/shell'
+import { restartRobot } from '/app/redux/robot-admin'
+import { home, ROBOT } from '/app/redux/robot-controls'
 import { useIsRobotBusy } from './hooks'
-import { useCanDisconnect } from '../../resources/networking/hooks'
-import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
-
-import type { DiscoveredRobot } from '../../redux/discovery/types'
-import type { Dispatch, State } from '../../redux/types'
+import { useCanDisconnect } from '/app/resources/networking/hooks'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useCurrentRunId } from '/app/resources/runs'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
+import type { Dispatch } from '/app/redux/types'
 
 interface RobotOverviewOverflowMenuProps {
   robot: DiscoveredRobot
@@ -91,11 +91,9 @@ export const RobotOverviewOverflowMenu = (
     setShowChooseProtocolSlideout(true)
   }
 
-  const { autoUpdateAction } = useSelector((state: State) => {
-    return getRobotUpdateDisplayInfo(state, robot.name)
-  })
-  const isRobotOnWrongVersionOfSoftware =
-    autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'
+  const isRobotOnWrongVersionOfSoftware = useIsRobotOnWrongVersionOfSoftware(
+    robot.name
+  )
   const isRobotUnavailable = isRobotBusy || robot?.status !== CONNECTABLE
   const isUpdateSoftwareItemVisible =
     isRobotOnWrongVersionOfSoftware &&
@@ -118,7 +116,7 @@ export const RobotOverviewOverflowMenu = (
       <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
       {showOverflowMenu ? (
         <Flex
-          whiteSpace="nowrap"
+          whiteSpace={NO_WRAP}
           zIndex={10}
           borderRadius={BORDERS.borderRadius8}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"

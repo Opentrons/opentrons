@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import find from 'lodash/find'
 import { Select } from './Select'
 import {

@@ -19,6 +19,7 @@ from opentrons_shared_data.protocol.types import (
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import ProtocolContext
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parse import PythonParseMode
@@ -409,8 +410,14 @@ async def test_run_json_runner_stop_requested_stops_enqueuing(
                 createdAt=datetime(year=2021, month=1, day=1),
                 error=pe_errors.ProtocolEngineError(),
             ),
+            status=pe_commands.CommandStatus.FAILED,
         )
     )
+    decoy.when(
+        protocol_engine.state_view.commands.get_error_recovery_type(
+            "protocol-command-id"
+        )
+    ).then_return(ErrorRecoveryType.FAIL_RUN)
 
     await json_runner_subject.load(json_protocol_source)
 
@@ -638,6 +645,7 @@ async def test_load_legacy_python(
         legacy_protocol_source,
         python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         run_time_param_values=None,
+        run_time_param_paths=None,
     )
 
     run_func_captor = matchers.Captor()
@@ -719,6 +727,7 @@ async def test_load_python_with_pe_papi_core(
         protocol_source,
         python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         run_time_param_values=None,
+        run_time_param_paths=None,
     )
 
     decoy.verify(protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)), times=0)
@@ -781,6 +790,7 @@ async def test_load_legacy_json(
         legacy_protocol_source,
         python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         run_time_param_values=None,
+        run_time_param_paths=None,
     )
 
     run_func_captor = matchers.Captor()

@@ -1,16 +1,16 @@
-import * as React from 'react'
+import type * as React from 'react'
 import cx from 'classnames'
 
 import { Icon } from '..'
 import styles from './forms.module.css'
 
-export interface DropdownOption {
+export interface LegacyDropdownOption {
   name: string
   value: string
   disabled?: boolean
 }
 
-export type Options = DropdownOption[]
+export type Options = LegacyDropdownOption[]
 
 export interface DropdownFieldProps {
   /** change handler */
@@ -43,8 +43,8 @@ export interface DropdownFieldProps {
   isIndeterminate?: boolean
 }
 
-const BLANK_OPTION: DropdownOption = { name: '', value: '' }
-const INDETERMINATE_OPTION: DropdownOption = {
+const BLANK_OPTION: LegacyDropdownOption = { name: '', value: '' }
+const INDETERMINATE_OPTION: LegacyDropdownOption = {
   name: '-',
   value: '',
   disabled: true,

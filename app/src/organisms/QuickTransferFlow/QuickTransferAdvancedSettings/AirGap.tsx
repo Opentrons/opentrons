@@ -1,18 +1,22 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+
 import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
-  POSITION_FIXED,
-  COLORS,
   ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  InputField,
+  RadioButton,
+  POSITION_FIXED,
+  SPACING,
 } from '@opentrons/components'
-import { getTopPortalEl } from '../../../App/portal'
-import { LargeButton } from '../../../atoms/buttons'
+
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { getTopPortalEl } from '/app/App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
-import { InputField } from '../../../atoms/InputField'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ACTIONS } from '../constants'
 
 import type {
@@ -20,8 +24,8 @@ import type {
   QuickTransferSummaryAction,
   FlowRateKind,
 } from '../types'
-import { i18n } from '../../../i18n'
-import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
+import { i18n } from '/app/i18n'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 
 interface AirGapProps {
   onBack: () => void
@@ -33,6 +37,7 @@ interface AirGapProps {
 export function AirGap(props: AirGapProps): JSX.Element {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = React.useRef(null)
 
   const [airGapEnabled, setAirGapEnabled] = React.useState<boolean>(
@@ -79,10 +84,22 @@ export function AirGap(props: AirGapProps): JSX.Element {
         setCurrentStep(currentStep + 1)
       } else {
         dispatch({ type: action, volume: undefined })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            setting: `AirGap_${kind}`,
+          },
+        })
         onBack()
       }
     } else if (currentStep === 2) {
       dispatch({ type: action, volume: volume ?? undefined })
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+        properties: {
+          setting: `AirGap_${kind}`,
+        },
+      })
       onBack()
     }
   }
@@ -109,24 +126,29 @@ export function AirGap(props: AirGapProps): JSX.Element {
       // after each aspirate action, so we need to halve the available capacity for single path
       // to get the amount available, assuming a min of 2 aspirates per dispense
       maxAvailableCapacity =
-        (Math.min(maxPipetteVolume, tipVolume) - state.volume) / 2
+        (Math.min(maxPipetteVolume, tipVolume) - 2 * state.volume) / 2
     } else {
       // aspirate air gap for multi dispense occurs once per asprirate and
       // available volume is max capacity - volume*3 assuming a min of 2 dispenses
       // per aspirate plus 1x the volume for disposal
       maxAvailableCapacity =
-        Math.min(maxPipetteVolume, tipVolume) - state.volume / 3
+        Math.min(maxPipetteVolume, tipVolume) - state.volume * 3
     }
   }
 
   const volumeRange = { min: 1, max: Math.floor(maxAvailableCapacity) }
-  const volumeError =
-    volume !== null && (volume < volumeRange.min || volume > volumeRange.max)
-      ? t(`value_out_of_range`, {
-          min: volumeRange.min,
-          max: volumeRange.max,
-        })
-      : null
+  let volumeError = null
+  if (volumeRange.min > volumeRange.max) {
+    volumeError = t('air_gap_capacity_error')
+  } else if (
+    volume !== null &&
+    (volume < volumeRange.min || volume > volumeRange.max)
+  ) {
+    volumeError = t(`value_out_of_range`, {
+      min: volumeRange.min,
+      max: volumeRange.max,
+    })
+  }
 
   let buttonIsDisabled = false
   if (currentStep === 2) {
@@ -156,13 +178,13 @@ export function AirGap(props: AirGapProps): JSX.Element {
           width="100%"
         >
           {enableAirGapDisplayItems.map(displayItem => (
-            <LargeButton
+            <RadioButton
               key={displayItem.description}
-              buttonType={
-                airGapEnabled === displayItem.option ? 'primary' : 'secondary'
-              }
-              onClick={displayItem.onClick}
-              buttonText={displayItem.description}
+              isSelected={airGapEnabled === displayItem.option}
+              onChange={displayItem.onClick}
+              buttonValue={displayItem.description}
+              buttonLabel={displayItem.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>
@@ -200,6 +222,7 @@ export function AirGap(props: AirGapProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              initialValue={String(volume ?? '')}
               onChange={e => {
                 setVolume(Number(e))
               }}

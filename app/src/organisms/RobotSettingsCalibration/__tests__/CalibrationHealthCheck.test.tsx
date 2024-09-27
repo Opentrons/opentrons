@@ -1,41 +1,44 @@
-import * as React from 'react'
+import type * as React from 'react'
 import userEvent from '@testing-library/user-event'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
-} from '../../../redux/analytics'
+} from '/app/redux/analytics'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
-} from '../../../redux/calibration/pipette-offset/__fixtures__'
+} from '/app/redux/calibration/pipette-offset/__fixtures__'
 import {
   mockTipLengthCalibration1,
   mockTipLengthCalibration2,
-} from '../../../redux/calibration/tip-length/__fixtures__'
-import { mockAttachedPipette } from '../../../redux/pipettes/__fixtures__'
+} from '/app/redux/calibration/tip-length/__fixtures__'
+import { mockAttachedPipette } from '/app/redux/pipettes/__fixtures__'
+import { useRunStatuses } from '/app/organisms/Devices/hooks'
+
 import {
   useAttachedPipettes,
   useAttachedPipetteCalibrations,
-  useRunStatuses,
-} from '../../../organisms/Devices/hooks'
+} from '/app/resources/instruments'
 
 import { CalibrationHealthCheck } from '../CalibrationHealthCheck'
 
 import type {
   AttachedPipettesByMount,
   PipetteCalibrationsByMount,
-} from '../../../redux/pipettes/types'
+} from '/app/redux/pipettes/types'
 
-vi.mock('../../../redux/analytics')
-vi.mock('../../../redux/config')
-vi.mock('../../../redux/pipettes')
-vi.mock('../../../organisms/Devices/hooks')
+vi.mock('/app/redux/analytics')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/pipettes')
+vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/resources/instruments')
+vi.mock('/app/redux-resources/robots')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,

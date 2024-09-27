@@ -1,7 +1,8 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
@@ -16,13 +17,14 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
-import { getIsOnDevice } from '../../redux/config'
-import { Tooltip } from '../../atoms/Tooltip'
-import { NeedHelpLink } from '../../organisms/CalibrationPanels'
-import { SmallButton, TextOnlyButton } from '../../atoms/buttons'
+
+import { getIsOnDevice } from '/app/redux/config'
+import { NeedHelpLink } from '/app/organisms/CalibrationPanels'
+import { SmallButton, TextOnlyButton } from '/app/atoms/buttons'
 
 const ALIGN_BUTTONS = css`
   align-items: ${ALIGN_FLEX_END};

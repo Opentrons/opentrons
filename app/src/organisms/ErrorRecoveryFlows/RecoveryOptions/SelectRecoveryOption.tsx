@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import head from 'lodash/head'
 import { useTranslation } from 'react-i18next'
 
@@ -7,6 +7,7 @@ import {
   Flex,
   SPACING,
   StyledText,
+  RadioButton,
 } from '@opentrons/components'
 
 import {
@@ -16,7 +17,6 @@ import {
   ODD_ONLY,
   DESKTOP_ONLY,
 } from '../constants'
-import { RadioButton } from '../../../atoms/buttons'
 import {
   RecoveryODDOneDesktopTwoColumnContentWrapper,
   RecoveryRadioGroup,
@@ -59,7 +59,7 @@ export function SelectRecoveryOptionHome({
   const { determineTipStatus } = tipStatusUtils
   const { setSelectedRecoveryOption } = currentRecoveryOptionUtils
   const validRecoveryOptions = getRecoveryOptions(errorKind)
-  const [selectedRoute, setSelectedRoute] = React.useState<RecoveryRoute>(
+  const [selectedRoute, setSelectedRoute] = useState<RecoveryRoute>(
     head(validRecoveryOptions) as RecoveryRoute
   )
 
@@ -121,7 +121,7 @@ export function ODDRecoveryOptions({
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
+      gridGap={SPACING.spacing8}
       width="100%"
     >
       {validRecoveryOptions.map((recoveryOption: RecoveryRoute) => {
@@ -135,6 +135,7 @@ export function ODDRecoveryOptions({
               setSelectedRoute(recoveryOption)
             }}
             isSelected={recoveryOption === selectedRoute}
+            radioButtonType="large"
           />
         )
       })}
@@ -177,7 +178,7 @@ export function DesktopRecoveryOptions({
 export function useCurrentTipStatus(
   determineTipStatus: () => Promise<PipetteWithTip[]>
 ): void {
-  React.useEffect(() => {
+  useEffect(() => {
     void determineTipStatus()
   }, [])
 }
@@ -192,6 +193,8 @@ export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
       return OVERPRESSURE_WHILE_ASPIRATING_OPTIONS
     case ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING:
       return OVERPRESSURE_WHILE_DISPENSING_OPTIONS
+    case ERROR_KINDS.TIP_NOT_DETECTED:
+      return TIP_NOT_DETECTED_OPTIONS
     case ERROR_KINDS.GENERAL_ERROR:
       return GENERAL_ERROR_OPTIONS
   }
@@ -220,8 +223,14 @@ export const OVERPRESSURE_WHILE_DISPENSING_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]
 
+export const TIP_NOT_DETECTED_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.RETRY_STEP.ROUTE,
+  RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
 export const GENERAL_ERROR_OPTIONS: RecoveryRoute[] = [
-  RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE,
+  RECOVERY_MAP.RETRY_STEP.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]
 

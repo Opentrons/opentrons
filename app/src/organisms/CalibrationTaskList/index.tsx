@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -14,22 +14,21 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  Modal,
 } from '@opentrons/components'
 
-import { StatusLabel } from '../../atoms/StatusLabel'
-import { LegacyModal } from '../../molecules/LegacyModal'
+import { StatusLabel } from '/app/atoms/StatusLabel'
 import { TaskList } from '../TaskList'
 
-import {
-  useAttachedPipettes,
-  useCalibrationTaskList,
-  useRunHasStarted,
-} from '../Devices/hooks'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { useCalibrationTaskList } from '/app/organisms/Devices/hooks'
+import { useAttachedPipettes } from '/app/resources/instruments'
+import { useCurrentRunId, useRunHasStarted } from '/app/resources/runs'
 
-import type { DashboardCalOffsetInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
-import type { DashboardCalTipLengthInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
-import type { DashboardCalDeckInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
+import type {
+  DashboardCalOffsetInvoker,
+  DashboardCalTipLengthInvoker,
+  DashboardCalDeckInvoker,
+} from '/app/organisms/Devices/hooks'
 
 interface CalibrationTaskListProps {
   robotName: string
@@ -46,14 +45,11 @@ export function CalibrationTaskList({
   deckCalLauncher,
   exitBeforeDeckConfigCompletion,
 }: CalibrationTaskListProps): JSX.Element {
-  const prevActiveIndex = React.useRef<[number, number] | null>(null)
-  const [hasLaunchedWizard, setHasLaunchedWizard] = React.useState<boolean>(
+  const prevActiveIndex = useRef<[number, number] | null>(null)
+  const [hasLaunchedWizard, setHasLaunchedWizard] = useState<boolean>(false)
+  const [showCompletionScreen, setShowCompletionScreen] = useState<boolean>(
     false
   )
-  const [
-    showCompletionScreen,
-    setShowCompletionScreen,
-  ] = React.useState<boolean>(false)
   const { t } = useTranslation(['robot_calibration', 'device_settings'])
   const navigate = useNavigate()
   const { activeIndex, taskList, taskListStatus } = useCalibrationTaskList(
@@ -78,7 +74,7 @@ export function CalibrationTaskList({
       'device_settings:some_robot_controls_are_not_available'
     )
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       prevActiveIndex.current !== null &&
       activeIndex === null &&
@@ -108,7 +104,7 @@ export function CalibrationTaskList({
   }
 
   return (
-    <LegacyModal
+    <Modal
       title={`${robotName} ${t('calibration_dashboard')}`}
       onClose={() => {
         navigate(`/devices/${robotName}/robot-settings/calibration`)
@@ -120,6 +116,7 @@ export function CalibrationTaskList({
         width: 50rem;
         height: 47.5rem;
       `}
+      marginLeft="0"
     >
       {showCompletionScreen ? (
         <Flex
@@ -183,6 +180,6 @@ export function CalibrationTaskList({
           />
         </>
       )}
-    </LegacyModal>
+    </Modal>
   )
 }

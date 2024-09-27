@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
@@ -12,12 +12,11 @@ import {
   OVERFLOW_HIDDEN,
   SPACING,
   LegacyStyledText,
+  CURSOR_POINTER,
 } from '@opentrons/components'
-import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
-import { useFeatureFlag } from '../../redux/config'
-import { formatInterval } from '../RunTimeControl/utils'
-import { formatTimestamp } from './utils'
-import { EMPTY_TIMESTAMP } from './constants'
+import { formatInterval } from '/app/transformations/commands'
+import { formatTimestamp } from '/app/transformations/runs'
+import { EMPTY_TIMESTAMP } from '/app/resources/runs'
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
 import { HistoricalProtocolRunDrawer as Drawer } from './HistoricalProtocolRunDrawer'
 import type { RunData } from '@opentrons/api-client'
@@ -41,10 +40,13 @@ export function HistoricalProtocolRun(
 ): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const { run, protocolName, robotIsBusy, robotName, protocolKey } = props
-  const [drawerOpen, setDrawerOpen] = React.useState(false)
-  const { data: protocolFileData } = useAllCsvFilesQuery(run.protocolId ?? '')
-  const allProtocolDataFiles =
-    protocolFileData != null ? protocolFileData.data.files : []
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const countRunDataFiles =
+    'runTimeParameters' in run
+      ? run?.runTimeParameters.filter(
+          parameter => parameter.type === 'csv_file'
+        ).length
+      : 0
   const runStatus = run.status
   const runDisplayName = formatTimestamp(run.createdAt)
   let duration = EMPTY_TIMESTAMP
@@ -55,7 +57,6 @@ export function HistoricalProtocolRun(
       duration = formatInterval(run.startedAt, new Date().toString())
     }
   }
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   return (
     <>
@@ -89,17 +90,13 @@ export function HistoricalProtocolRun(
           >
             {protocolName}
           </LegacyStyledText>
-          {enableCsvFile &&
-          allProtocolDataFiles != null &&
-          allProtocolDataFiles.length > 0 ? (
-            <LegacyStyledText
-              as="p"
-              width="5%"
-              data-testid={`RecentProtocolRuns_Files_${protocolKey}`}
-            >
-              {allProtocolDataFiles.length}
-            </LegacyStyledText>
-          ) : null}
+          <LegacyStyledText
+            as="p"
+            width="5%"
+            data-testid={`RecentProtocolRuns_Files_${protocolKey}`}
+          >
+            {countRunDataFiles}
+          </LegacyStyledText>
           <LegacyStyledText
             as="p"
             width="14%"
@@ -129,7 +126,7 @@ export function HistoricalProtocolRun(
             <Icon
               name={drawerOpen ? 'chevron-up' : 'chevron-down'}
               size="1.25rem"
-              css={{ cursor: 'pointer' }}
+              css={{ cursor: CURSOR_POINTER }}
             />
           </Box>
           <OverflowMenu

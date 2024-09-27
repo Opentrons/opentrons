@@ -1,26 +1,29 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  POSITION_FIXED,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  InputField,
+  POSITION_FIXED,
+  SPACING,
 } from '@opentrons/components'
-import { getTopPortalEl } from '../../../App/portal'
+
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { getTopPortalEl } from '/app/App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
-import { InputField } from '../../../atoms/InputField'
-import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { ACTIONS } from '../constants'
+import { createPortal } from 'react-dom'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 
 import type {
   QuickTransferSummaryState,
   QuickTransferSummaryAction,
   FlowRateKind,
 } from '../types'
-
-import { ACTIONS } from '../constants'
-import { createPortal } from 'react-dom'
 
 interface TipPositionEntryProps {
   onBack: () => void
@@ -32,6 +35,7 @@ interface TipPositionEntryProps {
 export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
   const { onBack, state, dispatch, kind } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = React.useRef(null)
 
   const [tipPosition, setTipPosition] = React.useState<number>(
@@ -72,6 +76,12 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
       dispatch({
         type: tipPositionAction,
         position: tipPosition,
+      })
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+        properties: {
+          setting: `TipPosition_${kind}`,
+        },
       })
     }
     onBack()
@@ -132,6 +142,7 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
         >
           <NumericalKeyboard
             keyboardRef={keyboardRef}
+            initialValue={String(tipPosition ?? '')}
             onChange={e => {
               setTipPosition(Number(e))
             }}

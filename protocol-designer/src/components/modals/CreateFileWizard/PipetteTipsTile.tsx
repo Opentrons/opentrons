@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
@@ -22,7 +22,7 @@ import {
   Btn,
   JUSTIFY_END,
 } from '@opentrons/components'
-import { getPipetteSpecsV2 } from '@opentrons/shared-data'
+import { OT2_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
@@ -161,9 +161,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   const pipettesByMount = watch('pipettesByMount')
   const allowAllTipracks = useSelector(getAllowAllTipracks)
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
-  const [showCustomTipracks, setShowCustomTipracks] = React.useState<boolean>(
-    false
-  )
+  const [showCustomTipracks, setShowCustomTipracks] = useState<boolean>(false)
   const allLabware = useSelector(getLabwareDefsByURI)
   const selectedPipetteName = pipettesByMount[mount].pipetteName
   const selectedPipetteDefaultTipracks =
@@ -189,7 +187,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
 
   const selectedValues = pipettesByMount[mount].tiprackDefURI ?? []
 
-  React.useEffect(() => {
+  useEffect(() => {
     setValue(`pipettesByMount.${mount}.tiprackDefURI`, [
       tiprackOptions[0]?.value ?? '',
     ])
@@ -204,7 +202,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
       <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
         {defaultTiprackOptions.map(o => (
           <EquipmentOption
-            robotType={fields.robotType}
+            robotType={fields.robotType ?? OT2_ROBOT_TYPE}
             key={o.name}
             isSelected={selectedValues.includes(o.value)}
             text={o.name}
@@ -275,7 +273,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
             >
               {customTiprackOptions.map(o => (
                 <EquipmentOption
-                  robotType={fields.robotType}
+                  robotType={fields.robotType ?? OT2_ROBOT_TYPE}
                   key={o.name}
                   isSelected={selectedValues.includes(o.value)}
                   text={o.name}

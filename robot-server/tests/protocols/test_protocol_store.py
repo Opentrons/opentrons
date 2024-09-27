@@ -1,4 +1,5 @@
 """Tests for the ProtocolStore interface."""
+from opentrons.protocol_engine.types import CSVParameter, FileInfo
 import pytest
 from decoy import Decoy
 from datetime import datetime, timezone
@@ -13,6 +14,19 @@ from opentrons.protocol_reader import (
     PythonProtocolConfig,
 )
 
+from robot_server.data_files.data_files_store import DataFilesStore, DataFileInfo
+from robot_server.data_files.models import DataFile
+from robot_server.protocols.analysis_memcache import MemoryCache
+from robot_server.protocols.analysis_models import (
+    CompletedAnalysis,
+    AnalysisStatus,
+    AnalysisResult,
+)
+from robot_server.protocols.completed_analysis_store import (
+    CompletedAnalysisResource,
+    CompletedAnalysisStore,
+)
+from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,
@@ -20,6 +34,7 @@ from robot_server.protocols.protocol_store import (
     ProtocolNotFoundError,
     ProtocolUsedByRunError,
 )
+from robot_server.protocols.rtp_resources import CSVParameterResource
 
 from robot_server.runs.run_store import RunStore
 
@@ -53,6 +68,23 @@ def run_store(sql_engine: SQLEngine, mock_runs_publisher: RunsPublisher) -> RunS
     return RunStore(sql_engine=sql_engine)
 
 
+@pytest.fixture
+def data_files_store(sql_engine: SQLEngine, tmp_path: Path) -> DataFilesStore:
+    """Get a mocked out DataFilesStore."""
+    data_files_dir = tmp_path / "data_files"
+    data_files_dir.mkdir()
+    return DataFilesStore(sql_engine=sql_engine, data_files_directory=data_files_dir)
+
+
+@pytest.fixture
+def completed_analysis_store(
+    decoy: Decoy,
+    sql_engine: SQLEngine,
+) -> CompletedAnalysisStore:
+    """Get a subject."""
+    return CompletedAnalysisStore(sql_engine, decoy.mock(cls=MemoryCache), "2")
+
+
 async def test_insert_and_get_protocol(
     protocol_file_directory: Path, subject: ProtocolStore
 ) -> None:
@@ -70,7 +102,7 @@ async def test_insert_and_get_protocol(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
-        protocol_kind="standard",
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
     assert subject.has("protocol-id") is False
@@ -99,7 +131,7 @@ async def test_insert_with_duplicate_key_raises(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
-        protocol_kind="standard",
+        protocol_kind=ProtocolKind.STANDARD,
     )
     protocol_resource_2 = ProtocolResource(
         protocol_id="protocol-id",
@@ -114,7 +146,7 @@ async def test_insert_with_duplicate_key_raises(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-222",
-        protocol_kind="standard",
+        protocol_kind=ProtocolKind.STANDARD,
     )
     subject.insert(protocol_resource_1)
 
@@ -152,7 +184,7 @@ async def test_get_all_protocols(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
-        protocol_kind="standard",
+        protocol_kind=ProtocolKind.STANDARD,
     )
     resource_2 = ProtocolResource(
         protocol_id="123",
@@ -167,7 +199,7 @@ async def test_get_all_protocols(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-222",
-        protocol_kind="standard",
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
     subject.insert(resource_1)
@@ -204,7 +236,7 @@ async def test_remove_protocol(
             content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
-        protocol_kind="standard",
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
     subject.insert(protocol_resource)
@@ -244,7 +276,7 @@ def test_remove_protocol_conflict(
             content_hash="abc123",
         ),
         protocol_key=None,
-        protocol_kind="standard",
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
     subject.insert(protocol_resource)
@@ -279,7 +311,7 @@ def test_get_usage_info(
             content_hash="abc123",
         ),
         protocol_key=None,
-        protocol_kind="standard",
+        protocol_kind=ProtocolKind.STANDARD,
     )
     protocol_resource_2 = ProtocolResource(
         protocol_id="protocol-id-2",
@@ -294,7 +326,7 @@ def test_get_usage_info(
             content_hash="abc123",
         ),
         protocol_key=None,
-        protocol_kind="standard",
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
     subject.insert(protocol_resource_1)
@@ -364,7 +396,7 @@ def test_get_referencing_run_ids(
             content_hash="abc123",
         ),
         protocol_key=None,
-        protocol_kind="standard",
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
     subject.insert(protocol_resource_1)
@@ -408,7 +440,7 @@ def test_get_protocol_ids(
             content_hash="abc1",
         ),
         protocol_key=None,
-        protocol_kind="standard",
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
     protocol_resource_2 = ProtocolResource(
@@ -424,7 +456,7 @@ def test_get_protocol_ids(
             content_hash="abc2",
         ),
         protocol_key=None,
-        protocol_kind="standard",
+        protocol_kind=ProtocolKind.STANDARD,
     )
 
     assert subject.get_all_ids() == []
@@ -459,7 +491,7 @@ async def test_insert_and_get_quick_transfer_protocol(
             content_hash="abc123",
         ),
         protocol_key="dummy-key-111",
-        protocol_kind="quick-transfer",
+        protocol_kind=ProtocolKind.QUICK_TRANSFER,
     )
 
     assert subject.has("protocol-id") is False
@@ -468,5 +500,168 @@ async def test_insert_and_get_quick_transfer_protocol(
     result = subject.get("protocol-id")
 
     assert result == protocol_resource
-    assert result.protocol_kind == "quick-transfer"
+    assert result.protocol_kind == ProtocolKind.QUICK_TRANSFER
     assert subject.has("protocol-id") is True
+
+
+def get_completed_analysis_resource(
+    analysis_id: str,
+    protocol_id: str,
+) -> CompletedAnalysisResource:
+    """Get a CompletedAnalysisResource."""
+    return CompletedAnalysisResource(
+        analysis_id,
+        protocol_id,
+        "2",
+        CompletedAnalysis(
+            id=analysis_id,
+            status=AnalysisStatus.COMPLETED,
+            result=AnalysisResult.OK,
+            pipettes=[],
+            labware=[],
+            modules=[],
+            commands=[],
+            errors=[],
+            liquids=[],
+        ),
+    )
+
+
+async def test_get_referenced_data_files(
+    subject: ProtocolStore,
+    data_files_store: DataFilesStore,
+    completed_analysis_store: CompletedAnalysisStore,
+    run_store: RunStore,
+) -> None:
+    """It should fetch a list of data files referenced in protocol's analyses and runs."""
+    protocol_resource_1 = ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime(year=2024, month=1, day=1, tzinfo=timezone.utc),
+        source=ProtocolSource(
+            directory=None,
+            main_file=Path("/dev/null"),
+            config=JsonProtocolConfig(schema_version=123),
+            files=[],
+            metadata={},
+            robot_type="OT-2 Standard",
+            content_hash="abc1",
+        ),
+        protocol_key=None,
+        protocol_kind=ProtocolKind.STANDARD,
+    )
+    analysis_resource1 = CompletedAnalysisResource(
+        "analysis-id-1",
+        "protocol-id",
+        "2",
+        CompletedAnalysis(
+            id="analysis-id-1",
+            status=AnalysisStatus.COMPLETED,
+            result=AnalysisResult.OK,
+            pipettes=[],
+            labware=[],
+            modules=[],
+            commands=[],
+            errors=[],
+            liquids=[],
+        ),
+    )
+    analysis_resource2 = CompletedAnalysisResource(
+        "analysis-id-2",
+        "protocol-id",
+        "2",
+        CompletedAnalysis(
+            id="analysis-id-2",
+            status=AnalysisStatus.COMPLETED,
+            result=AnalysisResult.OK,
+            pipettes=[],
+            labware=[],
+            modules=[],
+            commands=[],
+            errors=[],
+            liquids=[],
+        ),
+    )
+
+    subject.insert(protocol_resource_1)
+    await data_files_store.insert(
+        DataFileInfo(
+            id="data-file-id-1",
+            name="file-name",
+            file_hash="abc123",
+            created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        )
+    )
+    await data_files_store.insert(
+        DataFileInfo(
+            id="data-file-id-2",
+            name="file-name",
+            file_hash="abc123",
+            created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        )
+    )
+    await data_files_store.insert(
+        DataFileInfo(
+            id="data-file-id-3",
+            name="file-name",
+            file_hash="abc123",
+            created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        )
+    )
+
+    run_store.insert(
+        run_id="run-id-1",
+        protocol_id="protocol-id",
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+
+    run_store.insert_csv_rtp(
+        run_id="run-id-1",
+        run_time_parameters=[
+            CSVParameter(
+                variableName="csvFile",
+                displayName="csv param",
+                file=FileInfo(id="data-file-id-3", name="file-name"),
+            )
+        ],
+    )
+
+    await completed_analysis_store.make_room_and_add(
+        completed_analysis_resource=analysis_resource1,
+        primitive_rtp_resources=[],
+        csv_rtp_resources=[
+            CSVParameterResource(
+                analysis_id="analysis-id-1",
+                parameter_variable_name="csv-var",
+                file_id="data-file-id-1",
+            ),
+            CSVParameterResource(
+                analysis_id="analysis-id-1",
+                parameter_variable_name="csv-var",
+                file_id="data-file-id-2",
+            ),
+        ],
+    )
+    await completed_analysis_store.make_room_and_add(
+        completed_analysis_resource=analysis_resource2,
+        primitive_rtp_resources=[],
+        csv_rtp_resources=[],
+    )
+    result = await subject.get_referenced_data_files("protocol-id")
+
+    assert result == [
+        DataFile(
+            id="data-file-id-1",
+            name="file-name",
+            createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        ),
+        DataFile(
+            id="data-file-id-2",
+            name="file-name",
+            createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        ),
+        DataFile(
+            id="data-file-id-3",
+            name="file-name",
+            createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        ),
+    ]

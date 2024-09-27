@@ -1,28 +1,29 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { when } from 'vitest-when'
 import { describe, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
-} from '../../../redux/calibration/pipette-offset/__fixtures__'
+} from '/app/redux/calibration/pipette-offset/__fixtures__'
 import {
-  useIsFlex,
   usePipetteOffsetCalibrations,
   useAttachedPipettesFromInstrumentsQuery,
-} from '../../../organisms/Devices/hooks'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
+} from '/app/organisms/Devices/hooks'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
+import { useIsFlex } from '/app/redux-resources/robots'
 
 import { RobotSettingsPipetteOffsetCalibration } from '../RobotSettingsPipetteOffsetCalibration'
 import { PipetteOffsetCalibrationItems } from '../CalibrationDetails/PipetteOffsetCalibrationItems'
 
 import type { FormattedPipetteOffsetCalibration } from '..'
 
-vi.mock('../../../organisms/Devices/hooks')
+vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')
 
 const mockFormattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] = []

@@ -1,6 +1,6 @@
 // labware definition helpers
 // TODO(mc, 2019-03-18): move to shared-data?
-import * as React from 'react'
+import type * as React from 'react'
 import { useParams } from 'react-router-dom'
 import groupBy from 'lodash/groupBy'
 import uniq from 'lodash/uniq'

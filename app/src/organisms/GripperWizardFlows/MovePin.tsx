@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { EXTENSION } from '@opentrons/shared-data'
 import {
@@ -9,22 +9,24 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 import { css } from 'styled-components'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
   MOVE_PIN_TO_FRONT_JAW,
   REMOVE_PIN_FROM_REAR_JAW,
 } from './constants'
-import movePinStorageToFront from '../../assets/videos/gripper-wizards/PIN_FROM_STORAGE_TO_FRONT_JAW.webm'
-import movePinFrontToRear from '../../assets/videos/gripper-wizards/PIN_FROM_FRONT_TO_REAR_JAW.webm'
-import movePinRearToStorage from '../../assets/videos/gripper-wizards/PIN_FROM_REAR_TO_STORAGE.webm'
-import calibratingFrontJaw from '../../assets/videos/gripper-wizards/CALIBRATING_FRONT_JAW.webm'
-import calibratingRearJaw from '../../assets/videos/gripper-wizards/CALIBRATING_REAR_JAW.webm'
+import movePinStorageToFront from '/app/assets/videos/gripper-wizards/PIN_FROM_STORAGE_TO_FRONT_JAW.webm'
+import movePinFrontToRear from '/app/assets/videos/gripper-wizards/PIN_FROM_FRONT_TO_REAR_JAW.webm'
+import movePinRearToStorage from '/app/assets/videos/gripper-wizards/PIN_FROM_REAR_TO_STORAGE.webm'
+import calibratingFrontJaw from '/app/assets/videos/gripper-wizards/CALIBRATING_FRONT_JAW.webm'
+import calibratingRearJaw from '/app/assets/videos/gripper-wizards/CALIBRATING_REAR_JAW.webm'
 
 import type { Coordinates } from '@opentrons/shared-data'
-import type { CreateMaintenanceCommand } from '../../resources/runs'
+import type { CreateMaintenanceCommand } from '/app/resources/runs'
 import type { GripperWizardStepProps, MovePinStep } from './types'
 
 interface MovePinProps extends GripperWizardStepProps, MovePinStep {
@@ -245,7 +247,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
   } = infoByMovement[movement]
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={
           errorMessage == null && !isExiting
             ? inProgressText

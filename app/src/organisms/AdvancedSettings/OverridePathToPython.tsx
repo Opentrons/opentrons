@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -16,18 +16,18 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '../../atoms/buttons'
-import { getPathToPythonOverride, resetConfigValue } from '../../redux/config'
+import { TertiaryButton } from '/app/atoms/buttons'
+import { getPathToPythonOverride, resetConfigValue } from '/app/redux/config'
 import {
   openPythonInterpreterDirectory,
   changePythonPathOverrideConfig,
-} from '../../redux/protocol-analysis'
+} from '/app/redux/protocol-analysis'
 import {
   useTrackEvent,
   ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
-} from '../../redux/analytics'
+} from '/app/redux/analytics'
 
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 export function OverridePathToPython(): JSX.Element {
   const { t } = useTranslation(['app_settings', 'branded'])

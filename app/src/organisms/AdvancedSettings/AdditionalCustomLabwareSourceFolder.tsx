@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -16,18 +15,18 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '../../atoms/buttons'
+import { TertiaryButton } from '/app/atoms/buttons'
 import {
   changeCustomLabwareDirectory,
   getCustomLabwareDirectory,
   openCustomLabwareDirectory,
-} from '../../redux/custom-labware'
+} from '/app/redux/custom-labware'
 import {
   useTrackEvent,
   ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
-} from '../../redux/analytics'
+} from '/app/redux/analytics'
 
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 export function AdditionalCustomLabwareSourceFolder(): JSX.Element {
   const { t } = useTranslation('app_settings')

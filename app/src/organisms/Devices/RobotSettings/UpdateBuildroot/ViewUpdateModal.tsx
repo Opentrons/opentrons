@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 
@@ -8,15 +8,15 @@ import {
   getRobotUpdateDownloadError,
   getRobotSystemType,
   getRobotUpdateAvailable,
-} from '../../../../redux/robot-update'
-import { getAvailableShellUpdate } from '../../../../redux/shell'
+} from '/app/redux/robot-update'
+import { getAvailableShellUpdate } from '/app/redux/shell'
 import { getTopPortalEl } from '../../../../App/portal'
-import { UpdateAppModal } from '../../../../organisms/UpdateAppModal'
+import { UpdateAppModal } from '/app/organisms/UpdateAppModal'
 import { MigrationWarningModal } from './MigrationWarningModal'
 import { UpdateRobotModal } from './UpdateRobotModal'
 
-import type { State } from '../../../../redux/types'
-import type { ReachableRobot, Robot } from '../../../../redux/discovery/types'
+import type { State } from '/app/redux/types'
+import type { ReachableRobot, Robot } from '/app/redux/discovery/types'
 
 export interface ViewUpdateModalProps {
   robotName: string
@@ -28,7 +28,7 @@ export function ViewUpdateModal(
   props: ViewUpdateModalProps
 ): JSX.Element | null {
   const { robotName, robot, closeModal } = props
-  const [showAppUpdateModal, setShowAppUpdateModal] = React.useState(true)
+  const [showAppUpdateModal, setShowAppUpdateModal] = useState(true)
 
   const updateInfo = useSelector((state: State) =>
     getRobotUpdateInfo(state, robotName)
@@ -44,10 +44,9 @@ export function ViewUpdateModal(
     useSelector(getAvailableShellUpdate)
   )
 
-  const [
-    showMigrationWarning,
-    setShowMigrationWarning,
-  ] = React.useState<boolean>(robotSystemType === OT2_BALENA)
+  const [showMigrationWarning, setShowMigrationWarning] = useState<boolean>(
+    robotSystemType === OT2_BALENA
+  )
 
   const notNowButton = {
     onClick: closeModal,

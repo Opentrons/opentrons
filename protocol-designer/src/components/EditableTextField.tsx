@@ -1,6 +1,6 @@
 // TODO: Ian 2018-10-30 if we like this, add it to components library
 import * as React from 'react'
-import { ClickOutside, Icon, InputField } from '@opentrons/components'
+import { ClickOutside, Icon, LegacyInputField } from '@opentrons/components'
 import styles from './editableTextField.module.css'
 
 interface Props {
@@ -53,7 +53,7 @@ export function EditableTextField(props: Props): JSX.Element {
             onSubmit={handleFormSubmit}
             ref={ref}
           >
-            <InputField
+            <LegacyInputField
               autoFocus
               value={transientValue}
               onChange={updateValue}

@@ -2,12 +2,15 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useDispatch } from 'react-redux'
 import { useTranslation, Trans } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
   Btn,
+  Banner,
   Flex,
   JUSTIFY_FLEX_END,
+  Modal,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
@@ -16,12 +19,10 @@ import {
   WRAP_REVERSE,
 } from '@opentrons/components'
 
-import { analyzeProtocol } from '../../redux/protocol-storage'
-import { Banner } from '../../atoms/Banner'
+import { analyzeProtocol } from '/app/redux/protocol-storage'
 import { getTopPortalEl } from '../../App/portal'
-import { LegacyModal } from '../../molecules/LegacyModal'
 
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 interface ProtocolAnalysisFailureProps {
   errors: string[]
   protocolKey: string
@@ -90,16 +91,18 @@ export function ProtocolAnalysisFailure(
       </Flex>
       {showErrorDetails
         ? createPortal(
-            <LegacyModal
+            <Modal
               type="error"
               title={t('protocol_analysis_failure')}
               onClose={handleClickHideDetails}
             >
-              {errors.map((error, index) => (
-                <LegacyStyledText key={index} as="p">
-                  {error}
-                </LegacyStyledText>
-              ))}
+              <Flex css={SCROLL_LONG}>
+                {errors.map((error, index) => (
+                  <LegacyStyledText key={index} as="p">
+                    {error}
+                  </LegacyStyledText>
+                ))}
+              </Flex>
               <Flex justifyContent={JUSTIFY_FLEX_END}>
                 <PrimaryButton
                   onClick={handleClickHideDetails}
@@ -109,10 +112,16 @@ export function ProtocolAnalysisFailure(
                   {t('shared:close')}
                 </PrimaryButton>
               </Flex>
-            </LegacyModal>,
+            </Modal>,
             getTopPortalEl()
           )
         : null}
     </Banner>
   )
 }
+
+const SCROLL_LONG = css`
+  overflow: auto;
+  width: inherit;
+  max-height: 11.75rem;
+`

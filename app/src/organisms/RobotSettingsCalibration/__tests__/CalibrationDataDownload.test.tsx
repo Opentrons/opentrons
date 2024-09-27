@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { when } from 'vitest-when'
 import {
   describe,
@@ -18,32 +17,31 @@ import {
 } from '@opentrons/react-api-client'
 import { instrumentsResponseFixture } from '@opentrons/api-client'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
-} from '../../../redux/analytics'
-import { mockDeckCalData } from '../../../redux/calibration/__fixtures__'
+} from '/app/redux/analytics'
+import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
-} from '../../../redux/calibration/pipette-offset/__fixtures__'
+} from '/app/redux/calibration/pipette-offset/__fixtures__'
 import {
   mockTipLengthCalibration1,
   mockTipLengthCalibration2,
   mockTipLengthCalibration3,
-} from '../../../redux/calibration/tip-length/__fixtures__'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+} from '/app/redux/calibration/tip-length/__fixtures__'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import {
   useDeckCalibrationData,
-  useIsFlex,
   usePipetteOffsetCalibrations,
-  useRobot,
   useTipLengthCalibrations,
-} from '../../../organisms/Devices/hooks'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+} from '/app/organisms/Devices/hooks'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { CalibrationDataDownload } from '../CalibrationDataDownload'
 
 // file-saver has circular dep, need to mock with factory to prevent error
@@ -55,9 +53,10 @@ vi.mock('file-saver', async importOriginal => {
   }
 })
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../redux/analytics')
-vi.mock('../../../organisms/Devices/hooks')
-vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/redux/analytics')
+vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
 let mockTrackEvent: any
 const mockSetShowHowCalibrationWorksModal = vi.fn()

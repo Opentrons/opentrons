@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
@@ -8,7 +7,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Divider } from '../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 
 export interface ButtonProps {
   onClick?: () => unknown

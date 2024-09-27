@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -12,15 +12,15 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { SelectField } from '../../atoms/SelectField'
+import { SelectField } from '/app/atoms/SelectField'
 import {
   getUpdateChannel,
   getUpdateChannelOptions,
   updateConfigValue,
-} from '../../redux/config'
+} from '/app/redux/config'
 
-import type { SelectOption } from '../../atoms/SelectField/Select'
-import type { Dispatch } from '../../redux/types'
+import type { SelectOption } from '/app/atoms/SelectField/Select'
+import type { Dispatch } from '/app/redux/types'
 
 export function UpdatedChannel(): JSX.Element {
   const { t } = useTranslation('app_settings')

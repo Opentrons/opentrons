@@ -1,20 +1,23 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  LegacyStyledText,
-  SPACING,
-  TYPOGRAPHY,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  COLORS,
-  TEXT_ALIGN_RIGHT,
-  Icon,
-  SIZE_2,
   ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  ListItem,
+  SIZE_2,
+  SPACING,
+  TEXT_ALIGN_RIGHT,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
-import { ListItem } from '../../../atoms/ListItem'
+
+import { ANALYTICS_QUICK_TRANSFER_TIP_MANAGEMENT_TAB } from '/app/redux/analytics'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ChangeTip } from './ChangeTip'
 import { TipDropLocation } from './TipDropLocation'
 
@@ -31,9 +34,17 @@ interface TipManagementProps {
 export function TipManagement(props: TipManagementProps): JSX.Element | null {
   const { state, dispatch } = props
   const { t } = useTranslation(['quick_transfer', 'shared'])
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const [selectedSetting, setSelectedSetting] = React.useState<string | null>(
     null
   )
+
+  React.useEffect(() => {
+    trackEventWithRobotSerial({
+      name: ANALYTICS_QUICK_TRANSFER_TIP_MANAGEMENT_TAB,
+      properties: {},
+    })
+  }, [])
 
   const displayItems = [
     {

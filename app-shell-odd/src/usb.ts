@@ -199,11 +199,17 @@ const getLatestMassStorageCsvFiles = (
   filePaths: string[],
   dispatch: Dispatch
 ): void => {
-  // Note (kk:06/28/2024) The following regex is mostly for Resource fork file ex ._test.csv
-  // Resource fork file would be on a usb flash drive if a user uses macOS.
-  const regex = /._\w/gm
-  const csvFilePaths =
-    filePaths.filter(path => !path.match(regex) && path.endsWith('.csv')) ?? []
+  // Note (kk:07/29/2024) get all files' last path
+  // remove Resource fork that starts "._"
+  // remove hidden file that starts "."
+  const csvFilePaths = filePaths.filter(path => {
+    const fileName = path.split('/').pop() || ''
+    return (
+      !fileName.startsWith('._') &&
+      !fileName.startsWith('.') &&
+      fileName.endsWith('.csv')
+    )
+  })
   dispatch(sendFilePaths(csvFilePaths))
 }
 

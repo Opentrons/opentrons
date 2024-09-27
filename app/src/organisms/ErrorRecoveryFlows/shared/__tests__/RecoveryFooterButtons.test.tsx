@@ -1,11 +1,11 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { screen, fireEvent } from '@testing-library/react'
 
 import { COLORS } from '@opentrons/components'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { RecoveryFooterButtons } from '../RecoveryFooterButtons'
 
 import type { Mock } from 'vitest'
@@ -137,6 +137,61 @@ describe('RecoveryFooterButtons', () => {
 
     tertiaryBtns.forEach(btn => {
       expect(btn).toBeDisabled()
+    })
+  })
+
+  it('renders the secondary button as tertiary when secondaryAsTertiary is true', () => {
+    props = {
+      ...props,
+      secondaryAsTertiary: true,
+      secondaryBtnOnClick: mockSecondaryBtnOnClick,
+    }
+    render(props)
+
+    const secondaryBtn = screen.getAllByRole('button', { name: 'Go back' })
+    expect(secondaryBtn.length).toBe(1)
+
+    secondaryBtn.forEach(btn => {
+      mockSecondaryBtnOnClick.mockReset()
+      fireEvent.click(btn)
+      expect(mockSecondaryBtnOnClick).toHaveBeenCalled()
+    })
+  })
+
+  it('renders secondary button with custom text when secondaryBtnTextOverride is provided', () => {
+    props = {
+      ...props,
+      secondaryBtnTextOverride: 'Custom Back',
+    }
+    render(props)
+
+    const secondaryBtns = screen.getAllByRole('button', { name: 'Custom Back' })
+    expect(secondaryBtns.length).toBe(1)
+
+    secondaryBtns.forEach(btn => {
+      mockSecondaryBtnOnClick.mockReset()
+      fireEvent.click(btn)
+      expect(mockSecondaryBtnOnClick).toHaveBeenCalled()
+    })
+  })
+
+  it('renders secondary button as tertiary with custom text', () => {
+    props = {
+      ...props,
+      secondaryAsTertiary: true,
+      secondaryBtnTextOverride: 'Custom Tertiary',
+    }
+    render(props)
+
+    const secondaryBtns = screen.getAllByRole('button', {
+      name: 'Custom Tertiary',
+    })
+    expect(secondaryBtns.length).toBe(1)
+
+    secondaryBtns.forEach(btn => {
+      mockSecondaryBtnOnClick.mockReset()
+      fireEvent.click(btn)
+      expect(mockSecondaryBtnOnClick).toHaveBeenCalled()
     })
   })
 })

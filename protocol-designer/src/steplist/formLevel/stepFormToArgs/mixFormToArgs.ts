@@ -111,6 +111,7 @@ export const mixFormToArgs = (
     aspirateDelaySeconds,
     tipRack: hydratedFormData.tipRack,
     dispenseDelaySeconds,
+    //  TODO(jr, 7/26/24): wire up wellNames
     dropTipLocation: dropTip_location,
     nozzles,
     aspirateXOffset: mix_x_position ?? 0,

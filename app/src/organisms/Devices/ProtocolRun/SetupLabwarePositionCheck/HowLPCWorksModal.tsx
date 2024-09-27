@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -11,9 +10,9 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  Modal,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
-import { LegacyModal } from '../../../../molecules/LegacyModal'
 
 const OFFSET_DATA_HELP_ARTICLE =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -24,7 +23,7 @@ interface HowLPCWorksModalProps {
 export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
   const { t } = useTranslation(['protocol_setup', 'shared', 'branded'])
   return createPortal(
-    <LegacyModal
+    <Modal
       title={t('how_offset_data_works')}
       onClose={props.onCloseClick}
       width="31.25rem"
@@ -59,7 +58,7 @@ export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
           {t('shared:close')}
         </PrimaryButton>
       </Flex>
-    </LegacyModal>,
+    </Modal>,
     getTopPortalEl()
   )
 }

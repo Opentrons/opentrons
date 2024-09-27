@@ -1,12 +1,12 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, it, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { multiple_tipacks_with_tc } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { SetupLabwareList } from '../SetupLabwareList'
 import { LabwareListItem } from '../LabwareListItem'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'

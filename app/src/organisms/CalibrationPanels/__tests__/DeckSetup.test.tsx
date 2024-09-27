@@ -1,19 +1,19 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { vi, it, describe, expect } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import {
   mockDeckCalTipRack,
   mockRobotCalibrationCheckSessionDetails,
   mockTipLengthCalBlock,
-} from '../../../redux/sessions/__fixtures__'
-import * as Sessions from '../../../redux/sessions'
+} from '/app/redux/sessions/__fixtures__'
+import * as Sessions from '/app/redux/sessions'
 import { DeckSetup } from '../DeckSetup'
 
 import type { getDeckDefinitions } from '@opentrons/shared-data'
 
-vi.mock('../../../assets/labware/getLabware')
+vi.mock('/app/assets/labware/getLabware')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getDeckDefinitions>()
   return {
@@ -74,7 +74,7 @@ describe('DeckSetup', () => {
 
     screen.getByRole('heading', { name: 'Prepare the space' })
     screen.getByText('Place a full 300ul Tiprack FIXTURE into slot 8')
-    screen.getByText("Place the Calibration Block into it's designated slot")
+    screen.getByText('Place the Calibration Block into its designated slot')
     expect(screen.queryByText('To check the left pipette:')).toBeNull()
     expect(screen.queryByText('Clear all other deck slots')).toBeNull()
   })
@@ -88,9 +88,7 @@ describe('DeckSetup', () => {
     screen.getByRole('heading', { name: 'Prepare the space' })
     screen.getByText('Place a full 300ul Tiprack FIXTURE into slot 8')
     expect(
-      screen.queryByText(
-        "Place the Calibration Block into it's designated slot"
-      )
+      screen.queryByText('Place the Calibration Block into its designated slot')
     ).toBeNull()
     expect(screen.queryByText('To check the left pipette:')).toBeNull()
     expect(screen.queryByText('Clear all other deck slots')).toBeNull()
@@ -105,7 +103,7 @@ describe('DeckSetup', () => {
 
     screen.getByRole('heading', { name: 'Prepare the space' })
     screen.getByText('Place a full fake tiprack display name into slot 8')
-    screen.getByText("Place the Calibration Block into it's designated slot")
+    screen.getByText('Place the Calibration Block into its designated slot')
     screen.getByText('To check the left pipette:')
     screen.getByText('Clear all other deck slots')
   })
@@ -122,9 +120,7 @@ describe('DeckSetup', () => {
     screen.getByText('To check the left pipette:')
     screen.getByText('Clear all other deck slots')
     expect(
-      screen.queryByText(
-        "Place the Calibration Block into it's designated slot"
-      )
+      screen.queryByText('Place the Calibration Block into its designated slot')
     ).toBeNull()
   })
 })

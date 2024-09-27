@@ -10,15 +10,15 @@ import {
   JUSTIFY_FLEX_END,
   Link,
   PrimaryButton,
+  Modal,
   SPACING,
   LegacyStyledText,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LegacyModal } from '../../molecules/LegacyModal'
-import { updateConfigValue } from '../../redux/config'
-import type { Dispatch } from '../../redux/types'
-import type { UpdateConfigValueAction } from '../../redux/config/types'
+import { updateConfigValue } from '/app/redux/config'
+import type { Dispatch } from '/app/redux/types'
+import type { UpdateConfigValueAction } from '/app/redux/config/types'
 
 export function setHeaterShakerAttached(
   heaterShakerAttached: boolean
@@ -28,7 +28,7 @@ export function setHeaterShakerAttached(
     heaterShakerAttached
   )
 }
-interface ConfirmAttachmentModalProps {
+export interface ConfirmAttachmentModalProps {
   onCloseClick: () => void
   isProceedToRunModal: boolean
   onConfirmClick: () => void
@@ -50,7 +50,7 @@ export const ConfirmAttachmentModal = (
   }
 
   return (
-    <LegacyModal
+    <Modal
       title={t('confirm_heater_shaker_modal_attachment')}
       onClose={onCloseClick}
     >
@@ -129,6 +129,6 @@ export const ConfirmAttachmentModal = (
           </PrimaryButton>
         </Flex>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

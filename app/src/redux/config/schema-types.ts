@@ -1,5 +1,5 @@
 import type { LogLevel } from '../../logger'
-import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
+import type { ProtocolSort } from '/app/organisms/ProtocolsLanding/hooks'
 
 export type UrlProtocol = 'file:' | 'http:'
 
@@ -11,9 +11,7 @@ export type DevInternalFlag =
   | 'forceHttpPolling'
   | 'protocolStats'
   | 'enableRunNotes'
-  | 'enableQuickTransfer'
   | 'protocolTimeline'
-  | 'enableCsvFile'
   | 'enableLabwareCreator'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>

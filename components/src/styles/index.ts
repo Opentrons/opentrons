@@ -1,5 +1,6 @@
 export * from './borders'
 export * from './colors'
+export * from './cursor'
 export * from './flexbox'
 export * from './layout'
 export * from './position'

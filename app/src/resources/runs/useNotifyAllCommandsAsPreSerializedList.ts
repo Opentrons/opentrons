@@ -4,24 +4,28 @@ import { useNotifyDataReady } from '../useNotifyDataReady'
 
 import type { UseQueryResult } from 'react-query'
 import type { AxiosError } from 'axios'
-import type { CommandsData, GetCommandsParams } from '@opentrons/api-client'
+import type { CommandsData, GetRunCommandsParams } from '@opentrons/api-client'
 import type { QueryOptionsWithPolling } from '../useNotifyDataReady'
 
 export function useNotifyAllCommandsAsPreSerializedList(
   runId: string | null,
-  params?: GetCommandsParams | null,
+  params?: GetRunCommandsParams | null,
   options: QueryOptionsWithPolling<CommandsData, AxiosError> = {}
 ): UseQueryResult<CommandsData, AxiosError> {
-  const { notifyOnSettled, shouldRefetch } = useNotifyDataReady({
+  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
     topic: `robot-server/runs/pre_serialized_commands/${runId}`,
     options,
   })
 
-  const httpResponse = useAllCommandsAsPreSerializedList(runId, params, {
-    ...options,
-    enabled: options?.enabled !== false && shouldRefetch,
-    onSettled: notifyOnSettled,
-  })
+  const httpQueryResult = useAllCommandsAsPreSerializedList(
+    runId,
+    params,
+    queryOptionsNotify
+  )
 
-  return httpResponse
+  if (shouldRefetch) {
+    void httpQueryResult.refetch()
+  }
+
+  return httpQueryResult
 }

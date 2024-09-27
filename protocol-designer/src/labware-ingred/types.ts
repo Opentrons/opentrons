@@ -1,4 +1,5 @@
-import type { LocationLiquidState } from '@opentrons/step-generation'
+import type { CutoutId, ModuleModel } from '@opentrons/shared-data'
+import type { DeckSlot, LocationLiquidState } from '@opentrons/step-generation'
 // TODO Ian 2018-02-19 make these shared in component library, standardize with Run App
 //  ===== LABWARE ===========
 export interface DisplayLabware {
@@ -43,3 +44,21 @@ export type IngredInputs = LiquidGroup & {
 export type IngredGroupAccessor = keyof IngredInputs
 export type LiquidGroupsById = Record<string, LiquidGroup>
 export type AllIngredGroupFields = Record<string, IngredInputs>
+
+export type Fixture =
+  | 'stagingArea'
+  | 'trashBin'
+  | 'wasteChute'
+  | 'wasteChuteAndStagingArea'
+
+export interface ZoomedIntoSlotInfoState {
+  selectedLabwareDefUri: string | null
+  selectedNestedLabwareDefUri: string | null
+  selectedModuleModel: ModuleModel | null
+  selectedFixture: Fixture | null
+  selectedSlot: { slot: DeckSlot | null; cutout: CutoutId | null }
+}
+
+export interface GenerateNewProtocolState {
+  isNewProtocol: boolean
+}

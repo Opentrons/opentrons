@@ -1,15 +1,19 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { css } from 'styled-components'
 import { COLORS, BORDERS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
 import { Icon } from '../../icons'
 import {
   ALIGN_CENTER,
+  CURSOR_AUTO,
+  CURSOR_POINTER,
   DIRECTION_ROW,
+  FLEX_MAX_CONTENT,
   JUSTIFY_SPACE_BETWEEN,
 } from '../../styles'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { LegacyStyledText } from '../StyledText'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+import { StyledText } from '../StyledText'
+import { truncateString } from '../../utils'
 
 export interface CheckboxProps {
   /** checkbox is checked if value is true */
@@ -22,6 +26,10 @@ export interface CheckboxProps {
   tabIndex?: number
   /** if disabled is true, mouse events will not trigger onClick callback */
   disabled?: boolean
+  /** optional borderRadius type */
+  type?: 'round' | 'neutral'
+  /** optional width for helix */
+  width?: string
 }
 export function Checkbox(props: CheckboxProps): JSX.Element {
   const {
@@ -30,40 +38,59 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
     onClick,
     tabIndex = 0,
     disabled = false,
+    width = FLEX_MAX_CONTENT,
+    type = 'round',
   } = props
+  const truncatedLabel = truncateString(labelText, 25)
+
+  const CHECKBOX_STYLE = css`
+    width: ${width};
+    grid-gap: ${SPACING.spacing12};
+    border: none;
+    align-items: ${ALIGN_CENTER};
+    flex-direction: ${DIRECTION_ROW};
+    color: ${isChecked ? COLORS.white : COLORS.black90};
+    background-color: ${isChecked ? COLORS.blue50 : COLORS.blue35};
+    border-radius: ${type === 'round'
+      ? BORDERS.borderRadiusFull
+      : BORDERS.borderRadius8};
+    padding: ${SPACING.spacing12} ${SPACING.spacing16};
+    justify-content: ${JUSTIFY_SPACE_BETWEEN};
+    cursor: ${CURSOR_POINTER};
+
+    &:active {
+      background-color: ${isChecked ? COLORS.blue55 : COLORS.blue40};
+    }
+    &:focus-visible {
+      background-color: ${isChecked ? COLORS.blue50 : COLORS.blue35};
+      outline: 3px ${BORDERS.styleSolid} ${COLORS.blue50};
+      outline-offset: 2px;
+    }
+    &:disabled {
+      background-color: ${COLORS.grey35};
+      color: ${COLORS.grey50};
+    }
+
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      padding: ${SPACING.spacing20};
+      border-radius: ${BORDERS.borderRadius16};
+      width: 100%;
+      cursor: ${CURSOR_AUTO};
+    }
+  `
+
   return (
     <Flex
       as="button"
       role="checkbox"
-      width="100%"
-      flexDirection={DIRECTION_ROW}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      alignItems={ALIGN_CENTER}
-      padding={SPACING.spacing20}
-      borderRadius={BORDERS.borderRadius16}
-      backgroundColor={isChecked ? COLORS.blue50 : COLORS.blue35}
-      color={isChecked ? COLORS.white : COLORS.black90}
       onClick={onClick}
       tabIndex={tabIndex}
       disabled={disabled}
-      css={css`
-        &:active {
-          background-color: ${isChecked ? COLORS.blue55 : COLORS.blue40};
-        }
-        &:focus-visible {
-          background-color: ${isChecked ? COLORS.blue50 : COLORS.blue35};
-          outline: 3px ${BORDERS.styleSolid} ${COLORS.blue50};
-          outline-offset: 2px;
-        }
-        &:disabled {
-          background-color: ${COLORS.grey35};
-          color: ${COLORS.grey50};
-        }
-      `}
+      css={CHECKBOX_STYLE}
     >
-      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {labelText}
-      </LegacyStyledText>
+      <StyledText desktopStyle="bodyDefaultRegular" oddStyle="bodyTextSemiBold">
+        {truncatedLabel}
+      </StyledText>
       <Check isChecked={isChecked} />
     </Flex>
   )
@@ -71,15 +98,28 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
 
 interface CheckProps {
   isChecked: boolean
+  color?: string
 }
-function Check(props: CheckProps): JSX.Element {
-  return props.isChecked ? (
-    <Icon name="ot-checkbox" size="1.75rem" color={COLORS.white} />
+export function Check(props: CheckProps): JSX.Element {
+  const { isChecked, color = COLORS.white } = props
+  return isChecked ? (
+    <Flex css={CHECK_STYLE}>
+      <Icon name="ot-checkbox" color={color} />
+    </Flex>
   ) : (
     <Flex
-      size="1.75rem"
+      css={CHECK_STYLE}
       border={`2px solid ${COLORS.black90}`}
       borderRadius={BORDERS.borderRadius4}
     />
   )
 }
+
+const CHECK_STYLE = css`
+  width: 1rem;
+  height: 1rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+`

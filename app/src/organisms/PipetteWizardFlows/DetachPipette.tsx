@@ -6,23 +6,25 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
+  Banner,
   Btn,
   COLORS,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   PrimaryButton,
   RESPONSIVENESS,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Banner } from '../../atoms/Banner'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { Skeleton } from '../../atoms/Skeleton'
-import { SmallButton } from '../../atoms/buttons'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
+import { Skeleton } from '/app/atoms/Skeleton'
+import { SmallButton } from '/app/atoms/buttons'
 import { BODY_STYLE, SECTIONS } from './constants'
 import { getPipetteAnimations, getPipetteAnimations96 } from './utils'
 import type { PipetteWizardStepProps } from './types'
@@ -175,7 +177,8 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     )
   }
 
-  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
+  if (isRobotMoving)
+    return <SimpleWizardInProgressBody description={t('stand_back')} />
   if (showPipetteStillAttached) {
     return (
       <SimpleWizardBody

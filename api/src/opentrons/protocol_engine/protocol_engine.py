@@ -2,7 +2,10 @@
 from contextlib import AsyncExitStack
 from logging import getLogger
 from typing import Dict, Optional, Union, AsyncGenerator, Callable
-from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
+from opentrons.protocol_engine.actions.actions import (
+    ResumeFromRecoveryAction,
+    SetErrorRecoveryPolicyAction,
+)
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
 from opentrons.protocols.models import LabwareDefinition
@@ -35,7 +38,7 @@ from .execution import (
     DoorWatcher,
     HardwareStopper,
 )
-from .state import StateStore, StateView
+from .state.state import StateStore, StateView
 from .plugins import AbstractPlugin, PluginStarter
 from .actions import (
     ActionDispatcher,
@@ -55,6 +58,7 @@ from .actions import (
     HardwareStoppedAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
+    AddAbsorbanceReaderLidAction,
 )
 
 
@@ -84,7 +88,6 @@ class ProtocolEngine:
         self,
         hardware_api: HardwareControlAPI,
         state_store: StateStore,
-        error_recovery_policy: ErrorRecoveryPolicy,
         action_dispatcher: Optional[ActionDispatcher] = None,
         plugin_starter: Optional[PluginStarter] = None,
         queue_worker: Optional[QueueWorker] = None,
@@ -103,7 +106,6 @@ class ProtocolEngine:
         self._hardware_api = hardware_api
         self._state_store = state_store
         self._model_utils = model_utils or ModelUtils()
-        self._error_recovery_policy = error_recovery_policy
         self._action_dispatcher = action_dispatcher or ActionDispatcher(
             sink=self._state_store
         )
@@ -560,6 +562,12 @@ class ProtocolEngine:
             AddAddressableAreaAction(addressable_area=area)
         )
 
+    def add_absorbance_reader_lid(self, module_id: str, lid_id: str) -> None:
+        """Add an absorbance reader lid to the module state."""
+        self._action_dispatcher.dispatch(
+            AddAbsorbanceReaderLidAction(module_id=module_id, lid_id=lid_id)
+        )
+
     def reset_tips(self, labware_id: str) -> None:
         """Reset the tip state of a given labware."""
         # TODO(mm, 2023-03-10): Safely raise an error if the given labware isn't a
@@ -605,14 +613,18 @@ class ProtocolEngine:
         self, command_generator: Callable[[], AsyncGenerator[str, None]]
     ) -> None:
         """Set QueueWorker and start it."""
+        assert self._queue_worker is None
         self._queue_worker = create_queue_worker(
             hardware_api=self._hardware_api,
             state_store=self._state_store,
             action_dispatcher=self._action_dispatcher,
-            error_recovery_policy=self._error_recovery_policy,
             command_generator=command_generator,
         )
         self._queue_worker.start()
+
+    def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
+        """Replace the run's error recovery policy with a new one."""
+        self._action_dispatcher.dispatch(SetErrorRecoveryPolicyAction(policy))
 
 
 # TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence

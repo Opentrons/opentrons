@@ -10,6 +10,7 @@
   "module": "ESNext",
   "include": [
     "js",
+    "js/**/*.json",
     "protocol",
     "pipette",
     "labware",

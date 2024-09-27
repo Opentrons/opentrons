@@ -1,51 +1,50 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { when } from 'vitest-when'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
-import {
-  useCloseCurrentRun,
-  useCurrentRunId,
-} from '../../../organisms/ProtocolUpload/hooks'
-import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useTrackCreateProtocolRunEvent } from '/app/organisms/Devices/hooks'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
 import {
   getConnectableRobots,
   getReachableRobots,
   getScanning,
   getUnreachableRobots,
   startDiscovery,
-} from '../../../redux/discovery'
-import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
+} from '/app/redux/discovery'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
-} from '../../../redux/discovery/__fixtures__'
-import { getNetworkInterfaces } from '../../../redux/networking'
+} from '/app/redux/discovery/__fixtures__'
+import { getNetworkInterfaces } from '/app/redux/networking'
 import {
   storedProtocolData as storedProtocolDataFixture,
   storedProtocolDataWithCsvRunTimeParameter,
-} from '../../../redux/protocol-storage/__fixtures__'
+} from '/app/redux/protocol-storage/__fixtures__'
 import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 import { useOffsetCandidatesForAnalysis } from '../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotToRunProtocolSlideout } from '../'
-import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
+import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
+import { useCurrentRunId, useCloseCurrentRun } from '/app/resources/runs'
 
-import type { State } from '../../../redux/types'
+import type { State } from '/app/redux/types'
 
-vi.mock('../../../organisms/Devices/hooks')
-vi.mock('../../../organisms/ProtocolUpload/hooks')
-vi.mock('../../../organisms/RunTimeControl/hooks')
-vi.mock('../../../redux/discovery')
-vi.mock('../../../redux/robot-update')
-vi.mock('../../../redux/networking')
+vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/organisms/ProtocolUpload/hooks')
+vi.mock('/app/organisms/RunTimeControl/hooks')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux/networking')
 vi.mock('../useCreateRunFromProtocol')
 vi.mock('../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis')
-vi.mock('../../../resources/useNotifyDataReady')
+vi.mock('/app/resources/useNotifyDataReady')
+vi.mock('/app/resources/runs')
 
 const render = (
   props: React.ComponentProps<typeof ChooseRobotToRunProtocolSlideout>
@@ -72,11 +71,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     mockTrackCreateProtocolRunEvent = vi.fn(
       () => new Promise(resolve => resolve({}))
     )
-    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
-      autoUpdateAction: '',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
+    vi.mocked(useIsRobotOnWrongVersionOfSoftware).mockReturnValue(false)
     vi.mocked(getConnectableRobots).mockReturnValue([mockConnectableRobot])
     vi.mocked(getUnreachableRobots).mockReturnValue([mockUnreachableRobot])
     vi.mocked(getReachableRobots).mockReturnValue([mockReachableRobot])
@@ -88,7 +83,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       isClosingCurrentRun: false,
       closeCurrentRun: mockCloseCurrentRun,
     })
-    vi.mocked(useCurrentRunId).mockReturnValue(null)
+    provideNullCurrentRunIdFor(mockConnectableRobot.ip)
     vi.mocked(useCurrentRunStatus).mockReturnValue(null)
     when(vi.mocked(useCreateRunFromProtocol))
       .calledWith(
@@ -191,6 +186,8 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
       mockConnectableRobot,
     ])
+
+    provideNullCurrentRunIdFor('otherIp')
     render({
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: vi.fn(),
@@ -213,16 +210,13 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         files: [expect.any(File)],
         protocolKey: storedProtocolDataFixture.protocolKey,
         runTimeParameterValues: expect.any(Object),
+        runTimeParameterFiles: expect.any(Object),
       })
     )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
   })
   it('if selected robot is on a different version of the software than the app, disable CTA and show link to device details in options', () => {
-    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
-      autoUpdateAction: 'upgrade',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
+    vi.mocked(useIsRobotOnWrongVersionOfSoftware).mockReturnValue(true)
     render({
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: vi.fn(),
@@ -262,6 +256,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         files: [expect.any(File)],
         protocolKey: storedProtocolDataFixture.protocolKey,
         runTimeParameterValues: expect.any(Object),
+        runTimeParameterFiles: expect.any(Object),
       })
     )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
@@ -295,6 +290,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         files: [expect.any(File)],
         protocolKey: storedProtocolDataFixture.protocolKey,
         runTimeParameterValues: expect.any(Object),
+        runTimeParameterFiles: expect.any(Object),
       })
     )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
@@ -315,7 +311,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       runCreatedAt: '2022-05-11T13:33:51.012179+00:00',
     }
     when(vi.mocked(useOffsetCandidatesForAnalysis))
-      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, '127.0.0.1')
+      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, null)
       .thenReturn([mockOffsetCandidate])
     vi.mocked(getConnectableRobots).mockReturnValue([
       mockConnectableRobot,
@@ -328,7 +324,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     })
     expect(vi.mocked(useCreateRunFromProtocol)).toHaveBeenCalledWith(
       expect.any(Object),
-      { hostname: '127.0.0.1' },
+      null,
       [
         {
           vector: mockOffsetCandidate.vector,
@@ -348,6 +344,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         files: [expect.any(File)],
         protocolKey: storedProtocolDataFixture.protocolKey,
         runTimeParameterValues: expect.any(Object),
+        runTimeParameterFiles: expect.any(Object),
       })
     })
   })
@@ -363,15 +360,13 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       runCreatedAt: '2022-05-11T13:33:51.012179+00:00',
     }
     when(vi.mocked(useOffsetCandidatesForAnalysis))
-      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, '127.0.0.1')
+      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, null)
       .thenReturn([mockOffsetCandidate])
-    when(vi.mocked(useOffsetCandidatesForAnalysis))
-      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, 'otherIp')
-      .thenReturn([])
     vi.mocked(getConnectableRobots).mockReturnValue([
       mockConnectableRobot,
       { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
     ])
+    provideNullCurrentRunIdFor('otherIp')
     render({
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: vi.fn(),
@@ -386,10 +381,9 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     })
     fireEvent.click(proceedButton)
     fireEvent.click(screen.getByRole('button', { name: 'Confirm values' }))
-    expect(vi.mocked(useCreateRunFromProtocol)).nthCalledWith(
-      2,
+    expect(vi.mocked(useCreateRunFromProtocol)).toHaveBeenLastCalledWith(
       expect.any(Object),
-      { hostname: '127.0.0.1' },
+      null,
       [
         {
           vector: mockOffsetCandidate.vector,
@@ -397,11 +391,6 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
           definitionUri: mockOffsetCandidate.definitionUri,
         },
       ]
-    )
-    expect(vi.mocked(useCreateRunFromProtocol)).toHaveBeenLastCalledWith(
-      expect.any(Object),
-      { hostname: 'otherIp' },
-      []
     )
   })
 
@@ -450,3 +439,21 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     )
   })
 })
+
+const provideNullCurrentRunIdFor = (hostname: string): void => {
+  let once = true
+  when(vi.mocked(useCurrentRunId))
+    .calledWith(expect.any(Object), {
+      hostname,
+      requestor: undefined,
+    })
+    .thenDo(options => {
+      void (options?.onSuccess != null && once
+        ? options.onSuccess({
+            links: { current: null },
+          } as any)
+        : {})
+      once = false
+      return null
+    })
+}

@@ -1,19 +1,22 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
 
 import {
-  useHoverTooltip,
   ALIGN_CENTER,
+  Banner,
+  BORDERS,
   DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_SPACE_AROUND,
-  SPACING,
   Flex,
+  JUSTIFY_SPACE_AROUND,
+  JUSTIFY_SPACE_BETWEEN,
+  Modal,
   NewPrimaryBtn,
   NewSecondaryBtn,
-  BORDERS,
+  SPACING,
+  Tooltip,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import {
@@ -24,17 +27,14 @@ import {
   REINSTALL,
   DOWNGRADE,
   getRobotUpdateVersion,
-} from '../../../../redux/robot-update'
-import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
-import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
+} from '/app/redux/robot-update'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { ReleaseNotes } from '/app/molecules/ReleaseNotes'
 import { useIsRobotBusy } from '../../hooks'
-import { Tooltip } from '../../../../atoms/Tooltip'
-import { LegacyModal } from '../../../../molecules/LegacyModal'
-import { Banner } from '../../../../atoms/Banner'
-import { useDispatchStartRobotUpdate } from '../../../../redux/robot-update/hooks'
+import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 
-import type { State, Dispatch } from '../../../../redux/types'
-import type { RobotSystemType } from '../../../../redux/robot-update/types'
+import type { State, Dispatch } from '/app/redux/types'
+import type { RobotSystemType } from '/app/redux/robot-update/types'
 
 export const RELEASE_NOTES_URL_BASE =
   'https://github.com/Opentrons/opentrons/releases/tag/v'
@@ -91,7 +91,7 @@ export function UpdateRobotModal({
     disabledReason = updateFromFileDisabledReason
   else if (isRobotBusy) disabledReason = t('robot_busy_protocol')
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(robotUpdateChangelogSeen(robotName))
   }, [robotName])
 
@@ -148,7 +148,7 @@ export function UpdateRobotModal({
   )
 
   return (
-    <LegacyModal
+    <Modal
       title={heading}
       onClose={closeModal}
       closeOnOutsideClick={true}
@@ -161,6 +161,6 @@ export function UpdateRobotModal({
         </UpdateAppBanner>
         <ReleaseNotes source={releaseNotes} />
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

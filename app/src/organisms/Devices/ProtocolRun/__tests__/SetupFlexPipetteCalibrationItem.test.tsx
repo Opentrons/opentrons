@@ -1,22 +1,22 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, afterEach } from 'vitest'
 
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { PipetteWizardFlows } from '../../../PipetteWizardFlows'
 import { SetupFlexPipetteCalibrationItem } from '../SetupFlexPipetteCalibrationItem'
-import _uncastedModifiedSimpleV6Protocol from '../../hooks/__fixtures__/modifiedSimpleV6.json'
+import { modifiedSimpleV6Protocol as _uncastedModifiedSimpleV6Protocol } from '/app/resources/runs/__fixtures__'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../PipetteWizardFlows')
-vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../../hooks')
+vi.mock('/app/resources/runs')
+vi.mock('/app/resources/analysis')
 
 const RUN_ID = '1'
 const modifiedSimpleV6Protocol = ({

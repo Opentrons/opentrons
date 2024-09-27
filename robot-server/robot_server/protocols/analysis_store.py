@@ -10,7 +10,6 @@ from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons.protocol_engine.types import (
     RunTimeParameter,
-    RunTimeParamValuesType,
     CSVParameter,
 )
 from opentrons.protocol_engine import (
@@ -30,12 +29,11 @@ from .analysis_models import (
     CompletedAnalysis,
     AnalysisResult,
     AnalysisStatus,
-    RunTimeParameterAnalysisData,
-    AnalysisParameterType,
 )
 
 from .completed_analysis_store import CompletedAnalysisStore, CompletedAnalysisResource
 from .analysis_memcache import MemoryCache
+from .rtp_resources import PrimitiveParameterResource, CSVParameterResource
 
 _log = getLogger(__name__)
 
@@ -123,7 +121,8 @@ class AnalysisStore:
         self,
         protocol_id: str,
         analysis_id: str,
-    ) -> PendingAnalysis:
+        run_time_parameters: Optional[List[RunTimeParameter]],
+    ) -> None:
         """Add a new pending analysis to the store.
 
         Args:
@@ -136,9 +135,10 @@ class AnalysisStore:
         Returns:
             A summary of the just-added analysis.
         """
-        return self._pending_store.add(
+        self._pending_store.add(
             protocol_id=protocol_id,
             analysis_id=analysis_id,
+            run_time_parameters=run_time_parameters or [],
         )
 
     async def update(
@@ -207,15 +207,52 @@ class AnalysisStore:
             protocol_id=protocol_id,
             analyzer_version=_CURRENT_ANALYZER_VERSION,
             completed_analysis=completed_analysis,
-            run_time_parameter_values_and_defaults=self._extract_run_time_param_values_and_defaults(
-                completed_analysis
-            ),
         )
+        primitive_rtp_resources = self._extract_primitive_run_time_params(
+            completed_analysis
+        )
+        csv_rtp_resources = self._extract_csv_run_time_params(completed_analysis)
         await self._completed_store.make_room_and_add(
-            completed_analysis_resource=completed_analysis_resource
+            completed_analysis_resource=completed_analysis_resource,
+            primitive_rtp_resources=primitive_rtp_resources,
+            csv_rtp_resources=csv_rtp_resources,
         )
 
         self._pending_store.remove(analysis_id=analysis_id)
+
+    async def save_initialization_failed_analysis(
+        self,
+        protocol_id: str,
+        analysis_id: str,
+        robot_type: RobotType,
+        run_time_parameters: List[RunTimeParameter],
+        errors: List[ErrorOccurrence],
+    ) -> None:
+        """Commit the failed analysis to store."""
+        completed_analysis = CompletedAnalysis.construct(
+            id=analysis_id,
+            result=AnalysisResult.NOT_OK,
+            robotType=robot_type,
+            status=AnalysisStatus.COMPLETED,
+            runTimeParameters=run_time_parameters,
+            commands=[],
+            labware=[],
+            modules=[],
+            pipettes=[],
+            errors=errors,
+            liquids=[],
+        )
+        completed_analysis_resource = CompletedAnalysisResource(
+            id=completed_analysis.id,
+            protocol_id=protocol_id,
+            analyzer_version=_CURRENT_ANALYZER_VERSION,
+            completed_analysis=completed_analysis,
+        )
+        await self._completed_store.make_room_and_add(
+            completed_analysis_resource=completed_analysis_resource,
+            primitive_rtp_resources=[],
+            csv_rtp_resources=[],
+        )
 
     async def get(self, analysis_id: str) -> ProtocolAnalysis:
         """Get a single protocol analysis by its ID.
@@ -258,9 +295,6 @@ class AnalysisStore:
         completed_analysis_ids = self._completed_store.get_ids_by_protocol(
             protocol_id=protocol_id
         )
-        # TODO (spp, 2024-06-05): populate runTimeParameters in the completed analysis summaries once
-        #  we start saving RTPs to their own table. Currently, fetching RTPs from a
-        #  completed analysis requires de-serializing the full analysis resource.
         completed_analysis_summaries = [
             AnalysisSummary.construct(id=analysis_id, status=AnalysisStatus.COMPLETED)
             for analysis_id in completed_analysis_ids
@@ -292,39 +326,42 @@ class AnalysisStore:
             return completed_analyses + [pending_analysis]
 
     @staticmethod
-    def _extract_run_time_param_values_and_defaults(
+    def _extract_primitive_run_time_params(
         completed_analysis: CompletedAnalysis,
-    ) -> Dict[str, RunTimeParameterAnalysisData]:
-        """Extract the Run Time Parameters with current value and default value of each.
-
-        We do this in order to save the RTP data separately, outside the analysis
-        in the database. This saves us from having to de-serialize the entire analysis
-        to read just the RTP values.
-        """
+    ) -> List[PrimitiveParameterResource]:
+        """Extract the Primitive Run Time Parameters from analysis for saving in DB."""
         rtp_list = completed_analysis.runTimeParameters
-
-        rtp_values_and_defaults = {}
-        for param_spec in rtp_list:
-            value: AnalysisParameterType
-            if isinstance(param_spec, CSVParameter):
-                default = None
-                value = param_spec.file.id if param_spec.file is not None else None
-            else:
-                default = param_spec.default
-                value = param_spec.value
-            # TODO(jbl 2024-06-04) we might want to add type here, since CSV files value is a str and right now the only
-            #   thing disambiguating that is that default for that will be None, if we ever want to discern type.
-            rtp_values_and_defaults.update(
-                {
-                    param_spec.variableName: RunTimeParameterAnalysisData(
-                        value=value, default=default
-                    )
-                }
+        return [
+            PrimitiveParameterResource(
+                analysis_id=completed_analysis.id,
+                parameter_variable_name=param.variableName,
+                parameter_type=param.type,
+                parameter_value=param.value,
             )
-        return rtp_values_and_defaults
+            for param in rtp_list
+            if not isinstance(param, CSVParameter)
+        ]
+
+    @staticmethod
+    def _extract_csv_run_time_params(
+        completed_analysis: CompletedAnalysis,
+    ) -> List[CSVParameterResource]:
+        """Extract the Primitive Run Time Parameters from analysis for saving in DB."""
+        csv_rtp_list = completed_analysis.runTimeParameters
+        return [
+            CSVParameterResource(
+                analysis_id=completed_analysis.id,
+                parameter_variable_name=param.variableName,
+                file_id=param.file.id if param.file else None,
+            )
+            for param in csv_rtp_list
+            if isinstance(param, CSVParameter)
+        ]
 
     async def matching_rtp_values_in_analysis(
-        self, analysis_summary: AnalysisSummary, new_rtp_values: RunTimeParamValuesType
+        self,
+        last_analysis_summary: AnalysisSummary,
+        new_parameters: List[RunTimeParameter],
     ) -> bool:
         """Return whether the last analysis of the given protocol used the mentioned RTP values.
 
@@ -342,48 +379,43 @@ class AnalysisStore:
         with the values provided in the current request, and also verify that rest of the
         parameters in the analysis use default values.
         """
-        if analysis_summary.status == AnalysisStatus.PENDING:
+        if last_analysis_summary.status == AnalysisStatus.PENDING:
             # TODO: extract defaults and values from pending analysis now that they're available
             #   If the pending analysis RTPs match the current RTPs, do nothing(?).
             #   If the pending analysis RTPs DO NOT match the current RTPs, raise the
             #   AnalysisIsPending error. Eventually, we might allow either canceling the
             #   pending analysis or starting another analysis when there's already a pending one.
-            raise AnalysisIsPendingError(analysis_summary.id)
+            raise AnalysisIsPendingError(last_analysis_summary.id)
 
-        rtp_values_and_defaults_in_last_analysis = (
-            await self._completed_store.get_rtp_values_and_defaults_by_analysis_id(
-                analysis_summary.id
+        primitive_rtps_in_last_analysis = (
+            self._completed_store.get_primitive_rtps_by_analysis_id(
+                last_analysis_summary.id
             )
         )
-        # We already make sure that the protocol has an analysis associated with before
-        # checking the RTP values so this assert should never raise.
-        # It is only added for type checking.
-        assert (
-            rtp_values_and_defaults_in_last_analysis is not None
-        ), "This protocol has no analysis associated with it."
-
-        if not set(new_rtp_values.keys()).issubset(
-            set(rtp_values_and_defaults_in_last_analysis.keys())
+        csv_rtps_in_last_analysis = self._completed_store.get_csv_rtps_by_analysis_id(
+            last_analysis_summary.id
+        )
+        if (
+            len(new_parameters) != 0
+            and len(primitive_rtps_in_last_analysis) + len(csv_rtps_in_last_analysis)
+            == 0
         ):
-            # Since the RTP keys in analysis represent all params defined in the protocol,
-            # if the client passes a parameter that's not present in the analysis,
-            # it means that the client is sending incorrect parameters.
-            # We will let this request trigger an analysis using the incorrect params
-            # and have the analysis raise an appropriate error instead of giving an
-            # error response to the protocols request.
-            # This makes the behavior of robot server consistent regardless of whether
-            # the client is sending a protocol for the first time or for the nth time.
+            # Protocols migrated from v4 will not have any entries in RTP table,
+            # this is fine, and we should just trigger a new analysis and have
+            # the new values be stored in the RTP table.
             return False
-        for (
-            parameter,
-            prev_value_and_default,
-        ) in rtp_values_and_defaults_in_last_analysis.items():
-            if (
-                new_rtp_values.get(parameter, prev_value_and_default.default)
-                == prev_value_and_default.value
-            ):
-                continue
-            else:
+        total_params_in_last_analysis = list(
+            primitive_rtps_in_last_analysis.keys()
+        ) + list(csv_rtps_in_last_analysis.keys())
+        assert set(param.variableName for param in new_parameters) == set(
+            total_params_in_last_analysis
+        ), "Mismatch in parameters found in the current request vs. last saved parameters."  # Indicates internal bug
+        for param in new_parameters:
+            if isinstance(param, CSVParameter):
+                new_file_id = param.file.id if param.file else None
+                if csv_rtps_in_last_analysis[param.variableName] != new_file_id:
+                    return False
+            elif primitive_rtps_in_last_analysis[param.variableName] != param.value:
                 return False
         return True
 
@@ -407,7 +439,8 @@ class _PendingAnalysisStore:
         self,
         protocol_id: str,
         analysis_id: str,
-    ) -> PendingAnalysis:
+        run_time_parameters: List[RunTimeParameter],
+    ) -> None:
         """Add a new pending analysis and associate it with the given protocol."""
         assert (
             protocol_id not in self._analysis_ids_by_protocol_id
@@ -415,13 +448,12 @@ class _PendingAnalysisStore:
 
         new_pending_analysis = PendingAnalysis.construct(
             id=analysis_id,
+            runTimeParameters=run_time_parameters,
         )
 
         self._analyses_by_id[analysis_id] = new_pending_analysis
         self._analysis_ids_by_protocol_id[protocol_id] = analysis_id
         self._protocol_ids_by_analysis_id[analysis_id] = protocol_id
-
-        return new_pending_analysis
 
     def remove(self, analysis_id: str) -> None:
         """Remove the pending analysis with the given ID.

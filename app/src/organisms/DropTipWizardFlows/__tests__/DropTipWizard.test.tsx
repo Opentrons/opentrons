@@ -1,19 +1,21 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { mockDropTipWizardContainerProps } from '../__fixtures__'
 import { DropTipWizardContent, DropTipWizardContainer } from '../DropTipWizard'
 import { DropTipWizardHeader } from '../DropTipWizardHeader'
-import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
+import { InProgressModal } from '/app/molecules/InProgressModal'
 import { ExitConfirmation } from '../ExitConfirmation'
-import { SimpleWizardBody } from '../../../molecules/SimpleWizardBody'
-import { BeforeBeginning } from '../BeforeBeginning'
-import { ChooseLocation } from '../ChooseLocation'
-import { JogToPosition } from '../JogToPosition'
-import { Success } from '../Success'
+import {
+  BeforeBeginning,
+  ChooseLocation,
+  JogToPosition,
+  Success,
+} from '../steps'
+import { ErrorInfo } from '../ErrorInfo'
 import {
   BEFORE_BEGINNING,
   CHOOSE_BLOWOUT_LOCATION,
@@ -24,13 +26,10 @@ import {
   DROP_TIP_SUCCESS,
 } from '../constants'
 
-vi.mock('../../../molecules/InProgressModal/InProgressModal')
+vi.mock('/app/molecules/InProgressModal')
 vi.mock('../ExitConfirmation')
-vi.mock('../../../molecules/SimpleWizardBody')
-vi.mock('../BeforeBeginning')
-vi.mock('../ChooseLocation')
-vi.mock('../JogToPosition')
-vi.mock('../Success')
+vi.mock('../steps')
+vi.mock('../ErrorInfo')
 vi.mock('../DropTipWizardHeader')
 
 const renderDropTipWizardContainer = (
@@ -85,11 +84,11 @@ describe('DropTipWizardContent', () => {
     vi.mocked(ExitConfirmation).mockReturnValue(
       <div>MOCK_EXIT_CONFIRMATION</div>
     )
-    vi.mocked(SimpleWizardBody).mockReturnValue(<div>MOCK_ERROR_SCREEN</div>)
     vi.mocked(BeforeBeginning).mockReturnValue(<div>MOCK_BEFORE_BEGINNING</div>)
     vi.mocked(ChooseLocation).mockReturnValue(<div>MOCK_CHOOSE_LOCATION</div>)
     vi.mocked(JogToPosition).mockReturnValue(<div>MOCK_JOG_TO_POSITION</div>)
     vi.mocked(Success).mockReturnValue(<div>MOCK_SUCCESS</div>)
+    vi.mocked(ErrorInfo).mockReturnValue(<div>MOCK_ERROR_INFO</div>)
   })
 
   it(`renders InProgressModal when activeMaintenanceRunId is null`, () => {
@@ -116,13 +115,13 @@ describe('DropTipWizardContent', () => {
     screen.getByText('MOCK_EXIT_CONFIRMATION')
   })
 
-  it(`renders SimpleWizardBody when errorDetails is not null`, () => {
+  it(`renders ErrorInfo when errorDetails is not null`, () => {
     renderDropTipWizardContent({
       ...props,
       errorDetails: { message: 'MOCK_MESSAGE' },
     })
 
-    screen.getByText('MOCK_ERROR_SCREEN')
+    screen.getByText('MOCK_ERROR_INFO')
   })
 
   it(`renders BeforeBeginning when currentStep is ${BEFORE_BEGINNING}`, () => {
@@ -171,22 +170,5 @@ describe('DropTipWizardContent', () => {
     renderDropTipWizardContent({ ...props, currentStep: DROP_TIP_SUCCESS })
 
     screen.getByText('MOCK_SUCCESS')
-  })
-
-  it('renders alternative success button copy when the commandType is fixit', () => {
-    renderDropTipWizardContent({
-      ...props,
-      currentStep: DROP_TIP_SUCCESS,
-      fixitCommandTypeUtils: {
-        copyOverrides: { tipDropCompleteBtnCopy: 'proceed_to_tip_selection' },
-      } as any,
-    })
-
-    expect(vi.mocked(Success)).toHaveBeenCalledWith(
-      expect.objectContaining({
-        proceedText: 'proceed_to_tip_selection',
-      }),
-      expect.anything()
-    )
   })
 })

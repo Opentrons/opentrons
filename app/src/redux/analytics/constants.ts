@@ -66,10 +66,34 @@ export const ANALYTICS_ROBOT_UPDATE_CHANGE_LOG_VIEW = 'robotUpdateChangeLogView'
  */
 
 export const ANALYTICS_RECOVERY_ERROR_EVENT = 'recoveryErrorEvent'
-export const ANALYTICS_RECOVERY_INITIAL_ACTION = 'recoveryInitialAction'
 export const ANALYTICS_RECOVERY_ACTION_SELECTED =
   'recoverySelectedRecoveryAction'
 export const ANALYTICS_RECOVERY_VIEW_ERROR_DETAILS = 'recoveryViewErrorDetails'
 export const ANALYTICS_RECOVERY_ACTION_RESULT =
   'recoverySelectedRecoveryActionResult'
 export const ANALYTICS_RECOVERY_RUN_RESULT = 'recoveryRunResultAfterError'
+
+/**
+ * Quick Transfer Analytics
+ */
+
+export const ANALYTICS_QUICK_TRANSFER_TAB_SELECTED = 'quickTransferTab'
+export const ANALYTICS_QUICK_TRANSFER_FLOW_STARTED = 'quickTransferFlowStarted'
+export const ANALYTICS_QUICK_TRANSFER_WELL_SELECTION_DURATION =
+  'quickTransferWellSelectionDuration'
+export const ANALYTICS_QUICK_TRANSFER_EXIT_EARLY = 'quickTransferExitEarly'
+export const ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB =
+  'quickTransferAdvancedSettingsTab'
+export const ANALYTICS_QUICK_TRANSFER_TIP_MANAGEMENT_TAB =
+  'quickTransferTipManagementTab'
+export const ANALYTICS_QUICK_TRANSFER_SETTING_SAVED =
+  'quickTransferSettingSaved'
+export const ANALYTICS_QUICK_TRANSFER_TIME_TO_CREATE =
+  'quickTransferTimeToCreate'
+export const ANALYTICS_QUICK_TRANSFER_SAVE_FOR_LATER =
+  'quickTransferSaveForLater'
+export const ANALYTICS_QUICK_TRANSFER_RUN_NOW = 'quickTransferRunNow'
+export const ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE = 'quickTransferDetailsPage'
+export const ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS =
+  'quickTransferRunFromDetails'
+export const ANALYTICS_QUICK_TRANSFER_RERUN = 'quickTransferReRunFromSummary'

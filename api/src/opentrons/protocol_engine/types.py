@@ -4,6 +4,7 @@ import re
 from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
+from pathlib import Path
 from pydantic import (
     BaseModel,
     Field,
@@ -13,7 +14,17 @@ from pydantic import (
     StrictStr,
     validator,
 )
-from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple, FrozenSet
+from typing import (
+    Optional,
+    Union,
+    List,
+    Dict,
+    Any,
+    NamedTuple,
+    Tuple,
+    FrozenSet,
+    Mapping,
+)
 from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.types import PipetteNameType
@@ -199,6 +210,7 @@ class WellOrigin(str, Enum):
     TOP = "top"
     BOTTOM = "bottom"
     CENTER = "center"
+    MENISCUS = "meniscus"
 
 
 class DropTipWellOrigin(str, Enum):
@@ -298,6 +310,22 @@ class CurrentWell:
     pipette_id: str
     labware_id: str
     well_name: str
+
+
+class LiquidHeightInfo(BaseModel):
+    """Payload required to store recent measured liquid heights."""
+
+    height: float
+    last_measured: datetime
+
+
+class LiquidHeightSummary(BaseModel):
+    """Payload for liquid state height in StateSummary."""
+
+    labware_id: str
+    well_name: str
+    height: float
+    last_measured: datetime
 
 
 @dataclass(frozen=True)
@@ -786,6 +814,7 @@ class AreaType(Enum):
     TEMPERATURE = "temperatureModule"
     MAGNETICBLOCK = "magneticBlock"
     ABSORBANCE_READER = "absorbanceReader"
+    LID_DOCK = "lidDock"
 
 
 @dataclass(frozen=True)
@@ -876,12 +905,12 @@ class QuadrantNozzleLayoutConfiguration(BaseModel):
         ...,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
-    frontRightNozzle: Optional[str] = Field(
+    frontRightNozzle: str = Field(
         ...,
         regex=NOZZLE_NAME_REGEX,
         description="The front right nozzle in your configuration.",
     )
-    backLeftNozzle: Optional[str] = Field(
+    backLeftNozzle: str = Field(
         ...,
         regex=NOZZLE_NAME_REGEX,
         description="The back left nozzle in your configuration.",
@@ -1029,13 +1058,14 @@ class EnumParameter(RTPBase):
     )
 
 
-class FileId(BaseModel):
+class FileInfo(BaseModel):
     """A file UUID descriptor."""
 
     id: str = Field(
         ...,
         description="The UUID identifier of the file stored on the robot.",
     )
+    name: str = Field(..., description="Name of the file, including the extension.")
 
 
 class CSVParameter(RTPBase):
@@ -1044,15 +1074,21 @@ class CSVParameter(RTPBase):
     type: Literal["csv_file"] = Field(
         default="csv_file", description="String specifying the type of this parameter"
     )
-    file: Optional[FileId] = Field(
-        ...,
-        description="The CSV file stored on the robot, to be used as the CSV RTP override value."
-        " For local analysis this will be empty.",
+    file: Optional[FileInfo] = Field(
+        default=None,
+        description="ID of the CSV file stored on the robot; to be used for fetching the CSV file."
+        " For local analysis this will most likely be empty.",
     )
 
 
 RunTimeParameter = Union[NumberParameter, EnumParameter, BooleanParameter, CSVParameter]
 
-RunTimeParamValuesType = Dict[
+PrimitiveRunTimeParamValuesType = Mapping[
     StrictStr, Union[StrictInt, StrictFloat, StrictBool, StrictStr]
 ]  # update value types as more RTP types are added
+
+CSVRunTimeParamFilesType = Mapping[StrictStr, StrictStr]
+CSVRuntimeParamPaths = Dict[str, Path]
+
+
+ABSMeasureMode = Literal["single", "multi"]

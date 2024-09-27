@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
@@ -12,11 +12,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ToggleButton } from '../../../../atoms/buttons'
-import { updateSetting } from '../../../../redux/robot-settings'
+import { ToggleButton } from '/app/atoms/buttons'
+import { updateSetting } from '/app/redux/robot-settings'
 
-import type { Dispatch } from '../../../../redux/types'
-import type { RobotSettingsField } from '../../../../redux/robot-settings/types'
+import type { Dispatch } from '/app/redux/types'
+import type { RobotSettingsField } from '/app/redux/robot-settings/types'
 
 interface UsageSettingsProps {
   settings: RobotSettingsField | undefined

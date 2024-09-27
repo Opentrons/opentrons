@@ -1,11 +1,9 @@
 import type { DT_ROUTES } from './constants'
 import type { DropTipErrorComponents } from './hooks'
 import type { DropTipWizardProps } from './DropTipWizard'
-import type { ERUtilsResults } from '../ErrorRecoveryFlows/hooks'
 
 export type DropTipFlowsRoute = typeof DT_ROUTES[keyof typeof DT_ROUTES]
 export type DropTipFlowsStep = DropTipFlowsRoute[number]
-
 export interface ErrorDetails {
   message: string
   header?: string
@@ -13,6 +11,7 @@ export interface ErrorDetails {
 }
 
 export type IssuedCommandsType = 'setup' | 'fixit'
+export type DropTipModalStyle = 'simple' | 'intervention'
 
 interface CopyOverrides {
   tipDropCompleteBtnCopy: string
@@ -30,14 +29,22 @@ interface ButtonOverrides {
   tipDropComplete: (() => void) | null
 }
 
+export interface DropTipWizardRouteOverride {
+  route: DropTipFlowsRoute
+  step: DropTipFlowsStep | null
+}
+
 export interface FixitCommandTypeUtils {
   runId: string
   failedCommandId: string
-  trackCurrentMap: ERUtilsResults['trackExternalMap']
+  pipetteId: string | null
   copyOverrides: CopyOverrides
   errorOverrides: ErrorOverrides
   buttonOverrides: ButtonOverrides
-  routeOverride?: typeof DT_ROUTES[keyof typeof DT_ROUTES]
+  /* Report to an external flow (ex, Error Recovery) the current step of drop tip wizard. */
+  reportMap: (dropTipMap: DropTipWizardRouteOverride | null) => void
+  /* If supplied, begin drop tip flows on the specified route & step. If no step is supplied, begin at the start of the route. */
+  routeOverride?: DropTipWizardRouteOverride
 }
 
 export type DropTipWizardContainerProps = DropTipWizardProps & {

@@ -1,11 +1,10 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
   Box,
   Flex,
   Link,
-  Tooltip,
+  LegacyTooltip,
   useHoverTooltip,
   ALIGN_CENTER,
   SIZE_4,
@@ -20,13 +19,11 @@ import {
 } from '@opentrons/react-api-client'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
-import { TertiaryButton } from '../../../atoms/buttons'
-import {
-  useAttachedPipettes,
-  useDeckCalibrationData,
-  useRunHasStarted,
-} from '../hooks'
-import { useDashboardCalibrateTipLength } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
+import { TertiaryButton } from '/app/atoms/buttons'
+import { useAttachedPipettes } from '/app/resources/instruments'
+import { useRunHasStarted } from '/app/resources/runs'
+import { useDeckCalibrationData } from '../hooks'
+import { useDashboardCalibrateTipLength } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 
 import type { Mount } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -95,7 +92,7 @@ export function SetupTipLengthCalibrationButton({
       >
         {t('recalibrate')}
       </Box>
-      <Tooltip {...tooltipProps}>
+      <LegacyTooltip {...tooltipProps}>
         {
           <Box width={SIZE_4} textAlign={TEXT_ALIGN_CENTER}>
             {isDeckCalibrated
@@ -103,7 +100,7 @@ export function SetupTipLengthCalibrationButton({
               : t('calibrate_deck_to_proceed_to_tip_length_calibration')}
           </Box>
         }
-      </Tooltip>
+      </LegacyTooltip>
     </>
   ) : (
     <Link
@@ -144,13 +141,13 @@ export function SetupTipLengthCalibrationButton({
               {t('calibrate_now')}
             </TertiaryButton>
             {!isDeckCalibrated ? (
-              <Tooltip {...tooltipProps}>
+              <LegacyTooltip {...tooltipProps}>
                 {
                   <Box width={SIZE_4}>
                     {t('calibrate_deck_to_proceed_to_tip_length_calibration')}
                   </Box>
                 }
-              </Tooltip>
+              </LegacyTooltip>
             ) : null}
           </>
         )}

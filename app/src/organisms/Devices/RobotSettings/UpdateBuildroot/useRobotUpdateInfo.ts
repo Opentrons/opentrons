@@ -1,10 +1,10 @@
-import * as React from 'react'
+import { useMemo, useState, useRef } from 'react'
 import { useSelector } from 'react-redux'
 
-import { getRobotUpdateDownloadProgress } from '../../../../redux/robot-update'
+import { getRobotUpdateDownloadProgress } from '/app/redux/robot-update'
 
-import type { RobotUpdateSession } from '../../../../redux/robot-update/types'
-import type { State } from '../../../../redux/types'
+import type { RobotUpdateSession } from '/app/redux/robot-update/types'
+import type { State } from '/app/redux/types'
 
 export function useRobotUpdateInfo(
   robotName: string,
@@ -12,9 +12,7 @@ export function useRobotUpdateInfo(
 ): { updateStep: UpdateStep | null; progressPercent: number } {
   const progressPercent = useFindProgressPercentFrom(robotName, session)
 
-  const updateStep = React.useMemo(() => determineUpdateStepFrom(session), [
-    session,
-  ])
+  const updateStep = useMemo(() => determineUpdateStepFrom(session), [session])
 
   return {
     updateStep,
@@ -26,11 +24,11 @@ function useFindProgressPercentFrom(
   robotName: string,
   session: RobotUpdateSession | null
 ): number {
-  const [progressPercent, setProgressPercent] = React.useState<number>(0)
-  const hasSeenDownloadFileStep = React.useRef<boolean>(false)
-  const prevSeenUpdateStep = React.useRef<string | null>(null)
-  const prevSeenStepProgress = React.useRef<number>(0)
-  const currentStepWithProgress = React.useRef<number>(-1)
+  const [progressPercent, setProgressPercent] = useState<number>(0)
+  const hasSeenDownloadFileStep = useRef<boolean>(false)
+  const prevSeenUpdateStep = useRef<string | null>(null)
+  const prevSeenStepProgress = useRef<number>(0)
+  const currentStepWithProgress = useRef<number>(-1)
 
   const downloadProgress = useSelector((state: State) =>
     getRobotUpdateDownloadProgress(state, robotName)

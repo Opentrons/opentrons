@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   COLORS,
@@ -7,7 +6,7 @@ import {
   AlertPrimaryButton,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
 import type { Direction } from './types'
 

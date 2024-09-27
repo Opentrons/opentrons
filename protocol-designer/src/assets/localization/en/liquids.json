@@ -1,0 +1,18 @@
+{
+  "add_liquid": "Add liquid",
+  "add": "Add",
+  "clear_wells": "Clear wells",
+  "click_and_drag": "Click and drag to select wells",
+  "define_liquid": "Define a liquid",
+  "delete_liquid": "Delete liquid",
+  "description": "Description",
+  "display_color": "Color",
+  "liquid_volume": "Liquid volume by well",
+  "liquid": "Liquid",
+  "liquids_added": "Liquids added",
+  "liquids": "Liquids",
+  "microliters": "µL",
+  "name": "Name",
+  "save": "Save",
+  "well": "Well"
+}

@@ -1,9 +1,10 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation, Trans } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
+  Banner,
   Btn,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
@@ -13,10 +14,8 @@ import {
   WRAP_REVERSE,
 } from '@opentrons/components'
 
-import { Banner } from '../../atoms/Banner'
-
-import type { Dispatch } from '../../redux/types'
-import { analyzeProtocol } from '../../redux/protocol-storage'
+import type { Dispatch } from '/app/redux/types'
+import { analyzeProtocol } from '/app/redux/protocol-storage'
 interface ProtocolAnalysisStaleProps {
   protocolKey: string
 }

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link as RouterLink } from 'react-router-dom'
 
@@ -17,8 +16,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '../../atoms/buttons'
-import { StatusLabel } from '../../atoms/StatusLabel'
+import { TertiaryButton } from '/app/atoms/buttons'
+import { StatusLabel } from '/app/atoms/StatusLabel'
 
 import { useCalibrationTaskList } from '../Devices/hooks'
 

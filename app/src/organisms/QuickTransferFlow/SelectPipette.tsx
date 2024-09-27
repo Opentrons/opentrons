@@ -6,15 +6,15 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
+  RadioButton,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { RIGHT, LEFT } from '@opentrons/shared-data'
-import { RadioButton } from '../../atoms/buttons'
-import { usePipetteSpecsV2 } from '../../resources/instruments/hooks'
+import { usePipetteSpecsV2 } from '/app/local-resources/instruments'
 import { ChildNavigation } from '../ChildNavigation'
 
 import type { PipetteData, Mount } from '@opentrons/api-client'
-import type { SmallButton } from '../../atoms/buttons'
+import type { SmallButton } from '/app/atoms/buttons'
 import type {
   QuickTransferWizardState,
   QuickTransferWizardAction,

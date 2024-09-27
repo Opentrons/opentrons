@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import styled from 'styled-components'
 
 import {
@@ -14,18 +14,19 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  CURSOR_DEFAULT,
 } from '@opentrons/components'
-import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 
-import { SmallButton } from '../../atoms/buttons'
-import { InlineNotification } from '../../atoms/InlineNotification'
+import { SmallButton } from '/app/atoms/buttons'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 
 import type { IconName, StyleProps } from '@opentrons/components'
-import type { InlineNotificationProps } from '../../atoms/InlineNotification'
+import type { InlineNotificationProps } from '/app/atoms/InlineNotification'
 import type {
   IconPlacement,
   SmallButtonTypes,
-} from '../../atoms/buttons/SmallButton'
+} from '/app/atoms/buttons/SmallButton'
 
 interface ChildNavigationProps extends StyleProps {
   header: string
@@ -128,6 +129,6 @@ const IconButton = styled('button')`
     background-color: transparent;
   }
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    cursor: default;
+    cursor: ${CURSOR_DEFAULT};
   }
 `

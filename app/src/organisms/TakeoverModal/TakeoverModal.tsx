@@ -1,6 +1,7 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -12,13 +13,15 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getTopPortalEl } from '../../App/portal'
-import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import { getTopPortalEl } from '../../App/portal'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface TakeoverModalProps {
+  title: string
   showConfirmTerminateModal: boolean
   setShowConfirmTerminateModal: React.Dispatch<React.SetStateAction<boolean>>
   confirmTerminate: () => void
@@ -27,14 +30,15 @@ interface TakeoverModalProps {
 
 export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
   const {
+    title,
     showConfirmTerminateModal,
     setShowConfirmTerminateModal,
     confirmTerminate,
     terminateInProgress,
   } = props
-  const { i18n, t } = useTranslation(['shared', 'branded'])
+  const { t } = useTranslation(['shared', 'branded'])
 
-  const terminateHeader: ModalHeaderBaseProps = {
+  const terminateHeader: OddModalHeaderBaseProps = {
     title: t('terminate') + '?',
     iconName: 'ot-alert',
     iconColor: COLORS.yellow50,
@@ -43,7 +47,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
   return createPortal(
     showConfirmTerminateModal ? (
       //    confirm terminate modal
-      <Modal header={terminateHeader}>
+      <OddModal header={terminateHeader}>
         <Flex flexDirection={DIRECTION_COLUMN}>
           <LegacyStyledText as="p" marginBottom={SPACING.spacing32}>
             {t('branded:confirm_terminate')}
@@ -67,9 +71,9 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
             />
           </Flex>
         </Flex>
-      </Modal>
+      </OddModal>
     ) : (
-      <Modal>
+      <OddModal>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing40}
@@ -95,7 +99,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
               marginBottom={SPACING.spacing4}
               fontWeight={TYPOGRAPHY.fontWeightBold}
             >
-              {i18n.format(t('robot_is_busy'), 'capitalize')}
+              {title}
             </LegacyStyledText>
             <LegacyStyledText as="p" textAlign={TYPOGRAPHY.textAlignCenter}>
               {t('branded:computer_in_app_is_controlling_robot')}
@@ -111,7 +115,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
             {t('terminate')}
           </LegacyStyledText>
         </Flex>
-      </Modal>
+      </OddModal>
     ),
     getTopPortalEl()
   )

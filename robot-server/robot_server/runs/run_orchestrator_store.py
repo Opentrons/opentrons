@@ -4,7 +4,11 @@ import logging
 from typing import List, Optional, Callable
 
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
-from opentrons.protocol_engine.types import PostRunHardwareState, RunTimeParameter
+from opentrons.protocol_engine.types import (
+    PostRunHardwareState,
+    RunTimeParameter,
+    CSVRuntimeParamPaths,
+)
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.robot.types import RobotType
@@ -29,6 +33,7 @@ from opentrons.protocol_engine import (
     LabwareOffsetCreate,
     StateSummary,
     CommandSlice,
+    CommandErrorSlice,
     CommandPointer,
     Command,
     CommandCreate,
@@ -37,15 +42,17 @@ from opentrons.protocol_engine import (
     error_recovery_policy,
 )
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
+from opentrons.protocol_engine import ErrorOccurrence
 
 from robot_server.protocols.protocol_store import ProtocolResource
 from opentrons.protocol_engine.types import (
     DeckConfigurationType,
-    RunTimeParamValuesType,
+    PrimitiveRunTimeParamValuesType,
     EngineStatus,
 )
 from opentrons_shared_data.labware.types import LabwareUri
 
+from .error_recovery_mapping import default_error_recovery_policy
 
 _log = logging.getLogger(__name__)
 
@@ -171,6 +178,9 @@ class RunOrchestratorStore:
                     deck_type=self._deck_type,
                     block_on_door_open=False,
                 ),
+                # Error recovery mode would not make sense outside the context of a run--
+                # for example, there would be no equivalent to the `POST /runs/{id}/actions`
+                # endpoint to resume normal operation.
                 error_recovery_policy=error_recovery_policy.never_recover,
             )
             self._default_run_orchestrator = RunOrchestrator.build_orchestrator(
@@ -186,7 +196,9 @@ class RunOrchestratorStore:
         deck_configuration: DeckConfigurationType,
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
-        run_time_param_values: Optional[RunTimeParamValuesType] = None,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
+        # TODO(jbl 2024-08-02) combine this with run_time_param_values now that theres no ambiguity with Paths
+        run_time_param_paths: Optional[CSVRuntimeParamPaths] = None,
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
@@ -197,6 +209,7 @@ class RunOrchestratorStore:
             notify_publishers: Utilized by the engine to notify publishers of state changes.
             protocol: The protocol to load the runner with, if any.
             run_time_param_values: Any runtime parameter values to set.
+            run_time_param_paths: Any runtime filepath to set.
 
         Returns:
             The initial equipment and status summary of the engine.
@@ -221,7 +234,7 @@ class RunOrchestratorStore:
                     RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
             ),
-            error_recovery_policy=error_recovery_policy.standard_run_policy,
+            error_recovery_policy=default_error_recovery_policy,
             load_fixed_trash=load_fixed_trash,
             deck_configuration=deck_configuration,
             notify_publishers=notify_publishers,
@@ -242,6 +255,7 @@ class RunOrchestratorStore:
             await self.run_orchestrator.load(
                 protocol.source,
                 run_time_param_values=run_time_param_values,
+                run_time_param_paths=run_time_param_paths,
                 parse_mode=ParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
             )
         else:
@@ -319,17 +333,37 @@ class RunOrchestratorStore:
         return self.run_orchestrator.get_current_command()
 
     def get_command_slice(
-        self,
-        cursor: Optional[int],
-        length: int,
+        self, cursor: Optional[int], length: int, include_fixit_commands: bool
     ) -> CommandSlice:
         """Get a slice of run commands.
 
         Args:
             cursor: Requested index of first command in the returned slice.
             length: Length of slice to return.
+            include_fixit_commands: Include fixit commands.
         """
-        return self.run_orchestrator.get_command_slice(cursor=cursor, length=length)
+        return self.run_orchestrator.get_command_slice(
+            cursor=cursor, length=length, include_fixit_commands=include_fixit_commands
+        )
+
+    def get_command_error_slice(
+        self,
+        cursor: int,
+        length: int,
+    ) -> CommandErrorSlice:
+        """Get a slice of run commands error.
+
+        Args:
+            cursor: Requested index of first command error in the returned slice.
+            length: Length of slice to return.
+        """
+        return self.run_orchestrator.get_command_error_slice(
+            cursor=cursor, length=length
+        )
+
+    def get_command_errors(self) -> list[ErrorOccurrence]:
+        """Get all command errors."""
+        return self.run_orchestrator.get_command_errors()
 
     def get_command_recovery_target(self) -> Optional[CommandPointer]:
         """Get the current error recovery target."""
@@ -358,6 +392,12 @@ class RunOrchestratorStore:
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a new labware definition to state."""
         return self.run_orchestrator.add_labware_definition(definition)
+
+    def set_error_recovery_policy(
+        self, policy: error_recovery_policy.ErrorRecoveryPolicy
+    ) -> None:
+        """Create run policy rules for error recovery."""
+        self.run_orchestrator.set_error_recovery_policy(policy)
 
     async def add_command_and_wait_for_interval(
         self,

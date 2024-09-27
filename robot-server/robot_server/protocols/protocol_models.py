@@ -22,14 +22,6 @@ class ProtocolKind(str, Enum):
     STANDARD = "standard"
     QUICK_TRANSFER = "quick-transfer"
 
-    @staticmethod
-    def from_string(name: Optional[str]) -> Optional["ProtocolKind"]:
-        """Get the ProtocolKind from a string."""
-        for item in ProtocolKind:
-            if name == item.value:
-                return item
-        return None
-
 
 class ProtocolFile(BaseModel):
     """A file in a protocol."""

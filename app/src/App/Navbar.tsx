@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
+import debounce from 'lodash/debounce'
 
 import {
   ALIGN_CENTER,
@@ -14,14 +15,13 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_SPACE_EVENLY,
   Link,
-  SIZE_2,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import logoSvg from '../assets/images/logo_nav.svg'
-import logoSvgThree from '../assets/images/logo_nav_three.svg'
+import logoSvg from '/app/assets/images/logo_nav.svg'
+import logoSvgThree from '/app/assets/images/logo_nav_three.svg'
 
 import { NAV_BAR_WIDTH } from './constants'
 
@@ -29,6 +29,7 @@ import type { RouteProps } from './types'
 
 const SALESFORCE_HELP_LINK = 'https://support.opentrons.com/s/'
 const PROJECT: string = _OPENTRONS_PROJECT_
+const DEBOUNCE_DURATION_MS = 300
 
 const NavbarLink = styled(NavLink)`
   color: ${COLORS.white};
@@ -61,7 +62,7 @@ const NavbarLink = styled(NavLink)`
     background-color: ${COLORS.black90};
   }
 `
-const NavIconLink = styled(NavLink)`
+const NavIconLink = styled(Link)`
   &.active > svg {
     color: ${COLORS.grey30};
     background-color: ${COLORS.black70};
@@ -75,8 +76,8 @@ const IconLink = styled(Link)`
 `
 
 const NavbarIcon = styled(Icon)`
-  width: ${SIZE_2};
-  height: ${SIZE_2};
+  width: 2rem;
+  height: 2rem;
   padding: ${SPACING.spacing6};
   border-radius: 50%;
   color: ${COLORS.grey30};
@@ -109,9 +110,18 @@ const LogoImg = styled('img')`
 `
 
 export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
+  const navigate = useNavigate()
   const navRoutes = routes.filter(
     ({ navLinkTo }: RouteProps) => navLinkTo != null
   )
+
+  const debouncedNavigate = React.useCallback(
+    debounce((path: string) => {
+      navigate(path)
+    }, DEBOUNCE_DURATION_MS),
+    [navigate]
+  )
+
   return (
     <Flex
       backgroundColor={COLORS.black90}
@@ -148,7 +158,14 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
         alignSelf={ALIGN_STRETCH}
         justifyContent={JUSTIFY_SPACE_EVENLY}
       >
-        <NavIconLink data-testid="Navbar_settingsLink" to="/app-settings">
+        <NavIconLink
+          role="button"
+          data-testid="Navbar_settingsLink"
+          onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.preventDefault()
+            debouncedNavigate('/app-settings')
+          }}
+        >
           <NavbarIcon name="gear" />
         </NavIconLink>
         <IconLink href={SALESFORCE_HELP_LINK} external>

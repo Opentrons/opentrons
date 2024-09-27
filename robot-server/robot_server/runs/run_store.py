@@ -7,10 +7,11 @@ from functools import lru_cache
 from typing import Dict, List, Optional, Literal, Union
 
 import sqlalchemy
+from sqlalchemy import and_
 from pydantic import ValidationError
 
 from opentrons.util.helpers import utc_now
-from opentrons.protocol_engine import StateSummary, CommandSlice
+from opentrons.protocol_engine import StateSummary, CommandSlice, CommandIntent
 from opentrons.protocol_engine.commands import Command
 from opentrons.protocol_engine.types import RunTimeParameter
 
@@ -25,6 +26,7 @@ from robot_server.persistence.tables import (
     run_table,
     run_command_table,
     action_table,
+    run_csv_rtp_table,
 )
 from robot_server.persistence.pydantic import (
     json_to_pydantic,
@@ -83,6 +85,15 @@ class BadStateSummary:
     """A representation for a state summary that could not be loaded."""
 
     dataError: EnumeratedError
+
+
+@dataclass
+class CSVParameterRunResource:
+    """A CSV runtime parameter from a completed run, storable in a SQL database."""
+
+    run_id: str
+    parameter_variable_name: str
+    file_id: Optional[str]
 
 
 class CommandNotFoundError(ValueError):
@@ -165,6 +176,9 @@ class RunStore:
                         "index_in_run": command_index,
                         "command_id": command.id,
                         "command": pydantic_to_json(command),
+                        "command_intent": str(command.intent.value)
+                        if command.intent
+                        else CommandIntent.PROTOCOL,
                     },
                 )
 
@@ -197,6 +211,39 @@ class RunStore:
             transaction.execute(insert)
 
         self._clear_caches()
+
+    def get_all_csv_rtp(self) -> List[CSVParameterRunResource]:
+        """Get all of the csv rtp from the run_csv_rtp_table."""
+        select_all_csv_rtp = sqlalchemy.select(run_csv_rtp_table).order_by(
+            sqlite_rowid.asc()
+        )
+
+        with self._sql_engine.begin() as transaction:
+            csv_rtps = transaction.execute(select_all_csv_rtp).all()
+
+        return [_convert_row_to_csv_rtp(row) for row in csv_rtps]
+
+    def insert_csv_rtp(
+        self, run_id: str, run_time_parameters: List[RunTimeParameter]
+    ) -> None:
+        """Save csv rtp to the run_csv_rtp_table."""
+        insert_csv_rtp = sqlalchemy.insert(run_csv_rtp_table)
+
+        with self._sql_engine.begin() as transaction:
+            if not self._run_exists(run_id, transaction):
+                raise RunNotFoundError(run_id=run_id)
+            for run_time_param in run_time_parameters:
+                if run_time_param.type == "csv_file":
+                    transaction.execute(
+                        insert_csv_rtp,
+                        {
+                            "run_id": run_id,
+                            "parameter_variable_name": run_time_param.variableName,
+                            "file_id": run_time_param.file.id
+                            if run_time_param.file
+                            else None,
+                        },
+                    )
 
     def insert(
         self,
@@ -387,6 +434,7 @@ class RunStore:
         run_id: str,
         length: int,
         cursor: Optional[int],
+        include_fixit_commands: bool,
     ) -> CommandSlice:
         """Get a slice of run commands from the store.
 
@@ -396,6 +444,7 @@ class RunStore:
             cursor: The starting index of the slice in the whole collection.
                 If `None`, up to `length` elements at the end of the collection will
                 be returned.
+            include_fixit_commands: Wether we should include fixit command intent in the result.
 
         Returns:
             A collection of commands as well as the actual cursor used and
@@ -408,26 +457,47 @@ class RunStore:
             if not self._run_exists(run_id, transaction):
                 raise RunNotFoundError(run_id=run_id)
 
-            select_count = sqlalchemy.select(sqlalchemy.func.count()).where(
-                run_command_table.c.run_id == run_id
-            )
+            if include_fixit_commands:
+                select_count = sqlalchemy.select(sqlalchemy.func.count()).where(
+                    run_command_table.c.run_id == run_id
+                )
+            else:
+                select_count = sqlalchemy.select(sqlalchemy.func.count()).where(
+                    and_(
+                        run_command_table.c.run_id == run_id,
+                        run_command_table.c.command_intent != "fixit",
+                    )
+                )
             count_result: int = transaction.execute(select_count).scalar_one()
 
             actual_cursor = cursor if cursor is not None else count_result - length
             # Clamp to [0, count_result).
             actual_cursor = max(0, min(actual_cursor, count_result - 1))
-
-            select_slice = (
-                sqlalchemy.select(
-                    run_command_table.c.index_in_run, run_command_table.c.command
+            if include_fixit_commands:
+                select_slice = (
+                    sqlalchemy.select(
+                        run_command_table.c.index_in_run, run_command_table.c.command
+                    )
+                    .where(
+                        run_command_table.c.run_id == run_id,
+                        run_command_table.c.index_in_run >= actual_cursor,
+                        run_command_table.c.index_in_run < actual_cursor + length,
+                    )
+                    .order_by(run_command_table.c.index_in_run)
                 )
-                .where(
-                    run_command_table.c.run_id == run_id,
-                    run_command_table.c.index_in_run >= actual_cursor,
-                    run_command_table.c.index_in_run < actual_cursor + length,
+            else:
+                select_slice = (
+                    sqlalchemy.select(
+                        run_command_table.c.index_in_run, run_command_table.c.command
+                    )
+                    .where(
+                        run_command_table.c.run_id == run_id,
+                        run_command_table.c.index_in_run >= actual_cursor,
+                        run_command_table.c.index_in_run < actual_cursor + length,
+                        run_command_table.c.command_intent != "fixit",
+                    )
+                    .order_by(run_command_table.c.index_in_run)
                 )
-                .order_by(run_command_table.c.index_in_run)
-            )
             slice_result = transaction.execute(select_slice).all()
 
         sliced_commands: List[Command] = [
@@ -441,16 +511,29 @@ class RunStore:
             commands=sliced_commands,
         )
 
-    def get_all_commands_as_preserialized_list(self, run_id: str) -> List[str]:
+    def get_all_commands_as_preserialized_list(
+        self, run_id: str, include_fixit_commands: bool
+    ) -> List[str]:
         """Get all commands of the run as a list of strings of json command objects."""
         with self._sql_engine.begin() as transaction:
             if not self._run_exists(run_id, transaction):
                 raise RunNotFoundError(run_id=run_id)
-            select_commands = (
-                sqlalchemy.select(run_command_table.c.command)
-                .where(run_command_table.c.run_id == run_id)
-                .order_by(run_command_table.c.index_in_run)
-            )
+            # TODO (tz, 8-21-24): consolidate into 1 query.
+            if include_fixit_commands:
+                select_commands = (
+                    sqlalchemy.select(run_command_table.c.command)
+                    .where(run_command_table.c.run_id == run_id)
+                    .order_by(run_command_table.c.index_in_run)
+                )
+            else:
+                select_commands = (
+                    sqlalchemy.select(run_command_table.c.command)
+                    .where(
+                        and_(run_command_table.c.run_id == run_id),
+                        run_command_table.c.command_intent != "fixit",
+                    )
+                    .order_by(run_command_table.c.index_in_run)
+                )
             commands_result = transaction.scalars(select_commands).all()
         return commands_result
 
@@ -500,9 +583,13 @@ class RunStore:
         delete_commands = sqlalchemy.delete(run_command_table).where(
             run_command_table.c.run_id == run_id
         )
+        delete_csv_rtps = sqlalchemy.delete(run_csv_rtp_table).where(
+            run_csv_rtp_table.c.run_id == run_id
+        )
         with self._sql_engine.begin() as transaction:
             transaction.execute(delete_actions)
             transaction.execute(delete_commands)
+            transaction.execute(delete_csv_rtps)
             result = transaction.execute(delete_run)
 
         if result.rowcount < 1:
@@ -529,6 +616,22 @@ class RunStore:
 
 # The columns that must be present in a row passed to _convert_row_to_run().
 _run_columns = [run_table.c.id, run_table.c.protocol_id, run_table.c.created_at]
+
+
+def _convert_row_to_csv_rtp(
+    row: sqlalchemy.engine.Row,
+) -> CSVParameterRunResource:
+    run_id = row.run_id
+    parameter_variable_name = row.parameter_variable_name
+    file_id = row.file_id
+
+    assert isinstance(run_id, str)
+    assert isinstance(parameter_variable_name, str)
+    assert isinstance(file_id, str) or file_id is None
+
+    return CSVParameterRunResource(
+        run_id=run_id, parameter_variable_name=parameter_variable_name, file_id=file_id
+    )
 
 
 def _convert_row_to_run(

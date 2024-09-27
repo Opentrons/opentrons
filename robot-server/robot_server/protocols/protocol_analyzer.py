@@ -1,5 +1,6 @@
 """Protocol analysis module."""
 import logging
+import asyncio
 from typing import Optional, List
 
 from opentrons_shared_data.robot.types import RobotType
@@ -7,7 +8,11 @@ from opentrons_shared_data.robot.types import RobotType
 import opentrons.protocol_runner.create_simulating_orchestrator as simulating_runner
 from opentrons.protocol_engine.errors import ErrorOccurrence
 from opentrons.util.performance_helpers import TrackingFunctions
-from opentrons.protocol_engine.types import RunTimeParamValuesType, RunTimeParameter
+from opentrons.protocol_engine.types import (
+    PrimitiveRunTimeParamValuesType,
+    RunTimeParameter,
+    CSVRuntimeParamPaths,
+)
 import opentrons.util.helpers as datetime_helper
 from opentrons.protocol_runner import (
     RunOrchestrator,
@@ -34,37 +39,51 @@ class ProtocolAnalyzer:
         """Initialize the analyzer and its dependencies."""
         self._analysis_store = analysis_store
         self._protocol_resource = protocol_resource
+        self._orchestrator: Optional[RunOrchestrator] = None
 
-    async def load_runner(
+    @property
+    def protocol_resource(self) -> ProtocolResource:
+        """Return the protocol resource."""
+        return self._protocol_resource
+
+    def get_verified_run_time_parameters(self) -> List[RunTimeParameter]:
+        """Get the validated RTPs with values set by the client."""
+        assert self._orchestrator is not None
+        return self._orchestrator.get_run_time_parameters()
+
+    async def load_orchestrator(
         self,
-        run_time_param_values: Optional[RunTimeParamValuesType],
-    ) -> RunOrchestrator:
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
+        run_time_param_paths: Optional[CSVRuntimeParamPaths],
+    ) -> None:
         """Load runner with the protocol and run time parameter values.
 
         Returns: The RunOrchestrator instance.
         """
-        orchestrator = await simulating_runner.create_simulating_orchestrator(
+        self._orchestrator = await simulating_runner.create_simulating_orchestrator(
             robot_type=self._protocol_resource.source.robot_type,
             protocol_config=self._protocol_resource.source.config,
         )
-        await orchestrator.load(
+        await self._orchestrator.load(
             protocol_source=self._protocol_resource.source,
             parse_mode=ParseMode.NORMAL,
             run_time_param_values=run_time_param_values,
+            run_time_param_paths=run_time_param_paths,
         )
-        return orchestrator
 
     @TrackingFunctions.track_analysis
     async def analyze(
         self,
-        orchestrator: RunOrchestrator,
         analysis_id: str,
-        run_time_parameters: Optional[List[RunTimeParameter]] = None,
     ) -> None:
-        """Analyze a given protocol, storing the analysis when complete."""
+        """Analyze a given protocol, storing the analysis when complete.
+
+        This method should only be called once the run orchestrator is loaded.
+        """
         assert self._protocol_resource is not None
+        assert self._orchestrator is not None
         try:
-            result = await orchestrator.run(
+            result = await self._orchestrator.run(
                 deck_configuration=[],
             )
         except BaseException as error:
@@ -72,7 +91,7 @@ class ProtocolAnalyzer:
                 analysis_id=analysis_id,
                 protocol_robot_type=self._protocol_resource.source.robot_type,
                 error=error,
-                run_time_parameters=run_time_parameters or [],
+                run_time_parameters=self._orchestrator.get_run_time_parameters(),
             )
             return
 
@@ -118,6 +137,24 @@ class ProtocolAnalyzer:
             ],
             liquids=[],
         )
+
+    def __del__(self) -> None:
+        """Stop the simulating run orchestrator.
+
+        Once the analyzer is no longer in use- either because analysis completed
+        or was not required, stop the orchestrator so that all its background tasks
+        are stopped timely and do not block server shutdown.
+        """
+        if self._orchestrator is not None:
+            if self._orchestrator.get_is_okay_to_clear():
+                asyncio.run_coroutine_threadsafe(
+                    self._orchestrator.stop(), asyncio.get_running_loop()
+                )
+            else:
+                log.warning(
+                    "Analyzer is no longer in use but orchestrator is busy. "
+                    "Cannot stop the orchestrator currently."
+                )
 
 
 def create_protocol_analyzer(

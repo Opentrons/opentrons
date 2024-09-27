@@ -111,6 +111,14 @@ const helixProductStyleMap = {
       }
     `,
   },
+  captionBold: {
+    as: 'label',
+    style: css`
+      @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+        font: ${HELIX_TYPOGRAPHY.fontStyleCaptionBold};
+      }
+    `,
+  },
   captionRegular: {
     as: 'label',
     style: css`
@@ -300,12 +308,13 @@ function styleForODDName(name?: ODDStyles): FlattenSimpleInterpolation {
   return name ? ODDStyleMap[name].style : css``
 }
 
-// this is some artifact of the way styled-text forwards arguments.
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-const DesktopStyledText: (props: Props) => JSX.Element = styled(Text)<Props>`
-  ${props => styleForDesktopName(props.desktopStyle)}
+const DesktopStyledText: (props: Props) => JSX.Element = styled(
+  Text
+).withConfig({
+  shouldForwardProp: p => p !== 'oddStyle' && p !== 'desktopStyle',
+})`
+  ${(props: Props) => styleForDesktopName(props.desktopStyle)}
 `
-/* eslint-enable @typescript-eslint/no-unsafe-argument */
 
 export const StyledText: (props: Props) => JSX.Element = styled(
   DesktopStyledText

@@ -1,8 +1,8 @@
-import * as React from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import head from 'lodash/head'
 import last from 'lodash/last'
 
-import { DT_ROUTES, INVALID } from '../constants'
+import { BEFORE_BEGINNING_STEPS, DT_ROUTES, INVALID } from '../constants'
 
 import type {
   DropTipFlowsRoute,
@@ -44,20 +44,18 @@ export interface UseDropTipRoutingResult {
 export function useDropTipRouting(
   fixitUtils?: FixitCommandTypeUtils
 ): UseDropTipRoutingResult {
-  const [initialRoute, initialStep] = React.useMemo(
+  const [initialRoute, initialStep] = useMemo(
     () => getInitialRouteAndStep(fixitUtils),
-    [fixitUtils]
+    []
   )
 
-  const [dropTipFlowsMap, setDropTipFlowsMap] = React.useState<DropTipFlowsMap>(
-    {
-      currentRoute: initialRoute as DropTipFlowsRoute,
-      currentStep: initialStep,
-      currentStepIdx: 0,
-    }
-  )
+  const [dropTipFlowsMap, setDropTipFlowsMap] = useState<DropTipFlowsMap>({
+    currentRoute: initialRoute as DropTipFlowsRoute,
+    currentStep: initialStep,
+    currentStepIdx: 0,
+  })
 
-  useExternalMapUpdates(dropTipFlowsMap, fixitUtils)
+  useReportMap(dropTipFlowsMap, fixitUtils)
 
   const { currentStep, currentRoute } = dropTipFlowsMap
 
@@ -126,7 +124,7 @@ interface DropTipRouteNavigationResult {
 
 // Returns functions that calculate the next and previous steps of a route given a step.
 function getDropTipRouteNavigation(
-  route: DropTipFlowsStep[]
+  route: readonly DropTipFlowsStep[]
 ): DropTipRouteNavigationResult {
   const getNextStep = (step: DropTipFlowsStep): StepNavigationResult => {
     const isStepFinalStep = step === last(route)
@@ -180,17 +178,17 @@ function determineValidRoute(
 }
 
 // If an external flow is keeping track of the Drop tip flow map, update it when the drop tip flow map updates.
-export function useExternalMapUpdates(
+export function useReportMap(
   map: DropTipFlowsMap,
   fixitUtils?: FixitCommandTypeUtils
 ): void {
   const { currentStep, currentRoute } = map
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (fixitUtils != null) {
-      fixitUtils.trackCurrentMap({ currentRoute, currentStep })
+      fixitUtils.reportMap({ route: currentRoute, step: currentStep })
     }
-  }, [currentStep, currentRoute, fixitUtils])
+  }, [currentStep, currentRoute])
 }
 
 // If present, return fixit route overrides for setting the initial Drop Tip Wizard route.
@@ -198,8 +196,8 @@ export function getInitialRouteAndStep(
   fixitUtils?: FixitCommandTypeUtils
 ): [DropTipFlowsRoute, DropTipFlowsStep] {
   const routeOverride = fixitUtils?.routeOverride
-  const initialRoute = routeOverride ?? DT_ROUTES.BEFORE_BEGINNING
-  const initialStep = head(routeOverride) ?? head(DT_ROUTES.BEFORE_BEGINNING)
+  const initialRoute = routeOverride?.route ?? DT_ROUTES.BEFORE_BEGINNING
+  const initialStep = routeOverride?.step ?? BEFORE_BEGINNING_STEPS[0]
 
-  return [initialRoute as DropTipFlowsRoute, initialStep as DropTipFlowsStep]
+  return [initialRoute, initialStep]
 }

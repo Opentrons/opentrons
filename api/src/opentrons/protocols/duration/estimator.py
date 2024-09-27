@@ -1,7 +1,6 @@
 import logging
-from typing import Optional, List
+from typing import Any, Optional, List, cast
 from typing_extensions import Final
-
 import math
 import functools
 
@@ -54,7 +53,7 @@ class DurationEstimator:
     Broker listener that calculates the duration of protocol steps.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         # Which slot the last command was in.
         self._last_deckslot = STARTING_SLOT
         # todo(mm, 2021-09-08): Support protocols with more than one
@@ -128,39 +127,50 @@ class DurationEstimator:
         # TODO (al, 2021-09-09):
         #  - Make this into a map
         #  - Remove "noqa: C901"
-        #  - type the payload in the on_X methods.
         if message_name == types.PICK_UP_TIP:
+            payload = cast(types.PickUpTipCommandPayload, payload)
             duration = self.on_pick_up_tip(payload=payload)
         elif message_name == types.DROP_TIP:
+            payload = cast(types.DropTipCommandPayload, payload)
             duration = self.on_drop_tip(payload=payload)
         elif message_name == types.ASPIRATE:
+            payload = cast(types.AspirateDispenseCommandPayload, payload)
             duration = self.on_aspirate(payload=payload)
         elif message_name == types.DISPENSE:
+            payload = cast(types.AspirateDispenseCommandPayload, payload)
             duration = self.on_dispense(payload=payload)
         elif message_name == types.BLOW_OUT:
+            payload = cast(types.BlowOutCommandPayload, payload)
             duration = self.on_blow_out(payload=payload)
         elif message_name == types.TOUCH_TIP:
-            duration = self.on_touch_tip(payload=payload)
+            payload = cast(types.TouchTipCommandPayload, payload)
+            duration = self.on_touch_tip()
         elif message_name == types.DELAY:
+            payload = cast(types.DelayCommandPayload, payload)
             duration = self.on_delay(payload=payload)
         elif message_name == types.TEMPDECK_SET_TEMP:
+            payload = cast(types.TempdeckSetTempCommandPayload, payload)
             duration = self.on_tempdeck_set_temp(payload=payload)
         elif message_name == types.TEMPDECK_DEACTIVATE:
-            duration = self.on_tempdeck_deactivate(payload=payload)
+            payload = cast(types.TempdeckDeactivateCommandPayload, payload)
+            duration = self.on_tempdeck_deactivate()
         elif message_name == types.TEMPDECK_AWAIT_TEMP:
-            duration = self.on_tempdeck_await_temp(payload=payload)
+            payload = cast(types.TempdeckAwaitTempCommandPayload, payload)
+            duration = self.on_tempdeck_await_temp()
         elif message_name == types.THERMOCYCLER_SET_BLOCK_TEMP:
+            payload = cast(types.ThermocyclerSetBlockTempCommandPayload, payload)
             duration = self.on_thermocycler_block_temp(payload=payload)
         elif message_name == types.THERMOCYCLER_EXECUTE_PROFILE:
+            payload = cast(types.ThermocyclerExecuteProfileCommandPayload, payload)
             duration = self.on_execute_profile(payload=payload)
         elif message_name == types.THERMOCYCLER_SET_LID_TEMP:
-            duration = self.on_thermocycler_set_lid_temp(payload=payload)
+            duration = self.on_thermocycler_set_lid_temp()
         elif message_name == types.THERMOCYCLER_CLOSE:
-            duration = self.on_thermocycler_lid_close(payload=payload)
+            duration = self.on_thermocycler_lid_close()
         elif message_name == types.THERMOCYCLER_DEACTIVATE_LID:
-            duration = self.on_thermocycler_deactivate_lid(payload=payload)
+            duration = self.on_thermocycler_deactivate_lid()
         elif message_name == types.THERMOCYCLER_OPEN:
-            duration = self.on_thermocycler_lid_open(payload=payload)
+            duration = self.on_thermocycler_lid_open()
         elif message_name == types.TRANSFER:
             # Already accounted for in other steps
             pass
@@ -177,10 +187,10 @@ class DurationEstimator:
             )
         return duration
 
-    def on_pick_up_tip(self, payload) -> float:
+    def on_pick_up_tip(self, payload: types.PickUpTipCommandPayload) -> float:
         """Handle a pick up tip event"""
-        instrument = payload["instrument"]
 
+        instrument = payload["instrument"]
         location = payload["location"]
         prev_slot = self._last_deckslot
         curr_slot = self.get_slot(location)
@@ -200,7 +210,8 @@ class DurationEstimator:
         )
         return duration
 
-    def on_drop_tip(self, payload) -> float:
+    def on_drop_tip(self, payload: types.DropTipCommandPayload) -> float:
+
         instrument = payload["instrument"]
         # We are going to once again use our "deck movement" set up. This should
         # be in pickup, drop tip, aspirate, dispense
@@ -221,7 +232,7 @@ class DurationEstimator:
         logger.info(f"{instrument.name}, drop tip duration is {duration}")
         return duration
 
-    def on_aspirate(self, payload) -> float:
+    def on_aspirate(self, payload: types.AspirateDispenseCommandPayload) -> float:
         # General aspiration code
         instrument = payload["instrument"]
         volume = payload["volume"]
@@ -250,13 +261,14 @@ class DurationEstimator:
         deck_travel_time = self.calc_deck_movement_time(
             self._deck, curr_slot, prev_slot, gantry_speed
         )
+        assert isinstance(aspiration_time, float)
         duration = deck_travel_time + z_total_time + aspiration_time
         logger.info(
             f"{instrument.name} aspirate from {slot}, " f"the duration is {duration}"
         )
         return duration
 
-    def on_dispense(self, payload) -> float:
+    def on_dispense(self, payload: types.AspirateDispenseCommandPayload) -> float:
         # General code for aspiration/dispense
         instrument = payload["instrument"]
         volume = payload["volume"]
@@ -282,6 +294,7 @@ class DurationEstimator:
             self._deck, curr_slot, prev_slot, gantry_speed
         )
 
+        assert isinstance(dispense_time, float)
         duration = deck_travel_time + z_total_time + dispense_time
 
         logger.info(
@@ -289,7 +302,7 @@ class DurationEstimator:
         )
         return duration
 
-    def on_blow_out(self, payload) -> float:
+    def on_blow_out(self, payload: types.BlowOutCommandPayload) -> float:
         location = payload["location"]
         curr_slot = self.get_slot(location)
         # In theory, we could use instrument.flow_rate.blow_out, but we don't
@@ -299,7 +312,7 @@ class DurationEstimator:
         logger.info(f"blowing_out_for {duration} seconds, in slot {curr_slot}")
         return duration
 
-    def on_touch_tip(self, payload) -> float:
+    def on_touch_tip(self) -> float:
         # base assumption. Touch_tip takes 0.5 seconds This is consistent with a
         # ~7.5mm diameter (default 60mm/s, 4 sides)
         # plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '1')
@@ -311,17 +324,20 @@ class DurationEstimator:
         logger.info(f"touch_tip for {duration} seconds")
         return duration
 
-    def on_delay(self, payload) -> float:
+    def on_delay(self, payload: types.DelayCommandPayload) -> float:
         # Explanation: we are gathering seconds and minutes here
         seconds_delay = payload["seconds"]
         minutes_delay = payload["minutes"]
         duration = seconds_delay + minutes_delay * 60
+        duration = float(duration)
         # Note will need to multiply minutes by 60
         logger.info(f"delay for {seconds_delay} seconds and {minutes_delay} minutes")
 
         return duration
 
-    def on_thermocycler_block_temp(self, payload) -> float:
+    def on_thermocycler_block_temp(
+        self, payload: types.ThermocyclerSetBlockTempCommandPayload
+    ) -> float:
         temperature = payload["temperature"]
         hold_time = payload["hold_time"]
         temp0 = self._last_thermocycler_module_temperature
@@ -340,10 +356,13 @@ class DurationEstimator:
             f"hold for {hold_time} seconds and set temp for {temperature}"
             f" C total duration {duration}"
         )
+        duration = float(duration)
 
         return duration
 
-    def on_execute_profile(self, payload) -> float:
+    def on_execute_profile(
+        self, payload: types.ThermocyclerExecuteProfileCommandPayload
+    ) -> float:
         # Overview We need to run each time a temperature change happens
         # through thermocycler_handler and multiply
         # By the cycle count. Then we also (in parallel) do the same with delays
@@ -386,35 +405,37 @@ class DurationEstimator:
         )
         return duration
 
-    def on_thermocycler_set_lid_temp(self, payload) -> float:
+    def on_thermocycler_set_lid_temp(self) -> float:
         # Hardware said ~1 minute
         duration = 60
         thermoaction = "set lid temperature"
         logger.info(f"thermocation =  {thermoaction}")
         return duration
 
-    def on_thermocycler_lid_close(self, payload) -> float:
+    def on_thermocycler_lid_close(self) -> float:
         # Hardware said ~24 seconds
         duration = 24
         thermoaction = "closing"
         logger.info(f"thermocation =  {thermoaction}")
         return duration
 
-    def on_thermocycler_lid_open(self, payload) -> float:
+    def on_thermocycler_lid_open(self) -> float:
         # Hardware said ~24 seconds
         duration = 24
         thermoaction = "opening"
         logger.info(f"thermocation =  {thermoaction}")
         return duration
 
-    def on_thermocycler_deactivate_lid(self, payload) -> float:
+    def on_thermocycler_deactivate_lid(self) -> float:
         # Hardware said ~23 seconds
         duration = 23
         thermoaction = "Deactivating"
         logger.info(f"thermocation =  {thermoaction}")
         return duration
 
-    def on_tempdeck_set_temp(self, payload) -> float:
+    def on_tempdeck_set_temp(
+        self, payload: types.TempdeckSetTempCommandPayload
+    ) -> float:
         temperature_tempdeck = payload["celsius"]
         temp0 = self._last_temperature_module_temperature
         temp1 = float(temperature_tempdeck)
@@ -460,20 +481,20 @@ class DurationEstimator:
                 duration = self.rate_low(temp0, temp1)
         return duration
 
-    def on_tempdeck_deactivate(self, payload) -> float:
+    def on_tempdeck_deactivate(self) -> float:
         # TODO (al, 2021-09-08: Find an answer for this value.
         duration = 0.0
         logger.info("tempdeck deactivating")
         return duration
 
-    def on_tempdeck_await_temp(self, payload) -> float:
+    def on_tempdeck_await_temp(self) -> float:
         # The duration is accounted for in set temperature
         duration = 0.0
         logger.info("tempdeck awaiting temperature")
         return duration
 
     @staticmethod
-    def get_slot(location) -> Optional[str]:
+    def get_slot(location: Any) -> Optional[str]:
         """A utility function to extract the slot number from the location."""
         if isinstance(location, Location):
             return location.labware.first_parent()

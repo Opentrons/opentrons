@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { renderHook } from '@testing-library/react'
@@ -8,7 +8,7 @@ import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
-} from '../../../../redux/calibration/pipette-offset/__fixtures__'
+} from '/app/redux/calibration/pipette-offset/__fixtures__'
 import { usePipetteOffsetCalibrations } from '..'
 
 vi.mock('@opentrons/react-api-client')

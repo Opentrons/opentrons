@@ -13,6 +13,7 @@ module.exports = {
     'prettier',
     'plugin:json/recommended',
     'plugin:storybook/recommended',
+    'plugin:react/jsx-runtime',
   ],
 
   plugins: ['react', 'react-hooks', 'json', 'testing-library'],
@@ -114,6 +115,12 @@ module.exports = {
           'error',
           { ignore: ['css', 'indeterminate'] },
         ],
+      },
+    },
+    {
+      files: ['./app/src/**/*.@(ts|tsx)'],
+      rules: {
+        'import/no-absolute-path': 'off',
       },
     },
     {

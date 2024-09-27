@@ -1,10 +1,10 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 import { useTranslation } from 'react-i18next'
 
 import { Flex, DISPLAY_INLINE, StyledText } from '@opentrons/components'
 
-import { CommandText } from '../../../molecules/Command'
+import { CommandText } from '/app/molecules/Command'
 
 import type { StyleProps } from '@opentrons/components'
 import type { RecoveryContentProps } from '../types'
@@ -30,10 +30,6 @@ export function StepInfo({
   const { t } = useTranslation('error_recovery')
   const { currentStepNumber, totalStepCount } = stepCounts
 
-  const analysisCommand = protocolAnalysis?.commands.find(
-    command => command.key === failedCommand?.key
-  )
-
   const currentCopy = currentStepNumber ?? '?'
   const totalCopy = totalStepCount ?? '?'
 
@@ -49,9 +45,9 @@ export function StepInfo({
       >
         {`${t('at_step')} ${currentCopy}/${totalCopy}: `}
       </StyledText>
-      {analysisCommand != null && protocolAnalysis != null ? (
+      {failedCommand?.byAnalysis != null && protocolAnalysis != null ? (
         <CommandText
-          command={analysisCommand}
+          command={failedCommand.byAnalysis}
           commandTextData={protocolAnalysis}
           robotType={robotType}
           display={DISPLAY_INLINE}

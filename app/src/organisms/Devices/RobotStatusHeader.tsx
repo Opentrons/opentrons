@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
@@ -14,31 +14,30 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
-  LegacyStyledText,
+  Tooltip,
   truncateString,
   TYPOGRAPHY,
   useHoverTooltip,
   useInterval,
 } from '@opentrons/components'
 
-import { QuaternaryButton } from '../../atoms/buttons'
-import { Tooltip } from '../../atoms/Tooltip'
-import { useIsFlex } from '../../organisms/Devices/hooks'
-import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
-import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
+import { QuaternaryButton } from '/app/atoms/buttons'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
 import {
   getRobotAddressesByName,
   HEALTH_STATUS_OK,
   OPENTRONS_USB,
-} from '../../redux/discovery'
-import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
-import { useNotifyRunQuery } from '../../resources/runs'
+} from '/app/redux/discovery'
+import { getNetworkInterfaces, fetchStatus } from '/app/redux/networking'
+import { useNotifyRunQuery, useCurrentRunId } from '/app/resources/runs'
 
 import type { IconName, StyleProps } from '@opentrons/components'
-import type { DiscoveredRobot } from '../../redux/discovery/types'
-import type { Dispatch, State } from '../../redux/types'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 type RobotStatusHeaderProps = StyleProps &
   Pick<DiscoveredRobot, 'name' | 'local'> & {

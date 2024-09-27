@@ -1,8 +1,7 @@
 // client entry point and application manifest
-import React from 'react'
 import ReactDom from 'react-dom/client'
 import { Provider } from 'react-redux'
-import { BrowserRouter } from 'react-router-dom'
+import { HashRouter } from 'react-router-dom'
 
 import { ApiClientProvider } from '@opentrons/react-api-client'
 
@@ -32,10 +31,10 @@ if (container == null) throw new Error('Failed to find the root element')
 const root = ReactDom.createRoot(container)
 root.render(
   <Provider store={store}>
-    <BrowserRouter>
+    <HashRouter>
       <ApiClientProvider>
         <App />
       </ApiClientProvider>
-    </BrowserRouter>
+    </HashRouter>
   </Provider>
 )

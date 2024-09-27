@@ -1439,49 +1439,43 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
               command.params.addressableAreaName === 'fixedTrash')) ||
           command.commandType === 'moveToAddressableAreaForDropTip'
       )
+
       const trashAddressableAreaName =
         trashBinCommand?.params.addressableAreaName
       const savedStepForms = file.designerApplication?.data?.savedStepForms
-      const moveLiquidStepTrashBin =
-        savedStepForms != null
-          ? Object.values(savedStepForms).find(
-              stepForm =>
-                stepForm.stepType === 'moveLiquid' &&
-                (stepForm.aspirate_labware.includes('trashBin') ||
-                  stepForm.dispense_labware.includes('trashBin') ||
-                  stepForm.dropTip_location.includes('trashBin') ||
-                  stepForm.blowout_location?.includes('trashBin'))
-            )
-          : null
-      const mixStepTrashBin =
-        savedStepForms != null
-          ? Object.values(savedStepForms).find(
-              stepForm =>
-                stepForm.stepType === 'mix' &&
-                stepForm.dropTip_location.includes('trashBin')
-            )
-          : null
 
-      let trashBinId: string | null = null
-      if (moveLiquidStepTrashBin != null) {
-        if (moveLiquidStepTrashBin.aspirate_labware.includes('trashBin')) {
-          trashBinId = moveLiquidStepTrashBin.aspirate_labware
-        } else if (
-          moveLiquidStepTrashBin.dispense_labware.includes('trashBin')
-        ) {
-          trashBinId = moveLiquidStepTrashBin.dispense_labware
-        } else if (
-          moveLiquidStepTrashBin.dropTip_location.includes('trashBin')
-        ) {
-          trashBinId = moveLiquidStepTrashBin.dropTip_location
-        } else if (
-          moveLiquidStepTrashBin.blowOut_location?.includes('trashBin')
-        ) {
-          trashBinId = moveLiquidStepTrashBin.blowOut_location
+      const findTrashBinId = (): string | null => {
+        if (!savedStepForms) {
+          return null
         }
-      } else if (mixStepTrashBin != null) {
-        trashBinId = mixStepTrashBin.dropTip_location
+
+        for (const stepForm of Object.values(savedStepForms)) {
+          if (stepForm.stepType === 'moveLiquid') {
+            if (stepForm.dispense_labware.toLowerCase().includes('trash')) {
+              return stepForm.dispense_labware
+            }
+            if (stepForm.dropTip_location.toLowerCase().includes('trash')) {
+              return stepForm.dropTip_location
+            }
+            if (stepForm.blowout_location?.toLowerCase().includes('trash')) {
+              return stepForm.blowout_location
+            }
+          }
+          if (stepForm.stepType === 'mix') {
+            if (stepForm.dropTip_location.toLowerCase().includes('trash')) {
+              return stepForm.dropTip_location
+            } else if (
+              stepForm.blowout_location?.toLowerCase().includes('trash')
+            ) {
+              return stepForm.blowout_location
+            }
+          }
+        }
+
+        return null
       }
+
+      const trashBinId = findTrashBinId()
       const trashCutoutId =
         trashAddressableAreaName != null
           ? getCutoutIdByAddressableArea(
@@ -1490,6 +1484,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
               isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
             )
           : null
+
       const trashBin =
         trashAddressableAreaName != null && trashBinId != null
           ? {
@@ -1590,6 +1585,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
               ),
         },
       }
+
       if (isFlex) {
         if (trashBin != null) {
           return {

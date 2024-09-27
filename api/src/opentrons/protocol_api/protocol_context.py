@@ -5,7 +5,6 @@ from typing import (
     Callable,
     Dict,
     List,
-    NamedTuple,
     Optional,
     Type,
     Union,
@@ -18,8 +17,10 @@ from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, StagingSlotName
 from opentrons.legacy_broker import LegacyBroker
-from opentrons.hardware_control import SyncHardwareAPI
-from opentrons.hardware_control.modules.types import MagneticBlockModel
+from opentrons.hardware_control.modules.types import (
+    MagneticBlockModel,
+    AbsorbanceReaderModel,
+)
 from opentrons.legacy_commands import protocol_commands as cmds, types as cmd_types
 from opentrons.legacy_commands.helpers import stringify_labware_movement_command
 from opentrons.legacy_commands.publisher import (
@@ -41,6 +42,7 @@ from opentrons.protocols.api_support.util import (
     RobotTypeError,
     UnsupportedAPIError,
 )
+from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
 from ._types import OffDeckType
 from .core.common import ModuleCore, LabwareCore, ProtocolCore
@@ -54,6 +56,7 @@ from .core.module import (
     AbstractMagneticBlockCore,
     AbstractAbsorbanceReaderCore,
 )
+from .robot_context import RobotContext, HardwareManager
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
@@ -88,13 +91,14 @@ ModuleTypes = Union[
 ]
 
 
-class HardwareManager(NamedTuple):
-    """Back. compat. wrapper for a removed class called `HardwareManager`.
+class _Unset:
+    """A sentinel value for when no value has been supplied for an argument,
+    when `None` is already taken for some other meaning.
 
-    This interface will not be present in PAPIv3.
+    User code should never use this explicitly.
     """
 
-    hardware: SyncHardwareAPI
+    pass
 
 
 class ProtocolContext(CommandPublisher):
@@ -179,6 +183,7 @@ class ProtocolContext(CommandPublisher):
         self._commands: List[str] = []
         self._params: Parameters = Parameters()
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
+        self._robot = RobotContext(self._core)
         self.clear_commands()
 
     @property
@@ -204,14 +209,24 @@ class ProtocolContext(CommandPublisher):
         return self._api_version
 
     @property
+    @requires_version(2, 21)
+    def robot(self) -> RobotContext:
+        """The :py:class:`.RobotContext` for the protocol.
+
+        :meta private:
+        """
+        return self._robot
+
+    @property
     def _hw_manager(self) -> HardwareManager:
         # TODO (lc 01-05-2021) remove this once we have a more
         # user facing hardware control http api.
+        # HardwareManager(hardware=self._core.get_hardware())
         logger.warning(
             "This function will be deprecated in later versions."
             "Please use with caution."
         )
-        return HardwareManager(hardware=self._core.get_hardware())
+        return self._robot.hardware
 
     @property
     @requires_version(2, 0)
@@ -272,7 +287,7 @@ class ProtocolContext(CommandPublisher):
                 api_element="ProtocolContext.max_speeds",
                 since_version=f"{ENGINE_CORE_API_VERSION}",
                 current_version=f"{self._api_version}",
-                message=" Set speeds using InstrumentContext.default_speed or the per-method 'speed' argument.",
+                extra_message="Set speeds using InstrumentContext.default_speed or the per-method 'speed' argument.",
             )
 
         return self._core.get_max_speeds()
@@ -697,6 +712,13 @@ class ProtocolContext(CommandPublisher):
                 f"Expected labware of type 'Labware' but got {type(labware)}."
             )
 
+        # Ensure that when moving to an absorbance reader than the lid is open
+        if isinstance(new_location, AbsorbanceReaderContext):
+            if new_location.is_lid_on():
+                raise CommandPreconditionViolated(
+                    f"Cannot move {labware.name} onto the Absorbance Reader Module when its lid is closed."
+                )
+
         location: Union[
             ModuleCore,
             LabwareCore,
@@ -820,6 +842,12 @@ class ProtocolContext(CommandPublisher):
                 until_version="2.15",
                 current_version=f"{self._api_version}",
             )
+        if isinstance(
+            requested_model, AbsorbanceReaderModel
+        ) and self._api_version < APIVersion(2, 21):
+            raise APIVersionError(
+                f"Module of type {module_name} is only available in versions 2.21 and above."
+            )
 
         deck_slot = (
             None
@@ -906,7 +934,10 @@ class ProtocolContext(CommandPublisher):
                              control <advanced-control>` applications. You cannot
                              replace an instrument in the middle of a protocol being run
                              from the Opentrons App or touchscreen.
-        :param bool liquid_presence_detection: If ``True``, enable liquid presence detection for instrument. Only available on Flex robots in API Version 2.20 and above.
+        :param bool liquid_presence_detection: If ``True``, enable automatic
+            :ref:`liquid presence detection <lpd>` for Flex 1-, 8-, or 96-channel pipettes.
+
+            .. versionadded:: 2.20
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
@@ -1039,7 +1070,7 @@ class ProtocolContext(CommandPublisher):
                 api_element="A Python Protocol safely resuming itself after a pause",
                 since_version=f"{ENGINE_CORE_API_VERSION}",
                 current_version=f"{self._api_version}",
-                message=" To wait automatically for a period of time, use ProtocolContext.delay().",
+                extra_message="To wait automatically for a period of time, use ProtocolContext.delay().",
             )
 
         # TODO(mc, 2023-02-13): this assert should be enough for mypy
@@ -1160,7 +1191,7 @@ class ProtocolContext(CommandPublisher):
                     api_element="Fixed Trash",
                     since_version="2.16",
                     current_version=f"{self._api_version}",
-                    message=" Fixed trash is no longer supported on Flex protocols.",
+                    extra_message="Fixed trash is no longer supported on Flex protocols.",
                 )
             disposal_locations = self._core.get_disposal_locations()
             if len(disposal_locations) == 0:
@@ -1200,17 +1231,54 @@ class ProtocolContext(CommandPublisher):
 
     @requires_version(2, 14)
     def define_liquid(
-        self, name: str, description: Optional[str], display_color: Optional[str]
+        self,
+        name: str,
+        description: Union[str, None, _Unset] = _Unset(),
+        display_color: Union[str, None, _Unset] = _Unset(),
     ) -> Liquid:
+        # This first line of the docstring overrides the method signature in our public
+        # docs, which would otherwise have the `_Unset()`s expanded to a bunch of junk.
         """
+        define_liquid(self, name: str, description: Optional[str] = None, display_color: Optional[str] = None)
+
         Define a liquid within a protocol.
 
         :param str name: A human-readable name for the liquid.
-        :param str description: An optional description of the liquid.
-        :param str display_color: An optional hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.
+        :param Optional[str] description: An optional description of the liquid.
+        :param Optional[str] display_color: An optional hex color code, with hash included,
+            to represent the specified liquid. For example, ``"#48B1FA"``.
+            Standard three-value, four-value, six-value, and eight-value syntax are all
+            acceptable.
 
         :return: A :py:class:`~opentrons.protocol_api.Liquid` object representing the specified liquid.
+
+        .. versionchanged:: 2.20
+            You can now omit the ``description`` and ``display_color`` arguments.
+            Formerly, when you didn't want to provide values, you had to supply
+            ``description=None`` and ``display_color=None`` explicitly.
         """
+        desc_and_display_color_omittable_since = APIVersion(2, 20)
+        if isinstance(description, _Unset):
+            if self._api_version < desc_and_display_color_omittable_since:
+                raise APIVersionError(
+                    api_element="Calling `define_liquid()` without a `description`",
+                    current_version=str(self._api_version),
+                    until_version=str(desc_and_display_color_omittable_since),
+                    extra_message="Use a newer API version or explicitly supply `description=None`.",
+                )
+            else:
+                description = None
+        if isinstance(display_color, _Unset):
+            if self._api_version < desc_and_display_color_omittable_since:
+                raise APIVersionError(
+                    api_element="Calling `define_liquid()` without a `display_color`",
+                    current_version=str(self._api_version),
+                    until_version=str(desc_and_display_color_omittable_since),
+                    extra_message="Use a newer API version or explicitly supply `display_color=None`.",
+                )
+            else:
+                display_color = None
+
         return self._core.define_liquid(
             name=name,
             description=description,

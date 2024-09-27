@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, Fragment } from 'react'
 import { createPortal } from 'react-dom'
 import map from 'lodash/map'
 import omit from 'lodash/omit'
@@ -19,48 +19,47 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
+  DISPLAY_GRID,
   Flex,
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
+  Modal,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   PrimaryButton,
   ProtocolDeck,
-  Tabs,
   SIZE_1,
   SIZE_5,
   SPACING,
-  LegacyStyledText,
+  Tabs,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  parseInitialPipetteNamesByMount,
-  parseInitialLoadedModulesBySlot,
-  parseInitialLoadedLabwareBySlot,
-  parseInitialLoadedLabwareByModuleId,
-  parseInitialLoadedLabwareByAdapter,
-} from '@opentrons/api-client'
 import {
   MAGNETIC_BLOCK_TYPE,
   getGripperDisplayName,
   getModuleType,
   getSimplestDeckConfigForProtocol,
+  parseInitialLoadedLabwareByAdapter,
+  parseInitialLoadedLabwareByModuleId,
+  parseInitialLoadedLabwareBySlot,
+  parseInitialLoadedModulesBySlot,
+  parseInitialPipetteNamesByMount,
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '../../App/portal'
-import { Divider } from '../../atoms/structure'
-import { LegacyModal } from '../../molecules/LegacyModal'
+import { Divider } from '/app/atoms/structure'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '../../redux/analytics'
+} from '/app/redux/analytics'
 import {
   getIsProtocolAnalysisInProgress,
   analyzeProtocol,
-} from '../../redux/protocol-storage'
-import { useFeatureFlag } from '../../redux/config'
+} from '/app/redux/protocol-storage'
+import { useFeatureFlag } from '/app/redux/config'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
@@ -69,7 +68,7 @@ import {
   getAnalysisStatus,
   getProtocolDisplayName,
 } from '../ProtocolsLanding/utils'
-import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
+import { getProtocolUsesGripper } from '/app/transformations/commands'
 import { ProtocolOverflowMenu } from '../ProtocolsLanding/ProtocolOverflowMenu'
 import { ProtocolStats } from './ProtocolStats'
 import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
@@ -79,13 +78,19 @@ import { ProtocolParameters } from './ProtocolParameters'
 import { AnnotatedSteps } from './AnnotatedSteps'
 
 import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
-import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { State, Dispatch } from '../../redux/types'
+import type { StoredProtocolData } from '/app/redux/protocol-storage'
+import type { State, Dispatch } from '/app/redux/types'
 
 const GRID_STYLE = css`
-  display: grid;
+  display: ${DISPLAY_GRID};
   width: 100%;
   grid-template-columns: 26.6% 26.6% 26.6% 20.2%;
+`
+
+const TWO_COL_GRID_STYLE = css`
+  display: ${DISPLAY_GRID};
+  grid-gap: ${SPACING.spacing24};
+  grid-template-columns: 22.5% 77.5%;
 `
 
 const ZOOM_ICON_STYLE = css`
@@ -132,10 +137,12 @@ function MetadataDetails({
         flexDirection={DIRECTION_COLUMN}
         data-testid="ProtocolDetails_description"
       >
-        <LegacyStyledText as="p">{description}</LegacyStyledText>
+        <LegacyStyledText as="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
+          {description}
+        </LegacyStyledText>
         {filteredMetaData.map((item, index) => {
           return (
-            <React.Fragment key={index}>
+            <Fragment key={index}>
               <LegacyStyledText
                 as="h6"
                 marginTop={SPACING.spacing8}
@@ -144,7 +151,7 @@ function MetadataDetails({
                 {startCase(item.label)}
               </LegacyStyledText>
               <LegacyStyledText as="p">{item.value}</LegacyStyledText>
-            </React.Fragment>
+            </Fragment>
           )
         })}
       </Flex>
@@ -160,16 +167,18 @@ interface ReadMoreContentProps {
 const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
   const { metadata, protocolType } = props
   const { t, i18n } = useTranslation('protocol_details')
-  const [isReadMore, setIsReadMore] = React.useState(true)
+  const [isReadMore, setIsReadMore] = useState(true)
 
   const description = isEmpty(metadata.description)
     ? t('shared:no_data')
     : metadata.description
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacing16}>
       {isReadMore ? (
-        <LegacyStyledText as="p">{description.slice(0, 160)}</LegacyStyledText>
+        <LegacyStyledText as="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
+          {description.slice(0, 160)}
+        </LegacyStyledText>
       ) : (
         <MetadataDetails
           description={description}
@@ -208,18 +217,18 @@ export function ProtocolDetails(
   const enableProtocolTimeline = useFeatureFlag('protocolTimeline')
   const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
   const hasRunTimeParameters = runTimeParameters.length > 0
-  const [currentTab, setCurrentTab] = React.useState<
+  const [currentTab, setCurrentTab] = useState<
     'robot_config' | 'labware' | 'liquids' | 'stats' | 'parameters' | 'timeline'
   >(hasRunTimeParameters ? 'parameters' : 'robot_config')
   const [
     showChooseRobotToRunProtocolSlideout,
     setShowChooseRobotToRunProtocolSlideout,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const [
     showSendProtocolToFlexSlideout,
     setShowSendProtocolToFlexSlideout,
-  ] = React.useState<boolean>(false)
-  const [showDeckViewModal, setShowDeckViewModal] = React.useState(false)
+  ] = useState<boolean>(false)
+  const [showDeckViewModal, setShowDeckViewModal] = useState(false)
 
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
@@ -389,14 +398,14 @@ export function ProtocolDetails(
     <>
       {showDeckViewModal
         ? createPortal(
-            <LegacyModal
+            <Modal
               title={t('deck_view')}
               onClose={() => {
                 setShowDeckViewModal(false)
               }}
             >
               {deckMap}
-            </LegacyModal>,
+            </Modal>,
             getTopPortalEl()
           )
         : null}
@@ -495,7 +504,7 @@ export function ProtocolDetails(
                 </Flex>
                 <Flex
                   css={css`
-                    display: grid;
+                    display: ${DISPLAY_GRID};
                     justify-self: end;
                   `}
                 >
@@ -511,7 +520,7 @@ export function ProtocolDetails(
                 </Flex>
               </Flex>
               <Divider marginY={SPACING.spacing16} />
-              <Flex css={GRID_STYLE}>
+              <Flex css={TWO_COL_GRID_STYLE}>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_author"
@@ -521,7 +530,6 @@ export function ProtocolDetails(
                   </LegacyStyledText>
                   <LegacyStyledText
                     as="p"
-                    marginRight={SPACING.spacing20}
                     overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                   >
                     {analysisStatus === 'loading'

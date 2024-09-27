@@ -12,9 +12,9 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import { Divider } from '../../../atoms/structure'
-import { ToggleButton } from '../../../atoms/buttons'
-import { useIsFlex, useIsRobotBusy, useRobot } from '../hooks'
+import { Divider } from '/app/atoms/structure'
+import { ToggleButton } from '/app/atoms/buttons'
+import { useIsRobotBusy } from '../hooks'
 import {
   DeviceReset,
   DisplayRobotName,
@@ -31,26 +31,27 @@ import {
   UsageSettings,
   UseOlderAspirateBehavior,
 } from './AdvancedTab'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import {
   updateSetting,
   getRobotSettings,
   fetchSettings,
-} from '../../../redux/robot-settings'
+} from '/app/redux/robot-settings'
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { DeviceResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetSlideout'
 import { DeviceResetModal } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetModal'
 import { FactoryModeSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryModeSlideout'
 import { handleUpdateBuildroot } from './UpdateBuildroot'
-import { getRobotSerialNumber, UNREACHABLE } from '../../../redux/discovery'
+import { getRobotSerialNumber, UNREACHABLE } from '/app/redux/discovery'
 import { getTopPortalEl } from '../../../App/portal'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
-import type { State, Dispatch } from '../../../redux/types'
+import type { State, Dispatch } from '/app/redux/types'
 import type {
   RobotSettings,
   RobotSettingsField,
-} from '../../../redux/robot-settings/types'
-import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
+} from '/app/redux/robot-settings/types'
+import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
 
 interface RobotSettingsAdvancedProps {
   robotName: string
@@ -220,14 +221,15 @@ export function RobotSettingsAdvanced({
             handleUpdateBuildroot(robot)
           }}
         />
+        <Divider marginY={SPACING.spacing16} />
         {isFlex ? (
           <>
-            <Divider marginY={SPACING.spacing16} />
             <FactoryMode
               isRobotBusy={isRobotBusy || isEstopNotDisengaged}
               setShowFactoryModeSlideout={setShowFactoryModeSlideout}
               sn={sn}
             />
+            <Divider marginY={SPACING.spacing16} />
           </>
         ) : null}
         <Troubleshooting robotName={robotName} />

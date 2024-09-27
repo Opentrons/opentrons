@@ -1,8 +1,8 @@
 """Parameter context for python protocols."""
-
 from typing import List, Optional, Union, Dict
 
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import requires_version
 from opentrons.protocols.parameters import (
     parameter_definition,
     csv_parameter_definition,
@@ -12,10 +12,16 @@ from opentrons.protocols.parameters.types import (
     ParameterChoice,
     UserFacingTypes,
 )
-from opentrons.protocols.parameters.exceptions import ParameterDefinitionError
+from opentrons.protocols.parameters.exceptions import (
+    ParameterDefinitionError,
+    ParameterValueError,
+    IncompatibleParameterError,
+)
 from opentrons.protocol_engine.types import (
     RunTimeParameter,
-    RunTimeParamValuesType,
+    PrimitiveRunTimeParamValuesType,
+    CSVRuntimeParamPaths,
+    FileInfo,
 )
 
 from ._parameters import Parameters
@@ -164,6 +170,7 @@ class ParameterContext:
         )
         self._parameters[parameter.variable_name] = parameter
 
+    @requires_version(2, 20)
     def add_csv_file(
         self,
         display_name: str,
@@ -177,6 +184,14 @@ class ParameterContext:
             variable_name: The variable name the CSV parameter will be referred to in the run context.
             description: A description of the parameter as it will show up on the frontend.
         """
+        if any(
+            isinstance(parameter, csv_parameter_definition.CSVParameterDefinition)
+            for parameter in self._parameters.values()
+        ):
+            raise IncompatibleParameterError(
+                "Only one CSV File parameter can be defined per protocol."
+            )
+
         validation.validate_variable_name_unique(variable_name, set(self._parameters))
         parameter = csv_parameter_definition.create_csv_parameter(
             display_name=display_name,
@@ -185,7 +200,9 @@ class ParameterContext:
         )
         self._parameters[parameter.variable_name] = parameter
 
-    def set_parameters(self, parameter_overrides: RunTimeParamValuesType) -> None:
+    def set_parameters(
+        self, parameter_overrides: PrimitiveRunTimeParamValuesType
+    ) -> None:
         """Sets parameters to values given by client, validating them as well.
 
         :meta private:
@@ -200,12 +217,49 @@ class ParameterContext:
                     f"Parameter {variable_name} is not defined as a parameter for this protocol."
                 )
             if isinstance(parameter, csv_parameter_definition.CSVParameterDefinition):
-                pass
+                raise ParameterValueError(
+                    f"A primitive param value was provided for the parameter '{variable_name}',"
+                    f" but '{variable_name}' is a CSV parameter that can only accept file IDs."
+                )
             else:
                 validated_value = validation.ensure_value_type(
                     override_value, parameter.parameter_type
                 )
                 parameter.value = validated_value
+
+    def initialize_csv_files(
+        self, run_time_param_file_overrides: CSVRuntimeParamPaths
+    ) -> None:
+        """Initializes the files for CSV parameters.
+
+        :meta private:
+
+        This is intended for Opentrons internal use only and is not a guaranteed API.
+        """
+        for variable_name, file_path in run_time_param_file_overrides.items():
+            try:
+                parameter = self._parameters[variable_name]
+            except KeyError:
+                raise ParameterDefinitionError(
+                    f"Parameter {variable_name} is not defined as a parameter for this protocol."
+                )
+            if not isinstance(
+                parameter, csv_parameter_definition.CSVParameterDefinition
+            ):
+                raise ParameterValueError(
+                    f"File Id was provided for the parameter '{variable_name}',"
+                    f" but '{variable_name}' is not a CSV parameter."
+                )
+
+            # The parent folder in the path will be the file ID, so we can use that to resolve that here
+            file_id = file_path.parent.name
+            file_name = file_path.name
+
+            with file_path.open("rb") as fh:
+                contents = fh.read()
+
+            parameter.file_info = FileInfo(id=file_id, name=file_name)
+            parameter.value = contents
 
     def export_parameters_for_analysis(self) -> List[RunTimeParameter]:
         """Exports all parameters into a protocol engine models for reporting in analysis.
@@ -230,7 +284,7 @@ class ParameterContext:
         for parameter in self._parameters.values():
             value: UserFacingTypes
             if isinstance(parameter, csv_parameter_definition.CSVParameterDefinition):
-                value = parameter.as_csv_parameter_interface()
+                value = parameter.as_csv_parameter_interface(self._api_version)
             else:
                 value = parameter.value
             parameters_for_protocol[parameter.variable_name] = value

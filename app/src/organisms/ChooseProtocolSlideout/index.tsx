@@ -10,24 +10,32 @@ import {
   BORDERS,
   Box,
   COLORS,
+  CURSOR_AUTO,
+  CURSOR_DEFAULT,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_BLOCK,
+  DISPLAY_GRID,
+  DropdownMenu,
   Flex,
   Icon,
-  Link as LinkComponent,
+  InputField,
   JUSTIFY_CENTER,
   JUSTIFY_END,
   JUSTIFY_FLEX_START,
+  LegacyStyledText,
+  Link as LinkComponent,
+  NO_WRAP,
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   ProtocolDeck,
-  SPACING,
   SecondaryButton,
-  LegacyStyledText,
+  SPACING,
+  Tooltip,
   TYPOGRAPHY,
-  useTooltip,
   useHoverTooltip,
+  useTooltip,
 } from '@opentrons/components'
 import {
   ApiHostProvider,
@@ -36,17 +44,13 @@ import {
 import { sortRuntimeParameters } from '@opentrons/shared-data'
 
 import { useLogger } from '../../logger'
-import { useFeatureFlag } from '../../redux/config'
-import { OPENTRONS_USB } from '../../redux/discovery'
-import { getStoredProtocols } from '../../redux/protocol-storage'
-import { appShellRequestor } from '../../redux/shell/remote'
-import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
-import { Tooltip } from '../../atoms/Tooltip'
-import { ToggleButton } from '../../atoms/buttons'
-import { InputField } from '../../atoms/InputField'
-import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
-import { MiniCard } from '../../molecules/MiniCard'
-import { UploadInput } from '../../molecules/UploadInput'
+import { OPENTRONS_USB } from '/app/redux/discovery'
+import { getStoredProtocols } from '/app/redux/protocol-storage'
+import { appShellRequestor } from '/app/redux/shell/remote'
+import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
+import { ToggleButton } from '/app/atoms/buttons'
+import { MiniCard } from '/app/molecules/MiniCard'
+import { UploadInput } from '/app/molecules/UploadInput'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
@@ -55,14 +59,14 @@ import { FileCard } from '../ChooseRobotSlideout/FileCard'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
-} from '../Devices/utils'
+} from '/app/transformations/runs'
 import { getAnalysisStatus } from '../ProtocolsLanding/utils'
 
 import type { DropdownOption } from '@opentrons/components'
 import type { RunTimeParameter } from '@opentrons/shared-data'
-import type { Robot } from '../../redux/discovery/types'
-import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { State } from '../../redux/types'
+import type { Robot } from '/app/redux/discovery/types'
+import type { StoredProtocolData } from '/app/redux/protocol-storage'
+import type { State } from '/app/redux/types'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
@@ -117,7 +121,6 @@ export function ChooseProtocolSlideoutComponent(
     ) ?? false
   )
   const [isInputFocused, setIsInputFocused] = React.useState<boolean>(false)
-  const enableCsvFile = useFeatureFlag('enableCsvFile')
 
   React.useEffect(() => {
     setRunTimeParametersOverrides(
@@ -220,7 +223,7 @@ export function ChooseProtocolSlideoutComponent(
             : acc,
         {}
       )
-      Promise.all(
+      void Promise.all(
         Object.entries(dataFilesForProtocolMap).map(([key, file]) => {
           const fileResponse = uploadCsvFile(file)
           const varName = Promise.resolve(key)
@@ -239,20 +242,12 @@ export function ChooseProtocolSlideoutComponent(
           runTimeParametersOverrides,
           mappedResolvedCsvVariableToFileId
         )
-        if (enableCsvFile) {
-          createRunFromProtocolSource({
-            files: srcFileObjects,
-            protocolKey: selectedProtocol.protocolKey,
-            runTimeParameterValues,
-            runTimeParameterFiles,
-          })
-        } else {
-          createRunFromProtocolSource({
-            files: srcFileObjects,
-            protocolKey: selectedProtocol.protocolKey,
-            runTimeParameterValues,
-          })
-        }
+        createRunFromProtocolSource({
+          files: srcFileObjects,
+          protocolKey: selectedProtocol.protocolKey,
+          runTimeParameterValues,
+          runTimeParameterFiles,
+        })
       })
     } else {
       logger.warn('failed to create protocol, no protocol selected')
@@ -441,7 +436,7 @@ export function ChooseProtocolSlideoutComponent(
               if (error != null) {
                 errors.push(error as string)
               }
-              return !enableCsvFile ? null : (
+              return (
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   alignItems={ALIGN_CENTER}
@@ -558,7 +553,7 @@ export function ChooseProtocolSlideoutComponent(
           }}
           css={css`
             &:hover {
-              cursor: auto;
+              cursor: ${CURSOR_AUTO};
             }
           `}
         >
@@ -597,23 +592,35 @@ export function ChooseProtocolSlideoutComponent(
         {t('shared:continue_to_param')}
       </PrimaryButton>
     ) : (
-      <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_ROW}>
+      <Flex
+        gridGap={SPACING.spacing8}
+        flexDirection={DIRECTION_ROW}
+        whiteSpace={NO_WRAP}
+      >
         <SecondaryButton
           onClick={() => {
             setCurrentPage(1)
           }}
-          width="51%"
+          width="50%"
         >
           {t('shared:change_protocol')}
         </SecondaryButton>
         <PrimaryButton
-          width="49%"
+          width="50%"
           onClick={handleProceed}
           disabled={hasParamError}
           {...targetPropsHover}
         >
           {isCreatingRun ? (
-            <Icon name="ot-spinner" spin size="1rem" />
+            <Flex
+              gridGap={SPACING.spacing4}
+              alignItems={ALIGN_CENTER}
+              whiteSpace={NO_WRAP}
+              marginLeft={`-${SPACING.spacing4}`}
+            >
+              <Icon name="ot-spinner" spin size="1rem" />
+              {t('shared:confirm_values')}
+            </Flex>
           ) : (
             t('shared:confirm_values')
           )}
@@ -748,7 +755,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 }}
               >
                 <Box
-                  display="grid"
+                  display={DISPLAY_GRID}
                   gridTemplateColumns="1fr 3fr"
                   marginRight={SPACING.spacing16}
                 >
@@ -923,13 +930,13 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
 
 const ENABLED_LINK_CSS = css`
   ${TYPOGRAPHY.linkPSemiBold}
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
 `
 
 const DISABLED_LINK_CSS = css`
   ${TYPOGRAPHY.linkPSemiBold}
   color: ${COLORS.grey40};
-  cursor: default;
+  cursor: ${CURSOR_DEFAULT};
 
   &:hover {
     color: ${COLORS.grey40};

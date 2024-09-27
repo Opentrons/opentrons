@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -11,17 +11,17 @@ import {
   DIRECTION_ROW,
   Flex,
   InstrumentDiagram,
-  SPACING,
   LegacyStyledText,
+  OverflowBtn,
+  SPACING,
   TYPOGRAPHY,
+  useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { usePipetteSettingsQuery } from '@opentrons/react-api-client'
 
-import { LEFT } from '../../../redux/pipettes'
-import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
-import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
+import { LEFT } from '/app/redux/pipettes'
 import { ChangePipette } from '../../ChangePipette'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
@@ -32,7 +32,7 @@ import {
 } from '../../DropTipWizardFlows'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
-import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
+import type { AttachedPipette, Mount } from '/app/redux/pipettes/types'
 
 interface PipetteCardProps {
   pipetteModelSpecs: PipetteModelSpecs | null
@@ -68,9 +68,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       setShowOverflowMenu(false)
     },
   })
-  const [showChangePipette, setChangePipette] = React.useState(false)
-  const [showSlideout, setShowSlideout] = React.useState(false)
-  const [showAboutSlideout, setShowAboutSlideout] = React.useState(false)
+  const [showChangePipette, setChangePipette] = useState(false)
+  const [showSlideout, setShowSlideout] = useState(false)
+  const [showAboutSlideout, setShowAboutSlideout] = useState(false)
 
   const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
 
@@ -111,6 +111,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           mount={mount}
           instrumentModelSpecs={pipetteModelSpecs}
           closeFlow={toggleDTWiz}
+          modalStyle="simple"
         />
       ) : null}
       {showSlideout &&

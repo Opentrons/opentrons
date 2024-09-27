@@ -19,7 +19,7 @@ from opentrons.protocol_engine.errors.exceptions import (
     EStopActivatedError as PE_EStopActivatedError,
 )
 from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
     RunCommandAction,
@@ -140,9 +140,11 @@ def command_note_tracker_provider(decoy: Decoy) -> CommandNoteTrackerProvider:
 
 
 @pytest.fixture
-def error_recovery_policy(decoy: Decoy) -> ErrorRecoveryPolicy:
+def error_recovery_policy(state_store: StateStore, decoy: Decoy) -> ErrorRecoveryPolicy:
     """Get a mock error recovery policy."""
-    return decoy.mock(cls=ErrorRecoveryPolicy)
+    mock = decoy.mock(cls=ErrorRecoveryPolicy)
+    decoy.when(state_store.commands.get_error_recovery_policy()).then_return(mock)
+    return mock
 
 
 def get_next_tracker(
@@ -182,7 +184,6 @@ def subject(
     status_bar: StatusBarHandler,
     model_utils: ModelUtils,
     command_note_tracker_provider: CommandNoteTrackerProvider,
-    error_recovery_policy: ErrorRecoveryPolicy,
 ) -> CommandExecutor:
     """Get a CommandExecutor test subject with its dependencies mocked out."""
     return CommandExecutor(
@@ -200,7 +201,6 @@ def subject(
         rail_lights=rail_lights,
         status_bar=status_bar,
         command_note_tracker_provider=command_note_tracker_provider,
-        error_recovery_policy=error_recovery_policy,
     )
 
 
@@ -219,7 +219,7 @@ class _TestCommandDefinedError(ErrorOccurrence):
 
 _TestCommandReturn = Union[
     SuccessData[_TestCommandResult, None],
-    DefinedErrorData[_TestCommandDefinedError, None],
+    DefinedErrorData[_TestCommandDefinedError],
 ]
 
 
@@ -561,7 +561,6 @@ async def test_execute_defined_error(
     error_id = "error-id"
     returned_error = DefinedErrorData(
         public=_TestCommandDefinedError(id=error_id, createdAt=failed_at),
-        private=None,
     )
     queued_command = cast(
         Command,

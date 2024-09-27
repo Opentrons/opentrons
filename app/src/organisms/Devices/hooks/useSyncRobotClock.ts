@@ -1,8 +1,8 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import { syncSystemTime } from '../../../redux/robot-admin'
+import { syncSystemTime } from '/app/redux/robot-admin'
 
-import type { Dispatch } from '../../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 /**
  * syncs robot system time once on mount
@@ -12,7 +12,7 @@ import type { Dispatch } from '../../../redux/types'
 export function useSyncRobotClock(robotName: string | null): void {
   const dispatch = useDispatch<Dispatch>()
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (robotName != null) {
       dispatch(syncSystemTime(robotName))
     }

@@ -1,23 +1,23 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { i18n } from '../../../../../i18n'
+import { i18n } from '/app/i18n'
 import { useRobotUpdateInfo } from '../useRobotUpdateInfo'
-import { getRobotUpdateDownloadProgress } from '../../../../../redux/robot-update'
+import { getRobotUpdateDownloadProgress } from '/app/redux/robot-update'
 
 import type { Store } from 'redux'
-import type { State } from '../../../../../redux/types'
+import type { State } from '/app/redux/types'
 import type {
   RobotUpdateSession,
   UpdateSessionStep,
   UpdateSessionStage,
-} from '../../../../../redux/robot-update/types'
+} from '/app/redux/robot-update/types'
 
-vi.mock('../../../../../redux/robot-update')
+vi.mock('/app/redux/robot-update')
 
 describe('useRobotUpdateInfo', () => {
   let store: Store<State>

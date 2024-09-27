@@ -31,7 +31,7 @@ describe('getFailedCommandPipetteInfo', () => {
 
   it('should return null if failedCommand is null', () => {
     const result = getFailedCommandPipetteInfo({
-      failedCommand: null,
+      failedCommandByRunRecord: null,
       runRecord: undefined,
       attachedInstruments: undefined,
     })
@@ -40,7 +40,7 @@ describe('getFailedCommandPipetteInfo', () => {
 
   it('should return null if failedCommand does not have pipetteId in params', () => {
     const result = getFailedCommandPipetteInfo({
-      failedCommand: { params: {} } as any,
+      failedCommandByRunRecord: failedCommand,
       runRecord: undefined,
       attachedInstruments: undefined,
     })
@@ -49,7 +49,7 @@ describe('getFailedCommandPipetteInfo', () => {
 
   it('should return null if no matching pipette is found in runRecord', () => {
     const result = getFailedCommandPipetteInfo({
-      failedCommand,
+      failedCommandByRunRecord: failedCommand,
       runRecord: { data: { pipettes: [runRecordPipette2] } } as any,
       attachedInstruments: {
         data: [attachedInstrument1, attachedInstrument2],
@@ -60,7 +60,7 @@ describe('getFailedCommandPipetteInfo', () => {
 
   it('should return null if no matching instrument is found in attachedInstruments', () => {
     const result = getFailedCommandPipetteInfo({
-      failedCommand,
+      failedCommandByRunRecord: failedCommand,
       runRecord: { data: { pipettes: [runRecordPipette1] } } as any,
       attachedInstruments: { data: [attachedInstrument2] } as any,
     })
@@ -69,7 +69,7 @@ describe('getFailedCommandPipetteInfo', () => {
 
   it('should return the matching pipette data', () => {
     const result = getFailedCommandPipetteInfo({
-      failedCommand,
+      failedCommandByRunRecord: failedCommand,
       runRecord: {
         data: { pipettes: [runRecordPipette1, runRecordPipette2] },
       } as any,

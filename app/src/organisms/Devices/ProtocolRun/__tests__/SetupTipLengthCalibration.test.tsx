@@ -1,19 +1,18 @@
-import * as React from 'react'
 import { when } from 'vitest-when'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtures__'
-import { useRunPipetteInfoByMount } from '../../hooks'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
+import { useRunPipetteInfoByMount } from '/app/resources/runs'
 import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationButton'
 import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
 
-import type { PipetteInfo } from '../../hooks'
+import type { PipetteInfo } from '/app/redux/pipettes'
 
-vi.mock('../../../../redux/config')
-vi.mock('../../hooks')
+vi.mock('/app/redux/config')
+vi.mock('/app/resources/runs')
 vi.mock('../SetupTipLengthCalibrationButton')
 
 const ROBOT_NAME = 'otie'

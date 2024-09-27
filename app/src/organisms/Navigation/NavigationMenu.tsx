@@ -10,18 +10,18 @@ import {
   Flex,
   Icon,
   LegacyStyledText,
+  MenuItem,
+  MenuList,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { MenuList } from '../../atoms/MenuList'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { home, ROBOT } from '../../redux/robot-controls'
+import { home, ROBOT } from '/app/redux/robot-controls'
 import { useLights } from '../Devices/hooks'
 import { getTopPortalEl } from '../../App/portal'
 import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
 
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 interface NavigationMenuProps {
   onClick: React.MouseEventHandler

@@ -43,21 +43,3 @@ class SupportsTracking(typing.Protocol):
 
 
 StorableData = typing.Union[int, float, str]
-
-
-class SupportsCSVStorage(typing.Protocol):
-    """A protocol for classes that support CSV storage."""
-
-    @classmethod
-    def headers(self) -> typing.Tuple[str, ...]:
-        """Returns the headers for the CSV data."""
-        ...
-
-    def csv_row(self) -> typing.Tuple[StorableData, ...]:
-        """Returns the object as a CSV row."""
-        ...
-
-    @classmethod
-    def from_csv_row(cls, row: typing.Tuple[StorableData, ...]) -> "SupportsCSVStorage":
-        """Returns an object from a CSV row."""
-        ...

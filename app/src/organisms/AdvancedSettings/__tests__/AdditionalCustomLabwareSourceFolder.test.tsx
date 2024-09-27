@@ -1,18 +1,17 @@
-import * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../i18n'
-import { getCustomLabwareDirectory } from '../../../redux/custom-labware'
+import { i18n } from '/app/i18n'
+import { getCustomLabwareDirectory } from '/app/redux/custom-labware'
 import {
   useTrackEvent,
   ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
-} from '../../../redux/analytics'
+} from '/app/redux/analytics'
 
 import { AdditionalCustomLabwareSourceFolder } from '../AdditionalCustomLabwareSourceFolder'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
-vi.mock('../../../redux/custom-labware')
-vi.mock('../../../redux/analytics')
+vi.mock('/app/redux/custom-labware')
+vi.mock('/app/redux/analytics')
 
 const render = () => {
   return renderWithProviders(<AdditionalCustomLabwareSourceFolder />, {

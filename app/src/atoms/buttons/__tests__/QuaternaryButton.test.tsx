@@ -1,9 +1,9 @@
-import * as React from 'react'
+import type * as React from 'react'
 import '@testing-library/jest-dom/vitest'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import { COLORS, SPACING, TYPOGRAPHY, BORDERS } from '@opentrons/components'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
 import { QuaternaryButton } from '..'
 

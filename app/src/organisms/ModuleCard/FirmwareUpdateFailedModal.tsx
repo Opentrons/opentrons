@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import {
@@ -11,11 +10,11 @@ import {
   PrimaryButton,
   SPACING,
   LegacyStyledText,
+  Modal,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LegacyModal } from '../../molecules/LegacyModal'
 
-import type { AttachedModule } from '../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 interface FirmwareUpdateFailedModalProps {
   onCloseClick: () => void
@@ -43,7 +42,7 @@ export const FirmwareUpdateFailedModal = (
   )
 
   return (
-    <LegacyModal title={title} onClose={onCloseClick}>
+    <Modal title={title} onClose={onCloseClick}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         data-testid={`FirmwareUpdateFailedModal_body_text_${module.serialNumber}`}
@@ -68,6 +67,6 @@ export const FirmwareUpdateFailedModal = (
           {t('shared:close')}
         </PrimaryButton>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo } from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
@@ -14,37 +14,37 @@ import {
 } from '@opentrons/components'
 
 import { useLogger } from '../../logger'
-import * as Sessions from '../../redux/sessions'
+import * as Sessions from '/app/redux/sessions'
 import {
   JogControls,
   MEDIUM_STEP_SIZE_MM,
   SMALL_STEP_SIZE_MM,
-} from '../../molecules/JogControls'
+} from '/app/molecules/JogControls'
 import { formatJogVector } from './utils'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { NeedHelpLink } from './NeedHelpLink'
 
-import slot1LeftMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_1_LEFT_MULTI_X-Y.webm'
-import slot1LeftSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_1_LEFT_SINGLE_X-Y.webm'
-import slot1RightMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_1_RIGHT_MULTI_X-Y.webm'
-import slot1RightSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_1_RIGHT_SINGLE_X-Y.webm'
-import slot3LeftMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_3_LEFT_MULTI_X-Y.webm'
-import slot3LeftSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_3_LEFT_SINGLE_X-Y.webm'
-import slot3RightMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_3_RIGHT_MULTI_X-Y.webm'
-import slot3RightSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_3_RIGHT_SINGLE_X-Y.webm'
-import slot7LeftMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_7_LEFT_MULTI_X-Y.webm'
-import slot7LeftSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_7_LEFT_SINGLE_X-Y.webm'
-import slot7RightMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_7_RIGHT_MULTI_X-Y.webm'
-import slot7RightSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_7_RIGHT_SINGLE_X-Y.webm'
+import slot1LeftMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_1_LEFT_MULTI_X-Y.webm'
+import slot1LeftSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_1_LEFT_SINGLE_X-Y.webm'
+import slot1RightMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_1_RIGHT_MULTI_X-Y.webm'
+import slot1RightSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_1_RIGHT_SINGLE_X-Y.webm'
+import slot3LeftMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_3_LEFT_MULTI_X-Y.webm'
+import slot3LeftSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_3_LEFT_SINGLE_X-Y.webm'
+import slot3RightMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_3_RIGHT_MULTI_X-Y.webm'
+import slot3RightSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_3_RIGHT_SINGLE_X-Y.webm'
+import slot7LeftMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_LEFT_MULTI_X-Y.webm'
+import slot7LeftSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_LEFT_SINGLE_X-Y.webm'
+import slot7RightMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_RIGHT_MULTI_X-Y.webm'
+import slot7RightSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_RIGHT_SINGLE_X-Y.webm'
 
-import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { CalibrationPanelProps } from './types'
 import type {
   SessionType,
   CalibrationSessionStep,
   SessionCommandString,
   CalibrationLabware,
-} from '../../redux/sessions/types'
+} from '/app/redux/sessions/types'
 import type { Mount } from '@opentrons/components'
 
 const assetMap: Record<
@@ -143,7 +143,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
   const { slotNumber, moveCommand } =
     contentsBySessionTypeByCurrentStep[sessionType]?.[currentStep] ?? {}
 
-  const demoAsset = React.useMemo(
+  const demoAsset = useMemo(
     () =>
       slotNumber != null
         ? assetMap[slotNumber][mount][isMulti ? 'multi' : 'single']

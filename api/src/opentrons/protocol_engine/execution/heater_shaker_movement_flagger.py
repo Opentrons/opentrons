@@ -13,7 +13,7 @@ from ..errors import (
     HeaterShakerLabwareLatchStatusUnknown,
     WrongModuleTypeError,
 )
-from ..state import StateStore
+from ..state.state import StateStore
 from ..state.module_substates import HeaterShakerModuleSubState
 from ..types import (
     HeaterShakerMovementRestrictors,

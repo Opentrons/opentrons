@@ -1,6 +1,6 @@
 """Router for /runs endpoints dealing with labware offsets and definitions."""
 import logging
-from typing import Union
+from typing import Annotated, Union
 
 from fastapi import APIRouter, Depends, status
 
@@ -49,8 +49,10 @@ labware_router = APIRouter()
 )
 async def add_labware_offset(
     request_body: RequestModel[LabwareOffsetCreate],
-    run_orchestrator_store: RunOrchestratorStore = Depends(get_run_orchestrator_store),
-    run: Run = Depends(get_run_data_from_url),
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
+    run: Annotated[Run, Depends(get_run_data_from_url)],
 ) -> PydanticResponse[SimpleBody[LabwareOffset]]:
     """Add a labware offset to a run.
 
@@ -91,8 +93,10 @@ async def add_labware_offset(
 )
 async def add_labware_definition(
     request_body: RequestModel[LabwareDefinition],
-    run_orchestrator_store: RunOrchestratorStore = Depends(get_run_orchestrator_store),
-    run: Run = Depends(get_run_data_from_url),
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
+    run: Annotated[Run, Depends(get_run_data_from_url)],
 ) -> PydanticResponse[SimpleBody[LabwareDefinitionSummary]]:
     """Add a labware offset to a run.
 
@@ -136,7 +140,7 @@ async def add_labware_definition(
 )
 async def get_run_loaded_labware_definitions(
     runId: str,
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[SimpleBody[ResponseList[SD_LabwareDefinition]]]:
     """Get a run's loaded labware definition by the run ID.
 

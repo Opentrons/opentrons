@@ -13,30 +13,30 @@ import {
   JUSTIFY_FLEX_END,
   NewPrimaryBtn,
   SPACING,
+  Modal,
   LegacyStyledText,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
-import { LegacyModal } from '../../../../molecules/LegacyModal'
-import { ProgressBar } from '../../../../atoms/ProgressBar'
+import { ProgressBar } from '/app/atoms/ProgressBar'
 import { FOOTER_BUTTON_STYLE } from './UpdateRobotModal'
 import {
   startRobotUpdate,
   clearRobotUpdateSession,
   getRobotUpdateDownloadError,
-} from '../../../../redux/robot-update'
+} from '/app/redux/robot-update'
 import { useRobotUpdateInfo } from './useRobotUpdateInfo'
-import successIcon from '../../../../assets/images/icon_success.png'
+import successIcon from '/app/assets/images/icon_success.png'
 import {
   useRobotInitializationStatus,
   INIT_STATUS,
-} from '../../../../resources/health/hooks'
+} from '/app/resources/health/hooks'
 
-import type { State } from '../../../../redux/types'
+import type { State } from '/app/redux/types'
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol'
-import type { RobotUpdateSession } from '../../../../redux/robot-update/types'
+import type { RobotUpdateSession } from '/app/redux/robot-update/types'
 import type { UpdateStep } from './useRobotUpdateInfo'
-import type { RobotInitializationStatus } from '../../../../resources/health/hooks'
+import type { RobotInitializationStatus } from '/app/resources/health/hooks'
 
 const UPDATE_PROGRESS_BAR_STYLE = css`
   margin-top: ${SPACING.spacing24};
@@ -113,7 +113,7 @@ export function RobotUpdateProgressModal({
   )
 
   return (
-    <LegacyModal
+    <Modal
       title={`${t('updating')} ${robotName}`}
       width="40rem"
       textAlign="center"
@@ -167,7 +167,7 @@ export function RobotUpdateProgressModal({
           </LegacyStyledText>
         </Flex>
       )}
-    </LegacyModal>
+    </Modal>
   )
 }
 

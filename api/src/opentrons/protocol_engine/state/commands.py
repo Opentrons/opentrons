@@ -15,8 +15,12 @@ from opentrons.hardware_control.types import DoorState
 from opentrons.protocol_engine.actions.actions import (
     ResumeFromRecoveryAction,
     RunCommandAction,
+    SetErrorRecoveryPolicyAction,
 )
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
+from opentrons.protocol_engine.error_recovery_policy import (
+    ErrorRecoveryPolicy,
+    ErrorRecoveryType,
+)
 from opentrons.protocol_engine.notes.notes import CommandNote
 
 from ..actions import (
@@ -45,7 +49,7 @@ from ..errors import (
     ProtocolCommandFailedError,
 )
 from ..types import EngineStatus
-from .abstract_store import HasState, HandlesActions
+from ._abstract_store import HasState, HandlesActions
 from .command_history import (
     CommandEntry,
     CommandHistory,
@@ -109,6 +113,15 @@ class CommandSlice:
     """A subset of all commands in state."""
 
     commands: List[Command]
+    cursor: int
+    total_length: int
+
+
+@dataclass(frozen=True)
+class CommandErrorSlice:
+    """A subset of all commands errors in state."""
+
+    commands_errors: List[ErrorOccurrence]
     cursor: int
     total_length: int
 
@@ -199,8 +212,17 @@ class CommandState:
     This value can be used to generate future hashes.
     """
 
+    failed_command_errors: List[ErrorOccurrence]
+    """List of command errors that occurred during run execution."""
+
+    has_entered_error_recovery: bool
+    """Whether the run has entered error recovery."""
+
     stopped_by_estop: bool
     """If this is set to True, the engine was stopped by an estop event."""
+
+    error_recovery_policy: ErrorRecoveryPolicy
+    """See `CommandView.get_error_recovery_policy()`."""
 
 
 class CommandStore(HasState[CommandState], HandlesActions):
@@ -213,6 +235,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         *,
         config: Config,
         is_door_open: bool,
+        error_recovery_policy: ErrorRecoveryPolicy,
     ) -> None:
         """Initialize a CommandStore and its state."""
         self._config = config
@@ -230,6 +253,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
             run_started_at=None,
             latest_protocol_command_hash=None,
             stopped_by_estop=False,
+            failed_command_errors=[],
+            error_recovery_policy=error_recovery_policy,
+            has_entered_error_recovery=False,
         )
 
     def handle_action(self, action: Action) -> None:
@@ -257,6 +283,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 self._handle_hardware_stopped_action(action)
             case DoorChangeAction():
                 self._handle_door_change_action(action)
+            case SetErrorRecoveryPolicyAction():
+                self._handle_set_error_recovery_policy_action(action)
             case _:
                 pass
 
@@ -319,6 +347,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             notes=action.notes,
         )
         self._state.failed_command = self._state.command_history.get(action.command_id)
+        self._state.failed_command_errors.append(public_error_occurrence)
 
         other_command_ids_to_fail: List[str]
         if prev_entry.command.intent == CommandIntent.SETUP:
@@ -362,6 +391,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         ):
             self._state.queue_status = QueueStatus.AWAITING_RECOVERY
             self._state.recovery_target_command_id = action.command_id
+            self._state.has_entered_error_recovery = True
 
     def _handle_play_action(self, action: PlayAction) -> None:
         if not self._state.run_result:
@@ -459,6 +489,11 @@ class CommandStore(HasState[CommandState], HandlesActions):
             elif action.door_state == DoorState.CLOSED:
                 self._state.is_door_blocking = False
 
+    def _handle_set_error_recovery_policy_action(
+        self, action: SetErrorRecoveryPolicyAction
+    ) -> None:
+        self._state.error_recovery_policy = action.error_recovery_policy
+
     def _update_to_failed(
         self,
         command_id: str,
@@ -545,18 +580,19 @@ class CommandView(HasState[CommandState]):
         return self._state.command_history.get_all_commands()
 
     def get_slice(
-        self,
-        cursor: Optional[int],
-        length: int,
+        self, cursor: Optional[int], length: int, include_fixit_commands: bool
     ) -> CommandSlice:
         """Get a subset of commands around a given cursor.
 
         If the cursor is omitted, a cursor will be selected automatically
         based on the currently running or most recently executed command.
         """
+        command_ids = self._state.command_history.get_filtered_command_ids(
+            include_fixit_commands=include_fixit_commands
+        )
         running_command = self._state.command_history.get_running_command()
         queued_command_ids = self._state.command_history.get_queue_ids()
-        total_length = self._state.command_history.length()
+        total_length = len(command_ids)
 
         # TODO(mm, 2024-05-17): This looks like it's attempting to do the same thing
         # as self.get_current(), but in a different way. Can we unify them?
@@ -585,10 +621,32 @@ class CommandView(HasState[CommandState]):
         # start is inclusive, stop is exclusive
         actual_cursor = max(0, min(cursor, total_length - 1))
         stop = min(total_length, actual_cursor + length)
-        commands = self._state.command_history.get_slice(start=actual_cursor, stop=stop)
+        commands = self._state.command_history.get_slice(
+            start=actual_cursor, stop=stop, command_ids=command_ids
+        )
 
         return CommandSlice(
             commands=commands,
+            cursor=actual_cursor,
+            total_length=total_length,
+        )
+
+    def get_errors_slice(
+        self,
+        cursor: int,
+        length: int,
+    ) -> CommandErrorSlice:
+        """Get a subset of commands error around a given cursor."""
+        # start is inclusive, stop is exclusive
+        all_errors = self.get_all_errors()
+        total_length = len(all_errors)
+        actual_cursor = max(0, min(cursor, total_length - 1))
+        stop = min(total_length, actual_cursor + length)
+
+        sliced_errors = all_errors[actual_cursor:stop]
+
+        return CommandErrorSlice(
+            commands_errors=sliced_errors,
             cursor=actual_cursor,
             total_length=total_length,
         )
@@ -618,6 +676,14 @@ class CommandView(HasState[CommandState]):
             return combined_error
         else:
             return run_error or finish_error
+
+    def get_all_errors(self) -> List[ErrorOccurrence]:
+        """Get the run's full error list, if there was none, returns an empty list."""
+        return self._state.failed_command_errors
+
+    def get_has_entered_recovery_mode(self) -> bool:
+        """Get whether the run has entered recovery mode."""
+        return self._state.has_entered_error_recovery
 
     def get_running_command_id(self) -> Optional[str]:
         """Return the ID of the command that's currently running, if there is one."""
@@ -985,3 +1051,12 @@ class CommandView(HasState[CommandState]):
     def get_latest_protocol_command_hash(self) -> Optional[str]:
         """Get the command hash of the last queued command, if any."""
         return self._state.latest_protocol_command_hash
+
+    def get_error_recovery_policy(self) -> ErrorRecoveryPolicy:
+        """Return the run's current error recovery policy (see `ErrorRecoveryPolicy`).
+
+        This error recovery policy is not ever evaluated by
+        `CommandStore`/`CommandView`. It's stored here for convenience, but evaluated by
+        higher-level code.
+        """
+        return self._state.error_recovery_policy

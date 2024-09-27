@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   AlertPrimaryButton,
@@ -9,10 +9,10 @@ import {
   JUSTIFY_FLEX_END,
   Link,
   SPACING,
+  Modal,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LegacyModal } from '../../molecules/LegacyModal'
 
 interface ConfirmDeleteProtocolModalProps {
   cancelDeleteProtocol: React.MouseEventHandler<HTMLAnchorElement> | undefined
@@ -24,7 +24,7 @@ export function ConfirmDeleteProtocolModal(
 ): JSX.Element {
   const { t } = useTranslation(['protocol_list', 'shared'])
   return (
-    <LegacyModal
+    <Modal
       type="warning"
       onClose={props.cancelDeleteProtocol}
       title={t('delete_this_protocol')}
@@ -51,6 +51,6 @@ export function ConfirmDeleteProtocolModal(
           </AlertPrimaryButton>
         </Flex>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

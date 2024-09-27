@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Link as InternalLink } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -12,13 +11,13 @@ import {
   useTrackEvent,
   ANALYTICS_U2E_DRIVE_ALERT_DISMISSED,
   ANALYTICS_U2E_DRIVE_LINK_CLICKED,
-} from '../../redux/analytics'
+} from '/app/redux/analytics'
 import {
   U2E_DRIVER_UPDATE_URL,
   U2E_DRIVER_OUTDATED_MESSAGE,
   U2E_DRIVER_DESCRIPTION,
   U2E_DRIVER_OUTDATED_CTA,
-} from '../../redux/system-info'
+} from '/app/redux/system-info'
 import type { AlertProps } from './types'
 
 // TODO(mc, 2020-05-07): i18n

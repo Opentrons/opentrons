@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import { C_MED_DARK_GRAY, C_MED_GRAY } from '../../styles'
 import { BORDERS } from '../../helix-design-system'

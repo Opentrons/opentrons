@@ -27,7 +27,7 @@ class ProtocolAutoDeleter:  # noqa: D101
         protocols = {
             p.protocol_id
             for p in self._protocol_store.get_all()
-            if p.protocol_kind == self._protocol_kind.value
+            if p.protocol_kind == self._protocol_kind
         }
 
         protocol_run_usage_info = [

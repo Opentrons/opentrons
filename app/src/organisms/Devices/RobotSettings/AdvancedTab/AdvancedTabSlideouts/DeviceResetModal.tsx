@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import last from 'lodash/last'
@@ -13,24 +13,21 @@ import {
   Link,
   PrimaryButton,
   SPACING,
+  Modal,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LegacyModal } from '../../../../../molecules/LegacyModal'
 import {
   useDispatchApiRequest,
   getRequestById,
   SUCCESS,
   PENDING,
-} from '../../../../../redux/robot-api'
-import {
-  getResetConfigOptions,
-  resetConfig,
-} from '../../../../../redux/robot-admin'
-import { useIsFlex } from '../../../hooks'
+} from '/app/redux/robot-api'
+import { getResetConfigOptions, resetConfig } from '/app/redux/robot-admin'
+import { useIsFlex } from '/app/redux-resources/robots'
 
-import type { State } from '../../../../../redux/types'
-import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
+import type { State } from '/app/redux/types'
+import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
 
 interface DeviceResetModalProps {
   closeModal: () => void
@@ -83,7 +80,7 @@ export function DeviceResetModal({
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (resetRequestStatus === SUCCESS) closeModal()
   }, [resetRequestStatus, closeModal])
 
@@ -92,7 +89,7 @@ export function DeviceResetModal({
   return (
     <>
       {isRobotReachable ? (
-        <LegacyModal
+        <Modal
           type="warning"
           title={t('reset_to_factory_settings')}
           onClose={closeModal}
@@ -120,9 +117,9 @@ export function DeviceResetModal({
               </AlertPrimaryButton>
             </Flex>
           </Flex>
-        </LegacyModal>
+        </Modal>
       ) : (
-        <LegacyModal
+        <Modal
           type="warning"
           title={t('connection_to_robot_lost')}
           onClose={closeModal}
@@ -142,7 +139,7 @@ export function DeviceResetModal({
               {t('shared:close')}
             </PrimaryButton>
           </Flex>
-        </LegacyModal>
+        </Modal>
       )}
     </>
   )

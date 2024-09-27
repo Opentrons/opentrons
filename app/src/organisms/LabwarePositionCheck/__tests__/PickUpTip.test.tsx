@@ -1,22 +1,19 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { it, describe, beforeEach, vi, afterEach, expect } from 'vitest'
 import { FLEX_ROBOT_TYPE, HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
-import { i18n } from '../../../i18n'
-import { useProtocolMetadata } from '../../Devices/hooks'
-import { getIsOnDevice } from '../../../redux/config'
+import { i18n } from '/app/i18n'
+import { useProtocolMetadata } from '/app/resources/protocols'
+import { getIsOnDevice } from '/app/redux/config'
 import { PickUpTip } from '../PickUpTip'
 import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 import type { CommandData } from '@opentrons/api-client'
-import {
-  nestedTextMatcher,
-  renderWithProviders,
-} from '../../../__testing-utils__'
+import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
 import type { Mock } from 'vitest'
 
-vi.mock('../../Devices/hooks')
-vi.mock('../../../redux/config')
+vi.mock('/app/resources/protocols')
+vi.mock('/app/redux/config')
 
 const mockStartPosition = { x: 10, y: 20, z: 30 }
 

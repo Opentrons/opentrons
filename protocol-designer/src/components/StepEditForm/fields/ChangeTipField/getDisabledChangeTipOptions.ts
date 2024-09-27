@@ -16,8 +16,8 @@ export const getDisabledChangeTipOptions = (
     case 'moveLiquid': {
       const wellRatio = getWellRatio(aspirateWells, dispenseWells)
 
-      // form with no wells selected treated as 'single'
-      if (!wellRatio || !path || path === 'single') {
+      //  ensure wells are selected
+      if (wellRatio != null && path === 'single') {
         if (wellRatio === '1:many') {
           return new Set(['perSource'])
         }

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -31,21 +30,25 @@ import {
   useModulesQuery,
 } from '@opentrons/react-api-client'
 
-import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
-import FLEX_PNG from '../../assets/images/FLEX.png'
-import { InstrumentContainer } from '../../atoms/InstrumentContainer'
-import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
-import { ModuleIcon } from '../../molecules/ModuleIcon'
+import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
+import FLEX_PNG from '/app/assets/images/FLEX.png'
+import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
+import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
+import { ModuleIcon } from '/app/molecules/ModuleIcon'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
-import { useIsFlex } from './hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
+import {
+  ErrorRecoveryBanner,
+  useErrorRecoveryBanner,
+} from '../ErrorRecoveryBanner'
 
 import type { GripperData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
-import type { DiscoveredRobot } from '../../redux/discovery/types'
-import type { State } from '../../redux/types'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
+import type { State } from '/app/redux/types'
 
 interface RobotCardProps {
   robot: DiscoveredRobot
@@ -58,6 +61,8 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
   const robotModel = useSelector((state: State) =>
     getRobotModelByName(state, robotName)
   )
+
+  const { showRecoveryBanner, recoveryIntent } = useErrorRecoveryBanner()
 
   return robot != null ? (
     <Flex
@@ -87,6 +92,12 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       >
         <UpdateRobotBanner robot={robot} marginRight={SPACING.spacing24} />
         <ReachableBanner robot={robot} />
+        {showRecoveryBanner ? (
+          <ErrorRecoveryBanner
+            recoveryIntent={recoveryIntent}
+            marginRight={SPACING.spacing24}
+          />
+        ) : null}
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
           <RobotStatusHeader
             local={local}

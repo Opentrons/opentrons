@@ -18,6 +18,7 @@ import {
   SecondaryButton,
   SPACING,
   LegacyStyledText,
+  ModalShell,
   TYPOGRAPHY,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
@@ -28,22 +29,21 @@ import {
   getVectorSum,
 } from '@opentrons/shared-data'
 
-import levelWithTip from '../../assets/images/lpc_level_with_tip.svg'
-import levelWithLabware from '../../assets/images/lpc_level_with_labware.svg'
-import levelProbeWithTip from '../../assets/images/lpc_level_probe_with_tip.svg'
-import levelProbeWithLabware from '../../assets/images/lpc_level_probe_with_labware.svg'
-import { getIsOnDevice } from '../../redux/config'
+import levelWithTip from '/app/assets/images/lpc_level_with_tip.svg'
+import levelWithLabware from '/app/assets/images/lpc_level_with_labware.svg'
+import levelProbeWithTip from '/app/assets/images/lpc_level_probe_with_tip.svg'
+import levelProbeWithLabware from '/app/assets/images/lpc_level_probe_with_labware.svg'
+import { getIsOnDevice } from '/app/redux/config'
 import { getTopPortalEl } from '../../App/portal'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { NeedHelpLink } from '../CalibrationPanels'
-import { JogControls } from '../../molecules/JogControls'
+import { JogControls } from '/app/molecules/JogControls'
 import { LiveOffsetValue } from './LiveOffsetValue'
 
 import type { PipetteName, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { WellStroke } from '@opentrons/components'
 import type { VectorOffset } from '@opentrons/api-client'
-import type { Jog } from '../../molecules/JogControls'
+import type { Jog } from '/app/molecules/JogControls'
 
 const DECK_MAP_VIEWBOX = '-10 -10 150 105'
 const LPC_HELP_LINK_URL =
@@ -193,7 +193,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
           </Flex>
           {showFullJogControls
             ? createPortal(
-                <LegacyModalShell
+                <ModalShell
                   width="60rem"
                   height="33.5rem"
                   padding={SPACING.spacing32}
@@ -229,7 +229,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                     }
                     isOnDevice={true}
                   />
-                </LegacyModalShell>,
+                </ModalShell>,
                 getTopPortalEl()
               )
             : null}

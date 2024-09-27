@@ -1,6 +1,7 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
@@ -8,19 +9,21 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
+  MenuItem,
+  NO_WRAP,
+  OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
+  useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
+
+import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import { formatLastCalibrated } from './CalibrationDetails/utils'
-import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { GripperData } from '@opentrons/api-client'
 
@@ -68,7 +71,7 @@ export function RobotSettingsGripperCalibration(
       setShowOverflowMenu(false)
     },
   })
-  const [showWizardFlow, setShowWizardFlow] = React.useState<boolean>(false)
+  const [showWizardFlow, setShowWizardFlow] = useState<boolean>(false)
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   const gripperCalibrationLastModified =
@@ -148,7 +151,7 @@ export function RobotSettingsGripperCalibration(
                   {showOverflowMenu ? (
                     <Flex
                       ref={calsOverflowWrapperRef}
-                      whiteSpace="nowrap"
+                      whiteSpace={NO_WRAP}
                       zIndex={10}
                       borderRadius="4px 4px 0px 0px"
                       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"

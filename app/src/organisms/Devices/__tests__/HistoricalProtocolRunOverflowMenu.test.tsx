@@ -1,36 +1,42 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
-import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
+
 import { useDeleteRunMutation } from '@opentrons/react-api-client'
-import { i18n } from '../../../i18n'
-import runRecord from '../../../organisms/RunDetails/__fixtures__/runRecord.json'
-import { useDownloadRunLog, useTrackProtocolRunEvent, useRobot } from '../hooks'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import runRecord from '../ProtocolRun/ProtocolRunHeader/RunHeaderModalContainer/modals/__fixtures__/runRecord.json'
+import { useDownloadRunLog } from '../hooks'
+import { useRobot } from '/app/redux-resources/robots'
+import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useRunControls } from '../../RunTimeControl/hooks'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '../../../redux/analytics'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+} from '/app/redux/analytics'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
-import { useNotifyAllCommandsQuery } from '../../../resources/runs'
+import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
 import type { UseQueryResult } from 'react-query'
 import type { CommandsData } from '@opentrons/api-client'
 
-vi.mock('../../../redux/analytics')
-vi.mock('../../../redux/robot-update/selectors')
-vi.mock('../../Devices/hooks')
+vi.mock('/app/redux/analytics')
+vi.mock('/app/redux/robot-update/selectors')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/organisms/Devices/hooks')
 vi.mock('../../RunTimeControl/hooks')
-vi.mock('../../../redux/analytics')
-vi.mock('../../../redux/config')
-vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
-vi.mock('../../../resources/runs')
+vi.mock('/app/redux/analytics')
+vi.mock('/app/redux/config')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/resources/runs')
+vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux-resources/analytics')
 vi.mock('@opentrons/react-api-client')
 
 const render = (
@@ -58,11 +64,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
     mockTrackEvent = vi.fn()
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     mockTrackProtocolRunEvent = vi.fn(() => new Promise(resolve => resolve({})))
-    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
-      autoUpdateAction: 'reinstall',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
+    vi.mocked(useIsRobotOnWrongVersionOfSoftware).mockReturnValue(false)
     vi.mocked(useDownloadRunLog).mockReturnValue({
       downloadRunLog: mockDownloadRunLog,
       isRunLogLoading: false,
@@ -87,6 +89,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
         isStopRunActionLoading: false,
         isResetRunLoading: false,
         isResumeRunFromRecoveryActionLoading: false,
+        isRunControlLoading: false,
       })
     when(useNotifyAllCommandsQuery)
       .calledWith(
@@ -139,11 +142,33 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
   })
 
   it('disables the rerun protocol menu item if robot software update is available', () => {
-    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
-      autoUpdateAction: 'upgrade',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
+    vi.mocked(useIsRobotOnWrongVersionOfSoftware).mockReturnValue(true)
+    render(props)
+    const btn = screen.getByRole('button')
+    fireEvent.click(btn)
+    screen.getByRole('button', {
+      name: 'View protocol run record',
     })
+    const rerunBtn = screen.getByRole('button', { name: 'Rerun protocol now' })
+    expect(rerunBtn).toBeDisabled()
+  })
+
+  it('disables the rerun protocol menu item if run data is loading', () => {
+    when(useRunControls)
+      .calledWith(RUN_ID, expect.anything())
+      .thenReturn({
+        play: () => {},
+        pause: () => {},
+        stop: () => {},
+        reset: () => {},
+        resumeFromRecovery: () => {},
+        isPlayRunActionLoading: false,
+        isPauseRunActionLoading: false,
+        isStopRunActionLoading: false,
+        isResetRunLoading: false,
+        isResumeRunFromRecoveryActionLoading: false,
+        isRunControlLoading: true,
+      })
     render(props)
     const btn = screen.getByRole('button')
     fireEvent.click(btn)

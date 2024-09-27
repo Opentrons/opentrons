@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { Flex } from '../../primitives'
 import { COLORS } from '../../helix-design-system'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'

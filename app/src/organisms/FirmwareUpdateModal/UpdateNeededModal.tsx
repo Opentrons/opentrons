@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation, Trans } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
@@ -16,13 +16,13 @@ import {
 } from '@opentrons/react-api-client'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../App/portal'
-import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
 import { UpdateInProgressModal } from './UpdateInProgressModal'
 import { UpdateResultsModal } from './UpdateResultsModal'
 import type { Subsystem } from '@opentrons/api-client'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface UpdateNeededModalProps {
   onClose: () => void
@@ -34,9 +34,9 @@ interface UpdateNeededModalProps {
 export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
   const { onClose, shouldExit, subsystem, setInitiatedSubsystemUpdate } = props
   const { t } = useTranslation('firmware_update')
-  const [updateId, setUpdateId] = React.useState<string | null>(null)
+  const [updateId, setUpdateId] = useState<string | null>(null)
   // when we move to the next subsystem to update, set updateId back to null
-  React.useEffect(() => {
+  useEffect(() => {
     setUpdateId(null)
   }, [subsystem])
 
@@ -58,7 +58,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
   const status = updateData?.data.updateStatus
   const ongoingUpdateId = updateData?.data.id
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (status === 'done') {
       setInitiatedSubsystemUpdate(null)
     }
@@ -70,14 +70,14 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
   if (subsystem === 'pipette_left') mount = LEFT
   else if (subsystem === 'pipette_right') mount = RIGHT
 
-  const updateNeededHeader: ModalHeaderBaseProps = {
+  const updateNeededHeader: OddModalHeaderBaseProps = {
     title: t('update_needed'),
     iconName: 'ot-alert',
     iconColor: COLORS.yellow50,
   }
 
   let modalContent = (
-    <Modal header={updateNeededHeader}>
+    <OddModal header={updateNeededHeader}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <LegacyStyledText as="p" marginBottom={SPACING.spacing60}>
           <Trans
@@ -101,7 +101,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
           width="100%"
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
   if (
     (status === 'updating' || status === 'queued') &&

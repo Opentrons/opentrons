@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
@@ -15,15 +14,13 @@ import {
 
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
-import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'
-import { LEFT } from '../../../redux/pipettes'
-import {
-  useAttachedPipettes,
-  useIsFlex,
-  useAttachedPipettesFromInstrumentsQuery,
-} from '../../../organisms/Devices/hooks'
+import { getCustomLabwareDefinitions } from '/app/redux/custom-labware'
+import { LEFT } from '/app/redux/pipettes'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/organisms/Devices/hooks'
+import { useAttachedPipettes } from '/app/resources/instruments'
+import { useIsFlex } from '/app/redux-resources/robots'
 
-import type { State } from '../../../redux/types'
+import type { State } from '/app/redux/types'
 import type { FormattedPipetteOffsetCalibration } from '..'
 
 const StyledTable = styled.table`

@@ -9,10 +9,11 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  InputField,
+  LegacyStyledText,
   Link,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -21,16 +22,15 @@ import {
   useUpdateRobotSettingMutation,
 } from '@opentrons/react-api-client'
 
-import { ToggleButton } from '../../../../../atoms/buttons'
-import { InputField } from '../../../../../atoms/InputField'
-import { MultiSlideout } from '../../../../../atoms/Slideout/MultiSlideout'
-import { FileUpload } from '../../../../../molecules/FileUpload'
-import { UploadInput } from '../../../../../molecules/UploadInput'
-import { restartRobot } from '../../../../../redux/robot-admin'
+import { ToggleButton } from '/app/atoms/buttons'
+import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
+import { FileUpload } from '/app/molecules/FileUpload'
+import { UploadInput } from '/app/molecules/UploadInput'
+import { restartRobot } from '/app/redux/robot-admin'
 
 import type { FieldError, Resolver } from 'react-hook-form'
 import type { RobotSettingsField } from '@opentrons/api-client'
-import type { Dispatch } from '../../../../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 interface FactoryModeSlideoutProps {
   isExpanded: boolean

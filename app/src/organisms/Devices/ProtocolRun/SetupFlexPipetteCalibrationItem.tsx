@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -14,14 +14,15 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { TertiaryButton } from '../../../atoms/buttons'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { TertiaryButton } from '/app/atoms/buttons'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 import type { PipetteData } from '@opentrons/api-client'
 import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data'
-import type { Mount } from '../../../redux/pipettes/types'
+import type { Mount } from '/app/redux/pipettes/types'
 
 interface SetupInstrumentCalibrationItemProps {
   mount: Mount
@@ -35,16 +36,16 @@ export function SetupFlexPipetteCalibrationItem({
   instrumentsRefetch,
 }: SetupInstrumentCalibrationItemProps): JSX.Element | null {
   const { t } = useTranslation(['protocol_setup', 'devices_landing'])
-  const [showFlexPipetteFlow, setShowFlexPipetteFlow] = React.useState<boolean>(
-    false
-  )
+  const [showFlexPipetteFlow, setShowFlexPipetteFlow] = useState<boolean>(false)
   const { data: attachedInstruments } = useInstrumentsQuery()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const loadPipetteCommand = mostRecentAnalysis?.commands.find(
+  const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
+  const completedAnalysis = mostRecentAnalysis ?? storedProtocolAnalysis
+  const loadPipetteCommand = completedAnalysis?.commands.find(
     (command): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette' && command.params.mount === mount
   )
-  const requestedPipette = mostRecentAnalysis?.pipettes?.find(
+  const requestedPipette = completedAnalysis?.pipettes?.find(
     pipette => pipette.id === loadPipetteCommand?.result?.pipetteId
   )
 
@@ -120,7 +121,7 @@ export function SetupFlexPipetteCalibrationItem({
               ? NINETY_SIX_CHANNEL
               : SINGLE_MOUNT_PIPETTES
           }
-          pipetteInfo={mostRecentAnalysis?.pipettes}
+          pipetteInfo={completedAnalysis?.pipettes}
           onComplete={instrumentsRefetch}
         />
       )}

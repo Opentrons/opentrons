@@ -8,39 +8,40 @@ import {
   BORDERS,
   Box,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  MenuItem,
   Overlay,
   POSITION_ABSOLUTE,
   SecondaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import {
   getProtocolsDesktopSortKey,
   updateConfigValue,
-} from '../../redux/config'
+} from '/app/redux/config'
 import { useSortedProtocols } from './hooks'
-import { Slideout } from '../../atoms/Slideout'
+import { Slideout } from '/app/atoms/Slideout'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { ProtocolUploadInput } from './ProtocolUploadInput'
 import { ProtocolCard } from './ProtocolCard'
 import { EmptyStateLinks } from './EmptyStateLinks'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
 
-import type { StoredProtocolData } from '../../redux/protocol-storage'
+import type { StoredProtocolData } from '/app/redux/protocol-storage'
 import type { ProtocolSort } from './hooks'
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   &:hover {
     background-color: ${COLORS.grey30};
   }

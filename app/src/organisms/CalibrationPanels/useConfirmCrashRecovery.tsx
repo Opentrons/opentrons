@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -10,7 +10,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import * as Sessions from '../../redux/sessions'
+import * as Sessions from '/app/redux/sessions'
 import { ConfirmCrashRecovery } from './ConfirmCrashRecovery'
 
 import type { CalibrationPanelProps } from './types'
@@ -20,7 +20,7 @@ export function useConfirmCrashRecovery(
 ): [link: JSX.Element, confirmation: JSX.Element | null] {
   const { t } = useTranslation('robot_calibration')
   const { sendCommands } = props
-  const [showModal, setShowModal] = React.useState(false)
+  const [showModal, setShowModal] = useState(false)
 
   const doStartOver = (): void => {
     sendCommands({ command: Sessions.sharedCalCommands.INVALIDATE_LAST_ACTION })

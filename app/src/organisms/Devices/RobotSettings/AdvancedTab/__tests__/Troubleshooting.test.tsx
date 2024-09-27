@@ -1,28 +1,28 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { act, waitFor, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { useHost } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../../../i18n'
-import { useToaster } from '../../../../../organisms/ToasterOven'
+import { i18n } from '/app/i18n'
+import { useToaster } from '/app/organisms/ToasterOven'
 import {
   mockConnectableRobot,
   mockUnreachableRobot,
-} from '../../../../../redux/discovery/__fixtures__'
-import { useRobot } from '../../../hooks'
+} from '/app/redux/discovery/__fixtures__'
+import { useRobot } from '/app/redux-resources/robots'
 import { Troubleshooting } from '../Troubleshooting'
 
 import type { HostConfig } from '@opentrons/api-client'
 import type { ToasterContextType } from '../../../../ToasterOven/ToasterContext'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../../organisms/ToasterOven')
-vi.mock('../../../../../redux/discovery/selectors')
-vi.mock('../../../hooks')
+vi.mock('/app/organisms/ToasterOven')
+vi.mock('/app/redux/discovery/selectors')
+vi.mock('/app/redux-resources/robots')
 
 const ROBOT_NAME = 'otie'
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }

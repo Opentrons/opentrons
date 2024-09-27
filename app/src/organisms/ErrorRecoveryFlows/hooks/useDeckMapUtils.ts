@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo } from 'react'
 
 import {
   getDeckDefFromRobotType,
@@ -50,7 +50,7 @@ export function useDeckMapUtils({
   const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
   const deckDef = getDeckDefFromRobotType(robotType)
 
-  const currentModulesInfo = React.useMemo(
+  const currentModulesInfo = useMemo(
     () =>
       getRunCurrentModulesInfo({
         runRecord,
@@ -60,7 +60,7 @@ export function useDeckMapUtils({
     [runRecord, deckDef, protocolAnalysis]
   )
 
-  const runCurrentModules = React.useMemo(
+  const runCurrentModules = useMemo(
     () =>
       getRunCurrentModulesOnDeck({
         failedLabwareUtils,
@@ -69,12 +69,12 @@ export function useDeckMapUtils({
     [runId, protocolAnalysis, runRecord, deckDef, failedLabwareUtils]
   )
 
-  const currentLabwareInfo = React.useMemo(
+  const currentLabwareInfo = useMemo(
     () => getRunCurrentLabwareInfo({ runRecord, protocolAnalysis }),
     [runRecord, protocolAnalysis]
   )
 
-  const runCurrentLabware = React.useMemo(
+  const runCurrentLabware = useMemo(
     () =>
       getRunCurrentLabwareOnDeck({
         failedLabwareUtils,

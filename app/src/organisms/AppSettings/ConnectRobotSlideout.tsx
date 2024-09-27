@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
@@ -18,12 +18,12 @@ import {
 
 import { ManualIpHostnameForm } from './ManualIpHostnameForm'
 import { ManualIpHostnameList } from './ManualIpHostnameList'
-import { Slideout } from '../../atoms/Slideout'
-import { ExternalLink } from '../../atoms/Link/ExternalLink'
-import { Divider } from '../../atoms/structure'
-import { getScanning, startDiscovery } from '../../redux/discovery'
+import { Slideout } from '/app/atoms/Slideout'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { Divider } from '/app/atoms/structure'
+import { getScanning, startDiscovery } from '/app/redux/discovery'
 
-import type { Dispatch, State } from '../../redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 const SUPPORT_PAGE_LINK =
   'https://support.opentrons.com/s/article/Manually-adding-a-robot-s-IP-address'
@@ -37,10 +37,10 @@ export function ConnectRobotSlideout({
   isExpanded,
   onCloseClick,
 }: ConnectRobotSlideoutProps): JSX.Element | null {
-  const [mostRecentAddition, setMostRecentAddition] = React.useState<
-    string | null
-  >(null)
-  const [mostRecentDiscovered, setMostRecentDiscovered] = React.useState<
+  const [mostRecentAddition, setMostRecentAddition] = useState<string | null>(
+    null
+  )
+  const [mostRecentDiscovered, setMostRecentDiscovered] = useState<
     boolean | null
   >(null)
   const { t } = useTranslation(['app_settings', 'shared', 'branded'])
@@ -62,7 +62,7 @@ export function ConnectRobotSlideout({
     )
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(startDiscovery())
   }, [dispatch])
 

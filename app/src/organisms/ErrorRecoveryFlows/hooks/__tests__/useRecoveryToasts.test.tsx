@@ -1,7 +1,7 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { I18nextProvider } from 'react-i18next'
-import { i18n } from '../../../../i18n'
+import { i18n } from '/app/i18n'
 import { renderHook, render, screen } from '@testing-library/react'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -14,13 +14,13 @@ import {
 } from '../useRecoveryToasts'
 import { RECOVERY_MAP } from '../../constants'
 import { useToaster } from '../../../ToasterOven'
-import { useCommandTextString } from '../../../../molecules/Command'
+import { useCommandTextString } from '/app/molecules/Command'
 
 import type { Mock } from 'vitest'
 import type { BuildToast } from '../useRecoveryToasts'
 
 vi.mock('../../../ToasterOven')
-vi.mock('../../../../molecules/Command')
+vi.mock('/app/molecules/Command')
 
 const TEST_COMMAND = 'test command'
 const TC_COMMAND = 'tc command cycle some more text'

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import {
@@ -10,12 +10,12 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Divider } from '../../atoms/structure'
-import { ToggleButton } from '../../atoms/buttons'
-import * as Config from '../../redux/config'
+import { Divider } from '/app/atoms/structure'
+import { ToggleButton } from '/app/atoms/buttons'
+import * as Config from '/app/redux/config'
 
-import type { DevInternalFlag } from '../../redux/config/types'
-import type { Dispatch } from '../../redux/types'
+import type { DevInternalFlag } from '/app/redux/config/types'
+import type { Dispatch } from '/app/redux/types'
 
 export function FeatureFlags(): JSX.Element {
   const { t } = useTranslation('app_settings')
@@ -32,7 +32,7 @@ export function FeatureFlags(): JSX.Element {
       paddingY={SPACING.spacing24}
     >
       {Config.DEV_INTERNAL_FLAGS.map((flag, index) => (
-        <React.Fragment key={flag}>
+        <Fragment key={flag}>
           <Flex
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -54,7 +54,7 @@ export function FeatureFlags(): JSX.Element {
           {index !== Config.DEV_INTERNAL_FLAGS.length - 1 && (
             <Divider marginY={SPACING.spacing24} />
           )}
-        </React.Fragment>
+        </Fragment>
       ))}
     </Flex>
   )

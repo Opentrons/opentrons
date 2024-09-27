@@ -7,7 +7,7 @@ import {
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import { getValidCustomLabwareFiles } from '../../redux/custom-labware/selectors'
+import { getValidCustomLabwareFiles } from '/app/redux/custom-labware/selectors'
 
 import type { UseMutateFunction } from 'react-query'
 import type {
@@ -17,7 +17,7 @@ import type {
 } from '@opentrons/api-client'
 import type { UseCreateRunMutationOptions } from '@opentrons/react-api-client/src/runs/useCreateRunMutation'
 import type { CreateProtocolVariables } from '@opentrons/react-api-client/src/protocols/useCreateProtocolMutation'
-import type { State } from '../../redux/types'
+import type { State } from '/app/redux/types'
 
 export interface UseCreateRun {
   createRunFromProtocolSource: UseMutateFunction<
@@ -71,11 +71,12 @@ export function useCreateRunFromProtocol(
     reset: resetProtocolMutation,
   } = useCreateProtocolMutation(
     {
-      onSuccess: (data, { runTimeParameterValues }) => {
+      onSuccess: (data, { runTimeParameterValues, runTimeParameterFiles }) => {
         createRun({
           protocolId: data.data.id,
           labwareOffsets,
           runTimeParameterValues,
+          runTimeParameterFiles,
         })
       },
     },
@@ -98,7 +99,12 @@ export function useCreateRunFromProtocol(
 
   return {
     createRunFromProtocolSource: (
-      { files: srcFiles, protocolKey, runTimeParameterValues },
+      {
+        files: srcFiles,
+        protocolKey,
+        runTimeParameterValues,
+        runTimeParameterFiles,
+      },
       ...args
     ) => {
       resetRunMutation()
@@ -107,6 +113,7 @@ export function useCreateRunFromProtocol(
           files: [...srcFiles, ...customLabwareFiles],
           protocolKey,
           runTimeParameterValues,
+          runTimeParameterFiles,
         },
         ...args
       )

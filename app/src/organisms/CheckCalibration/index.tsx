@@ -3,9 +3,9 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { useConditionalConfirm } from '@opentrons/components'
+import { useConditionalConfirm, ModalShell } from '@opentrons/components'
 
-import * as Sessions from '../../redux/sessions'
+import * as Sessions from '/app/redux/sessions'
 import {
   Introduction,
   DeckSetup,
@@ -17,9 +17,8 @@ import {
   MeasureTip,
   LoadingState,
   ConfirmExit,
-} from '../../organisms/CalibrationPanels'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
-import { WizardHeader } from '../../molecules/WizardHeader'
+} from '/app/organisms/CalibrationPanels'
+import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getTopPortalEl } from '../../App/portal'
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
@@ -30,11 +29,11 @@ import type {
   RobotCalibrationCheckPipetteRank,
   RobotCalibrationCheckStep,
   SessionCommandParams,
-} from '../../redux/sessions/types'
+} from '/app/redux/sessions/types'
 
-import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
+import type { CalibrationPanelProps } from '/app/organisms/CalibrationPanels/types'
 import type { CalibrationCheckParentProps } from './types'
-import { CHECK_PIPETTE_RANK_FIRST } from '../../redux/sessions'
+import { CHECK_PIPETTE_RANK_FIRST } from '/app/redux/sessions'
 
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Calibration health check'
 
@@ -175,7 +174,7 @@ export function CheckCalibration(
       ? PANEL_BY_STEP[currentStep]
       : null
   return createPortal(
-    <LegacyModalShell
+    <ModalShell
       width="47rem"
       header={
         <WizardHeader
@@ -219,7 +218,7 @@ export function CheckCalibration(
           activePipette={activePipette}
         />
       )}
-    </LegacyModalShell>,
+    </ModalShell>,
     getTopPortalEl()
   )
 }

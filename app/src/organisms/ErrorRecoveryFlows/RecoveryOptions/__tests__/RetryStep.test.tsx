@@ -1,19 +1,19 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
 
 import { mockRecoveryContentProps } from '../../__fixtures__'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { RetryStep, RetryStepInfo } from '../RetryStep'
-import { RECOVERY_MAP } from '../../constants'
+import { ERROR_KINDS, RECOVERY_MAP } from '../../constants'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
 
 import { clickButtonLabeled } from '../../__tests__/util'
 
 import type { Mock } from 'vitest'
 
-vi.mock('../../../../molecules/Command')
+vi.mock('/app/molecules/Command')
 vi.mock('../SelectRecoveryOption')
 
 const render = (props: React.ComponentProps<typeof RetryStep>) => {
@@ -47,12 +47,12 @@ describe('RetryStep', () => {
     vi.resetAllMocks()
   })
 
-  it(`renders RetryStepInfo when step is ${RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY}`, () => {
+  it(`renders RetryStepInfo when step is ${RECOVERY_MAP.RETRY_STEP.STEPS.CONFIRM_RETRY}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        step: RECOVERY_MAP.RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
+        step: RECOVERY_MAP.RETRY_STEP.STEPS.CONFIRM_RETRY,
       },
     }
     render(props)
@@ -64,7 +64,7 @@ describe('RetryStep', () => {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        step: 'UNKNOWN_STEP',
+        step: 'UNKNOWN_STEP' as any,
       },
     }
     render(props)
@@ -74,19 +74,19 @@ describe('RetryStep', () => {
 
 describe('RetryStepInfo', () => {
   let props: React.ComponentProps<typeof RetryStepInfo>
-  let mockSetRobotInMotion: Mock
+  let mockhandleMotionRouting: Mock
   let mockRetryFailedCommand: Mock
   let mockResumeRun: Mock
 
   beforeEach(() => {
-    mockSetRobotInMotion = vi.fn(() => Promise.resolve())
+    mockhandleMotionRouting = vi.fn(() => Promise.resolve())
     mockRetryFailedCommand = vi.fn(() => Promise.resolve())
     mockResumeRun = vi.fn()
 
     props = {
       ...mockRecoveryContentProps,
       routeUpdateActions: {
-        setRobotInMotion: mockSetRobotInMotion,
+        handleMotionRouting: mockhandleMotionRouting,
       } as any,
       recoveryCommands: {
         retryFailedCommand: mockRetryFailedCommand,
@@ -99,7 +99,16 @@ describe('RetryStepInfo', () => {
     vi.resetAllMocks()
   })
 
-  it('renders the component with the correct text', () => {
+  it(`renders the component with the correct text for ${ERROR_KINDS.TIP_NOT_DETECTED} `, () => {
+    renderRetryStepInfo({ ...props, errorKind: ERROR_KINDS.TIP_NOT_DETECTED })
+    screen.getByText('Retry step')
+    screen.queryByText(
+      'First, take any necessary actions to prepare the robot to retry the failed tip pickup.'
+    )
+    screen.queryByText('Then, close the robot door before proceeding.')
+  })
+
+  it('renders the component with the correct text for not specifically handled error kinds', () => {
     renderRetryStepInfo(props)
     screen.getByText('Retry step')
     screen.queryByText(
@@ -113,7 +122,7 @@ describe('RetryStepInfo', () => {
     clickButtonLabeled('Retry now')
 
     await waitFor(() => {
-      expect(mockSetRobotInMotion).toHaveBeenCalledWith(
+      expect(mockhandleMotionRouting).toHaveBeenCalledWith(
         true,
         RECOVERY_MAP.ROBOT_RETRYING_STEP.ROUTE
       )
@@ -125,7 +134,7 @@ describe('RetryStepInfo', () => {
       expect(mockResumeRun).toHaveBeenCalled()
     })
 
-    expect(mockSetRobotInMotion.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(mockhandleMotionRouting.mock.invocationCallOrder[0]).toBeLessThan(
       mockRetryFailedCommand.mock.invocationCallOrder[0]
     )
     expect(mockRetryFailedCommand.mock.invocationCallOrder[0]).toBeLessThan(

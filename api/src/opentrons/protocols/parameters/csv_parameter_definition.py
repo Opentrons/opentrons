@@ -1,18 +1,19 @@
 """CSV Parameter definition and associated classes/functions."""
-from typing import Optional, TextIO
+from typing import Optional
 
 from opentrons.protocol_engine.types import (
     RunTimeParameter,
-    FileId,
     CSVParameter as ProtocolEngineCSVParameter,
+    FileInfo,
 )
+from opentrons.protocols.api_support.types import APIVersion
 
 from . import validation
 from .parameter_definition import AbstractParameterDefinition
-from .types import CSVParameter
+from .csv_parameter_interface import CSVParameter
 
 
-class CSVParameterDefinition(AbstractParameterDefinition[Optional[TextIO]]):
+class CSVParameterDefinition(AbstractParameterDefinition[Optional[bytes]]):
     """The definition for a user defined CSV file parameter."""
 
     def __init__(
@@ -28,8 +29,8 @@ class CSVParameterDefinition(AbstractParameterDefinition[Optional[TextIO]]):
         self._display_name = validation.ensure_display_name(display_name)
         self._variable_name = validation.ensure_variable_name(variable_name)
         self._description = validation.ensure_description(description)
-        self._value: Optional[TextIO] = None
-        self._id: Optional[str] = None
+        self._value: Optional[bytes] = None
+        self._file_info: Optional[FileInfo] = None
 
     @property
     def variable_name(self) -> str:
@@ -37,24 +38,24 @@ class CSVParameterDefinition(AbstractParameterDefinition[Optional[TextIO]]):
         return self._variable_name
 
     @property
-    def value(self) -> Optional[TextIO]:
+    def value(self) -> Optional[bytes]:
         """The current set file for the CSV parameter. Defaults to None on definition creation."""
         return self._value
 
     @value.setter
-    def value(self, new_file: TextIO) -> None:
-        self._value = new_file
+    def value(self, contents: bytes) -> None:
+        self._value = contents
 
     @property
-    def id(self) -> Optional[str]:
-        return self._id
+    def file_info(self) -> Optional[FileInfo]:
+        return self._file_info
 
-    @id.setter
-    def id(self, uuid: str) -> None:
-        self._id = uuid
+    @file_info.setter
+    def file_info(self, file_info: FileInfo) -> None:
+        self._file_info = file_info
 
-    def as_csv_parameter_interface(self) -> CSVParameter:
-        return CSVParameter(csv_file=self._value)
+    def as_csv_parameter_interface(self, api_version: APIVersion) -> CSVParameter:
+        return CSVParameter(contents=self._value, api_version=api_version)
 
     def as_protocol_engine_type(self) -> RunTimeParameter:
         """Returns CSV parameter as a Protocol Engine type to send to client."""
@@ -62,7 +63,7 @@ class CSVParameterDefinition(AbstractParameterDefinition[Optional[TextIO]]):
             displayName=self._display_name,
             variableName=self._variable_name,
             description=self._description,
-            file=FileId(id=self._id) if self._id is not None else None,
+            file=self._file_info,
         )
 
 

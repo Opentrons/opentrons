@@ -14,12 +14,20 @@ import sqlalchemy
 
 from opentrons.protocols.parse import PythonParseMode
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
+
+from robot_server.data_files.models import DataFile
 from robot_server.persistence.database import sqlite_rowid
 from robot_server.persistence.tables import (
     analysis_table,
     protocol_table,
     run_table,
+    analysis_primitive_type_rtp_table,
+    analysis_csv_rtp_table,
+    data_files_table,
+    run_csv_rtp_table,
+    ProtocolKindSQLEnum,
 )
+from robot_server.protocols.protocol_models import ProtocolKind
 
 
 _CACHE_ENTRIES = 32
@@ -36,7 +44,7 @@ class ProtocolResource:
     created_at: datetime
     source: ProtocolSource
     protocol_key: Optional[str]
-    protocol_kind: Optional[str]
+    protocol_kind: ProtocolKind
 
 
 @dataclass(frozen=True)
@@ -168,7 +176,7 @@ class ProtocolStore:
                 protocol_id=resource.protocol_id,
                 created_at=resource.created_at,
                 protocol_key=resource.protocol_key,
-                protocol_kind=resource.protocol_kind,
+                protocol_kind=_http_protocol_kind_to_sql(resource.protocol_kind),
             )
         )
         self._sources_by_id[resource.protocol_id] = resource.source
@@ -186,7 +194,7 @@ class ProtocolStore:
             protocol_id=sql_resource.protocol_id,
             created_at=sql_resource.created_at,
             protocol_key=sql_resource.protocol_key,
-            protocol_kind=sql_resource.protocol_kind,
+            protocol_kind=_sql_protocol_kind_to_http(sql_resource.protocol_kind),
             source=self._sources_by_id[sql_resource.protocol_id],
         )
 
@@ -202,7 +210,7 @@ class ProtocolStore:
                 protocol_id=r.protocol_id,
                 created_at=r.created_at,
                 protocol_key=r.protocol_key,
-                protocol_kind=r.protocol_kind,
+                protocol_kind=_sql_protocol_kind_to_http(r.protocol_kind),
                 source=self._sources_by_id[r.protocol_id],
             )
             for r in all_sql_resources
@@ -300,6 +308,48 @@ class ProtocolStore:
 
         return usage_info
 
+    async def get_referenced_data_files(self, protocol_id: str) -> List[DataFile]:
+        """Return a list of data files referenced in specified protocol's analyses and runs.
+
+        List returned is in the order in which the data files were uploaded to the server.
+        """
+        # Get analyses and runs of protocol_id
+        select_referencing_analysis_ids = sqlalchemy.select(analysis_table.c.id).where(
+            analysis_table.c.protocol_id == protocol_id
+        )
+        select_referencing_run_ids = sqlalchemy.select(run_table.c.id).where(
+            run_table.c.protocol_id == protocol_id
+        )
+        # Get all entries in analysis_csv_table that match the analysis IDs above
+        select_analysis_csv_file_ids = sqlalchemy.select(
+            analysis_csv_rtp_table.c.file_id
+        ).where(
+            analysis_csv_rtp_table.c.analysis_id.in_(select_referencing_analysis_ids)
+        )
+        # Get all entries in run_csv_table that match the run IDs above
+        select_run_csv_file_ids = sqlalchemy.select(run_csv_rtp_table.c.file_id).where(
+            run_csv_rtp_table.c.run_id.in_(select_referencing_run_ids)
+        )
+
+        with self._sql_engine.begin() as transaction:
+            data_files_rows = transaction.execute(
+                data_files_table.select()
+                .where(
+                    data_files_table.c.id.in_(select_analysis_csv_file_ids)
+                    | data_files_table.c.id.in_(select_run_csv_file_ids)
+                )
+                .order_by(sqlite_rowid)
+            ).all()
+
+        return [
+            DataFile(
+                id=sql_row.id,
+                name=sql_row.name,
+                createdAt=sql_row.created_at,
+            )
+            for sql_row in data_files_rows
+        ]
+
     def get_referencing_run_ids(self, protocol_id: str) -> List[str]:
         """Return a list of run ids that reference a particular protocol.
 
@@ -347,6 +397,21 @@ class ProtocolStore:
         return [_convert_sql_row_to_dataclass(sql_row=row) for row in all_rows]
 
     def _sql_remove(self, protocol_id: str) -> None:
+        select_referencing_analysis_ids = sqlalchemy.select(analysis_table.c.id).where(
+            analysis_table.c.protocol_id == protocol_id
+        )
+        delete_analysis_rtps_statement = sqlalchemy.delete(
+            analysis_primitive_type_rtp_table
+        ).where(
+            analysis_primitive_type_rtp_table.c.analysis_id.in_(
+                select_referencing_analysis_ids
+            )
+        )
+        delete_analysis_csv_rtps_statement = sqlalchemy.delete(
+            analysis_csv_rtp_table
+        ).where(
+            analysis_csv_rtp_table.c.analysis_id.in_(select_referencing_analysis_ids)
+        )
         delete_analyses_statement = sqlalchemy.delete(analysis_table).where(
             analysis_table.c.protocol_id == protocol_id
         )
@@ -355,16 +420,18 @@ class ProtocolStore:
         )
 
         with self._sql_engine.begin() as transaction:
-            # TODO(mm, 2022-04-28): Deleting analyses from the table is enough to
-            # avoid a SQL foreign key conflict. But, if this protocol had any *pending*
-            # analyses, they'll be left behind in the AnalysisStore, orphaned,
-            # since they're stored independently of this SQL table.
+            # TODO(mm, 2022-04-28): Deleting analyses, and any RTP tables that reference
+            #  those analyses, from the table is enough to avoid a SQL foreign key conflict.
+            #  But, if this protocol had any *pending* analyses, they'll be left behind
+            #  in the AnalysisStore, orphaned, since they're stored independently of this SQL table.
             #
-            # To fix this, we'll need to either:
+            #  To fix this, we'll need to either:
             #
-            # * Merge the Store classes or otherwise give them access to each other.
-            # * Switch from SQLAlchemy Core to ORM and use cascade deletes.
+            #  * Merge the Store classes or otherwise give them access to each other.
+            #  * Switch from SQLAlchemy Core to ORM and use cascade deletes.
             try:
+                transaction.execute(delete_analysis_rtps_statement)
+                transaction.execute(delete_analysis_csv_rtps_statement)
                 transaction.execute(delete_analyses_statement)
                 result = transaction.execute(delete_protocol_statement)
             except sqlalchemy.exc.IntegrityError as e:
@@ -476,7 +543,7 @@ class _DBProtocolResource:
     protocol_id: str
     created_at: datetime
     protocol_key: Optional[str]
-    protocol_kind: Optional[str]
+    protocol_kind: ProtocolKindSQLEnum
 
 
 def _convert_sql_row_to_dataclass(
@@ -491,9 +558,9 @@ def _convert_sql_row_to_dataclass(
     assert protocol_key is None or isinstance(
         protocol_key, str
     ), f"Protocol Key {protocol_key} not a string or None"
-    assert protocol_kind is None or isinstance(
-        protocol_kind, str
-    ), f"Protocol Kind {protocol_kind} not a string or None"
+    assert isinstance(
+        protocol_kind, ProtocolKindSQLEnum
+    ), f"Protocol Kind {protocol_kind} not the expected enum"
 
     return _DBProtocolResource(
         protocol_id=protocol_id,
@@ -512,3 +579,19 @@ def _convert_dataclass_to_sql_values(
         "protocol_key": resource.protocol_key,
         "protocol_kind": resource.protocol_kind,
     }
+
+
+def _http_protocol_kind_to_sql(http_enum: ProtocolKind) -> ProtocolKindSQLEnum:
+    match http_enum:
+        case ProtocolKind.STANDARD:
+            return ProtocolKindSQLEnum.STANDARD
+        case ProtocolKind.QUICK_TRANSFER:
+            return ProtocolKindSQLEnum.QUICK_TRANSFER
+
+
+def _sql_protocol_kind_to_http(sql_enum: ProtocolKindSQLEnum) -> ProtocolKind:
+    match sql_enum:
+        case ProtocolKindSQLEnum.STANDARD:
+            return ProtocolKind.STANDARD
+        case ProtocolKindSQLEnum.QUICK_TRANSFER:
+            return ProtocolKind.QUICK_TRANSFER

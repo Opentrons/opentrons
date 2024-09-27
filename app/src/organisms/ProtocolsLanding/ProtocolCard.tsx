@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
@@ -10,6 +9,8 @@ import {
   getPipetteNameSpecs,
   FLEX_STANDARD_MODEL,
   getGripperDisplayName,
+  parseAllRequiredModuleModels,
+  parseInitialPipetteNamesByMount,
 } from '@opentrons/shared-data'
 import {
   ALIGN_FLEX_START,
@@ -32,17 +33,12 @@ import {
   WRAP,
 } from '@opentrons/components'
 
-import {
-  parseInitialPipetteNamesByMount,
-  parseAllRequiredModuleModels,
-} from '@opentrons/api-client'
-
-import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
-import { InstrumentContainer } from '../../atoms/InstrumentContainer'
+import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage'
+import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
-import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
+import { getProtocolUsesGripper } from '/app/transformations/commands'
 import { ProtocolAnalysisStale } from '../ProtocolAnalysisFailure/ProtocolAnalysisStale'
 import {
   getAnalysisStatus,
@@ -51,8 +47,8 @@ import {
 } from './utils'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
-import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { State } from '../../redux/types'
+import type { StoredProtocolData } from '/app/redux/protocol-storage'
+import type { State } from '/app/redux/types'
 
 interface ProtocolCardProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void

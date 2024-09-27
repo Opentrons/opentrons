@@ -1,65 +1,71 @@
-import * as React from 'react'
 import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
 import {
+  getSimplestDeckConfigForProtocol,
   parseAllRequiredModuleModels,
   parseLiquidsInLoadOrder,
-} from '@opentrons/api-client'
-import {
-  getSimplestDeckConfigForProtocol,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   simple_v4 as noModulesProtocol,
   test_modules_protocol as withModulesProtocol,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
-} from '../../../../resources/deck_configuration/utils'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
+} from '/app/resources/deck_configuration/utils'
 import {
-  useIsFlex,
+  useMostRecentCompletedAnalysis,
+  useRunCalibrationStatus,
+  useRunPipetteInfoByMount,
+  useNotifyRunQuery,
+  useRunHasStarted,
+  useUnmatchedModulesForProtocol,
   useModuleCalibrationStatus,
   useProtocolAnalysisErrors,
-  useRobot,
-  useRunCalibrationStatus,
-  useRunHasStarted,
-  useRunPipetteInfoByMount,
-  useStoredProtocolAnalysis,
-  useUnmatchedModulesForProtocol,
-} from '../../hooks'
+} from '/app/resources/runs'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+
 import { SetupLabware } from '../SetupLabware'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 import { SetupLiquids } from '../SetupLiquids'
 import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
-import { useNotifyRunQuery } from '../../../../resources/runs'
+import type { MissingSteps } from '../ProtocolRunSetup'
 
 import type * as SharedData from '@opentrons/shared-data'
 
-vi.mock('@opentrons/api-client')
-vi.mock('../../hooks')
 vi.mock('../SetupLabware')
 vi.mock('../SetupRobotCalibration')
 vi.mock('../SetupModuleAndDeck')
 vi.mock('../SetupLiquids')
 vi.mock('../EmptySetupStep')
-vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../../../../redux/config')
-vi.mock('../../../../resources/deck_configuration/utils')
-vi.mock('../../../../resources/deck_configuration/hooks')
-vi.mock('../../../../resources/runs/useNotifyRunQuery')
+vi.mock('/app/resources/runs/useNotifyRunQuery')
+vi.mock('/app/resources/runs/useMostRecentCompletedAnalysis')
+vi.mock('/app/resources/runs/useRunCalibrationStatus')
+vi.mock('/app/resources/runs/useRunPipetteInfoByMount')
+vi.mock('/app/resources/runs/useRunHasStarted')
+vi.mock('/app/resources/runs/useUnmatchedModulesForProtocol')
+vi.mock('/app/resources/runs/useModuleCalibrationStatus')
+vi.mock('/app/resources/runs/useProtocolAnalysisErrors')
+vi.mock('/app/redux/config')
+vi.mock('/app/resources/deck_configuration/utils')
+vi.mock('/app/resources/deck_configuration/hooks')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/resources/analysis')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
   return {
     ...actualSharedData,
+    parseAllRequiredModuleModels: vi.fn(),
+    parseLiquidsInLoadOrder: vi.fn(),
     parseProtocolData: vi.fn(),
     getSimplestDeckConfigForProtocol: vi.fn(),
   }
@@ -68,12 +74,18 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 const MOCK_PROTOCOL_LIQUID_KEY = { liquids: [] }
+let mockMissingSteps: MissingSteps = []
+const mockSetMissingSteps = vi.fn((missingSteps: MissingSteps) => {
+  mockMissingSteps = missingSteps
+})
 const render = () => {
   return renderWithProviders(
     <ProtocolRunSetup
       protocolRunHeaderRef={null}
       robotName={ROBOT_NAME}
       runId={RUN_ID}
+      missingSteps={mockMissingSteps}
+      setMissingSteps={mockSetMissingSteps}
     />,
     {
       i18nInstance: i18n,
@@ -83,6 +95,7 @@ const render = () => {
 
 describe('ProtocolRunSetup', () => {
   beforeEach(() => {
+    mockMissingSteps = []
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
@@ -121,7 +134,6 @@ describe('ProtocolRunSetup', () => {
     when(vi.mocked(SetupLabware))
       .calledWith(
         expect.objectContaining({
-          protocolRunHeaderRef: null,
           robotName: ROBOT_NAME,
           runId: RUN_ID,
         }),
@@ -146,6 +158,9 @@ describe('ProtocolRunSetup', () => {
     when(vi.mocked(useRunPipetteInfoByMount))
       .calledWith(RUN_ID)
       .thenReturn({ left: null, right: null })
+    when(vi.mocked(useModuleCalibrationStatus))
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .thenReturn({ complete: true })
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -179,13 +194,6 @@ describe('ProtocolRunSetup', () => {
       .thenReturn({ complete: false })
     render()
     screen.getByText('Calibration needed')
-  })
-
-  it('does not render calibration status when run has started', () => {
-    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
-    render()
-    expect(screen.queryByText('Calibration needed')).toBeNull()
-    expect(screen.queryByText('Calibration ready')).toBeNull()
   })
 
   describe('when no modules are in the protocol', () => {
@@ -426,10 +434,6 @@ describe('ProtocolRunSetup', () => {
       when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
 
       render()
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      expect(screen.getByText('Mock SetupRobotCalibration')).not.toBeVisible()
-      expect(screen.getByText('Mock SetupModules')).not.toBeVisible()
-      expect(screen.getByText('Mock SetupLabware')).not.toBeVisible()
       screen.getByText('Setup is view-only once run has started')
     })
 

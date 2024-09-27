@@ -1,17 +1,17 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import '@testing-library/jest-dom/vitest'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { OT3_PIPETTES } from '@opentrons/shared-data'
+import { OT3_PIPETTES, isFlexPipette } from '@opentrons/shared-data'
 import {
   useDeleteCalibrationMutation,
   useAllPipetteOffsetCalibrationsQuery,
   useAllTipLengthCalibrationsQuery,
 } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../../i18n'
-import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
+import { i18n } from '/app/i18n'
+import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import { PipetteWizardFlows } from '../../../PipetteWizardFlows'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
 import {
@@ -19,14 +19,15 @@ import {
   useRunStatuses,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../../Devices/hooks'
-import { mockAttachedPipetteInformation } from '../../../../redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import {
   mockPipetteOffsetCalibrationsResponse,
   mockTipLengthCalibrationResponse,
 } from '../__fixtures__'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { useIsEstopNotDisengaged } from '../../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { OverflowMenu } from '../OverflowMenu'
+
 import type { Mount } from '@opentrons/components'
 
 const render = (
@@ -51,17 +52,23 @@ vi.mock('file-saver', async importOriginal => {
     saveAs: vi.fn(),
   }
 })
+
+vi.mock('@opentrons/shared-data', async () => {
+  const actual = await vi.importActual('@opentrons/shared-data')
+  return {
+    ...actual,
+    isFlexPipette: vi.fn(),
+  }
+})
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../redux/sessions/selectors')
-vi.mock('../../../../redux/discovery')
-vi.mock('../../../../redux/robot-api/selectors')
-vi.mock(
-  '../../../../organisms/CalibratePipetteOffset/useCalibratePipetteOffset'
-)
-vi.mock('../../../../organisms/ProtocolUpload/hooks')
-vi.mock('../../../../organisms/Devices/hooks')
+vi.mock('/app/redux/sessions/selectors')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/robot-api/selectors')
+vi.mock('/app/organisms/CalibratePipetteOffset/useCalibratePipetteOffset')
+vi.mock('/app/organisms/ProtocolUpload/hooks')
+vi.mock('/app/organisms/Devices/hooks')
 vi.mock('../../../PipetteWizardFlows')
-vi.mock('../../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
 const RUN_STATUSES = {
   isRunRunning: false,
@@ -113,6 +120,7 @@ describe('OverflowMenu', () => {
       },
     } as any)
     when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
+    vi.mocked(isFlexPipette).mockReturnValue(false)
   })
 
   it('should render Overflow menu buttons - pipette offset calibrations', () => {
@@ -186,6 +194,7 @@ describe('OverflowMenu', () => {
       ...props,
       pipetteName: OT3_PIPETTE_NAME,
     }
+    vi.mocked(isFlexPipette).mockReturnValue(true)
     render(props)
     const button = screen.getByLabelText(
       'CalibrationOverflowMenu_button_pipetteOffset'
@@ -212,6 +221,7 @@ describe('OverflowMenu', () => {
       ...props,
       pipetteName: OT3_PIPETTE_NAME,
     }
+    vi.mocked(isFlexPipette).mockReturnValue(true)
     render(props)
     const button = screen.getByLabelText(
       'CalibrationOverflowMenu_button_pipetteOffset'
@@ -300,6 +310,24 @@ describe('OverflowMenu', () => {
     render(props)
     expect(
       screen.getByLabelText('CalibrationOverflowMenu_button_pipetteOffset')
+    ).toBeDisabled()
+  })
+
+  it('should disable the calibration overflow menu option when the run is running', () => {
+    vi.mocked(useRunStatuses).mockReturnValue({
+      ...RUN_STATUSES,
+      isRunRunning: true,
+    })
+    vi.mocked(isFlexPipette).mockReturnValue(true)
+
+    render(props)
+
+    fireEvent.click(
+      screen.getByLabelText('CalibrationOverflowMenu_button_pipetteOffset')
+    )
+
+    expect(
+      screen.getByLabelText('CalibrationOverflowMenu_button_calibrate')
     ).toBeDisabled()
   })
 })

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -10,7 +9,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StatusLabel } from '../../../atoms/StatusLabel'
+import { StatusLabel } from '/app/atoms/StatusLabel'
 
 interface CalibrationHealthCheckResultsProps {
   isCalibrationRecommended: boolean

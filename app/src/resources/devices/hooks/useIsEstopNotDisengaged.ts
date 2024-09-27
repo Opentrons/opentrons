@@ -1,6 +1,6 @@
 import { useEstopQuery } from '@opentrons/react-api-client'
-import { useIsFlex } from '../../../organisms/Devices/hooks'
-import { DISENGAGED } from '../../../organisms/EmergencyStop'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { DISENGAGED } from '/app/organisms/EmergencyStop'
 
 /**
  * Checks if the emergency stop is not disengaged.

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -6,25 +6,29 @@ import { useCreateProtocolMutation } from '@opentrons/react-api-client'
 
 import { FLEX_DISPLAY_NAME, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { PrimaryButton } from '@opentrons/components'
-import { ERROR_TOAST, INFO_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
-import { ChooseRobotSlideout } from '../../organisms/ChooseRobotSlideout'
+import {
+  PrimaryButton,
+  ERROR_TOAST,
+  INFO_TOAST,
+  SUCCESS_TOAST,
+} from '@opentrons/components'
+import { ChooseRobotSlideout } from '/app/organisms/ChooseRobotSlideout'
 import {
   getAnalysisStatus,
   getProtocolDisplayName,
-} from '../../organisms/ProtocolsLanding/utils'
-import { useToaster } from '../../organisms/ToasterOven'
-import { appShellRequestor } from '../../redux/shell/remote'
-import { OPENTRONS_USB } from '../../redux/discovery'
-import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
-import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
-import { getValidCustomLabwareFiles } from '../../redux/custom-labware'
+} from '/app/organisms/ProtocolsLanding/utils'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { appShellRequestor } from '/app/redux/shell/remote'
+import { OPENTRONS_USB } from '/app/redux/discovery'
+import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { getValidCustomLabwareFiles } from '/app/redux/custom-labware'
 
 import type { AxiosError } from 'axios'
 import type { IconProps, StyleProps } from '@opentrons/components'
-import type { Robot } from '../../redux/discovery/types'
-import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { State } from '../../redux/types'
+import type { Robot } from '/app/redux/discovery/types'
+import type { StoredProtocolData } from '/app/redux/protocol-storage'
+import type { State } from '/app/redux/types'
 
 const _getFileBaseName = (filePath: string): string => {
   return filePath.split('/').reverse()[0]
@@ -48,16 +52,11 @@ export function SendProtocolToFlexSlideout(
   } = storedProtocolData
   const { t } = useTranslation(['protocol_details', 'protocol_list'])
 
-  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
+  const [selectedRobot, setSelectedRobot] = useState<Robot | null>(null)
 
-  const { autoUpdateAction } = useSelector((state: State) =>
-    getRobotUpdateDisplayInfo(state, selectedRobot?.name ?? '')
+  const isSelectedRobotOnDifferentSoftwareVersion = useIsRobotOnWrongVersionOfSoftware(
+    selectedRobot?.name ?? ''
   )
-
-  const isSelectedRobotOnDifferentSoftwareVersion = [
-    'upgrade',
-    'downgrade',
-  ].includes(autoUpdateAction)
 
   const { eatToast, makeToast } = useToaster()
 

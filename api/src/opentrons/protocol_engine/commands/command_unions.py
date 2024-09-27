@@ -10,9 +10,7 @@ from opentrons.util.get_union_elements import get_union_elements
 from .command import DefinedErrorData
 from .pipetting_common import (
     OverpressureError,
-    OverpressureErrorInternalData,
     LiquidNotFoundError,
-    LiquidNotFoundErrorInternalData,
 )
 
 from . import absorbance_reader
@@ -22,6 +20,7 @@ from . import temperature_module
 from . import thermocycler
 
 from . import calibration
+from . import unsafe
 
 from .set_rail_lights import (
     SetRailLights,
@@ -215,7 +214,6 @@ from .pick_up_tip import (
     PickUpTipResult,
     PickUpTipCommandType,
     TipPhysicallyMissingError,
-    TipPhysicallyMissingErrorInternalData,
 )
 
 from .touch_tip import (
@@ -381,12 +379,18 @@ Command = Annotated[
         thermocycler.OpenLid,
         thermocycler.CloseLid,
         thermocycler.RunProfile,
+        absorbance_reader.CloseLid,
+        absorbance_reader.OpenLid,
         absorbance_reader.Initialize,
-        absorbance_reader.MeasureAbsorbance,
+        absorbance_reader.ReadAbsorbance,
         calibration.CalibrateGripper,
         calibration.CalibratePipette,
         calibration.CalibrateModule,
         calibration.MoveToMaintenancePosition,
+        unsafe.UnsafeBlowOutInPlace,
+        unsafe.UnsafeDropTipInPlace,
+        unsafe.UpdatePositionEstimators,
+        unsafe.UnsafeEngageAxes,
     ],
     Field(discriminator="commandType"),
 ]
@@ -450,12 +454,18 @@ CommandParams = Union[
     thermocycler.OpenLidParams,
     thermocycler.CloseLidParams,
     thermocycler.RunProfileParams,
+    absorbance_reader.CloseLidParams,
+    absorbance_reader.OpenLidParams,
     absorbance_reader.InitializeParams,
-    absorbance_reader.MeasureAbsorbanceParams,
+    absorbance_reader.ReadAbsorbanceParams,
     calibration.CalibrateGripperParams,
     calibration.CalibratePipetteParams,
     calibration.CalibrateModuleParams,
     calibration.MoveToMaintenancePositionParams,
+    unsafe.UnsafeBlowOutInPlaceParams,
+    unsafe.UnsafeDropTipInPlaceParams,
+    unsafe.UpdatePositionEstimatorsParams,
+    unsafe.UnsafeEngageAxesParams,
 ]
 
 CommandType = Union[
@@ -517,12 +527,18 @@ CommandType = Union[
     thermocycler.OpenLidCommandType,
     thermocycler.CloseLidCommandType,
     thermocycler.RunProfileCommandType,
+    absorbance_reader.CloseLidCommandType,
+    absorbance_reader.OpenLidCommandType,
     absorbance_reader.InitializeCommandType,
-    absorbance_reader.MeasureAbsorbanceCommandType,
+    absorbance_reader.ReadAbsorbanceCommandType,
     calibration.CalibrateGripperCommandType,
     calibration.CalibratePipetteCommandType,
     calibration.CalibrateModuleCommandType,
     calibration.MoveToMaintenancePositionCommandType,
+    unsafe.UnsafeBlowOutInPlaceCommandType,
+    unsafe.UnsafeDropTipInPlaceCommandType,
+    unsafe.UpdatePositionEstimatorsCommandType,
+    unsafe.UnsafeEngageAxesCommandType,
 ]
 
 CommandCreate = Annotated[
@@ -585,12 +601,18 @@ CommandCreate = Annotated[
         thermocycler.OpenLidCreate,
         thermocycler.CloseLidCreate,
         thermocycler.RunProfileCreate,
+        absorbance_reader.CloseLidCreate,
+        absorbance_reader.OpenLidCreate,
         absorbance_reader.InitializeCreate,
-        absorbance_reader.MeasureAbsorbanceCreate,
+        absorbance_reader.ReadAbsorbanceCreate,
         calibration.CalibrateGripperCreate,
         calibration.CalibratePipetteCreate,
         calibration.CalibrateModuleCreate,
         calibration.MoveToMaintenancePositionCreate,
+        unsafe.UnsafeBlowOutInPlaceCreate,
+        unsafe.UnsafeDropTipInPlaceCreate,
+        unsafe.UpdatePositionEstimatorsCreate,
+        unsafe.UnsafeEngageAxesCreate,
     ],
     Field(discriminator="commandType"),
 ]
@@ -654,12 +676,18 @@ CommandResult = Union[
     thermocycler.OpenLidResult,
     thermocycler.CloseLidResult,
     thermocycler.RunProfileResult,
+    absorbance_reader.CloseLidResult,
+    absorbance_reader.OpenLidResult,
     absorbance_reader.InitializeResult,
-    absorbance_reader.MeasureAbsorbanceResult,
+    absorbance_reader.ReadAbsorbanceResult,
     calibration.CalibrateGripperResult,
     calibration.CalibratePipetteResult,
     calibration.CalibrateModuleResult,
     calibration.MoveToMaintenancePositionResult,
+    unsafe.UnsafeBlowOutInPlaceResult,
+    unsafe.UnsafeDropTipInPlaceResult,
+    unsafe.UpdatePositionEstimatorsResult,
+    unsafe.UnsafeEngageAxesResult,
 ]
 
 # todo(mm, 2024-06-12): Ideally, command return types would have specific
@@ -675,9 +703,9 @@ CommandPrivateResult = Union[
 
 # All `DefinedErrorData`s that implementations will actually return in practice.
 CommandDefinedErrorData = Union[
-    DefinedErrorData[TipPhysicallyMissingError, TipPhysicallyMissingErrorInternalData],
-    DefinedErrorData[OverpressureError, OverpressureErrorInternalData],
-    DefinedErrorData[LiquidNotFoundError, LiquidNotFoundErrorInternalData],
+    DefinedErrorData[TipPhysicallyMissingError],
+    DefinedErrorData[OverpressureError],
+    DefinedErrorData[LiquidNotFoundError],
 ]
 
 

@@ -1,20 +1,19 @@
-import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
-import { getRobotApiVersion } from '../../../../../redux/discovery'
-import { getRobotUpdateDisplayInfo } from '../../../../../redux/robot-update'
-import { mockConnectableRobot } from '../../../../../redux/discovery/__fixtures__'
-import { useRobot } from '../../../hooks'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getRobotApiVersion } from '/app/redux/discovery'
+import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { handleUpdateBuildroot } from '../../UpdateBuildroot'
 import { RobotServerVersion } from '../RobotServerVersion'
+import { useRobot } from '/app/redux-resources/robots'
 
-vi.mock('../../../hooks')
-vi.mock('../../../../../redux/robot-update/selectors')
-vi.mock('../../../../../redux/discovery/selectors')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/redux/robot-update/selectors')
+vi.mock('/app/redux/discovery/selectors')
 vi.mock('../../UpdateBuildroot')
 
 const MOCK_ROBOT_VERSION = '7.7.7'

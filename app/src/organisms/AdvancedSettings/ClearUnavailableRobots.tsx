@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -16,22 +15,23 @@ import {
   SPACING_AUTO,
   SPACING,
   LegacyStyledText,
+  ERROR_TOAST,
+  SUCCESS_TOAST,
   TYPOGRAPHY,
   useConditionalConfirm,
+  Modal,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '../../atoms/buttons'
-import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
-import { useToaster } from '../../organisms/ToasterOven'
-import { LegacyModal } from '../../molecules/LegacyModal'
+import { TertiaryButton } from '/app/atoms/buttons'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { getTopPortalEl } from '../../App/portal'
 import {
   clearDiscoveryCache,
   getReachableRobots,
   getUnreachableRobots,
-} from '../../redux/discovery'
+} from '/app/redux/discovery'
 
-import type { Dispatch, State } from '../../redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 export function ClearUnavailableRobots(): JSX.Element {
   const { t } = useTranslation('app_settings')
@@ -68,7 +68,7 @@ export function ClearUnavailableRobots(): JSX.Element {
     <>
       {showConfirmDeleteUnavailRobots
         ? createPortal(
-            <LegacyModal
+            <Modal
               type="warning"
               title={t('clear_unavailable_robots')}
               onClose={cancelExit}
@@ -101,7 +101,7 @@ export function ClearUnavailableRobots(): JSX.Element {
                   </AlertPrimaryButton>
                 </Flex>
               </Flex>
-            </LegacyModal>,
+            </Modal>,
             getTopPortalEl()
           )
         : null}

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   COLORS,
@@ -9,7 +8,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Slideout } from '../../atoms/Slideout'
+import { Slideout } from '/app/atoms/Slideout'
 
 interface AboutGripperSlideoutProps {
   serialNumber: string

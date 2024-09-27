@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
@@ -6,14 +6,14 @@ import { MemoryRouter } from 'react-router-dom'
 import { opentrons96PcrAdapterV1 } from '@opentrons/shared-data'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import {
   mockHeaterShaker,
   mockMagneticModule,
   mockTemperatureModule,
   mockThermocycler,
-} from '../../../../../redux/modules/__fixtures__'
+} from '/app/redux/modules/__fixtures__'
 import { mockLabwareDef } from '../../../../LabwarePositionCheck/__fixtures__/mockLabwareDef'
 import { SecureLabwareModal } from '../SecureLabwareModal'
 import { LabwareListItem } from '../LabwareListItem'
@@ -24,8 +24,8 @@ import type {
   LabwareDefinition2,
   LoadModuleRunTimeCommand,
 } from '@opentrons/shared-data'
-import type { AttachedModule } from '../../../../../redux/modules/types'
-import type { ModuleRenderInfoForProtocol } from '../../../hooks'
+import type { AttachedModule } from '/app/redux/modules/types'
+import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 
 vi.mock('../SecureLabwareModal')
 vi.mock('@opentrons/react-api-client')
@@ -172,7 +172,7 @@ describe('LabwareListItem', () => {
     })
     screen.getByText('Mock Labware Definition')
     screen.getByTestId('slot_info_7')
-    screen.getByTestId('LocationIcon_stacked')
+    screen.getByTestId('DeckInfoLabel_stacked')
     screen.getByText('Magnetic Module GEN1')
     const button = screen.getByText('Secure labware instructions')
     fireEvent.click(button)
@@ -207,7 +207,7 @@ describe('LabwareListItem', () => {
     })
     screen.getByText('Mock Labware Definition')
     screen.getByTestId('slot_info_7')
-    screen.getByTestId('LocationIcon_stacked')
+    screen.getByTestId('DeckInfoLabel_stacked')
     screen.getByText('Temperature Module GEN1')
     screen.getByText('nickName')
   })

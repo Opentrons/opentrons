@@ -5,21 +5,22 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   POSITION_FIXED,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 const StyledLabel = styled.label`
   display: ${DISPLAY_FLEX};
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_CENTER};
   width: 100%;
@@ -29,8 +30,7 @@ const StyledLabel = styled.label`
   text-align: ${TYPOGRAPHY.textAlignCenter};
   background-color: ${COLORS.white};
 
-  &:hover,
-  &:focus-within {
+  &:hover {
     border: 2px dashed ${COLORS.blue50};
   }
 `

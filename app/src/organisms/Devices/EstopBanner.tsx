@@ -1,7 +1,7 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Btn,
+  Banner,
   DIRECTION_ROW,
   Flex,
   SPACING,
@@ -9,7 +9,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Banner } from '../../atoms/Banner'
 import {
   NOT_PRESENT,
   PHYSICALLY_ENGAGED,

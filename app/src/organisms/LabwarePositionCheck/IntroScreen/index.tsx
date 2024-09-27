@@ -13,33 +13,33 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
+  ModalShell,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { RobotMotionLoader } from '../RobotMotionLoader'
 import { getPrepCommands } from './getPrepCommands'
-import { WizardRequiredEquipmentList } from '../../../molecules/WizardRequiredEquipmentList'
-import { getLatestCurrentOffsets } from '../../Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
-import { getIsOnDevice } from '../../../redux/config'
+import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
+import { getLatestCurrentOffsets } from '/app/transformations/runs'
+import { getIsOnDevice } from '/app/redux/config'
 import { NeedHelpLink } from '../../CalibrationPanels'
 import { useSelector } from 'react-redux'
 import { TwoUpTileLayout } from '../TwoUpTileLayout'
 import { getTopPortalEl } from '../../../App/portal'
-import { LegacyModalShell } from '../../../molecules/LegacyModal'
-import { SmallButton } from '../../../atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 import { CALIBRATION_PROBE } from '../../PipetteWizardFlows/constants'
 import { TerseOffsetTable } from '../ResultsSummary'
-import { getLabwareDefinitionsFromCommands } from '../../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import type { useChainRunCommands } from '../../../resources/runs'
+import type { useChainRunCommands } from '/app/resources/runs'
 import type { RegisterPositionAction } from '../types'
-import type { Jog } from '../../../molecules/JogControls'
+import type { Jog } from '/app/molecules/JogControls'
 
 export const INTERVAL_MS = 3000
 
@@ -181,7 +181,7 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
       </Btn>
       {showOffsetsTable
         ? createPortal(
-            <LegacyModalShell
+            <ModalShell
               width="60rem"
               height="33.5rem"
               padding={SPACING.spacing32}
@@ -213,7 +213,7 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
                   labwareDefinitions={labwareDefinitions}
                 />
               </Box>
-            </LegacyModalShell>,
+            </ModalShell>,
             getTopPortalEl()
           )
         : null}

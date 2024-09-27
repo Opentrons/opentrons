@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Flex } from '../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../styles'
 import singleSrc from './single_channel_GEN1_800px.png'

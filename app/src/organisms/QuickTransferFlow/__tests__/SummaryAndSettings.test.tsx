@@ -1,14 +1,18 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
+
 import {
   useCreateProtocolMutation,
   useCreateRunMutation,
 } from '@opentrons/react-api-client'
-import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { ANALYTICS_QUICK_TRANSFER_RUN_NOW } from '/app/redux/analytics'
 import { createQuickTransferFile } from '../utils'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { SummaryAndSettings } from '../SummaryAndSettings'
 import { NameQuickTransfer } from '../NameQuickTransfer'
 import { Overview } from '../Overview'
@@ -25,6 +29,7 @@ vi.mock('react-router-dom', async importOriginal => {
 })
 vi.mock('../Overview')
 vi.mock('../NameQuickTransfer')
+vi.mock('/app/redux-resources/analytics')
 vi.mock('../utils', async () => {
   const actual = await vi.importActual('../utils')
   return {
@@ -34,13 +39,14 @@ vi.mock('../utils', async () => {
 })
 vi.mock('../utils/createQuickTransferFile')
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../resources/deck_configuration')
+vi.mock('/app/resources/deck_configuration')
 
 const render = (props: React.ComponentProps<typeof SummaryAndSettings>) => {
   return renderWithProviders(<SummaryAndSettings {...props} />, {
     i18nInstance: i18n,
   })
 }
+let mockTrackEventWithRobotSerial: any
 
 describe('SummaryAndSettings', () => {
   let props: React.ComponentProps<typeof SummaryAndSettings>
@@ -65,13 +71,19 @@ describe('SummaryAndSettings', () => {
         transferType: 'transfer',
         volume: 25,
       },
+      analyticsStartTime: new Date(),
     }
+    mockTrackEventWithRobotSerial = vi.fn(
+      () => new Promise(resolve => resolve({}))
+    )
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: {
         data: [],
       },
     } as any)
-
+    vi.mocked(useTrackEventWithRobotSerial).mockReturnValue({
+      trackEventWithRobotSerial: mockTrackEventWithRobotSerial,
+    })
     vi.mocked(useCreateProtocolMutation).mockReturnValue({
       mutateAsync: createProtocol,
     } as any)
@@ -112,6 +124,7 @@ describe('SummaryAndSettings', () => {
     render(props)
     const continueBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     fireEvent.click(continueBtn)
+    expect(mockTrackEventWithRobotSerial).toHaveBeenCalled()
     screen.getByText('Do you want to run your quick transfer now?')
     screen.getByText('Save your quick transfer to run it in the future.')
   })
@@ -129,6 +142,10 @@ describe('SummaryAndSettings', () => {
     fireEvent.click(continueBtn)
     const runBtn = screen.getByText('Run now')
     fireEvent.click(runBtn)
+    expect(mockTrackEventWithRobotSerial).toHaveBeenCalledWith({
+      name: ANALYTICS_QUICK_TRANSFER_RUN_NOW,
+      properties: {},
+    })
     expect(vi.mocked(createQuickTransferFile)).toHaveBeenCalled()
     expect(vi.mocked(createProtocol)).toHaveBeenCalled()
   })

@@ -39,12 +39,7 @@ from ._nozzle_layout import NozzleLayout
 from . import labware, validation
 
 
-AdvancedLiquidHandling = Union[
-    labware.Well,
-    types.Location,
-    Sequence[Union[labware.Well, types.Location]],
-    Sequence[Sequence[labware.Well]],
-]
+AdvancedLiquidHandling = transfers.AdvancedLiquidHandling
 
 _DEFAULT_ASPIRATE_CLEARANCE = 1.0
 _DEFAULT_DISPENSE_CLEARANCE = 1.0
@@ -266,9 +261,9 @@ class InstrumentContext(publisher.CommandPublisher):
             and well is not None
             and self.liquid_presence_detection
             and self._96_tip_config_valid()
+            and self._core.get_current_volume() == 0
         ):
             self.require_liquid_presence(well=well)
-            self.prepare_to_aspirate()
 
         with publisher.publish_context(
             broker=self.broker,
@@ -945,8 +940,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 # in which self.starting_tip consumes tips. It would currently vary
                 # depending on the configuration layout of a pipette at a given
                 # time, which means that some combination of starting tip and partial
-                # configuraiton are incompatible under the current understanding of
-                # starting tip behavior. Replacing starting_tip with an undeprecated
+                # configuration are incompatible under the current understanding of
+                # starting tip behavior. Replacing starting_tip with an un-deprecated
                 # Labware.has_tip may solve this.
                 raise CommandPreconditionViolated(
                     "Automatic tip tracking is not available when using a partial pipette"
@@ -1688,12 +1683,10 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 20)
     def liquid_presence_detection(self) -> bool:
         """
-        Gets the global setting for liquid level detection.
+        Whether the pipette will perform automatic liquid presence detection.
 
-        When True, `liquid_probe` will be called before
-        aspirates and dispenses to bring the tip to the liquid level.
-
-        The default value is False.
+        When ``True``, the pipette will check for liquid on every aspiration.
+        Defaults to ``False``. See :ref:`lpd`.
         """
         return self._core.get_liquid_presence_detection()
 
@@ -1990,7 +1983,7 @@ class InstrumentContext(publisher.CommandPublisher):
         self._core.prepare_to_aspirate()
 
     @requires_version(2, 16)
-    def configure_nozzle_layout(  # noqa: C901
+    def configure_nozzle_layout(
         self,
         style: NozzleLayout,
         start: Optional[str] = None,
@@ -2012,16 +2005,19 @@ class InstrumentContext(publisher.CommandPublisher):
             tips from a tip rack that is in an adapter, the API will raise an error.
 
         :param style: The shape of the nozzle layout.
+            You must :ref:`import the layout constant <nozzle-layouts>` in order to use it.
 
-            - ``SINGLE`` sets the pipette to use 1 nozzle. This corresponds to a single of well on labware.
-            - ``COLUMN`` sets the pipette to use 8 nozzles, aligned from front to back
-              with respect to the deck. This corresponds to a column of wells on labware.
-            - ``PARTIAL_COLUMN`` sets the pipette to use 2-7 nozzles, aligned from front to back
-              with respect to the deck.
-            - ``ROW`` sets the pipette to use 12 nozzles, aligned from left to right
-              with respect to the deck. This corresponds to a row of wells on labware.
             - ``ALL`` resets the pipette to use all of its nozzles. Calling
               ``configure_nozzle_layout`` with no arguments also resets the pipette.
+            - ``COLUMN`` sets a 96-channel pipette to use 8 nozzles, aligned from front to back
+              with respect to the deck. This corresponds to a column of wells on labware.
+              For 8-channel pipettes, use ``ALL`` instead.
+            - ``PARTIAL_COLUMN`` sets an 8-channel pipette to use 2--7 nozzles, aligned from front to back
+              with respect to the deck. Not compatible with the 96-channel pipette.
+            - ``ROW`` sets a 96-channel pipette to use 12 nozzles, aligned from left to right
+              with respect to the deck. This corresponds to a row of wells on labware.
+              Not compatible with 8-channel pipettes.
+            - ``SINGLE`` sets the pipette to use 1 nozzle. This corresponds to a single well on labware.
 
         :type style: ``NozzleLayout`` or ``None``
         :param start: The primary nozzle of the layout, which the robot uses
@@ -2039,16 +2035,15 @@ class InstrumentContext(publisher.CommandPublisher):
             should be of the same format used when identifying wells by name.
             Required when setting ``style=PARTIAL_COLUMN``.
 
-            .. note::
-                Nozzle layouts numbering between 2-7 nozzles, account for the distance from
-                ``start``. For example, 4 nozzles would require ``start="H1"`` and ``end="E1"``.
-
         :type end: str or ``None``
         :param tip_racks: Behaves the same as setting the ``tip_racks`` parameter of
             :py:meth:`.load_instrument`. If not specified, the new configuration resets
             :py:obj:`.InstrumentContext.tip_racks` and you must specify the location
             every time you call :py:meth:`~.InstrumentContext.pick_up_tip`.
         :type tip_racks: List[:py:class:`.Labware`]
+
+        .. versionchanged:: 2.20
+            Added partial column, row, and single layouts.
         """
         #       TODO: add the following back into the docstring when QUADRANT is supported
         #
@@ -2064,8 +2059,10 @@ class InstrumentContext(publisher.CommandPublisher):
             NozzleLayout.QUADRANT,
         ]
         if style in disabled_layouts:
-            raise ValueError(
-                f"Nozzle layout configuration of style {style.value} is currently unsupported."
+            # todo(mm, 2024-08-20): UnsupportedAPIError boils down to an API_REMOVED
+            # error code, which is not correct here.
+            raise UnsupportedAPIError(
+                message=f"Nozzle layout configuration of style {style.value} is currently unsupported."
             )
 
         original_enabled_layouts = [NozzleLayout.COLUMN, NozzleLayout.ALL]
@@ -2073,46 +2070,64 @@ class InstrumentContext(publisher.CommandPublisher):
             self._api_version
             < _PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN
         ) and (style not in original_enabled_layouts):
-            raise ValueError(
-                f"Nozzle layout configuration of style {style.value} is unsupported in API Versions lower than {_PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN}."
-            )
-
-        if style != NozzleLayout.ALL:
-            if start is None:
-                raise ValueError(
-                    f"Cannot configure a nozzle layout of style {style.value} without a starting nozzle."
-                )
-            if start not in types.ALLOWED_PRIMARY_NOZZLES:
-                raise ValueError(
-                    f"Starting nozzle specified is not one of {types.ALLOWED_PRIMARY_NOZZLES}"
-                )
-        if style == NozzleLayout.QUADRANT:
-            if front_right is None and back_left is None:
-                raise ValueError(
-                    "Cannot configure a QUADRANT layout without a front right or back left nozzle."
-                )
-        elif not (front_right is None and back_left is None):
-            raise ValueError(
-                f"Parameters 'front_right' and 'back_left' cannot be used with {style.value} Nozzle Configuration Layout."
+            raise APIVersionError(
+                api_element=f"Nozzle layout configuration of style {style.value}",
+                until_version=str(
+                    _PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN
+                ),
+                current_version=str(self._api_version),
             )
 
         front_right_resolved = front_right
         back_left_resolved = back_left
-        if style == NozzleLayout.PARTIAL_COLUMN:
-            if end is None:
-                raise ValueError(
-                    "Parameter 'end' is required for Partial Column Nozzle Configuration Layout."
+        validated_start: Optional[str] = None
+        match style:
+            case NozzleLayout.SINGLE:
+                validated_start = _check_valid_start_nozzle(style, start)
+                _raise_if_has_end_or_front_right_or_back_left(
+                    style, end, front_right, back_left
                 )
-
-            # Determine if 'end' will be configured as front_right or back_left
-            if start == "H1" or start == "H12":
-                back_left_resolved = end
-            elif start == "A1" or start == "A12":
-                front_right_resolved = end
+            case NozzleLayout.COLUMN | NozzleLayout.ROW:
+                self._raise_if_configuration_not_supported_by_pipette(style)
+                validated_start = _check_valid_start_nozzle(style, start)
+                _raise_if_has_end_or_front_right_or_back_left(
+                    style, end, front_right, back_left
+                )
+            case NozzleLayout.PARTIAL_COLUMN:
+                self._raise_if_configuration_not_supported_by_pipette(style)
+                validated_start = _check_valid_start_nozzle(style, start)
+                validated_end = _check_valid_end_nozzle(validated_start, end)
+                _raise_if_has_front_right_or_back_left_for_partial_column(
+                    front_right, back_left
+                )
+                # Convert 'validated_end' to front_right or back_left as appropriate
+                if validated_start == "H1" or validated_start == "H12":
+                    back_left_resolved = validated_end
+                    front_right_resolved = validated_start
+                elif start == "A1" or start == "A12":
+                    front_right_resolved = validated_end
+                    back_left_resolved = validated_start
+            case NozzleLayout.QUADRANT:
+                validated_start = _check_valid_start_nozzle(style, start)
+                _raise_if_has_end_nozzle_for_quadrant(end)
+                _raise_if_no_front_right_or_back_left_for_quadrant(
+                    front_right, back_left
+                )
+                if front_right is None:
+                    front_right_resolved = validated_start
+                elif back_left is None:
+                    back_left_resolved = validated_start
+            case NozzleLayout.ALL:
+                validated_start = start
+                if any([start, end, front_right, back_left]):
+                    _log.warning(
+                        "Parameters 'start', 'end', 'front_right', 'back_left' specified"
+                        " for ALL nozzle configuration will be ignored."
+                    )
 
         self._core.configure_nozzle_layout(
             style,
-            primary_nozzle=start,
+            primary_nozzle=validated_start,
             front_right_nozzle=front_right_resolved,
             back_left_nozzle=back_left_resolved,
         )
@@ -2120,9 +2135,12 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 20)
     def detect_liquid_presence(self, well: labware.Well) -> bool:
-        """Check if there is liquid in a well.
+        """Checks for liquid in a well.
 
-        :returns: A boolean.
+        Returns ``True`` if liquid is present and ``False`` if liquid is not present. Will not raise an error if it does not detect liquid. When simulating a protocol, the check always succeeds (returns ``True``). Works with Flex 1-, 8-, and 96-channel pipettes. See :ref:`detect-liquid-presence`.
+
+        .. note::
+            The pressure sensors for the Flex 8-channel pipette are on channels 1 and 8 (positions A1 and H1). For the Flex 96-channel pipette, the pressure sensors are on channels 1 and 96 (positions A1 and H12). Other channels on multi-channel pipettes do not have sensors and cannot detect liquid.
         """
         loc = well.top()
         self._96_tip_config_valid()
@@ -2130,9 +2148,12 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 20)
     def require_liquid_presence(self, well: labware.Well) -> None:
-        """If there is no liquid in a well, raise an error.
+        """Check for liquid in a well and raises an error if none is detected.
 
-        :returns: None.
+        When this method raises an error, Flex will offer the opportunity to enter recovery mode. In recovery mode, you can manually add liquid to resolve the error. When simulating a protocol, the check always succeeds (does not raise an error). Works with Flex 1-, 8-, and 96-channel pipettes. See :ref:`lpd` and :ref:`require-liquid-presence`.
+
+        .. note::
+            The pressure sensors for the Flex 8-channel pipette are on channels 1 and 8 (positions A1 and H1). For the Flex 96-channel pipette, the pressure sensors are on channels 1 and 96 (positions A1 and H12). Other channels on multi-channel pipettes do not have sensors and cannot detect liquid.
         """
         loc = well.top()
         self._96_tip_config_valid()
@@ -2153,3 +2174,91 @@ class InstrumentContext(publisher.CommandPublisher):
         self._96_tip_config_valid()
         height = self._core.liquid_probe_without_recovery(well._core, loc)
         return height
+
+    def _raise_if_configuration_not_supported_by_pipette(
+        self, style: NozzleLayout
+    ) -> None:
+        match style:
+            case NozzleLayout.COLUMN | NozzleLayout.ROW:
+                if self.channels != 96:
+                    raise ValueError(
+                        f"{style.value} configuration is only supported on 96-Channel pipettes."
+                    )
+            case NozzleLayout.PARTIAL_COLUMN:
+                if self.channels != 8:
+                    raise ValueError(
+                        "Partial column configuration is only supported on 8-Channel pipettes."
+                    )
+            # SINGLE, QUADRANT and ALL are supported by all pipettes
+
+
+def _raise_if_has_end_or_front_right_or_back_left(
+    style: NozzleLayout,
+    end: Optional[str],
+    front_right: Optional[str],
+    back_left: Optional[str],
+) -> None:
+    if any([end, front_right, back_left]):
+        raise ValueError(
+            f"Parameters 'end', 'front_right' and 'back_left' cannot be used with "
+            f"the {style.name} nozzle configuration."
+        )
+
+
+def _check_valid_start_nozzle(style: NozzleLayout, start: Optional[str]) -> str:
+    if start is None:
+        raise ValueError(
+            f"Cannot configure a nozzle layout of style {style.value} without a starting nozzle."
+        )
+    if start not in types.ALLOWED_PRIMARY_NOZZLES:
+        raise ValueError(
+            f"Starting nozzle specified is not one of {types.ALLOWED_PRIMARY_NOZZLES}."
+        )
+    return start
+
+
+def _check_valid_end_nozzle(start: str, end: Optional[str]) -> str:
+    if end is None:
+        raise ValueError("Partial column configurations require the 'end' parameter.")
+    if start[0] in end:
+        raise ValueError(
+            "The 'start' and 'end' parameters of a partial column configuration cannot be in the same row."
+        )
+    if start == "H1" or start == "H12":
+        if "A" in end:
+            raise ValueError(
+                f"A partial column configuration with 'start'={start} cannot have its 'end' parameter be in row A. Use `ALL` configuration to utilize all nozzles."
+            )
+    elif start == "A1" or start == "A12":
+        if "H" in end:
+            raise ValueError(
+                f"A partial column configuration with 'start'={start} cannot have its 'end' parameter be in row H. Use `ALL` configuration to utilize all nozzles."
+            )
+    return end
+
+
+def _raise_if_no_front_right_or_back_left_for_quadrant(
+    front_right: Optional[str], back_left: Optional[str]
+) -> None:
+    if front_right is None and back_left is None:
+        raise ValueError(
+            "Cannot configure a QUADRANT layout without a front right or back left nozzle."
+        )
+
+
+def _raise_if_has_end_nozzle_for_quadrant(end: Optional[str]) -> None:
+    if end is not None:
+        raise ValueError(
+            "Parameter 'end' is not supported for QUADRANT configuration."
+            " Use 'front_right' and 'back_left' arguments to specify the quadrant nozzle map instead."
+        )
+
+
+def _raise_if_has_front_right_or_back_left_for_partial_column(
+    front_right: Optional[str], back_left: Optional[str]
+) -> None:
+    if any([front_right, back_left]):
+        raise ValueError(
+            "Parameters 'front_right' and 'back_left' cannot be used with "
+            "the PARTIAL_COLUMN configuration."
+        )

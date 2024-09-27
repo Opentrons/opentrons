@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
@@ -18,7 +17,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { OffsetVector } from '../../../molecules/OffsetVector'
+import { OffsetVector } from '/app/molecules/OffsetVector'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { useLabwareOffsetForLabware } from './useLabwareOffsetForLabware'

@@ -33,16 +33,14 @@ from ..database import (
 )
 from ..tables import schema_2, schema_3
 from .._folder_migrator import Migration
+from ..file_and_directory_names import (
+    DECK_CONFIGURATION_FILE,
+    PROTOCOLS_DIRECTORY,
+    DB_FILE,
+)
 from ._util import copy_rows_unmodified, copy_if_exists, copytree_if_exists
 from . import up_to_2
-
 from . import _up_to_3_worker
-
-
-# TODO: Define a single source of truth somewhere for these paths.
-_DECK_CONFIGURATION_FILE = "deck_configuration.json"
-_PROTOCOLS_DIRECTORY = "protocols"
-_DB_FILE = "robot_server.db"
 
 
 _log = getLogger(__name__)
@@ -52,14 +50,14 @@ class MigrationUpTo3(Migration):  # noqa: D101
     def migrate(self, source_dir: Path, dest_dir: Path) -> None:
         """Migrate the persistence directory from schema 2 to 3."""
         copy_if_exists(
-            source_dir / _DECK_CONFIGURATION_FILE, dest_dir / _DECK_CONFIGURATION_FILE
+            source_dir / DECK_CONFIGURATION_FILE, dest_dir / DECK_CONFIGURATION_FILE
         )
         copytree_if_exists(
-            source_dir / _PROTOCOLS_DIRECTORY, dest_dir / _PROTOCOLS_DIRECTORY
+            source_dir / PROTOCOLS_DIRECTORY, dest_dir / PROTOCOLS_DIRECTORY
         )
 
-        source_db_file = source_dir / _DB_FILE
-        dest_db_file = dest_dir / _DB_FILE
+        source_db_file = source_dir / DB_FILE
+        dest_db_file = dest_dir / DB_FILE
 
         with ExitStack() as exit_stack:
             source_engine = exit_stack.enter_context(sql_engine_ctx(source_db_file))

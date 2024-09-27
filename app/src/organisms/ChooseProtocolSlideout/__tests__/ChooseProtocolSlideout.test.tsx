@@ -1,29 +1,31 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 
-import { simpleAnalysisFileFixture } from '@opentrons/api-client'
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { getStoredProtocols } from '../../../redux/protocol-storage'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+import {
+  OT2_ROBOT_TYPE,
+  simpleAnalysisFileFixture,
+} from '@opentrons/shared-data'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getStoredProtocols } from '/app/redux/protocol-storage'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import {
   storedProtocolData as storedProtocolDataFixture,
   storedProtocolDataWithoutRunTimeParameters,
-} from '../../../redux/protocol-storage/__fixtures__'
-import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
+} from '/app/redux/protocol-storage/__fixtures__'
+import { useTrackCreateProtocolRunEvent } from '/app/organisms/Devices/hooks'
 import { useCreateRunFromProtocol } from '../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ChooseProtocolSlideout } from '../'
-import { useNotifyDataReady } from '../../../resources/useNotifyDataReady'
+import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 vi.mock('../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol')
-vi.mock('../../../redux/protocol-storage')
-vi.mock('../../../organisms/Devices/hooks')
-vi.mock('../../../redux/config')
-vi.mock('../../../resources/useNotifyDataReady')
+vi.mock('/app/redux/protocol-storage')
+vi.mock('/app/organisms/Devices/hooks')
+vi.mock('/app/redux/config')
+vi.mock('/app/resources/useNotifyDataReady')
 
 const render = (props: React.ComponentProps<typeof ChooseProtocolSlideout>) => {
   return renderWithProviders(
@@ -127,6 +129,7 @@ describe('ChooseProtocolSlideout', () => {
         files: [expect.any(File)],
         protocolKey: storedProtocolDataFixture.protocolKey,
         runTimeParameterValues: expect.any(Object),
+        runTimeParameterFiles: expect.any(Object),
       })
     )
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()

@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import omit from 'lodash/omit'
 
 import {
-  Modal,
+  LegacyModal,
   OutlineButton,
   LabeledValue,
   WELL_LABEL_OPTIONS,
@@ -74,7 +74,7 @@ const WellSelectionModalComponent = (
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
 
   return (
-    <Modal
+    <LegacyModal
       className={modalStyles.modal}
       contentsClassName={cx(
         modalStyles.modal_contents,
@@ -95,6 +95,7 @@ const WellSelectionModalComponent = (
 
       {labwareDef != null ? (
         <SelectableLabware
+          showBorder
           labwareProps={{
             wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
             definition: labwareDef,
@@ -115,7 +116,7 @@ const WellSelectionModalComponent = (
       ) : null}
 
       <WellSelectionInstructions />
-    </Modal>
+    </LegacyModal>
   )
 }
 

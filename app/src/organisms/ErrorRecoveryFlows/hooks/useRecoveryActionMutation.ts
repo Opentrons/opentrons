@@ -1,20 +1,35 @@
+import { usePlayRunMutation } from '@opentrons/react-api-client'
+
+import { RECOVERY_MAP } from '../constants'
+
+import type { RunAction } from '@opentrons/api-client'
+import type { ERUtilsResults } from './useERUtils'
 import type { ErrorRecoveryFlowsProps } from '..'
-import { useRunActionMutations } from '@opentrons/react-api-client'
 
 export interface RecoveryActionMutationResult {
-  resumeRecovery: ReturnType<typeof useRunActionMutations>['playRun']
-  isResumeRecoveryLoading: ReturnType<
-    typeof useRunActionMutations
-  >['isPlayRunActionLoading']
+  resumeRecovery: () => Promise<RunAction>
+  isResumeRecoveryLoading: ReturnType<typeof usePlayRunMutation>['isLoading']
 }
 
 export function useRecoveryActionMutation(
-  runId: ErrorRecoveryFlowsProps['runId']
+  runId: ErrorRecoveryFlowsProps['runId'],
+  routeUpdateActions: ERUtilsResults['routeUpdateActions']
 ): RecoveryActionMutationResult {
   const {
-    playRun: resumeRecovery,
-    isPlayRunActionLoading: isResumeRecoveryLoading,
-  } = useRunActionMutations(runId)
+    mutateAsync,
+    isLoading: isResumeRecoveryLoading,
+  } = usePlayRunMutation()
+  const { proceedToRouteAndStep } = routeUpdateActions
+
+  const resumeRecovery = (): Promise<RunAction> => {
+    return mutateAsync(runId).catch(e => {
+      return proceedToRouteAndStep(
+        RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE
+      ).then(() => {
+        throw new Error(`Could not resume recovery: ${e}`)
+      })
+    })
+  }
 
   return { resumeRecovery, isResumeRecoveryLoading }
 }

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   SPACING,
@@ -8,8 +8,8 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
-import { SmallButton } from '../../atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+import { SmallButton } from '/app/atoms/buttons'
 import { NameQuickTransfer } from './NameQuickTransfer'
 
 interface SaveOrRunModalProps {
@@ -19,12 +19,13 @@ interface SaveOrRunModalProps {
 
 export const SaveOrRunModal = (props: SaveOrRunModalProps): JSX.Element => {
   const { t } = useTranslation('quick_transfer')
-  const [showNameTransfer, setShowNameTransfer] = React.useState(false)
+  const [showNameTransfer, setShowNameTransfer] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   return showNameTransfer ? (
     <NameQuickTransfer onSave={props.onSave} />
   ) : (
-    <Modal
+    <OddModal
       header={{
         title: t('run_quick_transfer_now'),
         iconName: 'alert-circle',
@@ -33,19 +34,17 @@ export const SaveOrRunModal = (props: SaveOrRunModalProps): JSX.Element => {
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing10}
+        gridGap={SPACING.spacing32}
         width="100%"
       >
-        <LegacyStyledText
-          css={TYPOGRAPHY.bodyTextRegular}
-          paddingBottom={SPACING.spacing24}
-        >
+        <LegacyStyledText css={TYPOGRAPHY.bodyTextRegular}>
           {t('save_to_run_later')}
         </LegacyStyledText>
         <Flex gridGap={SPACING.spacing8}>
           <SmallButton
             width="50%"
             buttonText={t('save_for_later')}
+            disabled={isLoading}
             onClick={() => {
               setShowNameTransfer(true)
             }}
@@ -54,10 +53,14 @@ export const SaveOrRunModal = (props: SaveOrRunModalProps): JSX.Element => {
           <SmallButton
             width="50%"
             buttonText={t('run_now')}
-            onClick={props.onRun}
+            disabled={isLoading}
+            onClick={() => {
+              setIsLoading(true)
+              props.onRun()
+            }}
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

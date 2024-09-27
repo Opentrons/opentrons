@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -11,8 +10,8 @@ import {
   TYPOGRAPHY,
   LegacyStyledText,
 } from '@opentrons/components'
-import { ToggleButton } from '../../../../atoms/buttons'
-import { useLEDLights } from '../../hooks'
+import { ToggleButton } from '/app/atoms/buttons'
+import { useLEDLights } from '/app/resources/robot-settings'
 
 interface EnableStatusLightProps {
   robotName: string

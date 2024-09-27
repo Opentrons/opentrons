@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import type * as React from 'react'
 import { css } from 'styled-components'
 
 import {
@@ -7,34 +6,27 @@ import {
   BORDERS,
   Btn,
   COLORS,
+  CURSOR_DEFAULT,
   DIRECTION_ROW,
   Flex,
   Icon,
   POSITION_FIXED,
   SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
-import type { IconName, StyleProps } from '@opentrons/components'
+import type { IconName } from '@opentrons/components'
 
-interface FloatingActionButtonProps extends StyleProps {
-  buttonText?: React.ReactNode
+interface FloatingActionButtonProps extends React.ComponentProps<typeof Btn> {
+  buttonText: string
   disabled?: boolean
   iconName?: IconName
-  onClick: React.MouseEventHandler
 }
 
 export function FloatingActionButton(
   props: FloatingActionButtonProps
 ): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
-  const {
-    buttonText = t('map_view'),
-    disabled = false,
-    iconName = 'deck-map',
-    ...buttonProps
-  } = props
+  const { buttonText, disabled = false, iconName, ...buttonProps } = props
 
   const contentColor = disabled ? COLORS.grey50 : COLORS.white
   const FLOATING_ACTION_BUTTON_STYLE = css`
@@ -42,7 +34,7 @@ export function FloatingActionButton(
     border-radius: ${BORDERS.borderRadius40};
     box-shadow: ${BORDERS.shadowBig};
     color: ${contentColor};
-    cursor: default;
+    cursor: ${CURSOR_DEFAULT};
 
     &:active {
       background-color: ${COLORS.purple55};
@@ -65,9 +57,6 @@ export function FloatingActionButton(
       bottom={SPACING.spacing24}
       css={FLOATING_ACTION_BUTTON_STYLE}
       disabled={disabled}
-      fontSize={TYPOGRAPHY.fontSize28}
-      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      lineHeight={TYPOGRAPHY.lineHeight36}
       padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
       position={POSITION_FIXED}
       right={SPACING.spacing24}
@@ -78,13 +67,15 @@ export function FloatingActionButton(
         flexDirection={DIRECTION_ROW}
         gridGap={SPACING.spacing8}
       >
-        <Icon
-          color={contentColor}
-          height="3rem"
-          name={iconName}
-          width="3.75rem"
-        />
-        <LegacyStyledText>{buttonText}</LegacyStyledText>
+        {iconName != null ? (
+          <Icon
+            color={contentColor}
+            height="3rem"
+            name={iconName}
+            width="3.75rem"
+          />
+        ) : null}
+        <StyledText oddStyle="level4HeaderSemiBold">{buttonText}</StyledText>
       </Flex>
     </Btn>
   )

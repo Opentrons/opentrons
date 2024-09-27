@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import {
@@ -14,15 +14,17 @@ import {
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { useHost } from '@opentrons/react-api-client'
 
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
-import { RunPausedSplash, useRunPausedSplash } from './RunPausedSplash'
+import { RecoverySplash, useRecoverySplash } from './RecoverySplash'
+import { RecoveryTakeover } from './RecoveryTakeover'
 import {
   useCurrentlyRecoveringFrom,
   useERUtils,
-  useRecoveryAnalytics,
-  useShowDoorInfo,
+  useRecoveryTakeover,
+  useRetainedFailedCommandBySource,
 } from './hooks'
 
 import type { RunStatus } from '@opentrons/api-client'
@@ -45,7 +47,7 @@ const INVALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_IDLE,
 ]
 
-interface UseErrorRecoveryResult {
+export interface UseErrorRecoveryResult {
   isERActive: boolean
   /* There is no FailedCommand if the run statis is not AWAITING_RECOVERY. */
   failedCommand: FailedCommand | null
@@ -55,11 +57,9 @@ export function useErrorRecoveryFlows(
   runId: string,
   runStatus: RunStatus | null
 ): UseErrorRecoveryResult {
-  const [isERActive, setIsERActive] = React.useState(false)
+  const [isERActive, setIsERActive] = useState(false)
   // If client accesses a valid ER runs status besides AWAITING_RECOVERY but accesses it outside of Error Recovery flows, don't show ER.
-  const [hasSeenAwaitingRecovery, setHasSeenAwaitingRecovery] = React.useState(
-    false
-  )
+  const [hasSeenAwaitingRecovery, setHasSeenAwaitingRecovery] = useState(false)
   const failedCommand = useCurrentlyRecoveringFrom(runId, runStatus)
 
   if (
@@ -106,57 +106,76 @@ export function useErrorRecoveryFlows(
 export interface ErrorRecoveryFlowsProps {
   runId: string
   runStatus: RunStatus | null
-  failedCommand: FailedCommand | null
+  failedCommandByRunRecord: FailedCommand | null
   protocolAnalysis: CompletedProtocolAnalysis | null
 }
 
 export function ErrorRecoveryFlows(
   props: ErrorRecoveryFlowsProps
 ): JSX.Element | null {
-  const { protocolAnalysis, runStatus, failedCommand } = props
+  const { protocolAnalysis, runStatus, failedCommandByRunRecord } = props
+
+  const failedCommandBySource = useRetainedFailedCommandBySource(
+    failedCommandByRunRecord,
+    protocolAnalysis
+  )
 
   const { hasLaunchedRecovery, toggleERWizard, showERWizard } = useERWizard()
-
   const isOnDevice = useSelector(getIsOnDevice)
   const robotType = protocolAnalysis?.robotType ?? OT2_ROBOT_TYPE
-  const showSplash = useRunPausedSplash(isOnDevice, showERWizard)
-  const analytics = useRecoveryAnalytics()
+  const robotName = useHost()?.robotName ?? 'robot'
 
-  React.useEffect(() => {
-    analytics.reportErrorEvent(failedCommand)
-  }, [analytics, failedCommand])
-
-  const isDoorOpen = useShowDoorInfo(runStatus)
+  const {
+    showTakeover,
+    isActiveUser,
+    intent,
+    toggleERWizAsActiveUser,
+  } = useRecoveryTakeover(toggleERWizard)
 
   const recoveryUtils = useERUtils({
     ...props,
     hasLaunchedRecovery,
-    toggleERWizard,
+    toggleERWizAsActiveUser,
     isOnDevice,
     robotType,
-    analytics,
+    showTakeover,
+    failedCommand: failedCommandBySource,
   })
+
+  const renderWizard =
+    isActiveUser &&
+    (showERWizard || recoveryUtils.doorStatusUtils.isProhibitedDoorOpen)
+  const showSplash = useRecoverySplash(isOnDevice, renderWizard as boolean)
 
   return (
     <>
-      {showERWizard || isDoorOpen ? (
+      {showTakeover ? (
+        <RecoveryTakeover
+          intent={intent}
+          robotName={robotName}
+          isOnDevice={isOnDevice}
+          runStatus={runStatus}
+        />
+      ) : null}
+      {renderWizard ? (
         <ErrorRecoveryWizard
           {...props}
           {...recoveryUtils}
           robotType={robotType}
           isOnDevice={isOnDevice}
-          isDoorOpen={isDoorOpen}
-          analytics={analytics}
+          failedCommand={failedCommandBySource}
         />
       ) : null}
       {showSplash ? (
-        <RunPausedSplash
+        <RecoverySplash
           {...props}
           {...recoveryUtils}
           robotType={robotType}
+          robotName={robotName}
           isOnDevice={isOnDevice}
-          toggleERWiz={toggleERWizard}
-          analytics={analytics}
+          toggleERWizAsActiveUser={toggleERWizAsActiveUser}
+          failedCommand={failedCommandBySource}
+          resumePausedRecovery={!renderWizard && !showTakeover}
         />
       ) : null}
     </>

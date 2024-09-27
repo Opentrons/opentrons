@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
 import {
   screen,
@@ -7,10 +7,10 @@ import {
   render as testingRender,
 } from '@testing-library/react'
 
-import { mockPipetteInfo } from '../../../../redux/pipettes/__fixtures__'
+import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
 import { mockRecoveryContentProps } from '../../__fixtures__'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { ManageTips, useDropTipFlowUtils } from '../ManageTips'
 import { RECOVERY_MAP } from '../../constants'
 import { DropTipWizardFlows } from '../../../DropTipWizardFlows'
@@ -44,12 +44,12 @@ describe('ManageTips', () => {
   let props: React.ComponentProps<typeof ManageTips>
   let mockProceedNextStep: Mock
   let mockProceedToRouteAndStep: Mock
-  let mockSetRobotInMotion: Mock
+  let mockhandleMotionRouting: Mock
 
   beforeEach(() => {
     mockProceedNextStep = vi.fn()
     mockProceedToRouteAndStep = vi.fn(() => Promise.resolve())
-    mockSetRobotInMotion = vi.fn(() => Promise.resolve())
+    mockhandleMotionRouting = vi.fn(() => Promise.resolve())
 
     props = {
       ...mockRecoveryContentProps,
@@ -58,17 +58,18 @@ describe('ManageTips', () => {
         step: DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL,
       },
       tipStatusUtils: {
-        pipettesWithTip: [{ mount: 'left', specs: MOCK_ACTUAL_PIPETTE }],
+        aPipetteWithTip: { mount: 'left', specs: MOCK_ACTUAL_PIPETTE },
       } as any,
       routeUpdateActions: {
         proceedNextStep: mockProceedNextStep,
-        setRobotInMotion: mockSetRobotInMotion,
+        handleMotionRouting: mockhandleMotionRouting,
         proceedToRouteAndStep: mockProceedToRouteAndStep,
       } as any,
       recoveryCommands: { cancelRun: vi.fn() } as any,
       currentRecoveryOptionUtils: {
         selectedRecoveryOption: null,
       } as any,
+      subMapUtils: { subMap: null, updateSubMap: vi.fn() },
     }
 
     vi.mocked(DropTipWizardFlows).mockReturnValue(
@@ -81,7 +82,10 @@ describe('ManageTips', () => {
   })
 
   it('renders SelectRecoveryOption when the route is unknown', () => {
-    props = { ...props, recoveryMap: { ...props.recoveryMap, step: 'UNKNOWN' } }
+    props = {
+      ...props,
+      recoveryMap: { ...props.recoveryMap, step: 'UNKNOWN' as any },
+    }
     render(props)
 
     screen.getByText('MOCK SELECT RECOVERY OPTION')
@@ -90,27 +94,29 @@ describe('ManageTips', () => {
   it(`renders BeginRemoval with correct copy when the step is ${DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL}`, () => {
     render(props)
 
-    screen.getByText('Remove tips from left pipette before canceling the run?')
+    screen.getByText('Remove any attached tips')
+    screen.queryByText(
+      /Homing the .* pipette with liquid in the tips may damage it\. You must remove all tips before using the pipette again\./
+    )
     screen.queryAllByText('Begin removal')
-    screen.queryAllByText('Skip')
-    expect(screen.getAllByText('Continue').length).toBe(2)
+    screen.queryAllByText('Skip and home pipette')
   })
 
   it('routes correctly when continuing on BeginRemoval', () => {
     render(props)
 
     const beginRemovalBtn = screen.queryAllByText('Begin removal')[0]
-    const skipBtn = screen.queryAllByText('Skip removal')[0]
+    const skipBtn = screen.queryAllByText('Skip and home pipette')[0]
 
     fireEvent.click(beginRemovalBtn)
-    clickButtonLabeled('Continue')
+    clickButtonLabeled('Begin removal')
 
     expect(mockProceedNextStep).toHaveBeenCalled()
 
     fireEvent.click(skipBtn)
-    clickButtonLabeled('Continue')
+    clickButtonLabeled('Skip and home pipette')
 
-    expect(mockSetRobotInMotion).toHaveBeenCalled()
+    expect(mockhandleMotionRouting).toHaveBeenCalled()
   })
 
   it(`handles special routing for ${RETRY_NEW_TIPS.ROUTE} when skipping tip drop`, () => {
@@ -122,10 +128,10 @@ describe('ManageTips', () => {
     }
     render(props)
 
-    const skipBtn = screen.queryAllByText('Skip removal')[0]
+    const skipBtn = screen.queryAllByText('Skip and home pipette')[0]
 
     fireEvent.click(skipBtn)
-    clickButtonLabeled('Continue')
+    clickButtonLabeled('Skip and home pipette')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RETRY_NEW_TIPS.ROUTE,
@@ -168,19 +174,75 @@ describe('ManageTips', () => {
 
     screen.getByText('MOCK DROP TIP FLOWS')
   })
+
+  describe('routeAlternativelyIfNoPipette', () => {
+    it('should route to RETRY_NEW_TIPS.STEPS.REPLACE_TIPS when selectedRecoveryOption is RETRY_NEW_TIPS.ROUTE and no pipette with tip', () => {
+      props.tipStatusUtils.aPipetteWithTip = null
+      props.currentRecoveryOptionUtils.selectedRecoveryOption =
+        RETRY_NEW_TIPS.ROUTE
+
+      render(props)
+
+      expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+        RETRY_NEW_TIPS.ROUTE,
+        RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+      )
+    })
+
+    it('should route to SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS when selectedRecoveryOption is SKIP_STEP_WITH_NEW_TIPS.ROUTE and no pipette with tip', () => {
+      props.tipStatusUtils.aPipetteWithTip = null
+      props.currentRecoveryOptionUtils.selectedRecoveryOption =
+        RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE
+
+      render(props)
+
+      expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+        RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE,
+        RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS
+      )
+    })
+
+    it('should route to OPTION_SELECTION.ROUTE when selectedRecoveryOption is not RETRY_NEW_TIPS or SKIP_STEP_WITH_NEW_TIPS and no pipette with tip', () => {
+      props.tipStatusUtils.aPipetteWithTip = null
+      props.currentRecoveryOptionUtils.selectedRecoveryOption =
+        RECOVERY_MAP.CANCEL_RUN.ROUTE
+
+      render(props)
+
+      expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+        RECOVERY_MAP.OPTION_SELECTION.ROUTE
+      )
+    })
+
+    it('should not route alternatively when there is a pipette with tip', () => {
+      props.tipStatusUtils.aPipetteWithTip = {
+        mount: 'left',
+        specs: MOCK_ACTUAL_PIPETTE,
+      }
+      props.currentRecoveryOptionUtils.selectedRecoveryOption =
+        RETRY_NEW_TIPS.ROUTE
+
+      render(props)
+
+      expect(mockProceedToRouteAndStep).not.toHaveBeenCalled()
+    })
+  })
 })
 
 describe('useDropTipFlowUtils', () => {
   const mockRunId = 'MOCK_RUN_ID'
   const mockTipStatusUtils = { runId: mockRunId }
   const mockProceedToRouteAndStep = vi.fn()
+  const mockUpdateSubMap = vi.fn()
   const { ERROR_WHILE_RECOVERING, DROP_TIP_FLOWS } = RECOVERY_MAP
 
   const mockProps = {
     tipStatusUtils: mockTipStatusUtils,
     failedCommand: null,
-    previousRoute: null,
-    trackExternalMap: vi.fn(),
+    subMapUtils: {
+      updateSubMap: mockUpdateSubMap,
+      subMap: null,
+    },
     currentRecoveryOptionUtils: {
       selectedRecoveryOption: null,
     } as any,
@@ -204,7 +266,11 @@ describe('useDropTipFlowUtils', () => {
     const { result } = renderHook(() =>
       useDropTipFlowUtils({
         ...mockProps,
-        failedCommand: { id: 'MOCK_COMMAND_ID' },
+        failedCommand: {
+          byRunRecord: {
+            id: 'MOCK_COMMAND_ID',
+          },
+        },
       } as any)
     )
 
@@ -223,19 +289,13 @@ describe('useDropTipFlowUtils', () => {
     screen.getByText('Proceed to cancel')
   })
 
-  it('should call trackExternalMap with the current map', () => {
-    const mockTrackExternalMap = vi.fn()
-    const { result } = renderHook(() =>
-      useDropTipFlowUtils({
-        ...mockProps,
-        trackExternalMap: mockTrackExternalMap,
-      })
-    )
+  it('should call updateSubMap with the current map', () => {
+    const { result } = renderHook(() => useDropTipFlowUtils(mockProps))
 
-    const currentMap = { route: 'route', step: 'step' }
-    result.current.trackCurrentMap(currentMap)
+    const currentMap = { route: 'route', step: 'step' } as any
+    result.current.reportMap(currentMap)
 
-    expect(mockTrackExternalMap).toHaveBeenCalledWith(currentMap)
+    expect(mockUpdateSubMap).toHaveBeenCalledWith(currentMap)
   })
 
   it('should return the correct error overrides', () => {
@@ -294,19 +354,43 @@ describe('useDropTipFlowUtils', () => {
     )
   })
 
-  it(`should return correct route overrides when the route is ${DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP}`, () => {
+  it(`should return correct route override when the step is ${DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP}`, () => {
     const { result } = renderHook(() => useDropTipFlowUtils(mockProps))
 
-    expect(result.current.routeOverride).toEqual(DT_ROUTES.DROP_TIP)
+    expect(result.current.routeOverride).toEqual({
+      route: DT_ROUTES.DROP_TIP,
+      step: null,
+    })
   })
 
-  it(`should return correct route overrides when the route is ${DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT}`, () => {
+  it(`should return correct route override when the step is ${DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT}`, () => {
     const mockPropsBlowout = {
       ...mockProps,
       recoveryMap: { step: DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT },
     }
     const { result } = renderHook(() => useDropTipFlowUtils(mockPropsBlowout))
 
-    expect(result.current.routeOverride).toEqual(DT_ROUTES.BLOWOUT)
+    expect(result.current.routeOverride).toEqual({
+      route: DT_ROUTES.BLOWOUT,
+      step: null,
+    })
+  })
+
+  it('should use subMap.step in routeOverride if available', () => {
+    const mockPropsWithSubMap = {
+      ...mockProps,
+      subMapUtils: {
+        ...mockProps.subMapUtils,
+        subMap: { route: DT_ROUTES.DROP_TIP, step: 'SOME_STEP' },
+      },
+    }
+    const { result } = renderHook(() =>
+      useDropTipFlowUtils(mockPropsWithSubMap)
+    )
+
+    expect(result.current.routeOverride).toEqual({
+      route: DT_ROUTES.DROP_TIP,
+      step: 'SOME_STEP',
+    })
   })
 })

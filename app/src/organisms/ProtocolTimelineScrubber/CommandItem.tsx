@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -8,8 +8,8 @@ import {
   LegacyStyledText,
   OVERFLOW_SCROLL,
 } from '@opentrons/components'
-import { getCommandTextData } from '../../molecules/Command/utils/getCommandTextData'
-import { CommandText } from '../../molecules/Command'
+import { getCommandTextData } from '/app/molecules/Command/utils/getCommandTextData'
+import { CommandText } from '/app/molecules/Command'
 import { COMMAND_WIDTH_PX } from './index'
 
 import type {
@@ -28,7 +28,7 @@ interface CommandItemProps {
   robotType: RobotType
 }
 export function CommandItem(props: CommandItemProps): JSX.Element {
-  const [showDetails, setShowDetails] = React.useState(false)
+  const [showDetails, setShowDetails] = useState(false)
   const {
     index,
     command,

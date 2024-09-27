@@ -1,27 +1,31 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+
 import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
-  POSITION_FIXED,
-  COLORS,
   ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  InputField,
+  RadioButton,
+  POSITION_FIXED,
+  SPACING,
 } from '@opentrons/components'
-import { getTopPortalEl } from '../../../App/portal'
-import { LargeButton } from '../../../atoms/buttons'
+
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { getTopPortalEl } from '/app/App/portal'
 import { ChildNavigation } from '../../ChildNavigation'
-import { InputField } from '../../../atoms/InputField'
 import { ACTIONS } from '../constants'
+import { i18n } from '/app/i18n'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 
 import type {
   QuickTransferSummaryState,
   QuickTransferSummaryAction,
   FlowRateKind,
 } from '../types'
-import { i18n } from '../../../i18n'
-import { NumericalKeyboard } from '../../../atoms/SoftwareKeyboard'
 
 interface TouchTipProps {
   onBack: () => void
@@ -33,6 +37,7 @@ interface TouchTipProps {
 export function TouchTip(props: TouchTipProps): JSX.Element {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = React.useRef(null)
 
   const [touchTipIsEnabled, setTouchTipIsEnabled] = React.useState<boolean>(
@@ -77,12 +82,24 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
     if (currentStep === 1) {
       if (!touchTipIsEnabled) {
         dispatch({ type: touchTipAction, position: undefined })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            setting: `TouchTip_${kind}`,
+          },
+        })
         onBack()
       } else {
         setCurrentStep(2)
       }
     } else if (currentStep === 2) {
       dispatch({ type: touchTipAction, position: position ?? undefined })
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+        properties: {
+          setting: `TouchTip_${kind}`,
+        },
+      })
       onBack()
     }
   }
@@ -150,15 +167,13 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
           width="100%"
         >
           {enableTouchTipDisplayItems.map(displayItem => (
-            <LargeButton
+            <RadioButton
               key={displayItem.description}
-              buttonType={
-                touchTipIsEnabled === displayItem.option
-                  ? 'primary'
-                  : 'secondary'
-              }
-              onClick={displayItem.onClick}
-              buttonText={displayItem.description}
+              isSelected={touchTipIsEnabled === displayItem.option}
+              onChange={displayItem.onClick}
+              buttonValue={displayItem.description}
+              buttonLabel={displayItem.description}
+              radioButtonType="large"
             />
           ))}
         </Flex>
@@ -183,7 +198,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
             <InputField
               type="number"
               value={position}
-              title={t('delay_position_mm')}
+              title={t('touch_tip_position_mm')}
               error={positionError}
               readOnly
             />
@@ -196,6 +211,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              initialValue={String(position ?? '')}
               onChange={e => {
                 setPosition(Number(e))
               }}

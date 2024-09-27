@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
-import { COLORS, LegacyStyledText } from '@opentrons/components'
+import { COLORS, LegacyStyledText, ModalShell } from '@opentrons/components'
 import {
   getModuleType,
   getModuleDisplayName,
@@ -14,17 +14,15 @@ import {
   getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/organisms/Devices/hooks'
+import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
+import { getIsOnDevice } from '/app/redux/config'
 import {
-  useChainMaintenanceCommands,
-  useCreateTargetedMaintenanceRunMutation,
-} from '../../resources/runs'
-import { getIsOnDevice } from '../../redux/config'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
 import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'
 import { FLEX_SLOT_NAMES_BY_MOD_TYPE, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -33,10 +31,14 @@ import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 import { DetachProbe } from './DetachProbe'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import {
+  useChainMaintenanceCommands,
+  useNotifyCurrentMaintenanceRun,
+} from '/app/resources/maintenance_runs'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import type {
   CreateCommand,
   CutoutConfig,
@@ -47,6 +49,7 @@ interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
   closeFlow: () => void
   isPrepCommandLoading: boolean
+  isLoadedInRun?: boolean
   onComplete?: () => void
   prepCommandErrorMessage?: string
 }
@@ -58,6 +61,7 @@ export const ModuleWizardFlows = (
 ): JSX.Element | null => {
   const {
     attachedModule,
+    isLoadedInRun = false,
     isPrepCommandLoading,
     closeFlow,
     onComplete,
@@ -263,13 +267,17 @@ export const ModuleWizardFlows = (
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (isPrepCommandLoading) {
     modalContent = (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={t('prepping_module', {
           module: getModuleDisplayName(attachedModule.moduleModel),
         })}
       />
     )
-  } else if (prepCommandErrorMessage != null || errorMessage != null) {
+  } else if (
+    prepCommandErrorMessage != null ||
+    errorMessage != null ||
+    maintenanceRunData?.data.status === RUN_STATUS_FAILED
+  ) {
     modalContent = (
       <SimpleWizardBody
         isSuccess={false}
@@ -296,7 +304,11 @@ export const ModuleWizardFlows = (
       />
     )
   } else if (isExiting) {
-    modalContent = <InProgressModal description={t('stand_back_exiting')} />
+    modalContent = (
+      <SimpleWizardInProgressBody
+        description={t('stand_back_robot_in_motion')}
+      />
+    )
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     modalContent = <BeforeBeginning {...currentStep} {...calibrateBaseProps} />
   } else if (currentStep.section === SECTIONS.SELECT_LOCATION) {
@@ -306,6 +318,7 @@ export const ModuleWizardFlows = (
         {...calibrateBaseProps}
         availableSlotNames={availableSlotNames}
         deckConfig={deckConfig}
+        isLoadedInRun={isLoadedInRun}
         occupiedCutouts={occupiedCutouts}
         configuredFixtureIdByCutoutId={fixtureIdByCutoutId}
       />
@@ -357,14 +370,14 @@ export const ModuleWizardFlows = (
 
   return createPortal(
     isOnDevice ? (
-      <LegacyModalShell>
+      <ModalShell>
         {wizardHeader}
         {modalContent}
-      </LegacyModalShell>
+      </ModalShell>
     ) : (
-      <LegacyModalShell width="47rem" height="auto" header={wizardHeader}>
+      <ModalShell width="47rem" height="auto" header={wizardHeader}>
         {modalContent}
-      </LegacyModalShell>
+      </ModalShell>
     ),
     getTopPortalEl()
   )

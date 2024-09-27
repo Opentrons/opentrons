@@ -1,31 +1,32 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { when } from 'vitest-when'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
-import { mockTemperatureModule } from '../../../../../redux/modules/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { mockTemperatureModule } from '/app/redux/modules/__fixtures__'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
-} from '../../../../../resources/deck_configuration/utils'
+} from '/app/resources/deck_configuration/utils'
 import {
-  useIsFlex,
   useRunHasStarted,
-  useUnmatchedModulesForProtocol,
   useModuleCalibrationStatus,
-} from '../../../hooks'
+  useUnmatchedModulesForProtocol,
+} from '/app/resources/runs'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { SetupModuleAndDeck } from '../index'
 import { SetupModulesList } from '../SetupModulesList'
 import { SetupModulesMap } from '../SetupModulesMap'
 import { SetupFixtureList } from '../SetupFixtureList'
 
-vi.mock('../../../hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../SetupModulesList')
 vi.mock('../SetupModulesMap')
 vi.mock('../SetupFixtureList')
-vi.mock('../../../../../redux/config')
-vi.mock('../../../../../resources/deck_configuration/utils')
+vi.mock('/app/redux/config')
+vi.mock('/app/resources/deck_configuration/utils')
+vi.mock('/app/resources/runs')
 
 const MOCK_ROBOT_NAME = 'otie'
 const MOCK_RUN_ID = '1'

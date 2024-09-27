@@ -19,6 +19,7 @@ import type {
   CalibrationRunTimeCommand,
   CalibrationCreateCommand,
 } from './calibration'
+import type { UnsafeRunTimeCommand, UnsafeCreateCommand } from './unsafe'
 
 export * from './annotation'
 export * from './calibration'
@@ -28,6 +29,7 @@ export * from './module'
 export * from './pipetting'
 export * from './setup'
 export * from './timing'
+export * from './unsafe'
 
 // NOTE: these key/value pairs will only be present on commands at analysis/run time
 // they pertain only to the actual execution status of a command on hardware, as opposed to
@@ -67,6 +69,7 @@ export type CreateCommand =
   | CalibrationCreateCommand // for automatic pipette calibration
   | AnnotationCreateCommand // annotating command execution
   | IncidentalCreateCommand // command with only incidental effects (status bar animations)
+  | UnsafeCreateCommand // command providing capabilities that are not safe for scientific uses
 
 // commands will be required to have a key, but will not be created with one
 export type RunTimeCommand =
@@ -78,6 +81,7 @@ export type RunTimeCommand =
   | CalibrationRunTimeCommand // for automatic pipette calibration
   | AnnotationRunTimeCommand // annotating command execution
   | IncidentalRunTimeCommand // command with only incidental effects (status bar animations)
+  | UnsafeRunTimeCommand // command providing capabilities that are not safe for scientific uses
 
 export type RunCommandError =
   | RunCommandErrorUndefined

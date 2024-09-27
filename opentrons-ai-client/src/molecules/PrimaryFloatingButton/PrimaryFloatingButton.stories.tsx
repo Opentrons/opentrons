@@ -1,4 +1,3 @@
-import React from 'react'
 import { PrimaryFloatingButton as PrimaryFloatingButtonComponent } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'

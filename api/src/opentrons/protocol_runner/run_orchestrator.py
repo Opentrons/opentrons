@@ -21,7 +21,9 @@ from ..protocol_engine import (
     StateSummary,
     CommandPointer,
     CommandSlice,
+    CommandErrorSlice,
     DeckType,
+    ErrorOccurrence,
 )
 from ..protocol_engine.errors import RunStoppedError
 from ..protocol_engine.types import (
@@ -31,8 +33,11 @@ from ..protocol_engine.types import (
     LabwareOffset,
     DeckConfigurationType,
     RunTimeParameter,
-    RunTimeParamValuesType,
+    PrimitiveRunTimeParamValuesType,
+    CSVRuntimeParamPaths,
 )
+from ..protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
+
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig, ProtocolSource
 from ..protocols.parse import PythonParseMode
 
@@ -168,7 +173,7 @@ class RunOrchestrator:
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
-        run_time_param_values: Optional[RunTimeParamValuesType] = None,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
         """Start the run."""
         if self._protocol_runner:
@@ -227,7 +232,20 @@ class RunOrchestrator:
         return self._protocol_engine.state_view.labware.get_loaded_labware_definitions()
 
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
-        """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
+        """Get the list of run time parameters defined in the protocol, if any.
+
+        This returns a list of all run time parameters with their validated definitions
+        and client-requested values. Will always be empty before loading the runner.
+
+        If there was an error during RTP definition validation, then this list will
+        contain the parameter definitions that were validated before the error occurred.
+        These parameters' values will be default values.
+
+        If all definitions validated successfully but an error occurred while
+        setting the RTP values with those sent by the client, then only the parameters
+        whose values were successfully set will have the client-requested values while
+        the others will contain the default values.
+        """
         return (
             []
             if self._protocol_runner is None
@@ -239,17 +257,33 @@ class RunOrchestrator:
         return self._protocol_engine.state_view.commands.get_current()
 
     def get_command_slice(
-        self,
-        cursor: Optional[int],
-        length: int,
+        self, cursor: Optional[int], length: int, include_fixit_commands: bool
     ) -> CommandSlice:
         """Get a slice of run commands.
 
         Args:
             cursor: Requested index of first command in the returned slice.
             length: Length of slice to return.
+            include_fixit_commands: Get all command intents.
         """
         return self._protocol_engine.state_view.commands.get_slice(
+            cursor=cursor, length=length, include_fixit_commands=include_fixit_commands
+        )
+
+    def get_command_error_slice(
+        self,
+        cursor: int,
+        length: int,
+    ) -> CommandErrorSlice:
+        """Get a slice of run commands errors.
+
+        Args:
+            cursor: Requested index of first error in the returned slice.
+                If the cursor is omitted, a cursor will be selected automatically
+                based on the last error occurence.
+            length: Length of slice to return.
+        """
+        return self._protocol_engine.state_view.commands.get_errors_slice(
             cursor=cursor, length=length
         )
 
@@ -264,6 +298,10 @@ class RunOrchestrator:
     def get_all_commands(self) -> List[Command]:
         """Get all run commands."""
         return self._protocol_engine.state_view.commands.get_all()
+
+    def get_command_errors(self) -> List[ErrorOccurrence]:
+        """Get all run command errors."""
+        return self._protocol_engine.state_view.commands.get_all_errors()
 
     def get_run_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
@@ -323,7 +361,8 @@ class RunOrchestrator:
     async def load(
         self,
         protocol_source: ProtocolSource,
-        run_time_param_values: Optional[RunTimeParamValuesType],
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
+        run_time_param_paths: Optional[CSVRuntimeParamPaths],
         parse_mode: ParseMode,
     ) -> None:
         """Load a json/python protocol."""
@@ -339,6 +378,7 @@ class RunOrchestrator:
                 # doesn't conform to the new rules.
                 python_parse_mode=python_parse_mode,
                 run_time_param_values=run_time_param_values,
+                run_time_param_paths=run_time_param_paths,
             )
 
     def get_is_okay_to_clear(self) -> bool:
@@ -356,6 +396,10 @@ class RunOrchestrator:
     def get_deck_type(self) -> DeckType:
         """Get engine deck type."""
         return self._protocol_engine.state_view.config.deck_type
+
+    def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
+        """Create error recovery policy for the run."""
+        self._protocol_engine.set_error_recovery_policy(policy)
 
     async def command_generator(self) -> AsyncGenerator[str, None]:
         """Yield next command to execute."""

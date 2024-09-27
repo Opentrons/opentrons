@@ -113,6 +113,22 @@ def create_succeeded_command(
     )
 
 
+def create_comment_command(command_id: str = "command-id") -> cmd.Comment:
+    """Create a completed LoadLabware command."""
+    params = cmd.CommentParams(message="hello world!")
+
+    result = cmd.CommentResult()
+
+    return cmd.Comment(
+        id=command_id,
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
 def create_load_labware_command(
     labware_id: str,
     location: LabwareLocation,
@@ -286,6 +302,32 @@ def create_dispense_in_place_command(
     result = cmd.DispenseInPlaceResult(volume=volume)
 
     return cmd.DispenseInPlace(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
+def create_liquid_probe_command(
+    pipette_id: str = "pippete-id",
+    labware_id: str = "labware-id",
+    well_name: str = "well-name",
+    well_location: Optional[WellLocation] = None,
+    destination: DeckPoint = DeckPoint(x=0, y=0, z=0),
+) -> cmd.LiquidProbe:
+    """Get a completed Liquid Probe command."""
+    params = cmd.LiquidProbeParams(
+        pipetteId=pipette_id,
+        labwareId=labware_id,
+        wellName=well_name,
+        wellLocation=well_location or WellLocation(),
+    )
+    result = cmd.LiquidProbeResult(position=destination, z_position=0.5)
+
+    return cmd.LiquidProbe(
         id="command-id",
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,
@@ -596,6 +638,44 @@ def create_reload_labware_command(
     )
 
     return cmd.ReloadLabware(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
+def create_unsafe_blow_out_in_place_command(
+    pipette_id: str,
+    flow_rate: float,
+) -> cmd.unsafe.UnsafeBlowOutInPlace:
+    """Create a completed UnsafeBlowOutInPlace command."""
+    params = cmd.unsafe.UnsafeBlowOutInPlaceParams(
+        pipetteId=pipette_id, flowRate=flow_rate
+    )
+    result = cmd.unsafe.UnsafeBlowOutInPlaceResult()
+
+    return cmd.unsafe.UnsafeBlowOutInPlace(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
+def create_unsafe_drop_tip_in_place_command(
+    pipette_id: str,
+) -> cmd.unsafe.UnsafeDropTipInPlace:
+    """Get a completed UnsafeDropTipInPlace command."""
+    params = cmd.unsafe.UnsafeDropTipInPlaceParams(pipetteId=pipette_id)
+
+    result = cmd.unsafe.UnsafeDropTipInPlaceResult()
+
+    return cmd.unsafe.UnsafeDropTipInPlace(
         id="command-id",
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,

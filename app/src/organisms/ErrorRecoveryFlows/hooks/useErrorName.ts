@@ -17,6 +17,8 @@ export function useErrorName(errorKind: ErrorKind): string {
       return t('pipette_overpressure')
     case ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING:
       return t('pipette_overpressure')
+    case ERROR_KINDS.TIP_NOT_DETECTED:
+      return t('tip_not_detected')
     default:
       return t('error')
   }

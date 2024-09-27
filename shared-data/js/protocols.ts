@@ -4,6 +4,7 @@
 
 import Ajv from 'ajv'
 
+import commandSchema9 from '../command/schemas/9.json'
 import commandSchema8 from '../command/schemas/8.json'
 import commandSchema7 from '../command/schemas/7.json'
 import commandAnnotationSchema1 from '../commandAnnotation/schemas/1.json'
@@ -29,6 +30,9 @@ const validateCommands8 = (
   new Promise((resolve, reject) => {
     const requestedSchema = toValidate.commandSchemaId
     switch (requestedSchema) {
+      case 'opentronsCommandSchemaV9':
+        resolve(commandSchema9)
+        break
       case 'opentronsCommandSchemaV8':
         resolve(commandSchema8)
         break

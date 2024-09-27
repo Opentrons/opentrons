@@ -1,38 +1,39 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { css } from 'styled-components'
 
 import {
-  Flex,
+  ALIGN_FLEX_END,
   BORDERS,
   COLORS,
-  POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
+  Flex,
+  MenuItem,
+  NO_WRAP,
+  OverflowBtn,
+  POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  ALIGN_FLEX_END,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
+  useMenuHandleClickOutside,
 } from '@opentrons/components'
 
-import { CONNECTABLE, removeRobot } from '../../redux/discovery'
-import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { Tooltip } from '../../atoms/Tooltip'
-import { Divider } from '../../atoms/structure'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { CONNECTABLE, removeRobot } from '/app/redux/discovery'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { Divider } from '/app/atoms/structure'
 import { getTopPortalEl } from '../../App/portal'
 import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { useCurrentRunId } from '/app/resources/runs'
 import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { useIsRobotBusy } from './hooks'
 
 import type { StyleProps } from '@opentrons/components'
-import type { DiscoveredRobot } from '../../redux/discovery/types'
-import type { Dispatch, State } from '../../redux/types'
-import { css } from 'styled-components'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
+import type { Dispatch } from '/app/redux/types'
 
 interface RobotOverflowMenuProps extends StyleProps {
   robot: DiscoveredRobot
@@ -59,11 +60,9 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
     setShowConnectionTroubleshootingModal,
   ] = React.useState<boolean>(false)
 
-  const { autoUpdateAction } = useSelector((state: State) => {
-    return getRobotUpdateDisplayInfo(state, robot.name)
-  })
-  const isRobotOnWrongVersionOfSoftware =
-    autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'
+  const isRobotOnWrongVersionOfSoftware = useIsRobotOnWrongVersionOfSoftware(
+    robot.name
+  )
 
   const isRobotBusy = useIsRobotBusy({ poll: true })
 
@@ -174,7 +173,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
       />
       {showOverflowMenu && !showConnectionTroubleshootingModal ? (
         <Flex
-          whiteSpace="nowrap"
+          whiteSpace={NO_WRAP}
           zIndex={10}
           borderRadius={BORDERS.borderRadius8}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"

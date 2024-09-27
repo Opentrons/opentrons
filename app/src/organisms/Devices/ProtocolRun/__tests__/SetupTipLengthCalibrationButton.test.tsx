@@ -1,28 +1,30 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { when } from 'vitest-when'
 import { screen, fireEvent } from '@testing-library/react'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
 import { fixtureTiprack300ul } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import { mockTipLengthCalLauncher } from '../../hooks/__fixtures__/taskListFixtures'
-import { useDeckCalibrationData, useRunHasStarted } from '../../hooks'
-import { useDashboardCalibrateTipLength } from '../../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
+import { useDeckCalibrationData } from '../../hooks'
+import { useRunHasStarted } from '/app/resources/runs'
+import { useDashboardCalibrateTipLength } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationButton'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/components/src/hooks')
-vi.mock('../../../../organisms/RunTimeControl/hooks')
+vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock(
-  '../../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
+  '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 )
-vi.mock('../../../../redux/config')
-vi.mock('../../../../redux/sessions/selectors')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/sessions/selectors')
 vi.mock('../../hooks')
+vi.mock('/app/resources/runs')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'

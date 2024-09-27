@@ -1,9 +1,9 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, vi, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { ProtocolParameters } from '..'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
@@ -13,9 +13,7 @@ vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Components>()
   return {
     ...actual,
-    NoParameters: vi.fn(() => (
-      <div>No parameters specified in this protocol</div>
-    )),
+    InfoScreen: vi.fn(() => <div>mock InfoScreen</div>),
   }
 })
 
@@ -133,11 +131,11 @@ describe('ProtocolParameters', () => {
     screen.getByText('Left, Right')
   })
 
-  it('should render empty display when protocol does not have any parameter', () => {
+  it('should render InfoScreen component when protocol does not have any parameter', () => {
     props = {
       runTimeParameters: [],
     }
     render(props)
-    screen.getByText('No parameters specified in this protocol')
+    screen.getByText('mock InfoScreen')
   })
 })

@@ -1,7 +1,5 @@
-import * as React from 'react'
-
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { LocationIcon } from '../../molecules'
+import { DeckInfoLabel } from '../../molecules'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN, JUSTIFY_CENTER } from '../../styles'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
@@ -41,36 +39,16 @@ export const SlotLabels = ({
           width="2.5rem"
         >
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <LocationIcon
-              color={color}
-              slotName="A"
-              height="max-content"
-              width="100%"
-            />
+            <DeckInfoLabel deckLabel="A" height="max-content" width="100%" />
           </Flex>
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <LocationIcon
-              color={color}
-              slotName="B"
-              height="max-content"
-              width="100%"
-            />
+            <DeckInfoLabel deckLabel="B" height="max-content" width="100%" />
           </Flex>
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <LocationIcon
-              color={color}
-              slotName="C"
-              height="max-content"
-              width="100%"
-            />
+            <DeckInfoLabel deckLabel="C" height="max-content" width="100%" />
           </Flex>
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <LocationIcon
-              color={color}
-              slotName="D"
-              height="max-content"
-              width="100%"
-            />
+            <DeckInfoLabel deckLabel="D" height="max-content" width="100%" />
           </Flex>
         </Flex>
       </RobotCoordsForeignObject>
@@ -99,14 +77,14 @@ export const SlotLabels = ({
             justifyContent={JUSTIFY_CENTER}
             width={`${widthLargeRem}rem`}
           >
-            <LocationIcon color={color} slotName="1" height="100%" />
+            <DeckInfoLabel deckLabel="1" height="100%" />
           </Flex>
           <Flex
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
             width={`${widthSmallRem}rem`}
           >
-            <LocationIcon color={color} slotName="2" height="100%" />
+            <DeckInfoLabel deckLabel="2" height="100%" />
           </Flex>
           <Flex
             alignItems={ALIGN_CENTER}
@@ -115,7 +93,7 @@ export const SlotLabels = ({
               show4thColumn ? `${widthSmallRem}rem` : `${widthLargeRem}rem`
             }
           >
-            <LocationIcon color={color} slotName="3" height="100%" />
+            <DeckInfoLabel deckLabel="3" height="100%" />
           </Flex>
           {show4thColumn ? (
             <Flex
@@ -123,7 +101,7 @@ export const SlotLabels = ({
               justifyContent={JUSTIFY_CENTER}
               width={`${widthSmallRem}rem`}
             >
-              <LocationIcon color={color} slotName="4" height="100%" />
+              <DeckInfoLabel deckLabel="4" height="100%" />
             </Flex>
           ) : null}
         </Flex>

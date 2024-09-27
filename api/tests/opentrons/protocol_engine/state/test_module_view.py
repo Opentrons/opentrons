@@ -92,6 +92,12 @@ def get_addressable_area_view(
             "robotType": "OT-3 Standard",
             "models": ["OT-3 Standard"],
             "extents": [477.2, 493.8, 0.0],
+            "paddingOffsets": {
+                "rear": -177.42,
+                "front": 51.8,
+                "leftSide": 31.88,
+                "rightSide": -80.32,
+            },
             "mountOffsets": {
                 "left": [-13.5, -60.5, 255.675],
                 "right": [40.5, -60.5, 255.675],
@@ -126,6 +132,7 @@ def make_module_view(
         module_offset_by_serial=module_offset_by_serial or {},
         additional_slots_occupied_by_module_id=additional_slots_occupied_by_module_id
         or {},
+        deck_fixed_labware=[],
     )
 
     return ModuleView(state=state)

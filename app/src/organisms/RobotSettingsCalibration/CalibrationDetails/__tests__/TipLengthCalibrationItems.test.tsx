@@ -1,19 +1,19 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { i18n } from '../../../../i18n'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '/app/i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { TipLengthCalibrationItems } from '../TipLengthCalibrationItems'
 import { OverflowMenu } from '../OverflowMenu'
 import type { Mount } from '@opentrons/components'
 
-vi.mock('../../../../redux/custom-labware/selectors')
-vi.mock('../../../../redux/config')
-vi.mock('../../../../redux/sessions/selectors')
-vi.mock('../../../../redux/discovery')
-vi.mock('../../../../assets/labware/findLabware')
-vi.mock('../../../../organisms/Devices/hooks')
+vi.mock('/app/redux/custom-labware/selectors')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/sessions/selectors')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/assets/labware/findLabware')
+vi.mock('/app/organisms/Devices/hooks')
 vi.mock('../OverflowMenu')
 
 const ROBOT_NAME = 'otie'

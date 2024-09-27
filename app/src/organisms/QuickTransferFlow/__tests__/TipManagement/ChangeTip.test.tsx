@@ -1,16 +1,22 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ChangeTip } from '../../TipManagement/ChangeTip'
+
+vi.mock('/app/redux-resources/analytics')
 
 const render = (props: React.ComponentProps<typeof ChangeTip>): any => {
   return renderWithProviders(<ChangeTip {...props} />, {
     i18nInstance: i18n,
   })
 }
+
+let mockTrackEventWithRobotSerial: any
 
 describe('ChangeTip', () => {
   let props: React.ComponentProps<typeof ChangeTip>
@@ -28,6 +34,12 @@ describe('ChangeTip', () => {
       } as any,
       dispatch: vi.fn(),
     }
+    mockTrackEventWithRobotSerial = vi.fn(
+      () => new Promise(resolve => resolve({}))
+    )
+    vi.mocked(useTrackEventWithRobotSerial).mockReturnValue({
+      trackEventWithRobotSerial: mockTrackEventWithRobotSerial,
+    })
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -49,6 +61,10 @@ describe('ChangeTip', () => {
     const saveBtn = screen.getByText('Save')
     fireEvent.click(saveBtn)
     expect(props.dispatch).toHaveBeenCalled()
+    expect(mockTrackEventWithRobotSerial).toHaveBeenCalledWith({
+      name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+      properties: { setting: 'ChangeTip' },
+    })
   })
   it('renders correct change tip options when single transfer of less than 96 wells', () => {
     render(props)

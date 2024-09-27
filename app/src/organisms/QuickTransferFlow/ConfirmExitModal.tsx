@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   SPACING,
@@ -8,8 +7,8 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
-import { SmallButton } from '../../atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+import { SmallButton } from '/app/atoms/buttons'
 
 interface ConfirmExitModalProps {
   confirmExit: () => void
@@ -20,7 +19,7 @@ export const ConfirmExitModal = (props: ConfirmExitModalProps): JSX.Element => {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
 
   return (
-    <Modal
+    <OddModal
       header={{
         title: t('exit_quick_transfer'),
         iconName: 'alert-circle',
@@ -29,7 +28,7 @@ export const ConfirmExitModal = (props: ConfirmExitModalProps): JSX.Element => {
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing10}
+        gridGap={SPACING.spacing32}
         width="100%"
       >
         <LegacyStyledText css={TYPOGRAPHY.bodyTextRegular}>
@@ -49,6 +48,6 @@ export const ConfirmExitModal = (props: ConfirmExitModalProps): JSX.Element => {
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

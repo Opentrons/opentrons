@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
@@ -13,7 +13,7 @@ import {
   DIRECTION_ROW,
 } from '@opentrons/components'
 import { getCutoutDisplayName } from '@opentrons/shared-data'
-import stagingAreaImage from '../../images/staging_area.png'
+import stagingAreaImage from '../../assets/images/staging_area.png'
 import { getStagingAreaSlots } from '../../utils'
 import { getTopPortalEl } from '../portals/TopPortal'
 import { StagingAreasModal } from './StagingAreasModal'
@@ -33,9 +33,7 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
   const { handleAttachment, stagingAreas } = props
   const { t } = useTranslation(['modules', 'shared'])
   const hasStagingAreas = stagingAreas.length > 0
-  const [stagingAreaModal, openStagingAreaModal] = React.useState<boolean>(
-    false
-  )
+  const [stagingAreaModal, openStagingAreaModal] = useState<boolean>(false)
   const stagingAreaLocations = getStagingAreaSlots(stagingAreas)
 
   return (

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo } from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
@@ -13,31 +13,31 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
-import * as Sessions from '../../redux/sessions'
+import * as Sessions from '/app/redux/sessions'
 import {
   JogControls,
   MEDIUM_STEP_SIZE_MM,
   SMALL_STEP_SIZE_MM,
-} from '../../molecules/JogControls'
+} from '/app/molecules/JogControls'
 import { NeedHelpLink } from './NeedHelpLink'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { formatJogVector } from './utils'
 
-import leftMultiBlockAssetTLC from '../../assets/videos/tip-length-cal/Left_Multi_CalBlock_WITH_TIP_(330x260)REV1.webm'
-import leftMultiTrashAsset from '../../assets/videos/tip-length-cal/Left_Multi_Trash_WITH_TIP_(330x260)REV1.webm'
-import leftSingleBlockAssetTLC from '../../assets/videos/tip-length-cal/Left_Single_CalBlock_WITH_TIP_(330x260)REV1.webm'
-import leftSingleTrashAsset from '../../assets/videos/tip-length-cal/Left_Single_Trash_WITH_TIP_(330x260)REV1.webm'
-import rightMultiBlockAssetTLC from '../../assets/videos/tip-length-cal/Right_Multi_CalBlock_WITH_TIP_(330x260)REV1.webm'
-import rightMultiTrashAsset from '../../assets/videos/tip-length-cal/Right_Multi_Trash_WITH_TIP_(330x260)REV1.webm'
-import rightSingleBlockAssetTLC from '../../assets/videos/tip-length-cal/Right_Single_CalBlock_WITH_TIP_(330x260)REV1.webm'
-import rightSingleTrashAsset from '../../assets/videos/tip-length-cal/Right_Single_Trash_WITH_TIP_(330x260)REV1.webm'
-import leftMultiBlockAssetHealth from '../../assets/videos/health-check/Left_Multi_CalBlock_WITH_TIP_(330x260)REV2.webm'
-import rightMultiBlockAssetHealth from '../../assets/videos/health-check/Right_Multi_CalBlock_WITH_TIP_(330x260)REV2.webm'
-import leftSingleBlockAssetHealth from '../../assets/videos/health-check/Left_Single_CalBlock_WITH_TIP_(330x260)REV2.webm'
-import rightSingleBlockAssetHealth from '../../assets/videos/health-check/Right_Single_CalBlock_WITH_TIP_(330x260)REV2.webm'
+import leftMultiBlockAssetTLC from '/app/assets/videos/tip-length-cal/Left_Multi_CalBlock_WITH_TIP_(330x260)REV1.webm'
+import leftMultiTrashAsset from '/app/assets/videos/tip-length-cal/Left_Multi_Trash_WITH_TIP_(330x260)REV1.webm'
+import leftSingleBlockAssetTLC from '/app/assets/videos/tip-length-cal/Left_Single_CalBlock_WITH_TIP_(330x260)REV1.webm'
+import leftSingleTrashAsset from '/app/assets/videos/tip-length-cal/Left_Single_Trash_WITH_TIP_(330x260)REV1.webm'
+import rightMultiBlockAssetTLC from '/app/assets/videos/tip-length-cal/Right_Multi_CalBlock_WITH_TIP_(330x260)REV1.webm'
+import rightMultiTrashAsset from '/app/assets/videos/tip-length-cal/Right_Multi_Trash_WITH_TIP_(330x260)REV1.webm'
+import rightSingleBlockAssetTLC from '/app/assets/videos/tip-length-cal/Right_Single_CalBlock_WITH_TIP_(330x260)REV1.webm'
+import rightSingleTrashAsset from '/app/assets/videos/tip-length-cal/Right_Single_Trash_WITH_TIP_(330x260)REV1.webm'
+import leftMultiBlockAssetHealth from '/app/assets/videos/health-check/Left_Multi_CalBlock_WITH_TIP_(330x260)REV2.webm'
+import rightMultiBlockAssetHealth from '/app/assets/videos/health-check/Right_Multi_CalBlock_WITH_TIP_(330x260)REV2.webm'
+import leftSingleBlockAssetHealth from '/app/assets/videos/health-check/Left_Single_CalBlock_WITH_TIP_(330x260)REV2.webm'
+import rightSingleBlockAssetHealth from '/app/assets/videos/health-check/Right_Single_CalBlock_WITH_TIP_(330x260)REV2.webm'
 
 import type { Mount } from '@opentrons/components'
-import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { CalibrationPanelProps } from './types'
 
 const assetMapTrash = {
@@ -82,7 +82,7 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')
   const { sendCommands, calBlock, isMulti, mount, sessionType } = props
 
-  const demoAsset = React.useMemo(
+  const demoAsset = useMemo(
     () =>
       calBlock != null
         ? assetMapBlock[sessionType]?.[mount]?.[isMulti ? 'multi' : 'single']

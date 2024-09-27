@@ -1,0 +1,132 @@
+test_name: Test the protocol analysis endpoints with a CSV file
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+
+stages:
+  - name: Upload a CSV file
+    request:
+      url: '{ot2_server_base_url}/dataFiles'
+      method: POST
+      data:
+        filePath: 'tests/integration/data_files/sample_record.csv'
+    response:
+      save:
+        json:
+          csv_file_id: data.id
+          csv_file_name: data.name
+          file_created_at: data.createdAt
+      status_code:
+      - 201
+      json:
+        data:
+          id: !anystr
+          name: "sample_record.csv"
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+
+  - name: Upload a protocol
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: POST
+      data:
+        runTimeParameterValues: '{{"sample_count": 10}}'
+        runTimeParameterFiles: '{{"liq_handling_csv_file": "{csv_file_id}"}}'
+      files:
+        files: 'tests/integration/protocols/basic_transfer_with_run_time_parameters.py'
+    response:
+      save:
+        json:
+          protocol_id: data.id
+          analysis_id: data.analysisSummaries[0].id
+          run_time_parameters_data1: data.analysisSummaries[0].runTimeParameters
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          analyses: []
+          analysisSummaries:
+            - id: !anystr
+              status: pending
+              runTimeParameters:
+                - displayName: Sample count
+                  variableName: sample_count
+                  type: int
+                  default: 6.0
+                  min: 1.0
+                  max: 12.0
+                  value: 10.0
+                  description: How many samples to process.
+                - displayName: Pipette volume
+                  variableName: volume
+                  type: float
+                  default: 20.1
+                  choices:
+                    - displayName: Low Volume
+                      value: 10.23
+                    - displayName: Medium Volume
+                      value: 20.1
+                    - displayName: High Volume
+                      value: 50.5
+                  value: 20.1
+                  description: How many microliters to pipette of each sample.
+                - displayName: Dry Run
+                  variableName: dry_run
+                  type: bool
+                  default: false
+                  value: false
+                  description: Skip aspirate and dispense steps.
+                - displayName: Pipette Name
+                  variableName: pipette
+                  type: str
+                  choices:
+                    - displayName: Single channel 50µL
+                      value: flex_1channel_50
+                    - displayName: Eight Channel 50µL
+                      value: flex_8channel_50
+                  default: flex_1channel_50
+                  value: flex_1channel_50
+                  description: What pipette to use during the protocol.
+                - displayName: Liquid handling CSV file
+                  variableName: liq_handling_csv_file
+                  description: A CSV file that contains wells to use for pipetting
+                  type: csv_file
+                  file:
+                    id: '{csv_file_id}'
+                    name: 'sample_record.csv'
+
+  - name: Wait until analysis is completed
+    max_retries: 5
+    delay_after: 1
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}'
+    response:
+      status_code: 200
+      json:
+        data:
+          analyses: []
+          analysisSummaries:
+            - id: '{analysis_id}'
+              status: completed
+          id: !anything
+          protocolType: !anything
+          files: !anything
+          createdAt: !anything
+          robotType: !anything
+          protocolKind: !anything
+          metadata: !anything
+        links: !anything
+
+  - name: Get the data file used by protocol ID
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/dataFiles'
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          - id: '{csv_file_id}'
+            name: '{csv_file_name}'
+            createdAt: '{file_created_at}'

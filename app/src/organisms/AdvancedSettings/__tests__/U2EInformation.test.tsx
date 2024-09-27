@@ -1,20 +1,19 @@
-import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import {
   getU2EAdapterDevice,
   getU2EWindowsDriverStatus,
   NOT_APPLICABLE,
   OUTDATED,
   UP_TO_DATE,
-} from '../../../redux/system-info'
-import * as Fixtures from '../../../redux/system-info/__fixtures__'
-import { renderWithProviders } from '../../../__testing-utils__'
+} from '/app/redux/system-info'
+import * as Fixtures from '/app/redux/system-info/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
 import { U2EInformation } from '../U2EInformation'
 
-vi.mock('../../../redux/system-info')
+vi.mock('/app/redux/system-info')
 
 const render = () => {
   return renderWithProviders(<U2EInformation />, {

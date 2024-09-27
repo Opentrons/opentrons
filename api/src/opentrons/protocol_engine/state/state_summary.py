@@ -6,6 +6,7 @@ from datetime import datetime
 from ..errors import ErrorOccurrence
 from ..types import (
     EngineStatus,
+    LiquidHeightSummary,
     LoadedLabware,
     LabwareOffset,
     LoadedModule,
@@ -21,6 +22,7 @@ class StateSummary(BaseModel):
     # errors is a list for historical reasons. (This model needs to stay compatible with
     # robot-server's database.) It shouldn't have more than 1 element.
     errors: List[ErrorOccurrence]
+    hasEverEnteredErrorRecovery: bool = Field(default=False)
     labware: List[LoadedLabware]
     pipettes: List[LoadedPipette]
     modules: List[LoadedModule]
@@ -28,3 +30,4 @@ class StateSummary(BaseModel):
     startedAt: Optional[datetime]
     completedAt: Optional[datetime]
     liquids: List[Liquid] = Field(default_factory=list)
+    wells: List[LiquidHeightSummary] = Field(default_factory=list)

@@ -4,13 +4,17 @@ import { saveAs } from 'file-saver'
 import { css } from 'styled-components'
 
 import {
-  Flex,
+  ALIGN_FLEX_END,
   BORDERS,
   COLORS,
-  POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
+  Flex,
+  MenuItem,
+  NO_WRAP,
+  OverflowBtn,
+  POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  ALIGN_FLEX_END,
+  useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
 import { isFlexPipette, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
@@ -20,21 +24,18 @@ import {
   useAllTipLengthCalibrationsQuery,
 } from '@opentrons/react-api-client'
 
-import { Divider } from '../../../atoms/structure'
-import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
-import { MenuItem } from '../../../atoms/MenuList/MenuItem'
-import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
+import { Divider } from '/app/atoms/structure'
 import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
-} from '../../../redux/analytics'
+} from '/app/redux/analytics'
 import {
   useRunStatuses,
   useAttachedPipettesFromInstrumentsQuery,
-} from '../../../organisms/Devices/hooks'
+} from '/app/organisms/Devices/hooks'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { Mount } from '@opentrons/components'
 import type { PipetteName } from '@opentrons/shared-data'
@@ -198,7 +199,7 @@ export function OverflowMenu({
       {showOverflowMenu ? (
         <Flex
           ref={calsOverflowWrapperRef}
-          whiteSpace="nowrap"
+          whiteSpace={NO_WRAP}
           zIndex={10}
           borderRadius={BORDERS.borderRadius8}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
@@ -214,6 +215,8 @@ export function OverflowMenu({
               css={css`
                 border-radius: ${BORDERS.borderRadius8};
               `}
+              disabled={isRunning}
+              aria-label={`CalibrationOverflowMenu_button_calibrate`}
             >
               {t(
                 ot3PipCal == null

@@ -1,20 +1,20 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { when } from 'vitest-when'
 import { vi, it, expect, describe, beforeEach } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import * as RobotApi from '../../../redux/robot-api'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import * as RobotApi from '/app/redux/robot-api'
 import { ConfigurePipette } from '../../ConfigurePipette'
-import { mockPipetteSettingsFieldsMap } from '../../../redux/pipettes/__fixtures__'
-import { getConfig } from '../../../redux/config'
+import { mockPipetteSettingsFieldsMap } from '/app/redux/pipettes/__fixtures__'
+import { getConfig } from '/app/redux/config'
 
-import type { DispatchApiRequestType } from '../../../redux/robot-api'
-import type { State } from '../../../redux/types'
+import type { DispatchApiRequestType } from '/app/redux/robot-api'
+import type { State } from '/app/redux/types'
 import { screen } from '@testing-library/react'
 
-vi.mock('../../../redux/robot-api')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/robot-api')
+vi.mock('/app/redux/config')
 
 const render = (props: React.ComponentProps<typeof ConfigurePipette>) => {
   return renderWithProviders(<ConfigurePipette {...props} />, {

@@ -1,12 +1,12 @@
 import { vi } from 'vitest'
-import { formatTimestamp } from '../../utils'
+import { formatTimestamp } from '/app/transformations/runs'
 import type { Mock } from 'vitest'
 
 import type {
   TipLengthCalibration,
   PipetteOffsetCalibration,
-} from '../../../../redux/calibration/api-types'
-import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
+} from '/app/redux/calibration/api-types'
+import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 import type { TaskListProps } from '../../../TaskList/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 

@@ -1,9 +1,8 @@
-import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { LegacyStyledText } from '@opentrons/components'
-import * as Sessions from '../../../redux/sessions'
+import * as Sessions from '/app/redux/sessions'
 
-import type { SessionType } from '../../../redux/sessions/types'
+import type { SessionType } from '/app/redux/sessions/types'
 
 interface BodyProps {
   sessionType: SessionType

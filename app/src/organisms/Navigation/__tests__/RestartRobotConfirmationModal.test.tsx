@@ -1,13 +1,13 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { restartRobot } from '../../../redux/robot-admin'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { restartRobot } from '/app/redux/robot-admin'
 import { RestartRobotConfirmationModal } from '../RestartRobotConfirmationModal'
 
-vi.mock('../../../redux/robot-admin')
+vi.mock('/app/redux/robot-admin')
 
 const mockFunc = vi.fn()
 

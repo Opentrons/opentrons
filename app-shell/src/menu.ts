@@ -8,6 +8,8 @@ import { LOG_DIR } from './log'
 const PRODUCT_NAME: string = _PKG_PRODUCT_NAME_
 const BUGS_URL: string = _PKG_BUGS_URL_
 
+const EULA_URL = 'https://opentrons.com/eula' as const
+
 // file or application menu
 const firstMenu: MenuItemConstructorOptions = {
   role: process.platform === 'darwin' ? 'appMenu' : 'fileMenu',
@@ -40,6 +42,16 @@ const helpMenu: MenuItemConstructorOptions = {
       click: () => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         shell.openExternal(BUGS_URL)
+      },
+    },
+    {
+      label: 'View Privacy Policy',
+      click: () => {
+        shell.openExternal(EULA_URL).catch((e: Error) => {
+          console.error(
+            `could not open end user license agreement: ${e.message}`
+          )
+        })
       },
     },
   ],

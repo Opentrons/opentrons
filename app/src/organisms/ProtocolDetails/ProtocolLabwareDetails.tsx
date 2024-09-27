@@ -9,21 +9,22 @@ import {
   Flex,
   Icon,
   InfoScreen,
+  MenuItem,
+  NO_WRAP,
+  OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
   StyledText,
+  useMenuHandleClickOutside,
 } from '@opentrons/components'
 import { getLabwareDefURI } from '@opentrons/shared-data'
-import { Divider } from '../../atoms/structure'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { getTopPortalEl } from '../../App/portal'
-import { LabwareDetails } from '../LabwareDetails'
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
+import { Divider } from '/app/atoms/structure'
+import { getTopPortalEl } from '/app/App/portal'
+import { LabwareDetails } from '../Desktop/Labware/LabwareDetails'
 
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
-import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
+import type { LabwareDefAndDate } from '/app/local-resources/labware'
 
 interface ProtocolLabwareDetailsProps {
   requiredLabwareDetails: LoadLabwareRunTimeCommand[] | null
@@ -88,7 +89,7 @@ export const ProtocolLabwareDetails = (
           ))}
         </Flex>
       ) : (
-        <InfoScreen contentType="labware" />
+        <InfoScreen content={t('no_labware_specified')} />
       )}
     </>
   )
@@ -182,7 +183,7 @@ export const LabwareDetailOverflowMenu = (
       </Flex>
       {showOverflowMenu ? (
         <Flex
-          whiteSpace="nowrap"
+          whiteSpace={NO_WRAP}
           zIndex={10}
           borderRadius="4px 4px 0px 0px"
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"

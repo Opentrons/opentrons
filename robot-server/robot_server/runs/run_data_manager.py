@@ -9,14 +9,21 @@ from opentrons.protocol_engine import (
     LabwareOffsetCreate,
     StateSummary,
     CommandSlice,
+    CommandErrorSlice,
     CommandPointer,
     Command,
+    ErrorOccurrence,
 )
-from opentrons.protocol_engine.types import RunTimeParamValuesType
+from opentrons.protocol_engine.types import (
+    PrimitiveRunTimeParamValuesType,
+    CSVRuntimeParamPaths,
+)
 
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.notifications import RunsPublisher
+from . import error_recovery_mapping
+from .error_recovery_models import ErrorRecoveryRule
 
 from .run_orchestrator_store import RunOrchestratorStore
 from .run_store import RunResource, RunStore, BadRunResource, BadStateSummary
@@ -42,6 +49,7 @@ def _build_run(
             actions=run_resource.actions,
             status=state_summary.status,
             errors=state_summary.errors,
+            hasEverEnteredErrorRecovery=state_summary.hasEverEnteredErrorRecovery,
             labware=state_summary.labware,
             labwareOffsets=state_summary.labwareOffsets,
             pipettes=state_summary.pipettes,
@@ -63,6 +71,8 @@ def _build_run(
             pipettes=[],
             modules=[],
             liquids=[],
+            wells=[],
+            hasEverEnteredErrorRecovery=False,
         )
         errors.append(state_summary.dataError)
     else:
@@ -105,6 +115,7 @@ def _build_run(
         startedAt=state.startedAt,
         liquids=state.liquids,
         runTimeParameters=run_time_parameters,
+        hasEverEnteredErrorRecovery=state.hasEverEnteredErrorRecovery,
     )
 
 
@@ -150,7 +161,8 @@ class RunDataManager:
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
-        run_time_param_values: Optional[RunTimeParamValuesType],
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
+        run_time_param_paths: Optional[CSVRuntimeParamPaths],
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
     ) -> Union[Run, BadRun]:
@@ -163,6 +175,7 @@ class RunDataManager:
             deck_configuration: A mapping of fixtures to cutout fixtures the deck will be loaded with.
             notify_publishers: Utilized by the engine to notify publishers of state changes.
             run_time_param_values: Any runtime parameter values to set.
+            run_time_param_paths: Any runtime filepath to set.
             protocol: The protocol to load the runner with, if any.
 
         Returns:
@@ -187,6 +200,7 @@ class RunDataManager:
             deck_configuration=deck_configuration,
             protocol=protocol,
             run_time_param_values=run_time_param_values,
+            run_time_param_paths=run_time_param_paths,
             notify_publishers=notify_publishers,
         )
         run_resource = self._run_store.insert(
@@ -194,7 +208,11 @@ class RunDataManager:
             created_at=created_at,
             protocol_id=protocol.protocol_id if protocol is not None else None,
         )
-        await self._runs_publisher.start_publishing_for_run(
+        run_time_parameters = self._run_orchestrator_store.get_run_time_parameters()
+        self._run_store.insert_csv_rtp(
+            run_id=run_id, run_time_parameters=run_time_parameters
+        )
+        self._runs_publisher.start_publishing_for_run(
             get_current_command=self.get_current_command,
             get_recovery_target_command=self.get_recovery_target_command,
             get_state_summary=self._get_good_state_summary,
@@ -205,7 +223,7 @@ class RunDataManager:
             run_resource=run_resource,
             state_summary=state_summary,
             current=True,
-            run_time_parameters=[],
+            run_time_parameters=run_time_parameters,
         )
 
     def get(self, run_id: str) -> Union[Run, BadRun]:
@@ -289,7 +307,7 @@ class RunDataManager:
         if run_id == self._run_orchestrator_store.current_run_id:
             await self._run_orchestrator_store.clear()
 
-        await self._runs_publisher.clean_up_run(run_id=run_id)
+        self._runs_publisher.clean_up_run(run_id=run_id)
 
         self._run_store.remove(run_id=run_id)
 
@@ -334,13 +352,13 @@ class RunDataManager:
                 commands=commands,
                 run_time_parameters=parameters,
             )
-            await self._runs_publisher.publish_pre_serialized_commands_notification(
-                run_id
-            )
+            self._runs_publisher.publish_pre_serialized_commands_notification(run_id)
         else:
             state_summary = self._run_orchestrator_store.get_state_summary()
             parameters = self._run_orchestrator_store.get_run_time_parameters()
             run_resource = self._run_store.get(run_id=run_id)
+
+        self._runs_publisher.publish_runs_advise_refetch(run_id)
 
         return _build_run(
             run_resource=run_resource,
@@ -354,7 +372,34 @@ class RunDataManager:
         run_id: str,
         cursor: Optional[int],
         length: int,
+        include_fixit_commands: bool,
     ) -> CommandSlice:
+        """Get a slice of run commands.
+
+        Args:
+            run_id: ID of the run.
+            cursor: Requested index of first command in the returned slice.
+            length: Length of slice to return.
+            include_fixit_commands: Include fixit commands.
+
+        Raises:
+            RunNotFoundError: The given run identifier was not found in the database.
+        """
+        if run_id == self._run_orchestrator_store.current_run_id:
+            return self._run_orchestrator_store.get_command_slice(
+                cursor=cursor,
+                length=length,
+                include_fixit_commands=include_fixit_commands,
+            )
+
+        # Let exception propagate
+        return self._run_store.get_commands_slice(
+            run_id=run_id, cursor=cursor, length=length, include_fixit_commands=True
+        )
+
+    def get_command_error_slice(
+        self, run_id: str, cursor: int, length: int
+    ) -> CommandErrorSlice:
         """Get a slice of run commands.
 
         Args:
@@ -363,17 +408,15 @@ class RunDataManager:
             length: Length of slice to return.
 
         Raises:
-            RunNotFoundError: The given run identifier was not found in the database.
+            RunNotCurrentError: The given run identifier is not the current run.
         """
         if run_id == self._run_orchestrator_store.current_run_id:
-            return self._run_orchestrator_store.get_command_slice(
+            return self._run_orchestrator_store.get_command_error_slice(
                 cursor=cursor, length=length
             )
 
-        # Let exception propagate
-        return self._run_store.get_commands_slice(
-            run_id=run_id, cursor=cursor, length=length
-        )
+        # TODO(tz, 8-5-2024): Change this to return to error list from the DB when we implement https://opentrons.atlassian.net/browse/EXEC-655.
+        raise RunNotCurrentError()
 
     def get_current_command(self, run_id: str) -> Optional[CommandPointer]:
         """Get the "current" command, if any.
@@ -422,7 +465,17 @@ class RunDataManager:
 
         return self._run_store.get_command(run_id=run_id, command_id=command_id)
 
-    def get_all_commands_as_preserialized_list(self, run_id: str) -> List[str]:
+    def get_command_errors(self, run_id: str) -> list[ErrorOccurrence]:
+        """Get all command errors."""
+        if run_id == self._run_orchestrator_store.current_run_id:
+            return self._run_orchestrator_store.get_command_errors()
+
+        # TODO(tz, 8-5-2024): Change this to return the error list from the DB when we implement https://opentrons.atlassian.net/browse/EXEC-655.
+        raise RunNotCurrentError()
+
+    def get_all_commands_as_preserialized_list(
+        self, run_id: str, include_fixit_commands: bool
+    ) -> List[str]:
         """Get all commands of a run in a serialized json list."""
         if (
             run_id == self._run_orchestrator_store.current_run_id
@@ -431,7 +484,20 @@ class RunDataManager:
             raise PreSerializedCommandsNotAvailableError(
                 "Pre-serialized commands are only available after a run has ended."
             )
-        return self._run_store.get_all_commands_as_preserialized_list(run_id)
+        return self._run_store.get_all_commands_as_preserialized_list(
+            run_id, include_fixit_commands
+        )
+
+    def set_policies(self, run_id: str, policies: List[ErrorRecoveryRule]) -> None:
+        """Create run policy rules for error recovery."""
+        if run_id != self._run_orchestrator_store.current_run_id:
+            raise RunNotCurrentError(
+                f"Cannot update {run_id} because it is not the current run."
+            )
+        policy = error_recovery_mapping.create_error_recovery_policy_from_rules(
+            policies
+        )
+        self._run_orchestrator_store.set_error_recovery_policy(policy=policy)
 
     def _get_state_summary(self, run_id: str) -> Union[StateSummary, BadStateSummary]:
         if run_id == self._run_orchestrator_store.current_run_id:

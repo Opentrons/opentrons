@@ -1,11 +1,7 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import {
-  getIsHeaterShakerAttached,
-  updateConfigValue,
-} from '../../redux/config'
+import { getIsHeaterShakerAttached, updateConfigValue } from '/app/redux/config'
 
 import {
   ALIGN_CENTER,
@@ -17,9 +13,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ToggleButton } from '../../atoms/buttons'
+import { ToggleButton } from '/app/atoms/buttons'
 
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 export function ShowHeaterShakerAttachmentModal(): JSX.Element {
   const { t } = useTranslation('app_settings')

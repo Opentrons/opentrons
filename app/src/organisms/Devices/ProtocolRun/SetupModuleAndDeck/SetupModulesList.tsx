@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import map from 'lodash/map'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
@@ -13,9 +13,10 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TOOLTIP_LEFT,
+  Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -33,36 +34,37 @@ import {
   TC_MODULE_LOCATION_OT3,
 } from '@opentrons/shared-data'
 
-import { TertiaryButton } from '../../../../atoms/buttons'
-import { StatusLabel } from '../../../../atoms/StatusLabel'
-import { Tooltip } from '../../../../atoms/Tooltip'
-import { useChainLiveCommands } from '../../../../resources/runs'
+import { useRobot, useIsFlex } from '/app/redux-resources/robots'
+import { TertiaryButton } from '/app/atoms/buttons'
+import { StatusLabel } from '/app/atoms/StatusLabel'
+import {
+  useChainLiveCommands,
+  useRunCalibrationStatus,
+  useModuleRenderInfoForProtocolById,
+  useUnmatchedModulesForProtocol,
+} from '/app/resources/runs'
 import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
-import { getModulePrepCommands } from '../../getModulePrepCommands'
-import { getModuleTooHot } from '../../getModuleTooHot'
 import {
-  useIsFlex,
-  useModuleRenderInfoForProtocolById,
-  useRobot,
-  useUnmatchedModulesForProtocol,
-  useRunCalibrationStatus,
-} from '../../hooks'
-import { LocationConflictModal } from './LocationConflictModal'
+  getModulePrepCommands,
+  getModuleImage,
+} from '/app/local-resources/modules'
+import { getModuleTooHot } from '/app/transformations/modules'
+
+import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { OT2MultipleModulesHelp } from './OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
-import { getModuleImage } from './utils'
 
 import type {
   CutoutConfig,
   DeckDefinition,
   ModuleModel,
 } from '@opentrons/shared-data'
-import type { AttachedModule } from '../../../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 import type {
-  ModuleRenderInfoForProtocol,
   ProtocolCalibrationStatus,
-} from '../../hooks'
+  ModuleRenderInfoForProtocol,
+} from '/app/resources/runs'
 
 interface SetupModulesListProps {
   robotName: string
@@ -169,21 +171,20 @@ export function ModulesListItem({
     attachedModuleMatch != null
       ? t('module_connected')
       : t('module_not_connected')
-  const [
-    showModuleSetupModal,
-    setShowModuleSetupModal,
-  ] = React.useState<Boolean>(false)
+  const [showModuleSetupModal, setShowModuleSetupModal] = useState<Boolean>(
+    false
+  )
   const [
     showLocationConflictModal,
     setShowLocationConflictModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
-  const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
+  const [showModuleWizard, setShowModuleWizard] = useState<boolean>(false)
   const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
   const [
     prepCommandErrorMessage,
     setPrepCommandErrorMessage,
-  ] = React.useState<string>('')
+  ] = useState<string>('')
 
   const handleCalibrateClick = (): void => {
     if (attachedModuleMatch != null) {

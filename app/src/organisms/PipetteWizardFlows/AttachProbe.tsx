@@ -1,7 +1,8 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
 import {
+  Banner,
   COLORS,
   Flex,
   RESPONSIVENESS,
@@ -10,17 +11,18 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LEFT, WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
-import { Banner } from '../../atoms/Banner'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import pipetteProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
-import pipetteProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
-import probing96 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
+import pipetteProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
+import pipetteProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
+import probing96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
 import { BODY_STYLE, SECTIONS, FLOWS } from './constants'
 import { getPipetteAnimations } from './utils'
 import { ProbeNotAttached } from './ProbeNotAttached'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { MotorAxes, CreateCommand } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
@@ -56,9 +58,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   } = props
   const { t, i18n } = useTranslation('pipette_wizard_flows')
   const pipetteWizardStep = { mount, flowType, section: SECTIONS.ATTACH_PROBE }
-  const [showUnableToDetect, setShowUnableToDetect] = React.useState<boolean>(
-    false
-  )
+  const [showUnableToDetect, setShowUnableToDetect] = useState<boolean>(false)
 
   const pipetteId = attachedPipettes[mount]?.serialNumber
   const displayName = attachedPipettes[mount]?.displayName
@@ -156,7 +156,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         alternativeSpinner={isExiting ? null : pipetteProbeVid}
         description={
           isExiting
@@ -173,7 +173,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
             </LegacyStyledText>
           </Flex>
         )}
-      </InProgressModal>
+      </SimpleWizardInProgressBody>
     )
   else if (showUnableToDetect)
     return (

@@ -6,8 +6,8 @@ import {
   Flex,
   FormGroup,
   Icon,
-  InputField,
-  Tooltip,
+  LegacyInputField,
+  LegacyTooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 import { getWellsDepth, getWellDimension } from '@opentrons/shared-data'
@@ -103,7 +103,6 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
     zValue =
       mmFromBottom ?? getDefaultMmFromBottom({ name: zName, wellDepthMm })
   }
-
   let modal = (
     <ZTipPositionModal
       name={zName}
@@ -158,7 +157,7 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
 
   return (
     <>
-      <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
+      <LegacyTooltip {...tooltipProps}>{tooltipContent}</LegacyTooltip>
       {isModalOpen ? modal : null}
       <Wrapper
         targetProps={targetProps}
@@ -186,7 +185,7 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
             />
           </Flex>
         ) : (
-          <InputField
+          <LegacyInputField
             disabled={disabled}
             className={stepFormStyles.small_field}
             readOnly

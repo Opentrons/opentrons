@@ -1,5 +1,5 @@
 """Get the default protocol engine."""
-from typing_extensions import Literal
+from typing import Annotated, Literal
 
 from fastapi import Depends, status
 
@@ -34,9 +34,11 @@ class RunActive(ErrorDetails):
 
 
 async def get_default_orchestrator(
-    run_orchestrator_store: RunOrchestratorStore = Depends(get_run_orchestrator_store),
-    hardware_api: HardwareControlAPI = Depends(get_hardware),
-    module_identifier: ModuleIdentifier = Depends(ModuleIdentifier),
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
+    hardware_api: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    module_identifier: Annotated[ModuleIdentifier, Depends(ModuleIdentifier)],
 ) -> RunOrchestrator:
     """Get the default run orchestrator with attached modules loaded."""
     try:

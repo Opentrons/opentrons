@@ -1,20 +1,20 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 import {
   mockLeftProtoPipette,
   mockPipetteSettingsFieldsMap,
-} from '../../../../redux/pipettes/__fixtures__'
+} from '/app/redux/pipettes/__fixtures__'
 import { isFlexPipette } from '@opentrons/shared-data'
 
-import type { Mount } from '../../../../redux/pipettes/types'
+import type { Mount } from '/app/redux/pipettes/types'
 import type * as SharedData from '@opentrons/shared-data'
 
-vi.mock('../../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
   return {

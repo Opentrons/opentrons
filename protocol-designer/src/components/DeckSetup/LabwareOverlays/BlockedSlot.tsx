@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
 import styles from './LabwareOverlays.module.css'

@@ -1,23 +1,22 @@
-import React from 'react'
 import NiceModal from '@ebay/nice-modal-react'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 
 import { handleTipsAttachedModal } from '../TipsAttachedModal'
 import { LEFT } from '@opentrons/shared-data'
-import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
-import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
+import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
+import { useCloseCurrentRun } from '/app/resources/runs'
 import { useDropTipWizardFlows } from '..'
 
+import type { Mock } from 'vitest'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { HostConfig } from '@opentrons/api-client'
-import type { Mock } from 'vitest'
-import type { PipetteWithTip } from '..'
+import type { PipetteWithTip } from '../hooks'
 
-vi.mock('../../ProtocolUpload/hooks')
+vi.mock('/app/resources/runs/useCloseCurrentRun')
 vi.mock('..')
 
 const MOCK_ACTUAL_PIPETTE = {
@@ -33,25 +32,26 @@ const ninetySixSpecs = {
   channels: 96,
 } as PipetteModelSpecs
 
-const MOCK_PIPETTES_WITH_TIP: PipetteWithTip[] = [
-  { mount: LEFT, specs: MOCK_ACTUAL_PIPETTE },
-]
-const MOCK_96_WITH_TIP: PipetteWithTip[] = [
-  { mount: LEFT, specs: ninetySixSpecs },
-]
+const MOCK_A_PIPETTE_WITH_TIP: PipetteWithTip = {
+  mount: LEFT,
+  specs: MOCK_ACTUAL_PIPETTE,
+}
+
+const MOCK_96_WITH_TIP: PipetteWithTip = { mount: LEFT, specs: ninetySixSpecs }
 
 const mockSetTipStatusResolved = vi.fn()
 const MOCK_HOST: HostConfig = { hostname: 'MOCK_HOST' }
 
-const render = (pipettesWithTips: PipetteWithTip[]) => {
+const render = (aPipetteWithTip: PipetteWithTip) => {
   return renderWithProviders(
     <NiceModal.Provider>
       <button
         onClick={() =>
           handleTipsAttachedModal({
             host: MOCK_HOST,
-            pipettesWithTip: pipettesWithTips,
+            aPipetteWithTip,
             setTipStatusResolved: mockSetTipStatusResolved,
+            onSettled: vi.fn(),
           })
         }
         data-testid="testButton"
@@ -79,24 +79,25 @@ describe('TipsAttachedModal', () => {
   })
 
   it('renders appropriate warning given the pipette mount', () => {
-    render(MOCK_PIPETTES_WITH_TIP)
+    render(MOCK_A_PIPETTE_WITH_TIP)
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 
-    screen.getByText('Tips are attached')
-    screen.queryByText(`${LEFT} Pipette`)
+    screen.getByText('Remove any attached tips')
+    screen.queryByText(
+      /Homing the .* pipette with liquid in the tips may damage it\. You must remove all tips before using the pipette again\./
+    )
   })
   it('clicking the skip button properly closes the modal', () => {
-    render(MOCK_PIPETTES_WITH_TIP)
+    render(MOCK_A_PIPETTE_WITH_TIP)
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 
-    const skipBtn = screen.getByText('Skip')
+    const skipBtn = screen.getByText('Skip and home pipette')
     fireEvent.click(skipBtn)
-    expect(mockSetTipStatusResolved).toHaveBeenCalled()
   })
   it('clicking the launch wizard button properly launches the wizard', () => {
-    render(MOCK_PIPETTES_WITH_TIP)
+    render(MOCK_A_PIPETTE_WITH_TIP)
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 

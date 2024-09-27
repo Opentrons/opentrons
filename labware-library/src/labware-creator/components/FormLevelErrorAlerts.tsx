@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { AlertItem } from '@opentrons/components'
 import { FORM_LEVEL_ERRORS } from '../formLevelValidation'
 import type { LabwareCreatorErrors } from '../formLevelValidation'

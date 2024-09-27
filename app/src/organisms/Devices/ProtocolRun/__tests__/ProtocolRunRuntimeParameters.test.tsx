@@ -1,15 +1,19 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import { InfoScreen } from '@opentrons/components'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useRunStatus } from '../../../RunTimeControl/hooks'
-import { useNotifyRunQuery } from '../../../../resources/runs'
-import { useFeatureFlag } from '../../../../redux/config'
-import { mockSucceededRun } from '../../../RunTimeControl/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import {
+  useMostRecentCompletedAnalysis,
+  useNotifyRunQuery,
+  useRunStatus,
+} from '/app/resources/runs'
+import {
+  mockSucceededRun,
+  mockIdleUnstartedRun,
+} from '/app/resources/runs/__fixtures__'
 import { ProtocolRunRuntimeParameters } from '../ProtocolRunRunTimeParameters'
 
 import type { UseQueryResult } from 'react-query'
@@ -26,10 +30,8 @@ vi.mock('@opentrons/components', async importOriginal => {
     InfoScreen: vi.fn(),
   }
 })
-vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../../../RunTimeControl/hooks')
-vi.mock('../../../../resources/runs')
-vi.mock('../../../../redux/config')
+vi.mock('/app/resources/runs')
+vi.mock('/app/redux/config')
 
 const RUN_ID = 'mockId'
 
@@ -93,7 +95,8 @@ const mockCsvRtp = {
   description: '',
   type: 'csv_file',
   file: {
-    file: { name: 'mock.csv' } as File,
+    id: 'mock_csv_id',
+    name: 'mock.csv',
   },
 }
 
@@ -121,9 +124,6 @@ describe('ProtocolRunRuntimeParameters', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue(({
       data: { data: mockSucceededRun },
     } as unknown) as UseQueryResult<Run>)
-    when(vi.mocked(useFeatureFlag))
-      .calledWith('enableCsvFile')
-      .thenReturn(false)
   })
 
   afterEach(() => {
@@ -131,6 +131,13 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   it('should render title, and banner when RunTimeParameters are not empty and all values are default', () => {
+    when(useNotifyRunQuery)
+      .calledWith(RUN_ID)
+      .thenReturn({
+        data: {
+          data: mockIdleUnstartedRun,
+        },
+      } as any)
     render(props)
     screen.getByText('Parameters')
     screen.getByText('Default values')
@@ -154,6 +161,13 @@ describe('ProtocolRunRuntimeParameters', () => {
         },
       ],
     } as CompletedProtocolAnalysis)
+    when(useNotifyRunQuery)
+      .calledWith(RUN_ID)
+      .thenReturn({
+        data: {
+          data: mockIdleUnstartedRun,
+        },
+      } as any)
     render(props)
     screen.getByText('Parameters')
     screen.getByText('Custom values')
@@ -161,6 +175,39 @@ describe('ProtocolRunRuntimeParameters', () => {
     screen.getByText('Cancel the run and restart setup to edit')
     screen.getByText('Name')
     screen.getByText('Value')
+  })
+
+  it('should render title, and banner when RunTimeParameters from view protocol run record overflow menu button', () => {
+    when(useNotifyRunQuery)
+      .calledWith(RUN_ID)
+      .thenReturn({
+        data: {
+          data: {
+            ...mockSucceededRun,
+            runTimeParameters: mockRunTimeParameterData,
+          },
+        },
+      } as any)
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
+      runTimeParameters: [
+        ...mockRunTimeParameterData,
+        {
+          displayName: 'Dry Run',
+          variableName: 'DRYRUN',
+          description: 'Is this a dry or wet run? Wet is true, dry is false',
+          type: 'bool',
+          default: false,
+          value: true,
+        },
+      ],
+    } as CompletedProtocolAnalysis)
+
+    vi.mocked(useRunStatus).mockReturnValue('succeeded')
+    render(props)
+    screen.getByText('Download files')
+    screen.getByText(
+      'All files associated with the protocol run are available on the robot detail screen.'
+    )
   })
 
   it('should render RunTimeParameters when RunTimeParameters are not empty', () => {
@@ -188,7 +235,6 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   it('should render csv row if a protocol requires a csv', () => {
-    when(vi.mocked(useFeatureFlag)).calledWith('enableCsvFile').thenReturn(true)
     vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
       runTimeParameters: [...mockRunTimeParameterData, mockCsvRtp],
     } as CompletedProtocolAnalysis)

@@ -1,10 +1,10 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link as RRDLink } from 'react-router-dom'
 import {
+  Banner,
   Box,
   Flex,
-  Tooltip,
+  LegacyTooltip,
   useHoverTooltip,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -18,14 +18,12 @@ import {
   JUSTIFY_FLEX_END,
   WRAP,
 } from '@opentrons/components'
-import { TertiaryButton } from '../../../atoms/buttons'
-import { Banner } from '../../../atoms/Banner'
-import * as PipetteConstants from '../../../redux/pipettes/constants'
+import { TertiaryButton } from '/app/atoms/buttons'
+import * as PipetteConstants from '/app/redux/pipettes/constants'
 import { useDeckCalibrationData } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 
-import type { Mount } from '../../../redux/pipettes/types'
-import type { PipetteInfo } from '../hooks'
+import type { Mount, PipetteInfo } from '/app/redux/pipettes'
 
 const inexactPipetteSupportArticle =
   'https://support.opentrons.com/s/article/GEN2-pipette-compatibility'
@@ -123,11 +121,11 @@ export function SetupPipetteCalibrationItem({
             </TertiaryButton>
           </RRDLink>
           {!isDeckCalibrated ? (
-            <Tooltip {...tooltipProps}>
+            <LegacyTooltip {...tooltipProps}>
               <Box width={SIZE_4}>
                 {t('calibrate_deck_to_proceed_to_pipette_calibration')}
               </Box>
-            </Tooltip>
+            </LegacyTooltip>
           ) : null}
         </Flex>
       </>

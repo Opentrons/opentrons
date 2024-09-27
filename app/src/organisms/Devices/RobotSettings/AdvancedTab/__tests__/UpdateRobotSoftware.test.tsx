@@ -1,18 +1,17 @@
 /* eslint-disable testing-library/no-node-access */
-import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../i18n'
-import { getRobotUpdateDisplayInfo } from '../../../../../redux/robot-update'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 
 import { UpdateRobotSoftware } from '../UpdateRobotSoftware'
 
-vi.mock('../../../../../redux/robot-settings/selectors')
-vi.mock('../../../../../redux/discovery')
-vi.mock('../../../../../redux/robot-update/selectors')
+vi.mock('/app/redux/robot-settings/selectors')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/robot-update/selectors')
 vi.mock('../../../hooks')
 
 const mockOnUpdateStart = vi.fn()
@@ -65,5 +64,14 @@ describe('RobotSettings UpdateRobotSoftware', () => {
     render()
     const button = screen.getByText('Browse file system')
     expect(button).toBeDisabled()
+  })
+
+  it('should render a banner warning users about downgrading their robot', () => {
+    render()
+    screen.getByTestId('Banner_warning')
+    screen.getByLabelText('icon_warning')
+    screen.getByText(
+      'You should not downgrade to a software version released before the manufacture date of your robot or any attached hardware.'
+    )
   })
 })

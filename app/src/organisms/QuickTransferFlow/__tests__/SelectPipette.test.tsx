@@ -1,15 +1,15 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { useIsOEMMode } from '../../../resources/robot-settings/hooks'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
 import { SelectPipette } from '../SelectPipette'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../resources/robot-settings/hooks')
+vi.mock('/app/resources/robot-settings/hooks')
 
 const render = (props: React.ComponentProps<typeof SelectPipette>) => {
   return renderWithProviders(<SelectPipette {...props} />, {

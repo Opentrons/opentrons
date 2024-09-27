@@ -1,21 +1,21 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { getHasCalibrationBlock } from '../../../redux/config'
-import { getMovementStatus } from '../../../redux/robot-controls'
-import { getCalibrationForPipette } from '../../../redux/calibration'
-import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getHasCalibrationBlock } from '/app/redux/config'
+import { getMovementStatus } from '/app/redux/robot-controls'
+import { getCalibrationForPipette } from '/app/redux/calibration'
+import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
 import {
   getRequestById,
   SUCCESS,
   useDispatchApiRequests,
-} from '../../../redux/robot-api'
-import { useAttachedPipettes } from '../../Devices/hooks'
+} from '/app/redux/robot-api'
+import { useAttachedPipettes } from '/app/resources/instruments'
 import { PipetteSelection } from '../PipetteSelection'
 import { ExitModal } from '../ExitModal'
 import { ConfirmPipette } from '../ConfirmPipette'
@@ -23,8 +23,8 @@ import { ChangePipette } from '..'
 
 import type { NavigateFunction } from 'react-router-dom'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
-import type { AttachedPipette } from '../../../redux/pipettes/types'
-import type { DispatchApiRequestType } from '../../../redux/robot-api'
+import type { AttachedPipette } from '/app/redux/pipettes/types'
+import type { DispatchApiRequestType } from '/app/redux/robot-api'
 
 const mockNavigate = vi.fn()
 
@@ -43,16 +43,16 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     getPipetteNameSpecs: vi.fn(),
   }
 })
-vi.mock('../../../redux/config')
-vi.mock('../../../redux/robot-controls')
-vi.mock('../../../redux/calibration')
-vi.mock('../../../redux/robot-api')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/robot-controls')
+vi.mock('/app/redux/calibration')
+vi.mock('/app/redux/robot-api')
 vi.mock('../PipetteSelection')
 vi.mock('../ExitModal')
-vi.mock('../../../molecules/InProgressModal/InProgressModal')
+vi.mock('/app/molecules/InProgressModal/InProgressModal')
 vi.mock('../ConfirmPipette')
-vi.mock('../../Devices/hooks')
-vi.mock('../../../assets/images')
+vi.mock('/app/resources/instruments')
+vi.mock('/app/assets/images')
 
 const render = (props: React.ComponentProps<typeof ChangePipette>) => {
   return renderWithProviders(<ChangePipette {...props} />, {

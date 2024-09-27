@@ -1,10 +1,10 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
 import { DeckConfigurator } from '@opentrons/components'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { CreateNewTransfer } from '../CreateNewTransfer'
 
 import type * as OpentronsComponents from '@opentrons/components'

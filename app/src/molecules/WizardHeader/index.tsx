@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
@@ -15,7 +14,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StepMeter } from '../../atoms/StepMeter'
+import { StepMeter } from '/app/atoms/StepMeter'
 
 interface WizardHeaderProps {
   title: string

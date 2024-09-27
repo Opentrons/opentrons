@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 import {
   getDeckDefFromRobotType,
@@ -109,6 +109,10 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
   )
   const absorbanceReaderFixtures = deckConfig.filter(
     ({ cutoutFixtureId }) => cutoutFixtureId === ABSORBANCE_READER_V1_FIXTURE
+  )
+  const magneticBlockStagingAreaFixtures = deckConfig.filter(
+    ({ cutoutFixtureId }) =>
+      cutoutFixtureId === STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
   )
 
   return (
@@ -261,7 +265,8 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         color={darkFill}
         show4thColumn={
           stagingAreaFixtures.length > 0 ||
-          wasteChuteStagingAreaFixtures.length > 0
+          wasteChuteStagingAreaFixtures.length > 0 ||
+          magneticBlockStagingAreaFixtures.length > 0
         }
       />
       {children}

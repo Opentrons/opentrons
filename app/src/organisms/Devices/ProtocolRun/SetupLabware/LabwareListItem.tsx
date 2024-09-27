@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
@@ -6,17 +6,18 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Btn,
-  LocationIcon,
   COLORS,
+  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
+  DISPLAY_GRID,
   Flex,
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  MODULE_ICON_NAME_BY_TYPE,
   LabwareRender,
+  MODULE_ICON_NAME_BY_TYPE,
   SIZE_AUTO,
   SPACING,
   StyledText,
@@ -36,8 +37,8 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
-import { ToggleButton } from '../../../../atoms/buttons'
-import { Divider } from '../../../../atoms/structure'
+import { ToggleButton } from '/app/atoms/buttons'
+import { Divider } from '/app/atoms/structure'
 import { SecureLabwareModal } from './SecureLabwareModal'
 
 import type {
@@ -49,14 +50,16 @@ import type {
   LoadModuleRunTimeCommand,
   LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
-import type { ModuleRenderInfoForProtocol } from '../../hooks'
-import type { LabwareSetupItem } from '../../../../pages/Protocols/utils'
+import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
+import type {
+  LabwareSetupItem,
+  NestedLabwareInfo,
+} from '/app/transformations/commands'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
-import type { NestedLabwareInfo } from './getNestedLabwareInfo'
 
 const LabwareRow = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 6fr 5.9fr;
+  display: ${DISPLAY_GRID};
+  grid-template-columns: 90px 12fr;
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
   border-color: ${COLORS.grey30};
@@ -94,11 +97,11 @@ export function LabwareListItem(
   const [
     secureLabwareModalType,
     setSecureLabwareModalType,
-  ] = React.useState<ModuleType | null>(null)
+  ] = useState<ModuleType | null>(null)
   const labwareDisplayName = getLabwareDisplayName(definition)
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const [isLatchLoading, setIsLatchLoading] = React.useState<boolean>(false)
-  const [isLatchClosed, setIsLatchClosed] = React.useState<boolean>(false)
+  const [isLatchLoading, setIsLatchLoading] = useState<boolean>(false)
+  const [isLatchClosed, setIsLatchClosed] = useState<boolean>(false)
 
   let slotInfo: string | null = null
 
@@ -268,9 +271,9 @@ export function LabwareListItem(
 
   return (
     <LabwareRow>
-      <Flex alignItems={ALIGN_CENTER} width="80px" gridGap={SPACING.spacing2}>
+      <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing2} width="5rem">
         {slotInfo != null && isFlex ? (
-          <LocationIcon slotName={slotInfo} />
+          <DeckInfoLabel deckLabel={slotInfo} />
         ) : (
           <StyledText
             css={TYPOGRAPHY.pSemiBold}
@@ -280,34 +283,13 @@ export function LabwareListItem(
           </StyledText>
         )}
         {nestedLabwareInfo != null || moduleDisplayName != null ? (
-          <LocationIcon iconName="stacked" />
+          <DeckInfoLabel iconName="stacked" />
         ) : null}
       </Flex>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing16}
-        width="45.875rem"
-      >
-        <Flex>
-          {showLabwareSVG && <StandaloneLabware definition={definition} />}
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_CENTER}
-            marginLeft={SPACING.spacing8}
-            marginRight={SPACING.spacing24}
-          >
-            <StyledText desktopStyle="bodyDefaultSemiBold">
-              {labwareDisplayName}
-            </StyledText>
-            <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-              {nickName}
-            </StyledText>
-          </Flex>
-        </Flex>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
         {nestedLabwareInfo != null &&
         nestedLabwareInfo?.sharedSlotId === slotInfo ? (
           <>
-            <Divider />
             <Flex>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
@@ -326,11 +308,30 @@ export function LabwareListItem(
                 </StyledText>
               </Flex>
             </Flex>
+            <Divider marginY="0" />
           </>
         ) : null}
+        <Flex>
+          {showLabwareSVG ? (
+            <StandaloneLabware definition={definition} />
+          ) : null}
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
+            marginLeft={SPACING.spacing8}
+            marginRight={SPACING.spacing24}
+          >
+            <StyledText desktopStyle="bodyDefaultSemiBold">
+              {labwareDisplayName}
+            </StyledText>
+            <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+              {nickName}
+            </StyledText>
+          </Flex>
+        </Flex>
         {moduleDisplayName != null ? (
           <>
-            <Divider />
+            <Divider marginY="0" />
             <Flex
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               flexDirection={DIRECTION_ROW}
@@ -340,7 +341,7 @@ export function LabwareListItem(
             >
               <Flex gridGap={SPACING.spacing12} alignItems={ALIGN_CENTER}>
                 {moduleType != null ? (
-                  <LocationIcon
+                  <DeckInfoLabel
                     iconName={MODULE_ICON_NAME_BY_TYPE[moduleType]}
                   />
                 ) : null}

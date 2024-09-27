@@ -17,6 +17,24 @@ stages:
         json:
           protocol_id: data.id
 
+  - name: Upload sample_plates.csv file
+    request:
+      url: '{ot2_server_base_url}/dataFiles'
+      method: POST
+      files:
+        file: 'tests/integration/data_files/sample_plates.csv'
+    response:
+      save:
+        json:
+          data_file_id: data.id
+      status_code:
+        - 201
+      json:
+        data:
+          id: !anystr
+          name: "sample_plates.csv"
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+
   - name: Create run from protocol
     request:
       url: '{ot2_server_base_url}/runs'
@@ -29,11 +47,14 @@ stages:
             volume: 10.23
             dry_run: True
             pipette: flex_8channel_50
+          runTimeParameterFiles:
+            liq_handling_csv_file: '{data_file_id}'
     response:
       status_code: 201
       save:
         json:
           run_id: data.id
+          run_time_parameters_data: data.runTimeParameters
       json:
         data:
           id: !anystr
@@ -43,11 +64,57 @@ stages:
           current: True
           actions: []
           errors: []
+          hasEverEnteredErrorRecovery: False
           pipettes: []
           modules: []
           labware: []
           labwareOffsets: []
-          runTimeParameters: []
+          runTimeParameters:
+            - displayName: Sample count
+              variableName: sample_count
+              type: int
+              default: 6.0
+              min: 1.0
+              max: 12.0
+              value: 4.0
+              description: How many samples to process.
+            - displayName: Pipette volume
+              variableName: volume
+              type: float
+              default: 20.1
+              choices:
+                - displayName: Low Volume
+                  value: 10.23
+                - displayName: Medium Volume
+                  value: 20.1
+                - displayName: High Volume
+                  value: 50.5
+              value: 10.23
+              description: How many microliters to pipette of each sample.
+            - displayName: Dry Run
+              variableName: dry_run
+              type: bool
+              default: false
+              value: true
+              description: Skip aspirate and dispense steps.
+            - displayName: Pipette Name
+              variableName: pipette
+              type: str
+              choices:
+                - displayName: Single channel 50µL
+                  value: flex_1channel_50
+                - displayName: Eight Channel 50µL
+                  value: flex_8channel_50
+              default: flex_1channel_50
+              value: flex_8channel_50
+              description: What pipette to use during the protocol.
+            - displayName: Liquid handling CSV file
+              variableName: liq_handling_csv_file
+              description: A CSV file that contains wells to use for pipetting
+              type: csv_file
+              file:
+                id: '{data_file_id}'
+                name: sample_plates.csv
           liquids: []
           protocolId: '{protocol_id}'
 
@@ -95,45 +162,7 @@ stages:
           createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           status: succeeded
           current: True
-          runTimeParameters:
-            - displayName: Sample count
-              variableName: sample_count
-              type: int
-              default: 6.0
-              min: 1.0
-              max: 12.0
-              value: 4.0
-              description: How many samples to process.
-            - displayName: Pipette volume
-              variableName: volume
-              type: float
-              default: 20.1
-              choices:
-                - displayName: Low Volume
-                  value: 10.23
-                - displayName: Medium Volume
-                  value: 20.1
-                - displayName: High Volume
-                  value: 50.5
-              value: 10.23
-              description: How many microliters to pipette of each sample.
-            - displayName: Dry Run
-              variableName: dry_run
-              type: bool
-              default: false
-              value: true
-              description: Skip aspirate and dispense steps.
-            - displayName: Pipette Name
-              variableName: pipette
-              type: str
-              choices:
-                - displayName: Single channel 50µL
-                  value: flex_1channel_50
-                - displayName: Eight Channel 50µL
-                  value: flex_8channel_50
-              default: flex_1channel_50
-              value: flex_8channel_50
-              description: What pipette to use during the protocol.
+          runTimeParameters: !force_original_structure '{run_time_parameters_data}'
           protocolId: '{protocol_id}'
 
   - name: Mark the run as not-current
@@ -161,43 +190,5 @@ stages:
           createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           status: succeeded
           current: False
-          runTimeParameters:
-            - displayName: Sample count
-              variableName: sample_count
-              type: int
-              default: 6.0
-              min: 1.0
-              max: 12.0
-              value: 4.0
-              description: How many samples to process.
-            - displayName: Pipette volume
-              variableName: volume
-              type: float
-              default: 20.1
-              choices:
-                - displayName: Low Volume
-                  value: 10.23
-                - displayName: Medium Volume
-                  value: 20.1
-                - displayName: High Volume
-                  value: 50.5
-              value: 10.23
-              description: How many microliters to pipette of each sample.
-            - displayName: Dry Run
-              variableName: dry_run
-              type: bool
-              default: false
-              value: true
-              description: Skip aspirate and dispense steps.
-            - displayName: Pipette Name
-              variableName: pipette
-              type: str
-              choices:
-                - displayName: Single channel 50µL
-                  value: flex_1channel_50
-                - displayName: Eight Channel 50µL
-                  value: flex_8channel_50
-              default: flex_1channel_50
-              value: flex_8channel_50
-              description: What pipette to use during the protocol.
+          runTimeParameters: !force_original_structure '{run_time_parameters_data}'
           protocolId: '{protocol_id}'

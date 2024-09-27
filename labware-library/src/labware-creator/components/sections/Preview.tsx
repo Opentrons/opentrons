@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { getLabwareName } from '../../utils'
 import { ConditionalLabwareRender } from '../ConditionalLabwareRender'

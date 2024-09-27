@@ -1,23 +1,25 @@
-import * as React from 'react'
+import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import {
-  parseLabwareInfoByLiquidId,
-  parseLiquidsInLoadOrder,
-} from '@opentrons/api-client'
+
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  JUSTIFY_CENTER,
   Flex,
+  LiquidIcon,
   Icon,
   SPACING,
   LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Divider } from '../../atoms/structure'
-import { LiquidsListItemDetails } from '../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList'
+import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
+
+import { Divider } from '/app/atoms/structure'
 
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
 
@@ -32,7 +34,6 @@ export const ProtocolLiquidsDetails = (
   const { commands, liquids } = props
   const { i18n, t } = useTranslation('protocol_details')
   const liquidsInLoadOrder = parseLiquidsInLoadOrder(liquids, commands)
-  const labwareByLiquidId = parseLabwareInfoByLiquidId(commands)
   const HIDE_SCROLLBAR = css`
     ::-webkit-scrollbar {
       display: none;
@@ -49,21 +50,35 @@ export const ProtocolLiquidsDetails = (
       {liquidsInLoadOrder.length > 0 ? (
         liquidsInLoadOrder?.map((liquid, index) => {
           return (
-            <React.Fragment key={liquid.id}>
+            <Fragment key={liquid.id}>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 marginY={SPACING.spacing16}
               >
-                <LiquidsListItemDetails
-                  liquidId={liquid.id}
-                  displayColor={liquid.displayColor}
-                  displayName={liquid.displayName}
-                  description={liquid.description}
-                  labwareByLiquidId={labwareByLiquidId}
-                />
+                <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+                  <LiquidIcon color={liquid.displayColor} />
+                  <Flex
+                    flexDirection={DIRECTION_COLUMN}
+                    justifyContent={JUSTIFY_CENTER}
+                  >
+                    <StyledText
+                      desktopStyle="bodyDefaultSemiBold"
+                      marginX={SPACING.spacing16}
+                    >
+                      {liquid.displayName}
+                    </StyledText>
+                    <StyledText
+                      desktopStyle="bodyDefaultRegular"
+                      color={COLORS.grey60}
+                      marginX={SPACING.spacing16}
+                    >
+                      {liquid.description}
+                    </StyledText>
+                  </Flex>
+                </Flex>
               </Flex>
               {index < liquidsInLoadOrder.length - 1 && <Divider />}
-            </React.Fragment>
+            </Fragment>
           )
         })
       ) : (

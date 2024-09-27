@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Link, useParams, useLocation } from 'react-router-dom'
@@ -18,18 +17,16 @@ import {
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
-import {
-  useRobot,
-  useRunCreatedAtTimestamp,
-} from '../../organisms/Devices/hooks'
-import { getProtocolDisplayName } from '../../organisms/ProtocolsLanding/utils'
-import { getIsOnDevice } from '../../redux/config'
-import { OPENTRONS_USB } from '../../redux/discovery'
-import { getStoredProtocol } from '../../redux/protocol-storage'
-import { appShellRequestor } from '../../redux/shell/remote'
+import { useRunCreatedAtTimestamp } from '/app/resources/runs'
+import { getProtocolDisplayName } from '/app/organisms/ProtocolsLanding/utils'
+import { getIsOnDevice } from '/app/redux/config'
+import { OPENTRONS_USB } from '/app/redux/discovery'
+import { getStoredProtocol } from '/app/redux/protocol-storage'
+import { appShellRequestor } from '/app/redux/shell/remote'
+import { useRobot } from '/app/redux-resources/robots'
 
 import type { DesktopRouteParams } from '../../App/types'
-import type { State } from '../../redux/types'
+import type { State } from '/app/redux/types'
 
 interface CrumbNameProps {
   crumbName: string

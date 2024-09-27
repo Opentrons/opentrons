@@ -64,7 +64,7 @@ def test_validate_takes_liquid(ctx: ProtocolContext, reject_module: bool) -> Non
 #
 # Find a different way to test this so that both paths are covered.
 @pytest.mark.apiv2_non_pe_only
-def test_validate_takes_liquid_module_location(ctx):
+def test_validate_takes_liquid_module_location(ctx: ProtocolContext) -> None:
     module = ctx.load_module("magdeck", 1)
 
     validate_takes_liquid(
@@ -85,7 +85,7 @@ def test_validate_takes_liquid_module_location(ctx):
 
 
 @pytest.mark.ot3_only
-def test_validate_takes_liquid_adapter(ctx):
+def test_validate_takes_liquid_adapter(ctx: ProtocolContext) -> None:
     well_plate = ctx.load_labware("corning_96_wellplate_360ul_flat", 1)
     adapter = ctx.load_adapter("opentrons_96_pcr_adapter", 2)
 
@@ -147,8 +147,11 @@ def test_validate_takes_liquid_adapter(ctx):
     ],
 )
 def test_validate_tiprack(
-    ctx: ProtocolContext, caplog, pipette_name: str, log_value: Optional[str]
-):
+    ctx: ProtocolContext,
+    caplog: pytest.LogCaptureFixture,
+    pipette_name: str,
+    log_value: Optional[str],
+) -> None:
     tip_rack = ctx.load_labware("opentrons_flex_96_tiprack_200ul", 2)
 
     with caplog.at_level(logging.WARNING):

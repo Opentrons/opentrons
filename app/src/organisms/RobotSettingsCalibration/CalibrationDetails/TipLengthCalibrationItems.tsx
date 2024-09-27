@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
@@ -11,13 +10,13 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { useAttachedPipettes } from '../../../organisms/Devices/hooks'
-import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'
+import { useAttachedPipettes } from '/app/resources/instruments'
+import { getCustomLabwareDefinitions } from '/app/redux/custom-labware'
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
 
 import type { Mount } from '@opentrons/components'
-import type { State } from '../../../redux/types'
+import type { State } from '/app/redux/types'
 import type { FormattedTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
 import type { FormattedPipetteOffsetCalibration } from '..'
 

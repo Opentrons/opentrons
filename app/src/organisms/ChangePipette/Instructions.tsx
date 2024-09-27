@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
 import {
@@ -23,7 +23,7 @@ import type {
   PipetteModelSpecs,
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
-import type { Mount } from '../../redux/pipettes/types'
+import type { Mount } from '/app/redux/pipettes/types'
 import type { Direction } from './types'
 
 interface Props {
@@ -69,7 +69,7 @@ export function Instructions(props: Props): JSX.Element {
   } = props
   const { t } = useTranslation('change_pipette')
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (direction === 'detach' && currentStepCount === 0) {
       nextStep()
     }

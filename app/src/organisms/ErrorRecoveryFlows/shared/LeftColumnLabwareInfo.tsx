@@ -1,6 +1,6 @@
-import * as React from 'react'
+import type * as React from 'react'
 
-import { InterventionContent } from '../../../molecules/InterventionModal/InterventionContent'
+import { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
 
 import type { RecoveryContentProps } from '../types'
 
@@ -44,7 +44,7 @@ export function LeftColumnLabwareInfo({
         type,
         labwareName: failedLabwareName ?? '',
         labwareNickname: failedLabwareNickname ?? '',
-        currentLocationProps: { slotName: buildLabwareLocationSlotName() },
+        currentLocationProps: { deckLabel: buildLabwareLocationSlotName() },
       }}
       notificationProps={
         bannerText ? { type: 'alert', heading: bannerText } : undefined

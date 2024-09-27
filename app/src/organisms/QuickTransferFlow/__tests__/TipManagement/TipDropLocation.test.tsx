@@ -1,19 +1,23 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { TipDropLocation } from '../../TipManagement/TipDropLocation'
 
-vi.mock('../../../../resources/deck_configuration')
+vi.mock('/app/resources/deck_configuration')
+vi.mock('/app/redux-resources/analytics')
 
 const render = (props: React.ComponentProps<typeof TipDropLocation>): any => {
   return renderWithProviders(<TipDropLocation {...props} />, {
     i18nInstance: i18n,
   })
 }
+let mockTrackEventWithRobotSerial: any
 
 describe('TipDropLocation', () => {
   let props: React.ComponentProps<typeof TipDropLocation>
@@ -26,6 +30,12 @@ describe('TipDropLocation', () => {
       } as any,
       dispatch: vi.fn(),
     }
+    mockTrackEventWithRobotSerial = vi.fn(
+      () => new Promise(resolve => resolve({}))
+    )
+    vi.mocked(useTrackEventWithRobotSerial).mockReturnValue({
+      trackEventWithRobotSerial: mockTrackEventWithRobotSerial,
+    })
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
         {
@@ -62,5 +72,9 @@ describe('TipDropLocation', () => {
     const saveBtn = screen.getByText('Save')
     fireEvent.click(saveBtn)
     expect(props.dispatch).toHaveBeenCalled()
+    expect(mockTrackEventWithRobotSerial).toHaveBeenCalledWith({
+      name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+      properties: { setting: 'TipDropLocation' },
+    })
   })
 })

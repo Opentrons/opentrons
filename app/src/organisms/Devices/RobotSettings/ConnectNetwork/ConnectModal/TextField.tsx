@@ -1,7 +1,7 @@
-import * as React from 'react'
+import { useReducer } from 'react'
 
 import {
-  InputField,
+  LegacyInputField,
   DeprecatedCheckboxField,
   INPUT_TYPE_TEXT,
   INPUT_TYPE_PASSWORD,
@@ -32,12 +32,12 @@ export const TextField = (props: TextFieldProps): JSX.Element => {
     field,
     fieldState
   )
-  const [showPw, toggleShowPw] = React.useReducer(show => !show, false)
+  const [showPw, toggleShowPw] = useReducer(show => !show, false)
   const type = isPassword && !showPw ? INPUT_TYPE_PASSWORD : INPUT_TYPE_TEXT
 
   return (
     <FormRow label={label} labelFor={id}>
-      <InputField
+      <LegacyInputField
         {...{ className, type, id, name, value, error, onChange, onBlur }}
       />
       {isPassword && (

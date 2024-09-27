@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
@@ -8,7 +8,7 @@ import {
   mockTipLengthCalibration1,
   mockTipLengthCalibration2,
   mockTipLengthCalibration3,
-} from '../../../../redux/calibration/tip-length/__fixtures__'
+} from '/app/redux/calibration/tip-length/__fixtures__'
 import { useTipLengthCalibrations } from '..'
 
 vi.mock('@opentrons/react-api-client')

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import {
@@ -16,7 +15,7 @@ import {
   LeftColumnLabwareInfo,
   TwoColTextAndFailedStepNextStep,
 } from '../shared'
-import { TwoColumn, DeckMapContent } from '../../../molecules/InterventionModal'
+import { TwoColumn, DeckMapContent } from '/app/molecules/InterventionModal'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
@@ -81,7 +80,7 @@ export function SkipToNextStep(
     currentRecoveryOptionUtils,
   } = props
   const {
-    setRobotInMotion,
+    handleMotionRouting,
     goBackPrevStep,
     proceedToRouteAndStep,
   } = routeUpdateActions
@@ -100,7 +99,7 @@ export function SkipToNextStep(
   }
 
   const primaryBtnOnClick = (): Promise<void> => {
-    return setRobotInMotion(true, ROBOT_SKIPPING_STEP.ROUTE).then(() => {
+    return handleMotionRouting(true, ROBOT_SKIPPING_STEP.ROUTE).then(() => {
       skipFailedCommand()
     })
   }

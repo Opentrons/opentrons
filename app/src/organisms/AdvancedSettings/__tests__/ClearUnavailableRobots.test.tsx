@@ -1,17 +1,13 @@
-import * as React from 'react'
 import { screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useConditionalConfirm } from '@opentrons/components'
-import { i18n } from '../../../i18n'
-import {
-  getReachableRobots,
-  getUnreachableRobots,
-} from '../../../redux/discovery'
+import { i18n } from '/app/i18n'
+import { getReachableRobots, getUnreachableRobots } from '/app/redux/discovery'
 import {
   mockReachableRobot,
   mockUnreachableRobot,
-} from '../../../redux/discovery/__fixtures__'
-import { renderWithProviders } from '../../../__testing-utils__'
+} from '/app/redux/discovery/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { ClearUnavailableRobots } from '../ClearUnavailableRobots'
 import type * as OpentronsComponents from '@opentrons/components'
 
@@ -30,7 +26,7 @@ vi.mock('@opentrons/components', async importOriginal => {
   }
 })
 
-vi.mock('../../../redux/discovery')
+vi.mock('/app/redux/discovery')
 
 const render = () => {
   return renderWithProviders(<ClearUnavailableRobots />, {
