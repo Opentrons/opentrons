@@ -43,29 +43,29 @@ _default_dispense: Dict[str, DispenseSettings] = {
     _WATER: DispenseSettings(
         flow_rate=None,
         push_out=None,
-        submerge_mm=3.0,  # NON-contact dispense
+        submerge_mm=-1.5,  # contact dispense
         retract_mm=3.0,
         delay=0.5,
     ),
     _GLYCEROL_50: DispenseSettings(
         flow_rate=None,
         push_out=None,
-        submerge_mm=3.0,  # NON-contact dispense
+        submerge_mm=-1.5,  # contact dispense
         retract_mm=3.0,
         delay=0.5,
     ),
     _ETHANOL_70: DispenseSettings(
         flow_rate=None,
         push_out=None,
-        submerge_mm=3.0,  # NON-contact dispense
+        submerge_mm=-1.5,  # contact dispense
         retract_mm=3.0,
         delay=0.5,
     ),
 }
 _default_volume_correction: Dict[str, str] = {
     _WATER: "1",
-    _GLYCEROL_50: "2",
-    _ETHANOL_70: "3",
+    _GLYCEROL_50: "2",  # FIXME: only exists for P50S right now
+    _ETHANOL_70: "3",  # FIXME: doesn't exist yet
 }
 
 _defaults: Dict[
