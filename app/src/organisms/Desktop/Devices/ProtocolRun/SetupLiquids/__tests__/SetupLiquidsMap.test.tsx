@@ -29,6 +29,7 @@ import {
   getProtocolModulesInfo,
   getLabwareRenderInfo,
 } from '/app/transformations/analysis'
+/* eslint-disable-next-line opentrons/no-imports-across-applications  */
 import { mockProtocolModuleInfo } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupLabware/__fixtures__'
 import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
 

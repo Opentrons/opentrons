@@ -9,7 +9,7 @@ import { useModulesQuery } from '@opentrons/react-api-client'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ProtocolRunHeader } from '..'
-import { useIsRobotViewable } from '../../../hooks'
+import { useIsRobotViewable } from '/app/redux-resources/robots'
 import {
   useRunStatus,
   useProtocolDetailsForRun,
@@ -29,7 +29,6 @@ import {
 vi.mock('react-router-dom')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/robots')
-vi.mock('../../../hooks')
 vi.mock('/app/resources/runs')
 vi.mock('../RunHeaderModalContainer')
 vi.mock('../RunHeaderBannerContainer')

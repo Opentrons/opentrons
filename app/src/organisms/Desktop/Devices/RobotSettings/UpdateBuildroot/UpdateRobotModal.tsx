@@ -30,7 +30,7 @@ import {
 } from '/app/redux/robot-update'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { ReleaseNotes } from '/app/molecules/ReleaseNotes'
-import { useIsRobotBusy } from '../../hooks'
+import { useIsRobotBusy } from '/app/redux-resources/robots'
 import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 
 import type { State, Dispatch } from '/app/redux/types'

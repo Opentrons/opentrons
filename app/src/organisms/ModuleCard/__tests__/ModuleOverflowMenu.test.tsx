@@ -11,17 +11,14 @@ import {
   mockHeaterShaker,
   mockThermocyclerGen2,
 } from '/app/redux/modules/__fixtures__'
-import {
-  useRunStatuses,
-  useIsLegacySessionInProgress,
-} from '/app/organisms/Desktop/Devices/hooks'
+import { useIsLegacySessionInProgress } from '/app/resources/legacy_sessions'
 import { useIsFlex } from '/app/redux-resources/robots'
-import { useCurrentRunId } from '/app/resources/runs'
+import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 
 import type { TemperatureStatus } from '@opentrons/api-client'
 
-vi.mock('../../Desktop/Devices/hooks')
+vi.mock('/app/resources/legacy_sessions')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/runs')
 

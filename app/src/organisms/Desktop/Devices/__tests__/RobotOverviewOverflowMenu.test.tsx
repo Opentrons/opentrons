@@ -19,7 +19,7 @@ import { useCanDisconnect } from '/app/resources/networking/hooks'
 import { DisconnectModal } from '../RobotSettings/ConnectNetwork/DisconnectModal'
 import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
 import { useCurrentRunId } from '/app/resources/runs'
-import { useIsRobotBusy } from '../hooks'
+import { useIsRobotBusy } from '/app/redux-resources/robots'
 import { handleUpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
@@ -34,6 +34,7 @@ vi.mock('/app/organisms/Desktop/ChooseProtocolSlideout')
 vi.mock('/app/resources/runs')
 vi.mock('../RobotSettings/UpdateBuildroot')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/redux-resources/robots')
 
 const render = (
   props: React.ComponentProps<typeof RobotOverviewOverflowMenu>

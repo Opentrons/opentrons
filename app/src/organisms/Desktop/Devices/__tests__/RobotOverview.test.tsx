@@ -9,7 +9,7 @@ import * as DiscoveryClientFixtures from '../../../../../../discovery-client/src
 import { useAuthorization } from '@opentrons/react-api-client'
 
 import { i18n } from '/app/i18n'
-import { useCurrentRunId } from '/app/resources/runs'
+import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { getConfig, useFeatureFlag } from '/app/redux/config'
@@ -22,14 +22,13 @@ import {
   OPENTRONS_USB,
   ROBOT_MODEL_OT3,
 } from '/app/redux/discovery/constants'
-import { useRobot } from '/app/redux-resources/robots'
 import {
-  useCalibrationTaskList,
   useIsRobotBusy,
-  useLights,
-  useRunStatuses,
   useIsRobotViewable,
-} from '../hooks'
+  useRobot,
+} from '/app/redux-resources/robots'
+import { useLights } from '/app/resources/devices'
+import { useCalibrationTaskList } from '../hooks'
 import {
   expectedBadDeckTaskList,
   expectedBadDeckAndPipetteOffsetTaskList,
@@ -66,6 +65,7 @@ vi.mock('/app/redux/robot-update/selectors')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/resources/runs')
+vi.mock('/app/resources/devices')
 vi.mock('../hooks')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../RobotStatusHeader')

@@ -14,10 +14,12 @@ import {
 } from '@opentrons/api-client'
 import { vi, it, expect, describe, beforeEach } from 'vitest'
 
-import { useCurrentRunId, useRunStatus } from '/app/resources/runs'
-import { useRunStatuses } from '..'
+import { useCurrentRunId } from '../useCurrentRunId'
+import { useRunStatus } from '../useRunStatus'
+import { useRunStatuses } from '../useRunStatuses'
 
-vi.mock('/app/resources/runs')
+vi.mock('../useCurrentRunId')
+vi.mock('../useRunStatus')
 
 describe('useRunStatuses', () => {
   beforeEach(() => {

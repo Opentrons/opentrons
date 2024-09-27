@@ -18,15 +18,13 @@ import {
   mockAttachedPipette,
   mockAttachedPipetteInformation,
 } from '/app/redux/pipettes/__fixtures__'
-import {
-  usePipetteOffsetCalibrations,
-  useRunStatuses,
-} from '/app/organisms/Desktop/Devices/hooks'
+import { usePipetteOffsetCalibrations } from '/app/organisms/Desktop/Devices/hooks'
 import {
   useAttachedPipettes,
   useAttachedPipettesFromInstrumentsQuery,
 } from '/app/resources/instruments'
 import { useRobot, useIsFlex } from '/app/redux-resources/robots'
+import { useRunStatuses } from '/app/resources/runs'
 
 import { CalibrationDataDownload } from '../CalibrationDataDownload'
 import { CalibrationHealthCheck } from '../CalibrationHealthCheck'
@@ -53,6 +51,7 @@ vi.mock('/app/redux/robot-api/selectors')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/instruments')
 vi.mock('/app/organisms/Desktop/Devices/hooks')
+vi.mock('/app/resources/runs')
 vi.mock('../CalibrationDataDownload')
 vi.mock('../CalibrationHealthCheck')
 vi.mock('../RobotSettingsDeckCalibration')

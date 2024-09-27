@@ -51,7 +51,7 @@ import {
   updateConfigValue,
 } from '/app/redux/config'
 import { updateBrightness } from '/app/redux/shell'
-import { SLEEP_NEVER_MS } from './constants'
+import { SLEEP_NEVER_MS } from '/app/local-resources/config'
 import { useProtocolReceiptToast, useSoftwareUpdatePoll } from './hooks'
 import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
 

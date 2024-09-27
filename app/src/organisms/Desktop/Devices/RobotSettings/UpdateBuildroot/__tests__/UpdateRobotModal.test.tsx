@@ -12,14 +12,14 @@ import {
 } from '/app/redux/robot-update'
 import { getDiscoverableRobotByName } from '/app/redux/discovery'
 import { UpdateRobotModal, RELEASE_NOTES_URL_BASE } from '../UpdateRobotModal'
-import { useIsRobotBusy } from '../../../hooks'
+import { useIsRobotBusy } from '/app/redux-resources/robots'
 
 import type { Store } from 'redux'
 import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/discovery')
-vi.mock('../../../hooks')
+vi.mock('/app/redux-resources/robots')
 
 const render = (props: React.ComponentProps<typeof UpdateRobotModal>) => {
   return renderWithProviders(<UpdateRobotModal {...props} />, {

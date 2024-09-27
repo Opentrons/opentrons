@@ -17,7 +17,7 @@ import {
 } from '@opentrons/components'
 
 import { home, ROBOT } from '/app/redux/robot-controls'
-import { useLights } from '../Desktop/Devices/hooks'
+import { useLights } from '/app/resources/devices'
 import { getTopPortalEl } from '/app/App/portal'
 import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
 

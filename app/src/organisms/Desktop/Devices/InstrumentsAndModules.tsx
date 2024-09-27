@@ -21,10 +21,9 @@ import {
 } from '@opentrons/components'
 
 import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationWarning'
-import { useCurrentRunId } from '/app/resources/runs'
-import { useIsFlex } from '/app/redux-resources/robots'
+import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
+import { useIsFlex, useIsRobotViewable } from '/app/redux-resources/robots'
 import { ModuleCard } from '/app/organisms/ModuleCard'
-import { useIsRobotViewable, useRunStatuses } from './hooks'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 import { PipetteCard } from './PipetteCard'
 import { FlexPipetteCard } from './PipetteCard/FlexPipetteCard'

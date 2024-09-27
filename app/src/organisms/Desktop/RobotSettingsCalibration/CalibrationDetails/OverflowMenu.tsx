@@ -29,7 +29,7 @@ import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
 } from '/app/redux/analytics'
-import { useRunStatuses } from '/app/organisms/Desktop/Devices/hooks'
+import { useRunStatuses } from '/app/resources/runs'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'

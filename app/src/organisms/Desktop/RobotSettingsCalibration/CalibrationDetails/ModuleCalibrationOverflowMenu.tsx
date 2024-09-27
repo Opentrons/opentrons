@@ -17,8 +17,7 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 
-import { useChainLiveCommands } from '/app/resources/runs'
-import { useRunStatuses } from '/app/organisms/Desktop/Devices/hooks'
+import { useChainLiveCommands, useRunStatuses } from '/app/resources/runs'
 import { getModulePrepCommands } from '/app/local-resources/modules'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { getModuleTooHot } from '/app/transformations/modules'

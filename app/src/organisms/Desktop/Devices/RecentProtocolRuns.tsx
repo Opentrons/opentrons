@@ -16,8 +16,12 @@ import {
 } from '@opentrons/components'
 
 import { HistoricalProtocolRun } from './HistoricalProtocolRun'
-import { useIsRobotViewable, useRunStatuses } from './hooks'
-import { useNotifyAllRunsQuery, useCurrentRunId } from '/app/resources/runs'
+import { useIsRobotViewable } from '/app/redux-resources/robots'
+import {
+  useNotifyAllRunsQuery,
+  useCurrentRunId,
+  useRunStatuses,
+} from '/app/resources/runs'
 
 interface RecentProtocolRunsProps {
   robotName: string

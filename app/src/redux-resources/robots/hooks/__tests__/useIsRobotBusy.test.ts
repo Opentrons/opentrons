@@ -5,11 +5,6 @@ import {
 } from '@opentrons/react-api-client'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 
-import {
-  DISENGAGED,
-  NOT_PRESENT,
-  PHYSICALLY_ENGAGED,
-} from '/app/organisms/EmergencyStop'
 import { useIsRobotBusy } from '../useIsRobotBusy'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
@@ -26,9 +21,9 @@ vi.mock('/app/resources/maintenance_runs')
 
 const mockEstopStatus = {
   data: {
-    status: DISENGAGED,
-    leftEstopPhysicalStatus: DISENGAGED,
-    rightEstopPhysicalStatus: NOT_PRESENT,
+    status: 'disengaged',
+    leftEstopPhysicalStatus: 'disengaged',
+    rightEstopPhysicalStatus: 'notPresent',
   },
 }
 
@@ -149,7 +144,7 @@ describe('useIsRobotBusy', () => {
     const mockEngagedStatus = {
       data: {
         ...mockEstopStatus.data,
-        status: PHYSICALLY_ENGAGED,
+        status: 'physicallyEngaged',
       },
     }
     vi.mocked(useEstopQuery).mockReturnValue({ data: mockEngagedStatus } as any)
@@ -180,7 +175,7 @@ describe('useIsRobotBusy', () => {
     const mockEngagedStatus = {
       data: {
         ...mockEstopStatus.data,
-        status: PHYSICALLY_ENGAGED,
+        status: 'physicallyEngaged',
       },
     }
     vi.mocked(useEstopQuery).mockReturnValue({ data: mockEngagedStatus } as any)
