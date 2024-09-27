@@ -1,7 +1,7 @@
 // internal link that preserves query parameters
 import { Link as BaseLink } from 'react-router-dom'
 
-import type {ReactNode} from "react";
+import type { ReactNode } from 'react'
 
 export interface LinkProps {
   to: string
