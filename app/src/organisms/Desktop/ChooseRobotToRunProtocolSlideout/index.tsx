@@ -31,7 +31,7 @@ import {
 } from '/app/transformations/runs'
 import { ApplyHistoricOffsets } from '/app/organisms/ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '/app/organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { ChooseRobotSlideout } from '/app/organisms/ChooseRobotSlideout'
+import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
 import type { StyleProps } from '@opentrons/components'
 import type { RunTimeParameter } from '@opentrons/shared-data'

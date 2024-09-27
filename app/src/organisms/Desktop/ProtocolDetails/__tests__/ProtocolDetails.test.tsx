@@ -34,7 +34,7 @@ vi.mock('/app/redux/custom-labware/selectors')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/protocol-storage/selectors')
 vi.mock('/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout')
-vi.mock('/app/organisms/SendProtocolToFlexSlideout')
+vi.mock('/app/organisms/Desktop/SendProtocolToFlexSlideout')
 
 const render = (
   props: Partial<React.ComponentProps<typeof ProtocolDetails>> = {}

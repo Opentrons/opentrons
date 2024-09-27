@@ -21,7 +21,7 @@ import {
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import { Divider } from '/app/atoms/structure'
 import { getTopPortalEl } from '/app/App/portal'
-import { LabwareDetails } from '../Desktop/Labware/LabwareDetails'
+import { LabwareDetails } from '/app/organisms/Desktop/Labware/LabwareDetails'
 
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareDefAndDate } from '/app/local-resources/labware'

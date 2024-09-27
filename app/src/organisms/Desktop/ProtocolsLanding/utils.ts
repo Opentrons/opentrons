@@ -1,4 +1,3 @@
-import first from 'lodash/first'
 import { FLEX_STANDARD_MODEL } from '@opentrons/shared-data'
 import type { ProtocolAnalysisOutput, RobotType } from '@opentrons/shared-data'
 
@@ -30,14 +29,6 @@ export function getAnalysisStatus(
     return 'error'
   }
   return 'complete'
-}
-
-export function getProtocolDisplayName(
-  protocolKey: string,
-  srcFileNames: string[],
-  analysis?: ProtocolAnalysisOutput | null
-): string {
-  return analysis?.metadata?.protocolName ?? first(srcFileNames) ?? protocolKey
 }
 
 export function getRobotTypeDisplayName(

@@ -1,14 +1,9 @@
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { getProtocolDisplayName } from './utils'
-import type { StoredProtocolData } from '/app/redux/protocol-storage'
-
-export type ProtocolSort =
-  | 'alphabetical'
-  | 'reverse'
-  | 'recent'
-  | 'oldest'
-  | 'flex'
-  | 'ot2'
+import { getProtocolDisplayName } from '/app/transformations/protocols'
+import type {
+  StoredProtocolData,
+  ProtocolSort,
+} from '/app/redux/protocol-storage'
 
 export function useSortedProtocols(
   sortBy: ProtocolSort,

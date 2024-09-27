@@ -40,11 +40,9 @@ import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
 import { getProtocolUsesGripper } from '/app/transformations/commands'
 import { ProtocolAnalysisStale } from '../ProtocolAnalysisFailure/ProtocolAnalysisStale'
-import {
-  getAnalysisStatus,
-  getProtocolDisplayName,
-  getRobotTypeDisplayName,
-} from './utils'
+import { getRobotTypeDisplayName } from './utils'
+import { getAnalysisStatus } from '/app/transformations/analysis'
+import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '/app/redux/protocol-storage'

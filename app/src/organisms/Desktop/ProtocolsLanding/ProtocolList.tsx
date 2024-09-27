@@ -35,8 +35,10 @@ import { ProtocolUploadInput } from './ProtocolUploadInput'
 import { ProtocolCard } from './ProtocolCard'
 import { EmptyStateLinks } from './EmptyStateLinks'
 
-import type { StoredProtocolData } from '/app/redux/protocol-storage'
-import type { ProtocolSort } from './hooks'
+import type {
+  StoredProtocolData,
+  ProtocolSort,
+} from '/app/redux/protocol-storage'
 import type { Dispatch } from '/app/redux/types'
 
 const SORT_BY_BUTTON_STYLE = css`

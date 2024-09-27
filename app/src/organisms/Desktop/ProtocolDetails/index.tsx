@@ -64,10 +64,8 @@ import { ChooseRobotToRunProtocolSlideout } from '/app/organisms/Desktop/ChooseR
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
-import {
-  getAnalysisStatus,
-  getProtocolDisplayName,
-} from '../ProtocolsLanding/utils'
+import { getAnalysisStatus } from '/app/transformations/analysis'
+import { getProtocolDisplayName } from '/app/transformations/protocols'
 import { getProtocolUsesGripper } from '/app/transformations/commands'
 import { ProtocolOverflowMenu } from '../ProtocolsLanding/ProtocolOverflowMenu'
 import { ProtocolStats } from './ProtocolStats'

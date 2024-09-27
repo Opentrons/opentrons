@@ -16,8 +16,8 @@ import {
   useTrackEvent,
   ANALYTICS_IMPORT_PROTOCOL_TO_APP,
 } from '/app/redux/analytics'
-import { useLogger } from '../../logger'
-import { useToaster } from '../ToasterOven'
+import { useLogger } from '/app/logger'
+import { useToaster } from '/app/organisms/ToasterOven'
 
 import type { Dispatch } from '/app/redux/types'
 

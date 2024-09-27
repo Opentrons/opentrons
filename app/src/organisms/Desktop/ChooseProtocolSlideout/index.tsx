@@ -55,12 +55,12 @@ import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/h
 import { useCreateRunFromProtocol } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ApplyHistoricOffsets } from '/app/organisms/ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '/app/organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { FileCard } from '/app/organisms/ChooseRobotSlideout/FileCard'
+import { FileCard } from '../ChooseRobotSlideout/FileCard'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
 } from '/app/transformations/runs'
-import { getAnalysisStatus } from '/app/organisms/ProtocolsLanding/utils'
+import { getAnalysisStatus } from '/app/organisms/Desktop/ProtocolsLanding/utils'
 
 import type { DropdownOption } from '@opentrons/components'
 import type { RunTimeParameter } from '@opentrons/shared-data'

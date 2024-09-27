@@ -7,10 +7,10 @@ import { MemoryRouter } from 'react-router-dom'
 import {
   mockOT3HealthResponse,
   mockOT3ServerHealthResponse,
-} from '../../../../../discovery-client/src/fixtures'
+} from '../../../../../../discovery-client/src/fixtures'
 import { useCreateProtocolMutation } from '@opentrons/react-api-client'
 
-import { mockSuccessQueryResults } from '../../../__fixtures__'
+import { mockSuccessQueryResults } from '/app/__fixtures__'
 import { i18n } from '/app/i18n'
 import { useToaster } from '/app/organisms/ToasterOven'
 import {

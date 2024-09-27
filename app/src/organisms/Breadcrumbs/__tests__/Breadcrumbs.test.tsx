@@ -7,7 +7,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '/app/i18n'
 import { useRunCreatedAtTimestamp } from '/app/resources/runs'
 import { useRobot } from '/app/redux-resources/robots'
-import { getProtocolDisplayName } from '/app/organisms/ProtocolsLanding/utils'
+import { getProtocolDisplayName } from '/app/transformations/protocols'
 import { getIsOnDevice } from '/app/redux/config'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
@@ -19,7 +19,7 @@ import type { State } from '/app/redux/types'
 
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux-resources/robots')
-vi.mock('/app/organisms/ProtocolsLanding/utils')
+vi.mock('/app/transformations/protocols')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/protocol-storage')
 
