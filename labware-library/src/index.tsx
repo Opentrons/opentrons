@@ -7,10 +7,9 @@ import { LabwareCreator } from './labware-creator'
 
 import { getPublicPath } from './public-path'
 import './styles.global.module.css'
+import type { BrowserRouterProps } from 'react-router-dom'
 
 export * from './labware-creator'
-
-import type { BrowserRouterProps } from 'react-router-dom'
 
 const $root = document.getElementById('root')
 
