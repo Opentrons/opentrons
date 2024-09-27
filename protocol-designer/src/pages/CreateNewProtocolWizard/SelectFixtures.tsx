@@ -81,10 +81,11 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-            <StyledText desktopStyle="headingSmallBold">
-              {t('which_fixtures')}
-            </StyledText>
-
+            {filteredAdditionalEquipment.length > 0 ? (
+              <StyledText desktopStyle="headingSmallBold">
+                {t('which_fixtures')}
+              </StyledText>
+            ) : null}
             <Flex gridGap={SPACING.spacing4} flexWrap={WRAP}>
               {filteredAdditionalEquipment.map(equipment => (
                 <EmptySelectorButton
