@@ -9,14 +9,14 @@ import * as Config from '/app/redux/config'
 import { GeneralSettings } from '../GeneralSettings'
 import { PrivacySettings } from '../PrivacySettings'
 import { AdvancedSettings } from '../AdvancedSettings'
-import { FeatureFlags } from '/app/organisms/AppSettings/FeatureFlags'
+import { FeatureFlags } from '/app/organisms/Desktop/AppSettings/FeatureFlags'
 import { AppSettings } from '..'
 
 vi.mock('/app/redux/config')
 vi.mock('../GeneralSettings')
 vi.mock('../PrivacySettings')
 vi.mock('../AdvancedSettings')
-vi.mock('/app/organisms/AppSettings/FeatureFlags')
+vi.mock('/app/organisms/Desktop/AppSettings/FeatureFlags')
 
 const render = (path = '/'): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(

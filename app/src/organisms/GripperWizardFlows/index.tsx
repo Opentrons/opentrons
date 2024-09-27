@@ -19,7 +19,7 @@ import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
 } from '/app/resources/maintenance_runs'
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { WizardHeader } from '/app/molecules/WizardHeader'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'

@@ -23,9 +23,9 @@ import {
   useGripperDisplayName,
   usePipetteNameSpecs,
 } from '/app/local-resources/instruments'
-import { FLOWS } from '../PipetteWizardFlows/constants'
-import { PipetteWizardFlows } from '../PipetteWizardFlows'
-import { GripperWizardFlows } from '../GripperWizardFlows'
+import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
+import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 
 import type { InstrumentData } from '@opentrons/api-client'
 import type {

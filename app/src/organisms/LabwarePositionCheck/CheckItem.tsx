@@ -25,7 +25,7 @@ import { useSelector } from 'react-redux'
 import { getLabwareDef } from './utils/labware'
 import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
 import { UnorderedList } from '/app/molecules/UnorderedList'
-import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
+import { getCurrentOffsetForLabwareInLocation } from '../Desktop/Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getIsOnDevice } from '/app/redux/config'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 

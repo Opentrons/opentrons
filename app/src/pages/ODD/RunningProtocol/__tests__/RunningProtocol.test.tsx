@@ -22,7 +22,7 @@ import {
   CurrentRunningProtocolCommand,
   RunningProtocolSkeleton,
 } from '/app/organisms/ODD/RunningProtocol'
-import { mockUseAllCommandsResponseNonDeterministic } from '/app/organisms/RunProgressMeter/__fixtures__'
+import { mockUseAllCommandsResponseNonDeterministic } from '/app/organisms/Desktop/RunProgressMeter/__fixtures__'
 import { getLocalRobot } from '/app/redux/discovery'
 import { CancelingRunModal } from '/app/organisms/ODD/RunningProtocol/CancelingRunModal'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'

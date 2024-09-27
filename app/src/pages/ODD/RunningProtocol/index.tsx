@@ -58,7 +58,7 @@ import {
   ErrorRecoveryFlows,
 } from '/app/organisms/ErrorRecoveryFlows'
 
-import type { OnDeviceRouteParams } from '../../../App/types'
+import type { OnDeviceRouteParams } from '/app/App/types'
 
 const RUN_STATUS_REFETCH_INTERVAL = 5000
 const LIVE_RUN_COMMANDS_POLL_MS = 3000

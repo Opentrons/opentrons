@@ -31,7 +31,7 @@ import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
+import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
 import { MediumButton, SmallButton } from '/app/atoms/buttons'
 import {
   ProtocolDetailsHeaderChipSkeleton,
@@ -60,7 +60,7 @@ import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import type { Protocol } from '@opentrons/api-client'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { Dispatch } from '/app/redux/types'
-import type { OnDeviceRouteParams } from '../../../App/types'
+import type { OnDeviceRouteParams } from '/app/App/types'
 
 interface ProtocolHeaderProps {
   title?: string | null

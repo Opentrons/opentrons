@@ -23,7 +23,7 @@ import zAxisDetach96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Zaxis
 import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 
-import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
+import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import type { PipetteWizardFlow, PipetteWizardStep } from './types'
 
 export function getIsGantryEmpty(

@@ -19,7 +19,7 @@ import {
   OVERFLOW_HIDDEN,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { getIsOnDevice } from '/app/redux/config'
 import { ExitConfirmation } from './ExitConfirmation'
 import {

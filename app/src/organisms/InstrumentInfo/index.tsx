@@ -16,11 +16,11 @@ import {
   SINGLE_MOUNT_PIPETTES,
   NINETY_SIX_CHANNEL,
 } from '@opentrons/shared-data'
-import { PipetteWizardFlows } from '../PipetteWizardFlows'
-import { GripperWizardFlows } from '../GripperWizardFlows'
+import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import { MediumButton } from '/app/atoms/buttons'
-import { FLOWS } from '../PipetteWizardFlows/constants'
-import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
+import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
+import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 
 import type { InstrumentData } from '@opentrons/api-client'

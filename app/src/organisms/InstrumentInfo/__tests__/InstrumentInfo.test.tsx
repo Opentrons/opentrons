@@ -4,8 +4,8 @@ import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockPipetteData1Channel } from '/app/redux/pipettes/__fixtures__'
-import { PipetteWizardFlows } from '../../PipetteWizardFlows'
-import { GripperWizardFlows } from '../../GripperWizardFlows'
+import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import { InstrumentInfo } from '..'
 
 import type { GripperData } from '@opentrons/api-client'
@@ -13,8 +13,8 @@ import type * as Dom from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 
-vi.mock('../../PipetteWizardFlows')
-vi.mock('../../GripperWizardFlows')
+vi.mock('/app/organisms/PipetteWizardFlows')
+vi.mock('/app/organisms/GripperWizardFlows')
 vi.mock('react-router-dom', async importOriginal => {
   const reactRouterDom = await importOriginal<typeof Dom>()
   return {

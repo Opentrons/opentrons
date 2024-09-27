@@ -1,5 +1,5 @@
 import type { LogLevel } from '../../logger'
-import type { ProtocolSort } from '/app/organisms/ProtocolsLanding/hooks'
+import type { ProtocolSort } from '/app/redux/protocol-storage'
 
 export type UrlProtocol = 'file:' | 'http:'
 

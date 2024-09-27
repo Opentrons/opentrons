@@ -21,12 +21,12 @@ import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
 } from '/app/resources/maintenance_runs'
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { WizardHeader } from '/app/molecules/WizardHeader'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { getIsOnDevice } from '/app/redux/config'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
-import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { usePipetteFlowWizardHeaderText } from './hooks'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
 import { getPipetteWizardStepsForProtocol } from './getPipetteWizardStepsForProtocol'

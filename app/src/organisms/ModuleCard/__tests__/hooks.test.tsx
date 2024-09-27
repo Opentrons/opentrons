@@ -17,7 +17,7 @@ import {
   mockThermocycler,
   mockThermocyclerGen2,
 } from '/app/redux/modules/__fixtures__'
-import { useIsRobotBusy, useRunStatuses } from '../../Devices/hooks'
+import { useIsRobotBusy, useRunStatuses } from '../../Desktop/Devices/hooks'
 
 import {
   useCurrentRunId,
@@ -34,7 +34,7 @@ import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs')
-vi.mock('../../Devices/hooks')
+vi.mock('../../Desktop/Devices/hooks')
 
 const mockCloseLatchHeaterShaker = {
   id: 'heatershaker_id',

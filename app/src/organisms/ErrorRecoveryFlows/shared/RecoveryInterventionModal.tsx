@@ -5,7 +5,7 @@ import { css } from 'styled-components'
 import { Flex, RESPONSIVENESS, SPACING } from '@opentrons/components'
 
 import { InterventionModal } from '/app/molecules/InterventionModal'
-import { getModalPortalEl, getTopPortalEl } from '../../../App/portal'
+import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
 
 import type { ModalType } from '/app/molecules/InterventionModal'
 import type { DesktopSizeType } from '../types'

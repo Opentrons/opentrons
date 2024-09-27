@@ -6,12 +6,15 @@ import { when } from 'vitest-when'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import { useRunStatuses, useSyncRobotClock } from '/app/organisms/Devices/hooks'
-import { ProtocolRunHeader } from '/app/organisms/Devices/ProtocolRun/ProtocolRunHeader'
-import { ProtocolRunModuleControls } from '/app/organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
-import { ProtocolRunSetup } from '/app/organisms/Devices/ProtocolRun/ProtocolRunSetup'
-import { RunPreviewComponent } from '/app/organisms/RunPreview'
-import { ProtocolRunRuntimeParameters } from '/app/organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
+import {
+  useRunStatuses,
+  useSyncRobotClock,
+} from '/app/organisms/Desktop/Devices/hooks'
+import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader'
+import { ProtocolRunModuleControls } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunModuleControls'
+import { ProtocolRunSetup } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup'
+import { RunPreviewComponent } from '/app/organisms/Desktop/Devices/RunPreview'
+import { ProtocolRunRuntimeParameters } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 import {
   useCurrentRunId,
   useMostRecentCompletedAnalysis,
@@ -24,13 +27,15 @@ import { ProtocolRunDetails } from '..'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
-vi.mock('/app/organisms/Devices/hooks')
-vi.mock('/app/organisms/Devices/ProtocolRun/ProtocolRunHeader')
-vi.mock('/app/organisms/Devices/ProtocolRun/ProtocolRunSetup')
-vi.mock('/app/organisms/RunPreview')
-vi.mock('/app/organisms/Devices/ProtocolRun/ProtocolRunModuleControls')
+vi.mock('/app/organisms/Desktop/Devices/hooks')
+vi.mock('/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader')
+vi.mock('/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup')
+vi.mock('/app/organisms/Desktop/Devices/RunPreview')
+vi.mock('/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunModuleControls')
 vi.mock('/app/resources/runs')
-vi.mock('/app/organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters')
+vi.mock(
+  '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
+)
 vi.mock('/app/redux/config')
 vi.mock('/app/redux-resources/robots')
 
