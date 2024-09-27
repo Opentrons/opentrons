@@ -29,7 +29,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
 import { useCurrentRunId } from '/app/resources/runs'
 import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
-import { useIsRobotBusy } from './hooks'
+import { useIsRobotBusy } from '/app/redux-resources/robots'
 
 import type { StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'

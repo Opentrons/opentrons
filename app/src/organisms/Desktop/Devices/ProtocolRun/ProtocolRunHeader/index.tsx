@@ -12,7 +12,7 @@ import {
 import { useModulesQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
-import { useIsRobotViewable } from '../../hooks'
+import { useIsRobotViewable } from '/app/redux-resources/robots'
 import { RunProgressMeter } from '../../../RunProgressMeter'
 import {
   useNotifyRunQuery,

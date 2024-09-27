@@ -9,7 +9,7 @@ import { useCurrentRunId } from '/app/resources/runs'
 import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
 import { RobotOverflowMenu } from '../RobotOverflowMenu'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { useIsRobotBusy } from '../hooks'
+import { useIsRobotBusy } from '/app/redux-resources/robots'
 
 import {
   mockUnreachableRobot,
@@ -20,6 +20,7 @@ vi.mock('/app/redux/robot-update/hooks')
 vi.mock('/app/resources/runs')
 vi.mock('/app/organisms/Desktop/ChooseProtocolSlideout')
 vi.mock('../hooks')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
 const render = (props: React.ComponentProps<typeof RobotOverflowMenu>) => {

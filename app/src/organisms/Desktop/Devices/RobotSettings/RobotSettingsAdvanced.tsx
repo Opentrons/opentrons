@@ -14,7 +14,6 @@ import {
 
 import { Divider } from '/app/atoms/structure'
 import { ToggleButton } from '/app/atoms/buttons'
-import { useIsRobotBusy } from '../hooks'
 import {
   DeviceReset,
   DisplayRobotName,
@@ -31,7 +30,11 @@ import {
   UsageSettings,
   UseOlderAspirateBehavior,
 } from './AdvancedTab'
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
+import {
+  useRobot,
+  useIsFlex,
+  useIsRobotBusy,
+} from '/app/redux-resources/robots'
 import {
   updateSetting,
   getRobotSettings,

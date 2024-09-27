@@ -6,7 +6,7 @@ import { Navigation } from '/app/organisms/Navigation'
 import { AttachedInstrumentMountItem } from '/app/organisms/InstrumentMountItem'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
-import { PipetteRecalibrationODDWarning } from './PipetteRecalibrationODDWarning'
+import { PipetteRecalibrationODDWarning } from '/app/organisms/ODD/PipetteRecalibrationODDWarning'
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 
 const FETCH_PIPETTE_CAL_POLL = 10000

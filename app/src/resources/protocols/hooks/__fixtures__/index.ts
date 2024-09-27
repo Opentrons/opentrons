@@ -1,26 +1,8 @@
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { renderHook } from '@testing-library/react'
-import { when } from 'vitest-when'
-
-import {
-  useProtocolQuery,
-  useProtocolAnalysisAsDocumentQuery,
-} from '@opentrons/react-api-client'
 import { fixtureTiprack300ul } from '@opentrons/shared-data'
-import { useRequiredProtocolLabware, useRunTimeParameters } from '../index'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-import type { UseQueryResult } from 'react-query'
-import type {
-  CompletedProtocolAnalysis,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
-import type { Protocol } from '@opentrons/api-client'
-
-vi.mock('@opentrons/react-api-client')
-vi.mock('/app/organisms/Desktop/Devices/hooks')
-
-const PROTOCOL_ID = 'fake_protocol_id'
-const mockRTPData = [
+export const PROTOCOL_ID = 'fake_protocol_id'
+export const MOCK_RTP_DATA = [
   {
     displayName: 'Dry Run',
     variableName: 'DRYRUN',
@@ -99,8 +81,8 @@ const mockRTPData = [
     default: 'none',
   },
 ]
-const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2
-const PROTOCOL_ANALYSIS = {
+export const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2
+export const PROTOCOL_ANALYSIS = {
   id: 'fake analysis',
   status: 'completed',
   labware: [],
@@ -152,10 +134,10 @@ const PROTOCOL_ANALYSIS = {
       completedAt: 'fakeCompletedAtTimestamp',
     },
   ],
-  runTimeParameters: mockRTPData,
+  runTimeParameters: MOCK_RTP_DATA,
 } as any
 
-const NULL_COMMAND = {
+export const NULL_COMMAND = {
   id: '97ba49a5-04f6-4f91-986a-04a0eb632882',
   createdAt: '2022-09-07T19:47:42.781065+00:00',
   commandType: 'loadPipette',
@@ -172,78 +154,9 @@ const NULL_COMMAND = {
   startedAt: '2022-09-07T19:47:42.782665+00:00',
   completedAt: '2022-09-07T19:47:42.785061+00:00',
 }
-const NULL_PROTOCOL_ANALYSIS = {
+
+export const NULL_PROTOCOL_ANALYSIS = {
   ...PROTOCOL_ANALYSIS,
   id: 'null_analysis',
   commands: [NULL_COMMAND],
 } as any
-
-describe('useRunTimeParameters', () => {
-  beforeEach(() => {
-    when(vi.mocked(useProtocolQuery))
-      .calledWith(PROTOCOL_ID)
-      .thenReturn({
-        data: {
-          data: { analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id } as any] },
-        },
-      } as UseQueryResult<Protocol>)
-    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
-      .calledWith(PROTOCOL_ID, PROTOCOL_ANALYSIS.id, { enabled: true })
-      .thenReturn({
-        data: PROTOCOL_ANALYSIS,
-      } as UseQueryResult<CompletedProtocolAnalysis>)
-  })
-  it('return RTP', () => {
-    const { result } = renderHook(() => useRunTimeParameters(PROTOCOL_ID))
-    expect(result.current).toBe(mockRTPData)
-  })
-})
-describe('useRequiredProtocolLabware', () => {
-  beforeEach(() => {
-    when(vi.mocked(useProtocolQuery))
-      .calledWith(PROTOCOL_ID)
-      .thenReturn({
-        data: {
-          data: { analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id } as any] },
-        },
-      } as UseQueryResult<Protocol>)
-    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
-      .calledWith(PROTOCOL_ID, PROTOCOL_ANALYSIS.id, { enabled: true })
-      .thenReturn({
-        data: PROTOCOL_ANALYSIS,
-      } as UseQueryResult<CompletedProtocolAnalysis>)
-    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
-      .calledWith(PROTOCOL_ID, NULL_PROTOCOL_ANALYSIS.id, { enabled: true })
-      .thenReturn({
-        data: NULL_PROTOCOL_ANALYSIS,
-      } as UseQueryResult<CompletedProtocolAnalysis>)
-  })
-
-  afterEach(() => {
-    vi.resetAllMocks()
-  })
-
-  it('should return LabwareSetupItem array', () => {
-    const { result } = renderHook(() => useRequiredProtocolLabware(PROTOCOL_ID))
-    expect(result.current.length).toBe(1)
-    expect(result.current[0].nickName).toEqual('first labware nickname')
-    expect(result.current[0].definition.dimensions.xDimension).toBe(127.76)
-    expect(result.current[0].definition.metadata.displayName).toEqual(
-      '300ul Tiprack FIXTURE'
-    )
-  })
-
-  it('should return empty array when there is no match with protocol id', () => {
-    when(vi.mocked(useProtocolQuery))
-      .calledWith(PROTOCOL_ID)
-      .thenReturn({
-        data: {
-          data: {
-            analysisSummaries: [{ id: NULL_PROTOCOL_ANALYSIS.id } as any],
-          },
-        },
-      } as UseQueryResult<Protocol>)
-    const { result } = renderHook(() => useRequiredProtocolLabware(PROTOCOL_ID))
-    expect(result.current.length).toBe(0)
-  })
-})

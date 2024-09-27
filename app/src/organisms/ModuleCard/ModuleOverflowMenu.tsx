@@ -17,11 +17,8 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { useCurrentRunId } from '/app/resources/runs'
-import {
-  useRunStatuses,
-  useIsLegacySessionInProgress,
-} from '/app/organisms/Desktop/Devices/hooks'
+import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
+import { useIsLegacySessionInProgress } from '/app/resources/legacy_sessions'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useModuleOverflowMenu } from './hooks'
 

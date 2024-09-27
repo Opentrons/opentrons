@@ -12,7 +12,7 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '/app/redux/discovery/__fixtures__'
-import { useIsRobotViewable } from '..'
+import { useIsRobotViewable } from '../useIsRobotViewable'
 import type { Store } from 'redux'
 
 vi.mock('/app/redux/discovery')

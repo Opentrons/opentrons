@@ -7,7 +7,6 @@ import {
 
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
-import { DISENGAGED } from '/app/organisms/EmergencyStop'
 import { useIsFlex } from '/app/redux-resources/robots'
 
 const ROBOT_STATUS_POLL_MS = 30000
@@ -50,7 +49,9 @@ export function useIsRobotBusy(
     isMaintenanceRunExisting ||
     (allSessionsQueryResponse?.data?.data != null &&
       allSessionsQueryResponse?.data?.data?.length !== 0) ||
-    (isFlex && estopStatus?.data.status !== DISENGAGED && estopError == null) ||
+    (isFlex &&
+      estopStatus?.data.status !== 'disengaged' &&
+      estopError == null) ||
     isSubsystemUpdating
   )
 }

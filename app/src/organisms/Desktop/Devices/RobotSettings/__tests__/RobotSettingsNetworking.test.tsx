@@ -15,8 +15,7 @@ import {
 import * as Networking from '/app/redux/networking'
 import { useCanDisconnect, useWifiList } from '/app/resources/networking/hooks'
 import * as Fixtures from '/app/redux/networking/__fixtures__'
-import { useIsFlex } from '/app/redux-resources/robots'
-import { useIsRobotBusy } from '../../hooks'
+import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
 
 import { DisconnectModal } from '../ConnectNetwork/DisconnectModal'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
@@ -30,7 +29,6 @@ vi.mock('/app/redux/networking')
 vi.mock('/app/redux/robot-api/selectors')
 vi.mock('/app/resources/networking/hooks')
 vi.mock('/app/redux-resources/robots')
-vi.mock('../../hooks')
 vi.mock('../ConnectNetwork/DisconnectModal')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 

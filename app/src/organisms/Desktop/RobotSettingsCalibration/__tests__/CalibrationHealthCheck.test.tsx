@@ -19,7 +19,7 @@ import {
   mockTipLengthCalibration2,
 } from '/app/redux/calibration/tip-length/__fixtures__'
 import { mockAttachedPipette } from '/app/redux/pipettes/__fixtures__'
-import { useRunStatuses } from '../../Devices/hooks'
+import { useRunStatuses } from '/app/resources/runs'
 
 import {
   useAttachedPipettes,
@@ -36,7 +36,7 @@ import type {
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/pipettes')
-vi.mock('../../Devices/hooks')
+vi.mock('/app/resources/runs')
 vi.mock('/app/resources/instruments')
 vi.mock('/app/redux-resources/robots')
 

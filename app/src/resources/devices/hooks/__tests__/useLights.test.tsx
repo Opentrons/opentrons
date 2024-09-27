@@ -9,7 +9,7 @@ import {
   useSetLightsMutation,
 } from '@opentrons/react-api-client'
 
-import { useLights } from '..'
+import { useLights } from '../useLights'
 
 import type { Store } from 'redux'
 import type { Mock } from 'vitest'

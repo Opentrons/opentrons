@@ -14,9 +14,10 @@ import { i18n } from '/app/i18n'
 import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { useCalibratePipetteOffset } from '/app/organisms/Desktop/CalibratePipetteOffset/useCalibratePipetteOffset'
-import { useDeckCalibrationData, useRunStatuses } from '../../../Devices/hooks'
+import { useDeckCalibrationData } from '../../../Devices/hooks'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
+import { useRunStatuses } from '/app/resources/runs'
 import {
   mockPipetteOffsetCalibrationsResponse,
   mockTipLengthCalibrationResponse,
@@ -68,6 +69,7 @@ vi.mock('../../../Devices/hooks')
 vi.mock('/app/organisms/PipetteWizardFlows')
 vi.mock('/app/resources/devices')
 vi.mock('/app/resources/instruments')
+vi.mock('/app/resources/runs')
 
 const RUN_STATUSES = {
   isRunRunning: false,

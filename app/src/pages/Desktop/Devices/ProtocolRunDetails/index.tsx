@@ -22,10 +22,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import {
-  useRunStatuses,
-  useSyncRobotClock,
-} from '/app/organisms/Desktop/Devices/hooks'
+import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
 import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader'
 import { RunPreview } from '/app/organisms/Desktop/Devices/RunPreview'
 import {
@@ -40,6 +37,7 @@ import {
   useMostRecentCompletedAnalysis,
   useRunHasStarted,
   useModuleRenderInfoForProtocolById,
+  useRunStatuses,
 } from '/app/resources/runs'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { fetchProtocols } from '/app/redux/protocol-storage'

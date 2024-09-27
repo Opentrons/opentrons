@@ -27,7 +27,7 @@ import * as Calibration from '/app/redux/calibration'
 import * as Config from '/app/redux/config'
 import * as Pipettes from '/app/redux/pipettes'
 import * as Sessions from '/app/redux/sessions'
-import { useRunStatuses } from '../Devices/hooks'
+import { useRunStatuses } from '/app/resources/runs'
 import {
   useAttachedPipettes,
   useAttachedPipetteCalibrations,

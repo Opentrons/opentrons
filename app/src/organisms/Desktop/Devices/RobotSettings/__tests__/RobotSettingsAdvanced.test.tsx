@@ -7,8 +7,7 @@ import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getShellUpdateState } from '/app/redux/shell'
-import { useIsFlex } from '/app/redux-resources/robots'
-import { useIsRobotBusy } from '../../hooks'
+import { useIsRobotBusy, useIsFlex } from '/app/redux-resources/robots'
 import {
   DeviceReset,
   DisplayRobotName,
@@ -39,7 +38,6 @@ vi.mock('/app/redux/shell/update', async importOriginal => {
     getShellUpdateState: vi.fn(),
   }
 })
-vi.mock('../../hooks')
 vi.mock('../AdvancedTab/DeviceReset')
 vi.mock('../AdvancedTab/DisplayRobotName')
 vi.mock('../AdvancedTab/EnableStatusLight')
