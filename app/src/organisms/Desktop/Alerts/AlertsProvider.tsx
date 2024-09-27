@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { AlertsModal } from '.'
-import { useToaster } from '../ToasterOven'
+import { useToaster } from '/app/organisms/ToasterOven'
 
 export interface AlertsContextProps {
   removeActiveAppUpdateToast: () => void

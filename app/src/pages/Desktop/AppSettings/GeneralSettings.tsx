@@ -40,7 +40,7 @@ import {
   useTrackEvent,
   ANALYTICS_APP_UPDATE_NOTIFICATIONS_TOGGLED,
 } from '/app/redux/analytics'
-import { UpdateAppModal } from '/app/organisms/UpdateAppModal'
+import { UpdateAppModal } from '/app/organisms/Desktop/UpdateAppModal'
 import { PreviousVersionModal } from '/app/organisms/AppSettings/PreviousVersionModal'
 import { ConnectRobotSlideout } from '/app/organisms/AppSettings/ConnectRobotSlideout'
 import { getTopPortalEl } from '/app/App/portal'

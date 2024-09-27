@@ -8,7 +8,7 @@ import { SUCCESS_TOAST, WARNING_TOAST } from '@opentrons/components'
 import * as AppAlerts from '/app/redux/alerts'
 import { getHasJustUpdated, toggleConfigValue } from '/app/redux/config'
 import { getAvailableShellUpdate } from '/app/redux/shell'
-import { useToaster } from '../ToasterOven'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { UpdateAppModal } from '../UpdateAppModal'
 import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
 
