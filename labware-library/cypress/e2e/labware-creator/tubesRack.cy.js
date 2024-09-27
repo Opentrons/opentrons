@@ -5,7 +5,7 @@
 context('Tubes and Rack', () => {
   describe('Six tubes', () => {
     before(() => {
-      cy.visit('/create')
+      cy.visit('#/create')
       cy.viewport('macbook-15')
       cy.get('label')
         .contains('What type of labware are you creating?')

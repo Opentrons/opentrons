@@ -4,7 +4,7 @@
 
 context('Tubes and Block', () => {
   beforeEach(() => {
-    cy.visit('/create')
+    cy.visit('#/create')
     cy.viewport('macbook-15')
 
     cy.get('label')

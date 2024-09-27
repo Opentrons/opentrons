@@ -6,7 +6,7 @@ const expectedExportFixture =
 
 context('Tubes and Rack', () => {
   before(() => {
-    cy.visit('/create')
+    cy.visit('#/create')
     cy.viewport('macbook-15')
   })
 

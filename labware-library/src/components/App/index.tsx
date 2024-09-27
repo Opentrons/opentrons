@@ -60,11 +60,8 @@ export function App(): JSX.Element {
           <DefinitionRoute render={props => <AppComponent {...props} />} />
         }
       />
-      <Route
-        path={`${publicRoute}`}
-        element={<AppComponent definition={null} />}
-      />
-      <Route path="*" element={<Navigate to={`${publicRoute}`} />} />
+      <Route path={publicRoute} element={<AppComponent definition={null} />} />
+      <Route path="*" element={<Navigate to={publicRoute} />} />
     </Routes>
   )
 }

@@ -4,7 +4,7 @@ const importedLabwareFile = 'TestLabwareDefinition.json'
 
 describe('File Import', () => {
   before(() => {
-    cy.visit('/create')
+    cy.visit('#/create')
     cy.viewport('macbook-15')
   })
 

@@ -4,7 +4,7 @@
 
 context('Reservoirs', () => {
   before(() => {
-    cy.visit('/create')
+    cy.visit('#/create')
     cy.viewport('macbook-15')
   })
 
