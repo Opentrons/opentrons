@@ -137,7 +137,7 @@ context('Tubes and Rack', () => {
 
   describe('Fifteen tubes', () => {
     before(() => {
-      cy.visit('/create')
+      cy.visit('#/create')
       cy.viewport('macbook-15')
 
       cy.get('label')
@@ -268,7 +268,7 @@ context('Tubes and Rack', () => {
 
   describe('Twentyfour tubes', () => {
     before(() => {
-      cy.visit('/create')
+      cy.visit('#/create')
       cy.viewport('macbook-15')
 
       cy.get('label')

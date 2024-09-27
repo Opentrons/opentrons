@@ -445,7 +445,7 @@ context('Tubes and Block', () => {
       })
 
       it('tests the whole form and file export', () => {
-        cy.visit('/create')
+        cy.visit('#/create')
         cy.viewport('macbook-15')
         cy.get('label')
           .contains('What type of labware are you creating?')
