@@ -3,6 +3,7 @@
   "default_tip_option": "Default - get next tip",
   "delete": "Delete step",
   "duplicate": "Duplicate step",
+  "engage_height": "Engage height",
   "final_deck_state": "Final deck state",
   "heater_shaker_settings": "Heater-shaker settings",
   "module": "Module",

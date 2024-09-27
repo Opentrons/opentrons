@@ -13,6 +13,7 @@ import {
 } from '@opentrons/components'
 
 import type { StepFormProps } from '../../types'
+import { ToggleExpandStepFormField } from '../../../../../../molecules'
 
 export function MagnetTools(props: StepFormProps): JSX.Element {
   const { propsForFields, formData } = props
@@ -37,6 +38,20 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
             </StyledText>
           </Flex>
         </ListItem>
+        <Box borderBottom={`1px solid ${COLORS.grey30}`} />
+        <ToggleExpandStepFormField
+          {...propsForFields.getMagnetLabwareEngageHeight}
+          toggleValue={propsForFields.engageHeightDefault}
+          toggleUpdateValue={propsForFields.engageHeight.updateValue}
+          title={t('form:step_edit_form.field.magnetAction.label')}
+          fieldTitle={t('protocol_steps:engage_height')}
+          isSelected={formData.MagnetAction === 'engage'}
+          units={t('units.millimeter')}
+          onLabel={t('form:step_edit_form.field.magnetAction.options.engage')}
+          offLabel={t(
+            'form:step_edit_form.field.magnetAction.options.disengage'
+          )}
+        />
       </Flex>
       <Box borderBottom={`1px solid ${COLORS.grey30}`} />
     </Flex>
