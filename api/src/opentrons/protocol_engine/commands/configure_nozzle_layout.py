@@ -97,6 +97,7 @@ class ConfigureNozzleLayoutImplementation(
                 pipette_id=params.pipetteId,
                 nozzle_map=nozzle_map,
             ),
+            state_update=update_state,
         )
 
 
