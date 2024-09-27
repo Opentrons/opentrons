@@ -1,7 +1,7 @@
 // labware definition helpers
 // TODO(mc, 2019-03-18): move to shared-data?
 import * as React from 'react'
-import { useParams } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import groupBy from 'lodash/groupBy'
 import uniq from 'lodash/uniq'
 import {
@@ -83,7 +83,9 @@ export interface DefinitionRouteProps {
 }
 
 export const DefinitionRoute: React.FC<DefinitionRouteProps> = ({ render }) => {
-  const { loadName } = useParams<{ loadName: string }>()
+  const location = useLocation()
+  const searchParams = new URLSearchParams(location.search)
+  const loadName = searchParams.get('loadName')
   const definition = getDefinition(loadName)
 
   // TODO: handle 404 if loadName exists but definition isn't found
