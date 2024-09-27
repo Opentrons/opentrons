@@ -12,3 +12,14 @@ if (location.hostname.startsWith('sandbox')) {
 export function getPublicPath(): string {
   return _publicPath
 }
+
+export function getLoadnamePath(pathname: string): string {
+  let modifiedLoadName = ''
+  if (location.hostname.startsWith('sandbox')) {
+    modifiedLoadName = pathname.slice(1).split('/')[1] ?? ''
+  } else {
+    modifiedLoadName = pathname.split('/')[1]
+  }
+
+  return modifiedLoadName
+}

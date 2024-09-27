@@ -8,6 +8,7 @@ import {
   LABWAREV2_DO_NOT_LIST,
   getAllDefinitions as _getAllDefinitions,
 } from '@opentrons/shared-data'
+import { getLoadnamePath } from './public-path'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareList, LabwareDefinition } from './types'
@@ -84,7 +85,7 @@ export interface DefinitionRouteProps {
 
 export const DefinitionRoute: React.FC<DefinitionRouteProps> = ({ render }) => {
   const location = useLocation()
-  const loadName = location.pathname.split('/')[1]
+  const loadName = getLoadnamePath(location.pathname)
   const definition = getDefinition(loadName)
 
   // TODO: handle 404 if loadName exists but definition isn't found
