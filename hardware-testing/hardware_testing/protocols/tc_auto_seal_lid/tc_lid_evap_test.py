@@ -1,3 +1,4 @@
+"""Protocol to Test Evaporation % of the Tough Auto Seal Lid."""
 from typing import List
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 from opentrons.protocol_api import (
@@ -55,11 +56,11 @@ def _fill_with_liquid_and_measure(
         return_tips=True,
         blow_out=False,
     )
-    protocol.pause("Weight Armadillo Plate, place on thermocycler, put on lid")
+    protocol.pause("Weight Armadillo Plate, place on thermocycler.")
 
 
 def _pcr_cycle(thermocycler: ThermocyclerContext) -> None:
-    "30x cycles of: 70° for 30s 72° for 30s 95° for 10s."
+    """30x cycles of: 70° for 30s 72° for 30s 95° for 10s."""
     profile_TAG2: List[ThermocyclerStep] = [
         {"temperature": 70, "hold_time_seconds": 30},
         {"temperature": 72, "hold_time_seconds": 30},
@@ -77,11 +78,12 @@ def _move_lid(
     bottom_lid: Labware,
     wasteChute: WasteChute,
 ) -> None:
-    """Move lid from tc to deck"""
+    """Move lid from tc to deck."""
     # Move lid from thermocycler to deck to stack to waste chute
     thermocycler.open_lid()
     # Move Lid to Deck
-    protocol.move_labware(top_lid, "B2", use_gripper=True)
+    protocol.move_labware(top_lid, "C4", use_gripper=True)
+    protocol.pause("Weigh armadillo plate.")
     # Move Lid to Stack
     protocol.move_labware(top_lid, bottom_lid, use_gripper=True)
     # Move Lid to Waste Chute
@@ -134,7 +136,7 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 
 def run(protocol: ProtocolContext) -> None:
-    """Run protocol"""
+    """Run protocol."""
     # LOAD PARAMETERS
     pipette_type = protocol.params.pipette_type  # type: ignore[attr-defined]
     mount_position = protocol.params.mount_pos  # type: ignore[attr-defined]
@@ -154,10 +156,10 @@ def run(protocol: ProtocolContext) -> None:
     tiprack_50_1 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "C3")
     reservoir = protocol.load_labware("nest_12_reservoir_15ml", "A2")
     lids: List[Labware] = [
-        protocol.load_labware("opentrons_tough_auto_sealing_lid", "D2")
+        protocol.load_labware("opentrons_tough_pcr_auto_sealing_lid", "D4")
     ]
     for i in range(4):
-        lids.append(lids[-1].load_labware("opentrons_tough_auto_sealing_lid"))
+        lids.append(lids[-1].load_labware("opentrons_tough_pcr_auto_sealing_lid"))
     lids.reverse()
     top_lid = lids[0]
     bottom_lid = lids[1]
@@ -190,6 +192,7 @@ def run(protocol: ProtocolContext) -> None:
     if test_type == "evap_test":
         _fill_with_liquid_and_measure(protocol, pipette, reservoir, plate_in_cycler)
         protocol.move_labware(top_lid, plate_in_cycler, use_gripper=True)
+        protocol.comment("Ensure TC lid sits completely flat on pcr plate.")
         thermocycler.close_lid()
         thermocycler.execute_profile(
             steps=profile_TAG, repetitions=1, block_max_volume=50
@@ -201,7 +204,7 @@ def run(protocol: ProtocolContext) -> None:
         # # # Cool to 4°
         thermocycler.set_block_temperature(4)
         thermocycler.set_lid_temperature(tc_lid_temp)
+        protocol.pause("THERMOCYCLER LID ABOUT TO OPEN! PLEASE STANDBY!")
         # Open lid
     thermocycler.open_lid()
     _move_lid(thermocycler, protocol, top_lid, bottom_lid, wasteChute)
-    protocol.pause("Weigh armadillo plate.")
