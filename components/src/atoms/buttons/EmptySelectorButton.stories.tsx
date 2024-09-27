@@ -6,13 +6,6 @@ const meta: Meta<typeof EmptySelectorButtonComponent> = {
   title: 'Library/Atoms/Buttons/EmptySelectorButton',
   component: EmptySelectorButtonComponent,
   argTypes: {
-    size: {
-      control: {
-        type: 'select',
-        options: ['large', 'small'],
-      },
-      defaultValue: 'large',
-    },
     textAlignment: {
       controls: {
         type: 'select',
@@ -37,7 +30,6 @@ export const EmptySelectorButton: Story = {
   args: {
     text: 'mock text',
     iconName: 'plus',
-    size: 'small',
     textAlignment: 'left',
     onClick: () => {},
   },
