@@ -76,7 +76,7 @@ function Title(props: LabwareCardProps): JSX.Element {
   const { displayName } = props.definition.metadata
 
   return (
-    <Link to={`${getPublicPath()}${loadName}`}>
+    <Link to={`${getPublicPath()}`} search={`loadName=${loadName}`}>
       <h2 className={styles.title}>
         <span className={styles.title_text}>{displayName}</span>
         <Icon className={styles.title_icon} name="chevron-right" />
