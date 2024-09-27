@@ -214,6 +214,7 @@ class StateUpdate:
         new_location: LabwareLocation,
         new_offset_id: str | None,
     ) -> None:
+        """Set labware location."""
         self.labware_location = LabwareLocationUpdate(
             labware_id=labware_id,
             new_location=new_location,
@@ -248,6 +249,7 @@ class StateUpdate:
         mount: MountType,
         liquid_presence_detection: typing.Optional[bool],
     ) -> None:
+        """Add loaded pipette to state."""
         self.loaded_pipette = LoadPipetteUpdate(
             pipette_id=pipette_id,
             pipette_name=pipette_name,
@@ -261,11 +263,13 @@ class StateUpdate:
         config: pipette_data_provider.LoadedStaticPipetteData,
         serial_number: str,
     ) -> None:
+        """Update pipette config."""
         self.pipette_config = PipetteConfigUpdate(
             pipette_id=pipette_id, config=config, serial_number=serial_number
         )
 
     def update_pipette_nozzle(self, pipette_id: str, nozzle_map: NozzleMap) -> None:
+        """Update pipette nozzle map."""
         self.pipette_nozzle_map = PipetteNozzleMapUpdate(
             pipette_id=pipette_id, nozzle_map=nozzle_map
         )
@@ -273,6 +277,7 @@ class StateUpdate:
     def update_tip_state(
         self, pipette_id: str, tip_geometry: typing.Optional[TipGeometry]
     ) -> None:
+        """Update tip state."""
         self.pipette_tip_state = PipetteTipStateUpdate(
             pipette_id=pipette_id, tip_geometry=tip_geometry
         )

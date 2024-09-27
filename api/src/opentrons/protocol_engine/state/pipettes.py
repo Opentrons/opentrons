@@ -38,9 +38,6 @@ from ..types import (
     CurrentPipetteLocation,
     TipGeometry,
 )
-from ..commands.configuring_common import (
-    PipetteNozzleLayoutResultMixin,
-)
 from ..actions import (
     Action,
     SetPipetteMovementSpeedAction,
@@ -148,7 +145,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(action, SetPipetteMovementSpeedAction):
             self._state.movement_speed_by_id[action.pipette_id] = action.speed
 
-    def _handle_command(  # noqa: C901
+    def _handle_command(
         self, action: Union[SucceedCommandAction, FailCommandAction]
     ) -> None:
         self._set_load_pipette(action)

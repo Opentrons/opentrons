@@ -1,7 +1,6 @@
 """Drop tip in place command request, result, and implementation models."""
 from __future__ import annotations
 from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.types import TipGeometry
 from pydantic import Field, BaseModel
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
