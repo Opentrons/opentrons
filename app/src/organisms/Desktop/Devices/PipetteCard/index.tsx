@@ -22,7 +22,7 @@ import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { usePipetteSettingsQuery } from '@opentrons/react-api-client'
 
 import { LEFT } from '/app/redux/pipettes'
-import { ChangePipette } from '/app/organisms/ChangePipette'
+import { ChangePipette } from '../ChangePipette'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
