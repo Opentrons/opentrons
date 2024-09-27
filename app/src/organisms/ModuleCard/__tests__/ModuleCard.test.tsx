@@ -252,7 +252,7 @@ describe('ModuleCard', () => {
   })
 
   it('renders information for a thermocycler module with mocked status', () => {
-    const { unmount } = render({
+    render({
       ...props,
       module: mockThermocycler,
     })
