@@ -100,7 +100,7 @@ def engine_state_summary() -> StateSummary:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def run_time_parameters() -> List[pe_types.RunTimeParameter]:
     """Get a RunTimeParameter list."""
     return [
@@ -109,6 +109,18 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
             variableName="variable_name",
             value=False,
             default=True,
+        )
+    ]
+
+
+@pytest.fixture
+def command_annotations() -> List[pe_types.CommandAnnotation]:
+    """Get a CommandAnnotation list."""
+    return [
+        pe_types.SecondOrderCommandAnnotation(
+            commandKeys=["abc"],
+            params={"abc": "123"},
+            machineReadableName="hello world",
         )
     ]
 
@@ -634,6 +646,7 @@ async def test_update_current(
     decoy: Decoy,
     engine_state_summary: StateSummary,
     run_time_parameters: List[pe_types.RunTimeParameter],
+    command_annotations: List[pe_types.CommandAnnotation],
     run_resource: RunResource,
     run_command: commands.Command,
     mock_run_orchestrator_store: RunOrchestratorStore,
@@ -649,6 +662,7 @@ async def test_update_current(
             commands=[run_command],
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
+            command_annotations=command_annotations,
         )
     )
 
@@ -770,6 +784,7 @@ async def test_create_archives_existing(
     decoy: Decoy,
     engine_state_summary: StateSummary,
     run_time_parameters: List[pe_types.RunTimeParameter],
+    command_annotations: List[pe_types.CommandAnnotation],
     run_resource: RunResource,
     run_command: commands.Command,
     mock_run_orchestrator_store: RunOrchestratorStore,
@@ -786,6 +801,7 @@ async def test_create_archives_existing(
             commands=[run_command],
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
+            command_annotations=command_annotations,
         )
     )
 

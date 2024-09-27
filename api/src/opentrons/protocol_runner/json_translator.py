@@ -21,7 +21,7 @@ from opentrons.protocol_engine import (
     DeckSlotLocation,
     Liquid,
 )
-from opentrons.protocol_engine.types import HexColor
+from opentrons.protocol_engine.types import HexColor, CommandAnnotation
 
 
 class CommandTranslatorError(Exception):
@@ -196,7 +196,7 @@ class JsonTranslator:
     """Class that translates commands/liquids from PD/JSON to ProtocolEngine."""
 
     def translate_liquids(
-        self, protocol: Union[ProtocolSchemaV6, ProtocolSchemaV7]
+        self, protocol: Union[ProtocolSchemaV6, ProtocolSchemaV7, ProtocolSchemaV8]
     ) -> List[Liquid]:
         """Takes json protocol v6 and translates liquids->protocol engine liquids."""
         protocol_liquids = protocol.liquids or {}
@@ -268,3 +268,26 @@ class JsonTranslator:
         )
 
         return [_translate_simple_command(command) for command in protocol.commands]
+
+    def translate_command_annotations(
+        self,
+        protocol: Union[ProtocolSchemaV8, ProtocolSchemaV7, ProtocolSchemaV6],
+    ) -> List[CommandAnnotation]:
+        """Translate command annotations in json protocol schema v8."""
+        if isinstance(protocol, (ProtocolSchemaV6, ProtocolSchemaV7)):
+            return []
+        else:
+            if (
+                protocol.commandAnnotationSchemaId
+                == "opentronsCommandAnnotationSchemaV1"
+            ):
+                command_annotations: List[CommandAnnotation] = [
+                    parse_obj_as(
+                        CommandAnnotation,  # type: ignore[arg-type]
+                        command_annotation.dict(),
+                    )
+                    for command_annotation in protocol.commandAnnotations
+                ]
+            else:
+                raise ValueError("Uh oh")
+            return command_annotations

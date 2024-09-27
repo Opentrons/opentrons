@@ -1670,6 +1670,64 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
   },
   initialAdditionalEquipmentState
 )
+export const ADD_STEPS_TO_GROUP = 'ADD_STEPS_TO_GROUP'
+export const CREATE_GROUP = 'CREATE_GROUP'
+export const REMOVE_GROUP = 'REMOVE_GROUP'
+export type StepGroupsState = Record<string, StepIdType[]>
+const initialStepGroupState = {}
+const stepGroups: Reducer<StepGroupsState, any> = handleActions<
+  StepGroupsState,
+  any
+>(
+  {
+    CREATE_GROUP: (state, action) => {
+      return {
+        ...state,
+        [action.payload.groupName]: [],
+      }
+    },
+    REMOVE_GROUP: (state, action) => {
+      const {
+        [action.payload.groupName]: removedGroup,
+        ...remainingGroups
+      } = state
+      return remainingGroups
+    },
+    ADD_STEPS_TO_GROUP: (state, action) => {
+      return {
+        ...state,
+        [action.payload.groupName]: [
+          ...state[action.payload.groupName],
+          ...action.payload.stepIds,
+        ],
+      }
+    },
+  },
+  initialStepGroupState
+)
+export type UnsavedGroupState = StepIdType[]
+export const SELECT_STEP_FOR_UNSAVED_GROUP = 'SELECT_STEP_FOR_UNSAVED_GROUP'
+export const CLEAR_UNSAVED_GROUP = 'CLEAR_UNSAVED_GROUP'
+const initialUnsavedGroupState: StepIdType[] = []
+const unsavedGroup: Reducer<UnsavedGroupState, any> = handleActions<
+  UnsavedGroupState,
+  any
+>(
+  {
+    SELECT_STEP_FOR_UNSAVED_GROUP: (state, action) => {
+      const stepId: string = action.payload.stepId
+      if (state.includes(stepId)) {
+        return state.filter(id => id !== stepId)
+      } else {
+        return [...state, stepId]
+      }
+    },
+    CLEAR_UNSAVED_GROUP: () => {
+      return []
+    },
+  },
+  initialUnsavedGroupState
+)
 
 export type OrderedStepIdsState = StepIdType[]
 const initialOrderedStepIdsState: string[] = []
@@ -1786,6 +1844,8 @@ export const presavedStepForm = (
   }
 }
 export interface RootState {
+  unsavedGroup: UnsavedGroupState
+  stepGroups: StepGroupsState
   orderedStepIds: OrderedStepIdsState
   labwareDefs: LabwareDefsRootState
   labwareInvariantProperties: NormalizedLabwareById
@@ -1802,6 +1862,8 @@ export interface RootState {
 // TODO: Ian 2018-12-13 remove this 'action: any' type
 export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
   ({ action, state, prevStateFallback }) => ({
+    unsavedGroup: unsavedGroup(prevStateFallback.unsavedGroup, action),
+    stepGroups: stepGroups(prevStateFallback.stepGroups, action),
     orderedStepIds: orderedStepIds(prevStateFallback.orderedStepIds, action),
     labwareInvariantProperties: labwareInvariantProperties(
       prevStateFallback.labwareInvariantProperties,

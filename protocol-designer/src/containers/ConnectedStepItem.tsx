@@ -2,7 +2,7 @@ import type * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import uniq from 'lodash/uniq'
 import UAParser from 'ua-parser-js'
-import { useConditionalConfirm } from '@opentrons/components'
+import { Box, useConditionalConfirm } from '@opentrons/components'
 
 import { selectors as uiLabwareSelectors } from '../ui/labware'
 import * as timelineWarningSelectors from '../top-selectors/timelineWarnings'
@@ -73,7 +73,6 @@ export const ConnectedStepItem = (
   props: ConnectedStepItemProps
 ): JSX.Element => {
   const { stepId, stepNumber } = props
-
   const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]
   const argsAndErrors = useSelector(stepFormSelectors.getArgsAndErrorsByStepId)[
     stepId
@@ -197,6 +196,7 @@ export const ConnectedStepItem = (
   )
 
   const stepItemProps: StepItemProps = {
+    stepId,
     description: step.stepDetails,
     rawForm: step,
     stepNumber,
@@ -249,9 +249,14 @@ export const ConnectedStepItem = (
           onCancelClick={cancel}
         />
       )}
-      <StepItem {...stepItemProps} onStepContextMenu={props.onStepContextMenu}>
-        <StepItemContents {...stepItemContentsProps} />
-      </StepItem>
+      <Box>
+        <StepItem
+          {...stepItemProps}
+          onStepContextMenu={props.onStepContextMenu}
+        >
+          <StepItemContents {...stepItemContentsProps} />
+        </StepItem>
+      </Box>
     </>
   )
 }

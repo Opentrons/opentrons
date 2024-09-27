@@ -89,6 +89,7 @@ stages:
             result: ok
             robotType: OT-2 Standard
             runTimeParameters: []
+            commandAnnotations: []
             pipettes:
               - id: pipetteId
                 pipetteName: p10_single

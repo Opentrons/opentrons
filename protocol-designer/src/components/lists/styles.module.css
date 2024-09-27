@@ -65,6 +65,8 @@
 }
 
 .pd_titled_list {
+  flex-direction: row;
+  width: 100%;
   margin: 0.4rem 0.125rem;
   color: var(--c-dark-gray);
   box-shadow: var(--shadow-lvl-1);

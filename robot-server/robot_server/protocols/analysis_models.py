@@ -6,6 +6,7 @@ from opentrons.protocol_engine.types import (
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
     CSVRunTimeParamFilesType,
+    CommandAnnotation,
 )
 from opentrons_shared_data.robot.types import RobotType
 from pydantic import BaseModel, Field
@@ -192,6 +193,10 @@ class CompletedAnalysis(BaseModel):
             " For historical reasons, this is an array,"
             " but it won't have more than one element."
         ),
+    )
+    commandAnnotations: List[CommandAnnotation] = Field(
+        default_factory=list,
+        description="Optional annotations for commands in this run.",
     )
 
 

@@ -14,6 +14,8 @@ import {
   getInitialDeckSetup,
   getOrderedStepIds,
   getSavedStepForms,
+  getStepGroups,
+  getUnsavedGroup,
 } from '../../step-forms/selectors'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { getErrorStepId, getSubsteps } from '../../file-data/selectors'
@@ -27,6 +29,7 @@ import {
   getMultiSelectLastSelected,
   getSelectedStepId,
 } from '../../ui/steps'
+import { getEnableStepGrouping } from '../../feature-flags/selectors'
 import { getLabwareNicknamesById } from '../../ui/labware/selectors'
 import { ConnectedStepItem } from '../ConnectedStepItem'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -38,6 +41,7 @@ vi.mock('../../dismiss/selectors')
 vi.mock('../../ui/steps')
 vi.mock('../../labware-ingred/selectors')
 vi.mock('../../ui/labware/selectors')
+vi.mock('../../feature-flags/selectors')
 
 const render = (props: React.ComponentProps<typeof ConnectedStepItem>) => {
   return renderWithProviders(<ConnectedStepItem {...props} />, {
@@ -61,6 +65,9 @@ describe('ConnectedStepItem', () => {
       stepNumber: 2,
       onStepContextMenu: vi.fn(),
     }
+    vi.mocked(getStepGroups).mockReturnValue({})
+    vi.mocked(getUnsavedGroup).mockReturnValue([])
+    vi.mocked(getEnableStepGrouping).mockReturnValue(true)
     vi.mocked(getSavedStepForms).mockReturnValue({
       [pauseStepId]: {
         stepType: 'pause',

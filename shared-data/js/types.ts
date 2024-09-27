@@ -31,6 +31,7 @@ import type {
 import type { RunTimeCommand, LabwareLocation } from '../command/types'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type { PipetteName } from './pipettes'
+import type { CommandAnnotation } from '../commandAnnotation/types'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
 
@@ -765,6 +766,7 @@ export interface CompletedProtocolAnalysis {
   errors: AnalysisError[]
   robotType?: RobotType | null
   runTimeParameters?: RunTimeParameter[]
+  commandAnnotations?: CommandAnnotation[]
 }
 
 export interface ResourceFile {

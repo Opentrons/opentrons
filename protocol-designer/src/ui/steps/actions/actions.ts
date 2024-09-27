@@ -24,6 +24,7 @@ import type {
   ClearWellSelectionLabwareKeyAction,
   SelectStepAction,
   SelectMultipleStepsAction,
+  SelectMultipleStepsForGroupAction,
 } from './types'
 // adds an incremental integer ID for Step reducers.
 // NOTE: if this is an "add step" directly performed by the user,
@@ -128,6 +129,22 @@ export const selectMultipleSteps = (
 ) => {
   const selectStepAction: SelectMultipleStepsAction = {
     type: 'SELECT_MULTIPLE_STEPS',
+    payload: {
+      stepIds,
+      lastSelected,
+    },
+  }
+  dispatch(selectStepAction)
+}
+export const selectMultipleStepsForGroup = (
+  stepIds: StepIdType[],
+  lastSelected: StepIdType
+): ThunkAction<SelectMultipleStepsForGroupAction> => (
+  dispatch: ThunkDispatch<any>,
+  getState: GetState
+) => {
+  const selectStepAction: SelectMultipleStepsForGroupAction = {
+    type: 'SELECT_MULTIPLE_STEPS_FOR_GROUP',
     payload: {
       stepIds,
       lastSelected,

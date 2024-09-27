@@ -31,5 +31,9 @@
   "OT_PD_ENABLE_RETURN_TIP": {
     "title": "Enable return tip",
     "description": "You can choose which tip to pick up and where to drop tip."
+  },
+  "OT_PD_ENABLE_STEP_GROUPING": {
+    "title": "Enable step grouping",
+    "description": "Define groups and add steps to them."
   }
 }

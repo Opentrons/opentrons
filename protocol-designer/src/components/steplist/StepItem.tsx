@@ -45,6 +45,7 @@ import type {
 import type { InitialDeckSetup } from '../../step-forms'
 
 export interface StepItemProps {
+  stepId: string
   description?: string | null
   rawForm?: FormData | null
   stepNumber: number
@@ -71,14 +72,13 @@ export const StepItem = (props: StepItemProps): JSX.Element => {
   const {
     stepType,
     stepNumber,
-
+    stepId,
     collapsed,
     error,
     warning,
     selected,
     isLastSelected,
     hovered,
-
     unhighlightStep,
     handleClick,
     onStepContextMenu,
@@ -100,6 +100,7 @@ export const StepItem = (props: StepItemProps): JSX.Element => {
 
   return (
     <TitledStepList
+      stepId={stepId}
       className={cx(styles.step_item_wrapper)}
       description={Description}
       iconName={error || warning ? 'alert-circle' : iconName}
