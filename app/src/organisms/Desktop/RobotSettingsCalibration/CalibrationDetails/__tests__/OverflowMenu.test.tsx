@@ -13,7 +13,7 @@ import {
 import { i18n } from '/app/i18n'
 import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
-import { useCalibratePipetteOffset } from '/app/organisms/CalibratePipetteOffset/useCalibratePipetteOffset'
+import { useCalibratePipetteOffset } from '/app/organisms/Desktop/CalibratePipetteOffset/useCalibratePipetteOffset'
 import { useDeckCalibrationData, useRunStatuses } from '../../../Devices/hooks'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
@@ -61,7 +61,9 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/sessions/selectors')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-api/selectors')
-vi.mock('/app/organisms/CalibratePipetteOffset/useCalibratePipetteOffset')
+vi.mock(
+  '/app/organisms/Desktop/CalibratePipetteOffset/useCalibratePipetteOffset'
+)
 vi.mock('../../../Devices/hooks')
 vi.mock('/app/organisms/PipetteWizardFlows')
 vi.mock('/app/resources/devices')

@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import { CalibrationTaskList } from '/app/organisms/CalibrationTaskList'
+import { CalibrationTaskList } from '/app/organisms/Desktop/CalibrationTaskList'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { appShellRequestor } from '/app/redux/shell/remote'
 import { useDashboardCalibrateDeck } from './hooks/useDashboardCalibrateDeck'

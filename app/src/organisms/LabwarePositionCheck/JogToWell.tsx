@@ -36,7 +36,7 @@ import levelProbeWithLabware from '/app/assets/images/lpc_level_probe_with_labwa
 import { getIsOnDevice } from '/app/redux/config'
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
-import { NeedHelpLink } from '../CalibrationPanels'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { JogControls } from '/app/molecules/JogControls'
 import { LiveOffsetValue } from './LiveOffsetValue'
 

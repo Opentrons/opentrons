@@ -19,7 +19,7 @@ import { RobotSettingsDeckCalibration } from '../RobotSettingsDeckCalibration'
 
 import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 
-vi.mock('/app/organisms/CalibrationStatusCard')
+vi.mock('../..//CalibrationStatusCard')
 vi.mock('/app/redux/robot-api/selectors')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/organisms/Desktop/Devices/hooks')
