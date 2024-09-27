@@ -35,7 +35,7 @@ from robot_server.hardware import (
     get_robot_type_enum,
     get_ot2_hardware,
 )
-from robot_server.runs.error_recovery_setting_store import (
+from robot_server.error_recovery.settings.store import (
     ErrorRecoverySettingStore,
     get_error_recovery_setting_store,
 )

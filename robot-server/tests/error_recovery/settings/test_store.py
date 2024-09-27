@@ -1,7 +1,7 @@
-"""Tests for error_recovery_setting_store."""
+"""Tests for the error recovery settings store."""
 
 
-from robot_server.runs.error_recovery_setting_store import ErrorRecoverySettingStore
+from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
 
 import pytest
 import sqlalchemy
