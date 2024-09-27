@@ -7,7 +7,7 @@ import {
   SPACING,
   LegacyStyledText,
 } from '@opentrons/components'
-import { labwareImages } from './labwareImages'
+import { labwareImages } from '/app/local-resources/labware'
 
 import type { SelectOption } from '@opentrons/components'
 export interface ChosenTipRackRenderProps {
