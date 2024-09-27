@@ -43,7 +43,7 @@ import { RobotStatusHeader } from './RobotStatusHeader'
 import {
   ErrorRecoveryBanner,
   useErrorRecoveryBanner,
-} from '/app/organisms/ErrorRecoveryBanner'
+} from './ErrorRecoveryBanner'
 
 import type { GripperData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'

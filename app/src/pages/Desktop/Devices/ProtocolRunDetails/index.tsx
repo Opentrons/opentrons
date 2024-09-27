@@ -22,9 +22,12 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import { useRunStatuses, useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
+import {
+  useRunStatuses,
+  useSyncRobotClock,
+} from '/app/organisms/Desktop/Devices/hooks'
 import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader'
-import { RunPreview } from '/app/organisms/RunPreview'
+import { RunPreview } from '/app/organisms/Desktop/Devices/RunPreview'
 import {
   ProtocolRunSetup,
   initialMissingSteps,
@@ -44,10 +47,7 @@ import { appShellRequestor } from '/app/redux/shell/remote'
 import { useRobot, useRobotType } from '/app/redux-resources/robots'
 
 import type { ViewportListRef } from 'react-viewport-list'
-import type {
-  DesktopRouteParams,
-  ProtocolRunDetailsTab,
-} from '/app/App/types'
+import type { DesktopRouteParams, ProtocolRunDetailsTab } from '/app/App/types'
 import type { Dispatch } from '/app/redux/types'
 
 const baseRoundTabStyling = css`

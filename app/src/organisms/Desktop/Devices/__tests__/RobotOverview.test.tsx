@@ -47,7 +47,7 @@ import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 import {
   ErrorRecoveryBanner,
   useErrorRecoveryBanner,
-} from '/app/organisms/ErrorRecoveryBanner'
+} from '../ErrorRecoveryBanner'
 
 import type { Config } from '/app/redux/config/types'
 import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'
@@ -71,7 +71,7 @@ vi.mock('/app/redux-resources/robots')
 vi.mock('../RobotStatusHeader')
 vi.mock('../../UpdateRobotBanner')
 vi.mock('../RobotOverviewOverflowMenu')
-vi.mock('/app/organisms/ErrorRecoveryBanner')
+vi.mock('../ErrorRecoveryBanner')
 
 const OT2_PNG_FILE_NAME = '/app/src/assets/images/OT2-R_HERO.png'
 const FLEX_PNG_FILE_NAME = '/app/src/assets/images/FLEX.png'

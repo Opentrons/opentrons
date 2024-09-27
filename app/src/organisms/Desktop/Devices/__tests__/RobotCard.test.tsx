@@ -35,7 +35,7 @@ import { RobotCard } from '../RobotCard'
 import {
   ErrorRecoveryBanner,
   useErrorRecoveryBanner,
-} from '/app/organisms/ErrorRecoveryBanner'
+} from '../ErrorRecoveryBanner'
 
 import type { State } from '/app/redux/types'
 
@@ -48,7 +48,7 @@ vi.mock('../../UpdateRobotBanner')
 vi.mock('/app/redux/config')
 vi.mock('../RobotOverflowMenu')
 vi.mock('../RobotStatusHeader')
-vi.mock('/app/organisms/ErrorRecoveryBanner')
+vi.mock('../ErrorRecoveryBanner')
 
 const OT2_PNG_FILE_NAME = '/app/src/assets/images/OT2-R_HERO.png'
 const FLEX_PNG_FILE_NAME = '/app/src/assets/images/FLEX.png'
