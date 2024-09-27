@@ -10,14 +10,24 @@ import './styles.global.module.css'
 
 export * from './labware-creator'
 
+import type { BrowserRouterProps } from 'react-router-dom'
+
 const $root = document.getElementById('root')
+
+const routerBaseName =
+  process.env.NODE_ENV === 'production'
+    ? null
+    : `/${window.location.pathname.split('/')[1]}`
 
 if (!$root) {
   throw new Error('fatal: :root not found')
 }
 
+const browserRouterProps: BrowserRouterProps =
+  routerBaseName != null ? { basename: routerBaseName } : {}
+
 const Root = (): JSX.Element => (
-  <BrowserRouter>
+  <BrowserRouter {...browserRouterProps}>
     <Routes>
       <Route path={`${getPublicPath()}create`} element={<LabwareCreator />} />
       <Route path={`${getPublicPath()}*`} element={<App />} />
