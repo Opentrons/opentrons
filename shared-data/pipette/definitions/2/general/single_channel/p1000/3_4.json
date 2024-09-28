@@ -1,6 +1,7 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
   "displayName": "Flex 1-Channel 1000 μL",
+  "name": "p1000_single_flex",
   "model": "p1000",
   "displayCategory": "FLEX",
   "validNozzleMaps": {

@@ -1,6 +1,7 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
   "displayName": "P50 8-Channel GEN1",
+  "name": "p50_multi",
   "model": "p50",
   "displayCategory": "GEN1",
   "validNozzleMaps": {

@@ -1,6 +1,7 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
   "displayName": "P10 Single-Channel GEN1",
+  "name": "p10_single",
   "model": "p10",
   "displayCategory": "GEN1",
   "validNozzleMaps": {

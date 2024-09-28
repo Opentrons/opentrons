@@ -1,6 +1,7 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
   "displayName": "P20 8-Channel GEN2",
+  "name": "p20_multi_gen2",
   "model": "p20",
   "displayCategory": "GEN2",
   "validNozzleMaps": {

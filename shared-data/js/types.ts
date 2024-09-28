@@ -418,6 +418,7 @@ interface pressAndCamConfigurationValues {
 }
 export interface PipetteV2GeneralSpecs {
   displayName: string
+  name: PipetteName
   model: string
   displayCategory: PipetteDisplayCategory
   validNozzleMaps: {

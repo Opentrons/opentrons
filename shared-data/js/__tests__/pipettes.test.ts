@@ -12,6 +12,7 @@ const PIPETTE_NAMES = [
   'p50_single',
   'p300_single',
   'p1000_single',
+  'p1000_single_flex',
   'p10_multi',
   'p50_multi',
   'p300_multi',
@@ -77,6 +78,7 @@ describe('pipette data accessors', () => {
         channels: 1,
         displayCategory: 'FLEX',
         displayName: 'Flex 1-Channel 1000 μL',
+        name: 'p1000_single_flex',
         dropTipConfigurations: { plungerEject: { current: 1, speed: 15 } },
         liquids: {
           default: {
