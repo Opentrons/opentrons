@@ -10,6 +10,7 @@ import { StepOverflowMenu } from '../StepOverflowMenu'
 import {
   getCurrentFormHasUnsavedChanges,
   getCurrentFormIsPresaved,
+  getUnsavedForm,
 } from '../../../../../step-forms/selectors'
 import type * as React from 'react'
 
@@ -35,6 +36,7 @@ describe('StepOverflowMenu', () => {
     }
     vi.mocked(getCurrentFormIsPresaved).mockReturnValue(false)
     vi.mocked(getCurrentFormHasUnsavedChanges).mockReturnValue(false)
+    vi.mocked(getUnsavedForm).mockReturnValue(null)
   })
 
   it('renders each button and clicking them calls the action', () => {
@@ -46,7 +48,7 @@ describe('StepOverflowMenu', () => {
     fireEvent.click(screen.getByText('Edit step'))
     expect(vi.mocked(populateForm)).toHaveBeenCalled()
     fireEvent.click(screen.getByText('View commands'))
-    fireEvent.click(screen.getByText('Add step details'))
-    //  TODO: wire up view commands and add step details
+    fireEvent.click(screen.getByText('View step details'))
+    //  TODO: wire up view commands and view step details
   })
 })

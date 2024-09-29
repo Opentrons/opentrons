@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useConditionalConfirm } from '@opentrons/components'
 import * as timelineWarningSelectors from '../../../../top-selectors/timelineWarnings'
 import { selectors as dismissSelectors } from '../../../../dismiss'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
@@ -11,7 +12,11 @@ import {
   getSelectedStepId,
 } from '../../../../ui/steps'
 import { selectors as fileDataSelectors } from '../../../../file-data'
-
+import {
+  CLOSE_STEP_FORM_WITH_CHANGES,
+  CLOSE_UNSAVED_STEP_FORM,
+  ConfirmDeleteModal,
+} from '../../../../components/modals/ConfirmDeleteModal'
 import { stepIconsByType } from '../../../../form-types'
 import { getOrderedStepIds } from '../../../../step-forms/selectors'
 import { StepContainer } from './StepContainer'
@@ -20,6 +25,7 @@ import type { ThunkDispatch } from 'redux-thunk'
 import type { HoverOnStepAction } from '../../../../ui/steps'
 import type { StepIdType } from '../../../../form-types'
 import type { BaseState, ThunkAction } from '../../../../types'
+import type { DeleteModalType } from '../../../../components/modals/ConfirmDeleteModal'
 
 export interface ConnectedStepInfoProps {
   stepId: StepIdType
@@ -57,7 +63,12 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const selected: boolean = multiSelectItemIds?.length
     ? multiSelectItemIds.includes(stepId)
     : selectedStepId === stepId
-
+  const currentFormIsPresaved = useSelector(
+    stepFormSelectors.getCurrentFormIsPresaved
+  )
+  const singleEditFormHasUnsavedChanges = useSelector(
+    stepFormSelectors.getCurrentFormHasUnsavedChanges
+  )
   const selectStep = (): ThunkAction<any> =>
     dispatch(stepsActions.selectStep(stepId))
   const selectStepOnDoubleClick = (): ThunkAction<any> =>
@@ -67,23 +78,49 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const unhighlightStep = (): HoverOnStepAction =>
     dispatch(stepsActions.hoverOnStep(null))
 
+  const handleStepItemSelection = (): void => {
+    selectStepOnDoubleClick()
+  }
+
+  const { confirm, showConfirmation, cancel } = useConditionalConfirm(
+    handleStepItemSelection,
+    currentFormIsPresaved || singleEditFormHasUnsavedChanges
+  )
+
+  const getModalType = (): DeleteModalType => {
+    if (currentFormIsPresaved) {
+      return CLOSE_UNSAVED_STEP_FORM
+    } else {
+      return CLOSE_STEP_FORM_WITH_CHANGES
+    }
+  }
+
   const iconName = stepIconsByType[step.stepType]
 
   return (
-    <StepContainer
-      hasError={hasError}
-      isStepAfterError={stepAfterError}
-      stepId={stepId}
-      onMouseLeave={unhighlightStep}
-      selected={selected}
-      onDoubleClick={selectStepOnDoubleClick}
-      onClick={selectStep}
-      hovered={hoveredStep === stepId && !hoveredSubstep}
-      onMouseEnter={highlightStep}
-      iconName={hasError || hasWarnings ? 'alert-circle' : iconName}
-      title={`${stepNumber}. ${
-        step.stepName || t(`stepType.${step.stepType}`)
-      }`}
-    />
+    <>
+      {showConfirmation && (
+        <ConfirmDeleteModal
+          modalType={getModalType()}
+          onContinueClick={confirm}
+          onCancelClick={cancel}
+        />
+      )}
+      <StepContainer
+        hasError={hasError}
+        isStepAfterError={stepAfterError}
+        stepId={stepId}
+        onMouseLeave={unhighlightStep}
+        selected={selected}
+        onDoubleClick={confirm}
+        onClick={selectStep}
+        hovered={hoveredStep === stepId && !hoveredSubstep}
+        onMouseEnter={highlightStep}
+        iconName={hasError || hasWarnings ? 'alert-circle' : iconName}
+        title={`${stepNumber}. ${
+          step.stepName || t(`stepType.${step.stepType}`)
+        }`}
+      />
+    </>
   )
 }

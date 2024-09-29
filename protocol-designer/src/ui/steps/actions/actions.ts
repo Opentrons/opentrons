@@ -110,6 +110,10 @@ export const selectStep = (stepId: StepIdType): ThunkAction<any> => (
     payload: stepId,
   }
   dispatch(selectStepAction)
+  dispatch({
+    type: 'POPULATE_FORM',
+    payload: null,
+  })
   resetScrollElements()
 }
 

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { createPortal } from 'react-dom'
 import {
   ALIGN_CENTER,
@@ -11,21 +10,17 @@ import {
   CURSOR_POINTER,
   Flex,
   Icon,
-  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_START,
   OverflowBtn,
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getUnsavedForm } from '../../../../step-forms/selectors'
 import { getTopPortalEl } from '../../../../components/portals/TopPortal'
 import { StepOverflowMenu } from './StepOverflowMenu'
 import { capitalizeFirstLetterAfterNumber } from './utils'
 
 import type { IconName } from '@opentrons/components'
-import { cancelStepForm } from '../../../../steplist/actions'
-import { ThunkDispatch } from '../../../../types'
 
 const STARTING_DECK_STATE = 'Starting deck state'
 const FINAL_DECK_STATE = 'Final deck state'
@@ -60,8 +55,6 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
     hasError = false,
     isStepAfterError = false,
   } = props
-  const formData = useSelector(getUnsavedForm)
-  const dispatch = useDispatch<ThunkDispatch<any>>()
   const [top, setTop] = React.useState<number>(0)
   const menuRootRef = React.useRef<HTMLDivElement | null>(null)
   const [stepOverflowMenu, setStepOverflowMenu] = React.useState<boolean>(false)
@@ -130,7 +123,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
           onClick={onClick}
           padding={SPACING.spacing12}
           borderRadius={BORDERS.borderRadius8}
-          width={formData != null ? '6rem' : '100%'}
+          width="100%"
           backgroundColor={backgroundColor}
           color={color}
           opacity={isStepAfterError ? '50%' : '100%'}
@@ -144,19 +137,17 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
             <Flex
               alignItems={ALIGN_CENTER}
               gridGap={SPACING.spacing8}
-              justifyContent={formData != null ? JUSTIFY_CENTER : JUSTIFY_START}
+              justifyContent={JUSTIFY_START}
               width="100%"
             >
               {iconName && (
                 <Icon size="1rem" name={iconName} color={iconColor ?? color} />
               )}
-              {formData != null ? null : (
-                <StyledText desktopStyle="bodyDefaultRegular">
-                  {capitalizeFirstLetterAfterNumber(title)}
-                </StyledText>
-              )}
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {capitalizeFirstLetterAfterNumber(title)}
+              </StyledText>
             </Flex>
-            {selected && !isStartingOrEndingState && formData == null ? (
+            {selected && !isStartingOrEndingState ? (
               <OverflowBtn
                 data-testid={`StepContainer_${stepId}`}
                 fillColor={COLORS.white}

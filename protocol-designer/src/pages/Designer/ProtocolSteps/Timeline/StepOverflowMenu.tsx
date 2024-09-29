@@ -25,6 +25,7 @@ import {
 import {
   getCurrentFormHasUnsavedChanges,
   getCurrentFormIsPresaved,
+  getUnsavedForm,
 } from '../../../../step-forms/selectors'
 import type * as React from 'react'
 import type { ThunkDispatch } from 'redux-thunk'
@@ -46,6 +47,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
   const deleteStep = (stepId: StepIdType): void => {
     dispatch(steplistActions.deleteStep(stepId))
   }
+  const formData = useSelector(getUnsavedForm)
   const currentFormIsPresaved = useSelector(getCurrentFormIsPresaved)
   const singleEditFormHasUnsavedChanges = useSelector(
     getCurrentFormHasUnsavedChanges
@@ -99,8 +101,11 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
           e.stopPropagation()
         }}
       >
-        <MenuButton onClick={confirm}>{t('edit_step')}</MenuButton>
+        {formData != null ? null : (
+          <MenuButton onClick={confirm}>{t('edit_step')}</MenuButton>
+        )}
         <MenuButton
+          disabled={formData != null}
           onClick={() => {
             console.log('wire this up')
           }}
@@ -108,11 +113,12 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
           {t('view_commands')}
         </MenuButton>
         <MenuButton
+          disabled={formData != null}
           onClick={() => {
             console.log('wire this up')
           }}
         >
-          {t('add_details')}
+          {t('view_details')}
         </MenuButton>
         <MenuButton
           onClick={() => {
