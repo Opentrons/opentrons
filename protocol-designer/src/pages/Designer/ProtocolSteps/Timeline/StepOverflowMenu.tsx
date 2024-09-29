@@ -1,7 +1,6 @@
-import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -13,14 +12,25 @@ import {
   NO_WRAP,
   POSITION_ABSOLUTE,
   SPACING,
+  useConditionalConfirm,
 } from '@opentrons/components'
 import { actions as steplistActions } from '../../../../steplist'
 import { actions as stepsActions } from '../../../../ui/steps'
-
+import { populateForm } from '../../../../ui/steps/actions/actions'
+import {
+  CLOSE_STEP_FORM_WITH_CHANGES,
+  CLOSE_UNSAVED_STEP_FORM,
+  ConfirmDeleteModal,
+} from '../../../../components/modals/ConfirmDeleteModal'
+import {
+  getCurrentFormHasUnsavedChanges,
+  getCurrentFormIsPresaved,
+} from '../../../../step-forms/selectors'
+import type * as React from 'react'
 import type { ThunkDispatch } from 'redux-thunk'
 import type { BaseState } from '../../../../types'
 import type { StepIdType } from '../../../../form-types'
-import { populateForm } from '../../../../ui/steps/actions/actions'
+import type { DeleteModalType } from '../../../../components/modals/ConfirmDeleteModal'
 
 interface StepOverflowMenuProps {
   stepId: string
@@ -36,59 +46,91 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
   const deleteStep = (stepId: StepIdType): void => {
     dispatch(steplistActions.deleteStep(stepId))
   }
+  const currentFormIsPresaved = useSelector(getCurrentFormIsPresaved)
+  const singleEditFormHasUnsavedChanges = useSelector(
+    getCurrentFormHasUnsavedChanges
+  )
   const duplicateStep = (
     stepId: StepIdType
   ): ReturnType<typeof stepsActions.duplicateStep> =>
     dispatch(stepsActions.duplicateStep(stepId))
 
+  const handleStepItemSelection = (): void => {
+    dispatch(populateForm(stepId))
+    setStepOverflowMenu(false)
+  }
+
+  const { confirm, showConfirmation, cancel } = useConditionalConfirm(
+    handleStepItemSelection,
+    currentFormIsPresaved || singleEditFormHasUnsavedChanges
+  )
+
+  const getModalType = (): DeleteModalType => {
+    if (currentFormIsPresaved) {
+      return CLOSE_UNSAVED_STEP_FORM
+    } else {
+      return CLOSE_STEP_FORM_WITH_CHANGES
+    }
+  }
+
   return (
-    <Flex
-      ref={menuRootRef}
-      zIndex={5}
-      top={top}
-      left="19.5rem"
-      position={POSITION_ABSOLUTE}
-      whiteSpace={NO_WRAP}
-      borderRadius={BORDERS.borderRadius8}
-      boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
-      backgroundColor={COLORS.white}
-      flexDirection={DIRECTION_COLUMN}
-      onClick={(e: React.MouseEvent) => {
-        e.preventDefault()
-        e.stopPropagation()
-      }}
-    >
-      <MenuButton
-        onClick={() => {
-          dispatch(populateForm(stepId))
-          setStepOverflowMenu(false)
+    <>
+      {/* TODO: update this modal */}
+      {showConfirmation && (
+        <ConfirmDeleteModal
+          modalType={getModalType()}
+          onContinueClick={confirm}
+          onCancelClick={cancel}
+        />
+      )}
+      <Flex
+        ref={menuRootRef}
+        zIndex={5}
+        top={top}
+        left="19.5rem"
+        position={POSITION_ABSOLUTE}
+        whiteSpace={NO_WRAP}
+        borderRadius={BORDERS.borderRadius8}
+        boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
+        backgroundColor={COLORS.white}
+        flexDirection={DIRECTION_COLUMN}
+        onClick={(e: React.MouseEvent) => {
+          e.preventDefault()
+          e.stopPropagation()
         }}
       >
-        {'Edit step'}
-      </MenuButton>
-      <MenuButton
-        onClick={() => {
-          console.log('wire this up')
-        }}
-      >
-        {t('view_commands')}
-      </MenuButton>
-      <MenuButton
-        onClick={() => {
-          duplicateStep(stepId)
-        }}
-      >
-        {t('duplicate')}
-      </MenuButton>
-      <Divider marginY="0" />
-      <MenuButton
-        onClick={() => {
-          deleteStep(stepId)
-        }}
-      >
-        {t('delete')}
-      </MenuButton>
-    </Flex>
+        <MenuButton onClick={confirm}>{t('edit_step')}</MenuButton>
+        <MenuButton
+          onClick={() => {
+            console.log('wire this up')
+          }}
+        >
+          {t('view_commands')}
+        </MenuButton>
+        <MenuButton
+          onClick={() => {
+            console.log('wire this up')
+          }}
+        >
+          {t('add_details')}
+        </MenuButton>
+        <MenuButton
+          onClick={() => {
+            duplicateStep(stepId)
+          }}
+        >
+          {t('duplicate')}
+        </MenuButton>
+        <Divider marginY="0" />
+        <MenuButton
+          onClick={() => {
+            deleteStep(stepId)
+          }}
+        >
+          {t('delete')}
+        </MenuButton>
+      </Flex>
+    </>
   )
 }
 

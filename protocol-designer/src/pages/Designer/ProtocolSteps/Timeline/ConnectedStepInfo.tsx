@@ -65,39 +65,24 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const unhighlightStep = (): HoverOnStepAction =>
     dispatch(stepsActions.hoverOnStep(null))
 
-  // const { confirm, showConfirmation, cancel } = useConditionalConfirm(
-  //   handleStepItemSelection,
-  //   currentFormIsPresaved || singleEditFormHasUnsavedChanges
-  // )
-
   const iconName = stepIconsByType[step.stepType]
 
   return (
-    <>
-      {/* {showConfirmation && (
-        <ConfirmDeleteModal
-          modalType={getModalType()}
-          onContinueClick={confirm}
-          onCancelClick={cancel}
-        />
-      )} */}
-      <StepContainer
-        hasError={hasError}
-        isStepAfterError={stepAfterError}
-        stepId={stepId}
-        onMouseLeave={unhighlightStep}
-        selected={selected}
-        // setSelectedStep={setSelectedStep}
-        onClick={() => {
-          selectStep()
-        }}
-        hovered={hoveredStep === stepId && !hoveredSubstep}
-        onMouseEnter={highlightStep}
-        iconName={hasError || hasWarnings ? 'alert-circle' : iconName}
-        title={`${stepNumber}. ${
-          step.stepName || t(`stepType.${step.stepType}`)
-        }`}
-      />
-    </>
+    <StepContainer
+      hasError={hasError}
+      isStepAfterError={stepAfterError}
+      stepId={stepId}
+      onMouseLeave={unhighlightStep}
+      selected={selected}
+      onClick={() => {
+        selectStep()
+      }}
+      hovered={hoveredStep === stepId && !hoveredSubstep}
+      onMouseEnter={highlightStep}
+      iconName={hasError || hasWarnings ? 'alert-circle' : iconName}
+      title={`${stepNumber}. ${
+        step.stepName || t(`stepType.${step.stepType}`)
+      }`}
+    />
   )
 }

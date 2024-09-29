@@ -19,10 +19,8 @@ import { StepForm } from './StepForm'
 export function ProtocolSteps(): JSX.Element {
   const { t } = useTranslation(['starting_deck_state'])
   const formData = useSelector(getUnsavedForm)
-  // const dispatch = useDispatch<any>()
   const leftString = t('onDeck')
   const rightString = t('offDeck')
-  // const [selectAStep, setSelectedStep] = useState<string | null>(null)
   const [deckView, setDeckView] = useState<
     typeof leftString | typeof rightString
   >(leftString)
@@ -35,11 +33,6 @@ export function ProtocolSteps(): JSX.Element {
     }
   }, [formData, formType, deckView])
 
-  // useEffect(() => {
-  //   if (selectAStep != null) {
-  //     dispatch(selectStep(selectAStep))
-  //   }
-  // })
   return (
     <>
       <StepForm />

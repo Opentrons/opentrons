@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -25,9 +25,6 @@ import { DraggableSteps } from './DraggableSteps'
 import type { StepIdType } from '../../../../form-types'
 import type { ThunkDispatch } from '../../../../types'
 
-// interface TimelineToolboxProps {
-//   setSelectedStep: React.Dispatch<React.SetStateAction<string | null>>
-// }
 export const TimelineToolbox = (): JSX.Element => {
   const { t } = useTranslation('protocol_steps')
   const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
@@ -50,7 +47,7 @@ export const TimelineToolbox = (): JSX.Element => {
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     const onKeyDown = (e: KeyboardEvent): void => {
       handleKeyDown(e)
     }

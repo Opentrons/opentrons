@@ -110,7 +110,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
       setStepOverflowMenu(false)
     }
   }
-console.log(formData)
+
   return (
     <>
       <Box
