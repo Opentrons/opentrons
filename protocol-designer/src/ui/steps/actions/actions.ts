@@ -126,6 +126,23 @@ export const populateForm = (stepId: StepIdType): ThunkAction<any> => (
   resetScrollElements()
 }
 
+export const selectStepOnDoubleClick = (
+  stepId: StepIdType
+): ThunkAction<any> => (dispatch: ThunkDispatch<any>, getState: GetState) => {
+  const selectStepAction: SelectStepAction = {
+    type: 'SELECT_STEP',
+    payload: stepId,
+  }
+  dispatch(selectStepAction)
+  const state = getState()
+  const formData = { ...stepFormSelectors.getSavedStepForms(state)[stepId] }
+  dispatch({
+    type: 'POPULATE_FORM',
+    payload: formData,
+  })
+  resetScrollElements()
+}
+
 // NOTE(sa, 2020-12-11): this is a thunk so that we can populate the batch edit form with things later
 export const selectMultipleSteps = (
   stepIds: StepIdType[],

@@ -60,6 +60,8 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
 
   const selectStep = (): ThunkAction<any> =>
     dispatch(stepsActions.selectStep(stepId))
+  const selectStepOnDoubleClick = (): ThunkAction<any> =>
+    dispatch(stepsActions.selectStepOnDoubleClick(stepId))
   const highlightStep = (): HoverOnStepAction =>
     dispatch(stepsActions.hoverOnStep(stepId))
   const unhighlightStep = (): HoverOnStepAction =>
@@ -74,9 +76,8 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
       stepId={stepId}
       onMouseLeave={unhighlightStep}
       selected={selected}
-      onClick={() => {
-        selectStep()
-      }}
+      onDoubleClick={selectStepOnDoubleClick}
+      onClick={selectStep}
       hovered={hoveredStep === stepId && !hoveredSubstep}
       onMouseEnter={highlightStep}
       iconName={hasError || hasWarnings ? 'alert-circle' : iconName}

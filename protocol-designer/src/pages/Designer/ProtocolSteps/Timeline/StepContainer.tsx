@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { createPortal } from 'react-dom'
 import {
   ALIGN_CENTER,
@@ -24,6 +24,8 @@ import { StepOverflowMenu } from './StepOverflowMenu'
 import { capitalizeFirstLetterAfterNumber } from './utils'
 
 import type { IconName } from '@opentrons/components'
+import { cancelStepForm } from '../../../../steplist/actions'
+import { ThunkDispatch } from '../../../../types'
 
 const STARTING_DECK_STATE = 'Starting deck state'
 const FINAL_DECK_STATE = 'Final deck state'
@@ -34,6 +36,7 @@ export interface StepContainerProps {
   stepId?: string
   iconColor?: string
   onClick?: (event: React.MouseEvent) => void
+  onDoubleClick?: (event: React.MouseEvent) => void
   onMouseEnter?: (event: React.MouseEvent) => void
   onMouseLeave?: (event: React.MouseEvent) => void
   selected?: boolean
@@ -46,6 +49,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
   const {
     stepId,
     iconName,
+    onDoubleClick,
     onMouseEnter,
     onMouseLeave,
     selected,
@@ -57,6 +61,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
     isStepAfterError = false,
   } = props
   const formData = useSelector(getUnsavedForm)
+  const dispatch = useDispatch<ThunkDispatch<any>>()
   const [top, setTop] = React.useState<number>(0)
   const menuRootRef = React.useRef<HTMLDivElement | null>(null)
   const [stepOverflowMenu, setStepOverflowMenu] = React.useState<boolean>(false)
@@ -121,6 +126,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
         }}
       >
         <Btn
+          onDoubleClick={onDoubleClick}
           onClick={onClick}
           padding={SPACING.spacing12}
           borderRadius={BORDERS.borderRadius8}
