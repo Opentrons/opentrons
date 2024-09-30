@@ -112,11 +112,17 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
                 well_name=well_name,
             )
 
+        well_location = params.wellLocation
+        if well_location.origin == WellOrigin.MENISCUS:
+            well_location.volumeOffset = "operationVolume"
+            if well_location.offset.z == 0.0:
+                well_location.offset.z = -2.0 # disallow offset.z > -1.0 ?
+
         position = await self._movement.move_to_well(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
-            well_location=params.wellLocation,
+            well_location=well_location,
             current_well=current_well,
             operation_volume=-params.volume,
         )

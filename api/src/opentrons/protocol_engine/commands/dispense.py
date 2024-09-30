@@ -7,7 +7,7 @@ from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
 
 from pydantic import Field
 
-from ..types import DeckPoint
+from ..types import DeckPoint, WellOrigin
 from ..state.update_types import StateUpdate
 from .pipetting_common import (
     PipetteIdMixin,
@@ -76,11 +76,17 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
         """Move to and dispense to the requested well."""
         state_update = StateUpdate()
 
+        well_location = params.wellLocation
+        if well_location.origin == WellOrigin.MENISCUS:
+            well_location.volumeOffset = 0.0
+            if well_location.offset.z == 0.0:
+                well_location.offset.z = -2.0 # disallow offset.z > -1.0 ?
+
         position = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
-            well_location=params.wellLocation,
+            well_location=well_location,
         )
         deck_point = DeckPoint.construct(x=position.x, y=position.y, z=position.z)
         state_update.set_pipette_location(
