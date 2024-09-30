@@ -2,7 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { LabelText, LABEL_LEFT } from './LabelText'
-import { ClickableIcon } from './ClickableIcon'
+// import { ClickableIcon } from './ClickableIcon'
 import styles from './styles.module.css'
 
 interface TableTitleProps {
@@ -29,12 +29,12 @@ export function TableTitle(props: TableTitleProps): JSX.Element {
     <>
       <div className={styles.table_title}>
         <LabelText position={LABEL_LEFT}>{label}</LabelText>
-        <ClickableIcon
+        {/* <ClickableIcon
           title="info"
           name="information"
           className={iconClassName}
           onClick={toggleGuide}
-        />
+        /> */}
       </div>
       <div className={contentClassName}>{diagram}</div>
     </>
