@@ -70,9 +70,9 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
     stepFormSelectors.getCurrentFormHasUnsavedChanges
   )
   const selectStep = (): ThunkAction<any> =>
-    dispatch(stepsActions.selectStep(stepId))
+    dispatch(stepsActions.resetSelectStep(stepId))
   const selectStepOnDoubleClick = (): ThunkAction<any> =>
-    dispatch(stepsActions.selectStepOnDoubleClick(stepId))
+    dispatch(stepsActions.selectStep(stepId))
   const highlightStep = (): HoverOnStepAction =>
     dispatch(stepsActions.hoverOnStep(stepId))
   const unhighlightStep = (): HoverOnStepAction =>

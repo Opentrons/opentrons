@@ -101,7 +101,7 @@ export const clearWellSelectionLabwareKey = (): ClearWellSelectionLabwareKeyActi
   type: 'CLEAR_WELL_SELECTION_LABWARE_KEY',
   payload: null,
 })
-export const selectStep = (stepId: StepIdType): ThunkAction<any> => (
+export const resetSelectStep = (stepId: StepIdType): ThunkAction<any> => (
   dispatch: ThunkDispatch<any>,
   getState: GetState
 ) => {
@@ -130,9 +130,10 @@ export const populateForm = (stepId: StepIdType): ThunkAction<any> => (
   resetScrollElements()
 }
 
-export const selectStepOnDoubleClick = (
-  stepId: StepIdType
-): ThunkAction<any> => (dispatch: ThunkDispatch<any>, getState: GetState) => {
+export const selectStep = (stepId: StepIdType): ThunkAction<any> => (
+  dispatch: ThunkDispatch<any>,
+  getState: GetState
+) => {
   const selectStepAction: SelectStepAction = {
     type: 'SELECT_STEP',
     payload: stepId,

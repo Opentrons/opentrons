@@ -77,7 +77,9 @@ describe('steps actions', () => {
         },
         {
           type: 'POPULATE_FORM',
-          payload: null,
+          payload: {
+            foo: 'getSavedStepFormsResult',
+          },
         },
       ])
     })
