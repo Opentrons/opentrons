@@ -125,7 +125,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
       <HandleEnter onEnter={handleProceed}>
         <WizardBody
           stepNumber={2}
-          header={page === 'add' ? t('add_pip') : t('robot_pipettes')}
+          header={page === 'add' ? t('add_pipette') : t('robot_pipettes')}
           subHeader={page === 'add' ? t('which_pipette') : undefined}
           proceed={handleProceed}
           goBack={() => {
@@ -445,7 +445,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                       setMount('left')
                       resetFields()
                     }}
-                    text={t('add_pip')}
+                    text={t('add_pipette')}
                     textAlignment="left"
                     iconName="plus"
                   />
@@ -476,7 +476,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                       setMount('right')
                       resetFields()
                     }}
-                    text={t('add_pip')}
+                    text={t('add_pipette')}
                     textAlignment="left"
                     iconName="plus"
                   />

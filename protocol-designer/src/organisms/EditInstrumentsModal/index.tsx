@@ -267,7 +267,7 @@ export function EditInstrumentsModal(
                     setMount('left')
                     resetFields()
                   }}
-                  text={t('add_pip')}
+                  text={t('add_pipette')}
                   textAlignment="left"
                   iconName="plus"
                 />
@@ -301,7 +301,7 @@ export function EditInstrumentsModal(
                     setPage('add')
                     setMount('right')
                   }}
-                  text={t('add_pip')}
+                  text={t('add_pipette')}
                   textAlignment="left"
                   iconName="plus"
                 />

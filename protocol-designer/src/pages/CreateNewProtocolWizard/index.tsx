@@ -8,8 +8,10 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useDispatch, useSelector } from 'react-redux'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
+
 import {
   FLEX_ROBOT_TYPE,
+  getAreSlotsAdjacent,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -18,9 +20,9 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
-  getAreSlotsAdjacent,
 } from '@opentrons/shared-data'
 import { Box, COLORS } from '@opentrons/components'
+
 import { actions as fileActions } from '../../load-file'
 import { uuid } from '../../utils'
 import * as labwareDefSelectors from '../../labware-defs/selectors'
