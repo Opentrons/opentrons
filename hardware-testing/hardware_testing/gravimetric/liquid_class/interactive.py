@@ -26,8 +26,8 @@ def interactively_build_liquid_class(
 ) -> LiquidClassSettings:
     ret = deepcopy(default)
     for asp_or_disp_field in fields(LiquidClassSettings):
-        print(f"{asp_or_disp_field.name.upper()}:")
         settings = getattr(default, asp_or_disp_field.name)
+        print(f"{asp_or_disp_field.name.upper()}:")
         for f in fields(settings):
             _default: Optional[float] = getattr(settings, f.name)
             _new_val: float = _user_input_value_for_attribute(f.name, _default)

@@ -68,11 +68,6 @@ _default_dispense: Dict[str, DispenseSettings] = {
         delay=0.5,
     ),
 }
-_default_volume_correction: Dict[str, str] = {
-    _WATER: "1",
-    _GLYCEROL_50: "1",  # FIXME: only exists for P50S right now
-    _ETHANOL_70: "1",  # FIXME: doesn't exist yet
-}
 
 _defaults: Dict[
     int, Dict[int, Dict[int, Dict[int, Dict[str, LiquidClassSettings]]]]
@@ -98,7 +93,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                     _GLYCEROL_50: LiquidClassSettings(  # glycerol-50
                         aspirate=AspirateSettings(
@@ -117,7 +111,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                 },
                 10: {  # 10uL
@@ -138,7 +131,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                     _GLYCEROL_50: LiquidClassSettings(  # glycerol-50
                         aspirate=AspirateSettings(
@@ -157,7 +149,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                 },
                 50: {  # 50uL
@@ -173,12 +164,11 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=57,
-                            push_out=11,
+                            push_out=3.9,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                     _GLYCEROL_50: LiquidClassSettings(  # glycerol-50
                         aspirate=AspirateSettings(
@@ -192,12 +182,11 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=40.0,
-                            push_out=11,
+                            push_out=3.9,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                 },
             },
@@ -222,7 +211,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                     _GLYCEROL_50: LiquidClassSettings(  # glycerol-50
                         aspirate=AspirateSettings(
@@ -241,7 +229,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                 },
                 10: {  # 10uL
@@ -262,7 +249,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                     _GLYCEROL_50: LiquidClassSettings(  # glycerol-50
                         aspirate=AspirateSettings(
@@ -281,7 +267,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                 },
                 50: {  # 50uL
@@ -302,7 +287,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                     _GLYCEROL_50: LiquidClassSettings(  # glycerol-50
                         aspirate=AspirateSettings(
@@ -321,7 +305,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                 },
             },
@@ -348,7 +331,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                     _GLYCEROL_50: LiquidClassSettings(  # glycerol-50
                         aspirate=AspirateSettings(
@@ -367,7 +349,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                 },
                 50: {  # 50uL
@@ -388,7 +369,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                     _GLYCEROL_50: LiquidClassSettings(  # glycerol-50
                         aspirate=AspirateSettings(
@@ -407,7 +387,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                 },
                 200: {  # 200uL
@@ -428,7 +407,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                     _GLYCEROL_50: LiquidClassSettings(  # glycerol-50
                         aspirate=AspirateSettings(
@@ -447,7 +425,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                 },
             },
@@ -474,7 +451,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                     _GLYCEROL_50: LiquidClassSettings(  # glycerol-50
                         aspirate=AspirateSettings(
@@ -493,7 +469,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                 },
                 100: {  # 100uL
@@ -514,7 +489,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                     _GLYCEROL_50: LiquidClassSettings(  # glycerol-50
                         aspirate=AspirateSettings(
@@ -533,7 +507,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                 },
                 1000: {  # 1000uL
@@ -554,7 +527,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                     _GLYCEROL_50: LiquidClassSettings(  # glycerol-50
                         aspirate=AspirateSettings(
@@ -573,7 +545,6 @@ _defaults: Dict[
                             retract_mm=None,
                             delay=None,
                         ),
-                        volume_correction_version=None,
                     ),
                 },
             },
@@ -587,7 +558,6 @@ def get_default(liquid: str, dilution: float) -> LiquidClassSettings:
     return LiquidClassSettings(
         aspirate=deepcopy(_default_aspirate[cls_name]),
         dispense=deepcopy(_default_dispense[cls_name]),
-        volume_correction_version=str(_default_volume_correction[cls_name]),
     )
 
 

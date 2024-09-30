@@ -152,6 +152,8 @@ class GravimetricRecording(List):
 
     def calculate_cv(self) -> float:
         """Calculate the percent CV of the recording."""
+        if not self.average:
+            return 0.0
         return self.stdev / self.average
 
     def calculate_d(self, target: float) -> float:

@@ -154,12 +154,6 @@ def _pipette_with_liquid_settings(  # noqa: C901
     hw_api = get_sync_hw_api(ctx)
     hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
     hw_pipette = hw_api.hardware_pipettes[hw_mount.to_mount()]
-    # NOTE: override whatever is set by SW, so we can use more curves
-    vol_corr_ver = liquid_class.volume_correction_version
-    assert vol_corr_ver in hw_pipette.active_tip_settings.aspirate.default
-    assert vol_corr_ver in hw_pipette.active_tip_settings.dispense.default
-    hw_pipette._pipetting_function_version = vol_corr_ver
-    _check_aspirate_dispense_args(mix, aspirate, dispense)
 
     def _get_max_blow_out_ul() -> float:
         # NOTE: calculated using blow-out distance (mm) and the nominal ul-per-mm

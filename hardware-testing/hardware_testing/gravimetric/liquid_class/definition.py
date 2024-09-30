@@ -34,7 +34,6 @@ class LiquidClassSettings:
 
     aspirate: AspirateSettings
     dispense: DispenseSettings
-    volume_correction_version: Optional[str]
 
 
 def interpolate(
@@ -47,6 +46,7 @@ def interpolate(
 
     return LiquidClassSettings(
         aspirate=AspirateSettings(
+            z_speed=_interp(a.aspirate.z_speed, b.aspirate.z_speed),
             submerge_mm=_interp(a.aspirate.submerge_mm, b.aspirate.submerge_mm),
             flow_rate=_interp(a.aspirate.flow_rate, b.aspirate.flow_rate),
             delay=_interp(a.aspirate.delay, b.aspirate.delay),
@@ -54,6 +54,7 @@ def interpolate(
             air_gap=_interp(a.aspirate.air_gap, b.aspirate.air_gap),
         ),
         dispense=DispenseSettings(
+            z_speed=_interp(a.dispense.z_speed, b.dispense.z_speed),
             submerge_mm=_interp(a.dispense.submerge_mm, b.dispense.submerge_mm),
             flow_rate=_interp(a.dispense.flow_rate, b.dispense.flow_rate),
             delay=_interp(a.dispense.delay, b.dispense.delay),

@@ -199,7 +199,9 @@ class RunArgs:
         environment_sensor = asair_sensor.BuildAsairSensor(True)
         git_description = get_git_description()
         if not args.photometric:
-            scale = Scale.build(simulate=_ctx.is_simulating())
+            scale = Scale.build(simulate=(_ctx.is_simulating() or args.sim_scale))
+        else:
+            scale = None
         ui.print_header("LOAD PIPETTE")
         pipette = helpers._load_pipette(
             _ctx,
@@ -320,10 +322,7 @@ class RunArgs:
             else:
                 protocol_cfg = GRAVIMETRIC_CFG[args.pipette][args.channels]
             name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
-            sim_scale = (_ctx.is_simulating() or args.sim_scale)
-            recorder = execute._load_scale(
-                name, scale, run_id, pipette_tag, start_time, sim_scale
-            )
+            recorder = execute._load_scale(name, scale, run_id, pipette_tag, start_time)
             assert (
                 0.0 <= args.dilution <= 1.0
             ), f"dilution must be between 0-1, not {args.dilution}"

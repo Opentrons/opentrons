@@ -345,7 +345,8 @@ def _run_trial(
     else:
         # center channel over well
         trial.pipette.move_to(trial.well.top(50).move(trial.channel_offset))
-    trial.pipette._retract()  # retract to top of gantry
+    if not trial.recorder.is_simulator:
+        trial.pipette._retract()  # retract to top of gantry
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
     ui.print_info(f"\tinitial grams: {m_data_init.grams_average} g")
     # update the vials volumes, using the last-known weight
@@ -362,6 +363,9 @@ def _run_trial(
         )
     _PREV_TRIAL_GRAMS = m_data_init
 
+    if trial.cfg.interactive:
+        ui.get_user_ready("aspirating")
+
     # RUN ASPIRATE
     aspirate_with_liquid_class(
         trial.ctx,
@@ -377,12 +381,16 @@ def _run_trial(
         mode=trial.mode,
         clear_accuracy_function=trial.cfg.nominal_plunger,
     )
-    trial.pipette._retract()  # retract to top of gantry
+    if not trial.recorder.is_simulator:
+        trial.pipette._retract()  # retract to top of gantry
 
     _take_photos(trial, "aspirate")
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
     ui.print_info(f"\tgrams after aspirate: {m_data_aspirate.grams_average} g")
     ui.print_info(f"\tcelsius after aspirate: {m_data_aspirate.celsius_pipette} C")
+
+    if trial.cfg.interactive:
+        ui.get_user_ready("dispensing")
 
     # RUN DISPENSE
     dispense_with_liquid_class(
@@ -399,7 +407,8 @@ def _run_trial(
         mode=trial.mode,
         clear_accuracy_function=trial.cfg.nominal_plunger,
     )
-    trial.pipette._retract()  # retract to top of gantry
+    if not trial.recorder.is_simulator:
+        trial.pipette._retract()  # retract to top of gantry
     _take_photos(trial, "dispense")
     m_data_dispense = _record_measurement_and_store(MeasurementType.DISPENSE)
     ui.print_info(f"\tgrams after dispense: {m_data_dispense.grams_average} g")
@@ -411,6 +420,8 @@ def _run_trial(
     volume_dispense = calculate_change_in_volume(
         m_data_aspirate, m_data_dispense, liq, dilution=trial.cfg.dilution
     )
+    if trial.cfg.interactive:
+        ui.get_user_ready("examine tip")
     return volume_aspirate, m_data_aspirate, volume_dispense, m_data_dispense
 
 
@@ -472,7 +483,6 @@ def _load_scale(
     run_id: str,
     pipette_tag: str,
     start_time: float,
-    simulating: bool,
 ) -> GravimetricRecorder:
     ui.print_header("LOAD SCALE")
     ui.print_info(
@@ -488,14 +498,14 @@ def _load_scale(
             tag=pipette_tag,
             start_time=start_time,
             duration=0,
-            frequency=1000 if simulating else 5,
+            frequency=1000 if scale.is_simulator else 5,
             stable=False,
         ),
         scale,
-        simulate=simulating,
+        simulate=scale.is_simulator,
     )
     ui.print_info(f'found scale "{recorder.serial_number}"')
-    if simulating:
+    if scale.is_simulator:
         recorder.set_simulation_mass(0)
     recorder.record(in_thread=True)
     ui.print_info(f'scale is recording to "{recorder.file_name}"')
