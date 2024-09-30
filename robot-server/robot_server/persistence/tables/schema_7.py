@@ -102,6 +102,7 @@ analysis_primitive_type_rtp_table = sqlalchemy.Table(
             PrimitiveParamSQLEnum,
             values_callable=lambda obj: [e.value for e in obj],
             create_constraint=True,
+            # todo(mm, 2024-09-24): Can we add validate_strings=True here?
         ),
         nullable=False,
     ),
@@ -261,5 +262,32 @@ run_csv_rtp_table = sqlalchemy.Table(
         "file_id",
         sqlalchemy.ForeignKey("data_files.id"),
         nullable=True,
+    ),
+)
+
+
+class BooleanSettingKey(enum.Enum):
+    """Keys for boolean settings."""
+
+    DISABLE_ERROR_RECOVERY = "disable_error_recovery"
+
+
+boolean_setting_table = sqlalchemy.Table(
+    "boolean_setting",
+    metadata,
+    sqlalchemy.Column(
+        "key",
+        sqlalchemy.Enum(
+            BooleanSettingKey,
+            values_callable=lambda obj: [e.value for e in obj],
+            validate_strings=True,
+            create_constraint=True,
+        ),
+        primary_key=True,
+    ),
+    sqlalchemy.Column(
+        "value",
+        sqlalchemy.Boolean,
+        nullable=False,
     ),
 )
