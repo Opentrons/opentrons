@@ -320,8 +320,9 @@ class RunArgs:
             else:
                 protocol_cfg = GRAVIMETRIC_CFG[args.pipette][args.channels]
             name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
+            sim_scale = (_ctx.is_simulating() or args.sim_scale)
             recorder = execute._load_scale(
-                name, scale, run_id, pipette_tag, start_time, _ctx.is_simulating()
+                name, scale, run_id, pipette_tag, start_time, sim_scale
             )
             assert (
                 0.0 <= args.dilution <= 1.0
@@ -574,6 +575,7 @@ if __name__ == "__main__":
     parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--skip-labware-offsets", action="store_true")
     parser.add_argument("--no-blank", action="store_true")
+    parser.add_argument("--sim-scale", action="store_true")
     parser.add_argument("--blank-trials", type=int, default=10)
     parser.add_argument("--mix", action="store_true")
     parser.add_argument("--user-volumes", nargs="+", type=float, default=[])
