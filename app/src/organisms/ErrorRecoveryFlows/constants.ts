@@ -18,6 +18,7 @@ export const DEFINED_ERROR_TYPES = {
   OVERPRESSURE: 'overpressure',
   LIQUID_NOT_FOUND: 'liquidNotFound',
   TIP_PHYSICALLY_MISSING: 'tipPhysicallyMissing',
+  GRIPPER_MOVEMENT: 'gripperMovement',
 }
 
 // Client-defined error-handling flows.
