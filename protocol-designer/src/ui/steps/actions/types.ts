@@ -90,7 +90,8 @@ export interface SelectMultipleStepsAction {
   }
 }
 
+export type ViewSubstep = StepIdType | null
 export interface ToggleViewSubstepAction {
   type: 'TOGGLE_VIEW_SUBSTEP'
-  payload: StepIdType
+  payload: ViewSubstep
 }

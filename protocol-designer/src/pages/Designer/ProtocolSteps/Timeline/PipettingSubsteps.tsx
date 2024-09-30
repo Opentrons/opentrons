@@ -6,6 +6,11 @@ import type {
   SubstepIdentifier,
   WellIngredientNames,
 } from '../../../../steplist'
+import { useSelector } from 'react-redux'
+import {
+  getAdditionalEquipment,
+  getSavedStepForms,
+} from '../../../../step-forms/selectors'
 
 interface PipettingSubstepsProps {
   substeps: SourceDestSubstepItem
@@ -16,6 +21,15 @@ interface PipettingSubstepsProps {
 
 export function PipettingSubsteps(props: PipettingSubstepsProps): JSX.Element {
   const { substeps, selectSubstep, hoveredSubstep } = props
+  const stepId = substeps.parentStepId
+  const formData = useSelector(getSavedStepForms)[stepId]
+  const additionalEquipment = useSelector(getAdditionalEquipment)
+  const destLocationId = formData.dispense_labware
+  const trashName =
+    additionalEquipment[destLocationId] != null
+      ? additionalEquipment[destLocationId]?.name
+      : null
+
   if (substeps.multichannel) {
     return (
       <Flex
@@ -25,6 +39,7 @@ export function PipettingSubsteps(props: PipettingSubstepsProps): JSX.Element {
       >
         {substeps.multiRows.map((rowGroup, groupKey) => (
           <MultichannelSubstep
+            trashName={trashName}
             key={groupKey}
             highlighted={
               !!hoveredSubstep &&
@@ -49,6 +64,7 @@ export function PipettingSubsteps(props: PipettingSubstepsProps): JSX.Element {
     >
       {substeps.rows.map((row, substepIndex) => (
         <Substep
+          trashName={trashName}
           key={substepIndex}
           selectSubstep={selectSubstep}
           stepId={substeps.parentStepId}

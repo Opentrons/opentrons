@@ -15,6 +15,7 @@ import {
 } from '@opentrons/components'
 import { Substep } from './Substep'
 import { formatVolume } from './utils'
+import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type {
   StepItemSourceDestRow,
   SubstepIdentifier,
@@ -22,6 +23,7 @@ import type {
 } from '../../../../steplist'
 
 interface MultichannelSubstepProps {
+  trashName: AdditionalEquipmentName | null
   rowGroup: StepItemSourceDestRow[]
   ingredNames: WellIngredientNames
   stepId: string
@@ -33,7 +35,14 @@ interface MultichannelSubstepProps {
 export function MultichannelSubstep(
   props: MultichannelSubstepProps
 ): JSX.Element {
-  const { rowGroup, stepId, selectSubstep, substepIndex, ingredNames } = props
+  const {
+    rowGroup,
+    stepId,
+    selectSubstep,
+    substepIndex,
+    ingredNames,
+    trashName,
+  } = props
   const { t } = useTranslation('application')
   const [collapsed, setCollapsed] = useState<Boolean>(true)
   const handleToggleCollapsed = (): void => {
@@ -47,9 +56,9 @@ export function MultichannelSubstep(
   }:${lastChannelSource ? lastChannelSource.well : ''}`
   const firstChannelDest = rowGroup[0].dest
   const lastChannelDest = rowGroup[rowGroup.length - 1].dest
-  const destWellRange = `${firstChannelDest ? firstChannelDest.well : ''}:${
-    lastChannelDest ? lastChannelDest.well : ''
-  }`
+  const destWellRange = `${
+    firstChannelDest ? firstChannelDest.well ?? 'Trash' : ''
+  }:${lastChannelDest ? lastChannelDest.well : ''}`
 
   return (
     <Flex
@@ -98,6 +107,7 @@ export function MultichannelSubstep(
         rowGroup.map((row, rowKey) => {
           return (
             <Substep
+              trashName={trashName}
               key={rowKey}
               volume={row.volume}
               ingredNames={ingredNames}

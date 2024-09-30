@@ -25,6 +25,7 @@ import type {
   SelectStepAction,
   SelectMultipleStepsAction,
   ToggleViewSubstepAction,
+  ViewSubstep,
 } from './types'
 
 // adds an incremental integer ID for Step reducers.
@@ -233,7 +234,7 @@ export const deselectAllSteps = (
 }
 
 export const toggleViewSubstep = (
-  stepId: StepIdType | null
+  stepId: ViewSubstep
 ): ToggleViewSubstepAction => ({
   type: 'TOGGLE_VIEW_SUBSTEP',
   payload: stepId,

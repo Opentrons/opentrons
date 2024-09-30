@@ -22,6 +22,8 @@ import {
   swatchColors,
 } from '../../../../components/swatchColors'
 import { compactPreIngreds, formatVolume } from './utils'
+import type { AdditionalEquipmentName } from '@opentrons/step-generation'
+
 import type {
   SubstepIdentifier,
   SubstepWellData,
@@ -29,10 +31,11 @@ import type {
 } from '../../../../steplist'
 
 interface SubstepRowProps {
-  volume: number | string | null | undefined
+  trashName: AdditionalEquipmentName | null
   ingredNames: WellIngredientNames
   stepId: string
   substepIndex: number
+  volume?: number | string | null
   source?: SubstepWellData
   dest?: SubstepWellData
   selectSubstep?: (substepIdentifier: SubstepIdentifier) => void
@@ -46,9 +49,10 @@ function SubstepComponent(props: SubstepRowProps): JSX.Element {
     substepIndex,
     source,
     dest,
+    trashName,
     selectSubstep: propSelectSubstep,
   } = props
-  const { t } = useTranslation(['application', 'protocol_steps'])
+  const { t } = useTranslation(['application', 'protocol_steps', 'shared'])
   const compactedSourcePreIngreds = props.source
     ? compactPreIngreds(props.source.preIngreds)
     : {}
@@ -71,7 +75,6 @@ function SubstepComponent(props: SubstepRowProps): JSX.Element {
       type="default"
     />
   )
-
   return (
     <Flex
       onMouseEnter={() => {
@@ -94,11 +97,14 @@ function SubstepComponent(props: SubstepRowProps): JSX.Element {
           width="100%"
           alignItems={ALIGN_CENTER}
         >
-          <LiquidIcon color={color} size="medium" />
           {ingredIds.length > 0 ? (
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {ingredIds.map(groupId => ingredNames[groupId]).join(',')}
-            </StyledText>
+            <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
+              <LiquidIcon color={color} size="medium" />
+
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {ingredIds.map(groupId => ingredNames[groupId]).join(',')}
+              </StyledText>
+            </Flex>
           ) : null}
           {source != null ? (
             <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
@@ -126,26 +132,32 @@ function SubstepComponent(props: SubstepRowProps): JSX.Element {
           width="100%"
           alignItems={ALIGN_CENTER}
         >
-          <LiquidIcon color={color} size="medium" />
           {ingredIds.length > 0 ? (
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {ingredIds.map(groupId => ingredNames[groupId]).join(',')}
-            </StyledText>
+            <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
+              <LiquidIcon color={color} size="medium" />
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {ingredIds.map(groupId => ingredNames[groupId]).join(',')}
+              </StyledText>
+            </Flex>
           ) : null}
-
-          {dest != null ? (
+          {dest != null || trashName != null ? (
             <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
               <StyledText desktopStyle="bodyDefaultRegular">
                 {t('protocol_steps:dispensed')}
               </StyledText>
               {volumeTag}
               <StyledText desktopStyle="bodyDefaultRegular">
-                {t('protocol_steps:from')}
+                {t('protocol_steps:into')}
               </StyledText>
+
               <DeckInfoLabel
-                deckLabel={t('protocol_steps:well_name', {
-                  wellName: dest.well,
-                })}
+                deckLabel={
+                  dest?.well != null
+                    ? t('protocol_steps:well_name', {
+                        wellName: dest.well,
+                      })
+                    : t(`shared:${trashName}`)
+                }
               />
             </Flex>
           ) : null}

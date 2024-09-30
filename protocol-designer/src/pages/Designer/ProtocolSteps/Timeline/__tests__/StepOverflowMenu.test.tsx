@@ -10,6 +10,10 @@ import {
   getCurrentFormIsPresaved,
   getUnsavedForm,
 } from '../../../../../step-forms/selectors'
+import {
+  hoverOnStep,
+  toggleViewSubstep,
+} from '../../../../../ui/steps/actions/actions'
 import type * as React from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
 
@@ -37,12 +41,13 @@ const render = (props: React.ComponentProps<typeof StepOverflowMenu>) => {
   })[0]
 }
 
+const moveLiquidStepId = 'mockId'
 describe('StepOverflowMenu', () => {
   let props: React.ComponentProps<typeof StepOverflowMenu>
 
   beforeEach(() => {
     props = {
-      stepId: 'mockId',
+      stepId: moveLiquidStepId,
       top: 0,
       menuRootRef: { current: null },
       setStepOverflowMenu: vi.fn(),
@@ -50,6 +55,12 @@ describe('StepOverflowMenu', () => {
     vi.mocked(getCurrentFormIsPresaved).mockReturnValue(false)
     vi.mocked(getCurrentFormHasUnsavedChanges).mockReturnValue(false)
     vi.mocked(getUnsavedForm).mockReturnValue(null)
+    vi.mocked(getSavedStepForms).mockReturnValue({
+      [moveLiquidStepId]: {
+        stepType: 'moveLiquid',
+        id: moveLiquidStepId,
+      },
+    })
   })
 
   it('renders each button and clicking them calls the action', () => {
@@ -62,7 +73,9 @@ describe('StepOverflowMenu', () => {
     expect(vi.mocked(duplicateStep)).toHaveBeenCalled()
     fireEvent.click(screen.getByText('Edit step'))
     expect(mockConfirm).toHaveBeenCalled()
-    fireEvent.click(screen.getByText('View commands'))
-    //  TODO: wire up view commands
+    fireEvent.click(screen.getByText('View details'))
+    expect(vi.mocked(hoverOnStep)).toHaveBeenCalled()
+    expect(vi.mocked(toggleViewSubstep)).toHaveBeenCalled()
+    fireEvent.click(screen.getByText('Rename step'))
   })
 })

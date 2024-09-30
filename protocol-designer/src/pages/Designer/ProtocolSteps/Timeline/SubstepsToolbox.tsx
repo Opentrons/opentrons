@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
 import { getSubsteps } from '../../../../file-data/selectors'
-import { HoverOnSubstepAction, getHoveredSubstep } from '../../../../ui/steps'
+import { getHoveredSubstep } from '../../../../ui/steps'
 import {
   hoverOnStep,
   hoverOnSubstep,
@@ -20,6 +20,7 @@ import { getSavedStepForms } from '../../../../step-forms/selectors'
 import { PipettingSubsteps } from './PipettingSubsteps'
 import { ThermocyclerProfileSubsteps } from './ThermocyclerProfileSubsteps'
 import type { SubstepIdentifier } from '../../../../steplist'
+import type { HoverOnSubstepAction } from '../../../../ui/steps'
 
 interface SubstepsToolboxProps {
   stepId: string
@@ -56,7 +57,7 @@ export function SubstepsToolbox(
       substeps.commandCreatorFnName === 'mix')) ||
     substeps.substepType === THERMOCYCLER_PROFILE ? (
     <Toolbox
-      width="381px"
+      width="23.8125rem"
       childrenPadding="0"
       confirmButton={
         <PrimaryButton
