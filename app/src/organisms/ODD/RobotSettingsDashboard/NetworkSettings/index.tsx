@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
@@ -17,7 +17,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import type { IconName, ChipType } from '@opentrons/components'
 import type { NetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'

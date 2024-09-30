@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -47,7 +47,7 @@ export const TimelineToolbox = (): JSX.Element => {
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     const onKeyDown = (e: KeyboardEvent): void => {
       handleKeyDown(e)
     }

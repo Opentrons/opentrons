@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
@@ -48,7 +48,7 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
     >
       <Flex
         width="60%"
-        padding={SPACING.spacing80}
+        padding={`${SPACING.spacing40} ${SPACING.spacing80} ${SPACING.spacing80} ${SPACING.spacing80}`}
         flexDirection={DIRECTION_COLUMN}
         backgroundColor={COLORS.white}
         borderRadius={BORDERS.borderRadius16}

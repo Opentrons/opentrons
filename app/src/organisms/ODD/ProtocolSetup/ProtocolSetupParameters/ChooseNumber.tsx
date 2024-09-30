@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 
 import { useToaster } from '/app/organisms/ToasterOven'
-import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import type { NumberParameter } from '@opentrons/shared-data'
 
@@ -30,16 +30,14 @@ export function ChooseNumber({
   const { makeSnackbar } = useToaster()
 
   const { i18n, t } = useTranslation(['protocol_setup', 'shared'])
-  const keyboardRef = React.useRef(null)
-  const [paramValue, setParamValue] = React.useState<string>(
-    String(parameter.value)
-  )
+  const keyboardRef = useRef(null)
+  const [paramValue, setParamValue] = useState<string>(String(parameter.value))
 
   // We need to arbitrarily set the value of the keyboard to a string the
   // same length as the initial parameter value (as string) when the component mounts
   // so that the delete button operates properly on the exisiting input field value.
-  const [prevKeyboardValue, setPrevKeyboardValue] = React.useState<string>('')
-  React.useEffect(() => {
+  const [prevKeyboardValue, setPrevKeyboardValue] = useState<string>('')
+  useEffect(() => {
     const arbitraryInput = new Array(paramValue).join('*')
     // @ts-expect-error keyboard should expose for `setInput` method
     keyboardRef.current?.setInput(arbitraryInput)

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { LabwareNameOverlay, truncateString } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'

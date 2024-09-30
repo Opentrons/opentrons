@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { LabelText, Value, LABEL_LEFT } from '../ui'
 import { TAGS } from '../../localization'
 import type { LabwareDefinition } from '../../types'

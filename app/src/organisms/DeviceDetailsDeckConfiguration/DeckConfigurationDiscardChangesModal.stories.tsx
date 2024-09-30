@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { VIEWPORT } from '@opentrons/components'
 import { DeckConfigurationDiscardChangesModal } from './DeckConfigurationDiscardChangesModal'
 import type { Story, Meta } from '@storybook/react'

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
@@ -15,7 +14,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { getNetworkInterfaces } from '/app/redux/networking'
 import { getLocalRobot } from '/app/redux/discovery'
 

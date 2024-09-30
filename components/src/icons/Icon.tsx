@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { css, keyframes } from 'styled-components'
 import cx from 'classnames'
 

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
@@ -28,6 +28,8 @@ describe('StepContainer', () => {
       selected: false,
       hovered: false,
       stepId: 'mockStepId',
+      hasError: false,
+      isStepAfterError: false,
     }
     vi.mocked(StepOverflowMenu).mockReturnValue(
       <div>mock StepOverflowMenu</div>

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { Controller, useForm, useWatch } from 'react-hook-form'
@@ -98,7 +98,7 @@ const StagingAreasModalComponent = (
 
   const selectableSlots =
     mappedStagingAreas.length > 0 ? mappedStagingAreas : STANDARD_EMPTY_SLOTS
-  const [updatedSlots, setUpdatedSlots] = React.useState<DeckConfiguration>(
+  const [updatedSlots, setUpdatedSlots] = useState<DeckConfiguration>(
     selectableSlots
   )
 

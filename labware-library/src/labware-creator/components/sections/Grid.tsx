@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { maskToInteger } from '../../fieldMasks'
 import { isEveryFieldHidden, getLabwareName } from '../../utils'

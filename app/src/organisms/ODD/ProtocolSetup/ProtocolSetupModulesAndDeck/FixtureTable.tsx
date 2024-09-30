@@ -20,12 +20,15 @@ import {
   getFixtureDisplayName,
   getSimplestDeckConfigForProtocol,
   SINGLE_SLOT_FIXTURES,
+  TC_MODULE_LOCATION_OT3,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
+  THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
-import { LocationConflictModal } from '../../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
+import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 
 import type {
   CompletedProtocolAnalysis,
@@ -74,8 +77,30 @@ export function FixtureTable({
     deckConfigCompatibility
   )
 
+  const hasTwoLabwareThermocyclerConflicts =
+    requiredDeckConfigCompatibility.some(
+      ({ cutoutFixtureId, missingLabwareDisplayName }) =>
+        cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE &&
+        missingLabwareDisplayName != null
+    ) &&
+    requiredDeckConfigCompatibility.some(
+      ({ cutoutFixtureId, missingLabwareDisplayName }) =>
+        cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE &&
+        missingLabwareDisplayName != null
+    )
+
+  // if there are two labware conflicts with the thermocycler, don't show the conflict with the thermocycler rear fixture
+  const filteredDeckConfigCompatibility = requiredDeckConfigCompatibility.filter(
+    ({ cutoutFixtureId }) => {
+      return (
+        !hasTwoLabwareThermocyclerConflicts ||
+        !(cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE)
+      )
+    }
+  )
+
   // list not configured/conflicted fixtures first
-  const sortedDeckConfigCompatibility = requiredDeckConfigCompatibility.sort(
+  const sortedDeckConfigCompatibility = filteredDeckConfigCompatibility.sort(
     a =>
       a.cutoutFixtureId != null &&
       a.compatibleCutoutFixtureIds.includes(a.cutoutFixtureId)
@@ -139,6 +164,11 @@ function FixtureTableItem({
     cutoutFixtureId != null &&
     compatibleCutoutFixtureIds.includes(cutoutFixtureId)
   const isRequiredSingleSlotMissing = missingLabwareDisplayName != null
+
+  const isThermocyclerCurrentFixture =
+    cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE ||
+    cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE
+
   let chipLabel: JSX.Element
   if (!isCurrentFixtureCompatible) {
     const isConflictingFixtureConfigured =
@@ -219,7 +249,13 @@ function FixtureTableItem({
           </LegacyStyledText>
         </Flex>
         <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
-          <DeckInfoLabel deckLabel={getCutoutDisplayName(cutoutId)} />
+          <DeckInfoLabel
+            deckLabel={
+              isThermocyclerCurrentFixture && isRequiredSingleSlotMissing
+                ? TC_MODULE_LOCATION_OT3
+                : getCutoutDisplayName(cutoutId)
+            }
+          />
         </Flex>
         <Flex
           flex="4 0 0"

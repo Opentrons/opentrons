@@ -6,8 +6,8 @@ import {
   useRunStatus,
   useCloneRun,
   DEFAULT_RUN_QUERY_REFETCH_INTERVAL,
+  useMostRecentCompletedAnalysis,
 } from '/app/resources/runs'
-import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import type { UseQueryOptions } from 'react-query'
 import type { RunStatus, Run, RunData } from '@opentrons/api-client'

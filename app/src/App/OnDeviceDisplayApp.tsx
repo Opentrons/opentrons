@@ -1,6 +1,6 @@
-import * as React from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { css } from 'styled-components'
 import { ErrorBoundary } from 'react-error-boundary'
 
@@ -33,7 +33,7 @@ import { RobotDashboard } from '/app/pages/ODD/RobotDashboard'
 import { RobotSettingsDashboard } from '/app/pages/ODD/RobotSettingsDashboard'
 import { ProtocolDashboard } from '/app/pages/ODD/ProtocolDashboard'
 import { ProtocolDetails } from '/app/pages/ODD/ProtocolDetails'
-import { QuickTransferFlow } from '/app/organisms/QuickTransferFlow'
+import { QuickTransferFlow } from '/app/organisms/ODD/QuickTransferFlow'
 import { QuickTransferDashboard } from '/app/pages/ODD/QuickTransferDashboard'
 import { QuickTransferDetails } from '/app/pages/ODD/QuickTransferDetails'
 import { RunningProtocol } from '/app/pages/ODD/RunningProtocol'
@@ -51,7 +51,7 @@ import {
   updateConfigValue,
 } from '/app/redux/config'
 import { updateBrightness } from '/app/redux/shell'
-import { SLEEP_NEVER_MS } from './constants'
+import { SLEEP_NEVER_MS } from '/app/local-resources/config'
 import { useProtocolReceiptToast, useSoftwareUpdatePoll } from './hooks'
 import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
 
@@ -163,7 +163,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   const dispatch = useDispatch<Dispatch>()
   const isIdle = useIdle(sleepTime, options)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isIdle) {
       dispatch(updateBrightness(TURN_OFF_BACKLIGHT))
     } else {
@@ -220,11 +220,19 @@ const getTargetPath = (unfinishedUnboxingFlowRoute: string | null): string => {
 // split to a separate function because scrollRef rerenders on every route change
 // this avoids rerendering parent providers as well
 export function OnDeviceDisplayAppRoutes(): JSX.Element {
-  const [currentNode, setCurrentNode] = React.useState<null | HTMLElement>(null)
-  const scrollRef = React.useCallback((node: HTMLElement | null) => {
+  const [currentNode, setCurrentNode] = useState<null | HTMLElement>(null)
+  const scrollRef = useCallback((node: HTMLElement | null) => {
     setCurrentNode(node)
   }, [])
   const isScrolling = useScrolling(currentNode)
+  const location = useLocation()
+  useEffect(() => {
+    currentNode?.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto',
+    })
+  }, [location.pathname])
 
   const { unfinishedUnboxingFlowRoute } = useSelector(
     getOnDeviceDisplaySettings

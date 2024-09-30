@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styles from './StepItem.module.css'
 import type { PauseArgs } from '@opentrons/step-generation'

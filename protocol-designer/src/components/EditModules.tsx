@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   FLEX_ROBOT_TYPE,
@@ -50,7 +50,7 @@ export const EditModules = (props: EditModulesProps): JSX.Element => {
   const [
     changeModuleWarningInfo,
     displayModuleWarning,
-  ] = React.useState<null | ModelModuleInfo>(null)
+  ] = useState<null | ModelModuleInfo>(null)
   const dispatch = useDispatch()
 
   const editModuleModel = (selectedModel: ModuleModel): void => {

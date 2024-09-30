@@ -1,8 +1,7 @@
-import * as React from 'react'
-
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
+import { AnnouncementModal } from '../../../organisms'
 import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { getHasOptedIn } from '../../../analytics/selectors'
@@ -13,6 +12,7 @@ import { optIn } from '../../../analytics/actions'
 import { setFeatureFlags } from '../../../feature-flags/actions'
 import { Settings } from '..'
 
+vi.mock('../../../organisms')
 vi.mock('../../../feature-flags/actions')
 vi.mock('../../../analytics/actions')
 vi.mock('../../../tutorial/actions')
@@ -42,6 +42,7 @@ describe('Settings', () => {
     screen.getByText('App settings')
     screen.getByText('Protocol designer version')
     screen.getByText('fake_PD_version')
+    screen.getAllByText('View release notes')
     screen.getByText('User settings')
     screen.getByText('Hints')
     screen.getByText('Reset all hints and tips notifications')
@@ -51,6 +52,16 @@ describe('Settings', () => {
     screen.getByText(
       'We’re working to improve Protocol Designer. Part of the process involves watching real user sessions to understand which parts of the interface are working and which could use improvement. We never share sessions outside of Opentrons.'
     )
+  })
+  it('renders the announcement modal when view release notes button is clicked', () => {
+    vi.mocked(AnnouncementModal).mockReturnValue(
+      <div>mock AnnouncementModal</div>
+    )
+    render()
+    fireEvent.click(
+      screen.getByTestId('AnnouncementModal_viewReleaseNotesButton')
+    )
+    screen.getByText('mock AnnouncementModal')
   })
   it('renders the hints button and calls to dismiss them when text is pressed', () => {
     render()

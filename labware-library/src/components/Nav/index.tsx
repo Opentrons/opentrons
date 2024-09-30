@@ -1,5 +1,4 @@
 // top nav bar component
-import * as React from 'react'
 import { SubdomainNav, MainNav } from '../website-navigation'
 import styles from './styles.module.css'
 

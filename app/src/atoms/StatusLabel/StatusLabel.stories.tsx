@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { COLORS } from '@opentrons/components'
 import { StatusLabel } from './index'
 import type { Story, Meta } from '@storybook/react'

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import map from 'lodash/map'
 import { BaseDeck, Flex } from '@opentrons/components'
 import {
@@ -7,8 +6,8 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { getStandardDeckViewLayerBlockList } from '../../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
-import { getLabwareRenderInfo } from '../../../Devices/ProtocolRun/utils/getLabwareRenderInfo'
+import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
+import { getLabwareRenderInfo } from '/app/transformations/analysis'
 
 import type {
   CompletedProtocolAnalysis,
@@ -16,7 +15,7 @@ import type {
   LabwareDefinition2,
   LoadedLabwareByAdapter,
 } from '@opentrons/shared-data'
-import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
+import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 
 interface LabwareMapViewProps {
   attachedProtocolModuleMatches: AttachedProtocolModuleMatch[]

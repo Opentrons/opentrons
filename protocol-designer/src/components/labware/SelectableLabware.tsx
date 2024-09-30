@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import reduce from 'lodash/reduce'
 
 import { COLUMN } from '@opentrons/shared-data'

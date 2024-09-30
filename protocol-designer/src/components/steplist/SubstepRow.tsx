@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { memo, Fragment } from 'react'
 import { useSelector } from 'react-redux'
 import map from 'lodash/map'
 import noop from 'lodash/noop'
@@ -81,13 +81,13 @@ export const PillTooltipContents = (
         </tbody>
       </table>
       {hasMultipleIngreds && (
-        <React.Fragment>
+        <Fragment>
           <div className={styles.total_divider} />
           <div className={styles.total_row}>
             <span>{`${props.well} Total Volume`}</span>
             <span>{formatVolume(totalLiquidVolume, 2)}µl</span>
           </div>
-        </React.Fragment>
+        </Fragment>
       )}
     </div>
   )
@@ -178,4 +178,4 @@ function SubstepRowComponent(props: SubstepRowProps): JSX.Element {
   )
 }
 
-export const SubstepRow = React.memo(SubstepRowComponent)
+export const SubstepRow = memo(SubstepRowComponent)

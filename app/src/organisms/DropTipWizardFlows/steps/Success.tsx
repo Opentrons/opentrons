@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
@@ -13,15 +12,15 @@ import {
 } from '@opentrons/components'
 
 import { DropTipFooterButtons } from '../shared'
-import { BLOWOUT_SUCCESS, DROP_TIP_SUCCESS, DT_ROUTES } from '../constants'
+import { DT_ROUTES } from '../constants'
 
 import SuccessIcon from '../../../assets/images/icon_success.png'
 
 import type { DropTipWizardContainerProps } from '../types'
 
 export const Success = ({
-  currentStep,
-  proceedToRoute,
+  currentRoute,
+  proceedToRouteAndStep,
   fixitCommandTypeUtils,
   proceedWithConditionalClose,
   modalStyle,
@@ -31,8 +30,8 @@ export const Success = ({
 
   // Route to the drop tip route if user is at the blowout success screen, otherwise proceed conditionally.
   const handleProceed = (): void => {
-    if (currentStep === BLOWOUT_SUCCESS) {
-      void proceedToRoute(DT_ROUTES.DROP_TIP)
+    if (currentRoute === DT_ROUTES.BLOWOUT) {
+      void proceedToRouteAndStep(DT_ROUTES.DROP_TIP)
     } else {
       // Clear the error recovery submap upon completion of drop tip wizard.
       fixitCommandTypeUtils?.reportMap(null)
@@ -46,10 +45,10 @@ export const Success = ({
   }
 
   const buildProceedText = (): string => {
-    if (fixitCommandTypeUtils != null && currentStep === DROP_TIP_SUCCESS) {
+    if (fixitCommandTypeUtils != null && currentRoute === DT_ROUTES.DROP_TIP) {
       return fixitCommandTypeUtils.copyOverrides.tipDropCompleteBtnCopy
     } else {
-      return currentStep === BLOWOUT_SUCCESS ? t('continue') : t('exit')
+      return currentRoute === DT_ROUTES.BLOWOUT ? t('continue') : t('exit')
     }
   }
 
@@ -66,7 +65,7 @@ export const Success = ({
           }
         />
         <StyledText desktopStyle="headingSmallBold" oddStyle="level3HeaderBold">
-          {currentStep === BLOWOUT_SUCCESS
+          {currentRoute === DT_ROUTES.BLOWOUT
             ? t('blowout_complete')
             : t('drop_tip_complete')}
         </StyledText>

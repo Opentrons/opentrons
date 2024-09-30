@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
@@ -11,7 +10,7 @@ import {
   getReachableRobots,
   getUnreachableRobots,
 } from '/app/redux/discovery'
-import { useIsUnboxingFlowOngoing } from '/app/organisms/ODD/hooks'
+import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -24,7 +23,7 @@ import type { NavigateFunction } from 'react-router-dom'
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/analytics')
-vi.mock('/app/organisms/ODD/hooks')
+vi.mock('/app/redux-resources/config')
 
 const mockNavigate = vi.fn()
 

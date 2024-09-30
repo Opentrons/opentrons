@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
 
@@ -6,9 +5,9 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { useEstopQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '/app/i18n'
-import { InstrumentsAndModules } from '/app/organisms/Devices/InstrumentsAndModules'
-import { RecentProtocolRuns } from '/app/organisms/Devices/RecentProtocolRuns'
-import { RobotOverview } from '/app/organisms/Devices/RobotOverview'
+import { InstrumentsAndModules } from '/app/organisms/Desktop/Devices/InstrumentsAndModules'
+import { RecentProtocolRuns } from '/app/organisms/Desktop/Devices/RecentProtocolRuns'
+import { RobotOverview } from '/app/organisms/Desktop/Devices/RobotOverview'
 import { DISENGAGED, NOT_PRESENT } from '/app/organisms/EmergencyStop'
 import { DeviceDetailsDeckConfiguration } from '/app/organisms/DeviceDetailsDeckConfiguration'
 import { useIsFlex } from '/app/redux-resources/robots'
@@ -16,9 +15,9 @@ import { DeviceDetailsComponent } from '../DeviceDetailsComponent'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/robots')
-vi.mock('/app/organisms/Devices/InstrumentsAndModules')
-vi.mock('/app/organisms/Devices/RecentProtocolRuns')
-vi.mock('/app/organisms/Devices/RobotOverview')
+vi.mock('/app/organisms/Desktop/Devices/InstrumentsAndModules')
+vi.mock('/app/organisms/Desktop/Devices/RecentProtocolRuns')
+vi.mock('/app/organisms/Desktop/Devices/RobotOverview')
 vi.mock('/app/organisms/DeviceDetailsDeckConfiguration')
 vi.mock('/app/redux/discovery')
 

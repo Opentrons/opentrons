@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment } from 'react'
 import { EmanatingNozzle } from './EmanatingNozzle'
 
 export const EightEmanatingNozzles = (props: {
@@ -8,7 +8,7 @@ export const EightEmanatingNozzles = (props: {
   const { cx, initialCy } = props
   const MULTI_CHANNEL_NOZZLE_SPACING = 9
   return (
-    <React.Fragment>
+    <Fragment>
       {[...Array(8)].map((_, i: number) => {
         return (
           <EmanatingNozzle
@@ -18,6 +18,6 @@ export const EightEmanatingNozzles = (props: {
           />
         )
       })}
-    </React.Fragment>
+    </Fragment>
   )
 }

@@ -11,7 +11,8 @@ from ...errors import CannotPerformModuleAction
 from opentrons.protocol_engine.types import AddressableAreaLocation
 
 from opentrons.protocol_engine.resources import labware_validation
-from .types import MoveLidResult
+from ...state.update_types import StateUpdate
+
 
 from opentrons.drivers.types import AbsorbanceReaderLidStatus
 
@@ -32,7 +33,7 @@ class CloseLidParams(BaseModel):
     moduleId: str = Field(..., description="Unique ID of the absorbance reader.")
 
 
-class CloseLidResult(MoveLidResult):
+class CloseLidResult(BaseModel):
     """Result data from closing the lid on an aborbance reading."""
 
 
@@ -132,11 +133,17 @@ class CloseLidImpl(
                 labware_location=new_location,
             )
 
+        state_update = StateUpdate()
+        state_update.set_labware_location(
+            labware_id=loaded_lid.id,
+            new_location=new_location,
+            new_offset_id=new_offset_id,
+        )
+
         return SuccessData(
-            public=CloseLidResult(
-                lidId=loaded_lid.id, newLocation=new_location, offsetId=new_offset_id
-            ),
+            public=CloseLidResult(),
             private=None,
+            state_update=state_update,
         )
 
 

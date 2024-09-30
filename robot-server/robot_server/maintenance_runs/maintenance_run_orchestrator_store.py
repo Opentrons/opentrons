@@ -175,6 +175,9 @@ class MaintenanceRunOrchestratorStore:
                     RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
             ),
+            # Maintenance runs have no `/actions` endpoint that a client can POST to
+            # to resume normal operation after it enters recovery mode, so they should
+            # never be allowed to enter recovery mode.
             error_recovery_policy=error_recovery_policy.never_recover,
             deck_configuration=deck_configuration,
             notify_publishers=notify_publishers,

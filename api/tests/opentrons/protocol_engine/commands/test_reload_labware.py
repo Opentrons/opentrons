@@ -1,5 +1,9 @@
 """Test load labware commands."""
 import inspect
+from opentrons.protocol_engine.state.update_types import (
+    LabwareLocationUpdate,
+    StateUpdate,
+)
 import pytest
 
 from decoy import Decoy
@@ -63,6 +67,13 @@ async def test_reload_labware_implementation(
             offsetId="labware-offset-id",
         ),
         private=None,
+        state_update=StateUpdate(
+            labware_location=LabwareLocationUpdate(
+                labware_id="my-labware-id",
+                new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+                offset_id="labware-offset-id",
+            )
+        ),
     )
 
 

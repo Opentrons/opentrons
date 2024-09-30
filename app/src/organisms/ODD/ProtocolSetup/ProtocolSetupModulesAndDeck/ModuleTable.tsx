@@ -26,21 +26,23 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
-import { getModulePrepCommands } from '../../../Devices/getModulePrepCommands'
-import { getModuleTooHot } from '../../../Devices/getModuleTooHot'
-import { useRunCalibrationStatus } from '../../../Devices/hooks'
-import { LocationConflictModal } from '../../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
-import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
-import { useToaster } from '../../../ToasterOven'
+import { getModulePrepCommands } from '/app/local-resources/modules'
+import { getModuleTooHot } from '/app/transformations/modules'
+import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
+import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { getLocalRobot } from '/app/redux/discovery'
-import { useChainLiveCommands } from '/app/resources/runs'
+import {
+  useChainLiveCommands,
+  useRunCalibrationStatus,
+} from '/app/resources/runs'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { CommandData } from '@opentrons/api-client'
 import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'
-import type { ModulePrepCommandsType } from '../../../Devices/getModulePrepCommands'
-import type { ProtocolCalibrationStatus } from '../../../Devices/hooks'
-import type { AttachedProtocolModuleMatch } from './utils'
+import type { ModulePrepCommandsType } from '/app/local-resources/modules'
+import type { ProtocolCalibrationStatus } from '/app/resources/runs'
+import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 

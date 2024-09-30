@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
@@ -16,7 +16,15 @@ import {
 } from '../../persist'
 import { useAnnouncements } from './announcements'
 
-export const AnnouncementModal = (): JSX.Element => {
+interface AnnouncementModalProps {
+  isViewReleaseNotes?: boolean
+  onClose?: () => void
+}
+
+export const AnnouncementModal = (
+  props: AnnouncementModalProps
+): JSX.Element => {
+  const { onClose, isViewReleaseNotes = false } = props
   const { t } = useTranslation(['modal', 'button'])
   const announcements = useAnnouncements()
 
@@ -27,12 +35,12 @@ export const AnnouncementModal = (): JSX.Element => {
   const userHasNotSeenAnnouncement =
     getLocalStorageItem(localStorageAnnouncementKey) !== announcementKey
 
-  const [
-    showAnnouncementModal,
-    setShowAnnouncementModal,
-  ] = React.useState<boolean>(userHasNotSeenAnnouncement)
+  const [showAnnouncementModal, setShowAnnouncementModal] = useState<boolean>(
+    isViewReleaseNotes || userHasNotSeenAnnouncement
+  )
 
   const handleClick = (): void => {
+    if (onClose != null) onClose()
     setLocalStorageItem(localStorageAnnouncementKey, announcementKey)
     setShowAnnouncementModal(false)
   }

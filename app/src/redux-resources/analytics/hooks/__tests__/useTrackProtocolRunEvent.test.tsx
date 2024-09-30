@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import { QueryClient, QueryClientProvider } from 'react-query'

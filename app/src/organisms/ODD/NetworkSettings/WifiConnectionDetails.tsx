@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -18,7 +18,7 @@ import {
 } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
-import { RobotSetupHeader } from '/app/organisms/RobotSetupHeader'
+import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
 import { getLocalRobot } from '/app/redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '/app/redux/networking'
 import { NetworkDetailsModal } from '../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
@@ -53,9 +53,9 @@ export function WifiConnectionDetails({
   const [
     showNetworkDetailsModal,
     setShowNetworkDetailsModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(fetchStatus(robotName))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

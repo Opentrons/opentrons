@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Flex } from '../../../primitives'
 import {
   ALIGN_CENTER,

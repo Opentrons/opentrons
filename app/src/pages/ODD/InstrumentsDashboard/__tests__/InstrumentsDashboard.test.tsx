@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Route, MemoryRouter, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -91,7 +90,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
 vi.mock('/app/organisms/GripperWizardFlows')
 vi.mock('/app/organisms/PipetteWizardFlows')
 vi.mock('/app/organisms/PipetteWizardFlows/ChoosePipette')
-vi.mock('/app/organisms/Navigation')
+vi.mock('/app/organisms/ODD/Navigation')
 
 const render = (path = '/') => {
   return renderWithProviders(

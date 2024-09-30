@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
-import { useIsUnboxingFlowOngoing } from '../hooks'
+import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 
 interface SetWifiSsidProps {
   errorMessage?: string | null

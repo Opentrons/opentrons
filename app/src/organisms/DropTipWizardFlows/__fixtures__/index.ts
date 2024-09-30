@@ -39,8 +39,9 @@ export const mockDropTipWizardContainerProps: DropTipWizardContainerProps = {
   closeFlow: MOCK_FN,
   confirmExit: MOCK_FN,
   goBackRunValid: MOCK_FN,
-  proceedToRoute: MOCK_FN,
+  proceedToRouteAndStep: MOCK_FN,
   toggleExitInitiated: MOCK_FN,
   proceedWithConditionalClose: MOCK_FN,
   proceed: MOCK_FN,
+  dropTipCommandLocations: [],
 }

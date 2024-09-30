@@ -25,6 +25,8 @@ export interface ToolboxProps {
   closeButtonText?: string
   side?: 'left' | 'right'
   horizontalSide?: 'top' | 'bottom'
+  childrenPadding?: string
+  subHeader?: JSX.Element | null
 }
 
 export function Toolbox(props: ToolboxProps): JSX.Element {
@@ -41,6 +43,8 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
     confirmButton,
     side = 'right',
     horizontalSide = 'bottom',
+    childrenPadding = SPACING.spacing16,
+    subHeader,
   } = props
 
   const slideOutRef = React.useRef<HTMLDivElement>(null)
@@ -86,29 +90,34 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <Flex
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          alignItems={ALIGN_CENTER}
           padding={`${SPACING.spacing20} ${SPACING.spacing16}`}
-          borderBottom={`1px solid ${COLORS.grey30}`}
-          gridGap={SPACING.spacing12}
+          flexDirection={DIRECTION_COLUMN}
         >
-          {title}
-          {onCloseClick != null && closeButtonText != null ? (
-            <Btn
-              onClick={onCloseClick}
-              textDecoration={textDecorationUnderline}
-              data-testid={`Toolbox_${closeButtonText}`}
-              whiteSpace={NO_WRAP}
-              disable={disableCloseButton}
-            >
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {closeButtonText}
-              </StyledText>
-            </Btn>
-          ) : null}
+          {subHeader != null ? subHeader : null}
+          <Flex
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            alignItems={ALIGN_CENTER}
+            borderBottom={`1px solid ${COLORS.grey30}`}
+            gridGap={SPACING.spacing12}
+          >
+            {title}
+            {onCloseClick != null && closeButtonText != null ? (
+              <Btn
+                onClick={onCloseClick}
+                textDecoration={textDecorationUnderline}
+                data-testid={`Toolbox_${closeButtonText}`}
+                whiteSpace={NO_WRAP}
+                disable={disableCloseButton}
+              >
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {closeButtonText}
+                </StyledText>
+              </Btn>
+            ) : null}
+          </Flex>
         </Flex>
         <Box
-          padding={SPACING.spacing16}
+          padding={childrenPadding}
           flex="1 1 auto"
           overflowY="auto"
           ref={slideOutRef}
