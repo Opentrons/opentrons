@@ -96,6 +96,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
   }
   const isPipetteStep =
     formData?.stepType === 'moveLiquid' || formData?.stepType === 'mix'
+  const isThermocyclerStep = formData?.stepType === 'thermocycler'
 
   return (
     <>
@@ -134,14 +135,16 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
         {formData != null ? null : (
           <MenuButton onClick={confirm}>{t('edit_step')}</MenuButton>
         )}
-        <MenuButton
-          onClick={() => {
-            dispatch(hoverOnStep(stepId))
-            dispatch(toggleViewSubstep(stepId))
-          }}
-        >
-          {t('view_commands')}
-        </MenuButton>
+        {isPipetteStep || isThermocyclerStep ? (
+          <MenuButton
+            onClick={() => {
+              dispatch(hoverOnStep(stepId))
+              dispatch(toggleViewSubstep(stepId))
+            }}
+          >
+            {t('view_commands')}
+          </MenuButton>
+        ) : null}
         <MenuButton
           onClick={() => {
             duplicateStep(stepId)

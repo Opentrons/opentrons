@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -16,8 +15,10 @@ import {
   hoverOnSubstep,
   toggleViewSubstep,
 } from '../../../../ui/steps/actions/actions'
+import { THERMOCYCLER_PROFILE } from '../../../../constants'
 import { getSavedStepForms } from '../../../../step-forms/selectors'
 import { PipettingSubsteps } from './PipettingSubsteps'
+import { ThermocyclerProfileSubsteps } from './ThermocyclerProfileSubsteps'
 import type { SubstepIdentifier } from '../../../../steplist'
 
 interface SubstepsToolboxProps {
@@ -48,12 +49,14 @@ export function SubstepsToolbox(
 
   const uiStepType = t(`application:stepType.${formData.stepType}`)
 
-  return 'commandCreatorFnName' in substeps &&
+  return ('commandCreatorFnName' in substeps &&
     (substeps.commandCreatorFnName === 'transfer' ||
       substeps.commandCreatorFnName === 'consolidate' ||
       substeps.commandCreatorFnName === 'distribute' ||
-      substeps.commandCreatorFnName === 'mix') ? (
+      substeps.commandCreatorFnName === 'mix')) ||
+    substeps.substepType === THERMOCYCLER_PROFILE ? (
     <Toolbox
+      width="381px"
       childrenPadding="0"
       confirmButton={
         <PrimaryButton
@@ -77,13 +80,17 @@ export function SubstepsToolbox(
       }
     >
       <Flex padding={SPACING.spacing12} width="100%">
-        <PipettingSubsteps
-          key="substeps"
-          ingredNames={ingredNames}
-          substeps={substeps}
-          hoveredSubstep={hoveredSubstep}
-          selectSubstep={highlightSubstep}
-        />
+        {substeps.substepType === THERMOCYCLER_PROFILE ? (
+          <ThermocyclerProfileSubsteps />
+        ) : (
+          <PipettingSubsteps
+            key="substeps"
+            ingredNames={ingredNames}
+            substeps={substeps}
+            hoveredSubstep={hoveredSubstep}
+            selectSubstep={highlightSubstep}
+          />
+        )}
       </Flex>
     </Toolbox>
   ) : null

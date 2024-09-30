@@ -16,23 +16,23 @@ import type { LabwareOnDeck } from '../../../step-forms'
 interface LabwareControlsProps {
   labwareOnDeck: LabwareOnDeck
   slotPosition: CoordinateTuple
-  // setHoveredLabware: (labware?: LabwareOnDeck | null) => void
-  // setDraggedLabware: (labware?: LabwareOnDeck | null) => void
-  // swapBlocked: boolean
-  // selectedTerminalItemId?: TerminalItemId | null
+  setHoveredLabware: (labware?: LabwareOnDeck | null) => void
+  setDraggedLabware: (labware?: LabwareOnDeck | null) => void
+  swapBlocked: boolean
+  selectedTerminalItemId?: TerminalItemId | null
 }
 
 export const LabwareControls = (props: LabwareControlsProps): JSX.Element => {
   const {
     labwareOnDeck,
     slotPosition,
-    // selectedTerminalItemId,
-    // setHoveredLabware,
-    // setDraggedLabware,
-    // swapBlocked,
+    selectedTerminalItemId,
+    setHoveredLabware,
+    setDraggedLabware,
+    swapBlocked,
   } = props
 
-  // const canEdit = selectedTerminalItemId === START_TERMINAL_ITEM_ID
+  const canEdit = selectedTerminalItemId === START_TERMINAL_ITEM_ID
   const [x, y] = slotPosition
   const width = labwareOnDeck.def.dimensions.xDimension
   const height = labwareOnDeck.def.dimensions.yDimension
@@ -45,7 +45,7 @@ export const LabwareControls = (props: LabwareControlsProps): JSX.Element => {
         }}
       >
         <LabwareHighlight labwareOnDeck={labwareOnDeck} />
-        {/* {canEdit ? (
+        {canEdit ? (
           <EditLabware
             labwareOnDeck={labwareOnDeck}
             setHoveredLabware={setHoveredLabware}
@@ -55,14 +55,14 @@ export const LabwareControls = (props: LabwareControlsProps): JSX.Element => {
         ) : (
           <BrowseLabware labwareOnDeck={labwareOnDeck} />
         )}
-        <LabwareName labwareOnDeck={labwareOnDeck} /> */}
+        <LabwareName labwareOnDeck={labwareOnDeck} />
       </RobotCoordsForeignDiv>
-      {/* {swapBlocked && (
+      {swapBlocked && (
         <BlockedSlot
           {...{ x, y, width, height }}
           message="MODULE_INCOMPATIBLE_LABWARE_SWAP"
         />
-      )} */}
+      )}
     </>
   )
 }

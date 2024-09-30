@@ -23,6 +23,7 @@ import { getStagingAreaAddressableAreas } from '../../../utils'
 import { editSlotInfo } from '../../../labware-ingred/actions'
 import { getRobotType } from '../../../file-data/selectors'
 import { getSlotInformation } from '../utils'
+import { HighlightLabware } from '../HighlightLabware'
 import { DeckItemHover } from './DeckItemHover'
 import { SlotOverflowMenu } from './SlotOverflowMenu'
 import { HoveredItems } from './HoveredItems'
@@ -45,7 +46,6 @@ import type {
 } from '../../../step-forms'
 import type { DeckSetupTabType } from '../types'
 import type { Fixture } from './constants'
-import { LabwareControls } from '../../../components/DeckSetup/LabwareOverlays'
 
 interface DeckSetupDetailsProps extends DeckSetupTabType {
   activeDeckSetup: InitialDeckSetup
@@ -206,7 +206,10 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                     y={0}
                     labwareOnDeck={labwareLoadedOnModule}
                   />
-
+                  <HighlightLabware
+                    labwareOnDeck={labwareLoadedOnModule}
+                    position={[0, 0, 0]}
+                  />
                   <DeckItemHover
                     isSelected={selectedZoomInSlot != null}
                     hover={hover}
@@ -316,10 +319,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               y={slotPosition[1]}
               labwareOnDeck={labware}
             />
-            <LabwareControls
-              labwareOnDeck={labware}
-              slotPosition={slotPosition}
-            />
+            <HighlightLabware labwareOnDeck={labware} position={slotPosition} />
             <DeckItemHover
               isSelected={selectedZoomInSlot != null}
               hover={hover}
@@ -382,6 +382,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               y={slotPosition[1]}
               labwareOnDeck={labware}
             />
+            <HighlightLabware labwareOnDeck={labware} position={slotPosition} />
             <DeckItemHover
               isSelected={selectedZoomInSlot != null}
               hover={hover}

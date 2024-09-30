@@ -1,12 +1,11 @@
-import * as React from 'react'
-import {
+import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import { Substep } from './Substep'
+import { MultichannelSubstep } from './MultichannelSubstep'
+import type {
   SourceDestSubstepItem,
   SubstepIdentifier,
   WellIngredientNames,
 } from '../../../../steplist'
-import { MultiChannelSubstep } from '../../../../components/steplist/MultiChannelSubstep'
-import { Substep } from './Substep'
-import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
 interface PipettingSubstepsProps {
   substeps: SourceDestSubstepItem
@@ -19,23 +18,27 @@ export function PipettingSubsteps(props: PipettingSubstepsProps): JSX.Element {
   const { substeps, selectSubstep, hoveredSubstep } = props
   if (substeps.multichannel) {
     return (
-      <li>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        width="100%"
+      >
         {substeps.multiRows.map((rowGroup, groupKey) => (
-          <MultiChannelSubstep
+          <MultichannelSubstep
             key={groupKey}
-            rowGroup={rowGroup}
-            stepId={substeps.parentStepId}
-            substepIndex={groupKey}
-            selectSubstep={selectSubstep}
-            ingredNames={props.ingredNames}
             highlighted={
               !!hoveredSubstep &&
               hoveredSubstep.stepId === substeps.parentStepId &&
               hoveredSubstep.substepIndex === groupKey
             }
+            rowGroup={rowGroup}
+            stepId={substeps.parentStepId}
+            substepIndex={groupKey}
+            selectSubstep={selectSubstep}
+            ingredNames={props.ingredNames}
           />
         ))}
-      </li>
+      </Flex>
     )
   }
   return (

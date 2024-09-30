@@ -1,7 +1,7 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import noop from 'lodash/noop'
-import omitBy from 'lodash/omitBy'
 import { AIR } from '@opentrons/step-generation'
 import {
   ALIGN_CENTER,
@@ -13,13 +13,15 @@ import {
   LiquidIcon,
   ListItem,
   SPACING,
+  StyledText,
+  Tag,
 } from '@opentrons/components'
 import { selectors } from '../../../../labware-ingred/selectors'
 import {
   MIXED_WELL_COLOR,
   swatchColors,
 } from '../../../../components/swatchColors'
-import { formatVolume } from './utils'
+import { compactPreIngreds, formatVolume } from './utils'
 import type {
   SubstepIdentifier,
   SubstepWellData,
@@ -46,11 +48,7 @@ function SubstepComponent(props: SubstepRowProps): JSX.Element {
     dest,
     selectSubstep: propSelectSubstep,
   } = props
-  const compactPreIngreds = (preIngreds: any) => {
-    return omitBy(preIngreds, ingred => {
-      return typeof ingred.volume === 'number' && ingred.volume <= 0
-    })
-  }
+  const { t } = useTranslation(['application', 'protocol_steps'])
   const compactedSourcePreIngreds = props.source
     ? compactPreIngreds(props.source.preIngreds)
     : {}
@@ -67,11 +65,16 @@ function SubstepComponent(props: SubstepRowProps): JSX.Element {
       ? COLORS.transparent
       : MIXED_WELL_COLOR
 
+  const volumeTag = (
+    <Tag
+      text={`${formatVolume(volume)} ${t('units.microliter')}`}
+      type="default"
+    />
+  )
+
   return (
-    <ListItem
-      type="noActive"
+    <Flex
       onMouseEnter={() => {
-        console.log('hello')
         selectSubstep({
           stepId,
           substepIndex,
@@ -80,24 +83,75 @@ function SubstepComponent(props: SubstepRowProps): JSX.Element {
       onMouseLeave={() => {
         selectSubstep(null)
       }}
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing4}
     >
-      <Flex
-        gridGap={SPACING.spacing4}
-        padding={SPACING.spacing12}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        width="100%"
-        alignItems={ALIGN_CENTER}
-      >
-        <LiquidIcon color={color} size="medium" />
-
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          {ingredIds.map(groupId => ingredNames[groupId]).join(',')}
+      <ListItem type="noActive">
+        <Flex
+          gridGap={SPACING.spacing4}
+          padding={SPACING.spacing12}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          width="100%"
+          alignItems={ALIGN_CENTER}
+        >
+          <LiquidIcon color={color} size="medium" />
+          {ingredIds.length > 0 ? (
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {ingredIds.map(groupId => ingredNames[groupId]).join(',')}
+            </StyledText>
+          ) : null}
+          {source != null ? (
+            <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('protocol_steps:aspirated')}
+              </StyledText>
+              {volumeTag}
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('protocol_steps:from')}
+              </StyledText>
+              <DeckInfoLabel
+                deckLabel={t('protocol_steps:well_name', {
+                  wellName: source.well,
+                })}
+              />
+            </Flex>
+          ) : null}
         </Flex>
-        {source != null ? <DeckInfoLabel deckLabel={source.well} /> : null}
-        {`${formatVolume(volume)} μL`}
-        {dest != null ? <DeckInfoLabel deckLabel={dest.well} /> : null}
-      </Flex>
-    </ListItem>
+      </ListItem>
+      <ListItem type="noActive">
+        <Flex
+          gridGap={SPACING.spacing4}
+          padding={SPACING.spacing12}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          width="100%"
+          alignItems={ALIGN_CENTER}
+        >
+          <LiquidIcon color={color} size="medium" />
+          {ingredIds.length > 0 ? (
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {ingredIds.map(groupId => ingredNames[groupId]).join(',')}
+            </StyledText>
+          ) : null}
+
+          {dest != null ? (
+            <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('protocol_steps:dispensed')}
+              </StyledText>
+              {volumeTag}
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('protocol_steps:from')}
+              </StyledText>
+              <DeckInfoLabel
+                deckLabel={t('protocol_steps:well_name', {
+                  wellName: dest.well,
+                })}
+              />
+            </Flex>
+          ) : null}
+        </Flex>
+      </ListItem>
+    </Flex>
   )
 }
 

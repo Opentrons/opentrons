@@ -1,0 +1,113 @@
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import {
+  ALIGN_CENTER,
+  Btn,
+  DIRECTION_COLUMN,
+  DeckInfoLabel,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  ListItem,
+  SPACING,
+  StyledText,
+  Tag,
+} from '@opentrons/components'
+import { Substep } from './Substep'
+import { formatVolume } from './utils'
+import type {
+  StepItemSourceDestRow,
+  SubstepIdentifier,
+  WellIngredientNames,
+} from '../../../../steplist'
+
+interface MultichannelSubstepProps {
+  rowGroup: StepItemSourceDestRow[]
+  ingredNames: WellIngredientNames
+  stepId: string
+  substepIndex: number
+  selectSubstep: (substepIdentifier: SubstepIdentifier) => void
+  highlighted?: boolean
+}
+
+export function MultichannelSubstep(
+  props: MultichannelSubstepProps
+): JSX.Element {
+  const { rowGroup, stepId, selectSubstep, substepIndex, ingredNames } = props
+  const { t } = useTranslation('application')
+  const [collapsed, setCollapsed] = useState<Boolean>(true)
+  const handleToggleCollapsed = (): void => {
+    setCollapsed(!collapsed)
+  }
+
+  const firstChannelSource = rowGroup[0].source
+  const lastChannelSource = rowGroup[rowGroup.length - 1].source
+  const sourceWellRange = `${
+    firstChannelSource ? firstChannelSource.well : ''
+  }:${lastChannelSource ? lastChannelSource.well : ''}`
+  const firstChannelDest = rowGroup[0].dest
+  const lastChannelDest = rowGroup[rowGroup.length - 1].dest
+  const destWellRange = `${firstChannelDest ? firstChannelDest.well : ''}:${
+    lastChannelDest ? lastChannelDest.well : ''
+  }`
+
+  return (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing8}
+      width="100%"
+      onMouseEnter={() => {
+        selectSubstep({ stepId, substepIndex })
+      }}
+      onMouseLeave={() => {
+        selectSubstep(null)
+      }}
+    >
+      {/* TODO: need to update this to match designs! */}
+      <ListItem type="noActive">
+        <Flex
+          gridGap={SPACING.spacing4}
+          padding={SPACING.spacing12}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          width="100%"
+          alignItems={ALIGN_CENTER}
+        >
+          <StyledText desktopStyle="bodyDefaultRegular">Multi</StyledText>
+          {firstChannelSource != null ? (
+            <DeckInfoLabel deckLabel={sourceWellRange} />
+          ) : null}
+          <Tag
+            text={`${formatVolume(rowGroup[0].volume)} ${t(
+              'units.microliter'
+            )}`}
+            type="default"
+          />
+          {firstChannelDest != null ? (
+            <DeckInfoLabel deckLabel={destWellRange} />
+          ) : null}
+          <Btn onClick={handleToggleCollapsed}>
+            <Icon
+              name={collapsed ? 'chevron-down' : 'chevron-up'}
+              size="1rem"
+            />
+          </Btn>
+        </Flex>
+      </ListItem>
+
+      {!collapsed &&
+        rowGroup.map((row, rowKey) => {
+          return (
+            <Substep
+              key={rowKey}
+              volume={row.volume}
+              ingredNames={ingredNames}
+              source={row.source}
+              dest={row.dest}
+              stepId={stepId}
+              substepIndex={substepIndex}
+            />
+          )
+        })}
+    </Flex>
+  )
+}
