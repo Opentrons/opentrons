@@ -17,13 +17,13 @@ def subject(
 
 def test_error_recovery_setting_store(subject: ErrorRecoverySettingStore) -> None:
     """Test `ErrorRecoverySettingStore`."""
-    assert subject.get_is_disabled() is None
+    assert subject.get_is_enabled() is None
 
-    subject.set_is_disabled(is_disabled=False)
-    assert subject.get_is_disabled() is False
+    subject.set_is_enabled(is_enabled=False)
+    assert subject.get_is_enabled() is False
 
-    subject.set_is_disabled(is_disabled=True)
-    assert subject.get_is_disabled() is True
+    subject.set_is_enabled(is_enabled=True)
+    assert subject.get_is_enabled() is True
 
-    subject.set_is_disabled(is_disabled=None)
-    assert subject.get_is_disabled() is None
+    subject.set_is_enabled(is_enabled=None)
+    assert subject.get_is_enabled() is None

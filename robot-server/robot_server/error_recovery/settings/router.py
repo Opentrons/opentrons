@@ -39,7 +39,7 @@ async def patch_error_recovery_settings(  # noqa: D103
     ],
 ) -> PydanticResponse[SimpleBody[ResponseData]]:
     if request_body.data.enabled is not None:
-        store.set_is_disabled(is_disabled=not request_body.data.enabled)
+        store.set_is_enabled(request_body.data.enabled)
     return await _get_current_response(store)
 
 
@@ -53,14 +53,18 @@ async def delete_error_recovery_settings(  # noqa: D103
         ErrorRecoverySettingStore, fastapi.Depends(get_error_recovery_setting_store)
     ],
 ) -> PydanticResponse[SimpleBody[ResponseData]]:
-    store.set_is_disabled(None)
+    store.set_is_enabled(None)
     return await _get_current_response(store)
 
 
 async def _get_current_response(
     store: ErrorRecoverySettingStore,
 ) -> PydanticResponse[SimpleBody[ResponseData]]:
-    is_enabled = not store.get_is_disabled()
+    is_enabled = store.get_is_enabled()
+    if is_enabled is None:
+        # todo(mm, 2024-09-30): This defaulting will probably need to move down a layer
+        # when we connect this setting to `POST /runs`.
+        is_enabled = True
     return await PydanticResponse.create(
         SimpleBody.construct(data=ResponseData.construct(enabled=is_enabled))
     )
