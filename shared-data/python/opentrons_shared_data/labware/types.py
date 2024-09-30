@@ -37,6 +37,8 @@ LabwareRoles = Union[
 
 Circular = Literal["circular"]
 Rectangular = Literal["rectangular"]
+TruncatedCircular = Literal["truncatedcircular"]
+RoundedRectangular = Literal["roundedrectangular"]
 Spherical = Literal["spherical"]
 WellShape = Union[Circular, Rectangular]
 
@@ -123,37 +125,73 @@ class WellGroup(TypedDict, total=False):
 class SphericalSegment(TypedDict):
     shape: Spherical
     radiusOfCurvature: float
-    depth: float
-
-
-class RectangularBoundedSection(TypedDict):
-    shape: Rectangular
-    xDimension: float
-    yDimension: float
     topHeight: float
 
 
-class CircularBoundedSection(TypedDict):
+# class RectangularBoundedSection(TypedDict):
+#     shape: Rectangular
+#     xDimension: float
+#     yDimension: float
+#     topHeight: float
+#
+#
+# class CircularBoundedSection(TypedDict):
+#     shape: Circular
+#     diameter: float
+#     topHeight: float
+
+
+class CircularFrustum(TypedDict):
     shape: Circular
-    diameter: float
+    bottomDiameter: float
+    topDiameter: float
     topHeight: float
+    bottom_height: float
 
 
-def is_circular_frusta_list(
-    items: List[Any],
-) -> TypeGuard[List[CircularBoundedSection]]:
-    return all(item.shape == "circular" for item in items)
+class RectangularFrustum(TypedDict):
+    shape: Rectangular
+    bottomXDimension: float
+    bottomYDimension: float
+    topXDimension: float
+    topYDimension: float
+    topHeight: float
+    bottom_height: float
 
 
-def is_rectangular_frusta_list(
-    items: List[Any],
-) -> TypeGuard[List[RectangularBoundedSection]]:
-    return all(item.shape == "rectangular" for item in items)
+# A truncated circle is a square that is trimmed at the corners by a smaller circle
+#   that is concentric with the square.
+class TruncatedCircularSegment(TypedDict):
+    shape: TruncatedCircular
+    circleDiameter: float
+    rectangleXDimension: float
+    rectangleYDimension: float
+    topHeight: float
+    bottom_height: float
+
+
+# A rounded rectangle is a rectangle that is filleted by 4 circles
+#   centered somewhere along the diagonals of the rectangle
+class RoundedRectangularSegment(TypedDict):
+    shape: RoundedRectangular
+    circleDiameter: float
+    rectangleXDimension: float
+    rectangleYDimension: float
+    topHeight: float
+    bottom_height: float
+
+
+WellSegment = Union[
+    CircularFrustum,
+    RectangularFrustum,
+    TruncatedCircularSegment,
+    RoundedRectangularSegment,
+    SphericalSegment
+]
 
 
 class InnerWellGeometry(TypedDict):
-    frusta: Union[List[CircularBoundedSection], List[RectangularBoundedSection]]
-    bottomShape: Optional[SphericalSegment]
+    sections: List[WellSegment]
 
 
 class LabwareDefinition(TypedDict):

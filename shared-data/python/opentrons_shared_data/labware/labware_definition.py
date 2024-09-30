@@ -233,39 +233,112 @@ class SphericalSegment(BaseModel):
         ...,
         description="radius of curvature of bottom subsection of wells",
     )
-    depth: _NonNegativeNumber = Field(
+    topHeight: _NonNegativeNumber = Field(
         ..., description="The depth of a spherical bottom of a well"
     )
 
 
-class CircularBoundedSection(BaseModel):
+class CircularFrustum(BaseModel):
     shape: Literal["circular"] = Field(..., description="Denote shape as circular")
-    diameter: _NonNegativeNumber = Field(
-        ..., description="The diameter of a circular cross section of a well"
+    bottomDiameter: _NonNegativeNumber = Field(
+        ..., description="The diameter at the bottom cross-section of a circular frustum"
+    )
+    topDiameter: _NonNegativeNumber = Field(
+        ..., description="The diameter at the top cross-section of a circular frustum"
     )
     topHeight: _NonNegativeNumber = Field(
         ...,
         description="The height at the top of a bounded subsection of a well, relative to the bottom"
         "of the well",
     )
+    bottomHeight: _NonNegativeNumber = Field(
+        ...,
+        description="The height at the bottom of a bounded subsection of a well, relative to the bottom of the well"
+    )
 
 
-class RectangularBoundedSection(BaseModel):
+class RectangularFrustum(BaseModel):
     shape: Literal["rectangular"] = Field(
         ..., description="Denote shape as rectangular"
     )
-    xDimension: _NonNegativeNumber = Field(
+    bottomXDimension: _NonNegativeNumber = Field(
         ...,
-        description="x dimension of a subsection of wells",
+        description="x dimension of the bottom cross-section of a rectangular frustum",
     )
-    yDimension: _NonNegativeNumber = Field(
+    bottomYDimension: _NonNegativeNumber = Field(
         ...,
-        description="y dimension of a subsection of wells",
+        description="y dimension of the bottom cross-section of a rectangular frustum",
+    )
+    topXDimension: _NonNegativeNumber = Field(
+        ...,
+        description="x dimension of the top cross-section of a rectangular frustum",
+    )
+    topYDimension: _NonNegativeNumber = Field(
+        ...,
+        description="y dimension of the top cross-section of a rectangular frustum",
     )
     topHeight: _NonNegativeNumber = Field(
         ...,
         description="The height at the top of a bounded subsection of a well, relative to the bottom"
-        "of the well",
+                    "of the well",
+    )
+    bottomHeight: _NonNegativeNumber = Field(
+        ...,
+        description="The height at the bottom of a bounded subsection of a well, relative to the bottom of the well"
+    )
+
+
+class TruncatedCircularSegment(BaseModel):
+    shape: Literal["truncatedcircular"] = Field(
+        ..., description="Denote shape as a truncated circular segment"
+    ),
+    circleDiameter: _NonNegativeNumber = Field(
+        ...,
+        description="diameter of the circular face of a truncated circular segment"
+    ),
+    rectangleXDimension: _NonNegativeNumber = Field(
+        ...,
+        description="x dimension of the rectangular face of a truncated circular segment"
+    )
+    rectangleYDimension: _NonNegativeNumber = Field(
+        ...,
+        description="y dimension of the rectangular face of a truncated circular segment"
+    )
+    topHeight: _NonNegativeNumber = Field(
+        ...,
+        description="The height at the top of a bounded subsection of a well, relative to the bottom"
+                    "of the well",
+    )
+    bottomHeight: _NonNegativeNumber = Field(
+        ...,
+        description="The height at the bottom of a bounded subsection of a well, relative to the bottom of the well"
+    )
+
+
+class RoundedRectangularSegment(BaseModel):
+    shape: Literal["roundedrectangular"] = Field(
+        ..., description="Denote shape as a rounded rectangular segment"
+    ),
+    circleDiameter: _NonNegativeNumber = Field(
+        ...,
+        description="diameter of the circular face of a rounded rectangular segment"
+    ),
+    rectangleXDimension: _NonNegativeNumber = Field(
+        ...,
+        description="x dimension of the rectangular face of a rounded rectangular segment"
+    )
+    rectangleYDimension: _NonNegativeNumber = Field(
+        ...,
+        description="y dimension of the rectangular face of a rounded rectangular segment"
+    )
+    topHeight: _NonNegativeNumber = Field(
+        ...,
+        description="The height at the top of a bounded subsection of a well, relative to the bottom"
+                    "of the well",
+    )
+    bottomHeight: _NonNegativeNumber = Field(
+        ...,
+        description="The height at the bottom of a bounded subsection of a well, relative to the bottom of the well"
     )
 
 
@@ -297,16 +370,19 @@ class Group(BaseModel):
     )
 
 
+WellSegment = Union[
+    CircularFrustum,
+    RectangularFrustum,
+    TruncatedCircularSegment,
+    RoundedRectangularSegment,
+    SphericalSegment
+]
+
+
 class InnerWellGeometry(BaseModel):
-    frusta: Union[
-        List[CircularBoundedSection], List[RectangularBoundedSection]
-    ] = Field(
+    sections: List[WellSegment] = Field(
         ...,
         description="A list of all of the sections of the well that have a contiguous shape",
-    )
-    bottomShape: Optional[SphericalSegment] = Field(
-        None,
-        description="The shape at the bottom of the well: either a spherical segment or a cross-section",
     )
 
 
