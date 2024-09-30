@@ -4,7 +4,7 @@ import { LegacyStyledText } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
 import {
-  ReplaceTips,
+  TwoColLwInfoAndDeck,
   SelectTips,
   TwoColTextAndFailedStepNextStep,
 } from '../shared'
@@ -31,7 +31,7 @@ export function SkipStepNewTips(
   const buildContent = (): JSX.Element => {
     switch (step) {
       case SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS:
-        return <ReplaceTips {...props} />
+        return <TwoColLwInfoAndDeck {...props} />
       case SKIP_STEP_WITH_NEW_TIPS.STEPS.SELECT_TIPS:
         return <SelectTips {...props} />
       case SKIP_STEP_WITH_NEW_TIPS.STEPS.SKIP:

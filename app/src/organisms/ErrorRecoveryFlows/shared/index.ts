@@ -4,7 +4,7 @@ export {
   RecoveryTwoColumnContentWrapper,
   RecoveryODDOneDesktopTwoColumnContentWrapper,
 } from './RecoveryContentWrapper'
-export { ReplaceTips } from './ReplaceTips'
+export { TwoColLwInfoAndDeck } from './TwoColLwInfoAndDeck'
 export { SelectTips } from './SelectTips'
 export { TwoColTextAndFailedStepNextStep } from './TwoColTextAndFailedStepNextStep'
 export { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
