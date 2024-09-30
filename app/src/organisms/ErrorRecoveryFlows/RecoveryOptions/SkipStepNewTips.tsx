@@ -1,13 +1,5 @@
-import { Trans, useTranslation } from 'react-i18next'
-
-import { LegacyStyledText } from '@opentrons/components'
-
 import { RECOVERY_MAP } from '../constants'
-import {
-  TwoColLwInfoAndDeck,
-  SelectTips,
-  TwoColTextAndFailedStepNextStep,
-} from '../shared'
+import { TwoColLwInfoAndDeck, SelectTips, SkipStepInfo } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
@@ -35,7 +27,7 @@ export function SkipStepNewTips(
       case SKIP_STEP_WITH_NEW_TIPS.STEPS.SELECT_TIPS:
         return <SelectTips {...props} />
       case SKIP_STEP_WITH_NEW_TIPS.STEPS.SKIP:
-        return <SkipStepWithNewTips {...props} />
+        return <SkipStepInfo {...props} />
       default:
         console.warn(`${step} in ${route} not explicitly handled. Rerouting.`)
         return <SelectRecoveryOption {...props} />
@@ -43,40 +35,4 @@ export function SkipStepNewTips(
   }
 
   return buildContent()
-}
-
-export function SkipStepWithNewTips(props: RecoveryContentProps): JSX.Element {
-  const { recoveryCommands, routeUpdateActions } = props
-  const { skipFailedCommand } = recoveryCommands
-  const { handleMotionRouting } = routeUpdateActions
-  const { ROBOT_SKIPPING_STEP } = RECOVERY_MAP
-  const { t } = useTranslation('error_recovery')
-
-  const primaryBtnOnClick = (): Promise<void> => {
-    return handleMotionRouting(true, ROBOT_SKIPPING_STEP.ROUTE).then(() => {
-      skipFailedCommand()
-    })
-  }
-
-  const buildBodyText = (): JSX.Element => {
-    return (
-      <Trans
-        t={t}
-        i18nKey="failed_dispense_step_not_completed"
-        components={{
-          block: <LegacyStyledText as="p" />,
-        }}
-      />
-    )
-  }
-
-  return (
-    <TwoColTextAndFailedStepNextStep
-      {...props}
-      leftColTitle={t('skip_to_next_step_new_tips')}
-      leftColBodyText={buildBodyText()}
-      primaryBtnOnClick={primaryBtnOnClick}
-      primaryBtnCopy={t('continue_run_now')}
-    />
-  )
 }

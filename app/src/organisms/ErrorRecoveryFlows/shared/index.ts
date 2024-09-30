@@ -17,5 +17,6 @@ export { FailedStepNextStep } from './FailedStepNextStep'
 export { RecoveryRadioGroup } from './RecoveryRadioGroup'
 export { GripperReleaseLabware } from './GripperReleaseLabware'
 export { RetryStepInfo } from './RetryStepInfo'
+export { SkipStepInfo } from './SkipStepInfo'
 
 export type { RecoveryInterventionModalProps } from './RecoveryInterventionModal'
