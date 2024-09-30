@@ -8,6 +8,14 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ---
 
+## Opentrons App Changes in 8.1.0
+
+Welcome to the v8.1.0 release of the Opentrons App!
+
+There are no changes to the Opentrons App in v8.1.0, but it is required for updating the robot software to support the latest model of Flex robots (serial numbers beginning `TKTKTK`).
+
+---
+
 ## Opentrons App Changes in 8.0.0
 
 Welcome to the v8.0.0 release of the Opentrons App!
