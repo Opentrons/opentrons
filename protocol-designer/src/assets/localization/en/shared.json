@@ -115,6 +115,7 @@
   "user_settings": "User settings",
   "uses_standard_namespace": "Opentrons verified labware",
   "version": "Version # {{version}}",
+  "view_release_notes": "View release notes",
   "warning": "WARNING:",
   "wasteChute": "Waste chute",
   "wasteChuteAndStagingArea": "Waste chute and staging area slot",

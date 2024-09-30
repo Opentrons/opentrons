@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import isEmpty from 'lodash/isEmpty'
 import { useTranslation } from 'react-i18next'

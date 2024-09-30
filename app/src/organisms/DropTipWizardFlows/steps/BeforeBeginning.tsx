@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
@@ -32,20 +32,20 @@ import type { DropTipWizardContainerProps } from '../types'
 type FlowType = 'blowout' | 'drop_tips' | null
 
 export const BeforeBeginning = ({
-  proceedToRoute,
+  proceedToRouteAndStep,
   isOnDevice,
   issuedCommandsType,
   fixitCommandTypeUtils,
   modalStyle,
 }: DropTipWizardContainerProps): JSX.Element | null => {
   const { t } = useTranslation('drop_tip_wizard')
-  const [flowType, setFlowType] = React.useState<FlowType>(null)
+  const [flowType, setFlowType] = useState<FlowType>(null)
 
   const handleProceed = (): void => {
     if (flowType === 'blowout') {
-      void proceedToRoute(DT_ROUTES.BLOWOUT)
+      void proceedToRouteAndStep(DT_ROUTES.BLOWOUT)
     } else if (flowType === 'drop_tips') {
-      void proceedToRoute(DT_ROUTES.DROP_TIP)
+      void proceedToRouteAndStep(DT_ROUTES.DROP_TIP)
     }
   }
 

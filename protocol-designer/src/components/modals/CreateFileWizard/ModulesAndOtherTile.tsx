@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 import without from 'lodash/without'
@@ -226,7 +226,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
     modules,
     trashType: 'trashBin',
   })
-  React.useEffect(() => {
+  useEffect(() => {
     if (trashBinDisabled) {
       setValue('additionalEquipment', without(additionalEquipment, 'trashBin'))
     }

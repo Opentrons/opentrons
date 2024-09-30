@@ -1,4 +1,4 @@
-import React from 'react'
+import { useEffect } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useTranslation } from 'react-i18next'
 import { useForm, FormProvider } from 'react-hook-form'
@@ -42,7 +42,7 @@ export function App(): JSX.Element | null {
     },
   })
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isAuthenticated && !isLoading) {
       void loginWithRedirect()
     }

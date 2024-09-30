@@ -1,4 +1,3 @@
-import React from 'react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { when } from 'vitest-when'

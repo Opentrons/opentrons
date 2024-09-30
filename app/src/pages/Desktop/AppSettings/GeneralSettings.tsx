@@ -1,5 +1,5 @@
 // app info card with version and updated
-import * as React from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
@@ -40,10 +40,10 @@ import {
   useTrackEvent,
   ANALYTICS_APP_UPDATE_NOTIFICATIONS_TOGGLED,
 } from '/app/redux/analytics'
-import { UpdateAppModal } from '/app/organisms/UpdateAppModal'
-import { PreviousVersionModal } from '/app/organisms/AppSettings/PreviousVersionModal'
-import { ConnectRobotSlideout } from '/app/organisms/AppSettings/ConnectRobotSlideout'
-import { getTopPortalEl } from '../../../App/portal'
+import { UpdateAppModal } from '/app/organisms/Desktop/UpdateAppModal'
+import { PreviousVersionModal } from '/app/organisms/Desktop/AppSettings/PreviousVersionModal'
+import { ConnectRobotSlideout } from '/app/organisms/Desktop/AppSettings/ConnectRobotSlideout'
+import { getTopPortalEl } from '/app/App/portal'
 
 import type { Dispatch, State } from '/app/redux/types'
 
@@ -60,22 +60,21 @@ export function GeneralSettings(): JSX.Element {
   const [
     showPreviousVersionModal,
     setShowPreviousVersionModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const updateAvailable = Boolean(useSelector(getAvailableShellUpdate))
-  const [showUpdateBanner, setShowUpdateBanner] = React.useState<boolean>(
+  const [showUpdateBanner, setShowUpdateBanner] = useState<boolean>(
     updateAvailable
   )
-  const [
-    showConnectRobotSlideout,
-    setShowConnectRobotSlideout,
-  ] = React.useState(false)
+  const [showConnectRobotSlideout, setShowConnectRobotSlideout] = useState(
+    false
+  )
 
   // may be enabled, disabled, or unknown (because config is loading)
   const updateAlertEnabled = useSelector((s: State) => {
     const ignored = getAlertIsPermanentlyIgnored(s, ALERT_APP_UPDATE_AVAILABLE)
     return ignored !== null ? !ignored : null
   })
-  const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(false)
+  const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false)
   const handleToggle = (): void => {
     if (updateAlertEnabled !== null) {
       dispatch(

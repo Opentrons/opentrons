@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import {
   ALIGN_FLEX_START,
   DIRECTION_ROW,

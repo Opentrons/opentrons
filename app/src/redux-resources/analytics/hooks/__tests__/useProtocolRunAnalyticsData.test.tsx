@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { renderHook, waitFor } from '@testing-library/react'
@@ -69,7 +69,7 @@ const ROBOT_PROTOCOL_ANALYSIS = {
   runTimeParameters: RUNTIME_PARAMETERS,
 }
 
-describe('useProtocolAnalysisErrors hook', () => {
+describe('useProtocolRunAnalyticsData hook', () => {
   beforeEach(() => {
     store = createStore(vi.fn(), {})
     const queryClient = new QueryClient()

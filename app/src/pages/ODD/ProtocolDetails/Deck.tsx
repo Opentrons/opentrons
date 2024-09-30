@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import last from 'lodash/last'
 
 import { Flex, ProtocolDeck, SPACING } from '@opentrons/components'
@@ -8,7 +8,7 @@ import {
 } from '@opentrons/react-api-client'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
-import { LabwareStackModal } from '/app/organisms/Devices/ProtocolRun/SetupLabware/LabwareStackModal'
+import { LabwareStackModal } from '/app/molecules/LabwareStackModal'
 import { SingleLabwareModal } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupLabware/SingleLabwareModal'
 import { getLabwareSetupItemGroups } from '/app/transformations/commands'
 
@@ -30,8 +30,8 @@ export const Deck = (props: { protocolId: string }): JSX.Element => {
   const [
     showLabwareDetailsModal,
     setShowLabwareDetailsModal,
-  ] = React.useState<boolean>(false)
-  const [selectedLabware, setSelectedLabware] = React.useState<
+  ] = useState<boolean>(false)
+  const [selectedLabware, setSelectedLabware] = useState<
     | (LabwareDefinition2 & {
         location: LabwareLocation
         nickName: string | null

@@ -1,5 +1,5 @@
 // SidePanelGroup component
-import * as React from 'react'
+import type * as React from 'react'
 import cx from 'classnames'
 
 import styles from './lists.module.css'

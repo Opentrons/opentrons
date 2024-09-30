@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { StyledText } from '../../atoms/StyledText'
 import { Banner } from './index'
 

@@ -1,4 +1,4 @@
-import React from 'react'
+import type * as React from 'react'
 import { describe, it, expect } from 'vitest'
 import { FormProvider, useForm } from 'react-hook-form'
 import { fireEvent, screen } from '@testing-library/react'

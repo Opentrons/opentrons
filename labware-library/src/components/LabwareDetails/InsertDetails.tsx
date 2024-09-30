@@ -1,6 +1,4 @@
 // full-width labware details
-import * as React from 'react'
-
 import { getUniqueWellProperties } from '@opentrons/shared-data'
 import { getWellLabel, WellProperties, ManufacturerStats } from '../labware-ui'
 import { DetailsBox } from '../ui'

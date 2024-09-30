@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import {
@@ -112,9 +111,14 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-            {filteredSupportedModules.length > 0 ? (
+            {(filteredSupportedModules.length > 0 && enableAbsorbanceReader) ||
+            // note (kk:09/26/2024) the condition for absorbanceReaderV1 will be removed when ff is removed
+            !(
+              filteredSupportedModules.length === 1 &&
+              filteredSupportedModules[0] === 'absorbanceReaderV1'
+            ) ? (
               <StyledText desktopStyle="headingSmallBold">
-                {t('which_mods')}
+                {t('which_modules')}
               </StyledText>
             ) : null}
             <Flex gridGap={SPACING.spacing4} flexWrap={WRAP}>

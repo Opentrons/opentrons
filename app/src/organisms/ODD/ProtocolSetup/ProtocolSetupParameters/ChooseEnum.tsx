@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
@@ -10,7 +9,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useToaster } from '../../../ToasterOven'
-import { ChildNavigation } from '../../../ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import type { ChoiceParameter } from '@opentrons/shared-data'
 
 interface ChooseEnumProps {

@@ -9,12 +9,12 @@ import {
   RadioButton,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
 } from '/app/redux/config'
-import { SLEEP_NEVER_MS } from '../../../App/constants'
+import { SLEEP_NEVER_MS } from '/app/local-resources/config'
 
 import type { Dispatch } from '/app/redux/types'
 import type { SetSettingOption } from './types'

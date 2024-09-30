@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -16,7 +16,7 @@ import {
 } from '@opentrons/api-client'
 
 import { useUpdateClientDataRecovery } from '/app/resources/client_data'
-import { TakeoverModal } from '../TakeoverModal/TakeoverModal'
+import { TakeoverModal } from '/app/organisms/TakeoverModal/TakeoverModal'
 import { RecoveryInterventionModal } from './shared'
 
 import type {
@@ -99,7 +99,7 @@ export function RecoveryTakeoverODD({
   clearClientData,
   isRunStatusAwaitingRecovery,
 }: RecoveryTakeoverProps): JSX.Element {
-  const [showConfirmation, setShowConfirmation] = React.useState(false)
+  const [showConfirmation, setShowConfirmation] = useState(false)
 
   return (
     <TakeoverModal

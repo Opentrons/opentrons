@@ -1,4 +1,3 @@
-import * as React from 'react'
 import styles from './TitledListNotes.module.css'
 import { useTranslation } from 'react-i18next'
 import { truncateString } from '@opentrons/components'

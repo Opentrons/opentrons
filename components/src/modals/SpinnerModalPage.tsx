@@ -1,5 +1,5 @@
 // titled modal page component
-import * as React from 'react'
+import type * as React from 'react'
 
 import { TitleBar } from '../structure'
 import { SpinnerModal } from './SpinnerModal'

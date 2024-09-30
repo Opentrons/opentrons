@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { when } from 'vitest-when'
@@ -15,7 +14,7 @@ import {
 import { i18n } from '/app/i18n'
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
 import { useOffsetCandidatesForAnalysis } from '/app/organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { useRunTimeParameters } from '/app/pages/Desktop/Protocols/hooks'
+import { useRunTimeParameters } from '/app/resources/protocols'
 import { ProtocolSetupParameters } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
 import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
@@ -49,7 +48,7 @@ vi.mock('/app/organisms/ODD/RobotDashboard/hooks')
 vi.mock(
   '/app/organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 )
-vi.mock('/app/pages/Desktop/Protocols/hooks')
+vi.mock('/app/resources/protocols')
 vi.mock('/app/transformations/commands')
 vi.mock('../Deck')
 vi.mock('../Hardware')

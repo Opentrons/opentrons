@@ -1,4 +1,3 @@
-import * as React from 'react'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { Trans, useTranslation } from 'react-i18next'
 

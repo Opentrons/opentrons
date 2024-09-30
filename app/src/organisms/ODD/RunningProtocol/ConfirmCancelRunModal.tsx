@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
@@ -66,7 +66,7 @@ export function ConfirmCancelRunModal({
   const robotName = localRobot?.name ?? ''
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const navigate = useNavigate()
-  const [isCanceling, setIsCanceling] = React.useState(false)
+  const [isCanceling, setIsCanceling] = useState(false)
 
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('cancel_run_modal_heading'),
@@ -84,7 +84,7 @@ export function ConfirmCancelRunModal({
     })
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED) {
       trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
       if (!isActiveRun) {

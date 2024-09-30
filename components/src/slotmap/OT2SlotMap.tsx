@@ -1,4 +1,3 @@
-import * as React from 'react'
 import cx from 'classnames'
 import { Icon } from '../icons'
 import styles from './styles.module.css'

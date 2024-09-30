@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Box, SPACING } from '@opentrons/components'
 import { Divider } from '/app/atoms/structure'
 import {
@@ -12,7 +11,7 @@ import {
   U2EInformation,
   UpdatedChannel,
   AdditionalCustomLabwareSourceFolder,
-} from '/app/organisms/AdvancedSettings'
+} from '/app/organisms/Desktop/AdvancedSettings'
 
 export function AdvancedSettings(): JSX.Element {
   return (

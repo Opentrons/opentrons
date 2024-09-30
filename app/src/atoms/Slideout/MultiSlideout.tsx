@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Slideout } from './index'
 
 import type { MultiSlideoutSpecs, SlideoutProps } from './index'

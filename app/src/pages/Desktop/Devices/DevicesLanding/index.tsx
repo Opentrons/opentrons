@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import partition from 'lodash/partition'
@@ -28,8 +27,8 @@ import {
   OPENTRONS_USB,
 } from '/app/redux/discovery'
 import { appShellRequestor } from '/app/redux/shell/remote'
-import { RobotCard } from '/app/organisms/Devices/RobotCard'
-import { DevicesEmptyState } from '/app/organisms/Devices/DevicesEmptyState'
+import { RobotCard } from '/app/organisms/Desktop/Devices/RobotCard'
+import { DevicesEmptyState } from '/app/organisms/Desktop/Devices/DevicesEmptyState'
 import { CollapsibleSection } from '/app/molecules/CollapsibleSection'
 
 import { Divider } from '/app/atoms/structure'

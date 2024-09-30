@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { vi, describe, beforeEach, it, expect, afterEach } from 'vitest'
 import { Route } from 'react-router'
 import { MemoryRouter, Routes } from 'react-router-dom'
@@ -10,14 +9,14 @@ import * as Config from '/app/redux/config'
 import { GeneralSettings } from '../GeneralSettings'
 import { PrivacySettings } from '../PrivacySettings'
 import { AdvancedSettings } from '../AdvancedSettings'
-import { FeatureFlags } from '/app/organisms/AppSettings/FeatureFlags'
+import { FeatureFlags } from '/app/organisms/Desktop/AppSettings/FeatureFlags'
 import { AppSettings } from '..'
 
 vi.mock('/app/redux/config')
 vi.mock('../GeneralSettings')
 vi.mock('../PrivacySettings')
 vi.mock('../AdvancedSettings')
-vi.mock('/app/organisms/AppSettings/FeatureFlags')
+vi.mock('/app/organisms/Desktop/AppSettings/FeatureFlags')
 
 const render = (path = '/'): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(

@@ -33,11 +33,6 @@ import {
   getFixtureDisplayName,
 } from '@opentrons/shared-data'
 
-import {
-  useLPCDisabledReason,
-  useModuleCalibrationStatus,
-  useProtocolAnalysisErrors,
-} from '/app/organisms/Devices/hooks'
 import { useRobotType } from '/app/redux-resources/robots'
 import {
   useRobotAnalyticsData,
@@ -79,11 +74,17 @@ import { getLatestCurrentOffsets } from '/app/transformations/runs'
 import { CloseButton, PlayButton } from './Buttons'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
-import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
+import {
+  useNotifyRunQuery,
+  useRunStatus,
+  useLPCDisabledReason,
+  useModuleCalibrationStatus,
+  useProtocolAnalysisErrors,
+} from '/app/resources/runs'
 
 import type { Run } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
-import type { OnDeviceRouteParams } from '../../../App/types'
+import type { OnDeviceRouteParams } from '/app/App/types'
 import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 import type { SetupScreens } from '/app/organisms/ODD/ProtocolSetup'
 import type {

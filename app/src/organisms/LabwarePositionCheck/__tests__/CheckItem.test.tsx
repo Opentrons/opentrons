@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 
@@ -18,7 +18,7 @@ import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 import type { Mock } from 'vitest'
 
 vi.mock('/app/redux/config')
-vi.mock('../../Devices/hooks')
+vi.mock('../../Desktop/Devices/hooks')
 
 const mockStartPosition = { x: 10, y: 20, z: 30 }
 const mockEndPosition = { x: 9, y: 19, z: 29 }

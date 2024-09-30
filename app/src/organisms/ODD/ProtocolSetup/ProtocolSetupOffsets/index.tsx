@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Chip,
@@ -122,7 +122,7 @@ export function ProtocolSetupOffsets({
                 />
               </>
             ) : (
-              <InfoScreen content={t('noLabwareOffsetDataYet')} />
+              <InfoScreen content={t('no_labware_offset_data')} />
             )}
           </Flex>
           <FloatingActionButton

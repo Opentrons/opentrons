@@ -23,4 +23,5 @@ export interface StepFormProps {
   formData: FormData
   focusHandlers: FocusHandlers
   propsForFields: FieldPropsByName
+  toolboxStep: number
 }

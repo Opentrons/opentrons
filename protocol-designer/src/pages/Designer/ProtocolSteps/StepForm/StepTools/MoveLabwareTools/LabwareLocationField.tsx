@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { getHasWasteChute } from '@opentrons/step-generation'
@@ -27,7 +26,7 @@ export function LabwareLocationField(
   props: LabwareLocationFieldProps
 ): JSX.Element {
   const { t } = useTranslation(['form', 'protocol_steps'])
-  const { labware, useGripper, value } = props
+  const { labware, useGripper, value, canSave } = props
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
@@ -79,12 +78,12 @@ export function LabwareLocationField(
       {...props}
       options={unoccupiedLabwareLocationsOptions}
       errorToShow={
-        !props.canSave && bothFieldsSelected
+        !canSave && bothFieldsSelected
           ? t('step_edit_form.labwareLabel.errors.labwareSlotIncompatible', {
               labwareName: labwareDisplayName,
               slot: locationString,
             })
-          : undefined
+          : null
       }
       title={t('protocol_steps:new_location')}
     />

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { DropdownField } from '@opentrons/components'
 import type {
   ControllerFieldState,

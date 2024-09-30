@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -31,7 +31,8 @@ import {
 
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
-import { useIsRobotViewable, useRunStatuses } from '../Devices/hooks'
+import { useRunStatuses } from '/app/resources/runs'
+import { useIsRobotViewable } from '/app/redux-resources/robots'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import {
   useDeckConfigurationEditingTools,
@@ -58,7 +59,7 @@ export function DeviceDetailsDeckConfiguration({
   const [
     showSetupInstructionsModal,
     setShowSetupInstructionsModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
   const { data: modulesData } = useModulesQuery()
   const deckConfig =

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
@@ -20,7 +20,7 @@ import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '@opentrons/shared-data'
 
 import { getIsOnDevice } from '/app/redux/config'
 import { SmallButton } from '/app/atoms/buttons'
-import { NeedHelpLink } from '../CalibrationPanels'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type {

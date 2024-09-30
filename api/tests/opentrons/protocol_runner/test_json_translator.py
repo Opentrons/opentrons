@@ -706,7 +706,7 @@ def _load_labware_definition_data() -> LabwareDefinition:
                 ],
                 bottomShape=SphericalSegment(
                     shape="spherical",
-                    radius_of_curvature=6,
+                    radiusOfCurvature=6,
                     depth=10,
                 ),
             )

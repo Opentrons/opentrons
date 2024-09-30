@@ -1,3 +1,5 @@
 export * from './useRobot'
 export * from './useIsFlex'
 export * from './useRobotType'
+export * from './useIsRobotViewable'
+export * from './useIsRobotBusy'

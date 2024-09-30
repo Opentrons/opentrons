@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -29,7 +29,7 @@ export function LiquidCard(props: LiquidCardProps): JSX.Element {
   const { info } = props
   const { name, color, liquidIndex } = info
   const { t } = useTranslation('liquids')
-  const [isExpanded, setIsExpanded] = React.useState<boolean>(false)
+  const [isExpanded, setIsExpanded] = useState<boolean>(false)
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const labwareEntities = useSelector(getLabwareEntities)
   const selectedLabwareDef =

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { memo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -162,4 +162,4 @@ function FormAlertsComponent(props: FormAlertsProps): JSX.Element {
   )
 }
 
-export const FormAlerts = React.memo(FormAlertsComponent)
+export const FormAlerts = memo(FormAlertsComponent)

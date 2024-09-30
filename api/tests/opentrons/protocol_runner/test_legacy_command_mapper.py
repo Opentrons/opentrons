@@ -3,6 +3,11 @@ import inspect
 from datetime import datetime
 from typing import cast
 
+from opentrons.protocol_engine.state.update_types import (
+    LoadPipetteUpdate,
+    LoadedLabwareUpdate,
+    StateUpdate,
+)
 import pytest
 from decoy import matchers, Decoy
 
@@ -316,6 +321,15 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
             notes=[],
         ),
         private_result=None,
+        state_update=StateUpdate(
+            loaded_labware=LoadedLabwareUpdate(
+                labware_id="labware-0",
+                definition=matchers.Anything(),
+                offset_id="labware-offset-id-123",
+                new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                display_name="My special labware",
+            )
+        ),
     )
     result_queue, result_run, result_succeed = LegacyCommandMapper().map_equipment_load(
         input
@@ -368,6 +382,14 @@ def test_map_instrument_load(decoy: Decoy) -> None:
         ),
         private_result=pe_commands.LoadPipettePrivateResult(
             pipette_id="pipette-0", serial_number="fizzbuzz", config=pipette_config
+        ),
+        state_update=StateUpdate(
+            loaded_pipette=LoadPipetteUpdate(
+                pipette_id="pipette-0",
+                mount=expected_params.mount,
+                pipette_name=expected_params.pipetteName,
+                liquid_presence_detection=expected_params.liquidPresenceDetection,
+            )
         ),
     )
 
@@ -500,6 +522,15 @@ def test_map_module_labware_load(minimal_labware_def: LabwareDefinition) -> None
             notes=[],
         ),
         private_result=None,
+        state_update=StateUpdate(
+            loaded_labware=LoadedLabwareUpdate(
+                labware_id="labware-0",
+                definition=matchers.Anything(),
+                offset_id="labware-offset-id-123",
+                new_location=ModuleLocation(moduleId="module-123"),
+                display_name="My very special module labware",
+            )
+        ),
     )
 
     subject = LegacyCommandMapper()

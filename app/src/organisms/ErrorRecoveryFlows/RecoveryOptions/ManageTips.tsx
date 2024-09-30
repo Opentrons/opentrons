@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import {
@@ -20,15 +19,15 @@ import {
   RecoveryFooterButtons,
   RecoverySingleColumnContentWrapper,
 } from '../shared'
-import { DropTipWizardFlows } from '../../DropTipWizardFlows'
-import { DT_ROUTES } from '../../DropTipWizardFlows/constants'
+import { DropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
+import { DT_ROUTES } from '/app/organisms/DropTipWizardFlows/constants'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps, RecoveryRoute, RouteStep } from '../types'
 import type {
   FixitCommandTypeUtils,
   PipetteWithTip,
-} from '../../DropTipWizardFlows'
+} from '/app/organisms/DropTipWizardFlows'
 
 // The Drop Tip flow entry point. Includes entry from SelectRecoveryOption and CancelRun.
 export function ManageTips(props: RecoveryContentProps): JSX.Element {

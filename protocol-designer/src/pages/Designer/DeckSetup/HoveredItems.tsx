@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment } from 'react'
 import { useSelector } from 'react-redux'
 import { LabwareRender, Module } from '@opentrons/components'
 import {
@@ -113,7 +113,7 @@ export const HoveredItems = (
       hoveredSlotPosition != null &&
       hoveredLabware != null &&
       selectedModuleModel == null ? (
-        <React.Fragment key={`${hoveredLabwareDef.parameters.loadName}_hover`}>
+        <Fragment key={`${hoveredLabwareDef.parameters.loadName}_hover`}>
           <g
             transform={`translate(${hoveredSlotPosition[0]}, ${hoveredSlotPosition[1]})`}
           >
@@ -126,7 +126,7 @@ export const HoveredItems = (
             position={hoveredSlotPosition}
             nestedLabwareInfo={nestedInfo}
           />
-        </React.Fragment>
+        </Fragment>
       ) : null}
     </>
   )

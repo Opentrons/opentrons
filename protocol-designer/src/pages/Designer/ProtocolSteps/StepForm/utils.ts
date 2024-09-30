@@ -238,7 +238,7 @@ export const makeSingleEditFieldProps = (
   focusHandlers: FocusHandlers,
   formData: FormData,
   handleChangeFormInput: (name: string, value: unknown) => void,
-  hydratedForm: { [key: string]: any },
+  hydratedForm: { [key: string]: any }, //  TODO: create real HydratedFormData type
   t: any
 ): FieldPropsByName => {
   const { dirtyFields, blur, focusedField, focus } = focusHandlers
@@ -246,9 +246,10 @@ export const makeSingleEditFieldProps = (
     getDefaultsForStepType(formData.stepType)
   )
   return fieldNames.reduce<FieldPropsByName>((acc, name) => {
-    const disabled =
-      hydratedForm != null ? getDisabledFields(hydratedForm).has(name) : false
-    const value = formData != null ? formData[name] : null
+    const disabled = hydratedForm
+      ? getDisabledFields(hydratedForm).has(name)
+      : false
+    const value = formData ? formData[name] : null
     const showErrors = showFieldErrors({
       name,
       focusedField,
@@ -256,7 +257,7 @@ export const makeSingleEditFieldProps = (
     })
     const errors = getFieldErrors(name, value)
     const errorToShow =
-      showErrors != null && errors.length > 0 ? errors.join(', ') : null
+      showErrors && errors.length > 0 ? errors.join(', ') : null
 
     const updateValue = (value: unknown): void => {
       handleChangeFormInput(name, value)
@@ -288,4 +289,35 @@ export const makeSingleEditFieldProps = (
     }
     return { ...acc, [name]: fieldProps }
   }, {})
+}
+
+interface SaveStepSnackbarTextProps {
+  numWarnings: number
+  numErrors: number
+  stepTypeDisplayName: string
+  t: any
+}
+export const getSaveStepSnackbarText = (
+  props: SaveStepSnackbarTextProps
+): string => {
+  const { numWarnings, numErrors, stepTypeDisplayName, t } = props
+  if (numWarnings === 0 && numErrors > 0) {
+    return t(`protocol_steps:save_errors`, {
+      num: numErrors,
+      stepType: stepTypeDisplayName,
+    })
+  } else if (numWarnings > 0 && numErrors === 0) {
+    return t(`protocol_steps:save_warnings`, {
+      numWarnings: numWarnings,
+      stepType: stepTypeDisplayName,
+    })
+  } else if (numWarnings > 0 && numErrors > 0) {
+    return t(`protocol_steps:save_warnings_and_errors`, {
+      numWarnings: numWarnings,
+      numErrors: numErrors,
+      stepType: stepTypeDisplayName,
+    })
+  } else {
+    return t(`protocol_steps:save_no_errors`, { stepType: stepTypeDisplayName })
+  }
 }

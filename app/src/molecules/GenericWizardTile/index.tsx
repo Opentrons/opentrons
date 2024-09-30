@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
@@ -23,7 +23,7 @@ import {
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '/app/redux/config'
-import { NeedHelpLink } from '/app/organisms/CalibrationPanels'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { SmallButton, TextOnlyButton } from '/app/atoms/buttons'
 
 const ALIGN_BUTTONS = css`

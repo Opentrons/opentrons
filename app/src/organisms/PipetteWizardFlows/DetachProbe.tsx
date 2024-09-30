@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { LegacyStyledText } from '@opentrons/components'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'

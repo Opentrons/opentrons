@@ -1,4 +1,3 @@
-import * as React from 'react'
 import map from 'lodash/map'
 import { BaseDeck, Flex } from '@opentrons/components'
 import {
@@ -16,7 +15,7 @@ import type {
   LabwareDefinition2,
   LoadedLabwareByAdapter,
 } from '@opentrons/shared-data'
-import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
+import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 
 interface LabwareMapViewProps {
   attachedProtocolModuleMatches: AttachedProtocolModuleMatch[]

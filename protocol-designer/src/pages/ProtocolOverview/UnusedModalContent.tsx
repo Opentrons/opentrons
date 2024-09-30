@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import type { ModuleOnDeck, PipetteOnDeck } from '../../step-forms'
 import type { Fixture } from './index'
 

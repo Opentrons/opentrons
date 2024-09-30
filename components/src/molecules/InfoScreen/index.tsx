@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants/index'
 import { LegacyStyledText } from '../../atoms/StyledText'

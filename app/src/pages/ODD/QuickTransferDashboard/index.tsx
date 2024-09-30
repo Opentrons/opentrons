@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -26,7 +26,7 @@ import {
   ANALYTICS_QUICK_TRANSFER_FLOW_STARTED,
 } from '/app/redux/analytics'
 import { SmallButton, FloatingActionButton } from '/app/atoms/buttons'
-import { Navigation } from '/app/organisms/Navigation'
+import { Navigation } from '/app/organisms/ODD/Navigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import {
   getPinnedQuickTransferIds,
@@ -54,29 +54,28 @@ export function QuickTransferDashboard(): JSX.Element {
   const navigate = useNavigate()
   const { t } = useTranslation(['quick_transfer', 'protocol_info'])
   const dispatch = useDispatch<Dispatch>()
-  const [navMenuIsOpened, setNavMenuIsOpened] = React.useState<boolean>(false)
-  const [
-    longPressModalIsOpened,
-    setLongPressModalOpened,
-  ] = React.useState<boolean>(false)
+  const [navMenuIsOpened, setNavMenuIsOpened] = useState<boolean>(false)
+  const [longPressModalIsOpened, setLongPressModalOpened] = useState<boolean>(
+    false
+  )
   const [
     showDeleteConfirmationModal,
     setShowDeleteConfirmationModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const [
     showPipetteNotAttachedModal,
     setShowPipetteNotAttaachedModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const [
     showStorageLimitReachedModal,
     setShowStorageLimitReachedModal,
-  ] = React.useState<boolean>(false)
-  const [targetTransferId, setTargetTransferId] = React.useState<string>('')
+  ] = useState<boolean>(false)
+  const [targetTransferId, setTargetTransferId] = useState<string>('')
   const sortBy = useSelector(getQuickTransfersOnDeviceSortKey) ?? 'alphabetical'
   const hasDismissedIntro = useSelector(getHasDismissedQuickTransferIntro)
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
-  React.useEffect(() => {
+  useEffect(() => {
     trackEventWithRobotSerial({
       name: ANALYTICS_QUICK_TRANSFER_TAB_SELECTED,
       properties: {},

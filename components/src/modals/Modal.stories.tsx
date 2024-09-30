@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 import { LegacyStyledText } from '../atoms'
 import { SPACING, TYPOGRAPHY } from '../ui-style-constants'

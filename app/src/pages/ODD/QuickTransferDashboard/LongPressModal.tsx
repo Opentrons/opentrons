@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 import { useCreateRunMutation } from '@opentrons/react-api-client'
 
-import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
+import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
 import { SmallModalChildren } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getPinnedQuickTransferIds, updateConfigValue } from '/app/redux/config'
@@ -41,7 +41,7 @@ export function LongPressModal({
 
   const pinned = pinnedQuickTransferIds.includes(transferId)
 
-  const [showMaxPinsAlert, setShowMaxPinsAlert] = React.useState<boolean>(false)
+  const [showMaxPinsAlert, setShowMaxPinsAlert] = useState<boolean>(false)
 
   const { createRun } = useCreateRunMutation({
     onSuccess: data => {

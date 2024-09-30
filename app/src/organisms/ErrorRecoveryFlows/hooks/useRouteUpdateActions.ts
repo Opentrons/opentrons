@@ -1,10 +1,10 @@
-import * as React from 'react'
+import type { MutableRefObject } from 'react'
+import { useRef, useCallback } from 'react'
 import last from 'lodash/last'
+
 import head from 'lodash/head'
 
 import { INVALID, RECOVERY_MAP, STEP_ORDER } from '../constants'
-
-import type { MutableRefObject } from 'react'
 import type {
   IRecoveryMap,
   RecoveryRoute,
@@ -61,9 +61,9 @@ export function useRouteUpdateActions(
   const { route: currentRoute, step: currentStep } = recoveryMap
   const { OPTION_SELECTION, ROBOT_IN_MOTION, ROBOT_DOOR_OPEN } = RECOVERY_MAP
   const { isDoorOpen } = doorStatusUtils
-  const stashedMapRef = React.useRef<IRecoveryMap | null>(null)
+  const stashedMapRef = useRef<IRecoveryMap | null>(null)
 
-  const goBackPrevStep = React.useCallback((): Promise<void> => {
+  const goBackPrevStep = useCallback((): Promise<void> => {
     return new Promise((resolve, reject) => {
       const { getPrevStep } = getRecoveryRouteNavigation(currentRoute)
       const updatedStep = getPrevStep(currentStep)
@@ -78,7 +78,7 @@ export function useRouteUpdateActions(
     })
   }, [currentStep, currentRoute, routeUpdateActionsParams])
 
-  const proceedNextStep = React.useCallback((): Promise<void> => {
+  const proceedNextStep = useCallback((): Promise<void> => {
     return new Promise((resolve, reject) => {
       const { getNextStep } = getRecoveryRouteNavigation(currentRoute)
       const updatedStep = getNextStep(currentStep)
@@ -93,7 +93,7 @@ export function useRouteUpdateActions(
     })
   }, [currentStep, currentRoute, routeUpdateActionsParams])
 
-  const proceedToRouteAndStep = React.useCallback(
+  const proceedToRouteAndStep = useCallback(
     (route: RecoveryRoute, step?: RouteStep): Promise<void> => {
       return new Promise((resolve, reject) => {
         const newFlowSteps = STEP_ORDER[route]
@@ -110,7 +110,7 @@ export function useRouteUpdateActions(
 
   // If the door is permitted on the current step, but the robot is about to move, we need to manually redirect users
   // to the door modal unless the step is specifically a gripper jaw release step.
-  const checkDoorStatus = React.useCallback((): Promise<void> => {
+  const checkDoorStatus = useCallback((): Promise<void> => {
     return new Promise((resolve, reject) => {
       if (isDoorOpen && !GRIPPER_MOVE_STEPS.includes(currentStep)) {
         stashedMapRef.current = { route: currentRoute, step: currentStep }
@@ -131,7 +131,7 @@ export function useRouteUpdateActions(
     })
   }, [currentRoute, currentStep, isDoorOpen])
 
-  const setRobotInMotion = React.useCallback(
+  const setRobotInMotion = useCallback(
     (inMotion: boolean, robotMovingRoute?: RobotMovingRoute): Promise<void> => {
       return new Promise((resolve, reject) => {
         if (inMotion) {

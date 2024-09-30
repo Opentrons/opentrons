@@ -1,9 +1,9 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { SelectAuthenticationType } from '../../NetworkSettings'
 
 import type { WifiSecurityType } from '@opentrons/api-client'

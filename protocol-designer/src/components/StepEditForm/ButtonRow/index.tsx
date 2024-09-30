@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { OutlineButton, DeprecatedPrimaryButton } from '@opentrons/components'

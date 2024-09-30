@@ -1,12 +1,12 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
-import { Navigation } from '/app/organisms/Navigation'
-import { AttachedInstrumentMountItem } from '/app/organisms/InstrumentMountItem'
+import { Navigation } from '/app/organisms/ODD/Navigation'
+import { AttachedInstrumentMountItem } from '/app/organisms/ODD/InstrumentMountItem'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
-import { PipetteRecalibrationODDWarning } from './PipetteRecalibrationODDWarning'
+import { PipetteRecalibrationODDWarning } from '/app/organisms/ODD/PipetteRecalibrationODDWarning'
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 
 const FETCH_PIPETTE_CAL_POLL = 10000
@@ -15,7 +15,7 @@ export const InstrumentsDashboard = (): JSX.Element => {
   const { data: attachedInstruments } = useInstrumentsQuery({
     refetchInterval: FETCH_PIPETTE_CAL_POLL,
   })
-  const [wizardProps, setWizardProps] = React.useState<
+  const [wizardProps, setWizardProps] = useState<
     | React.ComponentProps<typeof GripperWizardFlows>
     | React.ComponentProps<typeof PipetteWizardFlows>
     | null

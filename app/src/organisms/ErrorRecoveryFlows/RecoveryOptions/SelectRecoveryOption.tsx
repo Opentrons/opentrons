@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import head from 'lodash/head'
 import { useTranslation } from 'react-i18next'
 
@@ -24,7 +24,7 @@ import {
 } from '../shared'
 
 import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
-import type { PipetteWithTip } from '../../DropTipWizardFlows'
+import type { PipetteWithTip } from '/app/organisms/DropTipWizardFlows'
 
 // The "home" route within Error Recovery. When a user completes a non-terminal flow or presses "Go back" enough
 // to escape the boundaries of any route, they will be redirected here.
@@ -59,7 +59,7 @@ export function SelectRecoveryOptionHome({
   const { determineTipStatus } = tipStatusUtils
   const { setSelectedRecoveryOption } = currentRecoveryOptionUtils
   const validRecoveryOptions = getRecoveryOptions(errorKind)
-  const [selectedRoute, setSelectedRoute] = React.useState<RecoveryRoute>(
+  const [selectedRoute, setSelectedRoute] = useState<RecoveryRoute>(
     head(validRecoveryOptions) as RecoveryRoute
   )
 
@@ -178,7 +178,7 @@ export function DesktopRecoveryOptions({
 export function useCurrentTipStatus(
   determineTipStatus: () => Promise<PipetteWithTip[]>
 ): void {
-  React.useEffect(() => {
+  useEffect(() => {
     void determineTipStatus()
   }, [])
 }
@@ -222,6 +222,12 @@ export const OVERPRESSURE_WHILE_ASPIRATING_OPTIONS: RecoveryRoute[] = [
 export const OVERPRESSURE_WHILE_DISPENSING_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE,
   RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
+export const TIP_NOT_DETECTED_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.RETRY_STEP.ROUTE,
+  RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]
 

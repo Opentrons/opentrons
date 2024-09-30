@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
@@ -21,17 +20,17 @@ import {
 } from '/app/resources/runs'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import { useAttachedModules } from '/app/resources/modules'
-import { getProtocolModulesInfo } from '/app/transformations/analysis'
+import {
+  getProtocolModulesInfo,
+  getAttachedProtocolModuleMatches,
+} from '/app/transformations/analysis'
 import { mockApiHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { mockProtocolModuleInfo } from '../../ProtocolSetupInstruments/__fixtures__'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
-import {
-  getAttachedProtocolModuleMatches,
-  getUnmatchedModulesForProtocol,
-} from '../utils'
-import { LocationConflictModal } from '../../../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
-import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
+import { getUnmatchedModulesForProtocol } from '../utils'
+import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
+import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { SetupInstructionsModal } from '../SetupInstructionsModal'
 import { FixtureTable } from '../FixtureTable'
 import { ModulesAndDeckMapView } from '../ModulesAndDeckMapView'
@@ -48,11 +47,9 @@ vi.mock('/app/resources/deck_configuration')
 vi.mock('/app/transformations/analysis')
 vi.mock('../utils')
 vi.mock('../SetupInstructionsModal')
-vi.mock('../../../../ModuleWizardFlows')
+vi.mock('/app/organisms/ModuleWizardFlows')
 vi.mock('../FixtureTable')
-vi.mock(
-  '../../../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
-)
+vi.mock('/app/organisms/LocationConflictModal')
 vi.mock('../ModulesAndDeckMapView')
 
 const ROBOT_NAME = 'otie'

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
@@ -102,7 +102,7 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
   // Resume recovery when the run when the door is closed.
   // The CTA/flow for handling a door open event within the ER wizard is different, and because this splash always renders
   // behind the wizard, we want to ensure we only implicitly resume recovery when only viewing the splash from this app.
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       runStatus === RUN_STATUS_AWAITING_RECOVERY_PAUSED &&
       resumePausedRecovery
