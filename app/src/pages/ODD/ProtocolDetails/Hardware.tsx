@@ -28,7 +28,7 @@ import {
   useGripperDisplayName,
   usePipetteNameSpecs,
 } from '/app/local-resources/instruments'
-import { useRequiredProtocolHardware } from '/app/pages/Desktop/Protocols/hooks'
+import { useRequiredProtocolHardware } from '/app/resources/protocols'
 import { EmptySection } from './EmptySection'
 
 import type { TFunction } from 'i18next'

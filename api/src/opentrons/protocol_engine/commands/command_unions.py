@@ -144,6 +144,7 @@ from .load_pipette import (
 )
 
 from .move_labware import (
+    GripperMovementError,
     MoveLabware,
     MoveLabwareParams,
     MoveLabwareCreate,
@@ -706,6 +707,7 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[TipPhysicallyMissingError],
     DefinedErrorData[OverpressureError],
     DefinedErrorData[LiquidNotFoundError],
+    DefinedErrorData[GripperMovementError],
 ]
 
 

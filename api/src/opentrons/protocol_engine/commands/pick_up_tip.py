@@ -9,7 +9,7 @@ from typing_extensions import Literal
 from ..errors import ErrorOccurrence, TipNotAttachedError
 from ..resources import ModelUtils
 from ..state import update_types
-from ..types import PickUpTipWellLocation, DeckPoint
+from ..types import PickUpTipWellLocation, DeckPoint, TipGeometry
 from .pipetting_common import (
     PipetteIdMixin,
     DestinationPositionResult,
@@ -135,6 +135,14 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
                 pipette_id=pipette_id,
                 labware_id=labware_id,
                 well_name=well_name,
+            )
+            state_update.update_tip_state(
+                pipette_id=pipette_id,
+                tip_geometry=TipGeometry(
+                    volume=tip_geometry.volume,
+                    length=tip_geometry.length,
+                    diameter=tip_geometry.diameter,
+                ),
             )
         except TipNotAttachedError as e:
             return DefinedErrorData(

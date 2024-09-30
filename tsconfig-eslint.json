@@ -39,6 +39,7 @@
     "usb-bridge/node-client/src",
     "**/*.js",
     "**/*.ts",
+    "**/*.mts",
     "*.js",
     ".*.js",
     "**/*.json"

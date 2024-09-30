@@ -18,7 +18,7 @@ import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 import type { Mock } from 'vitest'
 
 vi.mock('/app/redux/config')
-vi.mock('../../Devices/hooks')
+vi.mock('../../Desktop/Devices/hooks')
 
 const mockStartPosition = { x: 10, y: 20, z: 30 }
 const mockEndPosition = { x: 9, y: 19, z: 29 }

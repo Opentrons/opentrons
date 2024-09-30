@@ -137,7 +137,7 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
             )
 
 
-class Dispense(BaseCommand[DispenseParams, DispenseResult, ErrorOccurrence]):
+class Dispense(BaseCommand[DispenseParams, DispenseResult, OverpressureError]):
     """Dispense command model."""
 
     commandType: DispenseCommandType = "dispense"

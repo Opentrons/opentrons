@@ -152,7 +152,6 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                 onClick={addLabware}
                 text={t('add_labware')}
                 textAlignment="middle"
-                size="large"
                 iconName="plus"
               />
             </Flex>

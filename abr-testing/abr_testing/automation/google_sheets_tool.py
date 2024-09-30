@@ -225,8 +225,8 @@ class google_sheet:
 
     def token_check(self) -> None:
         """Check if credentials are still valid and refresh if expired."""
-        if self.credentials.expired:
-            self.credentials.refresh()  # Refresh the credentials
+        if self.credentials.access_token_expired:
+            self.gc.login()  # Refresh the credentials
 
     def get_row_index_with_value(self, some_string: str, col_num: int) -> Any:
         """Find row index of string by looking in specific column."""

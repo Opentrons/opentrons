@@ -13,8 +13,8 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 import NiceModal from '@ebay/nice-modal-react'
 
 import { i18n } from '/app/i18n'
-import { Alerts } from '/app/organisms/Alerts'
-import { Breadcrumbs } from '/app/organisms/Breadcrumbs'
+import { Alerts } from '/app/organisms/Desktop/Alerts'
+import { Breadcrumbs } from '/app/organisms/Desktop/Breadcrumbs'
 import { ToasterOven } from '/app/organisms/ToasterOven'
 import { CalibrationDashboard } from '/app/pages/Desktop/Devices/CalibrationDashboard'
 import { DeviceDetails } from '/app/pages/Desktop/Devices/DeviceDetails'
@@ -51,7 +51,7 @@ export const DesktopApp = (): JSX.Element => {
   const desktopRoutes: RouteProps[] = [
     {
       Component: ProtocolsLanding,
-      name: 'Protocols',
+      name: 'protocols',
       navLinkTo: '/protocols',
       path: '/protocols',
     },
@@ -67,13 +67,13 @@ export const DesktopApp = (): JSX.Element => {
     },
     {
       Component: Labware,
-      name: 'Labware',
+      name: 'labware',
       navLinkTo: '/labware',
       path: '/labware',
     },
     {
       Component: DevicesLanding,
-      name: 'Devices',
+      name: 'devices',
       navLinkTo: '/devices',
       path: '/devices',
     },

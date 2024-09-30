@@ -38,10 +38,6 @@ from ..types import (
     CurrentPipetteLocation,
     TipGeometry,
 )
-from ..commands.configuring_common import (
-    PipetteConfigUpdateResultMixin,
-    PipetteNozzleLayoutResultMixin,
-)
 from ..actions import (
     Action,
     SetPipetteMovementSpeedAction,
@@ -149,72 +145,32 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(action, SetPipetteMovementSpeedAction):
             self._state.movement_speed_by_id[action.pipette_id] = action.speed
 
-    def _handle_command(  # noqa: C901
+    def _handle_command(
         self, action: Union[SucceedCommandAction, FailCommandAction]
     ) -> None:
+        self._set_load_pipette(action)
         self._update_current_location(action)
+        self._update_pipette_config(action)
+        self._update_pipette_nozzle_map(action)
+        self._update_tip_state(action)
         self._update_volumes(action)
 
-        if not isinstance(action, SucceedCommandAction):
-            return
-
-        command, private_result = action.command, action.private_result
-
-        if isinstance(private_result, PipetteConfigUpdateResultMixin):
-            config = private_result.config
-            self._state.static_config_by_id[
-                private_result.pipette_id
-            ] = StaticPipetteConfig(
-                serial_number=private_result.serial_number,
-                model=config.model,
-                display_name=config.display_name,
-                min_volume=config.min_volume,
-                max_volume=config.max_volume,
-                channels=config.channels,
-                tip_configuration_lookup_table=config.tip_configuration_lookup_table,
-                nominal_tip_overlap=config.nominal_tip_overlap,
-                home_position=config.home_position,
-                nozzle_offset_z=config.nozzle_offset_z,
-                pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
-                    back_left_corner=config.back_left_corner_offset,
-                    front_right_corner=config.front_right_corner_offset,
-                    back_right_corner=Point(
-                        config.front_right_corner_offset.x,
-                        config.back_left_corner_offset.y,
-                        config.back_left_corner_offset.z,
-                    ),
-                    front_left_corner=Point(
-                        config.back_left_corner_offset.x,
-                        config.front_right_corner_offset.y,
-                        config.back_left_corner_offset.z,
-                    ),
-                ),
-                bounding_nozzle_offsets=BoundingNozzlesOffsets(
-                    back_left_offset=config.nozzle_map.back_left_nozzle_offset,
-                    front_right_offset=config.nozzle_map.front_right_nozzle_offset,
-                ),
-                default_nozzle_map=config.nozzle_map,
-                lld_settings=config.pipette_lld_settings,
-            )
-            self._state.flow_rates_by_id[private_result.pipette_id] = config.flow_rates
-            self._state.nozzle_configuration_by_id[
-                private_result.pipette_id
-            ] = config.nozzle_map
-        elif isinstance(private_result, PipetteNozzleLayoutResultMixin):
-            self._state.nozzle_configuration_by_id[
-                private_result.pipette_id
-            ] = private_result.nozzle_map
-
-        if isinstance(command.result, commands.LoadPipetteResult):
-            pipette_id = command.result.pipetteId
+    def _set_load_pipette(
+        self, action: Union[SucceedCommandAction, FailCommandAction]
+    ) -> None:
+        if (
+            isinstance(action, SucceedCommandAction)
+            and action.state_update.loaded_pipette != update_types.NO_CHANGE
+        ):
+            pipette_id = action.state_update.loaded_pipette.pipette_id
 
             self._state.pipettes_by_id[pipette_id] = LoadedPipette(
                 id=pipette_id,
-                pipetteName=command.params.pipetteName,
-                mount=command.params.mount,
+                pipetteName=action.state_update.loaded_pipette.pipette_name,
+                mount=action.state_update.loaded_pipette.mount,
             )
             self._state.liquid_presence_detection_by_id[pipette_id] = (
-                command.params.liquidPresenceDetection or False
+                action.state_update.loaded_pipette.liquid_presence_detection or False
             )
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.movement_speed_by_id[pipette_id] = None
@@ -225,61 +181,60 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     pipette_id
                 ] = static_config.default_nozzle_map
 
-        elif isinstance(command.result, commands.PickUpTipResult):
-            pipette_id = command.params.pipetteId
-            attached_tip = TipGeometry(
-                length=command.result.tipLength,
-                volume=command.result.tipVolume,
-                diameter=command.result.tipDiameter,
-            )
+    def _update_tip_state(
+        self, action: Union[SucceedCommandAction, FailCommandAction]
+    ) -> None:
 
-            self._state.attached_tip_by_id[pipette_id] = attached_tip
-            self._state.aspirated_volume_by_id[pipette_id] = 0
+        if (
+            isinstance(action, SucceedCommandAction)
+            and action.state_update.pipette_tip_state != update_types.NO_CHANGE
+        ):
+            pipette_id = action.state_update.pipette_tip_state.pipette_id
+            if action.state_update.pipette_tip_state.tip_geometry:
+                attached_tip = action.state_update.pipette_tip_state.tip_geometry
 
-            static_config = self._state.static_config_by_id.get(pipette_id)
-            if static_config:
-                try:
-                    tip_configuration = static_config.tip_configuration_lookup_table[
-                        attached_tip.volume
-                    ]
-                except KeyError:
-                    # TODO(seth,9/11/2023): this is a bad way of doing defaults but better than max volume.
-                    # we used to look up a default tip config via the pipette max volume, but if that isn't
-                    # tip volume (as it isn't when we're in low-volume mode) then that lookup fails. Using
-                    # the first entry in the table is ok I guess but we really need to generally rethink how
-                    # we identify tip classes - looking things up by volume is not enough.
+                self._state.attached_tip_by_id[pipette_id] = attached_tip
+                self._state.aspirated_volume_by_id[pipette_id] = 0
+
+                static_config = self._state.static_config_by_id.get(pipette_id)
+                if static_config:
+                    try:
+                        tip_configuration = (
+                            static_config.tip_configuration_lookup_table[
+                                attached_tip.volume
+                            ]
+                        )
+                    except KeyError:
+                        # TODO(seth,9/11/2023): this is a bad way of doing defaults but better than max volume.
+                        # we used to look up a default tip config via the pipette max volume, but if that isn't
+                        # tip volume (as it isn't when we're in low-volume mode) then that lookup fails. Using
+                        # the first entry in the table is ok I guess but we really need to generally rethink how
+                        # we identify tip classes - looking things up by volume is not enough.
+                        tip_configuration = list(
+                            static_config.tip_configuration_lookup_table.values()
+                        )[0]
+                    self._state.flow_rates_by_id[pipette_id] = FlowRates(
+                        default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
+                        default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
+                        default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
+                    )
+
+            else:
+                pipette_id = action.state_update.pipette_tip_state.pipette_id
+                self._state.aspirated_volume_by_id[pipette_id] = None
+                self._state.attached_tip_by_id[pipette_id] = None
+
+                static_config = self._state.static_config_by_id.get(pipette_id)
+                if static_config:
+                    # TODO(seth,9/11/2023): bad way to do defaulting, see above.
                     tip_configuration = list(
                         static_config.tip_configuration_lookup_table.values()
                     )[0]
-                self._state.flow_rates_by_id[pipette_id] = FlowRates(
-                    default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
-                    default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
-                    default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
-                )
-
-        elif isinstance(
-            command.result,
-            (
-                commands.DropTipResult,
-                commands.DropTipInPlaceResult,
-                commands.unsafe.UnsafeDropTipInPlaceResult,
-            ),
-        ):
-            pipette_id = command.params.pipetteId
-            self._state.aspirated_volume_by_id[pipette_id] = None
-            self._state.attached_tip_by_id[pipette_id] = None
-
-            static_config = self._state.static_config_by_id.get(pipette_id)
-            if static_config:
-                # TODO(seth,9/11/2023): bad way to do defaulting, see above.
-                tip_configuration = list(
-                    static_config.tip_configuration_lookup_table.values()
-                )[0]
-                self._state.flow_rates_by_id[pipette_id] = FlowRates(
-                    default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
-                    default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
-                    default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
-                )
+                    self._state.flow_rates_by_id[pipette_id] = FlowRates(
+                        default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
+                        default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
+                        default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
+                    )
 
     def _update_current_location(
         self, action: Union[SucceedCommandAction, FailCommandAction]
@@ -326,6 +281,66 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 self._state.current_deck_point = CurrentDeckPoint(
                     mount=loaded_pipette.mount, deck_point=new_deck_point
                 )
+
+    def _update_pipette_config(
+        self, action: Union[SucceedCommandAction, FailCommandAction]
+    ) -> None:
+        if (
+            isinstance(action, SucceedCommandAction)
+            and action.state_update.pipette_config != update_types.NO_CHANGE
+        ):
+            config = action.state_update.pipette_config.config
+            self._state.static_config_by_id[
+                action.state_update.pipette_config.pipette_id
+            ] = StaticPipetteConfig(
+                serial_number=action.state_update.pipette_config.serial_number,
+                model=config.model,
+                display_name=config.display_name,
+                min_volume=config.min_volume,
+                max_volume=config.max_volume,
+                channels=config.channels,
+                tip_configuration_lookup_table=config.tip_configuration_lookup_table,
+                nominal_tip_overlap=config.nominal_tip_overlap,
+                home_position=config.home_position,
+                nozzle_offset_z=config.nozzle_offset_z,
+                pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
+                    back_left_corner=config.back_left_corner_offset,
+                    front_right_corner=config.front_right_corner_offset,
+                    back_right_corner=Point(
+                        config.front_right_corner_offset.x,
+                        config.back_left_corner_offset.y,
+                        config.back_left_corner_offset.z,
+                    ),
+                    front_left_corner=Point(
+                        config.back_left_corner_offset.x,
+                        config.front_right_corner_offset.y,
+                        config.back_left_corner_offset.z,
+                    ),
+                ),
+                bounding_nozzle_offsets=BoundingNozzlesOffsets(
+                    back_left_offset=config.nozzle_map.back_left_nozzle_offset,
+                    front_right_offset=config.nozzle_map.front_right_nozzle_offset,
+                ),
+                default_nozzle_map=config.nozzle_map,
+                lld_settings=config.pipette_lld_settings,
+            )
+            self._state.flow_rates_by_id[
+                action.state_update.pipette_config.pipette_id
+            ] = config.flow_rates
+            self._state.nozzle_configuration_by_id[
+                action.state_update.pipette_config.pipette_id
+            ] = config.nozzle_map
+
+    def _update_pipette_nozzle_map(
+        self, action: Union[SucceedCommandAction, FailCommandAction]
+    ) -> None:
+        if (
+            isinstance(action, SucceedCommandAction)
+            and action.state_update.pipette_nozzle_map != update_types.NO_CHANGE
+        ):
+            self._state.nozzle_configuration_by_id[
+                action.state_update.pipette_nozzle_map.pipette_id
+            ] = action.state_update.pipette_nozzle_map.nozzle_map
 
     def _update_volumes(
         self, action: Union[SucceedCommandAction, FailCommandAction]

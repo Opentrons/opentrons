@@ -24,7 +24,7 @@ import {
 
 import { useAcknowledgeEstopDisengageMutation } from '@opentrons/react-api-client'
 
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { getIsOnDevice } from '/app/redux/config'

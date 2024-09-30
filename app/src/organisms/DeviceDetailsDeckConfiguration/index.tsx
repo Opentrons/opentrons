@@ -31,7 +31,8 @@ import {
 
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
-import { useIsRobotViewable, useRunStatuses } from '../Devices/hooks'
+import { useRunStatuses } from '/app/resources/runs'
+import { useIsRobotViewable } from '/app/redux-resources/robots'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import {
   useDeckConfigurationEditingTools,

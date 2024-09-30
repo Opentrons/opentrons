@@ -17,7 +17,7 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { Slideout } from '../../atoms/Slideout'
-import { useCurrentRunStatus } from '../RunTimeControl/hooks'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 
 import type { AttachedModule } from '/app/redux/modules/types'
 

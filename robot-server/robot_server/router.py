@@ -8,6 +8,7 @@ from .versioning import check_version_header
 from .client_data.router import router as client_data_router
 from .commands.router import commands_router
 from .deck_configuration.router import router as deck_configuration_router
+from .error_recovery.settings.router import router as error_recovery_settings_router
 from .health.router import health_router
 from .instruments.router import instruments_router
 from .maintenance_runs.router import maintenance_runs_router
@@ -86,6 +87,12 @@ router.include_router(
 router.include_router(
     router=deck_configuration_router,
     tags=["Flex Deck Configuration"],
+    dependencies=[Depends(check_version_header)],
+)
+
+router.include_router(
+    router=error_recovery_settings_router,
+    tags=["Error Recovery Settings"],
     dependencies=[Depends(check_version_header)],
 )
 

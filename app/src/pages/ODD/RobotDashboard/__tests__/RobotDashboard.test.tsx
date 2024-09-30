@@ -10,7 +10,7 @@ import {
   RecentRunProtocolCarousel,
   EmptyRecentRun,
 } from '/app/organisms/ODD/RobotDashboard'
-import { Navigation } from '/app/organisms/Navigation'
+import { Navigation } from '/app/organisms/ODD/Navigation'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { getOnDeviceDisplaySettings } from '/app/redux/config'
 import { WelcomeModal } from '../WelcomeModal'
@@ -32,7 +32,7 @@ vi.mock('react-router-dom', async importOriginal => {
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ODD/RobotDashboard/EmptyRecentRun')
 vi.mock('/app/organisms/ODD/RobotDashboard/RecentRunProtocolCarousel')
-vi.mock('/app/organisms/Navigation')
+vi.mock('/app/organisms/ODD/Navigation')
 vi.mock('/app/transformations/commands')
 vi.mock('/app/redux/config')
 vi.mock('../WelcomeModal')

@@ -72,7 +72,7 @@ import {
 } from '/app/organisms/DropTipWizardFlows'
 
 import type { IconName } from '@opentrons/components'
-import type { OnDeviceRouteParams } from '../../../App/types'
+import type { OnDeviceRouteParams } from '/app/App/types'
 import type { PipetteWithTip } from '/app/organisms/DropTipWizardFlows'
 
 export function RunSummary(): JSX.Element {

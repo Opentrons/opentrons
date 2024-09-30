@@ -15,7 +15,7 @@ import {
   useUpdateSubsystemMutation,
 } from '@opentrons/react-api-client'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { UpdateInProgressModal } from './UpdateInProgressModal'
