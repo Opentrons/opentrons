@@ -30,6 +30,7 @@ from ..errors.error_occurrence import ErrorOccurrence
 if TYPE_CHECKING:
     from ..execution import MovementHandler, PipettingHandler
     from ..resources import ModelUtils
+    from ..state.state import StateView
 
 
 DispenseCommandType = Literal["dispense"]
@@ -63,11 +64,13 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
 
     def __init__(
         self,
+        state_view: StateView,
         movement: MovementHandler,
         pipetting: PipettingHandler,
         model_utils: ModelUtils,
         **kwargs: object,
     ) -> None:
+        self._state_view = state_view
         self._movement = movement
         self._pipetting = pipetting
         self._model_utils = model_utils
@@ -75,31 +78,40 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
     async def execute(self, params: DispenseParams) -> _ExecuteReturn:
         """Move to and dispense to the requested well."""
         state_update = StateUpdate()
-
         well_location = params.wellLocation
+        labware_id = params.labwareId
+        well_name = params.wellName
+        volume = params.volume
+
         if well_location.origin == WellOrigin.MENISCUS:
             well_location.volumeOffset = 0.0
             if well_location.offset.z == 0.0:
-                well_location.offset.z = -2.0 # disallow offset.z > -1.0 ?
+                well_location.offset.z = -2.0  # disallow offset.z > -1.0 ?
+        self._state_view.geometry.validate_dispense_volume_into_well(
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+            volume=volume,
+        )
 
         position = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
-            labware_id=params.labwareId,
-            well_name=params.wellName,
+            labware_id=labware_id,
+            well_name=well_name,
             well_location=well_location,
         )
         deck_point = DeckPoint.construct(x=position.x, y=position.y, z=position.z)
         state_update.set_pipette_location(
             pipette_id=params.pipetteId,
-            new_labware_id=params.labwareId,
-            new_well_name=params.wellName,
+            new_labware_id=labware_id,
+            new_well_name=well_name,
             new_deck_point=deck_point,
         )
 
         try:
             volume = await self._pipetting.dispense_in_place(
                 pipette_id=params.pipetteId,
-                volume=params.volume,
+                volume=volume,
                 flow_rate=params.flowRate,
                 push_out=params.pushOut,
             )

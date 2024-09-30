@@ -73,6 +73,7 @@ from .exceptions import (
     LiquidHeightUnknownError,
     InvalidWellDefinitionError,
     OperationLocationNotInWellError,
+    InvalidDispenseVolumeError,
 )
 
 from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
@@ -154,4 +155,5 @@ __all__ = [
     "LiquidHeightUnknownError",
     "InvalidWellDefinitionError",
     "OperationLocationNotInWellError",
+    "InvalidDispenseVolumeError",
 ]

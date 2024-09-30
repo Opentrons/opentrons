@@ -14,6 +14,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.execution import MovementHandler, PipettingHandler
 from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.types import Point
 
 from opentrons.protocol_engine.commands.command import SuccessData, DefinedErrorData
@@ -28,13 +29,17 @@ from opentrons.protocol_engine.commands.pipetting_common import OverpressureErro
 
 @pytest.fixture
 def subject(
+    state_view: StateView,
     movement: MovementHandler,
     pipetting: PipettingHandler,
     model_utils: ModelUtils,
 ) -> DispenseImplementation:
     """Get the implementation subject."""
     return DispenseImplementation(
-        movement=movement, pipetting=pipetting, model_utils=model_utils
+        state_view=state_view,
+        movement=movement,
+        pipetting=pipetting,
+        model_utils=model_utils,
     )
 
 

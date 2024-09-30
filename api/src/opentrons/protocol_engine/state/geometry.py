@@ -19,7 +19,6 @@ from ..errors import (
     LabwareNotLoadedOnLabwareError,
     LabwareNotLoadedOnModuleError,
     LabwareMovementNotAllowedError,
-    InvalidWellDefinitionError,
     OperationLocationNotInWellError,
 )
 from ..resources import fixture_validation
@@ -1287,14 +1286,30 @@ class GeometryView:
             volume = operation_volume or 0.0
 
         if volume:
+            well_geometry = self._labware.get_well_geometry(labware_id, well_name)
             return self.get_well_height_after_volume(
-                labware_id=labware_id,
-                well_name=well_name,
+                well_geometry=well_geometry,
                 initial_height=initial_handling_height,
                 volume=volume,
             )
         else:
             return initial_handling_height
+
+    def get_meniscus_height(
+        self,
+        labware_id: str,
+        well_name: str,
+    ) -> float:
+        """Returns stored meniscus height in specified well."""
+        meniscus_height = self._wells.get_last_measured_liquid_height(
+            labware_id=labware_id, well_name=well_name
+        )
+        if meniscus_height is None:
+            raise errors.LiquidHeightUnknownError(
+                "Must liquid probe before specifying WellOrigin.MENISCUS."
+            )
+        else:
+            return meniscus_height
 
     def get_well_handling_height(
         self,
@@ -1310,22 +1325,15 @@ class GeometryView:
         elif well_location.origin == WellOrigin.CENTER:
             handling_height = well_depth / 2.0
         elif well_location.origin == WellOrigin.MENISCUS:
-            liquid_height = self._wells.get_last_measured_liquid_height(
+            handling_height = self.get_meniscus_height(
                 labware_id=labware_id, well_name=well_name
             )
-            if liquid_height is None:
-                raise errors.LiquidHeightUnknownError(
-                    "Must liquid probe before specifying WellOrigin.MENISCUS."
-                )
-            else:
-                handling_height = liquid_height
         return float(handling_height)
 
     def get_well_height_after_volume(
-        self, labware_id: str, well_name: str, initial_height: float, volume: float
+        self, well_geometry: InnerWellGeometry, initial_height: float, volume: float
     ) -> float:
         """Return the height of liquid in a labware well after a given volume has been handled, given an initial handling height (with reference to the well bottom)."""
-        well_geometry = self._labware.get_well_geometry(labware_id, well_name)
         initial_volume = self.get_well_volume_at_height(
             well_geometry=well_geometry, target_height=initial_height
         )
@@ -1351,15 +1359,36 @@ class GeometryView:
         )
 
     def get_well_volumetric_capacity(
-        self, labware_id: str, well_id: str
+        self, well_geometry: InnerWellGeometry
     ) -> List[Tuple[float, float]]:
         """Return a map of heights to partial volumes."""
-        labware_def = self._labware.get_definition(labware_id)
-        if labware_def.innerLabwareGeometry is None:
-            raise InvalidWellDefinitionError(message="No InnerLabwareGeometry found.")
-        well_geometry = labware_def.innerLabwareGeometry.get(well_id)
-        if well_geometry is None:
-            raise InvalidWellDefinitionError(
-                message=f"No InnerWellGeometry found for well id: {well_id}"
-            )
         return get_well_volumetric_capacity(well_geometry)
+
+    def validate_dispense_volume_into_well(
+        self,
+        labware_id: str,
+        well_name: str,
+        well_location: WellLocations,
+        volume: float,
+    ) -> None:
+        """Raise InvalidDispenseVolumeError if planned dispense volume will overflow well."""
+        well_def = self._labware.get_well_definition(labware_id, well_name)
+        well_volumetric_capacity = well_def.totalLiquidVolume
+        if well_location.origin == WellOrigin.MENISCUS:
+            well_geometry = self._labware.get_well_geometry(labware_id, well_name)
+            meniscus_height = self.get_meniscus_height(
+                labware_id=labware_id, well_name=well_name
+            )
+            meniscus_volume = self.get_well_volume_at_height(
+                well_geometry=well_geometry, target_height=meniscus_height
+            )
+            remaining_volume = well_volumetric_capacity - meniscus_volume
+            if volume > remaining_volume:
+                raise errors.InvalidDispenseVolumeError(
+                    f"Attempting to dispense {volume}µL of liquid into a well that can currently only hold {remaining_volume}µL (well {well_name} in labware_id: {labware_id})"
+                )
+        else:
+            if volume > well_volumetric_capacity:
+                raise errors.InvalidDispenseVolumeError(
+                    f"Attempting to dispense {volume}µL of liquid into a well that can only hold {well_volumetric_capacity}µL (well {well_name} in labware_id: {labware_id})"
+                )
