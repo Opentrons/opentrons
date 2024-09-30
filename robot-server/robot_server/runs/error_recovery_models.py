@@ -4,33 +4,37 @@ from typing import List
 
 from pydantic import BaseModel, Field
 
+# There's a lot of nested classes here.
+# Here's an example of a JSON document that this code models:
+# {
+#   "policyRules": [
+#     {
+#       "matchCriteria": {
+#         "command": {
+#           "commandType": "foo",
+#           "error": {
+#             "errorType": "bar"
+#           }
+#         }
+#       },
+#       "ifMatch": "ignoreAndContinue"
+#     }
+#   ]
+# }
+
 
 class ReactionIfMatch(Enum):
-    """The type of the error recovery setting.
+    """How to handle a given error.
 
-    * `"ignoreAndContinue"`: Ignore this error and future errors of the same type.
-    * `"failRun"`: Errors of this type should fail the run.
-    * `"waitForRecovery"`: Instances of this error should initiate a recover operation.
+    * `"ignoreAndContinue"`: Ignore this error and continue with the next command.
+    * `"failRun"`: Fail the run.
+    * `"waitForRecovery"`: Enter interactive error recovery mode.
 
     """
 
     IGNORE_AND_CONTINUE = "ignoreAndContinue"
     FAIL_RUN = "failRun"
     WAIT_FOR_RECOVERY = "waitForRecovery"
-
-
-# There's a lot of nested classes here. This is the JSON schema this code models.
-# "ErrorRecoveryRule": {
-#     "matchCriteria": {
-#         "command": {
-#             "commandType": "foo",
-#             "error": {
-#                 "errorType": "bar"
-#             }
-#         }
-#     },
-#     "ifMatch": "baz"
-# }
 
 
 class ErrorMatcher(BaseModel):
@@ -67,7 +71,7 @@ class ErrorRecoveryRule(BaseModel):
     )
     ifMatch: ReactionIfMatch = Field(
         ...,
-        description="The specific recovery setting that will be in use if the type parameters match.",
+        description="How to handle errors matched by this rule.",
     )
 
 
@@ -76,6 +80,9 @@ class ErrorRecoveryPolicy(BaseModel):
 
     policyRules: List[ErrorRecoveryRule] = Field(
         ...,
-        description="A list or error recovery rules to apply for a run's recovery management."
-        "The rules are evaluated first-to-last. The first exact match will dectate recovery management.",
+        description=(
+            "A list or error recovery rules to apply for a run's recovery management."
+            " The rules are evaluated first-to-last."
+            " The first exact match will dictate recovery management."
+        ),
     )
