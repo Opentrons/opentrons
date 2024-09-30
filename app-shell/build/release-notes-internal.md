@@ -1,6 +1,10 @@
 For more details about this release, please see the full [technical changelog][].
 [technical change log]: https://github.com/Opentrons/opentrons/releases
 
+## Internal Release 2.1.0-alpha.0
+
+This internal release contains features being developed for 8.1.0. It's for internal testing only.
+
 ## Internal Release 2.0.0-alpha.4
 
 This internal release, pulled from the `edge` branch, contains features being developed for 8.0.0. It's for internal testing only. There are no changes to `buildroot`, `ot3-firmware`, or `oe-core` since the last internal release.
