@@ -177,7 +177,7 @@ def record_measurement_data(
     env_data = read_environment_data(mount, ctx.is_simulating(), env_sensor)
     # NOTE: we need to delay some amount, to give the scale time to accumulate samples
     with recorder.samples_of_tag(tag):
-        if ctx.is_simulating():
+        if recorder.is_simulator:
             # NOTE: give a bit of time during simulation, so some fake data can be stored
             sleep(0.1)
         elif shorten:
