@@ -188,7 +188,6 @@ settings = [
         description="When this setting is on, Flex will continue its activities regardless of pressure changes inside the pipette. Do not turn this setting on unless you are intentionally causing pressures over 8 kPa inside the pipette air channel.",
         robot_type=[RobotTypeEnum.FLEX],
     ),
-    # todo(mm, 2024-09-25): enableErrorRecoveryExperiments is unused and we can probably delete it now.
     SettingDefinition(
         _id="enableErrorRecoveryExperiments",
         title="Enable error recovery experiments",
@@ -200,11 +199,6 @@ settings = [
         robot_type=[RobotTypeEnum.FLEX],
         internal_only=True,
     ),
-    # todo(mm, 2024-09-25): enableOEMMode seems like it was added here so it would show
-    # up in robot-server's /settings endpoints. This package (the `opentrons` library)
-    # does not deal with OEM mode, and it's redundant for this package to store the
-    # value of this setting because it's already stored by system-server. Remove this
-    # when robot-server's /settings endpoints don't need it here anymore.
     SettingDefinition(
         _id="enableOEMMode",
         title="Enable OEM Mode",
