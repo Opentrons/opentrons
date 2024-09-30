@@ -599,10 +599,12 @@ class GeometryView:
                 "Cannot get staging slot name for labware not on staging slot."
             )
 
-    def get_ancestor_slot_name(self, labware_id: str) -> DeckSlotName:
+    def get_ancestor_slot_name(
+        self, labware_id: str
+    ) -> Union[DeckSlotName, StagingSlotName]:
         """Get the slot name of the labware or the module that the labware is on."""
         labware = self._labware.get(labware_id)
-        slot_name: DeckSlotName
+        slot_name: Union[DeckSlotName, StagingSlotName]
 
         if isinstance(labware.location, DeckSlotLocation):
             slot_name = labware.location.slotName
@@ -617,10 +619,8 @@ class GeometryView:
             # TODO we might want to eventually return some sort of staging slot name when we're ready to work through
             #   the linting nightmare it will create
             if fixture_validation.is_staging_slot(area_name):
-                raise errors.LocationIsStagingSlotError(
-                    "Cannot get ancestor slot name for labware on staging slot."
-                )
-            slot_name = DeckSlotName.from_primitive(area_name)
+                slot_name = StagingSlotName.from_primitive(area_name)
+
         elif labware.location == OFF_DECK_LOCATION:
             raise errors.LabwareNotOnDeckError(
                 f"Labware {labware_id} does not have a slot associated with it"
@@ -1055,7 +1055,13 @@ class GeometryView:
                         )
 
                 assert isinstance(
-                    ancestor, (DeckSlotLocation, ModuleLocation, OnLabwareLocation)
+                    ancestor,
+                    (
+                        DeckSlotLocation,
+                        ModuleLocation,
+                        OnLabwareLocation,
+                        AddressableAreaLocation,
+                    ),
                 ), "No gripper offsets for off-deck labware"
                 return (
                     direct_parent_offset.pickUpOffset
@@ -1102,7 +1108,13 @@ class GeometryView:
                         )
 
                 assert isinstance(
-                    ancestor, (DeckSlotLocation, ModuleLocation, OnLabwareLocation)
+                    ancestor,
+                    (
+                        DeckSlotLocation,
+                        ModuleLocation,
+                        OnLabwareLocation,
+                        AddressableAreaLocation,
+                    ),
                 ), "No gripper offsets for off-deck labware"
                 return (
                     direct_parent_offset.dropOffset
@@ -1178,6 +1190,7 @@ class GeometryView:
                 DeckSlotLocation,
                 ModuleLocation,
                 AddressableAreaLocation,
+                OnLabwareLocation,
             ),
         ), "No gripper offsets for off-deck labware"
 
