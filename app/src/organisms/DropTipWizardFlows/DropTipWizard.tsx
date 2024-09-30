@@ -19,7 +19,7 @@ import {
   OVERFLOW_HIDDEN,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { getIsOnDevice } from '/app/redux/config'
 import { ExitConfirmation } from './ExitConfirmation'
 import {
@@ -27,30 +27,40 @@ import {
   BLOWOUT_SUCCESS,
   CHOOSE_BLOWOUT_LOCATION,
   CHOOSE_DROP_TIP_LOCATION,
+  CHOOSE_LOCATION_OPTION,
+  CONFIRM_POSITION,
   DROP_TIP_SUCCESS,
+  DT_ROUTES,
   POSITION_AND_BLOWOUT,
   POSITION_AND_DROP_TIP,
 } from './constants'
 import {
   BeforeBeginning,
   ChooseLocation,
+  ChooseDeckLocation,
   JogToPosition,
   Success,
+  ConfirmPosition,
+  useConfirmPosition,
 } from './steps'
 import { InProgressModal } from '/app/molecules/InProgressModal'
 import { useDropTipErrorComponents } from './hooks'
 import { DropTipWizardHeader } from './DropTipWizardHeader'
 import { ErrorInfo } from './ErrorInfo'
-import { ConfirmPosition, useConfirmPosition } from './ConfirmPosition'
 
 import type { DropTipWizardFlowsProps } from '.'
 import type { DropTipWizardContainerProps, IssuedCommandsType } from './types'
-import type { UseDropTipRoutingResult, UseDropTipWithTypeResult } from './hooks'
+import type {
+  UseDropTipRoutingResult,
+  UseDropTipWithTypeResult,
+  DropTipBlowoutLocationDetails,
+} from './hooks'
 
 export type DropTipWizardProps = DropTipWizardFlowsProps &
   UseDropTipWithTypeResult &
   UseDropTipRoutingResult & {
     issuedCommandsType: IssuedCommandsType
+    dropTipCommandLocations: DropTipBlowoutLocationDetails[]
   }
 
 export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
@@ -170,6 +180,7 @@ export const DropTipWizardContent = (
   const {
     activeMaintenanceRunId,
     currentStep,
+    currentRoute,
     errorDetails,
     isCommandInProgress,
     issuedCommandsType,
@@ -192,7 +203,7 @@ export const DropTipWizardContent = (
     return (
       <InProgressModal
         description={
-          currentStep === POSITION_AND_BLOWOUT
+          currentRoute === DT_ROUTES.BLOWOUT
             ? t('stand_back_blowing_out')
             : t('stand_back_dropping_tips')
         }
@@ -213,7 +224,11 @@ export const DropTipWizardContent = (
   }
 
   function buildChooseLocation(): JSX.Element {
-    return <ChooseLocation {...props} />
+    return <ChooseLocation {...props} {...confirmPositionUtils} />
+  }
+
+  function buildChooseDeckLocation(): JSX.Element {
+    return <ChooseDeckLocation {...props} />
   }
 
   function buildJogToPosition(): JSX.Element {
@@ -237,33 +252,35 @@ export const DropTipWizardContent = (
       issuedCommandsType === 'setup'
     ) {
       return buildGettingReady()
+    } else if (confirmPositionUtils.isRobotPipetteMoving) {
+      return buildRobotPipetteMoving()
     } else if (isCommandInProgress || isExiting) {
       return buildRobotInMotion()
-    } else if (confirmPositionUtils.showConfirmPosition) {
-      return buildConfirmPosition()
     } else if (showConfirmExit) {
       return buildShowExitConfirmation()
     } else if (errorDetails != null) {
       return buildErrorScreen()
     } else if (currentStep === BEFORE_BEGINNING) {
       return buildBeforeBeginning()
+    } else if (currentStep === CHOOSE_LOCATION_OPTION) {
+      return buildChooseLocation()
     } else if (
       currentStep === CHOOSE_BLOWOUT_LOCATION ||
       currentStep === CHOOSE_DROP_TIP_LOCATION
     ) {
-      return buildChooseLocation()
+      return buildChooseDeckLocation()
     } else if (
       currentStep === POSITION_AND_BLOWOUT ||
       currentStep === POSITION_AND_DROP_TIP
     ) {
       return buildJogToPosition()
+    } else if (currentStep === CONFIRM_POSITION) {
+      return buildConfirmPosition()
     } else if (
       currentStep === BLOWOUT_SUCCESS ||
       currentStep === DROP_TIP_SUCCESS
     ) {
       return buildSuccess()
-    } else if (confirmPositionUtils.isRobotPipetteMoving) {
-      return buildRobotPipetteMoving()
     } else {
       return <div>UNASSIGNED STEP</div>
     }

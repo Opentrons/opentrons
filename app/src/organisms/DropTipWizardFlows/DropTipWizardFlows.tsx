@@ -1,6 +1,10 @@
 import { useState } from 'react'
 
-import { useDropTipRouting, useDropTipWithType } from './hooks'
+import {
+  useDropTipLocations,
+  useDropTipRouting,
+  useDropTipWithType,
+} from './hooks'
 import { DropTipWizard } from './DropTipWizard'
 
 import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
@@ -52,8 +56,8 @@ export function DropTipWizardFlows(
     ...props,
     issuedCommandsType,
   })
-
   const dropTipRoutingUtils = useDropTipRouting(fixitCommandTypeUtils)
+  const dropTipCommandLocations = useDropTipLocations(props.robotType) // Prefetch to reduce client latency
 
   return (
     <DropTipWizard
@@ -61,6 +65,7 @@ export function DropTipWizardFlows(
       {...dropTipWithTypeUtils}
       {...dropTipRoutingUtils}
       issuedCommandsType={issuedCommandsType}
+      dropTipCommandLocations={dropTipCommandLocations}
     />
   )
 }

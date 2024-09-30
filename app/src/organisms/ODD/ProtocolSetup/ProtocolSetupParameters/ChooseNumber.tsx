@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 
 import { useToaster } from '/app/organisms/ToasterOven'
-import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import type { NumberParameter } from '@opentrons/shared-data'
 

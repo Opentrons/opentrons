@@ -15,7 +15,7 @@ import {
   TopPortalRoot,
   MODAL_PORTAL_ID,
   TOP_PORTAL_ID,
-} from '../../../App/portal'
+} from '/app/App/portal'
 import * as Fixtures from '../__fixtures__'
 
 vi.mock('../hooks')

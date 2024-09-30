@@ -16,7 +16,7 @@ import {
 } from '@opentrons/api-client'
 
 import { useUpdateClientDataRecovery } from '/app/resources/client_data'
-import { TakeoverModal } from '../TakeoverModal/TakeoverModal'
+import { TakeoverModal } from '/app/organisms/TakeoverModal/TakeoverModal'
 import { RecoveryInterventionModal } from './shared'
 
 import type {

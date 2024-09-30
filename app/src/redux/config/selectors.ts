@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import { SLEEP_NEVER_MS } from '../../App/constants'
+import { SLEEP_NEVER_MS } from '/app/local-resources/config'
 import type { State } from '../types'
 import type {
   Config,
@@ -9,8 +9,13 @@ import type {
   QuickTransfersOnDeviceSortKey,
   OnDeviceDisplaySettings,
 } from './types'
-import type { SelectOption } from '/app/atoms/SelectField/Select'
-import type { ProtocolSort } from '/app/organisms/ProtocolsLanding/hooks'
+import type { ProtocolSort } from '/app/redux/protocol-storage'
+
+export interface SelectOption {
+  value: string
+  label?: string
+  isDisabled?: boolean
+}
 
 export const getConfig = (state: State): Config | null => state.config
 

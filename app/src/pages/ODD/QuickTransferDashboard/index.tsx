@@ -26,7 +26,7 @@ import {
   ANALYTICS_QUICK_TRANSFER_FLOW_STARTED,
 } from '/app/redux/analytics'
 import { SmallButton, FloatingActionButton } from '/app/atoms/buttons'
-import { Navigation } from '/app/organisms/Navigation'
+import { Navigation } from '/app/organisms/ODD/Navigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import {
   getPinnedQuickTransferIds,

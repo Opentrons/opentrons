@@ -141,7 +141,6 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                         numMagneticBlocks === 4)
                     }
                     textAlignment={TYPOGRAPHY.textAlignLeft}
-                    size="small"
                     iconName="plus"
                     text={getModuleDisplayName(moduleModel)}
                     onClick={() => {

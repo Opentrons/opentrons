@@ -5,12 +5,12 @@ import { screen } from '@testing-library/react'
 import { i18n } from '/app/i18n'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { useRunTimeParameters } from '/app/pages/Desktop/Protocols/hooks'
+import { useRunTimeParameters } from '/app/resources/protocols'
 import { Parameters } from '../Parameters'
 import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
 
 vi.mock('/app/organisms/ToasterOven')
-vi.mock('/app/pages/Desktop/Protocols/hooks')
+vi.mock('/app/resources/protocols')
 
 const render = (props: React.ComponentProps<typeof Parameters>) => {
   return renderWithProviders(<Parameters {...props} />, {

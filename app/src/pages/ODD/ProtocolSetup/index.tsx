@@ -84,7 +84,7 @@ import {
 
 import type { Run } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
-import type { OnDeviceRouteParams } from '../../../App/types'
+import type { OnDeviceRouteParams } from '/app/App/types'
 import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 import type { SetupScreens } from '/app/organisms/ODD/ProtocolSetup'
 import type {
