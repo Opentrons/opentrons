@@ -21,6 +21,7 @@ import {
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
+  DELETE_STEP_FORM,
 } from '../../../../components/modals/ConfirmDeleteModal'
 import {
   getCurrentFormHasUnsavedChanges,
@@ -61,11 +62,26 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
     dispatch(populateForm(stepId))
     setStepOverflowMenu(false)
   }
+  const handleDelete = (): void => {
+    if (stepId != null) {
+      deleteStep(stepId)
+    } else {
+      console.warn(
+        'something went wrong, cannot delete a step without a step id'
+      )
+    }
+  }
 
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
     handleStepItemSelection,
     currentFormIsPresaved || singleEditFormHasUnsavedChanges
   )
+
+  const {
+    confirm: confirmDelete,
+    showConfirmation: showDeleteConfirmation,
+    cancel: cancelDelete,
+  } = useConditionalConfirm(handleDelete, true)
 
   const getModalType = (): DeleteModalType => {
     if (currentFormIsPresaved) {
@@ -83,6 +99,14 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
           modalType={getModalType()}
           onContinueClick={confirm}
           onCancelClick={cancel}
+        />
+      )}
+      {/* TODO: update this modal */}
+      {showDeleteConfirmation && (
+        <ConfirmDeleteModal
+          modalType={DELETE_STEP_FORM}
+          onCancelClick={cancelDelete}
+          onContinueClick={confirmDelete}
         />
       )}
       <Flex
@@ -128,13 +152,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
           {t('duplicate')}
         </MenuButton>
         <Divider marginY="0" />
-        <MenuButton
-          onClick={() => {
-            deleteStep(stepId)
-          }}
-        >
-          {t('delete')}
-        </MenuButton>
+        <MenuButton onClick={confirmDelete}>{t('delete')}</MenuButton>
       </Flex>
     </>
   )
