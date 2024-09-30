@@ -24,6 +24,8 @@
   "failed_step": "Failed step",
   "go_back": "Go back",
   "gripper_errors_occur_when": "Gripper errors occur when the gripper stalls or collides with another object on the deck and are usually caused by improperly placed labware or inaccurate labware offsets",
+  "gripper_releasing_labware": "Gripper releasing labware",
+  "gripper_will_release_in_s": "Gripper will release labware in {{seconds}}",
   "homing_pipette_dangerous": "Homing the <bold>{{mount}} pipette</bold> with liquid in the tips may damage it. You must remove all tips before using the pipette again.",
   "if_issue_persists_gripper_error": " If the issue persists, cancel the run and rerun gripper calibration",
   "if_issue_persists_overpressure": " If the issue persists, cancel the run and make the necessary changes to the protocol",

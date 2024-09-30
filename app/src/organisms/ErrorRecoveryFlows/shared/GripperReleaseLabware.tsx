@@ -19,17 +19,15 @@ import type { JSX } from 'react'
 import type { RecoveryContentProps } from '../types'
 
 export function GripperReleaseLabware({
-  recoveryCommands,
   routeUpdateActions,
 }: RecoveryContentProps): JSX.Element {
-  const { handleMotionRouting, proceedNextStep } = routeUpdateActions
-  const { releaseGripperJaws } = recoveryCommands
+  const { handleMotionRouting } = routeUpdateActions
   const { t } = useTranslation()
 
   const buildPrimaryOnClick = (): void => {
+    // Because the actual release command is executed on a delay, the execution behavior is deferred to the
+    // motion route.
     void handleMotionRouting(true, RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE)
-      .then(() => releaseGripperJaws())
-      .then(() => proceedNextStep())
   }
 
   return (
