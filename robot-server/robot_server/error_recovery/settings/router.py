@@ -38,7 +38,8 @@ async def patch_error_recovery_settings(  # noqa: D103
         ErrorRecoverySettingStore, fastapi.Depends(get_error_recovery_setting_store)
     ],
 ) -> PydanticResponse[SimpleBody[ResponseData]]:
-    store.set_is_disabled(is_disabled=not request_body.data.enabled)
+    if request_body.data.enabled is not None:
+        store.set_is_disabled(is_disabled=not request_body.data.enabled)
     return await _get_current_response(store)
 
 
