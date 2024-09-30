@@ -92,7 +92,6 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
                   disabled={numSlotsAvailable === 0}
                   key={equipment}
                   textAlignment={TYPOGRAPHY.textAlignLeft}
-                  size="small"
                   iconName="plus"
                   text={t(`${equipment}`)}
                   onClick={() => {
