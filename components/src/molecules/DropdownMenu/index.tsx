@@ -9,7 +9,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
-  NO_WRAP,
   OVERFLOW_AUTO,
   OVERFLOW_HIDDEN,
   POSITION_ABSOLUTE,
@@ -312,7 +311,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
 const MENU_TEXT_STYLE = css`
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  overflow: hidden;
+  overflow: ${OVERFLOW_HIDDEN};
   text-overflow: ellipsis;
   word-wrap: break-word;
   -webkit-line-clamp: 1;

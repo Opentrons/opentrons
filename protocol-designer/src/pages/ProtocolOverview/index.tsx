@@ -58,6 +58,7 @@ import {
 import { DeckThumbnail } from './DeckThumbnail'
 import { OffDeckThumbnail } from './OffdeckThumbnail'
 import { getWarningContent } from './UnusedModalContent'
+import { LiquidDefinitions } from './LiquidDefinitions'
 
 import type { CreateCommand, PipetteName } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
@@ -449,45 +450,9 @@ export function ProtocolOverview(): JSX.Element {
                 ) : null}
               </Flex>
             </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-              <StyledText desktopStyle="headingSmallBold">
-                {t('liquid_defs')}
-              </StyledText>
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                {Object.keys(allIngredientGroupFields).length > 0 ? (
-                  Object.values(allIngredientGroupFields).map(
-                    (liquid, index) => (
-                      <ListItem
-                        type="noActive"
-                        key={`${liquid.name}_${liquid.displayColor}_${index}`}
-                      >
-                        <ListItemDescriptor
-                          type="default"
-                          description={
-                            <Flex
-                              alignItems={ALIGN_CENTER}
-                              gridGap={SPACING.spacing8}
-                            >
-                              <LiquidIcon color={liquid.displayColor} />
-                              <StyledText
-                                desktopStyle="bodyDefaultRegular"
-                                overflowWrap="anywhere"
-                                id="liquid-name"
-                              >
-                                {liquid.name}
-                              </StyledText>
-                            </Flex>
-                          }
-                          content={liquid.description ?? t('na')}
-                        />
-                      </ListItem>
-                    )
-                  )
-                ) : (
-                  <InfoScreen content={t('no_liquids_defined')} />
-                )}
-              </Flex>
-            </Flex>
+            <LiquidDefinitions
+              allIngredientGroupFields={allIngredientGroupFields}
+            />
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
               <Flex>
                 <StyledText desktopStyle="headingSmallBold">
