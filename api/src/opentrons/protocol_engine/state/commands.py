@@ -741,9 +741,10 @@ class CommandView(HasState[CommandState]):
         if (
             next_fixit_cmd
             and self._state.queue_status == QueueStatus.AWAITING_RECOVERY
-            or self._state.queue_status == QueueStatus.PAUSED
+            or next_fixit_cmd
+            and self._state.queue_status == QueueStatus.PAUSED
             and self.state.is_door_blocking
-            and self.get(next_fixit_cmd).commandType == "unsafe/openJaw"
+            and self.get(next_fixit_cmd).commandType == "unsafe/ungripLabware"
         ):
             return next_fixit_cmd
 
