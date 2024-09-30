@@ -34,6 +34,7 @@ describe('useInterventionModal', () => {
     runStatus: RUN_STATUS_RUNNING,
     robotName: 'TestRobot',
     analysis: null,
+    doorIsOpen: false,
   }
 
   it('should return showModal true when conditions are met', () => {
@@ -79,6 +80,13 @@ describe('useInterventionModal', () => {
       robotName: 'TestRobot',
       analysis: null,
     })
+  })
+  it('should return showModal true and an alternate footer when door is open', () => {
+    const { result } = renderHook(() =>
+      useInterventionModal({ ...defaultProps, doorIsOpen: true })
+    )
+    expect(result.current.showModal).toBe(true)
+    expect(result.current.modalProps?.alternateFooterContent).toBeTruthy()
   })
 })
 

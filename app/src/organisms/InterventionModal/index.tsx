@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -12,11 +13,13 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  JUSTIFY_CENTER,
   Link,
   PrimaryButton,
   SPACING,
   TYPOGRAPHY,
   LegacyStyledText,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import {
   RUN_STATUS_FAILED,
@@ -33,7 +36,9 @@ import { PauseInterventionContent } from './PauseInterventionContent'
 import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
 import { isInterventionCommand } from './utils'
 import { useRobotType } from '/app/redux-resources/robots'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 
+import type { ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type {
@@ -55,6 +60,7 @@ export interface UseInterventionModalProps {
   runStatus: RunStatus | null
   robotName: string | null
   analysis: CompletedProtocolAnalysis | null
+  doorIsOpen: boolean
 }
 
 export type UseInterventionModalResult =
@@ -68,6 +74,7 @@ export function useInterventionModal({
   runStatus,
   robotName,
   analysis,
+  doorIsOpen,
 }: UseInterventionModalProps): UseInterventionModalResult {
   const isValidIntervention =
     lastRunCommand != null &&
@@ -87,6 +94,23 @@ export function useInterventionModal({
         run: runData,
         robotName,
         analysis,
+        alternateFooterContent: doorIsOpen ? (
+          <Flex
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_CENTER}
+            width="100%"
+            css={css`
+              @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+                min-height: 60px;
+              }
+            `}
+          >
+            <InlineNotification
+              type="neutral"
+              heading="Close the robot door to resume"
+            />
+          </Flex>
+        ) : undefined,
       },
     }
   }
@@ -98,6 +122,7 @@ export interface InterventionModalProps {
   command: RunCommandSummary
   run: RunData
   analysis: CompletedProtocolAnalysis | null
+  alternateFooterContent?: ReactNode
 }
 
 export function InterventionModal({
@@ -106,6 +131,7 @@ export function InterventionModal({
   command,
   run,
   analysis,
+  alternateFooterContent,
 }: InterventionModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_command_text', 'protocol_info'])
   const isOnDevice = useSelector(getIsOnDevice)
@@ -187,11 +213,13 @@ export function InterventionModal({
         width="100%"
       >
         {childContent}
-        <SmallButton
-          buttonText={t('confirm_and_resume')}
-          onClick={onResume}
-          buttonType="secondary"
-        />
+        {alternateFooterContent ?? (
+          <SmallButton
+            buttonText={t('confirm_and_resume')}
+            onClick={onResume}
+            buttonType="secondary"
+          />
+        )}
       </Flex>
     </OddModal>
   ) : (
@@ -202,23 +230,25 @@ export function InterventionModal({
     >
       <Box {...CONTENT_STYLE}>
         {childContent}
-        <Box {...FOOTER_STYLE}>
-          <Link
-            css={TYPOGRAPHY.darkLinkH4SemiBold}
-            href={LEARN_ABOUT_MANUAL_STEPS_URL}
-            external
-          >
-            {t('protocol_info:manual_steps_learn_more')}
-            <Icon
-              name="open-in-new"
-              marginLeft={SPACING.spacing4}
-              size="0.5rem"
-            />
-          </Link>
-          <PrimaryButton onClick={onResume}>
-            {t('confirm_and_resume')}
-          </PrimaryButton>
-        </Box>
+        {alternateFooterContent ?? (
+          <Box {...FOOTER_STYLE}>
+            <Link
+              css={TYPOGRAPHY.darkLinkH4SemiBold}
+              href={LEARN_ABOUT_MANUAL_STEPS_URL}
+              external
+            >
+              {t('protocol_info:manual_steps_learn_more')}
+              <Icon
+                name="open-in-new"
+                marginLeft={SPACING.spacing4}
+                size="0.5rem"
+              />
+            </Link>
+            <PrimaryButton onClick={onResume}>
+              {t('confirm_and_resume')}
+            </PrimaryButton>
+          </Box>
+        )}
       </Box>
     </InterventionModalMolecule>
   )

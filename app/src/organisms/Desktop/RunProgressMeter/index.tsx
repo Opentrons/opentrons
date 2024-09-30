@@ -27,6 +27,7 @@ import {
   RUN_STATUS_IDLE,
   RUN_STATUS_FINISHING,
   RUN_STATUS_RUNNING,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 
 import { getModalPortalEl } from '/app/App/portal'
@@ -98,7 +99,6 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     e.stopPropagation()
     downloadRunLog()
   }
-
   const {
     showModal: showIntervention,
     modalProps: interventionProps,
@@ -108,6 +108,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     runData,
     analysis,
     lastRunCommand,
+    doorIsOpen: runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   })
 
   const {
