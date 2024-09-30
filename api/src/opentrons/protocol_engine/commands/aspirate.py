@@ -21,6 +21,7 @@ from .command import (
     SuccessData,
 )
 from ..errors.error_occurrence import ErrorOccurrence
+from ..errors import InvalidAspirateLocationError
 
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -115,8 +116,10 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
         well_location = params.wellLocation
         if well_location.origin == WellOrigin.MENISCUS:
             well_location.volumeOffset = "operationVolume"
-            if well_location.offset.z == 0.0:
-                well_location.offset.z = -2.0  # disallow offset.z > -1.0 ?
+            if well_location.offset.z > 0.0:
+                raise InvalidAspirateLocationError(
+                    f"Cannot specify a meniscus-relative Aspirate with a z-offset of {well_location.offset.z}"
+                )
 
         position = await self._movement.move_to_well(
             pipette_id=pipette_id,

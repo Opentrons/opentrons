@@ -85,8 +85,6 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
 
         if well_location.origin == WellOrigin.MENISCUS:
             well_location.volumeOffset = 0.0
-            if well_location.offset.z == 0.0:
-                well_location.offset.z = -2.0  # disallow offset.z > -1.0 ?
         self._state_view.geometry.validate_dispense_volume_into_well(
             labware_id=labware_id,
             well_name=well_name,

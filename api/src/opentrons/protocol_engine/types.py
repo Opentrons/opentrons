@@ -252,8 +252,9 @@ class WellLocation(BaseModel):
 
 class LiquidHandlingWellLocation(BaseModel):
     """A relative location in reference to a well's location.
-    
-    To be used with commands that handle liquids."""
+
+    To be used with commands that handle liquids.
+    """
 
     origin: WellOrigin = WellOrigin.TOP
     offset: WellOffset = Field(default_factory=WellOffset)
@@ -265,8 +266,9 @@ class LiquidHandlingWellLocation(BaseModel):
 
 class PickUpTipWellLocation(BaseModel):
     """A relative location in reference to a well's location.
-    
-    To be used for picking up tips."""
+
+    To be used for picking up tips.
+    """
 
     origin: WellOrigin = WellOrigin.TOP
     offset: WellOffset = Field(default_factory=WellOffset)

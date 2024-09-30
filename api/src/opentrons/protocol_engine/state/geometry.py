@@ -434,7 +434,8 @@ class GeometryView:
     ) -> None:
         """Raise exception if operation location is not within well.
 
-        Primarily this checks if there is not enough liquid in a well to do meniscus-relative static aspiration."""
+        Primarily this checks if there is not enough liquid in a well to do meniscus-relative static aspiration.
+        """
         if z_offset < 0:
             if isinstance(well_location, PickUpTipWellLocation):
                 raise OperationLocationNotInWellError(
@@ -1274,8 +1275,9 @@ class GeometryView:
         operation_volume: Optional[float] = None,
     ) -> float:
         """Return a z-axis distance that accounts for well handling height and operation volume.
-        
-        Distance is with reference to the well bottom."""
+
+        Distance is with reference to the well bottom.
+        """
         initial_handling_height = self.get_well_handling_height(
             labware_id=labware_id,
             well_name=well_name,
@@ -1338,8 +1340,9 @@ class GeometryView:
         self, well_geometry: InnerWellGeometry, initial_height: float, volume: float
     ) -> float:
         """Return the height of liquid in a labware well after a given volume has been handled.
-        
-        This is given an initial handling height, with reference to the well bottom."""
+
+        This is given an initial handling height, with reference to the well bottom.
+        """
         initial_volume = self.get_well_volume_at_height(
             well_geometry=well_geometry, target_height=initial_height
         )
