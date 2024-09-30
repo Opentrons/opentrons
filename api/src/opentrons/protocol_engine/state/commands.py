@@ -738,7 +738,13 @@ class CommandView(HasState[CommandState]):
 
         # if queue is in recovery mode, return the next fixit command
         next_fixit_cmd = self._state.command_history.get_fixit_queue_ids().head(None)
-        if next_fixit_cmd and self._state.queue_status == QueueStatus.AWAITING_RECOVERY:
+        if (
+            next_fixit_cmd
+            and self._state.queue_status == QueueStatus.AWAITING_RECOVERY
+            or self._state.queue_status == QueueStatus.PAUSED
+            and self.state.is_door_blocking
+            and self.get(next_fixit_cmd).commandType == "unsafe/openJaw"
+        ):
             return next_fixit_cmd
 
         # if there is a setup command queued, prioritize it
