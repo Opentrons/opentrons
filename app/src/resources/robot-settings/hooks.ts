@@ -10,7 +10,8 @@ import type { RobotSettingsField } from '@opentrons/api-client'
  * @returns boolean
  */
 export function useIsOEMMode(): boolean {
-  const { settings } = useRobotSettingsQuery().data ?? {}
+  // set enabled false to avoid refetch that reinitializes localization provider
+  const { settings } = useRobotSettingsQuery({ enabled: false }).data ?? {}
   const isOnDevice = useSelector(getIsOnDevice)
 
   const oemModeSetting =
