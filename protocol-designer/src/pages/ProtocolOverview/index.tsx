@@ -469,7 +469,11 @@ export function ProtocolOverview(): JSX.Element {
                               gridGap={SPACING.spacing8}
                             >
                               <LiquidIcon color={liquid.displayColor} />
-                              <StyledText desktopStyle="bodyDefaultRegular">
+                              <StyledText
+                                desktopStyle="bodyDefaultRegular"
+                                overflowWrap="anywhere"
+                                id="liquid-name"
+                              >
                                 {liquid.name}
                               </StyledText>
                             </Flex>

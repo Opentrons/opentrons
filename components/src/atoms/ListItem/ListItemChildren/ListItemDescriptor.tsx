@@ -36,7 +36,9 @@ export const ListItemDescriptor = (
       >
         {description}
       </Flex>
-      <Flex flex={type === 'default' && '1.95'}>{content}</Flex>
+      <Flex flex={type === 'default' && '1.95'} overflowWrap="anywhere">
+        {content}
+      </Flex>
     </Flex>
   )
 }
