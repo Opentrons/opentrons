@@ -32,7 +32,7 @@ import type { DropTipWizardContainerProps } from '../types'
 type FlowType = 'blowout' | 'drop_tips' | null
 
 export const BeforeBeginning = ({
-  proceedToRoute,
+  proceedToRouteAndStep,
   isOnDevice,
   issuedCommandsType,
   fixitCommandTypeUtils,
@@ -43,9 +43,9 @@ export const BeforeBeginning = ({
 
   const handleProceed = (): void => {
     if (flowType === 'blowout') {
-      void proceedToRoute(DT_ROUTES.BLOWOUT)
+      void proceedToRouteAndStep(DT_ROUTES.BLOWOUT)
     } else if (flowType === 'drop_tips') {
-      void proceedToRoute(DT_ROUTES.DROP_TIP)
+      void proceedToRouteAndStep(DT_ROUTES.DROP_TIP)
     }
   }
 

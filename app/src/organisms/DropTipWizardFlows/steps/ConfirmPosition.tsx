@@ -16,15 +16,17 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { POSITION_AND_BLOWOUT, POSITION_AND_DROP_TIP } from './constants'
-import { DropTipFooterButtons } from './shared'
+import {
+  CHOOSE_LOCATION_OPTION,
+  CONFIRM_POSITION,
+  DT_ROUTES,
+} from '../constants'
+import { DropTipFooterButtons } from '../shared'
 
-import type { DropTipWizardContainerProps } from './types'
+import type { DropTipWizardContainerProps } from '../types'
 
 export interface UseConfirmPositionResult {
-  showConfirmPosition: boolean
   isRobotPipetteMoving: boolean
-  toggleShowConfirmPosition: () => void
   toggleIsRobotPipetteMoving: () => void
 }
 
@@ -34,33 +36,23 @@ export interface UseConfirmPositionResult {
 export function useConfirmPosition(
   currentStep: DropTipWizardContainerProps['currentStep']
 ): UseConfirmPositionResult {
-  const [showConfirmPosition, setShowConfirmPosition] = useState(false)
   const [isRobotPipetteMoving, setIsRobotPipetteMoving] = useState(false)
-
-  const toggleShowConfirmPosition = (): void => {
-    setShowConfirmPosition(!showConfirmPosition)
-  }
 
   const toggleIsRobotPipetteMoving = (): void => {
     setIsRobotPipetteMoving(!isRobotPipetteMoving)
   }
 
-  // NOTE: The useEffect logic is potentially problematic on views that are not steps, but it is not currently.
   useEffect(() => {
     if (
-      currentStep !== POSITION_AND_BLOWOUT &&
-      currentStep !== POSITION_AND_DROP_TIP &&
       isRobotPipetteMoving &&
-      showConfirmPosition
+      currentStep !== CONFIRM_POSITION &&
+      currentStep !== CHOOSE_LOCATION_OPTION
     ) {
-      toggleShowConfirmPosition()
       toggleIsRobotPipetteMoving()
     }
   }, [currentStep, isRobotPipetteMoving])
 
   return {
-    showConfirmPosition,
-    toggleShowConfirmPosition,
     toggleIsRobotPipetteMoving,
     isRobotPipetteMoving,
   }
@@ -70,9 +62,9 @@ type ConfirmPositionProps = DropTipWizardContainerProps &
   UseConfirmPositionResult
 
 export function ConfirmPosition({
-  toggleShowConfirmPosition,
   toggleIsRobotPipetteMoving,
-  currentStep,
+  goBackRunValid,
+  currentRoute,
   dropTipCommands,
   proceed,
   modalStyle,
@@ -81,11 +73,11 @@ export function ConfirmPosition({
   const { t } = useTranslation('drop_tip_wizard')
 
   const buildPrimaryBtnText = (): string =>
-    currentStep === POSITION_AND_BLOWOUT ? t('blowout_liquid') : t('drop_tips')
+    currentRoute === DT_ROUTES.BLOWOUT ? t('blowout_liquid') : t('drop_tips')
 
   const handleProceed = (): void => {
     toggleIsRobotPipetteMoving()
-    void blowoutOrDropTip(currentStep, proceed)
+    void blowoutOrDropTip(currentRoute, proceed)
   }
 
   return (
@@ -99,7 +91,7 @@ export function ConfirmPosition({
       >
         <Icon name="alert-circle" css={ICON_STYLE} />
         <StyledText oddStyle="level3HeaderBold" desktopStyle="headingSmallBold">
-          {currentStep === POSITION_AND_BLOWOUT
+          {currentRoute === DT_ROUTES.BLOWOUT
             ? t('confirm_blowout_location')
             : t('confirm_drop_tip_location')}
         </StyledText>
@@ -107,7 +99,7 @@ export function ConfirmPosition({
       <DropTipFooterButtons
         primaryBtnOnClick={handleProceed}
         primaryBtnTextOverride={buildPrimaryBtnText()}
-        secondaryBtnOnClick={toggleShowConfirmPosition}
+        secondaryBtnOnClick={goBackRunValid}
       />
     </>
   )
