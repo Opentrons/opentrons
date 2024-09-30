@@ -1,11 +1,12 @@
-import type * as React from 'react'
 import { describe, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { InfoScreen } from '@opentrons/components'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 import { LiquidDefinitions } from '../LiquidDefinitions'
+
+import { ComponentProps } from 'react'
+import type { InfoScreen } from '@opentrons/components'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof InfoScreen>()
@@ -39,14 +40,14 @@ const mockAllIngredientGroupFields = {
   },
 }
 
-const render = (props: React.ComponentProps<typeof LiquidDefinitions>) => {
+const render = (props: ComponentProps<typeof LiquidDefinitions>) => {
   return renderWithProviders(<LiquidDefinitions {...props} />, {
     i18nInstance: i18n,
   })
 }
 
 describe('LiquidDefinitions', () => {
-  let props: React.ComponentProps<typeof LiquidDefinitions>
+  let props: ComponentProps<typeof LiquidDefinitions>
 
   beforeEach(() => {
     props = {
