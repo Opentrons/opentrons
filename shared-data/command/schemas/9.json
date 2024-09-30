@@ -320,7 +320,7 @@
     },
     "LiquidHandlingWellLocation": {
       "title": "LiquidHandlingWellLocation",
-      "description": "A relative location in reference to a well's location. To be used with commands that handle liquids.",
+      "description": "A relative location in reference to a well's location.\n\nTo be used with commands that handle liquids.",
       "type": "object",
       "properties": {
         "origin": {
@@ -2442,7 +2442,7 @@
     },
     "PickUpTipWellLocation": {
       "title": "PickUpTipWellLocation",
-      "description": "A relative location in reference to a well's location. To be used for picking up tips.",
+      "description": "A relative location in reference to a well's location.\n\nTo be used for picking up tips.",
       "type": "object",
       "properties": {
         "origin": {
