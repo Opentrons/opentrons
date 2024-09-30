@@ -1,4 +1,4 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { describe, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { InfoScreen } from '@opentrons/components'

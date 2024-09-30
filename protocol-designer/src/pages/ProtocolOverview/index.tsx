@@ -1,5 +1,4 @@
-import { Fragment } from 'react'
-import { useState, useEffect } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -17,7 +16,6 @@ import {
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   LargeButton,
-  LiquidIcon,
   ListItem,
   ListItemDescriptor,
   Modal,
