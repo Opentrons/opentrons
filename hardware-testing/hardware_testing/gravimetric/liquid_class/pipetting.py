@@ -184,11 +184,11 @@ def _pipette_with_liquid_settings(  # noqa: C901
 
     # SET Z SPEEDS DURING SUBMERGE/RETRACT
     if aspirate or mix:
-        submerge_speed = config.TIP_SPEED_WHILE_SUBMERGING_ASPIRATE
-        retract_speed = config.TIP_SPEED_WHILE_RETRACTING_ASPIRATE
+        submerge_speed = liquid_class.aspirate.z_speed
+        retract_speed = liquid_class.aspirate.z_speed
     else:
-        submerge_speed = config.TIP_SPEED_WHILE_SUBMERGING_DISPENSE
-        retract_speed = config.TIP_SPEED_WHILE_RETRACTING_DISPENSE
+        submerge_speed = liquid_class.dispense.z_speed
+        retract_speed = liquid_class.dispense.z_speed
 
     # CREATE CALLBACKS FOR EACH PHASE
     def _aspirate_on_approach() -> None:

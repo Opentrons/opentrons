@@ -7,9 +7,10 @@ from typing import Optional
 class LiquidSettings:
     """Liquid Settings for both aspirate and dispense."""
 
+    z_speed: Optional[float]  # mm/sec of mount during submerge/retract
     submerge_mm: Optional[float]  # millimeters below meniscus
     flow_rate: Optional[float]  # ul/sec
-    delay: Optional[float]  # secondss
+    delay: Optional[float]  # seconds
     retract_mm: Optional[float]  # millimeters above meniscus
 
 

@@ -73,110 +73,13 @@ GRAV_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets", "slots_tiprack"]
 PHOTO_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets", "slots_tiprack"]
 
 NUM_BLANK_TRIALS: int = 10
-NUM_MIXES_BEFORE_ASPIRATE = 5
 SCALE_SECONDS_TO_TRUE_STABILIZE = 30
 
-LOW_VOLUME_UPPER_LIMIT_UL: Final = 2.0
-
 TOUCH_TIP_SPEED = 30
-
 GANTRY_MAX_SPEED = 40
-TIP_SPEED_WHILE_SUBMERGING_ASPIRATE = 50
-TIP_SPEED_WHILE_SUBMERGING_DISPENSE = 50
-TIP_SPEED_WHILE_RETRACTING_ASPIRATE = 50
-TIP_SPEED_WHILE_RETRACTING_DISPENSE = 50
 
 VIAL_SAFE_Z_OFFSET: Final = 25
 LABWARE_BOTTOM_CLEARANCE = 1.5
-
-LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
-    50: {
-        1: {
-            50: {
-                "mount_speed": 5,
-                "plunger_speed": 20,
-                "sensor_threshold_pascals": 15,
-            },
-        },
-        8: {
-            50: {
-                "mount_speed": 5,
-                "plunger_speed": 20,
-                "sensor_threshold_pascals": 15,
-            },
-        },
-    },
-    1000: {
-        1: {
-            50: {
-                "mount_speed": 5,
-                "plunger_speed": 20,
-                "sensor_threshold_pascals": 15,
-            },
-            200: {
-                "mount_speed": 5,
-                "plunger_speed": 20,
-                "sensor_threshold_pascals": 15,
-            },
-            1000: {
-                "mount_speed": 5,
-                "plunger_speed": 20,
-                "sensor_threshold_pascals": 15,
-            },
-        },
-        8: {
-            50: {
-                "mount_speed": 5,
-                "plunger_speed": 20,
-                "sensor_threshold_pascals": 15,
-            },
-            200: {
-                "mount_speed": 5,
-                "plunger_speed": 20,
-                "sensor_threshold_pascals": 15,
-            },
-            1000: {
-                "mount_speed": 5,
-                "plunger_speed": 20,
-                "sensor_threshold_pascals": 15,
-            },
-        },
-        96: {
-            50: {
-                "mount_speed": 5,
-                "plunger_speed": 20,
-                "sensor_threshold_pascals": 15,
-            },
-            200: {
-                "mount_speed": 5,
-                "plunger_speed": 20,
-                "sensor_threshold_pascals": 15,
-            },
-            1000: {
-                "mount_speed": 5,
-                "plunger_speed": 20,
-                "sensor_threshold_pascals": 15,
-            },
-        },
-    },
-}
-
-
-def _get_liquid_probe_settings(
-    cfg: VolumetricConfig, well: Well
-) -> LiquidProbeSettings:
-    lqid_cfg: Dict[str, int] = LIQUID_PROBE_SETTINGS[cfg.pipette_volume][
-        cfg.pipette_channels
-    ][cfg.tip_volume]
-    return LiquidProbeSettings(
-        mount_speed=lqid_cfg["mount_speed"],
-        plunger_speed=lqid_cfg["plunger_speed"],
-        plunger_impulse_time=0.2,
-        sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
-        output_option=OutputOptions.sync_only,
-        aspirate_while_sensing=False,
-        data_files={InstrumentProbeType.PRIMARY: "/data/testing_data/pressure.csv"},
-    )
 
 
 QC_VOLUMES_G: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
