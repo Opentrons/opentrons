@@ -146,7 +146,7 @@ class CircularFrustum(TypedDict):
     bottomDiameter: float
     topDiameter: float
     topHeight: float
-    bottom_height: float
+    bottomHeight: float
 
 
 class RectangularFrustum(TypedDict):
@@ -156,7 +156,7 @@ class RectangularFrustum(TypedDict):
     topXDimension: float
     topYDimension: float
     topHeight: float
-    bottom_height: float
+    bottomHeight: float
 
 
 # A truncated circle is a square that is trimmed at the corners by a smaller circle
@@ -167,7 +167,7 @@ class TruncatedCircularSegment(TypedDict):
     rectangleXDimension: float
     rectangleYDimension: float
     topHeight: float
-    bottom_height: float
+    bottomHeight: float
 
 
 # A rounded rectangle is a rectangle that is filleted by 4 circles
@@ -178,7 +178,7 @@ class RoundedRectangularSegment(TypedDict):
     rectangleXDimension: float
     rectangleYDimension: float
     topHeight: float
-    bottom_height: float
+    bottomHeight: float
 
 
 WellSegment = Union[
