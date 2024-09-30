@@ -100,6 +100,11 @@ async def post_settings(
         await hardware.set_status_bar_enabled(ff.status_bar_enabled())
     except ValueError as e:
         raise LegacyErrorResponse.from_exc(e).as_error(status.HTTP_400_BAD_REQUEST)
+    except advanced_settings.SettingException as e:
+        # Severe internal error
+        raise LegacyErrorResponse.from_exc(e).as_error(
+            status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
     return _create_settings_response(robot_type)
 
 

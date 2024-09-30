@@ -28,6 +28,12 @@ log = logging.getLogger(__name__)
 SettingsMap = Dict[str, Optional[bool]]
 
 
+class SettingException(Exception):
+    def __init__(self, message: str, error: str) -> None:
+        super(Exception, self).__init__(message)
+        self.error = error
+
+
 class SettingsData(NamedTuple):
     settings_map: SettingsMap
     version: int
