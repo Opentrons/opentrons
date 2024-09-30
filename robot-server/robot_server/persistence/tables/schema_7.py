@@ -269,7 +269,7 @@ run_csv_rtp_table = sqlalchemy.Table(
 class BooleanSettingKey(enum.Enum):
     """Keys for boolean settings."""
 
-    DISABLE_ERROR_RECOVERY = "disable_error_recovery"
+    ENABLE_ERROR_RECOVERY = "enable_error_recovery"
 
 
 boolean_setting_table = sqlalchemy.Table(
