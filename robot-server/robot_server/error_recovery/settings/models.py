@@ -30,17 +30,16 @@ class RequestData(pydantic.BaseModel):
         pydantic.Field(
             description=textwrap.dedent(
                 """\
-                If provided, the new setting for whether error recovery mode is globally
-                enabled.
+                If provided, globally enables or disables error recovery mode.
 
                 If this is `true`, a run (see the `/runs` endpoints) will *potentially*
                 enter recovery mode when an error happens, depending on the details of
                 the error and depending on `/runs/{runId}/errorRecoveryPolicy`.
 
-                If this is `false`, a run will fail if it encounters an error.
+                If this is `false`, a run will just fail if it encounters an error.
 
-                This currently only has an effect on Flex robots. On OT-2s, error
-                recovery is not supported.
+                The default is `true`. This currently only has an effect on Flex robots.
+                On OT-2s, error recovery is not supported.
                 """
             )
         ),
