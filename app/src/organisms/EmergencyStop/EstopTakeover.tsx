@@ -5,7 +5,7 @@ import { useEstopQuery } from '@opentrons/react-api-client'
 import { EstopPressedModal } from './EstopPressedModal'
 import { EstopMissingModal } from './EstopMissingModal'
 import { useEstopContext } from './hooks'
-import { useIsUnboxingFlowOngoing } from '../ODD/hooks'
+import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 import { getLocalRobot } from '/app/redux/discovery'
 import {
   PHYSICALLY_ENGAGED,

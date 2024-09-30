@@ -15,7 +15,7 @@ import type {
   LabwareDefinition2,
   LoadedLabwareByAdapter,
 } from '@opentrons/shared-data'
-import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
+import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 
 interface LabwareMapViewProps {
   attachedProtocolModuleMatches: AttachedProtocolModuleMatch[]

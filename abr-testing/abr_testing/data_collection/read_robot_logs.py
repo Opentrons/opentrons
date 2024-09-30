@@ -14,6 +14,7 @@ import time as t
 import json
 import requests
 import sys
+from abr_testing.tools import plate_reader
 
 
 def lpc_data(
@@ -166,6 +167,69 @@ def instrument_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
         "Average Liquid Probe Time (sec)": avg_liquid_probe_time_sec,
     }
     return pipette_dict
+
+
+def plate_reader_commands(
+    file_results: Dict[str, Any], hellma_plate_standards: List[Dict[str, Any]]
+) -> Dict[str, object]:
+    """Plate Reader Command Counts."""
+    commandData = file_results.get("commands", "")
+    move_lid_count: int = 0
+    initialize_count: int = 0
+    read = "no"
+    final_result = {}
+    # Count Number of Reads
+    read_count, avg_read_time = count_command_in_run_data(
+        commandData, "absorbanceReader/read", True
+    )
+    # Count Number of Initializations
+    initialize_count, avg_initialize_time = count_command_in_run_data(
+        commandData, "absorbanceReader/initialize", True
+    )
+    # Count Number of Lid Movements
+    for command in commandData:
+        commandType = command["commandType"]
+        if (
+            commandType == "absorbanceReader/openLid"
+            or commandType == "absorbanceReader/closeLid"
+        ):
+            move_lid_count += 1
+        elif commandType == "absorbanceReader/read":
+            read = "yes"
+        elif read == "yes" and commandType == "comment":
+            result = command["params"].get("message", "")
+            wavelength = result.split("result: {")[1].split(":")[0]
+            wavelength_str = wavelength + ": "
+            rest_of_string = result.split(wavelength_str)[1][:-1]
+            result_dict = eval(rest_of_string)
+            result_ndarray = plate_reader.convert_read_dictionary_to_array(result_dict)
+            for item in hellma_plate_standards:
+                wavelength_of_interest = item["wavelength"]
+                if str(wavelength) == str(wavelength_of_interest):
+                    error_cells = plate_reader.check_byonoy_data_accuracy(
+                        result_ndarray, item, False
+                    )
+                    if len(error_cells[0]) > 0:
+                        percent = (96 - len(error_cells)) / 96 * 100
+                        for cell in error_cells:
+                            print("FAIL: Cell " + str(cell) + " out of accuracy spec.")
+                    else:
+                        percent = 100
+                        print(
+                            f"PASS: {wavelength_of_interest} meet accuracy specification"
+                        )
+                    final_result[wavelength] = percent
+                    input("###########################")
+            read = "no"
+    plate_dict = {
+        "Plate Reader # of Reads": read_count,
+        "Plate Reader Avg Read Time (sec)": avg_read_time,
+        "Plate Reader # of Initializations": initialize_count,
+        "Plate Reader Avg Initialize Time (sec)": avg_initialize_time,
+        "Plate Reader # of Lid Movements": move_lid_count,
+        "Plate Reader Result": final_result,
+    }
+    return plate_dict
 
 
 def hs_commands(file_results: Dict[str, Any]) -> Dict[str, float]:

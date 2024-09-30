@@ -754,10 +754,17 @@ class LegacyCommandMapper:
             # We just set this above, so we know it's not None.
             started_at=succeeded_command.startedAt,  # type: ignore[arg-type]
         )
+        state_update = StateUpdate()
+        state_update.set_load_pipette(
+            pipette_id=pipette_id,
+            mount=succeeded_command.params.mount,
+            pipette_name=succeeded_command.params.pipetteName,
+            liquid_presence_detection=succeeded_command.params.liquidPresenceDetection,
+        )
         succeed_action = pe_actions.SucceedCommandAction(
             command=succeeded_command,
             private_result=pipette_config_result,
-            state_update=StateUpdate(),
+            state_update=state_update,
         )
 
         self._command_count["LOAD_PIPETTE"] = count + 1

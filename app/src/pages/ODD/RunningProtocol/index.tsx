@@ -52,13 +52,13 @@ import {
 import { CancelingRunModal } from '/app/organisms/ODD/RunningProtocol/CancelingRunModal'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol/ConfirmCancelRunModal'
 import { getLocalRobot } from '/app/redux/discovery'
-import { OpenDoorAlertModal } from '/app/organisms/OpenDoorAlertModal'
+import { OpenDoorAlertModal } from '/app/organisms/ODD/OpenDoorAlertModal'
 import {
   useErrorRecoveryFlows,
   ErrorRecoveryFlows,
 } from '/app/organisms/ErrorRecoveryFlows'
 
-import type { OnDeviceRouteParams } from '../../../App/types'
+import type { OnDeviceRouteParams } from '/app/App/types'
 
 const RUN_STATUS_REFETCH_INTERVAL = 5000
 const LIVE_RUN_COMMANDS_POLL_MS = 3000

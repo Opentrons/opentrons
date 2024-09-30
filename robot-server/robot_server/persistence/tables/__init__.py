@@ -12,8 +12,10 @@ from .schema_7 import (
     action_table,
     run_csv_rtp_table,
     data_files_table,
+    boolean_setting_table,
     PrimitiveParamSQLEnum,
     ProtocolKindSQLEnum,
+    BooleanSettingKey,
 )
 
 
@@ -28,6 +30,8 @@ __all__ = [
     "action_table",
     "run_csv_rtp_table",
     "data_files_table",
+    "boolean_setting_table",
     "PrimitiveParamSQLEnum",
     "ProtocolKindSQLEnum",
+    "BooleanSettingKey",
 ]

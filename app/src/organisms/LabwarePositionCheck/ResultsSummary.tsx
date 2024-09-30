@@ -11,7 +11,7 @@ import {
   getVectorSum,
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
-import { NeedHelpLink } from '../CalibrationPanels'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
@@ -36,8 +36,8 @@ import {
   getIsOnDevice,
 } from '/app/redux/config'
 import { SmallButton } from '/app/atoms/buttons'
-import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
-import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
+import { LabwareOffsetTabs } from '/app/organisms/LabwareOffsetTabs'
+import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
 import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 

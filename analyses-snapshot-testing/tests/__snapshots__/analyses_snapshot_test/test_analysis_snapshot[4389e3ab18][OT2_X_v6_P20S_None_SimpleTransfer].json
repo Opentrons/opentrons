@@ -1757,13 +1757,13 @@
       "createdAt": "TIMESTAMP",
       "error": {
         "createdAt": "TIMESTAMP",
-        "detail": "Cannot aspirate 21.0 µL when only 20.0 is available.",
+        "detail": "Cannot aspirate 21.0 µL when only 20 is available.",
         "errorCode": "4000",
         "errorInfo": {
           "attempted_aspirate_volume": 21.0,
-          "available_volume": 20.0,
+          "available_volume": 20,
           "max_pipette_volume": 20,
-          "max_tip_volume": 20.0
+          "max_tip_volume": 20
         },
         "errorType": "InvalidAspirateVolumeError",
         "id": "UUID",
@@ -1800,13 +1800,13 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "Cannot aspirate 21.0 µL when only 20.0 is available.",
+      "detail": "Cannot aspirate 21.0 µL when only 20 is available.",
       "errorCode": "4000",
       "errorInfo": {
         "attempted_aspirate_volume": 21.0,
-        "available_volume": 20.0,
+        "available_volume": 20,
         "max_pipette_volume": 20,
-        "max_tip_volume": 20.0
+        "max_tip_volume": 20
       },
       "errorType": "InvalidAspirateVolumeError",
       "id": "UUID",

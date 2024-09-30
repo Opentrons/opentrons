@@ -69,7 +69,7 @@ export function TerminalItemStep(props: TerminalItemStepProps): JSX.Element {
       <StepContainer
         {...{
           stepId: `TerminalItem_${id}`,
-          iconName: 'arrow-right',
+          iconName: title === 'Starting deck state' ? 'ot-start' : 'ot-end',
           hovered,
           selected,
           title,

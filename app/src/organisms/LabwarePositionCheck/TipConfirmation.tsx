@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 
-import { NeedHelpLink } from '../CalibrationPanels'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { useSelector } from 'react-redux'
 import { getIsOnDevice } from '/app/redux/config'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'

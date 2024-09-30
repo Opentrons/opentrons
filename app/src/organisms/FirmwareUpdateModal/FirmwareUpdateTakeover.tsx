@@ -7,8 +7,8 @@ import {
   useSubsystemUpdateQuery,
 } from '@opentrons/react-api-client'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
-import { getTopPortalEl } from '../../App/portal'
-import { useIsUnboxingFlowOngoing } from '../ODD/hooks'
+import { getTopPortalEl } from '/app/App/portal'
+import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 import { UpdateInProgressModal } from './UpdateInProgressModal'
 import { UpdateNeededModal } from './UpdateNeededModal'
 import type { Subsystem, InstrumentData } from '@opentrons/api-client'

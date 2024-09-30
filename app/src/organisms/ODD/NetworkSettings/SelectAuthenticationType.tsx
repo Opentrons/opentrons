@@ -18,7 +18,7 @@ import {
 
 import { getLocalRobot } from '/app/redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '/app/redux/networking'
-import { useIsUnboxingFlowOngoing } from '../hooks'
+import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 import { AlternativeSecurityTypeModal } from './AlternativeSecurityTypeModal'
 
 import type { WifiSecurityType } from '@opentrons/api-client'

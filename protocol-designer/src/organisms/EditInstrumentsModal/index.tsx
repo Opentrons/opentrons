@@ -207,7 +207,7 @@ export function EditInstrumentsModal(
               alignItems={ALIGN_CENTER}
             >
               <StyledText desktopStyle="bodyLargeSemiBold">
-                {t('your_pips')}
+                {t('your_pipettes')}
               </StyledText>
               {has96Channel ? null : (
                 <Btn
@@ -267,10 +267,9 @@ export function EditInstrumentsModal(
                     setMount('left')
                     resetFields()
                   }}
-                  text={t('add_pip')}
+                  text={t('add_pipette')}
                   textAlignment="left"
                   iconName="plus"
-                  size="large"
                 />
               )}
               {rightPip != null &&
@@ -302,10 +301,9 @@ export function EditInstrumentsModal(
                     setPage('add')
                     setMount('right')
                   }}
-                  text={t('add_pip')}
+                  text={t('add_pipette')}
                   textAlignment="left"
                   iconName="plus"
-                  size="large"
                 />
               )}
             </Flex>
@@ -367,7 +365,6 @@ export function EditInstrumentsModal(
                     text={t('protocol_overview:add_gripper')}
                     textAlignment="left"
                     iconName="plus"
-                    size="large"
                   />
                 )}
               </Flex>
@@ -385,7 +382,7 @@ export function EditInstrumentsModal(
               desktopStyle="bodyLargeSemiBold"
               marginBottom={SPACING.spacing16}
             >
-              {t('pip_type')}
+              {t('pipette_type')}
             </StyledText>
             <Flex gridGap={SPACING.spacing4}>
               {PIPETTE_TYPES[robotType].map(type => {
@@ -415,7 +412,7 @@ export function EditInstrumentsModal(
                 desktopStyle="bodyLargeSemiBold"
                 marginBottom={SPACING.spacing16}
               >
-                {t('pip_gen')}
+                {t('pipette_gen')}
               </StyledText>
               <Flex gridGap={SPACING.spacing4}>
                 {PIPETTE_GENS.map(gen => (
@@ -446,7 +443,7 @@ export function EditInstrumentsModal(
                 desktopStyle="bodyLargeSemiBold"
                 marginBottom={SPACING.spacing16}
               >
-                {t('pip_vol')}
+                {t('pipette_vol')}
               </StyledText>
               <Flex gridGap={SPACING.spacing4}>
                 {PIPETTE_VOLUMES[robotType]?.map(volume => {
@@ -506,7 +503,7 @@ export function EditInstrumentsModal(
                       desktopStyle="bodyLargeSemiBold"
                       marginBottom={SPACING.spacing16}
                     >
-                      {t('pip_tips')}
+                      {t('pipette_tips')}
                     </StyledText>
                     <Box
                       css={css`

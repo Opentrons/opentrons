@@ -15,7 +15,7 @@ import {
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
-import { getProtocolModulesInfo } from '/app/transformations/analysis'
+import { getProtocolModulesInfo } from '/app/transformations/analysis/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '..'
 import {
   mockProtocolModuleInfo,
@@ -40,7 +40,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
 })
 
 vi.mock('/app/resources/runs')
-vi.mock('/app/transformations/analysis')
+vi.mock('/app/transformations/analysis/getProtocolModulesInfo')
 vi.mock('/app/resources/deck_configuration')
 
 const RUN_ID = "otie's run"
