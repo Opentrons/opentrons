@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { SetWifiCred } from '../../NetworkSettings/SetWifiCred'
 
 import type { SetSettingOption } from '../types'

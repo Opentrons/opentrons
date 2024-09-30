@@ -123,7 +123,10 @@ async def test_drop_tip_implementation(
                     well_name="A3",
                 ),
                 new_deck_point=DeckPoint(x=111, y=222, z=333),
-            )
+            ),
+            pipette_tip_state=update_types.PipetteTipStateUpdate(
+                pipette_id="abc", tip_geometry=None
+            ),
         ),
     )
 
@@ -196,6 +199,9 @@ async def test_drop_tip_with_alternating_locations(
                     well_name="A3",
                 ),
                 new_deck_point=DeckPoint(x=111, y=222, z=333),
-            )
+            ),
+            pipette_tip_state=update_types.PipetteTipStateUpdate(
+                pipette_id="abc", tip_geometry=None
+            ),
         ),
     )

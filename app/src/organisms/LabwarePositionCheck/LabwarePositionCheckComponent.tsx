@@ -11,7 +11,7 @@ import {
 } from '@opentrons/react-api-client'
 import { FIXED_TRASH_ID, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 // import { useTrackEvent } from '/app/redux/analytics'
 import { IntroScreen } from './IntroScreen'
 import { ExitConfirmation } from './ExitConfirmation'

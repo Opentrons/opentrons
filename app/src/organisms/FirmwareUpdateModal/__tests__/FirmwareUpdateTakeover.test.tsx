@@ -11,7 +11,7 @@ import {
 import { i18n } from '/app/i18n'
 import { UpdateNeededModal } from '../UpdateNeededModal'
 import { UpdateInProgressModal } from '../UpdateInProgressModal'
-import { useIsUnboxingFlowOngoing } from '../../ODD/hooks'
+import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 import { FirmwareUpdateTakeover } from '../FirmwareUpdateTakeover'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
@@ -20,7 +20,7 @@ import type { BadPipette, PipetteData } from '@opentrons/api-client'
 vi.mock('@opentrons/react-api-client')
 vi.mock('../UpdateNeededModal')
 vi.mock('../UpdateInProgressModal')
-vi.mock('../../ODD/hooks')
+vi.mock('/app/redux-resources/config')
 vi.mock('/app/resources/maintenance_runs')
 
 const render = () => {

@@ -5,6 +5,7 @@ import os
 import csv
 from abr_testing.data_collection import read_robot_logs
 from abr_testing.data_collection import abr_google_drive
+from abr_testing.tools import plate_reader
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Read single run log locally saved.")
@@ -25,13 +26,21 @@ if __name__ == "__main__":
         sys.exit()
     # Get Runs from Storage and Read Logs
     run_ids_in_storage = read_robot_logs.get_run_ids_from_storage(run_log_file_path)
+    # Get hellma readins
+    file_values = plate_reader.read_hellma_plate_files(run_log_file_path, 101934)
+
     (
         runs_and_robots,
         header,
         runs_and_lpc,
         lpc_headers,
     ) = abr_google_drive.create_data_dictionary(
-        run_ids_in_storage, run_log_file_path, "", "", ""
+        run_ids_in_storage,
+        run_log_file_path,
+        "",
+        "",
+        "",
+        hellma_plate_standards=file_values,
     )
     transposed_list = list(zip(*runs_and_robots))
     # Adds Run to local csv

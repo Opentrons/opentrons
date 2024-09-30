@@ -24,7 +24,7 @@ import {
 } from '../shared'
 
 import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
-import type { PipetteWithTip } from '../../DropTipWizardFlows'
+import type { PipetteWithTip } from '/app/organisms/DropTipWizardFlows'
 
 // The "home" route within Error Recovery. When a user completes a non-terminal flow or presses "Go back" enough
 // to escape the boundaries of any route, they will be redirected here.
