@@ -15,5 +15,6 @@ export { useErrorDetailsModal, ErrorDetailsModal } from './ErrorDetailsModal'
 export { RecoveryInterventionModal } from './RecoveryInterventionModal'
 export { FailedStepNextStep } from './FailedStepNextStep'
 export { RecoveryRadioGroup } from './RecoveryRadioGroup'
+export { GripperReleaseLabware } from './GripperReleaseLabware'
 
 export type { RecoveryInterventionModalProps } from './RecoveryInterventionModal'
