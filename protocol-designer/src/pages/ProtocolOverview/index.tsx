@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -224,8 +225,11 @@ export function ProtocolOverview(): JSX.Element {
   const cancelModal = (): void => {
     setShowExportWarningModal(false)
   }
+
+  console.log('obj', JSON.stringify(allIngredientGroupFields, null, 4))
+
   return (
-    <>
+    <Fragment>
       {showEditMetadataModal ? (
         <EditProtocolMetadataModal
           onClose={() => {
@@ -531,7 +535,7 @@ export function ProtocolOverview(): JSX.Element {
           </Flex>
         </Flex>
       </Flex>
-    </>
+    </Fragment>
   )
 }
 
