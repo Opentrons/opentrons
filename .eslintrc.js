@@ -110,6 +110,7 @@ module.exports = {
         '@typescript-eslint/unbound-method': 'warn',
         '@typescript-eslint/consistent-generic-constructors': 'warn',
         '@typescript-eslint/no-misused-promises': 'warn',
+        '@typescript-eslint/no-unsafe-argument': 'warn',
         // need this to be able to pass in css prop into raw elements (babel adds this at build time for styled-components)
         'react/no-unknown-property': [
           'error',
