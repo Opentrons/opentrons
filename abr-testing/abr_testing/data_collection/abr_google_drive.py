@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from abr_testing.data_collection import read_robot_logs
 from typing import Set, Dict, Any, Tuple, List, Union
 from abr_testing.automation import google_drive_tool, google_sheets_tool
-from abr_testing.tools import sync_abr_sheet
+from abr_testing.tools import sync_abr_sheet, plate_reader
 
 
 def get_modules(file_results: Dict[str, str]) -> Dict[str, Any]:
@@ -17,6 +17,7 @@ def get_modules(file_results: Dict[str, str]) -> Dict[str, Any]:
         "temperatureModuleV2",
         "magneticBlockV1",
         "thermocyclerModuleV2",
+        "absorbanceReaderV1",
     )
     all_modules = {key: "" for key in modList}
     for module in file_results.get("modules", []):
@@ -35,6 +36,7 @@ def create_data_dictionary(
     issue_url: str,
     plate: str,
     accuracy: Any,
+    hellma_plate_standards: List[Dict[str, Any]],
 ) -> Tuple[List[List[Any]], List[str], List[List[Any]], List[str]]:
     """Pull data from run files and format into a dictionary."""
     runs_and_robots: List[Any] = []
@@ -113,6 +115,9 @@ def create_data_dictionary(
                 hs_dict = read_robot_logs.hs_commands(file_results)
                 tm_dict = read_robot_logs.temperature_module_commands(file_results)
                 pipette_dict = read_robot_logs.instrument_commands(file_results)
+                plate_reader_dict = read_robot_logs.plate_reader_commands(
+                    file_results, hellma_plate_standards
+                )
                 notes = {"Note1": "", "Jira Link": issue_url}
                 plate_measure = {
                     "Plate Measured": plate,
@@ -132,6 +137,7 @@ def create_data_dictionary(
                     **hs_dict,
                     **tm_dict,
                     **tc_dict,
+                    **plate_reader_dict,
                     **pipette_dict,
                     **plate_measure,
                 }
@@ -181,6 +187,7 @@ if __name__ == "__main__":
     storage_directory = args.storage_directory[0]
     google_sheet_name = args.google_sheet_name[0]
     email = args.email[0]
+
     try:
         credentials_path = os.path.join(storage_directory, "credentials.json")
     except FileNotFoundError:
@@ -203,13 +210,22 @@ if __name__ == "__main__":
     missing_runs_from_gs = read_robot_logs.get_unseen_run_ids(
         run_ids_on_gd, run_ids_on_gs
     )
+    # Read Hellma Files
+    file_values = plate_reader.read_hellma_plate_files(storage_directory, 101934)
     # Add missing runs to google sheet
     (
         transposed_runs_and_robots,
         headers,
         transposed_runs_and_lpc,
         headers_lpc,
-    ) = create_data_dictionary(missing_runs_from_gs, storage_directory, "", "", "")
+    ) = create_data_dictionary(
+        missing_runs_from_gs,
+        storage_directory,
+        "",
+        "",
+        "",
+        hellma_plate_standards=file_values,
+    )
     start_row = google_sheet.get_index_row() + 1
     print(start_row)
     google_sheet.batch_update_cells(transposed_runs_and_robots, "A", start_row, "0")
