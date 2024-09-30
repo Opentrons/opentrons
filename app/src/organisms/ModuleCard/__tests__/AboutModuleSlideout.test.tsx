@@ -17,10 +17,10 @@ import {
   mockTemperatureModuleGen2,
   mockThermocycler,
 } from '/app/redux/modules/__fixtures__'
-import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import { AboutModuleSlideout } from '../AboutModuleSlideout'
 
-vi.mock('../../RunTimeControl/hooks')
+vi.mock('/app/organisms/RunTimeControl')
 
 const render = (props: React.ComponentProps<typeof AboutModuleSlideout>) => {
   return renderWithProviders(<AboutModuleSlideout {...props} />, {

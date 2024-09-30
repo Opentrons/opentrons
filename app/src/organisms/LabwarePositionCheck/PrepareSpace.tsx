@@ -20,7 +20,7 @@ import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '@opentrons/shared-data'
 
 import { getIsOnDevice } from '/app/redux/config'
 import { SmallButton } from '/app/atoms/buttons'
-import { NeedHelpLink } from '../CalibrationPanels'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type {

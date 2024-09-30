@@ -22,7 +22,7 @@ import {
   U2EInformation,
   UpdatedChannel,
   AdditionalCustomLabwareSourceFolder,
-} from '/app/organisms/AdvancedSettings'
+} from '/app/organisms/Desktop/AdvancedSettings'
 import { useFeatureFlag } from '/app/redux/config'
 
 export function AdvancedSettings(): JSX.Element {

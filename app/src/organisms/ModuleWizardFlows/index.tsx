@@ -14,9 +14,9 @@ import {
   getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { WizardHeader } from '/app/molecules/WizardHeader'
-import { useAttachedPipettesFromInstrumentsQuery } from '/app/organisms/Devices/hooks'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 import { getIsOnDevice } from '/app/redux/config'
 import {

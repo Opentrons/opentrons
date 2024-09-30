@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Flex, DIRECTION_COLUMN } from '@opentrons/components'
 
 import { SelectAuthenticationType as SelectAuthenticationTypeComponent } from '/app/organisms/ODD/NetworkSettings'
-import { RobotSetupHeader } from '/app/organisms/RobotSetupHeader'
+import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { WifiScreenOption } from './'

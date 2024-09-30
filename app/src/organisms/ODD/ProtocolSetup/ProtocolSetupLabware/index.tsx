@@ -41,11 +41,13 @@ import {
   getLabwareSetupItemGroups,
   getNestedLabwareInfo,
 } from '/app/transformations/commands'
-import { getProtocolModulesInfo } from '/app/transformations/analysis'
+import {
+  getAttachedProtocolModuleMatches,
+  getProtocolModulesInfo,
+} from '/app/transformations/analysis'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { LabwareStackModal } from '/app/molecules/LabwareStackModal'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
-import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModulesAndDeck/utils'
 import { LabwareMapView } from './LabwareMapView'
 import { SingleLabwareModal } from './SingleLabwareModal'
 
@@ -64,7 +66,7 @@ import type {
   NestedLabwareInfo,
 } from '/app/transformations/commands'
 import type { SetupScreens } from '../types'
-import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
+import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 
 const MODULE_REFETCH_INTERVAL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000

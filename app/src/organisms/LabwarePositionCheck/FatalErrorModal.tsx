@@ -19,7 +19,7 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { WizardHeader } from '/app/molecules/WizardHeader'
 import { i18n } from '/app/i18n'
 

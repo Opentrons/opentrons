@@ -32,7 +32,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getIsHeaterShakerAttached } from '/app/redux/config'
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { Slideout } from '/app/atoms/Slideout'
 import { TertiaryButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'

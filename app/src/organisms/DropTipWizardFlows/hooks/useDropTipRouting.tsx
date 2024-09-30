@@ -27,8 +27,11 @@ export interface UseDropTipRoutingResult {
   goBack: () => Promise<void>
   /* Proceed a step within the current route. Reroutes to "Before Beginning" if currently on the last step. */
   proceed: () => Promise<void>
-  /* Proceed to the first step of a given route. */
-  proceedToRoute: (route: DropTipFlowsRoute) => Promise<void>
+  /* Proceed to a given step of a given route or the first step of a given route if none is specified. */
+  proceedToRouteAndStep: (
+    route: DropTipFlowsRoute,
+    step?: DropTipFlowsStep
+  ) => Promise<void>
 }
 
 /**
@@ -95,19 +98,37 @@ export function useDropTipRouting(
     })
   }
 
-  const proceedToRoute = (route: DropTipFlowsRoute): Promise<void> => {
+  const proceedToRouteAndStep = (
+    route: DropTipFlowsRoute,
+    step?: DropTipFlowsStep
+  ): Promise<void> => {
     return new Promise((resolve, reject) => {
-      setDropTipFlowsMap({
-        currentRoute: route,
-        currentStep: head(route) as DropTipFlowsStep,
-        currentStepIdx: 0,
-      })
+      // @ts-expect-error Step always valid or handled appropriately.
+      const isStepNotInRoute = step != null && !route.includes(step)
+
+      if (step == null || isStepNotInRoute) {
+        setDropTipFlowsMap({
+          currentRoute: route,
+          currentStep: head(route) as DropTipFlowsStep,
+          currentStepIdx: 0,
+        })
+        if (isStepNotInRoute) {
+          console.error(`Step ${step} not found in route ${route}`)
+        }
+      } else {
+        setDropTipFlowsMap({
+          currentRoute: route,
+          currentStep: step,
+          // @ts-expect-error Step always valid or handled appropriately.
+          currentStepIdx: route.indexOf(step),
+        })
+      }
 
       resolve()
     })
   }
 
-  return { ...dropTipFlowsMap, goBack, proceed, proceedToRoute }
+  return { ...dropTipFlowsMap, goBack, proceed, proceedToRouteAndStep }
 }
 
 type DTStepOrInvalid = DropTipFlowsStep | typeof INVALID

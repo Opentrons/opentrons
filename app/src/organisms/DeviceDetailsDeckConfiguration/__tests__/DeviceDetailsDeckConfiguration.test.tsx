@@ -12,7 +12,8 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useIsRobotViewable, useRunStatuses } from '../../Devices/hooks'
+import { useRunStatuses } from '/app/resources/runs'
+import { useIsRobotViewable } from '/app/redux-resources/robots'
 import { DeckFixtureSetupInstructionsModal } from '../DeckFixtureSetupInstructionsModal'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { DeviceDetailsDeckConfiguration } from '../'
@@ -36,7 +37,8 @@ vi.mock('@opentrons/components', async importOriginal => {
 })
 vi.mock('@opentrons/react-api-client')
 vi.mock('../DeckFixtureSetupInstructionsModal')
-vi.mock('../../Devices/hooks')
+vi.mock('/app/resources/runs')
+vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/maintenance_runs')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 vi.mock('/app/resources/deck_configuration')

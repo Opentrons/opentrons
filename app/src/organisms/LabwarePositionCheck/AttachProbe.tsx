@@ -8,7 +8,7 @@ import {
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import { css } from 'styled-components'
-import { ProbeNotAttached } from '../PipetteWizardFlows/ProbeNotAttached'
+import { ProbeNotAttached } from '/app/organisms/PipetteWizardFlows/ProbeNotAttached'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'

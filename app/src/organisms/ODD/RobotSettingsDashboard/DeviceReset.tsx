@@ -17,7 +17,7 @@ import {
 
 import { MediumButton, SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import {
   getResetConfigOptions,
   fetchResetConfigOptions,

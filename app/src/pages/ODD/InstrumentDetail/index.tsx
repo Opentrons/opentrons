@@ -18,7 +18,7 @@ import { FLEX_ROBOT_TYPE, getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import { BackButton } from '/app/atoms/buttons/BackButton'
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
-import { InstrumentInfo } from '/app/organisms/InstrumentInfo'
+import { InstrumentInfo } from '/app/organisms/ODD/InstrumentInfo'
 import { handleInstrumentDetailOverflowMenu } from './InstrumentDetailOverflowMenu'
 import {
   useGripperDisplayName,

@@ -20,15 +20,15 @@ import {
 } from '/app/resources/runs'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import { useAttachedModules } from '/app/resources/modules'
-import { getProtocolModulesInfo } from '/app/transformations/analysis'
+import {
+  getProtocolModulesInfo,
+  getAttachedProtocolModuleMatches,
+} from '/app/transformations/analysis'
 import { mockApiHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { mockProtocolModuleInfo } from '../../ProtocolSetupInstruments/__fixtures__'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
-import {
-  getAttachedProtocolModuleMatches,
-  getUnmatchedModulesForProtocol,
-} from '../utils'
+import { getUnmatchedModulesForProtocol } from '../utils'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { SetupInstructionsModal } from '../SetupInstructionsModal'

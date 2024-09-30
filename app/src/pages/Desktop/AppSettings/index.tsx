@@ -18,11 +18,11 @@ import * as Config from '/app/redux/config'
 import { GeneralSettings } from './GeneralSettings'
 import { PrivacySettings } from './PrivacySettings'
 import { AdvancedSettings } from './AdvancedSettings'
-import { FeatureFlags } from '/app/organisms/AppSettings/FeatureFlags'
+import { FeatureFlags } from '/app/organisms/Desktop/AppSettings/FeatureFlags'
 import { NavTab } from '/app/molecules/NavTab'
 import { Line } from '/app/atoms/structure'
 
-import type { DesktopRouteParams, AppSettingsTab } from '../../../App/types'
+import type { DesktopRouteParams, AppSettingsTab } from '/app/App/types'
 
 export function AppSettings(): JSX.Element {
   const { t } = useTranslation('app_settings')

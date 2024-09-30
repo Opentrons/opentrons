@@ -14,7 +14,7 @@ import {
   Modal,
 } from '@opentrons/components'
 
-import { getTopPortalEl } from '../../../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 
 const NEW_FLEX_SETUP_SUPPORT_ARTICLE_HREF =
