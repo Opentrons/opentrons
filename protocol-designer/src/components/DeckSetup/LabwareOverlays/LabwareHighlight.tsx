@@ -48,9 +48,9 @@ export const LabwareHighlight = (
           [styles.highlight_fill]: isTcProfile,
         })}
       >
-        {/* {isTcProfile && ( */}
-        <Icon className={styles.thermocycler_icon} name={'ot-thermocycler'} />
-        {/* )} */}
+        {isTcProfile && (
+          <Icon className={styles.thermocycler_icon} name={'ot-thermocycler'} />
+        )}
       </div>
     )
   }

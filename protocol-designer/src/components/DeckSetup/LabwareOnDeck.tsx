@@ -7,7 +7,6 @@ import * as highlightSelectors from '../../top-selectors/substep-highlight'
 import * as tipContentsSelectors from '../../top-selectors/tip-contents'
 import { wellFillFromWellContents } from '../labware/utils'
 import type { LabwareOnDeck as LabwareOnDeckType } from '../../step-forms'
-import { LabwareHighlight } from './LabwareOverlays/LabwareHighlight'
 
 interface LabwareOnDeckProps {
   className?: string
@@ -38,8 +37,6 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
 
   return (
     <g transform={`translate(${x}, ${y})`} className={className}>
-      <LabwareHighlight labwareOnDeck={labwareOnDeck} />
-
       <LabwareRender
         definition={labwareOnDeck.def}
         wellFill={wellFillFromWellContents(wellContents, liquidDisplayColors)}

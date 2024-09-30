@@ -41,7 +41,9 @@ export const LabwareControls = (props: LabwareControlsProps): JSX.Element => {
       <RobotCoordsForeignDiv
         {...{ x, y, width, height }}
         innerDivProps={{
-          className: cx(styles.labware_controls),
+          className: cx(styles.labware_controls, {
+            [styles.can_edit]: canEdit,
+          }),
         }}
       >
         <LabwareHighlight labwareOnDeck={labwareOnDeck} />

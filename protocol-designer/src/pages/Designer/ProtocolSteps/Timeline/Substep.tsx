@@ -75,6 +75,9 @@ function SubstepComponent(props: SubstepRowProps): JSX.Element {
       type="default"
     />
   )
+
+  const isMix = source?.well === dest?.well
+
   return (
     <Flex
       onMouseEnter={() => {
@@ -89,80 +92,119 @@ function SubstepComponent(props: SubstepRowProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing4}
     >
-      <ListItem type="noActive">
-        <Flex
-          gridGap={SPACING.spacing4}
-          padding={SPACING.spacing12}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          width="100%"
-          alignItems={ALIGN_CENTER}
-        >
-          {ingredIds.length > 0 ? (
-            <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
-              <LiquidIcon color={color} size="medium" />
+      {isMix ? (
+        <ListItem type="noActive">
+          <Flex
+            gridGap={SPACING.spacing4}
+            padding={SPACING.spacing12}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            width="100%"
+            alignItems={ALIGN_CENTER}
+          >
+            {ingredIds.length > 0 ? (
+              <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
+                <LiquidIcon color={color} size="medium" />
 
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {ingredIds.map(groupId => ingredNames[groupId]).join(',')}
-              </StyledText>
-            </Flex>
-          ) : null}
-          {source != null ? (
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {ingredIds.map(groupId => ingredNames[groupId]).join(',')}
+                </StyledText>
+              </Flex>
+            ) : null}
+
             <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
               <StyledText desktopStyle="bodyDefaultRegular">
-                {t('protocol_steps:aspirated')}
+                {t('protocol_steps:mix')}
               </StyledText>
               {volumeTag}
               <StyledText desktopStyle="bodyDefaultRegular">
-                {t('protocol_steps:from')}
+                {t('protocol_steps:in')}
               </StyledText>
               <DeckInfoLabel
                 deckLabel={t('protocol_steps:well_name', {
-                  wellName: source.well,
+                  wellName: source?.well ?? '',
                 })}
               />
             </Flex>
-          ) : null}
-        </Flex>
-      </ListItem>
-      <ListItem type="noActive">
-        <Flex
-          gridGap={SPACING.spacing4}
-          padding={SPACING.spacing12}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          width="100%"
-          alignItems={ALIGN_CENTER}
-        >
-          {ingredIds.length > 0 ? (
-            <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
-              <LiquidIcon color={color} size="medium" />
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {ingredIds.map(groupId => ingredNames[groupId]).join(',')}
-              </StyledText>
-            </Flex>
-          ) : null}
-          {dest != null || trashName != null ? (
-            <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {t('protocol_steps:dispensed')}
-              </StyledText>
-              {volumeTag}
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {t('protocol_steps:into')}
-              </StyledText>
+          </Flex>
+        </ListItem>
+      ) : (
+        <>
+          <ListItem type="noActive">
+            <Flex
+              gridGap={SPACING.spacing4}
+              padding={SPACING.spacing12}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              width="100%"
+              alignItems={ALIGN_CENTER}
+            >
+              {ingredIds.length > 0 ? (
+                <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
+                  <LiquidIcon color={color} size="medium" />
 
-              <DeckInfoLabel
-                deckLabel={
-                  dest?.well != null
-                    ? t('protocol_steps:well_name', {
-                        wellName: dest.well,
-                      })
-                    : t(`shared:${trashName}`)
-                }
-              />
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {ingredIds.map(groupId => ingredNames[groupId]).join(',')}
+                  </StyledText>
+                </Flex>
+              ) : null}
+              {source != null ? (
+                <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('protocol_steps:aspirated')}
+                  </StyledText>
+                  {volumeTag}
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('protocol_steps:from')}
+                  </StyledText>
+                  <DeckInfoLabel
+                    deckLabel={t('protocol_steps:well_name', {
+                      wellName: source.well,
+                    })}
+                  />
+                </Flex>
+              ) : null}
             </Flex>
-          ) : null}
-        </Flex>
-      </ListItem>
+          </ListItem>
+          <ListItem type="noActive">
+            <Flex
+              gridGap={SPACING.spacing4}
+              padding={SPACING.spacing12}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              width="100%"
+              alignItems={ALIGN_CENTER}
+            >
+              {ingredIds.length > 0 ? (
+                <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
+                  <LiquidIcon color={color} size="medium" />
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {ingredIds.map(groupId => ingredNames[groupId]).join(',')}
+                  </StyledText>
+                </Flex>
+              ) : null}
+              {dest != null || trashName != null ? (
+                <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('protocol_steps:dispensed')}
+                  </StyledText>
+                  {volumeTag}
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('protocol_steps:into')}
+                  </StyledText>
+
+                  <DeckInfoLabel
+                    deckLabel={
+                      dest?.well != null
+                        ? t('protocol_steps:well_name', {
+                            wellName: dest.well,
+                          })
+                        : t(`shared:${trashName}`)
+                    }
+                  />
+                </Flex>
+              ) : null}
+            </Flex>
+          </ListItem>
+        </>
+      )}
     </Flex>
   )
 }
