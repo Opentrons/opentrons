@@ -47,6 +47,7 @@ import type { FormModule, FormModules } from '../../step-forms'
 import type { WizardTileProps } from './types'
 
 const MAX_MAGNETIC_BLOCKS = 4
+const MAGNETIC_BLOCKS_ADJUSTMENT = 3
 
 export function SelectModules(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, setValue } = props
@@ -257,7 +258,9 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                         dropdownType: 'neutral' as DropdownBorder,
                         filterOptions: getNumOptions(
                           module.model === 'magneticBlockV1'
-                            ? numSlotsAvailable + 3 + module.count
+                            ? numSlotsAvailable +
+                                MAGNETIC_BLOCKS_ADJUSTMENT +
+                                module.count
                             : numSlotsAvailable + module.count
                         ),
                       }
