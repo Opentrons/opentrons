@@ -197,18 +197,6 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             labware_id=params.labwareId, new_location=available_new_location
         )
 
-        # We might be moving the labware that contains the current well out from
-        # under the pipette. Clear the current location to reflect the fact that the
-        # pipette is no longer over any labware. This is necessary for safe path
-        # planning in case the next movement goes to the same labware (now in a new
-        # place).
-        pipette_location = self._state_view.pipettes.get_current_location()
-        if (
-            isinstance(pipette_location, CurrentWell)
-            and pipette_location.labware_id == params.labwareId
-        ):
-            state_update.clear_all_pipette_locations()
-
         if params.strategy == LabwareMovementStrategy.USING_GRIPPER:
             if self._state_view.config.robot_type == "OT-2 Standard":
                 raise NotSupportedOnRobotType(
