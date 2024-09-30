@@ -1,12 +1,10 @@
 """Helper functions for liquid-level related calculations inside a given frustum."""
-from typing import List, Tuple, Iterator, Sequence, Any, Union, Optional
+from typing import List, Tuple, Any, Optional
 from numpy import pi, iscomplex, roots, real
 from math import isclose
 
 from ..errors.exceptions import InvalidLiquidHeightFound, InvalidWellDefinitionError
 
-# from opentrons_shared_data.labware.types import (
-# )
 from opentrons_shared_data.labware.labware_definition import InnerWellGeometry
 
 
@@ -332,7 +330,6 @@ def _find_volume_in_partial_frustum(
     target_height: float,
 ) -> Optional[float]:
     """Look through a sorted list of frusta for a target height, and find the volume at that height."""
-
     partial_volume: Optional[float] = None
     for segment in sorted_well:
         if segment["bottomHeight"] < target_height < segment["topHeight"]:
@@ -390,7 +387,6 @@ def _find_height_in_partial_frustum(
     target_volume: float,
 ) -> Optional[float]:
     """Look through a sorted list of frusta for a target volume, and find the height at that volume."""
-
     bottom_section_volume = 0.0
     height_within_well: Optional[float] = None
     for section, capacity in zip(sorted_well, volumetric_capacity):

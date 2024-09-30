@@ -13,7 +13,7 @@ from opentrons_shared_data.labware.labware_definition import (
     Group,
     Metadata1,
     WellDefinition,
-    RectangularBoundedSection,
+    RectangularFrustum,
     InnerWellGeometry,
     SphericalSegment,
 )
@@ -690,25 +690,31 @@ def _load_labware_definition_data() -> LabwareDefinition:
         cornerOffsetFromSlot=CornerOffsetFromSlot(x=0, y=0, z=0),
         innerLabwareGeometry={
             "welldefinition1111": InnerWellGeometry(
-                frusta=[
-                    RectangularBoundedSection(
+                sections=[
+                    RectangularFrustum(
                         shape="rectangular",
-                        xDimension=7.6,
-                        yDimension=8.5,
+                        topXDimension=7.6,
+                        topYDimension=8.5,
+                        bottomXDimension=5.6,
+                        bottomYDimension=6.5,
                         topHeight=45,
+                        bottomHeight=20,
                     ),
-                    RectangularBoundedSection(
+                    RectangularFrustum(
                         shape="rectangular",
-                        xDimension=5.6,
-                        yDimension=6.5,
+                        topXDimension=5.6,
+                        topYDimension=6.5,
+                        bottomXDimension=4.5,
+                        bottomYDimension=4.0,
                         topHeight=20,
+                        bottomHeight=10,
+                    ),
+                    SphericalSegment(
+                        shape="spherical",
+                        radiusOfCurvature=6,
+                        topHeight=10,
                     ),
                 ],
-                bottomShape=SphericalSegment(
-                    shape="spherical",
-                    radiusOfCurvature=6,
-                    depth=10,
-                ),
             )
         },
         brand=BrandData(brand="foo"),
