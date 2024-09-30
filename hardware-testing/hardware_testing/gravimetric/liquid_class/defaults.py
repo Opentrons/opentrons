@@ -70,8 +70,8 @@ _default_dispense: Dict[str, DispenseSettings] = {
 }
 _default_volume_correction: Dict[str, str] = {
     _WATER: "1",
-    _GLYCEROL_50: "2",  # FIXME: only exists for P50S right now
-    _ETHANOL_70: "3",  # FIXME: doesn't exist yet
+    _GLYCEROL_50: "1",  # FIXME: only exists for P50S right now
+    _ETHANOL_70: "1",  # FIXME: doesn't exist yet
 }
 
 _defaults: Dict[
