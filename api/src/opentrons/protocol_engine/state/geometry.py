@@ -9,6 +9,7 @@ from functools import cached_property
 from opentrons.types import Point, DeckSlotName, StagingSlotName, MountType
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
+from opentrons_shared_data.labware.labware_definition import InnerWellGeometry
 from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.pipette import PIPETTE_X_SPAN
 from opentrons_shared_data.pipette.types import ChannelCount
@@ -1324,49 +1325,27 @@ class GeometryView:
         self, labware_id: str, well_name: str, initial_height: float, volume: float
     ) -> float:
         """Return the height of liquid in a labware well after a given volume has been handled, given an initial handling height (with reference to the well bottom)."""
-        well_def = self._labware.get_well_definition(labware_id, well_name)
-        well_id = well_def.geometryDefinitionId
-        if well_id is not None:
-            initial_volume = self.get_well_volume_at_height(
-                labware_id=labware_id, well_id=well_id, target_height=initial_height
-            )
-            final_volume = initial_volume + volume
-            return self.get_well_height_at_volume(
-                labware_id=labware_id, well_id=well_id, target_volume=final_volume
-            )
-        else:
-            raise InvalidWellDefinitionError(
-                message=f"No geometryDefinitionId found for well: {well_name} in labware_id: {labware_id}"
-            )
+        well_geometry = self._labware.get_well_geometry(labware_id, well_name)
+        initial_volume = self.get_well_volume_at_height(
+            well_geometry=well_geometry, target_height=initial_height
+        )
+        final_volume = initial_volume + volume
+        return self.get_well_height_at_volume(
+            well_geometry=well_geometry, target_volume=final_volume
+        )
 
     def get_well_volume_at_height(
-        self, labware_id: str, well_id: str, target_height: float
+        self, well_geometry: InnerWellGeometry, target_height: float
     ) -> float:
         """Return the volume of liquid in a labware well at a given liquid height (with reference to the well bottom)."""
-        labware_def = self._labware.get_definition(labware_id)
-        if labware_def.innerLabwareGeometry is None:
-            raise InvalidWellDefinitionError(message="No InnerLabwareGeometry found.")
-        well_geometry = labware_def.innerLabwareGeometry.get(well_id)
-        if well_geometry is None:
-            raise InvalidWellDefinitionError(
-                message=f"No InnerWellGeometry found for well id: {well_id}"
-            )
         return find_volume_at_well_height(
             target_height=target_height, well_geometry=well_geometry
         )
 
     def get_well_height_at_volume(
-        self, labware_id: str, well_id: str, target_volume: float
+        self, well_geometry: InnerWellGeometry, target_volume: float
     ) -> float:
         """Return the height of liquid in a labware well at a given liquid volume."""
-        labware_def = self._labware.get_definition(labware_id)
-        if labware_def.innerLabwareGeometry is None:
-            raise InvalidWellDefinitionError(message="No InnerLabwareGeometry found.")
-        well_geometry = labware_def.innerLabwareGeometry.get(well_id)
-        if well_geometry is None:
-            raise InvalidWellDefinitionError(
-                message=f"No InnerWellGeometry found for well id: {well_id}"
-            )
         return find_height_at_well_volume(
             target_volume=target_volume, well_geometry=well_geometry
         )

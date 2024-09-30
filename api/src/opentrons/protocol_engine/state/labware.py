@@ -18,7 +18,10 @@ from typing import (
 from opentrons.protocol_engine.state import update_types
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
-from opentrons_shared_data.labware.labware_definition import LabwareRole
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareRole,
+    InnerWellGeometry,
+)
 from opentrons_shared_data.pipette.types import LabwareUri
 
 from opentrons.types import DeckSlotName, StagingSlotName, MountType
@@ -461,6 +464,29 @@ class LabwareView(HasState[LabwareState]):
             raise errors.WellDoesNotExistError(
                 f"{well_name} does not exist in {labware_id}."
             ) from e
+
+    def get_well_geometry(
+        self, labware_id: str, well_name: Optional[str] = None
+    ) -> InnerWellGeometry:
+        """Get a well's inner geometry by labware and well name."""
+        labware_def = self.get_definition(labware_id)
+        if labware_def.innerLabwareGeometry is None:
+            raise errors.InvalidWellDefinitionError(
+                message=f"No innerLabwareGeometry found for labware_id: {labware_id}."
+            )
+        well_def = self.get_well_definition(labware_id, well_name)
+        well_id = well_def.geometryDefinitionId
+        if well_id is None:
+            raise errors.InvalidWellDefinitionError(
+                message=f"No geometryDefinitionId found for well: {well_name} in labware_id: {labware_id}"
+            )
+        else:
+            well_geometry = labware_def.innerLabwareGeometry.get(well_id)
+            if well_geometry is None:
+                raise errors.InvalidWellDefinitionError(
+                    message=f"No innerLabwareGeometry found for well_id: {well_id} in labware_id: {labware_id}"
+                )
+            return well_geometry
 
     def get_well_size(
         self, labware_id: str, well_name: str
