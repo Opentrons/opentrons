@@ -3,8 +3,8 @@
 types in this file by and large require the use of typing_extensions.
 this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 """
-from typing import Dict, List, NewType, Union, Optional, Any
-from typing_extensions import Literal, TypedDict, NotRequired, TypeGuard
+from typing import Dict, List, NewType, Union
+from typing_extensions import Literal, TypedDict, NotRequired
 
 
 LabwareUri = NewType("LabwareUri", str)
@@ -128,19 +128,6 @@ class SphericalSegment(TypedDict):
     topHeight: float
 
 
-# class RectangularBoundedSection(TypedDict):
-#     shape: Rectangular
-#     xDimension: float
-#     yDimension: float
-#     topHeight: float
-#
-#
-# class CircularBoundedSection(TypedDict):
-#     shape: Circular
-#     diameter: float
-#     topHeight: float
-
-
 class CircularFrustum(TypedDict):
     shape: Circular
     bottomDiameter: float
@@ -186,7 +173,7 @@ WellSegment = Union[
     RectangularFrustum,
     TruncatedCircularSegment,
     RoundedRectangularSegment,
-    SphericalSegment
+    SphericalSegment,
 ]
 
 
