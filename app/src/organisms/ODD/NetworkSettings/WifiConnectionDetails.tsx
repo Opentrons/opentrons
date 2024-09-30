@@ -18,7 +18,7 @@ import {
 } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
-import { RobotSetupHeader } from '/app/organisms/RobotSetupHeader'
+import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
 import { getLocalRobot } from '/app/redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '/app/redux/networking'
 import { NetworkDetailsModal } from '../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'

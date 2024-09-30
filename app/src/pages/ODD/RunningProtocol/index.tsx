@@ -52,7 +52,7 @@ import {
 import { CancelingRunModal } from '/app/organisms/ODD/RunningProtocol/CancelingRunModal'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol/ConfirmCancelRunModal'
 import { getLocalRobot } from '/app/redux/discovery'
-import { OpenDoorAlertModal } from '/app/organisms/OpenDoorAlertModal'
+import { OpenDoorAlertModal } from '/app/organisms/ODD/OpenDoorAlertModal'
 import {
   useErrorRecoveryFlows,
   ErrorRecoveryFlows,

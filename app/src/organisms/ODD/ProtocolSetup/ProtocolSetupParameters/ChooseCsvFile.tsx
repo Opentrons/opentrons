@@ -19,7 +19,7 @@ import {
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 
 import { getShellUpdateDataFiles } from '/app/redux/shell'
-import { ChildNavigation } from '../../../ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { EmptyFile } from './EmptyFile'
 
 import type {
