@@ -13,6 +13,8 @@ import {
   setCommandIntent,
 } from './utils'
 import { getIsOnDevice } from '/app/redux/config'
+// TODO: refactor this so helper code doesn't spawn UI
+/* eslint-disable-next-line opentrons/no-imports-across-applications */
 import { useMaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 
 import type { CreateCommand } from '@opentrons/shared-data'

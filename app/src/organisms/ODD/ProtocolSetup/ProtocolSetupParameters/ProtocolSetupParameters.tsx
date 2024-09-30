@@ -23,7 +23,7 @@ import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
 } from '/app/transformations/runs'
-import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { ResetValuesModal } from './ResetValuesModal'
 import { ChooseEnum } from './ChooseEnum'
 import { ChooseNumber } from './ChooseNumber'

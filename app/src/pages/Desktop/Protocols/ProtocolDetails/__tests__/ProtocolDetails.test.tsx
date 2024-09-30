@@ -7,7 +7,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getStoredProtocol } from '/app/redux/protocol-storage'
 import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
-import { ProtocolDetails as ProtocolDetailsContents } from '/app/organisms/ProtocolDetails'
+import { ProtocolDetails as ProtocolDetailsContents } from '/app/organisms/Desktop/ProtocolDetails'
 
 import { ProtocolDetails } from '../'
 
@@ -16,7 +16,7 @@ import type { State } from '/app/redux/types'
 const mockProtocolKey = 'protocolKeyStub'
 
 vi.mock('/app/redux/protocol-storage')
-vi.mock('/app/organisms/ProtocolDetails')
+vi.mock('/app/organisms/Desktop/ProtocolDetails')
 
 const MOCK_STATE: State = {
   protocolStorage: {

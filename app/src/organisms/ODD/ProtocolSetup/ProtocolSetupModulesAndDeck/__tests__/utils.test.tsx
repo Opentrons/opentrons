@@ -1,14 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import {
-  TEMPERATURE_MODULE_V2_FIXTURE,
-  getModuleDef2,
-} from '@opentrons/shared-data'
+import { getModuleDef2 } from '@opentrons/shared-data'
 
 import { mockTemperatureModuleGen2 } from '/app/redux/modules/__fixtures__'
-import {
-  getAttachedProtocolModuleMatches,
-  getUnmatchedModulesForProtocol,
-} from '../utils'
+import { getUnmatchedModulesForProtocol } from '../utils'
 
 const temperatureProtocolModule = {
   moduleId: 'mockTempModuleId',
@@ -35,58 +29,6 @@ const magneticProtocolModule = {
   protocolLoadOrder: 0,
   slotName: 'D1',
 }
-
-describe('getAttachedProtocolModuleMatches', () => {
-  it('returns no module matches when no modules attached', () => {
-    const result = getAttachedProtocolModuleMatches(
-      [],
-      [temperatureProtocolModule, magneticProtocolModule],
-      []
-    )
-    expect(result).toEqual([
-      { ...temperatureProtocolModule, attachedModuleMatch: null },
-      { ...magneticProtocolModule, attachedModuleMatch: null },
-    ])
-  })
-
-  it('returns no module matches when no modules match', () => {
-    const result = getAttachedProtocolModuleMatches(
-      [mockTemperatureModuleGen2],
-      [magneticProtocolModule],
-      [
-        {
-          cutoutId: 'cutoutD1',
-          cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
-          opentronsModuleSerialNumber: mockTemperatureModuleGen2.serialNumber,
-        },
-      ]
-    )
-    expect(result).toEqual([
-      { ...magneticProtocolModule, attachedModuleMatch: null },
-    ])
-  })
-
-  it('returns module match when modules match', () => {
-    const result = getAttachedProtocolModuleMatches(
-      [mockTemperatureModuleGen2],
-      [temperatureProtocolModule, magneticProtocolModule],
-      [
-        {
-          cutoutId: 'cutoutD1',
-          cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
-          opentronsModuleSerialNumber: mockTemperatureModuleGen2.serialNumber,
-        },
-      ]
-    )
-    expect(result).toEqual([
-      {
-        ...temperatureProtocolModule,
-        attachedModuleMatch: mockTemperatureModuleGen2,
-      },
-      { ...magneticProtocolModule, attachedModuleMatch: null },
-    ])
-  })
-})
 
 describe('getUnmatchedModulesForProtocol', () => {
   it('returns no missing module ids or remaining attached modules when no modules required or attached', () => {

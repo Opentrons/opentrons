@@ -14,7 +14,7 @@ import {
 } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
-import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { RobotSystemVersionModal } from './RobotSystemVersionModal'
 
 import type { RobotUpdateInfo } from '/app/redux/robot-update/types'

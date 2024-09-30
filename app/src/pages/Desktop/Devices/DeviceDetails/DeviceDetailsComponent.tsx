@@ -10,10 +10,10 @@ import {
 } from '@opentrons/components'
 
 import { DeviceDetailsDeckConfiguration } from '/app/organisms/DeviceDetailsDeckConfiguration'
-import { RobotOverview } from '/app/organisms/Devices/RobotOverview'
-import { InstrumentsAndModules } from '/app/organisms/Devices/InstrumentsAndModules'
-import { RecentProtocolRuns } from '/app/organisms/Devices/RecentProtocolRuns'
-import { EstopBanner } from '/app/organisms/Devices/EstopBanner'
+import { RobotOverview } from '/app/organisms/Desktop/Devices/RobotOverview'
+import { InstrumentsAndModules } from '/app/organisms/Desktop/Devices/InstrumentsAndModules'
+import { RecentProtocolRuns } from '/app/organisms/Desktop/Devices/RecentProtocolRuns'
+import { EstopBanner } from '/app/organisms/Desktop/Devices/EstopBanner'
 import { DISENGAGED, useEstopContext } from '/app/organisms/EmergencyStop'
 import { useIsFlex } from '/app/redux-resources/robots'
 

@@ -448,7 +448,6 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                     text={t('add_pipette')}
                     textAlignment="left"
                     iconName="plus"
-                    size="large"
                   />
                 )}
                 {pipettesByMount.right.pipetteName != null &&
@@ -480,7 +479,6 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                     text={t('add_pipette')}
                     textAlignment="left"
                     iconName="plus"
-                    size="large"
                   />
                 )}
               </Flex>

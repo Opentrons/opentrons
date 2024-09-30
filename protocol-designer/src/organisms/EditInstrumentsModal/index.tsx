@@ -270,7 +270,6 @@ export function EditInstrumentsModal(
                   text={t('add_pipette')}
                   textAlignment="left"
                   iconName="plus"
-                  size="large"
                 />
               )}
               {rightPip != null &&
@@ -305,7 +304,6 @@ export function EditInstrumentsModal(
                   text={t('add_pipette')}
                   textAlignment="left"
                   iconName="plus"
-                  size="large"
                 />
               )}
             </Flex>
@@ -367,7 +365,6 @@ export function EditInstrumentsModal(
                     text={t('protocol_overview:add_gripper')}
                     textAlignment="left"
                     iconName="plus"
-                    size="large"
                   />
                 )}
               </Flex>

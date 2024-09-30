@@ -17,7 +17,7 @@ import {
 } from '@opentrons/components'
 
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
-import { RobotSetupHeader } from '/app/organisms/RobotSetupHeader'
+import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
 import { DisplaySearchNetwork } from './DisplaySearchNetwork'
 
 import type { WifiNetwork } from '/app/redux/networking/types'

@@ -42,7 +42,7 @@ import type { CommandData } from '@opentrons/api-client'
 import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { ProtocolCalibrationStatus } from '/app/resources/runs'
-import type { AttachedProtocolModuleMatch } from './utils'
+import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 

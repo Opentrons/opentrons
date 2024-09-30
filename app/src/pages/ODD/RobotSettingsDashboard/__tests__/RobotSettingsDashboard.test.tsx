@@ -9,7 +9,7 @@ import { getRobotSettings } from '/app/redux/robot-settings'
 import { getLocalRobot } from '/app/redux/discovery'
 import { toggleDevtools, toggleHistoricOffsets } from '/app/redux/config'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
-import { Navigation } from '/app/organisms/Navigation'
+import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
   DeviceReset,
   TouchScreenSleep,
@@ -34,7 +34,7 @@ vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/robot-settings')
 vi.mock('/app/resources/robot-settings')
-vi.mock('/app/organisms/Navigation')
+vi.mock('/app/organisms/ODD/Navigation')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/TouchScreenSleep')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/DeviceReset')

@@ -8,7 +8,7 @@ import { ModuleInfo } from '/app/molecules/ModuleInfo'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { AttachedProtocolModuleMatch } from './utils'
+import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 
 interface ModulesAndDeckMapViewProps {
   attachedProtocolModuleMatches: AttachedProtocolModuleMatch[]

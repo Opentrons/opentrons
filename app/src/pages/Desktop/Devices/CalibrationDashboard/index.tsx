@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import { CalibrationTaskList } from '/app/organisms/CalibrationTaskList'
+import { CalibrationTaskList } from '/app/organisms/Desktop/CalibrationTaskList'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { appShellRequestor } from '/app/redux/shell/remote'
 import { useDashboardCalibrateDeck } from './hooks/useDashboardCalibrateDeck'
@@ -8,7 +8,7 @@ import { useDashboardCalibratePipOffset } from './hooks/useDashboardCalibratePip
 import { useDashboardCalibrateTipLength } from './hooks/useDashboardCalibrateTipLength'
 import { useRobot } from '/app/redux-resources/robots'
 
-import type { DesktopRouteParams } from '../../../../App/types'
+import type { DesktopRouteParams } from '/app/App/types'
 
 export function CalibrationDashboard(): JSX.Element {
   const { robotName } = useParams<

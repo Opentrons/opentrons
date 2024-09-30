@@ -19,11 +19,11 @@ import {
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
-import { ChildNavigation } from '../../../ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { AddFixtureModal } from '../../../DeviceDetailsDeckConfiguration/AddFixtureModal'
 import { DeckConfigurationDiscardChangesModal } from '../../../DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
-import { getTopPortalEl } from '../../../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type {
