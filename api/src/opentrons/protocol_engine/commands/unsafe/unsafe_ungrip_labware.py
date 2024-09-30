@@ -1,11 +1,10 @@
 """Update position estimators payload, result, and implementaiton."""
 
 from __future__ import annotations
-from pydantic import BaseModel, Field
-from typing import TYPE_CHECKING, Optional, List, Type
+from pydantic import BaseModel
+from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from ...types import MotorAxis
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
 from ...resources import ensure_ot3_hardware
@@ -47,9 +46,10 @@ class UnsafeUngripLabwareImplementation(
     async def execute(
         self, params: UnsafeUngripLabwareParams
     ) -> SuccessData[UnsafeUngripLabwareResult, None]:
-        """Ungrip Llabware."""
+        """Ungrip Labware."""
         ot3_hardware_api = ensure_ot3_hardware(self._hardware_api)
-        await ot3_hardware_api.ungrip()
+        if ot3_hardware_api.gripper_jaw_can_home():
+            await ot3_hardware_api.ungrip()
         return SuccessData(public=UnsafeUngripLabwareResult(), private=None)
 
 
