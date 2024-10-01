@@ -23,6 +23,7 @@
   "error_on_robot": "Error on {{robot}}",
   "failed_dispense_step_not_completed": "<block>The failed dispense step will not be completed. The run will continue from the next step with the attached tips.</block><block>Close the robot door before proceeding.</block>",
   "failed_step": "Failed step",
+  "first_is_gripper_holding_labware": "First, is the gripper holding labware?",
   "go_back": "Go back",
   "gripper_errors_occur_when": "Gripper errors occur when the gripper stalls or collides with another object on the deck and are usually caused by improperly placed labware or inaccurate labware offsets",
   "gripper_releasing_labware": "Gripper releasing labware",
