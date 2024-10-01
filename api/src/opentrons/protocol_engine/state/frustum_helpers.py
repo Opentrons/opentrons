@@ -37,20 +37,6 @@ def _reject_unacceptable_heights(
     return valid_heights[0]
 
 
-def get_cross_section_area(bounded_section: Any) -> float:
-    """Find the shape of a cross-section and calculate the area appropriately."""
-    if bounded_section["shape"] == "circular":
-        cross_section_area = cross_section_area_circular(bounded_section["diameter"])
-    elif bounded_section["shape"] == "rectangular":
-        cross_section_area = cross_section_area_rectangular(
-            bounded_section["xDimension"],
-            bounded_section["yDimension"],
-        )
-    else:
-        raise InvalidWellDefinitionError(message="Invalid well volume components.")
-    return cross_section_area
-
-
 def _cross_section_area_circular(diameter: float) -> float:
     """Get the area of a circular cross-section."""
     radius = diameter / 2
