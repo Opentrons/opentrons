@@ -1,3 +1,6 @@
+import { useContext } from 'react'
+import { I18nContext } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
@@ -10,7 +13,6 @@ import {
 } from '@opentrons/components'
 
 import { Divider } from '/app/atoms/structure'
-import { i18n } from '/app/i18n'
 import {
   ClearUnavailableRobots,
   EnableDevTools,
@@ -23,7 +25,9 @@ import {
   UpdatedChannel,
   AdditionalCustomLabwareSourceFolder,
 } from '/app/organisms/Desktop/AdvancedSettings'
-import { useFeatureFlag } from '/app/redux/config'
+import { updateConfigValue, useFeatureFlag } from '/app/redux/config'
+
+import type { Dispatch } from '/app/redux/types'
 
 export function AdvancedSettings(): JSX.Element {
   return (
@@ -57,6 +61,9 @@ export function AdvancedSettings(): JSX.Element {
 
 function LocalizationSetting(): JSX.Element | null {
   const enableLocalization = useFeatureFlag('enableLocalization')
+  const dispatch = useDispatch<Dispatch>()
+
+  const { i18n } = useContext(I18nContext)
 
   return enableLocalization ? (
     <>
@@ -70,7 +77,7 @@ function LocalizationSetting(): JSX.Element | null {
           `}
           value={i18n.language}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            void i18n.changeLanguage(event.currentTarget.value)
+            dispatch(updateConfigValue('language', event.currentTarget.value))
           }}
           options={[
             { name: 'EN', value: 'en' },

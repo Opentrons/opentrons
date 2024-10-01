@@ -31,6 +31,7 @@ import {
   toggleDevInternalFlag,
   toggleDevtools,
   toggleHistoricOffsets,
+  updateConfigValue,
   useFeatureFlag,
 } from '/app/redux/config'
 import { InlineNotification } from '/app/atoms/InlineNotification'
@@ -273,6 +274,7 @@ function FeatureFlags(): JSX.Element {
 
 function LanguageToggle(): JSX.Element | null {
   const enableLocalization = useFeatureFlag('enableLocalization')
+  const dispatch = useDispatch<Dispatch>()
 
   const { i18n } = useContext(I18nContext)
 
@@ -280,9 +282,9 @@ function LanguageToggle(): JSX.Element | null {
     <RobotSettingButton
       settingName={`Change Language: ${i18n.language}`}
       onClick={() => {
-        void (i18n.language === 'en'
-          ? i18n.changeLanguage('zh')
-          : i18n.changeLanguage('en'))
+        i18n.language === 'en'
+          ? dispatch(updateConfigValue('language', 'zh'))
+          : dispatch(updateConfigValue('language', 'en'))
       }}
       rightElement={<></>}
     />
