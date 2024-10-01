@@ -16,7 +16,7 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 import NiceModal from '@ebay/nice-modal-react'
 
 import { SleepScreen } from '/app/atoms/SleepScreen'
-import { OnDeviceLocalizationProvider } from '../LocalizationProvider'
+import { LocalizationProvider } from '../LocalizationProvider'
 import { ToasterOven } from '/app/organisms/ToasterOven'
 import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 import { FirmwareUpdateTakeover } from '/app/organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
@@ -180,7 +180,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   return (
     <ApiHostProvider hostname="127.0.0.1">
       <InitialLoadingScreen>
-        <OnDeviceLocalizationProvider>
+        <LocalizationProvider>
           <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
             <Box width="100%" css="user-select: none;">
               {isIdle ? (
@@ -203,7 +203,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
             </Box>
             <ODDTopLevelRedirects />
           </ErrorBoundary>
-        </OnDeviceLocalizationProvider>
+        </LocalizationProvider>
       </InitialLoadingScreen>
     </ApiHostProvider>
   )

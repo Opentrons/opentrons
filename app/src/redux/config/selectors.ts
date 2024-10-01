@@ -8,6 +8,7 @@ import type {
   ProtocolsOnDeviceSortKey,
   QuickTransfersOnDeviceSortKey,
   OnDeviceDisplaySettings,
+  Language,
 } from './types'
 import type { ProtocolSort } from '/app/redux/protocol-storage'
 
@@ -154,4 +155,9 @@ export const getOnDeviceDisplaySettings: (
 export const getUserId: (state: State) => string = createSelector(
   getConfig,
   config => config?.userInfo.userId ?? ''
+)
+
+export const getLanguage: (state: State) => Language | null = createSelector(
+  getConfig,
+  config => config?.language ?? 'en'
 )
