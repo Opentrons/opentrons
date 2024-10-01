@@ -30,6 +30,7 @@ import {
 import {
   getCurrentFormHasUnsavedChanges,
   getCurrentFormIsPresaved,
+  getSavedStepForms,
   getUnsavedForm,
 } from '../../../../step-forms/selectors'
 import type * as React from 'react'
@@ -53,6 +54,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
     dispatch(steplistActions.deleteStep(stepId))
   }
   const formData = useSelector(getUnsavedForm)
+  const savedStepFormData = useSelector(getSavedStepForms)[stepId]
   const currentFormIsPresaved = useSelector(getCurrentFormIsPresaved)
   const singleEditFormHasUnsavedChanges = useSelector(
     getCurrentFormHasUnsavedChanges
@@ -95,8 +97,9 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
     }
   }
   const isPipetteStep =
-    formData?.stepType === 'moveLiquid' || formData?.stepType === 'mix'
-  const isThermocyclerStep = formData?.stepType === 'thermocycler'
+    savedStepFormData.stepType === 'moveLiquid' ||
+    savedStepFormData.stepType === 'mix'
+  const isThermocyclerStep = savedStepFormData.stepType === 'thermocycler'
 
   return (
     <>
@@ -142,7 +145,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
               dispatch(toggleViewSubstep(stepId))
             }}
           >
-            {t('view_commands')}
+            {t('view_details')}
           </MenuButton>
         ) : null}
         <MenuButton

@@ -20,7 +20,7 @@ interface PipettingSubstepsProps {
 }
 
 export function PipettingSubsteps(props: PipettingSubstepsProps): JSX.Element {
-  const { substeps, selectSubstep, hoveredSubstep } = props
+  const { substeps, selectSubstep, hoveredSubstep, ingredNames } = props
   const stepId = substeps.parentStepId
   const formData = useSelector(getSavedStepForms)[stepId]
   const additionalEquipment = useSelector(getAdditionalEquipment)
@@ -30,51 +30,44 @@ export function PipettingSubsteps(props: PipettingSubstepsProps): JSX.Element {
       ? additionalEquipment[destLocationId]?.name
       : null
 
-  if (substeps.multichannel) {
-    return (
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing4}
-        width="100%"
-      >
-        {substeps.multiRows.map((rowGroup, groupKey) => (
-          <MultichannelSubstep
-            trashName={trashName}
-            key={groupKey}
-            highlighted={
-              !!hoveredSubstep &&
-              hoveredSubstep.stepId === substeps.parentStepId &&
-              hoveredSubstep.substepIndex === groupKey
-            }
-            rowGroup={rowGroup}
-            stepId={substeps.parentStepId}
-            substepIndex={groupKey}
-            selectSubstep={selectSubstep}
-            ingredNames={props.ingredNames}
-          />
-        ))}
-      </Flex>
-    )
-  }
-  return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
-      width="100%"
-    >
-      {substeps.rows.map((row, substepIndex) => (
+  const renderSubsteps = substeps.multichannel
+    ? substeps.multiRows.map((rowGroup, groupKey) => (
+        <MultichannelSubstep
+          trashName={trashName}
+          key={groupKey}
+          highlighted={
+            !!hoveredSubstep &&
+            hoveredSubstep.stepId === substeps.parentStepId &&
+            hoveredSubstep.substepIndex === groupKey
+          }
+          rowGroup={rowGroup}
+          stepId={substeps.parentStepId}
+          substepIndex={groupKey}
+          selectSubstep={selectSubstep}
+          ingredNames={ingredNames}
+        />
+      ))
+    : substeps.rows.map((row, substepIndex) => (
         <Substep
           trashName={trashName}
           key={substepIndex}
           selectSubstep={selectSubstep}
           stepId={substeps.parentStepId}
           substepIndex={substepIndex}
-          ingredNames={props.ingredNames}
+          ingredNames={ingredNames}
           volume={row.volume}
           source={row.source}
           dest={row.dest}
         />
-      ))}
+      ))
+
+  return (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing4}
+      width="100%"
+    >
+      {renderSubsteps}
     </Flex>
   )
 }

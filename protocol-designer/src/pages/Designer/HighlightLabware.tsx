@@ -10,9 +10,9 @@ interface HighlightLabwareProps {
   position: CoordinateTuple
 }
 
-export const HighlightLabware = (
+export function HighlightLabware(
   props: HighlightLabwareProps
-): JSX.Element | null => {
+): JSX.Element | null {
   const { labwareOnDeck, position } = props
   const labwareEntities = useSelector(getLabwareEntities)
   const hoveredLabware = useSelector(getHoveredStepLabware)

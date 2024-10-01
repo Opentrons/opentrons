@@ -30,7 +30,7 @@ import type {
   WellIngredientNames,
 } from '../../../../steplist'
 
-interface SubstepRowProps {
+interface SubstepProps {
   trashName: AdditionalEquipmentName | null
   ingredNames: WellIngredientNames
   stepId: string
@@ -41,7 +41,7 @@ interface SubstepRowProps {
   selectSubstep?: (substepIdentifier: SubstepIdentifier) => void
 }
 
-function SubstepComponent(props: SubstepRowProps): JSX.Element {
+function SubstepComponent(props: SubstepProps): JSX.Element {
   const {
     volume,
     ingredNames,
@@ -53,8 +53,8 @@ function SubstepComponent(props: SubstepRowProps): JSX.Element {
     selectSubstep: propSelectSubstep,
   } = props
   const { t } = useTranslation(['application', 'protocol_steps', 'shared'])
-  const compactedSourcePreIngreds = props.source
-    ? compactPreIngreds(props.source.preIngreds)
+  const compactedSourcePreIngreds = source
+    ? compactPreIngreds(source.preIngreds)
     : {}
 
   const selectSubstep = propSelectSubstep ?? noop
