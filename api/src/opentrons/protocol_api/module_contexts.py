@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Optional, Union, cast
+from typing import List, Dict, Optional, Union, cast
 
+from opentrons.protocol_engine.types import ABSMeasureMode
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.module.types import ModuleModel, ModuleType
 
@@ -976,23 +977,58 @@ class AbsorbanceReaderContext(ModuleContext):
     It should not be instantiated directly; instead, it should be
     created through :py:meth:`.ProtocolContext.load_module`.
 
-    .. versionadded:: 2.18
+    .. versionadded:: 2.21
     """
 
     _core: AbsorbanceReaderCore
 
     @property
-    @requires_version(2, 18)
+    @requires_version(2, 21)
     def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
         return self._core.get_serial_number()
 
-    @requires_version(2, 18)
-    def initialize(self, wavelength: int) -> None:
-        """Initialize the Absorbance Reader by taking zero reading."""
-        self._core.initialize(wavelength)
+    @requires_version(2, 21)
+    def close_lid(self) -> None:
+        """Close the lid of the Absorbance Reader."""
+        self._core.close_lid()
 
-    @requires_version(2, 18)
-    def initiate_read(self) -> None:
-        """Initiate read on the Absorbance Reader."""
-        self._core.initiate_read()
+    @requires_version(2, 21)
+    def open_lid(self) -> None:
+        """Open the lid of the Absorbance Reader."""
+        self._core.open_lid()
+
+    @requires_version(2, 21)
+    def is_lid_on(self) -> bool:
+        """Return ``True`` if the Absorbance Reader's lid is currently closed."""
+        return self._core.is_lid_on()
+
+    @requires_version(2, 21)
+    def initialize(
+        self,
+        mode: ABSMeasureMode,
+        wavelengths: List[int],
+        reference_wavelength: Optional[int] = None,
+    ) -> None:
+        """Take a zero reading on the Absorbance Plate Reader Module.
+
+        :param mode: Either ``"single"`` or ``"multi"``.
+
+             - In single measurement mode, :py:meth:`.AbsorbanceReaderContext.read` uses
+               one sample wavelength and an optional reference wavelength.
+             - In multiple measurement mode, :py:meth:`.AbsorbanceReaderContext.read` uses
+               a list of up to six sample wavelengths.
+        :param wavelengths: A list of wavelengths, in mm, to measure.
+             - Must contain only one item when initializing a single measurement.
+             - Must contain one to six items when initializing a multiple measurement.
+        :param reference_wavelength: An optional reference wavelength, in mm. Cannot be
+             used with multiple measurements.
+        """
+        self._core.initialize(
+            mode, wavelengths, reference_wavelength=reference_wavelength
+        )
+
+    @requires_version(2, 21)
+    def read(self) -> Optional[Dict[int, Dict[str, float]]]:
+        """Initiate read on the Absorbance Reader. Returns a dictionary of wavelengths to dictionary of values ordered by well name."""
+        return self._core.read()

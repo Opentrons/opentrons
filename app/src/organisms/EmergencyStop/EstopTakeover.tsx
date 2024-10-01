@@ -1,12 +1,12 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useEstopQuery } from '@opentrons/react-api-client'
 
 import { EstopPressedModal } from './EstopPressedModal'
 import { EstopMissingModal } from './EstopMissingModal'
 import { useEstopContext } from './hooks'
-import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
-import { getLocalRobot } from '../../redux/discovery'
+import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
+import { getLocalRobot } from '/app/redux/discovery'
 import {
   PHYSICALLY_ENGAGED,
   LOGICALLY_ENGAGED,
@@ -22,11 +22,11 @@ interface EstopTakeoverProps {
 }
 
 export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
-  const [estopEngaged, setEstopEngaged] = React.useState<boolean>(false)
+  const [estopEngaged, setEstopEngaged] = useState<boolean>(false)
   const [
     isWaitingForLogicalDisengage,
     setIsWaitingForLogicalDisengage,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
   const { data: estopStatus } = useEstopQuery({
     refetchInterval: estopEngaged
       ? ESTOP_CURRENTLY_ENGAGED_REFETCH_INTERVAL_MS

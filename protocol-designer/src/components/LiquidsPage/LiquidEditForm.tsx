@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -8,7 +8,7 @@ import {
   Card,
   DeprecatedCheckboxField,
   FormGroup,
-  InputField,
+  LegacyInputField,
   OutlineButton,
   DeprecatedPrimaryButton,
   Flex,
@@ -133,7 +133,7 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
                 control={control}
                 name="name"
                 render={({ field }) => (
-                  <InputField
+                  <LegacyInputField
                     name="name"
                     error={
                       touchedFields.name != null ? errors.name?.message : null
@@ -153,7 +153,7 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
                 control={control}
                 name="description"
                 render={({ field }) => (
-                  <InputField
+                  <LegacyInputField
                     name="description"
                     value={description}
                     onChange={field.onChange}

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
@@ -13,7 +12,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
+import { OddModal } from '/app/molecules/OddModal'
 import type { Subsystem } from '@opentrons/api-client'
 
 interface UpdateInProgressModalProps {
@@ -36,7 +35,7 @@ export function UpdateInProgressModal(
   const { t } = useTranslation('firmware_update')
 
   return (
-    <Modal>
+    <OddModal>
       <Flex
         height="17.25rem"
         width="100%"
@@ -63,6 +62,6 @@ export function UpdateInProgressModal(
           spin
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

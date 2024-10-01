@@ -1,9 +1,10 @@
-import * as React from 'react'
+import type { MutableRefObject } from 'react'
+import { useRef, useCallback } from 'react'
 import last from 'lodash/last'
+
 import head from 'lodash/head'
 
 import { INVALID, RECOVERY_MAP, STEP_ORDER } from '../constants'
-
 import type {
   IRecoveryMap,
   RecoveryRoute,
@@ -11,12 +12,14 @@ import type {
   RouteStep,
 } from '../types'
 import type { UseRecoveryTakeoverResult } from './useRecoveryTakeover'
+import type { UseShowDoorInfoResult } from './useShowDoorInfo'
 
 export interface GetRouteUpdateActionsParams {
   hasLaunchedRecovery: boolean
   toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
   recoveryMap: IRecoveryMap
   setRecoveryMap: (recoveryMap: IRecoveryMap) => void
+  doorStatusUtils: UseShowDoorInfoResult
 }
 
 export interface UseRouteUpdateActionsResult {
@@ -29,23 +32,33 @@ export interface UseRouteUpdateActionsResult {
     route: RecoveryRoute,
     step?: RouteStep
   ) => Promise<void>
-  /* Stashes the current map then sets the current map to robot in motion. Restores the map after motion completes. */
-  setRobotInMotion: (
+  /* Stashes the current map then sets the current map to robot in motion after validating the door is closed.
+  Restores the map after motion completes. */
+  handleMotionRouting: (
     inMotion: boolean,
     movingRoute?: RobotMovingRoute
   ) => Promise<void>
+  /* Contains the recovery map prior to implicit redirection, if any. Example, if the user is on route A, step A, and the
+  app implicitly navigates the user to route Z, step Z, the stashed map will contain route A, step A. */
+  stashedMap: IRecoveryMap | null
+  stashedMapRef: MutableRefObject<IRecoveryMap | null>
 }
 
 // Utilities related to routing within the error recovery flows.
 export function useRouteUpdateActions(
   routeUpdateActionsParams: GetRouteUpdateActionsParams
 ): UseRouteUpdateActionsResult {
-  const { recoveryMap, setRecoveryMap } = routeUpdateActionsParams
+  const {
+    recoveryMap,
+    setRecoveryMap,
+    doorStatusUtils,
+  } = routeUpdateActionsParams
   const { route: currentRoute, step: currentStep } = recoveryMap
-  const { OPTION_SELECTION, ROBOT_IN_MOTION } = RECOVERY_MAP
-  const stashedMapRef = React.useRef<IRecoveryMap | null>(null)
+  const { OPTION_SELECTION, ROBOT_IN_MOTION, ROBOT_DOOR_OPEN } = RECOVERY_MAP
+  const { isDoorOpen } = doorStatusUtils
+  const stashedMapRef = useRef<IRecoveryMap | null>(null)
 
-  const goBackPrevStep = React.useCallback((): Promise<void> => {
+  const goBackPrevStep = useCallback((): Promise<void> => {
     return new Promise((resolve, reject) => {
       const { getPrevStep } = getRecoveryRouteNavigation(currentRoute)
       const updatedStep = getPrevStep(currentStep)
@@ -60,7 +73,7 @@ export function useRouteUpdateActions(
     })
   }, [currentStep, currentRoute, routeUpdateActionsParams])
 
-  const proceedNextStep = React.useCallback((): Promise<void> => {
+  const proceedNextStep = useCallback((): Promise<void> => {
     return new Promise((resolve, reject) => {
       const { getNextStep } = getRecoveryRouteNavigation(currentRoute)
       const updatedStep = getNextStep(currentStep)
@@ -75,7 +88,7 @@ export function useRouteUpdateActions(
     })
   }, [currentStep, currentRoute, routeUpdateActionsParams])
 
-  const proceedToRouteAndStep = React.useCallback(
+  const proceedToRouteAndStep = useCallback(
     (route: RecoveryRoute, step?: RouteStep): Promise<void> => {
       return new Promise((resolve, reject) => {
         const newFlowSteps = STEP_ORDER[route]
@@ -90,7 +103,30 @@ export function useRouteUpdateActions(
     []
   )
 
-  const setRobotInMotion = React.useCallback(
+  // If the door is permitted on the current step, but the robot is about to move, we need to manually redirect users
+  // to the door modal.
+  const checkDoorStatus = useCallback((): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (isDoorOpen) {
+        stashedMapRef.current = { route: currentRoute, step: currentStep }
+
+        setRecoveryMap({
+          route: ROBOT_DOOR_OPEN.ROUTE,
+          step: ROBOT_DOOR_OPEN.STEPS.DOOR_OPEN,
+        })
+
+        reject(
+          new Error(
+            'Cannot perform a command while the door is open. Routing to door open modal.'
+          )
+        )
+      } else {
+        resolve()
+      }
+    })
+  }, [currentRoute, currentStep, isDoorOpen])
+
+  const setRobotInMotion = useCallback(
     (inMotion: boolean, robotMovingRoute?: RobotMovingRoute): Promise<void> => {
       return new Promise((resolve, reject) => {
         if (inMotion) {
@@ -122,11 +158,27 @@ export function useRouteUpdateActions(
     [currentRoute, currentStep]
   )
 
+  const handleMotionRouting = (
+    inMotion: boolean,
+    robotMovingRoute?: RobotMovingRoute
+  ): Promise<void> => {
+    // Only check door status if we are fixin' to move.
+    if (inMotion) {
+      return checkDoorStatus().then(() =>
+        setRobotInMotion(inMotion, robotMovingRoute)
+      )
+    } else {
+      return setRobotInMotion(inMotion, robotMovingRoute)
+    }
+  }
+
   return {
     goBackPrevStep,
     proceedNextStep,
     proceedToRouteAndStep,
-    setRobotInMotion,
+    handleMotionRouting,
+    stashedMap: stashedMapRef.current,
+    stashedMapRef: stashedMapRef,
   }
 }
 
@@ -167,7 +219,7 @@ export function getRecoveryRouteNavigation(
 }
 
 type DetermineRecoveryRoutingParams = GetRouteUpdateActionsParams & {
-  updatedStep: string
+  updatedStep: RouteStep
   currentRoute: RecoveryRoute
 }
 

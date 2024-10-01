@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Opentrons96DeepWellAdapter } from './Opentrons96DeepWellAdapter'
 import { Opentrons96FlatBottomAdapter } from './Opentrons96FlatBottomAdapter'
 import { OpentronsUniversalFlatAdapter } from './OpentronsUniversalFlatAdapter'

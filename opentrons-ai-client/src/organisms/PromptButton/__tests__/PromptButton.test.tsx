@@ -1,4 +1,4 @@
-import React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
 

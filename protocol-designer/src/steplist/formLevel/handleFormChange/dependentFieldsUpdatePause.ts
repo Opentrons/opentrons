@@ -20,7 +20,8 @@ const updatePatchOnPauseTemperatureChange = (
         'pauseTemperature',
         'pauseHour',
         'pauseMinute',
-        'pauseSecond'
+        'pauseSecond',
+        'pauseTime'
       ),
     }
   }

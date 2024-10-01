@@ -9,7 +9,8 @@ from opentrons.protocol_engine import (
     WellOffset,
     DeckPoint,
 )
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.execution import MovementHandler, TipHandler
 from opentrons.types import Point
 
@@ -112,7 +113,21 @@ async def test_drop_tip_implementation(
     result = await subject.execute(params)
 
     assert result == SuccessData(
-        public=DropTipResult(position=DeckPoint(x=111, y=222, z=333)), private=None
+        public=DropTipResult(position=DeckPoint(x=111, y=222, z=333)),
+        private=None,
+        state_update=update_types.StateUpdate(
+            pipette_location=update_types.PipetteLocationUpdate(
+                pipette_id="abc",
+                new_location=update_types.Well(
+                    labware_id="123",
+                    well_name="A3",
+                ),
+                new_deck_point=DeckPoint(x=111, y=222, z=333),
+            ),
+            pipette_tip_state=update_types.PipetteTipStateUpdate(
+                pipette_id="abc", tip_geometry=None
+            ),
+        ),
     )
 
     decoy.verify(
@@ -174,5 +189,19 @@ async def test_drop_tip_with_alternating_locations(
 
     result = await subject.execute(params)
     assert result == SuccessData(
-        public=DropTipResult(position=DeckPoint(x=111, y=222, z=333)), private=None
+        public=DropTipResult(position=DeckPoint(x=111, y=222, z=333)),
+        private=None,
+        state_update=update_types.StateUpdate(
+            pipette_location=update_types.PipetteLocationUpdate(
+                pipette_id="abc",
+                new_location=update_types.Well(
+                    labware_id="123",
+                    well_name="A3",
+                ),
+                new_deck_point=DeckPoint(x=111, y=222, z=333),
+            ),
+            pipette_tip_state=update_types.PipetteTipStateUpdate(
+                pipette_id="abc", tip_geometry=None
+            ),
+        ),
     )

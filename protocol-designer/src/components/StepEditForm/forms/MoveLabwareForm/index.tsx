@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import {
@@ -6,7 +5,7 @@ import {
   Flex,
   FormGroup,
   SPACING,
-  Tooltip,
+  LegacyTooltip,
   TOOLTIP_BOTTOM,
   TOOLTIP_FIXED,
   useHoverTooltip,
@@ -59,9 +58,9 @@ export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
             marginLeft={SPACING.spacing16}
           >
             {!isGripperAttached ? (
-              <Tooltip {...tooltipProps}>
+              <LegacyTooltip {...tooltipProps}>
                 {t('tooltip:step_fields.moveLabware.disabled.gripper_not_used')}
-              </Tooltip>
+              </LegacyTooltip>
             ) : null}
             <div {...targetProps}>
               <FormGroup>

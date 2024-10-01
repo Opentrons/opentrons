@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment } from 'react'
 import { getAllLabwareDefs, getAllPipetteNames } from '@opentrons/shared-data'
 import { LabwareRender } from '../Labware'
 import { RobotWorkSpace } from '../Deck'
@@ -38,13 +38,13 @@ const Template: Story<{
   return (
     <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
       {() => (
-        <React.Fragment>
+        <Fragment>
           <LabwareRender definition={labwareDef} />
           <PipetteRender
             labwareDef={labwareDef}
             pipetteName={args.pipetteName}
           />
-        </React.Fragment>
+        </Fragment>
       )}
     </RobotWorkSpace>
   )

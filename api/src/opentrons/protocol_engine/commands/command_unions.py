@@ -10,9 +10,7 @@ from opentrons.util.get_union_elements import get_union_elements
 from .command import DefinedErrorData
 from .pipetting_common import (
     OverpressureError,
-    OverpressureErrorInternalData,
     LiquidNotFoundError,
-    LiquidNotFoundErrorInternalData,
 )
 
 from . import absorbance_reader
@@ -146,6 +144,7 @@ from .load_pipette import (
 )
 
 from .move_labware import (
+    GripperMovementError,
     MoveLabware,
     MoveLabwareParams,
     MoveLabwareCreate,
@@ -216,7 +215,6 @@ from .pick_up_tip import (
     PickUpTipResult,
     PickUpTipCommandType,
     TipPhysicallyMissingError,
-    TipPhysicallyMissingErrorInternalData,
 )
 
 from .touch_tip import (
@@ -382,8 +380,10 @@ Command = Annotated[
         thermocycler.OpenLid,
         thermocycler.CloseLid,
         thermocycler.RunProfile,
+        absorbance_reader.CloseLid,
+        absorbance_reader.OpenLid,
         absorbance_reader.Initialize,
-        absorbance_reader.MeasureAbsorbance,
+        absorbance_reader.ReadAbsorbance,
         calibration.CalibrateGripper,
         calibration.CalibratePipette,
         calibration.CalibrateModule,
@@ -455,8 +455,10 @@ CommandParams = Union[
     thermocycler.OpenLidParams,
     thermocycler.CloseLidParams,
     thermocycler.RunProfileParams,
+    absorbance_reader.CloseLidParams,
+    absorbance_reader.OpenLidParams,
     absorbance_reader.InitializeParams,
-    absorbance_reader.MeasureAbsorbanceParams,
+    absorbance_reader.ReadAbsorbanceParams,
     calibration.CalibrateGripperParams,
     calibration.CalibratePipetteParams,
     calibration.CalibrateModuleParams,
@@ -526,8 +528,10 @@ CommandType = Union[
     thermocycler.OpenLidCommandType,
     thermocycler.CloseLidCommandType,
     thermocycler.RunProfileCommandType,
+    absorbance_reader.CloseLidCommandType,
+    absorbance_reader.OpenLidCommandType,
     absorbance_reader.InitializeCommandType,
-    absorbance_reader.MeasureAbsorbanceCommandType,
+    absorbance_reader.ReadAbsorbanceCommandType,
     calibration.CalibrateGripperCommandType,
     calibration.CalibratePipetteCommandType,
     calibration.CalibrateModuleCommandType,
@@ -598,8 +602,10 @@ CommandCreate = Annotated[
         thermocycler.OpenLidCreate,
         thermocycler.CloseLidCreate,
         thermocycler.RunProfileCreate,
+        absorbance_reader.CloseLidCreate,
+        absorbance_reader.OpenLidCreate,
         absorbance_reader.InitializeCreate,
-        absorbance_reader.MeasureAbsorbanceCreate,
+        absorbance_reader.ReadAbsorbanceCreate,
         calibration.CalibrateGripperCreate,
         calibration.CalibratePipetteCreate,
         calibration.CalibrateModuleCreate,
@@ -671,8 +677,10 @@ CommandResult = Union[
     thermocycler.OpenLidResult,
     thermocycler.CloseLidResult,
     thermocycler.RunProfileResult,
+    absorbance_reader.CloseLidResult,
+    absorbance_reader.OpenLidResult,
     absorbance_reader.InitializeResult,
-    absorbance_reader.MeasureAbsorbanceResult,
+    absorbance_reader.ReadAbsorbanceResult,
     calibration.CalibrateGripperResult,
     calibration.CalibratePipetteResult,
     calibration.CalibrateModuleResult,
@@ -696,9 +704,10 @@ CommandPrivateResult = Union[
 
 # All `DefinedErrorData`s that implementations will actually return in practice.
 CommandDefinedErrorData = Union[
-    DefinedErrorData[TipPhysicallyMissingError, TipPhysicallyMissingErrorInternalData],
-    DefinedErrorData[OverpressureError, OverpressureErrorInternalData],
-    DefinedErrorData[LiquidNotFoundError, LiquidNotFoundErrorInternalData],
+    DefinedErrorData[TipPhysicallyMissingError],
+    DefinedErrorData[OverpressureError],
+    DefinedErrorData[LiquidNotFoundError],
+    DefinedErrorData[GripperMovementError],
 ]
 
 

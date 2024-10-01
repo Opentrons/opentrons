@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
 import '@testing-library/jest-dom/vitest'
@@ -6,16 +6,16 @@ import '@testing-library/jest-dom/vitest'
 import { screen, fireEvent } from '@testing-library/react'
 import { COLORS, BORDERS } from '@opentrons/components'
 
-import { i18n } from '../../../i18n'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { getIsOnDevice } from '../../../redux/config'
+import { i18n } from '/app/i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { getIsOnDevice } from '/app/redux/config'
 
 import { InterventionModal } from '../'
 
 import type { ModalType } from '../'
-import type { State } from '../../../redux/types'
+import type { State } from '/app/redux/types'
 
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 
 const MOCK_STATE: State = {
   config: {

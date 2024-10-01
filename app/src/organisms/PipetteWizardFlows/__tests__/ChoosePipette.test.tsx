@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
@@ -9,17 +9,17 @@ import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
 
 import { COLORS } from '@opentrons/components'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
-import { getIsOnDevice } from '../../../redux/config'
-import { useAttachedPipettesFromInstrumentsQuery } from '../../Devices/hooks'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
+import { getIsOnDevice } from '/app/redux/config'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { ChoosePipette } from '../ChoosePipette'
 import { getIsGantryEmpty } from '../utils'
 
 vi.mock('../utils')
-vi.mock('../../Devices/hooks')
-vi.mock('../../../redux/config')
+vi.mock('/app/resources/instruments')
+vi.mock('/app/redux/config')
 
 const render = (props: React.ComponentProps<typeof ChoosePipette>) => {
   return renderWithProviders(<ChoosePipette {...props} />, {

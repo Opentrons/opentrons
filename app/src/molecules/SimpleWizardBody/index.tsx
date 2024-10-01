@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 import { SimpleWizardBodyContainer } from './SimpleWizardBodyContainer'
 import { SimpleWizardBodyContent } from './SimpleWizardBodyContent'

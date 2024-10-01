@@ -1,7 +1,7 @@
 """Protocol API module implementation logic."""
 from __future__ import annotations
 
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
 from opentrons.hardware_control.modules.types import (
@@ -16,12 +16,15 @@ from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
-from opentrons.types import DeckSlotName
+
 from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.types import ABSMeasureMode
+from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors.exceptions import (
     LabwareNotLoadedOnModuleError,
     NoMagnetEngageHeightError,
+    CannotPerformModuleAction,
 )
 
 from opentrons.protocols.api_support.types import APIVersion
@@ -523,23 +526,66 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore):
     """Absorbance Reader core logic implementation for Python protocols."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.AbsorbanceReader]
-    _initialized_value: Optional[int] = None
+    _initialized_value: Optional[List[int]] = None
 
-    def initialize(self, wavelength: int) -> None:
+    def initialize(
+        self,
+        mode: ABSMeasureMode,
+        wavelengths: List[int],
+        reference_wavelength: Optional[int] = None,
+    ) -> None:
         """Initialize the Absorbance Reader by taking zero reading."""
+        # TODO: check that the wavelengths are within the supported wavelengths
         self._engine_client.execute_command(
             cmd.absorbance_reader.InitializeParams(
                 moduleId=self.module_id,
-                sampleWavelength=wavelength,
+                measureMode=mode,
+                sampleWavelengths=wavelengths,
+                referenceWavelength=reference_wavelength,
             ),
         )
-        self._initialized_value = wavelength
+        self._initialized_value = wavelengths
 
-    def initiate_read(self) -> None:
-        """Initiate read on the Absorbance Reader."""
+    def read(self) -> Optional[Dict[int, Dict[str, float]]]:
+        """Initiate a read on the Absorbance Reader, and return the results. During Analysis, this will return None."""
         if self._initialized_value:
             self._engine_client.execute_command(
-                cmd.absorbance_reader.MeasureAbsorbanceParams(
-                    moduleId=self.module_id, sampleWavelength=self._initialized_value
-                )
+                cmd.absorbance_reader.ReadAbsorbanceParams(moduleId=self.module_id)
             )
+        if not self._engine_client.state.config.use_virtual_modules:
+            read_result = (
+                self._engine_client.state.modules.get_absorbance_reader_substate(
+                    self.module_id
+                ).data
+            )
+            if read_result is not None:
+                return read_result
+            raise CannotPerformModuleAction(
+                "Absorbance Reader failed to return expected read result."
+            )
+        return None
+
+    def close_lid(
+        self,
+    ) -> None:
+        """Close the Absorbance Reader's lid."""
+        self._engine_client.execute_command(
+            cmd.absorbance_reader.CloseLidParams(
+                moduleId=self.module_id,
+            )
+        )
+
+    def open_lid(self) -> None:
+        """Close the Absorbance Reader's lid."""
+        self._engine_client.execute_command(
+            cmd.absorbance_reader.OpenLidParams(
+                moduleId=self.module_id,
+            )
+        )
+
+    def is_lid_on(self) -> bool:
+        """Returns True if the Absorbance Reader's lid is currently on the Reader slot."""
+        abs_state = self._engine_client.state.modules.get_absorbance_reader_substate(
+            self.module_id
+        )
+        return abs_state.is_lid_on

@@ -8,13 +8,13 @@ import {
   RUN_STATUS_IDLE,
 } from '@opentrons/api-client'
 
-import { useNotifyAllCommandsQuery } from '../../../../resources/runs'
+import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 import { useCurrentlyRecoveringFrom } from '../useCurrentlyRecoveringFrom'
 
 import type { Mock } from 'vitest'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../resources/runs')
+vi.mock('/app/resources/runs')
 vi.mock('react-query')
 
 const MOCK_RUN_ID = 'runId'

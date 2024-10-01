@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -14,7 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { MediumButton } from '../../atoms/buttons'
+import { MediumButton } from '/app/atoms/buttons'
 
 export interface NoUpdateFoundProps {
   onContinue: () => void

@@ -121,13 +121,17 @@ def _wait_until_ready(base_url: str) -> None:
 def _clean_server_state(base_url: str) -> None:
     async def _clean_server_state_async() -> None:
         async with RobotClient.make(base_url=base_url, version="*") as robot_client:
-            # Delete runs first because protocols can't be deleted if a run refers to them.
+            # Delete runs -> protocols -> data_files in that order because
+            # protocols can't be deleted if a run refers to them, and,
+            # data files can't be deleted if runs or protocol analyses refer to them.
             await _delete_all_runs(robot_client)
             await _delete_all_protocols(robot_client)
+            await _delete_all_data_files(robot_client)
 
             await _delete_all_sessions(robot_client)
 
             await _reset_deck_configuration(robot_client)
+            await _reset_error_recovery_settings(robot_client)
 
             await _delete_client_data(robot_client)
 
@@ -150,6 +154,14 @@ async def _delete_all_protocols(robot_client: RobotClient) -> None:
         await robot_client.delete_protocol(protocol_id)
 
 
+async def _delete_all_data_files(robot_client: RobotClient) -> None:
+    """Delete all data files on the robot server."""
+    response = await robot_client.get_data_files()
+    file_ids = [file["id"] for file in response.json()["data"]]
+    for file_id in file_ids:
+        await robot_client.delete_data_file(file_id)
+
+
 async def _delete_all_sessions(robot_client: RobotClient) -> None:
     all_sessions_response = await robot_client.get_sessions()
     session_ids = [s["id"] for s in all_sessions_response.json()["data"]]
@@ -163,3 +175,7 @@ async def _delete_client_data(robot_client: RobotClient) -> None:
 
 async def _reset_deck_configuration(robot_client: RobotClient) -> None:
     await robot_client.post_setting_reset_options({"deckConfiguration": True})
+
+
+async def _reset_error_recovery_settings(robot_client: RobotClient) -> None:
+    await robot_client.delete_error_recovery_settings()

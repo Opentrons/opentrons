@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 import {
   DIRECTION_COLUMN,
@@ -11,7 +11,7 @@ import {
 import { ModuleIcon } from './index'
 
 import type { Story, Meta } from '@storybook/react'
-import type { AttachedModule } from '../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 export default {
   title: 'App/Molecules/ModuleIcon',

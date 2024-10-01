@@ -2,7 +2,7 @@
 
 
 from pathlib import Path
-from typing import Optional
+from typing import Annotated, Optional
 
 import fastapi
 
@@ -30,12 +30,14 @@ _accessor = AppStateAccessor[DeckConfigurationStore]("deck_configuration_store")
 
 
 async def get_deck_configuration_store(
-    app_state: AppState = fastapi.Depends(get_app_state),
-    deck_type: DeckType = fastapi.Depends(get_deck_type),
-    persistence_directory: Path = fastapi.Depends(get_active_persistence_directory),
-    deck_configuration_publisher: DeckConfigurationPublisher = fastapi.Depends(
-        get_deck_configuration_publisher
-    ),
+    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
+    deck_type: Annotated[DeckType, fastapi.Depends(get_deck_type)],
+    persistence_directory: Annotated[
+        Path, fastapi.Depends(get_active_persistence_directory)
+    ],
+    deck_configuration_publisher: Annotated[
+        DeckConfigurationPublisher, fastapi.Depends(get_deck_configuration_publisher)
+    ],
 ) -> DeckConfigurationStore:
     """Return the server's singleton `DeckConfigurationStore`."""
     deck_configuration_store = _accessor.get_from(app_state)
@@ -54,14 +56,14 @@ async def get_deck_configuration_store(
 
 # TODO(mm, 2024-02-07): Resolve the duplication between these two implementations.
 async def get_deck_configuration_store_failsafe(
-    app_state: AppState = fastapi.Depends(get_app_state),
-    deck_type: DeckType = fastapi.Depends(get_deck_type),
-    persistence_directory: Optional[Path] = fastapi.Depends(
-        get_active_persistence_directory_failsafe
-    ),
-    deck_configuration_publisher: DeckConfigurationPublisher = fastapi.Depends(
-        get_deck_configuration_publisher
-    ),
+    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
+    deck_type: Annotated[DeckType, fastapi.Depends(get_deck_type)],
+    persistence_directory: Annotated[
+        Optional[Path], fastapi.Depends(get_active_persistence_directory_failsafe)
+    ],
+    deck_configuration_publisher: Annotated[
+        DeckConfigurationPublisher, fastapi.Depends(get_deck_configuration_publisher)
+    ],
 ) -> Optional[DeckConfigurationStore]:
     """Return the server's singleton `DeckConfigurationStore`.
 

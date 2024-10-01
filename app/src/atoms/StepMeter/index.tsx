@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef } from 'react'
 import { css } from 'styled-components'
 import {
   Box,
@@ -16,7 +16,7 @@ interface StepMeterProps {
 
 export const StepMeter = (props: StepMeterProps): JSX.Element => {
   const { totalSteps, currentStep } = props
-  const prevPercentComplete = React.useRef(0)
+  const prevPercentComplete = useRef(0)
   const progress = currentStep != null ? currentStep : 0
   const percentComplete =
     //    this logic puts a cap at 100% percentComplete which we should never run into

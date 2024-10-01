@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -26,14 +25,14 @@ import {
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 
-import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
-import { InterventionModal as InterventionModalMolecule } from '../../molecules/InterventionModal'
-import { getIsOnDevice } from '../../redux/config'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+import { InterventionModal as InterventionModalMolecule } from '/app/molecules/InterventionModal'
+import { getIsOnDevice } from '/app/redux/config'
 import { PauseInterventionContent } from './PauseInterventionContent'
 import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
 import { isInterventionCommand } from './utils'
-import { useRobotType } from '../Devices/hooks'
+import { useRobotType } from '/app/redux-resources/robots'
 
 import type { IconName } from '@opentrons/components'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
@@ -170,7 +169,7 @@ export function InterventionModal({
   // TODO(bh, 2023-7-18): this is a one-off modal implementation for desktop
   // reimplement when design system shares a modal component between desktop/ODD
   return isOnDevice ? (
-    <Modal
+    <OddModal
       border={`${BORDERS.borderRadius8} ${BORDERS.styleSolid} ${COLORS.blue50}`}
       modalSize="large"
       header={{
@@ -194,7 +193,7 @@ export function InterventionModal({
           buttonType="secondary"
         />
       </Flex>
-    </Modal>
+    </OddModal>
   ) : (
     <InterventionModalMolecule
       iconHeading={<LegacyStyledText as="h1">{headerTitle}</LegacyStyledText>}

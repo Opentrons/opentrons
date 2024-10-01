@@ -1,7 +1,12 @@
 """The liquidProbe and tryLiquidProbe commands."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type, Union
+from typing import TYPE_CHECKING, NamedTuple, Optional, Type, Union
+from typing_extensions import Literal
+
+from pydantic import Field
+
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.errors.exceptions import (
     MustHomeError,
     PipetteNotReadyToAspirateError,
@@ -11,14 +16,10 @@ from opentrons.types import MountType
 from opentrons_shared_data.errors.exceptions import (
     PipetteLiquidNotFoundError,
 )
-from typing_extensions import Literal
-
-from pydantic import Field
 
 from ..types import DeckPoint
 from .pipetting_common import (
     LiquidNotFoundError,
-    LiquidNotFoundErrorInternalData,
     PipetteIdMixin,
     WellLocationMixin,
     DestinationPositionResult,
@@ -36,7 +37,7 @@ from ..errors.error_occurrence import ErrorOccurrence
 if TYPE_CHECKING:
     from ..execution import MovementHandler, PipettingHandler
     from ..resources import ModelUtils
-    from ..state import StateView
+    from ..state.state import StateView
 
 
 LiquidProbeCommandType = Literal["liquidProbe"]
@@ -85,9 +86,85 @@ class TryLiquidProbeResult(DestinationPositionResult):
 
 _LiquidProbeExecuteReturn = Union[
     SuccessData[LiquidProbeResult, None],
-    DefinedErrorData[LiquidNotFoundError, LiquidNotFoundErrorInternalData],
+    DefinedErrorData[LiquidNotFoundError],
 ]
 _TryLiquidProbeExecuteReturn = SuccessData[TryLiquidProbeResult, None]
+
+
+class _ExecuteCommonResult(NamedTuple):
+    # If the probe succeeded, the z_pos that it returned.
+    # Or, if the probe found no liquid, the error representing that,
+    # so calling code can propagate those details up.
+    z_pos_or_error: float | PipetteLiquidNotFoundError
+
+    state_update: update_types.StateUpdate
+    deck_point: DeckPoint
+
+
+async def _execute_common(
+    state_view: StateView,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
+    params: _CommonParams,
+) -> _ExecuteCommonResult:
+    pipette_id = params.pipetteId
+    labware_id = params.labwareId
+    well_name = params.wellName
+
+    state_update = update_types.StateUpdate()
+
+    # May raise TipNotAttachedError.
+    aspirated_volume = state_view.pipettes.get_aspirated_volume(pipette_id)
+
+    if aspirated_volume is None:
+        # Theoretically, we could avoid raising an error by automatically preparing
+        # to aspirate above the well like AspirateImplementation does. However, the
+        # only way for this to happen is if someone tries to do a liquid probe with
+        # a tip that's previously held liquid, which they should avoid anyway.
+        raise PipetteNotReadyToAspirateError(
+            "The pipette cannot probe liquid because of a previous blow out."
+            " The plunger must be reset while the tip is somewhere away from liquid."
+        )
+    elif aspirated_volume != 0:
+        raise TipNotEmptyError(
+            message="The pipette cannot probe for liquid when the tip has liquid in it."
+        )
+
+    if await movement.check_for_valid_position(mount=MountType.LEFT) is False:
+        raise MustHomeError(
+            message="Current position of pipette is invalid. Please home."
+        )
+
+    # liquid_probe process start position
+    position = await movement.move_to_well(
+        pipette_id=pipette_id,
+        labware_id=labware_id,
+        well_name=well_name,
+        well_location=params.wellLocation,
+    )
+    deck_point = DeckPoint.construct(x=position.x, y=position.y, z=position.z)
+    state_update.set_pipette_location(
+        pipette_id=pipette_id,
+        new_labware_id=labware_id,
+        new_well_name=well_name,
+        new_deck_point=deck_point,
+    )
+
+    try:
+        z_pos = await pipetting.liquid_probe_in_place(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=params.wellLocation,
+        )
+    except PipetteLiquidNotFoundError as exception:
+        return _ExecuteCommonResult(
+            z_pos_or_error=exception, state_update=state_update, deck_point=deck_point
+        )
+    else:
+        return _ExecuteCommonResult(
+            z_pos_or_error=z_pos, state_update=state_update, deck_point=deck_point
+        )
 
 
 class LiquidProbeImplementation(
@@ -124,48 +201,10 @@ class LiquidProbeImplementation(
             MustHomeError: as an undefined error, if the plunger is not in a valid
                 position.
         """
-        pipette_id = params.pipetteId
-        labware_id = params.labwareId
-        well_name = params.wellName
-
-        # May raise TipNotAttachedError.
-        aspirated_volume = self._state_view.pipettes.get_aspirated_volume(pipette_id)
-
-        if aspirated_volume is None:
-            # Theoretically, we could avoid raising an error by automatically preparing
-            # to aspirate above the well like AspirateImplementation does. However, the
-            # only way for this to happen is if someone tries to do a liquid probe with
-            # a tip that's previously held liquid, which they should avoid anyway.
-            raise PipetteNotReadyToAspirateError(
-                "The pipette cannot probe liquid because of a previous blow out."
-                " The plunger must be reset while the tip is somewhere away from liquid."
-            )
-        elif aspirated_volume != 0:
-            raise TipNotEmptyError(
-                message="The pipette cannot probe for liquid when the tip has liquid in it."
-            )
-
-        if await self._movement.check_for_valid_position(mount=MountType.LEFT) is False:
-            raise MustHomeError(
-                message="Current position of pipette is invalid. Please home."
-            )
-
-        # liquid_probe process start position
-        position = await self._movement.move_to_well(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
-            well_location=params.wellLocation,
+        z_pos_or_error, state_update, deck_point = await _execute_common(
+            self._state_view, self._movement, self._pipetting, params
         )
-
-        try:
-            z_pos = await self._pipetting.liquid_probe_in_place(
-                pipette_id=pipette_id,
-                labware_id=labware_id,
-                well_name=well_name,
-                well_location=params.wellLocation,
-            )
-        except PipetteLiquidNotFoundError as e:
+        if isinstance(z_pos_or_error, PipetteLiquidNotFoundError):
             return DefinedErrorData(
                 public=LiquidNotFoundError(
                     id=self._model_utils.generate_id(),
@@ -174,21 +213,19 @@ class LiquidProbeImplementation(
                         ErrorOccurrence.from_failed(
                             id=self._model_utils.generate_id(),
                             createdAt=self._model_utils.get_timestamp(),
-                            error=e,
+                            error=z_pos_or_error,
                         )
                     ],
                 ),
-                private=LiquidNotFoundErrorInternalData(
-                    position=DeckPoint(x=position.x, y=position.y, z=position.z)
-                ),
+                state_update=state_update,
             )
         else:
             return SuccessData(
                 public=LiquidProbeResult(
-                    z_position=z_pos,
-                    position=DeckPoint(x=position.x, y=position.y, z=position.z),
+                    z_position=z_pos_or_error, position=deck_point
                 ),
                 private=None,
+                state_update=state_update,
             )
 
 
@@ -202,13 +239,11 @@ class TryLiquidProbeImplementation(
         state_view: StateView,
         movement: MovementHandler,
         pipetting: PipettingHandler,
-        model_utils: ModelUtils,
         **kwargs: object,
     ) -> None:
         self._state_view = state_view
         self._movement = movement
         self._pipetting = pipetting
-        self._model_utils = model_utils
 
     async def execute(self, params: _CommonParams) -> _TryLiquidProbeExecuteReturn:
         """Execute a `tryLiquidProbe` command.
@@ -217,40 +252,23 @@ class TryLiquidProbeImplementation(
         found, `tryLiquidProbe` returns a success result with `z_position=null` instead
         of a defined error.
         """
-        # We defer to the `liquidProbe` implementation. If it returns a defined
-        # `liquidNotFound` error, we remap that to a success result.
-        # Otherwise, we return the result or propagate the exception unchanged.
-
-        original_impl = LiquidProbeImplementation(
-            state_view=self._state_view,
-            movement=self._movement,
-            pipetting=self._pipetting,
-            model_utils=self._model_utils,
+        z_pos_or_error, state_update, deck_point = await _execute_common(
+            self._state_view, self._movement, self._pipetting, params
         )
-        original_result = await original_impl.execute(params)
 
-        match original_result:
-            case DefinedErrorData(
-                public=LiquidNotFoundError(),
-                private=LiquidNotFoundErrorInternalData() as original_private,
-            ):
-                return SuccessData(
-                    public=TryLiquidProbeResult(
-                        z_position=None,
-                        position=original_private.position,
-                    ),
-                    private=None,
-                )
-            case SuccessData(
-                public=LiquidProbeResult() as original_public, private=None
-            ):
-                return SuccessData(
-                    public=TryLiquidProbeResult(
-                        position=original_public.position,
-                        z_position=original_public.z_position,
-                    ),
-                    private=None,
-                )
+        z_pos = (
+            None
+            if isinstance(z_pos_or_error, PipetteLiquidNotFoundError)
+            else z_pos_or_error
+        )
+        return SuccessData(
+            public=TryLiquidProbeResult(
+                z_position=z_pos,
+                position=deck_point,
+            ),
+            private=None,
+            state_update=state_update,
+        )
 
 
 class LiquidProbe(

@@ -137,6 +137,10 @@ class LiquidProbeSettings:
     sensor_threshold_pascals: float
     output_option: OutputOptions
     aspirate_while_sensing: bool
+    z_overlap_between_passes_mm: float
+    plunger_reset_offset: float
+    samples_for_baselining: int
+    sample_time_sec: float
     data_files: Optional[Dict[InstrumentProbeType, str]]
 
 

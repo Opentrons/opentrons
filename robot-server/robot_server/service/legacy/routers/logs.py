@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Query, Response
-from typing import Dict
+from typing import Annotated, Dict
 
 from opentrons.system import log_control
 
@@ -32,13 +32,15 @@ IDENTIFIER_TO_SYSLOG_ID: Dict[LogIdentifier, str] = {
 async def get_logs(
     log_identifier: LogIdentifier,
     response: Response,
-    format: LogFormat = Query(LogFormat.text, title="Log format type"),
-    records: int = Query(
-        log_control.DEFAULT_RECORDS,
-        title="Number of records to retrieve",
-        gt=0,
-        le=log_control.MAX_RECORDS,
-    ),
+    format: Annotated[LogFormat, Query(title="Log format type")] = LogFormat.text,
+    records: Annotated[
+        int,
+        Query(
+            title="Number of records to retrieve",
+            gt=0,
+            le=log_control.MAX_RECORDS,
+        ),
+    ] = log_control.DEFAULT_RECORDS,
 ) -> Response:
     syslog_id = IDENTIFIER_TO_SYSLOG_ID[log_identifier]
     modes = {

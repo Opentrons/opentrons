@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
@@ -11,7 +10,7 @@ import type { IconName } from '../../icons'
 
 export type TagType = 'default' | 'interactive' | 'branded'
 
-interface TagProps {
+export interface TagProps {
   /** Tag content */
   text: string
   /** name constant of the text color and the icon color to display */

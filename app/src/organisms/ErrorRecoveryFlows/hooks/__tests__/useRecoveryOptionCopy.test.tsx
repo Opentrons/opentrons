@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 import { describe, it } from 'vitest'
 import { screen } from '@testing-library/react'
@@ -7,8 +7,8 @@ import { useRecoveryOptionCopy } from '../useRecoveryOptionCopy'
 import { RECOVERY_MAP } from '../../constants'
 
 import type { RecoveryRoute } from '../../types'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 
 function MockRenderCmpt({
   route,
@@ -27,8 +27,8 @@ const render = (props: React.ComponentProps<typeof MockRenderCmpt>) => {
 }
 
 describe('useRecoveryOptionCopy', () => {
-  it(`renders the correct copy for ${RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE}`, () => {
-    render({ route: RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE })
+  it(`renders the correct copy for ${RECOVERY_MAP.RETRY_STEP.ROUTE}`, () => {
+    render({ route: RECOVERY_MAP.RETRY_STEP.ROUTE })
 
     screen.getByText('Retry step')
   })

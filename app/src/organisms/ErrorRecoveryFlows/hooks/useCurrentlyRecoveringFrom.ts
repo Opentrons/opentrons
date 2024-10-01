@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useQueryClient } from 'react-query'
 
 import {
@@ -8,7 +8,7 @@ import {
 } from '@opentrons/api-client'
 import { useCommandQuery, useHost } from '@opentrons/react-api-client'
 
-import { useNotifyAllCommandsQuery } from '../../../resources/runs'
+import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { FailedCommand } from '../types'
@@ -35,7 +35,7 @@ export function useCurrentlyRecoveringFrom(
   const isRunInRecoveryMode = VALID_RECOVERY_FETCH_STATUSES.includes(runStatus)
 
   // Prevent stale data on subsequent recoveries by clearing the query cache at the start of each recovery.
-  React.useEffect(() => {
+  useEffect(() => {
     if (isRunInRecoveryMode) {
       void queryClient.invalidateQueries([host, 'runs', runId])
     }

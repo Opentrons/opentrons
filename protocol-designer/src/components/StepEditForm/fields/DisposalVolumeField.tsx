@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
@@ -71,7 +71,6 @@ export const DisposalVolumeField = (
 
   const disposalOptions = useSelector(uiLabwareSelectors.getDisposalOptions)
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
-  const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const blowoutLocationOptions = getBlowoutLocationOptionsForForm({
     path,
     stepType,
@@ -85,8 +84,7 @@ export const DisposalVolumeField = (
       volume,
       tipRack,
     },
-    pipetteEntities,
-    labwareEntities
+    pipetteEntities
   )
   const disposalDestinationOptions = [
     ...disposalOptions,

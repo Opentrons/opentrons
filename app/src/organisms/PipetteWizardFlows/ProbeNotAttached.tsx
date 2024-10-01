@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
@@ -14,8 +14,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { css } from 'styled-components'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { SmallButton } from '../../atoms/buttons'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
+import { SmallButton } from '/app/atoms/buttons'
 
 interface ProbeNotAttachedProps {
   handleOnClick: () => void
@@ -32,7 +32,7 @@ export const ProbeNotAttached = (
     'branded',
   ])
   const { isOnDevice, handleOnClick, setShowUnableToDetect } = props
-  const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
+  const [numberOfTryAgains, setNumberOfTryAgains] = useState<number>(0)
 
   return (
     <SimpleWizardBody

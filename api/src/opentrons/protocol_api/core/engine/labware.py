@@ -9,7 +9,11 @@ from opentrons_shared_data.labware.types import (
 from opentrons_shared_data.labware.labware_definition import LabwareRole
 
 from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.errors import LabwareNotOnDeckError, ModuleNotOnDeckError
+from opentrons.protocol_engine.errors import (
+    LabwareNotOnDeckError,
+    ModuleNotOnDeckError,
+    LocationIsStagingSlotError,
+)
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.types import (
     LabwareOffsetCreate,
@@ -185,5 +189,9 @@ class LabwareCore(AbstractLabware[WellCore]):
             return self._engine_client.state.geometry.get_ancestor_slot_name(
                 self.labware_id
             )
-        except (LabwareNotOnDeckError, ModuleNotOnDeckError):
+        except (
+            LabwareNotOnDeckError,
+            ModuleNotOnDeckError,
+            LocationIsStagingSlotError,
+        ):
             return None

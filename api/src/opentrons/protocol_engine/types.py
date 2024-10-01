@@ -210,6 +210,7 @@ class WellOrigin(str, Enum):
     TOP = "top"
     BOTTOM = "bottom"
     CENTER = "center"
+    MENISCUS = "meniscus"
 
 
 class DropTipWellOrigin(str, Enum):
@@ -309,6 +310,22 @@ class CurrentWell:
     pipette_id: str
     labware_id: str
     well_name: str
+
+
+class LiquidHeightInfo(BaseModel):
+    """Payload required to store recent measured liquid heights."""
+
+    height: float
+    last_measured: datetime
+
+
+class LiquidHeightSummary(BaseModel):
+    """Payload for liquid state height in StateSummary."""
+
+    labware_id: str
+    well_name: str
+    height: float
+    last_measured: datetime
 
 
 @dataclass(frozen=True)
@@ -797,6 +814,7 @@ class AreaType(Enum):
     TEMPERATURE = "temperatureModule"
     MAGNETICBLOCK = "magneticBlock"
     ABSORBANCE_READER = "absorbanceReader"
+    LID_DOCK = "lidDock"
 
 
 @dataclass(frozen=True)
@@ -1071,3 +1089,6 @@ PrimitiveRunTimeParamValuesType = Mapping[
 
 CSVRunTimeParamFilesType = Mapping[StrictStr, StrictStr]
 CSVRuntimeParamPaths = Dict[str, Path]
+
+
+ABSMeasureMode = Literal["single", "multi"]

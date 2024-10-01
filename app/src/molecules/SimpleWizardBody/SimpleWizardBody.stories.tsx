@@ -1,10 +1,9 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { COLORS, PrimaryButton } from '@opentrons/components'
-import { LegacyModalShell } from '../LegacyModal'
+import { COLORS, PrimaryButton, ModalShell } from '@opentrons/components'
 import { WizardHeader } from '../WizardHeader'
-import { configReducer } from '../../redux/config/reducer'
+import { configReducer } from '/app/redux/config/reducer'
 import { SimpleWizardBody } from './index'
 
 import type { Store, StoreEnhancer } from 'redux'
@@ -28,10 +27,10 @@ const store: Store<any> = createStore(
 
 const Template: Story<React.ComponentProps<typeof SimpleWizardBody>> = args => (
   <Provider store={store}>
-    <LegacyModalShell>
+    <ModalShell>
       <WizardHeader currentStep={3} totalSteps={4} title="Attach a pipette" />
       <SimpleWizardBody {...args} />
-    </LegacyModalShell>
+    </ModalShell>
   </Provider>
 )
 

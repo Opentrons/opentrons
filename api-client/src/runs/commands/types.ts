@@ -5,6 +5,14 @@ export interface GetCommandsParams {
   pageLength: number // the number of items to include
 }
 
+export interface GetRunCommandsParams extends GetCommandsParams {
+  includeFixitCommands?: boolean
+}
+
+export interface GetRunCommandsParamsRequest extends GetCommandsParams {
+  includeFixitCommands: boolean | null
+}
+
 export interface RunCommandErrors {
   data: RunCommandError[]
   meta: GetCommandsParams & { totalLength: number }

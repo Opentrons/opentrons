@@ -96,6 +96,7 @@ def engine_state_summary() -> StateSummary:
         pipettes=[LoadedPipette.construct(id="some-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.construct(id="some-module-id")],  # type: ignore[call-arg]
         liquids=[Liquid(id="some-liquid-id", displayName="liquid", description="desc")],
+        wells=[],
     )
 
 
@@ -493,6 +494,7 @@ async def test_get_all_runs(
         pipettes=[LoadedPipette.construct(id="current-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.construct(id="current-module-id")],  # type: ignore[call-arg]
         liquids=[Liquid(id="some-liquid-id", displayName="liquid", description="desc")],
+        wells=[],
     )
     current_run_time_parameters: List[pe_types.RunTimeParameter] = [
         pe_types.BooleanParameter(
@@ -512,6 +514,7 @@ async def test_get_all_runs(
         pipettes=[LoadedPipette.construct(id="old-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.construct(id="old-module-id")],  # type: ignore[call-arg]
         liquids=[],
+        wells=[],
     )
     historical_run_time_parameters: List[pe_types.RunTimeParameter] = [
         pe_types.BooleanParameter(
@@ -661,11 +664,15 @@ async def test_update_current(
     result = await subject.update(run_id=run_id, current=False)
 
     decoy.verify(
-        await mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
+        mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
         times=1,
     )
     decoy.verify(
-        await mock_runs_publisher.publish_runs_advise_refetch_async(run_id),
+        mock_runs_publisher.publish_runs_advise_refetch(run_id),
+        times=1,
+    )
+    decoy.verify(
+        mock_runs_publisher.publish_runs_advise_refetch(run_id),
         times=1,
     )
     assert result == Run(
@@ -720,7 +727,7 @@ async def test_update_current_noop(
             commands=matchers.Anything(),
             run_time_parameters=matchers.Anything(),
         ),
-        await mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
+        mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
         times=0,
     )
 
@@ -846,9 +853,13 @@ def test_get_commands_slice_from_db(
     )
 
     decoy.when(
-        mock_run_store.get_commands_slice(run_id="run_id", cursor=1, length=2)
+        mock_run_store.get_commands_slice(
+            run_id="run_id", cursor=1, length=2, include_fixit_commands=True
+        )
     ).then_return(expected_command_slice)
-    result = subject.get_commands_slice(run_id="run_id", cursor=1, length=2)
+    result = subject.get_commands_slice(
+        run_id="run_id", cursor=1, length=2, include_fixit_commands=True
+    )
 
     assert expected_command_slice == result
 
@@ -875,11 +886,11 @@ def test_get_commands_slice_current_run(
         commands=expected_commands_result, cursor=1, total_length=3
     )
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("run-id")
-    decoy.when(mock_run_orchestrator_store.get_command_slice(1, 2)).then_return(
+    decoy.when(mock_run_orchestrator_store.get_command_slice(1, 2, True)).then_return(
         expected_command_slice
     )
 
-    result = subject.get_commands_slice("run-id", 1, 2)
+    result = subject.get_commands_slice("run-id", 1, 2, include_fixit_commands=True)
 
     assert expected_command_slice == result
 
@@ -926,10 +937,14 @@ def test_get_commands_slice_from_db_run_not_found(
 ) -> None:
     """Should get a sliced command list from run store."""
     decoy.when(
-        mock_run_store.get_commands_slice(run_id="run-id", cursor=1, length=2)
+        mock_run_store.get_commands_slice(
+            run_id="run-id", cursor=1, length=2, include_fixit_commands=True
+        )
     ).then_raise(RunNotFoundError(run_id="run-id"))
     with pytest.raises(RunNotFoundError):
-        subject.get_commands_slice(run_id="run-id", cursor=1, length=2)
+        subject.get_commands_slice(
+            run_id="run-id", cursor=1, length=2, include_fixit_commands=True
+        )
 
 
 def test_get_current_command(
@@ -1045,9 +1060,9 @@ def test_get_all_commands_as_preserialized_list(
     """It should return the pre-serialized commands list."""
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(None)
     decoy.when(
-        mock_run_store.get_all_commands_as_preserialized_list("run-id")
+        mock_run_store.get_all_commands_as_preserialized_list("run-id", True)
     ).then_return(['{"id": command-1}', '{"id": command-2}'])
-    assert subject.get_all_commands_as_preserialized_list("run-id") == [
+    assert subject.get_all_commands_as_preserialized_list("run-id", True) == [
         '{"id": command-1}',
         '{"id": command-2}',
     ]
@@ -1063,7 +1078,7 @@ def test_get_all_commands_as_preserialized_list_errors_for_active_runs(
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("current-run-id")
     decoy.when(mock_run_orchestrator_store.get_is_run_terminal()).then_return(False)
     with pytest.raises(PreSerializedCommandsNotAvailableError):
-        subject.get_all_commands_as_preserialized_list("current-run-id")
+        subject.get_all_commands_as_preserialized_list("current-run-id", True)
 
 
 async def test_get_current_run_labware_definition(

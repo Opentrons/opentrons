@@ -138,17 +138,23 @@ async def test_register_modules_sort(
     module_4 = decoy.mock(cls=AbstractModule)
     decoy.when(module_4.usb_port).then_return(USBPort(name="x", port_number=2))
 
+    module_5 = decoy.mock(cls=AbstractModule)
+    decoy.when(module_5.usb_port).then_return(USBPort(name="z", port_number=1))
+
     new_mods_at_ports = [ModuleAtPort(port="/dev/foo", name="bar")]
     actual_ports = [
         ModuleAtPort(port="/dev/a", name="magdeck", usb_port=module_1.usb_port),
         ModuleAtPort(port="/dev/b", name="tempdeck", usb_port=module_2.usb_port),
         ModuleAtPort(port="/dev/c", name="thermocycler", usb_port=module_3.usb_port),
         ModuleAtPort(port="/dev/d", name="heatershaker", usb_port=module_4.usb_port),
+        ModuleAtPort(
+            port="/dev/d", name="absorbancereader", usb_port=module_5.usb_port
+        ),
     ]
 
     decoy.when(usb_bus.match_virtual_ports(new_mods_at_ports)).then_return(actual_ports)
 
-    for mod in [module_1, module_2, module_3, module_4]:
+    for mod in [module_1, module_2, module_3, module_4, module_5]:
         decoy.when(
             await build_module(
                 usb_port=mod.usb_port,
@@ -162,4 +168,4 @@ async def test_register_modules_sort(
     await subject.register_modules(new_mods_at_ports=new_mods_at_ports)
     result = subject.available_modules
 
-    assert result == [module_4, module_3, module_2, module_1]
+    assert result == [module_5, module_4, module_3, module_2, module_1]

@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 export function FixedBase(): JSX.Element {
   return (
     <g id="fixedBase">

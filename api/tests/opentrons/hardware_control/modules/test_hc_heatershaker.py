@@ -1,6 +1,8 @@
 import asyncio
 import pytest
 import mock
+from typing import Any, AsyncGenerator
+import typing
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.hardware_control.modules.types import (
     TemperatureStatus,
@@ -12,21 +14,22 @@ from opentrons.drivers.types import HeaterShakerLabwareLatchStatus, Temperature,
 
 
 @pytest.fixture
-def usb_port():
+def usb_port() -> USBPort:
     return USBPort(
         name="",
-        hub=None,
         port_number=0,
         device_path="/dev/ot_module_sim_heatershaker0",
     )
 
 
 @pytest.fixture
-async def simulating_module(usb_port):
+async def simulating_module(
+    usb_port: USBPort,
+) -> AsyncGenerator[modules.AbstractModule, None]:
     module = await modules.build(
         port=usb_port.device_path,
         usb_port=usb_port,
-        type=modules.ModuleType.HEATER_SHAKER,
+        type=modules.ModuleType["HEATER_SHAKER"],
         simulating=True,
         hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
@@ -39,7 +42,9 @@ async def simulating_module(usb_port):
 
 
 @pytest.fixture
-async def simulating_module_driver_patched(simulating_module):
+async def simulating_module_driver_patched(
+    simulating_module: modules.HeaterShaker,
+) -> AsyncGenerator[modules.AbstractModule, None]:
     driver_mock = mock.MagicMock()
     with mock.patch.object(
         simulating_module, "_driver", driver_mock
@@ -47,7 +52,7 @@ async def simulating_module_driver_patched(simulating_module):
         yield simulating_module
 
 
-async def test_sim_state(simulating_module):
+async def test_sim_state(simulating_module: modules.HeaterShaker) -> None:
     assert simulating_module.temperature == 23
     assert simulating_module.speed == 0
     assert simulating_module.target_temperature is None
@@ -62,7 +67,7 @@ async def test_sim_state(simulating_module):
     assert status["version"] == "dummyVersionHS"
 
 
-async def test_sim_update(simulating_module):
+async def test_sim_update(simulating_module: modules.HeaterShaker) -> None:
     await simulating_module.start_set_temperature(10)
     await simulating_module.await_temperature(10)
     assert simulating_module.temperature == 10
@@ -85,7 +90,7 @@ async def test_sim_update(simulating_module):
     assert simulating_module.speed_status == SpeedStatus.IDLE
 
 
-async def test_await_both(simulating_module):
+async def test_await_both(simulating_module: modules.HeaterShaker) -> None:
     await simulating_module.start_set_temperature(10)
     await simulating_module.set_speed(2000)
     await simulating_module.await_temperature(10)
@@ -93,7 +98,7 @@ async def test_await_both(simulating_module):
     assert simulating_module.speed_status == SpeedStatus.HOLDING
 
 
-async def test_labware_latch(simulating_module):
+async def test_labware_latch(simulating_module: modules.HeaterShaker) -> None:
     await simulating_module.open_labware_latch()
     assert (
         await simulating_module._driver.get_labware_latch_status()
@@ -106,7 +111,7 @@ async def test_labware_latch(simulating_module):
     )
 
 
-async def test_initial_live_data(simulating_module):
+async def test_initial_live_data(simulating_module: modules.HeaterShaker) -> None:
     """Should return the simulating module's initial live data."""
     assert simulating_module.live_data == {
         "data": {
@@ -123,7 +128,7 @@ async def test_initial_live_data(simulating_module):
     }
 
 
-async def test_updated_live_data(simulating_module):
+async def test_updated_live_data(simulating_module: modules.HeaterShaker) -> None:
     """Should update live data after module commands."""
     await simulating_module.close_labware_latch()
     await simulating_module.start_set_temperature(50)
@@ -143,7 +148,9 @@ async def test_updated_live_data(simulating_module):
     }
 
 
-async def test_deactivated_updated_live_data(simulating_module):
+async def test_deactivated_updated_live_data(
+    simulating_module: modules.HeaterShaker,
+) -> None:
     """Should update live data after module commands."""
     await simulating_module.close_labware_latch()
     await simulating_module.start_set_temperature(50)
@@ -177,19 +184,24 @@ async def test_deactivated_updated_live_data(simulating_module):
     }
 
 
-async def fake_get_rpm(*args, **kwargs):
+async def fake_get_rpm(*args: Any, **kwargs: Any) -> RPM:
     return RPM(current=500, target=500)
 
 
-async def fake_get_temperature(*args, **kwargs):
+async def fake_get_temperature(*args: Any, **kwargs: Any) -> Temperature:
     return Temperature(current=50, target=50)
 
 
-async def fake_get_latch_status(*args, **kwargs):
+async def fake_get_latch_status(
+    *args: Any, **kwargs: Any
+) -> HeaterShakerLabwareLatchStatus:
     return HeaterShakerLabwareLatchStatus.IDLE_OPEN
 
 
-async def test_async_error_response(simulating_module_driver_patched):
+@typing.no_type_check
+async def test_async_error_response(
+    simulating_module_driver_patched: modules.HeaterShaker,
+) -> None:
     """Test that asynchronous error is detected by poller and module live data and status are updated."""
     # TODO(mc, 2022-10-13): driver is too deep a level to mock in this test
     # mock the reader, instead

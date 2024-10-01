@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Box, POSITION_STICKY, C_SELECTED_DARK } from '@opentrons/components'
 import { StepEditForm } from '../StepEditForm'

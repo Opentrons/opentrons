@@ -2,7 +2,7 @@
 import asyncio
 from logging import getLogger
 from fastapi import Depends
-from typing import Optional, Callable, List, Awaitable, Union
+from typing import Annotated, Optional, Callable, List, Awaitable, Union
 
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -29,7 +29,7 @@ class PublisherNotifier:
         """Extend the list of callbacks with a given list of callbacks."""
         self._callbacks.extend(callbacks)
 
-    async def _initialize(self) -> None:
+    def _initialize(self) -> None:
         """Initializes an instance of PublisherNotifier. This method should only be called once."""
         self._notifier = asyncio.create_task(
             self._wait_for_event(), name="Run publisher notifier"
@@ -61,7 +61,7 @@ _pe_publisher_notifier_accessor: AppStateAccessor[PublisherNotifier] = AppStateA
 
 
 def get_pe_publisher_notifier(
-    app_state: AppState = Depends(get_app_state),
+    app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> PublisherNotifier:
     """Intended for use by various publishers only. Intended for protocol engine."""
     publisher_notifier = _pe_publisher_notifier_accessor.get_from(app_state)
@@ -71,7 +71,7 @@ def get_pe_publisher_notifier(
 
 
 def get_pe_notify_publishers(
-    app_state: AppState = Depends(get_app_state),
+    app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> Callable[[], None]:
     """Provides access to the callback used to notify publishers of changes. Intended for protocol engine."""
     publisher_notifier = _pe_publisher_notifier_accessor.get_from(app_state)
@@ -80,7 +80,7 @@ def get_pe_notify_publishers(
     return publisher_notifier._notify_publishers
 
 
-async def initialize_pe_publisher_notifier(app_state: AppState) -> None:
+def initialize_pe_publisher_notifier(app_state: AppState) -> None:
     """Create a new `NotificationClient` and store it on `app_state`.
 
     Intended to be called just once, when the server starts up.
@@ -90,4 +90,4 @@ async def initialize_pe_publisher_notifier(app_state: AppState) -> None:
     )
     _pe_publisher_notifier_accessor.set_on(app_state, publisher_notifier)
 
-    await publisher_notifier._initialize()
+    publisher_notifier._initialize()

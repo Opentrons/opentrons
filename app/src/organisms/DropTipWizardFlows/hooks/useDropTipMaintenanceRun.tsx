@@ -1,10 +1,10 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 
-import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
 import {
-  useCreateTargetedMaintenanceRunMutation,
   useChainMaintenanceCommands,
-} from '../../../resources/runs'
+  useNotifyCurrentMaintenanceRun,
+} from '/app/resources/maintenance_runs'
+import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 import { buildLoadPipetteCommand } from './useDropTipCommands'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
@@ -20,12 +20,7 @@ export type UseDropTipMaintenanceRunParams = Omit<
   setErrorDetails?: (errorDetails: SetRobotErrorDetailsParams) => void
   instrumentModelSpecs?: PipetteModelSpecs
   mount?: PipetteData['mount']
-  /* Optionally control when a drop tip maintenance run is created. */
-  enabled?: boolean
 }
-
-// TODO(jh, 08-08-24): useDropTipMaintenanceRun is a bit overloaded now that we are using it create maintenance runs
-//  on-the-fly for one-off commands outside of a run. Consider refactoring.
 
 // Manages the maintenance run state if the flow is utilizing "setup" type commands.
 export function useDropTipMaintenanceRun({
@@ -34,14 +29,10 @@ export function useDropTipMaintenanceRun({
   instrumentModelSpecs,
   setErrorDetails,
   closeFlow,
-  enabled,
-}: UseDropTipMaintenanceRunParams): {
-  activeMaintenanceRunId: string | null
-  toggleClientEndRun: () => void
-} {
+}: UseDropTipMaintenanceRunParams): string | null {
   const isMaintenanceRunType = issuedCommandsType === 'setup'
 
-  const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
+  const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = useState<
     string | null
   >(null)
 
@@ -57,25 +48,21 @@ export function useDropTipMaintenanceRun({
     instrumentModelName: instrumentModelSpecs?.name,
     setErrorDetails,
     setCreatedMaintenanceRunId,
-    enabled,
   })
 
-  const toggleClientEndRun = useMonitorMaintenanceRunForDeletion({
+  useMonitorMaintenanceRunForDeletion({
     isMaintenanceRunType,
     activeMaintenanceRunId,
     createdMaintenanceRunId,
     closeFlow,
   })
 
-  return {
-    activeMaintenanceRunId: activeMaintenanceRunId ?? null,
-    toggleClientEndRun,
-  }
+  return activeMaintenanceRunId ?? null
 }
 
 type UseCreateDropTipMaintenanceRunParams = Omit<
   UseDropTipMaintenanceRunParams,
-  'robotType' | 'closeFlow'
+  'robotType' | 'closeFlow' | 'modalStyle'
 > & {
   setCreatedMaintenanceRunId: (id: string) => void
   instrumentModelName?: PipetteModelSpecs['name']
@@ -88,7 +75,6 @@ function useCreateDropTipMaintenanceRun({
   instrumentModelName,
   setErrorDetails,
   setCreatedMaintenanceRunId,
-  enabled,
 }: UseCreateDropTipMaintenanceRunParams): void {
   const { chainRunCommands } = useChainMaintenanceCommands()
 
@@ -115,13 +101,11 @@ function useCreateDropTipMaintenanceRun({
     },
   })
 
-  const isEnabled = enabled ?? true
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       issuedCommandsType === 'setup' &&
       mount != null &&
-      instrumentModelName != null &&
-      isEnabled
+      instrumentModelName != null
     ) {
       createTargetedMaintenanceRun({}).catch((e: Error) => {
         if (setErrorDetails != null) {
@@ -131,18 +115,16 @@ function useCreateDropTipMaintenanceRun({
         }
       })
     } else {
-      if (mount != null || instrumentModelName != null) {
-        console.warn(
-          'Could not create maintenance run due to missing pipette data.'
-        )
-      }
+      console.warn(
+        'Could not create maintenance run due to missing pipette data.'
+      )
     }
-  }, [enabled, mount, instrumentModelName])
+  }, [mount, instrumentModelName])
 }
 
 interface UseMonitorMaintenanceRunForDeletionParams {
   isMaintenanceRunType: boolean
-  closeFlow: (isTakeover?: boolean) => void
+  closeFlow: () => void
   createdMaintenanceRunId: string | null
   activeMaintenanceRunId?: string
 }
@@ -154,17 +136,14 @@ function useMonitorMaintenanceRunForDeletion({
   createdMaintenanceRunId,
   activeMaintenanceRunId,
   closeFlow,
-}: UseMonitorMaintenanceRunForDeletionParams): () => void {
+}: UseMonitorMaintenanceRunForDeletionParams): void {
   const [
     monitorMaintenanceRunForDeletion,
     setMonitorMaintenanceRunForDeletion,
-  ] = React.useState<boolean>(false)
-  const [closedOnce, setClosedOnce] = React.useState<boolean>(false)
-  const [closedByThisClient, setClosedByThisClient] = React.useState<boolean>(
-    false
-  )
+  ] = useState<boolean>(false)
+  const [closedOnce, setClosedOnce] = useState<boolean>(false)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isMaintenanceRunType && !closedOnce) {
       if (
         createdMaintenanceRunId !== null &&
@@ -174,16 +153,11 @@ function useMonitorMaintenanceRunForDeletion({
       }
       if (
         activeMaintenanceRunId !== createdMaintenanceRunId &&
-        monitorMaintenanceRunForDeletion &&
-        !closedByThisClient
+        monitorMaintenanceRunForDeletion
       ) {
-        closeFlow(true)
+        closeFlow()
         setClosedOnce(true)
       }
     }
   }, [isMaintenanceRunType, createdMaintenanceRunId, activeMaintenanceRunId])
-
-  return () => {
-    setClosedByThisClient(!closedByThisClient)
-  }
 }

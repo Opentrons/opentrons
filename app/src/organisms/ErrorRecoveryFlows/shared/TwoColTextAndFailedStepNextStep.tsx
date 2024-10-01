@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 import {
   DIRECTION_COLUMN,
@@ -9,7 +8,7 @@ import {
 } from '@opentrons/components'
 
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
-import { TwoColumn } from '../../../molecules/InterventionModal'
+import { TwoColumn } from '/app/molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { FailedStepNextStep } from './FailedStepNextStep'
 

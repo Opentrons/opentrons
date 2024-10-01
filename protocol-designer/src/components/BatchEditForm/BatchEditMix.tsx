@@ -1,10 +1,9 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Box,
   DeprecatedPrimaryButton,
   OutlineButton,
-  Tooltip,
+  LegacyTooltip,
   useHoverTooltip,
   TOOLTIP_TOP,
   TOOLTIP_FIXED,
@@ -183,9 +182,9 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
             >
               {t('button:discard_changes')}
             </OutlineButton>
-            <Tooltip {...cancelButtonTooltipProps}>
+            <LegacyTooltip {...cancelButtonTooltipProps}>
               {t('tooltip:cancel_batch_edit')}
-            </Tooltip>
+            </LegacyTooltip>
           </Box>
 
           <Box
@@ -199,13 +198,13 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
             >
               {t('button:save')}
             </DeprecatedPrimaryButton>
-            <Tooltip {...saveButtonTooltipProps}>
+            <LegacyTooltip {...saveButtonTooltipProps}>
               {t(
                 `tooltip:save_batch_edit.${
                   disableSave ? 'disabled' : 'enabled'
                 }`
               )}
-            </Tooltip>
+            </LegacyTooltip>
           </Box>
         </Box>
       </Box>

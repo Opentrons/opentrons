@@ -1,8 +1,7 @@
-import * as React from 'react'
 import { css } from 'styled-components'
-import detachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
-import detachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
-import detachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
+import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
+import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
+import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -11,7 +10,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
 import type { ModuleCalibrationWizardStepProps } from './types'
 

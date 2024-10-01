@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import {
   ALIGN_CENTER,
   Box,
@@ -9,9 +9,9 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
+import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 import { MiniCard } from './'
-import { Slideout } from '../../atoms/Slideout'
+import { Slideout } from '/app/atoms/Slideout'
 
 import type { Story, Meta } from '@storybook/react'
 

@@ -5,7 +5,6 @@ import type { UseMutateAsyncFunction } from 'react-query'
 import type { CommandData } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { CreateLiveCommandMutateParams } from '@opentrons/react-api-client/src/runs/useCreateLiveCommandMutation'
-import type { ModulePrepCommandsType } from '../../organisms/Devices/getModulePrepCommands'
 import type { CreateMaintenanceCommand, CreateRunCommand } from './hooks'
 
 export const chainRunCommandsRecursive = (
@@ -51,7 +50,7 @@ export const chainRunCommandsRecursive = (
 }
 
 export const chainLiveCommandsRecursive = (
-  commands: ModulePrepCommandsType[],
+  commands: CreateCommand[],
   createLiveCommand: UseMutateAsyncFunction<
     CommandData,
     unknown,

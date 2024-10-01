@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { ICON_DATA_BY_NAME, VIEWPORT } from '@opentrons/components'
 import { FloatingActionButton } from './'
 

@@ -1,5 +1,5 @@
 // full-width labware details
-import * as React from 'react'
+import { Fragment } from 'react'
 import { getUniqueWellProperties } from '@opentrons/shared-data'
 import {
   getWellLabel,
@@ -62,7 +62,7 @@ export function LabwareDetailsBox(props: LabwareDetailsBoxProps): JSX.Element {
               : ''
 
             return (
-              <React.Fragment key={i}>
+              <Fragment key={i}>
                 {!groupMetadata.displayCategory && irregular && (
                   <>
                     <WellCount
@@ -95,7 +95,7 @@ export function LabwareDetailsBox(props: LabwareDetailsBoxProps): JSX.Element {
                   labelSuffix={groupDisplaySuffix}
                   className={styles.details_table}
                 />
-              </React.Fragment>
+              </Fragment>
             )
           })}
         </div>

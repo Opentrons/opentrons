@@ -10,6 +10,7 @@ import requests
 from typing import Any, Tuple
 import sys
 import json
+from abr_testing.tools import plate_reader
 
 
 def get_protocol_step_as_int(
@@ -141,14 +142,20 @@ def get_most_recent_run_and_record(
             )
     # Record run to google sheets.
     print(most_recent_run_id)
-
+    # Read Hellma Files
+    hellma_file_values = plate_reader.read_hellma_plate_files(storage_directory, 101934)
     (
         runs_and_robots,
         headers,
         runs_and_lpc,
         headers_lpc,
     ) = abr_google_drive.create_data_dictionary(
-        most_recent_run_id, storage_directory, "", labware, accuracy
+        most_recent_run_id,
+        storage_directory,
+        "",
+        labware,
+        accuracy,
+        hellma_plate_standards=hellma_file_values,
     )
     google_sheet_abr_data = google_sheets_tool.google_sheet(
         credentials_path, "ABR-run-data", tab_number=0

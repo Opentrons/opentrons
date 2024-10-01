@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
 import {
@@ -7,9 +6,9 @@ import {
   SPACING,
   LegacyStyledText,
 } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { SmallButton } from '/app/atoms/buttons'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { getPipetteAnimations96 } from './utils'
 import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
 

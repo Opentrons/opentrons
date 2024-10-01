@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 import { useFormContext } from 'react-hook-form'
@@ -18,7 +18,11 @@ import { SendButton } from '../../atoms/SendButton'
 import { chatDataAtom, chatHistoryAtom, tokenAtom } from '../../resources/atoms'
 import { useApiCall } from '../../resources/hooks'
 import { calcTextAreaHeight } from '../../resources/utils/utils'
-import { STAGING_END_POINT, PROD_END_POINT } from '../../resources/constants'
+import {
+  STAGING_END_POINT,
+  PROD_END_POINT,
+  LOCAL_END_POINT,
+} from '../../resources/constants'
 
 import type { AxiosRequestConfig } from 'axios'
 import type { ChatData } from '../../resources/types'
@@ -29,7 +33,7 @@ export function InputPrompt(): JSX.Element {
   const [, setChatData] = useAtom(chatDataAtom)
   const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom)
   const [token] = useAtom(tokenAtom)
-  const [submitted, setSubmitted] = React.useState<boolean>(false)
+  const [submitted, setSubmitted] = useState<boolean>(false)
   const userPrompt = watch('userPrompt') ?? ''
   const { data, isLoading, callApi } = useApiCall()
 
@@ -47,11 +51,21 @@ export function InputPrompt(): JSX.Element {
         'Content-Type': 'application/json',
       }
 
+      const getEndpoint = (): string => {
+        switch (process.env.NODE_ENV) {
+          case 'production':
+            return PROD_END_POINT
+          case 'development':
+            return LOCAL_END_POINT
+          default:
+            return STAGING_END_POINT
+        }
+      }
+
+      const url = getEndpoint()
+
       const config = {
-        url:
-          process.env.NODE_ENV === 'production'
-            ? PROD_END_POINT
-            : STAGING_END_POINT,
+        url,
         method: 'POST',
         headers,
         data: {
@@ -72,7 +86,7 @@ export function InputPrompt(): JSX.Element {
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (submitted && data != null && !isLoading) {
       const { role, reply } = data as ChatData
       const assistantResponse: ChatData = {

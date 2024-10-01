@@ -1,11 +1,10 @@
-import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
-import { Box, POSITION_FIXED } from '@opentrons/components'
+import { Box, CURSOR_WAIT, POSITION_FIXED } from '@opentrons/components'
 import * as fileDataSelectors from '../file-data/selectors'
 
 const waitCursorStyle = css`
-  cursor: wait;
+  cursor: ${CURSOR_WAIT};
 `
 
 export const ComputingSpinner = (): JSX.Element | null => {

@@ -1,7 +1,7 @@
 import functools
 import logging
 from dataclasses import dataclass
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple, Type
 
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
@@ -27,7 +27,7 @@ class LabwareHeightError(Exception):
     pass
 
 
-def max_many(*args):
+def max_many(*args: float) -> float:
     return functools.reduce(max, args[1:], args[0])
 
 
@@ -76,7 +76,7 @@ class MoveConstraints:
     minimum_z_height: float = 0.0
 
     @classmethod
-    def build(cls, **kwargs):
+    def build(cls: Type["MoveConstraints"], **kwargs: Any) -> "MoveConstraints":
         return cls(**{k: v for k, v in kwargs.items() if v is not None})
 
 
@@ -103,10 +103,10 @@ def safe_height(
     to_loc: types.Location,
     deck: Deck,
     instr_max_height: float,
-    well_z_margin: float = None,
-    lw_z_margin: float = None,
-    minimum_lw_z_margin: float = None,
-    minimum_z_height: float = None,
+    well_z_margin: Optional[float] = None,
+    lw_z_margin: Optional[float] = None,
+    minimum_lw_z_margin: Optional[float] = None,
+    minimum_z_height: Optional[float] = None,
 ) -> float:
     """
     Derive the height required to clear the current deck setup along
@@ -147,7 +147,7 @@ def _build_safe_height(
     from_point = from_loc.point
     from_lw, from_well = from_loc.labware.get_parent_labware_and_well()
 
-    if to_lw and to_lw == from_lw:
+    if to_lw and from_lw and to_lw == from_lw:
         # If we know the labwares we’re moving from and to, we can calculate
         # a safe z based on their heights
         if to_well:
@@ -206,11 +206,11 @@ def plan_moves(
     to_loc: types.Location,
     deck: Deck,
     instr_max_height: float,
-    well_z_margin: float = None,
-    lw_z_margin: float = None,
+    well_z_margin: Optional[float] = None,
+    lw_z_margin: Optional[float] = None,
     force_direct: bool = False,
-    minimum_lw_z_margin: float = None,
-    minimum_z_height: float = None,
+    minimum_lw_z_margin: Optional[float] = None,
+    minimum_z_height: Optional[float] = None,
     use_experimental_waypoint_planning: bool = False,
 ) -> List[Tuple[types.Point, Optional[CriticalPoint]]]:
     """Plan moves between one :py:class:`.Location` and another.

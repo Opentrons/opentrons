@@ -16,7 +16,7 @@ from ..types import (
     CurrentWell,
     AddressableOffsetVector,
 )
-from ..state import StateStore
+from ..state.state import StateStore
 from ..resources import ModelUtils
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
 from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
@@ -151,6 +151,7 @@ class MovementHandler:
         speed: Optional[float] = None,
         stay_at_highest_possible_z: bool = False,
         ignore_tip_configuration: Optional[bool] = True,
+        highest_possible_z_extra_offset: Optional[float] = None,
     ) -> Point:
         """Move to a specific addressable area."""
         # Check for presence of heater shakers on deck, and if planned
@@ -201,6 +202,7 @@ class MovementHandler:
             minimum_z_height=minimum_z_height,
             stay_at_max_travel_z=stay_at_highest_possible_z,
             ignore_tip_configuration=ignore_tip_configuration,
+            max_travel_z_extra_margin=highest_possible_z_extra_offset,
         )
 
         speed = self._state_store.pipettes.get_movement_speed(

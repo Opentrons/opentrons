@@ -116,6 +116,4 @@ class RunController:
             commands=result.commands,
             run_time_parameters=result.parameters,
         )
-        await self._runs_publisher.publish_pre_serialized_commands_notification(
-            self._run_id
-        )
+        self._runs_publisher.publish_pre_serialized_commands_notification(self._run_id)
