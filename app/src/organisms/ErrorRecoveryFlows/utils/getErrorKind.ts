@@ -2,7 +2,6 @@ import { ERROR_KINDS, DEFINED_ERROR_TYPES } from '../constants'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { ErrorKind } from '../types'
-import { ERROR } from '/app/redux/robot-update'
 
 /**
  * Given server-side information about a failed command,
@@ -40,7 +39,7 @@ export function getErrorKind(failedCommand: RunTimeCommand | null): ErrorKind {
     // TODO(jh 09-25-24): Update the error to match what the server actually sends when available.
     else if (
       commandType === 'moveLabware' &&
-      errorType === DEFINED_ERROR_TYPES.GRIPPER_PLACEHOLDER_ERROR
+      errorType === DEFINED_ERROR_TYPES.GRIPPER_MOVEMENT
     ) {
       return ERROR_KINDS.GRIPPER_ERROR
     }

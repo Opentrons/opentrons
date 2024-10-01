@@ -1,8 +1,10 @@
 {
+  "add_details": "Add step details",
   "change_tips": "Change tips",
   "default_tip_option": "Default - get next tip",
   "delete": "Delete step",
   "duplicate": "Duplicate step",
+  "edit_step": "Edit step",
   "final_deck_state": "Final deck state",
   "heater_shaker_settings": "Heater-shaker settings",
   "module": "Module",

@@ -5,11 +5,7 @@ import { useRecoveryCommands } from './useRecoveryCommands'
 import { useRecoveryTipStatus } from './useRecoveryTipStatus'
 import { useRecoveryRouting } from './useRecoveryRouting'
 import { useFailedLabwareUtils } from './useFailedLabwareUtils'
-import {
-  getFailedCommandPipetteInfo,
-  getNextSteps,
-  cleanupRecoveryState,
-} from '../utils'
+import { getFailedCommandPipetteInfo, getNextSteps } from '../utils'
 import { useDeckMapUtils } from './useDeckMapUtils'
 import {
   useNotifyAllCommandsQuery,
@@ -21,6 +17,7 @@ import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 import { useRecoveryToasts } from './useRecoveryToasts'
 import { useRecoveryAnalytics } from '/app/redux-resources/analytics'
 import { useShowDoorInfo } from './useShowDoorInfo'
+import { useCleanupRecoveryState } from './useCleanupRecoveryState'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
@@ -177,7 +174,7 @@ export function useERUtils({
     SUBSEQUENT_COMMAND_DEPTH
   )
 
-  cleanupRecoveryState({
+  useCleanupRecoveryState({
     isTakeover: showTakeover,
     setRM,
     stashedMapRef: routeUpdateActions.stashedMapRef,

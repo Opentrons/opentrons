@@ -3,6 +3,7 @@
 Summary of changes from schema 6:
 
 - Adds a new command_intent to store the commands intent in the commands table
+- Adds the `boolean_setting` table.
 """
 
 import json
