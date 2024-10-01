@@ -63,7 +63,6 @@ describe('StepOverflowMenu', () => {
     fireEvent.click(screen.getByText('Edit step'))
     expect(mockConfirm).toHaveBeenCalled()
     fireEvent.click(screen.getByText('View commands'))
-    fireEvent.click(screen.getByText('View step details'))
-    //  TODO: wire up view commands and view step details
+    //  TODO: wire up view commands
   })
 })

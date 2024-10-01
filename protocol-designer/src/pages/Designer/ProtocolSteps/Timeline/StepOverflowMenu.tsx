@@ -137,14 +137,6 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
           {t('view_commands')}
         </MenuButton>
         <MenuButton
-          disabled={formData != null}
-          onClick={() => {
-            console.log('wire this up')
-          }}
-        >
-          {t('view_details')}
-        </MenuButton>
-        <MenuButton
           onClick={() => {
             duplicateStep(stepId)
           }}
