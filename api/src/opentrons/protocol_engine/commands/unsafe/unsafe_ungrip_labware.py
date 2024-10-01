@@ -1,4 +1,4 @@
-"""Update position estimators payload, result, and implementaiton."""
+"""Ungrip labware payload, result, and implementaiton."""
 
 from __future__ import annotations
 from pydantic import BaseModel

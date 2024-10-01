@@ -740,8 +740,11 @@ class CommandView(HasState[CommandState]):
         next_fixit_cmd = self._state.command_history.get_fixit_queue_ids().head(None)
         if next_fixit_cmd and (
             self._state.queue_status == QueueStatus.AWAITING_RECOVERY
-            or self._state.queue_status == QueueStatus.PAUSED
-            and self.state.is_door_blocking
+            or self.get_status()
+            in [
+                EngineStatus.BLOCKED_BY_OPEN_DOOR,
+                EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+            ]
             and self.get(next_fixit_cmd).commandType == "unsafe/ungripLabware"
         ):
             return next_fixit_cmd

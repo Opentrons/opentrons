@@ -557,6 +557,85 @@ def test_door_during_error_recovery() -> None:
     assert subject.state.failed_command_errors == [expected_error_occurance]
 
 
+def test_door_ungrip_labware() -> None:
+    """Test behavior when the door is opened during error recovery ungrip."""
+    subject = CommandStore(
+        is_door_open=False,
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        config=Config(
+            block_on_door_open=True,
+            # Choice of robot and deck type are arbitrary.
+            robot_type="OT-2 Standard",
+            deck_type=DeckType.OT2_STANDARD,
+        ),
+    )
+    subject_view = CommandView(subject.state)
+
+    # Fail a command to put the subject in recovery mode.
+    queue_1 = actions.QueueCommandAction(
+        request=commands.CommentCreate(
+            params=commands.CommentParams(message=""), key="command-key-1"
+        ),
+        request_hash=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id-1",
+    )
+    subject.handle_action(queue_1)
+    run_1 = actions.RunCommandAction(
+        command_id="command-id-1",
+        started_at=datetime(year=2022, month=2, day=2),
+    )
+    subject.handle_action(run_1)
+    expected_error = errors.ProtocolEngineError(message="oh no")
+    expected_error_occurance = errors.ErrorOccurrence(
+        id="error-id",
+        errorType="ProtocolEngineError",
+        createdAt=datetime(year=2023, month=3, day=3),
+        detail="oh no",
+        errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+    )
+    fail_1 = actions.FailCommandAction(
+        command_id="command-id-1",
+        running_command=subject_view.get("command-id-1"),
+        error_id="error-id",
+        failed_at=datetime(year=2023, month=3, day=3),
+        error=expected_error,
+        notes=[],
+        type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+    )
+    subject.handle_action(fail_1)
+
+    queue_2 = actions.QueueCommandAction(
+        request=commands.unsafe.UnsafeUngripLabwareCreate(
+            params=commands.unsafe.UnsafeUngripLabwareParams(),
+            intent=CommandIntent.FIXIT,
+        ),
+        request_hash=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id-2",
+    )
+    subject.handle_action(queue_2)
+    assert subject_view.get_status() == EngineStatus.AWAITING_RECOVERY
+    assert subject_view.get_next_to_execute() == "command-id-2"
+
+    # Test state after we open the door:
+    subject.handle_action(actions.DoorChangeAction(DoorState.OPEN))
+    assert (
+        subject_view.get_status() == EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR
+    )
+    assert subject_view.get_next_to_execute() == "command-id-2"
+    play = actions.PlayAction(requested_at=datetime.now())
+    action = subject_view.validate_action_allowed(play)
+
+    assert action == play
+
+    # Test state when we resume recovery mode:
+    subject.handle_action(play)
+    assert subject_view.get_status() == EngineStatus.AWAITING_RECOVERY
+    assert subject_view.get_next_to_execute() == "command-id-2"
+    assert subject.state.failed_command_errors == [expected_error_occurance]
+
+
 @pytest.mark.parametrize(
     ("door_initially_open", "expected_engine_status_after_play"),
     [
