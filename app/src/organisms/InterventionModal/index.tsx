@@ -83,6 +83,7 @@ export function useInterventionModal({
     runData != null &&
     runStatus != null &&
     !TERMINAL_RUN_STATUSES.includes(runStatus)
+  const { t } = useTranslation('run_details')
 
   if (!isValidIntervention) {
     return { showModal: false, modalProps: null }
@@ -101,13 +102,13 @@ export function useInterventionModal({
             width="100%"
             css={css`
               @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-                min-height: 60px;
+                min-height: ${SPACING.spacing60};
               }
             `}
           >
             <InlineNotification
               type="neutral"
-              heading="Close the robot door to resume"
+              heading={t('close_robot_door_to_resume')}
             />
           </Flex>
         ) : undefined,
