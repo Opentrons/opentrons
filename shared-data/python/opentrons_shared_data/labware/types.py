@@ -5,7 +5,7 @@ this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 """
 from typing import Dict, List, NewType, Union
 from typing_extensions import Literal, TypedDict, NotRequired
-
+from .labware_definition import WellSegment as WellSegmentDef
 
 LabwareUri = NewType("LabwareUri", str)
 
@@ -176,9 +176,20 @@ WellSegment = Union[
     SphericalSegment,
 ]
 
+@staticmethod
+def ToWellSegmentDict(segment: Union[WellSegment,WellSegmentDef]) -> WellSegment:
+    if isinstance(segment, WellSegmentDef):
+        return typing.cast(WellSegment, segment.model_dump(exclude_none=True, exclude_unset=True))
+    return segment
+
 
 class InnerWellGeometry(TypedDict):
     sections: List[WellSegment]
+
+@staticmethod
+def ToInnerWellGeometryDict(inner_well_geometry: Union[InnerWellGeometry,InnerWellGeometryDef]) -> InnerWellGeometry:
+    return InnerWellGeometry([ToWellSegmentDict(section) for section in inner_well_geometry["sections"]])
+
 
 
 class LabwareDefinition(TypedDict):
