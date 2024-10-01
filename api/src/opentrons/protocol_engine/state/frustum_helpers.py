@@ -230,39 +230,39 @@ def get_well_volumetric_capacity(
 
     for segment in sorted_well:
         section_volume: Optional[float] = None
-        if segment.shape == "spherical":
+        if segment["shape"] == "spherical":
             if sorted_well[0] != segment:
                 raise InvalidWellDefinitionError(
                     "spherical segment must only be at the bottom of a well."
                 )
-                target_height=segment.topHeight,
-                radius_of_curvature=segment.radiusOfCurvature,
             section_volume = _volume_from_height_spherical(
+                target_height=segment["topHeight"],
+                radius_of_curvature=segment["radiusOfCurvature"],
             )
-        elif segment.shape == "rectangular":
-            section_height = segment.topHeight - segment.bottomHeight
+        elif segment["shape"] == "rectangular":
+            section_height = segment["topHeight"] - segment["bottomHeight"]
             section_volume = _volume_from_height_rectangular(
                 target_height=section_height,
-                bottom_length=segment.bottomYDimension,
-                bottom_width=segment.bottomXDimension,
-                top_length=segment.topYDimension,
-                top_width=segment.topXDimension,
+                bottom_length=segment["bottomYDimension"],
+                bottom_width=segment["bottomXDimension"],
+                top_length=segment["topYDimension"],
+                top_width=segment["topXDimension"],
                 total_frustum_height=section_height,
             )
-        elif segment.shape == "circular":
-            section_height = segment.topHeight - segment.bottomHeight
+        elif segment["shape"] == "circular":
+            section_height = segment["topHeight"] - segment["bottomHeight"]
             section_volume = _volume_from_height_circular(
                 target_height=section_height,
                 total_frustum_height=section_height,
-                bottom_radius=(segment.bottomDiameter / 2),
-                top_radius=(segment.topDiameter / 2),
+                bottom_radius=(segment["bottomDiameter"] / 2),
+                top_radius=(segment["topDiameter"] / 2),
             )
         # TODO: implement volume calculations for truncated circular and rounded rectangular segments
         if not section_volume:
             raise NotImplementedError(
-                f"volume calculation for shape: {segment.shape} not yet implemented."
+                f"volume calculation for shape: {segment['shape']} not yet implemented."
             )
-        well_volume.append((segment.topHeight, section_volume))
+        well_volume.append((segment["topHeight"], section_volume))
     return well_volume
 
 

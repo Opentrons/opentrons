@@ -53,7 +53,12 @@ def fake_frusta() -> List[List[Any]]:
                 topHeight=1.0,
                 bottomHeight=1.0,
             ),
-            SphericalSegment(shape="spherical", radiusOfCurvature=4.0, topHeight=1.0),
+            SphericalSegment(
+                shape="spherical",
+                radiusOfCurvature=4.0,
+                topHeight=1.0,
+                bottomHeight=0.0,
+            ),
         ]
     )
     frusta.append(
@@ -112,11 +117,23 @@ def fake_frusta() -> List[List[Any]]:
                 topHeight=3.0,
                 bottomHeight=2.0,
             ),
-            SphericalSegment(shape="spherical", radiusOfCurvature=3.5, topHeight=2.0),
+            SphericalSegment(
+                shape="spherical",
+                radiusOfCurvature=3.5,
+                topHeight=2.0,
+                bottomHeight=0.0,
+            ),
         ]
     )
     frusta.append(
-        [SphericalSegment(shape="spherical", radiusOfCurvature=4.0, topHeight=3.0)]
+        [
+            SphericalSegment(
+                shape="spherical",
+                radiusOfCurvature=4.0,
+                topHeight=3.0,
+                bottomHeight=0.0,
+            )
+        ]
     )
     frusta.append(
         [
@@ -129,7 +146,12 @@ def fake_frusta() -> List[List[Any]]:
                 topHeight=3.5,
                 bottomHeight=1.5,
             ),
-            SphericalSegment(shape="spherical", radiusOfCurvature=4.0, topHeight=1.5),
+            SphericalSegment(
+                shape="spherical",
+                radiusOfCurvature=4.0,
+                topHeight=1.5,
+                bottomHeight=0.0,
+            ),
         ]
     )
     return frusta
