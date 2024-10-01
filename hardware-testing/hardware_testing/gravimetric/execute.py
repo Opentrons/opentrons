@@ -33,7 +33,7 @@ from .liquid_class.pipetting import (
     dispense_with_liquid_class,
     PipettingCallbacks,
 )
-from .liquid_class.defaults import get_liquid_class
+from .liquid_class.defaults import get_liquid_class, set_liquid_class
 from .liquid_class.interactive import interactively_build_liquid_class
 from .liquid_height.height import LiquidTracker
 from .measurement import (
@@ -286,6 +286,16 @@ def _run_trial(
     )
     if trial.cfg.interactive:
         liquid_class = interactively_build_liquid_class(liquid_class)
+        # store it, so that next loop we don't have to think so much
+        set_liquid_class(
+            liquid_class,
+            trial.cfg.liquid,
+            trial.cfg.dilution,
+            pip_size,
+            trial.pipette.channels,
+            trial.tip_volume,
+            int(round(trial.volume)),
+        )
 
     def _tag(m_type: MeasurementType) -> str:
         tag = create_measurement_tag(

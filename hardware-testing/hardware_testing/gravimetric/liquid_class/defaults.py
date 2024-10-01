@@ -601,3 +601,23 @@ def get_liquid_class(
         return _get_interp_liq_class(defined_volumes[1], defined_volumes[2])
     else:
         return _build_liquid_class(defined_volumes[2])
+
+
+def set_liquid_class(
+    new_settings: LiquidClassSettings,
+    liquid: str,
+    dilution: float,
+    pipette: int,
+    channels: int,
+    tip: int,
+    volume: int,
+) -> None:
+    cls_name = SupportedLiquid.from_string(liquid).name_with_dilution(dilution)
+    _cls_per_volume = _defaults[tip][pipette][channels]
+    defined_volumes = list(_cls_per_volume.keys())
+    defined_volumes.sort()
+    for def_vol, settings in _cls_per_volume.items():
+        if abs(def_vol - float(volume)) < 0.0001:
+            _cls_per_volume[def_vol][cls_name] = new_settings
+            return
+    raise ValueError(f"volume {volume} not defined in for {cls_name}")
