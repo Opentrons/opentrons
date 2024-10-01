@@ -48,8 +48,7 @@ class UnsafeUngripLabwareImplementation(
     ) -> SuccessData[UnsafeUngripLabwareResult, None]:
         """Ungrip Labware."""
         ot3_hardware_api = ensure_ot3_hardware(self._hardware_api)
-        if ot3_hardware_api.gripper_jaw_can_home():
-            await ot3_hardware_api.ungrip()
+        await ot3_hardware_api.ungrip()
         return SuccessData(public=UnsafeUngripLabwareResult(), private=None)
 
 

@@ -738,11 +738,9 @@ class CommandView(HasState[CommandState]):
 
         # if queue is in recovery mode, return the next fixit command
         next_fixit_cmd = self._state.command_history.get_fixit_queue_ids().head(None)
-        if (
-            next_fixit_cmd
-            and self._state.queue_status == QueueStatus.AWAITING_RECOVERY
-            or next_fixit_cmd
-            and self._state.queue_status == QueueStatus.PAUSED
+        if next_fixit_cmd and (
+            self._state.queue_status == QueueStatus.AWAITING_RECOVERY
+            or self._state.queue_status == QueueStatus.PAUSED
             and self.state.is_door_blocking
             and self.get(next_fixit_cmd).commandType == "unsafe/ungripLabware"
         ):
@@ -977,7 +975,10 @@ class CommandView(HasState[CommandState]):
                     "Setup commands are not allowed after run has started."
                 )
             elif action.request.intent == CommandIntent.FIXIT:
-                if self._state.queue_status != QueueStatus.AWAITING_RECOVERY or not self._state.is_door_blocking:
+                if (
+                    self._state.queue_status != QueueStatus.AWAITING_RECOVERY
+                    or not self._state.is_door_blocking
+                ):
                     raise FixitCommandNotAllowedError(
                         "Fixit commands are not allowed when the run is not in a recoverable state."
                     )
