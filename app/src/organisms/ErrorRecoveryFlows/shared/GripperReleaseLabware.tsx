@@ -21,8 +21,8 @@ import type { RecoveryContentProps } from '../types'
 export function GripperReleaseLabware({
   routeUpdateActions,
 }: RecoveryContentProps): JSX.Element {
-  const { handleMotionRouting } = routeUpdateActions
-  const { t } = useTranslation()
+  const { handleMotionRouting, goBackPrevStep } = routeUpdateActions
+  const { t } = useTranslation('error_recovery')
 
   const buildPrimaryOnClick = (): void => {
     // Because the actual release command is executed on a delay, the execution behavior is deferred to the
@@ -56,6 +56,7 @@ export function GripperReleaseLabware({
       <RecoveryFooterButtons
         primaryBtnOnClick={buildPrimaryOnClick}
         primaryBtnTextOverride={t('release')}
+        secondaryBtnOnClick={goBackPrevStep}
       />
     </RecoverySingleColumnContentWrapper>
   )

@@ -180,9 +180,9 @@ export function getCopyFromOption(
 ): string {
   switch (option) {
     case 'yes':
-      return i18n.format(t('yes'), 'capitalize')
+      return i18n.format(t('shared:yes'), 'capitalize')
     case 'no':
-      return i18n.format(t('no'), 'capitalize')
+      return i18n.format(t('shared:no'), 'capitalize')
     default:
       console.error('Unhandled copy option.')
       return 'UNHANDLED OPTION'
