@@ -108,7 +108,7 @@ export function useInterventionModal({
           >
             <InlineNotification
               type="neutral"
-              heading={t('close_robot_door_to_resume')}
+              heading={t('close_door_to_resume')}
             />
           </Flex>
         ) : undefined,
