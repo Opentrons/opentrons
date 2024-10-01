@@ -625,9 +625,14 @@ class LabwareView(HasState[LabwareState]):
     ) -> OverlapOffset:
         """Get the labware's overlap with requested labware's load name."""
         definition = self.get_definition(labware_id)
-        stacking_overlap = definition.stackingOffsetWithLabware.get(
-            below_labware_name, OverlapOffset(x=0, y=0, z=0)
-        )
+        if below_labware_name in definition.stackingOffsetWithLabware.keys():
+            stacking_overlap = definition.stackingOffsetWithLabware.get(
+                below_labware_name, OverlapOffset(x=0, y=0, z=0)
+            )
+        else:
+            stacking_overlap = definition.stackingOffsetWithLabware.get(
+                "default", OverlapOffset(x=0, y=0, z=0)
+            )
         return OverlapOffset(
             x=stacking_overlap.x, y=stacking_overlap.y, z=stacking_overlap.z
         )

@@ -41,6 +41,11 @@
     }
   },
   "stackingOffsetWithLabware": {
+    "default": {
+      "x": 0,
+      "y": 0,
+      "z": 8.193
+    },
     "opentrons_tough_pcr_auto_sealing_lid": {
       "x": 0,
       "y": 0,
