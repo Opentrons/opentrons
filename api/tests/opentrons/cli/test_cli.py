@@ -406,7 +406,7 @@ def test_rtp_csv_file_setting(
     result = _get_analysis_result(
         [protocol_source_file],
         output,
-        rtp_files=json.dumps({"csv_file": str(csv_source_file.resolve())})
+        rtp_files=json.dumps({"csv_file": str(csv_source_file.resolve())}),
     )
 
     assert result.exit_code == 0
