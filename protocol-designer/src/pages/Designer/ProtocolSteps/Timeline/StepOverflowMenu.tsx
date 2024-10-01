@@ -16,7 +16,6 @@ import {
 } from '@opentrons/components'
 import { actions as steplistActions } from '../../../../steplist'
 import { actions as stepsActions } from '../../../../ui/steps'
-import { populateForm } from '../../../../ui/steps/actions/actions'
 import {
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
@@ -26,6 +25,7 @@ import {
 import {
   hoverOnStep,
   toggleViewSubstep,
+  populateForm,
 } from '../../../../ui/steps/actions/actions'
 import {
   getCurrentFormHasUnsavedChanges,

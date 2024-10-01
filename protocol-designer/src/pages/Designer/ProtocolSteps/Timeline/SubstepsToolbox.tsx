@@ -38,11 +38,10 @@ export function SubstepsToolbox(
   const dispatch = useDispatch()
   const substeps = useSelector(getSubsteps)[stepId]
   const formData = useSelector(getSavedStepForms)[stepId]
-  const highlightSubstep = (payload: SubstepIdentifier): HoverOnSubstepAction =>
-    dispatch(hoverOnSubstep(payload))
-
   const hoveredSubstep = useSelector(getHoveredSubstep)
   const ingredNames = useSelector(labwareIngredSelectors.getLiquidNamesById)
+  const highlightSubstep = (payload: SubstepIdentifier): HoverOnSubstepAction =>
+    dispatch(hoverOnSubstep(payload))
 
   if (substeps == null) {
     return null
@@ -57,7 +56,7 @@ export function SubstepsToolbox(
       substeps.commandCreatorFnName === 'mix')) ||
     substeps.substepType === THERMOCYCLER_PROFILE ? (
     <Toolbox
-      width="23.8125rem"
+      width="396px"
       childrenPadding="0"
       confirmButton={
         <PrimaryButton

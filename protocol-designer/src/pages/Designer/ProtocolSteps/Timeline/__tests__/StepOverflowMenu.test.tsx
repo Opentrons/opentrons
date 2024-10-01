@@ -77,6 +77,5 @@ describe('StepOverflowMenu', () => {
     fireEvent.click(screen.getByText('View details'))
     expect(vi.mocked(hoverOnStep)).toHaveBeenCalled()
     expect(vi.mocked(toggleViewSubstep)).toHaveBeenCalled()
-    fireEvent.click(screen.getByText('Rename step'))
   })
 })

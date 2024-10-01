@@ -62,12 +62,13 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
   const ingredIds: string[] = Object.keys(compactedSourcePreIngreds)
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
   const noColor = ingredIds.filter(id => id !== AIR).length === 0
-  const color =
-    ingredIds.length === 1
-      ? liquidDisplayColors[Number(ingredIds[0])] ?? swatchColors(ingredIds[0])
-      : noColor
-      ? COLORS.transparent
-      : MIXED_WELL_COLOR
+  let color = MIXED_WELL_COLOR
+  if (ingredIds.length === 1) {
+    color =
+      liquidDisplayColors[Number(ingredIds[0])] ?? swatchColors(ingredIds[0])
+  } else if (noColor) {
+    color = COLORS.transparent
+  }
 
   const volumeTag = (
     <Tag

@@ -2,13 +2,11 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
-  Btn,
   DIRECTION_COLUMN,
   DeckInfoLabel,
   Flex,
-  Icon,
   JUSTIFY_SPACE_BETWEEN,
-  ListItem,
+  ListButton,
   SPACING,
   StyledText,
   Tag,
@@ -73,51 +71,51 @@ export function MultichannelSubstep(
       }}
     >
       {/* TODO: need to update this to match designs! */}
-      <ListItem type="noActive">
+      <ListButton type="noActive" onClick={handleToggleCollapsed}>
         <Flex
+          flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing4}
-          padding={SPACING.spacing12}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
           width="100%"
-          alignItems={ALIGN_CENTER}
         >
-          <StyledText desktopStyle="bodyDefaultRegular">Multi</StyledText>
-          {firstChannelSource != null ? (
-            <DeckInfoLabel deckLabel={sourceWellRange} />
-          ) : null}
-          <Tag
-            text={`${formatVolume(rowGroup[0].volume)} ${t(
-              'units.microliter'
-            )}`}
-            type="default"
-          />
-          {firstChannelDest != null ? (
-            <DeckInfoLabel deckLabel={destWellRange} />
-          ) : null}
-          <Btn onClick={handleToggleCollapsed}>
-            <Icon
-              name={collapsed ? 'chevron-down' : 'chevron-up'}
-              size="1rem"
+          <Flex
+            padding={SPACING.spacing12}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            width="100%"
+            alignItems={ALIGN_CENTER}
+          >
+            <StyledText desktopStyle="bodyDefaultRegular">Multi</StyledText>
+            {firstChannelSource != null ? (
+              <DeckInfoLabel deckLabel={sourceWellRange} />
+            ) : null}
+            <Tag
+              text={`${formatVolume(rowGroup[0].volume)} ${t(
+                'units.microliter'
+              )}`}
+              type="default"
             />
-          </Btn>
+            {firstChannelDest != null ? (
+              <DeckInfoLabel deckLabel={destWellRange} />
+            ) : null}
+          </Flex>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+            {!collapsed &&
+              rowGroup.map((row, rowKey) => {
+                return (
+                  <Substep
+                    trashName={trashName}
+                    key={rowKey}
+                    volume={row.volume}
+                    ingredNames={ingredNames}
+                    source={row.source}
+                    dest={row.dest}
+                    stepId={stepId}
+                    substepIndex={substepIndex}
+                  />
+                )
+              })}
+          </Flex>
         </Flex>
-      </ListItem>
-
-      {!collapsed &&
-        rowGroup.map((row, rowKey) => {
-          return (
-            <Substep
-              trashName={trashName}
-              key={rowKey}
-              volume={row.volume}
-              ingredNames={ingredNames}
-              source={row.source}
-              dest={row.dest}
-              stepId={stepId}
-              substepIndex={substepIndex}
-            />
-          )
-        })}
+      </ListButton>
     </Flex>
   )
 }
