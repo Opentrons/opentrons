@@ -165,7 +165,11 @@ export function Designer(): JSX.Element {
           {zoomIn.slot != null ? null : (
             <Tabs tabs={[startingDeckTab, protocolStepTab]} />
           )}
-          <ProtocolMetadataNav />
+          <ProtocolMetadataNav
+            isAddingHardwareOrLabware={
+              zoomIn.slot != null && zoomIn.cutout != null
+            }
+          />
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
             <SettingsIcon />
 
