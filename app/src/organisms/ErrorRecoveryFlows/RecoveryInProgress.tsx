@@ -85,7 +85,7 @@ type UseGripperReleaseProps = Pick<
 
 // Handles the gripper release copy and action, which operates on an interval. At T=0, release the labware then proceed
 // to the next step in the active route.
-function useGripperRelease({
+export function useGripperRelease({
   recoveryMap,
   recoveryCommands,
   routeUpdateActions,

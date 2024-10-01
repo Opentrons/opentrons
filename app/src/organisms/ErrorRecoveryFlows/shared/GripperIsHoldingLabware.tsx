@@ -21,7 +21,10 @@ import type { RecoveryContentProps } from '../types'
 import { RecoveryRadioGroup } from '/app/organisms/ErrorRecoveryFlows/shared/RecoveryRadioGroup'
 
 type HoldingLabwareOption = 'yes' | 'no'
-const HOLDING_LABWARE_OPTIONS: HoldingLabwareOption[] = ['yes', 'no'] as const
+export const HOLDING_LABWARE_OPTIONS: HoldingLabwareOption[] = [
+  'yes',
+  'no',
+] as const
 
 export function GripperIsHoldingLabware({
   routeUpdateActions,
@@ -117,7 +120,7 @@ interface GripperHoldingOptionsProps {
   setSelectedOption: (option: HoldingLabwareOption) => void
 }
 
-export function ODDGripperHoldingLwOptions({
+function ODDGripperHoldingLwOptions({
   t,
   selectedOption,
   setSelectedOption,
@@ -143,7 +146,7 @@ export function ODDGripperHoldingLwOptions({
   )
 }
 
-export function DesktopGripperHoldingLwOptions({
+function DesktopGripperHoldingLwOptions({
   t,
   selectedOption,
   setSelectedOption,
