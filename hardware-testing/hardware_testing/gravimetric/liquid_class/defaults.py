@@ -70,7 +70,7 @@ _default_dispense: Dict[str, DispenseSettings] = {
 }
 
 _defaults: Dict[
-    int, Dict[int, Dict[int, Dict[int, Dict[str, LiquidClassSettings]]]]
+    int, Dict[int, Dict[int, Dict[float, Dict[str, LiquidClassSettings]]]]
 ] = {
     50: {  # T50
         50: {  # P50
@@ -562,16 +562,16 @@ def get_default(liquid: str, dilution: float) -> LiquidClassSettings:
 
 
 def get_liquid_class(
-    liquid: str, dilution: float, pipette: int, channels: int, tip: int, volume: int
+    liquid: str, dilution: float, pipette: int, channels: int, tip: int, volume: float
 ) -> LiquidClassSettings:
     """Get liquid class."""
     cls_name = SupportedLiquid.from_string(liquid).name_with_dilution(dilution)
     _cls_per_volume = _defaults[tip][pipette][channels]
     defined_volumes = list(_cls_per_volume.keys())
     defined_volumes.sort()
-    assert len(defined_volumes) == 3
+    print(defined_volumes)
 
-    def _build_liquid_class(vol: int) -> LiquidClassSettings:
+    def _build_liquid_class(vol: float) -> LiquidClassSettings:
         _cls = deepcopy(_cls_per_volume[vol][cls_name])
         for f in fields(_cls.aspirate):
             if getattr(_cls.aspirate, f.name) is None:
@@ -585,22 +585,30 @@ def get_liquid_class(
                 )
         return _cls
 
-    def _get_interp_liq_class(lower_ul: int, upper_ul: int) -> LiquidClassSettings:
+    def _get_interp_liq_class(lower_ul: float, upper_ul: float) -> LiquidClassSettings:
         factor = (volume - lower_ul) / (upper_ul - lower_ul)
         lower_cls = _build_liquid_class(lower_ul)
         upper_cls = _build_liquid_class(upper_ul)
         return interpolate(lower_cls, upper_cls, factor)
 
+    # check if volume is below/above defined range
     if volume <= defined_volumes[0]:
         return _build_liquid_class(defined_volumes[0])
-    elif volume < defined_volumes[1]:
-        return _get_interp_liq_class(defined_volumes[0], defined_volumes[1])
-    elif volume == defined_volumes[1]:
-        return _build_liquid_class(defined_volumes[1])
-    elif volume < defined_volumes[2]:
-        return _get_interp_liq_class(defined_volumes[1], defined_volumes[2])
-    else:
-        return _build_liquid_class(defined_volumes[2])
+    if volume >= defined_volumes[-1]:
+        return _build_liquid_class(defined_volumes[-1])
+
+    # check if volume exactly equals one of the defined volumes
+    for def_vol in defined_volumes:
+        if volume == def_vol:
+            return _build_liquid_class(volume)
+
+    # interpolate between defined volumes below/above the volume
+    for i in range(len(defined_volumes) - 1):
+        vol_low = defined_volumes[i]
+        vol_high = defined_volumes[i + 1]
+        if vol_low < volume < vol_high:
+            return _get_interp_liq_class(vol_low, vol_high)
+    raise ValueError(f"unable to get class for volume: {volume}")
 
 
 def set_liquid_class(
@@ -610,14 +618,12 @@ def set_liquid_class(
     pipette: int,
     channels: int,
     tip: int,
-    volume: int,
+    volume: float,
 ) -> None:
     cls_name = SupportedLiquid.from_string(liquid).name_with_dilution(dilution)
     _cls_per_volume = _defaults[tip][pipette][channels]
-    defined_volumes = list(_cls_per_volume.keys())
-    defined_volumes.sort()
-    for def_vol, settings in _cls_per_volume.items():
-        if abs(def_vol - float(volume)) < 0.0001:
-            _cls_per_volume[def_vol][cls_name] = new_settings
-            return
-    raise ValueError(f"volume {volume} not defined in for {cls_name}")
+    if volume not in _cls_per_volume:
+        _cls_per_volume[volume] = {}
+    print(f"storing volume: {volume}")
+    print(new_settings.aspirate.z_speed)
+    _cls_per_volume[volume][cls_name] = new_settings

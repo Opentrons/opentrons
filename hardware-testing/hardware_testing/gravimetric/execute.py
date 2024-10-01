@@ -282,7 +282,7 @@ def _run_trial(
         pip_size,
         trial.pipette.channels,
         trial.tip_volume,
-        int(round(trial.volume)),
+        trial.volume,
     )
     if trial.cfg.interactive:
         liquid_class = interactively_build_liquid_class(liquid_class)
@@ -294,7 +294,7 @@ def _run_trial(
             pip_size,
             trial.pipette.channels,
             trial.tip_volume,
-            int(round(trial.volume)),
+            trial.volume,
         )
 
     def _tag(m_type: MeasurementType) -> str:
