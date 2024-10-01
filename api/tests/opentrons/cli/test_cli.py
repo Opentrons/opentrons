@@ -297,7 +297,7 @@ def test_run_time_parameter_setting(
     protocol_source_file = tmp_path / "protocol.py"
     protocol_source_file.write_text(python_protocol_source, encoding="utf-8")
     result = _get_analysis_result(
-        [protocol_source_file], output, rtp_values='{"dry_run": true}'
+        [protocol_source_file], output, rtp_values=json.dumps({"dry_run": True})
     )
 
     assert result.exit_code == 0
@@ -395,7 +395,7 @@ def test_rtp_csv_file_setting(
                     variable_name="csv_file",
                 )
             def run(protocol):
-                protocol.params.csv_file.file
+                protocol.params.csv_file.contents
         """
     )
     protocol_source_file = tmp_path / "protocol.py"
@@ -413,9 +413,7 @@ def test_rtp_csv_file_setting(
 
     assert result.json_output is not None
     assert result.json_output["robotType"] == "OT-2 Standard"
-    assert (
-        result.json_output["result"] == AnalysisResult.OK
-    ), f'{result.json_output["errors"]}'
+    assert result.json_output["result"] == AnalysisResult.OK
     assert result.json_output["pipettes"] == []
     assert result.json_output["commands"]  # There should be a home command
     assert result.json_output["labware"] == []
