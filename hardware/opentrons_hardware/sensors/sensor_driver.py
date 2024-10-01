@@ -278,6 +278,20 @@ class LogListener:
             self.response_queue.put_nowait(data)
             current_time = round((time.time() - self.start_time), 3)
             self.csv_writer.writerow([current_time, data])  # type: ignore
+        if isinstance(message, message_definitions.BatchReadFromSensorResponse):
+            data_length = message.payload.data_length.value
+            data_bytes = message.payload.sensor_data.value
+            data_ints = [
+                int.from_bytes(data_bytes[i * 4 : i * 4 + 4])
+                for i in range(data_length)
+            ]
+            for d in data_ints:
+                data = sensor_types.SensorDataType.build(
+                    d, message.payload.sensor
+                ).to_float()
+                self.response_queue.put_nowait(data)
+                current_time = round((time.time() - self.start_time), 3)
+                self.csv_writer.writerow([current_time, data])
         if isinstance(message, message_definitions.Acknowledgement):
             if (
                 self.event is not None
