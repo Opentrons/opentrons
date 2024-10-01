@@ -5,16 +5,15 @@ import { useNavigate } from 'react-router-dom'
 import {
   ALIGN_CENTER,
   ALIGN_END,
+  Btn,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   INFO_TOAST,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  PrimaryButton,
   SPACING,
   SecondaryButton,
-  StyledText,
   Tabs,
   ToggleGroup,
   useOnClickOutside,
@@ -169,18 +168,15 @@ export function Designer(): JSX.Element {
           <ProtocolMetadataNav />
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
             <SettingsIcon />
-            <PrimaryButton
+
+            <Btn
+              alignItems={ALIGN_CENTER}
               onClick={() => {
                 showLiquidOverflowMenu(true)
               }}
             >
-              <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-                <Icon size="1rem" name="liquid" />
-                <StyledText desktopStyle="bodyDefaultRegular">
-                  {t('liquids')}
-                </StyledText>
-              </Flex>
-            </PrimaryButton>
+              <Icon size="1.5rem" name="water-drop" data-testid="water-drop" />
+            </Btn>
             <SecondaryButton
               onClick={() => {
                 if (hasTrashEntity) {
