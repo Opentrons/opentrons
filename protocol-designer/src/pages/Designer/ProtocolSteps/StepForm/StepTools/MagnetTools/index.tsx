@@ -16,12 +16,14 @@ import {
   MIN_ENGAGE_HEIGHT_V1,
   MIN_ENGAGE_HEIGHT_V2,
 } from '../../../../../../constants'
-import { getMagnetLabwareEngageHeight, getMagneticLabwareOptions } from '../../../../../../ui/modules/selectors'
+import {
+  getMagnetLabwareEngageHeight,
+  getMagneticLabwareOptions,
+} from '../../../../../../ui/modules/selectors'
 import { ToggleExpandStepFormField } from '../../../../../../molecules'
 import { getModuleEntities } from '../../../../../../step-forms/selectors'
 
 import type { StepFormProps } from '../../types'
-
 
 export function MagnetTools(props: StepFormProps): JSX.Element {
   const { propsForFields, formData } = props
@@ -44,8 +46,7 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
     defaultEngageHeight != null
       ? t('magnet_recommended', { default: defaultEngageHeight })
       : ''
-  const engageHeightCaption = `${engageHeightMinMax} ${engageHeightDefault} mm.`
-
+  const engageHeightCaption = `${engageHeightMinMax} ${engageHeightDefault}`
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
@@ -67,9 +68,7 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
         </ListItem>
       </Flex>
       <Box borderBottom={`1px solid ${COLORS.grey30}`} />
-      <Flex flexDirection={DIRECTION_COLUMN}
-        padding={SPACING.spacing16}
-        >
+      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
         <ToggleExpandStepFormField
           {...propsForFields.engageHeight}
           toggleValue={propsForFields.magnetAction.value}
