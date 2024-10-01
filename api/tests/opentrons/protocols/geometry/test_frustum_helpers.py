@@ -8,17 +8,17 @@ from opentrons_shared_data.labware.types import (
     SphericalSegment,
 )
 from opentrons.protocol_engine.state.frustum_helpers import (
-    cross_section_area_rectangular,
-    cross_section_area_circular,
-    reject_unacceptable_heights,
-    circular_frustum_polynomial_roots,
-    rectangular_frustum_polynomial_roots,
-    volume_from_height_rectangular,
-    volume_from_height_circular,
-    volume_from_height_spherical,
-    height_from_volume_circular,
-    height_from_volume_rectangular,
-    height_from_volume_spherical,
+    _cross_section_area_rectangular,
+    _cross_section_area_circular,
+    _reject_unacceptable_heights,
+    _circular_frustum_polynomial_roots,
+    _rectangular_frustum_polynomial_roots,
+    _volume_from_height_rectangular,
+    _volume_from_height_circular,
+    _volume_from_height_spherical,
+    _height_from_volume_circular,
+    _height_from_volume_rectangular,
+    _height_from_volume_spherical,
 )
 from opentrons.protocol_engine.errors.exceptions import InvalidLiquidHeightFound
 
@@ -151,11 +151,11 @@ def test_reject_unacceptable_heights(
     """Make sure we reject all mathematical solutions that are physically not possible."""
     if len(expected_heights) != 1:
         with pytest.raises(InvalidLiquidHeightFound):
-            reject_unacceptable_heights(
+            _reject_unacceptable_heights(
                 max_height=max_height, potential_heights=potential_heights
             )
     else:
-        found_heights = reject_unacceptable_heights(
+        found_heights = _reject_unacceptable_heights(
             max_height=max_height, potential_heights=potential_heights
         )
         assert found_heights == expected_heights[0]
@@ -165,7 +165,7 @@ def test_reject_unacceptable_heights(
 def test_cross_section_area_circular(diameter: float) -> None:
     """Test circular area calculation."""
     expected_area = pi * (diameter / 2) ** 2
-    assert cross_section_area_circular(diameter) == expected_area
+    assert _cross_section_area_circular(diameter) == expected_area
 
 
 @pytest.mark.parametrize(
@@ -175,7 +175,9 @@ def test_cross_section_area_rectangular(x_dimension: float, y_dimension: float) 
     """Test rectangular area calculation."""
     expected_area = x_dimension * y_dimension
     assert (
-        cross_section_area_rectangular(x_dimension=x_dimension, y_dimension=y_dimension)
+        _cross_section_area_rectangular(
+            x_dimension=x_dimension, y_dimension=y_dimension
+        )
         == expected_area
     )
 
@@ -193,7 +195,7 @@ def test_volume_and_height_circular(well: List[Any]) -> None:
             a = pi * ((top_radius - bottom_radius) ** 2) / (3 * total_height**2)
             b = pi * bottom_radius * (top_radius - bottom_radius) / total_height
             c = pi * bottom_radius**2
-            assert circular_frustum_polynomial_roots(
+            assert _circular_frustum_polynomial_roots(
                 top_radius=top_radius,
                 bottom_radius=bottom_radius,
                 total_frustum_height=total_height,
@@ -205,7 +207,7 @@ def test_volume_and_height_circular(well: List[Any]) -> None:
                     + b * (target_height**2)
                     + c * target_height
                 )
-                found_volume = volume_from_height_circular(
+                found_volume = _volume_from_height_circular(
                     target_height=target_height,
                     total_frustum_height=total_height,
                     bottom_radius=bottom_radius,
@@ -213,7 +215,7 @@ def test_volume_and_height_circular(well: List[Any]) -> None:
                 )
                 assert found_volume == expected_volume
                 # test going backwards to get height back
-                found_height = height_from_volume_circular(
+                found_height = _height_from_volume_circular(
                     volume=found_volume,
                     total_frustum_height=total_height,
                     bottom_radius=bottom_radius,
@@ -244,7 +246,7 @@ def test_volume_and_height_rectangular(well: List[Any]) -> None:
                 + (bottom_width * (top_length - bottom_length))
             ) / (2 * total_height)
             c = bottom_length * bottom_width
-            assert rectangular_frustum_polynomial_roots(
+            assert _rectangular_frustum_polynomial_roots(
                 top_length=top_length,
                 bottom_length=bottom_length,
                 top_width=top_width,
@@ -258,7 +260,7 @@ def test_volume_and_height_rectangular(well: List[Any]) -> None:
                     + b * (target_height**2)
                     + c * target_height
                 )
-                found_volume = volume_from_height_rectangular(
+                found_volume = _volume_from_height_rectangular(
                     target_height=target_height,
                     total_frustum_height=total_height,
                     bottom_length=bottom_length,
@@ -268,7 +270,7 @@ def test_volume_and_height_rectangular(well: List[Any]) -> None:
                 )
                 assert found_volume == expected_volume
                 # test going backwards to get height back
-                found_height = height_from_volume_rectangular(
+                found_height = _height_from_volume_rectangular(
                     volume=found_volume,
                     total_frustum_height=total_height,
                     bottom_length=bottom_length,
@@ -290,12 +292,12 @@ def test_volume_and_height_spherical(well: List[Any]) -> None:
                 * (target_height**2)
                 * (3 * well[0]["radiusOfCurvature"] - target_height)
             )
-            found_volume = volume_from_height_spherical(
+            found_volume = _volume_from_height_spherical(
                 target_height=target_height,
                 radius_of_curvature=well[0]["radiusOfCurvature"],
             )
             assert found_volume == expected_volume
-            found_height = height_from_volume_spherical(
+            found_height = _height_from_volume_spherical(
                 volume=found_volume,
                 radius_of_curvature=well[0]["radiusOfCurvature"],
                 total_frustum_height=well[0]["topHeight"],

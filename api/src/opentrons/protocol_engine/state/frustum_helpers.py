@@ -8,7 +8,7 @@ from ..errors.exceptions import InvalidLiquidHeightFound, InvalidWellDefinitionE
 from opentrons_shared_data.labware.labware_definition import InnerWellGeometry
 
 
-def reject_unacceptable_heights(
+def _reject_unacceptable_heights(
     potential_heights: List[float], max_height: float
 ) -> float:
     """Reject any solutions to a polynomial equation that cannot be the height of a frustum."""
@@ -42,18 +42,18 @@ def get_cross_section_area(bounded_section: Any) -> float:
     return cross_section_area
 
 
-def cross_section_area_circular(diameter: float) -> float:
+def _cross_section_area_circular(diameter: float) -> float:
     """Get the area of a circular cross-section."""
     radius = diameter / 2
     return pi * (radius**2)
 
 
-def cross_section_area_rectangular(x_dimension: float, y_dimension: float) -> float:
+def _cross_section_area_rectangular(x_dimension: float, y_dimension: float) -> float:
     """Get the area of a rectangular cross-section."""
     return x_dimension * y_dimension
 
 
-def rectangular_frustum_polynomial_roots(
+def _rectangular_frustum_polynomial_roots(
     bottom_length: float,
     bottom_width: float,
     top_length: float,
@@ -75,7 +75,7 @@ def rectangular_frustum_polynomial_roots(
     return a, b, c
 
 
-def circular_frustum_polynomial_roots(
+def _circular_frustum_polynomial_roots(
     bottom_radius: float,
     top_radius: float,
     total_frustum_height: float,
@@ -88,14 +88,14 @@ def circular_frustum_polynomial_roots(
     return a, b, c
 
 
-def volume_from_height_circular(
+def _volume_from_height_circular(
     target_height: float,
     total_frustum_height: float,
     bottom_radius: float,
     top_radius: float,
 ) -> float:
     """Find the volume given a height within a circular frustum."""
-    a, b, c = circular_frustum_polynomial_roots(
+    a, b, c = _circular_frustum_polynomial_roots(
         bottom_radius=bottom_radius,
         top_radius=top_radius,
         total_frustum_height=total_frustum_height,
@@ -104,7 +104,7 @@ def volume_from_height_circular(
     return volume
 
 
-def volume_from_height_rectangular(
+def _volume_from_height_rectangular(
     target_height: float,
     total_frustum_height: float,
     bottom_length: float,
@@ -113,7 +113,7 @@ def volume_from_height_rectangular(
     top_width: float,
 ) -> float:
     """Find the volume given a height within a rectangular frustum."""
-    a, b, c = rectangular_frustum_polynomial_roots(
+    a, b, c = _rectangular_frustum_polynomial_roots(
         bottom_length=bottom_length,
         bottom_width=bottom_width,
         top_length=top_length,
@@ -124,7 +124,7 @@ def volume_from_height_rectangular(
     return volume
 
 
-def volume_from_height_spherical(
+def _volume_from_height_spherical(
     target_height: float,
     radius_of_curvature: float,
 ) -> float:
@@ -135,14 +135,14 @@ def volume_from_height_spherical(
     return volume
 
 
-def height_from_volume_circular(
+def _height_from_volume_circular(
     volume: float,
     total_frustum_height: float,
     bottom_radius: float,
     top_radius: float,
 ) -> float:
     """Find the height given a volume within a circular frustum."""
-    a, b, c = circular_frustum_polynomial_roots(
+    a, b, c = _circular_frustum_polynomial_roots(
         bottom_radius=bottom_radius,
         top_radius=top_radius,
         total_frustum_height=total_frustum_height,
@@ -151,14 +151,14 @@ def height_from_volume_circular(
     x_intercept_roots = (a, b, c, d)
 
     height_from_volume_roots = roots(x_intercept_roots)
-    height = reject_unacceptable_heights(
+    height = _reject_unacceptable_heights(
         potential_heights=list(height_from_volume_roots),
         max_height=total_frustum_height,
     )
     return height
 
 
-def height_from_volume_rectangular(
+def _height_from_volume_rectangular(
     volume: float,
     total_frustum_height: float,
     bottom_length: float,
@@ -167,7 +167,7 @@ def height_from_volume_rectangular(
     top_width: float,
 ) -> float:
     """Find the height given a volume within a rectangular frustum."""
-    a, b, c = rectangular_frustum_polynomial_roots(
+    a, b, c = _rectangular_frustum_polynomial_roots(
         bottom_length=bottom_length,
         bottom_width=bottom_width,
         top_length=top_length,
@@ -178,14 +178,14 @@ def height_from_volume_rectangular(
     x_intercept_roots = (a, b, c, d)
 
     height_from_volume_roots = roots(x_intercept_roots)
-    height = reject_unacceptable_heights(
+    height = _reject_unacceptable_heights(
         potential_heights=list(height_from_volume_roots),
         max_height=total_frustum_height,
     )
     return height
 
 
-def height_from_volume_spherical(
+def _height_from_volume_spherical(
     volume: float,
     radius_of_curvature: float,
     total_frustum_height: float,
@@ -198,7 +198,7 @@ def height_from_volume_spherical(
     x_intercept_roots = (a, b, c, d)
 
     height_from_volume_roots = roots(x_intercept_roots)
-    height = reject_unacceptable_heights(
+    height = _reject_unacceptable_heights(
         potential_heights=list(height_from_volume_roots),
         max_height=total_frustum_height,
     )
@@ -223,13 +223,13 @@ def get_well_volumetric_capacity(
                 raise InvalidWellDefinitionError(
                     "spherical segment must only be at the bottom of a well."
                 )
-            section_volume = volume_from_height_spherical(
                 target_height=segment.topHeight,
                 radius_of_curvature=segment.radiusOfCurvature,
+            section_volume = _volume_from_height_spherical(
             )
         elif segment.shape == "rectangular":
             section_height = segment.topHeight - segment.bottomHeight
-            section_volume = volume_from_height_rectangular(
+            section_volume = _volume_from_height_rectangular(
                 target_height=section_height,
                 bottom_length=segment.bottomYDimension,
                 bottom_width=segment.bottomXDimension,
@@ -239,7 +239,7 @@ def get_well_volumetric_capacity(
             )
         elif segment.shape == "circular":
             section_height = segment.topHeight - segment.bottomHeight
-            section_volume = volume_from_height_circular(
+            section_volume = _volume_from_height_circular(
                 target_height=section_height,
                 total_frustum_height=section_height,
                 bottom_radius=(segment.bottomDiameter / 2),
@@ -261,20 +261,20 @@ def height_at_volume_within_section(
 ) -> float:
     """Calculate a height within a bounded section according to geometry."""
     if section["shape"] == "spherical":
-        partial_height = height_from_volume_spherical(
+        partial_height = _height_from_volume_spherical(
             volume=target_volume_relative,
             total_frustum_height=section_height,
             radius_of_curvature=section.radiusOfCurvature,
         )
     elif section["shape"] == "circular":
-        partial_height = height_from_volume_circular(
+        partial_height = _height_from_volume_circular(
             volume=target_volume_relative,
             top_radius=(section["bottomDiameter"] / 2),
             bottom_radius=(section["topDiameter"] / 2),
             total_frustum_height=section_height,
         )
     elif section["shape"] == "rectangular":
-        partial_height = height_from_volume_rectangular(
+        partial_height = _height_from_volume_rectangular(
             volume=target_volume_relative,
             total_frustum_height=section_height,
             bottom_width=section["bottomXDimension"],
@@ -296,19 +296,19 @@ def volume_at_height_within_section(
 ) -> float:
     """Calculate a volume within a bounded section according to geometry."""
     if section["shape"] == "spherical":
-        partial_volume = volume_from_height_spherical(
+        partial_volume = _volume_from_height_spherical(
             target_height=target_height_relative,
             radius_of_curvature=section["radiusOfCurvature"],
         )
     elif section["shape"] == "circular":
-        partial_volume = volume_from_height_circular(
+        partial_volume = _volume_from_height_circular(
             target_height=target_height_relative,
             total_frustum_height=section_height,
             bottom_radius=(section["bottomDiameter"] / 2),
             top_radius=(section["topDiameter"] / 2),
         )
     elif section["shape"] == "rectangular":
-        partial_volume = volume_from_height_rectangular(
+        partial_volume = _volume_from_height_rectangular(
             target_height=target_height_relative,
             total_frustum_height=section_height,
             bottom_width=section["BottomXDimension"],
