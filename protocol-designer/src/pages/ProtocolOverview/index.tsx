@@ -224,8 +224,6 @@ export function ProtocolOverview(): JSX.Element {
     setShowExportWarningModal(false)
   }
 
-  console.log('obj', JSON.stringify(allIngredientGroupFields, null, 4))
-
   return (
     <Fragment>
       {showEditMetadataModal ? (
