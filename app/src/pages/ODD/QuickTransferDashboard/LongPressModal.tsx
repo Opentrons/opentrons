@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -13,6 +14,7 @@ import {
 import { useCreateRunMutation } from '@opentrons/react-api-client'
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
+import { getTopPortalEl } from '/app/App/portal'
 import { SmallModalChildren } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getPinnedQuickTransferIds, updateConfigValue } from '/app/redux/config'
@@ -94,7 +96,7 @@ export function LongPressModal({
     )
     longpress.setIsLongPressed(false)
   }
-
+  // TODO(sf 10-01-24): Create an ODD-specific component that wraps MenuList with a portal.
   return (
     <>
       {showMaxPinsAlert ? (
@@ -107,32 +109,35 @@ export function LongPressModal({
           }}
         />
       ) : (
-        <MenuList onClick={handleCloseModal} isOnDevice={true}>
-          <MenuItem onClick={handleRunClick} key="play-circle">
-            <Flex>
-              <Icon name="play-circle" size="1.75rem" />
-              <LegacyStyledText marginLeft={SPACING.spacing24}>
-                {t('run_transfer')}
-              </LegacyStyledText>
-            </Flex>
-          </MenuItem>
-          <MenuItem onClick={handlePinClick} key="pin">
-            <Flex>
-              <Icon name="pin" size="2.5rem" />
-              <LegacyStyledText marginLeft={SPACING.spacing24}>
-                {pinned ? t('unpin_transfer') : t('pin_transfer')}
-              </LegacyStyledText>
-            </Flex>
-          </MenuItem>
-          <MenuItem onClick={handleDeleteClick} key="trash" isAlert={true}>
-            <Flex>
-              <Icon name="trash" size="2.5rem" />
-              <LegacyStyledText marginLeft={SPACING.spacing24}>
-                {t('delete_transfer')}
-              </LegacyStyledText>
-            </Flex>
-          </MenuItem>
-        </MenuList>
+        createPortal(
+          <MenuList onClick={handleCloseModal} isOnDevice={true}>
+            <MenuItem onClick={handleRunClick} key="play-circle">
+              <Flex>
+                <Icon name="play-circle" size="1.75rem" />
+                <LegacyStyledText marginLeft={SPACING.spacing24}>
+                  {t('run_transfer')}
+                </LegacyStyledText>
+              </Flex>
+            </MenuItem>
+            <MenuItem onClick={handlePinClick} key="pin">
+              <Flex>
+                <Icon name="pin" size="2.5rem" />
+                <LegacyStyledText marginLeft={SPACING.spacing24}>
+                  {pinned ? t('unpin_transfer') : t('pin_transfer')}
+                </LegacyStyledText>
+              </Flex>
+            </MenuItem>
+            <MenuItem onClick={handleDeleteClick} key="trash" isAlert={true}>
+              <Flex>
+                <Icon name="trash" size="2.5rem" />
+                <LegacyStyledText marginLeft={SPACING.spacing24}>
+                  {t('delete_transfer')}
+                </LegacyStyledText>
+              </Flex>
+            </MenuItem>
+          </MenuList>,
+          getTopPortalEl()
+        )
       )}
     </>
   )

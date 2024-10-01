@@ -15,11 +15,11 @@ import {
   POSITION_ABSOLUTE,
   PrimaryButton,
   SecondaryButton,
+  LargeButton,
   SPACING,
   StyledText,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
-  LargeButton,
   WARNING_TOAST,
 } from '@opentrons/components'
 import {
@@ -66,10 +66,10 @@ type RecoverySplashProps = ErrorRecoveryFlowsProps &
     failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
     robotType: RobotType
     robotName: string
-    toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
-    analytics: UseRecoveryAnalyticsResult<RecoveryRoute, RouteStep>
     /* Whether the app should resume any paused recovery state without user action. */
     resumePausedRecovery: boolean
+    toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
+    analytics: UseRecoveryAnalyticsResult<RecoveryRoute, RouteStep>
   }
 export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
   const {
