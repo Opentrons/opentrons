@@ -220,12 +220,16 @@ def _get_runtime_parameter_values(
     rtp_values = {}
     try:
         for variable_name, value in json.loads(serialized_rtp_values).items():
-            assert isinstance(
-                value, (bool, int, float, str)
-            ), f"Value '{value}' is not of allowed type boolean, integer, float or string"
+            if not isinstance(value, (bool, int, float, str)):
+                raise click.BadParameter(
+                    f"Runtime parameter '{value}' is not of allowed type boolean, integer, float or string",
+                    param_hint="--rtp-values",
+                )
             rtp_values[variable_name] = value
-    except Exception as error:
-        raise click.ClickException(f"Could not parse runtime parameter values: {error}")
+    except json.JSONDecodeError as error:
+        raise click.BadParameter(
+            f"JSON decode error: {error}", param_hint="--rtp-values"
+        )
     return rtp_values
 
 
@@ -235,8 +239,10 @@ def _get_runtime_parameter_paths(serialized_rtp_files: str) -> CSVRuntimeParamPa
             variable_name: Path(path_string)
             for variable_name, path_string in json.loads(serialized_rtp_files).items()
         }
-    except Exception as error:
-        raise click.ClickException(f"Could not parse runtime parameter files: {error}")
+    except json.JSONDecodeError as error:
+        raise click.BadParameter(
+            f"JSON decode error: {error}", param_hint="--rtp-files"
+        )
 
 
 R = TypeVar("R")
