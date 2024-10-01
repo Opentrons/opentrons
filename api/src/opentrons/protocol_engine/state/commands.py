@@ -977,7 +977,12 @@ class CommandView(HasState[CommandState]):
             elif action.request.intent == CommandIntent.FIXIT:
                 if (
                     self._state.queue_status != QueueStatus.AWAITING_RECOVERY
-                    or not self._state.is_door_blocking
+                    or self.get_status()
+                    in (
+                        EngineStatus.BLOCKED_BY_OPEN_DOOR,
+                        EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+                    )
+                    and action.request.commandType != "unsafe/ungripLabware"
                 ):
                     raise FixitCommandNotAllowedError(
                         "Fixit commands are not allowed when the run is not in a recoverable state."
