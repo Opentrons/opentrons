@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from pydantic import BaseModel
-from typing import TYPE_CHECKING, Optional, Type
+from typing import Optional, Type
 from typing_extensions import Literal
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
@@ -10,9 +10,6 @@ from ...errors.error_occurrence import ErrorOccurrence
 from ...resources import ensure_ot3_hardware
 
 from opentrons.hardware_control import HardwareControlAPI
-
-if TYPE_CHECKING:
-    from ...execution import GantryMover
 
 
 UnsafeUngripLabwareCommandType = Literal["unsafe/ungripLabware"]
@@ -37,11 +34,9 @@ class UnsafeUngripLabwareImplementation(
     def __init__(
         self,
         hardware_api: HardwareControlAPI,
-        gantry_mover: GantryMover,
         **kwargs: object,
     ) -> None:
         self._hardware_api = hardware_api
-        self._gantry_mover = gantry_mover
 
     async def execute(
         self, params: UnsafeUngripLabwareParams
