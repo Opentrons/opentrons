@@ -967,8 +967,6 @@ class CommandView(HasState[CommandState]):
                 return action
 
         elif isinstance(action, QueueCommandAction):
-            print(self.get_status())
-            print(action.request.commandType)
             if (
                 action.request.intent == CommandIntent.SETUP
                 and self._state.queue_status != QueueStatus.SETUP
