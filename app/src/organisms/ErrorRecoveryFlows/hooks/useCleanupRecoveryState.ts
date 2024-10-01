@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { RECOVERY_MAP } from '../constants'
 
 import type {
@@ -13,17 +15,19 @@ export interface UseCleanupProps {
 }
 
 // When certain events (ex, a takeover) occur, reset state that needs to be reset.
-export function cleanupRecoveryState({
+export function useCleanupRecoveryState({
   isTakeover,
   stashedMapRef,
   setRM,
 }: UseCleanupProps): void {
-  if (isTakeover) {
-    stashedMapRef.current = null
+  useEffect(() => {
+    if (isTakeover) {
+      stashedMapRef.current = null
 
-    setRM({
-      route: RECOVERY_MAP.OPTION_SELECTION.ROUTE,
-      step: RECOVERY_MAP.OPTION_SELECTION.STEPS.SELECT,
-    })
-  }
+      setRM({
+        route: RECOVERY_MAP.OPTION_SELECTION.ROUTE,
+        step: RECOVERY_MAP.OPTION_SELECTION.STEPS.SELECT,
+      })
+    }
+  }, [isTakeover])
 }

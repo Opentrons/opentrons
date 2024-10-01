@@ -18,7 +18,6 @@ describe('EmptySelectorButton', () => {
       text: 'mock text',
       iconName: 'add',
       textAlignment: 'left',
-      size: 'large',
     }
   })
   it('renders the props and button cta', () => {
@@ -33,7 +32,6 @@ describe('EmptySelectorButton', () => {
   })
   it('renders middled aligned button', () => {
     props.textAlignment = 'middle'
-    props.size = 'small'
     props.iconName = undefined
     render(props)
     expect(screen.getByTestId('EmptySelectorButton_container')).toHaveStyle(

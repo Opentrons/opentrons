@@ -19,6 +19,6 @@
     "errors",
     "liquid/types",
     "commandAnnotation/types",
-    "vite.config.ts"
+    "vite.config.mts"
   ]
 }

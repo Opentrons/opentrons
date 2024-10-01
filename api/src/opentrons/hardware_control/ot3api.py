@@ -307,6 +307,12 @@ class OT3API(
         async with self._backend.restore_system_constraints():
             yield
 
+    @contextlib.asynccontextmanager
+    async def grab_pressure(self, mount: OT3Mount) -> AsyncIterator[None]:
+        instrument = self._pipette_handler.get_pipette(mount)
+        async with self._backend.grab_pressure(instrument.channels, mount):
+            yield
+
     def _update_door_state(self, door_state: DoorState) -> None:
         mod_log.info(f"Updating the window switch status: {door_state}")
         self.door_state = door_state

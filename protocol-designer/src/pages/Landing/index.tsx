@@ -83,9 +83,7 @@ export function Landing(): JSX.Element {
         }}
         buttonText={
           <StyledNavLink to={'/createNew'}>
-            <StyledText desktopStyle="bodyLargeRegular">
-              {t('create_a_protocol')}
-            </StyledText>
+            <ButtonText>{t('create_a_protocol')}</ButtonText>
           </StyledNavLink>
         }
       />
@@ -108,6 +106,14 @@ const StyledLabel = styled.label`
     display: none;
   }
 `
+
+const ButtonText = styled.span`
+  line-height: ${TYPOGRAPHY.lineHeight24};
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+`
+
 const StyledNavLink = styled(NavLink)<React.ComponentProps<typeof NavLink>>`
   color: ${COLORS.white};
   text-decoration: none;

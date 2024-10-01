@@ -9,7 +9,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
-  NO_WRAP,
   OVERFLOW_AUTO,
   OVERFLOW_HIDDEN,
   POSITION_ABSOLUTE,
@@ -235,12 +234,9 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                 font-weight: ${dropdownType === 'rounded'
                   ? TYPOGRAPHY.pSemiBold
                   : TYPOGRAPHY.pRegular};
-                white-space: ${NO_WRAP};
-                overflow: ${OVERFLOW_HIDDEN};
-                text-overflow: ellipsis;
               `}
             >
-              <StyledText desktopStyle="captionRegular">
+              <StyledText desktopStyle="captionRegular" css={MENU_TEXT_STYLE}>
                 {currentOption.name}
               </StyledText>
             </Flex>
@@ -311,3 +307,12 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     </Flex>
   )
 }
+
+const MENU_TEXT_STYLE = css`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: ${OVERFLOW_HIDDEN};
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  -webkit-line-clamp: 1;
+`
