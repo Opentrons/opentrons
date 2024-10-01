@@ -967,6 +967,8 @@ class CommandView(HasState[CommandState]):
                 return action
 
         elif isinstance(action, QueueCommandAction):
+            print(self.get_status())
+            print(action.request.commandType)
             if (
                 action.request.intent == CommandIntent.SETUP
                 and self._state.queue_status != QueueStatus.SETUP
@@ -975,14 +977,17 @@ class CommandView(HasState[CommandState]):
                     "Setup commands are not allowed after run has started."
                 )
             elif action.request.intent == CommandIntent.FIXIT:
-                if (
-                    self._state.queue_status != QueueStatus.AWAITING_RECOVERY
-                    or self.get_status()
+                allowed_while_door_open = (
+                    self.get_status()
                     in (
                         EngineStatus.BLOCKED_BY_OPEN_DOOR,
                         EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
                     )
-                    and action.request.commandType != "unsafe/ungripLabware"
+                    and action.request.commandType == "unsafe/ungripLabware"
+                )
+                if (
+                    self._state.queue_status != QueueStatus.AWAITING_RECOVERY
+                    and not allowed_while_door_open
                 ):
                     raise FixitCommandNotAllowedError(
                         "Fixit commands are not allowed when the run is not in a recoverable state."
