@@ -209,8 +209,12 @@ class ProtocolContext(CommandPublisher):
         return self._api_version
 
     @property
-    @requires_version(2, 20)
+    @requires_version(2, 21)
     def robot(self) -> RobotContext:
+        """The :py:class:`.RobotContext` for the protocol.
+
+        :meta private:
+        """
         return self._robot
 
     @property

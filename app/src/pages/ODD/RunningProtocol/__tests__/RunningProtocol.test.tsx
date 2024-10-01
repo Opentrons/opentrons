@@ -22,11 +22,12 @@ import {
   CurrentRunningProtocolCommand,
   RunningProtocolSkeleton,
 } from '/app/organisms/ODD/RunningProtocol'
-import { mockUseAllCommandsResponseNonDeterministic } from '/app/organisms/RunProgressMeter/__fixtures__'
+/* eslint-disable-next-line opentrons/no-imports-across-applications */
+import { mockUseAllCommandsResponseNonDeterministic } from '/app/organisms/Desktop/RunProgressMeter/__fixtures__'
 import { getLocalRobot } from '/app/redux/discovery'
 import { CancelingRunModal } from '/app/organisms/ODD/RunningProtocol/CancelingRunModal'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
-import { OpenDoorAlertModal } from '/app/organisms/OpenDoorAlertModal'
+import { OpenDoorAlertModal } from '/app/organisms/ODD/OpenDoorAlertModal'
 import { RunningProtocol } from '..'
 import {
   useRunStatus,
@@ -56,7 +57,7 @@ vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/organisms/ODD/RunningProtocol')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/organisms/ODD/RunningProtocol/CancelingRunModal')
-vi.mock('/app/organisms/OpenDoorAlertModal')
+vi.mock('/app/organisms/ODD/OpenDoorAlertModal')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux/config')
 vi.mock('/app/organisms/ErrorRecoveryFlows')

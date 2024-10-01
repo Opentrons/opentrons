@@ -59,3 +59,12 @@ export type DropTipWizardContainerProps = DropTipWizardProps & {
   proceedWithConditionalClose: () => void
   goBackRunValid: () => void
 }
+
+/**
+ * Drop-tip/Blowout location types
+ */
+export type ValidDropTipBlowoutLocation =
+  | 'trash-bin'
+  | 'waste-chute'
+  | 'labware'
+  | 'deck'

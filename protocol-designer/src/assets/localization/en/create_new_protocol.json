@@ -3,7 +3,7 @@
   "add_fixtures": "Add your fixtures",
   "add_gripper": "Add a gripper",
   "add_modules": "Add your modules",
-  "add_pip": "Add a pipette and tips",
+  "add_pipette": "Add a pipette and tips",
   "author_org": "Author/Organization",
   "basics": "Let’s start with the basics",
   "description": "Description",
@@ -16,10 +16,10 @@
   "modules_added": "Modules added",
   "name": "Name",
   "need_gripper": "Do you want to move labware automatically with the gripper?",
-  "pip_gen": "Pipette generation",
-  "pip_tips": "Pipette tips",
-  "pip_type": "Pipette type",
-  "pip_vol": "Pipette volume",
+  "pipette_gen": "Pipette generation",
+  "pipette_tips": "Pipette tips",
+  "pipette_type": "Pipette type",
+  "pipette_vol": "Pipette volume",
   "pip": "{{mount}} pipette",
   "quantity": "Quantity",
   "remove": "Remove",
@@ -40,7 +40,7 @@
   "vol_label": "{{volume}} uL",
   "wasteChute": "Waste Chute",
   "which_fixtures": "Which fixtures will you be using?",
-  "which_mods": "Select modules to use in your protocol.",
+  "which_modules": "Select modules to use in your protocol.",
   "which_pipette": "Pick your first pipette. If you need a second pipette, you can add it next.",
-  "your_pips": "Your pipettes"
+  "your_pipettes": "Your pipettes"
 }

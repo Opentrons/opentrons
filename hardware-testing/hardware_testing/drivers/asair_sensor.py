@@ -74,12 +74,16 @@ class AsairSensorBase(ABC):
         ...
 
 
-def BuildAsairSensor(simulate: bool, autosearch: bool = True) -> AsairSensorBase:
+def BuildAsairSensor(
+    simulate: bool, autosearch: bool = True, port_substr: str = None
+) -> AsairSensorBase:
     """Try to find and return an Asair sensor, if not found return a simulator."""
     ui.print_title("Connecting to Environmental sensor")
     if not simulate:
         if not autosearch:
-            port = list_ports_and_select(device_name="Asair environmental sensor")
+            port = list_ports_and_select(
+                device_name="Asair environmental sensor", port_substr=port_substr
+            )
             sensor = AsairSensor.connect(port)
             ui.print_info(f"Found sensor on port {port}")
             return sensor

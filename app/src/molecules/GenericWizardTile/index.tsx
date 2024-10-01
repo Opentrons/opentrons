@@ -23,7 +23,7 @@ import {
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '/app/redux/config'
-import { NeedHelpLink } from '/app/organisms/CalibrationPanels'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { SmallButton, TextOnlyButton } from '/app/atoms/buttons'
 
 const ALIGN_BUTTONS = css`

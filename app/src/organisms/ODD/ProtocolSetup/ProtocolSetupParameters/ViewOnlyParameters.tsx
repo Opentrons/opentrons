@@ -19,7 +19,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
-import { ChildNavigation } from '/app/organisms/ChildNavigation'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
 
 import type { SetupScreens } from '../types'

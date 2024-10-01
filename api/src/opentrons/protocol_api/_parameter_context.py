@@ -1,4 +1,5 @@
 """Parameter context for python protocols."""
+import uuid
 from typing import List, Optional, Union, Dict
 
 from opentrons.protocols.api_support.types import APIVersion
@@ -251,8 +252,16 @@ class ParameterContext:
                     f" but '{variable_name}' is not a CSV parameter."
                 )
 
-            # The parent folder in the path will be the file ID, so we can use that to resolve that here
+            # TODO(jbl 2024-09-30) Refactor this so file ID is passed as its own argument and not assumed from the path
+            # If this is running on a robot, the parent folder in the path will be the file ID
+            # If it is running locally, most likely the parent folder will not be a UUID, so instead we will change
+            # this to be an empty string
             file_id = file_path.parent.name
+            try:
+                uuid.UUID(file_id, version=4)
+            except ValueError:
+                file_id = ""
+
             file_name = file_path.name
 
             with file_path.open("rb") as fh:

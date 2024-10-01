@@ -33,7 +33,7 @@ import { RobotDashboard } from '/app/pages/ODD/RobotDashboard'
 import { RobotSettingsDashboard } from '/app/pages/ODD/RobotSettingsDashboard'
 import { ProtocolDashboard } from '/app/pages/ODD/ProtocolDashboard'
 import { ProtocolDetails } from '/app/pages/ODD/ProtocolDetails'
-import { QuickTransferFlow } from '/app/organisms/QuickTransferFlow'
+import { QuickTransferFlow } from '/app/organisms/ODD/QuickTransferFlow'
 import { QuickTransferDashboard } from '/app/pages/ODD/QuickTransferDashboard'
 import { QuickTransferDetails } from '/app/pages/ODD/QuickTransferDetails'
 import { RunningProtocol } from '/app/pages/ODD/RunningProtocol'
@@ -51,7 +51,7 @@ import {
   updateConfigValue,
 } from '/app/redux/config'
 import { updateBrightness } from '/app/redux/shell'
-import { SLEEP_NEVER_MS } from './constants'
+import { SLEEP_NEVER_MS } from '/app/local-resources/config'
 import { useProtocolReceiptToast, useSoftwareUpdatePoll } from './hooks'
 import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
 

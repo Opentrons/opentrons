@@ -23,9 +23,9 @@ import { StepContainer } from './StepContainer'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { HoverOnStepAction } from '../../../../ui/steps'
-import type { DeleteModalType } from '../../../../components/modals/ConfirmDeleteModal'
 import type { StepIdType } from '../../../../form-types'
 import type { BaseState, ThunkAction } from '../../../../types'
+import type { DeleteModalType } from '../../../../components/modals/ConfirmDeleteModal'
 
 export interface ConnectedStepInfoProps {
   stepId: StepIdType
@@ -63,27 +63,31 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const selected: boolean = multiSelectItemIds?.length
     ? multiSelectItemIds.includes(stepId)
     : selectedStepId === stepId
-
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
   )
   const singleEditFormHasUnsavedChanges = useSelector(
     stepFormSelectors.getCurrentFormHasUnsavedChanges
   )
-
   const selectStep = (): ThunkAction<any> =>
+    dispatch(stepsActions.resetSelectStep(stepId))
+  const selectStepOnDoubleClick = (): ThunkAction<any> =>
     dispatch(stepsActions.selectStep(stepId))
   const highlightStep = (): HoverOnStepAction =>
     dispatch(stepsActions.hoverOnStep(stepId))
   const unhighlightStep = (): HoverOnStepAction =>
     dispatch(stepsActions.hoverOnStep(null))
 
-  const handleStepItemSelection = (): void => {
-    selectStep()
-  }
-
+  const {
+    confirm: confirmDoubleClick,
+    showConfirmation: showConfirmationDoubleClick,
+    cancel: cancelDoubleClick,
+  } = useConditionalConfirm(
+    selectStepOnDoubleClick,
+    currentFormIsPresaved || singleEditFormHasUnsavedChanges
+  )
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
-    handleStepItemSelection,
+    selectStep,
     currentFormIsPresaved || singleEditFormHasUnsavedChanges
   )
 
@@ -94,10 +98,20 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
       return CLOSE_STEP_FORM_WITH_CHANGES
     }
   }
+
   const iconName = stepIconsByType[step.stepType]
 
   return (
     <>
+      {/* TODO: update this modal */}
+      {showConfirmationDoubleClick && (
+        <ConfirmDeleteModal
+          modalType={getModalType()}
+          onContinueClick={confirmDoubleClick}
+          onCancelClick={cancelDoubleClick}
+        />
+      )}
+      {/* TODO: update this modal */}
       {showConfirmation && (
         <ConfirmDeleteModal
           modalType={getModalType()}
@@ -111,6 +125,7 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
         stepId={stepId}
         onMouseLeave={unhighlightStep}
         selected={selected}
+        onDoubleClick={confirmDoubleClick}
         onClick={confirm}
         hovered={hoveredStep === stepId && !hoveredSubstep}
         onMouseEnter={highlightStep}

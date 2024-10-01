@@ -4,7 +4,7 @@ import type { ErrorRecoveryWizardProps } from './ErrorRecoveryWizard'
 import type {
   DropTipFlowsRoute,
   DropTipFlowsStep,
-} from '../DropTipWizardFlows/types'
+} from '/app/organisms/DropTipWizardFlows/types'
 
 /**
  * Misc Recovery Types
