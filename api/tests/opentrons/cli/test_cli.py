@@ -413,7 +413,9 @@ def test_rtp_csv_file_setting(
 
     assert result.json_output is not None
     assert result.json_output["robotType"] == "OT-2 Standard"
-    assert result.json_output["result"] == AnalysisResult.OK
+    assert (
+        result.json_output["result"] == AnalysisResult.OK
+    ), f'{result.json_output["errors"]}'
     assert result.json_output["pipettes"] == []
     assert result.json_output["commands"]  # There should be a home command
     assert result.json_output["labware"] == []
