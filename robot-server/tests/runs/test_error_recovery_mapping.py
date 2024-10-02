@@ -71,7 +71,7 @@ def test_create_error_recovery_policy_with_rules(
     mock_rule: ErrorRecoveryRule,
 ) -> None:
     """Should return IGNORE_AND_CONTINUE if that's what we specify as the rule."""
-    policy = create_error_recovery_policy_from_rules([mock_rule])
+    policy = create_error_recovery_policy_from_rules([mock_rule], enabled=True)
     exampleConfig = Config(
         robot_type="OT-3 Standard",
         deck_type=DeckType.OT3_STANDARD,
@@ -86,7 +86,7 @@ def test_create_error_recovery_policy_undefined_error(
     decoy: Decoy, mock_command: LiquidProbe
 ) -> None:
     """Should return a FAIL_RUN policy when error is not defined."""
-    policy = create_error_recovery_policy_from_rules(rules=[])
+    policy = create_error_recovery_policy_from_rules(rules=[], enabled=True)
     exampleConfig = Config(
         robot_type="OT-3 Standard",
         deck_type=DeckType.OT3_STANDARD,
@@ -99,7 +99,7 @@ def test_create_error_recovery_policy_defined_error(
     decoy: Decoy, mock_command: LiquidProbe, mock_error_data: CommandDefinedErrorData
 ) -> None:
     """Should return a WAIT_FOR_RECOVERY policy when error is defined."""
-    policy = create_error_recovery_policy_from_rules(rules=[])
+    policy = create_error_recovery_policy_from_rules(rules=[], enabled=True)
     exampleConfig = Config(
         robot_type="OT-3 Standard",
         deck_type=DeckType.OT3_STANDARD,
