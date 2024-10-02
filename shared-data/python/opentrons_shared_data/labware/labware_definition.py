@@ -19,6 +19,14 @@ from pydantic import (
 )
 from typing_extensions import Literal
 
+from .constants import (
+    Circular,
+    Rectangular,
+    RoundedRectangular,
+    TruncatedCircular,
+    Spherical,
+)
+
 SAFE_STRING_REGEX = "^[a-z0-9._]+$"
 
 
@@ -228,7 +236,7 @@ class WellDefinition(BaseModel):
 
 
 class SphericalSegment(BaseModel):
-    shape: Literal["spherical"] = Field(..., description="Denote shape as spherical")
+    shape: Spherical = Field(..., description="Denote shape as spherical")
     radiusOfCurvature: _NonNegativeNumber = Field(
         ...,
         description="radius of curvature of bottom subsection of wells",
@@ -239,7 +247,7 @@ class SphericalSegment(BaseModel):
 
 
 class CircularFrustum(BaseModel):
-    shape: Literal["circular"] = Field(..., description="Denote shape as circular")
+    shape: Circular = Field(..., description="Denote shape as circular")
     bottomDiameter: _NonNegativeNumber = Field(
         ...,
         description="The diameter at the bottom cross-section of a circular frustum",
@@ -259,9 +267,7 @@ class CircularFrustum(BaseModel):
 
 
 class RectangularFrustum(BaseModel):
-    shape: Literal["rectangular"] = Field(
-        ..., description="Denote shape as rectangular"
-    )
+    shape: Rectangular = Field(..., description="Denote shape as rectangular")
     bottomXDimension: _NonNegativeNumber = Field(
         ...,
         description="x dimension of the bottom cross-section of a rectangular frustum",
@@ -290,7 +296,7 @@ class RectangularFrustum(BaseModel):
 
 
 class TruncatedCircularSegment(BaseModel):
-    shape: Literal["truncatedcircular"] = Field(
+    shape: TruncatedCircular = Field(
         ..., description="Denote shape as a truncated circular segment"
     )
     circleDiameter: _NonNegativeNumber = Field(
@@ -318,7 +324,7 @@ class TruncatedCircularSegment(BaseModel):
 
 
 class RoundedRectangularSegment(BaseModel):
-    shape: Literal["roundedrectangular"] = Field(
+    shape: RoundedRectangular = Field(
         ..., description="Denote shape as a rounded rectangular segment"
     )
     circleDiameter: _NonNegativeNumber = Field(

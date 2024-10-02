@@ -6,6 +6,13 @@ this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 from typing import Dict, List, NewType, Union
 from typing_extensions import Literal, TypedDict, NotRequired
 from .labware_definition import WellSegment as WellSegmentDef
+from .constants import (
+    Circular,
+    Rectangular,
+    TruncatedCircular,
+    RoundedRectangular,
+    Spherical,
+)
 
 LabwareUri = NewType("LabwareUri", str)
 
@@ -35,11 +42,6 @@ LabwareRoles = Union[
     Literal["maintenance"],
 ]
 
-Circular = Literal["circular"]
-Rectangular = Literal["rectangular"]
-TruncatedCircular = Literal["truncatedcircular"]
-RoundedRectangular = Literal["roundedrectangular"]
-Spherical = Literal["spherical"]
 WellShape = Union[Circular, Rectangular]
 
 
