@@ -46,7 +46,7 @@ from robot_server.protocols.protocol_store import (
 )
 from robot_server.protocols.router import ProtocolNotFound
 
-from ..run_models import RunNotFoundError
+from ..run_models import RunNotFoundError, ActiveNozzleLayout
 from ..run_auto_deleter import RunAutoDeleter
 from ..run_models import Run, BadRun, RunCreate, RunUpdate
 from ..run_orchestrator_store import RunConflictError
@@ -520,6 +520,57 @@ async def get_run_commands_error(
         content=SimpleMultiBody.construct(
             data=command_error_slice.commands_errors,
             meta=meta,
+        ),
+        status_code=status.HTTP_200_OK,
+    )
+
+
+@PydanticResponse.wrap_route(
+    base_router.get,
+    path="/runs/{runId}/activeNozzleLayout/{pipetteId}",
+    summary="Get the current run's active nozzle layout for a specific pipette.",
+    description=dedent(
+        """
+        Get the active nozzle layout for a specific pipette.
+        """
+    ),
+    responses={
+        status.HTTP_200_OK: {"model": SimpleBody[ActiveNozzleLayout]},
+        # status.HTTP_404_NOT_FOUND: {
+        #     "model": ErrorBody[Union[RunNotFound, PipetteNotFound]]
+        # },
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
+    },
+)
+async def get_active_nozzle_layout(
+    runId: str,
+    pipetteId: str,
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+) -> PydanticResponse[SimpleBody[ActiveNozzleLayout]]:
+    """Get the active nozzle layout for a specific pipette in a run.
+
+    Arguments:
+        runId: Run ID pulled from URL.
+        pipetteId: Pipette ID pulled from URL.
+        run_data_manager: Run data retrieval interface.
+    """
+    try:
+        active_nozzle_map = run_data_manager.get_nozzle_map(
+            run_id=runId, pipette_id=pipetteId
+        )
+    # TOME: Figure out which layer to put the pipettenotfoudnerror on.
+    # except PipetteNotFoundError as e:
+    #     raise PipetteNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+    except RunNotCurrentError as e:
+        raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
+
+    return await PydanticResponse.create(
+        content=SimpleBody.construct(
+            data=ActiveNozzleLayout.construct(
+                configuration=active_nozzle_map.configuration,
+                columns=active_nozzle_map.columns,
+                rows=active_nozzle_map.rows,
+            )
         ),
         status_code=status.HTTP_200_OK,
     )

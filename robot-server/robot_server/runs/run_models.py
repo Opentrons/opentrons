@@ -1,7 +1,7 @@
 """Request and response models for run resources."""
 from datetime import datetime
 from pydantic import BaseModel, Field
-from typing import List, Optional, Literal
+from typing import List, Optional, Literal, Dict
 
 from opentrons.protocol_engine import (
     CommandStatus,
@@ -24,6 +24,7 @@ from opentrons.protocol_engine.types import (
     CSVRunTimeParamFilesType,
 )
 from opentrons_shared_data.errors import GeneralError
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from robot_server.service.json_api import ResourceModel
 from robot_server.errors.error_responses import ErrorDetails
 from .action_models import RunAction
@@ -277,6 +278,22 @@ class LabwareDefinitionSummary(BaseModel):
     definitionUri: str = Field(
         ...,
         description="The definition's unique resource identifier in the run.",
+    )
+
+
+class ActiveNozzleLayout(BaseModel):
+    """Details about the active nozzle layout for a pipette."""
+
+    configuration: "NozzleConfigurationType" = Field(
+        None, description="The active nozzle configuration."
+    )
+    columns: Dict[str, List[str]] = Field(
+        None,
+        description="A map of all the pipette columns active in the current configuration.",
+    )
+    rows: Dict[str, List[str]] = Field(
+        None,
+        description="A map of all the pipette rows active in the current configuration.",
     )
 
 
