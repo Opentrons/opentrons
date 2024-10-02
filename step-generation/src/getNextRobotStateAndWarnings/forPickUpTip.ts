@@ -1,6 +1,6 @@
 import assert from 'assert'
 import { ALL, COLUMN, getIsTiprack } from '@opentrons/shared-data'
-import type { PickUpTipParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { PickUpTipParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 export function forPickUpTip(
   params: PickUpTipParams,
