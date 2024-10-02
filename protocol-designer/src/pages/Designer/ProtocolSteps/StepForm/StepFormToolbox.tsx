@@ -147,7 +147,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
             textDecoration={TYPOGRAPHY.textDecorationUnderline}
           >
             <StyledText desktopStyle="bodyDefaultRegular">
-              {t('protocol_steps:rename_btn')}
+              {t('protocol_steps:rename')}
             </StyledText>
           </Btn>
         }
