@@ -373,7 +373,7 @@ def _run_trial(
         )
     _PREV_TRIAL_GRAMS = m_data_init
 
-    if trial.cfg.interactive:
+    if trial.cfg.interactive and not trial.blank:
         ui.get_user_ready("aspirating")
 
     # RUN ASPIRATE
@@ -399,7 +399,7 @@ def _run_trial(
     ui.print_info(f"\tgrams after aspirate: {m_data_aspirate.grams_average} g")
     ui.print_info(f"\tcelsius after aspirate: {m_data_aspirate.celsius_pipette} C")
 
-    if trial.cfg.interactive:
+    if trial.cfg.interactive and not trial.blank:
         ui.get_user_ready("dispensing")
 
     # RUN DISPENSE
@@ -430,7 +430,7 @@ def _run_trial(
     volume_dispense = calculate_change_in_volume(
         m_data_aspirate, m_data_dispense, liq, dilution=trial.cfg.dilution
     )
-    if trial.cfg.interactive:
+    if trial.cfg.interactive and not trial.blank:
         ui.get_user_ready("examine tip")
     return volume_aspirate, m_data_aspirate, volume_dispense, m_data_dispense
 
