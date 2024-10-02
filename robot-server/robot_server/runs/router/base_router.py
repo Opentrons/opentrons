@@ -111,7 +111,7 @@ class RunStopped(ErrorDetails):
 
 
 class NozzleMapNotFound(ErrorDetails):
-    """An error if one tries to modify a stopped run."""
+    """An error if a nozzle map is not found."""
 
     id: Literal["NozzleMapNotFound"] = "NozzleMapNotFound"
     title: str = "Nozzle Map Not Found"
@@ -548,9 +548,9 @@ async def get_run_commands_error(
     ),
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[ActiveNozzleLayout]},
-        # status.HTTP_404_NOT_FOUND: {
-        #     "model": ErrorBody[Union[RunNotFound, PipetteNotFound]]
-        # },
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorBody[Union[RunNotFound, NozzleMapNotFound]]
+        },
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
 )
