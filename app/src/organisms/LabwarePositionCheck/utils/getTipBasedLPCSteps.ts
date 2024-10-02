@@ -19,7 +19,7 @@ import type {
   RunTimeCommand,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareLocationCombo } from '../../ApplyHistoricOffsets/hooks/getLabwareLocationCombos'
 
 interface LPCArgs {
