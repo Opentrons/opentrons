@@ -837,7 +837,7 @@ async def test_get_active_nozzle_layout_success(
     pipette_id = "test-pipette-id"
 
     decoy.when(
-        mock_run_data_manager.get_nozzle_map(run_id=run_id, pipette_id=pipette_id)
+        mock_run_data_manager.get_nozzle_maps(run_id=run_id, pipette_id=pipette_id)
     ).then_return(mock_nozzle_map)
 
     result = await get_active_nozzle_layout(
@@ -863,7 +863,7 @@ async def test_get_active_nozzle_layout_nozzle_map_not_found(
     pipette_id = "non-existent-pipette-id"
 
     decoy.when(
-        mock_run_data_manager.get_nozzle_map(run_id=run_id, pipette_id=pipette_id)
+        mock_run_data_manager.get_nozzle_maps(run_id=run_id, pipette_id=pipette_id)
     ).then_raise(NozzleMapNotFoundError("Nozzle map not found"))
 
     with pytest.raises(ApiError) as exc_info:
@@ -886,7 +886,7 @@ async def test_get_active_nozzle_layout_run_not_current(
     pipette_id = "test-pipette-id"
 
     decoy.when(
-        mock_run_data_manager.get_nozzle_map(run_id=run_id, pipette_id=pipette_id)
+        mock_run_data_manager.get_nozzle_maps(run_id=run_id, pipette_id=pipette_id)
     ).then_raise(RunNotCurrentError("Run is not current"))
 
     with pytest.raises(ApiError) as exc_info:

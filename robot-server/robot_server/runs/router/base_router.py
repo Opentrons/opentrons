@@ -53,7 +53,6 @@ from ..run_orchestrator_store import RunConflictError
 from ..run_data_manager import (
     RunDataManager,
     RunNotCurrentError,
-    NozzleMapNotFoundError,
 )
 from ..dependencies import (
     get_run_data_manager,
@@ -539,49 +538,34 @@ async def get_run_commands_error(
 
 @PydanticResponse.wrap_route(
     base_router.get,
-    path="/runs/{runId}/activeNozzleLayout/{pipetteId}",
+    path="/runs/{runId}/currentState",
     summary="Get the current run's active nozzle layout for a specific pipette.",
     description=dedent(
         """
-        Get the active nozzle layout for a specific pipette.
+        Get current state associated with a run if the run is current.
         """
     ),
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[ActiveNozzleLayout]},
-        status.HTTP_404_NOT_FOUND: {
-            "model": ErrorBody[Union[RunNotFound, NozzleMapNotFound]]
-        },
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
 )
-async def get_active_nozzle_layout(
+async def get_current_state(
     runId: str,
-    pipetteId: str,
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[SimpleBody[ActiveNozzleLayout]]:
-    """Get the active nozzle layout for a specific pipette in a run.
+    """Get current state associated with a run.
 
     Arguments:
         runId: Run ID pulled from URL.
-        pipetteId: Pipette ID pulled from URL.
         run_data_manager: Run data retrieval interface.
     """
     try:
-        active_nozzle_map = run_data_manager.get_nozzle_map(
-            run_id=runId, pipette_id=pipetteId
-        )
-    except NozzleMapNotFoundError as e:
-        raise NozzleMapNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+        active_nozzle_maps = run_data_manager.get_nozzle_maps(run_id=runId)
     except RunNotCurrentError as e:
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
     return await PydanticResponse.create(
-        content=SimpleBody.construct(
-            data=ActiveNozzleLayout.construct(
-                configuration=active_nozzle_map.configuration,
-                columns=active_nozzle_map.columns,
-                rows=active_nozzle_map.rows,
-            )
-        ),
+        content=SimpleBody.construct(data=active_nozzle_maps),
         status_code=status.HTTP_200_OK,
     )

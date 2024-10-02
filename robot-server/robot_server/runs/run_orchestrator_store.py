@@ -1,7 +1,7 @@
 """In-memory storage of ProtocolEngine instances."""
 import asyncio
 import logging
-from typing import List, Optional, Callable
+from typing import List, Optional, Callable, Dict
 
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.types import (
@@ -325,9 +325,9 @@ class RunOrchestratorStore:
         """Get loaded labware definitions."""
         return self.run_orchestrator.get_loaded_labware_definitions()
 
-    def get_nozzle_map(self, pipette_id: str) -> NozzleMap:
-        """Get nozzle map for a pipette."""
-        return self.run_orchestrator.get_nozzle_map(pipette_id=pipette_id)
+    def get_nozzle_maps(self) -> Dict[str, NozzleMap]:
+        """Get the current nozzle map keyed by pipette id."""
+        return self.run_orchestrator.get_nozzle_maps()
 
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""

@@ -1168,11 +1168,11 @@ def test_get_nozzle_map_current_run(
     pipette_id = "pipette-id"
 
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
-    decoy.when(mock_run_orchestrator_store.get_nozzle_map(pipette_id)).then_return(
+    decoy.when(mock_run_orchestrator_store.get_nozzle_maps(pipette_id)).then_return(
         mock_nozzle_map
     )
 
-    result = subject.get_nozzle_map(run_id=run_id, pipette_id=pipette_id)
+    result = subject.get_nozzle_maps(run_id=run_id, pipette_id=pipette_id)
 
     assert result == mock_nozzle_map
 
@@ -1191,7 +1191,7 @@ def test_get_nozzle_map_not_current_run(
     )
 
     with pytest.raises(RunNotCurrentError):
-        subject.get_nozzle_map(run_id=run_id, pipette_id=pipette_id)
+        subject.get_nozzle_maps(run_id=run_id, pipette_id=pipette_id)
 
 
 def test_get_nozzle_map_not_found(
@@ -1204,9 +1204,9 @@ def test_get_nozzle_map_not_found(
     pipette_id = "non-existent-pipette-id"
 
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
-    decoy.when(mock_run_orchestrator_store.get_nozzle_map(pipette_id)).then_raise(
+    decoy.when(mock_run_orchestrator_store.get_nozzle_maps(pipette_id)).then_raise(
         KeyError("Pipette not found")
     )
 
     with pytest.raises(NozzleMapNotFoundError):
-        subject.get_nozzle_map(run_id=run_id, pipette_id=pipette_id)
+        subject.get_nozzle_maps(run_id=run_id, pipette_id=pipette_id)
