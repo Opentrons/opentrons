@@ -15,7 +15,6 @@ import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 import { BUTTON_LINK_STYLE } from '../../atoms'
 import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
-import type { FormPipettesByMount, PipetteOnDeck } from '../../step-forms'
 
 interface PipetteInfoItemProps {
   mount: PipetteMount
@@ -23,8 +22,6 @@ interface PipetteInfoItemProps {
   tiprackDefURIs: string[]
   editClick: () => void
   cleanForm: () => void
-  formPipettesByMount?: FormPipettesByMount
-  pipetteOnDeck?: PipetteOnDeck[]
 }
 
 export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
