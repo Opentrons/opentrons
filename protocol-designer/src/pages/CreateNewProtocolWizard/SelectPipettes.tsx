@@ -445,7 +445,6 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                 pipettesByMount.left.tiprackDefURI != null ? (
                   <PipetteInfoItem
                     mount="left"
-                    formPipettesByMount={pipettesByMount}
                     pipetteName={
                       pipettesByMount.left.pipetteName as PipetteName
                     }
@@ -477,7 +476,6 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                 pipettesByMount.right.tiprackDefURI != null ? (
                   <PipetteInfoItem
                     mount="right"
-                    formPipettesByMount={pipettesByMount}
                     pipetteName={
                       pipettesByMount.right.pipetteName as PipetteName
                     }
