@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
@@ -31,20 +31,16 @@ export function ThermocyclerProfileModal(
   const { formData, propsForFields, setShowProfileModal } = props
   const { i18n, t } = useTranslation(['application', 'form'])
 
-  const [showCreateNewStep, setShowCreateNewStep] = React.useState<boolean>(
-    false
-  )
-  const [showCreateNewCycle, setShowCreateNewCycle] = React.useState<boolean>(
-    false
-  )
-  const [steps, setSteps] = React.useState<ThermocyclerStepType[]>(
+  const [showCreateNewStep, setShowCreateNewStep] = useState<boolean>(false)
+  const [showCreateNewCycle, setShowCreateNewCycle] = useState<boolean>(false)
+  const [steps, setSteps] = useState<ThermocyclerStepType[]>(
     formData.orderedProfileItems.map(
       (id: string) => formData.profileItemsById[id]
     ) as ThermocyclerStepType[]
   )
   const canAddStepOrProfile = !(showCreateNewCycle || showCreateNewStep)
 
-  function handleSaveModal(): void {
+  const handleSaveModal = (): void => {
     propsForFields.profileItemsById.updateValue(
       steps.reduce((acc, step) => {
         return { ...acc, [step.id]: step }

@@ -5,7 +5,8 @@ import isArray from 'lodash/isArray'
  ********************/
 // TODO: reconcile difference between returning error string and key
 export type FieldError =
-  | 'BAD_TIME'
+  | 'BAD_TIME_HMS'
+  | 'BAD_TIME_MS'
   | 'REQUIRED'
   | 'UNDER_WELL_MINIMUM'
   | 'NON_ZERO'
@@ -14,7 +15,8 @@ export type FieldError =
   | 'NOT_A_REAL_NUMBER'
   | 'OUTSIDE_OF_RANGE'
 const FIELD_ERRORS: Record<FieldError, string> = {
-  BAD_TIME: 'Must be a valid time (hh:mm:ss)',
+  BAD_TIME_HMS: 'Must be a valid time (hh:mm:ss)',
+  BAD_TIME_MS: 'Must be a valid time (mm:ss)',
   REQUIRED: 'This field is required',
   UNDER_WELL_MINIMUM: 'or more wells are required',
   NON_ZERO: 'Must be greater than zero',
@@ -35,7 +37,7 @@ export const isTimeFormat: ErrorChecker = (value: unknown): string | null => {
   const timeRegex = new RegExp(/^\d{1,2}:\d{1,2}:\d{1,2}$/g)
   return (typeof value === 'string' && timeRegex.test(value)) || value == null
     ? null
-    : FIELD_ERRORS.BAD_TIME
+    : FIELD_ERRORS.BAD_TIME_HMS
 }
 export const isTimeFormatMinutesSeconds: ErrorChecker = (
   value: unknown
@@ -43,7 +45,7 @@ export const isTimeFormatMinutesSeconds: ErrorChecker = (
   const timeRegex = new RegExp(/^\d{1,2}:\d{1,2}$/g)
   return (typeof value === 'string' && timeRegex.test(value)) || value == null
     ? null
-    : FIELD_ERRORS.BAD_TIME
+    : FIELD_ERRORS.BAD_TIME_MS
 }
 export const nonZero: ErrorChecker = (value: unknown) =>
   value && Number(value) === 0 ? FIELD_ERRORS.NON_ZERO : null

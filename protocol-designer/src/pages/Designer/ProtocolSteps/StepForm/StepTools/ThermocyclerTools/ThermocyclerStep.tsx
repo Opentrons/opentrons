@@ -1,21 +1,21 @@
 import { css } from 'styled-components'
-import * as React from 'react'
+import { useState } from 'react'
 import {
-  COLORS,
-  Flex,
-  SPACING,
-  JUSTIFY_SPACE_BETWEEN,
-  BORDERS,
   ALIGN_CENTER,
-  StyledText,
+  BORDERS,
   Btn,
-  NO_WRAP,
-  TEXT_DECORATION_UNDERLINE,
+  COLORS,
   CURSOR_POINTER,
-  Icon,
-  PrimaryButton,
   DIRECTION_COLUMN,
+  Flex,
+  Icon,
   InputField,
+  JUSTIFY_SPACE_BETWEEN,
+  NO_WRAP,
+  PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import {
@@ -39,7 +39,7 @@ export interface ThermocyclerStepType {
 }
 
 interface ThermocyclerStepProps {
-  steps: any[]
+  steps: ThermocyclerStepType[]
   setSteps: React.Dispatch<React.SetStateAction<any[]>>
   setShowCreateNewStep: (_: boolean) => void
   step?: ThermocyclerStepType
@@ -58,9 +58,9 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
     readOnly = true,
   } = props
   const { i18n, t } = useTranslation(['application', 'form'])
-  const [hover, setHover] = React.useState<boolean>(false)
-  const [showEdit, setShowEditCurrentStep] = React.useState<boolean>(!readOnly)
-  const [stepState, setStepState] = React.useState({
+  const [hover, setHover] = useState<boolean>(false)
+  const [showEdit, setShowEditCurrentStep] = useState<boolean>(!readOnly)
+  const [stepState, setStepState] = useState({
     name: { value: step?.title, error: null },
     temp: { value: step?.temperature, error: null },
     time: {
@@ -72,8 +72,11 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
     },
   })
   const id = step?.id ?? null
+  const isStepStateError =
+    Object.values(stepState).some(({ error }) => error != null) ||
+    Object.values(stepState).some(({ value }) => value == null || value === '')
 
-  function handleDeleteStep(): void {
+  const handleDeleteStep = (): void => {
     if (id != null) {
       setSteps(
         steps.filter((s: any) => {
@@ -84,11 +87,11 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
       setShowCreateNewStep(false)
     }
   }
-  function handleValueUpdate(
+  const handleValueUpdate = (
     field: 'name' | 'temp' | 'time',
     value: string,
     errorCheck?: (value: any) => string | null
-  ): void {
+  ): void => {
     setStepState({
       ...stepState,
       [field]: {
@@ -97,11 +100,7 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
       },
     })
   }
-  const isStepStateError =
-    Object.values(stepState).some(({ error }) => error != null) ||
-    Object.values(stepState).some(({ value }) => value == null || value === '')
-
-  function handleSaveStep(): void {
+  const handleSaveStep = (): void => {
     const stepId = uuid()
     const { minutes, seconds } = getTimeFromString(stepState.time.value ?? '')
     const stepBaseData = {
@@ -154,7 +153,7 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
         <Btn
           onClick={handleDeleteStep}
           whiteSpace={NO_WRAP}
-          textDecoration={TEXT_DECORATION_UNDERLINE}
+          textDecoration={TYPOGRAPHY.textDecorationUnderline}
         >
           <StyledText desktopStyle="bodyDefaultRegular">
             {i18n.format(
@@ -205,7 +204,7 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
         {hover ? (
           <Btn
             whiteSpace={NO_WRAP}
-            textDecoration={TEXT_DECORATION_UNDERLINE}
+            textDecoration={TYPOGRAPHY.textDecorationUnderline}
             onClick={() => {
               setShowEditCurrentStep(true)
             }}

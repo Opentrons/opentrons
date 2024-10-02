@@ -1,12 +1,12 @@
-import React from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
   DIRECTION_COLUMN,
+  Flex,
+  ListButton,
   SPACING,
   StyledText,
-  ListButton,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../../../../components/portals/TopPortal'
@@ -24,7 +24,7 @@ export function ProfileStepsSummary(
 ): JSX.Element {
   const { formData, propsForFields } = props
   const { i18n, t } = useTranslation('form')
-  const [showProfileModal, setShowProfileModal] = React.useState<boolean>(false)
+  const [showProfileModal, setShowProfileModal] = useState<boolean>(false)
 
   return (
     <>

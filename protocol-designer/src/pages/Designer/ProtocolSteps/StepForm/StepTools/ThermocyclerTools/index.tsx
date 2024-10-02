@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -24,7 +24,7 @@ export function ThermocyclerTools(props: StepFormProps): JSX.Element {
   const { propsForFields, formData } = props
   const { t } = useTranslation('form')
 
-  const [contentType, setContentType] = React.useState<ThermocyclerContentType>(
+  const [contentType, setContentType] = useState<ThermocyclerContentType>(
     (formData.thermocyclerFormType ?? null) as ThermocyclerContentType
   )
 
