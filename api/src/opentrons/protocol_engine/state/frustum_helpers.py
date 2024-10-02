@@ -13,6 +13,9 @@ from opentrons_shared_data.labware.types import (
 from opentrons_shared_data.labware.labware_definition import InnerWellGeometry
 
 
+SectionsType = Union[CircularBoundedSection, RectangularBoundedSection]
+
+
 def reject_unacceptable_heights(
     potential_heights: List[float], max_height: float
 ) -> float:
@@ -33,9 +36,7 @@ def reject_unacceptable_heights(
     return valid_heights[0]
 
 
-def get_cross_section_area(
-    bounded_section: Union[CircularBoundedSection, RectangularBoundedSection]
-) -> float:
+def get_cross_section_area(bounded_section: SectionsType) -> float:
     """Find the shape of a cross-section and calculate the area appropriately."""
     if bounded_section["shape"] == "circular":
         cross_section_area = cross_section_area_circular(bounded_section["diameter"])
@@ -242,11 +243,11 @@ def get_well_volumetric_capacity(
 
     if is_rectangular_frusta_list(sorted_frusta):
         for f, next_f in get_boundary_pairs(sorted_frusta):
-            top_cross_section_width = next_f["xDimension"]
-            top_cross_section_length = next_f["yDimension"]
-            bottom_cross_section_width = f["xDimension"]
-            bottom_cross_section_length = f["yDimension"]
-            frustum_height = next_f["topHeight"] - f["topHeight"]
+            top_cross_section_width = next_f.xDimension
+            top_cross_section_length = next_f.yDimension
+            bottom_cross_section_width = f.xDimension
+            bottom_cross_section_length = f.yDimension
+            frustum_height = next_f.topHeight - f.topHeight
             frustum_volume = volume_from_height_rectangular(
                 target_height=frustum_height,
                 total_frustum_height=frustum_height,
@@ -256,12 +257,12 @@ def get_well_volumetric_capacity(
                 top_width=top_cross_section_width,
             )
 
-            well_volume.append((next_f["topHeight"], frustum_volume))
+            well_volume.append((next_f.topHeight, frustum_volume))
     elif is_circular_frusta_list(sorted_frusta):
         for f, next_f in get_boundary_pairs(sorted_frusta):
-            top_cross_section_radius = next_f["diameter"] / 2.0
-            bottom_cross_section_radius = f["diameter"] / 2.0
-            frustum_height = next_f["topHeight"] - f["topHeight"]
+            top_cross_section_radius = next_f.diameter / 2.0
+            bottom_cross_section_radius = f.diameter / 2.0
+            frustum_height = next_f.topHeight - f.topHeight
             frustum_volume = volume_from_height_circular(
                 target_height=frustum_height,
                 total_frustum_height=frustum_height,
@@ -269,7 +270,7 @@ def get_well_volumetric_capacity(
                 top_radius=top_cross_section_radius,
             )
 
-            well_volume.append((next_f["topHeight"], frustum_volume))
+            well_volume.append((next_f.topHeight, frustum_volume))
     else:
         raise NotImplementedError(
             "Well section with differing boundary shapes not yet implemented."
@@ -278,20 +279,26 @@ def get_well_volumetric_capacity(
 
 
 def height_at_volume_within_section(
-    top_cross_section: Union[CircularBoundedSection, RectangularBoundedSection],
-    bottom_cross_section: Union[CircularBoundedSection, RectangularBoundedSection],
+    top_cross_section: SectionsType,
+    bottom_cross_section: SectionsType,
     target_volume_relative: float,
     frustum_height: float,
 ) -> float:
     """Calculate a height within a bounded section according to geometry."""
-    if top_cross_section["shape"] == bottom_cross_section["shape"] == "circular":
+    if (
+        top_cross_section["shape"] == "circular"
+        and bottom_cross_section["shape"] == "circular"
+    ):
         frustum_height = height_from_volume_circular(
             volume=target_volume_relative,
             top_radius=(top_cross_section["diameter"] / 2),
             bottom_radius=(bottom_cross_section["diameter"] / 2),
             total_frustum_height=frustum_height,
         )
-    elif top_cross_section["shape"] == bottom_cross_section["shape"] == "rectangular":
+    elif (
+        top_cross_section["shape"] == "rectangular"
+        and bottom_cross_section["shape"] == "rectangular"
+    ):
         frustum_height = height_from_volume_rectangular(
             volume=target_volume_relative,
             total_frustum_height=frustum_height,
@@ -308,20 +315,26 @@ def height_at_volume_within_section(
 
 
 def volume_at_height_within_section(
-    top_cross_section: Union[CircularBoundedSection, RectangularBoundedSection],
-    bottom_cross_section: Union[CircularBoundedSection, RectangularBoundedSection],
+    top_cross_section: SectionsType,
+    bottom_cross_section: SectionsType,
     target_height_relative: float,
     frustum_height: float,
 ) -> float:
     """Calculate a volume within a bounded section according to geometry."""
-    if top_cross_section["shape"] == bottom_cross_section["shape"] == "circular":
+    if (
+        top_cross_section["shape"] == "circular"
+        and bottom_cross_section["shape"] == "circular"
+    ):
         frustum_volume = volume_from_height_circular(
             target_height=target_height_relative,
             total_frustum_height=frustum_height,
             bottom_radius=(bottom_cross_section["diameter"] / 2),
             top_radius=(top_cross_section["diameter"] / 2),
         )
-    elif top_cross_section["shape"] == bottom_cross_section["shape"] == "rectangular":
+    elif (
+        top_cross_section["shape"] == "rectangular"
+        and bottom_cross_section["shape"] == "rectangular"
+    ):
         frustum_volume = volume_from_height_rectangular(
             target_height=target_height_relative,
             total_frustum_height=frustum_height,
@@ -347,13 +360,12 @@ def _find_volume_in_partial_frustum(
     partial_volume: Optional[float] = None
     for bottom_cross_section, top_cross_section in get_boundary_pairs(sorted_frusta):
         if (
-            bottom_cross_section["topHeight"]
-            < target_height
-            < top_cross_section["targetHeight"]
+            bottom_cross_section.topHeight < target_height
+            and target_height < top_cross_section.topHeight
         ):
-            relative_target_height = target_height - bottom_cross_section["topHeight"]
+            relative_target_height = target_height - bottom_cross_section.topHeight
             frustum_height = (
-                top_cross_section["topHeight"] - bottom_cross_section["topHeight"]
+                top_cross_section.topHeight - bottom_cross_section.topHeight
             )
             partial_volume = volume_at_height_within_section(
                 top_cross_section=top_cross_section,
@@ -420,7 +432,7 @@ def _find_height_in_partial_frustum(
         bottom_cross_section, top_cross_section = cross_sections
         (bottom_height, bottom_volume), (top_height, top_volume) = capacity
 
-        if bottom_volume < target_volume < top_volume:
+        if bottom_volume < target_volume and target_volume < top_volume:
             relative_target_volume = target_volume - bottom_volume
             frustum_height = top_height - bottom_height
             partial_height = height_at_volume_within_section(
