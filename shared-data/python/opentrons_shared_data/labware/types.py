@@ -3,9 +3,12 @@
 types in this file by and large require the use of typing_extensions.
 this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 """
-from typing import Dict, List, NewType, Union
+from typing import Dict, List, NewType, Union, cast
 from typing_extensions import Literal, TypedDict, NotRequired
-from .labware_definition import WellSegment as WellSegmentDef
+from .labware_definition import (
+    WellSegment as WellSegmentDef,
+    InnerWellGeometry as InnerWellGeometryDef,
+)
 from .constants import (
     Circular,
     Rectangular,
@@ -179,20 +182,30 @@ WellSegment = Union[
     SphericalSegment,
 ]
 
-@staticmethod
-def ToWellSegmentDict(segment: Union[WellSegment,WellSegmentDef]) -> WellSegment:
-    if isinstance(segment, WellSegmentDef):
-        return typing.cast(WellSegment, segment.model_dump(exclude_none=True, exclude_unset=True))
+
+def ToWellSegmentDict(segment: Union[WellSegment, WellSegmentDef]) -> WellSegment:
+    if not isinstance(segment, dict):
+        return cast(
+            WellSegment, segment.model_dump(exclude_none=True, exclude_unset=True)  # type: ignore[union-attr]
+        )
     return segment
 
 
 class InnerWellGeometry(TypedDict):
     sections: List[WellSegment]
 
-@staticmethod
-def ToInnerWellGeometryDict(inner_well_geometry: Union[InnerWellGeometry,InnerWellGeometryDef]) -> InnerWellGeometry:
-    return InnerWellGeometry([ToWellSegmentDict(section) for section in inner_well_geometry["sections"]])
 
+def ToInnerWellGeometryDict(
+    inner_well_geometry: Union[InnerWellGeometry, InnerWellGeometryDef]
+) -> InnerWellGeometry:
+    if not isinstance(inner_well_geometry, dict):
+        geometry_dict: InnerWellGeometry = {
+            "sections": [
+                ToWellSegmentDict(section) for section in inner_well_geometry.sections
+            ]
+        }
+        return geometry_dict
+    return inner_well_geometry
 
 
 class LabwareDefinition(TypedDict):
