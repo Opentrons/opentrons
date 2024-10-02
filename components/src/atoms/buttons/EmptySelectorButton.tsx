@@ -29,20 +29,8 @@ export function EmptySelectorButton(
 ): JSX.Element {
   const { onClick, text, iconName, textAlignment, disabled = false } = props
 
-  const StyledButton = styled.button`
-    border: none;
-    width: ${FLEX_MAX_CONTENT};
-    height: ${FLEX_MAX_CONTENT};
-    cursor: ${disabled ? CURSOR_DEFAULT : CURSOR_POINTER};
-    &:focus-visible {
-      outline: 2px solid ${COLORS.white};
-      box-shadow: 0 0 0 4px ${COLORS.blue50};
-      border-radius: ${BORDERS.borderRadius8};
-    }
-  `
-
   return (
-    <StyledButton onClick={onClick}>
+    <StyledButton onClick={onClick} disabled={disabled}>
       <Flex
         gridGap={SPACING.spacing4}
         padding={SPACING.spacing12}
@@ -70,3 +58,16 @@ export function EmptySelectorButton(
     </StyledButton>
   )
 }
+
+const StyledButton = styled.button<{ disabled: boolean }>`
+  border: none;
+  width: ${FLEX_MAX_CONTENT};
+  height: ${FLEX_MAX_CONTENT};
+  cursor: ${props => (props.disabled ? CURSOR_DEFAULT : CURSOR_POINTER)};
+
+  &:focus-visible {
+    outline: 2px solid ${COLORS.white};
+    box-shadow: 0 0 0 4px ${COLORS.blue50};
+    border-radius: ${BORDERS.borderRadius8};
+  }
+`

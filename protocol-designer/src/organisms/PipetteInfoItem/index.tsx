@@ -73,33 +73,31 @@ export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
           </Flex>
         </Flex>
         <Flex
-          gridGap={SPACING.spacing20}
+          gridGap={SPACING.spacing16}
           textDecoration={TYPOGRAPHY.textDecorationUnderline}
         >
           <Btn
             onClick={editClick}
             textDecoration={TYPOGRAPHY.textDecorationUnderline}
             css={BUTTON_LINK_STYLE}
+            padding={SPACING.spacing4}
           >
             <StyledText desktopStyle="bodyDefaultRegular">
               {t('edit')}
             </StyledText>
           </Btn>
-          {(formPipettesByMount != null &&
-            formPipettesByMount[oppositeMount].pipetteName == null) ||
-          (pipetteOnDeck != null && pipetteOnDeck.length === 1) ? null : (
-            <Btn
-              onClick={() => {
-                cleanForm()
-              }}
-              textDecoration={TYPOGRAPHY.textDecorationUnderline}
-              css={BUTTON_LINK_STYLE}
-            >
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {t('remove')}
-              </StyledText>
-            </Btn>
-          )}
+          <Btn
+            onClick={() => {
+              cleanForm()
+            }}
+            textDecoration={TYPOGRAPHY.textDecorationUnderline}
+            css={BUTTON_LINK_STYLE}
+            padding={SPACING.spacing4}
+          >
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {t('remove')}
+            </StyledText>
+          </Btn>
         </Flex>
       </Flex>
     </ListItem>

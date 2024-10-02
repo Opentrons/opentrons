@@ -101,8 +101,15 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
     }
   }, [pipetteType, pipetteGen, pipetteVolume, selectedPipetteName])
 
+  const noPipette =
+    (pipettesByMount.left.pipetteName == null ||
+      pipettesByMount.left.tiprackDefURI == null) &&
+    (pipettesByMount.right.pipetteName == null ||
+      pipettesByMount.right.tiprackDefURI == null)
+
   const isDisabled =
-    page === 'add' && pipettesByMount[defaultMount].tiprackDefURI == null
+    (page === 'add' && pipettesByMount[defaultMount].tiprackDefURI == null) ||
+    noPipette
 
   const handleProceed = (): void => {
     if (!isDisabled) {
@@ -113,6 +120,28 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
       }
     }
   }
+
+  const handleGoBack = (): void => {
+    if (page === 'add') {
+      resetFields()
+      setValue(`pipettesByMount.${defaultMount}.pipetteName`, undefined)
+      setValue(`pipettesByMount.${defaultMount}.tiprackDefURI`, undefined)
+      if (
+        pipettesByMount.left.pipetteName != null ||
+        pipettesByMount.left.tiprackDefURI != null ||
+        pipettesByMount.right.pipetteName != null ||
+        pipettesByMount.right.tiprackDefURI != null
+      ) {
+        setPage('overview')
+      } else {
+        goBack(1)
+      }
+    }
+    if (page === 'overview') {
+      setPage('add')
+    }
+  }
+
   return (
     <>
       {showIncompatibleTip ? (
@@ -129,17 +158,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
           subHeader={page === 'add' ? t('which_pipette') : undefined}
           proceed={handleProceed}
           goBack={() => {
-            if (page === 'add') {
-              resetFields()
-              setValue(`pipettesByMount.${defaultMount}.pipetteName`, undefined)
-              setValue(
-                `pipettesByMount.${defaultMount}.tiprackDefURI`,
-                undefined
-              )
-              goBack(1)
-            } else {
-              setPage('add')
-            }
+            handleGoBack()
           }}
           disabled={isDisabled}
         >
@@ -375,7 +394,11 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                 <StyledText desktopStyle="headingSmallBold">
                   {t('your_pipettes')}
                 </StyledText>
-                {has96Channel ? null : (
+                {has96Channel ||
+                (pipettesByMount.left.pipetteName == null &&
+                  pipettesByMount.right.pipetteName == null) ||
+                (pipettesByMount.left.tiprackDefURI == null &&
+                  pipettesByMount.right.tiprackDefURI == null) ? null : (
                   <Btn
                     css={BUTTON_LINK_STYLE}
                     onClick={() => {
@@ -411,7 +434,7 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                         transform="rotate(90deg)"
                       />
                       <StyledText desktopStyle="captionSemiBold">
-                        {t('swap')}
+                        {t('swap_pipettes')}
                       </StyledText>
                     </Flex>
                   </Btn>
@@ -469,7 +492,11 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                       resetFields()
                     }}
                   />
-                ) : has96Channel ? null : (
+                ) : has96Channel ||
+                  (pipettesByMount.left.pipetteName == null &&
+                    pipettesByMount.right.pipetteName == null) ||
+                  (pipettesByMount.left.tiprackDefURI == null &&
+                    pipettesByMount.right.tiprackDefURI == null) ? null : (
                   <EmptySelectorButton
                     onClick={() => {
                       setPage('add')
