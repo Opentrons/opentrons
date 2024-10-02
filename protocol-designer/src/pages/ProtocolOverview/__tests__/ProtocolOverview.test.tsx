@@ -16,6 +16,7 @@ import { selectors as labwareIngredSelectors } from '../../../labware-ingred/sel
 import { ProtocolOverview } from '../index'
 import { DeckThumbnail } from '../DeckThumbnail'
 import { OffDeckThumbnail } from '../OffdeckThumbnail'
+import { LiquidDefinitions } from '../LiquidDefinitions'
 
 import type { NavigateFunction } from 'react-router-dom'
 
@@ -27,6 +28,8 @@ vi.mock('../../../organisms/MaterialsListModal')
 vi.mock('../../../labware-ingred/selectors')
 vi.mock('../../../organisms')
 vi.mock('../../../labware-ingred/selectors')
+vi.mock('../LiquidDefinitions')
+
 const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
@@ -72,6 +75,9 @@ describe('ProtocolOverview', () => {
     vi.mocked(OffDeckThumbnail).mockReturnValue(
       <div>mock OffdeckThumbnail</div>
     )
+    vi.mocked(LiquidDefinitions).mockReturnValue(
+      <div>mock LiquidDefinitions</div>
+    )
   })
 
   it('renders each section with text', () => {
@@ -101,7 +107,7 @@ describe('ProtocolOverview', () => {
     screen.getByText('Right pipette')
     screen.getByText('Extension mount')
     //   liquids
-    screen.getByText('Liquid Definitions')
+    screen.getByText('mock LiquidDefinitions')
     //  steps
     screen.getByText('Protocol steps')
   })

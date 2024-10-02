@@ -50,6 +50,17 @@ describe('getErrorKind', () => {
     expect(result).toEqual(ERROR_KINDS.TIP_NOT_DETECTED)
   })
 
+  it(`returns ${ERROR_KINDS.GRIPPER_ERROR} for ${DEFINED_ERROR_TYPES.GRIPPER_MOVEMENT} errorType`, () => {
+    const result = getErrorKind({
+      commandType: 'moveLabware',
+      error: {
+        isDefined: true,
+        errorType: DEFINED_ERROR_TYPES.GRIPPER_MOVEMENT,
+      } as RunCommandError,
+    } as RunTimeCommand)
+    expect(result).toEqual(ERROR_KINDS.GRIPPER_ERROR)
+  })
+
   it(`returns ${ERROR_KINDS.GENERAL_ERROR} for undefined errors`, () => {
     const result = getErrorKind({
       commandType: 'aspirate',

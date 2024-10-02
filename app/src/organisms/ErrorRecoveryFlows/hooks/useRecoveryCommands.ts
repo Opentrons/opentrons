@@ -57,6 +57,8 @@ export interface UseRecoveryCommandsResult {
   homePipetteZAxes: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
   pickUpTips: () => Promise<CommandData[]>
+  /* A non-terminal recovery command */
+  releaseGripperJaws: () => Promise<void>
 }
 
 // TODO(jh, 07-24-24): Create tighter abstractions for terminal vs. non-terminal commands.
@@ -213,12 +215,18 @@ export function useRecoveryCommands({
     failedCommandByRunRecord?.commandType,
   ])
 
+  const releaseGripperJaws = useCallback((): Promise<void> => {
+    console.log('PLACEHOLDER RELEASE THE JAWS')
+    return Promise.resolve()
+  }, [])
+
   return {
     resumeRun,
     cancelRun,
     retryFailedCommand,
     homePipetteZAxes,
     pickUpTips,
+    releaseGripperJaws,
     skipFailedCommand,
     ignoreErrorKindThisRun,
   }

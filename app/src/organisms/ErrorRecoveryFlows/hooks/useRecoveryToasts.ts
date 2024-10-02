@@ -146,15 +146,17 @@ function handleRecoveryOptionAction<T>(
   nextStepReturnVal: T
 ): T | string {
   switch (selectedRecoveryOption) {
-    case RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE:
+    case RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE:
     case RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE:
     case RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE:
     case RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE:
+    case RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE:
       return nextStepReturnVal
     case RECOVERY_MAP.CANCEL_RUN.ROUTE:
     case RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE:
     case RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE:
     case RECOVERY_MAP.RETRY_STEP.ROUTE:
+    case RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE:
       return currentStepReturnVal
     default:
       return 'HANDLE RECOVERY TOAST OPTION EXPLICITLY.'

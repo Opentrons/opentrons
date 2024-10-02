@@ -65,6 +65,7 @@ export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
       case ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING:
       case ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING:
       case ERROR_KINDS.TIP_NOT_DETECTED:
+      case ERROR_KINDS.GRIPPER_ERROR:
         return true
       default:
         return false
@@ -209,6 +210,8 @@ export function NotificationBanner({
         return <OverpressureBanner />
       case ERROR_KINDS.TIP_NOT_DETECTED:
         return <TipNotDetectedBanner />
+      case ERROR_KINDS.GRIPPER_ERROR:
+        return <GripperErrorBanner />
       default:
         console.error('Handle error kind notification banners explicitly.')
         return <div />
@@ -238,6 +241,18 @@ export function TipNotDetectedBanner(): JSX.Element {
       type="alert"
       heading={t('tip_presence_errors_are_caused')}
       message={t('if_issue_persists_tip_not_detected')}
+    />
+  )
+}
+
+export function GripperErrorBanner(): JSX.Element {
+  const { t } = useTranslation('error_recovery')
+
+  return (
+    <InlineNotification
+      type="alert"
+      heading={t('gripper_errors_occur_when')}
+      message={t('if_issue_persists_gripper_error')}
     />
   )
 }
