@@ -713,6 +713,7 @@ def _load_labware_definition_data() -> LabwareDefinition:
                         shape="spherical",
                         radiusOfCurvature=6,
                         topHeight=10,
+                        bottomHeight=0.0,
                     ),
                 ],
             )

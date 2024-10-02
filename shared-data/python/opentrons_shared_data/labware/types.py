@@ -128,7 +128,7 @@ class SphericalSegment(TypedDict):
     shape: Spherical
     radiusOfCurvature: float
     topHeight: float
-    bottomHeight: Literal[0.0] = 0.0
+    bottomHeight: float
 
 
 class CircularFrustum(TypedDict):

@@ -244,6 +244,10 @@ class SphericalSegment(BaseModel):
     topHeight: _NonNegativeNumber = Field(
         ..., description="The depth of a spherical bottom of a well"
     )
+    bottomHeight: _NonNegativeNumber = Field(
+        ...,
+        description="Hight of the bottom of the segment, must be 0.0",
+    )
 
 
 class CircularFrustum(BaseModel):
