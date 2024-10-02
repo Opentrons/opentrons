@@ -18,8 +18,8 @@ import type {
 import type {
   RunTimeCommand,
   ProtocolAnalysisOutput,
+  PickUpTipRunTimeCommand,
 } from '@opentrons/shared-data'
-import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareLocationCombo } from '../../ApplyHistoricOffsets/hooks/getLabwareLocationCombos'
 
 interface LPCArgs {
