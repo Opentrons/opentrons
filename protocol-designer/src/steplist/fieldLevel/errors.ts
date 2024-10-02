@@ -37,6 +37,14 @@ export const isTimeFormat: ErrorChecker = (value: unknown): string | null => {
     ? null
     : FIELD_ERRORS.BAD_TIME
 }
+export const isTimeFormatMinutesSeconds: ErrorChecker = (
+  value: unknown
+): string | null => {
+  const timeRegex = new RegExp(/^\d{1,2}:\d{1,2}$/g)
+  return (typeof value === 'string' && timeRegex.test(value)) || value == null
+    ? null
+    : FIELD_ERRORS.BAD_TIME
+}
 export const nonZero: ErrorChecker = (value: unknown) =>
   value && Number(value) === 0 ? FIELD_ERRORS.NON_ZERO : null
 export const minimumWellCount = (minimum: number): ErrorChecker => (
