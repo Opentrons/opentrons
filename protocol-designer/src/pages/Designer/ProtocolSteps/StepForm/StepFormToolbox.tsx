@@ -106,7 +106,9 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   }
 
   const isMultiStepToolbox =
-    formData.stepType === 'moveLiquid' || formData.stepType === 'mix'
+    formData.stepType === 'moveLiquid' ||
+    formData.stepType === 'mix' ||
+    formData.stepType === 'thermocycler'
   const numWarnings =
     formWarningsForSelectedStep.length + timelineWarningsForSelectedStep.length
   const numErrors = timeline.errors?.length ?? 0

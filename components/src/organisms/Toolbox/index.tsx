@@ -92,12 +92,12 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
         <Flex
           padding={`${SPACING.spacing20} ${SPACING.spacing16}`}
           flexDirection={DIRECTION_COLUMN}
+          borderBottom={`1px solid ${COLORS.grey30}`}
         >
           {subHeader != null ? subHeader : null}
           <Flex
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             alignItems={ALIGN_CENTER}
-            borderBottom={`1px solid ${COLORS.grey30}`}
             gridGap={SPACING.spacing12}
           >
             {title}
