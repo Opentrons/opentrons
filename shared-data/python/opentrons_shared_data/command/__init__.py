@@ -19,7 +19,7 @@ def get_newest_schema_version() -> str:
     for schema_file_name in command_schemas:
         schema_version_match = re.match(r"(\d+).json", schema_file_name)
         if schema_version_match is not None:
-            all_schema_versions.append(schema_version_match.group(1))
+            all_schema_versions.append(int(schema_version_match.group(1)))
 
     return str(max(all_schema_versions))
 
