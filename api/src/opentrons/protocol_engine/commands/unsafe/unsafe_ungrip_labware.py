@@ -1,6 +1,7 @@
 """Ungrip labware payload, result, and implementaiton."""
 
 from __future__ import annotations
+from opentrons.protocol_engine.errors.exceptions import GripperNotAttachedError
 from pydantic import BaseModel
 from typing import Optional, Type
 from typing_extensions import Literal
@@ -42,7 +43,10 @@ class UnsafeUngripLabwareImplementation(
         self, params: UnsafeUngripLabwareParams
     ) -> SuccessData[UnsafeUngripLabwareResult, None]:
         """Ungrip Labware."""
+        print("ungripping")
         ot3_hardware_api = ensure_ot3_hardware(self._hardware_api)
+        if not ot3_hardware_api.has_gripper():
+            raise GripperNotAttachedError("No gripper found for ungrip.")
         await ot3_hardware_api.ungrip()
         return SuccessData(public=UnsafeUngripLabwareResult(), private=None)
 
