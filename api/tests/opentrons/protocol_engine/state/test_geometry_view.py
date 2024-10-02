@@ -40,6 +40,7 @@ from opentrons.protocol_engine.types import (
     LoadedModule,
     ModuleModel,
     WellLocation,
+    LiquidHandlingWellLocation,
     WellOrigin,
     DropTipWellLocation,
     DropTipWellOrigin,
@@ -91,6 +92,7 @@ from opentrons.protocol_engine.state.frustum_helpers import (
 from ..pipette_fixtures import get_default_nozzle_map
 from ..mock_circular_frusta import TEST_EXAMPLES as CIRCULAR_TEST_EXAMPLES
 from ..mock_rectangular_frusta import TEST_EXAMPLES as RECTANGULAR_TEST_EXAMPLES
+from ...protocol_runner.test_json_translator import _load_labware_definition_data
 
 
 @pytest.fixture
@@ -1273,52 +1275,6 @@ def test_get_well_position(
     )
 
 
-def test_get_well_position_meniscus(
-    decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    mock_labware_view: LabwareView,
-    mock_addressable_area_view: AddressableAreaView,
-    subject: GeometryView,
-) -> None:
-    """It should be able to get the position of a well top in a labware."""
-    labware_data = LoadedLabware(
-        id="labware-id",
-        loadName="load-name",
-        definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
-        offsetId="offset-id",
-    )
-    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
-    slot_pos = Point(4, 5, 6)
-    well_def = well_plate_def.wells["B2"]
-
-    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
-    )
-    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
-        calibration_offset
-    )
-    decoy.when(
-        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
-    ).then_return(slot_pos)
-    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
-        well_def
-    )
-
-    well_location = WellLocation(
-        origin=WellOrigin.MENISCUS, offset=WellOffset(x=0, y=0, z=-2)
-    )
-
-    result = subject.get_well_position("labware-id", "B2", well_location)
-
-    assert result == Point(
-        x=slot_pos[0] + 1 + well_def.x,
-        y=slot_pos[1] - 2 + well_def.y,
-        z=slot_pos[2] + 3 + well_def.z + well_def.depth,
-    )
-
-
 def test_get_well_height(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
@@ -1600,6 +1556,67 @@ def test_get_well_position_with_meniscus_offset(
         x=slot_pos[0] + 1 + well_def.x + 2,
         y=slot_pos[1] - 2 + well_def.y + 3,
         z=slot_pos[2] + 3 + well_def.z + 4 + 70.5,
+    )
+
+
+def test_get_well_position_with_meniscus_and_volume_offset(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    mock_labware_view: LabwareView,
+    mock_well_view: WellView,
+    mock_addressable_area_view: AddressableAreaView,
+    subject: GeometryView,
+) -> None:
+    """It should be able to get the position of a well center in a labware."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="offset-id",
+    )
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    slot_pos = Point(4, 5, 6)
+    well_def = well_plate_def.wells["B2"]
+
+    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
+        calibration_offset
+    )
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+    ).then_return(slot_pos)
+    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
+    )
+    decoy.when(
+        mock_well_view.get_last_measured_liquid_height("labware-id", "B2")
+    ).then_return(45.0)
+    labware_def = _load_labware_definition_data()
+    assert labware_def.innerLabwareGeometry is not None
+    inner_well_def = labware_def.innerLabwareGeometry["welldefinition1111"]
+    decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
+        inner_well_def
+    )
+
+    result = subject.get_well_position(
+        labware_id="labware-id",
+        well_name="B2",
+        well_location=LiquidHandlingWellLocation(
+            origin=WellOrigin.MENISCUS,
+            offset=WellOffset(x=2, y=3, z=4),
+            volumeOffset="operationVolume",
+        ),
+        operation_volume=-323.0,
+    )
+
+    assert result == Point(
+        x=slot_pos[0] + 1 + well_def.x + 2,
+        y=slot_pos[1] - 2 + well_def.y + 3,
+        z=slot_pos[2] + 3 + well_def.z + 4 + 40.0,
     )
 
 

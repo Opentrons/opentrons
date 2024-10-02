@@ -57,7 +57,6 @@ from .modules import ModuleView
 from .pipettes import PipetteView
 from .addressable_areas import AddressableAreaView
 from .frustum_helpers import (
-    get_well_volumetric_capacity,
     find_volume_at_well_height,
     find_height_at_well_volume,
 )
@@ -1343,35 +1342,13 @@ class GeometryView:
 
         This is given an initial handling height, with reference to the well bottom.
         """
-        initial_volume = self.get_well_volume_at_height(
-            well_geometry=well_geometry, target_height=initial_height
+        initial_volume = find_volume_at_well_height(
+            target_height=initial_height, well_geometry=well_geometry
         )
         final_volume = initial_volume + volume
-        return self.get_well_height_at_volume(
-            well_geometry=well_geometry, target_volume=final_volume
-        )
-
-    def get_well_volume_at_height(
-        self, well_geometry: InnerWellGeometry, target_height: float
-    ) -> float:
-        """Return the volume of liquid in a labware well at a given liquid height (with reference to the well bottom)."""
-        return find_volume_at_well_height(
-            target_height=target_height, well_geometry=well_geometry
-        )
-
-    def get_well_height_at_volume(
-        self, well_geometry: InnerWellGeometry, target_volume: float
-    ) -> float:
-        """Return the height of liquid in a labware well at a given liquid volume."""
         return find_height_at_well_volume(
-            target_volume=target_volume, well_geometry=well_geometry
+            target_volume=final_volume, well_geometry=well_geometry
         )
-
-    def get_well_volumetric_capacity(
-        self, well_geometry: InnerWellGeometry
-    ) -> List[Tuple[float, float]]:
-        """Return a map of heights to partial volumes."""
-        return get_well_volumetric_capacity(well_geometry)
 
     def validate_dispense_volume_into_well(
         self,
@@ -1388,8 +1365,8 @@ class GeometryView:
             meniscus_height = self.get_meniscus_height(
                 labware_id=labware_id, well_name=well_name
             )
-            meniscus_volume = self.get_well_volume_at_height(
-                well_geometry=well_geometry, target_height=meniscus_height
+            meniscus_volume = find_volume_at_well_height(
+                target_height=meniscus_height, well_geometry=well_geometry
             )
             remaining_volume = well_volumetric_capacity - meniscus_volume
             if volume > remaining_volume:
