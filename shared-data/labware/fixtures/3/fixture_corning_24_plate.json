@@ -325,7 +325,7 @@
     "venirhgerug": {
       "sections": [
         {
-          "shape": "circular",
+          "shape": "conical",
           "bottomDiameter": 16.26,
           "topDiameter": 16.26,
           "topHeight": 17.4,

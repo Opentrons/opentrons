@@ -64,7 +64,7 @@
     "daiwudhadfhiew": {
       "sections": [
         {
-          "shape": "rectangular",
+          "shape": "pyramidal",
           "topXDimension": 127.76,
           "topYDimension": 85.8,
           "bottomXDimension": 70.0,
@@ -77,7 +77,7 @@
     "iuweofiuwhfn": {
       "sections": [
         {
-          "shape": "circular",
+          "shape": "conical",
           "bottomDiameter": 35.0,
           "topDiameter": 35.0,
           "topHeight": 42.16,
@@ -86,7 +86,8 @@
         {
           "shape": "spherical",
           "radiusOfCurvature": 20.0,
-          "topHeight": 10.0
+          "topHeight": 10.0,
+          "bottomHeight": 0.0
         }
       ]
     }

@@ -67,10 +67,10 @@
     },
     "SphericalSegment": {
       "type": "object",
+      "description": "A list of all of the sections of the well that have a contiguous shape",
       "additionalProperties": false,
       "required": ["shape", "radiusOfCurvature", "topHeight"],
       "properties": {
-        "description": "A list of all of the sections of the well that have a contiguous shape",
         "shape": {
           "type": "string",
           "enum": ["spherical"]
@@ -80,20 +80,23 @@
         },
         "topHeight": {
           "type": "number"
+        },
+        "bottomHeight": {
+          "type": "number"
         }
       }
     },
     "ConicalFrustum": {
       "type": "object",
+      "description": "A list of all of the sections of the well that have a contiguous shape",
       "required": [
         "shape",
         "bottomDiameter",
-        "TopDiameter",
+        "topDiameter",
         "topHeight",
         "bottomHeight"
       ],
       "properties": {
-        "description": "A list of all of the sections of the well that have a contiguous shape",
         "shape": {
           "type": "string",
           "enum": ["conical"]
@@ -114,18 +117,18 @@
     },
     "PyramidalFrustum": {
       "type": "object",
+      "description": "A list of all of the sections of the well that have a contiguous shape",
       "required": [
         "shape",
         "bottomXDimension",
-        "bottomYDimensions",
+        "bottomYDimension",
         "topXDimension",
         "topYDimension",
         "topHeight",
         "bottomHeight"
       ],
       "properties": {
-        "description": "A list of all of the sections of the well that have a contiguous shape",
-        "shape": {
+          "shape": {
           "type": "string",
           "enum": ["pyramidal"]
         },
@@ -151,6 +154,7 @@
     },
     "SquaredConeSegment": {
       "type": "object",
+      "description": "The intersection of a pyramid and a cone that both share a central axis where one face is a circle and one face is a rectangle",
       "required": [
         "shape",
         "bottomCrossSection",
@@ -161,7 +165,6 @@
         "bottomHeight"
       ],
       "properties": {
-        "description": "The intersection of a pyramid and a cone that both share a central axis where one face is a circle and one face is a rectangle",
         "shape": {
           "type": "string",
           "enum": ["squaredcone"]
