@@ -126,6 +126,10 @@ class RunNotCurrentError(ValueError):
     """Error raised when a requested run is not the current run."""
 
 
+class NozzleMapNotFoundError(ValueError):
+    """Error raised when a requested nozzle map cannot be found."""
+
+
 class PreSerializedCommandsNotAvailableError(LookupError):
     """Error raised when a run's commands are not available as pre-serialized list of commands."""
 
@@ -476,11 +480,13 @@ class RunDataManager:
         # TODO(tz, 8-5-2024): Change this to return the error list from the DB when we implement https://opentrons.atlassian.net/browse/EXEC-655.
         raise RunNotCurrentError()
 
-    # TOME: This may get renamed if you do the data transformation here.
     def get_nozzle_map(self, run_id: str, pipette_id: str) -> NozzleMap:
         """Get nozzle map for a pipette."""
         if run_id == self._run_orchestrator_store.current_run_id:
-            return self._run_orchestrator_store.get_nozzle_map(pipette_id)
+            try:
+                return self._run_orchestrator_store.get_nozzle_map(pipette_id)
+            except KeyError:
+                raise NozzleMapNotFoundError()
 
         raise RunNotCurrentError()
 

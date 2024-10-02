@@ -50,7 +50,11 @@ from ..run_models import RunNotFoundError, ActiveNozzleLayout
 from ..run_auto_deleter import RunAutoDeleter
 from ..run_models import Run, BadRun, RunCreate, RunUpdate
 from ..run_orchestrator_store import RunConflictError
-from ..run_data_manager import RunDataManager, RunNotCurrentError
+from ..run_data_manager import (
+    RunDataManager,
+    RunNotCurrentError,
+    NozzleMapNotFoundError,
+)
 from ..dependencies import (
     get_run_data_manager,
     get_run_auto_deleter,
@@ -103,6 +107,14 @@ class RunStopped(ErrorDetails):
 
     id: Literal["RunStopped"] = "RunStopped"
     title: str = "Run Stopped"
+    errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
+
+
+class NozzleMapNotFound(ErrorDetails):
+    """An error if one tries to modify a stopped run."""
+
+    id: Literal["NozzleMapNotFound"] = "NozzleMapNotFound"
+    title: str = "Nozzle Map Not Found"
     errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
 
 
@@ -558,9 +570,8 @@ async def get_active_nozzle_layout(
         active_nozzle_map = run_data_manager.get_nozzle_map(
             run_id=runId, pipette_id=pipetteId
         )
-    # TOME: Figure out which layer to put the pipettenotfoudnerror on.
-    # except PipetteNotFoundError as e:
-    #     raise PipetteNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+    except NozzleMapNotFoundError as e:
+        raise NozzleMapNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
     except RunNotCurrentError as e:
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 

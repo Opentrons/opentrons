@@ -285,14 +285,14 @@ class ActiveNozzleLayout(BaseModel):
     """Details about the active nozzle layout for a pipette."""
 
     configuration: "NozzleConfigurationType" = Field(
-        None, description="The active nozzle configuration."
+        ..., description="The active nozzle configuration."
     )
     columns: Dict[str, List[str]] = Field(
-        None,
+        ...,
         description="A map of all the pipette columns active in the current configuration.",
     )
     rows: Dict[str, List[str]] = Field(
-        None,
+        ...,
         description="A map of all the pipette rows active in the current configuration.",
     )
 
