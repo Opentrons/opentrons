@@ -100,21 +100,15 @@ def _generate_callbacks_for_trial(
     encoder_bottom: float = -1
     encoder_aspirated: float = -1
 
-    def _on_aspirating() -> None:
+    def _encoder_monitor_start() -> None:
         nonlocal estimate_bottom, encoder_bottom
-        recorder.set_sample_tag(
-            create_measurement_tag("aspirate", volume, channel, trial)
-        )
         if not volume:
             return
         estimate_bottom = hw_api.current_position_ot3(hw_mount)[pip_ax]
         encoder_bottom = hw_api.encoder_current_position_ot3(hw_mount)[pip_ax]
 
-    def _on_retracting() -> None:
+    def _encoder_monitor_stop() -> None:
         nonlocal estimate_aspirated, encoder_aspirated
-        recorder.set_sample_tag(
-            create_measurement_tag("retract", volume, channel, trial)
-        )
         if not volume or estimate_aspirated >= 0 or encoder_aspirated >= 0:
             # NOTE: currently in dispense, because trial was already recorded
             return
@@ -138,8 +132,12 @@ def _generate_callbacks_for_trial(
         on_mixing=lambda: recorder.set_sample_tag(
             create_measurement_tag("mix", volume, channel, trial)
         ),
-        on_aspirating=_on_aspirating,
-        on_retracting=_on_retracting,
+        on_aspirating=lambda: recorder.set_sample_tag(
+            create_measurement_tag("aspirate", volume, channel, trial)
+        ),
+        on_retracting=lambda: recorder.set_sample_tag(
+            create_measurement_tag("retract", volume, channel, trial)
+        ),
         on_dispensing=lambda: recorder.set_sample_tag(
             create_measurement_tag("dispense", volume, channel, trial)
         ),
