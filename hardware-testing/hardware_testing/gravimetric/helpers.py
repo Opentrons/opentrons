@@ -394,10 +394,6 @@ def _get_volumes(
         test_volumes = get_test_volumes(
             kind, channels, pipette_volume, tip_volume, extra
         )
-    if not _check_if_software_supports_high_volumes():
-        _override_software_supports_high_volumes()
-        if not _check_if_software_supports_high_volumes():
-            raise RuntimeError("you are not the correct branch")
     return test_volumes
 
 
@@ -412,6 +408,11 @@ def _load_pipette(
 ) -> InstrumentContext:
     pip_name = f"flex_{pipette_channels}channel_{pipette_volume}"
     ui.print_info(f'pipette "{pip_name}" on mount "{pipette_mount}"')
+
+    if not _check_if_software_supports_high_volumes():
+        _override_software_supports_high_volumes()
+        if not _check_if_software_supports_high_volumes():
+            raise RuntimeError("you are not the correct branch")
 
     # if we're doing multiple tests in one run, the pipette may already be loaded
     loaded_pipettes = ctx.loaded_instruments
