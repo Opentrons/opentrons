@@ -252,9 +252,7 @@ describe('Create a Tip Rack', () => {
       // this validates the filename and the contents of the file
       cy.readFile(`${downloadsFolder}/generic_1_tiprack_20ul.json`).then(
         actualExportLabwareDef => {
-          expect(actualExportLabwareDef).to.deep.equal(
-            expectedExportLabwareDef
-          )
+          expect(actualExportLabwareDef).to.deep.equal(expectedExportLabwareDef)
         }
       )
     })
