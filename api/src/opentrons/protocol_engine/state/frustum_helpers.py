@@ -225,7 +225,7 @@ def get_well_volumetric_capacity(
                 target_height=segment["topHeight"],
                 radius_of_curvature=segment["radiusOfCurvature"],
             )
-        elif segment["shape"] == "rectangular":
+        elif segment["shape"] == "pyramidal":
             section_height = segment["topHeight"] - segment["bottomHeight"]
             section_volume = _volume_from_height_rectangular(
                 target_height=section_height,
@@ -235,7 +235,7 @@ def get_well_volumetric_capacity(
                 top_width=segment["topXDimension"],
                 total_frustum_height=section_height,
             )
-        elif segment["shape"] == "circular":
+        elif segment["shape"] == "conical":
             section_height = segment["topHeight"] - segment["bottomHeight"]
             section_volume = _volume_from_height_circular(
                 target_height=section_height,
@@ -265,14 +265,14 @@ def height_at_volume_within_section(
             total_frustum_height=section_height,
             radius_of_curvature=checked_section["radiusOfCurvature"],
         )
-    elif checked_section["shape"] == "circular":
+    elif checked_section["shape"] == "conical":
         partial_height = _height_from_volume_circular(
             volume=target_volume_relative,
             top_radius=(checked_section["bottomDiameter"] / 2),
             bottom_radius=(checked_section["topDiameter"] / 2),
             total_frustum_height=section_height,
         )
-    elif checked_section["shape"] == "rectangular":
+    elif checked_section["shape"] == "pyramidal":
         partial_height = _height_from_volume_rectangular(
             volume=target_volume_relative,
             total_frustum_height=section_height,
@@ -300,14 +300,14 @@ def volume_at_height_within_section(
             target_height=target_height_relative,
             radius_of_curvature=checked_section["radiusOfCurvature"],
         )
-    elif checked_section["shape"] == "circular":
+    elif checked_section["shape"] == "conical":
         partial_volume = _volume_from_height_circular(
             target_height=target_height_relative,
             total_frustum_height=section_height,
             bottom_radius=(checked_section["bottomDiameter"] / 2),
             top_radius=(checked_section["topDiameter"] / 2),
         )
-    elif checked_section["shape"] == "rectangular":
+    elif checked_section["shape"] == "pyramidal":
         partial_volume = _volume_from_height_rectangular(
             target_height=target_height_relative,
             total_frustum_height=section_height,

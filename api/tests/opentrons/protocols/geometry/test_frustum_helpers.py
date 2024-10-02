@@ -3,8 +3,8 @@ from math import pi, isclose
 from typing import Any, List
 
 from opentrons_shared_data.labware.types import (
-    CircularFrustum,
-    RectangularFrustum,
+    ConicalFrustum,
+    PyramidalFrustum,
     SphericalSegment,
 )
 from opentrons.protocol_engine.state.frustum_helpers import (
@@ -28,8 +28,8 @@ def fake_frusta() -> List[List[Any]]:
     frusta = []
     frusta.append(
         [
-            RectangularFrustum(
-                shape="rectangular",
+            PyramidalFrustum(
+                shape="pyramidal",
                 topXDimension=9.0,
                 topYDimension=10.0,
                 bottomXDimension=8.0,
@@ -37,8 +37,8 @@ def fake_frusta() -> List[List[Any]]:
                 topHeight=10.0,
                 bottomHeight=5.0,
             ),
-            RectangularFrustum(
-                shape="rectangular",
+            PyramidalFrustum(
+                shape="pyramidal",
                 topXDimension=8.0,
                 topYDimension=9.0,
                 bottomXDimension=15.0,
@@ -46,8 +46,8 @@ def fake_frusta() -> List[List[Any]]:
                 topHeight=5.0,
                 bottomHeight=1.0,
             ),
-            CircularFrustum(
-                shape="circular",
+            ConicalFrustum(
+                shape="conical",
                 topDiameter=23.0,
                 bottomDiameter=3.0,
                 topHeight=1.0,
@@ -63,8 +63,8 @@ def fake_frusta() -> List[List[Any]]:
     )
     frusta.append(
         [
-            RectangularFrustum(
-                shape="rectangular",
+            PyramidalFrustum(
+                shape="pyramidal",
                 topXDimension=8.0,
                 topYDimension=70.0,
                 bottomXDimension=7.0,
@@ -72,8 +72,8 @@ def fake_frusta() -> List[List[Any]]:
                 topHeight=3.5,
                 bottomHeight=2.0,
             ),
-            RectangularFrustum(
-                shape="rectangular",
+            PyramidalFrustum(
+                shape="pyramidal",
                 topXDimension=8.0,
                 topYDimension=80.0,
                 bottomXDimension=8.0,
@@ -85,22 +85,22 @@ def fake_frusta() -> List[List[Any]]:
     )
     frusta.append(
         [
-            CircularFrustum(
-                shape="circular",
+            ConicalFrustum(
+                shape="conical",
                 topDiameter=23.0,
                 bottomDiameter=11.5,
                 topHeight=7.5,
                 bottomHeight=5.0,
             ),
-            CircularFrustum(
-                shape="circular",
+            ConicalFrustum(
+                shape="conical",
                 topDiameter=11.5,
                 bottomDiameter=23.0,
                 topHeight=5.0,
                 bottomHeight=2.5,
             ),
-            CircularFrustum(
-                shape="circular",
+            ConicalFrustum(
+                shape="conical",
                 topDiameter=23.0,
                 bottomDiameter=11.5,
                 topHeight=2.5,
@@ -110,8 +110,8 @@ def fake_frusta() -> List[List[Any]]:
     )
     frusta.append(
         [
-            CircularFrustum(
-                shape="circular",
+            ConicalFrustum(
+                shape="conical",
                 topDiameter=4.0,
                 bottomDiameter=5.0,
                 topHeight=3.0,
@@ -137,8 +137,8 @@ def fake_frusta() -> List[List[Any]]:
     )
     frusta.append(
         [
-            RectangularFrustum(
-                shape="rectangular",
+            PyramidalFrustum(
+                shape="pyramidal",
                 topXDimension=27.0,
                 topYDimension=36.0,
                 bottomXDimension=36.0,
@@ -211,7 +211,7 @@ def test_volume_and_height_circular(well: List[Any]) -> None:
         return
     total_height = well[0]["topHeight"]
     for segment in well:
-        if segment["shape"] == "circular":
+        if segment["shape"] == "conical":
             top_radius = segment["topDiameter"] / 2
             bottom_radius = segment["bottomDiameter"] / 2
             a = pi * ((top_radius - bottom_radius) ** 2) / (3 * total_height**2)
@@ -253,7 +253,7 @@ def test_volume_and_height_rectangular(well: List[Any]) -> None:
         return
     total_height = well[0]["topHeight"]
     for segment in well:
-        if segment["shape"] == "rectangular":
+        if segment["shape"] == "pyramidal":
             top_length = segment["topYDimension"]
             top_width = segment["topXDimension"]
             bottom_length = segment["bottomYDimension"]

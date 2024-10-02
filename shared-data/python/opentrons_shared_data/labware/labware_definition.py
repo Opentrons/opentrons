@@ -20,10 +20,10 @@ from pydantic import (
 from typing_extensions import Literal
 
 from .constants import (
-    Circular,
-    Rectangular,
-    RoundedRectangular,
-    TruncatedCircular,
+    Conical,
+    Pyramidal,
+    RoundedPyramid,
+    SquaredCone,
     Spherical,
 )
 
@@ -250,8 +250,8 @@ class SphericalSegment(BaseModel):
     )
 
 
-class CircularFrustum(BaseModel):
-    shape: Circular = Field(..., description="Denote shape as circular")
+class ConicalFrustum(BaseModel):
+    shape: Conical = Field(..., description="Denote shape as circular")
     bottomDiameter: _NonNegativeNumber = Field(
         ...,
         description="The diameter at the bottom cross-section of a circular frustum",
@@ -270,8 +270,8 @@ class CircularFrustum(BaseModel):
     )
 
 
-class RectangularFrustum(BaseModel):
-    shape: Rectangular = Field(..., description="Denote shape as rectangular")
+class PyramidalFrustum(BaseModel):
+    shape: Pyramidal = Field(..., description="Denote shape as rectangular")
     bottomXDimension: _NonNegativeNumber = Field(
         ...,
         description="x dimension of the bottom cross-section of a rectangular frustum",
@@ -299,8 +299,8 @@ class RectangularFrustum(BaseModel):
     )
 
 
-class TruncatedCircularSegment(BaseModel):
-    shape: TruncatedCircular = Field(
+class SquaredConeSegment(BaseModel):
+    shape: SquaredCone = Field(
         ..., description="Denote shape as a truncated circular segment"
     )
     circleDiameter: _NonNegativeNumber = Field(
@@ -327,8 +327,8 @@ class TruncatedCircularSegment(BaseModel):
     )
 
 
-class RoundedRectangularSegment(BaseModel):
-    shape: RoundedRectangular = Field(
+class RoundedPyramidSegment(BaseModel):
+    shape: RoundedPyramid = Field(
         ..., description="Denote shape as a rounded rectangular segment"
     )
     circleDiameter: _NonNegativeNumber = Field(
@@ -383,10 +383,10 @@ class Group(BaseModel):
 
 
 WellSegment = Union[
-    CircularFrustum,
-    RectangularFrustum,
-    TruncatedCircularSegment,
-    RoundedRectangularSegment,
+    ConicalFrustum,
+    PyramidalFrustum,
+    SquaredConeSegment,
+    RoundedPyramidSegment,
     SphericalSegment,
 ]
 

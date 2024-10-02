@@ -10,11 +10,13 @@ from .labware_definition import (
     InnerWellGeometry as InnerWellGeometryDef,
 )
 from .constants import (
+    Conical,
+    Pyramidal,
+    SquaredCone,
+    RoundedPyramid,
+    Spherical,
     Circular,
     Rectangular,
-    TruncatedCircular,
-    RoundedRectangular,
-    Spherical,
 )
 
 LabwareUri = NewType("LabwareUri", str)
@@ -134,16 +136,16 @@ class SphericalSegment(TypedDict):
     bottomHeight: float
 
 
-class CircularFrustum(TypedDict):
-    shape: Circular
+class ConicalFrustum(TypedDict):
+    shape: Conical
     bottomDiameter: float
     topDiameter: float
     topHeight: float
     bottomHeight: float
 
 
-class RectangularFrustum(TypedDict):
-    shape: Rectangular
+class PyramidalFrustum(TypedDict):
+    shape: Pyramidal
     bottomXDimension: float
     bottomYDimension: float
     topXDimension: float
@@ -154,8 +156,8 @@ class RectangularFrustum(TypedDict):
 
 # A truncated circle is a square that is trimmed at the corners by a smaller circle
 #   that is concentric with the square.
-class TruncatedCircularSegment(TypedDict):
-    shape: TruncatedCircular
+class SquaredConeSegment(TypedDict):
+    shape: SquaredCone
     circleDiameter: float
     rectangleXDimension: float
     rectangleYDimension: float
@@ -165,8 +167,8 @@ class TruncatedCircularSegment(TypedDict):
 
 # A rounded rectangle is a rectangle that is filleted by 4 circles
 #   centered somewhere along the diagonals of the rectangle
-class RoundedRectangularSegment(TypedDict):
-    shape: RoundedRectangular
+class RoundedPyramidSegment(TypedDict):
+    shape: RoundedPyramid
     circleDiameter: float
     rectangleXDimension: float
     rectangleYDimension: float
@@ -175,10 +177,10 @@ class RoundedRectangularSegment(TypedDict):
 
 
 WellSegment = Union[
-    CircularFrustum,
-    RectangularFrustum,
-    TruncatedCircularSegment,
-    RoundedRectangularSegment,
+    ConicalFrustum,
+    PyramidalFrustum,
+    SquaredConeSegment,
+    RoundedPyramidSegment,
     SphericalSegment,
 ]
 
