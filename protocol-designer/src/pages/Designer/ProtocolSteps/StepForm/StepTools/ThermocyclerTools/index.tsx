@@ -21,14 +21,17 @@ type ThermocyclerContentType =
   | null
 
 export function ThermocyclerTools(props: StepFormProps): JSX.Element {
-  const { propsForFields, formData } = props
+  const { propsForFields, formData, toolboxStep } = props
   const { t } = useTranslation('form')
 
+  console.log(formData)
   const [contentType, setContentType] = useState<ThermocyclerContentType>(
-    (formData.thermocyclerFormType ?? null) as ThermocyclerContentType
+    // (formData.thermocyclerFormType ?? null) as ThermocyclerContentType
+    (formData.thermocyclerFormType as ThermocyclerContentType) ??
+      'thermocyclerState'
   )
 
-  if (contentType == null) {
+  if (toolboxStep === 0) {
     return (
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -45,6 +48,7 @@ export function ThermocyclerTools(props: StepFormProps): JSX.Element {
             setContentType('thermocyclerState')
             propsForFields.thermocyclerFormType.updateValue('thermocyclerState')
           }}
+          isSelected={contentType === 'thermocyclerState'}
         />
         <RadioButton
           buttonLabel={t(
@@ -58,6 +62,7 @@ export function ThermocyclerTools(props: StepFormProps): JSX.Element {
               'thermocyclerProfile'
             )
           }}
+          isSelected={contentType === 'thermocyclerProfile'}
         />
       </Flex>
     )
