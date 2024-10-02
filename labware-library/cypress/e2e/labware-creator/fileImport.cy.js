@@ -1,5 +1,9 @@
 const importedLabwareFile = 'TestLabwareDefinition.json'
 
+const flat = 'img[alt*="flat bottom"]'
+const round = 'img[alt*="u shaped"]'
+const v = 'img[alt*="v shaped"]'
+
 describe('File Import', () => {
   before(() => {
     cy.visit('/')
@@ -48,9 +52,6 @@ describe('File Import', () => {
 
     // verify well bottom and depth
     cy.get("input[name='wellBottomShape'][value='flat']").should('exist')
-    let flat = 'img[alt*="flat bottom"]'
-    let round = 'img[alt*="u shaped"]'
-    let v = 'img[alt*="v shaped"]'
     cy.get(flat).should('exist')
     cy.get(round).should('not.exist')
     cy.get(v).should('not.exist')

@@ -2,6 +2,10 @@
 // an element is in view before clicking or checking with
 // { force: true }
 
+const flat = 'img[alt*="flat bottom"]'
+const round = 'img[alt*="u shaped"]'
+const v = 'img[alt*="v shaped"]'
+
 context('Reservoirs', () => {
   before(() => {
     cy.visit('/')
@@ -140,9 +144,6 @@ context('Reservoirs', () => {
       cy.get("input[name='wellYDimension']").type('60').blur()
       cy.contains('Well Y is a required field').should('not.exist')
 
-      const flat = 'img[alt*="flat bottom"]'
-      const round = 'img[alt*="u shaped"]'
-      const v = 'img[alt*="v shaped"]'
       // verify well bottom shape and depth
       cy.get("input[name='wellBottomShape'][value='flat']").check({
         force: true,

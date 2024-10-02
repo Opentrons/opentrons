@@ -1,7 +1,4 @@
 import 'cypress-file-upload'
-import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
-
-const expectedExportFixture = '../fixtures/generic_1_tiprack_20ul.json'
 
 describe('Create a Tip Rack', () => {
   before(() => {
@@ -262,6 +259,5 @@ describe('Create a Tip Rack', () => {
       )
       .should('exist')
   })
-
-  //TODO: Add a test to verify the exported file
+  // TODO: Add a test to verify the exported file
 })
