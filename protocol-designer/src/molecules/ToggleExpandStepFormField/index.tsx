@@ -7,8 +7,9 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { Toggle } from '../../atoms'
+
 import { InputStepFormField } from '../InputStepFormField'
+import { ToggleButton } from '../../atoms/ToggleButton'
 import type { FieldProps } from '../../pages/Designer/ProtocolSteps/StepForm/types'
 
 interface ToggleExpandStepFormFieldProps extends FieldProps {
@@ -45,12 +46,12 @@ export function ToggleExpandStepFormField(
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
           <StyledText desktopStyle="bodyDefaultRegular">{title}</StyledText>
-          <Toggle
+          <ToggleButton
             onClick={() => {
               toggleUpdateValue(!toggleValue)
             }}
             label={isSelected ? onLabel : offLabel}
-            isSelected={isSelected}
+            toggledOn={isSelected}
           />
         </Flex>
         {isSelected ? (

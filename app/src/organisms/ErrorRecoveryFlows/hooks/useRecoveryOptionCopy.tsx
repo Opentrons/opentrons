@@ -22,7 +22,7 @@ export function useRecoveryOptionCopy(): (
         return t('retry_with_new_tips')
       case RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE:
         return t('retry_with_same_tips')
-      case RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE:
+      case RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE:
         return t('manually_fill_well_and_skip')
       case RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE:
         return t('ignore_error_and_skip')
@@ -30,6 +30,10 @@ export function useRecoveryOptionCopy(): (
         return t('skip_to_next_step_new_tips')
       case RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE:
         return t('skip_to_next_step_same_tips')
+      case RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE:
+        return t('manually_move_lw_and_skip')
+      case RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE:
+        return t('manually_replace_lw_and_retry')
       default:
         return 'Unknown action'
     }

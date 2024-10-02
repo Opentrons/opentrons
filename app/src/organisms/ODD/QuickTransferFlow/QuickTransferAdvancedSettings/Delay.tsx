@@ -12,7 +12,6 @@ import {
   POSITION_FIXED,
   SPACING,
 } from '@opentrons/components'
-
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 import { getTopPortalEl } from '/app/App/portal'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
