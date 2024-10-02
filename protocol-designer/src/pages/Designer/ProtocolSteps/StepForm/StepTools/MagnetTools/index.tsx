@@ -33,6 +33,7 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
   const defaultEngageHeight = useSelector(getMagnetLabwareEngageHeight)
   const moduleModel = moduleEntities[formData.moduleId].model
 
+  const mmUnits = t('units.millimeter')
   const isGen1 = moduleModel === MAGNETIC_MODULE_V1
   const engageHeightMinMax = isGen1
     ? t('magnet_height_caption', {
@@ -40,14 +41,16 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
         high: MAX_ENGAGE_HEIGHT_V1,
       })
     : t('magnet_height_caption', {
-        low: `${MIN_ENGAGE_HEIGHT_V2} mm`,
-        high: `${MAX_ENGAGE_HEIGHT_V2} mm`,
+        low: `${MIN_ENGAGE_HEIGHT_V2} ${mmUnits}`,
+        high: `${MAX_ENGAGE_HEIGHT_V2} ${mmUnits}`,
       })
   const engageHeightDefault =
     defaultEngageHeight != null
       ? isGen1
         ? t('magnet_recommended', { default: defaultEngageHeight })
-        : t('magnet_recommended', { default: `${defaultEngageHeight} mm` })
+        : t('magnet_recommended', {
+            default: `${defaultEngageHeight} ${mmUnits}`,
+          })
       : ''
   const engageHeightCaption = `${engageHeightMinMax} ${engageHeightDefault}`
 
@@ -79,7 +82,7 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
           title={t('form:step_edit_form.field.magnetAction.label')}
           fieldTitle={t('protocol_steps:engage_height')}
           isSelected={formData.magnetAction === 'engage'}
-          units={t('units.millimeter')}
+          units={mmUnits}
           onLabel={t('form:step_edit_form.field.magnetAction.options.engage')}
           offLabel={t(
             'form:step_edit_form.field.magnetAction.options.disengage'
