@@ -16,6 +16,7 @@ from opentrons_shared_data.robot.types import RobotTypeEnum
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.hardware_control.types import (
     EstopState,
     HardwareEvent,
@@ -323,6 +324,10 @@ class RunOrchestratorStore:
     def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
         """Get loaded labware definitions."""
         return self.run_orchestrator.get_loaded_labware_definitions()
+
+    def get_nozzle_map(self, pipette_id: str) -> NozzleMap:
+        """Get nozzle map for a pipette."""
+        return self.run_orchestrator.get_nozzle_map(pipette_id=pipette_id)
 
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""

@@ -14,6 +14,7 @@ from opentrons_shared_data.robot.types import RobotType
 from . import protocol_runner, RunResult, JsonRunner, PythonAndLegacyRunner
 from ..hardware_control import HardwareControlAPI
 from ..hardware_control.modules import AbstractModule as HardwareModuleAPI
+from ..hardware_control.nozzle_manager import NozzleMap
 from ..protocol_engine import (
     ProtocolEngine,
     CommandCreate,
@@ -396,6 +397,12 @@ class RunOrchestrator:
     def get_deck_type(self) -> DeckType:
         """Get engine deck type."""
         return self._protocol_engine.state_view.config.deck_type
+
+    def get_nozzle_map(self, pipette_id: str) -> NozzleMap:
+        """Get nozzle map for a pipette."""
+        return self._protocol_engine.state_view.tips.get_pipette_nozzle_map(
+            pipette_id=pipette_id
+        )
 
     def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
         """Create error recovery policy for the run."""

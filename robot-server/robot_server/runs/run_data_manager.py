@@ -4,6 +4,9 @@ from typing import List, Optional, Callable, Union
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors.exceptions import InvalidStoredData, EnumeratedError
+
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+
 from opentrons.protocol_engine import (
     EngineStatus,
     LabwareOffsetCreate,
@@ -471,6 +474,14 @@ class RunDataManager:
             return self._run_orchestrator_store.get_command_errors()
 
         # TODO(tz, 8-5-2024): Change this to return the error list from the DB when we implement https://opentrons.atlassian.net/browse/EXEC-655.
+        raise RunNotCurrentError()
+
+    # TOME: This may get renamed if you do the data transformation here.
+    def get_nozzle_map(self, run_id: str, pipette_id: str) -> NozzleMap:
+        """Get nozzle map for a pipette."""
+        if run_id == self._run_orchestrator_store.current_run_id:
+            return self._run_orchestrator_store.get_nozzle_map(pipette_id)
+
         raise RunNotCurrentError()
 
     def get_all_commands_as_preserialized_list(
