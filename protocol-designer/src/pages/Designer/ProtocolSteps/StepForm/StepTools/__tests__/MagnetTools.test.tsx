@@ -1,4 +1,3 @@
-import type * as React from 'react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../../../__testing-utils__'
@@ -9,6 +8,7 @@ import {
 } from '../../../../../../ui/modules/selectors'
 import { getModuleEntities } from '../../../../../../step-forms/selectors'
 import { MagnetTools } from '../MagnetTools'
+import type { ComponentProps } from 'react'
 import type * as ModulesSelectors from '../../../../../../ui/modules/selectors'
 
 vi.mock('../../../../../../step-forms/selectors')
@@ -21,7 +21,7 @@ vi.mock('../../../../../../ui/modules/selectors', async importOriginal => {
     getMagneticLabwareOptions: vi.fn(),
   }
 })
-const render = (props: React.ComponentProps<typeof MagnetTools>) => {
+const render = (props: ComponentProps<typeof MagnetTools>) => {
   return renderWithProviders(<MagnetTools {...props} />, {
     i18nInstance: i18n,
   })[0]

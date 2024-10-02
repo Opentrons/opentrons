@@ -58,7 +58,7 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        padding={`${SPACING.spacing16} ${SPACING.spacing16} ${SPACING.spacing12} ${SPACING.spacing16}`}
+        padding={`${SPACING.spacing16} ${SPACING.spacing16} ${SPACING.spacing12}`}
         gridGap={SPACING.spacing12}
         width="100%"
       >
