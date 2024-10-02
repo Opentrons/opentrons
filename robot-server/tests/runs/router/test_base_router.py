@@ -13,6 +13,8 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType, NozzleMap
+
 from robot_server.data_files.data_files_store import DataFilesStore, DataFileInfo
 
 from robot_server.errors.error_responses import ApiError
@@ -34,9 +36,13 @@ from robot_server.protocols.protocol_store import (
 
 from robot_server.runs.run_auto_deleter import RunAutoDeleter
 
-from robot_server.runs.run_models import Run, RunCreate, RunUpdate
+from robot_server.runs.run_models import Run, RunCreate, RunUpdate, ActiveNozzleLayout
 from robot_server.runs.run_orchestrator_store import RunConflictError
-from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
+from robot_server.runs.run_data_manager import (
+    RunDataManager,
+    RunNotCurrentError,
+    NozzleMapNotFoundError,
+)
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.router.base_router import (
     AllRunsLinks,
@@ -48,6 +54,7 @@ from robot_server.runs.router.base_router import (
     update_run,
     put_error_recovery_policy,
     get_run_commands_error,
+    get_active_nozzle_layout,
 )
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
@@ -81,6 +88,21 @@ def labware_offset_create() -> LabwareOffsetCreate:
         definitionUri="namespace_1/load_name_1/123",
         location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
+    )
+
+
+@pytest.fixture
+def mock_nozzle_map() -> NozzleMap:
+    """Get a mock NozzleMap."""
+    return NozzleMap(
+        configuration=NozzleConfigurationType.FULL,
+        columns={"1": ["A1"]},
+        rows={"A": ["A1"]},
+        map_store={},
+        starting_nozzle="A1",
+        valid_map_key="mock-key",
+        full_instrument_map_store={},
+        full_instrument_rows={},
     )
 
 
@@ -803,3 +825,76 @@ async def test_get_run_commands_errors_defualt_cursor(
         cursor=expected_cursor_result, totalLength=3
     )
     assert result.status_code == 200
+
+
+async def test_get_active_nozzle_layout_success(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+    mock_nozzle_map: NozzleMap,
+) -> None:
+    """It should return the active nozzle layout for a specific pipette."""
+    run_id = "test-run-id"
+    pipette_id = "test-pipette-id"
+
+    decoy.when(
+        mock_run_data_manager.get_nozzle_map(run_id=run_id, pipette_id=pipette_id)
+    ).then_return(mock_nozzle_map)
+
+    result = await get_active_nozzle_layout(
+        runId=run_id,
+        pipetteId=pipette_id,
+        run_data_manager=mock_run_data_manager,
+    )
+
+    assert result.status_code == 200
+    assert result.content.data == ActiveNozzleLayout(
+        configuration=NozzleConfigurationType.FULL,
+        columns={"1": ["A1"]},
+        rows={"A": ["A1"]},
+    )
+
+
+async def test_get_active_nozzle_layout_nozzle_map_not_found(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+) -> None:
+    """It should raise NozzleMapNotFound when the nozzle map is not found."""
+    run_id = "test-run-id"
+    pipette_id = "non-existent-pipette-id"
+
+    decoy.when(
+        mock_run_data_manager.get_nozzle_map(run_id=run_id, pipette_id=pipette_id)
+    ).then_raise(NozzleMapNotFoundError("Nozzle map not found"))
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_active_nozzle_layout(
+            runId=run_id,
+            pipetteId=pipette_id,
+            run_data_manager=mock_run_data_manager,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "NozzleMapNotFound"
+
+
+async def test_get_active_nozzle_layout_run_not_current(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+) -> None:
+    """It should raise RunStopped when the run is not current."""
+    run_id = "non-current-run-id"
+    pipette_id = "test-pipette-id"
+
+    decoy.when(
+        mock_run_data_manager.get_nozzle_map(run_id=run_id, pipette_id=pipette_id)
+    ).then_raise(RunNotCurrentError("Run is not current"))
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_active_nozzle_layout(
+            runId=run_id,
+            pipetteId=pipette_id,
+            run_data_manager=mock_run_data_manager,
+        )
+
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
