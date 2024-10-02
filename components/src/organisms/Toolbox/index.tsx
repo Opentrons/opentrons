@@ -9,7 +9,7 @@ import {
 } from '../../styles'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { SPACING } from '../../ui-style-constants'
-import { PrimaryButton, StyledText } from '../../atoms'
+import { PrimaryButton } from '../../atoms'
 import { textDecorationUnderline } from '../../ui-style-constants/typography'
 
 export interface ToolboxProps {
@@ -22,11 +22,12 @@ export interface ToolboxProps {
   onConfirmClick?: () => void
   confirmButton?: JSX.Element
   onCloseClick?: () => void
-  closeButtonText?: string
+  closeButton?: JSX.Element
   side?: 'left' | 'right'
   horizontalSide?: 'top' | 'bottom'
   childrenPadding?: string
   subHeader?: JSX.Element | null
+  secondaryHeaderButton?: JSX.Element
 }
 
 export function Toolbox(props: ToolboxProps): JSX.Element {
@@ -36,7 +37,7 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
     confirmButtonText,
     onCloseClick,
     onConfirmClick,
-    closeButtonText,
+    closeButton,
     height = '100%',
     disableCloseButton = false,
     width = '19.5rem',
@@ -45,6 +46,7 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
     horizontalSide = 'bottom',
     childrenPadding = SPACING.spacing16,
     subHeader,
+    secondaryHeaderButton,
   } = props
 
   const slideOutRef = React.useRef<HTMLDivElement>(null)
@@ -101,19 +103,20 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
             gridGap={SPACING.spacing12}
           >
             {title}
-            {onCloseClick != null && closeButtonText != null ? (
-              <Btn
-                onClick={onCloseClick}
-                textDecoration={textDecorationUnderline}
-                data-testid={`Toolbox_${closeButtonText}`}
-                whiteSpace={NO_WRAP}
-                disable={disableCloseButton}
-              >
-                <StyledText desktopStyle="bodyDefaultRegular">
-                  {closeButtonText}
-                </StyledText>
-              </Btn>
-            ) : null}
+            <Flex gridGap={SPACING.spacing4}>
+              {secondaryHeaderButton != null ? secondaryHeaderButton : null}
+              {onCloseClick != null && closeButton != null ? (
+                <Btn
+                  onClick={onCloseClick}
+                  textDecoration={textDecorationUnderline}
+                  data-testid="Toolbox_closeButton"
+                  whiteSpace={NO_WRAP}
+                  disable={disableCloseButton}
+                >
+                  {closeButton}
+                </Btn>
+              ) : null}
+            </Flex>
           </Flex>
         </Flex>
         <Box
