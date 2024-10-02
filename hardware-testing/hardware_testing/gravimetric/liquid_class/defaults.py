@@ -26,12 +26,12 @@ _default_aspirate: Dict[str, AspirateSettings] = {
         delay=1.0,
     ),
     _GLYCEROL_50: AspirateSettings(
-        z_speed=50,
+        z_speed=5,
         flow_rate=None,
         air_gap=None,
         submerge_mm=-1.5,
         retract_mm=3.0,
-        delay=1.5,  # 1.0 second was barely enough time (b/c viscosity)
+        delay=0.0,  # 1.0 second was barely enough time (b/c viscosity)
     ),
     _ETHANOL_70: AspirateSettings(
         z_speed=50,
@@ -52,12 +52,12 @@ _default_dispense: Dict[str, DispenseSettings] = {
         delay=0.5,
     ),
     _GLYCEROL_50: DispenseSettings(
-        z_speed=50,
+        z_speed=5,
         flow_rate=None,
         push_out=None,
         submerge_mm=-1.5,  # contact dispense
         retract_mm=3.0,
-        delay=0.5,
+        delay=0.0,
     ),
     _ETHANOL_70: DispenseSettings(
         z_speed=50,
@@ -173,7 +173,7 @@ _defaults: Dict[
                     _GLYCEROL_50: LiquidClassSettings(  # glycerol-50
                         aspirate=AspirateSettings(
                             z_speed=None,
-                            flow_rate=40.0,
+                            flow_rate=50.0,
                             air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -181,7 +181,7 @@ _defaults: Dict[
                         ),
                         dispense=DispenseSettings(
                             z_speed=None,
-                            flow_rate=40.0,
+                            flow_rate=50.0,
                             push_out=3.9,
                             submerge_mm=None,
                             retract_mm=None,
