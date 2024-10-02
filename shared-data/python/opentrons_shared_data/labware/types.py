@@ -154,8 +154,8 @@ class PyramidalFrustum(TypedDict):
     bottomHeight: float
 
 
-# A truncated circle is a square that is trimmed at the corners by a smaller circle
-#   that is concentric with the square.
+# A squared cone is the intersection of a cube and a cone that both
+# share a central axis, and is a transitional shape between a cone and pyramid
 class SquaredConeSegment(TypedDict):
     shape: SquaredCone
     circleDiameter: float
@@ -165,8 +165,15 @@ class SquaredConeSegment(TypedDict):
     bottomHeight: float
 
 
-# A rounded rectangle is a rectangle that is filleted by 4 circles
-#   centered somewhere along the diagonals of the rectangle
+# A rounded pyramid is a pyramid that is filleted on each corner with the following:
+# for each cross section the shape is a rectangle that has its corners rounded off
+# the rounding for the corner is done by taking the intersection of the rectangle and
+# a circle who's center is 1 radius away in both x and y from the edge of the rectangle
+# which means the two angles where the circle meets the rectangle are exactly 90 degrees
+# on the "circular" side of the shape all 4 filleting circles share a common center
+# at the center of the rectangle
+# on the "rectangular" side of the shape the 4 circles are 0 radius
+# and their centers are the exact corner of the rectangle
 class RoundedPyramidSegment(TypedDict):
     shape: RoundedPyramid
     circleDiameter: float
