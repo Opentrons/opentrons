@@ -8,10 +8,7 @@ from opentrons.protocol_engine.commands.unsafe.unsafe_ungrip_labware import (
 )
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.errors.exceptions import GripperNotAttachedError
-from opentrons.protocol_engine.execution import GantryMover
-from opentrons.protocol_engine.types import MotorAxis
 from opentrons.hardware_control import OT3HardwareControlAPI
-from opentrons.hardware_control.types import Axis
 import pytest
 
 
