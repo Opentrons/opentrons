@@ -1,16 +1,16 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Modal,
-  SPACING,
-  Flex,
-  JUSTIFY_FLEX_END,
-  SecondaryButton,
-  StyledText,
-  PrimaryButton,
   DIRECTION_COLUMN,
   EmptySelectorButton,
+  Flex,
   InfoScreen,
+  JUSTIFY_FLEX_END,
+  Modal,
+  PrimaryButton,
+  SecondaryButton,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { ThermocyclerStep } from './ThermocyclerStep'
