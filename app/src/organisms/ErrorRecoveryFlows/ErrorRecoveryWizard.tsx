@@ -17,6 +17,8 @@ import {
   SkipStepSameTips,
   SkipStepNewTips,
   IgnoreErrorSkipStep,
+  ManualMoveLwAndSkip,
+  ManualReplaceLwAndRetry,
 } from './RecoveryOptions'
 import {
   useErrorDetailsModal,
@@ -218,6 +220,14 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     return <IgnoreErrorSkipStep {...props} />
   }
 
+  const buildManualMoveLwAndSkip = (): JSX.Element => {
+    return <ManualMoveLwAndSkip {...props} />
+  }
+
+  const buildManualReplaceLwAndRetry = (): JSX.Element => {
+    return <ManualReplaceLwAndRetry {...props} />
+  }
+
   const buildManuallyRouteToDoorOpen = (): JSX.Element => {
     return <RecoveryDoorOpen {...props} />
   }
@@ -237,7 +247,7 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildRetryNewTips()
     case RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE:
       return buildRetrySameTips()
-    case RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE:
+    case RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE:
       return buildFillWellAndSkip()
     case RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE:
       return buildSkipStepSameTips()
@@ -245,12 +255,17 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildSkipStepNewTips()
     case RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE:
       return buildIgnoreErrorSkipStep()
+    case RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE:
+      return buildManualMoveLwAndSkip()
+    case RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE:
+      return buildManualReplaceLwAndRetry()
     case RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE:
     case RECOVERY_MAP.ROBOT_RESUMING.ROUTE:
     case RECOVERY_MAP.ROBOT_RETRYING_STEP.ROUTE:
     case RECOVERY_MAP.ROBOT_CANCELING.ROUTE:
     case RECOVERY_MAP.ROBOT_PICKING_UP_TIPS.ROUTE:
     case RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE:
+    case RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE:
       return buildRecoveryInProgress()
     case RECOVERY_MAP.ROBOT_DOOR_OPEN.ROUTE:
       return buildManuallyRouteToDoorOpen()

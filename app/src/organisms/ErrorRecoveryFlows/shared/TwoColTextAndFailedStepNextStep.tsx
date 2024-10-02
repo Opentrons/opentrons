@@ -22,6 +22,9 @@ type TwoColTextAndFailedStepNextStepProps = RecoveryContentProps & {
   secondaryBtnOnClickOverride?: () => void
 }
 
+// TODO(jh, 10-01-24): In some views we inject copy and in others, we derive it in the view based on
+//  selected recovery option.
+
 /**
  * Left Column: Title + body text
  * Right column: FailedStepNextStep

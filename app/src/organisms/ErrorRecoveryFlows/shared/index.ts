@@ -4,7 +4,7 @@ export {
   RecoveryTwoColumnContentWrapper,
   RecoveryODDOneDesktopTwoColumnContentWrapper,
 } from './RecoveryContentWrapper'
-export { ReplaceTips } from './ReplaceTips'
+export { TwoColLwInfoAndDeck } from './TwoColLwInfoAndDeck'
 export { SelectTips } from './SelectTips'
 export { TwoColTextAndFailedStepNextStep } from './TwoColTextAndFailedStepNextStep'
 export { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
@@ -15,5 +15,9 @@ export { useErrorDetailsModal, ErrorDetailsModal } from './ErrorDetailsModal'
 export { RecoveryInterventionModal } from './RecoveryInterventionModal'
 export { FailedStepNextStep } from './FailedStepNextStep'
 export { RecoveryRadioGroup } from './RecoveryRadioGroup'
+export { GripperReleaseLabware } from './GripperReleaseLabware'
+export { RetryStepInfo } from './RetryStepInfo'
+export { SkipStepInfo } from './SkipStepInfo'
+export { GripperIsHoldingLabware } from './GripperIsHoldingLabware'
 
 export type { RecoveryInterventionModalProps } from './RecoveryInterventionModal'

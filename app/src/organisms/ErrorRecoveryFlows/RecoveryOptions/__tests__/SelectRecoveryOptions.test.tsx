@@ -17,6 +17,7 @@ import {
   OVERPRESSURE_WHILE_DISPENSING_OPTIONS,
   NO_LIQUID_DETECTED_OPTIONS,
   TIP_NOT_DETECTED_OPTIONS,
+  GRIPPER_ERROR_OPTIONS,
 } from '../SelectRecoveryOption'
 import { RECOVERY_MAP, ERROR_KINDS } from '../../constants'
 import { clickButtonLabeled } from '../../__tests__/util'
@@ -88,7 +89,7 @@ describe('SelectRecoveryOption', () => {
       .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE)
       .thenReturn('Retry with new tips')
     when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE)
+      .calledWith(RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE)
       .thenReturn('Manually fill well and skip to next step')
     when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE)
@@ -164,7 +165,7 @@ describe('SelectRecoveryOption', () => {
     clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
-      RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE
+      RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE
     )
   })
 
@@ -244,7 +245,7 @@ describe('SelectRecoveryOption', () => {
         .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE)
         .thenReturn('Retry with new tips')
       when(mockGetRecoveryOptionCopy)
-        .calledWith(RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE)
+        .calledWith(RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE)
         .thenReturn('Manually fill well and skip to next step')
       when(mockGetRecoveryOptionCopy)
         .calledWith(RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE)
@@ -258,6 +259,12 @@ describe('SelectRecoveryOption', () => {
       when(mockGetRecoveryOptionCopy)
         .calledWith(RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE)
         .thenReturn('Ignore error and skip to next step')
+      when(mockGetRecoveryOptionCopy)
+        .calledWith(RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE)
+        .thenReturn('Manually move labware and skip to next step')
+      when(mockGetRecoveryOptionCopy)
+        .calledWith(RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE)
+        .thenReturn('Manually replace labware on deck and retry step')
     })
 
     it('renders valid recovery options for a general error errorKind', () => {
@@ -329,6 +336,40 @@ describe('SelectRecoveryOption', () => {
       screen.getByRole('label', { name: 'Skip to next step with new tips' })
       screen.getByRole('label', { name: 'Cancel run' })
     })
+
+    it(`renders valid recovery options for a ${ERROR_KINDS.TIP_NOT_DETECTED} errorKind`, () => {
+      props = {
+        ...props,
+        validRecoveryOptions: TIP_NOT_DETECTED_OPTIONS,
+      }
+
+      renderer(props)
+
+      screen.getByRole('label', {
+        name: 'Retry step',
+      })
+      screen.getByRole('label', {
+        name: 'Ignore error and skip to next step',
+      })
+      screen.getByRole('label', { name: 'Cancel run' })
+    })
+
+    it(`renders valid recovery options for a ${ERROR_KINDS.GRIPPER_ERROR} errorKind`, () => {
+      props = {
+        ...props,
+        validRecoveryOptions: GRIPPER_ERROR_OPTIONS,
+      }
+
+      renderer(props)
+
+      screen.getByRole('label', {
+        name: 'Manually move labware and skip to next step',
+      })
+      screen.getByRole('label', {
+        name: 'Manually replace labware on deck and retry step',
+      })
+      screen.getByRole('label', { name: 'Cancel run' })
+    })
   })
 })
 
@@ -375,5 +416,12 @@ describe('getRecoveryOptions', () => {
       ERROR_KINDS.TIP_NOT_DETECTED
     )
     expect(overpressureWhileDispensingOptions).toBe(TIP_NOT_DETECTED_OPTIONS)
+  })
+
+  it(`returns valid options when the errorKind is ${ERROR_KINDS.GRIPPER_ERROR}`, () => {
+    const overpressureWhileDispensingOptions = getRecoveryOptions(
+      ERROR_KINDS.GRIPPER_ERROR
+    )
+    expect(overpressureWhileDispensingOptions).toBe(GRIPPER_ERROR_OPTIONS)
   })
 })

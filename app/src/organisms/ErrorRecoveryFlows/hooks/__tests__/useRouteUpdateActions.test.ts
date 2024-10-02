@@ -134,6 +134,39 @@ describe('useRouteUpdateActions', () => {
     })
   })
 
+  it(`does not reject if the door is open but the step is ${RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_RELEASE_LABWARE}`, async () => {
+    const params = {
+      ...useRouteUpdateActionsParams,
+      doorStatusUtils: { isDoorOpen: true, isProhibitedDoorOpen: false },
+      recoveryMap: {
+        route: RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE,
+        step:
+          RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_RELEASE_LABWARE,
+      },
+    }
+
+    const { result } = renderHook(() => useRouteUpdateActions(params))
+    const { handleMotionRouting } = result.current
+
+    await expect(handleMotionRouting(true)).resolves.not.toThrow()
+  })
+
+  it(`does not reject if the door is open but the step is ${RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_RELEASE_LABWARE}`, async () => {
+    const params = {
+      ...useRouteUpdateActionsParams,
+      doorStatusUtils: { isDoorOpen: true, isProhibitedDoorOpen: false },
+      recoveryMap: {
+        route: RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE,
+        step: RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_RELEASE_LABWARE,
+      },
+    }
+
+    const { result } = renderHook(() => useRouteUpdateActions(params))
+    const { handleMotionRouting } = result.current
+
+    await expect(handleMotionRouting(true)).resolves.not.toThrow()
+  })
+
   it('routes to alternative motion routes if specified', async () => {
     const { result } = renderHook(() =>
       useRouteUpdateActions(useRouteUpdateActionsParams)
