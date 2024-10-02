@@ -284,7 +284,7 @@ def _run_trial(
         trial.tip_volume,
         trial.volume,
     )
-    if trial.cfg.interactive:
+    if trial.cfg.interactive and not trial.blank:
         liquid_class = interactively_build_liquid_class(liquid_class)
         # store it, so that next loop we don't have to think so much
         set_liquid_class(
