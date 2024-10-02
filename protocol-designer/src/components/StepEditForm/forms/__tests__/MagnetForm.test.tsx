@@ -82,7 +82,7 @@ describe('MagnetForm', () => {
     const engage = screen.getByText('Engage')
     screen.getByText('Disengage')
     fireEvent.click(engage)
-    screen.getByText('Must be between -2.5 mm to 25 mm.')
+    screen.getByText('Must be between -2.5 to 25.')
   })
   it('renders the input text for v1', () => {
     vi.mocked(getModuleEntities).mockReturnValue({
@@ -93,6 +93,6 @@ describe('MagnetForm', () => {
       },
     })
     render(props)
-    screen.getByText('Must be between 0 mm to 45 mm.')
+    screen.getByText('Must be between 0 to 45.')
   })
 })

@@ -10,7 +10,7 @@ export function getNextDefaultMagnetAction(
   const lastMagnetStep = last(prevMagnetSteps)
   // default the first magnet step to engage so that
   // recommended engage height can auto populate
-  let nextDefaultMagnetAction: MagnetAction = 'engage'
+  let nextDefaultMagnetAction: MagnetAction = 'disengage'
 
   if (lastMagnetStep && lastMagnetStep.magnetAction) {
     nextDefaultMagnetAction =

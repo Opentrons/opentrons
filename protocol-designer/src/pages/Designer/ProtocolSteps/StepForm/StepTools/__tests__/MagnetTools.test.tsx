@@ -101,6 +101,6 @@ describe('MagnetTools', () => {
       },
     })
     render(props)
-    screen.getByText('Must be between 0 mm to 45 mm.')
+    screen.getByText('Must be between 0 to 45.')
   })
 })

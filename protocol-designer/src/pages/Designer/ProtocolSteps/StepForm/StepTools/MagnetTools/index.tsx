@@ -32,19 +32,22 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
   const moduleEntities = useSelector(getModuleEntities)
   const defaultEngageHeight = useSelector(getMagnetLabwareEngageHeight)
   const moduleModel = moduleEntities[formData.moduleId].model
-  const engageHeightMinMax =
-    moduleModel === MAGNETIC_MODULE_V1
-      ? t('magnet_height_caption', {
-          low: MIN_ENGAGE_HEIGHT_V1,
-          high: MAX_ENGAGE_HEIGHT_V1,
-        })
-      : t('magnet_height_caption', {
-          low: MIN_ENGAGE_HEIGHT_V2,
-          high: MAX_ENGAGE_HEIGHT_V2,
-        })
+
+  const isGen1 = moduleModel === MAGNETIC_MODULE_V1
+  const engageHeightMinMax = isGen1
+    ? t('magnet_height_caption', {
+        low: MIN_ENGAGE_HEIGHT_V1,
+        high: MAX_ENGAGE_HEIGHT_V1,
+      })
+    : t('magnet_height_caption', {
+        low: `${MIN_ENGAGE_HEIGHT_V2} mm`,
+        high: `${MAX_ENGAGE_HEIGHT_V2} mm`,
+      })
   const engageHeightDefault =
     defaultEngageHeight != null
-      ? t('magnet_recommended', { default: defaultEngageHeight })
+      ? isGen1
+        ? t('magnet_recommended', { default: defaultEngageHeight })
+        : t('magnet_recommended', { default: `${defaultEngageHeight} mm` })
       : ''
   const engageHeightCaption = `${engageHeightMinMax} ${engageHeightDefault}`
 
