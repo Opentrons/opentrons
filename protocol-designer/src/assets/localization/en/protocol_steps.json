@@ -1,12 +1,18 @@
 {
   "add_details": "Add step details",
+  "aspirated": "Aspirated",
   "change_tips": "Change tips",
   "default_tip_option": "Default - get next tip",
   "delete": "Delete step",
+  "dispensed": "Dispensed",
   "duplicate": "Duplicate step",
   "edit_step": "Edit step",
   "final_deck_state": "Final deck state",
+  "from": "from",
   "heater_shaker_settings": "Heater-shaker settings",
+  "in": "in",
+  "into": "into",
+  "mix": "Mix",
   "module": "Module",
   "multiAspirate": "Consolidate path",
   "multiDispense": "Distribute path",
@@ -33,7 +39,9 @@
   "shake": "Shake",
   "single": "Single path",
   "starting_deck_state": "Starting deck state",
+  "step_substeps": "{{stepType}} details",
   "temperature": "Temperature",
   "time": "Time",
-  "view_commands": "View commands"
+  "view_details": "View details",
+  "well_name": "Well {{wellName}}"
 }
