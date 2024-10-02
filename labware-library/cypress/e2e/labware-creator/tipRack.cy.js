@@ -1,5 +1,7 @@
 import 'cypress-file-upload'
 
+const expectedExportFixture = '../fixtures/generic_1_tiprack_20ul.json'
+
 describe('Create a Tip Rack', () => {
   before(() => {
     cy.visit('/')
@@ -245,6 +247,18 @@ describe('Create a Tip Rack', () => {
     // Verify the exported file to the fixture
     cy.get('button').contains('EXPORT FILE').click()
 
+    cy.fixture(expectedExportFixture).then(expectedExportLabwareDef => {
+      const downloadsFolder = Cypress.config('downloadsFolder')
+      // this validates the filename and the contents of the file
+      cy.readFile(`${downloadsFolder}/generic_1_tiprack_20ul.json`).then(
+        actualExportLabwareDef => {
+          expect(actualExportLabwareDef).to.deep.equal(
+            expectedExportLabwareDef
+          )
+        }
+      )
+    })
+
     // 'verify the too big, too small error
     cy.get('input[name="gridOffsetY"]').clear().type('24')
     cy.get('#CheckYourWork span')
@@ -259,5 +273,4 @@ describe('Create a Tip Rack', () => {
       )
       .should('exist')
   })
-  // TODO: Add a test to verify the exported file
 })
