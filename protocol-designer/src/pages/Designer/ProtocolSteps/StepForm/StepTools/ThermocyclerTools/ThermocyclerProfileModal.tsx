@@ -93,7 +93,6 @@ export function ThermocyclerProfileModal(
               }
             }}
             textAlignment="left"
-            size="small"
             iconName="plus"
             disabled={!canAddStepOrProfile}
           />
@@ -105,7 +104,6 @@ export function ThermocyclerProfileModal(
               }
             }}
             textAlignment="left"
-            size="small"
             iconName="plus"
             disabled={!canAddStepOrProfile}
           />
