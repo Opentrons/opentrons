@@ -4,7 +4,8 @@
 
 context('Reservoirs', () => {
   before(() => {
-    cy.visit('/create')
+    cy.visit('/')
+    cy.get('a[href="/create"]').first().click()
     cy.viewport('macbook-15')
   })
 
@@ -139,25 +140,28 @@ context('Reservoirs', () => {
       cy.get("input[name='wellYDimension']").type('60').blur()
       cy.contains('Well Y is a required field').should('not.exist')
 
+      const flat = 'img[alt*="flat bottom"]'
+      const round = 'img[alt*="u shaped"]'
+      const v = 'img[alt*="v shaped"]'
       // verify well bottom shape and depth
       cy.get("input[name='wellBottomShape'][value='flat']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('exist')
-      cy.get("img[src*='_round.']").should('not.exist')
-      cy.get("img[src*='_v.']").should('not.exist')
+      cy.get(flat).should('exist')
+      cy.get(round).should('not.exist')
+      cy.get(v).should('not.exist')
       cy.get("input[name='wellBottomShape'][value='u']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('not.exist')
-      cy.get("img[src*='_round.']").should('exist')
-      cy.get("img[src*='_v.']").should('not.exist')
+      cy.get(flat).should('not.exist')
+      cy.get(round).should('exist')
+      cy.get(v).should('not.exist')
       cy.get("input[name='wellBottomShape'][value='v']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('not.exist')
-      cy.get("img[src*='_round.']").should('not.exist')
-      cy.get("img[src*='_v.']").should('exist')
+      cy.get(flat).should('not.exist')
+      cy.get(round).should('not.exist')
+      cy.get(v).should('exist')
       cy.get("input[name='wellDepth']").focus().blur()
       cy.contains('Depth is a required field').should('exist')
       cy.get("input[name='wellDepth']").type('70').blur()

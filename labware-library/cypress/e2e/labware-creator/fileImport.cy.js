@@ -1,10 +1,9 @@
-import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
-
 const importedLabwareFile = 'TestLabwareDefinition.json'
 
 describe('File Import', () => {
   before(() => {
-    cy.visit('/create')
+    cy.visit('/')
+    cy.get('a[href="/create"]').first().click()
     cy.viewport('macbook-15')
   })
 
@@ -49,9 +48,12 @@ describe('File Import', () => {
 
     // verify well bottom and depth
     cy.get("input[name='wellBottomShape'][value='flat']").should('exist')
-    cy.get("img[src*='_flat.']").should('exist')
-    cy.get("img[src*='_round.']").should('not.exist')
-    cy.get("img[src*='_v.']").should('not.exist')
+    let flat = 'img[alt*="flat bottom"]'
+    let round = 'img[alt*="u shaped"]'
+    let v = 'img[alt*="v shaped"]'
+    cy.get(flat).should('exist')
+    cy.get(round).should('not.exist')
+    cy.get(v).should('not.exist')
     cy.get("input[name='wellDepth'][value='5']").should('exist')
 
     // verify grid spacing
@@ -77,20 +79,14 @@ describe('File Import', () => {
       'Please resolve all invalid fields in order to export the labware definition'
     ).should('not.exist')
 
-    cy.fixture(importedLabwareFile).then(expected => {
-      cy.window()
-        .its('__lastSavedFileBlob__')
-        .should('be.a', 'blob') // wait until we get the blob
-        .should(async blob => {
-          const labwareDefText = await blob.text()
-          const savedDef = JSON.parse(labwareDefText)
-
-          expectDeepEqual(assert, savedDef, expected)
-        })
+    cy.fixture(importedLabwareFile).then(expectedExportLabwareDef => {
+      const downloadsFolder = Cypress.config('downloadsFolder')
+      // this validates the filename and the contents of the file
+      cy.readFile(`${downloadsFolder}/testpro_15_wellplate_5ul.json`).then(
+        actualExportLabwareDef => {
+          expect(actualExportLabwareDef).to.deep.equal(expectedExportLabwareDef)
+        }
+      )
     })
-
-    cy.window()
-      .its('__lastSavedFileName__')
-      .should('equal', 'testpro_15_wellplate_5ul.json')
   })
 })

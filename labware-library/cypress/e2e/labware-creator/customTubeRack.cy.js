@@ -1,12 +1,16 @@
 import 'cypress-file-upload'
-import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
 
 const expectedExportFixture =
   '../fixtures/somerackbrand_24_tuberack_1500ul.json'
 
+const flat = 'img[alt*="flat bottom"]'
+const round = 'img[alt*="u shaped"]'
+const v = 'img[alt*="v shaped"]'
+
 context('Tubes and Rack', () => {
   before(() => {
-    cy.visit('/create')
+    cy.visit('/')
+    cy.get('a[href="/create"]').first().click()
     cy.viewport('macbook-15')
   })
 
@@ -109,24 +113,29 @@ context('Tubes and Rack', () => {
       cy.contains('Diameter is a required field').should('not.exist')
 
       // well bottom shape and depth
+      // check flat
       cy.get("input[name='wellBottomShape'][value='flat']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('exist')
-      cy.get("img[src*='_round.']").should('not.exist')
-      cy.get("img[src*='_v.']").should('not.exist')
+      cy.get(flat).should('exist')
+      cy.get(round).should('not.exist')
+      cy.get(v).should('not.exist')
+
+      // check u shaped
       cy.get("input[name='wellBottomShape'][value='u']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('not.exist')
-      cy.get("img[src*='_round.']").should('exist')
-      cy.get("img[src*='_v.']").should('not.exist')
+      cy.get(flat).should('not.exist')
+      cy.get(round).should('exist')
+      cy.get(v).should('not.exist')
+
+      // check v shaped
       cy.get("input[name='wellBottomShape'][value='v']").check({
         force: true,
       })
-      cy.get("img[src*='_flat.']").should('not.exist')
-      cy.get("img[src*='_round.']").should('not.exist')
-      cy.get("img[src*='_v.']").should('exist')
+      cy.get(flat).should('not.exist')
+      cy.get(round).should('not.exist')
+      cy.get(v).should('exist')
       cy.get("input[name='wellDepth']").focus().blur()
       cy.contains('Depth is a required field').should('exist')
       cy.get("input[name='wellDepth']").type('100').blur()
@@ -163,23 +172,16 @@ context('Tubes and Rack', () => {
         'exist'
       )
 
-      // now try again with all fields inputed
+      // now try again with all fields set
       cy.fixture(expectedExportFixture).then(expectedExportLabwareDef => {
+        const downloadsFolder = Cypress.config('downloadsFolder')
         cy.get('button').contains('EXPORT FILE').click()
-
-        cy.window()
-          .its('__lastSavedFileBlob__')
-          .should('be.a', 'blob')
-          .should(async blob => {
-            const labwareDefText = await blob.text()
-            const savedDef = JSON.parse(labwareDefText)
-
-            expectDeepEqual(assert, savedDef, expectedExportLabwareDef)
-          })
-
-        cy.window()
-          .its('__lastSavedFileName__')
-          .should('equal', `somerackbrand_24_tuberack_1500ul.json`)
+        // this validates the filename and the contents of the file
+        cy.readFile(
+          `${downloadsFolder}/somerackbrand_24_tuberack_1500ul.json`
+        ).then(actualExportLabwareDef => {
+          expect(actualExportLabwareDef).to.deep.equal(expectedExportLabwareDef)
+        })
       })
     })
   })

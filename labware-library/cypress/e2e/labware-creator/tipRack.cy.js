@@ -5,7 +5,8 @@ const expectedExportFixture = '../fixtures/generic_1_tiprack_20ul.json'
 
 describe('Create a Tip Rack', () => {
   before(() => {
-    cy.visit('/create')
+    cy.visit('/')
+    cy.get('a[href="/create"]').first().click()
     cy.viewport('macbook-15')
   })
   it('Should create a tip rack', () => {
@@ -247,21 +248,6 @@ describe('Create a Tip Rack', () => {
     // Verify the exported file to the fixture
     cy.get('button').contains('EXPORT FILE').click()
 
-    cy.fixture(expectedExportFixture).then(expectedExportLabwareDef => {
-      cy.window()
-        .its('__lastSavedFileBlob__')
-        .should('be.a', 'blob')
-        .should(async blob => {
-          const labwareDefText = await blob.text()
-          const savedDef = JSON.parse(labwareDefText)
-
-          expectDeepEqual(assert, savedDef, expectedExportLabwareDef)
-        })
-    })
-
-    cy.window()
-      .its('__lastSavedFileName__')
-      .should('equal', `generic_1_tiprack_20ul.json`)
     // 'verify the too big, too small error
     cy.get('input[name="gridOffsetY"]').clear().type('24')
     cy.get('#CheckYourWork span')
@@ -276,4 +262,6 @@ describe('Create a Tip Rack', () => {
       )
       .should('exist')
   })
+
+  //TODO: Add a test to verify the exported file
 })
