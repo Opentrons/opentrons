@@ -24,7 +24,6 @@ from opentrons.protocol_engine.types import (
     CSVRunTimeParamFilesType,
 )
 from opentrons_shared_data.errors import GeneralError
-from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from robot_server.service.json_api import ResourceModel
 from robot_server.errors.error_responses import ErrorDetails
 from .action_models import RunAction
@@ -282,19 +281,22 @@ class LabwareDefinitionSummary(BaseModel):
 
 
 class ActiveNozzleLayout(BaseModel):
-    """Details about the active nozzle layout for a pipette."""
+    """Details about the active nozzle layout for a pipette used in the current run."""
 
-    configuration: "NozzleConfigurationType" = Field(
-        ..., description="The active nozzle configuration."
+    startingNozzle: str = Field(
+        ..., description="The nozzle used when issuing pipette commands."
     )
-    columns: Dict[str, List[str]] = Field(
+    activeNozzles: List[str] = Field(
         ...,
-        description="A map of all the pipette columns active in the current configuration.",
+        description="A map of all the pipette nozzles active in the current configuration.",
     )
-    rows: Dict[str, List[str]] = Field(
-        ...,
-        description="A map of all the pipette rows active in the current configuration.",
-    )
+    config: str = Field(..., description="The nozzle configuration type.")
+
+
+class RunCurrentState(BaseModel):
+    """Current details about a run."""
+
+    activeNozzleLayouts: Dict[str, ActiveNozzleLayout] = Field(..., description="")
 
 
 class RunNotFoundError(GeneralError):

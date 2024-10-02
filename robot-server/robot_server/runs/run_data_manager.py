@@ -477,7 +477,7 @@ class RunDataManager:
         raise RunNotCurrentError()
 
     def get_nozzle_maps(self, run_id: str) -> Dict[str, NozzleMap]:
-        """Get the current nozzle map keyed pipette id."""
+        """Get current nozzle maps keyed by pipette id."""
         if run_id == self._run_orchestrator_store.current_run_id:
             return self._run_orchestrator_store.get_nozzle_maps()
 

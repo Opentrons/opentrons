@@ -37,6 +37,7 @@ from robot_server.service.json_api import (
     MultiBodyMeta,
     ResourceLink,
     PydanticResponse,
+    Body,
 )
 
 from robot_server.protocols.dependencies import get_protocol_store
@@ -46,7 +47,7 @@ from robot_server.protocols.protocol_store import (
 )
 from robot_server.protocols.router import ProtocolNotFound
 
-from ..run_models import RunNotFoundError, ActiveNozzleLayout
+from ..run_models import RunNotFoundError, ActiveNozzleLayout, RunCurrentState
 from ..run_auto_deleter import RunAutoDeleter
 from ..run_models import Run, BadRun, RunCreate, RunUpdate
 from ..run_orchestrator_store import RunConflictError
@@ -109,20 +110,21 @@ class RunStopped(ErrorDetails):
     errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
 
 
-class NozzleMapNotFound(ErrorDetails):
-    """An error if a nozzle map is not found."""
-
-    id: Literal["NozzleMapNotFound"] = "NozzleMapNotFound"
-    title: str = "Nozzle Map Not Found"
-    errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
-
-
 class AllRunsLinks(BaseModel):
     """Links returned along with a collection of runs."""
 
     current: Optional[ResourceLink] = Field(
         None,
         description="Path to the currently active run, if a run is active.",
+    )
+
+
+class CurrentStateLinks(BaseModel):
+    """Links returned with the current state of a run."""
+
+    active_command: Optional[ResourceLink] = Field(
+        None,
+        description="Path to the command active when current state was reported.",
     )
 
 
@@ -539,22 +541,22 @@ async def get_run_commands_error(
 @PydanticResponse.wrap_route(
     base_router.get,
     path="/runs/{runId}/currentState",
-    summary="Get the current run's active nozzle layout for a specific pipette.",
+    summary="Get a run's current state.",
     description=dedent(
         """
         Get current state associated with a run if the run is current.
         """
     ),
     responses={
-        status.HTTP_200_OK: {"model": SimpleBody[ActiveNozzleLayout]},
+        status.HTTP_200_OK: {"model": SimpleBody[RunCurrentState]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
 )
 async def get_current_state(
     runId: str,
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
-) -> PydanticResponse[SimpleBody[ActiveNozzleLayout]]:
-    """Get current state associated with a run.
+) -> PydanticResponse[Body[RunCurrentState, CurrentStateLinks]]:
+    """Get current state associated with a run if the run is current.
 
     Arguments:
         runId: Run ID pulled from URL.
@@ -562,10 +564,32 @@ async def get_current_state(
     """
     try:
         active_nozzle_maps = run_data_manager.get_nozzle_maps(run_id=runId)
+
+        nozzle_layouts = {
+            pipetteId: ActiveNozzleLayout.construct(
+                startingNozzle=nozzle_map.starting_nozzle,
+                activeNozzles=list(nozzle_map.map_store.keys()),
+                config=nozzle_map.configuration.value,
+            )
+            for pipetteId, nozzle_map in active_nozzle_maps.items()
+        }
+
+        current_command = run_data_manager.get_current_command(run_id=runId)
     except RunNotCurrentError as e:
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
+    links = CurrentStateLinks.construct(
+        active_command=ResourceLink.construct(
+            href=f"/runs/{runId}/commands/{current_command.command_id}"
+        )
+        if current_command is not None
+        else None
+    )
+
     return await PydanticResponse.create(
-        content=SimpleBody.construct(data=active_nozzle_maps),
+        content=Body.construct(
+            data=RunCurrentState.construct(activeNozzleLayouts=nozzle_layouts),
+            links=links,
+        ),
         status_code=status.HTTP_200_OK,
     )

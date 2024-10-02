@@ -1,6 +1,6 @@
 """Tests for RunDataManager."""
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 import pytest
 from decoy import Decoy, matchers
@@ -38,7 +38,6 @@ from robot_server.runs.error_recovery_models import ErrorRecoveryRule
 from robot_server.runs.run_data_manager import (
     RunDataManager,
     RunNotCurrentError,
-    NozzleMapNotFoundError,
     PreSerializedCommandsNotAvailableError,
 )
 from robot_server.runs.run_models import Run, BadRun, RunNotFoundError, RunDataError
@@ -117,9 +116,10 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
 
 
 @pytest.fixture
-def mock_nozzle_map(decoy: Decoy) -> NozzleMap:
+def mock_nozzle_maps(decoy: Decoy) -> Dict[str, NozzleMap]:
     """Get a mock NozzleMap."""
-    return decoy.mock(cls=NozzleMap)
+    mock_nozzle_map = decoy.mock(cls=NozzleMap)
+    return {"mock-pipette-id": mock_nozzle_map}
 
 
 @pytest.fixture
@@ -1161,20 +1161,19 @@ def test_get_nozzle_map_current_run(
     decoy: Decoy,
     mock_run_orchestrator_store: RunOrchestratorStore,
     subject: RunDataManager,
-    mock_nozzle_map: NozzleMap,
+    mock_nozzle_maps: Dict[str, NozzleMap],
 ) -> None:
     """It should return the nozzle map for the current run."""
     run_id = "current-run-id"
-    pipette_id = "pipette-id"
 
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
-    decoy.when(mock_run_orchestrator_store.get_nozzle_maps(pipette_id)).then_return(
-        mock_nozzle_map
+    decoy.when(mock_run_orchestrator_store.get_nozzle_maps()).then_return(
+        mock_nozzle_maps
     )
 
-    result = subject.get_nozzle_maps(run_id=run_id, pipette_id=pipette_id)
+    result = subject.get_nozzle_maps(run_id=run_id)
 
-    assert result == mock_nozzle_map
+    assert result == mock_nozzle_maps
 
 
 def test_get_nozzle_map_not_current_run(
@@ -1184,29 +1183,10 @@ def test_get_nozzle_map_not_current_run(
 ) -> None:
     """It should raise RunNotCurrentError for a non-current run."""
     run_id = "non-current-run-id"
-    pipette_id = "pipette-id"
 
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(
         "different-run-id"
     )
 
     with pytest.raises(RunNotCurrentError):
-        subject.get_nozzle_maps(run_id=run_id, pipette_id=pipette_id)
-
-
-def test_get_nozzle_map_not_found(
-    decoy: Decoy,
-    mock_run_orchestrator_store: RunOrchestratorStore,
-    subject: RunDataManager,
-) -> None:
-    """It should raise NozzleMapNotFoundError when the nozzle map is not found."""
-    run_id = "current-run-id"
-    pipette_id = "non-existent-pipette-id"
-
-    decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
-    decoy.when(mock_run_orchestrator_store.get_nozzle_maps(pipette_id)).then_raise(
-        KeyError("Pipette not found")
-    )
-
-    with pytest.raises(NozzleMapNotFoundError):
-        subject.get_nozzle_maps(run_id=run_id, pipette_id=pipette_id)
+        subject.get_nozzle_maps(run_id=run_id)

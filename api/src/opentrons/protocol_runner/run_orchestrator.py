@@ -399,7 +399,7 @@ class RunOrchestrator:
         return self._protocol_engine.state_view.config.deck_type
 
     def get_nozzle_maps(self) -> Dict[str, NozzleMap]:
-        """Get the current nozzle map keyed by pipette id."""
+        """Get current nozzle maps keyed by pipette id."""
         return self._protocol_engine.state_view.tips.get_pipette_nozzle_maps()
 
     def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:

@@ -487,7 +487,7 @@ class TipView(HasState[TipState]):
         return self._state.nozzle_map_by_pipette_id[pipette_id]
 
     def get_pipette_nozzle_maps(self) -> Dict[str, NozzleMap]:
-        """Get the current nozzle map keyed by attached pipette id."""
+        """Get current nozzle maps keyed by pipette id."""
         return self._state.nozzle_map_by_pipette_id
 
     def has_clean_tip(self, labware_id: str, well_name: str) -> bool:
