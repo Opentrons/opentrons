@@ -70,6 +70,7 @@
       "additionalProperties": false,
       "required": ["shape", "radiusOfCurvature", "topHeight"],
       "properties": {
+        "description": "A list of all of the sections of the well that have a contiguous shape",
         "shape": {
           "type": "string",
           "enum": ["spherical"]
@@ -82,13 +83,20 @@
         }
       }
     },
-    "CircularFrustum": {
+    "ConicalFrustum": {
       "type": "object",
-      "required": ["shape", "bottomDiameter", "TopDiameter", "topHeight", "bottomHeight"],
+      "required": [
+        "shape",
+        "bottomDiameter",
+        "TopDiameter",
+        "topHeight",
+        "bottomHeight"
+      ],
       "properties": {
+        "description": "A list of all of the sections of the well that have a contiguous shape",
         "shape": {
           "type": "string",
-          "enum": ["circular"]
+          "enum": ["conical"]
         },
         "bottomDiameter": {
           "type": "number"
@@ -104,13 +112,22 @@
         }
       }
     },
-    "RectangularFrustum": {
+    "PyramidalFrustum": {
       "type": "object",
-      "required": ["shape", "bottomXDimension", "bottomYDimensions", "topXDimension", "topYDimension", "topHeight", "bottomHeight"],
+      "required": [
+        "shape",
+        "bottomXDimension",
+        "bottomYDimensions",
+        "topXDimension",
+        "topYDimension",
+        "topHeight",
+        "bottomHeight"
+      ],
       "properties": {
+        "description": "A list of all of the sections of the well that have a contiguous shape",
         "shape": {
           "type": "string",
-          "enum": ["rectangular"]
+          "enum": ["pyramidal"]
         },
         "bottomXDimension": {
           "type": "number"
@@ -132,13 +149,21 @@
         }
       }
     },
-    "TruncatedCircularSegment": {
+    "SquaredConeSegment": {
       "type": "object",
-      "required": ["shape", "circleDiameter", "rectangleXDimension", "rectangleYDimension", "topHeight", "bottomHeight"],
+      "required": [
+        "shape",
+        "circleDiameter",
+        "rectangleXDimension",
+        "rectangleYDimension",
+        "topHeight",
+        "bottomHeight"
+      ],
       "properties": {
+        "description": "The intersection of a pyramid and a cone that both share a central axis where one face is a circle and one face is a rectangle",
         "shape": {
           "type": "string",
-          "enum": ["truncatedcircular"]
+          "enum": ["squaredcone"]
         },
         "circleDiameter": {
           "type": "number"
@@ -157,13 +182,21 @@
         }
       }
     },
-    "RoundedRectangularSegment": {
+    "RoundedPyramidSegment": {
       "type": "object",
-      "required": ["shape", "circleDiameter", "rectangleXDimension", "rectangleYDimension", "topHeight", "bottomHeight"],
+      "description": "A pyramidal frustum where each corner is filleted out by circles with centers on the diagonals between opposite corners",
+      "required": [
+        "shape",
+        "circleDiameter",
+        "rectangleXDimension",
+        "rectangleYDimension",
+        "topHeight",
+        "bottomHeight"
+      ],
       "properties": {
         "shape": {
           "type": "string",
-          "enum": ["roundedrectangular"]
+          "enum": ["roundedpyramid"]
         },
         "circleDiameter": {
           "type": "number"
@@ -192,16 +225,16 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/CircularFrustum"
+                "$ref": "#/definitions/ConicalFrustum"
               },
               {
-                "$ref": "#/definitions/RectangularFrustum"
+                "$ref": "#/definitions/PyramidalFrustum"
               },
               {
-                "$ref": "#/definitions/TruncatedCircularSegment"
+                "$ref": "#/definitions/SquaredConeSegment"
               },
               {
-                "$ref": "#/definitions/RoundedRectangularSegment"
+                "$ref": "#/definitions/RoundedPyramidSegment"
               },
               {
                 "$ref": "#/definitions/SphericalSegment"

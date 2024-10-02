@@ -251,7 +251,7 @@ class SphericalSegment(BaseModel):
 
 
 class ConicalFrustum(BaseModel):
-    shape: Conical = Field(..., description="Denote shape as circular")
+    shape: Conical = Field(..., description="Denote shape as conical")
     bottomDiameter: _NonNegativeNumber = Field(
         ...,
         description="The diameter at the bottom cross-section of a circular frustum",
@@ -271,7 +271,7 @@ class ConicalFrustum(BaseModel):
 
 
 class PyramidalFrustum(BaseModel):
-    shape: Pyramidal = Field(..., description="Denote shape as rectangular")
+    shape: Pyramidal = Field(..., description="Denote shape as pyramidal")
     bottomXDimension: _NonNegativeNumber = Field(
         ...,
         description="x dimension of the bottom cross-section of a rectangular frustum",
@@ -301,7 +301,7 @@ class PyramidalFrustum(BaseModel):
 
 class SquaredConeSegment(BaseModel):
     shape: SquaredCone = Field(
-        ..., description="Denote shape as a truncated circular segment"
+        ..., description="Denote shape as a squared conical segment"
     )
     circleDiameter: _NonNegativeNumber = Field(
         ...,
@@ -329,7 +329,7 @@ class SquaredConeSegment(BaseModel):
 
 class RoundedPyramidSegment(BaseModel):
     shape: RoundedPyramid = Field(
-        ..., description="Denote shape as a rounded rectangular segment"
+        ..., description="Denote shape as a rounded pyramidal segment"
     )
     circleDiameter: _NonNegativeNumber = Field(
         ...,
