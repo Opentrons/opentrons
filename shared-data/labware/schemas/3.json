@@ -153,6 +153,7 @@
       "type": "object",
       "required": [
         "shape",
+        "bottomCrossSection",
         "circleDiameter",
         "rectangleXDimension",
         "rectangleYDimension",
@@ -164,6 +165,10 @@
         "shape": {
           "type": "string",
           "enum": ["squaredcone"]
+        },
+        "bottomCrossSection": {
+          "type": "string",
+          "enum": ["circular", "rectangular"]
         },
         "circleDiameter": {
           "type": "number"
@@ -187,6 +192,7 @@
       "description": "A pyramidal frustum where each corner is filleted out by circles with centers on the diagonals between opposite corners",
       "required": [
         "shape",
+        "bottomCrossSection",
         "circleDiameter",
         "rectangleXDimension",
         "rectangleYDimension",
@@ -197,6 +203,10 @@
         "shape": {
           "type": "string",
           "enum": ["roundedpyramid"]
+        },
+        "bottomCrossSection": {
+          "type": "string",
+          "enum": ["circular", "rectangular"]
         },
         "circleDiameter": {
           "type": "number"

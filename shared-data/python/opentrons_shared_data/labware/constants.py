@@ -1,6 +1,6 @@
 import re
 from typing_extensions import Final
-from typing import Literal
+from typing import Literal, Union
 
 
 # Regular expression to validate and extract row, column from well name
@@ -10,6 +10,7 @@ WELL_NAME_PATTERN: Final["re.Pattern[str]"] = re.compile(r"^([A-Z]+)([0-9]+)$", 
 # These shapes are for wellshape definitions and describe the top of the well
 Circular = Literal["circular"]
 Rectangular = Literal["rectangular"]
+WellShape = Union[Circular, Rectangular]
 
 # These shapes are used to describe the 3D primatives used to build wells
 Conical = Literal["conical"]

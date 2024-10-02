@@ -17,6 +17,7 @@ from .constants import (
     Spherical,
     Circular,
     Rectangular,
+    WellShape,
 )
 
 LabwareUri = NewType("LabwareUri", str)
@@ -46,8 +47,6 @@ LabwareRoles = Union[
     Literal["adapter"],
     Literal["maintenance"],
 ]
-
-WellShape = Union[Circular, Rectangular]
 
 
 class NamedOffset(TypedDict):
@@ -158,6 +157,7 @@ class PyramidalFrustum(TypedDict):
 # share a central axis, and is a transitional shape between a cone and pyramid
 class SquaredConeSegment(TypedDict):
     shape: SquaredCone
+    bottomCrossSection: WellShape
     circleDiameter: float
     rectangleXDimension: float
     rectangleYDimension: float
@@ -176,6 +176,7 @@ class SquaredConeSegment(TypedDict):
 # and their centers are the exact corner of the rectangle
 class RoundedPyramidSegment(TypedDict):
     shape: RoundedPyramid
+    bottomCrossSection: WellShape
     circleDiameter: float
     rectangleXDimension: float
     rectangleYDimension: float

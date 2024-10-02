@@ -25,6 +25,7 @@ from .constants import (
     RoundedPyramid,
     SquaredCone,
     Spherical,
+    WellShape,
 )
 
 SAFE_STRING_REGEX = "^[a-z0-9._]+$"
@@ -303,6 +304,10 @@ class SquaredConeSegment(BaseModel):
     shape: SquaredCone = Field(
         ..., description="Denote shape as a squared conical segment"
     )
+    bottomCrossSection: WellShape = Field(
+        ...,
+        description="Denote if the shape is going from circular to rectangular or vise versa",
+    )
     circleDiameter: _NonNegativeNumber = Field(
         ...,
         description="diameter of the circular face of a truncated circular segment",
@@ -330,6 +335,10 @@ class SquaredConeSegment(BaseModel):
 class RoundedPyramidSegment(BaseModel):
     shape: RoundedPyramid = Field(
         ..., description="Denote shape as a rounded pyramidal segment"
+    )
+    bottomCrossSection: WellShape = Field(
+        ...,
+        description="Denote if the shape is going from circular to rectangular or vise versa",
     )
     circleDiameter: _NonNegativeNumber = Field(
         ...,
