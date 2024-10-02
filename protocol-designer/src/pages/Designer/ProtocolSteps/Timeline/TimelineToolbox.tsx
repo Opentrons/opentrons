@@ -61,7 +61,7 @@ export const TimelineToolbox = (): JSX.Element => {
 
   return (
     <Toolbox
-      width={formData != null ? '8rem' : '19.5rem'}
+      width="19.5rem"
       height={formData != null ? FLEX_MAX_CONTENT : 'calc(100vh - 78px)'}
       side="left"
       horizontalSide={formData != null ? 'top' : 'bottom'}

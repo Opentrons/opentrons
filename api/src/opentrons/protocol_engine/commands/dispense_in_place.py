@@ -107,7 +107,7 @@ class DispenseInPlaceImplementation(
 
 
 class DispenseInPlace(
-    BaseCommand[DispenseInPlaceParams, DispenseInPlaceResult, ErrorOccurrence]
+    BaseCommand[DispenseInPlaceParams, DispenseInPlaceResult, OverpressureError]
 ):
     """DispenseInPlace command model."""
 

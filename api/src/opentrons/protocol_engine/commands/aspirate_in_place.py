@@ -129,7 +129,7 @@ class AspirateInPlaceImplementation(
 
 
 class AspirateInPlace(
-    BaseCommand[AspirateInPlaceParams, AspirateInPlaceResult, ErrorOccurrence]
+    BaseCommand[AspirateInPlaceParams, AspirateInPlaceResult, OverpressureError]
 ):
     """AspirateInPlace command model."""
 

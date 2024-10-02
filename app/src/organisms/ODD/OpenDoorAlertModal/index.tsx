@@ -44,7 +44,7 @@ export function OpenDoorAlertModal(): JSX.Element {
             textAlign={TYPOGRAPHY.textAlignCenter}
             color={COLORS.grey60}
           >
-            {t('close_door_to_resume')}
+            {t('close_door_to_resume_run')}
           </LegacyStyledText>
         </Flex>
       </Flex>

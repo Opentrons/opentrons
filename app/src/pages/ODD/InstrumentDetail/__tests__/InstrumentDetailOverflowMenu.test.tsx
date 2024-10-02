@@ -25,6 +25,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     getPipetteModelSpecs: vi.fn(),
   }
 })
+
 vi.mock('/app/resources/maintenance_runs')
 vi.mock('/app/organisms/PipetteWizardFlows')
 vi.mock('/app/organisms/GripperWizardFlows')
