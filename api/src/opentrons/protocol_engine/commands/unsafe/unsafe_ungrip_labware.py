@@ -45,7 +45,7 @@ class UnsafeUngripLabwareImplementation(
         """Ungrip Labware."""
         ot3_hardware_api = ensure_ot3_hardware(self._hardware_api)
         if not ot3_hardware_api.has_gripper():
-            raise GripperNotAttachedError("No gripper found for ungrip.")
+            raise GripperNotAttachedError("No gripper found to preform ungrip.")
         await ot3_hardware_api.ungrip()
         return SuccessData(public=UnsafeUngripLabwareResult(), private=None)
 

@@ -742,7 +742,6 @@ class CommandView(HasState[CommandState]):
             self._state.queue_status == QueueStatus.AWAITING_RECOVERY
             or self.get_status()
             in [
-                EngineStatus.BLOCKED_BY_OPEN_DOOR,
                 EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
             ]
             and self.get(next_fixit_cmd).commandType == "unsafe/ungripLabware"
@@ -980,10 +979,7 @@ class CommandView(HasState[CommandState]):
             elif action.request.intent == CommandIntent.FIXIT:
                 allowed_while_door_open = (
                     self.get_status()
-                    in (
-                        EngineStatus.BLOCKED_BY_OPEN_DOOR,
-                        EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
-                    )
+                    in (EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,)
                     and action.request.commandType == "unsafe/ungripLabware"
                 )
                 if (
