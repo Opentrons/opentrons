@@ -28,17 +28,8 @@ interface PipetteInfoItemProps {
 }
 
 export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
-  const {
-    mount,
-    pipetteName,
-    tiprackDefURIs,
-    editClick,
-    cleanForm,
-    formPipettesByMount,
-    pipetteOnDeck,
-  } = props
+  const { mount, pipetteName, tiprackDefURIs, editClick, cleanForm } = props
   const { t, i18n } = useTranslation('create_new_protocol')
-  const oppositeMount = mount === 'left' ? 'right' : 'left'
   const allLabware = useSelector(getLabwareDefsByURI)
   const is96Channel = pipetteName === 'p1000_96'
   return (
