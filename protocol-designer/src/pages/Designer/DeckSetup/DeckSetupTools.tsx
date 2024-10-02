@@ -257,7 +257,9 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
           </StyledText>
         </Flex>
       }
-      closeButtonText={t('clear')}
+      closeButton={
+        <StyledText desktopStyle="bodyDefaultRegular">{t('clear')}</StyledText>
+      }
       onCloseClick={() => {
         handleClear()
         handleResetToolbox()

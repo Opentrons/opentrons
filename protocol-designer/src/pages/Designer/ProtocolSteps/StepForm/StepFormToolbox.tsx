@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
+  Btn,
   COLORS,
   Flex,
   Icon,
@@ -12,6 +13,7 @@ import {
   SPACING,
   SecondaryButton,
   StyledText,
+  TYPOGRAPHY,
   Toolbox,
 } from '@opentrons/components'
 import { stepIconsByType } from '../../../../form-types'
@@ -20,6 +22,7 @@ import { useKitchen } from '../../../../organisms/Kitchen/hooks'
 import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
 import { getTimelineWarningsForSelectedStep } from '../../../../top-selectors/timelineWarnings'
 import { getRobotStateTimeline } from '../../../../file-data/selectors'
+import { BUTTON_LINK_STYLE } from '../../../../atoms'
 import {
   CommentTools,
   HeaterShakerTools,
@@ -135,9 +138,22 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
             </StyledText>
           ) : null
         }
+        secondaryHeaderButton={
+          <Btn
+            onClick={() => {
+              console.log('TODO: wire this up')
+            }}
+            css={BUTTON_LINK_STYLE}
+            textDecoration={TYPOGRAPHY.textDecorationUnderline}
+          >
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {t('protocol_steps:rename_btn')}
+            </StyledText>
+          </Btn>
+        }
         childrenPadding="0"
         onCloseClick={handleClose}
-        closeButtonText={t('shared:cancel')}
+        closeButton={<Icon size="2rem" name="close" />}
         confirmButton={
           <Flex gridGap={SPACING.spacing8}>
             {isMultiStepToolbox && toolboxStep === 1 ? (

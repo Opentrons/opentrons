@@ -224,7 +224,11 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
       onConfirmClick={onClose}
       onCloseClick={handleClearSelectedWells}
       height="calc(100vh - 64px)"
-      closeButtonText={t('clear_wells')}
+      closeButton={
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('clear_wells')}
+        </StyledText>
+      }
       disableCloseButton={
         !(labwareId != null && selectedWells != null && selectionHasLiquids)
       }

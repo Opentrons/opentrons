@@ -13,6 +13,7 @@
   "new_location": "New location",
   "protocol_steps": "Protocol steps",
   "protocol_timeline": "Protocol timeline",
+  "rename_btn": "Rename",
   "rename": "Rename step",
   "save_errors": "{{stepType}} has been saved with {{numErrors}} error(s)",
   "save_no_errors": "{{stepType}} has been saved",
