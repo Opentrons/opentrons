@@ -1,5 +1,4 @@
 """Functions used for managing error recovery policy."""
-from typing import Optional
 from opentrons.protocol_engine.state.config import Config
 from robot_server.runs.error_recovery_models import ErrorRecoveryRule, ReactionIfMatch
 from opentrons.protocol_engine.commands.command_unions import (
@@ -33,21 +32,15 @@ def create_error_recovery_policy_from_rules(
     def mapped_policy(
         config: Config,
         failed_command: Command,
-        defined_error_data: Optional[CommandDefinedErrorData],
+        defined_error_data: CommandDefinedErrorData | None,
     ) -> ErrorRecoveryType:
-        def rule_matches_error(rule: ErrorRecoveryRule) -> bool:
-            command_type_matches = (
-                failed_command.commandType == rule.matchCriteria.command.commandType
-            )
-            error_type_matches = (
-                defined_error_data is not None
-                and defined_error_data.public.errorType
-                == rule.matchCriteria.command.error.errorType
-            )
-            return command_type_matches and error_type_matches
-
         first_matching_rule = next(
-            (rule for rule in rules if rule_matches_error(rule)), None
+            (
+                rule
+                for rule in rules
+                if _rule_matches_error(rule, failed_command, defined_error_data)
+            ),
+            None,
         )
         robot_is_flex = config.robot_type == "OT-3 Standard"
         error_is_defined = defined_error_data is not None
@@ -87,6 +80,22 @@ def create_error_recovery_policy_from_rules(
             )
 
     return mapped_policy
+
+
+def _rule_matches_error(
+    rule: ErrorRecoveryRule,
+    failed_command: Command,
+    defined_error_data: CommandDefinedErrorData | None,
+) -> bool:
+    command_type_matches = (
+        failed_command.commandType == rule.matchCriteria.command.commandType
+    )
+    error_type_matches = (
+        defined_error_data is not None
+        and defined_error_data.public.errorType
+        == rule.matchCriteria.command.error.errorType
+    )
+    return command_type_matches and error_type_matches
 
 
 def _map_error_recovery_type(reaction_if_match: ReactionIfMatch) -> ErrorRecoveryType:

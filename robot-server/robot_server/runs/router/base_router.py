@@ -407,11 +407,13 @@ async def update_run(
 @PydanticResponse.wrap_route(
     base_router.put,
     path="/runs/{runId}/errorRecoveryPolicy",
-    summary="Set run policies",
+    summary="Set the run's error recovery policy",
     description=dedent(
         """
         Update how to handle different kinds of command failures.
-        The following rules will persist during the run.
+
+        For this to have any effect, error recovery must also be enabled globally.
+        See `PATCH /errorRecovery/settings`.
         """
     ),
     status_code=status.HTTP_201_CREATED,
