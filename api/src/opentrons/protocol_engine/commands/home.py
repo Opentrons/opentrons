@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Optional, List, Type
 from typing_extensions import Literal
 
 from opentrons.types import MountType
+from ..state import update_types
 from ..types import MotorAxis
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
@@ -51,6 +52,8 @@ class HomeImplementation(
 
     async def execute(self, params: HomeParams) -> SuccessData[HomeResult, None]:
         """Home some or all motors to establish positional accuracy."""
+        state_update = update_types.StateUpdate()
+
         if (
             params.skipIfMountPositionOk is None
             or not await self._movement.check_for_valid_position(
@@ -58,7 +61,12 @@ class HomeImplementation(
             )
         ):
             await self._movement.home(axes=params.axes)
-        return SuccessData(public=HomeResult(), private=None)
+
+        # todo(mm, 2024-09-17): Clearing all pipette locations *unconditionally* is to
+        # preserve prior behavior, but we might only want to do this if we actually home.
+        state_update.clear_all_pipette_locations()
+
+        return SuccessData(public=HomeResult(), private=None, state_update=state_update)
 
 
 class Home(BaseCommand[HomeParams, HomeResult, ErrorOccurrence]):

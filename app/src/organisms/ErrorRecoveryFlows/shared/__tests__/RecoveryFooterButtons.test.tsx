@@ -1,11 +1,11 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { screen, fireEvent } from '@testing-library/react'
 
 import { COLORS } from '@opentrons/components'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { RecoveryFooterButtons } from '../RecoveryFooterButtons'
 
 import type { Mock } from 'vitest'

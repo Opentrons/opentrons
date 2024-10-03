@@ -1,4 +1,6 @@
 """Maintenance Run router dependency-injection wire-up."""
+from typing import Annotated
+
 from fastapi import Depends
 
 from opentrons_shared_data.robot.types import RobotType
@@ -26,10 +28,10 @@ _run_orchestrator_store_accessor = AppStateAccessor[MaintenanceRunOrchestratorSt
 
 
 async def get_maintenance_run_orchestrator_store(
-    app_state: AppState = Depends(get_app_state),
-    hardware_api: HardwareControlAPI = Depends(get_hardware),
-    deck_type: DeckType = Depends(get_deck_type),
-    robot_type: RobotType = Depends(get_robot_type),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    hardware_api: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    deck_type: Annotated[DeckType, Depends(get_deck_type)],
+    robot_type: Annotated[RobotType, Depends(get_robot_type)],
 ) -> MaintenanceRunOrchestratorStore:
     """Get a singleton MaintenanceRunOrchestratorStore to keep track of created engines / runners."""
     run_orchestrator_store = _run_orchestrator_store_accessor.get_from(app_state)
@@ -44,12 +46,12 @@ async def get_maintenance_run_orchestrator_store(
 
 
 async def get_maintenance_run_data_manager(
-    run_orchestrator_store: MaintenanceRunOrchestratorStore = Depends(
-        get_maintenance_run_orchestrator_store
-    ),
-    maintenance_runs_publisher: MaintenanceRunsPublisher = Depends(
-        get_maintenance_runs_publisher
-    ),
+    run_orchestrator_store: Annotated[
+        MaintenanceRunOrchestratorStore, Depends(get_maintenance_run_orchestrator_store)
+    ],
+    maintenance_runs_publisher: Annotated[
+        MaintenanceRunsPublisher, Depends(get_maintenance_runs_publisher)
+    ],
 ) -> MaintenanceRunDataManager:
     """Get a maintenance run data manager to keep track of current run data."""
     return MaintenanceRunDataManager(

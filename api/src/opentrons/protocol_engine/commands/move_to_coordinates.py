@@ -5,6 +5,8 @@ from pydantic import Field
 from typing import Optional, Type, TYPE_CHECKING
 from typing_extensions import Literal
 
+
+from ..state import update_types
 from ..types import DeckPoint
 from .pipetting_common import PipetteIdMixin, MovementMixin, DestinationPositionResult
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
@@ -50,6 +52,8 @@ class MoveToCoordinatesImplementation(
         self, params: MoveToCoordinatesParams
     ) -> SuccessData[MoveToCoordinatesResult, None]:
         """Move the requested pipette to the requested coordinates."""
+        state_update = update_types.StateUpdate()
+
         x, y, z = await self._movement.move_to_coordinates(
             pipette_id=params.pipetteId,
             deck_coordinates=params.coordinates,
@@ -57,10 +61,15 @@ class MoveToCoordinatesImplementation(
             additional_min_travel_z=params.minimumZHeight,
             speed=params.speed,
         )
+        deck_point = DeckPoint.construct(x=x, y=y, z=z)
+        state_update.pipette_location = update_types.PipetteLocationUpdate(
+            pipette_id=params.pipetteId, new_location=None, new_deck_point=deck_point
+        )
 
         return SuccessData(
             public=MoveToCoordinatesResult(position=DeckPoint(x=x, y=y, z=z)),
             private=None,
+            state_update=state_update,
         )
 
 

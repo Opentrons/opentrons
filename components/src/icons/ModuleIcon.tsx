@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Icon } from './Icon'
 import {
   HEATERSHAKER_MODULE_TYPE,

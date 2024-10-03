@@ -1,6 +1,9 @@
-import * as React from 'react'
 import cx from 'classnames'
-import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'
+import {
+  LegacyTooltip,
+  useHoverTooltip,
+  TOOLTIP_FIXED,
+} from '@opentrons/components'
 import { PDListItem } from '../lists'
 import styles from './StepItem.module.css'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
@@ -19,9 +22,9 @@ export function MixHeader(props: Props): JSX.Element {
   })
   return (
     <>
-      <Tooltip {...tooltipProps}>
+      <LegacyTooltip {...tooltipProps}>
         <LabwareTooltipContents {...{ labwareNickname }} />
-      </Tooltip>
+      </LegacyTooltip>
 
       <PDListItem className={styles.step_subitem}>
         <span

@@ -13,11 +13,9 @@ class ClientDataPublisher:
     def __init__(self, client: NotificationClient) -> None:
         self._client = client
 
-    async def publish_client_data(self, client_data_key: str) -> None:
+    def publish_client_data(self, client_data_key: str) -> None:
         """Publish the equivalent of `GET /clientData/{key}`."""
-        await self._client.publish_advise_refetch_async(
-            topics.client_data(client_data_key)
-        )
+        self._client.publish_advise_refetch(topics.client_data(client_data_key))
 
 
 async def get_client_data_publisher(

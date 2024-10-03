@@ -17,7 +17,10 @@ from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, StagingSlotName
 from opentrons.legacy_broker import LegacyBroker
-from opentrons.hardware_control.modules.types import MagneticBlockModel
+from opentrons.hardware_control.modules.types import (
+    MagneticBlockModel,
+    AbsorbanceReaderModel,
+)
 from opentrons.legacy_commands import protocol_commands as cmds, types as cmd_types
 from opentrons.legacy_commands.helpers import stringify_labware_movement_command
 from opentrons.legacy_commands.publisher import (
@@ -39,6 +42,7 @@ from opentrons.protocols.api_support.util import (
     RobotTypeError,
     UnsupportedAPIError,
 )
+from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
 from ._types import OffDeckType
 from .core.common import ModuleCore, LabwareCore, ProtocolCore
@@ -205,8 +209,12 @@ class ProtocolContext(CommandPublisher):
         return self._api_version
 
     @property
-    @requires_version(2, 20)
+    @requires_version(2, 21)
     def robot(self) -> RobotContext:
+        """The :py:class:`.RobotContext` for the protocol.
+
+        :meta private:
+        """
         return self._robot
 
     @property
@@ -704,6 +712,13 @@ class ProtocolContext(CommandPublisher):
                 f"Expected labware of type 'Labware' but got {type(labware)}."
             )
 
+        # Ensure that when moving to an absorbance reader than the lid is open
+        if isinstance(new_location, AbsorbanceReaderContext):
+            if new_location.is_lid_on():
+                raise CommandPreconditionViolated(
+                    f"Cannot move {labware.name} onto the Absorbance Reader Module when its lid is closed."
+                )
+
         location: Union[
             ModuleCore,
             LabwareCore,
@@ -826,6 +841,12 @@ class ProtocolContext(CommandPublisher):
                 api_element=f"Module of type {module_name}",
                 until_version="2.15",
                 current_version=f"{self._api_version}",
+            )
+        if isinstance(
+            requested_model, AbsorbanceReaderModel
+        ) and self._api_version < APIVersion(2, 21):
+            raise APIVersionError(
+                f"Module of type {module_name} is only available in versions 2.21 and above."
             )
 
         deck_slot = (

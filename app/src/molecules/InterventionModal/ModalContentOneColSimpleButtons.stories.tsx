@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { ModalContentOneColSimpleButtons as ModalContentOneColSimpleButtonsComponent } from './ModalContentOneColSimpleButtons'
 
 import type { Meta, StoryObj } from '@storybook/react'

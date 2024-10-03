@@ -5,7 +5,7 @@ import logging
 from textwrap import dedent
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional, Union, Tuple
+from typing import Annotated, List, Literal, Optional, Union, Tuple
 
 from opentrons.protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
@@ -13,7 +13,6 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons.util.performance_helpers import TrackingFunctions
-from typing_extensions import Literal
 
 from fastapi import (
     APIRouter,
@@ -205,62 +204,70 @@ protocols_router = APIRouter()
     },
 )
 async def create_protocol(  # noqa: C901
+    protocol_directory: Annotated[Path, Depends(get_protocol_directory)],
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
+    file_reader_writer: Annotated[FileReaderWriter, Depends(get_file_reader_writer)],
+    protocol_reader: Annotated[ProtocolReader, Depends(get_protocol_reader)],
+    file_hasher: Annotated[FileHasher, Depends(get_file_hasher)],
+    analyses_manager: Annotated[AnalysesManager, Depends(get_analyses_manager)],
+    protocol_auto_deleter: Annotated[
+        ProtocolAutoDeleter, Depends(get_protocol_auto_deleter)
+    ],
+    data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
+    data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
+    quick_transfer_protocol_auto_deleter: Annotated[
+        ProtocolAutoDeleter, Depends(get_quick_transfer_protocol_auto_deleter)
+    ],
+    robot_type: Annotated[RobotType, Depends(get_robot_type)],
+    protocol_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
+    analysis_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
+    created_at: Annotated[datetime, Depends(get_current_time)],
+    maximum_quick_transfer_protocols: Annotated[
+        int, Depends(get_maximum_quick_transfer_protocols)
+    ],
     files: List[UploadFile] = File(...),
     # use Form because request is multipart/form-data
     # https://fastapi.tiangolo.com/tutorial/request-forms-and-files/
-    key: Optional[str] = Form(
-        default=None,
-        description=(
-            "An arbitrary client-defined string to attach to the new protocol resource."
-            " This should be no longer than ~100 characters or so."
-            " It's intended to store something like a UUID, to help clients that store"
-            " protocols locally keep track of which local files correspond to which"
-            " protocol resources on the robot."
+    key: Annotated[
+        Optional[str],
+        Form(
+            description=(
+                "An arbitrary client-defined string to attach to the new protocol resource."
+                " This should be no longer than ~100 characters or so."
+                " It's intended to store something like a UUID, to help clients that store"
+                " protocols locally keep track of which local files correspond to which"
+                " protocol resources on the robot."
+            ),
         ),
-    ),
-    run_time_parameter_values: Optional[str] = Form(
-        default=None,
-        description="Key-value pairs of run-time parameters defined in a protocol."
-        " Note that this is expected to be a string holding a JSON object."
-        " Also, if this data is included in the request, the server will"
-        " always trigger an analysis (for now).",
-        alias="runTimeParameterValues",
-    ),
-    protocol_kind: ProtocolKind = Form(
-        # This default needs to be kept in sync with the function body.
-        # See todo comments.
-        default=ProtocolKind.STANDARD,
-        description=(
-            "Whether this is a `standard` protocol or a `quick-transfer` protocol."
-            "if omitted, the protocol will be `standard` by default."
+    ] = None,
+    run_time_parameter_values: Annotated[
+        Optional[str],
+        Form(
+            description="Key-value pairs of run-time parameters defined in a protocol."
+            " Note that this is expected to be a string holding a JSON object."
+            " Also, if this data is included in the request, the server will"
+            " always trigger an analysis (for now).",
+            alias="runTimeParameterValues",
         ),
-        alias="protocolKind",
-    ),
-    run_time_parameter_files: Optional[str] = Form(
-        default=None,
-        description="Param-file pairs of CSV run-time parameters defined in the protocol.",
-        alias="runTimeParameterFiles",
-    ),
-    protocol_directory: Path = Depends(get_protocol_directory),
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
-    analysis_store: AnalysisStore = Depends(get_analysis_store),
-    file_reader_writer: FileReaderWriter = Depends(get_file_reader_writer),
-    protocol_reader: ProtocolReader = Depends(get_protocol_reader),
-    file_hasher: FileHasher = Depends(get_file_hasher),
-    analyses_manager: AnalysesManager = Depends(get_analyses_manager),
-    protocol_auto_deleter: ProtocolAutoDeleter = Depends(get_protocol_auto_deleter),
-    quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter = Depends(
-        get_quick_transfer_protocol_auto_deleter
-    ),
-    data_files_directory: Path = Depends(get_data_files_directory),
-    data_files_store: DataFilesStore = Depends(get_data_files_store),
-    robot_type: RobotType = Depends(get_robot_type),
-    protocol_id: str = Depends(get_unique_id, use_cache=False),
-    analysis_id: str = Depends(get_unique_id, use_cache=False),
-    created_at: datetime = Depends(get_current_time),
-    maximum_quick_transfer_protocols: int = Depends(
-        get_maximum_quick_transfer_protocols
-    ),
+    ] = None,
+    protocol_kind: Annotated[
+        ProtocolKind,
+        Form(
+            description=(
+                "Whether this is a `standard` protocol or a `quick-transfer` protocol."
+                "if omitted, the protocol will be `standard` by default."
+            ),
+            alias="protocolKind",
+        ),
+    ] = ProtocolKind.STANDARD,
+    run_time_parameter_files: Annotated[
+        Optional[str],
+        Form(
+            description="Param-file pairs of CSV run-time parameters defined in the protocol.",
+            alias="runTimeParameterFiles",
+        ),
+    ] = None,
 ) -> PydanticResponse[SimpleBody[Protocol]]:
     """Create a new protocol by uploading its files.
 
@@ -290,12 +297,8 @@ async def create_protocol(  # noqa: C901
         created_at: Timestamp to attach to the new resource.
         maximum_quick_transfer_protocols: Robot setting value limiting stored quick transfers protocols.
     """
-    # We have to do these isinstance checks because if `runTimeParameterValues` or
-    # `protocolKind` are not specified in the request, then they get assigned a
-    # Form(default) value instead of just the default value. \(O.o)/
     # TODO: check if we can make our own "RTP multipart-form field" Pydantic type
     #  so we can validate the data contents and return a better error response.
-    # TODO: check if this is still necessary after converting FastAPI args to Annotated.
     parsed_rtp_values = (
         json.loads(run_time_parameter_values)
         if isinstance(run_time_parameter_values, str)
@@ -306,8 +309,6 @@ async def create_protocol(  # noqa: C901
         if isinstance(run_time_parameter_files, str)
         else {}
     )
-    if not isinstance(protocol_kind, ProtocolKind):
-        protocol_kind = ProtocolKind.STANDARD
 
     if protocol_kind == ProtocolKind.QUICK_TRANSFER:
         quick_transfer_protocols = [
@@ -525,17 +526,19 @@ async def _start_new_analysis_if_necessary(
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[Protocol]}},
 )
 async def get_protocols(
-    protocol_kind: Optional[ProtocolKind] = Query(
-        None,
-        description=(
-            "Specify the kind of protocols you want to return."
-            " protocol kind can be `quick-transfer` or `standard` "
-            " If this is omitted or `null`, all protocols will be returned."
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
+    protocol_kind: Annotated[
+        Optional[ProtocolKind],
+        Query(
+            description=(
+                "Specify the kind of protocols you want to return."
+                " protocol kind can be `quick-transfer` or `standard` "
+                " If this is omitted or `null`, all protocols will be returned."
+            ),
+            alias="protocolKind",
         ),
-        alias="protocolKind",
-    ),
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
-    analysis_store: AnalysisStore = Depends(get_analysis_store),
+    ] = None,
 ) -> PydanticResponse[SimpleMultiBody[Protocol]]:
     """Get a list of all currently uploaded protocols.
 
@@ -582,7 +585,7 @@ async def get_protocols(
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[str]}},
 )
 async def get_protocol_ids(
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
 ) -> PydanticResponse[SimpleMultiBody[str]]:
     """Get a list of all protocol ids stored on the server.
 
@@ -609,8 +612,8 @@ async def get_protocol_ids(
 )
 async def get_protocol_by_id(
     protocolId: str,
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
-    analysis_store: AnalysisStore = Depends(get_analysis_store),
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
 ) -> PydanticResponse[Body[Protocol, ProtocolLinks]]:
     """Get an uploaded protocol by ID.
 
@@ -669,7 +672,7 @@ async def get_protocol_by_id(
 )
 async def delete_protocol_by_id(
     protocolId: str,
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete an uploaded protocol by ID.
 
@@ -712,13 +715,13 @@ async def delete_protocol_by_id(
 )
 async def create_protocol_analysis(
     protocolId: str,
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
+    analyses_manager: Annotated[AnalysesManager, Depends(get_analyses_manager)],
+    data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
+    data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
+    analysis_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
     request_body: Optional[RequestModel[AnalysisRequest]] = None,
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
-    analysis_store: AnalysisStore = Depends(get_analysis_store),
-    analyses_manager: AnalysesManager = Depends(get_analyses_manager),
-    analysis_id: str = Depends(get_unique_id, use_cache=False),
-    data_files_directory: Path = Depends(get_data_files_directory),
-    data_files_store: DataFilesStore = Depends(get_data_files_store),
 ) -> PydanticResponse[SimpleMultiBody[AnalysisSummary]]:
     """Start a new analysis for the given existing protocol.
 
@@ -790,8 +793,8 @@ async def create_protocol_analysis(
 )
 async def get_protocol_analyses(
     protocolId: str,
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
-    analysis_store: AnalysisStore = Depends(get_analysis_store),
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
 ) -> PydanticResponse[SimpleMultiBody[ProtocolAnalysis]]:
     """Get a protocol's full analyses list.
 
@@ -831,8 +834,8 @@ async def get_protocol_analyses(
 async def get_protocol_analysis_by_id(
     protocolId: str,
     analysisId: str,
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
-    analysis_store: AnalysisStore = Depends(get_analysis_store),
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
 ) -> PydanticResponse[SimpleBody[ProtocolAnalysis]]:
     """Get a protocol analysis by analysis ID.
 
@@ -886,8 +889,8 @@ async def get_protocol_analysis_by_id(
 async def get_protocol_analysis_as_document(
     protocolId: str,
     analysisId: str,
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
-    analysis_store: AnalysisStore = Depends(get_analysis_store),
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
 ) -> PlainTextResponse:
     """Get a protocol analysis by analysis ID.
 
@@ -929,7 +932,7 @@ async def get_protocol_analysis_as_document(
 )
 async def get_protocol_data_files(
     protocolId: str,
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
 ) -> PydanticResponse[SimpleMultiBody[DataFile]]:
     """Get the list of all data files associated with a protocol.
 

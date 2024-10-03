@@ -1,6 +1,6 @@
-import * as React from 'react'
+import type * as React from 'react'
 
-import SuccessIcon from '../../assets/images/icon_success.png'
+import SuccessIcon from '/app/assets/images/icon_success.png'
 
 import {
   LegacyStyledText,
@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   Box,
 } from '@opentrons/components'
-import { InlineNotification } from '../../atoms/InlineNotification'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 
 import { TwoColumn as TwoColumnComponent } from './'
 import { StandInContent } from './story-utils/StandIn'

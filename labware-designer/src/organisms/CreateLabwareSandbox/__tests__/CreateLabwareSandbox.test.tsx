@@ -1,4 +1,3 @@
-import * as React from 'react'
 import '@testing-library/jest-dom/vitest'
 import { describe, it, expect } from 'vitest'
 import { render, fireEvent, screen } from '@testing-library/react'

@@ -5,7 +5,7 @@ install-pipenv:
 
 .PHONY: setup
 setup: install-pipenv
-	python -m pipenv install --dev --python 3.12.4
+	python -m pipenv install --dev --python 3.12
 
 .PHONY: teardown
 teardown:

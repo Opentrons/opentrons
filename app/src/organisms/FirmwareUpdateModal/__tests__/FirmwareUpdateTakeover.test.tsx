@@ -1,28 +1,27 @@
-import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import {
   useInstrumentsQuery,
   useCurrentAllSubsystemUpdatesQuery,
   useSubsystemUpdateQuery,
 } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { UpdateNeededModal } from '../UpdateNeededModal'
 import { UpdateInProgressModal } from '../UpdateInProgressModal'
-import { useIsUnboxingFlowOngoing } from '../../RobotSettingsDashboard/NetworkSettings/hooks'
+import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 import { FirmwareUpdateTakeover } from '../FirmwareUpdateTakeover'
-import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
 import type { BadPipette, PipetteData } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../UpdateNeededModal')
 vi.mock('../UpdateInProgressModal')
-vi.mock('../../RobotSettingsDashboard/NetworkSettings/hooks')
-vi.mock('../../../resources/maintenance_runs')
+vi.mock('/app/redux-resources/config')
+vi.mock('/app/resources/maintenance_runs')
 
 const render = () => {
   return renderWithProviders(<FirmwareUpdateTakeover />, {

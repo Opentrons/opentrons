@@ -1,11 +1,14 @@
+import { useEffect } from 'react'
+import { useQueryClient } from 'react-query'
+
 import {
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
 } from '@opentrons/api-client'
-import { useCommandQuery } from '@opentrons/react-api-client'
+import { useCommandQuery, useHost } from '@opentrons/react-api-client'
 
-import { useNotifyAllCommandsQuery } from '../../../resources/runs'
+import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { FailedCommand } from '../types'
@@ -25,9 +28,18 @@ export function useCurrentlyRecoveringFrom(
   runId: string,
   runStatus: RunStatus | null
 ): FailedCommand | null {
+  const queryClient = useQueryClient()
+  const host = useHost()
   // There can only be a currentlyRecoveringFrom command when the run is in recovery mode.
   // In case we're falling back to polling, only enable queries when that is the case.
   const isRunInRecoveryMode = VALID_RECOVERY_FETCH_STATUSES.includes(runStatus)
+
+  // Prevent stale data on subsequent recoveries by clearing the query cache at the start of each recovery.
+  useEffect(() => {
+    if (isRunInRecoveryMode) {
+      void queryClient.invalidateQueries([host, 'runs', runId])
+    }
+  }, [isRunInRecoveryMode, host, runId])
 
   const { data: allCommandsQueryData } = useNotifyAllCommandsQuery(
     runId,

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import {
   WellLabels,
   StyledWells,
@@ -59,6 +59,8 @@ export interface LabwareRenderProps {
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
   gRef?: React.RefObject<SVGGElement>
   onLabwareClick?: () => void
+  showBorder?: boolean
+  strokeColor?: string
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
@@ -98,19 +100,20 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
       </g>
     )
   }
-
   return (
     <g
       transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
       ref={gRef}
     >
       <StaticLabware
+        showBorder={props.showBorder}
         definition={props.definition}
         onMouseEnterWell={props.onMouseEnterWell}
         onMouseLeaveWell={props.onMouseLeaveWell}
         onLabwareClick={props.onLabwareClick}
         highlight={props.highlight}
         highlightShadow={props.highlightShadow}
+        wellStroke={props.wellStroke}
       />
       {props.wellStroke != null ? (
         <StrokedWells
@@ -122,6 +125,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         <FilledWells
           definition={props.definition}
           fillByWell={props.wellFill}
+          strokeColor={props.strokeColor}
         />
       ) : null}
       {props.disabledWells != null

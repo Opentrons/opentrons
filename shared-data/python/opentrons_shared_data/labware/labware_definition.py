@@ -222,6 +222,51 @@ class WellDefinition(BaseModel):
         description="If 'rectangular', use xDimension and "
         "yDimension; if 'circular' use diameter",
     )
+    geometryDefinitionId: Optional[str] = Field(
+        None, description="str id of the well's corresponding" "innerWellGeometry"
+    )
+
+
+class SphericalSegment(BaseModel):
+    shape: Literal["spherical"] = Field(..., description="Denote shape as spherical")
+    radiusOfCurvature: _NonNegativeNumber = Field(
+        ...,
+        description="radius of curvature of bottom subsection of wells",
+    )
+    depth: _NonNegativeNumber = Field(
+        ..., description="The depth of a spherical bottom of a well"
+    )
+
+
+class CircularBoundedSection(BaseModel):
+    shape: Literal["circular"] = Field(..., description="Denote shape as circular")
+    diameter: _NonNegativeNumber = Field(
+        ..., description="The diameter of a circular cross section of a well"
+    )
+    topHeight: _NonNegativeNumber = Field(
+        ...,
+        description="The height at the top of a bounded subsection of a well, relative to the bottom"
+        "of the well",
+    )
+
+
+class RectangularBoundedSection(BaseModel):
+    shape: Literal["rectangular"] = Field(
+        ..., description="Denote shape as rectangular"
+    )
+    xDimension: _NonNegativeNumber = Field(
+        ...,
+        description="x dimension of a subsection of wells",
+    )
+    yDimension: _NonNegativeNumber = Field(
+        ...,
+        description="y dimension of a subsection of wells",
+    )
+    topHeight: _NonNegativeNumber = Field(
+        ...,
+        description="The height at the top of a bounded subsection of a well, relative to the bottom"
+        "of the well",
+    )
 
 
 class Metadata1(BaseModel):
@@ -249,6 +294,19 @@ class Group(BaseModel):
     )
     brand: Optional[BrandData] = Field(
         None, description="Brand data for the well group (e.g. for tubes)"
+    )
+
+
+class InnerWellGeometry(BaseModel):
+    frusta: Union[
+        List[CircularBoundedSection], List[RectangularBoundedSection]
+    ] = Field(
+        ...,
+        description="A list of all of the sections of the well that have a contiguous shape",
+    )
+    bottomShape: Optional[SphericalSegment] = Field(
+        None,
+        description="The shape at the bottom of the well: either a spherical segment or a cross-section",
     )
 
 
@@ -325,4 +383,8 @@ class LabwareDefinition(BaseModel):
     gripForce: Optional[float] = Field(
         default_factory=None,
         description="Force, in Newtons, with which the gripper should grip the labware.",
+    )
+    innerLabwareGeometry: Optional[Dict[str, InnerWellGeometry]] = Field(
+        None,
+        description="A dictionary holding all unique inner well geometries in a labware.",
     )

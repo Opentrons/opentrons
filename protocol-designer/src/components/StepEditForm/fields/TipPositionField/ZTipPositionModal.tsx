@@ -7,7 +7,7 @@ import {
   Flex,
   HandleKeypress,
   Icon,
-  InputField,
+  LegacyInputField,
   OutlineButton,
   RadioGroup,
 } from '@opentrons/components'
@@ -160,7 +160,7 @@ export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
   }
 
   const TipPositionInputField = !isDefault && (
-    <InputField
+    <LegacyInputField
       caption={t('tip_position.caption', {
         min: minMm,
         max: maxMm,

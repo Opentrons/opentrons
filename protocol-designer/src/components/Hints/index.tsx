@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
@@ -12,20 +12,18 @@ import {
 import { actions, selectors } from '../../tutorial'
 import { getMainPagePortalEl } from '../portals/MainPageModalPortal'
 import styles from './hints.module.css'
-import EXAMPLE_ADD_LIQUIDS_IMAGE from '../../images/example_add_liquids.png'
-import EXAMPLE_WATCH_LIQUIDS_MOVE_IMAGE from '../../images/example_watch_liquids_move.png'
-import EXAMPLE_BATCH_EDIT_IMAGE from '../../images/announcements/multi_select.gif'
+import EXAMPLE_ADD_LIQUIDS_IMAGE from '../../assets/images/example_add_liquids.png'
+import EXAMPLE_WATCH_LIQUIDS_MOVE_IMAGE from '../../assets/images/example_watch_liquids_move.png'
+import EXAMPLE_BATCH_EDIT_IMAGE from '../../assets/images/announcements/multi_select.gif'
 import type { HintKey } from '../../tutorial'
 
 const HINT_IS_ALERT: HintKey[] = ['add_liquids_and_labware']
 
 export const Hints = (): JSX.Element | null => {
   const { t } = useTranslation(['alert', 'nav', 'button'])
-  const [rememberDismissal, setRememberDismissal] = React.useState<boolean>(
-    false
-  )
+  const [rememberDismissal, setRememberDismissal] = useState<boolean>(false)
 
-  const toggleRememberDismissal = React.useCallback(() => {
+  const toggleRememberDismissal = useCallback(() => {
     setRememberDismissal(prevDismissal => !prevDismissal)
   }, [])
   const hintKey = useSelector(selectors.getHint)

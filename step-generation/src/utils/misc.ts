@@ -26,6 +26,7 @@ import type {
   LabwareDefinition2,
   BlowoutParams,
   PipetteChannels,
+  NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntities,
@@ -480,6 +481,8 @@ interface DispenseLocationHelperArgs {
   flowRate: number
   xOffset: number
   yOffset: number
+  nozzles: NozzleConfigurationStyle | null
+  tipRack: string
   offsetFromBottomMm?: number
   well?: string
 }
@@ -497,6 +500,8 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
     well,
     xOffset,
     yOffset,
+    tipRack,
+    nozzles,
   } = args
 
   const trashOrLabware = getTrashOrLabware(
@@ -521,6 +526,8 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
         offsetFromBottomMm,
         xOffset,
         yOffset,
+        tipRack,
+        nozzles,
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
@@ -612,6 +619,7 @@ interface AirGapArgs {
   tipRack: string
   pipetteId: string
   volume: number
+  nozzles: NozzleConfigurationStyle | null
   blowOutLocation?: string | null
   sourceId?: string
   sourceWell?: string
@@ -632,6 +640,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
     sourceId,
     sourceWell,
     volume,
+    nozzles,
   } = args
 
   const trashOrLabware = getTrashOrLabware(
@@ -667,6 +676,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
           tipRack,
           xOffset: 0,
           yOffset: 0,
+          nozzles,
         }),
       ]
       //  when aspirating out of multi wells for consolidate
@@ -684,6 +694,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
           //  NOTE: airgap aspirates happen at default x/y offset
           xOffset: 0,
           yOffset: 0,
+          nozzles,
         }),
       ]
     }

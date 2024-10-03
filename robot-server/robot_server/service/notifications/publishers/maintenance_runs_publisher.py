@@ -1,5 +1,5 @@
+from typing import Annotated, Callable, Optional
 from dataclasses import dataclass
-from typing import Callable, Optional
 from fastapi import Depends
 
 from opentrons.protocol_engine.state.state_summary import StateSummary
@@ -39,7 +39,6 @@ class MaintenanceRunsPublisher:
         self._client = client
         self._run_hooks: Optional[_RunHooks] = None
         self._engine_state_slice: Optional[_EngineStateSlice] = None
-
         publisher_notifier.register_publish_callbacks(
             [
                 self._handle_engine_status_change,
@@ -69,9 +68,7 @@ class MaintenanceRunsPublisher:
         self,
     ) -> None:
         """Publishes the equivalent of GET /maintenance_run/current_run"""
-        await self._client.publish_advise_refetch_async(
-            topic=topics.MAINTENANCE_RUNS_CURRENT_RUN
-        )
+        self._client.publish_advise_refetch(topic=topics.MAINTENANCE_RUNS_CURRENT_RUN)
 
     def publish_current_maintenance_run(
         self,
@@ -101,9 +98,13 @@ _maintenance_runs_publisher_accessor: AppStateAccessor[
 
 
 async def get_maintenance_runs_publisher(
-    app_state: AppState = Depends(get_app_state),
-    notification_client: NotificationClient = Depends(get_notification_client),
-    publisher_notifier: PublisherNotifier = Depends(get_pe_publisher_notifier),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    notification_client: Annotated[
+        NotificationClient, Depends(get_notification_client)
+    ],
+    publisher_notifier: Annotated[
+        PublisherNotifier, Depends(get_pe_publisher_notifier)
+    ],
 ) -> MaintenanceRunsPublisher:
     """Get a singleton MaintenanceRunsPublisher to publish maintenance run topics."""
     maintenance_runs_publisher = _maintenance_runs_publisher_accessor.get_from(

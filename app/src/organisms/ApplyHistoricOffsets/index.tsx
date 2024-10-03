@@ -15,18 +15,16 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  ModalHeader,
+  ModalShell,
 } from '@opentrons/components'
-import { getTopPortalEl } from '../../App/portal'
-import { ExternalLink } from '../../atoms/Link/ExternalLink'
-import {
-  LegacyModalHeader,
-  LegacyModalShell,
-} from '../../molecules/LegacyModal'
-import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
-import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
-import { getLabwareDefinitionsFromCommands } from '../../molecules/Command/utils/getLabwareDefinitionsFromCommands'
+import { getTopPortalEl } from '/app/App/portal'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { PythonLabwareOffsetSnippet } from '/app/molecules/PythonLabwareOffsetSnippet'
+import { LabwareOffsetTabs } from '/app/organisms/LabwareOffsetTabs'
+import { getLabwareDefinitionsFromCommands } from '/app/molecules/Command/utils/getLabwareDefinitionsFromCommands'
 import { LabwareOffsetTable } from './LabwareOffsetTable'
-import { getIsLabwareOffsetCodeSnippetsOn } from '../../redux/config'
+import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   LoadedLabware,
@@ -112,10 +110,10 @@ export function ApplyHistoricOffsets(
       </Link>
       {showOffsetDataModal
         ? createPortal(
-            <LegacyModalShell
+            <ModalShell
               maxWidth="40rem"
               header={
-                <LegacyModalHeader
+                <ModalHeader
                   title={t(
                     noOffsetData
                       ? 'what_is_labware_offset_data'
@@ -183,7 +181,7 @@ export function ApplyHistoricOffsets(
                   )
                 ) : null}
               </Flex>
-            </LegacyModalShell>,
+            </ModalShell>,
             getTopPortalEl()
           )
         : null}

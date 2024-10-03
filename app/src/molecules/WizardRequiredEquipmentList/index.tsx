@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
@@ -18,9 +18,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { getIsOnDevice } from '../../redux/config'
-import { Divider } from '../../atoms/structure'
-import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
+import { getIsOnDevice } from '/app/redux/config'
+import { Divider } from '/app/atoms/structure'
+import { labwareImages } from '/app/local-resources/labware'
 import { equipmentImages } from './equipmentImages'
 
 import type { StyleProps } from '@opentrons/components'

@@ -6,11 +6,12 @@ from typing_extensions import Literal, Type
 from pydantic import BaseModel, Field
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...state import update_types
 from ...errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.types import MotorAxis
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state import StateView
+    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 
 
@@ -43,6 +44,8 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, 
 
     async def execute(self, params: OpenLidParams) -> SuccessData[OpenLidResult, None]:
         """Open a Thermocycler's lid."""
+        state_update = update_types.StateUpdate()
+
         thermocycler_state = self._state_view.modules.get_thermocycler_module_substate(
             params.moduleId
         )
@@ -57,11 +60,14 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, 
             MotorAxis.Y,
         ] + self._state_view.motion.get_robot_mount_axes()
         await self._movement.home(axes=axes_to_home)
+        state_update.clear_all_pipette_locations()
 
         if thermocycler_hardware is not None:
             await thermocycler_hardware.open()
 
-        return SuccessData(public=OpenLidResult(), private=None)
+        return SuccessData(
+            public=OpenLidResult(), private=None, state_update=state_update
+        )
 
 
 class OpenLid(BaseCommand[OpenLidParams, OpenLidResult, ErrorOccurrence]):

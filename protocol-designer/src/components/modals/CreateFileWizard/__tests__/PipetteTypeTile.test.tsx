@@ -1,10 +1,10 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen, cleanup } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../localization'
+import { i18n } from '../../../../assets/localization'
 import { PipetteTypeTile } from '../PipetteTypeTile'
 import { EquipmentOption } from '../EquipmentOption'
 

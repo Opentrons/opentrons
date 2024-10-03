@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen, waitFor, renderHook } from '@testing-library/react'
@@ -12,10 +12,10 @@ import {
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
 } from '@opentrons/api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { mockRecoveryContentProps } from '../__fixtures__'
-import { getIsOnDevice } from '../../../redux/config'
+import { getIsOnDevice } from '/app/redux/config'
 import { useRecoverySplash, RecoverySplash } from '../RecoverySplash'
 import { StepInfo } from '../shared'
 import { useToaster } from '../../ToasterOven'
@@ -23,7 +23,7 @@ import { clickButtonLabeled } from './util'
 
 import type { Store } from 'redux'
 
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../shared')
 vi.mock('../../ToasterOven')
 
@@ -95,7 +95,7 @@ describe('RecoverySplash', () => {
       recoveryActionMutationUtils: {
         resumeRecovery: mockResumeRecovery,
       } as any,
-      isWizardActive: false,
+      resumePausedRecovery: true,
     }
 
     vi.mocked(StepInfo).mockReturnValue(<div>MOCK STEP INFO</div>)
@@ -177,7 +177,7 @@ describe('RecoverySplash', () => {
     expect(mockMakeToast).toHaveBeenCalled()
   })
 
-  it(`should transition the run status from ${RUN_STATUS_AWAITING_RECOVERY_PAUSED} to ${RUN_STATUS_AWAITING_RECOVERY}`, () => {
+  it(`should transition the run status from ${RUN_STATUS_AWAITING_RECOVERY_PAUSED} to ${RUN_STATUS_AWAITING_RECOVERY} when resumePausedRecovery is true`, () => {
     props = { ...props, runStatus: RUN_STATUS_AWAITING_RECOVERY_PAUSED }
 
     render(props)

@@ -10,7 +10,7 @@ from opentrons.motion_planning.adjacent_slots_getters import (
 )
 from opentrons import motion_planning
 
-from . import move_types
+from . import _move_types
 from .. import errors
 from ..types import (
     MotorAxis,
@@ -112,7 +112,7 @@ class MotionView:
             well_location,
         )
 
-        move_type = move_types.get_move_type_to_well(
+        move_type = _move_types.get_move_type_to_well(
             pipette_id, labware_id, well_name, location, force_direct
         )
         min_travel_z = self._geometry.get_min_travel_z(
@@ -151,6 +151,7 @@ class MotionView:
         minimum_z_height: Optional[float] = None,
         stay_at_max_travel_z: bool = False,
         ignore_tip_configuration: Optional[bool] = True,
+        max_travel_z_extra_margin: Optional[float] = None,
     ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as an addressable area."""
         location = self._pipettes.get_current_location()
@@ -169,7 +170,9 @@ class MotionView:
                 # beneath max_travel_z. Investigate why motion_planning.get_waypoints() does not
                 # let us travel at max_travel_z, and whether it's safe to make it do that.
                 # Possibly related: https://github.com/Opentrons/opentrons/pull/6882#discussion_r514248062
-                max_travel_z - motion_planning.waypoints.MINIMUM_Z_MARGIN,
+                max_travel_z
+                - motion_planning.waypoints.MINIMUM_Z_MARGIN
+                - (max_travel_z_extra_margin or 0.0),
             )
             destination = base_destination_at_max_z + Point(
                 offset.x, offset.y, offset.z
@@ -326,7 +329,7 @@ class MotionView:
             labware_id, well_name, radius
         )
 
-        positions = move_types.get_edge_point_list(
+        positions = _move_types.get_edge_point_list(
             center_point, x_offset, y_offset, edge_path_type
         )
         critical_point: Optional[CriticalPoint] = None

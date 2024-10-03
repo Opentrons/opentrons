@@ -9,6 +9,7 @@ import {
   SPACING,
   StyledText,
   RESPONSIVENESS,
+  RadioButton,
 } from '@opentrons/components'
 
 import {
@@ -23,7 +24,6 @@ import {
   RecoverySingleColumnContentWrapper,
   RecoveryRadioGroup,
 } from '../shared'
-import { RadioButton } from '../../../atoms/buttons'
 
 import type { RecoveryContentProps } from '../types'
 
@@ -50,7 +50,7 @@ export function IgnoreErrorStepHome({
   routeUpdateActions,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
-  const { FILL_MANUALLY_AND_SKIP } = RECOVERY_MAP
+  const { MANUAL_FILL_AND_SKIP } = RECOVERY_MAP
   const { ignoreErrorKindThisRun } = recoveryCommands
   const { proceedToRouteAndStep, goBackPrevStep } = routeUpdateActions
 
@@ -63,8 +63,8 @@ export function IgnoreErrorStepHome({
   // and route appropriately.
   const ignoreOnce = (): void => {
     void proceedToRouteAndStep(
-      FILL_MANUALLY_AND_SKIP.ROUTE,
-      FILL_MANUALLY_AND_SKIP.STEPS.SKIP
+      MANUAL_FILL_AND_SKIP.ROUTE,
+      MANUAL_FILL_AND_SKIP.STEPS.SKIP
     )
   }
 
@@ -72,8 +72,8 @@ export function IgnoreErrorStepHome({
   const ignoreAlways = (): void => {
     void ignoreErrorKindThisRun().then(() =>
       proceedToRouteAndStep(
-        FILL_MANUALLY_AND_SKIP.ROUTE,
-        FILL_MANUALLY_AND_SKIP.STEPS.SKIP
+        MANUAL_FILL_AND_SKIP.ROUTE,
+        MANUAL_FILL_AND_SKIP.STEPS.SKIP
       )
     )
   }

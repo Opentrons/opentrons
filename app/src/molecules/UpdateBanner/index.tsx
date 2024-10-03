@@ -1,20 +1,19 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_START,
-  DIRECTION_COLUMN,
-  SPACING,
-  TYPOGRAPHY,
   Btn,
-  useHoverTooltip,
+  Banner,
+  DIRECTION_COLUMN,
   Flex,
+  SPACING,
+  Tooltip,
+  TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
+import { useIsFlex } from '/app/redux-resources/robots'
 
-import { Banner } from '../../atoms/Banner'
-import { Tooltip } from '../../atoms/Tooltip'
-import { useIsFlex } from '../../organisms/Devices/hooks'
-import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 interface UpdateBannerProps {
   robotName: string

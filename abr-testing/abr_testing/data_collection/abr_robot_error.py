@@ -13,6 +13,7 @@ import json
 import re
 import pandas as pd
 from statistics import mean, StatisticsError
+from abr_testing.tools import plate_reader
 
 
 def compare_current_trh_to_average(
@@ -62,7 +63,9 @@ def compare_current_trh_to_average(
     df_all_run_data["Start_Time"] = pd.to_datetime(
         df_all_run_data["Start_Time"], format="mixed", utc=True
     ).dt.tz_localize(None)
-    df_all_run_data["Errors"] = pd.to_numeric(df_all_run_data["Errors"])
+    df_all_run_data["Run Ending Error"] = pd.to_numeric(
+        df_all_run_data["Run Ending Error"]
+    )
     df_all_run_data["Average Temp (oC)"] = pd.to_numeric(
         df_all_run_data["Average Temp (oC)"]
     )
@@ -70,7 +73,7 @@ def compare_current_trh_to_average(
         (df_all_run_data["Robot"] == robot)
         & (df_all_run_data["Start_Time"] >= weeks_ago_3)
         & (df_all_run_data["Start_Time"] <= start_time)
-        & (df_all_run_data["Errors"] < 1)
+        & (df_all_run_data["Run Ending Error"] < 1)
         & (df_all_run_data["Average Temp (oC)"] > 1)
     )
 
@@ -122,7 +125,7 @@ def compare_lpc_to_historical_data(
         & (df_lpc_data["Robot"] == robot)
         & (df_lpc_data["Module"] == labware_dict["Module"])
         & (df_lpc_data["Adapter"] == labware_dict["Adapter"])
-        & (df_lpc_data["Errors"] < 1)
+        & (df_lpc_data["Run Ending Error"] < 1)
     ]
     # Converts coordinates to floats and finds averages.
     x_float = [float(value) for value in relevant_lpc["X"]]
@@ -200,7 +203,7 @@ def read_each_log(folder_path: str, issue_url: str) -> None:
                         "content": [{"type": "text", "text": message}],
                     }
                     content_list.insert(0, line_1)
-                    ticket.comment(content_list, issue_url)
+                    ticket.comment(content_list, issue_key)
             no_word_found_message = (
                 f"Key words '{not_found_words} were not found in {file_name}."
             )
@@ -209,7 +212,7 @@ def read_each_log(folder_path: str, issue_url: str) -> None:
                 "content": [{"type": "text", "text": no_word_found_message}],
             }
             content_list.append(no_word_found_dict)
-            ticket.comment(content_list, issue_url)
+            ticket.comment(content_list, issue_key)
 
 
 def match_error_to_component(
@@ -330,18 +333,17 @@ def get_run_error_info_from_robot(
         ip, results, storage_directory
     )
     # Error Printout
-    (
-        num_of_errors,
-        error_type,
-        error_code,
-        error_instrument,
-        error_level,
-    ) = read_robot_logs.get_error_info(results)
+    error_dict = read_robot_logs.get_error_info(results)
+    error_level = error_dict["Error_Level"]
+    error_type = error_dict["Error_Type"]
+    error_code = error_dict["Error_Code"]
+    error_instrument = error_dict["Error_Instrument"]
     # JIRA Ticket Fields
+
     failure_level = "Level " + str(error_level) + " Failure"
 
     components = [failure_level, "Flex-RABR"]
-    components = match_error_to_component("RABR", error_type, components)
+    components = match_error_to_component("RABR", str(error_type), components)
     print(components)
     affects_version = results["API_Version"]
     parent = results.get("robot_name", "")
@@ -383,21 +385,29 @@ def get_run_error_info_from_robot(
                 errored_labware_dict["Slot"] = labware["location"].get("slotName", "")
                 errored_labware_dict["Labware Type"] = labware.get("definitionUri", "")
                 offset_id = labware.get("offsetId", "")
-                for lpc in lpc_dict:
-                    if lpc.get("id", "") == offset_id:
-                        errored_labware_dict["X"] = lpc["vector"].get("x", "")
-                        errored_labware_dict["Y"] = lpc["vector"].get("y", "")
-                        errored_labware_dict["Z"] = lpc["vector"].get("z", "")
-                        errored_labware_dict["Module"] = lpc["location"].get(
-                            "moduleModel", ""
-                        )
-                        errored_labware_dict["Adapter"] = lpc["location"].get(
-                            "definitionUri", ""
-                        )
+                labware_slot = errored_labware_dict["Slot"]
+                if str(labware_slot) == "":
+                    lpc_message = "No labware slot was associated with this error. \
+Please manually check LPC data."
+                elif offset_id == "":
+                    lpc_message = f"The current LPC coords found at {labware_slot} are (0, 0, 0). \
+Please confirm with the ABR-LPC sheet and re-LPC."
+                else:
+                    for lpc in lpc_dict:
+                        if lpc.get("id", "") == offset_id:
+                            errored_labware_dict["X"] = lpc["vector"].get("x", "")
+                            errored_labware_dict["Y"] = lpc["vector"].get("y", "")
+                            errored_labware_dict["Z"] = lpc["vector"].get("z", "")
+                            errored_labware_dict["Module"] = lpc["location"].get(
+                                "moduleModel", ""
+                            )
+                            errored_labware_dict["Adapter"] = lpc["location"].get(
+                                "definitionUri", ""
+                            )
 
-                        lpc_message = compare_lpc_to_historical_data(
-                            errored_labware_dict, parent, storage_directory
-                        )
+                            lpc_message = compare_lpc_to_historical_data(
+                                errored_labware_dict, parent, storage_directory
+                            )
 
     description["protocol_step"] = protocol_step
     description["right_mount"] = results.get("right", "No attachment")
@@ -535,15 +545,12 @@ if __name__ == "__main__":
         affects_version,
         parent_key,
     )
-
     # Link Tickets
     to_link = ticket.match_issues(all_issues, summary)
     ticket.link_issues(to_link, issue_key)
-
     # OPEN TICKET
     issue_url = ticket.open_issue(issue_key)
     # MOVE FILES TO ERROR FOLDER.
-
     error_files = [saved_file_path_calibration, run_log_file_path] + file_paths
     error_folder_path = os.path.join(storage_directory, issue_key)
     os.makedirs(error_folder_path, exist_ok=True)
@@ -555,8 +562,11 @@ if __name__ == "__main__":
             shutil.move(source_file, destination_file)
         except shutil.Error:
             continue
-    # OPEN FOLDER DIRECTORY
-    subprocess.Popen(["explorer", error_folder_path])
+    # POST FILES TO TICKET
+    list_of_files = os.listdir(error_folder_path)
+    for file in list_of_files:
+        file_to_attach = os.path.join(error_folder_path, file)
+        ticket.post_attachment_to_ticket(issue_key, file_to_attach)
     # ADD ERROR COMMENTS TO TICKET
     read_each_log(error_folder_path, raw_issue_url)
     # WRITE ERRORED RUN TO GOOGLE SHEET
@@ -581,13 +591,21 @@ if __name__ == "__main__":
         except FileNotFoundError:
             print("Run file not uploaded.")
         run_id = os.path.basename(error_run_log).split("_")[1].split(".")[0]
+        # Get hellma readings
+        file_values = plate_reader.read_hellma_plate_files(storage_directory, 101934)
+
         (
             runs_and_robots,
             headers,
             runs_and_lpc,
             headers_lpc,
         ) = abr_google_drive.create_data_dictionary(
-            run_id, error_folder_path, issue_url, "", ""
+            run_id,
+            error_folder_path,
+            issue_url,
+            "",
+            "",
+            hellma_plate_standards=file_values,
         )
 
         start_row = google_sheet.get_index_row() + 1
@@ -601,3 +619,5 @@ if __name__ == "__main__":
         google_sheet_lpc.batch_update_cells(runs_and_lpc, "A", start_row_lpc, "0")
     else:
         print("Ticket created.")
+    # Open folder directory incase uploads to ticket were incomplete
+    subprocess.Popen(["explorer", error_folder_path])

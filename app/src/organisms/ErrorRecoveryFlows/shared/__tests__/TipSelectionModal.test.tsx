@@ -1,10 +1,10 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { mockRecoveryContentProps } from '../../__fixtures__'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { TipSelectionModal } from '../TipSelectionModal'
 import { TipSelection } from '../TipSelection'
 

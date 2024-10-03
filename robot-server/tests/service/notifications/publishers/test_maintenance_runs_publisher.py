@@ -32,7 +32,7 @@ async def test_publish_current_maintenance_run(
     notification_client: AsyncMock, maintenance_runs_publisher: MaintenanceRunsPublisher
 ) -> None:
     """It should publish a notify flag for maintenance runs."""
-    await maintenance_runs_publisher.publish_current_maintenance_run_async()
-    notification_client.publish_advise_refetch_async.assert_awaited_once_with(
+    maintenance_runs_publisher.publish_current_maintenance_run()
+    notification_client.publish_advise_refetch.assert_called_once_with(
         topic=topics.MAINTENANCE_RUNS_CURRENT_RUN
     )

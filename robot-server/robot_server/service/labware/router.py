@@ -3,7 +3,7 @@
 As of the v5 software release, these endpoints do not function.
 All labware offsets are set via `/run` endpoints.
 """
-from typing import Optional
+from typing import Annotated, Optional
 from typing_extensions import Literal, NoReturn
 
 from fastapi import APIRouter, Depends, status
@@ -44,11 +44,11 @@ class LabwareCalibrationEndpointsRemoved(ErrorDetails):
     },
 )
 async def get_all_labware_calibrations(
+    requested_version: Annotated[int, Depends(get_requested_version)],
     loadName: Optional[str] = None,
     namespace: Optional[str] = None,
     version: Optional[int] = None,
     parent: Optional[str] = None,
-    requested_version: int = Depends(get_requested_version),
 ) -> lw_models.MultipleCalibrationsResponse:
     if requested_version <= 3:
         return lw_models.MultipleCalibrationsResponse(data=[], links=None)
@@ -72,7 +72,7 @@ async def get_all_labware_calibrations(
 )
 async def get_specific_labware_calibration(
     calibrationId: str,
-    requested_version: int = Depends(get_requested_version),
+    requested_version: Annotated[int, Depends(get_requested_version)],
 ) -> NoReturn:
     if requested_version <= 3:
         raise RobotServerError(
@@ -99,7 +99,8 @@ async def get_specific_labware_calibration(
     },
 )
 async def delete_specific_labware_calibration(
-    calibrationId: str, requested_version: int = Depends(get_requested_version)
+    calibrationId: str,
+    requested_version: Annotated[int, Depends(get_requested_version)],
 ) -> NoReturn:
     if requested_version <= 3:
         raise RobotServerError(

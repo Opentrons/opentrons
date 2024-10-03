@@ -1,5 +1,4 @@
-from typing import cast
-
+from typing import cast, Any, Type
 import mock
 import pytest
 
@@ -12,6 +11,7 @@ from opentrons.drivers.types import (
 )
 from opentrons.hardware_control import modules as hw_modules
 from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
+from opentrons.protocol_api.protocol_context import ProtocolContext
 from opentrons.hardware_control.modules.types import (
     SpeedStatus,
     ThermocyclerModuleModel,
@@ -113,37 +113,37 @@ def ctx_with_heater_shaker(
 # ______ load_module tests _______
 
 
-def test_load_module(ctx_with_tempdeck):
+def test_load_module(ctx_with_tempdeck: papi.ProtocolContext) -> None:
     ctx_with_tempdeck.home()
     mod = ctx_with_tempdeck.load_module("tempdeck", 1)
     assert isinstance(mod, papi.TemperatureModuleContext)
 
 
-def test_load_module_default_slot(ctx_with_thermocycler):
+def test_load_module_default_slot(ctx_with_thermocycler: papi.ProtocolContext) -> None:
     ctx_with_thermocycler.home()
     mod = ctx_with_thermocycler.load_module("thermocycler")
     assert isinstance(mod, papi.ThermocyclerContext)
 
 
-def test_no_slot_module_error(ctx_with_magdeck):
+def test_no_slot_module_error(ctx_with_magdeck: papi.ProtocolContext) -> None:
     ctx_with_magdeck.home()
     with pytest.raises(ValueError):
         assert ctx_with_magdeck.load_module("magdeck")
 
 
-def test_invalid_slot_module_error(ctx_with_thermocycler):
+def test_invalid_slot_module_error(ctx_with_thermocycler: papi.ProtocolContext) -> None:
     ctx_with_thermocycler.home()
     with pytest.raises(ValueError):
         assert ctx_with_thermocycler.load_module("thermocycler", 1)
 
 
-def test_bad_slot_module_error(ctx_with_tempdeck):
+def test_bad_slot_module_error(ctx_with_tempdeck: papi.ProtocolContext) -> None:
     ctx_with_tempdeck.home()
     with pytest.raises(ValueError):
         assert ctx_with_tempdeck.load_module("thermocycler", 42)
 
 
-def test_incorrect_module_error(ctx_with_tempdeck):
+def test_incorrect_module_error(ctx_with_tempdeck: papi.ProtocolContext) -> None:
     ctx_with_tempdeck.home()
     with pytest.raises(ValueError):
         assert ctx_with_tempdeck.load_module("the cool module", 1)
@@ -172,7 +172,9 @@ def test_incorrect_module_error(ctx_with_tempdeck):
         ("heaterShakerModuleV1", papi.HeaterShakerContext, "heaterShakerModuleV1"),
     ],
 )
-def test_load_simulating_module(ctx, loadname, klass, model):
+def test_load_simulating_module(
+    ctx: ProtocolContext, loadname: str, klass: Type[papi.ProtocolContext], model: str
+) -> None:
     """Check that a known module will not throw an error if in simulation mode.
 
     Note: This is basically an integration test that checks that a module can be
@@ -191,7 +193,7 @@ def test_load_simulating_module(ctx, loadname, klass, model):
 # _________ Magnetic Module tests __________
 
 
-def test_magdeck(ctx_with_magdeck, mock_module_controller):
+def test_magdeck(ctx_with_magdeck: papi.ProtocolContext) -> None:
     mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
     assert ctx_with_magdeck.deck[1] == mod.geometry
 
@@ -199,22 +201,26 @@ def test_magdeck(ctx_with_magdeck, mock_module_controller):
 # _________ Thermocycler tests __________
 
 
-def test_thermocycler(ctx_with_thermocycler, mock_module_controller):
+def test_thermocycler(ctx_with_thermocycler: papi.ProtocolContext) -> None:
     mod = ctx_with_thermocycler.load_module("thermocycler")
     assert ctx_with_thermocycler.deck[7] == mod.geometry
 
 
-def test_thermocycler_lid_status(ctx_with_thermocycler, mock_module_controller):
+def test_thermocycler_lid_status(
+    ctx_with_thermocycler: papi.ProtocolContext, mock_module_controller: mock.MagicMock
+) -> None:
     mod = ctx_with_thermocycler.load_module("thermocycler")
     m = mock.PropertyMock(return_value=ThermocyclerLidStatus.OPEN)
+    assert isinstance(mod, papi.ThermocyclerContext)
     type(mock_module_controller).lid_status = m
     assert mod.lid_position == "open"
 
 
 def test_thermocycler_profile_invalid_repetitions(
-    ctx_with_thermocycler, mock_module_controller
-):
+    ctx_with_thermocycler: papi.ProtocolContext, mock_module_controller: mock.MagicMock
+) -> None:
     mod = ctx_with_thermocycler.load_module("thermocycler")
+    assert isinstance(mod, papi.ThermocyclerContext)
 
     with pytest.raises(ValueError, match="positive integer"):
         mod.execute_profile(
@@ -227,21 +233,25 @@ def test_thermocycler_profile_invalid_repetitions(
 
 
 def test_thermocycler_profile_no_temperature(
-    ctx_with_thermocycler, mock_module_controller
-):
+    ctx_with_thermocycler: papi.ProtocolContext, mock_module_controller: mock.MagicMock
+) -> None:
     mod = ctx_with_thermocycler.load_module("thermocycler")
+    assert isinstance(mod, papi.ThermocyclerContext)
     with pytest.raises(ValueError, match="temperature must be defined"):
         mod.execute_profile(
             steps=[
                 {"temperature": 10, "hold_time_seconds": 30},
-                {"hold_time_seconds": 90},
+                {"hold_time_seconds": 90},  # type: ignore
             ],
             repetitions=5,
         )
 
 
-def test_thermocycler_profile_no_hold(ctx_with_thermocycler, mock_module_controller):
+def test_thermocycler_profile_no_hold(
+    ctx_with_thermocycler: papi.ProtocolContext, mock_module_controller: mock.MagicMock
+) -> None:
     mod = ctx_with_thermocycler.load_module("thermocycler")
+    assert isinstance(mod, papi.ThermocyclerContext)
     with pytest.raises(
         ValueError, match="either hold_time_minutes or hold_time_seconds"
     ):
@@ -252,7 +262,7 @@ def test_thermocycler_profile_no_hold(ctx_with_thermocycler, mock_module_control
 
 
 @pytest.mark.apiv2_non_pe_only  # Semi plate configuration removed in PAPIv2.14.
-def test_thermocycler_semi_plate_configuration(ctx):
+def test_thermocycler_semi_plate_configuration(ctx: papi.ProtocolContext) -> None:
     labware_name = "nest_96_wellplate_100ul_pcr_full_skirt"
     mod = ctx.load_module("thermocycler", configuration="semi")
     assert mod.geometry.labware_offset == Point(-23.28, 82.56, 97.8)
@@ -267,7 +277,9 @@ def test_thermocycler_semi_plate_configuration(ctx):
         assert tc_well_name == other_well_name
 
 
-def test_thermocycler_flag_unsafe_move(ctx_with_thermocycler, mock_module_controller):
+def test_thermocycler_flag_unsafe_move(
+    ctx_with_thermocycler: papi.ProtocolContext, mock_module_controller: mock.MagicMock
+) -> None:
     """Flag unsafe should raise if the lid is open and source or target is
     the labware on thermocycler."""
     mod = ctx_with_thermocycler.load_module("thermocycler", configuration="semi")
@@ -279,6 +291,8 @@ def test_thermocycler_flag_unsafe_move(ctx_with_thermocycler, mock_module_contro
 
     m = mock.PropertyMock(return_value=ThermocyclerLidStatus.CLOSED)
     type(mock_module_controller).lid_status = m
+
+    assert hasattr(mod._core, "flag_unsafe_move")
 
     with pytest.raises(RuntimeError, match="Cannot move to labware"):
         mod._core.flag_unsafe_move(with_tc_labware, without_tc_labware)
@@ -330,7 +344,7 @@ def test_hs_flag_unsafe_move_raises(
 ) -> None:
     """Test unsafe move raises underlying error."""
 
-    def raiser(*args, **kwargs):
+    def raiser(*args: Any, **kwargs: Any) -> None:
         raise PipetteMovementRestrictedByHeaterShakerError("uh oh")
 
     mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 3)
@@ -370,7 +384,7 @@ def test_heater_shaker_loading(
 # __________ Testing loading Labware on modules ___________
 
 
-def test_module_load_labware(ctx_with_tempdeck):
+def test_module_load_labware(ctx_with_tempdeck: papi.ProtocolContext) -> None:
     labware_name = "corning_96_wellplate_360ul_flat"
     # TODO Ian 2019-05-29 load fixtures, not real defs
     labware_def = load_labware_definition(labware_name, 1)
@@ -382,18 +396,20 @@ def test_module_load_labware(ctx_with_tempdeck):
         labware_def["cornerOffsetFromSlot"]["y"],
         labware_def["cornerOffsetFromSlot"]["z"],
     )
-    assert lw._core.get_geometry().offset == lw_offset + mod.geometry.location.point
+    assert lw._core.get_geometry().offset == lw_offset + mod.geometry.location.point  # type: ignore[attr-defined]
     assert lw.name == labware_name
 
 
-def test_module_load_labware_with_label(ctx_with_tempdeck):
+def test_module_load_labware_with_label(
+    ctx_with_tempdeck: papi.ProtocolContext,
+) -> None:
     labware_name = "corning_96_wellplate_360ul_flat"
     mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
     lw = mod.load_labware(labware_name, label="my cool labware")
     assert lw.name == "my cool labware"
 
 
-def test_module_load_invalid_labware(ctx_with_tempdeck):
+def test_module_load_invalid_labware(ctx_with_tempdeck: papi.ProtocolContext) -> None:
     labware_name = "corning_96_wellplate_360ul_flat"
     mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
     # wrong version number
@@ -406,42 +422,47 @@ def test_module_load_invalid_labware(ctx_with_tempdeck):
     assert mod.load_labware(labware_name, namespace="opentrons", version=1)
 
 
-def test_deprecated_module_load_labware_by_name(ctx_with_tempdeck):
+def test_deprecated_module_load_labware_by_name(
+    ctx_with_tempdeck: papi.ProtocolContext,
+) -> None:
     """It should call load labware"""
     mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
-    mod.load_labware = mock.MagicMock()
-    mod.load_labware_by_name(
-        name="a module", namespace="ns", label="a label", version=2
-    )
-    mod.load_labware.assert_called_once_with(
-        name="a module", label="a label", namespace="ns", version=2
-    )
+    with mock.patch.object(mod, "load_labware") as mock_load_labware:
+        mod.load_labware_by_name(
+            name="a module", namespace="ns", label="a label", version=2
+        )
+        mock_load_labware.assert_called_once_with(
+            name="a module", label="a label", namespace="ns", version=2
+        )
 
 
 @pytest.mark.apiv2_non_pe_only  # engage(height=...) param was removed in PAPIv2.14.
-async def test_magdeck_gen1_labware_props(ctx):
+async def test_magdeck_gen1_labware_props(ctx: papi.ProtocolContext) -> None:
     # TODO Ian 2019-05-29 load fixtures, not real defs
     labware_name = "biorad_96_wellplate_200ul_pcr"
     labware_def = load_labware_definition(labware_name, 1)
     mod = ctx.load_module("magdeck", 1)
     assert mod.labware is None
+    assert isinstance(mod, papi.MagneticModuleContext)
     mod.engage(height=45)
-    assert mod._core._sync_module_hardware.current_height == 45
+    assert mod._core._sync_module_hardware.current_height == 45  # type: ignore[attr-defined]
     with pytest.raises(ValueError):
         mod.engage(height=45.1)  # max engage height for gen1 is 45 mm
     mod.load_labware(labware_name)
     mod.engage()
+    if "magneticModuleEngageHeight" not in labware_def["parameters"]:
+        assert False
     lw_offset = labware_def["parameters"]["magneticModuleEngageHeight"]
-    assert await mod._core._sync_module_hardware._driver.get_plate_height() == lw_offset
+    assert await mod._core._sync_module_hardware._driver.get_plate_height() == lw_offset  # type: ignore[attr-defined]
     mod.disengage()
     mod.engage(offset=2)
     assert (
-        await mod._core._sync_module_hardware._driver.get_plate_height()
+        await mod._core._sync_module_hardware._driver.get_plate_height()  # type: ignore[attr-defined]
         == lw_offset + 2
     )
     mod.disengage()
     mod.engage(height=3)
-    assert await mod._core._sync_module_hardware._driver.get_plate_height() == 3
+    assert await mod._core._sync_module_hardware._driver.get_plate_height() == 3  # type: ignore[attr-defined]
     mod.geometry.reset_labware()
     labware_name = "corning_96_wellplate_360ul_flat"
     mod.load_labware(labware_name)
@@ -450,31 +471,32 @@ async def test_magdeck_gen1_labware_props(ctx):
     with pytest.raises(ValueError):
         mod.engage(offset=1)
     mod.engage(height=2)
-    assert await mod._core._sync_module_hardware._driver.get_plate_height() == 2
+    assert await mod._core._sync_module_hardware._driver.get_plate_height() == 2  # type: ignore[attr-defined]
     mod.engage(height=0)
-    assert await mod._core._sync_module_hardware._driver.get_plate_height() == 0
+    assert await mod._core._sync_module_hardware._driver.get_plate_height() == 0  # type: ignore[attr-defined]
     mod.engage(height_from_base=2)
     assert (
-        await mod._core._sync_module_hardware._driver.get_plate_height()
-        == 2 + OFFSET_TO_LABWARE_BOTTOM[mod._core._sync_module_hardware.model()]
+        await mod._core._sync_module_hardware._driver.get_plate_height()  # type: ignore[attr-defined]
+        == 2 + OFFSET_TO_LABWARE_BOTTOM[mod._core._sync_module_hardware.model()]  # type: ignore[attr-defined]
     )
 
 
 @pytest.mark.apiv2_non_pe_only  # engage(height=...) param was removed in PAPIv2.14.
-def test_magdeck_gen2_labware_props(ctx):
+def test_magdeck_gen2_labware_props(ctx: papi.ProtocolContext) -> None:
     mod = ctx.load_module("magnetic module gen2", 1)
+    assert isinstance(mod, papi.MagneticModuleContext)
     mod.engage(height=25)
-    assert mod._core._sync_module_hardware.current_height == 25
+    assert mod._core._sync_module_hardware.current_height == 25  # type: ignore[attr-defined]
     with pytest.raises(ValueError):
         mod.engage(height=25.1)  # max engage height for gen2 is 25 mm
     mod.engage(height=0)
-    assert mod._core._sync_module_hardware.current_height == 0
+    assert mod._core._sync_module_hardware.current_height == 0  # type: ignore[attr-defined]
 
 
-def test_module_compatibility():
+def test_module_compatibility() -> None:
     assert (
         models_compatible(
-            requested_model=ThermocyclerModuleModel.THERMOCYCLER_V1,
+            requested_model=ThermocyclerModuleModel["THERMOCYCLER_V1"],
             candidate_definition=cast(
                 ModuleDefinitionV3, {"model": "thermocyclerModuleV1"}
             ),
@@ -484,7 +506,7 @@ def test_module_compatibility():
 
     assert (
         models_compatible(
-            requested_model=ThermocyclerModuleModel.THERMOCYCLER_V2,
+            requested_model=ThermocyclerModuleModel["THERMOCYCLER_V2"],
             candidate_definition=cast(
                 ModuleDefinitionV3,
                 {
@@ -498,7 +520,7 @@ def test_module_compatibility():
 
     assert (
         models_compatible(
-            requested_model=ThermocyclerModuleModel.THERMOCYCLER_V1,
+            requested_model=ThermocyclerModuleModel["THERMOCYCLER_V1"],
             candidate_definition=cast(
                 ModuleDefinitionV3,
                 {

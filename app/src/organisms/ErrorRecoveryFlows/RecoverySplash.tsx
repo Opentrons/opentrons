@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
@@ -15,25 +15,20 @@ import {
   POSITION_ABSOLUTE,
   PrimaryButton,
   SecondaryButton,
+  LargeButton,
   SPACING,
   StyledText,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
+  WARNING_TOAST,
 } from '@opentrons/components'
 import {
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
 } from '@opentrons/api-client'
 
-import type {
-  ERUtilsResults,
-  UseRecoveryAnalyticsResult,
-  UseRecoveryTakeoverResult,
-  useRetainedFailedCommandBySource,
-} from './hooks'
 import { useErrorName } from './hooks'
 import { getErrorKind } from './utils'
-import { LargeButton } from '../../atoms/buttons'
 import {
   BANNER_TEXT_CONTAINER_STYLE,
   BANNER_TEXT_CONTENT_STYLE,
@@ -41,10 +36,16 @@ import {
 } from './constants'
 import { RecoveryInterventionModal, StepInfo } from './shared'
 import { useToaster } from '../ToasterOven'
-import { WARNING_TOAST } from '../../atoms/Toast'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '.'
+import type {
+  ERUtilsResults,
+  UseRecoveryTakeoverResult,
+  useRetainedFailedCommandBySource,
+} from './hooks'
+import type { RecoveryRoute, RouteStep } from './types'
+import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 
 export function useRecoverySplash(
   isOnDevice: boolean,
@@ -62,12 +63,13 @@ export function useRecoverySplash(
 type RecoverySplashProps = ErrorRecoveryFlowsProps &
   ERUtilsResults & {
     isOnDevice: boolean
-    isWizardActive: boolean
     failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
     robotType: RobotType
     robotName: string
+    /* Whether the app should resume any paused recovery state without user action. */
+    resumePausedRecovery: boolean
     toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
-    analytics: UseRecoveryAnalyticsResult
+    analytics: UseRecoveryAnalyticsResult<RecoveryRoute, RouteStep>
   }
 export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
   const {
@@ -79,7 +81,7 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
     robotName,
     runStatus,
     recoveryActionMutationUtils,
-    isWizardActive,
+    resumePausedRecovery,
   } = props
   const { t } = useTranslation('error_recovery')
   const errorKind = getErrorKind(failedCommand?.byRunRecord ?? null)
@@ -99,12 +101,15 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
 
   // Resume recovery when the run when the door is closed.
   // The CTA/flow for handling a door open event within the ER wizard is different, and because this splash always renders
-  // behind the wizard, we want to ensure we only implicitly resume recovery when only viewing the splash.
-  React.useEffect(() => {
-    if (runStatus === RUN_STATUS_AWAITING_RECOVERY_PAUSED && !isWizardActive) {
+  // behind the wizard, we want to ensure we only implicitly resume recovery when only viewing the splash from this app.
+  useEffect(() => {
+    if (
+      runStatus === RUN_STATUS_AWAITING_RECOVERY_PAUSED &&
+      resumePausedRecovery
+    ) {
       recoveryActionMutationUtils.resumeRecovery()
     }
-  }, [runStatus, isWizardActive])
+  }, [runStatus, resumePausedRecovery])
   const buildDoorOpenAlert = (): void => {
     makeToast(t('close_door_to_resume') as string, WARNING_TOAST)
   }

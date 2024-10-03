@@ -3,16 +3,16 @@ import pytest
 from decoy import Decoy
 from mock import AsyncMock, patch
 
-from typing import Dict, ContextManager, Optional
+from typing import Dict, ContextManager, Optional, OrderedDict
 from contextlib import nullcontext as does_not_raise
 
-from opentrons.types import Mount, MountType
+from opentrons.types import Mount, MountType, Point
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import TipStateType
 from opentrons.hardware_control.protocols.types import OT2RobotType, FlexRobotType
 
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import TipGeometry, TipPresenceStatus
 from opentrons.protocol_engine.resources import LabwareDataProvider
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
@@ -25,6 +25,8 @@ from opentrons.protocol_engine.execution.tip_handler import (
     VirtualTipHandler,
     create_tip_handler,
 )
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 
 
 @pytest.fixture
@@ -51,6 +53,17 @@ def mock_labware_data_provider(decoy: Decoy) -> LabwareDataProvider:
 def tip_rack_definition() -> LabwareDefinition:
     """Get a tip rack defintion value object."""
     return LabwareDefinition.construct(namespace="test", version=42)  # type: ignore[call-arg]
+
+
+MOCK_MAP = NozzleMap.build(
+    physical_nozzles=OrderedDict({"A1": Point(0, 0, 0)}),
+    physical_rows=OrderedDict({"A": ["A1"]}),
+    physical_columns=OrderedDict({"1": ["A1"]}),
+    starting_nozzle="A1",
+    back_left_nozzle="A1",
+    front_right_nozzle="A1",
+    valid_nozzle_maps=ValidNozzleMaps(maps={"Full": ["A1"]}),
+)
 
 
 async def test_create_tip_handler(
@@ -102,6 +115,9 @@ async def test_flex_pick_up_tip_state(
     decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
         MountType.LEFT
     )
+    decoy.when(mock_state_view.pipettes.state.nozzle_configuration_by_id).then_return(
+        {"pipette-id": MOCK_MAP}
+    )
     decoy.when(
         mock_state_view.geometry.get_nominal_tip_geometry(
             pipette_id="pipette-id",
@@ -121,7 +137,6 @@ async def test_flex_pick_up_tip_state(
     with patch.object(
         ot3_hardware_api, "cache_tip", AsyncMock(spec=ot3_hardware_api.cache_tip)
     ) as mock_add_tip:
-
         if tip_state == TipStateType.PRESENT:
             await subject.pick_up_tip(
                 pipette_id="pipette-id",
@@ -169,6 +184,10 @@ async def test_pick_up_tip(
 
     decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
         MountType.LEFT
+    )
+
+    decoy.when(mock_state_view.pipettes.state.nozzle_configuration_by_id).then_return(
+        {"pipette-id": MOCK_MAP}
     )
 
     decoy.when(
@@ -224,6 +243,9 @@ async def test_drop_tip(
 
     decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
         MountType.RIGHT
+    )
+    decoy.when(mock_state_view.pipettes.state.nozzle_configuration_by_id).then_return(
+        {"pipette-id": MOCK_MAP}
     )
 
     await subject.drop_tip(pipette_id="pipette-id", home_after=True)
@@ -499,6 +521,11 @@ async def test_verify_tip_presence_on_ot3(
         decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
             MountType.LEFT
         )
+
+        decoy.when(
+            mock_state_view.pipettes.state.nozzle_configuration_by_id
+        ).then_return({"pipette-id": MOCK_MAP})
+
         await subject.verify_tip_presence("pipette-id", expected, None)
 
         decoy.verify(

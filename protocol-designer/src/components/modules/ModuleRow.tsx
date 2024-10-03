@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import upperFirst from 'lodash/upperFirst'
@@ -6,7 +5,7 @@ import {
   LabeledValue,
   OutlineButton,
   OT2SlotMap,
-  Tooltip,
+  LegacyTooltip,
   useHoverTooltip,
   ModuleIcon,
   C_DARK_GRAY,
@@ -150,7 +149,7 @@ export function ModuleRow(props: Props): JSX.Element {
         </div>
         <div className={styles.slot_map}>
           {collisionSlots.length > 0 && (
-            <Tooltip {...tooltipProps}>{collisionTooltip}</Tooltip>
+            <LegacyTooltip {...tooltipProps}>{collisionTooltip}</LegacyTooltip>
           )}
           {slot &&
             (isFlex ? (

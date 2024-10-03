@@ -1,5 +1,10 @@
 """Test load labware commands."""
 import inspect
+from typing import Optional
+from opentrons.protocol_engine.state.update_types import (
+    LoadedLabwareUpdate,
+    StateUpdate,
+)
 import pytest
 
 from decoy import Decoy
@@ -18,7 +23,7 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.protocol_engine.execution import LoadedLabwareData, EquipmentHandler
 from opentrons.protocol_engine.resources import labware_validation
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.load_labware import (
@@ -32,16 +37,18 @@ from opentrons.protocol_engine.commands.load_labware import (
 def patch_mock_labware_validation(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Mock out move_types.py functions."""
+    """Mock out labware_validations.py functions."""
     for name, func in inspect.getmembers(labware_validation, inspect.isfunction):
         monkeypatch.setattr(labware_validation, name, decoy.mock(func=func))
 
 
+@pytest.mark.parametrize("display_name", [("My custom display name"), (None)])
 async def test_load_labware_implementation(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     equipment: EquipmentHandler,
     state_view: StateView,
+    display_name: Optional[str],
 ) -> None:
     """A LoadLabware command should have an execution implementation."""
     subject = LoadLabwareImplementation(equipment=equipment, state_view=state_view)
@@ -51,7 +58,7 @@ async def test_load_labware_implementation(
         loadName="some-load-name",
         namespace="opentrons-test",
         version=1,
-        displayName="My custom display name",
+        displayName=display_name,
     )
 
     decoy.when(
@@ -88,6 +95,15 @@ async def test_load_labware_implementation(
             offsetId="labware-offset-id",
         ),
         private=None,
+        state_update=StateUpdate(
+            loaded_labware=LoadedLabwareUpdate(
+                labware_id="labware-id",
+                definition=well_plate_def,
+                offset_id="labware-offset-id",
+                new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+                display_name=display_name,
+            )
+        ),
     )
 
 
@@ -156,7 +172,6 @@ async def test_load_labware_on_labware(
     ).then_return(True)
 
     result = await subject.execute(data)
-
     assert result == SuccessData(
         public=LoadLabwareResult(
             labwareId="labware-id",
@@ -164,6 +179,15 @@ async def test_load_labware_on_labware(
             offsetId="labware-offset-id",
         ),
         private=None,
+        state_update=StateUpdate(
+            loaded_labware=LoadedLabwareUpdate(
+                labware_id="labware-id",
+                definition=well_plate_def,
+                offset_id="labware-offset-id",
+                new_location=OnLabwareLocation(labwareId="another-labware-id"),
+                display_name="My custom display name",
+            )
+        ),
     )
 
     decoy.verify(

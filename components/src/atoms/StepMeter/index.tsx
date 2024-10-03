@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 import { Box } from '../../primitives'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'

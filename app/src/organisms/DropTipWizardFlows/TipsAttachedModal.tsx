@@ -1,4 +1,3 @@
-import * as React from 'react'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { Trans, useTranslation } from 'react-i18next'
 
@@ -12,24 +11,20 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
 import { DropTipWizardFlows, useDropTipWizardFlows } from '.'
 import { useHomePipettes } from './hooks'
 
 import type { HostConfig } from '@opentrons/api-client'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
-import type { PipetteWithTip } from '.'
-import type { UseHomePipettesProps } from './hooks'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { UseHomePipettesProps, PipetteWithTip } from './hooks'
+import type { PipetteDetails } from '/app/resources/maintenance_runs'
 
-type TipsAttachedModalProps = Pick<
-  UseHomePipettesProps,
-  'robotType' | 'instrumentModelSpecs' | 'mount' | 'isRunCurrent'
-> & {
+type TipsAttachedModalProps = Pick<UseHomePipettesProps, 'onSettled'> & {
   aPipetteWithTip: PipetteWithTip
   host: HostConfig | null
   setTipStatusResolved: (onEmpty?: () => void) => Promise<void>
-  onSkipAndHome: () => void
 }
 
 export const handleTipsAttachedModal = (
@@ -53,15 +48,16 @@ const TipsAttachedModal = NiceModal.create(
 
     const { mount, specs } = aPipetteWithTip
     const { showDTWiz, toggleDTWiz } = useDropTipWizardFlows()
-    const { homePipettes, isHomingPipettes } = useHomePipettes({
+    const { homePipettes, isHoming } = useHomePipettes({
       ...homePipetteProps,
-      onHome: () => {
+      pipetteInfo: buildPipetteDetails(aPipetteWithTip),
+      onSettled: () => {
         modal.remove()
         void setTipStatusResolved()
       },
     })
 
-    const tipsAttachedHeader: ModalHeaderBaseProps = {
+    const tipsAttachedHeader: OddModalHeaderBaseProps = {
       title: t('remove_any_attached_tips'),
       iconName: 'ot-alert',
       iconColor: COLORS.red50,
@@ -85,7 +81,7 @@ const TipsAttachedModal = NiceModal.create(
 
     return (
       <ApiHostProvider {...host} hostname={host?.hostname ?? null}>
-        <Modal header={tipsAttachedHeader}>
+        <OddModal header={tipsAttachedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <LegacyStyledText as="p">
               <Trans
@@ -105,17 +101,17 @@ const TipsAttachedModal = NiceModal.create(
                 buttonType="secondary"
                 buttonText={t('skip_and_home_pipette')}
                 onClick={onHomePipettes}
-                disabled={isHomingPipettes}
+                disabled={isHoming}
               />
               <SmallButton
                 flex="1"
                 buttonText={t('begin_removal')}
                 onClick={toggleDTWiz}
-                disabled={isHomingPipettes}
+                disabled={isHoming}
               />
             </Flex>
           </Flex>
-        </Modal>
+        </OddModal>
         {showDTWiz ? (
           <DropTipWizardFlows
             instrumentModelSpecs={specs}
@@ -124,9 +120,22 @@ const TipsAttachedModal = NiceModal.create(
             closeFlow={isTakeover => {
               cleanUpAndClose(isTakeover)
             }}
+            modalStyle="simple"
           />
         ) : null}
       </ApiHostProvider>
     )
   }
 )
+
+// TODO(jh, 09-12-24): Consolidate this with the same utility that exists elsewhere.
+function buildPipetteDetails(
+  aPipetteWithTip: PipetteWithTip | null
+): PipetteDetails | null {
+  return aPipetteWithTip != null
+    ? {
+        pipetteId: aPipetteWithTip.specs.name,
+        mount: aPipetteWithTip.mount,
+      }
+    : null
+}

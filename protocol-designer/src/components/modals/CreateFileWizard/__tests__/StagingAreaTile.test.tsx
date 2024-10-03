@@ -1,10 +1,10 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { vi, describe, beforeEach, expect, it } from 'vitest'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../localization'
+import { i18n } from '../../../../assets/localization'
 import { StagingAreaTile } from '../StagingAreaTile'
 
 import type * as Components from '@opentrons/components'

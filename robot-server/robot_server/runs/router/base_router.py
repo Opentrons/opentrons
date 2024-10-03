@@ -6,8 +6,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
-from typing import Optional, Union, Callable
-from typing_extensions import Literal, Final
+from typing import Annotated, Callable, Final, Literal, Optional, Union
 
 from fastapi import APIRouter, Depends, status, Query
 from pydantic import BaseModel, Field
@@ -118,7 +117,7 @@ class AllRunsLinks(BaseModel):
 
 async def get_run_data_from_url(
     runId: str,
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> Union[Run, BadRun]:
     """Get the data of a run.
 
@@ -155,22 +154,22 @@ async def get_run_data_from_url(
     },
 )
 async def create_run(  # noqa: C901
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    run_id: Annotated[str, Depends(get_unique_id)],
+    created_at: Annotated[datetime, Depends(get_current_time)],
+    run_auto_deleter: Annotated[RunAutoDeleter, Depends(get_run_auto_deleter)],
+    data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
+    data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
+    quick_transfer_run_auto_deleter: Annotated[
+        RunAutoDeleter, Depends(get_quick_transfer_run_auto_deleter)
+    ],
+    check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
+    deck_configuration_store: Annotated[
+        DeckConfigurationStore, Depends(get_deck_configuration_store)
+    ],
+    notify_publishers: Annotated[Callable[[], None], Depends(get_pe_notify_publishers)],
     request_body: Optional[RequestModel[RunCreate]] = None,
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
-    protocol_store: ProtocolStore = Depends(get_protocol_store),
-    run_id: str = Depends(get_unique_id),
-    created_at: datetime = Depends(get_current_time),
-    run_auto_deleter: RunAutoDeleter = Depends(get_run_auto_deleter),
-    quick_transfer_run_auto_deleter: RunAutoDeleter = Depends(
-        get_quick_transfer_run_auto_deleter
-    ),
-    data_files_directory: Path = Depends(get_data_files_directory),
-    data_files_store: DataFilesStore = Depends(get_data_files_store),
-    check_estop: bool = Depends(require_estop_in_good_state),
-    deck_configuration_store: DeckConfigurationStore = Depends(
-        get_deck_configuration_store
-    ),
-    notify_publishers: Callable[[], None] = Depends(get_pe_notify_publishers),
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Create a new run.
 
@@ -272,16 +271,18 @@ async def create_run(  # noqa: C901
     },
 )
 async def get_runs(
-    pageLength: Optional[int] = Query(
-        None,
-        description=(
-            "The maximum number of runs to return."
-            " If this is less than the total number of runs,"
-            " the most-recently created runs will be returned."
-            " If this is omitted or `null`, all runs will be returned."
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    pageLength: Annotated[
+        Optional[int],
+        Query(
+            description=(
+                "The maximum number of runs to return."
+                " If this is less than the total number of runs,"
+                " the most-recently created runs will be returned."
+                " If this is omitted or `null`, all runs will be returned."
+            ),
         ),
-    ),
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    ] = None,
 ) -> PydanticResponse[MultiBody[Union[Run, BadRun], AllRunsLinks]]:
     """Get all runs, in order from least-recently to most-recently created.
 
@@ -315,7 +316,7 @@ async def get_runs(
     },
 )
 async def get_run(
-    run_data: Run = Depends(get_run_data_from_url),
+    run_data: Annotated[Run, Depends(get_run_data_from_url)],
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Get a run by its ID.
 
@@ -340,7 +341,7 @@ async def get_run(
 )
 async def remove_run(
     runId: str,
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete a run by its ID.
 
@@ -377,7 +378,7 @@ async def remove_run(
 async def update_run(
     runId: str,
     request_body: RequestModel[RunUpdate],
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Update a run by its ID.
 
@@ -422,7 +423,7 @@ async def update_run(
 async def put_error_recovery_policy(
     runId: str,
     request_body: RequestModel[ErrorRecoveryPolicy],
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Create run polices.
 
@@ -463,20 +464,24 @@ async def put_error_recovery_policy(
     },
 )
 async def get_run_commands_error(
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
     runId: str,
-    cursor: Optional[int] = Query(
-        None,
-        description=(
-            "The starting index of the desired first command error in the list."
-            " If unspecified, a cursor will be selected automatically"
-            " based on the last error added."
+    pageLength: Annotated[
+        int,
+        Query(
+            description="The maximum number of command errors in the list to return.",
         ),
-    ),
-    pageLength: int = Query(
-        _DEFAULT_COMMAND_ERROR_LIST_LENGTH,
-        description="The maximum number of command errors in the list to return.",
-    ),
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    ] = _DEFAULT_COMMAND_ERROR_LIST_LENGTH,
+    cursor: Annotated[
+        Optional[int],
+        Query(
+            description=(
+                "The starting index of the desired first command error in the list."
+                " If unspecified, a cursor will be selected automatically"
+                " based on the last error added."
+            ),
+        ),
+    ] = None,
 ) -> PydanticResponse[SimpleMultiBody[pe_errors.ErrorOccurrence]]:
     """Get a summary of a set of command errors in a run.
 

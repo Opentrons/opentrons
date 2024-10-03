@@ -1,5 +1,6 @@
 """Command models to drop tip in place while plunger positions are unknown."""
 from __future__ import annotations
+from opentrons.protocol_engine.state.update_types import StateUpdate
 from pydantic import Field, BaseModel
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
@@ -14,7 +15,7 @@ from ...resources import ensure_ot3_hardware
 
 if TYPE_CHECKING:
     from ...execution import TipHandler
-    from ...state import StateView
+    from ...state.state import StateView
 
 
 UnsafeDropTipInPlaceCommandType = Literal["unsafe/dropTipInPlace"]
@@ -72,7 +73,12 @@ class UnsafeDropTipInPlaceImplementation(
             pipette_id=params.pipetteId, home_after=params.homeAfter
         )
 
-        return SuccessData(public=UnsafeDropTipInPlaceResult(), private=None)
+        state_update = StateUpdate()
+        state_update.update_tip_state(pipette_id=params.pipetteId, tip_geometry=None)
+
+        return SuccessData(
+            public=UnsafeDropTipInPlaceResult(), private=None, state_update=state_update
+        )
 
 
 class UnsafeDropTipInPlace(

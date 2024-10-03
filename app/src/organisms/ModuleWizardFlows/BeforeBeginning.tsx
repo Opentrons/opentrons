@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import {
@@ -8,8 +7,8 @@ import {
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 import { LegacyStyledText } from '@opentrons/components'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 
 import type { AttachedModule } from '@opentrons/api-client'
 import type { ModuleCalibrationWizardStepProps } from './types'

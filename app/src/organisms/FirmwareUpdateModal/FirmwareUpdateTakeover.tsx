@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 
 import {
@@ -6,9 +6,9 @@ import {
   useCurrentAllSubsystemUpdatesQuery,
   useSubsystemUpdateQuery,
 } from '@opentrons/react-api-client'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
-import { getTopPortalEl } from '../../App/portal'
-import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+import { getTopPortalEl } from '/app/App/portal'
+import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 import { UpdateInProgressModal } from './UpdateInProgressModal'
 import { UpdateNeededModal } from './UpdateNeededModal'
 import type { Subsystem, InstrumentData } from '@opentrons/api-client'
@@ -16,19 +16,18 @@ import type { Subsystem, InstrumentData } from '@opentrons/api-client'
 const POLL_INTERVAL_MS = 5000
 
 export function FirmwareUpdateTakeover(): JSX.Element {
-  const [
-    showUpdateNeededModal,
-    setShowUpdateNeededModal,
-  ] = React.useState<boolean>(false)
+  const [showUpdateNeededModal, setShowUpdateNeededModal] = useState<boolean>(
+    false
+  )
   const [
     initiatedSubsystemUpdate,
     setInitiatedSubsystemUpdate,
-  ] = React.useState<Subsystem | null>(null)
+  ] = useState<Subsystem | null>(null)
 
   const instrumentsData = useInstrumentsQuery({
     refetchInterval: POLL_INTERVAL_MS,
   }).data?.data
-  const [instrumentsToUpdate, setInstrumentsToUpdate] = React.useState<
+  const [instrumentsToUpdate, setInstrumentsToUpdate] = useState<
     InstrumentData[]
   >([])
   instrumentsData?.forEach(instrument => {
@@ -41,7 +40,7 @@ export function FirmwareUpdateTakeover(): JSX.Element {
       setInstrumentsToUpdate([...instrumentsToUpdate, instrument])
     }
   })
-  const [indexToUpdate, setIndexToUpdate] = React.useState(0)
+  const [indexToUpdate, setIndexToUpdate] = useState(0)
 
   const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: POLL_INTERVAL_MS,
@@ -63,7 +62,7 @@ export function FirmwareUpdateTakeover(): JSX.Element {
     externalSubsystemUpdate?.id ?? null
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     // in case instruments are updated elsewhere in the app, clear update needed list
     // when all instruments are ok but array has elements
     if (

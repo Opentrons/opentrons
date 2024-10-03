@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import uniq from 'lodash/uniq'
 import UAParser from 'ua-parser-js'

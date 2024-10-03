@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 export function MagneticModule(): JSX.Element {
   return (
     <g id="magneticModule">

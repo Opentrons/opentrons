@@ -1,40 +1,42 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
-  Flex,
   COLORS,
-  SPACING,
-  AlertPrimaryButton,
-  JUSTIFY_FLEX_END,
   StyledText,
-  PrimaryButton,
+  Icon,
+  Flex,
+  RESPONSIVENESS,
+  DISPLAY_FLEX,
+  SPACING,
+  DIRECTION_COLUMN,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
-import { getIsOnDevice } from '../../redux/config'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { SmallButton } from '../../atoms/buttons'
+import { DropTipFooterButtons } from './shared'
 
 import type { DropTipWizardContainerProps } from './types'
 
-type ExitConfirmationProps = DropTipWizardContainerProps & {
-  handleExit: () => void
-  handleGoBack: () => void
-}
+export function ExitConfirmation(
+  props: DropTipWizardContainerProps
+): JSX.Element {
+  const { mount, cancelExit, toggleExitInitiated, confirmExit } = props
+  const { t } = useTranslation('drop_tip_wizard')
 
-export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
-  const { handleGoBack, handleExit, mount } = props
-  const { t } = useTranslation(['drop_tip_wizard', 'shared'])
-
-  const isOnDevice = useSelector(getIsOnDevice)
+  const handleExit = (): void => {
+    toggleExitInitiated()
+    confirmExit()
+  }
 
   return (
-    <SimpleWizardBody
-      iconColor={COLORS.red50}
-      header={t('remove_any_attached_tips')}
-      isSuccess={false}
-      subHeader={
+    <>
+      <Flex css={CONTAINER_STYLE}>
+        <Icon name="alert-circle" css={ICON_STYLE} />
+        <StyledText oddStyle="level3HeaderBold" desktopStyle="headingSmallBold">
+          {t('remove_any_attached_tips')}
+        </StyledText>
         <StyledText
           desktopStyle="bodyDefaultRegular"
           oddStyle="level4HeaderRegular"
@@ -50,40 +52,39 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
             }}
           />
         </StyledText>
-      }
-      marginTop={isOnDevice ? '-2rem' : undefined}
-    >
-      {isOnDevice ? (
-        <Flex
-          width="100%"
-          justifyContent={JUSTIFY_FLEX_END}
-          gridGap={SPACING.spacing8}
-        >
-          <SmallButton
-            buttonText={t('shared:go_back')}
-            onClick={handleGoBack}
-          />
-          <SmallButton
-            buttonType="alert"
-            buttonText={t('exit_and_home_pipette')}
-            onClick={handleExit}
-            marginRight={SPACING.spacing4}
-          />
-        </Flex>
-      ) : (
-        <Flex
-          width="100%"
-          justifyContent={JUSTIFY_FLEX_END}
-          gridGap={SPACING.spacing8}
-        >
-          <PrimaryButton onClick={handleGoBack} marginRight={SPACING.spacing4}>
-            {t('shared:go_back')}
-          </PrimaryButton>
-          <AlertPrimaryButton onClick={handleExit}>
-            {t('exit_and_home_pipette')}
-          </AlertPrimaryButton>
-        </Flex>
-      )}
-    </SimpleWizardBody>
+      </Flex>
+      <DropTipFooterButtons
+        primaryBtnOnClick={handleExit}
+        secondaryBtnOnClick={cancelExit}
+        primaryBtnTextOverride={t('exit_and_home_pipette')}
+        primaryBtnStyle="alertStyle"
+      />
+    </>
   )
 }
+
+const CONTAINER_STYLE = css`
+  display: ${DISPLAY_FLEX};
+  flex-direction: ${DIRECTION_COLUMN};
+  grid-gap: ${SPACING.spacing16};
+  padding: ${SPACING.spacing40} ${SPACING.spacing16};
+  align-items: ${ALIGN_CENTER};
+  justify-content: ${JUSTIFY_CENTER};
+  text-align: ${TEXT_ALIGN_CENTER};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    grid-gap: ${SPACING.spacing24};
+    padding: ${SPACING.spacing40};
+  }
+`
+
+const ICON_STYLE = css`
+  width: 40px;
+  height: 40px;
+  color: ${COLORS.red50};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: 60px;
+    height: 60px;
+  }
+`

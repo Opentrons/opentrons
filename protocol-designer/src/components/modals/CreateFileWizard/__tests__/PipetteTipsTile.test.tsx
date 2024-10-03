@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -7,7 +7,7 @@ import {
   fixture_tiprack_300_ul,
 } from '@opentrons/shared-data/labware/fixtures/2'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../localization'
+import { i18n } from '../../../../assets/localization'
 import { getLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import { getAllowAllTipracks } from '../../../../feature-flags/selectors'
 import { getTiprackOptions } from '../../utils'

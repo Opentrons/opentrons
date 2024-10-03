@@ -71,6 +71,7 @@ def _build_run(
             pipettes=[],
             modules=[],
             liquids=[],
+            wells=[],
             hasEverEnteredErrorRecovery=False,
         )
         errors.append(state_summary.dataError)
@@ -211,7 +212,7 @@ class RunDataManager:
         self._run_store.insert_csv_rtp(
             run_id=run_id, run_time_parameters=run_time_parameters
         )
-        await self._runs_publisher.start_publishing_for_run(
+        self._runs_publisher.start_publishing_for_run(
             get_current_command=self.get_current_command,
             get_recovery_target_command=self.get_recovery_target_command,
             get_state_summary=self._get_good_state_summary,
@@ -306,7 +307,7 @@ class RunDataManager:
         if run_id == self._run_orchestrator_store.current_run_id:
             await self._run_orchestrator_store.clear()
 
-        await self._runs_publisher.clean_up_run(run_id=run_id)
+        self._runs_publisher.clean_up_run(run_id=run_id)
 
         self._run_store.remove(run_id=run_id)
 
@@ -351,15 +352,13 @@ class RunDataManager:
                 commands=commands,
                 run_time_parameters=parameters,
             )
-            await self._runs_publisher.publish_pre_serialized_commands_notification(
-                run_id
-            )
+            self._runs_publisher.publish_pre_serialized_commands_notification(run_id)
         else:
             state_summary = self._run_orchestrator_store.get_state_summary()
             parameters = self._run_orchestrator_store.get_run_time_parameters()
             run_resource = self._run_store.get(run_id=run_id)
 
-        await self._runs_publisher.publish_runs_advise_refetch_async(run_id)
+        self._runs_publisher.publish_runs_advise_refetch(run_id)
 
         return _build_run(
             run_resource=run_resource,
@@ -373,6 +372,7 @@ class RunDataManager:
         run_id: str,
         cursor: Optional[int],
         length: int,
+        include_fixit_commands: bool,
     ) -> CommandSlice:
         """Get a slice of run commands.
 
@@ -380,18 +380,21 @@ class RunDataManager:
             run_id: ID of the run.
             cursor: Requested index of first command in the returned slice.
             length: Length of slice to return.
+            include_fixit_commands: Include fixit commands.
 
         Raises:
             RunNotFoundError: The given run identifier was not found in the database.
         """
         if run_id == self._run_orchestrator_store.current_run_id:
             return self._run_orchestrator_store.get_command_slice(
-                cursor=cursor, length=length
+                cursor=cursor,
+                length=length,
+                include_fixit_commands=include_fixit_commands,
             )
 
         # Let exception propagate
         return self._run_store.get_commands_slice(
-            run_id=run_id, cursor=cursor, length=length
+            run_id=run_id, cursor=cursor, length=length, include_fixit_commands=True
         )
 
     def get_command_error_slice(
@@ -467,10 +470,12 @@ class RunDataManager:
         if run_id == self._run_orchestrator_store.current_run_id:
             return self._run_orchestrator_store.get_command_errors()
 
-        # TODO(tz, 8-5-2024): Change this to return to error list from the DB when we implement https://opentrons.atlassian.net/browse/EXEC-655.
+        # TODO(tz, 8-5-2024): Change this to return the error list from the DB when we implement https://opentrons.atlassian.net/browse/EXEC-655.
         raise RunNotCurrentError()
 
-    def get_all_commands_as_preserialized_list(self, run_id: str) -> List[str]:
+    def get_all_commands_as_preserialized_list(
+        self, run_id: str, include_fixit_commands: bool
+    ) -> List[str]:
         """Get all commands of a run in a serialized json list."""
         if (
             run_id == self._run_orchestrator_store.current_run_id
@@ -479,7 +484,9 @@ class RunDataManager:
             raise PreSerializedCommandsNotAvailableError(
                 "Pre-serialized commands are only available after a run has ended."
             )
-        return self._run_store.get_all_commands_as_preserialized_list(run_id)
+        return self._run_store.get_all_commands_as_preserialized_list(
+            run_id, include_fixit_commands
+        )
 
     def set_policies(self, run_id: str, policies: List[ErrorRecoveryRule]) -> None:
         """Create run policy rules for error recovery."""

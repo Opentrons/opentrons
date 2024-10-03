@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import {
   Flex,
   StyledText,
@@ -6,7 +6,7 @@ import {
   SPACING,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { InlineNotification } from '../../../atoms/InlineNotification'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 
 import { InterventionInfo } from './InterventionInfo'
 export type { InterventionInfoProps } from './InterventionInfo'

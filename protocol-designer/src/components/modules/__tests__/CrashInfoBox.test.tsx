@@ -1,8 +1,8 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 import { CrashInfoBox } from '../CrashInfoBox'
-import { i18n } from '../../../localization'
+import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 
 describe('CrashInfoBox', () => {

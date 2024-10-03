@@ -442,7 +442,9 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
                 {...formProps}
                 goBack={goBack}
                 proceed={() => {
-                  handleProceedRobotType(formProps.getValues().fields.robotType)
+                  handleProceedRobotType(
+                    formProps.getValues().fields.robotType ?? OT2_ROBOT_TYPE
+                  )
                   proceed()
                 }}
               />

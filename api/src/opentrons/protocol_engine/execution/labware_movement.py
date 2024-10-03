@@ -9,7 +9,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import OT3Mount, Axis
 from opentrons.motion_planning import get_gripper_labware_movement_waypoints
 
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
@@ -177,6 +177,9 @@ class LabwareMovementHandler:
                             labware_id
                         )
                         well_bbox = self._state_store.labware.get_well_bbox(labware_id)
+                        # todo(mm, 2024-09-26): This currently raises a lower-level 2015 FailedGripperPickupError.
+                        # Convert this to a higher-level 3001 LabwareDroppedError or 3002 LabwareNotPickedUpError,
+                        # depending on what waypoint we're at, to propagate a more specific error code to users.
                         ot3api.raise_error_if_gripper_pickup_failed(
                             expected_grip_width=labware_bbox.y,
                             grip_width_uncertainty_wider=abs(

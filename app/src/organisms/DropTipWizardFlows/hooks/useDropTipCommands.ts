@@ -1,10 +1,10 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
-import { MANAGED_PIPETTE_ID, POSITION_AND_BLOWOUT } from '../constants'
-import { getAddressableAreaFromConfig } from '../getAddressableAreaFromConfig'
-import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
+import { DT_ROUTES, MANAGED_PIPETTE_ID } from '../constants'
+import { getAddressableAreaFromConfig } from '../utils'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import type {
   CreateCommand,
   AddressableAreaName,
@@ -14,8 +14,8 @@ import type {
 } from '@opentrons/shared-data'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import type { CommandData, PipetteData } from '@opentrons/api-client'
-import type { Axis, Sign, StepSize } from '../../../molecules/JogControls/types'
-import type { DropTipFlowsStep, FixitCommandTypeUtils } from '../types'
+import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
+import type { DropTipFlowsRoute, FixitCommandTypeUtils } from '../types'
 import type { SetRobotErrorDetailsParams, UseDTWithTypeParams } from '.'
 import type { RunCommandByCommandTypeParams } from './useDropTipCreateCommands'
 
@@ -33,15 +33,17 @@ type UseDropTipSetupCommandsParams = UseDTWithTypeParams & {
   setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
   toggleIsExiting: () => void
   fixitCommandTypeUtils?: FixitCommandTypeUtils
-  toggleClientEndRun: () => void
 }
 
 export interface UseDropTipCommandsResult {
   handleCleanUpAndClose: (homeOnExit?: boolean) => Promise<void>
-  moveToAddressableArea: (addressableArea: AddressableAreaName) => Promise<void>
+  moveToAddressableArea: (
+    addressableArea: AddressableAreaName,
+    stayAtHighestPossibleZ?: boolean
+  ) => Promise<void>
   handleJog: (axis: Axis, dir: Sign, step: StepSize) => void
   blowoutOrDropTip: (
-    currentStep: DropTipFlowsStep,
+    currentRoute: DropTipFlowsRoute,
     proceed: () => void
   ) => Promise<void>
   handleMustHome: () => Promise<void>
@@ -58,12 +60,11 @@ export function useDropTipCommands({
   instrumentModelSpecs,
   robotType,
   fixitCommandTypeUtils,
-  toggleClientEndRun,
 }: UseDropTipSetupCommandsParams): UseDropTipCommandsResult {
   const isFlex = robotType === FLEX_ROBOT_TYPE
-  const [hasSeenClose, setHasSeenClose] = React.useState(false)
-  const [jogQueue, setJogQueue] = React.useState<Array<() => Promise<void>>>([])
-  const [isJogging, setIsJogging] = React.useState(false)
+  const [hasSeenClose, setHasSeenClose] = useState(false)
+  const [jogQueue, setJogQueue] = useState<Array<() => Promise<void>>>([])
+  const [isJogging, setIsJogging] = useState(false)
   const pipetteId = fixitCommandTypeUtils?.pipetteId ?? null
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
@@ -89,7 +90,6 @@ export function useDropTipCommands({
                 console.error(error.message)
               })
               .finally(() => {
-                toggleClientEndRun()
                 closeFlow()
                 deleteMaintenanceRun(activeMaintenanceRunId)
               })
@@ -100,7 +100,8 @@ export function useDropTipCommands({
   }
 
   const moveToAddressableArea = (
-    addressableArea: AddressableAreaName
+    addressableArea: AddressableAreaName,
+    stayAtHighestPossibleZ = true // Generally false when moving to a waste chute or trash bin.
   ): Promise<void> => {
     return new Promise((resolve, reject) => {
       const addressableAreaFromConfig = getAddressableAreaFromConfig(
@@ -113,12 +114,18 @@ export function useDropTipCommands({
       if (addressableAreaFromConfig != null) {
         const moveToAACommand = buildMoveToAACommand(
           addressableAreaFromConfig,
-          pipetteId
+          pipetteId,
+          stayAtHighestPossibleZ
         )
         return chainRunCommands(
           isFlex
-            ? [ENGAGE_AXES, UPDATE_ESTIMATORS_EXCEPT_PLUNGERS, moveToAACommand]
-            : [moveToAACommand],
+            ? [
+                ENGAGE_AXES,
+                UPDATE_ESTIMATORS_EXCEPT_PLUNGERS,
+                Z_HOME,
+                moveToAACommand,
+              ]
+            : [Z_HOME, moveToAACommand],
           true
         )
           .then((commandData: CommandData[]) => {
@@ -192,7 +199,7 @@ export function useDropTipCommands({
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     processJogQueue()
   }, [jogQueue.length, isJogging])
 
@@ -206,12 +213,12 @@ export function useDropTipCommands({
   }
 
   const blowoutOrDropTip = (
-    currentStep: DropTipFlowsStep,
+    currentRoute: DropTipFlowsRoute,
     proceed: () => void
   ): Promise<void> => {
     return new Promise((resolve, reject) => {
       chainRunCommands(
-        currentStep === POSITION_AND_BLOWOUT
+        currentRoute === DT_ROUTES.BLOWOUT
           ? buildBlowoutCommands(instrumentModelSpecs, isFlex, pipetteId)
           : buildDropTipInPlaceCommand(isFlex, pipetteId),
         true
@@ -223,7 +230,7 @@ export function useDropTipCommands({
               fixitCommandTypeUtils != null &&
               issuedCommandsType === 'fixit'
             ) {
-              if (currentStep === POSITION_AND_BLOWOUT) {
+              if (currentRoute === DT_ROUTES.BLOWOUT) {
                 fixitCommandTypeUtils.errorOverrides.blowoutFailed()
               } else {
                 fixitCommandTypeUtils.errorOverrides.tipDropFailed()
@@ -241,7 +248,7 @@ export function useDropTipCommands({
         })
         .catch((error: Error) => {
           if (fixitCommandTypeUtils != null && issuedCommandsType === 'fixit') {
-            if (currentStep === POSITION_AND_BLOWOUT) {
+            if (currentRoute === DT_ROUTES.BLOWOUT) {
               fixitCommandTypeUtils.errorOverrides.blowoutFailed()
             } else {
               fixitCommandTypeUtils.errorOverrides.tipDropFailed()
@@ -250,7 +257,7 @@ export function useDropTipCommands({
 
           setErrorDetails({
             message: `Error issuing ${
-              currentStep === POSITION_AND_BLOWOUT ? 'blowout' : 'drop tip'
+              currentRoute === DT_ROUTES.BLOWOUT ? 'blowout' : 'drop tip'
             } command: ${error.message}`,
           })
           resolve()
@@ -293,6 +300,11 @@ const ENGAGE_AXES: CreateCommand = {
   params: {
     axes: ['leftZ', 'rightZ', 'x', 'y', 'leftPlunger', 'rightPlunger'],
   },
+}
+
+const Z_HOME: CreateCommand = {
+  commandType: 'home' as const,
+  params: { axes: ['leftZ', 'rightZ'] },
 }
 
 const HOME_EXCEPT_PLUNGERS: CreateCommand = {
@@ -356,8 +368,6 @@ const buildBlowoutCommands = (
         },
       ]
     : [
-        ENGAGE_AXES,
-        UPDATE_PLUNGER_ESTIMATORS,
         {
           commandType: 'blowOutInPlace',
           params: {
@@ -370,15 +380,19 @@ const buildBlowoutCommands = (
 
 const buildMoveToAACommand = (
   addressableAreaFromConfig: AddressableAreaName,
-  pipetteId: string | null
+  pipetteId: string | null,
+  stayAtHighestPossibleZ: boolean
 ): CreateCommand => {
+  // Because we can never be certain about which tip is attached outside a protocol run, always assume the most
+  // conservative estimate, a 1000ul tip.
+  const zOffset = stayAtHighestPossibleZ ? 0 : 88
   return {
     commandType: 'moveToAddressableArea',
     params: {
       pipetteId: pipetteId ?? MANAGED_PIPETTE_ID,
-      stayAtHighestPossibleZ: true,
+      stayAtHighestPossibleZ,
       addressableAreaName: addressableAreaFromConfig,
-      offset: { x: 0, y: 0, z: 0 },
+      offset: { x: 0, y: 0, z: zOffset },
     },
   }
 }

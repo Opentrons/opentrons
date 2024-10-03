@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Component } from 'react'
 import styles from './styles.module.css'
 import { MobileMenu } from './MobileMenu'
 import { MobileContent } from './MobileContent'
@@ -16,7 +16,7 @@ interface State {
 
 type Props = Record<string, never>
 
-export class MobileList extends React.Component<Props, State> {
+export class MobileList extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = { menu: null }

@@ -29,7 +29,6 @@ stages:
           data_file_id: data.id
       status_code:
         - 201
-        - 200
       json:
         data:
           id: !anystr

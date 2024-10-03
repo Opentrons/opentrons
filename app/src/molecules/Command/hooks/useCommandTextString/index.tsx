@@ -217,6 +217,11 @@ export function useCommandTextString(
         commandText: utils.getCustomCommandText({ ...fullParams, command }),
       }
 
+    case 'setRailLights':
+      return {
+        commandText: utils.getRailLightsCommandText({ ...fullParams, command }),
+      }
+
     case undefined:
     case null:
       return { commandText: '' }

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE, fixtureTiprack300ul } from '@opentrons/shared-data'
@@ -8,7 +7,7 @@ import {
   getCurrentPage,
   getNewProtocolModal,
 } from '../../../navigation/selectors'
-import { i18n } from '../../../localization'
+import { i18n } from '../../../assets/localization'
 import {
   getAdditionalEquipment,
   getInitialDeckSetup,

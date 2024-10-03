@@ -1,7 +1,10 @@
-import * as React from 'react'
+import { createContext } from 'react'
 
-import type { ToastProps, ToastType } from '../../atoms/Toast'
-import type { SnackbarProps } from '../../atoms/Snackbar'
+import type {
+  ToastProps,
+  ToastType,
+  SnackbarProps,
+} from '@opentrons/components'
 
 export type MakeToastOptions = Omit<
   ToastProps,
@@ -22,7 +25,7 @@ export interface ToasterContextType {
   makeSnackbar: MakeSnackbar
 }
 
-export const ToasterContext = React.createContext<ToasterContextType>({
+export const ToasterContext = createContext<ToasterContextType>({
   eatToast: () => {},
   makeToast: () => '',
   makeSnackbar: () => {},
