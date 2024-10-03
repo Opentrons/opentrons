@@ -6,7 +6,6 @@ import {
   Icon,
   InputField,
   SPACING,
-  StyledText,
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -14,9 +13,10 @@ import type { FieldProps } from '../../components/StepEditForm/types'
 
 interface InputStepFormFieldProps extends FieldProps {
   title: string
-  units: string
+  units?: string
   padding?: string
   showTooltip?: boolean
+  caption?: string
 }
 
 export function InputStepFormField(
@@ -34,6 +34,7 @@ export function InputStepFormField(
     showTooltip = true,
     padding = SPACING.spacing16,
     tooltipContent,
+    caption,
     ...otherProps
   } = props
   const { t } = useTranslation('tooltip')
@@ -42,9 +43,6 @@ export function InputStepFormField(
   return (
     <Flex flexDirection={DIRECTION_COLUMN} padding={padding}>
       <Flex gridGap={SPACING.spacing8} paddingBottom={SPACING.spacing8}>
-        <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
-          {title}
-        </StyledText>
         {showTooltip ? (
           <>
             <Flex {...targetProps}>
@@ -63,6 +61,8 @@ export function InputStepFormField(
       </Flex>
       <InputField
         {...otherProps}
+        title={title}
+        caption={caption}
         name={name}
         error={errorToShow}
         onBlur={onFieldBlur}

@@ -131,6 +131,7 @@ export function RunningProtocol(): JSX.Element {
     runData: runRecord?.data ?? null,
     robotName,
     analysis: robotSideAnalysis,
+    doorIsOpen: runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   })
 
   useEffect(() => {
@@ -161,7 +162,7 @@ export function RunningProtocol(): JSX.Element {
           protocolAnalysis={robotSideAnalysis}
         />
       ) : null}
-      {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
+      {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR && !showIntervention ? (
         <OpenDoorAlertModal />
       ) : null}
       {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
@@ -177,7 +178,7 @@ export function RunningProtocol(): JSX.Element {
       >
         {robotSideAnalysis != null ? (
           <StepMeter
-            totalSteps={totalIndex != null ? totalIndex : 0}
+            totalSteps={totalIndex ?? 0}
             currentStep={
               currentRunCommandIndex != null
                 ? Number(currentRunCommandIndex) + 1

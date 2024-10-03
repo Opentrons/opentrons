@@ -11,14 +11,16 @@ import {
   ToggleGroup,
 } from '@opentrons/components'
 import { getUnsavedForm } from '../../../step-forms/selectors'
+import { getSelectedSubstep } from '../../../ui/steps/selectors'
 import { DeckSetupContainer } from '../DeckSetup'
 import { OffDeck } from '../Offdeck'
-import { TimelineToolbox } from './Timeline'
+import { TimelineToolbox, SubstepsToolbox } from './Timeline'
 import { StepForm } from './StepForm'
 
 export function ProtocolSteps(): JSX.Element {
   const { t } = useTranslation(['starting_deck_state'])
   const formData = useSelector(getUnsavedForm)
+  const selectedSubstep = useSelector(getSelectedSubstep)
   const leftString = t('onDeck')
   const rightString = t('offDeck')
   const [deckView, setDeckView] = useState<
@@ -35,6 +37,7 @@ export function ProtocolSteps(): JSX.Element {
 
   return (
     <>
+      {selectedSubstep ? <SubstepsToolbox stepId={selectedSubstep} /> : null}
       <StepForm />
       <Flex
         backgroundColor={COLORS.grey10}
