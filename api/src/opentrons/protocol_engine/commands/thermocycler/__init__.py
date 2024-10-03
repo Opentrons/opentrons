@@ -79,6 +79,8 @@ from .run_extended_profile import (
     RunExtendedProfileResult,
     RunExtendedProfile,
     RunExtendedProfileCreate,
+    ProfileCycle,
+    ProfileStep,
 )
 
 
@@ -145,4 +147,6 @@ __all__ = [
     "RunExtendedProfileResult",
     "RunExtendedProfile",
     "RunExtendedProfileCreate",
+    "ProfileCycle",
+    "ProfileStep",
 ]
