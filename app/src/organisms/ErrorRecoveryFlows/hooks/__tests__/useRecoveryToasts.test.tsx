@@ -45,6 +45,7 @@ describe('useRecoveryToasts', () => {
     mockMakeToast = vi.fn()
     vi.mocked(useToaster).mockReturnValue({ makeToast: mockMakeToast } as any)
     vi.mocked(useCommandTextString).mockReturnValue({
+      kind: 'generic',
       commandText: TEST_COMMAND,
     })
   })
@@ -69,6 +70,7 @@ describe('useRecoveryToasts', () => {
 
   it('should make toast with correct parameters for desktop', () => {
     vi.mocked(useCommandTextString).mockReturnValue({
+      kind: 'generic',
       commandText: TEST_COMMAND,
     })
 
@@ -80,8 +82,8 @@ describe('useRecoveryToasts', () => {
     )
 
     vi.mocked(useCommandTextString).mockReturnValue({
+      kind: 'generic',
       commandText: TEST_COMMAND,
-      stepTexts: undefined,
     })
 
     result.current.makeSuccessToast()
@@ -120,8 +122,8 @@ describe('useRecoveryToasts', () => {
 
   it('should use recoveryToastText when desktopFullCommandText is null', () => {
     vi.mocked(useCommandTextString).mockReturnValue({
+      kind: 'generic',
       commandText: '',
-      stepTexts: undefined,
     })
 
     const { result } = renderHook(() =>
@@ -196,8 +198,8 @@ describe('getStepNumber', () => {
 describe('useRecoveryFullCommandText', () => {
   it('should return the correct command text', () => {
     vi.mocked(useCommandTextString).mockReturnValue({
+      kind: 'generic',
       commandText: TEST_COMMAND,
-      stepTexts: undefined,
     })
 
     const { result } = renderHook(() =>
@@ -213,8 +215,8 @@ describe('useRecoveryFullCommandText', () => {
 
   it('should return null when relevantCmd is null', () => {
     vi.mocked(useCommandTextString).mockReturnValue({
+      kind: 'generic',
       commandText: '',
-      stepTexts: undefined,
     })
 
     const { result } = renderHook(() =>
@@ -242,6 +244,7 @@ describe('useRecoveryFullCommandText', () => {
 
   it('should truncate TC command', () => {
     vi.mocked(useCommandTextString).mockReturnValue({
+      kind: 'thermocycler/runProfile',
       commandText: TC_COMMAND,
       stepTexts: ['step'],
     })

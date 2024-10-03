@@ -1,11 +1,11 @@
 import type { TCRunProfileRunTimeCommand } from '@opentrons/shared-data/command'
-import type { GetCommandTextResult } from '..'
+import type { GetTCRunProfileCommandTextResult } from '..'
 import type { HandlesCommands } from './types'
 
 export function getTCRunProfileCommandText({
   command,
   t,
-}: HandlesCommands<TCRunProfileRunTimeCommand>): GetCommandTextResult {
+}: HandlesCommands<TCRunProfileRunTimeCommand>): GetTCRunProfileCommandTextResult {
   const { profile } = command.params
 
   const stepTexts = profile.map(
@@ -17,8 +17,12 @@ export function getTCRunProfileCommandText({
   )
 
   const startingProfileText = t('tc_starting_profile', {
-    repetitions: Object.keys(stepTexts).length,
+    stepCount: Object.keys(stepTexts).length,
   })
 
-  return { commandText: startingProfileText, stepTexts }
+  return {
+    kind: 'thermocycler/runProfile',
+    commandText: startingProfileText,
+    stepTexts,
+  }
 }

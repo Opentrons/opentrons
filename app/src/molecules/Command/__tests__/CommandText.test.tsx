@@ -822,7 +822,7 @@ describe('CommandText', () => {
       }
     )
     screen.getByText(
-      'Thermocycler starting 2 repetitions of cycle composed of the following steps:'
+      'Thermocycler starting 2 step profile composed of the following:'
     )
     screen.getByText('temperature: 20°C, seconds: 10')
     screen.getByText('temperature: 40°C, seconds: 30')
@@ -854,11 +854,129 @@ describe('CommandText', () => {
       }
     )
     screen.getByText(
-      'Thermocycler starting 2 repetitions of cycle composed of the following steps:'
+      'Thermocycler starting 2 step profile composed of the following:'
     )
     screen.getByText('temperature: 20°C, seconds: 10')
     expect(
       screen.queryByText('temperature: 40°C, seconds: 30')
+    ).not.toBeInTheDocument()
+  })
+  it('renders correct text for thermocycler/runExtendedProfile on Desktop', () => {
+    const mockProfileSteps = [
+      { holdSeconds: 10, celsius: 20 },
+      {
+        repetitions: 10,
+        steps: [
+          { holdSeconds: 15, celsius: 10 },
+          { holdSeconds: 12, celsius: 11 },
+        ],
+      },
+      { holdSeconds: 30, celsius: 40 },
+      {
+        repetitions: 9,
+        steps: [
+          { holdSeconds: 13, celsius: 12 },
+          { holdSeconds: 14, celsius: 13 },
+        ],
+      },
+    ]
+    renderWithProviders(
+      <CommandText
+        command={{
+          commandType: 'thermocycler/runExtendedProfile',
+          params: { profile: mockProfileSteps, moduleId: 'abc123' },
+          id: 'def456',
+          result: {},
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        commandTextData={mockCommandTextData}
+        robotType={FLEX_ROBOT_TYPE}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )
+    screen.getByText(
+      'Thermocycler starting 4 element profile composed of the following elements:'
+    )
+    screen.getByText('temperature: 20°C, seconds: 10')
+    screen.getByText('A cycle of 10 repetitions of the following steps:')
+    screen.getByText('temperature: 10°C, seconds: 15')
+    screen.getByText('temperature: 11°C, seconds: 12')
+    screen.getByText('temperature: 40°C, seconds: 30')
+    screen.getByText('A cycle of 9 repetitions of the following steps:')
+    screen.getByText('temperature: 12°C, seconds: 13')
+    screen.getByText('temperature: 13°C, seconds: 14')
+  })
+  it('renders correct text for thermocycler/runExtendedProfile on ODD', () => {
+    const mockProfileSteps = [
+      { holdSeconds: 10, celsius: 20 },
+      {
+        repetitions: 10,
+        steps: [
+          { holdSeconds: 15, celsius: 10 },
+          { holdSeconds: 12, celsius: 11 },
+        ],
+      },
+      { holdSeconds: 30, celsius: 40 },
+      {
+        repetitions: 9,
+        steps: [
+          { holdSeconds: 13, celsius: 12 },
+          { holdSeconds: 14, celsius: 13 },
+        ],
+      },
+    ]
+    renderWithProviders(
+      <CommandText
+        command={{
+          commandType: 'thermocycler/runExtendedProfile',
+          params: { profile: mockProfileSteps, moduleId: 'abc123' },
+          id: 'def456',
+          result: {},
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        commandTextData={mockCommandTextData}
+        robotType={FLEX_ROBOT_TYPE}
+        isOnDevice={true}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )
+    screen.getByText(
+      'Thermocycler starting 4 element profile composed of the following elements:'
+    )
+    screen.getByText('temperature: 20°C, seconds: 10')
+
+    expect(
+      screen.queryByText('A cycle of 10 repetitions of the following steps:')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('temperature: 10°C, seconds: 15')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('temperature: 11°C, seconds: 12')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('temperature: 40°C, seconds: 30')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('A cycle of 9 repetitions of the following steps:')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('temperature: 12°C, seconds: 13')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('temperature: 13°C, seconds: 14')
     ).not.toBeInTheDocument()
   })
   it('renders correct text for heaterShaker/setAndWaitForShakeSpeed', () => {
