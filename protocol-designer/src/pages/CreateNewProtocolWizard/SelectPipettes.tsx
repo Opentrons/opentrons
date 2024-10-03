@@ -111,6 +111,12 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
     (page === 'add' && pipettesByMount[defaultMount].tiprackDefURI == null) ||
     noPipette
 
+  const targetPipetteMount =
+    pipettesByMount.left.pipetteName == null ||
+    pipettesByMount.left.tiprackDefURI == null
+      ? 'left'
+      : 'right'
+
   const handleProceed = (): void => {
     if (!isDisabled) {
       if (page === 'overview') {
@@ -441,71 +447,74 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                 )}
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-                {pipettesByMount.left.pipetteName != null &&
-                pipettesByMount.left.tiprackDefURI != null ? (
-                  <PipetteInfoItem
-                    mount="left"
-                    pipetteName={
-                      pipettesByMount.left.pipetteName as PipetteName
-                    }
-                    tiprackDefURIs={pipettesByMount.left.tiprackDefURI}
-                    editClick={() => {
-                      setPage('add')
-                      setMount('left')
-                    }}
-                    cleanForm={() => {
-                      setValue(`pipettesByMount.left.pipetteName`, undefined)
-                      setValue(`pipettesByMount.left.tiprackDefURI`, undefined)
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing4}
+                >
+                  {pipettesByMount.left.pipetteName != null &&
+                  pipettesByMount.left.tiprackDefURI != null ? (
+                    <PipetteInfoItem
+                      mount="left"
+                      pipetteName={
+                        pipettesByMount.left.pipetteName as PipetteName
+                      }
+                      tiprackDefURIs={pipettesByMount.left.tiprackDefURI}
+                      editClick={() => {
+                        setPage('add')
+                        setMount('left')
+                      }}
+                      cleanForm={() => {
+                        setValue(`pipettesByMount.left.pipetteName`, undefined)
+                        setValue(
+                          `pipettesByMount.left.tiprackDefURI`,
+                          undefined
+                        )
 
-                      resetFields()
-                    }}
-                  />
-                ) : (
-                  <EmptySelectorButton
-                    onClick={() => {
-                      setPage('add')
-                      setMount('left')
-                      resetFields()
-                    }}
-                    text={t('add_pipette')}
-                    textAlignment="left"
-                    iconName="plus"
-                  />
-                )}
-                {pipettesByMount.right.pipetteName != null &&
-                pipettesByMount.right.tiprackDefURI != null ? (
-                  <PipetteInfoItem
-                    mount="right"
-                    pipetteName={
-                      pipettesByMount.right.pipetteName as PipetteName
-                    }
-                    tiprackDefURIs={pipettesByMount.right.tiprackDefURI}
-                    editClick={() => {
-                      setPage('add')
-                      setMount('right')
-                    }}
-                    cleanForm={() => {
-                      setValue(`pipettesByMount.right.pipetteName`, undefined)
-                      setValue(`pipettesByMount.right.tiprackDefURI`, undefined)
-                      resetFields()
-                    }}
-                  />
-                ) : has96Channel ||
-                  (pipettesByMount.left.pipetteName == null &&
-                    pipettesByMount.right.pipetteName == null) ||
-                  (pipettesByMount.left.tiprackDefURI == null &&
-                    pipettesByMount.right.tiprackDefURI == null) ? null : (
-                  <EmptySelectorButton
-                    onClick={() => {
-                      setPage('add')
-                      setMount('right')
-                      resetFields()
-                    }}
-                    text={t('add_pipette')}
-                    textAlignment="left"
-                    iconName="plus"
-                  />
-                )}
+                        resetFields()
+                      }}
+                    />
+                  ) : null}
+                  {pipettesByMount.right.pipetteName != null &&
+                  pipettesByMount.right.tiprackDefURI != null ? (
+                    <PipetteInfoItem
+                      mount="right"
+                      pipetteName={
+                        pipettesByMount.right.pipetteName as PipetteName
+                      }
+                      tiprackDefURIs={pipettesByMount.right.tiprackDefURI}
+                      editClick={() => {
+                        setPage('add')
+                        setMount('right')
+                      }}
+                      cleanForm={() => {
+                        setValue(`pipettesByMount.right.pipetteName`, undefined)
+                        setValue(
+                          `pipettesByMount.right.tiprackDefURI`,
+                          undefined
+                        )
+                        resetFields()
+                      }}
+                    />
+                  ) : null}
+                </Flex>
+                <>
+                  {has96Channel ||
+                  (pipettesByMount.left.pipetteName != null &&
+                    pipettesByMount.right.pipetteName != null &&
+                    pipettesByMount.left.tiprackDefURI != null &&
+                    pipettesByMount.right.tiprackDefURI != null) ? null : (
+                    <EmptySelectorButton
+                      onClick={() => {
+                        setPage('add')
+                        setMount(targetPipetteMount)
+                        resetFields()
+                      }}
+                      text={t('add_pipette')}
+                      textAlignment="left"
+                      iconName="plus"
+                    />
+                  )}
+                </>
               </Flex>
             </Flex>
           )}
