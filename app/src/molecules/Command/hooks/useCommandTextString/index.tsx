@@ -8,7 +8,7 @@ import type { GetDirectTranslationCommandText } from './utils/getDirectTranslati
 import type {
   TCProfileStepText,
   TCProfileCycleText,
-} from './utils/getTCRunExtendedProfile'
+} from './utils/getTCRunExtendedProfileCommandText'
 
 export interface UseCommandTextStringParams {
   command: RunTimeCommand | null
