@@ -18,7 +18,7 @@ vi.mock('../../shared', async () => {
   const actual = await vi.importActual('../../shared')
   return {
     ...actual,
-    ReplaceTips: vi.fn(() => <div>MOCK_REPLACE_TIPS</div>),
+    TwoColLwInfoAndDeck: vi.fn(() => <div>MOCK_REPLACE_TIPS</div>),
     SelectTips: vi.fn(() => <div>MOCK_SELECT_TIPS</div>),
   }
 })

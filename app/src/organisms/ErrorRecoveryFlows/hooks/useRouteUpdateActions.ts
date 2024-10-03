@@ -14,6 +14,11 @@ import type {
 import type { UseRecoveryTakeoverResult } from './useRecoveryTakeover'
 import type { UseShowDoorInfoResult } from './useShowDoorInfo'
 
+const GRIPPER_MOVE_STEPS: RouteStep[] = [
+  RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_RELEASE_LABWARE,
+  RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_RELEASE_LABWARE,
+]
+
 export interface GetRouteUpdateActionsParams {
   hasLaunchedRecovery: boolean
   toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
@@ -104,10 +109,10 @@ export function useRouteUpdateActions(
   )
 
   // If the door is permitted on the current step, but the robot is about to move, we need to manually redirect users
-  // to the door modal.
+  // to the door modal unless the step is specifically a gripper jaw release step.
   const checkDoorStatus = useCallback((): Promise<void> => {
     return new Promise((resolve, reject) => {
-      if (isDoorOpen) {
+      if (isDoorOpen && !GRIPPER_MOVE_STEPS.includes(currentStep)) {
         stashedMapRef.current = { route: currentRoute, step: currentStep }
 
         setRecoveryMap({

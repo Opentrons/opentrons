@@ -381,6 +381,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     ),
   },
   profileVolume: {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
     getErrors: composeErrors(
       minFieldValue(MIN_TC_PROFILE_VOLUME),
       maxFieldValue(MAX_TC_PROFILE_VOLUME)
