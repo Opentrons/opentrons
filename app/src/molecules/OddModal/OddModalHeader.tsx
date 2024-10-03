@@ -34,7 +34,7 @@ export function OddModalHeader(props: OddModalHeaderBaseProps): JSX.Element {
       borderRadius={`${BORDERS.borderRadius12} ${BORDERS.borderRadius12} 0px 0px`}
       {...styleProps}
     >
-      <Flex flexDirection={DIRECTION_ROW}>
+      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
         {iconName != null && iconColor != null ? (
           <Icon
             aria-label={`icon_${iconName}`}
@@ -42,7 +42,6 @@ export function OddModalHeader(props: OddModalHeaderBaseProps): JSX.Element {
             color={iconColor}
             size="2rem"
             alignSelf={ALIGN_CENTER}
-            marginRight={SPACING.spacing16}
           />
         ) : null}
         <LegacyStyledText

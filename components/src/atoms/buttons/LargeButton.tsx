@@ -48,6 +48,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     ...buttonProps
   } = props
 
+  const computedDisabled = disabled || ariaDisabled
+
   const LARGE_BUTTON_PROPS_BY_TYPE: Record<
     LargeButtonTypes,
     {
@@ -157,9 +159,9 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
   // In order to keep button sizes consistent and expected, all large button types need an outline.
   // The outline color is always the same as the background color unless the background color is uniquely different
   // from the outline.
-  const computedOutlineStyle = (): string => {
-    const outlineColor = (): string => {
-      if (disabled) {
+  const computedBorderStyle = (): string => {
+    const borderColor = (): string => {
+      if (computedDisabled) {
         return LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor
       } else if (buttonType === 'alertStroke') {
         return LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor
@@ -171,7 +173,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     const calculatedBorderRadius =
       buttonType === 'stroke' ? BORDERS.borderRadius2 : BORDERS.borderRadius4
 
-    return `${calculatedBorderRadius} solid ${outlineColor()}`
+    return `${calculatedBorderRadius} solid ${borderColor()}`
   }
 
   const LARGE_BUTTON_STYLE = css`
@@ -184,7 +186,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     text-align: ${TYPOGRAPHY.textAlignLeft};
     border-radius: ${BORDERS.borderRadiusFull};
     align-items: ${ALIGN_CENTER};
-    border: ${computedOutlineStyle()};
+    border: ${computedBorderStyle()};
 
     &:active {
       background-color: ${
@@ -203,7 +205,9 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       };
 
       border: ${
-        buttonType === 'stroke' ? `2px solid ${COLORS.blue55}` : 'none'
+        buttonType === 'stroke'
+          ? `2px solid ${COLORS.blue55}`
+          : `${computedBorderStyle()}`
       };
     }
 
@@ -237,14 +241,14 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
 
       &:active {
         background-color: ${
-          disabled
+          computedDisabled
             ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
             : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor
         };
-        ${!disabled && activeColorFor(buttonType)};
+        ${!computedDisabled && activeColorFor(buttonType)};
         outline: ${BORDERS.borderRadius4} solid
           ${
-            disabled
+            computedDisabled
               ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
               : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor
           };
@@ -255,15 +259,15 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
 
       &:focus-visible {
         background-color: ${
-          disabled
+          computedDisabled
             ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
             : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].focusVisibleBackgroundColor
         };
-        ${!disabled && activeColorFor(buttonType)};
+        ${!computedDisabled && activeColorFor(buttonType)};
         padding: calc(${SPACING.spacing24} + ${SPACING.spacing2});
-        border: ${SPACING.spacing2} solid ${COLORS.transparent};
+        border: ${computedBorderStyle()};
         outline: ${
-          disabled
+          computedDisabled
             ? 'none'
             : `3px solid
     ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].focusVisibleOutlineColor}`
@@ -280,7 +284,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       }
   `
 
-  const appliedIconColor = disabled
+  const appliedIconColor = computedDisabled
     ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledIconColor
     : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
 
@@ -309,7 +313,6 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
           aria-label={`${iconName} icon`}
           color={appliedIconColor}
           css={ICON_STYLE}
-          id="btn-icon"
         />
       ) : null}
     </Btn>

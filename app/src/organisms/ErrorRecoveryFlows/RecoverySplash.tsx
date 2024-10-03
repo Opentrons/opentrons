@@ -202,7 +202,7 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
             onClick={onCancelClick}
             buttonText={t('cancel_run')}
             iconName="remove"
-            disabled={isDisabled()}
+            ariaDisabled={isDisabled()}
             buttonType="alertAlt"
           />
           <LargeButton
@@ -210,7 +210,7 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
             onClick={onLaunchERClick}
             buttonText={t('launch_recovery_mode')}
             iconName="recovery"
-            disabled={isDisabled()}
+            ariaDisabled={isDisabled()}
             buttonType="alertStroke"
           />
         </Flex>
