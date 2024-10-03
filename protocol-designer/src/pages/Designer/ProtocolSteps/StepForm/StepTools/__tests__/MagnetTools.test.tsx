@@ -84,11 +84,10 @@ describe('MagnetTools', () => {
     screen.getByText('Module')
     screen.getByText('mock name')
     screen.getByText('Magnet action')
-    screen.getByText('Engage')
+    const toggleButton = screen.getByRole('switch', { name: 'Engage' })
     screen.getByText('Engage height')
     screen.getByText('Must be between -2.5 mm to 25 mm.')
 
-    const toggleButton = screen.getByRole('switch')
     fireEvent.click(toggleButton)
     expect(props.propsForFields.magnetAction.updateValue).toHaveBeenCalled()
   })
