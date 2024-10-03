@@ -125,7 +125,7 @@ export function getRelevantFailedLabwareCmdFrom({
     case ERROR_KINDS.GENERAL_ERROR:
       return null
     default:
-      console.warn(
+      console.error(
         'No labware associated with failed command. Handle case explicitly.'
       )
       return null

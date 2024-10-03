@@ -64,7 +64,7 @@ export function RunHeaderBannerContainer(
       ) : null}
       {showDoorOpenDuringRunBanner ? (
         <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
-          {t('close_door_to_resume')}
+          {t('close_door_to_resume_run')}
         </Banner>
       ) : null}
       {terminalBannerType != null ? (

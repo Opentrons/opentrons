@@ -23,6 +23,8 @@ import {
   SkipStepNewTips,
   SkipStepSameTips,
   IgnoreErrorSkipStep,
+  ManualReplaceLwAndRetry,
+  ManualMoveLwAndSkip,
 } from '../RecoveryOptions'
 import { RecoveryInProgress } from '../RecoveryInProgress'
 import { RecoveryError } from '../RecoveryError'
@@ -171,7 +173,7 @@ describe('ErrorRecoveryContent', () => {
     ROBOT_SKIPPING_STEP,
     RETRY_NEW_TIPS,
     RETRY_SAME_TIPS,
-    FILL_MANUALLY_AND_SKIP,
+    MANUAL_FILL_AND_SKIP,
     SKIP_STEP_WITH_SAME_TIPS,
     SKIP_STEP_WITH_NEW_TIPS,
     IGNORE_AND_SKIP,
@@ -179,6 +181,9 @@ describe('ErrorRecoveryContent', () => {
     DROP_TIP_FLOWS,
     ERROR_WHILE_RECOVERING,
     ROBOT_DOOR_OPEN,
+    ROBOT_RELEASING_LABWARE,
+    MANUAL_REPLACE_AND_RETRY,
+    MANUAL_MOVE_AND_SKIP,
   } = RECOVERY_MAP
 
   let props: React.ComponentProps<typeof ErrorRecoveryContent>
@@ -203,6 +208,12 @@ describe('ErrorRecoveryContent', () => {
       <div>MOCK_SKIP_STEP_SAME_TIPS</div>
     )
     vi.mocked(SkipStepNewTips).mockReturnValue(<div>MOCK_STEP_NEW_TIPS</div>)
+    vi.mocked(ManualReplaceLwAndRetry).mockReturnValue(
+      <div>MOCK_REPLACE_LW_AND_RETRY</div>
+    )
+    vi.mocked(ManualMoveLwAndSkip).mockReturnValue(
+      <div>MOCK_MOVE_LW_AND_SKIP</div>
+    )
     vi.mocked(IgnoreErrorSkipStep).mockReturnValue(
       <div>MOCK_IGNORE_ERROR_SKIP_STEP</div>
     )
@@ -228,7 +239,7 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_RESUME_RUN')
   })
 
-  it(`returns ManageTips when the route is ${DROP_TIP_FLOWS.ROUTE}`, () => {
+  it(`returns appropriate view when the route is ${DROP_TIP_FLOWS.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
@@ -241,7 +252,7 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_DROP_TIP_FLOWS')
   })
 
-  it(`returns CancelRun when the route is ${CANCEL_RUN.ROUTE}`, () => {
+  it(`returns appropriate view when the route is ${CANCEL_RUN.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
@@ -254,7 +265,7 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_CANCEL_RUN')
   })
 
-  it(`returns RetryNewTips when the route is ${RETRY_NEW_TIPS.ROUTE}`, () => {
+  it(`returns appropriate view when the route is ${RETRY_NEW_TIPS.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
@@ -267,7 +278,7 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_RETRY_NEW_TIPS')
   })
 
-  it(`returns RetrySameTips when the route is ${RETRY_SAME_TIPS.ROUTE}`, () => {
+  it(`returns appropriate view when the route is ${RETRY_SAME_TIPS.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
@@ -280,12 +291,12 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_RETRY_SAME_TIPS')
   })
 
-  it(`returns RetrySameTips when the route is ${FILL_MANUALLY_AND_SKIP.ROUTE}`, () => {
+  it(`returns appropriate view when the route is ${MANUAL_FILL_AND_SKIP.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        route: FILL_MANUALLY_AND_SKIP.ROUTE,
+        route: MANUAL_FILL_AND_SKIP.ROUTE,
       },
     }
     renderRecoveryContent(props)
@@ -293,7 +304,7 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_FILL_WELL_AND_SKIP')
   })
 
-  it(`returns RetrySameTips when the route is ${SKIP_STEP_WITH_SAME_TIPS.ROUTE}`, () => {
+  it(`returns appropriate view when the route is ${SKIP_STEP_WITH_SAME_TIPS.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
@@ -306,7 +317,7 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_SKIP_STEP_SAME_TIPS')
   })
 
-  it(`returns RetrySameTips when the route is ${SKIP_STEP_WITH_NEW_TIPS.ROUTE}`, () => {
+  it(`returns appropriate view when the route is ${SKIP_STEP_WITH_NEW_TIPS.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
@@ -319,7 +330,7 @@ describe('ErrorRecoveryContent', () => {
     screen.getByText('MOCK_STEP_NEW_TIPS')
   })
 
-  it(`returns RetrySameTips when the route is ${IGNORE_AND_SKIP.ROUTE}`, () => {
+  it(`returns appropriate view when the route is ${IGNORE_AND_SKIP.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
@@ -330,6 +341,32 @@ describe('ErrorRecoveryContent', () => {
     renderRecoveryContent(props)
 
     screen.getByText('MOCK_IGNORE_ERROR_SKIP_STEP')
+  })
+
+  it(`returns appropriate view when the route is ${MANUAL_MOVE_AND_SKIP.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: MANUAL_MOVE_AND_SKIP.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_MOVE_LW_AND_SKIP')
+  })
+
+  it(`returns appropriate view when the route is ${MANUAL_REPLACE_AND_RETRY.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: MANUAL_REPLACE_AND_RETRY.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
   })
 
   it(`returns RecoveryError when the route is ${ERROR_WHILE_RECOVERING.ROUTE}`, () => {
@@ -416,6 +453,19 @@ describe('ErrorRecoveryContent', () => {
       recoveryMap: {
         ...props.recoveryMap,
         route: ROBOT_SKIPPING_STEP.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_IN_PROGRESS')
+  })
+
+  it(`returns RecoveryInProgressModal when the route is ${ROBOT_RELEASING_LABWARE.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: ROBOT_RELEASING_LABWARE.ROUTE,
       },
     }
     renderRecoveryContent(props)
