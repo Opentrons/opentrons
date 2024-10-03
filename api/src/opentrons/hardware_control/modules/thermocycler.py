@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Callable, Optional, List, Dict, Mapping
+from typing import Callable, Optional, List, Dict, Mapping, Union, cast
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import ThermocyclerLidStatus, Temperature, PlateTemperature
 from opentrons.hardware_control.modules.lid_temp_status import LidTemperatureStatus
@@ -363,6 +363,39 @@ class Thermocycler(mod_abc.AbstractModule):
         self.make_cancellable(task)
         await task
 
+    async def execute_profile(
+        self,
+        profile: List[Union[types.ThermocyclerCycle, types.ThermocyclerStep]],
+        volume: Optional[float] = None,
+    ) -> None:
+        """Begin a set temperature profile, with both repeating and non-repeating steps.
+
+        Args:
+            profile: The temperature profile to follow.
+            volume: Optional volume
+
+        Returns: None
+        """
+        await self.wait_for_is_running()
+        self._total_cycle_count = 0
+        self._total_step_count = 0
+        self._current_cycle_index = 0
+        self._current_step_index = 0
+        for step_or_cycle in profile:
+            if "steps" in step_or_cycle:
+                # basically https://github.com/python/mypy/issues/14766
+                this_cycle = cast(types.ThermocyclerCycle, step_or_cycle)
+                self._total_cycle_count += this_cycle["repetitions"]
+                self._total_step_count += (
+                    len(this_cycle["steps"]) * this_cycle["repetitions"]
+                )
+            else:
+                self._total_step_count += 1
+                self._total_cycle_count += 1
+        task = self._loop.create_task(self._execute_profile(profile, volume))
+        self.make_cancellable(task)
+        await task
+
     async def set_lid_temperature(self, temperature: float) -> None:
         """Set the lid temperature in degrees Celsius"""
         await self.wait_for_is_running()
@@ -574,7 +607,7 @@ class Thermocycler(mod_abc.AbstractModule):
         self,
         steps: List[types.ThermocyclerStep],
         repetitions: int,
-        volume: Optional[float] = None,
+        volume: Optional[float],
     ) -> None:
         """
         Execute cycles.
@@ -591,6 +624,30 @@ class Thermocycler(mod_abc.AbstractModule):
             for step_idx, step in enumerate(steps):
                 self._current_step_index = step_idx + 1  # science starts at 1
                 await self._execute_cycle_step(step, volume)
+
+    async def _execute_profile(
+        self,
+        profile: List[Union[types.ThermocyclerCycle, types.ThermocyclerStep]],
+        volume: Optional[float],
+    ) -> None:
+        """
+        Execute profiles.
+
+        Profiles command a thermocycler pattern that can contain multiple cycles and out-of-cycle steps.
+        """
+        self._current_cycle_index = 0
+        self._current_step_index = 0
+        for step_or_cycle in profile:
+            self._current_cycle_index += 1
+            if "repetitions" in step_or_cycle:
+                # basically https://github.com/python/mypy/issues/14766
+                this_cycle = cast(types.ThermocyclerCycle, step_or_cycle)
+                for rep in range(this_cycle["repetitions"]):
+                    for step in this_cycle["steps"]:
+                        self._current_step_index += 1
+                        await self._execute_cycle_step(step, volume)
+            else:
+                await self._execute_cycle_step(step_or_cycle, volume)
 
     # TODO(mc, 2022-10-13): why does this exist?
     # Do the driver and poller really need to be disconnected?
