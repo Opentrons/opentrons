@@ -1,12 +1,15 @@
 """Measure Liquid Height."""
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Any
 from opentrons.protocol_api import (
     ProtocolContext,
     Labware,
     Well,
     InstrumentContext,
+    Parameters
 )
 from opentrons.types import Point
+from abr_testing.automation import google_sheets_tool
+
 
 ###########################################
 #  VARIABLES - START
@@ -35,6 +38,45 @@ SLOT_LABWARE = "D1"
 SLOT_RESERVOIR = "C1"
 SLOT_DIAL = "B3"
 
+def add_parameters(parameters: Parameters):
+    parameters.add_float(
+        variable_name = "dispense_flow_rate",
+        display_name = "Dispense Flow Rate",
+        description = "Blow Out Flow rate for dispense",
+        choices = [
+            {"display_name": "718", "value": 718.0},
+            {"display_name": "500", "value": 500.0},
+            {"display_name": "600", "value": 600.0},
+            {"display_name": "800", "value": 800.0}
+            ],
+        default = 718
+    )
+    parameters.add_float(
+        variable_name = "dispense_from_bottom",
+        display_name = "Dispense from Bottom",
+        description = "Disp distance from bottom (mm)",
+        choices  = [
+            {"display_name": "2", "value": 2.0},
+            {"display_name": "2.5", "value": 2.5},
+            {"display_name": "1.5", "value": 1.5},
+            {"display_name": "1", "value": 1},
+            
+        ],
+        default = 2.0
+    )
+    parameters.add_str(
+        variable_name = "probe_yes_or_no",
+        display_name = "Probe (Y/N)",
+        description = "Find Liquid height?",
+        choices = [
+            {"display_name": "Yes", "value": "yes"},
+            {"display_name": "No", "value": "no"},
+            
+        ],
+        default = "yes"
+    )
+
+
 ###########################################
 #  VARIABLES - END
 ###########################################
@@ -59,6 +101,18 @@ FILE_NAME = ""
 CSV_HEADER = ["trial", "volume", "height", "tip-z-error", "corrected-height"]
 CSV_SEPARATOR = ","
 
+def _set_up_google_sheet(
+    ctx: ProtocolContext, header: List[List[str]]
+) -> Optional[Tuple[google_sheets_tool.google_sheet, str, int]]:
+    """Connect to google sheet using credentials file in jupyter notebook."""
+    if ctx.is_simulating():
+        return None
+    credentials_path = "/var/lib/jupyter/notebooks/abr.json"
+    google_sheet = google_sheets_tool.google_sheet(
+        credentials_path, "Liquid Height Testing", tab_number=0
+    )
+    ctx.comment("Connected to the google sheet.")
+    return google_sheet
 
 def _setup(
     ctx: ProtocolContext,
@@ -70,6 +124,7 @@ def _setup(
     Labware,
     Labware,
     Labware,
+    Any
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME
     # TODO: use runtime-variables instead of constants
@@ -89,6 +144,7 @@ def _setup(
     labware = ctx.load_labware(LABWARE, SLOT_LABWARE)
     dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
 
+    google_sheet = None
     if not ctx.is_simulating() and DIAL_PORT is None:
         from hardware_testing.data import create_file_name, create_run_id
         from hardware_testing.drivers.mitutoyo_digimatic_indicator import (
@@ -105,6 +161,14 @@ def _setup(
         _write_line_to_csv(ctx, [liquid_pip_name])
         _write_line_to_csv(ctx, [liquid_rack_name])
         _write_line_to_csv(ctx, [LABWARE])
+        header = ["Run ID",	"Volume", "Dispense from Bottom", "Dispense Flow Rate",	"Trial 1",	"Trial 2", "Trial 3",	"Trial 4",	"Trial 5",	"Trial 6",	"Trial 7",	"Trial 8", "Trial 9","Trial 10", "Trial 11", "Trial 12", "Min Height","Max Height","Average Variance"]
+        try:
+            res = _set_up_google_sheet(ctx, header)
+            if res:
+                google_sheet = res
+                ctx.comment("google sheet connected")
+        except google_sheets_tool.google_interaction_error:
+            ctx.comment("Did not connect to google sheet.")
     return (
         liquid_pipette,
         liquid_rack,
@@ -113,6 +177,7 @@ def _setup(
         labware,
         reservoir,
         dial,
+        google_sheet,
     )
 
 
@@ -124,6 +189,15 @@ def _write_line_to_csv(ctx: ProtocolContext, line: List[str]) -> None:
     line_str = f"{CSV_SEPARATOR.join(line)}\n"
     append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
 
+def _write_line_to_google_sheet(
+    ctx: ProtocolContext,
+    google_sheet: Any,
+    line: List[Any],
+) -> None:
+    try:
+        google_sheet.write_to_row(line)
+    except Exception as e:
+        ctx.comment(f"Google sheet not updated. Error {e}.")
 
 def _get_test_wells(labware: Labware, channels: int) -> List[Well]:
     return [labware[w] for w in TEST_WELLS[channels][labware.load_name]]
@@ -208,6 +282,9 @@ def _test_for_finding_liquid_height(
     probing_tips: List[Well],
     src_well: Well,
     wells: List[Well],
+    dispense_from_bottom: float,
+    probe_yes_or_no: str,
+    google_sheet: Any, 
 ) -> None:
     assert len(liquid_tips) == len(
         probing_tips
@@ -216,44 +293,71 @@ def _test_for_finding_liquid_height(
         wells
     ), f"{len(liquid_tips)},{len(wells)}"
     trial_counter = 0
-    _store_dial_baseline(ctx, probing_pipette, dial)
+    if probe_yes_or_no == "yes":
+        _store_dial_baseline(ctx, probing_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
     all_corrected_heights: List[float] = []
-
+    corrected_height_list = []
     for liq_tip, probe_tip, well in zip(liquid_tips, probing_tips, wells):
         trial_counter += 1
+        if trial_counter == 1:
+            corrected_height_list.append(RUN_ID)
+            corrected_height_list.append(volume)
         # pickup probing tip, then measure Z-error
-        probing_pipette.pick_up_tip(probe_tip)
-        tip_z_error = _get_tip_z_error(ctx, probing_pipette, dial)
+        if probe_yes_or_no == "yes":
+            probing_pipette.pick_up_tip(probe_tip)
+            tip_z_error = _get_tip_z_error(ctx, probing_pipette, dial)
+        else:
+            tip_z_error = 0
         # pickup liquid tip, then immediately transfer liquid
         liquid_pipette.pick_up_tip(liq_tip)
         liquid_pipette.aspirate(volume, src_well.bottom(ASPIRATE_MM_FROM_BOTTOM))
-        liquid_pipette.dispense(volume, well.bottom(DISPENSE_MM_FROM_BOTTOM))
-        liquid_pipette.blow_out(well.top()).prepare_to_aspirate()
+        liquid_pipette.dispense(volume, well.bottom(dispense_from_bottom))
+        liquid_pipette.blow_out(well.top(z=-9)).prepare_to_aspirate()
         # get height of liquid
-        height = _get_height_of_liquid_in_well(probing_pipette, well)
+        if probe_yes_or_no == "yes":
+            height = _get_height_of_liquid_in_well(probing_pipette, well)
+        else:
+            height = 0
         corrected_height = height + tip_z_error
         all_corrected_heights.append(corrected_height)
         # drop all tips
         liquid_pipette.drop_tip()
-        probing_pipette.drop_tip()
+        if probe_yes_or_no== "yes":
+            probing_pipette.drop_tip()
         # save data
         trial_data = [trial_counter, volume, height, tip_z_error, corrected_height]
+        corrected_height_list.append(corrected_height)
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
+    dispense_flow_rate = liquid_pipette.flow_rate.dispense 
 
     avg = sum(all_corrected_heights) / len(all_corrected_heights)
     error_mm = (max(all_corrected_heights) - min(all_corrected_heights)) * 0.5
+    corrected_height_list.append(avg)
+    corrected_height_list.append(error_mm)
     error_percent = error_mm / avg if avg else 0.0
+    data_for_google_sheet = [RUN_ID,volume,dispense_from_bottom, dispense_flow_rate]
+    data_for_google_sheet = data_for_google_sheet.extend(corrected_height_list)
+    stats_for_google_sheet = [avg, error_mm, error_percent *100]
+    data_for_google_sheet = data_for_google_sheet.extend(stats_for_google_sheet)
     _write_line_to_csv(ctx, ["average", str(round(avg, 3))])
     _write_line_to_csv(ctx, ["error (mm)", str(round(error_mm, 3))])
     _write_line_to_csv(ctx, ["error (%)", str(round(error_percent * 100, 1))])
+    
+    _write_line_to_google_sheet(ctx, google_sheet, data_for_google_sheet)
 
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""
-    liq_pipette, liq_rack, probe_pipette, probe_rack, labware, reservoir, dial = _setup(
+    liq_pipette, liq_rack, probe_pipette, probe_rack, labware, reservoir, dial, google_sheet = _setup(
         ctx
     )
+    # Parameters
+    dispense_flow_rate = ctx.params.dispense_flow_rate
+    liq_pipette.flow_rate.blow_out = 800
+    liq_pipette.flow_rate.dispense = dispense_flow_rate
+    probe_yes_or_no = ctx.params.probe_yes_or_no
+    dispense_from_bottom = ctx.params.dispense_from_bottom
     test_wells = _get_test_wells(labware, channels=1)
     test_tips_liquid = _get_test_tips(liq_rack, channels=1)
     test_tips_probe = _get_test_tips(probe_rack, channels=1)
@@ -270,6 +374,9 @@ def run(ctx: ProtocolContext) -> None:
             probing_tips=test_tips_probe[:NUM_TRIALS],
             src_well=reservoir["A1"],
             wells=test_wells[:NUM_TRIALS],
+            dispense_from_bottom = dispense_from_bottom,
+            probe_yes_or_no = probe_yes_or_no,
+            google_sheet = google_sheet
         )
         test_wells = test_wells[NUM_TRIALS:]
         test_tips_liquid = test_tips_liquid[NUM_TRIALS:]
