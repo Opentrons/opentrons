@@ -434,10 +434,10 @@ async def put_error_recovery_policy(
         request_body:  Request body with run policies data.
         run_data_manager: Current and historical run data management.
     """
-    policies = request_body.data.policyRules
-    if policies:
+    rules = request_body.data.policyRules
+    if rules:
         try:
-            run_data_manager.set_policies(run_id=runId, policies=policies)
+            run_data_manager.set_error_recovery_rules(run_id=runId, rules=rules)
         except RunNotCurrentError as e:
             raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
 

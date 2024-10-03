@@ -52,8 +52,6 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons_shared_data.labware.types import LabwareUri
 
-from .error_recovery_mapping import default_error_recovery_policy
-
 _log = logging.getLogger(__name__)
 
 
@@ -192,6 +190,7 @@ class RunOrchestratorStore:
         self,
         run_id: str,
         labware_offsets: List[LabwareOffsetCreate],
+        initial_error_recovery_policy: error_recovery_policy.ErrorRecoveryPolicy,
         deck_configuration: DeckConfigurationType,
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
@@ -233,7 +232,7 @@ class RunOrchestratorStore:
                     RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
             ),
-            error_recovery_policy=default_error_recovery_policy,
+            error_recovery_policy=initial_error_recovery_policy,
             load_fixed_trash=load_fixed_trash,
             deck_configuration=deck_configuration,
             notify_publishers=notify_publishers,

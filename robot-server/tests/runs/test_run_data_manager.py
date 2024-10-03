@@ -1117,7 +1117,7 @@ async def test_create_policies_raises_run_not_current(
         "not-current-run-id"
     )
     with pytest.raises(RunNotCurrentError):
-        subject.set_policies(
+        subject.set_error_recovery_rules(
             run_id="run-id", policies=decoy.mock(cls=List[ErrorRecoveryRule])
         )
 
@@ -1144,5 +1144,5 @@ async def test_create_policies_translates_and_calls_orchestrator(
         error_recovery_mapping.create_error_recovery_policy_from_rules(input_rules)
     ).then_return(expected_output)
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("run-id")
-    subject.set_policies(run_id="run-id", policies=input_rules)
+    subject.set_error_recovery_rules(run_id="run-id", policies=input_rules)
     decoy.verify(mock_run_orchestrator_store.set_error_recovery_policy(expected_output))
