@@ -6,12 +6,13 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
+import { updateConfigValue } from '../../../redux/config'
 import { WelcomeModal } from '../WelcomeModal'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 
-vi.mock('../../../redux/config')
 vi.mock('@opentrons/react-api-client')
+vi.mock('../../../redux/config')
 
 const mockFunc = vi.fn()
 const WELCOME_MODAL_IMAGE_NAME = 'welcome_dashboard_modal.png'
@@ -61,6 +62,10 @@ describe('WelcomeModal', () => {
   it('should call a mock function when tapping next button', () => {
     render(props)
     fireEvent.click(screen.getByText('Next'))
+    expect(vi.mocked(updateConfigValue)).toHaveBeenCalledWith(
+      'onDeviceDisplaySettings.unfinishedUnboxingFlowRoute',
+      null
+    )
     expect(props.setShowWelcomeModal).toHaveBeenCalled()
   })
 })
