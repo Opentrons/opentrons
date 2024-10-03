@@ -14,7 +14,7 @@ Welcome to the v8.1.0 release of the Opentrons robot software!
 
 ### Hardware Support
 
-- Latest model of Flex robots (serial numbers beginning `TKTKTK`)
+- Latest production version of Flex robots
 
 ---
 
