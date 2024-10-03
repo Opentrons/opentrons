@@ -31,7 +31,7 @@ _default_aspirate: Dict[str, AspirateSettings] = {
         air_gap=None,
         submerge_mm=-1.5,
         retract_mm=3.0,
-        delay=0.0,  # 1.0 second was barely enough time (b/c viscosity)
+        delay=1.0,
     ),
     _ETHANOL_70: AspirateSettings(
         z_speed=50,
@@ -57,7 +57,7 @@ _default_dispense: Dict[str, DispenseSettings] = {
         push_out=None,
         submerge_mm=-1.5,  # contact dispense
         retract_mm=3.0,
-        delay=0.0,
+        delay=0.5,
     ),
     _ETHANOL_70: DispenseSettings(
         z_speed=50,

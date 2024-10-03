@@ -355,6 +355,8 @@ def _run_trial(
         trial.pipette.move_to(trial.well.top(50).move(trial.channel_offset))
     if not trial.recorder.is_simulator:
         trial.pipette._retract()  # retract to top of gantry
+    else:
+        trial.pipette.move_to(trial.well.top(10))
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
     ui.print_info(f"\tinitial grams: {m_data_init.grams_average} g")
     # update the vials volumes, using the last-known weight
@@ -388,6 +390,8 @@ def _run_trial(
     )
     if not trial.recorder.is_simulator:
         trial.pipette._retract()  # retract to top of gantry
+    else:
+        trial.pipette.move_to(trial.well.top(10))
 
     _take_photos(trial, "aspirate")
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
@@ -411,6 +415,8 @@ def _run_trial(
     )
     if not trial.recorder.is_simulator:
         trial.pipette._retract()  # retract to top of gantry
+    else:
+        trial.pipette.move_to(trial.well.top(10))
     _take_photos(trial, "dispense")
     m_data_dispense = _record_measurement_and_store(MeasurementType.DISPENSE)
     ui.print_info(f"\tgrams after dispense: {m_data_dispense.grams_average} g")
