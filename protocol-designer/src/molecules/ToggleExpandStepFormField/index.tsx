@@ -1,5 +1,6 @@
 import {
   ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
@@ -21,6 +22,7 @@ interface ToggleExpandStepFormFieldProps extends FieldProps {
   offLabel: string
   toggleUpdateValue: (value: unknown) => void
   toggleValue: unknown
+  caption?: string
 }
 export function ToggleExpandStepFormField(
   props: ToggleExpandStepFormFieldProps
@@ -34,8 +36,18 @@ export function ToggleExpandStepFormField(
     units,
     toggleUpdateValue,
     toggleValue,
+    caption,
     ...restProps
   } = props
+
+  const onToggleUpdateValue = (): void => {
+    if (typeof toggleValue === 'boolean') {
+      toggleUpdateValue(!toggleValue)
+    } else if (toggleValue === 'engage' || toggleValue === 'disengage') {
+      const newToggleValue = toggleValue === 'engage' ? 'disengage' : 'engage'
+      toggleUpdateValue(newToggleValue)
+    }
+  }
 
   return (
     <ListItem type="noActive">
@@ -48,21 +60,28 @@ export function ToggleExpandStepFormField(
           <StyledText desktopStyle="bodyDefaultRegular">{title}</StyledText>
           <ToggleButton
             onClick={() => {
-              toggleUpdateValue(!toggleValue)
+              onToggleUpdateValue()
             }}
             label={isSelected ? onLabel : offLabel}
             toggledOn={isSelected}
           />
         </Flex>
-        {isSelected ? (
-          <InputStepFormField
-            {...restProps}
-            padding="0"
-            showTooltip={false}
-            title={fieldTitle}
-            units={units}
-          />
-        ) : null}
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
+          {isSelected ? (
+            <InputStepFormField
+              {...restProps}
+              padding="0"
+              showTooltip={false}
+              title={fieldTitle}
+              units={units}
+            />
+          ) : null}
+          {isSelected && caption != null ? (
+            <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
+              {caption}
+            </StyledText>
+          ) : null}
+        </Flex>
       </Flex>
     </ListItem>
   )
