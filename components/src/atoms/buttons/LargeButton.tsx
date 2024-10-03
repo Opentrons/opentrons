@@ -4,8 +4,7 @@ import { Box, Btn } from '../../primitives'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { LegacyStyledText } from '../../atoms/StyledText'
-import { fontSizeBodyLargeSemiBold } from '../../helix-design-system/product/typography'
+import { StyledText } from '../StyledText'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -162,7 +161,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     };
     cursor: ${CURSOR_POINTER};
     padding: ${SPACING.spacing16} ${SPACING.spacing24};
-    text-align: ${TYPOGRAPHY.textAlignCenter};
+    text-align: ${TYPOGRAPHY.textAlignLeft};
     border-radius: ${BORDERS.borderRadiusFull};
     align-items: ${ALIGN_CENTER};
     border: ${buttonType === 'stroke' ? `2px solid ${COLORS.blue50}` : 'none'};
@@ -224,14 +223,6 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
 
       ${TYPOGRAPHY.pSemiBold}
 
-      #btn-icon: {
-        color: ${
-          disabled
-            ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledIconColor
-            : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
-        };
-      }
-
       &:active {
         background-color: ${
           disabled
@@ -276,6 +267,11 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
         };
       }
   `
+
+  const appliedIconColor = disabled
+    ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledIconColor
+    : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
+
   return (
     <Btn
       type={type}
@@ -286,17 +282,15 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       aria-disabled={ariaDisabled}
       {...buttonProps}
     >
-      <LegacyStyledText
+      <StyledText
+        oddStyle="level3HeaderSemiBold"
+        desktopStyle="bodyLargeSemiBold"
         css={css`
-          font-size: ${fontSizeBodyLargeSemiBold};
           padding-right: ${iconName != null ? SPACING.spacing8 : '0'};
-          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-            ${TYPOGRAPHY.level3HeaderSemiBold}
-          }
         `}
       >
         {buttonText}
-      </LegacyStyledText>
+      </StyledText>
       {iconName ? (
         <Box
           css={css`
@@ -308,7 +302,11 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
             }
           `}
         >
-          <Icon name={iconName} aria-label={`${iconName} icon`} id="btn-icon" />
+          <Icon
+            name={iconName}
+            aria-label={`${iconName} icon`}
+            color={appliedIconColor}
+          />
         </Box>
       ) : null}
     </Btn>
