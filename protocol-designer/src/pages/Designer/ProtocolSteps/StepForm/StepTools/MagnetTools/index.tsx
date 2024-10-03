@@ -1,9 +1,9 @@
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
-  Box,
   COLORS,
   DIRECTION_COLUMN,
+  Divider,
   Flex,
   ListItem,
   SPACING,
@@ -73,7 +73,7 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
           </Flex>
         </ListItem>
       </Flex>
-      <Box borderBottom={`1px solid ${COLORS.grey30}`} />
+      <Divider marginY="0" />
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
         <ToggleExpandStepFormField
           {...propsForFields.engageHeight}
