@@ -182,7 +182,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=50.0,
-                            push_out=3.9,
+                            push_out=2.5,
                             submerge_mm=None,
                             retract_mm=None,
                             delay=None,
