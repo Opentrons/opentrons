@@ -118,8 +118,6 @@ def _get_estop_listener(
 class RunOrchestratorStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
-    _run_orchestrator: Optional[RunOrchestrator] = None
-
     def __init__(
         self,
         hardware_api: HardwareControlAPI,
@@ -137,6 +135,7 @@ class RunOrchestratorStore:
         self._hardware_api = hardware_api
         self._robot_type = robot_type
         self._deck_type = deck_type
+        self._run_orchestrator: Optional[RunOrchestrator] = None
         self._default_run_orchestrator: Optional[RunOrchestrator] = None
         hardware_api.register_callback(_get_estop_listener(self))
 
