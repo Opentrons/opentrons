@@ -1,6 +1,11 @@
 import 'cypress-file-upload'
+import { join } from 'path'
 
-const expectedExportFixture = '../fixtures/generic_1_tiprack_20ul.json'
+const downloadsFolder = Cypress.config('downloadsFolder')
+const downloadFilestem = 'generic_1_tiprack_20ul'
+const downloadFilename = `${downloadFilestem}.json`
+const downloadPath = join(downloadsFolder, downloadFilename)
+const expectedExportFixture = `../fixtures/${downloadFilename}`
 
 describe('Create a Tip Rack', () => {
   before(() => {
@@ -242,19 +247,15 @@ describe('Create a Tip Rack', () => {
     cy.get('input[name="displayName"]')
       .clear()
       .type('Brand Chalu 1 Tip Rack 20ul')
-    cy.get('input[name="loadName"]').clear().type('generic_1_tiprack_20ul')
+    cy.get('input[name="loadName"]').clear().type(downloadFilestem)
 
     // Verify the exported file to the fixture
     cy.get('button').contains('EXPORT FILE').click()
 
     cy.fixture(expectedExportFixture).then(expectedExportLabwareDef => {
-      const downloadsFolder = Cypress.config('downloadsFolder')
-      // this validates the filename and the contents of the file
-      cy.readFile(`${downloadsFolder}/generic_1_tiprack_20ul.json`).then(
-        actualExportLabwareDef => {
-          expect(actualExportLabwareDef).to.deep.equal(expectedExportLabwareDef)
-        }
-      )
+      cy.readFile(downloadPath).then(actualExportLabwareDef => {
+        expect(actualExportLabwareDef).to.deep.equal(expectedExportLabwareDef)
+      })
     })
 
     // 'verify the too big, too small error

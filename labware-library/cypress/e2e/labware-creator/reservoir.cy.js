@@ -1,10 +1,13 @@
-// Scrolling seems wonky, so I disabled checking to see if
-// an element is in view before clicking or checking with
-// { force: true }
+import { join } from 'path'
 
 const flat = 'img[alt*="flat bottom"]'
 const round = 'img[alt*="u shaped"]'
 const v = 'img[alt*="v shaped"]'
+
+const downloadsFolder = Cypress.config('downloadsFolder')
+const downloadFilestem = 'testpro_10_reservoir_250ul'
+const downloadPath = join(downloadsFolder, `${downloadFilestem}.json`)
+const importedLabwareFile = `../fixtures/${downloadFilestem}.json`
 
 context('Reservoirs', () => {
   before(() => {
@@ -203,13 +206,19 @@ context('Reservoirs', () => {
 
       // File info
       cy.get("input[placeholder='TestPro 10 Reservoir 250 µL']").should('exist')
-      cy.get("input[placeholder='testpro_10_reservoir_250ul']").should('exist')
+      cy.get(`input[placeholder='${downloadFilestem}']`).should('exist')
 
       // All fields present
       cy.get('button[class*="_export_button_"]').click({ force: true })
       cy.contains(
         'Please resolve all invalid fields in order to export the labware definition'
       ).should('not.exist')
+      cy.fixture(importedLabwareFile).then(expectedExportLabwareDef => {
+        // this validates the filename and the contents of the file
+        cy.readFile(downloadPath).then(actualExportLabwareDef => {
+          expect(actualExportLabwareDef).to.deep.equal(expectedExportLabwareDef)
+        })
+      })
     })
   })
 })

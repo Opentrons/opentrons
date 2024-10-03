@@ -1,11 +1,14 @@
-// Scrolling seems wonky, so I disabled checking to see if
-// an element is in view before clicking or checking with
-// { force: true }
-const expectedExportFixture = '../fixtures/testpro_24_aluminumblock_10ul.json'
+import { join } from 'path'
 
 const flat = 'img[alt*="flat bottom"]'
 const round = 'img[alt*="u shaped"]'
 const v = 'img[alt*="v shaped"]'
+
+const downloadsFolder = Cypress.config('downloadsFolder')
+const downloadFilestem = 'testpro_24_aluminumblock_10ul'
+const downloadFilename = `${downloadFilestem}.json`
+const downloadPath = join(downloadsFolder, downloadFilename)
+const expectedExportFixture = `../fixtures/${downloadFilename}`
 
 context('Tubes and Block', () => {
   beforeEach(() => {
@@ -582,9 +585,7 @@ context('Tubes and Block', () => {
         cy.get("input[placeholder='TestPro 24 Aluminum Block 10 µL']").should(
           'exist'
         )
-        cy.get("input[placeholder='testpro_24_aluminumblock_10ul']").should(
-          'exist'
-        )
+        cy.get(`input[placeholder='${downloadFilestem}']`).should('exist')
 
         // All fields present
         cy.get('button[class*="_export_button_"]').click({ force: true })
@@ -593,11 +594,7 @@ context('Tubes and Block', () => {
         ).should('not.exist')
 
         cy.fixture(expectedExportFixture).then(expectedExportLabwareDef => {
-          const downloadsFolder = Cypress.config('downloadsFolder')
-          // this validates the filename and the contents of the file
-          cy.readFile(
-            `${downloadsFolder}/testpro_24_aluminumblock_10ul.json`
-          ).then(actualExportLabwareDef => {
+          cy.readFile(downloadPath).then(actualExportLabwareDef => {
             expect(actualExportLabwareDef).to.deep.equal(
               expectedExportLabwareDef
             )

@@ -1,7 +1,3 @@
-// Scrolling seems wonky, so I disabled checking to see if
-// an element is in view before clicking or checking with
-// { force: true }
-
 const flat = 'img[alt*="flat bottom"]'
 const round = 'img[alt*="u shaped"]'
 const v = 'img[alt*="v shaped"]'

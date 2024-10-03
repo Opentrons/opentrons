@@ -1,8 +1,16 @@
+import { join } from 'path'
+
 const importedLabwareFile = 'TestLabwareDefinition.json'
 
 const flat = 'img[alt*="flat bottom"]'
 const round = 'img[alt*="u shaped"]'
 const v = 'img[alt*="v shaped"]'
+
+const downloadsFolder = Cypress.config('downloadsFolder')
+const downloadFilestem = 'testpro_15_wellplate_5ul'
+const downloadFilename = `${downloadFilestem}.json`
+const downloadPath = join(downloadsFolder, downloadFilename)
+const expectedLabwareFile = `../fixtures/${downloadFilename}`
 
 describe('File Import', () => {
   before(() => {
@@ -72,7 +80,7 @@ describe('File Import', () => {
 
     // File info
     cy.get("input[placeholder='TestPro 15 Well Plate 5 µL']").should('exist')
-    cy.get("input[placeholder='testpro_15_wellplate_5ul']").should('exist')
+    cy.get(`input[placeholder='${downloadFilestem}']`).should('exist')
 
     // All fields present
     cy.get('button[class*="_export_button_"]').click({ force: true })
@@ -80,14 +88,10 @@ describe('File Import', () => {
       'Please resolve all invalid fields in order to export the labware definition'
     ).should('not.exist')
 
-    cy.fixture(importedLabwareFile).then(expectedExportLabwareDef => {
-      const downloadsFolder = Cypress.config('downloadsFolder')
-      // this validates the filename and the contents of the file
-      cy.readFile(`${downloadsFolder}/testpro_15_wellplate_5ul.json`).then(
-        actualExportLabwareDef => {
-          expect(actualExportLabwareDef).to.deep.equal(expectedExportLabwareDef)
-        }
-      )
+    cy.fixture(expectedLabwareFile).then(expectedExportLabwareDef => {
+      cy.readFile(downloadPath).then(actualExportLabwareDef => {
+        expect(actualExportLabwareDef).to.deep.equal(expectedExportLabwareDef)
+      })
     })
   })
 })

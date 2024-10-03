@@ -2,15 +2,17 @@
 // that cannot be imported. The creator probably shouldn't allow
 // a user to do this.
 
-// Scrolling seems wonky, so I disabled checking to see if
-// an element is in view before clicking or checking with
-// { force: true }
-
-const expectedExportFixture = '../fixtures/testpro_80_wellplate_100ul.json'
+import { join } from 'path'
 
 const flat = 'img[alt*="flat bottom"]'
 const round = 'img[alt*="u shaped"]'
 const v = 'img[alt*="v shaped"]'
+
+const downloadsFolder = Cypress.config('downloadsFolder')
+const downloadFilestem = 'testpro_80_wellplate_100ul'
+const downloadFilename = `${downloadFilestem}.json`
+const downloadPath = join(downloadsFolder, downloadFilename)
+const expectedExportFixture = `../fixtures/${downloadFilename}`
 
 context('Well Plates', () => {
   before(() => {
@@ -215,7 +217,7 @@ context('Well Plates', () => {
       cy.get("input[placeholder='TestPro 80 Well Plate 100 µL']").should(
         'exist'
       )
-      cy.get("input[placeholder='testpro_80_wellplate_100ul']").should('exist')
+      cy.get(`input[placeholder='${downloadFilestem}']`).should('exist')
 
       // All fields present
       cy.get('button[class*="_export_button_"]').click({ force: true })
@@ -224,15 +226,9 @@ context('Well Plates', () => {
       ).should('not.exist')
 
       cy.fixture(expectedExportFixture).then(expectedExportLabwareDef => {
-        const downloadsFolder = Cypress.config('downloadsFolder')
-        // this validates the filename and the contents of the file
-        cy.readFile(`${downloadsFolder}/testpro_80_wellplate_100ul.json`).then(
-          actualExportLabwareDef => {
-            expect(actualExportLabwareDef).to.deep.equal(
-              expectedExportLabwareDef
-            )
-          }
-        )
+        cy.readFile(downloadPath).then(actualExportLabwareDef => {
+          expect(actualExportLabwareDef).to.deep.equal(expectedExportLabwareDef)
+        })
       })
     })
   })

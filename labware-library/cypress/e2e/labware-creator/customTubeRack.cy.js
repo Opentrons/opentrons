@@ -1,11 +1,15 @@
 import 'cypress-file-upload'
-
-const expectedExportFixture =
-  '../fixtures/somerackbrand_24_tuberack_1500ul.json'
+import { join } from 'path'
 
 const flat = 'img[alt*="flat bottom"]'
 const round = 'img[alt*="u shaped"]'
 const v = 'img[alt*="v shaped"]'
+
+const downloadsFolder = Cypress.config('downloadsFolder')
+const downloadFilestem = 'somerackbrand_24_tuberack_1500ul'
+const downloadFilename = `${downloadFilestem}.json`
+const downloadPath = join(downloadsFolder, downloadFilename)
+const expectedExportFixture = `../fixtures/${downloadFilename}`
 
 context('Tubes and Rack', () => {
   before(() => {
@@ -168,18 +172,12 @@ context('Tubes and Rack', () => {
       cy.get(
         "input[placeholder='somerackbrand 24 Tube Rack with sometubebrand 1.5 mL']"
       ).should('exist')
-      cy.get("input[placeholder='somerackbrand_24_tuberack_1500ul']").should(
-        'exist'
-      )
+      cy.get(`input[placeholder='${downloadFilestem}']`).should('exist')
+      cy.get('button').contains('EXPORT FILE').click()
 
-      // now try again with all fields set
       cy.fixture(expectedExportFixture).then(expectedExportLabwareDef => {
-        const downloadsFolder = Cypress.config('downloadsFolder')
-        cy.get('button').contains('EXPORT FILE').click()
         // this validates the filename and the contents of the file
-        cy.readFile(
-          `${downloadsFolder}/somerackbrand_24_tuberack_1500ul.json`
-        ).then(actualExportLabwareDef => {
+        cy.readFile(downloadPath).then(actualExportLabwareDef => {
           expect(actualExportLabwareDef).to.deep.equal(expectedExportLabwareDef)
         })
       })
