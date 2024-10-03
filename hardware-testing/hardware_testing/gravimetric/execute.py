@@ -371,9 +371,6 @@ def _run_trial(
         )
     _PREV_TRIAL_GRAMS = m_data_init
 
-    if trial.cfg.interactive and not trial.blank:
-        ui.get_user_ready("aspirating")
-
     # RUN ASPIRATE
     aspirate_with_liquid_class(
         trial.ctx,
@@ -396,9 +393,6 @@ def _run_trial(
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
     ui.print_info(f"\tgrams after aspirate: {m_data_aspirate.grams_average} g")
     ui.print_info(f"\tcelsius after aspirate: {m_data_aspirate.celsius_pipette} C")
-
-    if trial.cfg.interactive and not trial.blank:
-        ui.get_user_ready("dispensing")
 
     # RUN DISPENSE
     dispense_with_liquid_class(

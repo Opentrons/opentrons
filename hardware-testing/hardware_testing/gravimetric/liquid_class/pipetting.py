@@ -302,7 +302,6 @@ def _pipette_with_liquid_settings(  # noqa: C901
 
     # EXIT
     callbacks.on_exiting()
-    pipette._retract()
 
 
 def mix_with_liquid_class(
