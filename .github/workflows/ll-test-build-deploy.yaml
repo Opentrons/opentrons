@@ -119,7 +119,7 @@ jobs:
         env:
           OT_LL_MIXPANEL_ID: ${{ secrets.OT_LL_MIXPANEL_ID }}
           OT_LL_MIXPANEL_DEV_ID: ${{ secrets.OT_LL_MIXPANEL_DEV_ID }}
-        run: make labware-library test-e2e
+        run: make test-e2e
   build-ll:
     name: 'build labware library artifact'
     needs: ['js-unit-test']
