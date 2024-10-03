@@ -115,10 +115,11 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'test-e2e'
+        working-directory: labware-library
         env:
           OT_LL_MIXPANEL_ID: ${{ secrets.OT_LL_MIXPANEL_ID }}
           OT_LL_MIXPANEL_DEV_ID: ${{ secrets.OT_LL_MIXPANEL_DEV_ID }}
-        run: make -C labware-library test-e2e
+        run: make labware-library test-e2e
   build-ll:
     name: 'build labware library artifact'
     needs: ['js-unit-test']
