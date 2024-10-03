@@ -1,5 +1,5 @@
 {
-  "allowedRoles": ["labware", "lid"],
+  "allowedRoles": ["labware"],
   "ordering": [],
   "brand": {
     "brand": "Opentrons",
@@ -17,7 +17,12 @@
     "zDimension": 12.8
   },
   "wells": {},
-  "groups": [],
+  "groups": [
+    {
+      "metadata": {},
+      "wells": []
+    }
+  ],
   "cornerOffsetFromSlot": {
     "x": 0,
     "y": 0,
