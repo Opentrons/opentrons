@@ -84,7 +84,7 @@ describe('MagnetTools', () => {
     screen.getByText('Module')
     screen.getByText('mock name')
     screen.getByText('Magnet action')
-    screen.getByText('Engage')
+    screen.getByLabelText('Engage')
     const toggleButton = screen.getByRole('switch')
     screen.getByText('Engage height')
     screen.getByText('Must be between -2.5 mm to 25 mm.')
