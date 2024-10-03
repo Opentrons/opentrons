@@ -349,6 +349,86 @@ class SquaredConeSegment(BaseModel):
     )
 
 
+"""
+module filitedPyramidSquare(bottom_shape, diameter, width, length, height, steps) {
+    module _slice(depth, x, y, r) {
+        echo("called with: ", depth, x, y, r);
+        circle_centers = [
+            [(x/2)-r, (y/2)-r, 0],
+            [(-x/2)+r, (y/2)-r, 0],
+            [(x/2)-r, (-y/2)+r, 0],
+            [(-x/2)+r, (-y/2)+r, 0]
+
+        ];
+        translate([0,0,depth/2])cube([x-2*r,y,depth], center=true);
+        translate([0,0,depth/2])cube([x,y-2*r,depth], center=true);
+        for (center = circle_centers) {
+            translate(center) cylinder(depth, r, r, $fn=100);
+        }
+    }
+    for (slice_height = [0:height/steps:height]) {
+        r = (diameter) * (slice_height/height);
+        translate([0,0,slice_height]) {
+             _slice(height/steps , width, length, r/2);
+        }
+    }
+}
+module filitedPyramidForce(bottom_shape, diameter, width, length, height, steps) {
+    module single_cone(r,x,y,z) {
+        r = diameter/2;
+        circle_face = [[ for (i = [0:1: steps]) i ]];
+        theta = 360/steps;
+        circle_points = [for (step = [0:1:steps]) [r*cos(theta*step), r*sin(theta*step), z]];
+        final_points = [[x,y,0]];
+        all_points = concat(circle_points, final_points);
+        triangles = [for (step = [0:1:steps-1]) [step, step+1, steps+1]];
+        faces = concat(circle_face, triangles);
+        polyhedron(all_points, faces);
+    }
+    module square_section(r, x, y, z) {
+        points = [
+            [x,y,0],
+            [-x,y,0],
+            [-x,-y,0],
+            [x,-y,0],
+            [r,0,z],
+            [0,r,z],
+            [-r,0,z],
+            [0,-r,z],
+        ];
+        faces = [
+            [0,1,2,3],
+            [4,5,6,7],
+            [4, 0, 3],
+            [5, 0, 1],
+            [6, 1, 2],
+            [7, 2, 3],
+        ];
+        polyhedron(points, faces);
+    }
+    circle_height = bottom_shape == "square" ? height : -height;
+    translate_height = bottom_shape == "square" ? 0 : height;
+    translate ([0,0, translate_height]) {
+        union() {
+            single_cone(diameter/2, width/2, length/2, circle_height);
+            single_cone(diameter/2, -width/2, length/2, circle_height);
+            single_cone(diameter/2, width/2, -length/2, circle_height);
+            single_cone(diameter/2, -width/2, -length/2, circle_height);
+            square_section(diameter/2, width/2, length/2, circle_height);
+        }
+    }
+}
+
+module filitedPyramid(bottom_shape, diameter, width, length, height) {
+    if (width == length && width == diameter) {
+        filitedPyramidSquare(bottom_shape, diameter, width, length, height, 100);
+    }
+    else {
+        filitedPyramidForce(bottom_shape, diameter, width, length, height, 100);
+    }
+}"""
+
+
 class RoundedPyramidSegment(BaseModel):
     shape: RoundedPyramid = Field(
         ..., description="Denote shape as a rounded pyramidal segment"
