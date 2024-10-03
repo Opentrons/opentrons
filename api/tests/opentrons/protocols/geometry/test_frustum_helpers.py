@@ -2,7 +2,7 @@ import pytest
 from math import pi, isclose
 from typing import Any, List
 
-from opentrons_shared_data.labware.types import (
+from opentrons_shared_data.labware.labware_definition import (
     ConicalFrustum,
     PyramidalFrustum,
     SphericalSegment,

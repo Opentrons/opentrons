@@ -300,6 +300,23 @@ class PyramidalFrustum(BaseModel):
     )
 
 
+# A squared cone is the intersection of a cube and a cone that both
+# share a central axis, and is a transitional shape between a cone and pyramid
+"""
+module RectangularPrismToCone(bottom_shape, diameter, x, y, z) {
+    circle_radius = diameter/2;
+    r1 = sqrt(x*x + y*y)/2;
+    r2 = circle_radius/2;
+    top_r = bottom_shape == "square" ? r1 : r2;
+    bottom_r = bottom_shape == "square" ? r2 : r1;
+    intersection() {
+        cylinder(z,top_r,bottom_r,$fn=100);
+        translate([0,0,z/2])cube([x, y, z], center=true);
+    }
+}
+"""
+
+
 class SquaredConeSegment(BaseModel):
     shape: SquaredCone = Field(
         ..., description="Denote shape as a squared conical segment"
