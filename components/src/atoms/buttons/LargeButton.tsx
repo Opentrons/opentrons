@@ -292,23 +292,22 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
         {buttonText}
       </StyledText>
       {iconName ? (
-        <Box
-          css={css`
-            width: 1.5rem;
-            height: 1.5rem;
-            @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-              width: 5rem;
-              height: 5rem;
-            }
-          `}
-        >
-          <Icon
-            name={iconName}
-            aria-label={`${iconName} icon`}
-            color={appliedIconColor}
-          />
-        </Box>
+        <Icon
+          name={iconName}
+          aria-label={`${iconName} icon`}
+          color={appliedIconColor}
+          css={ICON_STYLE}
+        />
       ) : null}
     </Btn>
   )
 }
+
+const ICON_STYLE = css`
+  width: 1.5rem;
+  height: 1.5rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: 5rem;
+    height: 5rem;
+  }
+`
