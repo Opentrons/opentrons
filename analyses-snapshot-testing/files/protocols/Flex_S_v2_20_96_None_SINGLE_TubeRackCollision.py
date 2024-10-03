@@ -38,7 +38,6 @@ def run(protocol):
 
     trash = protocol.load_trash_bin("A3")  # must load trash bin
 
-
     partial_tip_rack = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_50ul",
         label="Partial Tip Rack",

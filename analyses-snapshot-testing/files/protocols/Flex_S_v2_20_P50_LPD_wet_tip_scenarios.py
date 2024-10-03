@@ -136,7 +136,6 @@ def run(protocol: protocol_api.ProtocolContext):
     #     dest=[sample_plate.well("A1"), sample_plate.well("A3")],
     #     mix=True,
 
-
     # # reuse the tip for a second transfer
     # # no error
     # # we must say in docs do not do this

@@ -42,7 +42,6 @@ def run(protocol: protocol_api.ProtocolContext):
 
     pipette = p20
 
-
     pipette.pick_up_tip()
     protocol.comment("touch_tip")
     pipette.touch_tip(wet_sample.well("A1"))

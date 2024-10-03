@@ -75,7 +75,7 @@ def run(protocol):
     # If we ever do detect and error for this
     # Take all these examples into a negative Overrides test
 
-    volume=5
+    volume = 5
     pipette.pick_up_tip()
     comment_tip_rack_status(protocol, partial_tip_rack)
     # why with P20 do I get:
@@ -96,6 +96,7 @@ def run(protocol):
     # pipette.aspirate(volume=volume, location=destination_labware_2["G1"])
     # H is the only safe row
     pipette.aspirate(volume=volume, location=destination_labware_2["H1"])
+
 
 # ignore the below for the time being
 """

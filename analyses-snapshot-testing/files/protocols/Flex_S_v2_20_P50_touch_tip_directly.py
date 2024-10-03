@@ -54,13 +54,13 @@ def run(protocol: protocol_api.ProtocolContext):
     # don't do an aspirate before the touch_tip
     # pipette.aspirate(volume=total_volume, location=wet_sample.well("A1"))
     protocol.comment("touch_tip")
-    # no matter if you aspirate before or not, 
+    # no matter if you aspirate before or not,
     # the touch_tip is not shown in the app preview run
     pipette.touch_tip(location=wet_sample.well("A1"))
     protocol.comment("air_gap")
     # if you uncomment the air_gap an error is thrown
     # I should be at the wet_sample.well("A1") but it says I am at the tiprack
-    # pipette.air_gap(volume=20) 
+    # pipette.air_gap(volume=20)
     protocol.comment("blow_out with no arguments")
     pipette.blow_out()
     pipette.drop_tip()

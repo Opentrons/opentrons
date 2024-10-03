@@ -75,7 +75,7 @@ def run(protocol):
     # If we ever do detect and error for this
     # Take all these examples into a negative Overrides test
 
-    volume=20
+    volume = 20
     pipette.pick_up_tip()
     comment_tip_rack_status(protocol, partial_tip_rack)
     # bad - 4 tips will overhang into slot 5
@@ -92,6 +92,7 @@ def run(protocol):
     pipette.aspirate(volume=volume, location=destination_labware_2["G1"])
     # only one that is safe
     pipette.aspirate(volume=volume, location=destination_labware_2["H1"])
+
 
 # ignore the below for the time being
 """

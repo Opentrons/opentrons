@@ -33,6 +33,7 @@ def comment_tip_rack_status(ctx, tip_rack):
         # Print the full status line for the row
         ctx.comment(status_line)
 
+
 def aspirate_to_reservoir_test(ctx, labware):
     location = labware.wells()[0]
     ctx.comment(f"Aspirating from {labware.parent} {location}")
@@ -71,7 +72,6 @@ def run(protocol):
         location="D3",
     )
 
-
     pipette = protocol.load_instrument(instrument_name="flex_96channel_1000")
 
     pipette.configure_nozzle_layout(
@@ -89,7 +89,3 @@ def run(protocol):
         start="A1",
         tip_racks=[partial_tip_rack],
     )
-
-    
-
-

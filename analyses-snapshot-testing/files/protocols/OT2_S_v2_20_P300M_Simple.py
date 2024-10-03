@@ -62,7 +62,7 @@ def run(protocol):
     comment_tip_rack_status(protocol, tip_rack)
     pipette.aspirate(volume=volume, location=destination_labware_2["H1"])
     pipette.dispense(volume=volume, location=destination_labware_2["H2"])
-    for i in range(1,13):
+    for i in range(1, 13):
         protocol.comment(f"Touching tip to {destination_labware_2[f'H{i}']}")
         pipette.touch_tip(location=destination_labware_2[f"H{i}"])
 
