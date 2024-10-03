@@ -1,6 +1,6 @@
 import type * as React from 'react'
 import { css } from 'styled-components'
-import { Box, Btn } from '../../primitives'
+import { Btn } from '../../primitives'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
@@ -154,6 +154,26 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       ? `color: ${LARGE_BUTTON_PROPS_BY_TYPE[style].activeIconColor}`
       : ''
 
+  // In order to keep button sizes consistent and expected, all large button types need an outline.
+  // The outline color is always the same as the background color unless the background color is uniquely different
+  // from the outline.
+  const computedOutlineStyle = (): string => {
+    const outlineColor = (): string => {
+      if (disabled) {
+        return LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor
+      } else if (buttonType === 'alertStroke') {
+        return LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor
+      } else {
+        return LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultBackgroundColor
+      }
+    }
+
+    const calculatedBorderRadius =
+      buttonType === 'stroke' ? BORDERS.borderRadius2 : BORDERS.borderRadius4
+
+    return `${calculatedBorderRadius} solid ${outlineColor()}`
+  }
+
   const LARGE_BUTTON_STYLE = css`
     color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     background-color: ${
@@ -164,7 +184,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     text-align: ${TYPOGRAPHY.textAlignLeft};
     border-radius: ${BORDERS.borderRadiusFull};
     align-items: ${ALIGN_CENTER};
-    border: ${buttonType === 'stroke' ? `2px solid ${COLORS.blue50}` : 'none'};
+    border: ${computedOutlineStyle()};
 
     &:active {
       background-color: ${
@@ -214,14 +234,6 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       padding: ${SPACING.spacing24};
       line-height: ${TYPOGRAPHY.lineHeight20};
       gap: ${SPACING.spacing60};
-      outline: ${BORDERS.borderRadius4} solid
-        ${
-          buttonType === 'alertStroke' && !disabled
-            ? LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor
-            : 'none'
-        };
-
-      ${TYPOGRAPHY.pSemiBold}
 
       &:active {
         background-color: ${
@@ -297,6 +309,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
           aria-label={`${iconName} icon`}
           color={appliedIconColor}
           css={ICON_STYLE}
+          id="btn-icon"
         />
       ) : null}
     </Btn>
