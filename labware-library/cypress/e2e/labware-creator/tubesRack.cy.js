@@ -1,13 +1,9 @@
-const flat = 'img[alt*="flat bottom"]'
-const round = 'img[alt*="u shaped"]'
-const v = 'img[alt*="v shaped"]'
+import { navigateToPage, wellBottomImageLocator } from '../../support/e2e'
 
 context('Tubes and Rack', () => {
   describe('Six tubes', () => {
     before(() => {
-      cy.visit('/')
-      cy.get('a[href="/create"]').first().click()
-      cy.viewport('macbook-15')
+      navigateToPage('create')
       cy.get('label')
         .contains('What type of labware are you creating?')
         .children()
@@ -96,21 +92,21 @@ context('Tubes and Rack', () => {
       cy.get("input[name='wellBottomShape'][value='flat']").check({
         force: true,
       })
-      cy.get(flat).should('exist')
-      cy.get(round).should('not.exist')
-      cy.get(v).should('not.exist')
+      cy.get(wellBottomImageLocator.flat).should('exist')
+      cy.get(wellBottomImageLocator.round).should('not.exist')
+      cy.get(wellBottomImageLocator.v).should('not.exist')
       cy.get("input[name='wellBottomShape'][value='u']").check({
         force: true,
       })
-      cy.get(flat).should('not.exist')
-      cy.get(round).should('exist')
-      cy.get(v).should('not.exist')
+      cy.get(wellBottomImageLocator.flat).should('not.exist')
+      cy.get(wellBottomImageLocator.round).should('exist')
+      cy.get(wellBottomImageLocator.v).should('not.exist')
       cy.get("input[name='wellBottomShape'][value='v']").check({
         force: true,
       })
-      cy.get(flat).should('not.exist')
-      cy.get(round).should('not.exist')
-      cy.get(v).should('exist')
+      cy.get(wellBottomImageLocator.flat).should('not.exist')
+      cy.get(wellBottomImageLocator.round).should('not.exist')
+      cy.get(wellBottomImageLocator.v).should('exist')
       cy.get("input[name='wellDepth']").focus().blur()
       cy.contains('Depth is a required field').should('exist')
       cy.get("input[name='wellDepth']").type('10').blur()
@@ -228,21 +224,21 @@ context('Tubes and Rack', () => {
       cy.get("input[name='wellBottomShape'][value='flat']").check({
         force: true,
       })
-      cy.get(flat).should('exist')
-      cy.get(round).should('not.exist')
-      cy.get(v).should('not.exist')
+      cy.get(wellBottomImageLocator.flat).should('exist')
+      cy.get(wellBottomImageLocator.round).should('not.exist')
+      cy.get(wellBottomImageLocator.v).should('not.exist')
       cy.get("input[name='wellBottomShape'][value='u']").check({
         force: true,
       })
-      cy.get(flat).should('not.exist')
-      cy.get(round).should('exist')
-      cy.get(v).should('not.exist')
+      cy.get(wellBottomImageLocator.flat).should('not.exist')
+      cy.get(wellBottomImageLocator.round).should('exist')
+      cy.get(wellBottomImageLocator.v).should('not.exist')
       cy.get("input[name='wellBottomShape'][value='v']").check({
         force: true,
       })
-      cy.get(flat).should('not.exist')
-      cy.get(round).should('not.exist')
-      cy.get(v).should('exist')
+      cy.get(wellBottomImageLocator.flat).should('not.exist')
+      cy.get(wellBottomImageLocator.round).should('not.exist')
+      cy.get(wellBottomImageLocator.v).should('exist')
       cy.get("input[name='wellDepth']").focus().blur()
       cy.contains('Depth is a required field').should('exist')
       cy.get("input[name='wellDepth']").type('10').blur()
@@ -359,21 +355,21 @@ context('Tubes and Rack', () => {
       cy.get("input[name='wellBottomShape'][value='flat']").check({
         force: true,
       })
-      cy.get(flat).should('exist')
-      cy.get(round).should('not.exist')
-      cy.get(v).should('not.exist')
+      cy.get(wellBottomImageLocator.flat).should('exist')
+      cy.get(wellBottomImageLocator.round).should('not.exist')
+      cy.get(wellBottomImageLocator.v).should('not.exist')
       cy.get("input[name='wellBottomShape'][value='u']").check({
         force: true,
       })
-      cy.get(flat).should('not.exist')
-      cy.get(round).should('exist')
-      cy.get(v).should('not.exist')
+      cy.get(wellBottomImageLocator.flat).should('not.exist')
+      cy.get(wellBottomImageLocator.round).should('exist')
+      cy.get(wellBottomImageLocator.v).should('not.exist')
       cy.get("input[name='wellBottomShape'][value='v']").check({
         force: true,
       })
-      cy.get(flat).should('not.exist')
-      cy.get(round).should('not.exist')
-      cy.get(v).should('exist')
+      cy.get(wellBottomImageLocator.flat).should('not.exist')
+      cy.get(wellBottomImageLocator.round).should('not.exist')
+      cy.get(wellBottomImageLocator.v).should('exist')
       cy.get("input[name='wellDepth']").focus().blur()
       cy.contains('Depth is a required field').should('exist')
       cy.get("input[name='wellDepth']").type('10').blur()

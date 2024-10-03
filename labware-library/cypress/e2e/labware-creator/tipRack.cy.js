@@ -1,17 +1,9 @@
-import 'cypress-file-upload'
-import { join } from 'path'
-
-const downloadsFolder = Cypress.config('downloadsFolder')
-const downloadFilestem = 'generic_1_tiprack_20ul'
-const downloadFilename = `${downloadFilestem}.json`
-const downloadPath = join(downloadsFolder, downloadFilename)
-const expectedExportFixture = `../fixtures/${downloadFilename}`
+import { navigateToPage, fileHelper } from '../../support/e2e'
+const fileHolder = fileHelper('generic_1_tiprack_20ul')
 
 describe('Create a Tip Rack', () => {
   before(() => {
-    cy.visit('/')
-    cy.get('a[href="/create"]').first().click()
-    cy.viewport('macbook-15')
+    navigateToPage('create')
   })
   it('Should create a tip rack', () => {
     // Tip Rack Selection from drop down
@@ -247,16 +239,18 @@ describe('Create a Tip Rack', () => {
     cy.get('input[name="displayName"]')
       .clear()
       .type('Brand Chalu 1 Tip Rack 20ul')
-    cy.get('input[name="loadName"]').clear().type(downloadFilestem)
+    cy.get('input[name="loadName"]').clear().type(fileHolder.downloadFileStem)
 
     // Verify the exported file to the fixture
     cy.get('button').contains('EXPORT FILE').click()
 
-    cy.fixture(expectedExportFixture).then(expectedExportLabwareDef => {
-      cy.readFile(downloadPath).then(actualExportLabwareDef => {
-        expect(actualExportLabwareDef).to.deep.equal(expectedExportLabwareDef)
-      })
-    })
+    cy.fixture(fileHolder.expectedExportFixture).then(
+      expectedExportLabwareDef => {
+        cy.readFile(fileHolder.downloadPath).then(actualExportLabwareDef => {
+          expect(actualExportLabwareDef).to.deep.equal(expectedExportLabwareDef)
+        })
+      }
+    )
 
     // 'verify the too big, too small error
     cy.get('input[name="gridOffsetY"]').clear().type('24')

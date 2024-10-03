@@ -2,23 +2,16 @@
 // that cannot be imported. The creator probably shouldn't allow
 // a user to do this.
 
-import { join } from 'path'
-
-const flat = 'img[alt*="flat bottom"]'
-const round = 'img[alt*="u shaped"]'
-const v = 'img[alt*="v shaped"]'
-
-const downloadsFolder = Cypress.config('downloadsFolder')
-const downloadFilestem = 'testpro_80_wellplate_100ul'
-const downloadFilename = `${downloadFilestem}.json`
-const downloadPath = join(downloadsFolder, downloadFilename)
-const expectedExportFixture = `../fixtures/${downloadFilename}`
+import {
+  navigateToPage,
+  fileHelper,
+  wellBottomImageLocator,
+} from '../../support/e2e'
+const fileHolder = fileHelper('testpro_80_wellplate_100ul')
 
 context('Well Plates', () => {
   before(() => {
-    cy.visit('/')
-    cy.get('a[href="/create"]').first().click()
-    cy.viewport('macbook-15')
+    navigateToPage('create')
   })
 
   describe('Create a well plate', () => {
@@ -154,21 +147,21 @@ context('Well Plates', () => {
       cy.get("input[name='wellBottomShape'][value='flat']").check({
         force: true,
       })
-      cy.get(flat).should('exist')
-      cy.get(round).should('not.exist')
-      cy.get(v).should('not.exist')
+      cy.get(wellBottomImageLocator.flat).should('exist')
+      cy.get(wellBottomImageLocator.round).should('not.exist')
+      cy.get(wellBottomImageLocator.v).should('not.exist')
       cy.get("input[name='wellBottomShape'][value='u']").check({
         force: true,
       })
-      cy.get(flat).should('not.exist')
-      cy.get(round).should('exist')
-      cy.get(v).should('not.exist')
+      cy.get(wellBottomImageLocator.flat).should('not.exist')
+      cy.get(wellBottomImageLocator.round).should('exist')
+      cy.get(wellBottomImageLocator.v).should('not.exist')
       cy.get("input[name='wellBottomShape'][value='v']").check({
         force: true,
       })
-      cy.get(flat).should('not.exist')
-      cy.get(round).should('not.exist')
-      cy.get(v).should('exist')
+      cy.get(wellBottomImageLocator.flat).should('not.exist')
+      cy.get(wellBottomImageLocator.round).should('not.exist')
+      cy.get(wellBottomImageLocator.v).should('exist')
       cy.get("input[name='wellDepth']").focus().blur()
       cy.contains('Depth is a required field').should('exist')
       cy.get("input[name='wellDepth']").type('10').blur()
@@ -217,7 +210,9 @@ context('Well Plates', () => {
       cy.get("input[placeholder='TestPro 80 Well Plate 100 µL']").should(
         'exist'
       )
-      cy.get(`input[placeholder='${downloadFilestem}']`).should('exist')
+      cy.get(`input[placeholder='${fileHolder.downloadFileStem}']`).should(
+        'exist'
+      )
 
       // All fields present
       cy.get('button[class*="_export_button_"]').click({ force: true })
@@ -225,11 +220,15 @@ context('Well Plates', () => {
         'Please resolve all invalid fields in order to export the labware definition'
       ).should('not.exist')
 
-      cy.fixture(expectedExportFixture).then(expectedExportLabwareDef => {
-        cy.readFile(downloadPath).then(actualExportLabwareDef => {
-          expect(actualExportLabwareDef).to.deep.equal(expectedExportLabwareDef)
-        })
-      })
+      cy.fixture(fileHolder.expectedExportFixture).then(
+        expectedExportLabwareDef => {
+          cy.readFile(fileHolder.downloadPath).then(actualExportLabwareDef => {
+            expect(actualExportLabwareDef).to.deep.equal(
+              expectedExportLabwareDef
+            )
+          })
+        }
+      )
     })
   })
 })

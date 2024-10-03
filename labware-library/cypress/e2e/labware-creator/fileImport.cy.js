@@ -1,22 +1,15 @@
-import { join } from 'path'
+import {
+  navigateToPage,
+  fileHelper,
+  wellBottomImageLocator,
+} from '../../support/e2e'
+const fileHolder = fileHelper('testpro_15_wellplate_5ul')
 
 const importedLabwareFile = 'TestLabwareDefinition.json'
 
-const flat = 'img[alt*="flat bottom"]'
-const round = 'img[alt*="u shaped"]'
-const v = 'img[alt*="v shaped"]'
-
-const downloadsFolder = Cypress.config('downloadsFolder')
-const downloadFilestem = 'testpro_15_wellplate_5ul'
-const downloadFilename = `${downloadFilestem}.json`
-const downloadPath = join(downloadsFolder, downloadFilename)
-const expectedLabwareFile = `../fixtures/${downloadFilename}`
-
 describe('File Import', () => {
   before(() => {
-    cy.visit('/')
-    cy.get('a[href="/create"]').first().click()
-    cy.viewport('macbook-15')
+    navigateToPage('create')
   })
 
   it('tests the file import flow', () => {
@@ -60,9 +53,9 @@ describe('File Import', () => {
 
     // verify well bottom and depth
     cy.get("input[name='wellBottomShape'][value='flat']").should('exist')
-    cy.get(flat).should('exist')
-    cy.get(round).should('not.exist')
-    cy.get(v).should('not.exist')
+    cy.get(wellBottomImageLocator.flat).should('exist')
+    cy.get(wellBottomImageLocator.round).should('not.exist')
+    cy.get(wellBottomImageLocator.v).should('not.exist')
     cy.get("input[name='wellDepth'][value='5']").should('exist')
 
     // verify grid spacing
@@ -80,7 +73,9 @@ describe('File Import', () => {
 
     // File info
     cy.get("input[placeholder='TestPro 15 Well Plate 5 µL']").should('exist')
-    cy.get(`input[placeholder='${downloadFilestem}']`).should('exist')
+    cy.get(`input[placeholder='${fileHolder.downloadFileStem}']`).should(
+      'exist'
+    )
 
     // All fields present
     cy.get('button[class*="_export_button_"]').click({ force: true })
@@ -88,10 +83,12 @@ describe('File Import', () => {
       'Please resolve all invalid fields in order to export the labware definition'
     ).should('not.exist')
 
-    cy.fixture(expectedLabwareFile).then(expectedExportLabwareDef => {
-      cy.readFile(downloadPath).then(actualExportLabwareDef => {
-        expect(actualExportLabwareDef).to.deep.equal(expectedExportLabwareDef)
-      })
-    })
+    cy.fixture(fileHolder.expectedExportFixture).then(
+      expectedExportLabwareDef => {
+        cy.readFile(fileHolder.downloadPath).then(actualExportLabwareDef => {
+          expect(actualExportLabwareDef).to.deep.equal(expectedExportLabwareDef)
+        })
+      }
+    )
   })
 })
