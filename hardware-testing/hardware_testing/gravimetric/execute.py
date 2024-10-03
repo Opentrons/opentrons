@@ -430,6 +430,11 @@ def _run_trial(
     )
     if trial.cfg.interactive and not trial.blank:
         ui.get_user_ready("examine tip")
+
+    # NOTE: saving test CSV explicitly AFTER pipetting is complete
+    #       to avoid any unwanted delays
+    # FIXME: see why it takes so long to store CSV data
+    trial.test_report.save_to_disk()
     return volume_aspirate, m_data_aspirate, volume_dispense, m_data_dispense
 
 
