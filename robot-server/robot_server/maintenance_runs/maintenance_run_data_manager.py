@@ -39,7 +39,7 @@ def _build_run(
         id=run_id,
         createdAt=created_at,
         status=state_summary.status,
-        actions=[],  # TODO (spp, 2023-04-23): wire up actions once they are allowed
+        actions=[],
         errors=state_summary.errors,
         labware=state_summary.labware,
         labwareOffsets=state_summary.labwareOffsets,

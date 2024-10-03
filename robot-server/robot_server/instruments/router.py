@@ -258,9 +258,6 @@ async def _get_attached_instruments_ot2(
     description=(
         "Get a list of all instruments (pipettes & gripper) currently attached"
         " to the robot."
-        "\n\n"
-        "**Warning:** The behavior of this endpoint is currently only defined for Flex"
-        " robots. For OT-2 robots, use `/pipettes` instead."
     ),
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[AttachedItem]}},
 )
@@ -269,8 +266,6 @@ async def get_attached_instruments(
 ) -> PydanticResponse[SimpleMultiBody[AttachedItem]]:
     """Get a list of all attached instruments."""
     try:
-        # TODO (spp, 2023-01-06): revise according to
-        #  https://opentrons.atlassian.net/browse/RET-1295
         ot3_hardware = ensure_ot3_hardware(hardware_api=hardware)
         return await _get_attached_instruments_ot3(ot3_hardware)
     except HardwareNotSupportedError:
