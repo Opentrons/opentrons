@@ -193,6 +193,7 @@ class RunDataManager:
         """
         prev_run_id = self._run_orchestrator_store.current_run_id
         if prev_run_id is not None:
+            # Allow clear() to propagate RunConflictError.
             prev_run_result = await self._run_orchestrator_store.clear()
             self._run_store.update_run_state(
                 run_id=prev_run_id,
@@ -200,13 +201,18 @@ class RunDataManager:
                 commands=prev_run_result.commands,
                 run_time_parameters=prev_run_result.parameters,
             )
+
         error_recovery_is_enabled = self._error_recovery_setting_store.get_is_enabled()
+        initial_error_recovery_policy = (
+            error_recovery_mapping.create_error_recovery_policy_from_rules(
+                _INITIAL_ERROR_RECOVERY_RULES, error_recovery_is_enabled
+            )
+        )
+
         state_summary = await self._run_orchestrator_store.create(
             run_id=run_id,
             labware_offsets=labware_offsets,
-            initial_error_recovery_policy=error_recovery_mapping.create_error_recovery_policy_from_rules(
-                _INITIAL_ERROR_RECOVERY_RULES, error_recovery_is_enabled
-            ),
+            initial_error_recovery_policy=initial_error_recovery_policy,
             deck_configuration=deck_configuration,
             protocol=protocol,
             run_time_param_values=run_time_param_values,
@@ -222,6 +228,7 @@ class RunDataManager:
         self._run_store.insert_csv_rtp(
             run_id=run_id, run_time_parameters=run_time_parameters
         )
+
         self._runs_publisher.start_publishing_for_run(
             get_current_command=self.get_current_command,
             get_recovery_target_command=self.get_recovery_target_command,
