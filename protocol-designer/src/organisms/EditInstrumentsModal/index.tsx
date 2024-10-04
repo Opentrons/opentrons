@@ -510,7 +510,7 @@ export function EditInstrumentsModal(
                             !selectedTips.includes(option.value)
                           }
                           isChecked={selectedTips.includes(option.value)}
-                          labelText={option.name.replace('Opentrons Flex ', '')}
+                          labelText={option.name}
                           onClick={() => {
                             const updatedTips = selectedTips.includes(
                               option.value
