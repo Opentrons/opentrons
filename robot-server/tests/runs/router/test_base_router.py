@@ -664,7 +664,7 @@ async def test_create_policies(
     )
     decoy.verify(
         mock_run_data_manager.set_error_recovery_rules(
-            run_id="rud-id", policies=policies.policyRules
+            run_id="rud-id", rules=policies.policyRules
         )
     )
 
@@ -676,7 +676,7 @@ async def test_create_policies_raises_not_active_run(
     policies = decoy.mock(cls=ErrorRecoveryPolicy)
     decoy.when(
         mock_run_data_manager.set_error_recovery_rules(
-            run_id="rud-id", policies=policies.policyRules
+            run_id="rud-id", rules=policies.policyRules
         )
     ).then_raise(RunNotCurrentError())
     with pytest.raises(ApiError) as exc_info:
