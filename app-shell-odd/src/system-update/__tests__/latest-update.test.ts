@@ -1,17 +1,17 @@
 // app-shell self-update tests
 import { when } from 'vitest-when'
 import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
-import * as http from '../http'
-import { registerUpdate, FLEX_MANIFEST_URL } from '../update'
-import * as Cfg from '../config'
+import * as http from '../../http'
+import { registerUpdate, FLEX_MANIFEST_URL } from '../latest-update'
+import * as Cfg from '../../config'
 
-import type { Dispatch } from '../types'
+import type { Dispatch } from '../../types'
 
 vi.unmock('electron-updater')
 vi.mock('electron-updater')
-vi.mock('../log')
-vi.mock('../config')
-vi.mock('../http')
+vi.mock('../../log')
+vi.mock('../../config')
+vi.mock('../../http')
 vi.mock('fs-extra')
 
 describe('update', () => {

@@ -1,15 +1,15 @@
 import semver from 'semver'
-import { UI_INITIALIZED } from './constants'
-import { createLogger } from './log'
-import { getConfig } from './config'
+import { UI_INITIALIZED } from '../constants'
+import { createLogger } from '../log'
+import { getConfig } from '../config'
 import {
   downloadAndCacheReleaseManifest,
   getCachedReleaseManifest,
   getReleaseSet,
-} from './system-update/release-manifest'
+} from './release-manifest'
 
-import type { Action, Dispatch } from './types'
-import type { ReleaseSetUrls } from './system-update/types'
+import type { Action, Dispatch } from '../types'
+import type { ReleaseSetUrls } from './types'
 
 const log = createLogger('update')
 
