@@ -5,6 +5,7 @@ from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors import ModuleNotLoadedError
 from ..errors.error_occurrence import ErrorOccurrence
 from ..types import (
     DeckSlotLocation,
@@ -159,11 +160,12 @@ class LoadModuleImplementation(
             and params.model == ModuleModel.ABSORBANCE_READER_V1
             and params.moduleId is not None
         ):
-            abs_reader = self._equipment.get_module_hardware_api(
-                self._state_view.modules.get_absorbance_reader_substate(
-                    params.moduleId
-                ).module_id
-            )
+            try:
+                abs_reader = self._equipment.get_module_hardware_api(
+                    self._state_view.modules.get_absorbance_reader_substate(params.moduleId).module_id
+                )
+            except ModuleNotLoadedError:
+                abs_reader = None
 
             if abs_reader is not None:
                 result = await abs_reader.get_current_lid_status()
