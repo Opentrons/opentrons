@@ -230,7 +230,10 @@ def test_execute_profile_above_221(
 ) -> None:
     """It should run a thermocycler profile with the engine client."""
     subject_at_or_above_221.execute_profile(
-        steps=[{"temperature": 45.6, "hold_time_seconds": 12.3}],
+        steps=[
+            {"temperature": 45.6, "hold_time_seconds": 12.3},
+            {"temperature": 78.9, "hold_time_seconds": 45.6},
+        ],
         repetitions=2,
         block_max_volume=25,
     )
@@ -242,7 +245,12 @@ def test_execute_profile_above_221(
                     cmd.thermocycler.ProfileCycle(
                         repetitions=2,
                         steps=[
-                            cmd.thermocycler.ProfileStep(celsius=45.6, holdSeconds=12.3)
+                            cmd.thermocycler.ProfileStep(
+                                celsius=45.6, holdSeconds=12.3
+                            ),
+                            cmd.thermocycler.ProfileStep(
+                                celsius=78.9, holdSeconds=45.6
+                            ),
                         ],
                     )
                 ],

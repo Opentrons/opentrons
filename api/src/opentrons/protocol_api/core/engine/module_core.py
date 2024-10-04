@@ -366,9 +366,9 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore):
                         celsius=step["temperature"],
                         holdSeconds=step["hold_time_seconds"],
                     )
+                    for step in steps
                 ],
             )
-            for step in steps
         ]
         self._engine_client.execute_command(
             cmd.thermocycler.RunExtendedProfileParams(
