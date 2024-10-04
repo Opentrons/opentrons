@@ -13,6 +13,7 @@ import {
   ErrorDetailsModal,
   OverpressureBanner,
   TipNotDetectedBanner,
+  GripperErrorBanner,
 } from '../ErrorDetailsModal'
 
 vi.mock('react-dom', () => ({
@@ -171,6 +172,30 @@ describe('TipNotDetectedBanner', () => {
           'Tip presence errors are usually caused by improperly placed labware or inaccurate labware offsets',
         message:
           ' If the issue persists, cancel the run and initiate Labware Position Check',
+      }),
+      {}
+    )
+  })
+})
+
+describe('GripperErrorBanner', () => {
+  beforeEach(() => {
+    vi.mocked(InlineNotification).mockReturnValue(
+      <div>MOCK_INLINE_NOTIFICATION</div>
+    )
+  })
+
+  it('renders the InlineNotification', () => {
+    renderWithProviders(<GripperErrorBanner />, {
+      i18nInstance: i18n,
+    })
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading:
+          'Gripper errors occur when the gripper stalls or collides with another object on the deck and are usually caused by improperly placed labware or inaccurate labware offsets',
+        message:
+          ' If the issue persists, cancel the run and rerun gripper calibration',
       }),
       {}
     )

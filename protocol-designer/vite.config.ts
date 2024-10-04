@@ -9,7 +9,7 @@ import lostCss from 'lost'
 import { versionForProject } from '../scripts/git-version.mjs'
 import type { UserConfig } from 'vite'
 
-const testAliases: {} | { 'file-saver': string } =
+const testAliases: Record<string, unknown> | { 'file-saver': string } =
   process.env.CYPRESS === '1'
     ? {
         'file-saver':
@@ -17,6 +17,7 @@ const testAliases: {} | { 'file-saver': string } =
       }
     : {}
 
+// eslint-disable-next-line import/no-default-export
 export default defineConfig(
   async (): Promise<UserConfig> => {
     const OT_PD_VERSION = await versionForProject('protocol-designer')
@@ -71,8 +72,8 @@ export default defineConfig(
         },
       },
       server: {
-        port: 5178
-      }
+        port: 5178,
+      },
     }
   }
 )

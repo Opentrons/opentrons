@@ -2,8 +2,6 @@ import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import type { ChangeEvent } from 'react'
-
 import {
   BORDERS,
   COLORS,
@@ -27,9 +25,11 @@ import {
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
 } from '../../../../../../constants'
-import { selectors as uiModuleSelectors } from '../../../../../../ui/modules'
+import { InputStepFormField } from '../../../../../../molecules'
 import { getInitialDeckSetup } from '../../../../../../step-forms/selectors'
+import { selectors as uiModuleSelectors } from '../../../../../../ui/modules'
 
+import type { ChangeEvent } from 'react'
 import type { StepFormProps } from '../../types'
 
 export function PauseTools(props: StepFormProps): JSX.Element {
@@ -137,26 +137,15 @@ export function PauseTools(props: StepFormProps): JSX.Element {
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing4}
                 >
-                  <StyledText desktopStyle="captionRegular">
-                    {t('application:time')}
-                  </StyledText>
-                  <StyledTextArea
+                  <InputStepFormField
+                    {...propsForFields.pauseTime}
+                    title={t('application:time')}
                     value={propsForFields.pauseTime.value as string}
-                    onChange={(e: ChangeEvent<any>) => {
-                      propsForFields.pauseTime.updateValue(
-                        e.currentTarget.value
-                      )
-                    }}
-                    error={propsForFields.pauseTime.errorToShow != null}
+                    updateValue={propsForFields.pauseTime.updateValue}
+                    errorToShow={propsForFields.pauseTime.errorToShow}
+                    padding="0"
+                    showTooltip={false}
                   />
-                  {propsForFields.pauseTime.errorToShow != null ? (
-                    <StyledText
-                      desktopStyle="captionRegular"
-                      color={COLORS.red50}
-                    >
-                      {propsForFields.pauseTime.errorToShow}
-                    </StyledText>
-                  ) : null}
                 </Flex>
               </Flex>
             ) : null}
@@ -187,27 +176,14 @@ export function PauseTools(props: StepFormProps): JSX.Element {
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing4}
                 >
-                  <StyledText desktopStyle="captionRegular">
-                    {t('application:temperature')}
-                  </StyledText>
-                  <StyledTextArea
-                    value={propsForFields.pauseTemperature.value as string}
-                    onChange={(e: ChangeEvent<any>) => {
-                      propsForFields.pauseTemperature.updateValue(
-                        e.currentTarget.value
-                      )
-                    }}
-                    error={propsForFields.pauseTemperature.errorToShow != null}
+                  <InputStepFormField
+                    {...propsForFields.pauseTemperature}
+                    title={t('application:temperature')}
+                    updateValue={propsForFields.pauseTemperature.updateValue}
+                    errorToShow={propsForFields.pauseTemperature.errorToShow}
+                    padding="0"
+                    showTooltip={false}
                   />
-                  {propsForFields.pauseTemperature.value !== '' &&
-                  propsForFields.pauseTemperature.errorToShow != null ? (
-                    <StyledText
-                      desktopStyle="captionRegular"
-                      color={COLORS.red50}
-                    >
-                      {propsForFields.pauseTemperature.errorToShow}
-                    </StyledText>
-                  ) : null}
                 </Flex>
               </>
             ) : null}

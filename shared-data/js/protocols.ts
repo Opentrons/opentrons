@@ -4,6 +4,7 @@
 
 import Ajv from 'ajv'
 
+import commandSchema10 from '../command/schemas/10.json'
 import commandSchema9 from '../command/schemas/9.json'
 import commandSchema8 from '../command/schemas/8.json'
 import commandSchema7 from '../command/schemas/7.json'
@@ -30,6 +31,9 @@ const validateCommands8 = (
   new Promise((resolve, reject) => {
     const requestedSchema = toValidate.commandSchemaId
     switch (requestedSchema) {
+      case 'opentronsCommandSchemaV10':
+        resolve(commandSchema10)
+        break
       case 'opentronsCommandSchemaV9':
         resolve(commandSchema9)
         break
@@ -43,7 +47,13 @@ const validateCommands8 = (
             keyword: 'Invalid command schema requested',
             dataPath: requestedSchema,
             schemaPath: '#/properties/commandSchemaId',
-            params: { allowedValues: ['opentronsCommandSchemaV8'] },
+            params: {
+              allowedValues: [
+                'opentronsCommandSchemaV8',
+                'opentronsCommandSchemaV9',
+                'opentronsCommandSchemaV10',
+              ],
+            },
           },
         ])
         break

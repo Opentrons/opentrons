@@ -3,13 +3,15 @@ import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { getUnsavedForm } from '../../../../step-forms/selectors'
+import { getSelectedSubstep } from '../../../../ui/steps/selectors'
 import { DeckSetupContainer } from '../../DeckSetup'
 import { OffDeck } from '../../Offdeck'
 import { ProtocolSteps } from '..'
-import { TimelineToolbox } from '../Timeline'
+import { SubstepsToolbox, TimelineToolbox } from '../Timeline'
 
 vi.mock('../../Offdeck')
 vi.mock('../../../../step-forms/selectors')
+vi.mock('../../../../ui/steps/selectors')
 vi.mock('../StepForm')
 vi.mock('../../DeckSetup')
 vi.mock('../Timeline')
@@ -25,6 +27,8 @@ describe('ProtocolSteps', () => {
     )
     vi.mocked(OffDeck).mockReturnValue(<div>mock OffDeck</div>)
     vi.mocked(getUnsavedForm).mockReturnValue(null)
+    vi.mocked(getSelectedSubstep).mockReturnValue(null)
+    vi.mocked(SubstepsToolbox).mockReturnValue(<div>mock SubstepsToolbox</div>)
   })
 
   it('renders each component in ProtocolSteps', () => {
@@ -47,5 +51,11 @@ describe('ProtocolSteps', () => {
     })
     render()
     expect(screen.queryByText('offDeck')).not.toBeInTheDocument()
+  })
+
+  it('renders the substepToolbox when selectedSubstep is not null', () => {
+    vi.mocked(getSelectedSubstep).mockReturnValue('mockId')
+    render()
+    screen.getByText('mock SubstepsToolbox')
   })
 })

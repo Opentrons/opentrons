@@ -15,11 +15,11 @@ import {
   POSITION_ABSOLUTE,
   PrimaryButton,
   SecondaryButton,
+  LargeButton,
   SPACING,
   StyledText,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
-  LargeButton,
   WARNING_TOAST,
 } from '@opentrons/components'
 import {
@@ -66,10 +66,10 @@ type RecoverySplashProps = ErrorRecoveryFlowsProps &
     failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
     robotType: RobotType
     robotName: string
-    toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
-    analytics: UseRecoveryAnalyticsResult<RecoveryRoute, RouteStep>
     /* Whether the app should resume any paused recovery state without user action. */
     resumePausedRecovery: boolean
+    toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
+    analytics: UseRecoveryAnalyticsResult<RecoveryRoute, RouteStep>
   }
 export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
   const {
@@ -198,21 +198,19 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
           gridGap={SPACING.spacing16}
         >
           <LargeButton
+            css={SHARED_BUTTON_STYLE_ODD}
             onClick={onCancelClick}
             buttonText={t('cancel_run')}
-            css={
-              isDisabled() ? BTN_STYLE_DISABLED_ODD : SHARED_BUTTON_STYLE_ODD
-            }
-            iconName={'remove'}
+            iconName="remove"
+            ariaDisabled={isDisabled()}
             buttonType="alertAlt"
           />
           <LargeButton
+            css={SHARED_BUTTON_STYLE_ODD}
             onClick={onLaunchERClick}
             buttonText={t('launch_recovery_mode')}
-            css={
-              isDisabled() ? BTN_STYLE_DISABLED_ODD : SHARED_BUTTON_STYLE_ODD
-            }
-            iconName={'recovery'}
+            iconName="recovery"
+            ariaDisabled={isDisabled()}
             buttonType="alertStroke"
           />
         </Flex>
@@ -296,30 +294,6 @@ const SplashFrame = styled(Flex)`
 const SHARED_BUTTON_STYLE_ODD = css`
   width: 29rem;
   height: 13.5rem;
-`
-const BTN_STYLE_DISABLED_ODD = css`
-  ${SHARED_BUTTON_STYLE_ODD}
-
-  background-color: ${COLORS.grey35};
-  color: ${COLORS.grey50};
-  border: none;
-  box-shadow: none;
-
-  #btn-icon: {
-    color: ${COLORS.grey50};
-  }
-
-  &:active,
-  &:focus,
-  &:hover {
-    background-color: ${COLORS.grey35};
-    color: ${COLORS.grey50};
-  }
-  &:active,
-  &:focus,
-  &:hover #btn-icon {
-    color: ${COLORS.grey50};
-  }
 `
 
 const PRIMARY_BTN_STYLES_DESKTOP = css`

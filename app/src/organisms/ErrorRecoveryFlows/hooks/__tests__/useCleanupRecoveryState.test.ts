@@ -14,8 +14,8 @@ describe('useCleanupRecoveryState', () => {
       isTakeover: false,
       stashedMapRef: {
         current: {
-          route: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE,
-          step: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.STEPS.SKIP,
+          route: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
+          step: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP,
         },
       },
       setRM: mockSetRM,
@@ -26,8 +26,8 @@ describe('useCleanupRecoveryState', () => {
     renderHook(() => useCleanupRecoveryState(props))
 
     expect(props.stashedMapRef.current).toEqual({
-      route: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE,
-      step: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.STEPS.SKIP,
+      route: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
+      step: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP,
     })
     expect(mockSetRM).not.toHaveBeenCalled()
   })
@@ -61,18 +61,17 @@ describe('useCleanupRecoveryState', () => {
       { initialProps: { isTakeover: true } }
     )
 
-    // Reset mockSetRM and stashedMapRef
     mockSetRM.mockClear()
     props.stashedMapRef.current = {
-      route: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE,
-      step: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.STEPS.SKIP,
+      route: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
+      step: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP,
     }
 
     rerender({ isTakeover: false })
 
     expect(props.stashedMapRef.current).toEqual({
-      route: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE,
-      step: RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.STEPS.SKIP,
+      route: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE,
+      step: RECOVERY_MAP.MANUAL_FILL_AND_SKIP.STEPS.SKIP,
     })
     expect(mockSetRM).not.toHaveBeenCalled()
   })
