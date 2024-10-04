@@ -6,11 +6,8 @@ import path from 'path'
 import { createUi, waitForRobotServerAndShowMainWindow } from './ui'
 import { createLogger } from './log'
 import { registerDiscovery } from './discovery'
-import {
-  registerUpdate,
-  updateLatestVersion,
-  registerUpdateBrightness,
-} from './update'
+import { registerUpdate, updateLatestVersion } from './update'
+import { registerUpdateBrightness } from './system'
 import { registerRobotSystemUpdate } from './system-update'
 import { registerAppRestart } from './restart'
 import {
