@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """Command models to execute a Thermocycler profile."""
 from __future__ import annotations
 from typing import List, Optional, TYPE_CHECKING, overload, Union
