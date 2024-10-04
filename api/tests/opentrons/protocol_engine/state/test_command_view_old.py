@@ -597,7 +597,7 @@ action_allowed_specs: List[ActionAllowedSpec] = [
     ),
     ActionAllowedSpec(
         subject=get_command_view(
-            queue_status=QueueStatus.PAUSED, is_door_blocking=True
+            queue_status=QueueStatus.AWAITING_RECOVERY_PAUSED, is_door_blocking=True
         ),
         action=QueueCommandAction(
             request=cmd.unsafe.UnsafeUngripLabwareCreate(
