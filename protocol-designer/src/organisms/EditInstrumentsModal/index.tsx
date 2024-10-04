@@ -6,6 +6,7 @@ import styled, { css } from 'styled-components'
 import mapValues from 'lodash/mapValues'
 import {
   ALIGN_CENTER,
+  ALIGN_STRETCH,
   Box,
   Btn,
   Checkbox,
@@ -17,11 +18,13 @@ import {
   DISPLAY_INLINE_BLOCK,
   EmptySelectorButton,
   Flex,
+  FLEX_MAX_CONTENT,
   Icon,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   ListItem,
   Modal,
+  OVERFLOW_AUTO,
   PrimaryButton,
   PRODUCT,
   RadioButton,
@@ -143,9 +146,12 @@ export function EditInstrumentsModal(
 
   return createPortal(
     <Modal
-      title={t('shared:edit_instruments')}
+      title={
+        page === 'add' ? t('shared:edit_pipette') : t('shared:edit_instruments')
+      }
       type="info"
       closeOnOutsideClick
+      width="37.125rem"
       onClose={() => {
         resetFields()
         onClose()
@@ -154,7 +160,7 @@ export function EditInstrumentsModal(
         <Flex
           justifyContent={JUSTIFY_END}
           gridGap={SPACING.spacing8}
-          padding={SPACING.spacing24}
+          padding={`0 ${SPACING.spacing24} ${SPACING.spacing24}`}
         >
           {page === 'overview' ? null : (
             <SecondaryButton
@@ -199,11 +205,10 @@ export function EditInstrumentsModal(
       }
     >
       {page === 'overview' ? (
-        <>
-          <Flex marginTop={SPACING.spacing24} flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
             <Flex
               justifyContent={JUSTIFY_SPACE_BETWEEN}
-              marginBottom={SPACING.spacing12}
               alignItems={ALIGN_CENTER}
             >
               <StyledText desktopStyle="bodyLargeSemiBold">
@@ -309,13 +314,9 @@ export function EditInstrumentsModal(
             </Flex>
           </Flex>
           {robotType === FLEX_ROBOT_TYPE ? (
-            <Flex
-              marginTop={SPACING.spacing60}
-              flexDirection={DIRECTION_COLUMN}
-            >
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               <Flex
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
-                marginBottom={SPACING.spacing12}
                 alignItems={ALIGN_CENTER}
               >
                 <StyledText desktopStyle="bodyLargeSemiBold">
@@ -370,18 +371,15 @@ export function EditInstrumentsModal(
               </Flex>
             </Flex>
           ) : null}
-        </>
+        </Flex>
       ) : (
         <Flex
           flexDirection="column"
-          overflowY="scroll"
-          marginTop={SPACING.spacing24}
+          overflowY={OVERFLOW_AUTO}
+          gridGap={SPACING.spacing24}
         >
-          <>
-            <StyledText
-              desktopStyle="bodyLargeSemiBold"
-              marginBottom={SPACING.spacing16}
-            >
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            <StyledText desktopStyle="bodyLargeSemiBold">
               {t('pipette_type')}
             </StyledText>
             <Flex gridGap={SPACING.spacing4}>
@@ -402,16 +400,10 @@ export function EditInstrumentsModal(
                 )
               })}
             </Flex>
-          </>
+          </Flex>
           {pipetteType != null && robotType === OT2_ROBOT_TYPE ? (
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              marginBottom={SPACING.spacing16}
-            >
-              <StyledText
-                desktopStyle="bodyLargeSemiBold"
-                marginBottom={SPACING.spacing16}
-              >
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+              <StyledText desktopStyle="bodyLargeSemiBold">
                 {t('pipette_gen')}
               </StyledText>
               <Flex gridGap={SPACING.spacing4}>
@@ -437,12 +429,10 @@ export function EditInstrumentsModal(
             robotType === OT2_ROBOT_TYPE) ? (
             <Flex
               flexDirection={DIRECTION_COLUMN}
-              marginTop={SPACING.spacing16}
+              gridGap={SPACING.spacing8}
+              id="volume"
             >
-              <StyledText
-                desktopStyle="bodyLargeSemiBold"
-                marginBottom={SPACING.spacing16}
-              >
+              <StyledText desktopStyle="bodyLargeSemiBold">
                 {t('pipette_vol')}
               </StyledText>
               <Flex gridGap={SPACING.spacing4}>
@@ -497,12 +487,9 @@ export function EditInstrumentsModal(
                 return (
                   <Flex
                     flexDirection={DIRECTION_COLUMN}
-                    marginTop={SPACING.spacing16}
+                    gridGap={SPACING.spacing8}
                   >
-                    <StyledText
-                      desktopStyle="bodyLargeSemiBold"
-                      marginBottom={SPACING.spacing16}
-                    >
+                    <StyledText desktopStyle="bodyLargeSemiBold">
                       {t('pipette_tips')}
                     </StyledText>
                     <Box
@@ -510,6 +497,9 @@ export function EditInstrumentsModal(
                         gap: ${SPACING.spacing4};
                         display: ${DISPLAY_FLEX};
                         flex-wrap: ${WRAP};
+                        align-items: ${ALIGN_CENTER};
+                        align-content: ${ALIGN_CENTER};
+                        align-self: ${ALIGN_STRETCH};
                       `}
                     >
                       {tiprackOptions.map(option => (
@@ -520,7 +510,7 @@ export function EditInstrumentsModal(
                             !selectedTips.includes(option.value)
                           }
                           isChecked={selectedTips.includes(option.value)}
-                          labelText={option.name}
+                          labelText={option.name.replace('Opentrons Flex ', '')}
                           onClick={() => {
                             const updatedTips = selectedTips.includes(
                               option.value
@@ -531,41 +521,42 @@ export function EditInstrumentsModal(
                           }}
                         />
                       ))}
-                    </Box>
-                    <Flex
-                      gridGap={SPACING.spacing8}
-                      marginTop={SPACING.spacing4}
-                    >
-                      <StyledLabel>
-                        <StyledText desktopStyle="bodyDefaultRegular">
-                          {t('add_custom_tips')}
-                        </StyledText>
-                        <input
-                          data-testid="SelectPipettes_customTipInput"
-                          type="file"
-                          onChange={e => dispatch(createCustomTiprackDef(e))}
-                        />
-                      </StyledLabel>
-                      {pipetteVolume === 'p1000' &&
-                      robotType === FLEX_ROBOT_TYPE ? null : (
-                        <Btn
-                          onClick={() => {
-                            dispatch(
-                              setFeatureFlags({
-                                OT_PD_ALLOW_ALL_TIPRACKS: !allowAllTipracks,
-                              })
-                            )
-                          }}
-                          textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                        >
+                      <Flex
+                        gridGap={SPACING.spacing8}
+                        padding={SPACING.spacing4}
+                        width={FLEX_MAX_CONTENT}
+                      >
+                        <StyledLabel>
                           <StyledText desktopStyle="bodyDefaultRegular">
-                            {allowAllTipracks
-                              ? t('show_default_tips')
-                              : t('show_all_tips')}
+                            {t('add_custom_tips')}
                           </StyledText>
-                        </Btn>
-                      )}
-                    </Flex>
+                          <input
+                            data-testid="SelectPipettes_customTipInput"
+                            type="file"
+                            onChange={e => dispatch(createCustomTiprackDef(e))}
+                          />
+                        </StyledLabel>
+                        {pipetteVolume === 'p1000' &&
+                        robotType === FLEX_ROBOT_TYPE ? null : (
+                          <Btn
+                            onClick={() => {
+                              dispatch(
+                                setFeatureFlags({
+                                  OT_PD_ALLOW_ALL_TIPRACKS: !allowAllTipracks,
+                                })
+                              )
+                            }}
+                            textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                          >
+                            <StyledText desktopStyle="bodyDefaultRegular">
+                              {allowAllTipracks
+                                ? t('show_default_tips')
+                                : t('show_all_tips')}
+                            </StyledText>
+                          </Btn>
+                        )}
+                      </Flex>
+                    </Box>
                   </Flex>
                 )
               })()
