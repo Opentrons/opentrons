@@ -70,7 +70,7 @@
       "status": "succeeded",
       "params": {
         "moduleId": "f99da9f1-d63b-414b-929e-c646b23790fd:thermocyclerModuleType",
-        "profile": [
+        "profileElements": [
           {
             "repetitions": 10,
             "steps": [

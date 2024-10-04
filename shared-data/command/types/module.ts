@@ -325,6 +325,6 @@ export interface TCProfileCycle {
 
 export interface TCExtendedProfileParams {
   moduleId: string
-  profile: Array<TCProfileCycle | AtomicProfileStep>
+  profileElements: Array<TCProfileCycle | AtomicProfileStep>
   blockMaxVolumeUl?: number
 }

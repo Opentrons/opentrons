@@ -21,7 +21,7 @@ export function getTCRunExtendedProfileCommandText({
   command,
   t,
 }: HandlesCommands<TCRunExtendedProfileRunTimeCommand>): GetTCRunExtendedProfileCommandTextResult {
-  const { profile } = command.params
+  const { profileElements } = command.params
 
   const stepText = ({
     celsius,
@@ -59,8 +59,8 @@ export function getTCRunExtendedProfileCommandText({
   return {
     kind: 'thermocycler/runExtendedProfile',
     commandText: t('tc_starting_extended_profile', {
-      elementCount: profile.length,
+      elementCount: profileElements.length,
     }),
-    profileElementTexts: profileElementTexts(profile),
+    profileElementTexts: profileElementTexts(profileElements),
   }
 }

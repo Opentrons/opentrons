@@ -884,7 +884,7 @@ describe('CommandText', () => {
       <CommandText
         command={{
           commandType: 'thermocycler/runExtendedProfile',
-          params: { profile: mockProfileSteps, moduleId: 'abc123' },
+          params: { profileElements: mockProfileSteps, moduleId: 'abc123' },
           id: 'def456',
           result: {},
           status: 'queued',
@@ -935,7 +935,7 @@ describe('CommandText', () => {
       <CommandText
         command={{
           commandType: 'thermocycler/runExtendedProfile',
-          params: { profile: mockProfileSteps, moduleId: 'abc123' },
+          params: { profileElements: mockProfileSteps, moduleId: 'abc123' },
           id: 'def456',
           result: {},
           status: 'queued',
