@@ -46,6 +46,7 @@ from robot_server.runs.run_models import (
     RunCurrentState,
     ActiveNozzleLayout,
     CommandLinkNoMeta,
+    NozzleLayoutConfig,
 )
 from robot_server.runs.run_orchestrator_store import RunConflictError
 from robot_server.runs.run_data_manager import (
@@ -868,7 +869,9 @@ async def test_get_current_state_success(
     assert result.content.data == RunCurrentState.construct(
         activeNozzleLayouts={
             "mock-pipette-id": ActiveNozzleLayout(
-                startingNozzle="A1", activeNozzles=["A1"], config="FULL"
+                startingNozzle="A1",
+                activeNozzles=["A1"],
+                config=NozzleLayoutConfig.FULL,
             )
         }
     )

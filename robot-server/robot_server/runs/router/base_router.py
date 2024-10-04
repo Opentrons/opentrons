@@ -52,6 +52,7 @@ from ..run_models import (
     ActiveNozzleLayout,
     RunCurrentState,
     CommandLinkNoMeta,
+    NozzleLayoutConfig,
 )
 from ..run_auto_deleter import RunAutoDeleter
 from ..run_models import Run, BadRun, RunCreate, RunUpdate
@@ -576,7 +577,7 @@ async def get_current_state(
             pipetteId: ActiveNozzleLayout.construct(
                 startingNozzle=nozzle_map.starting_nozzle,
                 activeNozzles=list(nozzle_map.map_store.keys()),
-                config=nozzle_map.configuration.value,
+                config=NozzleLayoutConfig(nozzle_map.configuration.value.lower()),
             )
             for pipetteId, nozzle_map in active_nozzle_maps.items()
         }

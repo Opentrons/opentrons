@@ -1,5 +1,7 @@
 """Request and response models for run resources."""
 from datetime import datetime
+
+from enum import Enum
 from pydantic import BaseModel, Field
 from typing import List, Optional, Literal, Dict
 
@@ -280,6 +282,16 @@ class LabwareDefinitionSummary(BaseModel):
     )
 
 
+class NozzleLayoutConfig(str, Enum):
+    """Possible valid nozzle configurations."""
+
+    COLUMN = "column"
+    ROW = "row"
+    SINGLE = "single"
+    FULL = "full"
+    SUBRECT = "subrect"
+
+
 class ActiveNozzleLayout(BaseModel):
     """Details about the active nozzle layout for a pipette used in the current run."""
 
@@ -290,7 +302,9 @@ class ActiveNozzleLayout(BaseModel):
         ...,
         description="A map of all the pipette nozzles active in the current configuration.",
     )
-    config: str = Field(..., description="The nozzle configuration type.")
+    config: NozzleLayoutConfig = Field(
+        ..., description="The active nozzle configuration."
+    )
 
 
 class RunCurrentState(BaseModel):
