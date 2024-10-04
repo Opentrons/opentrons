@@ -63,11 +63,14 @@ export function useLaunchLPC(
         Promise.all(
           getLabwareDefinitionsFromCommands(
             mostRecentAnalysis?.commands ?? []
-          ).map(def =>
-            createLabwareDefinition({
-              maintenanceRunId: maintenanceRun?.data?.id,
-              labwareDef: def,
-            })
+          ).map(def => {
+            // HACK: Skip plate reader for now
+            if (def.parameters.loadName !== 'opentrons_flex_lid_absorbance_plate_reader_module')
+                createLabwareDefinition({
+                maintenanceRunId: maintenanceRun?.data?.id,
+                labwareDef: def,
+                })
+            }
           )
         ).then(() => {
           setMaintenanceRunId(maintenanceRun.data.id)

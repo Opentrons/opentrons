@@ -73,7 +73,12 @@ function getAllCheckSectionSteps(
     []
   )
 
-  return labwareLocations.map(
+  // HACK: Remove LPC for plate reader to unblock science.
+  const filteredLabwareLocations = labwareLocations.filter((labware) => {
+    return labware.location?.moduleModel !== 'absorbanceReaderV1'
+  })
+
+  return filteredLabwareLocations.map(
     ({ location, labwareId, moduleId, adapterId, definitionUri }) => ({
       section: SECTIONS.CHECK_POSITIONS,
       labwareId: labwareId,
