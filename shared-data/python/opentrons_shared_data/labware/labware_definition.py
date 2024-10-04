@@ -247,7 +247,7 @@ class SphericalSegment(BaseModel):
     )
     bottomHeight: _NonNegativeNumber = Field(
         ...,
-        description="Hight of the bottom of the segment, must be 0.0",
+        description="Height of the bottom of the segment, must be 0.0",
     )
 
 
