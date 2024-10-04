@@ -207,13 +207,13 @@ def test_cross_section_area_rectangular(x_dimension: float, y_dimension: float) 
 @pytest.mark.parametrize("well", fake_frusta())
 def test_volume_and_height_circular(well: List[Any]) -> None:
     """Test both volume and height calculations for circular frusta."""
-    if well[-1]["shape"] == "spherical":
+    if well[-1].shape == "spherical":
         return
-    total_height = well[0]["topHeight"]
+    total_height = well[0].topHeight
     for segment in well:
-        if segment["shape"] == "conical":
-            top_radius = segment["topDiameter"] / 2
-            bottom_radius = segment["bottomDiameter"] / 2
+        if segment.shape == "conical":
+            top_radius = segment.topDiameter / 2
+            bottom_radius = segment.bottomDiameter / 2
             a = pi * ((top_radius - bottom_radius) ** 2) / (3 * total_height**2)
             b = pi * bottom_radius * (top_radius - bottom_radius) / total_height
             c = pi * bottom_radius**2
@@ -249,15 +249,15 @@ def test_volume_and_height_circular(well: List[Any]) -> None:
 @pytest.mark.parametrize("well", fake_frusta())
 def test_volume_and_height_rectangular(well: List[Any]) -> None:
     """Test both volume and height calculations for rectangular frusta."""
-    if well[-1]["shape"] == "spherical":
+    if well[-1].shape == "spherical":
         return
-    total_height = well[0]["topHeight"]
+    total_height = well[0].topHeight
     for segment in well:
-        if segment["shape"] == "pyramidal":
-            top_length = segment["topYDimension"]
-            top_width = segment["topXDimension"]
-            bottom_length = segment["bottomYDimension"]
-            bottom_width = segment["bottomXDimension"]
+        if segment.shape == "pyramidal":
+            top_length = segment.topYDimension
+            top_width = segment.topXDimension
+            bottom_length = segment.bottomYDimension
+            bottom_width = segment.bottomXDimension
             a = (
                 (top_length - bottom_length)
                 * (top_width - bottom_width)
@@ -306,22 +306,22 @@ def test_volume_and_height_rectangular(well: List[Any]) -> None:
 @pytest.mark.parametrize("well", fake_frusta())
 def test_volume_and_height_spherical(well: List[Any]) -> None:
     """Test both volume and height calculations for spherical segments."""
-    if well[0]["shape"] == "spherical":
-        for target_height in range(round(well[0]["topHeight"])):
+    if well[0].shape == "spherical":
+        for target_height in range(round(well[0].topHeight)):
             expected_volume = (
                 (1 / 3)
                 * pi
                 * (target_height**2)
-                * (3 * well[0]["radiusOfCurvature"] - target_height)
+                * (3 * well[0].radiusOfCurvature - target_height)
             )
             found_volume = _volume_from_height_spherical(
                 target_height=target_height,
-                radius_of_curvature=well[0]["radiusOfCurvature"],
+                radius_of_curvature=well[0].radiusOfCurvature,
             )
             assert found_volume == expected_volume
             found_height = _height_from_volume_spherical(
                 volume=found_volume,
-                radius_of_curvature=well[0]["radiusOfCurvature"],
-                total_frustum_height=well[0]["topHeight"],
+                radius_of_curvature=well[0].radiusOfCurvature,
+                total_frustum_height=well[0].topHeight,
             )
             assert isclose(found_height, target_height)
