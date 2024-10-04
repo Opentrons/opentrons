@@ -333,7 +333,6 @@ def test_volume_and_height_spherical(well: List[Any]) -> None:
 def test_height_at_volume_within_section(well: List[Any]) -> None:
     """Test that finding the height when volume ~= capacity  works."""
     for segment in well:
-        print(segment)
         segment_height = segment.topHeight - segment.bottomHeight
         height = height_at_volume_within_section(
             segment, _get_segment_capacity(segment), segment_height
