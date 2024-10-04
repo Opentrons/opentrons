@@ -8,6 +8,9 @@ from ..errors.exceptions import InvalidLiquidHeightFound, InvalidWellDefinitionE
 from opentrons_shared_data.labware.labware_definition import (
     InnerWellGeometry,
     WellSegment,
+    SphericalSegment,
+    ConicalFrustum,
+    PyramidalFrustum,
 )
 
 
@@ -207,38 +210,39 @@ def get_well_volumetric_capacity(
 
     for segment in sorted_well:
         section_volume: Optional[float] = None
-        if segment.shape == "spherical":
-            if sorted_well[0] != segment:
-                raise InvalidWellDefinitionError(
-                    "spherical segment must only be at the bottom of a well."
+        match segment:
+            case SphericalSegment:
+                if sorted_well[0] != segment:
+                    raise InvalidWellDefinitionError(
+                        "spherical segment must only be at the bottom of a well."
+                    )
+                section_volume = _volume_from_height_spherical(
+                    target_height=segment.topHeight,
+                    radius_of_curvature=segment.radiusOfCurvature,
                 )
-            section_volume = _volume_from_height_spherical(
-                target_height=segment.topHeight,
-                radius_of_curvature=segment.radiusOfCurvature,
-            )
-        elif segment.shape == "pyramidal":
-            section_height = segment.topHeight - segment.bottomHeight
-            section_volume = _volume_from_height_rectangular(
-                target_height=section_height,
-                bottom_length=segment.bottomYDimension,
-                bottom_width=segment.bottomXDimension,
-                top_length=segment.topYDimension,
-                top_width=segment.topXDimension,
-                total_frustum_height=section_height,
-            )
-        elif segment.shape == "conical":
-            section_height = segment.topHeight - segment.bottomHeight
-            section_volume = _volume_from_height_circular(
-                target_height=section_height,
-                total_frustum_height=section_height,
-                bottom_radius=(segment.bottomDiameter / 2),
-                top_radius=(segment.topDiameter / 2),
-            )
-        # TODO: implement volume calculations for truncated circular and rounded rectangular segments
-        if not section_volume:
-            raise NotImplementedError(
-                f"volume calculation for shape: {segment.shape} not yet implemented."
-            )
+            case PyramidalFrustum:
+                section_height = segment.topHeight - segment.bottomHeight
+                section_volume = _volume_from_height_rectangular(
+                    target_height=section_height,
+                    bottom_length=segment.bottomYDimension,
+                    bottom_width=segment.bottomXDimension,
+                    top_length=segment.topYDimension,
+                    top_width=segment.topXDimension,
+                    total_frustum_height=section_height,
+                )
+            case ConicalFrustum:
+                section_height = segment.topHeight - segment.bottomHeight
+                section_volume = _volume_from_height_circular(
+                    target_height=section_height,
+                    total_frustum_height=section_height,
+                    bottom_radius=(segment.bottomDiameter / 2),
+                    top_radius=(segment.topDiameter / 2),
+                )
+            case _:
+                # TODO: implement volume calculations for truncated circular and rounded rectangular segments
+                raise NotImplementedError(
+                    f"volume calculation for shape: {segment.shape} not yet implemented."
+                )
         well_volume.append((segment.topHeight, section_volume))
     return well_volume
 
@@ -249,33 +253,33 @@ def height_at_volume_within_section(
     section_height: float,
 ) -> float:
     """Calculate a height within a bounded section according to geometry."""
-    if section.shape == "spherical":
-        partial_height = _height_from_volume_spherical(
-            volume=target_volume_relative,
-            total_frustum_height=section_height,
-            radius_of_curvature=section.radiusOfCurvature,
-        )
-    elif section.shape == "conical":
-        partial_height = _height_from_volume_circular(
-            volume=target_volume_relative,
-            top_radius=(section.bottomDiameter / 2),
-            bottom_radius=(section.topDiameter / 2),
-            total_frustum_height=section_height,
-        )
-    elif section.shape == "pyramidal":
-        partial_height = _height_from_volume_rectangular(
-            volume=target_volume_relative,
-            total_frustum_height=section_height,
-            bottom_width=section.bottomXDimension,
-            bottom_length=section.bottomYDimension,
-            top_width=section.topXDimension,
-            top_length=section.topYDimension,
-        )
-    else:
-        raise NotImplementedError(
-            "Height from volume calculation not yet implemented for this well shape."
-        )
-    return partial_height
+    match section:
+        case SphericalSegment:
+            return _height_from_volume_spherical(
+                volume=target_volume_relative,
+                total_frustum_height=section_height,
+                radius_of_curvature=section.radiusOfCurvature,
+            )
+        case ConicalFrustum:
+            return _height_from_volume_circular(
+                volume=target_volume_relative,
+                top_radius=(section.bottomDiameter / 2),
+                bottom_radius=(section.topDiameter / 2),
+                total_frustum_height=section_height,
+            )
+        case PyramidalFrustum:
+            return _height_from_volume_rectangular(
+                volume=target_volume_relative,
+                total_frustum_height=section_height,
+                bottom_width=section.bottomXDimension,
+                bottom_length=section.bottomYDimension,
+                top_width=section.topXDimension,
+                top_length=section.topYDimension,
+            )
+        case _:
+            raise NotImplementedError(
+                "Height from volume calculation not yet implemented for this well shape."
+            )
 
 
 def volume_at_height_within_section(
@@ -284,34 +288,34 @@ def volume_at_height_within_section(
     section_height: float,
 ) -> float:
     """Calculate a volume within a bounded section according to geometry."""
-    if section.shape == "spherical":
-        partial_volume = _volume_from_height_spherical(
-            target_height=target_height_relative,
-            radius_of_curvature=section.radiusOfCurvature,
-        )
-    elif section.shape == "conical":
-        partial_volume = _volume_from_height_circular(
-            target_height=target_height_relative,
-            total_frustum_height=section_height,
-            bottom_radius=(section.bottomDiameter / 2),
-            top_radius=(section.topDiameter / 2),
-        )
-    elif section.shape == "pyramidal":
-        partial_volume = _volume_from_height_rectangular(
-            target_height=target_height_relative,
-            total_frustum_height=section_height,
-            bottom_width=section.bottomXDimension,
-            bottom_length=section.bottomYDimension,
-            top_width=section.topXDimension,
-            top_length=section.topYDimension,
-        )
-    # TODO(cm): this would be the NEST-96 2uL wells referenced in EXEC-712
-    # we need to input the math attached to that issue
-    else:
-        raise NotImplementedError(
-            "Height from volume calculation not yet implemented for this well shape."
-        )
-    return partial_volume
+    match section:
+        case SphericalSegment:
+            return _volume_from_height_spherical(
+                target_height=target_height_relative,
+                radius_of_curvature=section.radiusOfCurvature,
+            )
+        case ConicalFrustum:
+            return _volume_from_height_circular(
+                target_height=target_height_relative,
+                total_frustum_height=section_height,
+                bottom_radius=(section.bottomDiameter / 2),
+                top_radius=(section.topDiameter / 2),
+            )
+        case PyramidalFrustum:
+            return _volume_from_height_rectangular(
+                target_height=target_height_relative,
+                total_frustum_height=section_height,
+                bottom_width=section.bottomXDimension,
+                bottom_length=section.bottomYDimension,
+                top_width=section.topXDimension,
+                top_length=section.topYDimension,
+            )
+        case _:
+            # TODO(cm): this would be the NEST-96 2uL wells referenced in EXEC-712
+            # we need to input the math attached to that issue
+            raise NotImplementedError(
+                "Height from volume calculation not yet implemented for this well shape."
+            )
 
 
 def _find_volume_in_partial_frustum(
