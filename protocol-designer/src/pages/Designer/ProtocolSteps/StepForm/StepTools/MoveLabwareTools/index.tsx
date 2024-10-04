@@ -40,7 +40,6 @@ export function MoveLabwareTools(props: StepFormProps): JSX.Element {
           }
         />
       ) : null}
-      <Box borderBottom={`1px solid ${COLORS.grey30}`} />
       <MoveLabwareField {...propsForFields.labware} />
       <Box borderBottom={`1px solid ${COLORS.grey30}`} />
       <LabwareLocationField

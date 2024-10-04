@@ -1,6 +1,6 @@
 """Tests for RunDataManager."""
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Dict
 from unittest.mock import sentinel
 
 import pytest
@@ -23,6 +23,8 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.types import BooleanParameter, CSVParameter
 from opentrons.protocol_runner import RunResult
+
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 
 from opentrons_shared_data.errors.exceptions import InvalidStoredData
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -130,6 +132,13 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
             default=True,
         )
     ]
+
+
+@pytest.fixture
+def mock_nozzle_maps(decoy: Decoy) -> Dict[str, NozzleMap]:
+    """Get a mock NozzleMap."""
+    mock_nozzle_map = decoy.mock(cls=NozzleMap)
+    return {"mock-pipette-id": mock_nozzle_map}
 
 
 @pytest.fixture
@@ -1135,3 +1144,38 @@ async def test_create_policies_translates_and_calls_orchestrator(
     decoy.verify(
         mock_run_orchestrator_store.set_error_recovery_policy(sentinel.expected_output)
     )
+
+
+def test_get_nozzle_map_current_run(
+    decoy: Decoy,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+    subject: RunDataManager,
+    mock_nozzle_maps: Dict[str, NozzleMap],
+) -> None:
+    """It should return the nozzle map for the current run."""
+    run_id = "current-run-id"
+
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
+    decoy.when(mock_run_orchestrator_store.get_nozzle_maps()).then_return(
+        mock_nozzle_maps
+    )
+
+    result = subject.get_nozzle_maps(run_id=run_id)
+
+    assert result == mock_nozzle_maps
+
+
+def test_get_nozzle_map_not_current_run(
+    decoy: Decoy,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+    subject: RunDataManager,
+) -> None:
+    """It should raise RunNotCurrentError for a non-current run."""
+    run_id = "non-current-run-id"
+
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return(
+        "different-run-id"
+    )
+
+    with pytest.raises(RunNotCurrentError):
+        subject.get_nozzle_maps(run_id=run_id)
