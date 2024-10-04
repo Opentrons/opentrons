@@ -1,6 +1,6 @@
 """Translation of JSON protocol commands into ProtocolEngine commands."""
-from typing import cast, List, Union
-from pydantic import parse_obj_as
+from typing import cast, List, Union, Iterator
+from pydantic import parse_obj_as, ValidationError as PydanticValidationError
 
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.protocol.models import (
@@ -12,6 +12,7 @@ from opentrons_shared_data.protocol.models import (
     protocol_schema_v8,
 )
 from opentrons_shared_data import command as command_schema
+from opentrons_shared_data.errors.exceptions import InvalidProtocolData, PythonException
 
 from opentrons.types import MountType
 from opentrons.protocol_engine import (
@@ -196,7 +197,7 @@ class JsonTranslator:
     """Class that translates commands/liquids from PD/JSON to ProtocolEngine."""
 
     def translate_liquids(
-        self, protocol: Union[ProtocolSchemaV6, ProtocolSchemaV7]
+        self, protocol: Union[ProtocolSchemaV6, ProtocolSchemaV7, ProtocolSchemaV8]
     ) -> List[Liquid]:
         """Takes json protocol v6 and translates liquids->protocol engine liquids."""
         protocol_liquids = protocol.liquids or {}
@@ -258,7 +259,8 @@ class JsonTranslator:
         self, protocol: ProtocolSchemaV8
     ) -> List[pe_commands.CommandCreate]:
         """Translate commands in json protocol schema v8, which might be of different command schemas."""
-        command_schema_ref = protocol.commandSchemaId
+        command_schema_ref = protocol.commandSchemaId.value
+
         # these calls will raise if the command schema version is invalid or unknown
         command_schema_version = command_schema.schema_version_from_ref(
             command_schema_ref
@@ -267,4 +269,18 @@ class JsonTranslator:
             command_schema_version
         )
 
-        return [_translate_simple_command(command) for command in protocol.commands]
+        def translate_all_commands() -> Iterator[pe_commands.CommandCreate]:
+            for command in protocol.commands:
+                try:
+                    yield _translate_simple_command(command)
+                except PydanticValidationError as pve:
+                    raise InvalidProtocolData(
+                        message=(
+                            "The protocol is invalid because it contains an unknown or malformed command, "
+                            f'"{command.commandType}".'
+                        ),
+                        detail={"kind": "invalid-command"},
+                        wrapping=[PythonException(pve)],
+                    )
+
+        return list(translate_all_commands())
