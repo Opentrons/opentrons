@@ -3,7 +3,7 @@ from typing import List, Tuple
 from numpy import pi, iscomplex, roots, real
 from math import isclose
 
-from ..errors.exceptions import InvalidLiquidHeightFound, InvalidWellDefinitionError
+from ..errors.exceptions import InvalidLiquidHeightFound
 
 from opentrons_shared_data.labware.labware_definition import (
     InnerWellGeometry,
@@ -199,12 +199,12 @@ def _height_from_volume_spherical(
 
 def _get_segment_capacity(segment: WellSegment) -> float:
     match segment:
-        case SphericalSegment:
+        case SphericalSegment():
             return _volume_from_height_spherical(
                 target_height=segment.topHeight,
                 radius_of_curvature=segment.radiusOfCurvature,
             )
-        case PyramidalFrustum:
+        case PyramidalFrustum():
             section_height = segment.topHeight - segment.bottomHeight
             return _volume_from_height_rectangular(
                 target_height=section_height,
@@ -214,7 +214,7 @@ def _get_segment_capacity(segment: WellSegment) -> float:
                 top_width=segment.topXDimension,
                 total_frustum_height=section_height,
             )
-        case ConicalFrustum:
+        case ConicalFrustum():
             section_height = segment.topHeight - segment.bottomHeight
             return _volume_from_height_circular(
                 target_height=section_height,
@@ -253,20 +253,20 @@ def height_at_volume_within_section(
 ) -> float:
     """Calculate a height within a bounded section according to geometry."""
     match section:
-        case SphericalSegment:
+        case SphericalSegment():
             return _height_from_volume_spherical(
                 volume=target_volume_relative,
                 total_frustum_height=section_height,
                 radius_of_curvature=section.radiusOfCurvature,
             )
-        case ConicalFrustum:
+        case ConicalFrustum():
             return _height_from_volume_circular(
                 volume=target_volume_relative,
                 top_radius=(section.bottomDiameter / 2),
                 bottom_radius=(section.topDiameter / 2),
                 total_frustum_height=section_height,
             )
-        case PyramidalFrustum:
+        case PyramidalFrustum():
             return _height_from_volume_rectangular(
                 volume=target_volume_relative,
                 total_frustum_height=section_height,
@@ -288,19 +288,19 @@ def volume_at_height_within_section(
 ) -> float:
     """Calculate a volume within a bounded section according to geometry."""
     match section:
-        case SphericalSegment:
+        case SphericalSegment():
             return _volume_from_height_spherical(
                 target_height=target_height_relative,
                 radius_of_curvature=section.radiusOfCurvature,
             )
-        case ConicalFrustum:
+        case ConicalFrustum():
             return _volume_from_height_circular(
                 target_height=target_height_relative,
                 total_frustum_height=section_height,
                 bottom_radius=(section.bottomDiameter / 2),
                 top_radius=(section.topDiameter / 2),
             )
-        case PyramidalFrustum:
+        case PyramidalFrustum():
             return _volume_from_height_rectangular(
                 target_height=target_height_relative,
                 total_frustum_height=section_height,
