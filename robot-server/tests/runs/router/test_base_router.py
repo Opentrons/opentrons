@@ -45,6 +45,7 @@ from robot_server.runs.run_models import (
     RunUpdate,
     RunCurrentState,
     ActiveNozzleLayout,
+    CommandLinkNoMeta,
 )
 from robot_server.runs.run_orchestrator_store import RunConflictError
 from robot_server.runs.run_data_manager import (
@@ -872,8 +873,9 @@ async def test_get_current_state_success(
         }
     )
     assert result.content.links == CurrentStateLinks(
-        active_command=ResourceLink(
-            href="/runs/test-run-id/commands/current-command-id", meta=None
+        current=CommandLinkNoMeta(
+            href="/runs/test-run-id/commands/current-command-id",
+            id="current-command-id",
         )
     )
 

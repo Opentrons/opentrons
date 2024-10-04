@@ -47,7 +47,12 @@ from robot_server.protocols.protocol_store import (
 )
 from robot_server.protocols.router import ProtocolNotFound
 
-from ..run_models import RunNotFoundError, ActiveNozzleLayout, RunCurrentState
+from ..run_models import (
+    RunNotFoundError,
+    ActiveNozzleLayout,
+    RunCurrentState,
+    CommandLinkNoMeta,
+)
 from ..run_auto_deleter import RunAutoDeleter
 from ..run_models import Run, BadRun, RunCreate, RunUpdate
 from ..run_orchestrator_store import RunConflictError
@@ -122,9 +127,9 @@ class AllRunsLinks(BaseModel):
 class CurrentStateLinks(BaseModel):
     """Links returned with the current state of a run."""
 
-    active_command: Optional[ResourceLink] = Field(
+    current: Optional[CommandLinkNoMeta] = Field(
         None,
-        description="Path to the command active when current state was reported.",
+        description="Path to the current command when current state was reported, if any.",
     )
 
 
@@ -545,6 +550,8 @@ async def get_run_commands_error(
     description=dedent(
         """
         Get current state associated with a run if the run is current.
+        "\n\n"
+        Note that this endpoint is experimental and subject to change.
         """
     ),
     responses={
@@ -578,9 +585,11 @@ async def get_current_state(
     except RunNotCurrentError as e:
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
+    # TODO(jh, 03-11-24): Use `last_completed_command` instead of `current_command` to avoid concurrency gotchas.
     links = CurrentStateLinks.construct(
-        active_command=ResourceLink.construct(
-            href=f"/runs/{runId}/commands/{current_command.command_id}"
+        current=CommandLinkNoMeta.construct(
+            id=current_command.command_id,
+            href=f"/runs/{runId}/commands/{current_command.command_id}",
         )
         if current_command is not None
         else None

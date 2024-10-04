@@ -299,6 +299,13 @@ class RunCurrentState(BaseModel):
     activeNozzleLayouts: Dict[str, ActiveNozzleLayout] = Field(..., description="")
 
 
+class CommandLinkNoMeta(BaseModel):
+    """A link to a command resource without a meta field."""
+
+    id: str = Field(..., description="The ID of the command.")
+    href: str = Field(..., description="The HTTP API path to the command.")
+
+
 class RunNotFoundError(GeneralError):
     """Error raised when a given Run ID is not found in the store."""
 
