@@ -1,3 +1,4 @@
+import { formatDurationLabeled } from '/app/transformations/commands'
 import type { TCRunProfileRunTimeCommand } from '@opentrons/shared-data/command'
 import type { GetTCRunProfileCommandTextResult } from '..'
 import type { HandlesCommands } from './types'
@@ -12,7 +13,7 @@ export function getTCRunProfileCommandText({
     ({ holdSeconds, celsius }: { holdSeconds: number; celsius: number }) =>
       t('tc_run_profile_steps', {
         celsius,
-        seconds: holdSeconds,
+        duration: formatDurationLabeled({ seconds: holdSeconds }),
       }).trim()
   )
 

@@ -822,8 +822,8 @@ describe('CommandText', () => {
       }
     )
     screen.getByText('Running thermocycler profile with 2 steps:')
-    screen.getByText('Temperature: 20°C, seconds: 10')
-    screen.getByText('Temperature: 40°C, seconds: 30')
+    screen.getByText('Temperature: 20°C, hold time: 00h 00m 10s')
+    screen.getByText('Temperature: 40°C, hold time: 00h 00m 30s')
   })
   it('renders correct text for thermocycler/runProfile on ODD', () => {
     const mockProfileSteps = [
@@ -852,9 +852,9 @@ describe('CommandText', () => {
       }
     )
     screen.getByText('Running thermocycler profile with 2 steps:')
-    screen.getByText('Temperature: 20°C, seconds: 10')
+    screen.getByText('Temperature: 20°C, hold time: 00h 00m 10s')
     expect(
-      screen.queryByText('Temperature: 40°C, seconds: 30')
+      screen.queryByText('Temperature: 40°C, hold time: 00h 00m 30s')
     ).not.toBeInTheDocument()
   })
   it('renders correct text for thermocycler/runExtendedProfile on Desktop', () => {
@@ -871,7 +871,7 @@ describe('CommandText', () => {
       {
         repetitions: 9,
         steps: [
-          { holdSeconds: 13, celsius: 12 },
+          { holdSeconds: 13000, celsius: 12 },
           { holdSeconds: 14, celsius: 13 },
         ],
       },
@@ -899,14 +899,14 @@ describe('CommandText', () => {
     screen.getByText(
       'Running thermocycler profile with 4 total steps and cycles:'
     )
-    screen.getByText('Temperature: 20°C, seconds: 10')
+    screen.getByText('Temperature: 20°C, hold time: 00h 00m 10s')
     screen.getByText('10 repetitions of the following steps:')
-    screen.getByText('Temperature: 10°C, seconds: 15')
-    screen.getByText('Temperature: 11°C, seconds: 12')
-    screen.getByText('Temperature: 40°C, seconds: 30')
+    screen.getByText('Temperature: 10°C, hold time: 00h 00m 15s')
+    screen.getByText('Temperature: 11°C, hold time: 00h 00m 12s')
+    screen.getByText('Temperature: 40°C, hold time: 00h 00m 30s')
     screen.getByText('9 repetitions of the following steps:')
-    screen.getByText('Temperature: 12°C, seconds: 13')
-    screen.getByText('Temperature: 13°C, seconds: 14')
+    screen.getByText('Temperature: 12°C, hold time: 03h 36m 40s')
+    screen.getByText('Temperature: 13°C, hold time: 00h 00m 14s')
   })
   it('renders correct text for thermocycler/runExtendedProfile on ODD', () => {
     const mockProfileSteps = [
@@ -951,28 +951,28 @@ describe('CommandText', () => {
     screen.getByText(
       'Running thermocycler profile with 4 total steps and cycles:'
     )
-    screen.getByText('Temperature: 20°C, seconds: 10')
+    screen.getByText('Temperature: 20°C, hold time: 00h 00m 10s')
 
     expect(
       screen.queryByText('10 repetitions of the following steps:')
     ).not.toBeInTheDocument()
     expect(
-      screen.queryByText('Temperature: 10°C, seconds: 15')
+      screen.queryByText('Temperature: 10°C, hold time: 00h 00m 15s')
     ).not.toBeInTheDocument()
     expect(
-      screen.queryByText('Temperature: 11°C, seconds: 12')
+      screen.queryByText('Temperature: 11°C, hold time: 00h 00m 12s')
     ).not.toBeInTheDocument()
     expect(
-      screen.queryByText('Temperature: 40°C, seconds: 30')
+      screen.queryByText('Temperature: 40°C, hold time: 00h 00m 30s')
     ).not.toBeInTheDocument()
     expect(
       screen.queryByText('9 repetitions of the following steps:')
     ).not.toBeInTheDocument()
     expect(
-      screen.queryByText('Temperature: 12°C, seconds: 13')
+      screen.queryByText('Temperature: 12°C, hold time: 00h 00m 13s')
     ).not.toBeInTheDocument()
     expect(
-      screen.queryByText('Temperature: 13°C, seconds: 14')
+      screen.queryByText('Temperature: 13°C, hold time: 00h 00m 14s')
     ).not.toBeInTheDocument()
   })
   it('renders correct text for heaterShaker/setAndWaitForShakeSpeed', () => {

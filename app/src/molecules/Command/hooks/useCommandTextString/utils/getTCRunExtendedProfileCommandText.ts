@@ -1,3 +1,4 @@
+import { formatDurationLabeled } from '/app/transformations/commands'
 import type {
   TCRunExtendedProfileRunTimeCommand,
   TCProfileCycle,
@@ -30,7 +31,7 @@ export function getTCRunExtendedProfileCommandText({
     kind: 'step',
     stepText: t('tc_run_profile_steps', {
       celsius,
-      seconds: holdSeconds,
+      duration: formatDurationLabeled({ seconds: holdSeconds }),
     }).trim(),
   })
 

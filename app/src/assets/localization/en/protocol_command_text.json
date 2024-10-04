@@ -71,7 +71,7 @@
   "slot": "Slot {{slot_name}}",
   "target_temperature": "target temperature",
   "tc_awaiting_for_duration": "Waiting for Thermocycler profile to complete",
-  "tc_run_profile_steps": "Temperature: {{celsius}}°C, seconds: {{seconds}}",
+  "tc_run_profile_steps": "Temperature: {{celsius}}°C, hold time: {{duration}}",
   "tc_starting_extended_profile_cycle": "{{repetitions}} repetitions of the following steps:",
   "tc_starting_extended_profile": "Running thermocycler profile with {{elementCount}} total steps and cycles:",
   "tc_starting_profile": "Running thermocycler profile with {{stepCount}} steps:",
