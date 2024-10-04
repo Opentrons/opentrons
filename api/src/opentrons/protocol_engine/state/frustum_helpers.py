@@ -1,5 +1,5 @@
 """Helper functions for liquid-level related calculations inside a given frustum."""
-from typing import List, Tuple, Optional
+from typing import List, Tuple
 from numpy import pi, iscomplex, roots, real
 from math import isclose
 
@@ -197,6 +197,38 @@ def _height_from_volume_spherical(
     return height
 
 
+def _get_segment_capacity(segment: WellSegment) -> float:
+    match segment:
+        case SphericalSegment:
+            return _volume_from_height_spherical(
+                target_height=segment.topHeight,
+                radius_of_curvature=segment.radiusOfCurvature,
+            )
+        case PyramidalFrustum:
+            section_height = segment.topHeight - segment.bottomHeight
+            return _volume_from_height_rectangular(
+                target_height=section_height,
+                bottom_length=segment.bottomYDimension,
+                bottom_width=segment.bottomXDimension,
+                top_length=segment.topYDimension,
+                top_width=segment.topXDimension,
+                total_frustum_height=section_height,
+            )
+        case ConicalFrustum:
+            section_height = segment.topHeight - segment.bottomHeight
+            return _volume_from_height_circular(
+                target_height=section_height,
+                total_frustum_height=section_height,
+                bottom_radius=(segment.bottomDiameter / 2),
+                top_radius=(segment.topDiameter / 2),
+            )
+        case _:
+            # TODO: implement volume calculations for truncated circular and rounded rectangular segments
+            raise NotImplementedError(
+                f"volume calculation for shape: {segment.shape} not yet implemented."
+            )
+
+
 def get_well_volumetric_capacity(
     well_geometry: InnerWellGeometry,
 ) -> List[Tuple[float, float]]:
@@ -209,40 +241,7 @@ def get_well_volumetric_capacity(
     sorted_well = sorted(well_geometry.sections, key=lambda section: section.topHeight)
 
     for segment in sorted_well:
-        section_volume: Optional[float] = None
-        match segment:
-            case SphericalSegment:
-                if sorted_well[0] != segment:
-                    raise InvalidWellDefinitionError(
-                        "spherical segment must only be at the bottom of a well."
-                    )
-                section_volume = _volume_from_height_spherical(
-                    target_height=segment.topHeight,
-                    radius_of_curvature=segment.radiusOfCurvature,
-                )
-            case PyramidalFrustum:
-                section_height = segment.topHeight - segment.bottomHeight
-                section_volume = _volume_from_height_rectangular(
-                    target_height=section_height,
-                    bottom_length=segment.bottomYDimension,
-                    bottom_width=segment.bottomXDimension,
-                    top_length=segment.topYDimension,
-                    top_width=segment.topXDimension,
-                    total_frustum_height=section_height,
-                )
-            case ConicalFrustum:
-                section_height = segment.topHeight - segment.bottomHeight
-                section_volume = _volume_from_height_circular(
-                    target_height=section_height,
-                    total_frustum_height=section_height,
-                    bottom_radius=(segment.bottomDiameter / 2),
-                    top_radius=(segment.topDiameter / 2),
-                )
-            case _:
-                # TODO: implement volume calculations for truncated circular and rounded rectangular segments
-                raise NotImplementedError(
-                    f"volume calculation for shape: {segment.shape} not yet implemented."
-                )
+        section_volume = _get_segment_capacity(segment)
         well_volume.append((segment.topHeight, section_volume))
     return well_volume
 
@@ -321,24 +320,21 @@ def volume_at_height_within_section(
 def _find_volume_in_partial_frustum(
     sorted_well: List[WellSegment],
     target_height: float,
-) -> Optional[float]:
+) -> float:
     """Look through a sorted list of frusta for a target height, and find the volume at that height."""
-    partial_volume: Optional[float] = None
     for segment in sorted_well:
         if segment.bottomHeight < target_height < segment.topHeight:
             relative_target_height = target_height - segment.bottomHeight
             section_height = segment.topHeight - segment.bottomHeight
-            partial_volume = volume_at_height_within_section(
+            return volume_at_height_within_section(
                 section=segment,
                 target_height_relative=relative_target_height,
                 section_height=section_height,
             )
-        if not partial_volume:
-            # if we've looked through all sections and can't find the target volume, raise an error
-            raise InvalidLiquidHeightFound(
-                f"Unable to find volume at given well-height {target_height}."
-            )
-    return partial_volume
+    # if we've looked through all sections and can't find the target volume, raise an error
+    raise InvalidLiquidHeightFound(
+        f"Unable to find volume at given well-height {target_height}."
+    )
 
 
 def find_volume_at_well_height(
@@ -361,16 +357,12 @@ def find_volume_at_well_height(
         if target_height == boundary_height:
             return closed_section_volume
     # find the section the target height is in and compute the volume
-    # since bottomShape is not in list of frusta, check here first
 
     sorted_well = sorted(well_geometry.sections, key=lambda section: section.topHeight)
-    # TODO(cm): handle non-frustum section that is not at the bottom.
     partial_volume = _find_volume_in_partial_frustum(
         sorted_well=sorted_well,
         target_height=target_height,
     )
-    if not partial_volume:
-        raise InvalidLiquidHeightFound("Unable to find volume at given well-height.")
     return partial_volume + closed_section_volume
 
 
@@ -378,10 +370,9 @@ def _find_height_in_partial_frustum(
     sorted_well: List[WellSegment],
     volumetric_capacity: List[Tuple[float, float]],
     target_volume: float,
-) -> Optional[float]:
+) -> float:
     """Look through a sorted list of frusta for a target volume, and find the height at that volume."""
     bottom_section_volume = 0.0
-    height_within_well: Optional[float] = None
     for section, capacity in zip(sorted_well, volumetric_capacity):
         section_top_height, section_volume = capacity
         if bottom_section_volume < target_volume < section_volume:
@@ -392,11 +383,15 @@ def _find_height_in_partial_frustum(
                 target_volume_relative=relative_target_volume,
                 section_height=relative_section_height,
             )
-            height_within_well = partial_height + section.bottomHeight
+            return partial_height + section.bottomHeight
         # bottom section volume should always be the volume enclosed in the previously
         # viewed section
         bottom_section_volume = section_volume
-    return height_within_well
+
+    # if we've looked through all sections and can't find the target volume, raise an error
+    raise InvalidLiquidHeightFound(
+        f"Unable to find height at given volume {target_volume}."
+    )
 
 
 def find_height_at_well_volume(
@@ -413,13 +408,8 @@ def find_height_at_well_volume(
 
     sorted_well = sorted(well_geometry.sections, key=lambda section: section.topHeight)
     # find the section the target volume is in and compute the height
-    well_height = _find_height_in_partial_frustum(
+    return _find_height_in_partial_frustum(
         sorted_well=sorted_well,
         volumetric_capacity=volumetric_capacity,
         target_volume=target_volume,
     )
-    if not well_height:
-        raise InvalidLiquidHeightFound(
-            f"Unable to find height at given well-volume {target_volume}."
-        )
-    return well_height
