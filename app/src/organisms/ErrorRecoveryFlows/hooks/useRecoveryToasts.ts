@@ -174,7 +174,7 @@ function truncateIfTCCommand(
   isTCCommand: boolean
 ): string {
   if (isTCCommand) {
-    const indexOfProfile = commandText.indexOf('profile')
+    const indexOfProfile = commandText.indexOf('steps')
 
     if (indexOfProfile === -1) {
       console.warn(
@@ -182,7 +182,7 @@ function truncateIfTCCommand(
       )
     }
 
-    return commandText.slice(0, indexOfProfile + 7) // +7 to include "profile"
+    return commandText.slice(0, indexOfProfile + 5) // +5 to include "steps"
   } else {
     return commandText
   }

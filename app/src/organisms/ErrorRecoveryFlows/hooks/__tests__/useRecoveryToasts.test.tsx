@@ -24,7 +24,7 @@ vi.mock('/app/molecules/Command')
 
 const TEST_COMMAND = 'test command'
 const TC_COMMAND =
-  'tc starting 1231231 element profile composed of some extra text bla bla'
+  'tc starting profile of 1231231 element steps composed of some extra text bla bla'
 
 let mockMakeToast: Mock
 
@@ -259,13 +259,13 @@ describe('useRecoveryFullCommandText', () => {
         } as any,
       })
     )
-    expect(result.current).toBe('tc starting 1231231 element profile')
+    expect(result.current).toBe('tc starting profile of 1231231 element steps')
   })
 
   it('should truncate new TC command', () => {
     vi.mocked(useCommandTextString).mockReturnValue({
       kind: 'thermocycler/runExtendedProfile',
-      commandText: 'tc starting 2123 element profile composed blah blah blah',
+      commandText: TC_COMMAND,
       profileElementTexts: [{ kind: 'step', stepText: 'blah blah blah' }],
     })
 
@@ -278,6 +278,6 @@ describe('useRecoveryFullCommandText', () => {
         } as any,
       })
     )
-    expect(result.current).toBe('tc starting 2123 element profile')
+    expect(result.current).toBe('tc starting profile of 1231231 element steps')
   })
 })
