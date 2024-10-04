@@ -402,9 +402,6 @@ def find_height_at_well_volume(
     max_volume = volumetric_capacity[-1][1]
     if target_volume < 0 or target_volume > max_volume:
         raise InvalidLiquidHeightFound("Invalid target volume.")
-    for section_height, section_volume in volumetric_capacity:
-        if target_volume == section_volume:
-            return section_height
 
     sorted_well = sorted(well_geometry.sections, key=lambda section: section.topHeight)
     # find the section the target volume is in and compute the height

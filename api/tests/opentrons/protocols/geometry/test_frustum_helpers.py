@@ -19,6 +19,8 @@ from opentrons.protocol_engine.state.frustum_helpers import (
     _height_from_volume_circular,
     _height_from_volume_rectangular,
     _height_from_volume_spherical,
+    height_at_volume_within_section,
+    _get_segment_capacity,
 )
 from opentrons.protocol_engine.errors.exceptions import InvalidLiquidHeightFound
 
@@ -325,3 +327,14 @@ def test_volume_and_height_spherical(well: List[Any]) -> None:
                 total_frustum_height=well[0].topHeight,
             )
             assert isclose(found_height, target_height)
+
+
+@pytest.mark.parametrize("well", fake_frusta())
+def test_height_at_volume_within_section(well: List[Any]) -> None:
+    """Test that finding the height when volume ~= capacity  works."""
+    for segment in well:
+        print(segment)
+        segment_height = segment.topHeight - segment.bottomHeight
+        height = height_at_volume_within_section(segment, _get_segment_capacity(segment), segment_height)
+        assert isclose(height, segment_height)
+
