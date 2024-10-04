@@ -407,7 +407,7 @@ async def update_run(
 @PydanticResponse.wrap_route(
     base_router.put,
     path="/runs/{runId}/errorRecoveryPolicy",
-    summary="Set the run's error recovery policy",
+    summary="Set a run's error recovery policy",
     description=dedent(
         """
         Update how to handle different kinds of command failures.
