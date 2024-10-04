@@ -283,6 +283,11 @@ def _pipette_with_liquid_settings(  # noqa: C901
     pipette.flow_rate.aspirate = liquid_class.aspirate.flow_rate
     pipette.flow_rate.dispense = liquid_class.dispense.flow_rate
     pipette.flow_rate.blow_out = liquid_class.dispense.flow_rate
+    default_flow_accel = float(hw_pipette.flow_acceleration)
+    if aspirate:
+        hw_pipette.flow_acceleration = liquid_class.aspirate.flow_acceleration
+    else:
+        hw_pipette.flow_acceleration = liquid_class.dispense.flow_acceleration
     pipette.move_to(well.bottom(approach_mm).move(channel_offset))
     _aspirate_on_approach() if aspirate or mix else _dispense_on_approach()
 
@@ -302,6 +307,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
 
     # EXIT
     callbacks.on_exiting()
+    hw_pipette.flow_acceleration = default_flow_accel  # back to default, just in-case
 
 
 def mix_with_liquid_class(

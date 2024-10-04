@@ -20,6 +20,7 @@ _default_aspirate: Dict[str, AspirateSettings] = {
     _WATER: AspirateSettings(
         z_speed=50,
         flow_rate=None,
+        flow_acceleration=None,
         air_gap=None,
         submerge_mm=-1.5,
         retract_mm=3.0,
@@ -28,6 +29,7 @@ _default_aspirate: Dict[str, AspirateSettings] = {
     _GLYCEROL_50: AspirateSettings(
         z_speed=5,
         flow_rate=None,
+        flow_acceleration=None,
         air_gap=None,
         submerge_mm=-1.5,
         retract_mm=3.0,
@@ -36,6 +38,7 @@ _default_aspirate: Dict[str, AspirateSettings] = {
     _ETHANOL_70: AspirateSettings(
         z_speed=50,
         flow_rate=None,
+        flow_acceleration=None,
         air_gap=None,
         submerge_mm=-1.5,
         retract_mm=3.0,
@@ -46,6 +49,7 @@ _default_dispense: Dict[str, DispenseSettings] = {
     _WATER: DispenseSettings(
         z_speed=50,
         flow_rate=None,
+        flow_acceleration=None,
         push_out=None,
         submerge_mm=-1.5,  # contact dispense
         retract_mm=3.0,
@@ -54,6 +58,7 @@ _default_dispense: Dict[str, DispenseSettings] = {
     _GLYCEROL_50: DispenseSettings(
         z_speed=5,
         flow_rate=None,
+        flow_acceleration=None,
         push_out=None,
         submerge_mm=-1.5,  # contact dispense
         retract_mm=3.0,
@@ -62,12 +67,17 @@ _default_dispense: Dict[str, DispenseSettings] = {
     _ETHANOL_70: DispenseSettings(
         z_speed=50,
         flow_rate=None,
+        flow_acceleration=None,
         push_out=None,
         submerge_mm=-1.5,  # contact dispense
         retract_mm=3.0,
         delay=0.5,
     ),
 }
+
+_default_accel_p50_ul_sec_sec = 1200
+_default_accel_p1000_ul_sec_sec = 24000
+_default_accel_96ch_ul_sec_sec = 16000
 
 _defaults: Dict[
     int, Dict[int, Dict[int, Dict[float, Dict[str, LiquidClassSettings]]]]
@@ -80,6 +90,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=35,
+                            flow_acceleration=_default_accel_p50_ul_sec_sec,
                             air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -88,6 +99,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=57,
+                            flow_acceleration=_default_accel_p50_ul_sec_sec,
                             push_out=11,
                             submerge_mm=None,
                             retract_mm=None,
@@ -98,6 +110,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=7.0,
+                            flow_acceleration=_default_accel_p50_ul_sec_sec,
                             air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -106,6 +119,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=40.0,
+                            flow_acceleration=_default_accel_p50_ul_sec_sec,
                             push_out=11.0,  # NOTE: Tecan is 40uL
                             submerge_mm=None,
                             retract_mm=None,
@@ -118,6 +132,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=23.5,
+                            flow_acceleration=_default_accel_p50_ul_sec_sec,
                             air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -126,6 +141,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=57,
+                            flow_acceleration=_default_accel_p50_ul_sec_sec,
                             push_out=11,
                             submerge_mm=None,
                             retract_mm=None,
@@ -136,6 +152,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=10.0,
+                            flow_acceleration=_default_accel_p50_ul_sec_sec,
                             air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -144,6 +161,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=40.0,
+                            flow_acceleration=_default_accel_p50_ul_sec_sec,
                             push_out=11,
                             submerge_mm=None,
                             retract_mm=None,
@@ -156,6 +174,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=35,
+                            flow_acceleration=_default_accel_p50_ul_sec_sec,
                             air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -164,6 +183,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=57,
+                            flow_acceleration=_default_accel_p50_ul_sec_sec,
                             push_out=3.9,
                             submerge_mm=None,
                             retract_mm=None,
@@ -174,6 +194,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=50.0,
+                            flow_acceleration=_default_accel_p50_ul_sec_sec,
                             air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -182,6 +203,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=50.0,
+                            flow_acceleration=_default_accel_p50_ul_sec_sec,
                             push_out=2.5,
                             submerge_mm=None,
                             retract_mm=None,
@@ -198,6 +220,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=318,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -206,6 +229,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=318,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             push_out=5,
                             submerge_mm=None,
                             retract_mm=None,
@@ -216,6 +240,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=8.0,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             air_gap=0.0,  # ~3.1uL and it "slides" up during retract
                             submerge_mm=None,
                             retract_mm=None,
@@ -224,6 +249,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=600.0,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             push_out=8.0,  # 8uL is minimum (and best performer?)
                             submerge_mm=None,
                             retract_mm=None,
@@ -236,6 +262,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=478,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -244,6 +271,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=478,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             push_out=5,
                             submerge_mm=None,
                             retract_mm=None,
@@ -254,6 +282,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=10.0,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -262,6 +291,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=600.0,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             push_out=30.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -274,6 +304,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=478,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -282,6 +313,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=57,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             push_out=5,
                             submerge_mm=None,
                             retract_mm=None,
@@ -292,6 +324,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=40.0,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -300,6 +333,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=600.0,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             push_out=20.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -318,6 +352,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=716,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             air_gap=0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -326,6 +361,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=716,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             push_out=5,
                             submerge_mm=None,
                             retract_mm=None,
@@ -336,6 +372,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=11.0,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -344,6 +381,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=500.0,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             push_out=20.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -356,6 +394,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=716,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             air_gap=0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -364,6 +403,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=716,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             push_out=5,
                             submerge_mm=None,
                             retract_mm=None,
@@ -374,6 +414,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=40.0,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -382,6 +423,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=500.0,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             push_out=11.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -394,6 +436,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=716,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             air_gap=0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -402,6 +445,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=716,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             push_out=5,
                             submerge_mm=None,
                             retract_mm=None,
@@ -412,6 +456,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=150.0,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -420,6 +465,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=500.0,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             push_out=11.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -438,6 +484,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=160,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             air_gap=0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -446,6 +493,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=160,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             push_out=20,
                             submerge_mm=None,
                             retract_mm=None,
@@ -456,6 +504,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=15.0,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -464,6 +513,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=600,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             push_out=30.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -476,6 +526,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=716,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             air_gap=0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -484,6 +535,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=716,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             push_out=20,
                             submerge_mm=None,
                             retract_mm=None,
@@ -494,6 +546,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=100.0,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -502,6 +555,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=600,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             push_out=20.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -514,6 +568,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=716,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             air_gap=0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -522,6 +577,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=716,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             push_out=20,
                             submerge_mm=None,
                             retract_mm=None,
@@ -532,6 +588,7 @@ _defaults: Dict[
                         aspirate=AspirateSettings(
                             z_speed=None,
                             flow_rate=150.0,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             air_gap=0.0,
                             submerge_mm=None,
                             retract_mm=None,
@@ -540,6 +597,7 @@ _defaults: Dict[
                         dispense=DispenseSettings(
                             z_speed=None,
                             flow_rate=600,
+                            flow_acceleration=_default_accel_p1000_ul_sec_sec,
                             push_out=11.0,
                             submerge_mm=None,
                             retract_mm=None,
