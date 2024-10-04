@@ -128,7 +128,7 @@
         "bottomHeight"
       ],
       "properties": {
-          "shape": {
+        "shape": {
           "type": "string",
           "enum": ["pyramidal"]
         },
