@@ -43,22 +43,15 @@ export interface ThermocyclerCycleType {
   repetitions: string
 }
 
+interface CycleStepValues {
+  value: string | null
+  error: string | null
+  wasAccessed?: boolean
+}
 interface CycleStepType {
-  name: {
-    value: string | null
-    error: string | null
-    wasAccessed?: boolean
-  }
-  temp: {
-    value: string | null
-    error: string | null
-    wasAccessed?: boolean
-  }
-  time: {
-    value?: string | null
-    error: string | null
-    wasAccessed?: boolean
-  }
+  name: CycleStepValues
+  temp: CycleStepValues
+  time: CycleStepValues
 }
 
 interface ThermocyclerCycleProps {
@@ -94,13 +87,17 @@ export function ThermocyclerCycle(props: ThermocyclerCycleProps): JSX.Element {
         return {
           ...acc,
           [id]: {
-            name: { value: title, error: null },
-            temp: { value: temperature, error: null, wasAccessed: false },
+            name: { value: title ?? null, error: null },
+            temp: {
+              value: temperature ?? null,
+              error: null,
+              wasAccessed: false,
+            },
             time: {
               value:
                 durationMinutes != null && durationSeconds != null
                   ? `${durationMinutes}:${durationSeconds}`
-                  : undefined,
+                  : null,
               error: null,
               wasAccessed: false,
             },
