@@ -335,6 +335,7 @@ def test_height_at_volume_within_section(well: List[Any]) -> None:
     for segment in well:
         print(segment)
         segment_height = segment.topHeight - segment.bottomHeight
-        height = height_at_volume_within_section(segment, _get_segment_capacity(segment), segment_height)
+        height = height_at_volume_within_section(
+            segment, _get_segment_capacity(segment), segment_height
+        )
         assert isclose(height, segment_height)
-
