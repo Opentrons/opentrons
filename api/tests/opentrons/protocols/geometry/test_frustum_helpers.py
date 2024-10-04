@@ -50,7 +50,7 @@ def fake_frusta() -> List[List[Any]]:
                 shape="conical",
                 topDiameter=23.0,
                 bottomDiameter=3.0,
-                topHeight=1.0,
+                topHeight=2.0,
                 bottomHeight=1.0,
             ),
             SphericalSegment(
