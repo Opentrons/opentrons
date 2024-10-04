@@ -29,7 +29,10 @@ class CommandAnnotation(BaseModel):
         extra = Extra.allow
 
 
-CommandSchemaId = Enum("CommandSchemaId", ((schema_id, schema_id) for schema_id in known_schema_ids()))
+CommandSchemaId = Enum(  # type: ignore[misc]
+    "CommandSchemaId", ((schema_id, schema_id) for schema_id in known_schema_ids())
+)
+
 
 class ProtocolSchemaV8(BaseModel):
     otSharedSchema: Literal["#/protocol/schemas/8"] = Field(
