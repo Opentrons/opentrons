@@ -747,8 +747,7 @@ class CommandView(HasState[CommandState]):
             return next_fixit_cmd
         if (
             next_fixit_cmd
-            and self._state.queue_status
-            in (QueueStatus.AWAITING_RECOVERY, QueueStatus.AWAITING_RECOVERY_PAUSED)
+            and self._state.queue_status == QueueStatus.AWAITING_RECOVERY_PAUSED
             and self._may_run_with_door_open(fixit_command=self.get(next_fixit_cmd))
         ):
             return next_fixit_cmd
