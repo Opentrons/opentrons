@@ -1,8 +1,9 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { css } from 'styled-components'
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
 import { BORDERS, COLORS } from '../../helix-design-system'
+import { CURSOR_POINTER } from '../../styles'
 import type { StyleProps } from '../../primitives'
 
 export * from './ListButtonChildren/index'
@@ -44,13 +45,14 @@ export function ListButton(props: ListButtonProps): JSX.Element {
   const listButtonProps = LISTBUTTON_PROPS_BY_TYPE[type]
 
   const LIST_BUTTON_STYLE = css`
-    cursor: pointer;
+    cursor: ${CURSOR_POINTER};
     background-color: ${disabled
       ? COLORS.grey35
       : listButtonProps.backgroundColor};
     max-width: 26.875rem;
-    padding: ${SPACING.spacing20} ${SPACING.spacing24};
-    border-radius: ${BORDERS.borderRadius16};
+    padding: ${styleProps.padding ??
+    `${SPACING.spacing20} ${SPACING.spacing24}`};
+    border-radius: ${BORDERS.borderRadius8};
 
     &:hover {
       background-color: ${listButtonProps.hoverBackgroundColor};

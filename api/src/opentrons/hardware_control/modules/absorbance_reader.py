@@ -12,6 +12,8 @@ from opentrons.drivers.types import (
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
     AbsorbanceReaderDeviceState,
+    ABSMeasurementMode,
+    ABSMeasurementConfig,
 )
 
 from opentrons.hardware_control.execution_manager import ExecutionManager
@@ -194,13 +196,21 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         self._device_info = device_info
         self._reader = reader
         self._poller = poller
+        self._measurement_config: Optional[ABSMeasurementConfig] = None
+        self._device_status = AbsorbanceReaderStatus.IDLE
         self._error: Optional[str] = None
         self._reader.register_error_handler(self._enter_error_state)
 
     @property
     def status(self) -> AbsorbanceReaderStatus:
-        """Return some string describing status."""
-        return AbsorbanceReaderStatus.IDLE
+        """Return some string describing the device status."""
+        state = self._reader.device_state
+        if state not in [
+            AbsorbanceReaderDeviceState.UNKNOWN,
+            AbsorbanceReaderDeviceState.OK,
+        ]:
+            return AbsorbanceReaderStatus.ERROR
+        return self._device_status
 
     @property
     def lid_status(self) -> AbsorbanceReaderLidStatus:
@@ -211,6 +221,20 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         return self._reader.plate_presence
 
     @property
+    def uptime(self) -> int:
+        """Time in ms this device has been running for."""
+        return self._reader.uptime
+
+    @property
+    def supported_wavelengths(self) -> List[int]:
+        """The wavelengths in nm this plate reader supports."""
+        return self._reader.supported_wavelengths
+
+    @property
+    def measurement_config(self) -> Optional[ABSMeasurementConfig]:
+        return self._measurement_config
+
+    @property
     def device_info(self) -> Mapping[str, str]:
         """Return a dict of the module's static information (serial, etc)"""
         return self._device_info
@@ -218,12 +242,17 @@ class AbsorbanceReader(mod_abc.AbstractModule):
     @property
     def live_data(self) -> LiveData:
         """Return a dict of the module's dynamic information"""
+        conf = self._measurement_config.data if self._measurement_config else dict()
         return {
             "status": self.status.value,
             "data": {
+                "uptime": self.uptime,
+                "deviceStatus": self.status.value,
                 "lidStatus": self.lid_status.value,
                 "platePresence": self.plate_presence.value,
-                "sampleWavelength": 400,
+                "measureMode": conf.get("measureMode", ""),
+                "sampleWavelengths": conf.get("sampleWavelengths", []),
+                "referenceWavelength": conf.get("referenceWavelength", 0),
             },
         }
 
@@ -309,17 +338,32 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         """
         await self.deactivate()
 
-    async def set_sample_wavelength(self, wavelength: int) -> None:
-        """Set the Absorbance Reader's active wavelength."""
-        await self._driver.initialize_measurement(wavelength)
+    async def set_sample_wavelength(
+        self,
+        mode: ABSMeasurementMode,
+        wavelengths: List[int],
+        reference_wavelength: Optional[int] = None,
+    ) -> None:
+        """Set the Absorbance Reader's measurement mode and active wavelength."""
+        if mode == ABSMeasurementMode.SINGLE:
+            assert (
+                len(wavelengths) == 1
+            ), "Cannot initialize single read mode with more than 1 wavelength."
 
-    async def start_measure(self, wavelength: int) -> List[float]:
-        """Initiate a single measurement."""
-        return await self._driver.get_single_measurement(wavelength)
+        await self._driver.initialize_measurement(wavelengths, mode)
+        self._measurement_config = ABSMeasurementConfig(
+            measure_mode=mode,
+            sample_wavelengths=wavelengths,
+            reference_wavelength=reference_wavelength,
+        )
 
-    async def get_current_wavelength(self) -> None:
-        """Get the Absorbance Reader's current active wavelength."""
-        pass  # TODO: implement
+    async def start_measure(self) -> List[List[float]]:
+        """Initiate a measurement depending on the measurement mode."""
+        try:
+            self._device_status = AbsorbanceReaderStatus.MEASURING
+            return await self._driver.get_measurement()
+        finally:
+            self._device_status = AbsorbanceReaderStatus.IDLE
 
     async def get_current_lid_status(self) -> AbsorbanceReaderLidStatus:
         """Get the Absorbance Reader's current lid status."""

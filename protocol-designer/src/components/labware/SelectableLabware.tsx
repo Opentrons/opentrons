@@ -1,7 +1,9 @@
-import * as React from 'react'
+import type * as React from 'react'
 import reduce from 'lodash/reduce'
 
 import { COLUMN } from '@opentrons/shared-data'
+import { COLORS } from '@opentrons/components'
+
 import {
   arrayToWellGroup,
   getCollidingWells,
@@ -11,7 +13,12 @@ import { SingleLabware } from './SingleLabware'
 import { SelectionRect } from '../SelectionRect'
 import { WellTooltip } from './WellTooltip'
 
-import type { WellMouseEvent, WellGroup } from '@opentrons/components'
+import type {
+  WellMouseEvent,
+  WellGroup,
+  WellFill,
+  WellStroke,
+} from '@opentrons/components'
 import type { ContentsByWell } from '../../labware-ingred/types'
 import type { WellIngredientNames } from '../../steplist/types'
 import type { GenericRect } from '../../collision-types'
@@ -30,6 +37,7 @@ export interface Props {
   nozzleType: NozzleType | null
   ingredNames: WellIngredientNames
   wellContents: ContentsByWell
+  showBorder: boolean
 }
 
 type ChannelType = 8 | 96
@@ -52,6 +60,7 @@ export const SelectableLabware = (props: Props): JSX.Element => {
     nozzleType,
     ingredNames,
     wellContents,
+    showBorder,
   } = props
   const labwareDef = labwareProps.definition
 
@@ -121,7 +130,11 @@ export const SelectableLabware = (props: Props): JSX.Element => {
     rect
   ) => {
     const wells = _wellsFromSelected(_getWellsFromRect(rect))
-    if (e.shiftKey) {
+    const areWellsAlreadySelected = Object.keys(wells).every(
+      well => well in selectedPrimaryWells
+    )
+
+    if (areWellsAlreadySelected) {
       deselectWells(wells)
     } else {
       selectWells(wells)
@@ -162,6 +175,27 @@ export const SelectableLabware = (props: Props): JSX.Element => {
         )
       : selectedPrimaryWells
 
+  const wellFillWithLiq: WellFill = {}
+  const wellStroke: WellStroke = {}
+  Object.keys(labwareDef.wells).forEach(wellName => {
+    wellFillWithLiq[wellName] = COLORS.blue35
+    wellStroke[wellName] = COLORS.transparent
+  })
+  Object.keys(allSelectedWells).forEach(wellName => {
+    wellFillWithLiq[wellName] = COLORS.blue50
+    wellStroke[wellName] = COLORS.transparent
+  })
+  Object.keys(selectedPrimaryWells).forEach(wellName => {
+    wellFillWithLiq[wellName] = COLORS.blue50
+    wellStroke[wellName] = COLORS.transparent
+  })
+  const wellFill = labwareProps.wellFill != null ? labwareProps.wellFill : null
+  if (wellFill != null) {
+    Object.keys(wellFill).forEach(wellName => {
+      wellFillWithLiq[wellName] = wellFill[wellName]
+    })
+  }
+
   return (
     <SelectionRect
       onSelectionMove={handleSelectionMove}
@@ -175,6 +209,10 @@ export const SelectableLabware = (props: Props): JSX.Element => {
         }) => (
           <SingleLabware
             {...labwareProps}
+            showBorder={showBorder}
+            strokeColor={COLORS.transparent}
+            wellStroke={wellStroke}
+            wellFill={wellFillWithLiq}
             selectedWells={allSelectedWells}
             onMouseLeaveWell={mouseEventArgs => {
               handleMouseLeaveWell(mouseEventArgs)

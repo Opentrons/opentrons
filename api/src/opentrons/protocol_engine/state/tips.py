@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, Optional, List, Union
 
-from .abstract_store import HasState, HandlesActions
+from ._abstract_store import HasState, HandlesActions
 from ..actions import (
     Action,
     SucceedCommandAction,
@@ -485,6 +485,10 @@ class TipView(HasState[TipState]):
     def get_pipette_nozzle_map(self, pipette_id: str) -> NozzleMap:
         """Get the current nozzle map the given pipette's configuration."""
         return self._state.nozzle_map_by_pipette_id[pipette_id]
+
+    def get_pipette_nozzle_maps(self) -> Dict[str, NozzleMap]:
+        """Get current nozzle maps keyed by pipette id."""
+        return self._state.nozzle_map_by_pipette_id
 
     def has_clean_tip(self, labware_id: str, well_name: str) -> bool:
         """Get whether a well in a labware has a clean tip.

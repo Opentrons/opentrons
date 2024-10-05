@@ -261,9 +261,9 @@ class InstrumentContext(publisher.CommandPublisher):
             and well is not None
             and self.liquid_presence_detection
             and self._96_tip_config_valid()
+            and self._core.get_current_volume() == 0
         ):
             self.require_liquid_presence(well=well)
-            self.prepare_to_aspirate()
 
         with publisher.publish_context(
             broker=self.broker,
@@ -540,12 +540,12 @@ class InstrumentContext(publisher.CommandPublisher):
             ),
         ):
             self.aspirate(volume, location, rate)
-            while repetitions - 1 > 0:
-                self.dispense(volume, rate=rate, **dispense_kwargs)
-                self.aspirate(volume, rate=rate)
-                repetitions -= 1
-            self.dispense(volume, rate=rate)
-
+            with AutoProbeDisable(self):
+                while repetitions - 1 > 0:
+                    self.dispense(volume, rate=rate, **dispense_kwargs)
+                    self.aspirate(volume, rate=rate)
+                    repetitions -= 1
+                self.dispense(volume, rate=rate)
         return self
 
     @requires_version(2, 0)
@@ -2059,6 +2059,8 @@ class InstrumentContext(publisher.CommandPublisher):
             NozzleLayout.QUADRANT,
         ]
         if style in disabled_layouts:
+            # todo(mm, 2024-08-20): UnsupportedAPIError boils down to an API_REMOVED
+            # error code, which is not correct here.
             raise UnsupportedAPIError(
                 message=f"Nozzle layout configuration of style {style.value} is currently unsupported."
             )
@@ -2069,7 +2071,11 @@ class InstrumentContext(publisher.CommandPublisher):
             < _PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN
         ) and (style not in original_enabled_layouts):
             raise APIVersionError(
-                f"Nozzle layout configuration of style {style.value} is unsupported in API Versions lower than {_PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN}."
+                api_element=f"Nozzle layout configuration of style {style.value}",
+                until_version=str(
+                    _PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN
+                ),
+                current_version=str(self._api_version),
             )
 
         front_right_resolved = front_right
@@ -2184,6 +2190,22 @@ class InstrumentContext(publisher.CommandPublisher):
                         "Partial column configuration is only supported on 8-Channel pipettes."
                     )
             # SINGLE, QUADRANT and ALL are supported by all pipettes
+
+
+class AutoProbeDisable:
+    """Use this class to temporarily disable automatic liquid presence detection."""
+
+    def __init__(self, instrument: InstrumentContext):
+        self.instrument = instrument
+
+    def __enter__(self) -> None:
+        if self.instrument.api_version >= APIVersion(2, 21):
+            self.auto_presence = self.instrument.liquid_presence_detection
+            self.instrument.liquid_presence_detection = False
+
+    def __exit__(self, *args: Any, **kwargs: Any) -> None:
+        if self.instrument.api_version >= APIVersion(2, 21):
+            self.instrument.liquid_presence_detection = self.auto_presence
 
 
 def _raise_if_has_end_or_front_right_or_back_left(

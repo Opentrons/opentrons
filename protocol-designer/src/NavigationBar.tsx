@@ -1,44 +1,52 @@
-import * as React from 'react'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import type * as React from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
+  Btn,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { toggleNewProtocolModal } from './navigation/actions'
 import { actions as loadFileActions } from './load-file'
-import type { ThunkDispatch, RouteProps } from './types'
+import { BUTTON_LINK_STYLE } from './atoms'
+import { getHasUnsavedChanges } from './load-file/selectors'
+import { SettingsIcon } from './molecules'
+import type { ThunkDispatch } from './types'
 
-export function NavigationBar({
-  routes,
-}: {
-  routes: RouteProps[]
-}): JSX.Element {
-  const { t } = useTranslation('shared')
-  const navRoutes = routes.filter(
-    (route: RouteProps) => route.navLinkTo !== '/createNew'
-  )
+export function NavigationBar(): JSX.Element | null {
+  const { t } = useTranslation(['shared', 'alert'])
   const location = useLocation()
-  const dispatch: ThunkDispatch<any> = useDispatch()
   const navigate = useNavigate()
+  const dispatch: ThunkDispatch<any> = useDispatch()
   const loadFile = (
     fileChangeEvent: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    if (window.confirm(t('confirm_import') as string)) {
-      dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
-      navigate('/overview')
+    dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
+    dispatch(toggleNewProtocolModal(false))
+  }
+  const hasUnsavedChanges = useSelector(getHasUnsavedChanges)
+
+  const handleCreateNew = (): void => {
+    if (
+      !hasUnsavedChanges ||
+      window.confirm(t('alert:confirm_create_new') as string)
+    ) {
+      dispatch(toggleNewProtocolModal(true))
+      navigate('/createNew')
     }
   }
-  const isFilteredNavPaths =
-    location.pathname === '/createNew' || location.pathname === '/'
 
-  return (
+  return location.pathname === '/designer' ||
+    location.pathname === '/liquids' ? null : (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -57,52 +65,30 @@ export function NavigationBar({
         </Flex>
         <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
           {location.pathname === '/createNew' ? null : (
-            <NavbarLink key="createNew" to="/createNew">
+            <Btn onClick={handleCreateNew} css={BUTTON_LINK_STYLE}>
               <StyledText desktopStyle="bodyDefaultRegular">
-                {t('create_new_protocol')}
+                {t('create_new')}
               </StyledText>
-            </NavbarLink>
+            </Btn>
           )}
           <StyledLabel>
-            <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-              {t('import')}
-            </StyledText>
+            <Flex css={BUTTON_LINK_STYLE}>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('import')}
+              </StyledText>
+            </Flex>
             <input type="file" onChange={loadFile}></input>
           </StyledLabel>
+          {location.pathname === '/createNew' ? null : <SettingsIcon />}
         </Flex>
       </Flex>
-      {/* TODO(ja, 8/12/24: delete later. Leaving access to other
-      routes at all times until we make breadcrumbs and protocol overview pg */}
-      {isFilteredNavPaths ? null : (
-        <Flex
-          backgroundColor={COLORS.blue20}
-          padding={`${SPACING.spacing12} ${SPACING.spacing40}`}
-          gridGap={SPACING.spacing40}
-        >
-          TODO add breadcrumbs here
-          {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
-            <NavbarLink key={name} to={navLinkTo}>
-              <StyledText desktopStyle="bodyDefaultRegular">{name}</StyledText>
-            </NavbarLink>
-          ))}
-        </Flex>
-      )}
     </Flex>
   )
 }
 
-const NavbarLink = styled(NavLink)`
-  color: ${COLORS.black90};
-  text-decoration: none;
-  align-self: ${ALIGN_CENTER};
-  &:hover {
-    color: ${COLORS.black70};
-  }
-`
-
 const StyledLabel = styled.label`
   height: 20px;
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   input[type='file'] {
     display: none;
   }

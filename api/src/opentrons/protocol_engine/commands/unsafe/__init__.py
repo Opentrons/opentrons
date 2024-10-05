@@ -23,6 +23,14 @@ from .update_position_estimators import (
     UpdatePositionEstimatorsCreate,
 )
 
+from .unsafe_engage_axes import (
+    UnsafeEngageAxesCommandType,
+    UnsafeEngageAxesParams,
+    UnsafeEngageAxesResult,
+    UnsafeEngageAxes,
+    UnsafeEngageAxesCreate,
+)
+
 __all__ = [
     # Unsafe blow-out-in-place command models
     "UnsafeBlowOutInPlaceCommandType",
@@ -42,4 +50,10 @@ __all__ = [
     "UpdatePositionEstimatorsResult",
     "UpdatePositionEstimators",
     "UpdatePositionEstimatorsCreate",
+    # Unsafe engage axes
+    "UnsafeEngageAxesCommandType",
+    "UnsafeEngageAxesParams",
+    "UnsafeEngageAxesResult",
+    "UnsafeEngageAxes",
+    "UnsafeEngageAxesCreate",
 ]

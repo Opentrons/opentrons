@@ -1,10 +1,10 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { screen, fireEvent } from '@testing-library/react'
 import { when } from 'vitest-when'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import {
   SelectRecoveryOption,
@@ -16,6 +16,8 @@ import {
   OVERPRESSURE_PREPARE_TO_ASPIRATE,
   OVERPRESSURE_WHILE_DISPENSING_OPTIONS,
   NO_LIQUID_DETECTED_OPTIONS,
+  TIP_NOT_DETECTED_OPTIONS,
+  GRIPPER_ERROR_OPTIONS,
 } from '../SelectRecoveryOption'
 import { RECOVERY_MAP, ERROR_KINDS } from '../../constants'
 import { clickButtonLabeled } from '../../__tests__/util'
@@ -49,7 +51,7 @@ const renderDesktopRecoveryOptions = (
 }
 
 describe('SelectRecoveryOption', () => {
-  const { RETRY_FAILED_COMMAND, RETRY_NEW_TIPS } = RECOVERY_MAP
+  const { RETRY_STEP, RETRY_NEW_TIPS } = RECOVERY_MAP
   let props: React.ComponentProps<typeof SelectRecoveryOption>
   let mockProceedToRouteAndStep: Mock
   let mockSetSelectedRecoveryOption: Mock
@@ -67,8 +69,8 @@ describe('SelectRecoveryOption', () => {
       ...mockRecoveryContentProps,
       routeUpdateActions: mockRouteUpdateActions,
       recoveryMap: {
-        route: RETRY_FAILED_COMMAND.ROUTE,
-        step: RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY,
+        route: RETRY_STEP.ROUTE,
+        step: RETRY_STEP.STEPS.CONFIRM_RETRY,
       },
       tipStatusUtils: { determineTipStatus: vi.fn() } as any,
       currentRecoveryOptionUtils: {
@@ -78,7 +80,7 @@ describe('SelectRecoveryOption', () => {
     }
 
     when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE)
+      .calledWith(RECOVERY_MAP.RETRY_STEP.ROUTE)
       .thenReturn('Retry step')
     when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.CANCEL_RUN.ROUTE)
@@ -87,7 +89,7 @@ describe('SelectRecoveryOption', () => {
       .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE)
       .thenReturn('Retry with new tips')
     when(mockGetRecoveryOptionCopy)
-      .calledWith(RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE)
+      .calledWith(RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE)
       .thenReturn('Manually fill well and skip to next step')
     when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE)
@@ -102,9 +104,7 @@ describe('SelectRecoveryOption', () => {
 
     clickButtonLabeled('Continue')
 
-    expect(mockSetSelectedRecoveryOption).toHaveBeenCalledWith(
-      RETRY_FAILED_COMMAND.ROUTE
-    )
+    expect(mockSetSelectedRecoveryOption).toHaveBeenCalledWith(RETRY_STEP.ROUTE)
   })
 
   it('renders appropriate "General Error" copy and click behavior', () => {
@@ -121,9 +121,7 @@ describe('SelectRecoveryOption', () => {
     fireEvent.click(retryStepOption[0])
     clickButtonLabeled('Continue')
 
-    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
-      RETRY_FAILED_COMMAND.ROUTE
-    )
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(RETRY_STEP.ROUTE)
   })
 
   it('renders appropriate "Overpressure while aspirating" copy and click behavior', () => {
@@ -167,7 +165,7 @@ describe('SelectRecoveryOption', () => {
     clickButtonLabeled('Continue')
 
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
-      RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE
+      RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE
     )
   })
 
@@ -238,7 +236,7 @@ describe('SelectRecoveryOption', () => {
       }
 
       when(mockGetRecoveryOptionCopy)
-        .calledWith(RECOVERY_MAP.RETRY_FAILED_COMMAND.ROUTE)
+        .calledWith(RECOVERY_MAP.RETRY_STEP.ROUTE)
         .thenReturn('Retry step')
       when(mockGetRecoveryOptionCopy)
         .calledWith(RECOVERY_MAP.CANCEL_RUN.ROUTE)
@@ -247,7 +245,7 @@ describe('SelectRecoveryOption', () => {
         .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE)
         .thenReturn('Retry with new tips')
       when(mockGetRecoveryOptionCopy)
-        .calledWith(RECOVERY_MAP.FILL_MANUALLY_AND_SKIP.ROUTE)
+        .calledWith(RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE)
         .thenReturn('Manually fill well and skip to next step')
       when(mockGetRecoveryOptionCopy)
         .calledWith(RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE)
@@ -261,6 +259,12 @@ describe('SelectRecoveryOption', () => {
       when(mockGetRecoveryOptionCopy)
         .calledWith(RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE)
         .thenReturn('Ignore error and skip to next step')
+      when(mockGetRecoveryOptionCopy)
+        .calledWith(RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE)
+        .thenReturn('Manually move labware and skip to next step')
+      when(mockGetRecoveryOptionCopy)
+        .calledWith(RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE)
+        .thenReturn('Manually replace labware on deck and retry step')
     })
 
     it('renders valid recovery options for a general error errorKind', () => {
@@ -332,6 +336,40 @@ describe('SelectRecoveryOption', () => {
       screen.getByRole('label', { name: 'Skip to next step with new tips' })
       screen.getByRole('label', { name: 'Cancel run' })
     })
+
+    it(`renders valid recovery options for a ${ERROR_KINDS.TIP_NOT_DETECTED} errorKind`, () => {
+      props = {
+        ...props,
+        validRecoveryOptions: TIP_NOT_DETECTED_OPTIONS,
+      }
+
+      renderer(props)
+
+      screen.getByRole('label', {
+        name: 'Retry step',
+      })
+      screen.getByRole('label', {
+        name: 'Ignore error and skip to next step',
+      })
+      screen.getByRole('label', { name: 'Cancel run' })
+    })
+
+    it(`renders valid recovery options for a ${ERROR_KINDS.GRIPPER_ERROR} errorKind`, () => {
+      props = {
+        ...props,
+        validRecoveryOptions: GRIPPER_ERROR_OPTIONS,
+      }
+
+      renderer(props)
+
+      screen.getByRole('label', {
+        name: 'Manually move labware and skip to next step',
+      })
+      screen.getByRole('label', {
+        name: 'Manually replace labware on deck and retry step',
+      })
+      screen.getByRole('label', { name: 'Cancel run' })
+    })
   })
 })
 
@@ -371,5 +409,19 @@ describe('getRecoveryOptions', () => {
     expect(overpressureWhileDispensingOptions).toBe(
       OVERPRESSURE_WHILE_DISPENSING_OPTIONS
     )
+  })
+
+  it(`returns valid options when the errorKind is ${ERROR_KINDS.TIP_NOT_DETECTED}`, () => {
+    const overpressureWhileDispensingOptions = getRecoveryOptions(
+      ERROR_KINDS.TIP_NOT_DETECTED
+    )
+    expect(overpressureWhileDispensingOptions).toBe(TIP_NOT_DETECTED_OPTIONS)
+  })
+
+  it(`returns valid options when the errorKind is ${ERROR_KINDS.GRIPPER_ERROR}`, () => {
+    const overpressureWhileDispensingOptions = getRecoveryOptions(
+      ERROR_KINDS.GRIPPER_ERROR
+    )
+    expect(overpressureWhileDispensingOptions).toBe(GRIPPER_ERROR_OPTIONS)
   })
 })

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { createPortal } from 'react-dom'
@@ -39,7 +39,7 @@ export function TipWellSelectionField(
     Array.isArray(selectedWells) && selectedWells.length > 0
       ? selectedWells.length.toString()
       : null
-  const [openModal, setOpenModal] = React.useState<boolean>(false)
+  const [openModal, setOpenModal] = useState<boolean>(false)
   const pipette = pipetteId != null ? pipetteEntities[String(pipetteId)] : null
   const nozzleType = getNozzleType(pipette, nozzles)
 

@@ -72,7 +72,7 @@ async def put_client_data(  # noqa: D103
     ],
 ) -> SimpleBody[ClientData]:
     store.put(key, request_body.data)
-    await client_data_publisher.publish_client_data(key)
+    client_data_publisher.publish_client_data(key)
     return SimpleBody.construct(data=store.get(key))
 
 
@@ -124,7 +124,7 @@ async def delete_client_data(  # noqa: D103
             fastapi.status.HTTP_404_NOT_FOUND
         ) from e
     else:
-        await client_data_publisher.publish_client_data(key)
+        client_data_publisher.publish_client_data(key)
         return SimpleEmptyBody.construct()
 
 
@@ -142,5 +142,5 @@ async def delete_all_client_data(  # noqa: D103
     keys_that_will_be_deleted = store.get_keys()
     store.delete_all()
     for deleted_key in keys_that_will_be_deleted:
-        await client_data_publisher.publish_client_data(deleted_key)
+        client_data_publisher.publish_client_data(deleted_key)
     return SimpleEmptyBody.construct()

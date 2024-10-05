@@ -1,6 +1,6 @@
 """Tests for RunDataManager."""
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 import pytest
 from decoy import Decoy, matchers
@@ -25,6 +25,8 @@ from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.protocol_engine.types import BooleanParameter, CSVParameter
 from opentrons.protocol_runner import RunResult
 from opentrons.types import DeckSlotName
+
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 
 from opentrons_shared_data.errors.exceptions import InvalidStoredData
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -96,6 +98,7 @@ def engine_state_summary() -> StateSummary:
         pipettes=[LoadedPipette.construct(id="some-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.construct(id="some-module-id")],  # type: ignore[call-arg]
         liquids=[Liquid(id="some-liquid-id", displayName="liquid", description="desc")],
+        wells=[],
     )
 
 
@@ -110,6 +113,13 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
             default=True,
         )
     ]
+
+
+@pytest.fixture
+def mock_nozzle_maps(decoy: Decoy) -> Dict[str, NozzleMap]:
+    """Get a mock NozzleMap."""
+    mock_nozzle_map = decoy.mock(cls=NozzleMap)
+    return {"mock-pipette-id": mock_nozzle_map}
 
 
 @pytest.fixture
@@ -493,6 +503,7 @@ async def test_get_all_runs(
         pipettes=[LoadedPipette.construct(id="current-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.construct(id="current-module-id")],  # type: ignore[call-arg]
         liquids=[Liquid(id="some-liquid-id", displayName="liquid", description="desc")],
+        wells=[],
     )
     current_run_time_parameters: List[pe_types.RunTimeParameter] = [
         pe_types.BooleanParameter(
@@ -512,6 +523,7 @@ async def test_get_all_runs(
         pipettes=[LoadedPipette.construct(id="old-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.construct(id="old-module-id")],  # type: ignore[call-arg]
         liquids=[],
+        wells=[],
     )
     historical_run_time_parameters: List[pe_types.RunTimeParameter] = [
         pe_types.BooleanParameter(
@@ -661,11 +673,15 @@ async def test_update_current(
     result = await subject.update(run_id=run_id, current=False)
 
     decoy.verify(
-        await mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
+        mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
         times=1,
     )
     decoy.verify(
-        await mock_runs_publisher.publish_runs_advise_refetch_async(run_id),
+        mock_runs_publisher.publish_runs_advise_refetch(run_id),
+        times=1,
+    )
+    decoy.verify(
+        mock_runs_publisher.publish_runs_advise_refetch(run_id),
         times=1,
     )
     assert result == Run(
@@ -720,7 +736,7 @@ async def test_update_current_noop(
             commands=matchers.Anything(),
             run_time_parameters=matchers.Anything(),
         ),
-        await mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
+        mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
         times=0,
     )
 
@@ -846,9 +862,13 @@ def test_get_commands_slice_from_db(
     )
 
     decoy.when(
-        mock_run_store.get_commands_slice(run_id="run_id", cursor=1, length=2)
+        mock_run_store.get_commands_slice(
+            run_id="run_id", cursor=1, length=2, include_fixit_commands=True
+        )
     ).then_return(expected_command_slice)
-    result = subject.get_commands_slice(run_id="run_id", cursor=1, length=2)
+    result = subject.get_commands_slice(
+        run_id="run_id", cursor=1, length=2, include_fixit_commands=True
+    )
 
     assert expected_command_slice == result
 
@@ -875,11 +895,11 @@ def test_get_commands_slice_current_run(
         commands=expected_commands_result, cursor=1, total_length=3
     )
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("run-id")
-    decoy.when(mock_run_orchestrator_store.get_command_slice(1, 2)).then_return(
+    decoy.when(mock_run_orchestrator_store.get_command_slice(1, 2, True)).then_return(
         expected_command_slice
     )
 
-    result = subject.get_commands_slice("run-id", 1, 2)
+    result = subject.get_commands_slice("run-id", 1, 2, include_fixit_commands=True)
 
     assert expected_command_slice == result
 
@@ -926,10 +946,14 @@ def test_get_commands_slice_from_db_run_not_found(
 ) -> None:
     """Should get a sliced command list from run store."""
     decoy.when(
-        mock_run_store.get_commands_slice(run_id="run-id", cursor=1, length=2)
+        mock_run_store.get_commands_slice(
+            run_id="run-id", cursor=1, length=2, include_fixit_commands=True
+        )
     ).then_raise(RunNotFoundError(run_id="run-id"))
     with pytest.raises(RunNotFoundError):
-        subject.get_commands_slice(run_id="run-id", cursor=1, length=2)
+        subject.get_commands_slice(
+            run_id="run-id", cursor=1, length=2, include_fixit_commands=True
+        )
 
 
 def test_get_current_command(
@@ -1045,9 +1069,9 @@ def test_get_all_commands_as_preserialized_list(
     """It should return the pre-serialized commands list."""
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(None)
     decoy.when(
-        mock_run_store.get_all_commands_as_preserialized_list("run-id")
+        mock_run_store.get_all_commands_as_preserialized_list("run-id", True)
     ).then_return(['{"id": command-1}', '{"id": command-2}'])
-    assert subject.get_all_commands_as_preserialized_list("run-id") == [
+    assert subject.get_all_commands_as_preserialized_list("run-id", True) == [
         '{"id": command-1}',
         '{"id": command-2}',
     ]
@@ -1063,7 +1087,7 @@ def test_get_all_commands_as_preserialized_list_errors_for_active_runs(
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("current-run-id")
     decoy.when(mock_run_orchestrator_store.get_is_run_terminal()).then_return(False)
     with pytest.raises(PreSerializedCommandsNotAvailableError):
-        subject.get_all_commands_as_preserialized_list("current-run-id")
+        subject.get_all_commands_as_preserialized_list("current-run-id", True)
 
 
 async def test_get_current_run_labware_definition(
@@ -1131,3 +1155,38 @@ async def test_create_policies_translates_and_calls_orchestrator(
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("run-id")
     subject.set_policies(run_id="run-id", policies=input_rules)
     decoy.verify(mock_run_orchestrator_store.set_error_recovery_policy(expected_output))
+
+
+def test_get_nozzle_map_current_run(
+    decoy: Decoy,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+    subject: RunDataManager,
+    mock_nozzle_maps: Dict[str, NozzleMap],
+) -> None:
+    """It should return the nozzle map for the current run."""
+    run_id = "current-run-id"
+
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
+    decoy.when(mock_run_orchestrator_store.get_nozzle_maps()).then_return(
+        mock_nozzle_maps
+    )
+
+    result = subject.get_nozzle_maps(run_id=run_id)
+
+    assert result == mock_nozzle_maps
+
+
+def test_get_nozzle_map_not_current_run(
+    decoy: Decoy,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+    subject: RunDataManager,
+) -> None:
+    """It should raise RunNotCurrentError for a non-current run."""
+    run_id = "non-current-run-id"
+
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return(
+        "different-run-id"
+    )
+
+    with pytest.raises(RunNotCurrentError):
+        subject.get_nozzle_maps(run_id=run_id)

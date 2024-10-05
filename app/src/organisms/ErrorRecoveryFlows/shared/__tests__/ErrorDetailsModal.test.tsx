@@ -1,28 +1,30 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { screen, act, renderHook } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { mockRecoveryContentProps } from '../../__fixtures__'
-import { InlineNotification } from '../../../../atoms/InlineNotification'
+import { InlineNotification } from '/app/atoms/InlineNotification'
 import { StepInfo } from '../StepInfo'
-import { OddModal } from '../../../../molecules/OddModal'
+import { OddModal } from '/app/molecules/OddModal'
 import {
   useErrorDetailsModal,
   ErrorDetailsModal,
   OverpressureBanner,
+  TipNotDetectedBanner,
+  GripperErrorBanner,
 } from '../ErrorDetailsModal'
 
 vi.mock('react-dom', () => ({
   ...vi.importActual('react-dom'),
   createPortal: vi.fn((element, container) => element),
 }))
-vi.mock('../../../../molecules/OddModal', () => ({
+vi.mock('/app/molecules/OddModal', () => ({
   OddModal: vi.fn(({ children }) => <div>{children}</div>),
 }))
 
-vi.mock('../../../../atoms/InlineNotification')
+vi.mock('/app/atoms/InlineNotification')
 vi.mock('../StepInfo')
 
 describe('useErrorDetailsModal', () => {
@@ -92,7 +94,7 @@ describe('ErrorDetailsModal', () => {
   })
 
   IS_ODD.forEach(isOnDevice => {
-    it('renders the OverpressureBanner when the error kind is an overpressure error', () => {
+    it('renders an inline banner when the error kind is an overpressure error', () => {
       props.failedCommand = {
         ...props.failedCommand,
         byRunRecord: {
@@ -106,8 +108,22 @@ describe('ErrorDetailsModal', () => {
       screen.getByText('MOCK_INLINE_NOTIFICATION')
     })
 
-    it('does not render the OverpressureBanner when the error kind is not an overpressure error', () => {
+    it('renders an inline banner when the error kind is a tip not detected error', () => {
+      props.failedCommand = {
+        ...props.failedCommand,
+        byRunRecord: {
+          ...props.failedCommand?.byRunRecord,
+          commandType: 'pickUpTip',
+          error: { isDefined: true, errorType: 'tipPhysicallyMissing' },
+        },
+      } as any
       render({ ...props, isOnDevice })
+
+      screen.getByText('MOCK_INLINE_NOTIFICATION')
+    })
+
+    it('does not render a banner when the error kind is not explicitly handled', () => {
+      render({ ...props, isOnDevice, failedCommand: {} as any })
 
       expect(screen.queryByText('MOCK_INLINE_NOTIFICATION')).toBeNull()
     })
@@ -132,6 +148,54 @@ describe('OverpressureBanner', () => {
           'Overpressure is usually caused by a tip contacting labware, a clog, or moving viscous liquid too quickly',
         message:
           ' If the issue persists, cancel the run and make the necessary changes to the protocol',
+      }),
+      {}
+    )
+  })
+})
+
+describe('TipNotDetectedBanner', () => {
+  beforeEach(() => {
+    vi.mocked(InlineNotification).mockReturnValue(
+      <div>MOCK_INLINE_NOTIFICATION</div>
+    )
+  })
+
+  it('renders the InlineNotification', () => {
+    renderWithProviders(<TipNotDetectedBanner />, {
+      i18nInstance: i18n,
+    })
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading:
+          'Tip presence errors are usually caused by improperly placed labware or inaccurate labware offsets',
+        message:
+          ' If the issue persists, cancel the run and initiate Labware Position Check',
+      }),
+      {}
+    )
+  })
+})
+
+describe('GripperErrorBanner', () => {
+  beforeEach(() => {
+    vi.mocked(InlineNotification).mockReturnValue(
+      <div>MOCK_INLINE_NOTIFICATION</div>
+    )
+  })
+
+  it('renders the InlineNotification', () => {
+    renderWithProviders(<GripperErrorBanner />, {
+      i18nInstance: i18n,
+    })
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading:
+          'Gripper errors occur when the gripper stalls or collides with another object on the deck and are usually caused by improperly placed labware or inaccurate labware offsets',
+        message:
+          ' If the issue persists, cancel the run and rerun gripper calibration',
       }),
       {}
     )

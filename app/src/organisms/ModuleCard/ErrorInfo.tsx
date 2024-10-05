@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -8,6 +8,7 @@ import {
 } from '@opentrons/shared-data'
 import {
   ALIGN_START,
+  Banner,
   Btn,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -19,10 +20,9 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Banner } from '../../atoms/Banner'
-import { getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 
-import type { AttachedModule } from '../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 interface ErrorInfoProps {
   attachedModule: AttachedModule
@@ -30,7 +30,7 @@ interface ErrorInfoProps {
 export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
   const { attachedModule } = props
   const { t } = useTranslation(['device_details', 'shared', 'branded'])
-  const [showErrorDetails, setShowErrorDetails] = React.useState(false)
+  const [showErrorDetails, setShowErrorDetails] = useState(false)
 
   let isError: boolean = false
   //  extend this logic when we know how to tell when Mag/Temp modules are in error state

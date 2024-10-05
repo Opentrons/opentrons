@@ -10,13 +10,15 @@ import {
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
-import type { StepOrder } from './types'
+import type { RecoveryRouteStepMetadata, StepOrder } from './types'
 
 // Server-defined error types.
 // (Values for the .error.errorType property of a run command.)
 export const DEFINED_ERROR_TYPES = {
   OVERPRESSURE: 'overpressure',
   LIQUID_NOT_FOUND: 'liquidNotFound',
+  TIP_PHYSICALLY_MISSING: 'tipPhysicallyMissing',
+  GRIPPER_MOVEMENT: 'gripperMovement',
 }
 
 // Client-defined error-handling flows.
@@ -26,9 +28,10 @@ export const ERROR_KINDS = {
   OVERPRESSURE_PREPARE_TO_ASPIRATE: 'OVERPRESSURE_PREPARE_TO_ASPIRATE',
   OVERPRESSURE_WHILE_ASPIRATING: 'OVERPRESSURE_WHILE_ASPIRATING',
   OVERPRESSURE_WHILE_DISPENSING: 'OVERPRESSURE_WHILE_DISPENSING',
+  TIP_NOT_DETECTED: 'TIP_NOT_DETECTED',
+  GRIPPER_ERROR: 'GRIPPER_ERROR',
 } as const
 
-// TODO(jh, 05-09-24): Refactor to a directed graph. EXEC-430.
 // TODO(jh, 06-14-24): Consolidate motion routes to a single route with several steps.
 // Valid recovery routes and steps.
 export const RECOVERY_MAP = {
@@ -68,6 +71,12 @@ export const RECOVERY_MAP = {
       PICKING_UP_TIPS: 'picking-up-tips',
     },
   },
+  ROBOT_RELEASING_LABWARE: {
+    ROUTE: 'robot-releasing-labware',
+    STEPS: {
+      RELEASING_LABWARE: 'releasing-labware',
+    },
+  },
   ROBOT_RESUMING: {
     ROUTE: 'robot-resuming',
     STEPS: {
@@ -86,6 +95,12 @@ export const RECOVERY_MAP = {
       SKIPPING: 'skipping',
     },
   },
+  ROBOT_DOOR_OPEN: {
+    ROUTE: 'door',
+    STEPS: {
+      DOOR_OPEN: 'door-open',
+    },
+  },
   // Recovery options below
   OPTION_SELECTION: {
     ROUTE: 'option-selection',
@@ -99,13 +114,34 @@ export const RECOVERY_MAP = {
     ROUTE: 'ignore-and-skip-step',
     STEPS: { SELECT_IGNORE_KIND: 'select-ignore' },
   },
-  FILL_MANUALLY_AND_SKIP: {
-    ROUTE: 'manually-fill-well-and-skip',
-    STEPS: { MANUALLY_FILL: 'manually-fill', SKIP: 'skip' },
+  MANUAL_FILL_AND_SKIP: {
+    ROUTE: 'manual-fill-well-and-skip',
+    STEPS: {
+      MANUAL_FILL: 'manual-fill',
+      SKIP: 'skip',
+    },
+  },
+  MANUAL_MOVE_AND_SKIP: {
+    ROUTE: 'manual-move-labware-and-skip',
+    STEPS: {
+      GRIPPER_HOLDING_LABWARE: 'gripper-holding-labware',
+      GRIPPER_RELEASE_LABWARE: 'gripper-release-labware',
+      MANUAL_MOVE: 'manual-move',
+      SKIP: 'skip',
+    },
+  },
+  MANUAL_REPLACE_AND_RETRY: {
+    ROUTE: 'manual-replace-and-retry',
+    STEPS: {
+      GRIPPER_HOLDING_LABWARE: 'gripper-holding-labware',
+      GRIPPER_RELEASE_LABWARE: 'gripper-release-labware',
+      MANUAL_REPLACE: 'manual-replace',
+      RETRY: 'retry',
+    },
   },
   REFILL_AND_RESUME: { ROUTE: 'refill-and-resume', STEPS: {} },
-  RETRY_FAILED_COMMAND: {
-    ROUTE: 'retry-failed-command',
+  RETRY_STEP: {
+    ROUTE: 'retry-step',
     STEPS: { CONFIRM_RETRY: 'confirm-retry' },
   },
   RETRY_NEW_TIPS: {
@@ -142,13 +178,15 @@ export const RECOVERY_MAP = {
 
 const {
   OPTION_SELECTION,
-  RETRY_FAILED_COMMAND,
+  RETRY_STEP,
   ROBOT_CANCELING,
   ROBOT_PICKING_UP_TIPS,
+  ROBOT_RELEASING_LABWARE,
   ROBOT_RESUMING,
   ROBOT_IN_MOTION,
   ROBOT_RETRYING_STEP,
   ROBOT_SKIPPING_STEP,
+  ROBOT_DOOR_OPEN,
   DROP_TIP_FLOWS,
   REFILL_AND_RESUME,
   IGNORE_AND_SKIP,
@@ -156,7 +194,9 @@ const {
   RETRY_NEW_TIPS,
   RETRY_SAME_TIPS,
   ERROR_WHILE_RECOVERING,
-  FILL_MANUALLY_AND_SKIP,
+  MANUAL_FILL_AND_SKIP,
+  MANUAL_MOVE_AND_SKIP,
+  MANUAL_REPLACE_AND_RETRY,
   SKIP_STEP_WITH_NEW_TIPS,
   SKIP_STEP_WITH_SAME_TIPS,
 } = RECOVERY_MAP
@@ -164,7 +204,7 @@ const {
 // The deterministic ordering of steps for a given route.
 export const STEP_ORDER: StepOrder = {
   [OPTION_SELECTION.ROUTE]: [OPTION_SELECTION.STEPS.SELECT],
-  [RETRY_FAILED_COMMAND.ROUTE]: [RETRY_FAILED_COMMAND.STEPS.CONFIRM_RETRY],
+  [RETRY_STEP.ROUTE]: [RETRY_STEP.STEPS.CONFIRM_RETRY],
   [RETRY_NEW_TIPS.ROUTE]: [
     RETRY_NEW_TIPS.STEPS.DROP_TIPS,
     RETRY_NEW_TIPS.STEPS.REPLACE_TIPS,
@@ -182,9 +222,13 @@ export const STEP_ORDER: StepOrder = {
   [ROBOT_CANCELING.ROUTE]: [ROBOT_CANCELING.STEPS.CANCELING],
   [ROBOT_IN_MOTION.ROUTE]: [ROBOT_IN_MOTION.STEPS.IN_MOTION],
   [ROBOT_PICKING_UP_TIPS.ROUTE]: [ROBOT_PICKING_UP_TIPS.STEPS.PICKING_UP_TIPS],
+  [ROBOT_RELEASING_LABWARE.ROUTE]: [
+    ROBOT_RELEASING_LABWARE.STEPS.RELEASING_LABWARE,
+  ],
   [ROBOT_RESUMING.ROUTE]: [ROBOT_RESUMING.STEPS.RESUMING],
   [ROBOT_RETRYING_STEP.ROUTE]: [ROBOT_RETRYING_STEP.STEPS.RETRYING],
   [ROBOT_SKIPPING_STEP.ROUTE]: [ROBOT_SKIPPING_STEP.STEPS.SKIPPING],
+  [ROBOT_DOOR_OPEN.ROUTE]: [ROBOT_DOOR_OPEN.STEPS.DOOR_OPEN],
   [DROP_TIP_FLOWS.ROUTE]: [
     DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL,
     DROP_TIP_FLOWS.STEPS.BEFORE_BEGINNING,
@@ -194,9 +238,21 @@ export const STEP_ORDER: StepOrder = {
   [REFILL_AND_RESUME.ROUTE]: [],
   [IGNORE_AND_SKIP.ROUTE]: [IGNORE_AND_SKIP.STEPS.SELECT_IGNORE_KIND],
   [CANCEL_RUN.ROUTE]: [CANCEL_RUN.STEPS.CONFIRM_CANCEL],
-  [FILL_MANUALLY_AND_SKIP.ROUTE]: [
-    FILL_MANUALLY_AND_SKIP.STEPS.MANUALLY_FILL,
-    FILL_MANUALLY_AND_SKIP.STEPS.SKIP,
+  [MANUAL_FILL_AND_SKIP.ROUTE]: [
+    MANUAL_FILL_AND_SKIP.STEPS.MANUAL_FILL,
+    MANUAL_FILL_AND_SKIP.STEPS.SKIP,
+  ],
+  [MANUAL_MOVE_AND_SKIP.ROUTE]: [
+    MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_HOLDING_LABWARE,
+    MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_RELEASE_LABWARE,
+    MANUAL_MOVE_AND_SKIP.STEPS.MANUAL_MOVE,
+    MANUAL_MOVE_AND_SKIP.STEPS.SKIP,
+  ],
+  [MANUAL_REPLACE_AND_RETRY.ROUTE]: [
+    MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_HOLDING_LABWARE,
+    MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_RELEASE_LABWARE,
+    MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE,
+    MANUAL_REPLACE_AND_RETRY.STEPS.RETRY,
   ],
   [ERROR_WHILE_RECOVERING.ROUTE]: [
     ERROR_WHILE_RECOVERING.STEPS.RECOVERY_ACTION_FAILED,
@@ -205,6 +261,131 @@ export const STEP_ORDER: StepOrder = {
     ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_BLOWOUT_FAILED,
   ],
 }
+
+// Contains metadata specific to all routes and/or steps.
+export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
+  [DROP_TIP_FLOWS.ROUTE]: {
+    [DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL]: { allowDoorOpen: false },
+    [DROP_TIP_FLOWS.STEPS.BEFORE_BEGINNING]: {
+      allowDoorOpen: false,
+    },
+    [DROP_TIP_FLOWS.STEPS.CHOOSE_TIP_DROP]: {
+      allowDoorOpen: false,
+    },
+    [DROP_TIP_FLOWS.STEPS.CHOOSE_BLOWOUT]: {
+      allowDoorOpen: false,
+    },
+  },
+  [ERROR_WHILE_RECOVERING.ROUTE]: {
+    [ERROR_WHILE_RECOVERING.STEPS.RECOVERY_ACTION_FAILED]: {
+      allowDoorOpen: false,
+    },
+    [ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_BLOWOUT_FAILED]: {
+      allowDoorOpen: false,
+    },
+    [ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_TIP_DROP_FAILED]: {
+      allowDoorOpen: false,
+    },
+    [ERROR_WHILE_RECOVERING.STEPS.DROP_TIP_GENERAL_ERROR]: {
+      allowDoorOpen: false,
+    },
+  },
+  [ROBOT_CANCELING.ROUTE]: {
+    [ROBOT_CANCELING.STEPS.CANCELING]: { allowDoorOpen: false },
+  },
+  [ROBOT_IN_MOTION.ROUTE]: {
+    [ROBOT_IN_MOTION.STEPS.IN_MOTION]: { allowDoorOpen: false },
+  },
+  [ROBOT_PICKING_UP_TIPS.ROUTE]: {
+    [ROBOT_PICKING_UP_TIPS.STEPS.PICKING_UP_TIPS]: {
+      allowDoorOpen: false,
+    },
+  },
+  [ROBOT_RELEASING_LABWARE.ROUTE]: {
+    [ROBOT_RELEASING_LABWARE.STEPS.RELEASING_LABWARE]: { allowDoorOpen: false },
+  },
+  [ROBOT_RESUMING.ROUTE]: {
+    [ROBOT_RESUMING.STEPS.RESUMING]: { allowDoorOpen: false },
+  },
+  [ROBOT_RETRYING_STEP.ROUTE]: {
+    [ROBOT_RETRYING_STEP.STEPS.RETRYING]: { allowDoorOpen: false },
+  },
+  [ROBOT_SKIPPING_STEP.ROUTE]: {
+    [ROBOT_SKIPPING_STEP.STEPS.SKIPPING]: { allowDoorOpen: false },
+  },
+  [ROBOT_DOOR_OPEN.ROUTE]: {
+    [ROBOT_DOOR_OPEN.STEPS.DOOR_OPEN]: { allowDoorOpen: false },
+  },
+  [OPTION_SELECTION.ROUTE]: {
+    [OPTION_SELECTION.STEPS.SELECT]: { allowDoorOpen: false },
+  },
+  [CANCEL_RUN.ROUTE]: {
+    [CANCEL_RUN.STEPS.CONFIRM_CANCEL]: { allowDoorOpen: false },
+  },
+  [IGNORE_AND_SKIP.ROUTE]: {
+    [IGNORE_AND_SKIP.STEPS.SELECT_IGNORE_KIND]: {
+      allowDoorOpen: false,
+    },
+  },
+  [MANUAL_FILL_AND_SKIP.ROUTE]: {
+    [MANUAL_FILL_AND_SKIP.STEPS.MANUAL_FILL]: {
+      allowDoorOpen: true,
+    },
+    [MANUAL_FILL_AND_SKIP.STEPS.SKIP]: { allowDoorOpen: true },
+  },
+  [MANUAL_MOVE_AND_SKIP.ROUTE]: {
+    [MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_HOLDING_LABWARE]: {
+      allowDoorOpen: true,
+    },
+    [MANUAL_MOVE_AND_SKIP.STEPS.GRIPPER_RELEASE_LABWARE]: {
+      allowDoorOpen: true,
+    },
+    [MANUAL_MOVE_AND_SKIP.STEPS.MANUAL_MOVE]: { allowDoorOpen: true },
+    [MANUAL_MOVE_AND_SKIP.STEPS.SKIP]: { allowDoorOpen: true },
+  },
+  [MANUAL_REPLACE_AND_RETRY.ROUTE]: {
+    [MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_HOLDING_LABWARE]: {
+      allowDoorOpen: true,
+    },
+    [MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_RELEASE_LABWARE]: {
+      allowDoorOpen: true,
+    },
+    [MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE]: { allowDoorOpen: true },
+    [MANUAL_REPLACE_AND_RETRY.STEPS.RETRY]: { allowDoorOpen: true },
+  },
+  [REFILL_AND_RESUME.ROUTE]: {},
+  [RETRY_STEP.ROUTE]: {
+    [RETRY_STEP.STEPS.CONFIRM_RETRY]: {
+      allowDoorOpen: false,
+    },
+  },
+  [RETRY_NEW_TIPS.ROUTE]: {
+    [RETRY_NEW_TIPS.STEPS.DROP_TIPS]: { allowDoorOpen: false },
+    [RETRY_NEW_TIPS.STEPS.REPLACE_TIPS]: { allowDoorOpen: true },
+    [RETRY_NEW_TIPS.STEPS.SELECT_TIPS]: { allowDoorOpen: true },
+    [RETRY_NEW_TIPS.STEPS.RETRY]: { allowDoorOpen: true },
+  },
+  [RETRY_SAME_TIPS.ROUTE]: {
+    [RETRY_SAME_TIPS.STEPS.RETRY]: { allowDoorOpen: true },
+  },
+  [SKIP_STEP_WITH_NEW_TIPS.ROUTE]: {
+    [SKIP_STEP_WITH_NEW_TIPS.STEPS.DROP_TIPS]: {
+      allowDoorOpen: false,
+    },
+    [SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS]: {
+      allowDoorOpen: true,
+    },
+    [SKIP_STEP_WITH_NEW_TIPS.STEPS.SELECT_TIPS]: {
+      allowDoorOpen: true,
+    },
+    [SKIP_STEP_WITH_NEW_TIPS.STEPS.SKIP]: { allowDoorOpen: true },
+  },
+  [SKIP_STEP_WITH_SAME_TIPS.ROUTE]: {
+    [SKIP_STEP_WITH_SAME_TIPS.STEPS.SKIP]: {
+      allowDoorOpen: true,
+    },
+  },
+} as const
 
 export const INVALID = 'INVALID' as const
 

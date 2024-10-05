@@ -54,6 +54,10 @@ class FlexBackend(Protocol):
     def restore_system_constraints(self) -> AsyncIterator[None]:
         ...
 
+    @asynccontextmanager
+    def grab_pressure(self, channels: int, mount: OT3Mount) -> AsyncIterator[None]:
+        ...
+
     def update_constraints_for_gantry_load(self, gantry_load: GantryLoad) -> None:
         ...
 
@@ -147,6 +151,7 @@ class FlexBackend(Protocol):
         plunger_speed: float,
         threshold_pascals: float,
         plunger_impulse_time: float,
+        num_baseline_reads: int,
         output_format: OutputOptions = OutputOptions.can_bus_only,
         data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,

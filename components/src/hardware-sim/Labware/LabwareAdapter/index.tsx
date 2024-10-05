@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Opentrons96DeepWellAdapter } from './Opentrons96DeepWellAdapter'
 import { Opentrons96FlatBottomAdapter } from './Opentrons96FlatBottomAdapter'
 import { OpentronsUniversalFlatAdapter } from './OpentronsUniversalFlatAdapter'
@@ -25,12 +24,18 @@ export interface LabwareAdapterProps {
   labwareLoadName: LabwareAdapterLoadName
   definition?: LabwareDefinition2
   highlight?: boolean
+  highlightShadow?: boolean
 }
 
 export const LabwareAdapter = (
   props: LabwareAdapterProps
 ): JSX.Element | null => {
-  const { labwareLoadName, definition, highlight = false } = props
+  const {
+    labwareLoadName,
+    definition,
+    highlight = false,
+    highlightShadow,
+  } = props
   const highlightOutline =
     highlight && definition != null ? (
       <LabwareOutline
@@ -39,10 +44,24 @@ export const LabwareAdapter = (
         fill={COLORS.transparent}
       />
     ) : null
+  const highlightShadowOutline =
+    highlight && definition != null ? (
+      <LabwareOutline
+        definition={definition}
+        highlight={highlight}
+        highlightShadow={highlightShadow}
+        fill={COLORS.transparent}
+      />
+    ) : null
   const SVGElement = LABWARE_ADAPTER_LOADNAME_PATHS[labwareLoadName]
 
   return (
     <g>
+      {/**
+       * render an initial shadow outline first in the DOM so that the SVG highlight shadow
+       * does not layer over the inside of the SVG labware adapter
+       */}
+      {highlightShadowOutline}
       <SVGElement />
       {highlightOutline}
     </g>

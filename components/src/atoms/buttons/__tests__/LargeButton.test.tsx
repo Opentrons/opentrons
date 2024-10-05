@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
@@ -66,6 +66,18 @@ describe('LargeButton', () => {
     expect(screen.getByRole('button')).toHaveStyle(
       `background-color: ${COLORS.white}`
     )
+  })
+
+  it('renders the stroke button', () => {
+    props = {
+      ...props,
+      buttonType: 'stroke',
+    }
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.white}`
+    )
+    expect(screen.getByRole('button')).toHaveStyle(`color: ${COLORS.blue50}`)
   })
 
   it('renders the button as disabled', () => {

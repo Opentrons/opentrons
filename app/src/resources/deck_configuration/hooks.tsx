@@ -25,7 +25,9 @@ import type {
 } from '@opentrons/shared-data'
 
 import { useNotifyDeckConfigurationQuery } from './useNotifyDeckConfigurationQuery'
-import { AddFixtureModal } from '../../organisms/DeviceDetailsDeckConfiguration/AddFixtureModal'
+// TODO: return the arguments or something - don't instantiate ui in helper code like this
+/* eslint-disable-next-line opentrons/no-imports-across-applications */
+import { AddFixtureModal } from '/app/organisms/DeviceDetailsDeckConfiguration/AddFixtureModal'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000

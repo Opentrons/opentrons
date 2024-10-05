@@ -9,14 +9,16 @@ from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, Succe
 from ...errors.error_occurrence import ErrorOccurrence
 from ...errors import CannotPerformModuleAction
 
-from .types import MoveLidResult
 from opentrons.protocol_engine.resources import labware_validation
 from opentrons.protocol_engine.types import AddressableAreaLocation
 
 from opentrons.drivers.types import AbsorbanceReaderLidStatus
 
+from ...state.update_types import StateUpdate
+
+
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state import StateView
+    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import (
         EquipmentHandler,
         LabwareMovementHandler,
@@ -32,7 +34,7 @@ class OpenLidParams(BaseModel):
     moduleId: str = Field(..., description="Unique ID of the absorbance reader.")
 
 
-class OpenLidResult(MoveLidResult):
+class OpenLidResult(BaseModel):
     """Result data from opening the lid on an aborbance reading."""
 
 
@@ -125,13 +127,18 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, SuccessData[OpenLidResult, 
                 labware_location=new_location,
             )
 
+        state_update = StateUpdate()
+
+        state_update.set_labware_location(
+            labware_id=loaded_lid.id,
+            new_location=new_location,
+            new_offset_id=new_offset_id,
+        )
+
         return SuccessData(
-            public=OpenLidResult(
-                lidId=loaded_lid.id,
-                newLocation=new_location,
-                offsetId=new_offset_id,
-            ),
+            public=OpenLidResult(),
             private=None,
+            state_update=state_update,
         )
 
 

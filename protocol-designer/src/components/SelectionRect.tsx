@@ -29,7 +29,6 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
     const top = Math.min(yStart, yDynamic)
     const width = Math.abs(xDynamic - xStart)
     const height = Math.abs(yDynamic - yStart)
-
     if (svg) {
       if (!parentRef.current) {
         return null

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
@@ -18,10 +18,10 @@ import {
 } from '@opentrons/components'
 import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '@opentrons/shared-data'
 
-import { getIsOnDevice } from '../../redux/config'
-import { SmallButton } from '../../atoms/buttons'
-import { NeedHelpLink } from '../CalibrationPanels'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import { getIsOnDevice } from '/app/redux/config'
+import { SmallButton } from '/app/atoms/buttons'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type {
   CompletedProtocolAnalysis,

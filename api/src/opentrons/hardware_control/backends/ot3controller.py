@@ -161,6 +161,7 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_pass,
     liquid_probe,
     check_overpressure,
+    grab_pressure,
 )
 from opentrons_hardware.hardware_control.rear_panel_settings import (
     get_door_state,
@@ -368,6 +369,14 @@ class OT3Controller(FlexBackend):
         finally:
             self._move_manager.update_constraints(old_system_constraints)
             log.debug(f"Restore previous system constraints: {old_system_constraints}")
+
+    @asynccontextmanager
+    async def grab_pressure(
+        self, channels: int, mount: OT3Mount
+    ) -> AsyncIterator[None]:
+        tool = axis_to_node(Axis.of_main_tool_actuator(mount))
+        async with grab_pressure(channels, tool, self._messenger):
+            yield
 
     def update_constraints_for_calibration_with_gantry_load(
         self,
@@ -1358,6 +1367,7 @@ class OT3Controller(FlexBackend):
         plunger_speed: float,
         threshold_pascals: float,
         plunger_impulse_time: float,
+        num_baseline_reads: int,
         output_option: OutputOptions = OutputOptions.can_bus_only,
         data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
@@ -1389,6 +1399,7 @@ class OT3Controller(FlexBackend):
             mount_speed=mount_speed,
             threshold_pascals=threshold_pascals,
             plunger_impulse_time=plunger_impulse_time,
+            num_baseline_reads=num_baseline_reads,
             csv_output=csv_output,
             sync_buffer_output=sync_buffer_output,
             can_bus_only_output=can_bus_only_output,

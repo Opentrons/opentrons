@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
@@ -8,9 +8,9 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import SINGLE_IMAGE from '../../../../images/path_single_transfers.svg'
-import MULTI_DISPENSE_IMAGE from '../../../../images/path_multi_dispense.svg'
-import MULTI_ASPIRATE_IMAGE from '../../../../images/path_multi_aspirate.svg'
+import SINGLE_IMAGE from '../../../../assets/images/path_single_transfers.svg'
+import MULTI_DISPENSE_IMAGE from '../../../../assets/images/path_multi_dispense.svg'
+import MULTI_ASPIRATE_IMAGE from '../../../../assets/images/path_multi_aspirate.svg'
 import { getDisabledPathMap } from './getDisabledPathMap'
 import styles from '../../StepEditForm.module.css'
 import type { PathOption } from '../../../../form-types'
@@ -18,13 +18,14 @@ import type { FieldProps } from '../../types'
 import type { DisabledPathMap, ValuesForPath } from './getDisabledPathMap'
 
 const PATH_ANIMATION_IMAGES = {
-  single: new URL('../../../../images/path_single.gif', import.meta.url).href,
+  single: new URL('../../../../assets/images/path_single.gif', import.meta.url)
+    .href,
   multiAspirate: new URL(
-    '../../../../images/path_multiAspirate.gif',
+    '../../../../assets/images/path_multiAspirate.gif',
     import.meta.url
   ).href,
   multiDispense: new URL(
-    '../../../../images/path_multiDispense.gif',
+    '../../../../assets/images/path_multiDispense.gif',
     import.meta.url
   ).href,
 }

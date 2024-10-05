@@ -1,17 +1,22 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import without from 'lodash/without'
-import { Flex, SPACING, StyledText, RadioButton } from '@opentrons/components'
+import {
+  Flex,
+  SPACING,
+  StyledText,
+  RadioButton,
+  DIRECTION_COLUMN,
+} from '@opentrons/components'
 import { WizardBody } from './WizardBody'
+import { HandleEnter } from './HandleEnter'
 
 import type { WizardTileProps } from './types'
 
 export function SelectGripper(props: WizardTileProps): JSX.Element | null {
   const { goBack, setValue, proceed, watch } = props
   const { t } = useTranslation(['create_new_protocol', 'shared'])
-  const [gripperStatus, setGripperStatus] = React.useState<'yes' | 'no' | null>(
-    null
-  )
+  const [gripperStatus, setGripperStatus] = useState<'yes' | 'no' | null>(null)
   const additionalEquipment = watch('additionalEquipment')
 
   const handleGripperSelection = (status: 'yes' | 'no'): void => {
@@ -25,44 +30,50 @@ export function SelectGripper(props: WizardTileProps): JSX.Element | null {
     }
   }
 
+  const isDisabled = gripperStatus == null
+  const handleProceed = (): void => {
+    if (!isDisabled) {
+      proceed(1)
+    }
+  }
+
   return (
-    <WizardBody
-      stepNumber={3}
-      header={t('add_gripper')}
-      disabled={gripperStatus == null}
-      goBack={() => {
-        goBack(1)
-      }}
-      proceed={() => {
-        proceed(1)
-      }}
-    >
-      <>
-        <StyledText
-          desktopStyle="headingSmallBold"
-          marginBottom={SPACING.spacing16}
-        >
-          {t('need_gripper')}
-        </StyledText>
-        <Flex gridGap={SPACING.spacing4}>
-          <RadioButton
-            onChange={() => {
-              handleGripperSelection('yes')
-            }}
-            buttonLabel={t('shared:yes')}
-            buttonValue="yes"
-            isSelected={gripperStatus === 'yes'}
-          />
-          <RadioButton
-            onChange={() => {
-              handleGripperSelection('no')
-            }}
-            buttonLabel={t('shared:no')}
-            buttonValue="no"
-            isSelected={gripperStatus === 'no'}
-          />
+    <HandleEnter onEnter={handleProceed}>
+      <WizardBody
+        stepNumber={3}
+        header={t('add_gripper')}
+        disabled={gripperStatus == null}
+        goBack={() => {
+          goBack(1)
+        }}
+        proceed={handleProceed}
+      >
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+            <StyledText desktopStyle="headingSmallBold">
+              {t('need_gripper')}
+            </StyledText>
+            <Flex gridGap={SPACING.spacing4}>
+              <RadioButton
+                onChange={() => {
+                  handleGripperSelection('yes')
+                }}
+                buttonLabel={t('shared:yes')}
+                buttonValue="yes"
+                isSelected={gripperStatus === 'yes'}
+              />
+              <RadioButton
+                onChange={() => {
+                  handleGripperSelection('no')
+                }}
+                buttonLabel={t('shared:no')}
+                buttonValue="no"
+                isSelected={gripperStatus === 'no'}
+              />
+            </Flex>
+          </Flex>
         </Flex>
-      </>
-    </WizardBody>
+      </WizardBody>
+    </HandleEnter>
   )
 }

@@ -6431,6 +6431,20 @@
         },
         "pipetteId": "f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb"
       }
+    },
+    {
+      "id": "84f7af1d-c097-4d4b-9819-ad56479bbbb8",
+      "createdAt": "2023-01-31T21:53:04.965216+00:00",
+      "commandType": "reloadLabware",
+      "key": "1248111104",
+      "status": "succeeded",
+      "params": {
+        "labwareId": "c8f42311-f83f-4722-9821-9d2225e4b0b5"
+      },
+      "result": {
+        "labwareId": "c8f42311-f83f-4722-9821-9d2225e4b0b5",
+        "offsetId": "offsetId-abc123"
+      }
     }
   ],
   "errors": [],

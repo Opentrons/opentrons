@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import '@testing-library/jest-dom/vitest'
 import { screen, queryByAttribute } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
@@ -29,7 +29,9 @@ describe('RadioButton', () => {
     render(props)
     const label = screen.getByRole('label')
     expect(label).toHaveStyle(`background-color: ${COLORS.blue35}`)
-    expect(label).toHaveStyle(`padding: 14px ${SPACING.spacing16}`)
+    expect(label).toHaveStyle(
+      `padding: ${SPACING.spacing12} ${SPACING.spacing16}`
+    )
   })
 
   it('renders the large selected button', () => {
@@ -41,7 +43,9 @@ describe('RadioButton', () => {
     render(props)
     const label = screen.getByRole('label')
     expect(label).toHaveStyle(`background-color: ${COLORS.blue50}`)
-    expect(label).toHaveStyle(`padding: 14px ${SPACING.spacing16}`)
+    expect(label).toHaveStyle(
+      `padding: ${SPACING.spacing12} ${SPACING.spacing16}`
+    )
   })
 
   it('renders the small button with an icon', () => {
@@ -53,7 +57,9 @@ describe('RadioButton', () => {
     render(props)
     const label = screen.getByRole('label')
     expect(label).toHaveStyle(`background-color: ${COLORS.blue35}`)
-    expect(label).toHaveStyle(`padding: 14px ${SPACING.spacing16}`)
+    expect(label).toHaveStyle(
+      `padding: ${SPACING.spacing12} ${SPACING.spacing16}`
+    )
   })
 
   it('renders the small selected button', () => {
@@ -65,7 +71,9 @@ describe('RadioButton', () => {
     render(props)
     const label = screen.getByRole('label')
     expect(label).toHaveStyle(`background-color: ${COLORS.blue50}`)
-    expect(label).toHaveStyle(`padding: 14px ${SPACING.spacing16}`)
+    expect(label).toHaveStyle(
+      `padding: ${SPACING.spacing12} ${SPACING.spacing16}`
+    )
   })
 
   it('renders id instead of buttonLabel when id is set', () => {
@@ -82,6 +90,7 @@ describe('RadioButton', () => {
     expect(idRadioButton).toBeInTheDocument()
     const buttonLabelIdRadioButton = getById(
       render(props).container,
+      //  @ts-expect-error(ja, 8/23/24): buttonLabel is a string type
       props.buttonLabel
     )
     expect(buttonLabelIdRadioButton).not.toBeInTheDocument()

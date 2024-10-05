@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { ICON_DATA_BY_NAME } from '../../icons'
 import { SPACING } from '../../ui-style-constants'
 import { Box } from '../../primitives'
@@ -85,6 +83,15 @@ export const AlertStroke: Story = {
 export const AlertAlt: Story = {
   args: {
     buttonType: 'alertAlt',
+    buttonText: 'Button text',
+    disabled: false,
+    iconName: 'ot-check',
+  },
+}
+
+export const Stroke: Story = {
+  args: {
+    buttonType: 'stroke',
     buttonText: 'Button text',
     disabled: false,
     iconName: 'ot-check',

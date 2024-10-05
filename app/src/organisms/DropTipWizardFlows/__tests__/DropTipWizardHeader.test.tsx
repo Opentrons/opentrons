@@ -1,9 +1,9 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderHook, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { mockDropTipWizardContainerProps } from '../__fixtures__'
 import {
   useWizardExitHeader,
@@ -31,7 +31,7 @@ describe('DropTipWizardHeader', () => {
   it('renders appropriate copy and onClick behavior', () => {
     render(props)
     screen.getByText('Drop tips')
-    screen.getByText('Step 1 / 3')
+    screen.getByText('Step 1 / 5')
   })
 })
 

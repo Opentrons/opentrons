@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 import without from 'lodash/without'
@@ -33,9 +33,9 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getIsCrashablePipetteSelected } from '../../../step-forms'
-import gripperImage from '../../../images/flex_gripper.png'
-import wasteChuteImage from '../../../images/waste_chute.png'
-import trashBinImage from '../../../images/flex_trash_bin.png'
+import gripperImage from '../../../assets/images/flex_gripper.png'
+import wasteChuteImage from '../../../assets/images/waste_chute.png'
+import trashBinImage from '../../../assets/images/flex_trash_bin.png'
 import { uuid } from '../../../utils'
 import { getEnableMoam } from '../../../feature-flags/selectors'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
@@ -226,7 +226,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
     modules,
     trashType: 'trashBin',
   })
-  React.useEffect(() => {
+  useEffect(() => {
     if (trashBinDisabled) {
       setValue('additionalEquipment', without(additionalEquipment, 'trashBin'))
     }

@@ -15,6 +15,7 @@ import {
   SPACING,
   Modal,
   TYPOGRAPHY,
+  CURSOR_DEFAULT,
 } from '@opentrons/components'
 import {
   useModulesQuery,
@@ -48,10 +49,10 @@ import {
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
-import { TertiaryButton } from '../../atoms/buttons'
-import { OddModal } from '../../molecules/OddModal'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration/'
+import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
+import { TertiaryButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
 
 import type {
   CutoutConfig,
@@ -59,7 +60,7 @@ import type {
   CutoutFixtureId,
 } from '@opentrons/shared-data'
 import type { ModalProps } from '@opentrons/components'
-import type { OddModalHeaderBaseProps } from '../../molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
@@ -385,7 +386,7 @@ export function AddFixtureModal({
 
 const FIXTURE_BUTTON_STYLE_ODD = css`
   background-color: ${COLORS.grey35};
-  cursor: default;
+  cursor: ${CURSOR_DEFAULT};
   border-radius: ${BORDERS.borderRadius16};
   box-shadow: none;
 

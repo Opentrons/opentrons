@@ -1,13 +1,13 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, renderHook, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { RUN_STATUS_RUNNING, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { mockTipRackDefinition } from '../../../redux/custom-labware/__fixtures__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
+import { i18n } from '/app/i18n'
 import {
   mockPauseCommandWithoutStartTime,
   mockPauseCommandWithStartTime,
@@ -16,7 +16,7 @@ import {
   truncatedCommandMessage,
 } from '../__fixtures__'
 import { InterventionModal, useInterventionModal } from '..'
-import { useIsFlex } from '../../Devices/hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { RunData } from '@opentrons/api-client'
@@ -25,7 +25,7 @@ const ROBOT_NAME = 'Otie'
 
 const mockOnResumeHandler = vi.fn()
 
-vi.mock('../../Devices/hooks')
+vi.mock('/app/redux-resources/robots')
 
 describe('useInterventionModal', () => {
   const defaultProps = {
@@ -34,6 +34,7 @@ describe('useInterventionModal', () => {
     runStatus: RUN_STATUS_RUNNING,
     robotName: 'TestRobot',
     analysis: null,
+    doorIsOpen: false,
   }
 
   it('should return showModal true when conditions are met', () => {
@@ -79,6 +80,13 @@ describe('useInterventionModal', () => {
       robotName: 'TestRobot',
       analysis: null,
     })
+  })
+  it('should return showModal true and an alternate footer when door is open', () => {
+    const { result } = renderHook(() =>
+      useInterventionModal({ ...defaultProps, doorIsOpen: true })
+    )
+    expect(result.current.showModal).toBe(true)
+    expect(result.current.modalProps?.alternateFooterContent).toBeTruthy()
   })
 })
 

@@ -4,7 +4,10 @@ from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
+from opentrons_shared_data.pipette.types import PipetteNameType
+
 from ..errors import LocationNotAccessibleByPipetteError
+from ..state import update_types
 from ..types import DeckPoint, AddressableOffsetVector
 from ..resources import fixture_validation
 from .pipetting_common import (
@@ -17,7 +20,7 @@ from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
-    from ..state import StateView
+    from ..state.state import StateView
 
 MoveToAddressableAreaCommandType = Literal["moveToAddressableArea"]
 
@@ -88,9 +91,24 @@ class MoveToAddressableAreaImplementation(
         self, params: MoveToAddressableAreaParams
     ) -> SuccessData[MoveToAddressableAreaResult, None]:
         """Move the requested pipette to the requested addressable area."""
+        state_update = update_types.StateUpdate()
+
         self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
             params.addressableAreaName
         )
+        loaded_pipette = self._state_view.pipettes.get(params.pipetteId)
+        if loaded_pipette.pipetteName in (
+            PipetteNameType.P10_SINGLE,
+            PipetteNameType.P10_MULTI,
+            PipetteNameType.P50_MULTI,
+            PipetteNameType.P50_SINGLE,
+            PipetteNameType.P300_SINGLE,
+            PipetteNameType.P300_MULTI,
+            PipetteNameType.P1000_SINGLE,
+        ):
+            extra_z_offset: Optional[float] = 5.0
+        else:
+            extra_z_offset = None
 
         if fixture_validation.is_staging_slot(params.addressableAreaName):
             raise LocationNotAccessibleByPipetteError(
@@ -105,11 +123,19 @@ class MoveToAddressableAreaImplementation(
             minimum_z_height=params.minimumZHeight,
             speed=params.speed,
             stay_at_highest_possible_z=params.stayAtHighestPossibleZ,
+            highest_possible_z_extra_offset=extra_z_offset,
+        )
+        deck_point = DeckPoint.construct(x=x, y=y, z=z)
+        state_update.set_pipette_location(
+            pipette_id=params.pipetteId,
+            new_addressable_area_name=params.addressableAreaName,
+            new_deck_point=deck_point,
         )
 
         return SuccessData(
             public=MoveToAddressableAreaResult(position=DeckPoint(x=x, y=y, z=z)),
             private=None,
+            state_update=state_update,
         )
 
 

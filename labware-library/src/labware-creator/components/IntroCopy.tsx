@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { getPublicPath } from '../../public-path'
 import { LinkOut } from './LinkOut'

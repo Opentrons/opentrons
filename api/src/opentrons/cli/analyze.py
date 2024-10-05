@@ -23,8 +23,14 @@ from typing import (
 )
 import logging
 import sys
+import json
 
-from opentrons.protocol_engine.types import RunTimeParameter, EngineStatus
+from opentrons.protocol_engine.types import (
+    RunTimeParameter,
+    CSVRuntimeParamPaths,
+    PrimitiveRunTimeParamValuesType,
+    EngineStatus,
+)
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_reader import (
     ProtocolReader,
@@ -104,8 +110,22 @@ class _Output:
     type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"], case_sensitive=False),
     default="WARNING",
 )
+@click.option(
+    "--rtp-values",
+    help="Serialized JSON of runtime parameter variable names to values.",
+    default="{}",
+    type=str,
+)
+@click.option(
+    "--rtp-files",
+    help="Serialized JSON of runtime parameter variable names to file paths.",
+    default="{}",
+    type=str,
+)
 def analyze(
     files: Sequence[Path],
+    rtp_values: str,
+    rtp_files: str,
     json_output: Optional[IO[bytes]],
     human_json_output: Optional[IO[bytes]],
     log_output: str,
@@ -125,7 +145,7 @@ def analyze(
 
     try:
         with _capture_logs(log_output, log_level):
-            sys.exit(run(_analyze, files, outputs, check))
+            sys.exit(run(_analyze, files, rtp_values, rtp_files, outputs, check))
     except click.ClickException:
         raise
     except Exception as e:
@@ -194,6 +214,37 @@ def _get_input_files(files_and_dirs: Sequence[Path]) -> List[Path]:
     return results
 
 
+def _get_runtime_parameter_values(
+    serialized_rtp_values: str,
+) -> PrimitiveRunTimeParamValuesType:
+    rtp_values = {}
+    try:
+        for variable_name, value in json.loads(serialized_rtp_values).items():
+            if not isinstance(value, (bool, int, float, str)):
+                raise click.BadParameter(
+                    f"Runtime parameter '{value}' is not of allowed type boolean, integer, float or string",
+                    param_hint="--rtp-values",
+                )
+            rtp_values[variable_name] = value
+    except json.JSONDecodeError as error:
+        raise click.BadParameter(
+            f"JSON decode error: {error}", param_hint="--rtp-values"
+        )
+    return rtp_values
+
+
+def _get_runtime_parameter_paths(serialized_rtp_files: str) -> CSVRuntimeParamPaths:
+    try:
+        return {
+            variable_name: Path(path_string)
+            for variable_name, path_string in json.loads(serialized_rtp_files).items()
+        }
+    except json.JSONDecodeError as error:
+        raise click.BadParameter(
+            f"JSON decode error: {error}", param_hint="--rtp-files"
+        )
+
+
 R = TypeVar("R")
 
 
@@ -238,7 +289,11 @@ class UnexpectedAnalysisError(EnumeratedError):
         )
 
 
-async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
+async def _do_analyze(
+    protocol_source: ProtocolSource,
+    rtp_values: PrimitiveRunTimeParamValuesType,
+    rtp_paths: CSVRuntimeParamPaths,
+) -> RunResult:
 
     orchestrator = await create_simulating_orchestrator(
         robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
@@ -247,8 +302,8 @@ async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
         await orchestrator.load(
             protocol_source=protocol_source,
             parse_mode=ParseMode.NORMAL,
-            run_time_param_values=None,
-            run_time_param_paths=None,
+            run_time_param_values=rtp_values,
+            run_time_param_paths=rtp_paths,
         )
     except Exception as error:
         err_id = "analysis-setup-error"
@@ -275,6 +330,7 @@ async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
                 modules=[],
                 labwareOffsets=[],
                 liquids=[],
+                wells=[],
                 hasEverEnteredErrorRecovery=False,
             ),
             parameters=[],
@@ -284,9 +340,16 @@ async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
 
 
 async def _analyze(
-    files_and_dirs: Sequence[Path], outputs: Sequence[_Output], check: bool
+    files_and_dirs: Sequence[Path],
+    rtp_values: str,
+    rtp_files: str,
+    outputs: Sequence[_Output],
+    check: bool,
 ) -> int:
     input_files = _get_input_files(files_and_dirs)
+    parsed_rtp_values = _get_runtime_parameter_values(rtp_values)
+    rtp_paths = _get_runtime_parameter_paths(rtp_files)
+
     try:
         protocol_source = await ProtocolReader().read_saved(
             files=input_files,
@@ -295,7 +358,7 @@ async def _analyze(
     except ProtocolFilesInvalidError as error:
         raise click.ClickException(str(error))
 
-    analysis = await _do_analyze(protocol_source)
+    analysis = await _do_analyze(protocol_source, parsed_rtp_values, rtp_paths)
     return_code = _get_return_code(analysis)
 
     if not outputs:

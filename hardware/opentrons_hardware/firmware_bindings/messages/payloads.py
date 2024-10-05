@@ -31,6 +31,7 @@ from .fields import (
     GearMotorIdField,
     OptionalRevisionField,
     MotorUsageTypeField,
+    BatchSensorDataField,
 )
 from .. import utils
 
@@ -442,6 +443,14 @@ class ReadFromSensorResponsePayload(SensorPayload):
     """A response for either a single reading or an averaged reading of a sensor."""
 
     sensor_data: utils.Int32Field
+
+
+@dataclass(eq=False)
+class BatchReadFromSensorResponsePayload(SensorPayload):
+    """A response for a batch of sensor responses."""
+
+    data_length: utils.UInt8Field
+    sensor_data: BatchSensorDataField
 
 
 @dataclass(eq=False)

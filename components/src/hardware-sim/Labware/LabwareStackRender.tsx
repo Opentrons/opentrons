@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { WellLabels, StaticLabware } from './labwareInternals'
 import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
 import { COLORS } from '../../helix-design-system'

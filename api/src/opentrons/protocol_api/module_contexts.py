@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from typing import List, Dict, Optional, Union, cast
 
+from opentrons.protocol_engine.types import ABSMeasureMode
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.module.types import ModuleModel, ModuleType
 
@@ -103,7 +104,7 @@ class ModuleContext(CommandPublisher):
             raise UnsupportedAPIError(
                 api_element="`ModuleContext.load_labware_object`",
                 since_version="2.14",
-                message=" Use `ModuleContext.load_labware` or `load_labware_by_definition` instead.",
+                extra_message="Use `ModuleContext.load_labware` or `load_labware_by_definition` instead.",
             )
 
         _log.warning(
@@ -305,7 +306,7 @@ class ModuleContext(CommandPublisher):
         raise UnsupportedAPIError(
             api_element="`ModuleContext.geometry`",
             since_version="2.14",
-            message=" Use properties of the `ModuleContext` itself.",
+            extra_message="Use properties of the `ModuleContext` itself.",
         )
 
     def __repr__(self) -> str:
@@ -482,7 +483,7 @@ class MagneticModuleContext(ModuleContext):
                     api_element="The height parameter of MagneticModuleContext.engage()",
                     since_version=f"{_MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN}",
                     current_version=f"{self._api_version}",
-                    message=" Use offset or height_from_base.",
+                    extra_message="Use offset or height_from_base.",
                 )
             self._core.engage(height_from_home=height)
 
@@ -1003,11 +1004,31 @@ class AbsorbanceReaderContext(ModuleContext):
         return self._core.is_lid_on()
 
     @requires_version(2, 21)
-    def initialize(self, wavelength: int) -> None:
-        """Initialize the Absorbance Reader by taking zero reading."""
-        self._core.initialize(wavelength)
+    def initialize(
+        self,
+        mode: ABSMeasureMode,
+        wavelengths: List[int],
+        reference_wavelength: Optional[int] = None,
+    ) -> None:
+        """Take a zero reading on the Absorbance Plate Reader Module.
+
+        :param mode: Either ``"single"`` or ``"multi"``.
+
+             - In single measurement mode, :py:meth:`.AbsorbanceReaderContext.read` uses
+               one sample wavelength and an optional reference wavelength.
+             - In multiple measurement mode, :py:meth:`.AbsorbanceReaderContext.read` uses
+               a list of up to six sample wavelengths.
+        :param wavelengths: A list of wavelengths, in mm, to measure.
+             - Must contain only one item when initializing a single measurement.
+             - Must contain one to six items when initializing a multiple measurement.
+        :param reference_wavelength: An optional reference wavelength, in mm. Cannot be
+             used with multiple measurements.
+        """
+        self._core.initialize(
+            mode, wavelengths, reference_wavelength=reference_wavelength
+        )
 
     @requires_version(2, 21)
-    def read(self) -> Optional[Dict[str, float]]:
-        """Initiate read on the Absorbance Reader. Returns a dictionary of values ordered by well name."""
+    def read(self) -> Optional[Dict[int, Dict[str, float]]]:
+        """Initiate read on the Absorbance Reader. Returns a dictionary of wavelengths to dictionary of values ordered by well name."""
         return self._core.read()

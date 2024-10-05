@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -7,12 +7,12 @@ import * as Yup from 'yup'
 import {
   Card,
   DeprecatedCheckboxField,
-  FormGroup,
-  LegacyInputField,
-  OutlineButton,
   DeprecatedPrimaryButton,
   Flex,
+  FormGroup,
   JUSTIFY_END,
+  LegacyInputField,
+  OutlineButton,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { DEPRECATED_WHALE_GREY } from '@opentrons/shared-data'
@@ -97,7 +97,7 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
 
   const {
     handleSubmit,
-    formState: { errors, touchedFields },
+    formState: { errors, touchedFields, isDirty },
     control,
     watch,
     setValue,
@@ -219,10 +219,11 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
           </DeprecatedPrimaryButton>
           <DeprecatedPrimaryButton
             disabled={
-              touchedFields.name == null ||
+              name == null ||
               errors.name != null ||
               name === '' ||
-              errors.displayColor != null
+              errors.displayColor != null ||
+              !isDirty
             }
             type="submit"
           >

@@ -10,7 +10,7 @@ from ...errors import CannotPerformModuleAction
 from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state import StateView
+    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 
@@ -18,16 +18,17 @@ ReadAbsorbanceCommandType = Literal["absorbanceReader/read"]
 
 
 class ReadAbsorbanceParams(BaseModel):
-    """Input parameters for a single absorbance reading."""
+    """Input parameters for an absorbance reading."""
 
     moduleId: str = Field(..., description="Unique ID of the Absorbance Reader.")
-    sampleWavelength: int = Field(..., description="Sample wavelength in nm.")
 
 
 class ReadAbsorbanceResult(BaseModel):
-    """Result data from running an aborbance reading, returned as a dictionary map of values by well name (eg. ("A1": 0.0, ...))."""
+    """Result data from running an aborbance reading, returned as a dictionary map of wavelengths containing a map of values by well name (eg. {450: {"A1": 0.0, ...}})."""
 
-    data: Optional[Dict[str, float]] = Field(..., description="Absorbance data points.")
+    data: Optional[Dict[int, Dict[str, float]]] = Field(
+        ..., description="Absorbance data points per wavelength."
+    )
 
 
 class ReadAbsorbanceImpl(
@@ -47,7 +48,7 @@ class ReadAbsorbanceImpl(
     async def execute(
         self, params: ReadAbsorbanceParams
     ) -> SuccessData[ReadAbsorbanceResult, None]:
-        """Initiate a single absorbance measurement."""
+        """Initiate an absorbance measurement."""
         abs_reader_substate = self._state_view.modules.get_absorbance_reader_substate(
             module_id=params.moduleId
         )
@@ -62,16 +63,21 @@ class ReadAbsorbanceImpl(
             )
 
         if abs_reader is not None:
-            result = await abs_reader.start_measure(wavelength=params.sampleWavelength)
-            converted_values = (
-                self._state_view.modules.convert_absorbance_reader_data_points(
-                    data=result
+            results = await abs_reader.start_measure()
+            if abs_reader._measurement_config is not None:
+                asbsorbance_result: Dict[int, Dict[str, float]] = {}
+                sample_wavelengths = abs_reader._measurement_config.sample_wavelengths
+                for wavelength, result in zip(sample_wavelengths, results):
+                    converted_values = (
+                        self._state_view.modules.convert_absorbance_reader_data_points(
+                            data=result
+                        )
+                    )
+                    asbsorbance_result[wavelength] = converted_values
+                return SuccessData(
+                    public=ReadAbsorbanceResult(data=asbsorbance_result),
+                    private=None,
                 )
-            )
-            return SuccessData(
-                public=ReadAbsorbanceResult(data=converted_values),
-                private=None,
-            )
 
         return SuccessData(
             public=ReadAbsorbanceResult(data=None),

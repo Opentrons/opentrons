@@ -13,6 +13,7 @@ from robot_server.persistence.tables import (
     schema_4,
     schema_5,
     schema_6,
+    schema_7,
 )
 
 # The statements that we expect to emit when we create a fresh database.
@@ -28,6 +29,134 @@ from robot_server.persistence.tables import (
 #
 # Whitespace and formatting changes, on the other hand, are allowed.
 EXPECTED_STATEMENTS_LATEST = [
+    """
+    CREATE TABLE protocol (
+        id VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        protocol_key VARCHAR,
+        protocol_kind VARCHAR(14) NOT NULL,
+        PRIMARY KEY (id),
+        CONSTRAINT protocolkindsqlenum CHECK (protocol_kind IN ('standard', 'quick-transfer'))
+    )
+    """,
+    """
+    CREATE TABLE analysis (
+        id VARCHAR NOT NULL,
+        protocol_id VARCHAR NOT NULL,
+        analyzer_version VARCHAR NOT NULL,
+        completed_analysis VARCHAR NOT NULL,
+        PRIMARY KEY (id),
+        FOREIGN KEY(protocol_id) REFERENCES protocol (id)
+    )
+    """,
+    """
+    CREATE TABLE analysis_primitive_rtp_table (
+        row_id INTEGER NOT NULL,
+        analysis_id VARCHAR NOT NULL,
+        parameter_variable_name VARCHAR NOT NULL,
+        parameter_type VARCHAR(5) NOT NULL,
+        parameter_value VARCHAR NOT NULL,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(analysis_id) REFERENCES analysis (id),
+        CONSTRAINT primitiveparamsqlenum CHECK (parameter_type IN ('int', 'float', 'bool', 'str'))
+    )
+    """,
+    """
+    CREATE TABLE analysis_csv_rtp_table (
+        row_id INTEGER NOT NULL,
+        analysis_id VARCHAR NOT NULL,
+        parameter_variable_name VARCHAR NOT NULL,
+        file_id VARCHAR,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(analysis_id) REFERENCES analysis (id),
+        FOREIGN KEY(file_id) REFERENCES data_files (id)
+    )
+    """,
+    """
+    CREATE INDEX ix_analysis_protocol_id ON analysis (protocol_id)
+    """,
+    """
+    CREATE TABLE run (
+        id VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        protocol_id VARCHAR,
+        state_summary VARCHAR,
+        engine_status VARCHAR,
+        _updated_at DATETIME,
+        run_time_parameters VARCHAR,
+        PRIMARY KEY (id),
+        FOREIGN KEY(protocol_id) REFERENCES protocol (id)
+    )
+    """,
+    """
+    CREATE TABLE action (
+        id VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        action_type VARCHAR NOT NULL,
+        run_id VARCHAR NOT NULL,
+        PRIMARY KEY (id),
+        FOREIGN KEY(run_id) REFERENCES run (id)
+    )
+    """,
+    """
+    CREATE TABLE run_command (
+        row_id INTEGER NOT NULL,
+        run_id VARCHAR NOT NULL,
+        index_in_run INTEGER NOT NULL,
+        command_id VARCHAR NOT NULL,
+        command VARCHAR NOT NULL,
+        command_intent VARCHAR NOT NULL,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(run_id) REFERENCES run (id)
+    )
+    """,
+    """
+    CREATE UNIQUE INDEX ix_run_run_id_command_id ON run_command (run_id, command_id)
+    """,
+    """
+    CREATE UNIQUE INDEX ix_run_run_id_index_in_run ON run_command (run_id, index_in_run)
+    """,
+    """
+    CREATE INDEX ix_protocol_protocol_kind ON protocol (protocol_kind)
+    """,
+    """
+    CREATE INDEX ix_run_command_command_intent ON run_command (command_intent)
+    """,
+    """
+    CREATE TABLE data_files (
+        id VARCHAR NOT NULL,
+        name VARCHAR NOT NULL,
+        file_hash VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        PRIMARY KEY (id)
+    )
+    """,
+    """
+    CREATE TABLE run_csv_rtp_table (
+        row_id INTEGER NOT NULL,
+        run_id VARCHAR NOT NULL,
+        parameter_variable_name VARCHAR NOT NULL,
+        file_id VARCHAR,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(run_id) REFERENCES run (id),
+        FOREIGN KEY(file_id) REFERENCES data_files (id)
+    )
+    """,
+    """
+    CREATE TABLE boolean_setting (
+        "key" VARCHAR(21) NOT NULL,
+        value BOOLEAN NOT NULL,
+        PRIMARY KEY ("key"),
+        CONSTRAINT booleansettingkey CHECK ("key" IN ('enable_error_recovery'))
+    )
+    """,
+]
+
+
+EXPECTED_STATEMENTS_V7 = EXPECTED_STATEMENTS_LATEST
+
+
+EXPECTED_STATEMENTS_V6 = [
     """
     CREATE TABLE protocol (
         id VARCHAR NOT NULL,
@@ -139,7 +268,6 @@ EXPECTED_STATEMENTS_LATEST = [
     """,
 ]
 
-EXPECTED_STATEMENTS_V6 = EXPECTED_STATEMENTS_LATEST
 
 EXPECTED_STATEMENTS_V5 = [
     """
@@ -215,6 +343,7 @@ EXPECTED_STATEMENTS_V5 = [
     )
     """,
 ]
+
 
 EXPECTED_STATEMENTS_V4 = [
     """
@@ -420,6 +549,7 @@ def _normalize_statement(statement: str) -> str:
     ("metadata", "expected_statements"),
     [
         (latest_metadata, EXPECTED_STATEMENTS_LATEST),
+        (schema_7.metadata, EXPECTED_STATEMENTS_V7),
         (schema_6.metadata, EXPECTED_STATEMENTS_V6),
         (schema_5.metadata, EXPECTED_STATEMENTS_V5),
         (schema_4.metadata, EXPECTED_STATEMENTS_V4),

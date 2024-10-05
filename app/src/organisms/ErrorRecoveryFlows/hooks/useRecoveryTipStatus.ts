@@ -1,16 +1,15 @@
-import * as React from 'react'
+import { useState } from 'react'
 import head from 'lodash/head'
 
 import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-
-import { useTipAttachmentStatus } from '../../DropTipWizardFlows'
+import { useTipAttachmentStatus } from '/app/organisms/DropTipWizardFlows'
 
 import type { Run, Instruments, PipetteData } from '@opentrons/api-client'
 import type {
-  TipAttachmentStatusResult,
   PipetteWithTip,
-} from '../../DropTipWizardFlows'
+  TipAttachmentStatusResult,
+} from '/app/organisms/DropTipWizardFlows'
 
 interface UseRecoveryTipStatusProps {
   runId: string
@@ -29,11 +28,11 @@ export type RecoveryTipStatusUtils = TipAttachmentStatusResult & {
 export function useRecoveryTipStatus(
   props: UseRecoveryTipStatusProps
 ): RecoveryTipStatusUtils {
-  const [isLoadingTipStatus, setIsLoadingTipStatus] = React.useState(false)
+  const [isLoadingTipStatus, setIsLoadingTipStatus] = useState(false)
   const [
     failedCommandPipette,
     setFailedCommandPipette,
-  ] = React.useState<PipetteWithTip | null>(null)
+  ] = useState<PipetteWithTip | null>(null)
   const host = useHost()
 
   const tipAttachmentStatusUtils = useTipAttachmentStatus({

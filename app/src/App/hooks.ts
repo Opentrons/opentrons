@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useCallback, useRef, useEffect } from 'react'
 import difference from 'lodash/difference'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
@@ -10,30 +10,20 @@ import {
   useHost,
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
-import {
-  getProtocol,
-  RUN_ACTION_TYPE_PLAY,
-  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  RUN_STATUS_IDLE,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_FAILED,
-  RUN_STATUS_SUCCEEDED,
-} from '@opentrons/api-client'
+import { getProtocol } from '@opentrons/api-client'
 
-import { checkShellUpdate } from '../redux/shell'
-import { useToaster } from '../organisms/ToasterOven'
-import { useCurrentRunId, useNotifyRunQuery } from '../resources/runs'
+import { checkShellUpdate } from '/app/redux/shell'
+import { useToaster } from '/app/organisms/ToasterOven'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
-import type { Dispatch } from '../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
-const CURRENT_RUN_POLL = 5000
 const UPDATE_RECHECK_INTERVAL_MS = 60000
 const PROTOCOL_IDS_RECHECK_INTERVAL_MS = 3000
 
 export function useSoftwareUpdatePoll(): void {
   const dispatch = useDispatch<Dispatch>()
-  const checkAppUpdate = React.useCallback(() => dispatch(checkShellUpdate()), [
+  const checkAppUpdate = useCallback(() => dispatch(checkShellUpdate()), [
     dispatch,
   ])
   useInterval(checkAppUpdate, UPDATE_RECHECK_INTERVAL_MS)
@@ -51,8 +41,8 @@ export function useProtocolReceiptToast(): void {
     true
   )
   const protocolIds = protocolIdsQuery.data?.data ?? []
-  const protocolIdsRef = React.useRef(protocolIds)
-  const hasRefetched = React.useRef(true)
+  const protocolIdsRef = useRef(protocolIds)
+  const hasRefetched = useRef(true)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const animationCommand: SetStatusBarCreateCommand = {
     commandType: 'setStatusBar',
@@ -63,7 +53,7 @@ export function useProtocolReceiptToast(): void {
     hasRefetched.current = false
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     const newProtocolIds = difference(protocolIds, protocolIdsRef.current)
     if (!hasRefetched.current && newProtocolIds.length > 0) {
       Promise.all(
@@ -122,38 +112,4 @@ export function useProtocolReceiptToast(): void {
     // dont want this hook to rerun when other deps change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [protocolIds])
-}
-
-export function useCurrentRunRoute(): string | null {
-  const currentRunId = useCurrentRunId({ refetchInterval: CURRENT_RUN_POLL })
-  const { data: runRecord } = useNotifyRunQuery(currentRunId, {
-    staleTime: Infinity,
-    enabled: currentRunId != null,
-  })
-
-  const runStatus = runRecord?.data.status
-  const runActions = runRecord?.data.actions
-  if (runRecord == null || runStatus == null || runActions == null) return null
-  // grabbing run id off of the run query to have all routing info come from one source of truth
-  const runId = runRecord.data.id
-  const hasRunStarted = runActions?.some(
-    action => action.actionType === RUN_ACTION_TYPE_PLAY
-  )
-  if (
-    runStatus === RUN_STATUS_SUCCEEDED ||
-    (runStatus === RUN_STATUS_STOPPED && hasRunStarted) ||
-    runStatus === RUN_STATUS_FAILED
-  ) {
-    return `/runs/${runId}/summary`
-  } else if (
-    runStatus === RUN_STATUS_IDLE ||
-    (!hasRunStarted && runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
-  ) {
-    return `/runs/${runId}/setup`
-  } else if (hasRunStarted) {
-    return `/runs/${runId}/run`
-  } else {
-    // includes runs cancelled before starting and runs not yet started
-    return null
-  }
 }

@@ -26,7 +26,7 @@ from opentrons.protocol_engine.errors import (
 from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
     HeaterShakerMovementFlagger,
 )
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.state.module_substates.heater_shaker_module_substate import (
     HeaterShakerModuleId,
     HeaterShakerModuleSubState,

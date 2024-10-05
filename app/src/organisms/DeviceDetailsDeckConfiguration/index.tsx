@@ -1,10 +1,11 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
+  Banner,
   BORDERS,
   COLORS,
   DeckConfigurator,
@@ -28,15 +29,15 @@ import {
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
-import { Banner } from '../../atoms/Banner'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
-import { useIsRobotViewable, useRunStatuses } from '../Devices/hooks'
-import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useRunStatuses } from '/app/resources/runs'
+import { useIsRobotViewable } from '/app/redux-resources/robots'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import {
   useDeckConfigurationEditingTools,
   useNotifyDeckConfigurationQuery,
-} from '../../resources/deck_configuration'
+} from '/app/resources/deck_configuration'
 
 import type { CutoutId } from '@opentrons/shared-data'
 
@@ -58,7 +59,7 @@ export function DeviceDetailsDeckConfiguration({
   const [
     showSetupInstructionsModal,
     setShowSetupInstructionsModal,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
 
   const { data: modulesData } = useModulesQuery()
   const deckConfig =

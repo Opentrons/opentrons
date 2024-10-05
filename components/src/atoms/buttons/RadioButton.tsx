@@ -1,31 +1,39 @@
-import * as React from 'react'
+import type * as React from 'react'
 import styled, { css } from 'styled-components'
 import { Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  CURSOR_DEFAULT,
+  CURSOR_NOT_ALLOWED,
+  CURSOR_POINTER,
   DIRECTION_ROW,
   Icon,
   RESPONSIVENESS,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '../..'
 import type { IconName } from '../..'
 import type { StyleProps } from '../../primitives'
 
 interface RadioButtonProps extends StyleProps {
-  buttonLabel: string
+  buttonLabel: string | React.ReactNode
   buttonValue: string | number
   onChange: React.ChangeEventHandler<HTMLInputElement>
   disabled?: boolean
+  iconName?: IconName
   isSelected?: boolean
+  largeDesktopBorderRadius?: boolean
   radioButtonType?: 'large' | 'small'
   subButtonLabel?: string
   id?: string
-  iconName?: IconName
   maxLines?: number | null
+  //  used for mouseEnter and mouseLeave
+  setNoHover?: () => void
+  setHovered?: () => void
+  // TODO wire up the error state for the radio button
+  error?: string | null
 }
 
 //  used for ODD and helix
@@ -38,9 +46,14 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     onChange,
     radioButtonType = 'large',
     subButtonLabel,
-    id = buttonLabel,
+    id = typeof buttonLabel === 'string'
+      ? buttonLabel
+      : `RadioButtonId_${buttonValue}`,
+    largeDesktopBorderRadius = false,
     iconName,
     maxLines = null,
+    setHovered,
+    setNoHover,
   } = props
 
   const isLarge = radioButtonType === 'large'
@@ -52,8 +65,9 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   const AVAILABLE_BUTTON_STYLE = css`
     background: ${COLORS.blue35};
 
+    &:hover,
     &:active {
-      background-color: ${COLORS.blue40};
+      background-color: ${disabled ? COLORS.grey35 : COLORS.blue40};
     }
   `
 
@@ -61,41 +75,65 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     background: ${COLORS.blue50};
     color: ${COLORS.white};
 
+    &:hover,
     &:active {
-      background-color: ${COLORS.blue60};
+      background-color: ${disabled ? COLORS.grey35 : COLORS.blue60};
     }
   `
 
   const DISABLED_BUTTON_STYLE = css`
     background-color: ${COLORS.grey35};
     color: ${COLORS.grey50};
-    cursor: not-allowed;
+
+    &:hover,
+    &:active {
+      background-color: ${COLORS.grey35};
+    }
+
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      cursor: ${CURSOR_NOT_ALLOWED};
+    }
   `
 
   const SettingButtonLabel = styled.label`
-      border-radius: ${BORDERS.borderRadius40};
-      cursor: pointer;
-      padding: 14px ${SPACING.spacing16};
-      width: 100%;
+    border-radius: ${!largeDesktopBorderRadius
+      ? BORDERS.borderRadius40
+      : BORDERS.borderRadius8};
+    cursor: ${CURSOR_POINTER};
+    padding: ${SPACING.spacing12} ${SPACING.spacing16};
+    width: 100%;
 
-      ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}
-      ${disabled && DISABLED_BUTTON_STYLE}
+    ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}
+    ${disabled && DISABLED_BUTTON_STYLE}
+
+    &:focus-visible {
+      outline: 2px solid ${COLORS.blue55};
+    }
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-        cursor: default;
-        padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
-        border-radius: ${BORDERS.borderRadius16};
-        display: ${maxLines != null ? '-webkit-box' : undefined};
-        -webkit-line-clamp: ${maxLines ?? undefined};
-        -webkit-box-orient: ${maxLines != null ? 'vertical' : undefined};
-      }
+      cursor: ${CURSOR_DEFAULT};
+      padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
+      border-radius: ${BORDERS.borderRadius16};
+      display: ${maxLines != null ? '-webkit-box' : undefined};
+      -webkit-line-clamp: ${maxLines ?? undefined};
+      -webkit-box-orient: ${maxLines != null ? 'vertical' : undefined};
+      word-wrap: break-word;
     }
+  `
+
+  const SUBBUTTON_LABEL_STYLE = css`
+    color: ${disabled
+      ? COLORS.grey50
+      : isSelected
+      ? COLORS.white
+      : COLORS.grey60};
   `
 
   return (
     <Flex
       css={css`
-        width: auto;
+        width: ${props.width ?? 'auto'};
+
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
           width: 100%;
         }
@@ -109,7 +147,13 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
         type="radio"
         value={buttonValue}
       />
-      <SettingButtonLabel role="label" htmlFor={id}>
+      <SettingButtonLabel
+        tabIndex={0}
+        role="label"
+        htmlFor={id}
+        onMouseEnter={setHovered}
+        onMouseLeave={setNoHover}
+      >
         <Flex
           flexDirection={DIRECTION_ROW}
           gridGap={SPACING.spacing2}
@@ -123,20 +167,28 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
               data-testid={`icon_${iconName}`}
             />
           ) : null}
-          <StyledText
-            oddStyle={isLarge ? 'level4HeaderSemiBold' : 'bodyTextRegular'}
-            desktopStyle="bodyDefaultRegular"
-          >
-            {buttonLabel}
-          </StyledText>
+          {typeof buttonLabel === 'string' ? (
+            <StyledText
+              oddStyle={isLarge ? 'level4HeaderSemiBold' : 'bodyTextRegular'}
+              desktopStyle={
+                isLarge ? 'bodyDefaultSemiBold' : 'bodyDefaultRegular'
+              }
+            >
+              {buttonLabel}
+            </StyledText>
+          ) : (
+            buttonLabel
+          )}
         </Flex>
         {subButtonLabel != null ? (
-          <StyledText
-            oddStyle="level4HeaderRegular"
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-          >
-            {subButtonLabel}
-          </StyledText>
+          <Flex css={SUBBUTTON_LABEL_STYLE}>
+            <StyledText
+              oddStyle={isLarge ? 'level4HeaderRegular' : 'bodyTextRegular'}
+              desktopStyle="bodyDefaultRegular"
+            >
+              {subButtonLabel}
+            </StyledText>
+          </Flex>
         ) : null}
       </SettingButtonLabel>
     </Flex>

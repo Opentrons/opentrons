@@ -1,7 +1,6 @@
-import * as React from 'react'
 import { Flex } from '@opentrons/components'
 import { I18nextProvider } from 'react-i18next'
-import { i18n } from '../../localization'
+import { i18n } from '../../assets/localization'
 import { SlotInformation as SlotInformationComponent } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'

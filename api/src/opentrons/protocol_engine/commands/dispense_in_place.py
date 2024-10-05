@@ -12,7 +12,6 @@ from .pipetting_common import (
     FlowRateMixin,
     BaseLiquidHandlingResult,
     OverpressureError,
-    OverpressureErrorInternalData,
 )
 from .command import (
     AbstractCommandImpl,
@@ -22,7 +21,6 @@ from .command import (
     DefinedErrorData,
 )
 from ..errors.error_occurrence import ErrorOccurrence
-from ..types import DeckPoint
 
 if TYPE_CHECKING:
     from ..execution import PipettingHandler, GantryMover
@@ -49,7 +47,7 @@ class DispenseInPlaceResult(BaseLiquidHandlingResult):
 
 _ExecuteReturn = Union[
     SuccessData[DispenseInPlaceResult, None],
-    DefinedErrorData[OverpressureError, OverpressureErrorInternalData],
+    DefinedErrorData[OverpressureError],
 ]
 
 
@@ -101,13 +99,6 @@ class DispenseInPlaceImplementation(
                         }
                     ),
                 ),
-                private=OverpressureErrorInternalData(
-                    position=DeckPoint(
-                        x=current_position.x,
-                        y=current_position.y,
-                        z=current_position.z,
-                    ),
-                ),
             )
         else:
             return SuccessData(
@@ -116,7 +107,7 @@ class DispenseInPlaceImplementation(
 
 
 class DispenseInPlace(
-    BaseCommand[DispenseInPlaceParams, DispenseInPlaceResult, ErrorOccurrence]
+    BaseCommand[DispenseInPlaceParams, DispenseInPlaceResult, OverpressureError]
 ):
     """DispenseInPlace command model."""
 

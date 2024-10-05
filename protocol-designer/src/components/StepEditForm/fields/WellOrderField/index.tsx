@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
@@ -11,7 +11,7 @@ import {
   C_LIGHT_GRAY,
 } from '@opentrons/components'
 import cx from 'classnames'
-import ZIG_ZAG_IMAGE from '../../../../images/zig_zag_icon.svg'
+import ZIG_ZAG_IMAGE from '../../../../assets/images/zig_zag_icon.svg'
 import { WellOrderModal } from './WellOrderModal'
 import stepEditStyles from '../../StepEditForm.module.css'
 import styles from './WellOrderInput.module.css'
@@ -40,7 +40,7 @@ export const WellOrderField = (props: WellOrderFieldProps): JSX.Element => {
     updateSecondWellOrder,
   } = props
   const { t } = useTranslation(['form', 'modal'])
-  const [isModalOpen, setModalOpen] = React.useState(false)
+  const [isModalOpen, setModalOpen] = useState(false)
 
   const handleOpen = (): void => {
     setModalOpen(true)

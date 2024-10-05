@@ -14,18 +14,15 @@ import {
   getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { getTopPortalEl } from '../../App/portal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'
-import {
-  useChainMaintenanceCommands,
-  useCreateTargetedMaintenanceRunMutation,
-} from '../../resources/runs'
-import { getIsOnDevice } from '../../redux/config'
+import { getTopPortalEl } from '/app/App/portal'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
+import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
+import { getIsOnDevice } from '/app/redux/config'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '../../molecules/SimpleWizardBody'
+} from '/app/molecules/SimpleWizardBody'
 import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'
 import { FLEX_SLOT_NAMES_BY_MOD_TYPE, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -34,10 +31,14 @@ import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 import { DetachProbe } from './DetachProbe'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import {
+  useChainMaintenanceCommands,
+  useNotifyCurrentMaintenanceRun,
+} from '/app/resources/maintenance_runs'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import type {
   CreateCommand,
   CutoutConfig,
@@ -48,6 +49,7 @@ interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
   closeFlow: () => void
   isPrepCommandLoading: boolean
+  isLoadedInRun?: boolean
   onComplete?: () => void
   prepCommandErrorMessage?: string
 }
@@ -59,6 +61,7 @@ export const ModuleWizardFlows = (
 ): JSX.Element | null => {
   const {
     attachedModule,
+    isLoadedInRun = false,
     isPrepCommandLoading,
     closeFlow,
     onComplete,
@@ -270,7 +273,11 @@ export const ModuleWizardFlows = (
         })}
       />
     )
-  } else if (prepCommandErrorMessage != null || errorMessage != null) {
+  } else if (
+    prepCommandErrorMessage != null ||
+    errorMessage != null ||
+    maintenanceRunData?.data.status === RUN_STATUS_FAILED
+  ) {
     modalContent = (
       <SimpleWizardBody
         isSuccess={false}
@@ -311,6 +318,7 @@ export const ModuleWizardFlows = (
         {...calibrateBaseProps}
         availableSlotNames={availableSlotNames}
         deckConfig={deckConfig}
+        isLoadedInRun={isLoadedInRun}
         occupiedCutouts={occupiedCutouts}
         configuredFixtureIdByCutoutId={fixtureIdByCutoutId}
       />

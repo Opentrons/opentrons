@@ -28,7 +28,11 @@ class _AnalysisCLIResult:
 
 
 def _get_analysis_result(
-    protocol_files: List[Path], output_type: str, check: bool = False
+    protocol_files: List[Path],
+    output_type: str,
+    check: bool = False,
+    rtp_values: Optional[str] = None,
+    rtp_files: Optional[str] = None,
 ) -> _AnalysisCLIResult:
     """Run `protocol_files` as a single protocol through the analysis CLI.
 
@@ -41,11 +45,16 @@ def _get_analysis_result(
     with tempfile.TemporaryDirectory() as temp_dir:
         analysis_output_file = Path(temp_dir) / "analysis_output.json"
         runner = CliRunner()
-        args = [
-            output_type,
-            str(analysis_output_file),
-            *[str(p.resolve()) for p in protocol_files],
-        ]
+        args = [output_type, str(analysis_output_file)]
+
+        if rtp_values is not None:
+            args.extend(["--rtp-values", rtp_values])
+
+        if rtp_files is not None:
+            args.extend(["--rtp-files", rtp_files])
+
+        args.extend([str(p.resolve()) for p in protocol_files])
+
         if check:
             args.append("--check")
 
@@ -263,6 +272,61 @@ def test_python_error_line_numbers(
 
 
 @pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+def test_run_time_parameter_setting(
+    tmp_path: Path,
+    output: str,
+) -> None:
+    """Test that a RTP can be set to a non default value for analysis.
+
+    Also verify that analysis result contains all static data about the protocol.
+    """
+    python_protocol_source = textwrap.dedent(
+        """\
+            requirements = {"robotType": "OT-2", "apiLevel": "2.18"}
+
+            def add_parameters(parameters):
+                parameters.add_bool(
+                    display_name="Dry Run",
+                    variable_name="dry_run",
+                    default=False,
+                )
+            def run(protocol):
+                pass
+        """
+    )
+    protocol_source_file = tmp_path / "protocol.py"
+    protocol_source_file.write_text(python_protocol_source, encoding="utf-8")
+    result = _get_analysis_result(
+        [protocol_source_file], output, rtp_values=json.dumps({"dry_run": True})
+    )
+
+    assert result.exit_code == 0
+
+    assert result.json_output is not None
+    assert result.json_output["robotType"] == "OT-2 Standard"
+    assert result.json_output["result"] == AnalysisResult.OK
+    assert result.json_output["pipettes"] == []
+    assert result.json_output["commands"]  # There should be a home command
+    assert result.json_output["labware"] == []
+    assert result.json_output["liquids"] == []
+    assert result.json_output["modules"] == []
+    assert result.json_output["config"] == {
+        "apiVersion": [2, 18],
+        "protocolType": "python",
+    }
+    assert result.json_output["files"] == [{"name": "protocol.py", "role": "main"}]
+    assert result.json_output["runTimeParameters"] == [
+        {
+            "displayName": "Dry Run",
+            "variableName": "dry_run",
+            "type": "bool",
+            "value": True,
+            "default": False,
+        }
+    ]
+
+
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
 def test_run_time_parameter_error(
     tmp_path: Path,
     output: str,
@@ -310,6 +374,64 @@ def test_run_time_parameter_error(
         "TypeError [line 5]: ParameterContext.add_bool() missing 1"
         " required positional argument: 'default'"
     )
+
+
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+def test_rtp_csv_file_setting(
+    tmp_path: Path,
+    output: str,
+) -> None:
+    """Test that a CSV file can be set for analysis.
+
+    Also verify that analysis result contains all static data about the protocol.
+    """
+    python_protocol_source = textwrap.dedent(
+        """\
+            requirements = {"robotType": "OT-2", "apiLevel": "2.20"}
+
+            def add_parameters(parameters):
+                parameters.add_csv_file(
+                    display_name="CSV File",
+                    variable_name="csv_file",
+                )
+            def run(protocol):
+                protocol.params.csv_file.contents
+        """
+    )
+    protocol_source_file = tmp_path / "protocol.py"
+    protocol_source_file.write_text(python_protocol_source, encoding="utf-8")
+    csv_source_file = tmp_path / "csv_file.csv"
+    csv_source_file.write_text("a,b,c", encoding="utf-8")
+
+    result = _get_analysis_result(
+        [protocol_source_file],
+        output,
+        rtp_files=json.dumps({"csv_file": str(csv_source_file.resolve())}),
+    )
+
+    assert result.exit_code == 0
+
+    assert result.json_output is not None
+    assert result.json_output["robotType"] == "OT-2 Standard"
+    assert result.json_output["result"] == AnalysisResult.OK
+    assert result.json_output["pipettes"] == []
+    assert result.json_output["commands"]  # There should be a home command
+    assert result.json_output["labware"] == []
+    assert result.json_output["liquids"] == []
+    assert result.json_output["modules"] == []
+    assert result.json_output["config"] == {
+        "apiVersion": [2, 20],
+        "protocolType": "python",
+    }
+    assert result.json_output["files"] == [{"name": "protocol.py", "role": "main"}]
+    assert result.json_output["runTimeParameters"] == [
+        {
+            "displayName": "CSV File",
+            "variableName": "csv_file",
+            "type": "csv_file",
+            "file": {"id": "", "name": "csv_file.csv"},
+        }
+    ]
 
 
 @pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])

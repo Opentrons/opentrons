@@ -594,6 +594,17 @@ class ReadFromSensorResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class BatchReadFromSensorResponse(BaseMessage):  # noqa: D101
+    payload: payloads.BatchReadFromSensorResponsePayload
+    payload_type: Type[
+        payloads.BatchReadFromSensorResponsePayload
+    ] = payloads.BatchReadFromSensorResponsePayload
+    message_id: Literal[
+        MessageId.batch_read_sensor_response
+    ] = MessageId.batch_read_sensor_response
+
+
+@dataclass
 class SetSensorThresholdRequest(BaseMessage):  # noqa: D101
     payload: payloads.SetSensorThresholdRequestPayload
     payload_type: Type[

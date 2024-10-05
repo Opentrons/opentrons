@@ -1,9 +1,9 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../localization'
+import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { SelectGripper } from '../SelectGripper'
 
@@ -47,7 +47,9 @@ describe('SelectGripper', () => {
     render(props)
     screen.getByText('Step 3')
     screen.getByText('Add a gripper')
-    screen.getByText('Does your protocol need a Flex Gripper?')
+    screen.getByText(
+      'Do you want to move labware automatically with the gripper?'
+    )
     fireEvent.click(screen.getByRole('label', { name: 'Yes' }))
     expect(props.setValue).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('label', { name: 'No' }))

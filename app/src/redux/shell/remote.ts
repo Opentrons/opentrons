@@ -57,7 +57,11 @@ export async function appShellRequestor<Data>(
       : data
   const configProxy = { ...config, data: formDataProxy }
 
-  return await remote.ipcRenderer.invoke('usb:request', configProxy)
+  const result = await remote.ipcRenderer.invoke('usb:request', configProxy)
+  if (result?.error != null) {
+    throw result.error
+  }
+  return result
 }
 
 interface CallbackStore {
@@ -69,37 +73,42 @@ const callbackStore: CallbackStore = {}
 
 interface AppShellListener {
   hostname: string
-  topic: NotifyTopic
+  notifyTopic: NotifyTopic
   callback: (data: NotifyResponseData) => void
   isDismounting?: boolean
 }
 export function appShellListener({
   hostname,
-  topic,
+  notifyTopic,
   callback,
   isDismounting = false,
 }: AppShellListener): CallbackStore {
-  if (isDismounting) {
-    const callbacks = callbackStore[hostname]?.[topic]
-    if (callbacks != null) {
-      callbackStore[hostname][topic] = callbacks.filter(cb => cb !== callback)
-      if (!callbackStore[hostname][topic].length) {
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-        delete callbackStore[hostname][topic]
-        if (!Object.keys(callbackStore[hostname]).length) {
+  // The shell emits general messages to ALL_TOPICS, typically errors, and all listeners must handle those messages.
+  const topics: NotifyTopic[] = [notifyTopic, 'ALL_TOPICS'] as const
+
+  topics.forEach(topic => {
+    if (isDismounting) {
+      const callbacks = callbackStore[hostname]?.[topic]
+      if (callbacks != null) {
+        callbackStore[hostname][topic] = callbacks.filter(cb => cb !== callback)
+        if (!callbackStore[hostname][topic].length) {
           // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-          delete callbackStore[hostname]
+          delete callbackStore[hostname][topic]
+          if (!Object.keys(callbackStore[hostname]).length) {
+            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+            delete callbackStore[hostname]
+          }
         }
       }
+    } else {
+      callbackStore[hostname] = callbackStore[hostname] ?? {}
+      callbackStore[hostname][topic] ??= []
+      callbackStore[hostname][topic].push(callback)
     }
-  } else {
-    callbackStore[hostname] = callbackStore[hostname] ?? {}
-    callbackStore[hostname][topic] ??= []
-    callbackStore[hostname][topic].push(callback)
-  }
+  })
+
   return callbackStore
 }
-
 // Instantiate the notify listener at runtime.
 remote.ipcRenderer.on(
   'notify',

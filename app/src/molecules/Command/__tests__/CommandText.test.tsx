@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { it, expect, describe } from 'vitest'
 import { screen } from '@testing-library/react'
 
@@ -7,8 +6,8 @@ import {
   OT2_ROBOT_TYPE,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { CommandText } from '../CommandText'
 import { mockCommandTextData } from '../__fixtures__'
 import { getCommandTextData } from '../utils/getCommandTextData'
@@ -587,6 +586,23 @@ describe('CommandText', () => {
       { i18nInstance: i18n }
     )
     screen.getByText('Load NEST 96 Well Plate 100 µL PCR Full Skirt off deck')
+  })
+  it('renders correct text for reloadLabware', () => {
+    const reloadLabwareCommand = mockCommandTextData.commands.find(
+      c => c.commandType === 'reloadLabware'
+    )
+    expect(reloadLabwareCommand).not.toBeUndefined()
+    if (reloadLabwareCommand != null) {
+      renderWithProviders(
+        <CommandText
+          commandTextData={mockCommandTextData}
+          robotType={FLEX_ROBOT_TYPE}
+          command={reloadLabwareCommand}
+        />,
+        { i18nInstance: i18n }
+      )
+    }
+    screen.getByText('Reloading NEST 96 Well Plate 100 µL PCR Full Skirt (1)')
   })
   it('renders correct text for loadLiquid', () => {
     const loadLabwareCommands = mockCommandTextData.commands.filter(

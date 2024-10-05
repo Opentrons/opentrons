@@ -60,20 +60,19 @@
       "thermocycler/waitForLidTemperature": "#/definitions/WaitForLidTemperatureCreate",
       "thermocycler/deactivateBlock": "#/definitions/DeactivateBlockCreate",
       "thermocycler/deactivateLid": "#/definitions/DeactivateLidCreate",
-      "thermocycler/openLid": "#/definitions/opentrons__protocol_engine__commands__thermocycler__open_lid__OpenLidCreate",
-      "thermocycler/closeLid": "#/definitions/opentrons__protocol_engine__commands__thermocycler__close_lid__CloseLidCreate",
+      "thermocycler/openLid": "#/definitions/OpenLidCreate",
+      "thermocycler/closeLid": "#/definitions/CloseLidCreate",
       "thermocycler/runProfile": "#/definitions/RunProfileCreate",
-      "absorbanceReader/closeLid": "#/definitions/opentrons__protocol_engine__commands__absorbance_reader__close_lid__CloseLidCreate",
-      "absorbanceReader/openLid": "#/definitions/opentrons__protocol_engine__commands__absorbance_reader__open_lid__OpenLidCreate",
       "absorbanceReader/initialize": "#/definitions/InitializeCreate",
-      "absorbanceReader/read": "#/definitions/ReadAbsorbanceCreate",
+      "absorbanceReader/measure": "#/definitions/MeasureAbsorbanceCreate",
       "calibration/calibrateGripper": "#/definitions/CalibrateGripperCreate",
       "calibration/calibratePipette": "#/definitions/CalibratePipetteCreate",
       "calibration/calibrateModule": "#/definitions/CalibrateModuleCreate",
       "calibration/moveToMaintenancePosition": "#/definitions/MoveToMaintenancePositionCreate",
       "unsafe/blowOutInPlace": "#/definitions/UnsafeBlowOutInPlaceCreate",
       "unsafe/dropTipInPlace": "#/definitions/UnsafeDropTipInPlaceCreate",
-      "unsafe/updatePositionEstimators": "#/definitions/UpdatePositionEstimatorsCreate"
+      "unsafe/updatePositionEstimators": "#/definitions/UpdatePositionEstimatorsCreate",
+      "unsafe/engageAxes": "#/definitions/UnsafeEngageAxesCreate"
     }
   },
   "oneOf": [
@@ -243,25 +242,19 @@
       "$ref": "#/definitions/DeactivateLidCreate"
     },
     {
-      "$ref": "#/definitions/opentrons__protocol_engine__commands__thermocycler__open_lid__OpenLidCreate"
+      "$ref": "#/definitions/OpenLidCreate"
     },
     {
-      "$ref": "#/definitions/opentrons__protocol_engine__commands__thermocycler__close_lid__CloseLidCreate"
+      "$ref": "#/definitions/CloseLidCreate"
     },
     {
       "$ref": "#/definitions/RunProfileCreate"
     },
     {
-      "$ref": "#/definitions/opentrons__protocol_engine__commands__absorbance_reader__close_lid__CloseLidCreate"
-    },
-    {
-      "$ref": "#/definitions/opentrons__protocol_engine__commands__absorbance_reader__open_lid__OpenLidCreate"
-    },
-    {
       "$ref": "#/definitions/InitializeCreate"
     },
     {
-      "$ref": "#/definitions/ReadAbsorbanceCreate"
+      "$ref": "#/definitions/MeasureAbsorbanceCreate"
     },
     {
       "$ref": "#/definitions/CalibrateGripperCreate"
@@ -283,6 +276,9 @@
     },
     {
       "$ref": "#/definitions/UpdatePositionEstimatorsCreate"
+    },
+    {
+      "$ref": "#/definitions/UnsafeEngageAxesCreate"
     }
   ],
   "definitions": {
@@ -3743,7 +3739,7 @@
       },
       "required": ["params"]
     },
-    "opentrons__protocol_engine__commands__thermocycler__open_lid__OpenLidParams": {
+    "OpenLidParams": {
       "title": "OpenLidParams",
       "description": "Input parameters to open a Thermocycler's lid.",
       "type": "object",
@@ -3756,7 +3752,7 @@
       },
       "required": ["moduleId"]
     },
-    "opentrons__protocol_engine__commands__thermocycler__open_lid__OpenLidCreate": {
+    "OpenLidCreate": {
       "title": "OpenLidCreate",
       "description": "A request to open a Thermocycler's lid.",
       "type": "object",
@@ -3768,7 +3764,7 @@
           "type": "string"
         },
         "params": {
-          "$ref": "#/definitions/opentrons__protocol_engine__commands__thermocycler__open_lid__OpenLidParams"
+          "$ref": "#/definitions/OpenLidParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
@@ -3786,7 +3782,7 @@
       },
       "required": ["params"]
     },
-    "opentrons__protocol_engine__commands__thermocycler__close_lid__CloseLidParams": {
+    "CloseLidParams": {
       "title": "CloseLidParams",
       "description": "Input parameters to close a Thermocycler's lid.",
       "type": "object",
@@ -3799,7 +3795,7 @@
       },
       "required": ["moduleId"]
     },
-    "opentrons__protocol_engine__commands__thermocycler__close_lid__CloseLidCreate": {
+    "CloseLidCreate": {
       "title": "CloseLidCreate",
       "description": "A request to close a Thermocycler's lid.",
       "type": "object",
@@ -3811,7 +3807,7 @@
           "type": "string"
         },
         "params": {
-          "$ref": "#/definitions/opentrons__protocol_engine__commands__thermocycler__close_lid__CloseLidParams"
+          "$ref": "#/definitions/CloseLidParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
@@ -3903,92 +3899,6 @@
       },
       "required": ["params"]
     },
-    "opentrons__protocol_engine__commands__absorbance_reader__close_lid__CloseLidParams": {
-      "title": "CloseLidParams",
-      "description": "Input parameters to close the lid on an absorbance reading.",
-      "type": "object",
-      "properties": {
-        "moduleId": {
-          "title": "Moduleid",
-          "description": "Unique ID of the absorbance reader.",
-          "type": "string"
-        }
-      },
-      "required": ["moduleId"]
-    },
-    "opentrons__protocol_engine__commands__absorbance_reader__close_lid__CloseLidCreate": {
-      "title": "CloseLidCreate",
-      "description": "A request to execute an Absorbance Reader close lid command.",
-      "type": "object",
-      "properties": {
-        "commandType": {
-          "title": "Commandtype",
-          "default": "absorbanceReader/closeLid",
-          "enum": ["absorbanceReader/closeLid"],
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/definitions/opentrons__protocol_engine__commands__absorbance_reader__close_lid__CloseLidParams"
-        },
-        "intent": {
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/CommandIntent"
-            }
-          ]
-        },
-        "key": {
-          "title": "Key",
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "type": "string"
-        }
-      },
-      "required": ["params"]
-    },
-    "opentrons__protocol_engine__commands__absorbance_reader__open_lid__OpenLidParams": {
-      "title": "OpenLidParams",
-      "description": "Input parameters to open the lid on an absorbance reading.",
-      "type": "object",
-      "properties": {
-        "moduleId": {
-          "title": "Moduleid",
-          "description": "Unique ID of the absorbance reader.",
-          "type": "string"
-        }
-      },
-      "required": ["moduleId"]
-    },
-    "opentrons__protocol_engine__commands__absorbance_reader__open_lid__OpenLidCreate": {
-      "title": "OpenLidCreate",
-      "description": "A request to execute an Absorbance Reader open lid command.",
-      "type": "object",
-      "properties": {
-        "commandType": {
-          "title": "Commandtype",
-          "default": "absorbanceReader/openLid",
-          "enum": ["absorbanceReader/openLid"],
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/definitions/opentrons__protocol_engine__commands__absorbance_reader__open_lid__OpenLidParams"
-        },
-        "intent": {
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/CommandIntent"
-            }
-          ]
-        },
-        "key": {
-          "title": "Key",
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "type": "string"
-        }
-      },
-      "required": ["params"]
-    },
     "InitializeParams": {
       "title": "InitializeParams",
       "description": "Input parameters to initialize an absorbance reading.",
@@ -4037,8 +3947,8 @@
       },
       "required": ["params"]
     },
-    "ReadAbsorbanceParams": {
-      "title": "ReadAbsorbanceParams",
+    "MeasureAbsorbanceParams": {
+      "title": "MeasureAbsorbanceParams",
       "description": "Input parameters for a single absorbance reading.",
       "type": "object",
       "properties": {
@@ -4055,19 +3965,19 @@
       },
       "required": ["moduleId", "sampleWavelength"]
     },
-    "ReadAbsorbanceCreate": {
-      "title": "ReadAbsorbanceCreate",
+    "MeasureAbsorbanceCreate": {
+      "title": "MeasureAbsorbanceCreate",
       "description": "A request to execute an Absorbance Reader measurement.",
       "type": "object",
       "properties": {
         "commandType": {
           "title": "Commandtype",
-          "default": "absorbanceReader/read",
-          "enum": ["absorbanceReader/read"],
+          "default": "absorbanceReader/measure",
+          "enum": ["absorbanceReader/measure"],
           "type": "string"
         },
         "params": {
-          "$ref": "#/definitions/ReadAbsorbanceParams"
+          "$ref": "#/definitions/MeasureAbsorbanceParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
@@ -4452,6 +4362,51 @@
         },
         "params": {
           "$ref": "#/definitions/UpdatePositionEstimatorsParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "UnsafeEngageAxesParams": {
+      "title": "UnsafeEngageAxesParams",
+      "description": "Payload required for an UnsafeEngageAxes command.",
+      "type": "object",
+      "properties": {
+        "axes": {
+          "description": "The axes for which to enable.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MotorAxis"
+          }
+        }
+      },
+      "required": ["axes"]
+    },
+    "UnsafeEngageAxesCreate": {
+      "title": "UnsafeEngageAxesCreate",
+      "description": "UnsafeEngageAxes command request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "unsafe/engageAxes",
+          "enum": ["unsafe/engageAxes"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/UnsafeEngageAxesParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",

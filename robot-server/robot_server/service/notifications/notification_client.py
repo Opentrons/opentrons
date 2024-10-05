@@ -1,10 +1,10 @@
 """An interface for managing interactions with the notification broker and relevant lifecycle utilities."""
+import contextlib
 import random
 import logging
 import paho.mqtt.client as mqtt
-from anyio import to_thread
 from fastapi import Depends
-from typing import Annotated, Any, Dict, Optional
+from typing import Annotated, Any, Dict, Generator, Optional
 from enum import Enum
 
 
@@ -77,30 +77,14 @@ class NotificationClient:
         )
         self._client.loop_start()
 
-    async def disconnect(self) -> None:
+    def disconnect(self) -> None:
         """Disconnect the client from the MQTT broker."""
         self._client.loop_stop()
-        await to_thread.run_sync(self._client.disconnect)
-
-    async def publish_advise_refetch_async(self, topic: TopicName) -> None:
-        """Asynchronously publish a refetch message on a specific topic to the MQTT broker.
-
-        Args:
-            topic: The topic to publish the message on.
-        """
-        await to_thread.run_sync(self.publish_advise_refetch, topic)
-
-    async def publish_advise_unsubscribe_async(self, topic: TopicName) -> None:
-        """Asynchronously publish an unsubscribe message on a specific topic to the MQTT broker.
-
-        Args:
-            topic: The topic to publish the message on.
-        """
-        await to_thread.run_sync(self.publish_advise_unsubscribe, topic)
+        self._client.disconnect()
 
     def publish_advise_refetch(
         self,
-        topic: str,
+        topic: TopicName,
     ) -> None:
         """Publish a refetch message on a specific topic to the MQTT broker.
 
@@ -118,7 +102,7 @@ class NotificationClient:
 
     def publish_advise_unsubscribe(
         self,
-        topic: str,
+        topic: TopicName,
     ) -> None:
         """Publish an unsubscribe message on a specific topic to the MQTT broker.
 
@@ -154,7 +138,7 @@ class NotificationClient:
         if rc == 0:
             log.info("Successfully connected to MQTT broker.")
         else:
-            log.info(f"Failed to connect to MQTT broker with reason code: {rc}")
+            log.error(f"Failed to connect to MQTT broker with reason code: {rc}")
 
     def _on_disconnect(
         self,
@@ -174,7 +158,7 @@ class NotificationClient:
         if rc == 0:
             log.info("Successfully disconnected from MQTT broker.")
         else:
-            log.info(f"Failed to disconnect from MQTT broker with reason code: {rc}")
+            log.error(f"Failed to disconnect from MQTT broker with reason code: {rc}")
 
 
 _notification_client_accessor: AppStateAccessor[NotificationClient] = AppStateAccessor[
@@ -182,36 +166,39 @@ _notification_client_accessor: AppStateAccessor[NotificationClient] = AppStateAc
 ]("notification_client")
 
 
-def initialize_notification_client(app_state: AppState) -> None:
-    """Create a new `NotificationClient` and store it on `app_state`.
+@contextlib.contextmanager
+def set_up_notification_client(app_state: AppState) -> Generator[None, None, None]:
+    """Set up the server's singleton `NotificationClient`.
 
-    Intended to be called just once, when the server starts up.
+    When this context manager is entered, the `NotificationClient` is initialized
+    and placed on `app_state` for later retrieval by endpoints via
+    `get_notification_client()`.
+
+    When this context manager is exited, the `NotificationClient` is cleaned up.
     """
     notification_client: NotificationClient = NotificationClient()
     _notification_client_accessor.set_on(app_state, notification_client)
 
     try:
         notification_client.connect()
-    except Exception as error:
-        log.info(f"Could not successfully connect to notification server: {error}")
+    except Exception:
+        log.warning(
+            "Could not successfully connect to MQTT broker. Is this a dev server?",
+            exc_info=True,
+        )
 
-
-async def clean_up_notification_client(app_state: AppState) -> None:
-    """Clean up the `NotificationClient` stored on `app_state`.
-
-    Intended to be called just once, when the server shuts down.
-    """
-    notification_client: Optional[
-        NotificationClient
-    ] = _notification_client_accessor.get_from(app_state)
-
-    if notification_client is not None:
-        await notification_client.disconnect()
+    try:
+        yield
+    finally:
+        notification_client.disconnect()
 
 
 def get_notification_client(
     app_state: Annotated[AppState, Depends(get_app_state)],
-) -> Optional[NotificationClient]:
+) -> NotificationClient:
     """Intended to be used by endpoint functions as a FastAPI dependency."""
     notification_client = _notification_client_accessor.get_from(app_state)
+    assert (
+        notification_client is not None
+    ), "Forgot to initialize notification client as part of server startup?"
     return notification_client

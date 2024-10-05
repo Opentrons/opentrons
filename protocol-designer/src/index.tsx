@@ -1,4 +1,3 @@
-import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { Provider, useSelector } from 'react-redux'
 import { I18nextProvider } from 'react-i18next'
@@ -7,7 +6,7 @@ import { configureStore } from './configureStore'
 import { initialize } from './initialize'
 import { initializeMixpanel } from './analytics/mixpanel'
 import { getEnableRedesign } from './feature-flags/selectors'
-import { i18n } from './localization'
+import { i18n } from './assets/localization'
 import { App } from './App'
 import { GlobalStyle } from './atoms/GlobalStyle'
 

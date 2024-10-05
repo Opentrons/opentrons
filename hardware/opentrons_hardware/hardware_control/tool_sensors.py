@@ -10,12 +10,13 @@ from typing import (
     Callable,
     AsyncContextManager,
     Optional,
+    AsyncIterator,
 )
 from logging import getLogger
 from numpy import float64
 from math import copysign
 from typing_extensions import Literal
-
+from contextlib import asynccontextmanager
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     SensorId,
@@ -81,11 +82,6 @@ capacitive_output_file_heading = [
     "plunger_velocity(mm/s)",
     "threshold(farads)",
 ]
-
-# FIXME we should organize all of these functions to use the sensor drivers.
-# FIXME we should restrict some of these functions by instrument type.
-
-PLUNGER_SOLO_MOVE_TIME = 0.2
 
 
 def _fix_pass_step_for_buffer(
@@ -402,6 +398,7 @@ async def liquid_probe(
     mount_speed: float,
     threshold_pascals: float,
     plunger_impulse_time: float,
+    num_baseline_reads: int,
     csv_output: bool = False,
     sync_buffer_output: bool = False,
     can_bus_only_output: bool = False,
@@ -413,8 +410,6 @@ async def liquid_probe(
     log_files: Dict[SensorId, str] = {} if not data_files else data_files
     sensor_driver = SensorDriver()
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
-    # How many samples to take to level out the sensor
-    num_baseline_reads = 20
     sensor_binding = None
     if sensor_id == SensorId.BOTH and force_both_sensors:
         # this covers the case when we want to use both sensors in an AND configuration
@@ -669,3 +664,55 @@ async def capacitive_pass(
                 break
 
     return list(_drain())
+
+
+@asynccontextmanager
+async def grab_pressure(
+    channels: int, tool: NodeId, messenger: CanMessenger
+) -> AsyncIterator[None]:
+    """Run some task and log the pressure."""
+    sensor_driver = SensorDriver()
+    sensor_id = SensorId.BOTH if channels > 1 else SensorId.S0
+    sensors: List[SensorId] = []
+    if sensor_id == SensorId.BOTH:
+        sensors.append(SensorId.S0)
+        sensors.append(SensorId.S1)
+    else:
+        sensors.append(sensor_id)
+
+    for sensor in sensors:
+        pressure_sensor = PressureSensor.build(
+            sensor_id=sensor,
+            node_id=tool,
+        )
+        num_baseline_reads = 10
+        # TODO: RH log this baseline and remove noqa
+        pressure_baseline = await sensor_driver.get_baseline(  # noqa: F841
+            messenger, pressure_sensor, num_baseline_reads
+        )
+        await messenger.ensure_send(
+            node_id=tool,
+            message=BindSensorOutputRequest(
+                payload=BindSensorOutputRequestPayload(
+                    sensor=SensorTypeField(SensorType.pressure),
+                    sensor_id=SensorIdField(sensor),
+                    binding=SensorOutputBindingField(SensorOutputBinding.report),
+                )
+            ),
+            expected_nodes=[tool],
+        )
+    try:
+        yield
+    finally:
+        for sensor in sensors:
+            await messenger.ensure_send(
+                node_id=tool,
+                message=BindSensorOutputRequest(
+                    payload=BindSensorOutputRequestPayload(
+                        sensor=SensorTypeField(SensorType.pressure),
+                        sensor_id=SensorIdField(sensor),
+                        binding=SensorOutputBindingField(SensorOutputBinding.none),
+                    )
+                ),
+                expected_nodes=[tool],
+            )

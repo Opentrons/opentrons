@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { TitleBar } from './TitleBar'
 import { Text, Icon, SIZE_1 } from '@opentrons/components'
 

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo, useState } from 'react'
 import without from 'lodash/without'
 
 import {
@@ -9,7 +9,7 @@ import {
 
 import { ERROR_KINDS } from '../constants'
 import { getErrorKind } from '../utils'
-import { getLoadedLabware } from '../../../molecules/Command/utils/accessors'
+import { getLoadedLabware } from '/app/molecules/Command/utils/accessors'
 
 import type { WellGroup } from '@opentrons/components'
 import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
@@ -56,7 +56,7 @@ export function useFailedLabwareUtils({
   runCommands,
   runRecord,
 }: UseFailedLabwareUtilsProps): UseFailedLabwareUtilsResult {
-  const recentRelevantFailedLabwareCmd = React.useMemo(
+  const recentRelevantFailedLabwareCmd = useMemo(
     () =>
       getRelevantFailedLabwareCmdFrom({
         failedCommandByRunRecord,
@@ -67,7 +67,7 @@ export function useFailedLabwareUtils({
 
   const tipSelectionUtils = useTipSelectionUtils(recentRelevantFailedLabwareCmd)
 
-  const failedLabwareDetails = React.useMemo(
+  const failedLabwareDetails = useMemo(
     () =>
       getFailedCmdRelevantLabware(
         protocolAnalysis,
@@ -77,7 +77,7 @@ export function useFailedLabwareUtils({
     [protocolAnalysis?.id, recentRelevantFailedLabwareCmd?.key]
   )
 
-  const failedLabware = React.useMemo(
+  const failedLabware = useMemo(
     () => getFailedLabware(recentRelevantFailedLabwareCmd, runRecord),
     [recentRelevantFailedLabwareCmd?.key]
   )
@@ -125,7 +125,7 @@ export function getRelevantFailedLabwareCmdFrom({
     case ERROR_KINDS.GENERAL_ERROR:
       return null
     default:
-      console.warn(
+      console.error(
         'No labware associated with failed command. Handle case explicitly.'
       )
       return null
@@ -174,6 +174,7 @@ interface UseTipSelectionUtilsResult {
   tipSelectorDef: LabwareDefinition2
   selectTips: (tipGroup: WellGroup) => void
   deselectTips: (locations: string[]) => void
+  areTipsSelected: boolean
 }
 
 // TODO(jh, 06-18-24): Enforce failure/warning when accessing tipSelectionUtils
@@ -184,7 +185,7 @@ interface UseTipSelectionUtilsResult {
 function useTipSelectionUtils(
   recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware
 ): UseTipSelectionUtilsResult {
-  const [selectedLocs, setSelectedLocs] = React.useState<WellGroup | null>(null)
+  const [selectedLocs, setSelectedLocs] = useState<WellGroup | null>(null)
 
   const initialLocs = useInitialSelectedLocationsFrom(
     recentRelevantFailedLabwareCmd
@@ -210,16 +211,20 @@ function useTipSelectionUtils(
   }
 
   // Use this labware to represent all tip racks for manual tip selection.
-  const tipSelectorDef = React.useMemo(
+  const tipSelectorDef = useMemo(
     () => getAllLabwareDefs().thermoscientificnunc96Wellplate1300UlV1,
     []
   )
+
+  const areTipsSelected =
+    selectedLocs != null && Object.keys(selectedLocs).length > 0
 
   return {
     selectedTipLocations: selectedLocs,
     tipSelectorDef,
     selectTips,
     deselectTips,
+    areTipsSelected,
   }
 }
 
@@ -227,7 +232,7 @@ function useTipSelectionUtils(
 function useInitialSelectedLocationsFrom(
   recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware
 ): WellGroup | null {
-  const [initialWells, setInitialWells] = React.useState<WellGroup | null>(null)
+  const [initialWells, setInitialWells] = useState<WellGroup | null>(null)
 
   // Note that while other commands may have a wellName associated with them,
   // we are only interested in wells for the purposes of tip picking up.

@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   FixedBase,

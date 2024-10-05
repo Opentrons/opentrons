@@ -1,9 +1,9 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach } from 'vitest'
 
 import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../localization'
+import { i18n } from '../../../../../assets/localization'
 import { getPipetteEntities } from '../../../../../step-forms/selectors'
 import { WellSelectionModal } from '../../WellSelectionField/WellSelectionModal'
 import { TipWellSelectionField } from '../index'

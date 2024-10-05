@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { vi, describe, beforeEach, it } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../__testing-utils__'
@@ -8,7 +7,7 @@ import {
   getInitialDeckSetup,
 } from '../../step-forms/selectors'
 import { getIsMultiSelectMode } from '../../ui/steps'
-import { i18n } from '../../localization'
+import { i18n } from '../../assets/localization'
 import { getEnableComment } from '../../feature-flags/selectors'
 import { StepCreationButton } from '../StepCreationButton'
 

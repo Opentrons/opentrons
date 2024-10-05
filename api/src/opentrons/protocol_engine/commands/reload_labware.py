@@ -6,9 +6,10 @@ from typing_extensions import Literal
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
+from ..state.update_types import StateUpdate
 
 if TYPE_CHECKING:
-    from ..state import StateView
+    from ..state.state import StateView
     from ..execution import EquipmentHandler
 
 
@@ -64,12 +65,21 @@ class ReloadLabwareImplementation(
             labware_id=params.labwareId,
         )
 
+        state_update = StateUpdate()
+
+        state_update.set_labware_location(
+            labware_id=params.labwareId,
+            new_location=reloaded_labware.location,
+            new_offset_id=reloaded_labware.offsetId,
+        )
+
         return SuccessData(
             public=ReloadLabwareResult(
                 labwareId=params.labwareId,
                 offsetId=reloaded_labware.offsetId,
             ),
             private=None,
+            state_update=state_update,
         )
 
 

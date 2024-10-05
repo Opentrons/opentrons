@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
@@ -14,14 +14,15 @@ import {
   Btn,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
-import temporaryImg from '../../images/placeholder_image_delete.png'
+import temporaryImg from '../../assets/images/placeholder_image_delete.png'
+import { BUTTON_LINK_STYLE } from '../../atoms'
 
 interface WizardBodyProps {
   stepNumber: number
   header: string
   children: React.ReactNode
   proceed: () => void
-  disabled: boolean
+  disabled?: boolean
   goBack?: () => void
   subHeader?: string
   imgSrc?: string
@@ -34,63 +35,61 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
     goBack,
     subHeader,
     proceed,
-    disabled,
+    disabled = false,
     imgSrc,
   } = props
   const { t } = useTranslation('shared')
 
   return (
-    <Flex padding={SPACING.spacing16} gridGap={SPACING.spacing16}>
+    <Flex
+      padding={SPACING.spacing16}
+      gridGap={SPACING.spacing16}
+      height="calc(100vh - 48px)"
+    >
       <Flex
         width="60%"
-        padding={SPACING.spacing80}
+        padding={`${SPACING.spacing40} ${SPACING.spacing80} ${SPACING.spacing80} ${SPACING.spacing80}`}
         flexDirection={DIRECTION_COLUMN}
         backgroundColor={COLORS.white}
         borderRadius={BORDERS.borderRadius16}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <StyledText
             color={COLORS.grey60}
             desktopStyle="bodyDefaultSemiBold"
-            marginBottom={SPACING.spacing8}
             textTransform={TYPOGRAPHY.textTransformUppercase}
           >
             {t('shared:step_count', { current: stepNumber })}
           </StyledText>
-          <StyledText
-            desktopStyle="displayBold"
-            marginBottom={SPACING.spacing16}
-          >
-            {header}
-          </StyledText>
-          {subHeader != null ? (
-            <StyledText
-              desktopStyle="headingLargeRegular"
-              marginBottom={SPACING.spacing60}
-              color={COLORS.grey60}
-            >
-              {subHeader}
-            </StyledText>
-          ) : null}
-          {children}
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing60}>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+              <StyledText desktopStyle="displayBold">{header}</StyledText>
+              {subHeader != null ? (
+                <StyledText
+                  desktopStyle="headingLargeRegular"
+                  color={COLORS.grey60}
+                >
+                  {subHeader}
+                </StyledText>
+              ) : null}
+            </Flex>
+            {children}
+          </Flex>
         </Flex>
         <Flex
           alignSelf={goBack != null ? 'auto' : ALIGN_END}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           {goBack != null ? (
-            <Btn onClick={goBack}>
-              <StyledText
-                desktopStyle="bodyLargeSemiBold"
-                color={COLORS.grey60}
-              >
+            <Btn onClick={goBack} css={BUTTON_LINK_STYLE}>
+              <StyledText desktopStyle="bodyLargeSemiBold">
                 {t('go_back')}
               </StyledText>
             </Btn>
           ) : null}
           <LargeButton
-            disabled={disabled}
+            ariaDisabled={disabled}
             onClick={proceed}
             iconName="arrow-right"
             buttonText={t('shared:confirm')}

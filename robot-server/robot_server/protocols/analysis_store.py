@@ -392,14 +392,18 @@ class AnalysisStore:
                 last_analysis_summary.id
             )
         )
-        if len(primitive_rtps_in_last_analysis) == 0:
-            # Protocols migrated from v4 will not have any entries in RTP table,
-            # this is fine and we should just trigger a new analysis and have
-            # the new values be stored in the RTP table.
-            return False
         csv_rtps_in_last_analysis = self._completed_store.get_csv_rtps_by_analysis_id(
             last_analysis_summary.id
         )
+        if (
+            len(new_parameters) != 0
+            and len(primitive_rtps_in_last_analysis) + len(csv_rtps_in_last_analysis)
+            == 0
+        ):
+            # Protocols migrated from v4 will not have any entries in RTP table,
+            # this is fine, and we should just trigger a new analysis and have
+            # the new values be stored in the RTP table.
+            return False
         total_params_in_last_analysis = list(
             primitive_rtps_in_last_analysis.keys()
         ) + list(csv_rtps_in_last_analysis.keys())

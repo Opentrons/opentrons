@@ -1,16 +1,16 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 
-import { i18n } from '../../i18n'
-import { checkShellUpdate } from '../../redux/shell'
+import { i18n } from '/app/i18n'
+import { checkShellUpdate } from '/app/redux/shell'
 import { useSoftwareUpdatePoll } from '../hooks'
 
 import type { Store } from 'redux'
-import type { State } from '../../redux/types'
+import type { State } from '/app/redux/types'
 
 describe('useSoftwareUpdatePoll', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>

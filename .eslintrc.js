@@ -13,9 +13,10 @@ module.exports = {
     'prettier',
     'plugin:json/recommended',
     'plugin:storybook/recommended',
+    'plugin:react/jsx-runtime',
   ],
 
-  plugins: ['react', 'react-hooks', 'json', 'testing-library'],
+  plugins: ['react', 'react-hooks', 'json', 'testing-library', 'opentrons'],
 
   rules: {
     camelcase: 'off',
@@ -117,6 +118,12 @@ module.exports = {
       },
     },
     {
+      files: ['./app/src/**/*.@(ts|tsx)'],
+      rules: {
+        'import/no-absolute-path': 'off',
+      },
+    },
+    {
       files: [
         '**/test/**.js',
         '**/__tests__/**.@(js|ts|tsx)',
@@ -159,6 +166,26 @@ module.exports = {
       files: ['app/src/resources/**', '**/__tests__/**test**'],
       rules: {
         'no-restricted-imports': 'off',
+      },
+    },
+    // Apply tree-of-life import requirements to app as errors
+    {
+      files: ['./app/src/**/*.@(ts|tsx)'],
+      rules: {
+        'opentrons/no-imports-up-the-tree-of-life': 'error',
+      },
+    },
+    {
+      files: ['./protocol-designer/src/**/*.@(ts|tsx)'],
+      rules: {
+        'opentrons/no-imports-up-the-tree-of-life': 'warn',
+      },
+    },
+    // apply application structure import requirements to app
+    {
+      files: ['./app/src/**/*.@(ts|tsx)'],
+      rules: {
+        'opentrons/no-imports-across-applications': 'error',
       },
     },
   ],

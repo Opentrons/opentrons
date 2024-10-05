@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { selectors } from '../navigation'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'

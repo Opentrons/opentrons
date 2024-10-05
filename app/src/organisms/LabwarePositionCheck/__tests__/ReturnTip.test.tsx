@@ -1,19 +1,19 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 import { FLEX_ROBOT_TYPE, HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis } from '../__fixtures__'
-import { useProtocolMetadata } from '../../Devices/hooks'
-import { getIsOnDevice } from '../../../redux/config'
+import { useProtocolMetadata } from '/app/resources/protocols'
+import { getIsOnDevice } from '/app/redux/config'
 import { ReturnTip } from '../ReturnTip'
 
-vi.mock('../../Devices/hooks')
-vi.mock('../../../redux/config')
+vi.mock('/app/redux/config')
+vi.mock('/app/resources/protocols')
 
 const render = (props: React.ComponentProps<typeof ReturnTip>) => {
   return renderWithProviders(<ReturnTip {...props} />, {

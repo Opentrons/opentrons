@@ -1,14 +1,46 @@
 import type { RunCommandSummary } from '@opentrons/api-client'
-import type { ERROR_KINDS, RECOVERY_MAP, INVALID } from './constants'
+import type { ERROR_KINDS, INVALID, RECOVERY_MAP } from './constants'
 import type { ErrorRecoveryWizardProps } from './ErrorRecoveryWizard'
 import type {
   DropTipFlowsRoute,
   DropTipFlowsStep,
-} from '../DropTipWizardFlows/types'
+} from '/app/organisms/DropTipWizardFlows/types'
 
+/**
+ * Misc Recovery Types
+ */
 export type FailedCommand = RunCommandSummary
+export type ErrorKind = typeof ERROR_KINDS[keyof typeof ERROR_KINDS]
+
+/**
+ * Prop Specific Types
+ */
+export type RecoveryContentProps = ErrorRecoveryWizardProps & {
+  errorKind: ErrorKind
+  isOnDevice: boolean
+}
+
+/**
+ * Drop Tip Specific Types
+ */
+export type ValidDropTipSubRoutes = DropTipFlowsRoute
+export type ValidDropTipSubSteps = DropTipFlowsStep
+export interface ValidDropTipSubMap {
+  route: ValidDropTipSubRoutes
+  step: ValidDropTipSubSteps | null
+}
+
+/**
+ * Recovery Map Types
+ */
+export interface IRecoveryMap {
+  route: RecoveryRoute
+  step: RouteStep
+}
+type RecoveryMap = typeof RECOVERY_MAP
 export type InvalidStep = typeof INVALID
-export type RecoveryRoute = typeof RECOVERY_MAP[keyof typeof RECOVERY_MAP]['ROUTE']
+export type RouteKey = RecoveryMap[keyof RecoveryMap]['ROUTE']
+export type RecoveryRoute = RouteKey
 export type RobotMovingRoute =
   | typeof RECOVERY_MAP['ROBOT_IN_MOTION']['ROUTE']
   | typeof RECOVERY_MAP['ROBOT_RESUMING']['ROUTE']
@@ -16,63 +48,36 @@ export type RobotMovingRoute =
   | typeof RECOVERY_MAP['ROBOT_CANCELING']['ROUTE']
   | typeof RECOVERY_MAP['ROBOT_PICKING_UP_TIPS']['ROUTE']
   | typeof RECOVERY_MAP['ROBOT_SKIPPING_STEP']['ROUTE']
-export type ErrorKind = typeof ERROR_KINDS[keyof typeof ERROR_KINDS]
+  | typeof RECOVERY_MAP['ROBOT_RELEASING_LABWARE']['ROUTE']
 
-interface RecoveryMapDetails {
-  ROUTE: string
-  STEPS: Record<string, string>
-  STEP_ORDER: RouteStep
-}
+type OriginalRouteKey = keyof RecoveryMap
+type StepsForRoute<R extends RouteKey> = RecoveryMap[{
+  [K in OriginalRouteKey]: RecoveryMap[K]['ROUTE'] extends R ? K : never
+}[OriginalRouteKey]]['STEPS']
+type StepKey<R extends RouteKey> = StepsForRoute<R>[keyof StepsForRoute<R>]
+export type AllStepTypes = {
+  [R in RouteKey]: StepKey<R>
+}[RouteKey]
 
-export type ValidSubRoutes = DropTipFlowsRoute
-export type ValidSubSteps = DropTipFlowsStep
-export interface ValidSubMap {
-  route: ValidSubRoutes
-  step: ValidSubSteps | null
-}
-
-export type RecoveryMap = Record<string, RecoveryMapDetails>
+export type RouteStep = AllStepTypes | InvalidStep
 export type StepOrder = {
   [K in RecoveryRoute]: RouteStep[]
 }
 
-type RecoveryStep<
-  K extends keyof RecoveryMap
-> = RecoveryMap[K]['STEPS'][keyof RecoveryMap[K]['STEPS']]
-
-type RobotCancellingRunStep = RecoveryStep<'ROBOT_CANCELING'>
-type RobotInMotionStep = RecoveryStep<'ROBOT_IN_MOTION'>
-type RobotResumingStep = RecoveryStep<'ROBOT_RESUMING'>
-type RobotRetryingCommandStep = RecoveryStep<'ROBOT_RETRYING_COMMAND'>
-type BeforeBeginningStep = RecoveryStep<'BEFORE_BEGINNING'>
-type CancelRunStep = RecoveryStep<'CANCEL_RUN'>
-type DropTipStep = RecoveryStep<'DROP_TIP'>
-type IgnoreAndResumeStep = RecoveryStep<'IGNORE_AND_RESUME'>
-type RefillAndResumeStep = RecoveryStep<'REFILL_AND_RESUME'>
-type ResumeStep = RecoveryStep<'RESUME'>
-type OptionSelectionStep = RecoveryStep<'OPTION_SELECTION'>
-
-export type RouteStep =
-  | RobotInMotionStep
-  | RobotResumingStep
-  | RobotRetryingCommandStep
-  | BeforeBeginningStep
-  | CancelRunStep
-  | DropTipStep
-  | IgnoreAndResumeStep
-  | ResumeStep
-  | OptionSelectionStep
-  | RefillAndResumeStep
-  | RobotCancellingRunStep
-
-export interface IRecoveryMap {
-  route: RecoveryRoute
-  step: RouteStep
+/**
+ * Route/Step Properties Types
+ */
+interface StepDoorConfig {
+  allowDoorOpen: boolean
+}
+type RouteDoorConfig<R extends RouteKey> = {
+  [Step in StepKey<R> & string]: StepDoorConfig
+}
+export type RecoveryRouteStepMetadata = {
+  [R in RouteKey]: RouteDoorConfig<R>
 }
 
-export type RecoveryContentProps = ErrorRecoveryWizardProps & {
-  errorKind: ErrorKind
-  isOnDevice: boolean
-}
-
+/**
+ * Style Types
+ */
 export type DesktopSizeType = 'desktop-small' | 'desktop-large'

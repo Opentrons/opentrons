@@ -1,8 +1,8 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, beforeEach } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { screen } from '@testing-library/react'
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
 import { InfoMessage } from '..'
 
 const render = (props: React.ComponentProps<typeof InfoMessage>) => {

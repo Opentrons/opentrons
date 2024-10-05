@@ -1,6 +1,5 @@
-import * as React from 'react'
 import { BORDERS } from '../../helix-design-system'
-import { Box, Flex } from '../../primitives'
+import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
 
 import { DeckLabelSet as DeckLabelSetComponent } from '.'
@@ -38,7 +37,10 @@ type Story = StoryObj<typeof DeckLabelSetComponent>
 export const DeckLabel: Story = {
   args: {
     // width and height from Figma
-    children: <Box width="31.9375rem" height="5.75rem"></Box>,
     deckLabels: mockDeckLabels,
+    width: 31.9375,
+    height: 5.75,
+    x: 0,
+    y: 0,
   },
 }

@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
+  Banner,
   BORDERS,
   Chip,
   COLORS,
@@ -23,16 +24,15 @@ import {
 
 import { useAcknowledgeEstopDisengageMutation } from '@opentrons/react-api-client'
 
-import { getTopPortalEl } from '../../App/portal'
-import { Banner } from '../../atoms/Banner'
-import { SmallButton } from '../../atoms/buttons'
-import { OddModal } from '../../molecules/OddModal'
-import { getIsOnDevice } from '../../redux/config'
+import { getTopPortalEl } from '/app/App/portal'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+import { getIsOnDevice } from '/app/redux/config'
 
 import type {
   OddModalHeaderBaseProps,
   ModalSize,
-} from '../../molecules/OddModal/types'
+} from '/app/molecules/OddModal/types'
 import type { ModalProps } from '@opentrons/components'
 
 // Note (07/13/2023) After the launch, we will unify the modal components into one component.
@@ -42,6 +42,8 @@ interface EstopPressedModalProps {
   closeModal: () => void
   isDismissedModal?: boolean
   setIsDismissedModal?: (isDismissedModal: boolean) => void
+  isWaitingForLogicalDisengage: boolean
+  setShouldSeeLogicalDisengage: () => void
 }
 
 export function EstopPressedModal({
@@ -49,11 +51,18 @@ export function EstopPressedModal({
   closeModal,
   isDismissedModal,
   setIsDismissedModal,
+  isWaitingForLogicalDisengage,
+  setShouldSeeLogicalDisengage,
 }: EstopPressedModalProps): JSX.Element {
   const isOnDevice = useSelector(getIsOnDevice)
   return createPortal(
     isOnDevice ? (
-      <TouchscreenModal isEngaged={isEngaged} closeModal={closeModal} />
+      <TouchscreenModal
+        isEngaged={isEngaged}
+        closeModal={closeModal}
+        isWaitingForLogicalDisengage={isWaitingForLogicalDisengage}
+        setShouldSeeLogicalDisengage={setShouldSeeLogicalDisengage}
+      />
     ) : (
       <>
         {isDismissedModal === false ? (
@@ -61,6 +70,8 @@ export function EstopPressedModal({
             isEngaged={isEngaged}
             closeModal={closeModal}
             setIsDismissedModal={setIsDismissedModal}
+            isWaitingForLogicalDisengage={isWaitingForLogicalDisengage}
+            setShouldSeeLogicalDisengage={setShouldSeeLogicalDisengage}
           />
         ) : null}
       </>
@@ -72,6 +83,8 @@ export function EstopPressedModal({
 function TouchscreenModal({
   isEngaged,
   closeModal,
+  isWaitingForLogicalDisengage,
+  setShouldSeeLogicalDisengage,
 }: EstopPressedModalProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'branded'])
   const [isResuming, setIsResuming] = React.useState<boolean>(false)
@@ -88,6 +101,7 @@ function TouchscreenModal({
   const handleClick = (): void => {
     setIsResuming(true)
     acknowledgeEstopDisengage(null)
+    setShouldSeeLogicalDisengage()
     closeModal()
   }
   return (
@@ -116,10 +130,16 @@ function TouchscreenModal({
         <SmallButton
           data-testid="Estop_pressed_button"
           width="100%"
-          iconName={isResuming ? 'ot-spinner' : undefined}
-          iconPlacement={isResuming ? 'startIcon' : undefined}
+          iconName={
+            isResuming || isWaitingForLogicalDisengage
+              ? 'ot-spinner'
+              : undefined
+          }
+          iconPlacement={
+            isResuming || isWaitingForLogicalDisengage ? 'startIcon' : undefined
+          }
           buttonText={t('resume_robot_operations')}
-          disabled={isEngaged || isResuming}
+          disabled={isEngaged || isResuming || isWaitingForLogicalDisengage}
           onClick={handleClick}
         />
       </Flex>
@@ -131,6 +151,8 @@ function DesktopModal({
   isEngaged,
   closeModal,
   setIsDismissedModal,
+  isWaitingForLogicalDisengage,
+  setShouldSeeLogicalDisengage,
 }: EstopPressedModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const [isResuming, setIsResuming] = React.useState<boolean>(false)
@@ -155,14 +177,19 @@ function DesktopModal({
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e): void => {
     e.preventDefault()
     setIsResuming(true)
-    acknowledgeEstopDisengage({
-      onSuccess: () => {
-        closeModal()
-      },
-      onError: () => {
-        setIsResuming(false)
-      },
-    })
+    acknowledgeEstopDisengage(
+      {},
+      {
+        onSuccess: () => {
+          setShouldSeeLogicalDisengage()
+          closeModal()
+        },
+        onError: (error: any) => {
+          setIsResuming(false)
+          console.error(error)
+        },
+      }
+    )
   }
 
   return (
@@ -177,14 +204,16 @@ function DesktopModal({
         <Flex justifyContent={JUSTIFY_FLEX_END}>
           <PrimaryButton
             onClick={handleClick}
-            disabled={isEngaged || isResuming}
+            disabled={isEngaged || isResuming || isWaitingForLogicalDisengage}
           >
             <Flex
               flexDirection={DIRECTION_ROW}
               gridGap={SPACING.spacing8}
               alignItems={ALIGN_CENTER}
             >
-              {isResuming ? <Icon size="1rem" spin name="ot-spinner" /> : null}
+              {isResuming || isWaitingForLogicalDisengage ? (
+                <Icon size="1rem" spin name="ot-spinner" />
+              ) : null}
               {t('resume_robot_operations')}
             </Flex>
           </PrimaryButton>

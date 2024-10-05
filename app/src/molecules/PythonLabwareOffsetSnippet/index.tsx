@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { TYPOGRAPHY, SPACING, BORDERS, COLORS } from '@opentrons/components'
 import { createSnippet } from './createSnippet'
@@ -32,8 +32,8 @@ export function PythonLabwareOffsetSnippet(
   props: PythonLabwareOffsetSnippetProps
 ): JSX.Element | null {
   const { commands, labware, modules, labwareOffsets, mode } = props
-  const [snippet, setSnippet] = React.useState<string | null>(null)
-  React.useEffect(() => {
+  const [snippet, setSnippet] = useState<string | null>(null)
+  useEffect(() => {
     if (labware.length > 0 && labwareOffsets != null) {
       setSnippet(
         createSnippet(mode, commands, labware, modules, labwareOffsets)

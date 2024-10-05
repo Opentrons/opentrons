@@ -151,15 +151,15 @@ describe('pipette data accessors', () => {
         },
         lldSettings: {
           t50: {
-            minHeight: 0.5,
+            minHeight: 1.0,
             minVolume: 0,
           },
           t200: {
-            minHeight: 0.5,
+            minHeight: 1.0,
             minVolume: 0,
           },
           t1000: {
-            minHeight: 0.5,
+            minHeight: 1.5,
             minVolume: 0,
           },
         },

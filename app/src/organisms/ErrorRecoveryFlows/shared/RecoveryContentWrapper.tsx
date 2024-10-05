@@ -1,7 +1,7 @@
 // TODO: replace this by making these props true of interventionmodal content wrappers
 // once error recovery uses interventionmodal consistently
 
-import * as React from 'react'
+import type * as React from 'react'
 import { css } from 'styled-components'
 import {
   DIRECTION_COLUMN,
@@ -15,7 +15,7 @@ import {
   OneColumn,
   TwoColumn,
   OneColumnOrTwoColumn,
-} from '../../../molecules/InterventionModal'
+} from '/app/molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
 interface SingleColumnContentWrapperProps {

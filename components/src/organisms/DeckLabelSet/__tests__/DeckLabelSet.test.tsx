@@ -1,10 +1,9 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../testing/utils'
 import { BORDERS, COLORS } from '../../../helix-design-system'
-import { Box } from '../../../primitives'
 import { DeckLabel } from '../../../molecules/DeckLabel'
 import { DeckLabelSet } from '..'
 
@@ -31,11 +30,10 @@ describe('DeckLabelSet', () => {
 
   beforeEach(() => {
     props = {
-      children: (
-        <Box width="31.9375rem" height="5.75rem">
-          test
-        </Box>
-      ),
+      x: 1,
+      y: 1,
+      width: 50,
+      height: 50,
       deckLabels: mockDeckLabels,
     }
     vi.mocked(DeckLabel).mockReturnValue(<div>mock DeckLabels</div>)
@@ -44,9 +42,8 @@ describe('DeckLabelSet', () => {
   it('should render blue border and DeckLabel', () => {
     render(props)
     expect(screen.getAllByText('mock DeckLabels').length).toBe(2)
-    screen.getByText('test')
     const deckLabelSet = screen.getByTestId('DeckLabeSet')
-    expect(deckLabelSet).toHaveStyle(`border: 3px solid ${COLORS.blue50}`)
-    expect(deckLabelSet).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
+    expect(deckLabelSet).toHaveStyle(`border: 1.5px solid ${COLORS.blue50}`)
+    expect(deckLabelSet).toHaveStyle(`border-radius: ${BORDERS.borderRadius4}`)
   })
 })

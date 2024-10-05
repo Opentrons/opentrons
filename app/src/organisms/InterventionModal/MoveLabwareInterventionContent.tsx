@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -26,6 +25,7 @@ import {
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
+  inferModuleOrientationFromXCoordinate,
   getDeckDefFromRobotType,
   getLoadedLabwareDefinitionsByUri,
   getModuleType,
@@ -37,12 +37,12 @@ import {
   getLabwareNameFromRunData,
   getModuleModelFromRunData,
 } from './utils'
-import { Divider } from '../../atoms/structure'
+import { Divider } from '/app/atoms/structure'
 import {
   getLoadedLabware,
   getLoadedModule,
-} from '../../molecules/Command/utils/accessors'
-import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+} from '/app/molecules/Command/utils/accessors'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type {
   CompletedProtocolAnalysis,
@@ -213,7 +213,13 @@ export function MoveLabwareInterventionContent({
                       nestedLabwareDef,
                       nestedLabwareId,
                     }) => (
-                      <Module key={moduleId} def={moduleDef} x={x} y={y}>
+                      <Module
+                        key={moduleId}
+                        def={moduleDef}
+                        x={x}
+                        y={y}
+                        orientation={inferModuleOrientationFromXCoordinate(x)}
+                      >
                         {nestedLabwareDef != null &&
                         nestedLabwareId !== command.params.labwareId ? (
                           <LabwareRender definition={nestedLabwareDef} />

@@ -1,10 +1,14 @@
 """Test state getters for retrieving geometry views of state."""
 import inspect
-
 import json
+from opentrons.protocol_engine.state.update_types import (
+    LoadedLabwareUpdate,
+    StateUpdate,
+)
 import pytest
+from math import isclose
 from decoy import Decoy
-from typing import cast, List, Tuple, Optional, NamedTuple
+from typing import cast, List, Tuple, Optional, NamedTuple, Dict
 from datetime import datetime
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5
@@ -61,9 +65,10 @@ from opentrons.protocol_engine.commands import (
     LoadModuleParams,
 )
 from opentrons.protocol_engine.actions import SucceedCommandAction
-from opentrons.protocol_engine.state import move_types
+from opentrons.protocol_engine.state import _move_types
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView, LabwareStore
+from opentrons.protocol_engine.state.wells import WellView, WellStore
 from opentrons.protocol_engine.state.modules import ModuleView, ModuleStore
 from opentrons.protocol_engine.state.pipettes import (
     PipetteView,
@@ -77,13 +82,27 @@ from opentrons.protocol_engine.state.addressable_areas import (
     AddressableAreaStore,
 )
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
+from opentrons.protocol_engine.state.frustum_helpers import (
+    height_from_volume_circular,
+    height_from_volume_rectangular,
+    volume_from_height_circular,
+    volume_from_height_rectangular,
+)
 from ..pipette_fixtures import get_default_nozzle_map
+from ..mock_circular_frusta import TEST_EXAMPLES as CIRCULAR_TEST_EXAMPLES
+from ..mock_rectangular_frusta import TEST_EXAMPLES as RECTANGULAR_TEST_EXAMPLES
 
 
 @pytest.fixture
 def mock_labware_view(decoy: Decoy) -> LabwareView:
     """Get a mock in the shape of a LabwareView."""
     return decoy.mock(cls=LabwareView)
+
+
+@pytest.fixture
+def mock_well_view(decoy: Decoy) -> WellView:
+    """Get a mock in the shape of a WellView."""
+    return decoy.mock(cls=WellView)
 
 
 @pytest.fixture
@@ -105,10 +124,10 @@ def mock_addressable_area_view(decoy: Decoy) -> AddressableAreaView:
 
 
 @pytest.fixture(autouse=True)
-def patch_mock_move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Mock out move_types.py functions."""
-    for name, func in inspect.getmembers(move_types, inspect.isfunction):
-        monkeypatch.setattr(move_types, name, decoy.mock(func=func))
+def patch_mock__move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Mock out _move_types.py functions."""
+    for name, func in inspect.getmembers(_move_types, inspect.isfunction):
+        monkeypatch.setattr(_move_types, name, decoy.mock(func=func))
 
 
 @pytest.fixture
@@ -142,6 +161,18 @@ def labware_store(deck_definition: DeckDefinitionV5) -> LabwareStore:
 def labware_view(labware_store: LabwareStore) -> LabwareView:
     """Get a labware view of a real labware store."""
     return LabwareView(labware_store._state)
+
+
+@pytest.fixture
+def well_store() -> WellStore:
+    """Get a well store that can accept actions."""
+    return WellStore()
+
+
+@pytest.fixture
+def well_view(well_store: WellStore) -> WellView:
+    """Get a well view of a real well store."""
+    return WellView(well_store._state)
 
 
 @pytest.fixture
@@ -184,6 +215,12 @@ def addressable_area_store(
             "robotType": "OT-3 Standard",
             "models": ["OT-3 Standard"],
             "extents": [477.2, 493.8, 0.0],
+            "paddingOffsets": {
+                "rear": -177.42,
+                "front": 51.8,
+                "leftSide": 31.88,
+                "rightSide": -80.32,
+            },
             "mountOffsets": {
                 "left": [-13.5, -60.5, 255.675],
                 "right": [40.5, -60.5, 255.675],
@@ -228,11 +265,13 @@ def nice_adapter_definition() -> LabwareDefinition:
 @pytest.fixture
 def subject(
     mock_labware_view: LabwareView,
+    mock_well_view: WellView,
     mock_module_view: ModuleView,
     mock_pipette_view: PipetteView,
     mock_addressable_area_view: AddressableAreaView,
     state_config: Config,
     labware_view: LabwareView,
+    well_view: WellView,
     module_view: ModuleView,
     pipette_view: PipetteView,
     addressable_area_view: AddressableAreaView,
@@ -253,6 +292,7 @@ def subject(
     return GeometryView(
         config=state_config,
         labware_view=mock_labware_view if use_mocks else labware_view,
+        well_view=mock_well_view if use_mocks else well_view,
         module_view=mock_module_view if use_mocks else module_view,
         pipette_view=mock_pipette_view if use_mocks else pipette_view,
         addressable_area_view=mock_addressable_area_view
@@ -1463,6 +1503,59 @@ def test_get_well_position_with_center_offset(
     )
 
 
+def test_get_well_position_with_meniscus_offset(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    mock_labware_view: LabwareView,
+    mock_well_view: WellView,
+    mock_addressable_area_view: AddressableAreaView,
+    subject: GeometryView,
+) -> None:
+    """It should be able to get the position of a well center in a labware."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="offset-id",
+    )
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    slot_pos = Point(4, 5, 6)
+    well_def = well_plate_def.wells["B2"]
+
+    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
+        calibration_offset
+    )
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+    ).then_return(slot_pos)
+    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
+    )
+    decoy.when(
+        mock_well_view.get_last_measured_liquid_height("labware-id", "B2")
+    ).then_return(70.5)
+
+    result = subject.get_well_position(
+        labware_id="labware-id",
+        well_name="B2",
+        well_location=WellLocation(
+            origin=WellOrigin.MENISCUS,
+            offset=WellOffset(x=2, y=3, z=4),
+        ),
+    )
+
+    assert result == Point(
+        x=slot_pos[0] + 1 + well_def.x + 2,
+        y=slot_pos[1] - 2 + well_def.y + 3,
+        z=slot_pos[2] + 3 + well_def.z + 4 + 70.5,
+    )
+
+
 def test_get_relative_well_location(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
@@ -2439,6 +2532,15 @@ def test_get_offset_location_deck_slot(
             ),
         ),
         private_result=None,
+        state_update=StateUpdate(
+            loaded_labware=LoadedLabwareUpdate(
+                labware_id="labware-id-1",
+                definition=nice_labware_definition,
+                offset_id=None,
+                new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
+                display_name=None,
+            )
+        ),
     )
     labware_store.handle_action(action)
     offset_location = subject.get_offset_location("labware-id-1")
@@ -2495,7 +2597,17 @@ def test_get_offset_location_module(
             ),
         ),
         private_result=None,
+        state_update=StateUpdate(
+            loaded_labware=LoadedLabwareUpdate(
+                labware_id="labware-id-1",
+                definition=nice_labware_definition,
+                offset_id=None,
+                new_location=ModuleLocation(moduleId="module-id-1"),
+                display_name=None,
+            )
+        ),
     )
+
     module_store.handle_action(load_module)
     labware_store.handle_action(load_labware)
     offset_location = subject.get_offset_location("labware-id-1")
@@ -2554,6 +2666,15 @@ def test_get_offset_location_module_with_adapter(
             ),
         ),
         private_result=None,
+        state_update=StateUpdate(
+            loaded_labware=LoadedLabwareUpdate(
+                labware_id="adapter-id-1",
+                definition=nice_adapter_definition,
+                offset_id=None,
+                new_location=ModuleLocation(moduleId="module-id-1"),
+                display_name=None,
+            )
+        ),
     )
     load_labware = SucceedCommandAction(
         command=LoadLabware(
@@ -2574,6 +2695,15 @@ def test_get_offset_location_module_with_adapter(
             ),
         ),
         private_result=None,
+        state_update=StateUpdate(
+            loaded_labware=LoadedLabwareUpdate(
+                labware_id="labware-id-1",
+                definition=nice_labware_definition,
+                offset_id=None,
+                new_location=OnLabwareLocation(labwareId="adapter-id-1"),
+                display_name=None,
+            )
+        ),
     )
     module_store.handle_action(load_module)
     labware_store.handle_action(load_adapter)
@@ -2614,7 +2744,92 @@ def test_get_offset_fails_with_off_deck_labware(
             ),
         ),
         private_result=None,
+        state_update=StateUpdate(
+            loaded_labware=LoadedLabwareUpdate(
+                labware_id="labware-id-1",
+                definition=nice_labware_definition,
+                offset_id=None,
+                new_location=OFF_DECK_LOCATION,
+                display_name=None,
+            )
+        ),
     )
     labware_store.handle_action(action)
     offset_location = subject.get_offset_location("labware-id-1")
     assert offset_location is None
+
+
+@pytest.mark.parametrize("frustum", RECTANGULAR_TEST_EXAMPLES)
+def test_rectangular_frustum_math_helpers(
+    decoy: Decoy,
+    frustum: Dict[str, List[float]],
+    subject: GeometryView,
+) -> None:
+    """Test both height and volume calculation within a given rectangular frustum."""
+    total_frustum_height = frustum["height"][0]
+    bottom_length = frustum["length"][-1]
+    bottom_width = frustum["width"][-1]
+
+    def _find_volume_from_height_(index: int) -> None:
+        nonlocal total_frustum_height, bottom_width, bottom_length
+        top_length = frustum["length"][index]
+        top_width = frustum["width"][index]
+        target_height = frustum["height"][index]
+
+        found_volume = volume_from_height_rectangular(
+            target_height=target_height,
+            total_frustum_height=total_frustum_height,
+            top_length=top_length,
+            bottom_length=bottom_length,
+            top_width=top_width,
+            bottom_width=bottom_width,
+        )
+
+        found_height = height_from_volume_rectangular(
+            volume=found_volume,
+            total_frustum_height=total_frustum_height,
+            top_length=top_length,
+            bottom_length=bottom_length,
+            top_width=top_width,
+            bottom_width=bottom_width,
+        )
+
+        assert isclose(found_height, frustum["height"][index])
+
+    for i in range(len(frustum["height"])):
+        _find_volume_from_height_(i)
+
+
+@pytest.mark.parametrize("frustum", CIRCULAR_TEST_EXAMPLES)
+def test_circular_frustum_math_helpers(
+    decoy: Decoy,
+    frustum: Dict[str, List[float]],
+    subject: GeometryView,
+) -> None:
+    """Test both height and volume calculation within a given circular frustum."""
+    total_frustum_height = frustum["height"][0]
+    bottom_radius = frustum["radius"][-1]
+
+    def _find_volume_from_height_(index: int) -> None:
+        nonlocal total_frustum_height, bottom_radius
+        top_radius = frustum["radius"][index]
+        target_height = frustum["height"][index]
+
+        found_volume = volume_from_height_circular(
+            target_height=target_height,
+            total_frustum_height=total_frustum_height,
+            top_radius=top_radius,
+            bottom_radius=bottom_radius,
+        )
+
+        found_height = height_from_volume_circular(
+            volume=found_volume,
+            total_frustum_height=total_frustum_height,
+            top_radius=top_radius,
+            bottom_radius=bottom_radius,
+        )
+
+        assert isclose(found_height, frustum["height"][index])
+
+    for i in range(len(frustum["height"])):
+        _find_volume_from_height_(i)

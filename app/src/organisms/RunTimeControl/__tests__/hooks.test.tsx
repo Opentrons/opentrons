@@ -4,27 +4,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { useRunActionMutations } from '@opentrons/react-api-client'
 
-import { useCloneRun, useRunCommands } from '../../ProtocolUpload/hooks'
+import { useRunControls, useCurrentRunStatus, useRunErrors } from '../hooks'
 import {
-  useRunControls,
+  useNotifyRunQuery,
+  useCurrentRunId,
   useRunStatus,
-  useCurrentRunStatus,
-  useRunTimestamps,
-  useRunErrors,
-} from '../hooks'
-import { useNotifyRunQuery, useCurrentRunId } from '../../../resources/runs'
+  useCloneRun,
+} from '/app/resources/runs'
 
 import {
   RUN_ID_2,
   mockPausedRun,
   mockRunningRun,
-  mockFailedRun,
-  mockStoppedRun,
-  mockSucceededRun,
-  mockIdleUnstartedRun,
-  mockIdleStartedRun,
-  mockCommand,
-} from '../__fixtures__'
+} from '/app/resources/runs/__fixtures__'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
@@ -38,8 +30,8 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   }
 })
 
-vi.mock('../../ProtocolUpload/hooks')
-vi.mock('../../../resources/runs')
+vi.mock('/app/resources/protocols')
+vi.mock('/app/resources/runs')
 
 describe('useRunControls hook', () => {
   it('returns run controls hooks', () => {
@@ -59,9 +51,11 @@ describe('useRunControls hook', () => {
       isStopRunActionLoading: false,
       isResumeRunFromRecoveryActionLoading: false,
     })
-    when(useCloneRun)
-      .calledWith(mockPausedRun.id, undefined, true)
-      .thenReturn({ cloneRun: mockCloneRun, isLoading: false })
+    when(useCloneRun).calledWith(mockPausedRun.id, undefined, true).thenReturn({
+      cloneRun: mockCloneRun,
+      isCloning: false,
+      isLoadingRun: false,
+    })
 
     const { result } = renderHook(() => useRunControls(mockPausedRun.id))
 
@@ -76,173 +70,15 @@ describe('useRunControls hook', () => {
   })
 })
 
-describe('useRunStatus hook', () => {
-  it('returns the run status of the run', async () => {
-    when(useNotifyRunQuery)
-      .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
-        data: { data: mockRunningRun },
-      } as unknown) as UseQueryResult<Run>)
-
-    const { result } = renderHook(() => useRunStatus(RUN_ID_2))
-    expect(result.current).toBe('running')
-  })
-
-  it('returns a "idle" run status if idle and run unstarted', () => {
-    when(useNotifyRunQuery)
-      .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
-        data: { data: mockIdleUnstartedRun },
-      } as unknown) as UseQueryResult<Run>)
-
-    const { result } = renderHook(() => useRunStatus(RUN_ID_2))
-    expect(result.current).toBe('idle')
-  })
-
-  it('returns a "running" run status if idle and run started', () => {
-    when(useNotifyRunQuery)
-      .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
-        data: { data: mockIdleStartedRun },
-      } as unknown) as UseQueryResult<Run>)
-
-    const { result } = renderHook(() => useRunStatus(RUN_ID_2))
-    expect(result.current).toBe('running')
-  })
-})
-
 describe('useCurrentRunStatus hook', () => {
   beforeEach(() => {
     when(useCurrentRunId).calledWith().thenReturn(RUN_ID_2)
   })
 
   it('returns the run status of the current run', async () => {
-    when(useNotifyRunQuery)
-      .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
-        data: { data: mockRunningRun },
-      } as unknown) as UseQueryResult<Run>)
-
+    when(useRunStatus).calledWith(RUN_ID_2).thenReturn('running')
     const { result } = renderHook(useCurrentRunStatus)
     expect(result.current).toBe('running')
-  })
-
-  it('returns a "idle" run status if idle and run unstarted', () => {
-    when(useNotifyRunQuery)
-      .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
-        data: { data: mockIdleUnstartedRun },
-      } as unknown) as UseQueryResult<Run>)
-
-    const { result } = renderHook(useCurrentRunStatus)
-    expect(result.current).toBe('idle')
-  })
-
-  it('returns a "running" run status if idle and run started', () => {
-    when(useNotifyRunQuery)
-      .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
-        data: { data: mockIdleStartedRun },
-      } as unknown) as UseQueryResult<Run>)
-
-    const { result } = renderHook(useCurrentRunStatus)
-    expect(result.current).toBe('running')
-  })
-})
-
-describe('useRunTimestamps hook', () => {
-  beforeEach(() => {
-    when(useRunCommands)
-      .calledWith(RUN_ID_2, { cursor: null, pageLength: 1 }, expect.any(Object))
-      .thenReturn([mockCommand.data as any])
-  })
-
-  it('returns the start time of the current run', async () => {
-    when(useNotifyRunQuery)
-      .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
-        data: { data: mockRunningRun },
-      } as unknown) as UseQueryResult<Run>)
-
-    const { result } = renderHook(() => useRunTimestamps(RUN_ID_2))
-    expect(result.current.startedAt).toBe('2021-10-25T12:54:53.366581+00:00')
-  })
-
-  it('returns null when pause is not the last action', async () => {
-    when(useNotifyRunQuery)
-      .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
-        data: { data: mockRunningRun },
-      } as unknown) as UseQueryResult<Run>)
-
-    const { result } = renderHook(() => useRunTimestamps(RUN_ID_2))
-    expect(result.current.pausedAt).toBe(null)
-  })
-
-  it('returns the pause time of the current run when pause is the last action', async () => {
-    when(useNotifyRunQuery)
-      .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
-        data: { data: mockPausedRun },
-      } as unknown) as UseQueryResult<Run>)
-
-    const { result } = renderHook(() => useRunTimestamps(RUN_ID_2))
-    expect(result.current.pausedAt).toBe('2021-10-25T13:23:31.366581+00:00')
-  })
-
-  it('returns stopped time null when stop is not the last action', async () => {
-    when(useNotifyRunQuery)
-      .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
-        data: { data: mockRunningRun },
-      } as unknown) as UseQueryResult<Run>)
-
-    const { result } = renderHook(() => useRunTimestamps(RUN_ID_2))
-    expect(result.current.stoppedAt).toBe(null)
-  })
-
-  it('returns the stop time of the current run when stop is the last action', async () => {
-    when(useNotifyRunQuery)
-      .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
-        data: { data: mockStoppedRun },
-      } as unknown) as UseQueryResult<Run>)
-
-    const { result } = renderHook(() => useRunTimestamps(RUN_ID_2))
-    expect(result.current.stoppedAt).toBe('2021-10-25T13:58:22.366581+00:00')
-  })
-
-  it('returns the complete time of a successful current run', async () => {
-    when(useNotifyRunQuery)
-      .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
-        data: { data: mockSucceededRun },
-      } as unknown) as UseQueryResult<Run>)
-
-    const { result } = renderHook(() => useRunTimestamps(RUN_ID_2))
-    expect(result.current.completedAt).toBe('noon thirty')
-  })
-
-  it('returns the complete time of a failed current run', async () => {
-    when(useNotifyRunQuery)
-      .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
-        data: { data: mockFailedRun },
-      } as unknown) as UseQueryResult<Run>)
-
-    const { result } = renderHook(() => useRunTimestamps(RUN_ID_2))
-    expect(result.current.completedAt).toBe('noon forty-five')
-  })
-
-  it('returns the complete time of a stopped current run', async () => {
-    when(useNotifyRunQuery)
-      .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
-        data: { data: mockStoppedRun },
-      } as unknown) as UseQueryResult<Run>)
-
-    const { result } = renderHook(() => useRunTimestamps(RUN_ID_2))
-    expect(result.current.completedAt).toBe('2021-10-25T13:58:22.366581+00:00')
   })
 })
 

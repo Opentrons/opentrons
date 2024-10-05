@@ -6,6 +6,7 @@ import { fontSizeH4 } from '../ui-style-constants/typography'
 import { spacing8 } from '../ui-style-constants/spacing'
 import { ARROW_SIZE_PX } from './styles'
 import { Box } from '../primitives'
+import { CURSOR_POINTER } from '../styles'
 
 import type { CSSProperties } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
@@ -60,7 +61,7 @@ export const LegacyTooltip = React.forwardRef(function TooltipComponent(
     padding: ${spacing8};
     color: ${COLORS.white};
     filter: drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.2));
-    cursor: pointer;
+    cursor: ${CURSOR_POINTER};
     font-size: ${fontSize};
     border-radius: ${BORDERS.borderRadius4};
   `

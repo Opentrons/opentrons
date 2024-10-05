@@ -9,6 +9,7 @@ from opentrons_shared_data.pipette import pipette_definition
 from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
+from opentrons.hardware_control import CriticalPoint
 from opentrons.types import MountType, Mount as HwMount, Point
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine import errors
@@ -586,8 +587,9 @@ class _PipetteSpecs(NamedTuple):
     tip_length: float
     bounding_box_offsets: PipetteBoundingBoxOffsets
     nozzle_map: NozzleMap
+    critical_point: Optional[CriticalPoint]
     destination_position: Point
-    nozzle_bounds_result: Tuple[Point, Point, Point, Point]
+    pipette_bounds_result: Tuple[Point, Point, Point, Point]
 
 
 _pipette_spec_cases = [
@@ -609,8 +611,9 @@ _pipette_spec_cases = [
             front_right_nozzle="H1",
             valid_nozzle_maps=ValidNozzleMaps(maps={"Full": EIGHT_CHANNEL_COLS["1"]}),
         ),
+        critical_point=None,
         destination_position=Point(100, 200, 300),
-        nozzle_bounds_result=(
+        pipette_bounds_result=(
             (
                 Point(x=100.0, y=200.0, z=342.0),
                 Point(x=100.0, y=137.0, z=342.0),
@@ -637,13 +640,76 @@ _pipette_spec_cases = [
             front_right_nozzle="H1",
             valid_nozzle_maps=ValidNozzleMaps(maps={"H1": ["H1"]}),
         ),
+        critical_point=None,
         destination_position=Point(100, 200, 300),
-        nozzle_bounds_result=(
+        pipette_bounds_result=(
             (
                 Point(x=100.0, y=263.0, z=342.0),
                 Point(x=100.0, y=200.0, z=342.0),
                 Point(x=100.0, y=263.0, z=342.0),
                 Point(x=100.0, y=200.0, z=342.0),
+            )
+        ),
+    ),
+    _PipetteSpecs(
+        # 8-channel P300, full configuration. Critical point of XY_CENTER
+        tip_length=42,
+        bounding_box_offsets=PipetteBoundingBoxOffsets(
+            back_left_corner=Point(0.0, 31.5, 35.52),
+            front_right_corner=Point(0.0, -31.5, 35.52),
+            front_left_corner=Point(0.0, -31.5, 35.52),
+            back_right_corner=Point(0.0, 31.5, 35.52),
+        ),
+        nozzle_map=NozzleMap.build(
+            physical_nozzles=EIGHT_CHANNEL_MAP,
+            physical_rows=EIGHT_CHANNEL_ROWS,
+            physical_columns=EIGHT_CHANNEL_COLS,
+            starting_nozzle="A1",
+            back_left_nozzle="A1",
+            front_right_nozzle="H1",
+            valid_nozzle_maps=ValidNozzleMaps(maps={"Full": EIGHT_CHANNEL_COLS["1"]}),
+        ),
+        critical_point=CriticalPoint.XY_CENTER,
+        destination_position=Point(100, 200, 300),
+        pipette_bounds_result=(
+            (
+                Point(x=100.0, y=231.5, z=342.0),
+                Point(x=100.0, y=168.5, z=342.0),
+                Point(x=100.0, y=231.5, z=342.0),
+                Point(x=100.0, y=168.5, z=342.0),
+            )
+        ),
+    ),
+    _PipetteSpecs(
+        # 8-channel P300, Partial A1-E1 configuration. Critical point of XY_CENTER
+        tip_length=42,
+        bounding_box_offsets=PipetteBoundingBoxOffsets(
+            back_left_corner=Point(0.0, 31.5, 35.52),
+            front_right_corner=Point(0.0, -31.5, 35.52),
+            front_left_corner=Point(0.0, -31.5, 35.52),
+            back_right_corner=Point(0.0, 31.5, 35.52),
+        ),
+        nozzle_map=NozzleMap.build(
+            physical_nozzles=EIGHT_CHANNEL_MAP,
+            physical_rows=EIGHT_CHANNEL_ROWS,
+            physical_columns=EIGHT_CHANNEL_COLS,
+            starting_nozzle="H1",
+            back_left_nozzle="E1",
+            front_right_nozzle="H1",
+            valid_nozzle_maps=ValidNozzleMaps(
+                maps={
+                    "H1toE1": ["E1", "F1", "G1", "H1"],
+                }
+            ),
+        ),
+        critical_point=CriticalPoint.XY_CENTER,
+        destination_position=Point(100, 200, 300),
+        pipette_bounds_result=(
+            (
+                Point(x=100.0, y=249.5, z=342.0),
+                Point(x=100.0, y=186.5, z=342.0),
+                Point(x=100.0, y=249.5, z=342.0),
+                Point(x=100.0, y=186.5, z=342.0),
             )
         ),
     ),
@@ -681,8 +747,9 @@ _pipette_spec_cases = [
                 }
             ),
         ),
+        critical_point=None,
         destination_position=Point(100, 200, 300),
-        nozzle_bounds_result=(
+        pipette_bounds_result=(
             (
                 Point(x=100.0, y=200.0, z=342.0),
                 Point(x=199.0, y=137.0, z=342.0),
@@ -709,8 +776,9 @@ _pipette_spec_cases = [
             front_right_nozzle="H1",
             valid_nozzle_maps=ValidNozzleMaps(maps={"Column1": NINETY_SIX_COLS["1"]}),
         ),
+        critical_point=None,
         destination_position=Point(100, 200, 300),
-        nozzle_bounds_result=(
+        pipette_bounds_result=(
             Point(100, 200, 342),
             Point(199, 137, 342),
             Point(199, 200, 342),
@@ -735,8 +803,9 @@ _pipette_spec_cases = [
             front_right_nozzle="H12",
             valid_nozzle_maps=ValidNozzleMaps(maps={"Column12": NINETY_SIX_COLS["12"]}),
         ),
+        critical_point=None,
         destination_position=Point(100, 200, 300),
-        nozzle_bounds_result=(
+        pipette_bounds_result=(
             Point(1, 200, 342),
             Point(100, 137, 342),
             Point(100, 200, 342),
@@ -761,12 +830,94 @@ _pipette_spec_cases = [
             front_right_nozzle="A12",
             valid_nozzle_maps=ValidNozzleMaps(maps={"RowA": NINETY_SIX_ROWS["A"]}),
         ),
+        critical_point=None,
         destination_position=Point(100, 200, 300),
-        nozzle_bounds_result=(
+        pipette_bounds_result=(
             Point(100, 200, 342),
             Point(199, 137, 342),
             Point(199, 200, 342),
             Point(100, 137, 342),
+        ),
+    ),
+    _PipetteSpecs(
+        # 96-channel P1000, ROW configuration. Critical point of XY_CENTER
+        tip_length=42,
+        bounding_box_offsets=PipetteBoundingBoxOffsets(
+            back_left_corner=Point(-36.0, -25.5, -259.15),
+            front_right_corner=Point(63.0, -88.5, -259.15),
+            front_left_corner=Point(-36.0, -88.5, -259.15),
+            back_right_corner=Point(63.0, -25.5, -259.15),
+        ),
+        nozzle_map=NozzleMap.build(
+            physical_nozzles=NINETY_SIX_MAP,
+            physical_rows=NINETY_SIX_ROWS,
+            physical_columns=NINETY_SIX_COLS,
+            starting_nozzle="A1",
+            back_left_nozzle="A1",
+            front_right_nozzle="A12",
+            valid_nozzle_maps=ValidNozzleMaps(maps={"RowA": NINETY_SIX_ROWS["A"]}),
+        ),
+        critical_point=CriticalPoint.XY_CENTER,
+        destination_position=Point(100, 200, 300),
+        pipette_bounds_result=(
+            Point(x=50.5, y=200, z=342),
+            Point(x=149.5, y=137, z=342),
+            Point(x=149.5, y=200, z=342),
+            Point(x=50.5, y=137, z=342),
+        ),
+    ),
+    _PipetteSpecs(
+        # 96-channel P1000, A12 COLUMN configuration. Critical point of Y_CENTER
+        tip_length=42,
+        bounding_box_offsets=PipetteBoundingBoxOffsets(
+            back_left_corner=Point(-36.0, -25.5, -259.15),
+            front_right_corner=Point(63.0, -88.5, -259.15),
+            front_left_corner=Point(-36.0, -88.5, -259.15),
+            back_right_corner=Point(63.0, -25.5, -259.15),
+        ),
+        nozzle_map=NozzleMap.build(
+            physical_nozzles=NINETY_SIX_MAP,
+            physical_rows=NINETY_SIX_ROWS,
+            physical_columns=NINETY_SIX_COLS,
+            starting_nozzle="A12",
+            back_left_nozzle="A12",
+            front_right_nozzle="H12",
+            valid_nozzle_maps=ValidNozzleMaps(maps={"Column12": NINETY_SIX_COLS["12"]}),
+        ),
+        critical_point=CriticalPoint.Y_CENTER,
+        destination_position=Point(100, 200, 300),
+        pipette_bounds_result=(
+            Point(1, 231.5, 342),
+            Point(100, 168.5, 342),
+            Point(100, 231.5, 342),
+            Point(1, 168.5, 342),
+        ),
+    ),
+    _PipetteSpecs(
+        # 96-channel P1000, A1 COLUMN configuration. Critical point of XY_CENTER
+        tip_length=42,
+        bounding_box_offsets=PipetteBoundingBoxOffsets(
+            back_left_corner=Point(-36.0, -25.5, -259.15),
+            front_right_corner=Point(63.0, -88.5, -259.15),
+            front_left_corner=Point(-36.0, -88.5, -259.15),
+            back_right_corner=Point(63.0, -25.5, -259.15),
+        ),
+        nozzle_map=NozzleMap.build(
+            physical_nozzles=NINETY_SIX_MAP,
+            physical_rows=NINETY_SIX_ROWS,
+            physical_columns=NINETY_SIX_COLS,
+            starting_nozzle="A1",
+            back_left_nozzle="A1",
+            front_right_nozzle="H1",
+            valid_nozzle_maps=ValidNozzleMaps(maps={"Column1": NINETY_SIX_COLS["1"]}),
+        ),
+        critical_point=CriticalPoint.XY_CENTER,
+        destination_position=Point(100, 200, 300),
+        pipette_bounds_result=(
+            Point(100, 231.5, 342),
+            Point(199, 168.5, 342),
+            Point(199, 231.5, 342),
+            Point(100, 168.5, 342),
         ),
     ),
 ]
@@ -776,12 +927,13 @@ _pipette_spec_cases = [
     argnames=_PipetteSpecs._fields,
     argvalues=_pipette_spec_cases,
 )
-def test_get_nozzle_bounds_at_location(
+def test_get_pipette_bounds_at_location(
     tip_length: float,
     bounding_box_offsets: PipetteBoundingBoxOffsets,
     nozzle_map: NozzleMap,
     destination_position: Point,
-    nozzle_bounds_result: Tuple[Point, Point, Point, Point],
+    critical_point: Optional[CriticalPoint],
+    pipette_bounds_result: Tuple[Point, Point, Point, Point],
 ) -> None:
     """It should get the pipette's nozzle's bounds at the given location."""
     subject = get_pipette_view(
@@ -810,7 +962,9 @@ def test_get_nozzle_bounds_at_location(
     )
     assert (
         subject.get_pipette_bounds_at_specified_move_to_position(
-            pipette_id="pipette-id", destination_position=destination_position
+            pipette_id="pipette-id",
+            destination_position=destination_position,
+            critical_point=critical_point,
         )
-        == nozzle_bounds_result
+        == pipette_bounds_result
     )

@@ -1,9 +1,9 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { RECOVERY_MAP } from '../constants'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
-import { TwoColumn } from '../../../molecules/InterventionModal'
+import { TwoColumn } from '/app/molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
 import { TipSelectionModal } from './TipSelectionModal'
@@ -17,19 +17,20 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
     routeUpdateActions,
     recoveryCommands,
     isOnDevice,
+    failedLabwareUtils,
   } = props
   const { ROBOT_PICKING_UP_TIPS } = RECOVERY_MAP
   const { pickUpTips } = recoveryCommands
   const {
     goBackPrevStep,
-    setRobotInMotion,
+    handleMotionRouting,
     proceedNextStep,
   } = routeUpdateActions
   const { t } = useTranslation('error_recovery')
-  const [showTipSelectModal, setShowTipSelectModal] = React.useState(false)
+  const [showTipSelectModal, setShowTipSelectModal] = useState(false)
 
   const primaryBtnOnClick = (): Promise<void> => {
-    return setRobotInMotion(true, ROBOT_PICKING_UP_TIPS.ROUTE)
+    return handleMotionRouting(true, ROBOT_PICKING_UP_TIPS.ROUTE)
       .then(() => pickUpTips())
       .then(() => proceedNextStep())
   }
@@ -75,6 +76,7 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
         </TwoColumn>
         <RecoveryFooterButtons
           primaryBtnOnClick={primaryBtnOnClick}
+          primaryBtnDisabled={!failedLabwareUtils.areTipsSelected}
           secondaryBtnOnClick={goBackPrevStep}
           primaryBtnTextOverride={t('pick_up_tips')}
           {...buildTertiaryBtnProps()}

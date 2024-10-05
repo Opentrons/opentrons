@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -19,9 +19,9 @@ import {
   TYPOGRAPHY,
   DIRECTION_ROW,
 } from '@opentrons/components'
-import gripperImage from '../../images/flex_gripper.png'
-import wasteChuteImage from '../../images/waste_chute.png'
-import trashBinImage from '../../images/flex_trash_bin.png'
+import gripperImage from '../../assets/images/flex_gripper.png'
+import wasteChuteImage from '../../assets/images/waste_chute.png'
+import trashBinImage from '../../assets/images/flex_trash_bin.png'
 import { getTopPortalEl } from '../portals/TopPortal'
 import { TrashModal } from './TrashModal'
 import { FlexSlotMap } from './FlexSlotMap'
@@ -52,7 +52,7 @@ export function AdditionalItemsRow(
   } = props
   const { t } = useTranslation(['modules', 'shared', 'tooltip'])
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const [trashModal, openTrashModal] = React.useState<boolean>(false)
+  const [trashModal, openTrashModal] = useState<boolean>(false)
   const addTrash = name !== 'gripper' && !isEquipmentAdded
   const disabledRemoveButton =
     (name === 'trashBin' && isEquipmentAdded && !hasWasteChute) ||

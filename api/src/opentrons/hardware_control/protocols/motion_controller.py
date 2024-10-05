@@ -204,6 +204,10 @@ class MotionController(Protocol[MountArgType]):
         """Disengage some axes."""
         ...
 
+    async def engage_axes(self, which: List[Axis]) -> None:
+        """Engage some axes."""
+        ...
+
     async def retract(self, mount: MountArgType, margin: float = 10) -> None:
         """Pull the specified mount up to its home position.
 

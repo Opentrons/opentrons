@@ -1,0 +1,309 @@
+{
+  "browse_labware": {
+    "instructions": "Hover on a well to see contents"
+  },
+  "announcements": {
+    "header": "We've updated the {{pd}}",
+    "modulesRequireRunAppUpdate": {
+      "body1": "{{pd}} Beta now includes support for Temperature and Magnetic modules.",
+      "body2": "Note: Protocols with modules <bold>may require an app and robot update to run</bold>. You will need to have the {{app}} and robot on the latest versions ( <bold>3.17 or higher</bold>)"
+    },
+    "thermocyclerSupport": {
+      "body1": "{{pd}} Beta now includes support for the Thermocycler!",
+      "body2": "Note: Protocols with modules <strong>may require an app and robot update to run</strong>. You will need to have the {{app}} and robot on the latest versions (<strong>3.18 or higher</strong>)."
+    },
+    "airGapDelaySettings": {
+      "body1": "{{pd}} Beta now includes support for more pipetting settings: Air gap and Delay.",
+      "body2": "Note: Protocols using new features <strong>may require an app and robot update to run.</strong> You will need to have the {{app}} and orbot on the latest versions (<strong>3.20 or higher</strong>)."
+    },
+    "batchEditTransfer": {
+      "body1": "Starting today, you’ll be able to:",
+      "body2": "Select, delete, and duplicate multiple steps at once",
+      "body3": "Edit advanced settings for multiple Transfer or Mix steps at once",
+      "body4": "To enter multi-select mode, simply hold <strong>SHIFT</strong> or <strong>CTRL/CMND</strong> and click on a step.",
+      "body5": "From here, you can access the control bar at the top of the protocol timeline, or edit advanced settings for Transfer or Mix steps!"
+    },
+    "heaterShakerSupport": {
+      "body1": "The {{opd}} now supports our Heater-Shaker Module!",
+      "body2": "All protocols now require {{app}} version <strong> 6.1+ </strong> to run."
+    },
+    "thermocyclerGen2Support": {
+      "body1": "The {{opd}} now supports our Thermocycler Module GEN2!",
+      "body2": "All protocols now require {{app}} version <strong> 6.2+ </strong> to run."
+    },
+    "liquidColorEnhancements": {
+      "body1": "The {{opd}} now lets you customize liquid colors!",
+      "body2": "All protocols now require {{app}} version <strong> 6.2+ </strong> to run."
+    },
+    "flexSupport": {
+      "body1": "Introducing the {{pd}} 7.0 with {{flex}} support!",
+      "body2": "All protocols now require {{app}} version <strong> 7.0+ </strong> to run."
+    },
+    "deckConfigAnd96Channel": {
+      "body1": "Introducing the {{pd}} 8.0 with deck configuration and 96-channel pipette support!",
+      "body2": "All protocols now require {{app}} version <strong> 7.1+ </strong> to run."
+    },
+    "customParamsAndMultiTipAndModule": {
+      "body1": "Introducing {{pd}} 8.1. Starting today, you will be able to:",
+      "body2": "Customize blowout speed and height.",
+      "body3": "Adjust horizontal position within a well when aspirating, dispensing, or mixing.",
+      "body4": "Assign up to three types of tip racks to a single pipette.",
+      "body5": "Add multiple Temperature Modules to the deck (Flex only).",
+      "body6": "All protocols require {{app}} version <strong>7.3.0 or later</strong> to run."
+    },
+    "redesign": {
+      "body1": "Welcome to Protocol Designer 9.0.0!",
+      "body2": "We’re excited to release the new Opentrons Protocol Designer, now with a fresh redesign! Enjoy the same functionality with some powerful new features:",
+      "body3": "Easily group multiple steps together, name the group, and keep your protocols organized with step grouping.",
+      "body4": "Add multiple Heater-Shaker Modules and Magnetic Blocks to the deck (Flex only).",
+      "body5": "All protocols now require Opentrons App version <strong>8.0.0+</strong> to run."
+    }
+  },
+  "labware_selection": {
+    "measurements": "Labware Measurements",
+    "well_count": "# of wells",
+    "max_vol": "Max Volume",
+    "see_details": "See detail page",
+    "view_measurements": "view measurements",
+    "creating_labware_defs": "Access the Labware Creator",
+    "recommended_labware_filter": "Show only recommended labware. Read more",
+    "heater_shaker_labware_filter": "Showing only labware that fit next to the Heater-Shaker Module. Read more",
+    "module_compatibility": {
+      "recommended": "Recommended for use on this module",
+      "potentiallyCompatible": "Potentially compatible with this module",
+      "notCompatible": "Not compatible with this module"
+    }
+  },
+  "tip_position": {
+    "title": "Tip Positioning",
+    "caption": "between {{min}} and {{max}}",
+    "warning": "One or more position offset values are close to the edge of the well and might collide with it",
+    "radio_button": {
+      "default": "{{defaultMmFromBottom}} mm from the bottom center (default)",
+      "blowout": "0 mm from the top center (default)",
+      "mix": "Aspirate 1mm, Dispense 0.5mm from the bottom center (default)",
+      "custom": "Custom"
+    },
+    "body": {
+      "blowout_z_offset": "Change from where in the well the robot emits blowout",
+      "aspirate_mmFromBottom": "Change from where in the well the robot aspirates",
+      "dispense_mmFromBottom": "Change from where in the well the robot dispenses",
+      "mix_mmFromBottom": "Change from where in the well the robot aspirates and dispenses during the mix",
+      "aspirate_touchTip_mmFromBottom": "Change from where in the well the robot performs touch tip",
+      "dispense_touchTip_mmFromBottom": "Change from where in the well the robot performs touch tip",
+      "mix_touchTip_mmFromBottom": "Change from where in the well the robot performs touch tip",
+      "aspirate_delay_mmFromBottom": "Change from where in the well the robot delays after aspirating",
+      "dispense_delay_mmFromBottom": "Change from where in the well the robot delays after dispensing"
+    },
+    "field_titles": {
+      "z_position": "Z position",
+      "x_position": "X position",
+      "y_position": "Y position"
+    },
+    "errors": {
+      "TOO_MANY_DECIMALS": "a max of 1 decimal place is allowed",
+      "OUT_OF_BOUNDS": "accepted range is {{minMm}} to {{maxMm}}"
+    },
+    "field_label": "Distance from bottom of well"
+  },
+  "labware_upload_message": {
+    "title": {
+      "INVALID_JSON_FILE": "Incompatible file type",
+      "NOT_JSON": "Incompatible file type",
+      "EXACT_LABWARE_MATCH": "Duplicate labware definition",
+      "LABWARE_NAME_CONFLICT": "Duplicate labware name",
+      "ASK_FOR_LABWARE_OVERWRITE": "Duplicate labware name",
+      "USES_STANDARD_NAMESPACE": "Standard (non-custom) Opentrons labware",
+      "ONLY_TIPRACK": "Incompatible file type"
+    },
+    "message": {
+      "EXACT_LABWARE_MATCH": "This labware is identical to one you have already uploaded.",
+      "INVALID_JSON_FILE": "The Protocol Designer only accepts custom JSON labware definitions made with our Labware Creator",
+      "NOT_JSON": "The Protocol Designer only accepts custom JSON labware definitions made with our Labware Creator. This is not a .json file!",
+      "ONLY_TIPRACK": "This labware definition is not a Tip Rack.",
+      "USES_STANDARD_NAMESPACE": "This labware definition appears to be an Opentrons standard labware. Please upload only custom labware."
+    },
+    "name_conflict": {
+      "shared_display_name": "Shared display name: ",
+      "shared_load_name": "Shared load name: ",
+      "shares_name": "This labware shares an API Load name and/or a display name with {{customOrStandard}} labware that has already been uploaded.",
+      "re_export": "If you wish to add this labware then please return to the Labware Creator and export it again with a unique load name and display name.",
+      "overwrite": "If you intended to replace your previous labware with this new version then proceed with the Overwrite button below.",
+      "mismatched": "the new labware has a different arrangement of wells than the definition it is replacing. Clicking the Overwrite button will deselect all wells in any existing steps that use the overwritten definition. You will have to edit each of those steps and re-select the wells.",
+      "warning": "WARNING:"
+    }
+  },
+  "new_protocol": {
+    "title": {
+      "PROTOCOL_FILE": "Create New Protocol for",
+      "PROTOCOL_PIPETTES": "Pipette & Tip Setup",
+      "PROTOCOL_MODULES": "Add Modules"
+    }
+  },
+
+  "add_optional_info": "Add more information, if you like (you can change this later).",
+  "choose_additional_items": "Choose additional items",
+  "choose_at_least_one_tip_rack": "Choose at least one tiprack for this pipette",
+  "choose_left_pipette": "Choose left pipette",
+  "choose_right_pipette": "Choose right pipette",
+  "choose_robot_type": "Choose robot type",
+  "choose_tips_for_pipette": "Choose tips for {{pipetteName}}",
+  "create_new_protocol": "Create New Protocol",
+  "custom_tiprack": "Custom tips",
+  "description": "Description",
+  "name_your_protocol": "Name your protocol.",
+  "organization_or_author": "Organization/Author",
+  "pipette_type": "Pipette Type",
+  "protocol_name_and_description": "Protocol name and description",
+  "protocol_name": "Protocol Name",
+  "review_file_details": "Review file details",
+  "robot_type": "Robot Type",
+  "staging_areas": "Staging area slots",
+  "upload_tiprack": "Upload a custom tiprack to select its definition",
+  "upload": "Upload",
+  "well_order": {
+    "title": "Well Order",
+    "body": "Change the order in which the robot aspirates from the selected wells",
+    "field_label": "Order",
+    "then": "then",
+    "viz_label": "Pattern"
+  },
+  "pipette_fields": {
+    "left_pipette": "Left Pipette",
+    "right_pipette": "Right Pipette",
+    "left_tiprack": "Left Tiprack*",
+    "right_tiprack": "Right Tiprack*",
+    "pipette": "Pipette",
+    "tiprack": "Tiprack*"
+  },
+  "edit_pipettes": {
+    "title": "Change Pipette Selection",
+    "body": "Update your pipette and tiprack selection. Please note, this may affect your existing protocol steps."
+  },
+  "confirm_delete_modal": {
+    "closeUnsavedStepForm": {
+      "title": "Unsaved step form",
+      "body": "You have not saved this step form. If you navigate away without saving, this step will be deleted.",
+      "confirm_button": "discard step"
+    },
+    "closeBatchEditForm": {
+      "title": "Unsaved changes to multiple steps",
+      "body": "You have unsaved changes in this form. If you change your step selection without saving you will lose these changes.",
+      "confirm_button": "discard changes"
+    },
+    "closeStepFormWithChanges": {
+      "title": "Unsaved changes to step",
+      "body": "You have unsaved changes in this step. If you navigate away without saving you will lose these changes.",
+      "confirm_button": "discard changes"
+    },
+    "deleteStepForm": {
+      "title": "Delete step",
+      "body": "Are you sure you want to delete this step?",
+      "confirm_button": "delete step"
+    },
+    "deleteMultipleStepForms": {
+      "title": "Delete multiple steps",
+      "body": "Are you sure you want to delete these steps?",
+      "confirm_button": "delete steps"
+    },
+    "deleteProfileCycle": {
+      "title": "Delete cycle",
+      "body": "This will delete the cycle and all profile steps inside.",
+      "confirm_button": "delete cycle"
+    }
+  },
+  "global_step_changes": {
+    "heading": "Are you sure you want to make this change?",
+    "switch_pipettes": {
+      "body": "Switching pipette or tip type may affect how steps appear in your protocol:",
+      "cause": {
+        "any": "Switching pipettes or tips of any type",
+        "multi_to_single": "Switching a Multi-channel pipette to a Single-channel pipette",
+        "single_to_multi": "Switching a Single-channel pipette to a Multi-channel pipette",
+        "next_pipette_smaller": "Switching to a pipette or tip of smaller volume"
+      },
+      "effect": {
+        "any": "Clears flow rate, mix, air gap, & disposal volume",
+        "multi_to_single": "Clears selected wells",
+        "single_to_multi": "Number of tips used may increase",
+        "next_pipette_smaller": "Number of tips used may increase"
+      }
+    }
+  },
+  "gate": {
+    "sign_up_below": "Sign Up For Opentrons Protocol Designer",
+    "failed_verification": "Something Went Wrong",
+    "sign_up_success": "Please confirm your email address to continue",
+    "check_email": "We've sent a confirmation URL to your email that will take you to the Protocol Designer. Keep an eye out for a follow up email which contains links to resources such as our help documents."
+  },
+  "experimental_feature_warning": {
+    "on": {
+      "title": "Switching on an experimental feature",
+      "body1": "Warning: At this time Opentrons does not provide support for protocols with experimental settings turned on.",
+      "body2": "We encourage you to report any bugs you find, however note that at this time we are unable to prioritize fixes as they are a result of experimental features. "
+    },
+    "off": {
+      "title": "Switching off an experimental feature",
+      "body1": "Warning: Any experimental features used in this protocol may cause inconsistent behavior in the Protocol Designer. For example, the Protocol Designer may no longer display all warnings or errors that exist when no experimental features have been used.",
+      "body2": "We encourage you to report any bugs you find, however note that at this time we are unable to prioritize fixes as they are a result of experimental features."
+    }
+  },
+  "auto_add_pause_until_temp_step": {
+    "title": "Pause protocol until temperature module is at {{temperature}}°C?",
+    "heater_shaker_title": "Pause protocol until Heater-Shaker module is at {{temperature}}°C?",
+    "body1": "Pause protocol now to wait until module reaches {{temperature}}°C before continuing on to the next step.",
+    "body2": "Build a pause later if you want your protocol to proceed to the next steps while the temperature module ramps up to {{temperature}}°C.",
+    "heater_shaker_pause_later": "Build a pause later if you want your protocol to proceed to the next steps while the Heater-Shaker module goes to {{temperature}}°C",
+    "now_button": "Pause protocol now",
+    "later_button": "I will build a pause later"
+  },
+  "step_notes": {
+    "title": "Step Notes"
+  },
+  "invalid": {
+    "header": "Invalid JSON file",
+    "body1": "This file is either missing information it needs to import properly or contains sections that the {{pd}} cannot read.",
+    "body2": "At this time we do not support JSON files created outside of the {{pd}}.",
+    "body3": "If this is a {{pd}} file that you have edited outside of this tool you may have introduced errors.",
+    "error": "Error message:"
+  },
+  "incorrect_file": {
+    "header": "Incorrect file type",
+    "body1": "Only JSON files created in the {{pd}} can be imported.",
+    "body2": "At this time Python protocol files are not supported."
+  },
+  "migrations": {
+    "header": "Your protocol was made in an older version of {{pd}}",
+    "noBehaviorChange": {
+      "body1": "Your protocol will be automatically updated to the latest version.",
+      "body2": "We have added new features since the last time this protocol was updated, but have not made any changes to existing protocol behavior. Because of this we do not expect any changes in how the robot will execute this protocol. To be safe we will still recommend keeping a separate copy of the file you just imported.",
+      "body3": "As always, please contact us with any questions or feedback."
+    },
+    "toV8_1Migration": {
+      "body1": "Your protocol will be automatically updated to the latest version.",
+      "body2": "The default dispense height is now 1 mm from the bottom of the well, instead of 0.5 mm. All dispense commands without a custom height will change to use the new default height.",
+      "body3": "Additionally, blowout actions now precede touch tip actions. The new order affects all dispenses that include both actions."
+    },
+    "toV8Migration": {
+      "body1": "Your protocol will be automatically updated to the latest version.",
+      "body2": "{{pd}} no longer supports aspirate or mix actions in a trash bin. If your protocol contains these actions, an error icon will appear next to them in the Protocol Timeline. To resolve the error, choose another location for aspirating or mixing.",
+      "body3": "Additionally, we have addressed a bug where blow out speeds were slower than expected. Your protocol will automatically update the flow rates unless they were specifically initialized.",
+      "body4": "As always, please contact us with any questions or feedback."
+    },
+    "generic": {
+      "body1": "Your protocol will be automatically updated to the latest version. Please note that the updated file will be incompatible with older versions of the {{pd}}. We recommend making a separate copy of the file that you just imported before continuing.",
+      "body2": "Updating the file may make changes to liquid handling actions. Please review your file in the {{pd}}",
+      "body3": "As always, please contact us with any questions or feedback."
+    },
+    "toV3Migration": {
+      "title": "Update protocol to use new labware definitions",
+      "button": "update protocol",
+      "body1": "<strong>To import your file successfully, you must update your protocol to use the new labware definitions. </strong>Your protocol was made using an older version of Protocol Designer. Since then, Protocol Designer has been improved to include new labware definitions which are more accurate and reliable.",
+      "body2": "What this means for you protocol",
+      "body3": "Updating your protocol to use the new labware definitions will consequently require you to re-calibrate all labware in your protocol prior to running it on your robot. We recommend you try a dry run or one with water to ensure everything is working as expected.",
+      "body4": "What happens if you don't update",
+      "body5": "If you choose not to update, you will still be able to run your protocol as usual with older labware, however you will not be able to make further updates to this protocol using the Protocol Designer.",
+      "body6": "Please note that in order to run the updated protocol on your robot successfully, the OT-2 App and robot are required to be updated to version 3.10.0 or higher."
+    }
+  }
+}

@@ -10,8 +10,14 @@ import type {
   LocationLiquidState,
   LabwareLiquidState,
 } from '@opentrons/step-generation'
+import type { LoadLabwareCreateCommand } from '@opentrons/shared-data'
 import type { Action, DeckSlot } from '../../types'
-import type { LiquidGroupsById, DisplayLabware } from '../types'
+import type {
+  LiquidGroupsById,
+  DisplayLabware,
+  ZoomedIntoSlotInfoState,
+  GenerateNewProtocolState,
+} from '../types'
 import type { LoadFileAction } from '../../load-file'
 import type {
   RemoveWellsContentsAction,
@@ -28,8 +34,13 @@ import type {
   CloseIngredientSelectorAction,
   DrillDownOnLabwareAction,
   DrillUpFromLabwareAction,
+  SelectLabwareAction,
+  SelectNestedLabwareAction,
+  SelectModuleAction,
+  SelectFixtureAction,
+  ZoomedIntoSlotAction,
+  GenerateNewProtocolAction,
 } from '../actions'
-import type { LoadLabwareCreateCommand } from '@opentrons/shared-data'
 // REDUCERS
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
 // (this state just toggles a modal)
@@ -344,7 +355,75 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
   },
   {}
 )
+
+const selectedSlotInfoInitialState: ZoomedIntoSlotInfoState = {
+  selectedLabwareDefUri: null,
+  selectedNestedLabwareDefUri: null,
+  selectedModuleModel: null,
+  selectedFixture: null,
+  selectedSlot: { slot: null, cutout: null },
+}
+
+export const zoomedInSlotInfo = (
+  state: ZoomedIntoSlotInfoState = selectedSlotInfoInitialState,
+  action:
+    | SelectLabwareAction
+    | SelectNestedLabwareAction
+    | SelectModuleAction
+    | SelectFixtureAction
+    | ZoomedIntoSlotAction
+): ZoomedIntoSlotInfoState => {
+  switch (action.type) {
+    case 'SELECT_LABWARE': {
+      const { labwareDefUri } = action.payload
+      return { ...state, selectedLabwareDefUri: labwareDefUri }
+    }
+    case 'SELECT_NESTED_LABWARE': {
+      const { nestedLabwareDefUri } = action.payload
+      return { ...state, selectedNestedLabwareDefUri: nestedLabwareDefUri }
+    }
+    case 'SELECT_MODULE': {
+      const { moduleModel } = action.payload
+      return { ...state, selectedModuleModel: moduleModel }
+    }
+    case 'SELECT_FIXTURE': {
+      const { fixture } = action.payload
+      return { ...state, selectedFixture: fixture }
+    }
+    case 'ZOOMED_INTO_SLOT': {
+      const { slot, cutout } = action.payload
+      return {
+        ...state,
+        selectedSlot: {
+          slot,
+          cutout,
+        },
+      }
+    }
+    default:
+      return state
+  }
+}
+
+const initialGenerateNewProtocolState: GenerateNewProtocolState = {
+  isNewProtocol: false,
+}
+
+export const generateNewProtocol = (
+  state: GenerateNewProtocolState = initialGenerateNewProtocolState,
+  action: GenerateNewProtocolAction
+): GenerateNewProtocolState => {
+  switch (action.type) {
+    case 'GENERATE_NEW_PROTOCOL': {
+      const { isNewProtocol } = action.payload
+      return { ...state, isNewProtocol }
+    }
+    default:
+      return state
+  }
+}
 export interface RootState {
+  zoomedInSlotInfo: ZoomedIntoSlotInfoState
   modeLabwareSelection: DeckSlot | false
   selectedContainerId: SelectedContainerId
   drillDownLabwareId: DrillDownLabwareId
@@ -353,9 +432,11 @@ export interface RootState {
   selectedLiquidGroup: SelectedLiquidGroupState
   ingredients: IngredientsState
   ingredLocations: LocationsState
+  generateNewProtocol: GenerateNewProtocolState
 }
 // TODO Ian 2018-01-15 factor into separate files
 export const rootReducer: Reducer<RootState, Action> = combineReducers({
+  zoomedInSlotInfo,
   modeLabwareSelection,
   selectedContainerId,
   selectedLiquidGroup,
@@ -364,4 +445,5 @@ export const rootReducer: Reducer<RootState, Action> = combineReducers({
   savedLabware,
   ingredients,
   ingredLocations,
+  generateNewProtocol,
 })

@@ -63,7 +63,7 @@
     "node-fetch": "2.6.7",
     "node-stream-zip": "1.8.2",
     "pump": "3.0.0",
-    "semver": "5.5.0",
+    "semver": "5.7.2",
     "serialport": "10.5.0",
     "tempy": "1.0.1",
     "usb": "^2.11.0",

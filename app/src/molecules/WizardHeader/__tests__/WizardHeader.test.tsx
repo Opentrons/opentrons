@@ -1,15 +1,15 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../i18n'
-import { getIsOnDevice } from '../../../redux/config'
-import { StepMeter } from '../../../atoms/StepMeter'
+import { i18n } from '/app/i18n'
+import { getIsOnDevice } from '/app/redux/config'
+import { StepMeter } from '/app/atoms/StepMeter'
 import { WizardHeader } from '..'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/app/__testing-utils__'
 
-vi.mock('../../../atoms/StepMeter')
-vi.mock('../../../redux/config')
+vi.mock('/app/atoms/StepMeter')
+vi.mock('/app/redux/config')
 
 const render = (props: React.ComponentProps<typeof WizardHeader>) => {
   return renderWithProviders(<WizardHeader {...props} />, {

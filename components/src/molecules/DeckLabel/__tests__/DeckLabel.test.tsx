@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, beforeEach, expect } from 'vitest'
 
@@ -27,12 +27,12 @@ describe('DeckLabel', () => {
     render(props)
     screen.getByText('mock DeckLabel text')
     const deckLabel = screen.getByTestId('DeckLabel_UnSelected')
-    expect(deckLabel).toHaveStyle(`padding: ${SPACING.spacing4}`)
+    expect(deckLabel).toHaveStyle(`padding: ${SPACING.spacing2}`)
     expect(deckLabel).toHaveStyle(`width: ${FLEX_MAX_CONTENT}`)
     expect(deckLabel).toHaveStyle(`color: ${COLORS.blue50}`)
-    expect(deckLabel).toHaveStyle(`border-right: 3px solid ${COLORS.blue50}`)
-    expect(deckLabel).toHaveStyle(`border-bottom: 3px solid ${COLORS.blue50}`)
-    expect(deckLabel).toHaveStyle(`border-left: 3px solid ${COLORS.blue50}`)
+    expect(deckLabel).toHaveStyle(`border-right: 1.5px solid ${COLORS.blue50}`)
+    expect(deckLabel).toHaveStyle(`border-bottom: 1.5px solid ${COLORS.blue50}`)
+    expect(deckLabel).toHaveStyle(`border-left: 1.5px solid ${COLORS.blue50}`)
     expect(deckLabel).toHaveStyle(`background-color: ${COLORS.white}`)
   })
 
@@ -44,14 +44,11 @@ describe('DeckLabel', () => {
     render(props)
     screen.getByText('mock DeckLabel text')
     const deckLabel = screen.getByTestId('DeckLabel_UnSelected')
-    expect(deckLabel).toHaveStyle(`padding: ${SPACING.spacing4}`)
+    expect(deckLabel).toHaveStyle(`padding: ${SPACING.spacing2}`)
     expect(deckLabel).toHaveStyle(`width: ${FLEX_MAX_CONTENT}`)
     expect(deckLabel).toHaveStyle(`color: ${COLORS.blue50}`)
-    expect(deckLabel).toHaveStyle(`border-right: 3px solid ${COLORS.blue50}`)
-    expect(deckLabel).not.toHaveStyle(
-      `border-bottom: 3px solid ${COLORS.blue50}`
-    )
-    expect(deckLabel).toHaveStyle(`border-left: 3px solid ${COLORS.blue50}`)
+    expect(deckLabel).toHaveStyle(`border-right: 1.5px solid ${COLORS.blue50}`)
+    expect(deckLabel).toHaveStyle(`border-left: 1.5px solid ${COLORS.blue50}`)
     expect(deckLabel).toHaveStyle(`background-color: ${COLORS.white}`)
   })
 
@@ -63,10 +60,10 @@ describe('DeckLabel', () => {
     render(props)
     screen.getByText('mock DeckLabel text')
     const deckLabel = screen.getByTestId('DeckLabel_Selected')
-    expect(deckLabel).toHaveStyle(`padding: ${SPACING.spacing4}`)
+    expect(deckLabel).toHaveStyle(`padding: ${SPACING.spacing2}`)
     expect(deckLabel).toHaveStyle(`width: ${FLEX_MAX_CONTENT}`)
     expect(deckLabel).toHaveStyle(`color: ${COLORS.white}`)
-    expect(deckLabel).toHaveStyle(`border: 3px solid ${COLORS.blue50}`)
+    expect(deckLabel).toHaveStyle(`border: 1.5px solid ${COLORS.blue50}`)
     expect(deckLabel).toHaveStyle(`background-color: ${COLORS.blue50}`)
   })
 })

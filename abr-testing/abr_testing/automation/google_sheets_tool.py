@@ -117,7 +117,7 @@ class google_sheet:
     def batch_update_cells(
         self,
         data: List[List[Any]],
-        start_column: str,
+        start_column_index: Any,
         start_row: int,
         sheet_id: str,
     ) -> None:
@@ -132,7 +132,8 @@ class google_sheet:
 
         requests = []
         user_entered_value: Dict[str, Any] = {}
-        start_column_index = column_letter_to_index(start_column) - 1
+        if type(start_column_index) == str:
+            start_column_index = column_letter_to_index(start_column_index) - 1
 
         for col_offset, col_values in enumerate(data):
             column_index = start_column_index + col_offset
@@ -223,9 +224,9 @@ class google_sheet:
             )
 
     def token_check(self) -> None:
-        """Check if still credentials are still logged in."""
+        """Check if credentials are still valid and refresh if expired."""
         if self.credentials.access_token_expired:
-            self.gc.login()
+            self.gc.login()  # Refresh the credentials
 
     def get_row_index_with_value(self, some_string: str, col_num: int) -> Any:
         """Find row index of string by looking in specific column."""

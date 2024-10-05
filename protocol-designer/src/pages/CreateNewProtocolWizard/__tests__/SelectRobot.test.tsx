@@ -1,9 +1,9 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../localization'
+import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { SelectRobot } from '../SelectRobot'
 import type { WizardFormState, WizardTileProps } from '../types'
@@ -45,10 +45,7 @@ describe('SelectRobot', () => {
     render(props)
     screen.getByText('Step 1')
     screen.getByText('Let’s start with the basics')
-    screen.getByText(
-      'We’re going to ask a few questions to help you get started building your protocol.'
-    )
-    screen.getByText('Which robot would you like to use?')
+    screen.getByText('What kind of robot do you have?')
     fireEvent.click(screen.getByRole('label', { name: 'Opentrons Flex' }))
     expect(props.setValue).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('label', { name: 'Opentrons OT-2' }))
