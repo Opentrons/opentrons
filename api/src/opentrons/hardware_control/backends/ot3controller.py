@@ -702,9 +702,10 @@ class OT3Controller(FlexBackend):
         if not pipette_axes:
             return None
 
-        speed_settings = self._configuration.motion_settings.max_speed_discontinuity[
-            gantry_load
-        ]
+        # FIXME: make this configurable as being different from discontinuity
+        speed_settings = {
+            OT3AxisKind.P: 10 if gantry_load == GantryLoad.LOW_THROUGHPUT else 5,
+        }
         move_groups: List[MoveGroup] = self._build_axes_home_groups(
             pipette_axes, speed_settings
         )
