@@ -646,6 +646,15 @@ class OT3Controller(FlexBackend):
         Returns:
             None
         """
+        possible_q_axis_origin = origin.pop(Axis.Q, None)
+        possible_q_axis_target = target.pop(Axis.Q, None)
+        tip_motor_move_group = []
+
+        if possible_q_axis_origin and possible_q_axis_target:
+            tip_motor_move_group = self._build_tip_action_group(
+                possible_q_axis_origin, [(possible_q_axis_origin, speed)]
+            )
+
         move_target = MoveTarget.build(position=target, max_speed=speed)
         try:
             _, movelist = self._move_manager.plan_motion(
@@ -669,7 +678,7 @@ class OT3Controller(FlexBackend):
         )
         move_group, _ = group
         runner = MoveGroupRunner(
-            move_groups=[move_group],
+            move_groups=[move_group, tip_motor_move_group],
             ignore_stalls=True
             if not self._feature_flags.stall_detection_enabled
             else False,
@@ -838,17 +847,31 @@ class OT3Controller(FlexBackend):
             self._gear_motor_position = {}
             raise e
 
-    async def tip_action(
-        self, origin: Dict[Axis, float], targets: List[Tuple[Dict[Axis, float], float]]
-    ) -> None:
+    def _build_tip_action_group(
+        self, origin: float, targets: List[Tuple[float, float]]
+    ) -> MoveGroup:
+        if origin > targets[0][0]:
+            # If the origin is larger than the first target move, assume it's a 'home' move.
+            pipette_action_type = "home"
+        else:
+            pipette_action_type = "clamp"
         move_targets = [
-            MoveTarget.build(target_pos, speed) for target_pos, speed in targets
+            MoveTarget.build({Axis.Q: target_pos}, speed)
+            for target_pos, speed in targets
         ]
         _, moves = self._move_manager.plan_motion(
-            origin=origin, target_list=move_targets
+            origin={Axis.Q: origin}, target_list=move_targets
         )
-        move_group = create_tip_action_group(moves[0], [NodeId.pipette_left], "clamp")
 
+        return create_tip_action_group(
+            moves[0], [NodeId.pipette_left], pipette_action_type
+        )
+
+    async def tip_action(
+        self, origin: float, targets: List[Tuple[float, float]]
+    ) -> None:
+
+        move_group = self._build_tip_action_group(origin, targets)
         runner = MoveGroupRunner(
             move_groups=[move_group],
             ignore_stalls=True

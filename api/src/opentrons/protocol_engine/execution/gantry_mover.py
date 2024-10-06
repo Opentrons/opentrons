@@ -2,10 +2,14 @@
 from typing import Optional, List, Dict
 from typing_extensions import Protocol as TypingProtocol
 
-from opentrons.types import Point, Mount
+from opentrons.types import Point, Mount, MountType
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import Axis as HardwareAxis
+from opentrons.hardware_control.types import Axis as HardwareAxis, CriticalPoint
+from opentrons.hardware_control.motion_utilities import (
+    target_axis_map_from_relative,
+    target_axis_map_from_absolute,
+)
 from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
 from opentrons.motion_planning import Waypoint
@@ -24,6 +28,29 @@ _MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
     MotorAxis.RIGHT_PLUNGER: HardwareAxis.C,
     MotorAxis.EXTENSION_Z: HardwareAxis.Z_G,
     MotorAxis.EXTENSION_JAW: HardwareAxis.G,
+    MotorAxis.CLAMP_JAW_96_CHANNEL: HardwareAxis.Q,
+}
+
+_MOTOR_AXIS_TO_HARDWARE_MOUNT: Dict[MotorAxis, Mount] = {
+    MotorAxis.LEFT_Z: Mount.LEFT,
+    MotorAxis.RIGHT_Z: Mount.RIGHT,
+    MotorAxis.EXTENSION_Z: Mount.EXTENSION,
+}
+
+_HARDWARE_AXIS_TO_MOTOR_AXIS: Dict[HardwareAxis, MotorAxis] = {
+    HardwareAxis.X: MotorAxis.X,
+    HardwareAxis.Y: MotorAxis.Y,
+    HardwareAxis.Z: MotorAxis.LEFT_Z,
+    HardwareAxis.A: MotorAxis.RIGHT_Z,
+    HardwareAxis.B: MotorAxis.LEFT_PLUNGER,
+    HardwareAxis.C: MotorAxis.RIGHT_PLUNGER,
+    HardwareAxis.P_L: MotorAxis.LEFT_PLUNGER,
+    HardwareAxis.P_R: MotorAxis.RIGHT_PLUNGER,
+    HardwareAxis.Z_L: MotorAxis.LEFT_Z,
+    HardwareAxis.Z_R: MotorAxis.RIGHT_Z,
+    HardwareAxis.Z_G: MotorAxis.EXTENSION_Z,
+    HardwareAxis.G: MotorAxis.EXTENSION_JAW,
+    HardwareAxis.Q: MotorAxis.CLAMP_JAW_96_CHANNEL,
 }
 
 # The height of the bottom of the pipette nozzle at home position without any tips.
@@ -50,14 +77,42 @@ class GantryMover(TypingProtocol):
         """Get the current position of the gantry."""
         ...
 
+    async def get_position_from_mount(
+        self,
+        mount: Mount,
+        critical_point: Optional[CriticalPoint] = None,
+        fail_on_not_homed: bool = False,
+    ) -> Point:
+        """Get the current position of the gantry based on the given mount."""
+        ...
+
     def get_max_travel_z(self, pipette_id: str) -> float:
         """Get the maximum allowed z-height for pipette movement."""
+        ...
+
+    def get_max_travel_z_from_mount(self, mount: MountType) -> float:
+        """Get the maximum allowed z-height for mount movement."""
+        ...
+
+    async def move_axes(
+        self,
+        axis_map: Dict[MotorAxis, float],
+        critical_point: Optional[Dict[MotorAxis, float]] = None,
+        speed: Optional[float] = None,
+    ) -> Dict[MotorAxis, float]:
+        """Move a set of axes a given distance."""
         ...
 
     async def move_to(
         self, pipette_id: str, waypoints: List[Waypoint], speed: Optional[float]
     ) -> Point:
         """Move the hardware gantry to a waypoint."""
+        ...
+
+    async def move_mount_to(
+        self, mount: Mount, waypoints: List[Waypoint], speed: Optional[float]
+    ) -> Point:
+        """Move the provided hardware mount to a waypoint."""
         ...
 
     async def move_relative(
@@ -85,6 +140,10 @@ class GantryMover(TypingProtocol):
         """Transform an engine motor axis into a hardware axis."""
         ...
 
+    def pick_mount_from_axis_map(self, axis_map: Dict[MotorAxis, float]) -> Mount:
+        """Find a mount axis in the axis_map if it exists otherwise default to left mount."""
+        ...
+
 
 class HardwareGantryMover(GantryMover):
     """Hardware API based gantry movement handler."""
@@ -96,6 +155,51 @@ class HardwareGantryMover(GantryMover):
     def motor_axis_to_hardware_axis(self, motor_axis: MotorAxis) -> HardwareAxis:
         """Transform an engine motor axis into a hardware axis."""
         return _MOTOR_AXIS_TO_HARDWARE_AXIS[motor_axis]
+
+    def _hardware_axis_to_motor_axis(self, motor_axis: HardwareAxis) -> MotorAxis:
+        """Transform an hardware axis into a engine motor axis."""
+        return _HARDWARE_AXIS_TO_MOTOR_AXIS[motor_axis]
+
+    def _convert_axis_map_for_hw(
+        self, axis_map: Dict[MotorAxis, float]
+    ) -> Dict[HardwareAxis, float]:
+        """Transform an engine motor axis map to a hardware axis map."""
+        return {_MOTOR_AXIS_TO_HARDWARE_AXIS[ax]: dist for ax, dist in axis_map.items()}
+
+    def _offset_axis_map_for_mount(self, mount: Mount) -> Dict[HardwareAxis, float]:
+        """Determine the offset for the given hardware mount"""
+        if (
+            self._state_view.config.robot_type == "OT-2 Standard"
+            and mount == Mount.RIGHT
+        ):
+            return {HardwareAxis.X: 0.0, HardwareAxis.Y: 0.0, HardwareAxis.A: 0.0}
+        elif (
+            self._state_view.config.robot_type == "OT-3 Standard"
+            and mount == Mount.EXTENSION
+        ):
+            offset = self._hardware_api.config.gripper_mount_offset  # type: ignore [union-attr]
+            return {
+                HardwareAxis.X: offset[0],
+                HardwareAxis.Y: offset[1],
+                HardwareAxis.Z_G: offset[2],
+            }
+        else:
+            offset = self._hardware_api.config.left_mount_offset
+            return {
+                HardwareAxis.X: offset[0],
+                HardwareAxis.Y: offset[1],
+                HardwareAxis.Z: offset[2],
+            }
+
+    def pick_mount_from_axis_map(self, axis_map: Dict[MotorAxis, float]) -> Mount:
+        """Find a mount axis in the axis_map if it exists otherwise default to left mount."""
+        found_mount = Mount.LEFT
+        mounts = list(_MOTOR_AXIS_TO_HARDWARE_MOUNT.keys())
+        for k in axis_map.keys():
+            if k in mounts:
+                found_mount = _MOTOR_AXIS_TO_HARDWARE_MOUNT[k]
+                break
+        return found_mount
 
     async def get_position(
         self,
@@ -114,12 +218,26 @@ class HardwareGantryMover(GantryMover):
             pipette_id=pipette_id,
             current_location=current_well,
         )
+        point = await self.get_position_from_mount(
+            mount=pipette_location.mount.to_hw_mount(),
+            critical_point=pipette_location.critical_point,
+            fail_on_not_homed=fail_on_not_homed,
+        )
+        return point
+
+    async def get_position_from_mount(
+        self,
+        mount: Mount,
+        critical_point: Optional[CriticalPoint] = None,
+        fail_on_not_homed: bool = False,
+    ) -> Point:
         try:
-            return await self._hardware_api.gantry_position(
-                mount=pipette_location.mount.to_hw_mount(),
-                critical_point=pipette_location.critical_point,
+            point = await self._hardware_api.gantry_position(
+                mount=mount,
+                critical_point=critical_point,
                 fail_on_not_homed=fail_on_not_homed,
             )
+            return point
         except PositionUnknownError as e:
             raise MustHomeError(message=str(e), wrapping=[e])
 
@@ -129,8 +247,16 @@ class HardwareGantryMover(GantryMover):
         Args:
             pipette_id: Pipette ID to get max travel z-height for.
         """
-        hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
-        return self._hardware_api.get_instrument_max_height(mount=hw_mount)
+        mount = self._state_view.pipettes.get_mount(pipette_id)
+        return self.get_max_travel_z_from_mount(mount=mount)
+
+    def get_max_travel_z_from_mount(self, mount: MountType) -> float:
+        """Get the maximum allowed z-height for any mount movement.
+
+        Args:
+            mount: Mount to get max travel z-height for.
+        """
+        return self._hardware_api.get_instrument_max_height(mount=mount.to_hw_mount())
 
     async def move_to(
         self, pipette_id: str, waypoints: List[Waypoint], speed: Optional[float]
@@ -149,6 +275,67 @@ class HardwareGantryMover(GantryMover):
             )
 
         return waypoints[-1].position
+
+    async def move_mount_to(
+        self, mount: Mount, waypoints: List[Waypoint], speed: Optional[float]
+    ) -> Point:
+        """Move the given hardware mount to a waypoint."""
+        assert len(waypoints) > 0, "Must have at least one waypoint"
+
+        for waypoint in waypoints:
+            await self._hardware_api.move_to(
+                mount=mount,
+                abs_position=waypoint.position,
+                critical_point=waypoint.critical_point,
+                speed=speed,
+            )
+
+        return waypoints[-1].position
+
+    async def move_axes(
+        self,
+        axis_map: Dict[MotorAxis, float],
+        critical_point: Optional[Dict[MotorAxis, float]] = None,
+        speed: Optional[float] = None,
+    ) -> Dict[MotorAxis, float]:
+        """Move a set of axes a given distance.
+
+        Args:
+            axis_map: The mapping of axes to command.
+            relative_move: Specifying whether a relative move needs to be handled or not.
+            speed: Optional speed parameter for the move.
+        """
+        try:
+            abs_pos_hw = self._convert_axis_map_for_hw(axis_map)
+            mount = self.pick_mount_from_axis_map(axis_map)
+            if not critical_point:
+                current_position = await self._hardware_api.current_position(
+                    mount, refresh=True
+                )
+                absolute_pos = target_axis_map_from_relative(
+                    abs_pos_hw, current_position
+                )
+            else:
+                mount_offset = self._offset_axis_map_for_mount(mount)
+                abs_cp_hw = self._convert_axis_map_for_hw(critical_point)
+                absolute_pos = target_axis_map_from_absolute(
+                    abs_pos_hw, abs_cp_hw, mount_offset
+                )
+            await self._hardware_api.move_axes(
+                position=absolute_pos,
+                speed=speed,
+            )
+
+        except PositionUnknownError as e:
+            raise MustHomeError(message=str(e), wrapping=[e])
+
+        current_position = await self._hardware_api.current_position(
+            mount, refresh=True
+        )
+        return {
+            self._hardware_axis_to_motor_axis(ax): pos
+            for ax, pos in current_position.items()
+        }
 
     async def move_relative(
         self,
@@ -239,6 +426,16 @@ class VirtualGantryMover(GantryMover):
         """Transform an engine motor axis into a hardware axis."""
         return _MOTOR_AXIS_TO_HARDWARE_AXIS[motor_axis]
 
+    def pick_mount_from_axis_map(self, axis_map: Dict[MotorAxis, float]) -> Mount:
+        """Find a mount axis in the axis_map if it exists otherwise default to left mount."""
+        found_mount = Mount.LEFT
+        mounts = list(_MOTOR_AXIS_TO_HARDWARE_MOUNT.keys())
+        for k in axis_map.keys():
+            if k in mounts:
+                found_mount = _MOTOR_AXIS_TO_HARDWARE_MOUNT[k]
+                break
+        return found_mount
+
     async def get_position(
         self,
         pipette_id: str,
@@ -261,6 +458,24 @@ class VirtualGantryMover(GantryMover):
             origin = Point(x=0, y=0, z=0)
         return origin
 
+    async def get_position_from_mount(
+        self,
+        mount: Mount,
+        critical_point: Optional[CriticalPoint] = None,
+        fail_on_not_homed: bool = False,
+    ) -> Point:
+        pipette = self._state_view.pipettes.get_by_mount(MountType[mount.name])
+        origin_deck_point = (
+            self._state_view.pipettes.get_deck_point(pipette.id) if pipette else None
+        )
+        if origin_deck_point is not None:
+            origin = Point(
+                x=origin_deck_point.x, y=origin_deck_point.y, z=origin_deck_point.z
+            )
+        else:
+            origin = Point(x=0, y=0, z=0)
+        return origin
+
     def get_max_travel_z(self, pipette_id: str) -> float:
         """Get the maximum allowed z-height for pipette movement.
 
@@ -275,6 +490,56 @@ class VirtualGantryMover(GantryMover):
             instrument_height = VIRTUAL_MAX_OT3_HEIGHT
         tip_length = self._state_view.tips.get_tip_length(pipette_id)
         return instrument_height - tip_length
+
+    def get_max_travel_z_from_mount(self, mount: MountType) -> float:
+        """Get the maximum allowed z-height for mount."""
+        pipette = self._state_view.pipettes.get_by_mount(mount)
+        if self._state_view.config.robot_type == "OT-2 Standard":
+            instrument_height = (
+                self._state_view.pipettes.get_instrument_max_height_ot2(pipette.id)
+                if pipette
+                else VIRTUAL_MAX_OT3_HEIGHT
+            )
+        else:
+            instrument_height = VIRTUAL_MAX_OT3_HEIGHT
+        tip_length = (
+            self._state_view.tips.get_tip_length(pipette.id) if pipette else 0.0
+        )
+
+        return instrument_height - tip_length
+
+    async def move_axes(
+        self,
+        axis_map: Dict[MotorAxis, float],
+        critical_point: Optional[Dict[MotorAxis, float]] = None,
+        speed: Optional[float] = None,
+    ) -> Dict[MotorAxis, float]:
+        """Move the give axes map. No-op in virtual implementation."""
+        mount = self.pick_mount_from_axis_map(axis_map)
+        current_position = await self.get_position_from_mount(mount)
+        axis_map[MotorAxis.X] = axis_map.get(MotorAxis.X, 0.0) + current_position[0]
+        axis_map[MotorAxis.Y] = axis_map.get(MotorAxis.Y, 0.0) + current_position[1]
+        if mount == Mount.RIGHT:
+            axis_map[MotorAxis.RIGHT_Z] = (
+                axis_map.get(MotorAxis.RIGHT_Z, 0.0) + current_position[2]
+            )
+        elif mount == Mount.EXTENSION:
+            axis_map[MotorAxis.EXTENSION_Z] = (
+                axis_map.get(MotorAxis.EXTENSION_Z, 0.0) + current_position[2]
+            )
+        else:
+            axis_map[MotorAxis.LEFT_Z] = (
+                axis_map.get(MotorAxis.LEFT_Z, 0.0) + current_position[2]
+            )
+        critical_point = critical_point or {}
+        return {ax: pos - critical_point.get(ax, 0.0) for ax, pos in axis_map.items()}
+
+    async def move_mount_to(
+        self, mount: Mount, waypoints: List[Waypoint], speed: Optional[float]
+    ) -> Point:
+        """Move the hardware mount to a waypoint. No-op in virtual implementation."""
+        assert len(waypoints) > 0, "Must have at least one waypoint"
+        return waypoints[-1].position
 
     async def move_to(
         self, pipette_id: str, waypoints: List[Waypoint], speed: Optional[float]

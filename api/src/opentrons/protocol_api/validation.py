@@ -21,7 +21,15 @@ from opentrons_shared_data.robot.types import RobotType
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import Mount, DeckSlotName, StagingSlotName, Location
+from opentrons.types import (
+    Mount,
+    DeckSlotName,
+    StagingSlotName,
+    Location,
+    AxisType,
+    AxisMapType,
+    StringAxisMap,
+)
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     MagneticModuleModel,
@@ -74,6 +82,14 @@ class InvalidPipetteMountError(ValueError):
 
 class PipetteMountTypeError(TypeError):
     """An error raised when an invalid mount type is used for loading pipettes."""
+
+
+class InstrumentMountTypeError(TypeError):
+    """An error raised when an invalid mount type is used for any available instruments."""
+
+
+class IncorrectAxisError(TypeError):
+    """An error raised when an invalid axis key is provided in an axis map."""
 
 
 class LabwareDefinitionIsNotAdapterError(ValueError):
@@ -147,6 +163,25 @@ def _ensure_mount(mount: Union[str, Mount]) -> Mount:
     )
 
 
+def ensure_instrument_mount(mount: Union[str, Mount]) -> Mount:
+    """Ensure that an input value represents a valid Mount for all instruments."""
+    if isinstance(mount, Mount):
+        return mount
+
+    if isinstance(mount, str):
+        if mount == "gripper":
+            # TODO (lc 08-02-2024) We should decide on the user facing name for
+            # the gripper mount axis.
+            mount = "extension"
+        try:
+            return Mount[mount.upper()]
+        except KeyError as e:
+            raise InstrumentMountTypeError(
+                "If mount is specified as a string, it must be 'left', 'right', 'gripper', or 'extension';"
+                f" instead, {mount} was given."
+            ) from e
+
+
 def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
     """Ensure that an input value represents a valid pipette name."""
     pipette_name = ensure_lowercase_name(pipette_name)
@@ -157,6 +192,66 @@ def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
         raise ValueError(
             f"Cannot resolve {pipette_name} to pipette, must be given valid pipette name."
         ) from None
+
+
+def ensure_axis_map_type(
+    axis_map: Union[AxisMapType, StringAxisMap],
+    robot_type: RobotType,
+    is_96_channel: bool = False,
+) -> AxisMapType:
+    """Ensure that the axis map provided is in the correct shape and contains the correct keys."""
+    axis_map_keys = list(axis_map.keys())
+    key_type = set(type(k) for k in axis_map_keys)
+
+    if len(key_type) > 1:
+        raise IncorrectAxisError(
+            "Please provide an `axis_map` with only string or only AxisType keys."
+        )
+    if robot_type == "OT-2 Standard" and isinstance(axis_map_keys[0], AxisType):
+        if any(k not in AxisType.ot2_axes() for k in axis_map_keys):
+            raise IncorrectAxisError(
+                f"An OT-2 Robot only accepts the following axes {AxisType.ot2_axes()}"
+            )
+    if robot_type == "OT-2 Standard" and isinstance(axis_map_keys[0], str):
+        if any(k.upper() not in [axis.value for axis in AxisType.ot2_axes()] for k in axis_map_keys):  # type: ignore [attr-defined]
+            raise IncorrectAxisError(
+                f"An OT-2 Robot only accepts the following axes {AxisType.ot2_axes()}"
+            )
+    if is_96_channel and any(
+        key_variation in axis_map_keys for key_variation in ["Z_R", "z_r", AxisType.Z_R]
+    ):
+        raise IncorrectAxisError(
+            "A 96 channel is attached. You cannot move the `Z_R` mount."
+        )
+    if not is_96_channel and any(
+        key_variation in axis_map_keys for key_variation in ["Q", "q", AxisType.Q]
+    ):
+        raise IncorrectAxisError(
+            "A 96 channel is not attached. The clamp `Q` motor does not exist."
+        )
+
+    if all(isinstance(k, AxisType) for k in axis_map_keys):
+        return_map: AxisMapType = axis_map  # type: ignore
+        return return_map
+    try:
+        return {AxisType[k.upper()]: v for k, v in axis_map.items()}  # type: ignore [union-attr]
+    except KeyError as e:
+        raise IncorrectAxisError(f"{e} is not a supported `AxisMapType`")
+
+
+def ensure_only_gantry_axis_map_type(
+    axis_map: AxisMapType, robot_type: RobotType
+) -> None:
+    if robot_type == "OT-2 Standard":
+        if any(k not in AxisType.ot2_gantry_axes() for k in axis_map.keys()):
+            raise IncorrectAxisError(
+                f"A critical point only accepts OT-2 gantry axes which are {AxisType.ot2_gantry_axes()}"
+            )
+    else:
+        if any(k not in AxisType.ot3_gantry_axes() for k in axis_map.keys()):
+            raise IncorrectAxisError(
+                f"A critical point only accepts Flex gantry axes which are {AxisType.ot3_gantry_axes()}"
+            )
 
 
 # TODO(jbl 11-17-2023) this function's original purpose was ensure a valid deck slot for a given robot type

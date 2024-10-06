@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from typing import Generic, List, Optional, Union, Tuple, Dict, TYPE_CHECKING
+from typing import Generic, Type, List, Optional, Union, Tuple, Dict, TYPE_CHECKING
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
 from opentrons_shared_data.pipette.types import PipetteNameType
@@ -18,6 +18,7 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
+from .robot import AbstractRobot
 from .._liquid import Liquid
 from .._types import OffDeckType
 from ..disposal_locations import TrashBin, WasteChute
@@ -253,3 +254,7 @@ class AbstractProtocol(
         self, labware_core: LabwareCoreType
     ) -> Union[str, LabwareCoreType, ModuleCoreType, OffDeckType]:
         """Get labware parent location."""
+
+    @abstractmethod
+    def load_robot(self) -> AbstractRobot:
+        """Load a Robot Core context into a protocol"""
