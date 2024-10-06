@@ -283,31 +283,33 @@ def _pipette_with_liquid_settings(  # noqa: C901
     pipette.flow_rate.aspirate = liquid_class.aspirate.flow_rate
     pipette.flow_rate.dispense = liquid_class.dispense.flow_rate
     pipette.flow_rate.blow_out = liquid_class.dispense.flow_rate
+
+    # FIXME: hack to enable "break-off" deceleration during dispense
     default_flow_accel = float(hw_pipette.flow_acceleration)
-    if aspirate:
-        hw_pipette.flow_acceleration = liquid_class.aspirate.flow_acceleration
-    else:
-        hw_pipette.flow_acceleration = liquid_class.dispense.flow_acceleration
-    pipette.move_to(well.bottom(approach_mm).move(channel_offset))
-    _aspirate_on_approach() if aspirate or mix else _dispense_on_approach()
+    if dispense and liquid_class.dispense.break_off:
+        hw_pipette.flow_acceleration = liquid_class.dispense.break_off
+    try:
+        pipette.move_to(well.bottom(approach_mm).move(channel_offset))
+        _aspirate_on_approach() if aspirate or mix else _dispense_on_approach()
 
-    if mix:
-        # PHASE 2A: MIXING
-        _aspirate_on_mix()
-    else:
-        # PHASE 2B: ASPIRATE or DISPENSE
-        callbacks.on_submerging()
-        _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
-        _aspirate_on_submerge() if aspirate else _dispense_on_submerge()
+        if mix:
+            # PHASE 2A: MIXING
+            _aspirate_on_mix()
+        else:
+            # PHASE 2B: ASPIRATE or DISPENSE
+            callbacks.on_submerging()
+            _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
+            _aspirate_on_submerge() if aspirate else _dispense_on_submerge()
 
-        # PHASE 3: RETRACT
-        callbacks.on_retracting()
-        _retract(ctx, pipette, well, channel_offset, retract_mm, retract_speed)
-        _aspirate_on_retract() if aspirate else _dispense_on_retract()
+            # PHASE 3: RETRACT
+            callbacks.on_retracting()
+            _retract(ctx, pipette, well, channel_offset, retract_mm, retract_speed)
+            _aspirate_on_retract() if aspirate else _dispense_on_retract()
 
-    # EXIT
-    callbacks.on_exiting()
-    hw_pipette.flow_acceleration = default_flow_accel  # back to default, just in-case
+        # EXIT
+        callbacks.on_exiting()
+    finally:
+        hw_pipette.flow_acceleration = default_flow_accel
 
 
 def mix_with_liquid_class(
