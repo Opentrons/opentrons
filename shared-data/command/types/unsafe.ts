@@ -6,12 +6,14 @@ export type UnsafeRunTimeCommand =
   | UnsafeDropTipInPlaceRunTimeCommand
   | UnsafeUpdatePositionEstimatorsRunTimeCommand
   | UnsafeEngageAxesRunTimeCommand
+  | UnsafeUngripLabwareRunTimeCommand
 
 export type UnsafeCreateCommand =
   | UnsafeBlowoutInPlaceCreateCommand
   | UnsafeDropTipInPlaceCreateCommand
   | UnsafeUpdatePositionEstimatorsCreateCommand
   | UnsafeEngageAxesCreateCommand
+  | UnsafeUngripLabwareCreateCommand
 
 export interface UnsafeBlowoutInPlaceParams {
   pipetteId: string
@@ -70,5 +72,18 @@ export interface UnsafeEngageAxesCreateCommand extends CommonCommandCreateInfo {
 export interface UnsafeEngageAxesRunTimeCommand
   extends CommonCommandRunTimeInfo,
     UnsafeEngageAxesCreateCommand {
+  result?: any
+}
+
+export interface UnsafeUngripLabwareParams {
+}
+
+export interface UnsafeUngripLabwareCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'unsafe/ungripLabware'
+  params: UnsafeUngripLabwareParams
+}
+export interface UnsafeUngripLabwareRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+  UnsafeUngripLabwareCreateCommand {
   result?: any
 }

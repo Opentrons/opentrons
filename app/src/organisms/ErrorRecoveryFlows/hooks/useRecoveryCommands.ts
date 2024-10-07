@@ -216,7 +216,9 @@ export function useRecoveryCommands({
   ])
 
   const releaseGripperJaws = useCallback((): Promise<void> => {
-    console.log('PLACEHOLDER RELEASE THE JAWS')
+    const ungripLabware = useCallback((): Promise<CommandData[]> => {
+      return chainRunRecoveryCommands([RELEASE_GRIPPER_JAW])
+    }, [chainRunRecoveryCommands])    
     return Promise.resolve()
   }, [])
 
@@ -235,6 +237,12 @@ export function useRecoveryCommands({
 export const HOME_PIPETTE_Z_AXES: CreateCommand = {
   commandType: 'home',
   params: { axes: ['leftZ', 'rightZ'] },
+  intent: 'fixit',
+}
+
+export const RELEASE_GRIPPER_JAW: CreateCommand = {
+  commandType: 'unsafe/ungripLabware',
+  params: {},
   intent: 'fixit',
 }
 
