@@ -162,25 +162,52 @@ export type LabwareWell = LabwareWellProperties & {
 export interface SphericalSegment {
   shape: 'spherical'
   radiusOfCurvature: number
-  depth: number
-}
-
-export interface CircularBoundedSection {
-  shape: 'circular'
-  diameter: number
   topHeight: number
+  bottomHeight: number
 }
 
-export interface RectangularBoundedSection {
-  shape: 'rectangular'
-  xDimension: number
-  yDimension: number
+export interface ConicalFrustum {
+  shape: 'conical'
+  bottomDiameter: number
+  topDiameter: number
   topHeight: number
+  bottomHeight: number
 }
 
-export interface InnerWellGeometry {
-  frusta: CircularBoundedSection[] | RectangularBoundedSection[]
-  bottomShape?: SphericalSegment | null
+export interface CuboidalFrustum {
+  shape: 'cuboidal'
+  bottomXDimension: number
+  bottomYDimension: number
+  topXDimension: number
+  topYDimension: number
+  topHeight: number
+  bottomHeight: number
+}
+
+export interface SquaredConeSegment {
+  shape: 'squaredcone'
+  bottomCrossSection: string
+  circleDiameter: number
+  rectangleXDimension: number
+  rectangleYDimension: number
+  topHeight: number
+  bottomHeight: number
+}
+
+export interface RoundedCuboidSegment {
+  shape: 'roundedcuboid'
+  bottomCrossSection: string
+  circleDiameter: number
+  rectangleXDimension: number
+  rectangleYDimension: number
+  topHeight: number
+  bottomHeight: number
+}
+
+export type WellSegment =  CuboidalFrustum | ConicalFrustum | SquaredConeSegment | SphericalSegment | RoundedCuboidSegment
+
+export type InnerWellGeometry  = {
+  sections: WellSegment[]
 }
 
 // TODO(mc, 2019-03-21): exact object is tough to use with the initial value in

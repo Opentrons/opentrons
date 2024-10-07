@@ -205,7 +205,7 @@
       "properties": {
         "shape": {
           "type": "string",
-          "enum": ["roundedpyramid"]
+          "enum": ["roundedcuboid"]
         },
         "bottomCrossSection": {
           "type": "string",
