@@ -258,13 +258,23 @@ async def _get_attached_instruments_ot2(
     description=(
         "Get a list of all instruments (pipettes & gripper) currently attached"
         " to the robot."
+        "\n\n"
+        "**Warning:** The behavior of this endpoint is currently only defined for Flex"
+        " robots. For OT-2 robots, use `/pipettes` instead."
     ),
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[AttachedItem]}},
 )
 async def get_attached_instruments(
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> PydanticResponse[SimpleMultiBody[AttachedItem]]:
-    """Get a list of all attached instruments."""
+    """Get a list of all attached instruments.
+
+    Note: This endpoint returns the full AttachedItem data for Flex instruments only.
+
+          On an OT-2, this endpoint will provide partial data of the OT-2 pipettes
+          (no pipette fw and calibration data), and will not fetch new data after
+          a pipette attachment/ removal.
+    """
     try:
         ot3_hardware = ensure_ot3_hardware(hardware_api=hardware)
         return await _get_attached_instruments_ot3(ot3_hardware)
