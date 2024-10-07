@@ -3,7 +3,7 @@ import { when } from 'vitest-when'
 import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 import * as http from '../../http'
 import { registerRobotSystemUpdate } from '../handler'
-import { FLEX_MANIFEST_URL } from '../latest-update'
+import { FLEX_MANIFEST_URL } from '../constants'
 import * as Cfg from '../../config'
 
 import type { Dispatch } from '../../types'
@@ -38,11 +38,10 @@ describe('update', () => {
             .calledWith(FLEX_MANIFEST_URL)
             .thenResolve({ production: { '5.0.0': {}, '6.0.0': {} } })
         const handleAction = registerRobotSystemUpdate(dispatch)
+        handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
         expect(vi.mocked(http.fetchJson)).toHaveBeenCalledWith(
             FLEX_MANIFEST_URL
         )
-        handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
-
         expect(vi.mocked(Cfg.getConfig)).toHaveBeenCalledWith('update')
 
         expect(vi.mocked(http.fetchJson)).toHaveBeenCalledWith(

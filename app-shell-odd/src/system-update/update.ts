@@ -1,18 +1,6 @@
 import { postFile } from '../http'
-import type {
-  RobotModel,
-  ViewableRobot,
-} from '@opentrons/app/src/redux/discovery/types'
-
-const OT2_FILENAME = 'ot2-system.zip'
-const SYSTEM_FILENAME = 'system-update.zip'
-
-const getSystemFileName = (robotModel: RobotModel): string => {
-  if (robotModel === 'OT-2 Standard' || robotModel === null) {
-    return OT2_FILENAME
-  }
-  return SYSTEM_FILENAME
-}
+import type { ViewableRobot } from '@opentrons/app/src/redux/discovery/types'
+import { SYSTEM_FILENAME } from './constants'
 
 export function uploadSystemFile(
   robot: ViewableRobot,
@@ -21,5 +9,5 @@ export function uploadSystemFile(
 ): Promise<unknown> {
   const url = `http://${robot.ip}:${robot.port}${urlPath}`
 
-  return postFile(url, getSystemFileName(robot.robotModel), file)
+  return postFile(url, SYSTEM_FILENAME, file)
 }

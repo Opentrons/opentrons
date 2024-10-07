@@ -6,17 +6,11 @@ import {
   getCachedReleaseManifest,
   getReleaseSet,
 } from './release-manifest'
+import { FLEX_MANIFEST_URL } from './constants'
 
 import type { ReleaseSetUrls } from './types'
 
 const log = createLogger('update')
-
-const OPENTRONS_PROJECT: string = _OPENTRONS_PROJECT_
-
-export const FLEX_MANIFEST_URL =
-  OPENTRONS_PROJECT && OPENTRONS_PROJECT.includes('robot-stack')
-    ? 'https://builds.opentrons.com/ot3-oe/releases.json'
-    : 'https://ot3-development.builds.opentrons.com/ot3-oe/releases.json'
 
 const PKG_VERSION = _PKG_VERSION_
 let LATEST_OT_SYSTEM_VERSION = PKG_VERSION

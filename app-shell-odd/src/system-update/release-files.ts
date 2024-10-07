@@ -9,10 +9,10 @@ import getStream from 'get-stream'
 
 import { createLogger } from '../log'
 import { fetchToFile } from '../http'
+import { VERSION_FILENAME } from './constants'
+
 import type { DownloadProgress } from '../http'
 import type { ReleaseSetUrls, ReleaseSetFilepaths, UserFileInfo } from './types'
-
-const VERSION_FILENAME = 'VERSION.json'
 
 const log = createLogger('systemUpdate/release-files')
 const outPath = (dir: string, url: string): string => {

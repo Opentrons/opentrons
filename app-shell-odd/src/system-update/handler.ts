@@ -19,13 +19,13 @@ import {
 } from './release-files'
 import { uploadSystemFile } from './update'
 import { getSystemUpdateDir } from './directories'
+import { REASONABLE_VERSION_FILE_SIZE_B } from './constants'
 
 import type { DownloadProgress } from '../http'
 import type { Action, Dispatch } from '../types'
 import type { ReleaseSetFilepaths } from './types'
 
 const log = createLogger('systemUpdate/index')
-const REASONABLE_VERSION_FILE_SIZE_B = 4096
 
 let isGettingLatestSystemFiles = false
 const isGettingMassStorageUpdatesFrom: Set<string> = new Set()

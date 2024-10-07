@@ -1,10 +1,6 @@
-import { app } from 'electron'
 import path from 'path'
 
-const SYSTEM_UPDATE_DIRECTORY = path.join(
-  app.getPath('sessionData'),
-  '__ot_system_update__'
-)
+import { SYSTEM_UPDATE_DIRECTORY } from './constants'
 
 export const getSystemUpdateDir = (): string => SYSTEM_UPDATE_DIRECTORY
 
