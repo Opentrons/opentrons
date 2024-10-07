@@ -18,6 +18,7 @@ LabwareDisplayCategory = Union[
     Literal["aluminumBlock"],
     Literal["adapter"],
     Literal["other"],
+    Literal["lid"],
 ]
 
 LabwareFormat = Union[

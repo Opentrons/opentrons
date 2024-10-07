@@ -103,6 +103,7 @@ class DisplayCategory(str, Enum):
     aluminumBlock = "aluminumBlock"
     adapter = "adapter"
     other = "other"
+    lid = "lid"
 
 
 class LabwareRole(str, Enum):
