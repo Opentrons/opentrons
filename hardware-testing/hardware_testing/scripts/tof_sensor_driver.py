@@ -11,7 +11,7 @@ from plotly.subplots import make_subplots
 from datetime import datetime
 
 def build_arg_parser():
-    arg_parser = argparse.ArgumentParser(description='Opentrons Temperature Kit Driver')
+    arg_parser = argparse.ArgumentParser(description='Opentrons TOF Sensor Driver')
     arg_parser.add_argument('-t', '--test', action="store_true", required=False, help='Gets sample histogram data from the sensor')
     arg_parser.add_argument('-w', '--labware', action="store_true", required=False, help='Measures the sensor for different labware quantity')
     arg_parser.add_argument('-m', '--labware_max', type=int, required=False, help='Sets the maximum number of labware', default=3)
@@ -20,7 +20,7 @@ def build_arg_parser():
     arg_parser.add_argument('-p', '--port_name', type=str, required=False, help='Sets serial connection port, ex: -p COM5')
     return arg_parser
 
-class TOFSensor():
+class TOF_Sensor_Driver():
     def __init__(self, port="/dev/ttyACM0", baudrate=115200):
         self.datetime = datetime.now()
         self.PORT = port
@@ -99,10 +99,10 @@ class TOFSensor():
         hist_list = histogram.split(":")[1].split(",")
         return hist_list
 
-    def log_histogram(self, duration, labware = 0):
+    def log_histogram(self, duration, labware = False, labware_num = 0):
         self.create_folder(self.log_folder)
-        if labware > 0:
-            self.create_file(labware)
+        if labware:
+            self.create_file(True, labware_num)
         else:
             self.create_file()
         filename = f"{self.log_folder}/{self.log_file}"
@@ -129,7 +129,7 @@ class TOFSensor():
         df.name = file
         return df
 
-    def plot_log(self, labware = 0):
+    def plot_log(self, labware = False, labware_num = 0):
         zone = args.zone
         filename = f"{self.log_folder}/{self.log_file}"
         self.create_folder(self.plot_folder)
@@ -138,9 +138,9 @@ class TOFSensor():
         print(df)
         for col in cols:
             file_suffix = col.lower().replace(" ","")
-            if labware > 0:
-                filename = f"tof_histogram_zone{zone}_{file_suffix}_lab{labware}"
-                title = f"TOF Histogram - Zone {zone} ({col}) [Labware = {labware}]"
+            if labware:
+                filename = f"tof_histogram_zone{zone}_{file_suffix}_lab{labware_num}"
+                title = f"TOF Histogram - Zone {zone} ({col}) [Labware = {labware_num}]"
             else:
                 filename = f"tof_histogram_zone{zone}_{file_suffix}"
                 title = f"TOF Histogram - Zone {zone} ({col})"
@@ -158,9 +158,9 @@ class TOFSensor():
 
         df["Average"] = df.mean(axis=1)
         print(df)
-        if labware > 0:
-            filename = f"tof_histogram_zone{zone}_average_lab{labware}"
-            title = f"TOF Histogram - Zone {zone} (Average) [Labware = {labware}]"
+        if labware:
+            filename = f"tof_histogram_zone{zone}_average_lab{labware_num}"
+            title = f"TOF Histogram - Zone {zone} (Average) [Labware = {labware_num}]"
             self.df_list.append(df)
         else:
             filename = f"tof_histogram_zone{zone}_average"
@@ -177,23 +177,35 @@ class TOFSensor():
         self.plot_param["annotation"] = None
         self.make_plot(self.plot_param)
 
-        if labware == args.labware_max:
+        if labware_num == args.labware_max:
             df_all = pd.DataFrame()
             for i, df in enumerate(self.df_list):
-                df_all[f"Labware{i+1}"] = df["Average"]
+                df_all[f"Labware{i}"] = df["Average"]
             print(df_all)
             legend = []
             y_axis = sorted(df_all)
             fig = px.line(df_all, y=y_axis)
             for i in range(len(y_axis)):
-                legend.append(f"Labware = {i+1}")
+                legend.append(f"Labware = {i}")
             self.set_legend(fig, legend)
+            ## Normal Plot
             self.plot_param["figure"] = fig
             self.plot_param["filename"] = f"tof_histogram_zone{zone}_average_all"
             self.plot_param["title"] = f"TOF Histogram - Zone {zone} (Average All)"
             self.plot_param["x_title"] = "Bin Number"
             self.plot_param["y_title"] = "Number of Photons"
             self.plot_param["x_range"] = [0, 127]
+            self.plot_param["y_range"] = None
+            self.plot_param["legend"] = "Number of Labware"
+            self.plot_param["annotation"] = None
+            self.make_plot(self.plot_param)
+            ## Zoomed Plot
+            self.plot_param["figure"] = fig
+            self.plot_param["filename"] = f"tof_histogram_zone{zone}_average_all_zoomed"
+            self.plot_param["title"] = f"TOF Histogram - Zone {zone} (Average All) [Zoomed]"
+            self.plot_param["x_title"] = "Bin Number"
+            self.plot_param["y_title"] = "Number of Photons"
+            self.plot_param["x_range"] = [0, 50]
             self.plot_param["y_range"] = None
             self.plot_param["legend"] = "Number of Labware"
             self.plot_param["annotation"] = None
@@ -256,13 +268,13 @@ class TOFSensor():
         if not os.path.exists(folder):
             os.makedirs(folder)
 
-    def create_file(self, labware = 0):
+    def create_file(self, labware = False, labware_num = 0):
         current_datetime = self.datetime.strftime("%m-%d-%y_%H-%M")
         port = self.PORT
         if "dev" in port:
             port = port.replace('/dev/tty','')
-        if labware > 0:
-            filename = f"TOF_{port}_ZONE{args.zone}_LAB{labware}_{current_datetime}.csv"
+        if labware:
+            filename = f"TOF_{port}_ZONE{args.zone}_LAB{labware_num}_{current_datetime}.csv"
         else:
             filename = f"TOF_{port}_ZONE{args.zone}_{current_datetime}.csv"
         self.log_file = filename
@@ -273,19 +285,19 @@ if __name__ == '__main__':
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
     if args.port_name:
-        sensor = TOFSensor(port=args.port_name, baudrate=115200)
+        sensor = TOF_Sensor_Driver(port=args.port_name, baudrate=115200)
     else:
-        sensor = TOFSensor(port="/dev/ttyACM0", baudrate=115200)
+        sensor = TOF_Sensor_Driver(port="/dev/ttyACM0", baudrate=115200)
     sensor.connect()
     if args.test:
         sensor.log_histogram(args.log)
         sensor.plot_log()
     elif args.labware:
-        print(f"Testing TOF Sensor from 1 to {args.labware_max} labware.\n")
-        for i in range(args.labware_max):
-            input(f"\nMeasure for Labware = {i+1} [Press ENTER to continue]")
-            sensor.log_histogram(args.log, i+1)
-            sensor.plot_log(i+1)
+        print(f"Testing TOF Sensor from 0 to {args.labware_max} labware.\n")
+        for i in range(args.labware_max + 1):
+            input(f"\nMeasure for Labware = {i} [Press ENTER to continue]")
+            sensor.log_histogram(args.log, True, i)
+            sensor.plot_log(True, i)
         print("Test Completed!")
     else:
         while True:
