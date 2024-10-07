@@ -40,7 +40,6 @@ export function InstrumentsInfo({
   )
 
   const pipetteInfo = (pipette?: PipetteOnDeck): JSX.Element | string => {
-    console.log('pipette', pipette)
     const pipetteName =
       pipette != null
         ? getPipetteSpecsV2(pipette.name as PipetteName)?.displayName
