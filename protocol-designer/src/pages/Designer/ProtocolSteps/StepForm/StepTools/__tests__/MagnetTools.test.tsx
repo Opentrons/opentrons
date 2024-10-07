@@ -83,7 +83,7 @@ describe('MagnetTools', () => {
     render(props)
     screen.getByText('Module')
     screen.getByText('mock name')
-    screen.getByText('Magnet action')
+    screen.getByText('Magnet state')
     screen.getByLabelText('Engage')
     const toggleButton = screen.getByRole('switch')
     screen.getByText('Engage height')

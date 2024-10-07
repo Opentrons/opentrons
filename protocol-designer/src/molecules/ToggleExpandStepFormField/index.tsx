@@ -23,6 +23,7 @@ interface ToggleExpandStepFormFieldProps extends FieldProps {
   toggleUpdateValue: (value: unknown) => void
   toggleValue: unknown
   caption?: string
+  islabel?: boolean
 }
 export function ToggleExpandStepFormField(
   props: ToggleExpandStepFormFieldProps
@@ -37,6 +38,7 @@ export function ToggleExpandStepFormField(
     toggleUpdateValue,
     toggleValue,
     caption,
+    islabel,
     ...restProps
   } = props
 
@@ -59,19 +61,22 @@ export function ToggleExpandStepFormField(
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
           <StyledText desktopStyle="bodyDefaultRegular">{title}</StyledText>
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
-          <StyledText
+            {islabel ? (
+              <StyledText
                 desktopStyle="bodyDefaultRegular"
                 color={COLORS.grey60}
               >
                 {isSelected ? onLabel : offLabel}
-          </StyledText>
-          <ToggleButton
-            onClick={() => {
-              onToggleUpdateValue()
-            }}
-            label={isSelected ? onLabel : offLabel}
-            toggledOn={isSelected}
-          />
+              </StyledText>
+            ) : null}
+
+            <ToggleButton
+              onClick={() => {
+                onToggleUpdateValue()
+              }}
+              label={isSelected ? onLabel : offLabel}
+              toggledOn={isSelected}
+            />
           </Flex>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>

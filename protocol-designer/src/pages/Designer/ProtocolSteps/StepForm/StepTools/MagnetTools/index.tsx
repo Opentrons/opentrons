@@ -88,6 +88,7 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
             'form:step_edit_form.field.magnetAction.options.disengage'
           )}
           caption={engageHeightCaption}
+          islabel={true}
         />
       </Flex>
     </Flex>
