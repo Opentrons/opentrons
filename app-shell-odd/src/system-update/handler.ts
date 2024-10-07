@@ -6,6 +6,7 @@ import StreamZip from 'node-stream-zip'
 import Semver from 'semver'
 import { UI_INITIALIZED } from '../constants'
 import { createLogger } from '../log'
+import { postFile } from '../http'
 import {
   getLatestSystemUpdateUrls,
   getLatestVersion,
@@ -17,9 +18,8 @@ import {
   readUserFileInfo,
   cleanupReleaseFiles,
 } from './release-files'
-import { uploadSystemFile } from './update'
 import { getSystemUpdateDir } from './directories'
-import { REASONABLE_VERSION_FILE_SIZE_B } from './constants'
+import { REASONABLE_VERSION_FILE_SIZE_B, SYSTEM_FILENAME } from './constants'
 
 import type { DownloadProgress } from '../http'
 import type { Action, Dispatch } from '../types'
@@ -28,7 +28,7 @@ import type { ReleaseSetFilepaths } from './types'
 const log = createLogger('systemUpdate/index')
 
 let isGettingLatestSystemFiles = false
-const isGettingMassStorageUpdatesFrom: Set<string> = new Set()
+const isGettingMassStorageUpdatesFrom = new Set<string>()
 let massStorageUpdateSet: ReleaseSetFilepaths | null = null
 let systemUpdateSet: ReleaseSetFilepaths | null = null
 
@@ -85,7 +85,11 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
       case 'robotUpdate:UPLOAD_FILE': {
         const { host, path, systemFile } = action.payload
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        uploadSystemFile(host, path, systemFile)
+        postFile(
+          `http://${host.ip}:${host.port}${path}`,
+          SYSTEM_FILENAME,
+          systemFile
+        )
           .then(() => ({
             type: 'robotUpdate:FILE_UPLOAD_DONE' as const,
             payload: host.name,
