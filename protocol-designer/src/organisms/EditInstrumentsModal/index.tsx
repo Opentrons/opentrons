@@ -144,6 +144,16 @@ export function EditInstrumentsModal(
       ? getSectionsFromPipetteName(leftPip.name, leftPip.spec)
       : null
 
+  const removeOpentronsPhrases = (input: string): string => {
+    const phrasesToRemove = ['Opentrons Flex 96', 'Opentrons OT-2 96']
+
+    return phrasesToRemove
+      .reduce((text, phrase) => {
+        return text.replace(new RegExp(phrase, 'gi'), '')
+      }, input)
+      .trim()
+  }
+
   return createPortal(
     <Modal
       title={
@@ -480,8 +490,8 @@ export function EditInstrumentsModal(
           {allPipetteOptions.includes(selectedPip as PipetteName)
             ? (() => {
                 const tiprackOptions = getTiprackOptions({
-                  allLabware: allLabware,
-                  allowAllTipracks: allowAllTipracks,
+                  allLabware,
+                  allowAllTipracks,
                   selectedPipetteName: selectedPip,
                 })
                 return (
@@ -510,7 +520,7 @@ export function EditInstrumentsModal(
                             !selectedTips.includes(option.value)
                           }
                           isChecked={selectedTips.includes(option.value)}
-                          labelText={option.name}
+                          labelText={removeOpentronsPhrases(option.name)}
                           onClick={() => {
                             const updatedTips = selectedTips.includes(
                               option.value
