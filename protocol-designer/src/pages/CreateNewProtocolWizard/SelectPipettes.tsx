@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
+import { useLocation } from 'react-router-dom'
 import {
   FLEX_ROBOT_TYPE,
   getAllPipetteNames,
@@ -57,6 +58,7 @@ const MAX_TIPRACKS_ALLOWED = 3
 export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, setValue } = props
   const { t } = useTranslation(['create_new_protocol', 'shared'])
+  const location = useLocation()
   const pipettesByMount = watch('pipettesByMount')
   const fields = watch('fields')
   const { makeSnackbar } = useKitchen()
@@ -147,6 +149,12 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
       setPage('add')
     }
   }
+
+  useEffect(() => {
+    if (location.state === 'gripper') {
+      setPage('overview')
+    }
+  }, [location])
 
   return (
     <>

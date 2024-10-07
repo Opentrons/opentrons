@@ -12,6 +12,7 @@ import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { SelectPipettes } from '../SelectPipettes'
 import { getTiprackOptions } from '../utils'
 
+import type { NavigateFunction } from 'react-router-dom'
 import type { WizardFormState, WizardTileProps } from '../types'
 
 vi.mock('../../../labware-defs/selectors')
@@ -19,6 +20,15 @@ vi.mock('../../../feature-flags/selectors')
 vi.mock('../../../organisms')
 vi.mock('../../../labware-defs/actions')
 vi.mock('../utils')
+const mockLocation = vi.fn()
+
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<NavigateFunction>()
+  return {
+    ...actual,
+    useLocation: () => mockLocation,
+  }
+})
 
 const render = (props: React.ComponentProps<typeof SelectPipettes>) => {
   return renderWithProviders(<SelectPipettes {...props} />, {
