@@ -1,5 +1,4 @@
 import semver from 'semver'
-import { UI_INITIALIZED } from '../constants'
 import { createLogger } from '../log'
 import { getConfig } from '../config'
 import {
@@ -8,7 +7,6 @@ import {
   getReleaseSet,
 } from './release-manifest'
 
-import type { Action, Dispatch } from '../types'
 import type { ReleaseSetUrls } from './types'
 
 const log = createLogger('update')
@@ -83,15 +81,3 @@ export const getCurrentVersion = (): string => PKG_VERSION
 
 export const isUpdateAvailable = (): boolean =>
   getLatestVersion() !== getCurrentVersion()
-
-export function registerUpdate(
-  dispatch: Dispatch
-): (action: Action) => unknown {
-  return function handleAction(action: Action) {
-    switch (action.type) {
-      case UI_INITIALIZED:
-      case 'shell:CHECK_UPDATE':
-        return updateLatestVersion()
-    }
-  }
-}

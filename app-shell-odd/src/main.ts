@@ -7,11 +7,7 @@ import { createUi, waitForRobotServerAndShowMainWindow } from './ui'
 import { createLogger } from './log'
 import { registerDiscovery } from './discovery'
 import { registerUpdateBrightness } from './system'
-import {
-  registerRobotSystemUpdate,
-  registerUpdate,
-  updateLatestVersion,
-} from './system-update'
+import { registerRobotSystemUpdate } from './system-update'
 import { registerAppRestart } from './restart'
 import {
   getConfig,
@@ -114,15 +110,9 @@ function startUp(): void {
   void establishBrokerConnection()
   mainWindow.once('closed', () => (mainWindow = null))
 
-  log.info('Fetching latest software version')
-  updateLatestVersion().catch((error: Error) => {
-    log.error('Error fetching latest software version: ', { error })
-  })
-
   const actionHandlers: Dispatch[] = [
     registerConfig(dispatch),
     registerDiscovery(dispatch),
-    registerUpdate(dispatch),
     registerRobotSystemUpdate(dispatch),
     registerAppRestart(),
     registerUpdateBrightness(),
