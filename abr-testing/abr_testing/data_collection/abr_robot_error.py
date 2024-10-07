@@ -529,7 +529,7 @@ if __name__ == "__main__":
     try:
         parent_key = project_key + "-" + robot.split("ABR")[1]
     except IndexError:
-        parent_key = None
+        parent_key = ""
 
     # Grab all previous issues
     all_issues = ticket.issues_on_board(project_key)
