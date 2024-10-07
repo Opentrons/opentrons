@@ -16,7 +16,6 @@ from abr_testing.automation import google_sheets_tool  # type: ignore[import]
 ###########################################
 # TODO: use runtime-variables instead of constants
 
-VOLUMES = [7, 10, 15, 25, 40, 60, 100, 200]
 NUM_TRIALS = 12
 
 ASPIRATE_MM_FROM_BOTTOM = 5
@@ -147,7 +146,7 @@ def _setup(
     Labware,
     Any,
 ]:
-    global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE_TYPE
+    global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE_TYPE, VOLUMES
     # TODO: use runtime-variables instead of constants
     ctx.load_trash_bin("A3")
     LABWARE_TYPE = ctx.params.labware_type  # type: ignore[attr-defined]
@@ -164,6 +163,13 @@ def _setup(
     reservoir = ctx.load_labware(RESERVOIR, SLOT_RESERVOIR)
     labware = ctx.load_labware(LABWARE_TYPE, SLOT_LABWARE)
     dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
+    
+    # DETERMINE VOLUME LIST
+    if LABWARE_TYPE == "armadillo_96_wellplate_200ul_pcr_full_skirt":
+        VOLUMES = [7, 10, 15, 25, 40, 60, 100, 200]
+    elif LABWARE_TYPE == "nest_96_wellplate_2ml_deep":
+        VOLUMES = [75, 100, 125, 150, 250, 1500]
+
 
     google_sheet = None
     if not ctx.is_simulating() and DIAL_PORT is None:
@@ -331,8 +337,16 @@ def _test_for_finding_liquid_height(
             tip_z_error = 0
         # pickup liquid tip, then immediately transfer liquid
         liquid_pipette.pick_up_tip(liq_tip)
-        liquid_pipette.aspirate(volume, src_well.bottom(ASPIRATE_MM_FROM_BOTTOM))
-        liquid_pipette.dispense(volume, well.bottom(dispense_from_bottom))
+        if volume < 1000:
+            liquid_pipette.aspirate(volume, src_well.bottom(ASPIRATE_MM_FROM_BOTTOM))
+            liquid_pipette.dispense(volume, well.bottom(dispense_from_bottom))
+        else:
+            volume_divide_by_2 = volume / 2
+            liquid_pipette.aspirate(volume_divide_by_2, src_well.bottom(ASPIRATE_MM_FROM_BOTTOM))
+            liquid_pipette.dispense(volume_divide_by_2, well.bottom(dispense_from_bottom))
+            liquid_pipette.aspirate(volume_divide_by_2, src_well.bottom(ASPIRATE_MM_FROM_BOTTOM))
+            liquid_pipette.dispense(volume_divide_by_2, well.bottom(dispense_from_bottom))
+            
         liquid_pipette.blow_out(well.top(z=-9)).prepare_to_aspirate()
         # get height of liquid
         if probe_yes_or_no == "yes":
