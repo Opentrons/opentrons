@@ -10,7 +10,7 @@ from opentrons_shared_data.labware.labware_definition import (
     WellSegment,
     SphericalSegment,
     ConicalFrustum,
-    PyramidalFrustum,
+    CuboidalFrustum,
 )
 
 
@@ -204,7 +204,7 @@ def _get_segment_capacity(segment: WellSegment) -> float:
                 target_height=segment.topHeight,
                 radius_of_curvature=segment.radiusOfCurvature,
             )
-        case PyramidalFrustum():
+        case CuboidalFrustum():
             section_height = segment.topHeight - segment.bottomHeight
             return _volume_from_height_rectangular(
                 target_height=section_height,
@@ -266,7 +266,7 @@ def height_at_volume_within_section(
                 bottom_radius=(section.topDiameter / 2),
                 total_frustum_height=section_height,
             )
-        case PyramidalFrustum():
+        case CuboidalFrustum():
             return _height_from_volume_rectangular(
                 volume=target_volume_relative,
                 total_frustum_height=section_height,
@@ -300,7 +300,7 @@ def volume_at_height_within_section(
                 bottom_radius=(section.bottomDiameter / 2),
                 top_radius=(section.topDiameter / 2),
             )
-        case PyramidalFrustum():
+        case CuboidalFrustum():
             return _volume_from_height_rectangular(
                 target_height=target_height_relative,
                 total_frustum_height=section_height,

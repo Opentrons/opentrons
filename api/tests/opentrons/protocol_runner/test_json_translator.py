@@ -13,7 +13,7 @@ from opentrons_shared_data.labware.labware_definition import (
     Group,
     Metadata1,
     WellDefinition,
-    PyramidalFrustum,
+    CuboidalFrustum,
     InnerWellGeometry,
     SphericalSegment,
 )
@@ -691,8 +691,8 @@ def _load_labware_definition_data() -> LabwareDefinition:
         innerLabwareGeometry={
             "welldefinition1111": InnerWellGeometry(
                 sections=[
-                    PyramidalFrustum(
-                        shape="pyramidal",
+                    CuboidalFrustum(
+                        shape="cuboidal",
                         topXDimension=7.6,
                         topYDimension=8.5,
                         bottomXDimension=5.6,
@@ -700,8 +700,8 @@ def _load_labware_definition_data() -> LabwareDefinition:
                         topHeight=45,
                         bottomHeight=20,
                     ),
-                    PyramidalFrustum(
-                        shape="pyramidal",
+                    CuboidalFrustum(
+                        shape="cuboidal",
                         topXDimension=5.6,
                         topYDimension=6.5,
                         bottomXDimension=4.5,

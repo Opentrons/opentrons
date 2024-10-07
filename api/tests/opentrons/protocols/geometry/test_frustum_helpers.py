@@ -4,7 +4,7 @@ from typing import Any, List
 
 from opentrons_shared_data.labware.labware_definition import (
     ConicalFrustum,
-    PyramidalFrustum,
+    CuboidalFrustum,
     SphericalSegment,
 )
 from opentrons.protocol_engine.state.frustum_helpers import (
@@ -30,8 +30,8 @@ def fake_frusta() -> List[List[Any]]:
     frusta = []
     frusta.append(
         [
-            PyramidalFrustum(
-                shape="pyramidal",
+            CuboidalFrustum(
+                shape="cuboidal",
                 topXDimension=9.0,
                 topYDimension=10.0,
                 bottomXDimension=8.0,
@@ -39,8 +39,8 @@ def fake_frusta() -> List[List[Any]]:
                 topHeight=10.0,
                 bottomHeight=5.0,
             ),
-            PyramidalFrustum(
-                shape="pyramidal",
+            CuboidalFrustum(
+                shape="cuboidal",
                 topXDimension=8.0,
                 topYDimension=9.0,
                 bottomXDimension=15.0,
@@ -65,8 +65,8 @@ def fake_frusta() -> List[List[Any]]:
     )
     frusta.append(
         [
-            PyramidalFrustum(
-                shape="pyramidal",
+            CuboidalFrustum(
+                shape="cuboidal",
                 topXDimension=8.0,
                 topYDimension=70.0,
                 bottomXDimension=7.0,
@@ -74,8 +74,8 @@ def fake_frusta() -> List[List[Any]]:
                 topHeight=3.5,
                 bottomHeight=2.0,
             ),
-            PyramidalFrustum(
-                shape="pyramidal",
+            CuboidalFrustum(
+                shape="cuboidal",
                 topXDimension=8.0,
                 topYDimension=80.0,
                 bottomXDimension=8.0,
@@ -139,8 +139,8 @@ def fake_frusta() -> List[List[Any]]:
     )
     frusta.append(
         [
-            PyramidalFrustum(
-                shape="pyramidal",
+            CuboidalFrustum(
+                shape="cuboidal",
                 topXDimension=27.0,
                 topYDimension=36.0,
                 bottomXDimension=36.0,
@@ -255,7 +255,7 @@ def test_volume_and_height_rectangular(well: List[Any]) -> None:
         return
     total_height = well[0].topHeight
     for segment in well:
-        if segment.shape == "pyramidal":
+        if segment.shape == "cuboidal":
             top_length = segment.topYDimension
             top_width = segment.topXDimension
             bottom_length = segment.bottomYDimension

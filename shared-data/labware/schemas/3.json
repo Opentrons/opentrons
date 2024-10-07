@@ -115,9 +115,9 @@
         }
       }
     },
-    "PyramidalFrustum": {
+    "CuboidalFrustum": {
       "type": "object",
-      "description": "A pyramidal shape bounded by two rectangles on the top and bottom",
+      "description": "A cuboidal shape bounded by two rectangles on the top and bottom",
       "required": [
         "shape",
         "bottomXDimension",
@@ -130,7 +130,7 @@
       "properties": {
         "shape": {
           "type": "string",
-          "enum": ["pyramidal"]
+          "enum": ["cuboidal"]
         },
         "bottomXDimension": {
           "type": "number"
@@ -190,9 +190,9 @@
         }
       }
     },
-    "RoundedPyramidSegment": {
+    "RoundedCuboidSegment": {
       "type": "object",
-      "description": "A pyramidal frustum where each corner is filleted out by circles with centers on the diagonals between opposite corners",
+      "description": "A cuboidal frustum where each corner is filleted out by circles with centers on the diagonals between opposite corners",
       "required": [
         "shape",
         "bottomCrossSection",
@@ -241,13 +241,13 @@
                 "$ref": "#/definitions/ConicalFrustum"
               },
               {
-                "$ref": "#/definitions/PyramidalFrustum"
+                "$ref": "#/definitions/CuboidalFrustum"
               },
               {
                 "$ref": "#/definitions/SquaredConeSegment"
               },
               {
-                "$ref": "#/definitions/RoundedPyramidSegment"
+                "$ref": "#/definitions/RoundedCuboidSegment"
               },
               {
                 "$ref": "#/definitions/SphericalSegment"

@@ -21,8 +21,8 @@ from typing_extensions import Literal
 
 from .constants import (
     Conical,
-    Pyramidal,
-    RoundedPyramid,
+    Cuboidal,
+    RoundedCuboid,
     SquaredCone,
     Spherical,
     WellShape,
@@ -271,8 +271,8 @@ class ConicalFrustum(BaseModel):
     )
 
 
-class PyramidalFrustum(BaseModel):
-    shape: Pyramidal = Field(..., description="Denote shape as pyramidal")
+class CuboidalFrustum(BaseModel):
+    shape: Cuboidal = Field(..., description="Denote shape as cuboidal")
     bottomXDimension: _NonNegativeNumber = Field(
         ...,
         description="x dimension of the bottom cross-section of a rectangular frustum",
@@ -350,7 +350,7 @@ class SquaredConeSegment(BaseModel):
 
 
 """
-module filitedPyramidSquare(bottom_shape, diameter, width, length, height, steps) {
+module filitedCuboidSquare(bottom_shape, diameter, width, length, height, steps) {
     module _slice(depth, x, y, r) {
         echo("called with: ", depth, x, y, r);
         circle_centers = [
@@ -373,7 +373,7 @@ module filitedPyramidSquare(bottom_shape, diameter, width, length, height, steps
         }
     }
 }
-module filitedPyramidForce(bottom_shape, diameter, width, length, height, steps) {
+module filitedCuboidForce(bottom_shape, diameter, width, length, height, steps) {
     module single_cone(r,x,y,z) {
         r = diameter/2;
         circle_face = [[ for (i = [0:1: steps]) i ]];
@@ -419,19 +419,19 @@ module filitedPyramidForce(bottom_shape, diameter, width, length, height, steps)
     }
 }
 
-module filitedPyramid(bottom_shape, diameter, width, length, height) {
+module filitedCuboid(bottom_shape, diameter, width, length, height) {
     if (width == length && width == diameter) {
-        filitedPyramidSquare(bottom_shape, diameter, width, length, height, 100);
+        filitedCuboidSquare(bottom_shape, diameter, width, length, height, 100);
     }
     else {
-        filitedPyramidForce(bottom_shape, diameter, width, length, height, 100);
+        filitedCuboidForce(bottom_shape, diameter, width, length, height, 100);
     }
 }"""
 
 
-class RoundedPyramidSegment(BaseModel):
-    shape: RoundedPyramid = Field(
-        ..., description="Denote shape as a rounded pyramidal segment"
+class RoundedCuboidSegment(BaseModel):
+    shape: RoundedCuboid = Field(
+        ..., description="Denote shape as a rounded cuboidal segment"
     )
     bottomCrossSection: WellShape = Field(
         ...,
@@ -490,9 +490,9 @@ class Group(BaseModel):
 
 WellSegment = Union[
     ConicalFrustum,
-    PyramidalFrustum,
+    CuboidalFrustum,
     SquaredConeSegment,
-    RoundedPyramidSegment,
+    RoundedCuboidSegment,
     SphericalSegment,
 ]
 

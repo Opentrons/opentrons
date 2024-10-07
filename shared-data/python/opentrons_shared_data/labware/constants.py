@@ -14,7 +14,7 @@ WellShape = Union[Circular, Rectangular]
 
 # These shapes are used to describe the 3D primatives used to build wells
 Conical = Literal["conical"]
-Pyramidal = Literal["pyramidal"]
+Cuboidal = Literal["cuboidal"]
 SquaredCone = Literal["squaredcone"]
-RoundedPyramid = Literal["roundedpyramid"]
+RoundedCuboid = Literal["roundedcuboid"]
 Spherical = Literal["spherical"]
