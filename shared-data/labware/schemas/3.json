@@ -69,7 +69,7 @@
       "type": "object",
       "description": "A partial sphere shaped section at the bottom of the well.",
       "additionalProperties": false,
-      "required": ["shape", "radiusOfCurvature", "topHeight"],
+      "required": ["shape", "radiusOfCurvature", "topHeight", "bottomHeight"],
       "properties": {
         "shape": {
           "type": "string",
