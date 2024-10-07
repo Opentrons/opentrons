@@ -426,11 +426,13 @@ async def update_run(
 @PydanticResponse.wrap_route(
     base_router.put,
     path="/runs/{runId}/errorRecoveryPolicy",
-    summary="Set run policies",
+    summary="Set a run's error recovery policy",
     description=dedent(
         """
         Update how to handle different kinds of command failures.
-        The following rules will persist during the run.
+
+        For this to have any effect, error recovery must also be enabled globally.
+        See `PATCH /errorRecovery/settings`.
         """
     ),
     status_code=status.HTTP_201_CREATED,
@@ -451,12 +453,11 @@ async def put_error_recovery_policy(
         request_body:  Request body with run policies data.
         run_data_manager: Current and historical run data management.
     """
-    policies = request_body.data.policyRules
-    if policies:
-        try:
-            run_data_manager.set_policies(run_id=runId, policies=policies)
-        except RunNotCurrentError as e:
-            raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
+    rules = request_body.data.policyRules
+    try:
+        run_data_manager.set_error_recovery_rules(run_id=runId, rules=rules)
+    except RunNotCurrentError as e:
+        raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
 
     return await PydanticResponse.create(
         content=SimpleEmptyBody.construct(),

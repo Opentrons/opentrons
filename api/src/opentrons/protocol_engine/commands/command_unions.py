@@ -392,6 +392,7 @@ Command = Annotated[
         unsafe.UnsafeDropTipInPlace,
         unsafe.UpdatePositionEstimators,
         unsafe.UnsafeEngageAxes,
+        unsafe.UnsafeUngripLabware,
     ],
     Field(discriminator="commandType"),
 ]
@@ -467,6 +468,7 @@ CommandParams = Union[
     unsafe.UnsafeDropTipInPlaceParams,
     unsafe.UpdatePositionEstimatorsParams,
     unsafe.UnsafeEngageAxesParams,
+    unsafe.UnsafeUngripLabwareParams,
 ]
 
 CommandType = Union[
@@ -540,6 +542,7 @@ CommandType = Union[
     unsafe.UnsafeDropTipInPlaceCommandType,
     unsafe.UpdatePositionEstimatorsCommandType,
     unsafe.UnsafeEngageAxesCommandType,
+    unsafe.UnsafeUngripLabwareCommandType,
 ]
 
 CommandCreate = Annotated[
@@ -614,6 +617,7 @@ CommandCreate = Annotated[
         unsafe.UnsafeDropTipInPlaceCreate,
         unsafe.UpdatePositionEstimatorsCreate,
         unsafe.UnsafeEngageAxesCreate,
+        unsafe.UnsafeUngripLabwareCreate,
     ],
     Field(discriminator="commandType"),
 ]
@@ -689,6 +693,7 @@ CommandResult = Union[
     unsafe.UnsafeDropTipInPlaceResult,
     unsafe.UpdatePositionEstimatorsResult,
     unsafe.UnsafeEngageAxesResult,
+    unsafe.UnsafeUngripLabwareResult,
 ]
 
 # todo(mm, 2024-06-12): Ideally, command return types would have specific

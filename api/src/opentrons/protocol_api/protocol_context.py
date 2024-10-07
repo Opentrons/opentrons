@@ -661,7 +661,6 @@ class ProtocolContext(CommandPublisher):
             if slot is not None
         }
 
-    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     @requires_version(2, 15)
     def move_labware(
         self,
