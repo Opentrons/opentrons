@@ -9,6 +9,10 @@
     "left": {
       "model": "p50_single_3.4",
       "id": "123"
+    },
+    "gripper":{
+      "model": "gripper_1.3",
+      "id": "1234"
     }
   },
   "attached_modules": {
