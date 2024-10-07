@@ -54,7 +54,7 @@ describe('formatDurationLabeled', () => {
       seconds: 2,
     }
 
-    const expected = '02h 40m 02s'
+    const expected = '2h 40m 02s'
 
     expect(formatDurationLabeled(duration)).toEqual(expected)
   })
@@ -64,7 +64,7 @@ describe('formatDurationLabeled', () => {
       seconds: 2,
     }
 
-    const expected = '00h 00m 02s'
+    const expected = '0h 00m 02s'
 
     expect(formatDurationLabeled(duration)).toEqual(expected)
   })

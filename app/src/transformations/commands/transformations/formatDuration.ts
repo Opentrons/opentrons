@@ -31,7 +31,7 @@ function timestampDetails(
   const normalizedMinutes = Math.floor((totalSeconds % 3600) / 60)
   const normalizedSeconds = totalSeconds % 60
 
-  const paddedHours = padStart(normalizedHours.toString(), 2, '0')
+  const paddedHours = padStart(normalizedHours.toString(), 1, '0')
   const paddedMinutes = padStart(normalizedMinutes.toString(), 2, '0')
   const paddedSeconds = padStart(normalizedSeconds.toString(), 2, '0')
   return { hours: paddedHours, minutes: paddedMinutes, seconds: paddedSeconds }
