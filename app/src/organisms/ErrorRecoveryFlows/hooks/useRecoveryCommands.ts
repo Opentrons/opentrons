@@ -58,9 +58,8 @@ export interface UseRecoveryCommandsResult {
   /* A non-terminal recovery command */
   pickUpTips: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
-  releaseGripperJaws: () => Promise<void>
+  releaseGripperJaws: () => Promise<CommandData[]>
 }
-
 // TODO(jh, 07-24-24): Create tighter abstractions for terminal vs. non-terminal commands.
 // Returns commands with a "fixit" intent. Commands may or may not terminate Error Recovery. See each command docstring for details.
 export function useRecoveryCommands({
@@ -215,12 +214,10 @@ export function useRecoveryCommands({
     failedCommandByRunRecord?.commandType,
   ])
 
-  const releaseGripperJaws = useCallback((): Promise<void> => {
-    const ungripLabware = useCallback((): Promise<CommandData[]> => {
-      return chainRunRecoveryCommands([RELEASE_GRIPPER_JAW])
-    }, [chainRunRecoveryCommands])    
-    return Promise.resolve()
-  }, [])
+  const releaseGripperJaws = useCallback((): Promise<CommandData[]> => {
+    return chainRunRecoveryCommands([RELEASE_GRIPPER_JAW])
+  }, [chainRunRecoveryCommands])
+  
 
   return {
     resumeRun,
