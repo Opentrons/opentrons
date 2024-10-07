@@ -12,14 +12,16 @@ export function formatDuration(duration: Duration): string {
 }
 
 export function formatDurationLabeled(duration: Duration): string {
-  const { hours, minutes, seconds } = timestampDetails(duration)
+  const { hours, minutes, seconds } = timestampDetails(duration, 1)
 
   return `${hours}h ${minutes}m ${seconds}s`
 }
 
 function timestampDetails(
-  duration: Duration
+  duration: Duration,
+  padHoursTo?: number
 ): { hours: string; minutes: string; seconds: string } {
+  const paddingWithDefault = padHoursTo ?? 2
   const days = duration?.days ?? 0
   const hours = duration?.hours ?? 0
   const minutes = duration?.minutes ?? 0
@@ -31,7 +33,11 @@ function timestampDetails(
   const normalizedMinutes = Math.floor((totalSeconds % 3600) / 60)
   const normalizedSeconds = totalSeconds % 60
 
-  const paddedHours = padStart(normalizedHours.toString(), 1, '0')
+  const paddedHours = padStart(
+    normalizedHours.toString(),
+    paddingWithDefault,
+    '0'
+  )
   const paddedMinutes = padStart(normalizedMinutes.toString(), 2, '0')
   const paddedSeconds = padStart(normalizedSeconds.toString(), 2, '0')
   return { hours: paddedHours, minutes: paddedMinutes, seconds: paddedSeconds }
