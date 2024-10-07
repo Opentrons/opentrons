@@ -72,12 +72,12 @@ def test_create_error_recovery_policy_with_rules(
 ) -> None:
     """Should return IGNORE_AND_CONTINUE if that's what we specify as the rule."""
     policy = create_error_recovery_policy_from_rules([mock_rule], enabled=True)
-    exampleConfig = Config(
+    example_config = Config(
         robot_type="OT-3 Standard",
         deck_type=DeckType.OT3_STANDARD,
     )
     assert (
-        policy(exampleConfig, mock_command, mock_error_data)
+        policy(example_config, mock_command, mock_error_data)
         == ErrorRecoveryType.IGNORE_AND_CONTINUE
     )
 
@@ -87,12 +87,12 @@ def test_create_error_recovery_policy_undefined_error(
 ) -> None:
     """Should return a FAIL_RUN policy when error is not defined."""
     policy = create_error_recovery_policy_from_rules(rules=[], enabled=True)
-    exampleConfig = Config(
+    example_config = Config(
         robot_type="OT-3 Standard",
         deck_type=DeckType.OT3_STANDARD,
     )
 
-    assert policy(exampleConfig, mock_command, None) == ErrorRecoveryType.FAIL_RUN
+    assert policy(example_config, mock_command, None) == ErrorRecoveryType.FAIL_RUN
 
 
 def test_create_error_recovery_policy_defined_error(
@@ -100,12 +100,12 @@ def test_create_error_recovery_policy_defined_error(
 ) -> None:
     """Should return a WAIT_FOR_RECOVERY policy when error is defined."""
     policy = create_error_recovery_policy_from_rules(rules=[], enabled=True)
-    exampleConfig = Config(
+    example_config = Config(
         robot_type="OT-3 Standard",
         deck_type=DeckType.OT3_STANDARD,
     )
 
     assert (
-        policy(exampleConfig, mock_command, mock_error_data)
+        policy(example_config, mock_command, mock_error_data)
         == ErrorRecoveryType.WAIT_FOR_RECOVERY
     )
