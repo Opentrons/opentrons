@@ -204,9 +204,14 @@ export interface RoundedCuboidSegment {
   bottomHeight: number
 }
 
-export type WellSegment =  CuboidalFrustum | ConicalFrustum | SquaredConeSegment | SphericalSegment | RoundedCuboidSegment
+export type WellSegment =
+  | CuboidalFrustum
+  | ConicalFrustum
+  | SquaredConeSegment
+  | SphericalSegment
+  | RoundedCuboidSegment
 
-export type InnerWellGeometry  = {
+export interface InnerWellGeometry {
   sections: WellSegment[]
 }
 
