@@ -67,7 +67,7 @@
     },
     "SphericalSegment": {
       "type": "object",
-      "description": "A list of all of the sections of the well that have a contiguous shape",
+      "description": "A partial sphere shaped section at the bottom of the well.",
       "additionalProperties": false,
       "required": ["shape", "radiusOfCurvature", "topHeight"],
       "properties": {
@@ -88,7 +88,7 @@
     },
     "ConicalFrustum": {
       "type": "object",
-      "description": "A list of all of the sections of the well that have a contiguous shape",
+      "description": "A cone or conical segment, bounded by two circles on the top and bottom.",
       "required": [
         "shape",
         "bottomDiameter",
@@ -117,7 +117,7 @@
     },
     "PyramidalFrustum": {
       "type": "object",
-      "description": "A list of all of the sections of the well that have a contiguous shape",
+      "description": "A pyramidal shape bounded by two rectangles on the top and bottom",
       "required": [
         "shape",
         "bottomXDimension",
