@@ -58,6 +58,13 @@ export function ToggleExpandStepFormField(
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
           <StyledText desktopStyle="bodyDefaultRegular">{title}</StyledText>
+          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
+          <StyledText
+                desktopStyle="bodyDefaultRegular"
+                color={COLORS.grey60}
+              >
+                {isSelected ? onLabel : offLabel}
+          </StyledText>
           <ToggleButton
             onClick={() => {
               onToggleUpdateValue()
@@ -65,6 +72,7 @@ export function ToggleExpandStepFormField(
             label={isSelected ? onLabel : offLabel}
             toggledOn={isSelected}
           />
+          </Flex>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
           {isSelected ? (
