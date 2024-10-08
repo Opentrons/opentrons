@@ -10,6 +10,7 @@ import {
 } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
+  ALIGN_STRETCH,
   Box,
   Btn,
   Checkbox,
@@ -323,6 +324,9 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                               gap: ${SPACING.spacing4};
                               display: ${DISPLAY_FLEX};
                               flex-wrap: ${WRAP};
+                              align-items: ${ALIGN_CENTER};
+                              align-content: ${ALIGN_CENTER};
+                              align-self: ${ALIGN_STRETCH};
                             `}
                           >
                             {Object.entries(tiprackOptions).map(
@@ -354,45 +358,45 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                               )
                             )}
                           </Box>
-                        </Flex>
-                        <Flex gridGap={SPACING.spacing8}>
-                          <StyledLabel>
-                            <StyledText desktopStyle="bodyDefaultRegular">
-                              {t('add_custom_tips')}
-                            </StyledText>
-                            <input
-                              data-testid="SelectPipettes_customTipInput"
-                              type="file"
-                              onChange={e =>
-                                dispatch(createCustomTiprackDef(e))
-                              }
-                            />
-                          </StyledLabel>
-                          {pipetteVolume === 'p1000' &&
-                          robotType === FLEX_ROBOT_TYPE ? null : (
-                            <Btn
-                              onClick={() => {
-                                if (allowAllTipracks) {
-                                  dispatch(
-                                    setFeatureFlags({
-                                      OT_PD_ALLOW_ALL_TIPRACKS: !allowAllTipracks,
-                                    })
-                                  )
-                                } else {
-                                  setIncompatibleTip(true)
-                                }
-                              }}
-                              textDecoration={
-                                TYPOGRAPHY.textDecorationUnderline
-                              }
-                            >
+                          <Flex gridGap={SPACING.spacing4}>
+                            <StyledLabel>
                               <StyledText desktopStyle="bodyDefaultRegular">
-                                {allowAllTipracks
-                                  ? t('show_default_tips')
-                                  : t('show_all_tips')}
+                                {t('add_custom_tips')}
                               </StyledText>
-                            </Btn>
-                          )}
+                              <input
+                                data-testid="SelectPipettes_customTipInput"
+                                type="file"
+                                onChange={e =>
+                                  dispatch(createCustomTiprackDef(e))
+                                }
+                              />
+                            </StyledLabel>
+                            {pipetteVolume === 'p1000' &&
+                            robotType === FLEX_ROBOT_TYPE ? null : (
+                              <Btn
+                                onClick={() => {
+                                  if (allowAllTipracks) {
+                                    dispatch(
+                                      setFeatureFlags({
+                                        OT_PD_ALLOW_ALL_TIPRACKS: !allowAllTipracks,
+                                      })
+                                    )
+                                  } else {
+                                    setIncompatibleTip(true)
+                                  }
+                                }}
+                                textDecoration={
+                                  TYPOGRAPHY.textDecorationUnderline
+                                }
+                              >
+                                <StyledText desktopStyle="bodyDefaultRegular">
+                                  {allowAllTipracks
+                                    ? t('show_default_tips')
+                                    : t('show_all_tips')}
+                                </StyledText>
+                              </Btn>
+                            )}
+                          </Flex>
                         </Flex>
                       </Flex>
                     )

@@ -77,7 +77,7 @@ describe('SelectPipettes', () => {
   it('renders the first page of select pipettes for a Flex', () => {
     render(props)
     screen.getByText('Step 2')
-    screen.getByText('Add a pipette and tips')
+    screen.getByText('Add a pipette')
     screen.getByText(
       'Pick your first pipette. If you need a second pipette, you can add it next.'
     )
@@ -125,7 +125,7 @@ describe('SelectPipettes', () => {
     }
     render(props)
     screen.getByText('Step 2')
-    screen.getByText('Add a pipette and tips')
+    screen.getByText('Add a pipette')
     screen.getByText(
       'Pick your first pipette. If you need a second pipette, you can add it next.'
     )
