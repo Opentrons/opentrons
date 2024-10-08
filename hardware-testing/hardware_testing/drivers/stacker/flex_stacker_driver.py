@@ -57,18 +57,18 @@ FS_ACK = "OK"+ FS_COMMAND_TERMINATOR.strip("\r")
 DEFAULT_COMMAND_RETRIES = 1
 TOTAL_TRAVEL_X = 202
 # TOTAL_TRAVEL_Z = 113.75
-TOTAL_TRAVEL_Z = 113
+TOTAL_TRAVEL_Z = 113.75
 RETRACT_DIST_X = 1
 RETRACT_DIST_Z = 1
 HOME_SPEED = 20
-RETRACT_SPEED_X = 10
-RETRACT_SPEED_Z = 10
-HOME_ACCELERATION = 10
-MOVE_ACCELERATION_X = 20
-MOVE_ACCELERATION_Z = 5
-MOVE_SPEED_X = 150
-MOVE_SPEED_UPZ = 50
-MOVE_SPEED_DOWNZ = 50
+HOME_ACCELERATION = 100
+MOVE_ACCELERATION_X = 1500
+MOVE_ACCELERATION_Z = 50
+MAX_SPEED_DISCONTINUITY_X = 20
+MAX_SPEED_DISCONTINUITY_Z = 20
+MOVE_SPEED_X = 300
+MOVE_SPEED_UPZ = 200
+MOVE_SPEED_DOWNZ = 200
 LABWARE_CLEARANCE = 9
 
 class FlexStacker():
@@ -90,6 +90,8 @@ class FlexStacker():
         self.home_speed = HOME_SPEED
         self.move_acceleration_x = MOVE_ACCELERATION_X
         self.move_acceleration_z = MOVE_ACCELERATION_Z
+        self.max_speed_discontinuity_x = MAX_SPEED_DISCONTINUITY_X
+        self.max_speed_discontinuity_z = MAX_SPEED_DISCONTINUITY_Z
         self.labware_clearance = LABWARE_CLEARANCE
         self.current_position = {'X': None, 'Z': None, 'L': None}
         # self.__class__.__name__ == 'FlexStacker'
@@ -135,18 +137,24 @@ class FlexStacker():
         x = x[0]
         # print(x)
         data_encode = data.encode()
-        # print(f'data encode: {data_encode}')
+        #print(f'data encode: {data_encode}')
         self._stacker_connection.write(data=data_encode)
+        start = time.time()
         while True:
-            response = self._stacker_connection.read_until(expected = f'{x} OK\n')
             # print(response)
+            response = self._stacker_connection.read_until(expected = f'{x} OK\n')
+            print(response)
             if (self._ack in response):
                 # Remove ack from response
                 response = response.replace(self._ack, b"OK\n")
                 str_response = self.process_raw_response(
                     command=data, response=response.decode()
                 )
-                # print(str_response)
+                print(str_response)
+                return str_response
+            end = time.time()
+            if (end-start) > 120:
+                str_response = b"OK\n"
                 return str_response
 
         self.on_retry()
@@ -195,6 +203,17 @@ class FlexStacker():
         """
         c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.ENABLE_MOTOR
+        ).add_element(axis.upper())
+        print(c)
+        response = self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES).strip('OK')
+
+    def disable_motor(self, axis: AXIS):
+        """Enables a Axis motor
+        Args:
+            command: Axis
+        """
+        c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
+            gcode=GCODE.DISABLE_MOTOR
         ).add_element(axis.upper())
         print(c)
         response = self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES).strip('OK')
@@ -255,10 +274,25 @@ class FlexStacker():
                         })
         return states
 
-    def move(self, axis: AXIS, distance: float, direction: DIR, velocity: int, acceleration: int):
-        max_speed_discontinuity = 5
-        if self.current_position['X'] == None or self.current_position['Z'] == None:
-            raise(f"Motor must be Home{axis}")
+    def move(self, axis: AXIS, distance: float, direction: DIR,
+                velocity: Optional[float] = None, acceleration: Optional[float] = None):
+        if axis == AXIS.X:
+            max_speed_discontinuity = 5
+            if velocity == None or acceleration == None:
+                velocity = self.move_speed_x
+                acceleration = self.move_acceleration_x
+        elif axis == AXIS.Z:
+            if velocity == None or acceleration == None:
+                velocity = self.move_speed_up_z
+                acceleration = self.move_acceleration_z
+        else:
+            max_speed_discontinuity = 5
+            if velocity == None or acceleration == None:
+                velocity = self.move_speed_up_z
+                acceleration = self.move_acceleration_z
+
+        # if self.current_position['X'] == None or self.current_position['Z'] == None:
+        #     raise(f"Motor must be Home{axis}")
         c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
                                                 gcode=GCODE.MOVE_DIST).add_element(
                                                 axis.upper() +
@@ -295,7 +329,13 @@ class FlexStacker():
         )
         self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
 
-    def home(self, axis: AXIS, direction: DIR, velocity: int, acceleration: int):
+    def home(self, axis: AXIS, direction: DIR, velocity: Optional[float] = None,
+                                                acceleration: Optional[float] = None):
+        if axis == AXIS.X or axis == AXIS.Z or axis == AXIS.L:
+            max_speed_discontinuity = 5
+            if velocity == None or acceleration == None:
+                velocity = self.home_speed
+                acceleration = self.home_acceleration
         # G5 X[dir: 0|1] V100 A50
         c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
                                                             gcode=GCODE.MOVE_LS
@@ -346,7 +386,8 @@ class FlexStacker():
         # print(current)
         c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.SET_IHOLD_CURRENT
-        ).add_element(axis).add_element(f''{current})
+        ).add_element(axis + f'{current}')
+        print(c)
         self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
 
     def set_run_current(self, current: float, axis: AXIS) -> str:
@@ -354,7 +395,7 @@ class FlexStacker():
         # current = convert_current_to_binary(current)
         c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.SET_PEAK_CURRENT
-        ).add_element(axis).add_element(f''{current})
+        ).add_element(axis + f'{current}')
         self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
 
     def close_latch(self):
@@ -401,8 +442,8 @@ class FlexStacker():
         self.home(AXIS.X, DIR.POSITIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
 
     def unload_labware(self):
-        labware_clearance = 9
-        labware_retract_speed= 50
+        labware_clearance = 31
+        labware_retract_speed= 100
         # ----------------Set up the Stacker------------------------
         self.home(AXIS.X, DIR.POSITIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
         self.home(AXIS.Z, DIR.NEGATIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
@@ -415,7 +456,7 @@ class FlexStacker():
         self.open_latch()
         self.move(AXIS.Z, labware_clearance, DIR.NEGATIVE, labware_retract_speed, HOME_ACCELERATION)
         self.close_latch()
-        self.move(AXIS.Z, TOTAL_TRAVEL_Z-20, DIR.NEGATIVE, self.move_speed_down_z, self.move_acceleration_z)
+        self.move(AXIS.Z, TOTAL_TRAVEL_Z-30, DIR.NEGATIVE, self.move_speed_down_z, self.move_acceleration_z)
         self.home(AXIS.Z, DIR.NEGATIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
         self.move(AXIS.X, TOTAL_TRAVEL_X-5, DIR.POSITIVE, self.move_speed_x, self.move_acceleration_x)
         self.home(AXIS.X, DIR.POSITIVE_HOME, HOME_SPEED, HOME_ACCELERATION)
