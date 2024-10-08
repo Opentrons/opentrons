@@ -75,15 +75,13 @@ export interface UnsafeEngageAxesRunTimeCommand
   result?: any
 }
 
-export interface UnsafeUngripLabwareParams {
-}
-
-export interface UnsafeUngripLabwareCreateCommand extends CommonCommandCreateInfo {
+export interface UnsafeUngripLabwareCreateCommand
+  extends CommonCommandCreateInfo {
   commandType: 'unsafe/ungripLabware'
-  params: UnsafeUngripLabwareParams
+  params: {}
 }
 export interface UnsafeUngripLabwareRunTimeCommand
   extends CommonCommandRunTimeInfo,
-  UnsafeUngripLabwareCreateCommand {
+    UnsafeUngripLabwareCreateCommand {
   result?: any
 }

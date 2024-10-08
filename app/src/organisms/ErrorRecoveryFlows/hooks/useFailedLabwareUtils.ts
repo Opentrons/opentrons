@@ -20,7 +20,7 @@ import type {
   AspirateRunTimeCommand,
   DispenseRunTimeCommand,
   LiquidProbeRunTimeCommand,
-  MoveLabwareRunTimeCommand
+  MoveLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { ERUtilsProps } from './useERUtils'
@@ -102,7 +102,7 @@ type FailedCommandRelevantLabware =
   | Omit<DispenseRunTimeCommand, 'result'>
   | Omit<LiquidProbeRunTimeCommand, 'result'>
   | Omit<PickUpTipRunTimeCommand, 'result'>
-  | Omit<MoveLabwareRunTimeCommand, 'result'> 
+  | Omit<MoveLabwareRunTimeCommand, 'result'>
   | null
 
 interface RelevantFailedLabwareCmd {
@@ -125,7 +125,7 @@ export function getRelevantFailedLabwareCmdFrom({
     case ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING:
       return getRelevantPickUpTipCommand(failedCommandByRunRecord, runCommands)
     case ERROR_KINDS.GRIPPER_ERROR:
-        return failedCommandByRunRecord as UnsafeUngripLabwareRunTimeCommand
+      return failedCommandByRunRecord as MoveLabwareRunTimeCommand
     case ERROR_KINDS.GENERAL_ERROR:
       return null
     default:
