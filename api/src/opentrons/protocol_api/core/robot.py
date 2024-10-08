@@ -15,7 +15,7 @@ class AbstractRobot(ABC):
 
     @abstractmethod
     def move_axes_to(
-        self, axis_map: AxisMapType, critical_point: AxisMapType, speed: Optional[float]
+        self, axis_map: AxisMapType, critical_point: Optional[AxisMapType], speed: Optional[float]
     ) -> None:
         ...
 

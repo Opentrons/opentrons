@@ -92,7 +92,7 @@ class RobotContext(publisher.CommandPublisher):
     def move_axes_to(
         self,
         axis_map: Union[AxisMapType, StringAxisMap],
-        critical_point: Union[AxisMapType, StringAxisMap],
+        critical_point: Optional[Union[AxisMapType, StringAxisMap]] = None,
         speed: Optional[float] = None,
     ) -> None:
         """
@@ -109,9 +109,10 @@ class RobotContext(publisher.CommandPublisher):
         axis_map = validation.ensure_axis_map_type(
             axis_map, self._protocol_core.robot_type, is_96_channel
         )
-        critical_point = validation.ensure_axis_map_type(
-            critical_point, self._protocol_core.robot_type, is_96_channel
-        )
+        if critical_point:
+            critical_point = validation.ensure_axis_map_type(
+                critical_point, self._protocol_core.robot_type, is_96_channel
+            )
         validation.ensure_only_gantry_axis_map_type(
             critical_point, self._protocol_core.robot_type
         )

@@ -57,10 +57,12 @@ class RobotCore(AbstractRobot):
         )
 
     def move_axes_to(
-        self, axis_map: AxisMapType, critical_point: AxisMapType, speed: Optional[float]
+        self, axis_map: AxisMapType, critical_point: Optional[AxisMapType], speed: Optional[float]
     ) -> None:
         axis_engine_map = self._convert_to_engine_mount(axis_map)
-        critical_point_engine = self._convert_to_engine_mount(critical_point)
+        critical_point_engine = critical_point
+        if critical_point:
+            critical_point_engine = self._convert_to_engine_mount(critical_point)
         self._engine_client.execute_command(
             cmd.robot.MoveAxesToParams(
                 axis_map=axis_engine_map,

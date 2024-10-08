@@ -301,6 +301,7 @@ class HardwareGantryMover(GantryMover):
         axis_map: Dict[MotorAxis, float],
         critical_point: Optional[Dict[MotorAxis, float]] = None,
         speed: Optional[float] = None,
+        relative_move: bool = False
     ) -> Dict[MotorAxis, float]:
         """Move a set of axes a given distance.
 
@@ -312,17 +313,17 @@ class HardwareGantryMover(GantryMover):
         try:
             pos_hw = self._convert_axis_map_for_hw(axis_map)
             mount = self.pick_mount_from_axis_map(axis_map)
-            if not critical_point:
+            if relative_move:
                 current_position = await self._hardware_api.current_position(
                     mount, refresh=True
                 )
                 log.info(f"The current position of the robot is: {current_position}.")
-                absolute_pos = target_axis_map_from_relative(
-                    pos_hw, current_position
+                absolute_pos = target_axis_map_from_relative(pos_hw, current_position)
+                log.info(
+                    f"The absolute position is: {absolute_pos} and hw pos map is {absolute_pos}."
                 )
-                log.info(f"The absolute position is: {absolute_pos} and hw pos map is {absolute_pos}.")
             else:
-                log.info(f"Incorrectly in abs move")
+                log.info(f"Absolute move {axis_map} and {mount}")
                 mount_offset = self._offset_axis_map_for_mount(mount)
                 abs_cp_hw = self._convert_axis_map_for_hw(critical_point)
                 absolute_pos = target_axis_map_from_absolute(
