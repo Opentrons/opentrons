@@ -1227,7 +1227,9 @@ class OT3API(
                     message=f"{axis} is not present", detail={"axis": str(axis)}
                 )
 
+        self._log.info(f"Attempting to move {position} with speed {speed}.")
         if not self._backend.check_encoder_status(list(position.keys())):
+            self._log.info("Calling home in move_axes")
             await self.home()
         self._assert_motor_ok(list(position.keys()))
 

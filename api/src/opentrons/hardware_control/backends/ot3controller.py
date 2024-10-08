@@ -652,10 +652,11 @@ class OT3Controller(FlexBackend):
 
         if possible_q_axis_origin and possible_q_axis_target:
             tip_motor_move_group = self._build_tip_action_group(
-                possible_q_axis_origin, [(possible_q_axis_origin, speed)]
+                possible_q_axis_origin, [(possible_q_axis_target, speed)]
             )
 
         move_target = MoveTarget.build(position=target, max_speed=speed)
+        log.info(f"The origin: {origin} and {target} position at speed: {speed}")
         try:
             _, movelist = self._move_manager.plan_motion(
                 origin=origin, target_list=[move_target]
@@ -677,6 +678,7 @@ class OT3Controller(FlexBackend):
             origin, moves, ordered_nodes, MoveStopCondition[stop_condition.name]
         )
         move_group, _ = group
+        log.info(f"The move group is {move_group} and the tip motor move group is {tip_motor_move_group}")
         runner = MoveGroupRunner(
             move_groups=[move_group, tip_motor_move_group],
             ignore_stalls=True
