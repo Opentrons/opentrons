@@ -125,7 +125,7 @@ def target_axis_map_from_absolute(
     }
     axis_map.update(axis_with_offset)
     target_position = OrderedDict(
-        ((ax, axis_map[ax]) for ax in EMPTY_ORDERED_DICT.keys())
+        ((ax, axis_map[ax]) for ax in EMPTY_ORDERED_DICT.keys() if ax in axis_map.keys())
     )
     return target_position
 
