@@ -19,7 +19,7 @@ def list_ports_and_select(device_name: str = "", port_substr: str = None) -> str
         for i, p in enumerate(ports):
             if port_substr in p.device:
                 return p.device
-        
+
     while True:
         idx_str = input(
             f"\nEnter number next to {device_name} port (or ENTER to re-scan): "
