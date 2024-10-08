@@ -30,28 +30,6 @@ class PipettingHeights:
     end: LiquidSurfaceHeights
 
 
-def _get_heights_in_well(
-    height_before: float,
-    height_after: float,
-    submerge: float,
-    retract: float,
-) -> Tuple[float, float, float]:
-    pipetting_heights = PipettingHeights(
-        start=LiquidSurfaceHeights(
-            above=max(height_before + retract, config.LABWARE_BOTTOM_CLEARANCE),
-            below=max(height_before + submerge, config.LABWARE_BOTTOM_CLEARANCE),
-        ),
-        end=LiquidSurfaceHeights(
-            above=max(height_after + retract, config.LABWARE_BOTTOM_CLEARANCE),
-            below=max(height_after + submerge, config.LABWARE_BOTTOM_CLEARANCE),
-        ),
-    )
-    approach = max(pipetting_heights.start.above, pipetting_heights.end.above)
-    submerge = pipetting_heights.end.below
-    retract = pipetting_heights.end.above
-    return approach, submerge, retract
-
-
 @dataclass
 class PipettingCallbacks:
     """Pipetting callbacks."""
@@ -100,10 +78,17 @@ def _get_approach_submerge_retract_heights(
     else:
         liq_submerge = liquid_class.dispense.submerge_mm
         liq_retract = liquid_class.dispense.retract_mm
-    approach_mm, submerge_mm, retract_mm = _get_heights_in_well(
-        liquid_before, liquid_after, liq_submerge, liq_retract
-    )
-    return approach_mm, submerge_mm, retract_mm
+    approach = liquid_before + liq_retract
+    retract = liquid_after + liq_retract
+    if dispense and liq_submerge > 0:
+        # guarantee NON-contact dispensing does not touch liquid
+        submerge = liquid_after + liq_submerge
+    else:
+        # guarantee CONTACT dispensing and aspirates stay submerged
+        submerge = min(liquid_before, liquid_after) + liq_submerge
+    # also make sure it doesn't hit the well's bottom
+    submerge = max(submerge, config.LABWARE_BOTTOM_CLEARANCE)
+    return approach, submerge, retract
 
 
 def _submerge(
