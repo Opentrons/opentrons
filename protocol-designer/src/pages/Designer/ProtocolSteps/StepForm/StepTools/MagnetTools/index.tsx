@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   DIRECTION_COLUMN,
+  DeckInfoLabel,
   Divider,
   Flex,
   ListItem,
@@ -32,6 +33,8 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
   const moduleEntities = useSelector(getModuleEntities)
   const defaultEngageHeight = useSelector(getMagnetLabwareEngageHeight)
   const moduleModel = moduleEntities[formData.moduleId].model
+
+  const slotLocation = moduleLabwareOptions[0].name.slice(-1)
 
   const mmUnits = t('units.millimeter')
   const isGen1 = moduleModel === MAGNETIC_MODULE_V1
@@ -66,7 +69,8 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
           {t('protocol_steps:module')}
         </StyledText>
         <ListItem type="noActive">
-          <Flex padding={SPACING.spacing12}>
+          <Flex padding={SPACING.spacing12} gridGap={SPACING.spacing8}>
+            <DeckInfoLabel deckLabel={slotLocation} />
             <StyledText desktopStyle="bodyDefaultRegular">
               {moduleLabwareOptions[0].name}
             </StyledText>
