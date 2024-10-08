@@ -33,7 +33,6 @@ def list_ports_and_select(device_name: str = "", port_substr: str = None) -> str
         except (ValueError, IndexError):
             print("Invalid selection. Please try again.")
 
-
 def find_port(vid: int, pid: int) -> str:
     """Find COM port from provided VIP:PID."""
     for port in comports():
