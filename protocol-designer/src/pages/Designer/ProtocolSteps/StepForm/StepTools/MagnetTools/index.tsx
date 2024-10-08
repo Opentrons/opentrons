@@ -10,7 +10,10 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
+import {
+  MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+} from '@opentrons/shared-data'
 import {
   MAX_ENGAGE_HEIGHT_V1,
   MAX_ENGAGE_HEIGHT_V2,
@@ -22,7 +25,11 @@ import {
   getMagneticLabwareOptions,
 } from '../../../../../../ui/modules/selectors'
 import { ToggleExpandStepFormField } from '../../../../../../molecules'
-import { getModuleEntities } from '../../../../../../step-forms/selectors'
+import {
+  getInitialDeckSetup,
+  getModuleEntities,
+} from '../../../../../../step-forms/selectors'
+import { getModulesOnDeckByType } from '../../../../../../ui/modules/utils'
 
 import type { StepFormProps } from '../../types'
 
@@ -32,10 +39,13 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
   const moduleLabwareOptions = useSelector(getMagneticLabwareOptions)
   const moduleEntities = useSelector(getModuleEntities)
   const defaultEngageHeight = useSelector(getMagnetLabwareEngageHeight)
+  const deckSetup = useSelector(getInitialDeckSetup)
+  const modulesOnDeck = getModulesOnDeckByType(deckSetup, MAGNETIC_MODULE_TYPE)
+
   const moduleModel = moduleEntities[formData.moduleId].model
 
   const slotInfo = moduleLabwareOptions[0].name.split('in')
-  const slotLocation = slotInfo[2].split('slot')
+  const slotLocation = modulesOnDeck != null ? modulesOnDeck[0].slot : ''
 
   const mmUnits = t('units.millimeter')
   const isGen1 = moduleModel === MAGNETIC_MODULE_V1
@@ -71,7 +81,7 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
         </StyledText>
         <ListItem type="noActive">
           <Flex padding={SPACING.spacing12} gridGap={SPACING.spacing24}>
-            <DeckInfoLabel deckLabel={slotLocation[1]} />
+            <DeckInfoLabel deckLabel={slotLocation} />
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
               <StyledText desktopStyle="bodyDefaultRegular">
                 {slotInfo[0]}
