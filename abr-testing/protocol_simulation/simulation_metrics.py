@@ -59,11 +59,11 @@ def set_api_level(protocol_file_path) -> None:
 # Mock sys.exit to avoid program termination
 original_exit = sys.exit  # Save the original sys.exit function
 
-def mock_exit(code=None):
+def mock_exit(code=None) -> None:
     print(f"sys.exit() called with code: {code}")
     raise SystemExit(code)  # Raise the exception but catch it to prevent termination
 
-def get_labware_name(id: str, object_dict: dict, json_data: dict):
+def get_labware_name(id: str, object_dict: dict, json_data: dict) -> str:
     slot = ""
     for obj in object_dict:
         if obj['id'] == id:
@@ -158,51 +158,48 @@ def parse_results_volume(json_data_file: str) -> Tuple[
         if x != 0:
             prev_command = commands[x-1]
             if command["commandType"] == "aspirate":
-                if not (prev_command["commandType"] == "comment" and (prev_command['params']['message'] == "AIR GAP" or prev_command['params']['message'] == "MIXING")):
-                    labware_id = command["params"]["labwareId"]
-                    labware_name = ""
-                    for labware in json_data.get("labware"):
-                        if labware["id"] == labware_id:
-                            labware_name = (labware["loadName"]) + get_labware_name(labware["id"], json_data["labware"], json_data)
-                    well_name = command["params"]["wellName"]
+                labware_id = command["params"]["labwareId"]
+                labware_name = ""
+                for labware in json_data.get("labware"):
+                    if labware["id"] == labware_id:
+                        labware_name = (labware["loadName"]) + get_labware_name(labware["id"], json_data["labware"], json_data)
+                well_name = command["params"]["wellName"]
 
-                    if labware_id not in labware_well_dict:
-                        labware_well_dict[labware_id] = {}
+                if labware_id not in labware_well_dict:
+                    labware_well_dict[labware_id] = {}
 
-                    if well_name not in labware_well_dict[labware_id]:
-                        labware_well_dict[labware_id][well_name] = (labware_name, 0, 0, "")
+                if well_name not in labware_well_dict[labware_id]:
+                    labware_well_dict[labware_id][well_name] = (labware_name, 0, 0, "")
 
-                    vol = int(command["params"]["volume"])
+                vol = int(command["params"]["volume"])
 
-                    labware_name, added_volumes, subtracted_volumes, log = labware_well_dict[labware_id][well_name]
+                labware_name, added_volumes, subtracted_volumes, log = labware_well_dict[labware_id][well_name]
 
-                    subtracted_volumes += vol
-                    log+=(f"aspirated {vol} ")
-                    labware_well_dict[labware_id][well_name] = (labware_name, added_volumes, subtracted_volumes, log)
+                subtracted_volumes += vol
+                log+=(f"aspirated {vol} ")
+                labware_well_dict[labware_id][well_name] = (labware_name, added_volumes, subtracted_volumes, log)
 
             elif command["commandType"] == "dispense":
-                if not (prev_command["commandType"] == "comment" and (prev_command['params']['message'] == "MIXING")):
-                    labware_id = command["params"]["labwareId"]
-                    labware_name = ""
-                    for labware in json_data.get("labware"):
-                        if labware["id"] == labware_id:
-                            labware_name = (labware["loadName"]) + get_labware_name(labware["id"], json_data["labware"], json_data)
-                    well_name = command["params"]["wellName"]
+                labware_id = command["params"]["labwareId"]
+                labware_name = ""
+                for labware in json_data.get("labware"):
+                    if labware["id"] == labware_id:
+                        labware_name = (labware["loadName"]) + get_labware_name(labware["id"], json_data["labware"], json_data)
+                well_name = command["params"]["wellName"]
 
-                    if labware_id not in labware_well_dict:
-                        labware_well_dict[labware_id] = {}
+                if labware_id not in labware_well_dict:
+                    labware_well_dict[labware_id] = {}
 
-                    if well_name not in labware_well_dict[labware_id]:
-                        labware_well_dict[labware_id][well_name] = (labware_name, 0, 0, "")
+                if well_name not in labware_well_dict[labware_id]:
+                    labware_well_dict[labware_id][well_name] = (labware_name, 0, 0, "")
 
-                    vol = int(command["params"]["volume"])
+                vol = int(command["params"]["volume"])
 
-                    labware_name, added_volumes, subtracted_volumes, log = labware_well_dict[labware_id][well_name]
+                labware_name, added_volumes, subtracted_volumes, log = labware_well_dict[labware_id][well_name]
 
-                    added_volumes += vol
-                    log+=(f"dispensed {vol} ")
-                    labware_well_dict[labware_id][well_name] = (labware_name, added_volumes, subtracted_volumes, log)
-                    # file_date_formatted = file_date.strftime("%Y-%m-%d_%H-%M-%S")
+                added_volumes += vol
+                log+=(f"dispensed {vol} ")
+                labware_well_dict[labware_id][well_name] = (labware_name, added_volumes, subtracted_volumes, log)
     with open(f"{os.path.dirname(json_data_file)}\\{protocol_name}_well_volumes_{file_date_formatted}.json", "w") as output_file:
         json.dump(labware_well_dict, output_file)
         output_file.close()
@@ -241,7 +238,7 @@ def parse_results_volume(json_data_file: str) -> Tuple[
         values_row)
     
 
-def main(storage_directory, google_sheet_name, protocol_file_path):
+def main(storage_directory, google_sheet_name, protocol_file_path) -> None:
     sys.exit = mock_exit  # Replace sys.exit with the mock function
 
 

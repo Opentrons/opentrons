@@ -539,7 +539,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=location,
             ),
         ):
-            # self._protocol_core.comment("MIXING")
             self.aspirate(volume, location, rate)
             while repetitions - 1 > 0:
                 self.dispense(volume, rate=rate, **dispense_kwargs)
@@ -765,7 +764,6 @@ class InstrumentContext(publisher.CommandPublisher):
             raise RuntimeError("No previous Well cached to perform air gap")
         target = loc.labware.as_well().top(height)
         self.move_to(target, publish=False)
-        self._protocol_core.comment("AIR GAP")
         self.aspirate(volume)
         return self
 
