@@ -352,3 +352,142 @@ describe('getWellSetForMultichannel (integration test)', () => {
     ).toEqual(ninetySixChannelWells)
   })
 })
+
+describe('getWellSetForMultichannel with pipetteNozzleDetails', () => {
+  let getWellSetForMultichannel: ReturnType<
+    typeof makeWellSetHelpers
+  >['getWellSetForMultichannel']
+
+  const labwareDef = fixture96Plate
+
+  beforeEach(() => {
+    const helpers = makeWellSetHelpers()
+    getWellSetForMultichannel = helpers.getWellSetForMultichannel
+  })
+
+  it('returns full column for 8-channel pipette with no config', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'C1',
+      channels: 8,
+    })
+    expect(result).toEqual(['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'])
+  })
+
+  it('returns full column for 8-channel pipette with full config', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'C1',
+      channels: 8,
+      pipetteNozzleDetails: {
+        nozzleConfig: 'full',
+        activeNozzleCount: 8,
+      },
+    })
+    expect(result).toEqual(['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'])
+  })
+
+  it('returns single well for 8-channel pipette with single nozzle config', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'C1',
+      channels: 8,
+      pipetteNozzleDetails: {
+        nozzleConfig: 'single',
+        activeNozzleCount: 1,
+      },
+    })
+    expect(result).toEqual(['C1'])
+  })
+
+  it('returns partial column for 8-channel pipette with partial column config', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'C1',
+      channels: 8,
+      pipetteNozzleDetails: {
+        nozzleConfig: 'column',
+        activeNozzleCount: 4,
+      },
+    })
+    expect(result).toEqual(['C1', 'D1', 'E1', 'F1'])
+  })
+
+  it('returns row for 8-channel pipette with row config', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'C1',
+      channels: 8,
+      pipetteNozzleDetails: {
+        nozzleConfig: 'row',
+        activeNozzleCount: 8,
+      },
+    })
+    expect(result).toEqual([
+      'C1',
+      'C2',
+      'C3',
+      'C4',
+      'C5',
+      'C6',
+      'C7',
+      'C8',
+      'C9',
+      'C10',
+      'C11',
+      'C12',
+    ])
+  })
+
+  it('handles edge cases for 8-channel partial column selection', () => {
+    const bottomEdgeResult = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'G1',
+      channels: 8,
+      pipetteNozzleDetails: {
+        nozzleConfig: 'column',
+        activeNozzleCount: 4,
+      },
+    })
+    expect(bottomEdgeResult).toEqual(['E1', 'F1', 'G1', 'H1'])
+  })
+
+  it('returns full plate for 96-channel pipette with no config', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'A1',
+      channels: 96,
+    })
+    expect(result?.length).toBe(96)
+    expect(result?.[0]).toBe('A1')
+    expect(result?.[95]).toBe('H12')
+  })
+
+  it('returns full plate for 96-channel pipette with full config', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'A1',
+      channels: 96,
+      pipetteNozzleDetails: {
+        nozzleConfig: 'full',
+        activeNozzleCount: 96,
+      },
+    })
+    expect(result?.length).toBe(96)
+    expect(result?.[0]).toBe('A1')
+    expect(result?.[95]).toBe('H12')
+  })
+
+  it('returns single column for 96-channel pipette with column config', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'C1',
+      channels: 96,
+      pipetteNozzleDetails: {
+        nozzleConfig: 'column',
+        activeNozzleCount: 8,
+      },
+    })
+    expect(result).toEqual(['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'])
+  })
+})

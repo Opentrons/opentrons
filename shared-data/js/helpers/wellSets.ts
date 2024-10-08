@@ -15,7 +15,11 @@ import uniq from 'lodash/uniq'
 
 import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 import { get96Channel384WellPlateWells, getLabwareDefURI, orderWells } from '.'
-import type { LabwareDefinition2, PipetteV2Specs } from '../types'
+import type {
+  LabwareDefinition2,
+  NozzleLayoutConfig,
+  PipetteV2Specs,
+} from '../types'
 
 type WellSetByPrimaryWell = string[][]
 
@@ -38,16 +42,30 @@ function _getAllWellSetsForLabware(
   )
 }
 
+export interface NozzleLayoutDetails {
+  nozzleConfig: NozzleLayoutConfig
+  /* The number of nozzles actively used by the pipette in the current configuration. */
+  activeNozzleCount: number
+}
 // creates memoized getAllWellSetsForLabware + getWellSetForMultichannel fns.
 export interface WellSetHelpers {
   getAllWellSetsForLabware: (
     labwareDef: LabwareDefinition2
   ) => WellSetByPrimaryWell
 
+  /** Given a well for a labware, returns the well set it belongs to (or null)
+   * for 8-channel and 96-channel access.
+   * Ex: C2 for 96-flat => ['A2', 'B2', 'C2', ... 'H2']
+   * Or A1 for trough => ['A1', 'A1', 'A1', ...]
+   *
+   * @param {string[] | undefined} pipetteNozzleDetails If specified, return only the wells utilized by the active pipette
+   * nozzle configuration.
+   **/
   getWellSetForMultichannel: (
     labwareDef: LabwareDefinition2,
     well: string,
-    channels: 8 | 96
+    channels: 8 | 96,
+    pipetteNozzleDetails?: NozzleLayoutDetails
   ) => string[] | null | undefined
 
   canPipetteUseLabware: (
@@ -89,37 +107,111 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
   const getWellSetForMultichannel = (
     labwareDef: LabwareDefinition2,
     well: string,
-    channels: 8 | 96
-  ): string[] | null | undefined => {
-    /** Given a well for a labware, returns the well set it belongs to (or null)
-     * for 8-channel access.
-     * Ie: C2 for 96-flat => ['A2', 'B2', 'C2', ... 'H2']
-     * Or A1 for trough => ['A1', 'A1', 'A1', ...]
-     **/
-    const allWellSetsFor8Channel = getAllWellSetsForLabware(labwareDef)
-    /**  getting all wells from the plate and turning into 1D array for 96-channel
-     */
-    const orderedWellsFor96Channel = orderWells(
-      labwareDef.ordering,
-      't2b',
-      'l2r'
-    )
+    channels: 8 | 96,
+    pipetteNozzleDetails?: NozzleLayoutDetails
+  ): string[] | null => {
+    // If the nozzle config isn't specified, assume the "full" config.
+    const nozzleConfig = pipetteNozzleDetails?.nozzleConfig ?? null
 
-    let ninetySixChannelWells = orderedWellsFor96Channel
-    /**  special casing 384 well plates to be every other well
-     * both on the x and y ases.
-     */
-    if (orderedWellsFor96Channel.length === 384) {
-      ninetySixChannelWells = get96Channel384WellPlateWells(
-        orderedWellsFor96Channel,
-        well
-      )
+    const getActiveRowFromWell = (wellSet: WellSetByPrimaryWell): string[] => {
+      const rowLetter = well.slice(0, 1)
+      // A = 0, B = 1, Z = 25, etc.
+      const rowIndex = rowLetter.toUpperCase().charCodeAt(0) - 65
+
+      return wellSet.map(columnOfWells => columnOfWells[rowIndex])
     }
-    return channels === 8
-      ? allWellSetsFor8Channel.find((wellSet: string[]) =>
-          wellSet.includes(well)
-        )
-      : ninetySixChannelWells
+
+    const get8ChPartialColumnFromWell = (
+      wellSet: WellSetByPrimaryWell
+    ): string[] => {
+      const activeNozzleCount = pipetteNozzleDetails?.activeNozzleCount ?? 0
+
+      // Find the column that contains the given well.
+      const targetColumn = wellSet.find(column => column.includes(well))
+      if (targetColumn == null || activeNozzleCount === 0) {
+        return []
+      }
+
+      const wellIndex = targetColumn.indexOf(well)
+      const totalWells = targetColumn.length
+
+      if (activeNozzleCount >= totalWells) {
+        return targetColumn
+      }
+
+      // Calculate how many wells we can include below the selected well, handling edge cases.
+      const wellsBelow = totalWells - wellIndex - 1
+      const wellsNeededAbove = Math.max(0, activeNozzleCount - wellsBelow - 1)
+
+      const startIndex = Math.max(0, wellIndex - wellsNeededAbove)
+      const endIndex = Math.min(totalWells, startIndex + activeNozzleCount)
+
+      return targetColumn.slice(startIndex, endIndex)
+    }
+
+    if (channels === 8) {
+      const allWellSetsFor8Channel = getAllWellSetsForLabware(labwareDef)
+
+      switch (nozzleConfig) {
+        case null:
+        case 'full':
+        case 'column': {
+          if (
+            pipetteNozzleDetails == null ||
+            pipetteNozzleDetails.activeNozzleCount === 8
+          ) {
+            return (
+              allWellSetsFor8Channel.find((wellSet: string[]) =>
+                wellSet.includes(well)
+              ) ?? null
+            )
+          } else {
+            return get8ChPartialColumnFromWell(allWellSetsFor8Channel)
+          }
+        }
+        case 'single':
+          return [well]
+        case 'row':
+          return getActiveRowFromWell(allWellSetsFor8Channel)
+        case 'subrect':
+        default:
+          console.error('Unhandled nozzleConfig case.')
+          return null
+      }
+    } else {
+      switch (nozzleConfig) {
+        case null:
+        case 'full': {
+          /**  getting all wells from the plate and turning into 1D array for 96-channel
+           */
+          const orderedWellsFor96Channel = orderWells(
+            labwareDef.ordering,
+            't2b',
+            'l2r'
+          )
+          /**  special casing 384 well plates to be every other well
+           * both on the x and y ases.
+           */
+          return orderedWellsFor96Channel.length === 384
+            ? get96Channel384WellPlateWells(orderedWellsFor96Channel, well)
+            : orderedWellsFor96Channel
+        }
+        case 'single':
+          return [well]
+        case 'column':
+          return (
+            labwareDef.ordering.find((wellSet: string[]) =>
+              wellSet.includes(well)
+            ) ?? null
+          )
+        case 'row':
+          return getActiveRowFromWell(labwareDef.ordering)
+        case 'subrect':
+        default:
+          console.error('Unhandled nozzleConfig case.')
+          return null
+      }
+    }
   }
 
   const canPipetteUseLabware = (
