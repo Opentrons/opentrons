@@ -113,9 +113,9 @@ class RobotContext(publisher.CommandPublisher):
             critical_point = validation.ensure_axis_map_type(
                 critical_point, self._protocol_core.robot_type, is_96_channel
             )
-        validation.ensure_only_gantry_axis_map_type(
-            critical_point, self._protocol_core.robot_type
-        )
+            validation.ensure_only_gantry_axis_map_type(
+                critical_point, self._protocol_core.robot_type
+            )
         self._core.move_axes_to(axis_map, critical_point, speed)
 
     @requires_version(2, 20)
