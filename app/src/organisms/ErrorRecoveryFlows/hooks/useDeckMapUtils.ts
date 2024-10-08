@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import {
   getDeckDefFromRobotType,
   getLoadedLabwareDefinitionsByUri,
+  getFixedTrashLabwareDefinitionsByUri,
   getModuleDef2,
   getPositionFromSlotId,
   getSimplestDeckConfigForProtocol,
@@ -254,6 +255,7 @@ export function getRunCurrentLabwareInfo({
   runRecord: UseDeckMapUtilsProps['runRecord']
   protocolAnalysis: UseDeckMapUtilsProps['protocolAnalysis']
 }): RunCurrentLabwareInfo[] {
+  console.log("runRecord: ", runRecord)
   if (runRecord == null || protocolAnalysis == null) {
     return []
   } else {
@@ -263,6 +265,9 @@ export function getRunCurrentLabwareInfo({
       const labwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri(
         protocolAnalysis.commands
       )
+      if (!labwareDefinitionsByUri){
+        labwareDefinitionsByUri = getFixedTrashLabwareDefinitionsByUri(lw.definitionUri)
+      }
       const labwareDef = labwareDefinitionsByUri[lw.definitionUri]
 
       if (slotName == null || labwareLocation == null) {
