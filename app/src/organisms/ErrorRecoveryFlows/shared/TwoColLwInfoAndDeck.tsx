@@ -20,7 +20,6 @@ export function TwoColLwInfoAndDeck(
     deckMapUtils,
     currentRecoveryOptionUtils,
   } = props
-  console.log('=>(TwoColLwInfoAndDeck.tsx:23) deckMapUtils', deckMapUtils)
   const {
     RETRY_NEW_TIPS,
     SKIP_STEP_WITH_NEW_TIPS,

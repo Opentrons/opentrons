@@ -18,6 +18,7 @@ import { useRecoveryToasts } from './useRecoveryToasts'
 import { useRecoveryAnalytics } from '/app/redux-resources/analytics'
 import { useShowDoorInfo } from './useShowDoorInfo'
 import { useCleanupRecoveryState } from './useCleanupRecoveryState'
+import { useFailedPipetteUtils } from './useFailedPipetteUtils'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
@@ -38,6 +39,7 @@ import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 import type { UseRecoveryTakeoverResult } from './useRecoveryTakeover'
 import type { useRetainedFailedCommandBySource } from './useRetainedFailedCommandBySource'
 import type { UseShowDoorInfoResult } from './useShowDoorInfo'
+import type { UseFailedPipetteUtilsResult } from './useFailedPipetteUtils'
 
 export type ERUtilsProps = Omit<ErrorRecoveryFlowsProps, 'failedCommand'> & {
   toggleERWizAsActiveUser: UseRecoveryTakeoverResult['toggleERWizAsActiveUser']
@@ -55,6 +57,7 @@ export interface ERUtilsResults {
   recoveryCommands: UseRecoveryCommandsResult
   tipStatusUtils: RecoveryTipStatusUtils
   failedLabwareUtils: UseFailedLabwareUtilsResult
+  failedPipetteUtils: UseFailedPipetteUtilsResult
   deckMapUtils: UseDeckMapUtilsResult
   getRecoveryOptionCopy: ReturnType<typeof useRecoveryOptionCopy>
   recoveryActionMutationUtils: RecoveryActionMutationResult
@@ -143,6 +146,11 @@ export function useERUtils({
     runCommands,
   })
 
+  const failedPipetteUtils = useFailedPipetteUtils(
+    runId,
+    failedCommand?.byRunRecord ?? null
+  )
+
   const recoveryCommands = useRecoveryCommands({
     runId,
     failedCommandByRunRecord,
@@ -190,6 +198,7 @@ export function useERUtils({
     hasLaunchedRecovery,
     tipStatusUtils,
     failedLabwareUtils,
+    failedPipetteUtils,
     failedPipetteInfo,
     deckMapUtils,
     getRecoveryOptionCopy,
