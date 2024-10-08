@@ -426,7 +426,10 @@ def thermocycler_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
             or commandType == "thermocycler/closeLid"
         ):
             lid_engagements += 1
-        if commandType == "thermocycler/setTargetBlockTemperature":
+        if (
+            commandType == "thermocycler/setTargetBlockTemperature"
+            and command["status"] != "queued"
+        ):
             block_temp = command["params"]["celsius"]
             block_temp_changes += 1
             block_on_time = datetime.strptime(
