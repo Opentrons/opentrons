@@ -67,7 +67,7 @@ describe('MagnetTools', () => {
       },
     }
     vi.mocked(getMagneticLabwareOptions).mockReturnValue([
-      { name: 'mock name', value: 'mockValue' },
+      { name: 'mock labware in mock module in slot abc', value: 'mockValue' },
     ])
     vi.mocked(getModuleEntities).mockReturnValue({
       magnetId: {
@@ -82,7 +82,9 @@ describe('MagnetTools', () => {
   it('renders the text and a switch button for v2', () => {
     render(props)
     screen.getByText('Module')
-    screen.getByText('mock name')
+    screen.getByText('abc')
+    screen.getByText('mock labware')
+    screen.getByText('mock module')
     screen.getByText('Magnet state')
     screen.getByLabelText('Engage')
     const toggleButton = screen.getByRole('switch')
