@@ -1,13 +1,13 @@
 {
-  "liquidName": "glycerol",
+  "liquidName": "Glycerol 50%",
   "schemaVersion": 1,
   "namespace": "opentrons",
   "byPipette": [
     {
-      "pipetteModel": "p300_single",
+      "pipetteModel": "p20_single_gen2",
       "byTipType": [
         {
-          "tipType": "standard",
+          "tipType": "p20_tip",
           "aspirate": {
             "submerge": {
               "positionReference": "meniscus",
@@ -20,7 +20,7 @@
               "delay": {
                 "enable": true,
                 "params": {
-                  "duration": 2
+                  "duration": 1.5
                 }
               }
             },
@@ -31,55 +31,51 @@
                 "y": 0,
                 "z": 5
               },
-              "speed": 150,
-              "airGapByVolume": [
-                {
-                  "volume": "100",
-                  "airGap": 10
-                },
-                {
-                  "volume": "200",
-                  "airGap": 20
-                }
-              ],
+              "speed": 100,
+              "airGapByVolume": {
+                "default": 2,
+                "5": 3,
+                "10": 4
+              },
               "touchTip": {
                 "enable": true,
                 "params": {
-                  "zOffset": 1,
-                  "mmToEdge": 2,
-                  "speed": 100
+                  "zOffset": 2,
+                  "mmToEdge": 1,
+                  "speed": 50
                 }
               },
               "delay": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "duration": 1
+                }
               }
             },
-            "positionReference": "meniscus",
+            "positionReference": "bottom",
             "offset": {
               "x": 0,
               "y": 0,
               "z": -5
             },
-            "flowRateByVolume": [
-              {
-                "volume": "100",
-                "flowRate": 50
-              },
-              {
-                "volume": "200",
-                "flowRate": 100
-              }
-            ],
+            "flowRateByVolume": {
+              "default": 50,
+              "10": 40,
+              "20": 30
+            },
             "preWet": true,
             "mix": {
               "enable": true,
               "params": {
                 "repetitions": 3,
-                "volume": 50
+                "volume": 15
               }
             },
             "delay": {
-              "enable": false
+              "enable": true,
+              "params": {
+                "duration": 2
+              }
             }
           },
           "singleDispense": {
@@ -94,7 +90,7 @@
               "delay": {
                 "enable": true,
                 "params": {
-                  "duration": 2
+                  "duration": 1.5
                 }
               }
             },
@@ -105,17 +101,12 @@
                 "y": 0,
                 "z": 5
               },
-              "speed": 150,
-              "airGapByVolume": [
-                {
-                  "volume": "100",
-                  "airGap": 10
-                },
-                {
-                  "volume": "200",
-                  "airGap": 20
-                }
-              ],
+              "speed": 100,
+              "airGapByVolume": {
+                "default": 2,
+                "5": 3,
+                "10": 4
+              },
               "blowout": {
                 "enable": true,
                 "params": {
@@ -126,9 +117,9 @@
               "touchTip": {
                 "enable": true,
                 "params": {
-                  "zOffset": 1,
-                  "mmToEdge": 2,
-                  "speed": 100
+                  "zOffset": 2,
+                  "mmToEdge": 1,
+                  "speed": 50
                 }
               },
               "delay": {
@@ -138,40 +129,30 @@
                 }
               }
             },
-            "positionReference": "meniscus",
+            "positionReference": "bottom",
             "offset": {
               "x": 0,
               "y": 0,
               "z": -5
             },
-            "flowRateByVolume": [
-              {
-                "volume": "100",
-                "flowRate": 50
-              },
-              {
-                "volume": "200",
-                "flowRate": 100
-              }
-            ],
+            "flowRateByVolume": {
+              "default": 50,
+              "10": 40,
+              "20": 30
+            },
             "mix": {
               "enable": true,
               "params": {
-                "repetitions": 2,
-                "volume": 30
+                "repetitions": 3,
+                "volume": 15
               }
             },
-            "pushOutByVolume": [
-              {
-                "volume": "100",
-                "pushOut": 5
-              },
-              {
-                "volume": "200",
-                "pushOut": 10
-              }
-            ],
-            "delay": 2
+            "pushOutByVolume": {
+              "default": 5,
+              "10": 7,
+              "20": 10
+            },
+            "delay": 1
           },
           "multiDispense": {
             "submerge": {
@@ -185,7 +166,7 @@
               "delay": {
                 "enable": true,
                 "params": {
-                  "duration": 2
+                  "duration": 1.5
                 }
               }
             },
@@ -196,79 +177,56 @@
                 "y": 0,
                 "z": 5
               },
-              "speed": 150,
-              "airGapByVolume": [
-                {
-                  "volume": "100",
-                  "airGap": 10
-                },
-                {
-                  "volume": "200",
-                  "airGap": 20
-                }
-              ],
-              "blowout": {
-                "enable": true,
-                "params": {
-                  "location": "trash",
-                  "flowRate": 100
-                }
+              "speed": 100,
+              "airGapByVolume": {
+                "default": 2,
+                "5": 3,
+                "10": 4
               },
               "touchTip": {
                 "enable": true,
                 "params": {
-                  "zOffset": 1,
-                  "mmToEdge": 2,
-                  "speed": 100
+                  "zOffset": 2,
+                  "mmToEdge": 1,
+                  "speed": 50
                 }
               },
               "delay": {
+                "enable": true,
+                "params": {
+                  "duration": 1
+                }
+              },
+              "blowout": {
                 "enable": false
               }
             },
-            "positionReference": "meniscus",
+            "positionReference": "bottom",
             "offset": {
               "x": 0,
               "y": 0,
               "z": -5
             },
-            "flowRateByVolume": [
-              {
-                "volume": "100",
-                "flowRate": 50
-              },
-              {
-                "volume": "200",
-                "flowRate": 100
-              }
-            ],
+            "flowRateByVolume": {
+              "default": 50,
+              "10": 40,
+              "20": 30
+            },
             "mix": {
               "enable": true,
               "params": {
-                "repetitions": 2,
-                "volume": 30
+                "repetitions": 3,
+                "volume": 15
               }
             },
-            "conditioningByVolume": [
-              {
-                "volume": "100",
-                "conditioning": 5
-              },
-              {
-                "volume": "200",
-                "conditioning": 10
-              }
-            ],
-            "disposalByVolume": [
-              {
-                "volume": "100",
-                "disposal": 5
-              },
-              {
-                "volume": "200",
-                "disposal": 10
-              }
-            ],
+            "conditioningByVolume": {
+              "default": 10,
+              "5": 5
+            },
+            "disposalByVolume": {
+              "default": 2,
+              "5": 3
+            },
             "delay": {
               "enable": true,
               "params": {

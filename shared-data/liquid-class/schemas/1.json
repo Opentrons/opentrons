@@ -90,100 +90,59 @@
       "additionalProperties": false
     },
     "airGapByVolume": {
-      "type": "array",
+      "type": "object",
       "description": "Settings for air gap keyed by target aspiration volume.",
-      "items": {
-        "type": "object",
-        "properties": {
-          "volume": {
-            "type": "string",
-            "description": "Transfer volume for which to use the given airgap volume, in microliters."
-          },
-          "airGap": {
-            "$ref": "#/definitions/positiveNumber",
-            "description": "Airgap volume after retract for the specified volume, in microliters."
-          }
-        },
-        "required": ["volume", "airGap"],
-        "additionalProperties": false
-      }
+      "properties": {
+        "default": { "$ref": "#/definitions/positiveNumber" }
+      },
+      "patternProperties": {
+        "d+": { "$ref": "#/definitions/positiveNumber" }
+      },
+      "required": ["default"]
     },
     "flowRateByVolume": {
-      "type": "array",
+      "type": "object",
       "description": "Settings for flow rate keyed by target aspiration/dispense volume.",
-      "items": {
-        "type": "object",
-        "properties": {
-          "volume": {
-            "type": "string",
-            "description": "The volume whose flow rate will be used"
-          },
-          "flowRate": {
-            "$ref": "#/definitions/positiveNumber",
-            "description": "Flow rate, in microliters per second."
-          }
-        },
-        "required": ["volume", "flowRate"],
-        "additionalProperties": false
-      }
+      "properties": {
+        "default": { "$ref": "#/definitions/positiveNumber" }
+      },
+      "patternProperties": {
+        "d+": { "$ref": "#/definitions/positiveNumber" }
+      },
+      "required": ["default"]
     },
     "pushOutByVolume": {
-      "type": "array",
+      "type": "object",
       "description": "Settings for pushout keyed by target aspiration volume.",
-      "items": {
-        "type": "object",
-        "properties": {
-          "volume": {
-            "type": "string",
-            "description": "The volume whose pushout will be used"
-          },
-          "pushOut": {
-            "$ref": "#/definitions/positiveNumber",
-            "description": "Pushout volume, in microliters."
-          }
-        },
-        "required": ["volume", "pushOut"],
-        "additionalProperties": false
-      }
+      "properties": {
+        "default": { "$ref": "#/definitions/positiveNumber" }
+      },
+      "patternProperties": {
+        "d+": { "$ref": "#/definitions/positiveNumber" }
+      },
+      "required": ["default"]
     },
     "disposalByVolume": {
-      "type": "array",
+      "type": "object",
       "description": "Settings for disposal volume keyed by target dispense volume.",
-      "items": {
-        "type": "object",
-        "properties": {
-          "volume": {
-            "type": "string",
-            "description": "The volume whose disposal volume will be used"
-          },
-          "disposal": {
-            "$ref": "#/definitions/positiveNumber",
-            "description": "Disposal volume, in microliters."
-          }
-        },
-        "required": ["volume", "disposal"],
-        "additionalProperties": false
-      }
+      "properties": {
+        "default": { "$ref": "#/definitions/positiveNumber" }
+      },
+      "patternProperties": {
+        "d+": { "$ref": "#/definitions/positiveNumber" }
+      },
+      "required": ["default"]
     },
     "conditioningByVolume": {
-      "type": "array",
+      "type": "object",
       "description": "Settings for conditioning volume keyed by target dispense volume.",
-      "items": {
-        "type": "object",
-        "properties": {
-          "volume": {
-            "type": "string",
-            "description": "The volume whose conditioning volume will be used"
-          },
-          "conditioning": {
-            "$ref": "#/definitions/positiveNumber",
-            "description": "Conditioning volume, in microliters."
-          }
-        },
-        "required": ["volume", "conditioning"],
-        "additionalProperties": false
+      "properties": {
+        "default": { "$ref": "#/definitions/positiveNumber" }
       },
-      "additionalProperties": false
+      "patternProperties": {
+        "d+": { "$ref": "#/definitions/positiveNumber" }
+      },
+      "required": ["default"]
     },
     "mix": {
       "type": "object",
