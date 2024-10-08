@@ -21,23 +21,20 @@
           "type": "boolean",
           "description": "Whether delay is enabled."
         },
-        "duration": {
-          "#ref": "#/definitions/positiveNumber",
-          "description": "Duration of delay, in seconds."
+        "params": {
+          "type": "object",
+          "properties": {
+            "duration": {
+              "#ref": "#/definitions/positiveNumber",
+              "description": "Duration of delay, in seconds."
+            }
+          },
+          "required": ["duration"],
+          "additionalProperties": false
         }
       },
-      "description": "Delay properties.",
-      "if": {
-        "properties": {
-          "enable": { "const": true }
-        }
-      },
-      "then": {
-        "required": ["enable", "duration"]
-      },
-      "else": {
-        "required": ["enable"]
-      }
+      "required": ["enable"],
+      "additionalProperties": false
     },
     "positionReference": {
       "type": "string",
@@ -58,7 +55,8 @@
           "type": "number"
         }
       },
-      "required": ["x", "y", "z"]
+      "required": ["x", "y", "z"],
+      "additionalProperties": false
     },
     "touchTip": {
       "type": "object",
@@ -68,30 +66,124 @@
           "type": "boolean",
           "description": "Whether touch-tip is enabled."
         },
-        "zOffset": {
-          "type": "number",
-          "description": "Offset from the top of the well for touch-tip, in millimeters."
-        },
-        "mmToEdge": {
-          "type": "number",
-          "description": "Offset away from the the well edge, in millimeters."
-        },
-        "speed": {
-          "$ref": "#/definitions/positiveNumber",
-          "description": "Touch-tip speed, in millimeters per second."
+        "params": {
+          "type": "object",
+          "properties": {
+            "zOffset": {
+              "type": "number",
+              "description": "Offset from the top of the well for touch-tip, in millimeters."
+            },
+            "mmToEdge": {
+              "type": "number",
+              "description": "Offset away from the the well edge, in millimeters."
+            },
+            "speed": {
+              "$ref": "#/definitions/positiveNumber",
+              "description": "Touch-tip speed, in millimeters per second."
+            }
+          },
+          "required": ["zOffset", "mmToEdge", "speed"],
+          "additionalProperties": false
         }
       },
-      "if": {
+      "required": ["enable"],
+      "additionalProperties": false
+    },
+    "airGapByVolume": {
+      "type": "array",
+      "description": "Settings for air gap keyed by target aspiration volume.",
+      "items": {
+        "type": "object",
         "properties": {
-          "enable": { "const": true }
-        }
-      },
-      "then": {
-        "required": ["enable", "zOffset", "mmToEdge", "speed"]
-      },
-      "else": {
-        "required": ["enable"]
+          "volume": {
+            "type": "string",
+            "description": "Transfer volume for which to use the given airgap volume, in microliters."
+          },
+          "airGap": {
+            "$ref": "#/definitions/positiveNumber",
+            "description": "Airgap volume after retract for the specified volume, in microliters."
+          }
+        },
+        "required": ["volume", "airGap"],
+        "additionalProperties": false
       }
+    },
+    "flowRateByVolume": {
+      "type": "array",
+      "description": "Settings for flow rate keyed by target aspiration/dispense volume.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "volume": {
+            "type": "string",
+            "description": "The volume whose flow rate will be used"
+          },
+          "flowRate": {
+            "$ref": "#/definitions/positiveNumber",
+            "description": "Flow rate, in microliters per second."
+          }
+        },
+        "required": ["volume", "flowRate"],
+        "additionalProperties": false
+      }
+    },
+    "pushOutByVolume": {
+      "type": "array",
+      "description": "Settings for pushout keyed by target aspiration volume.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "volume": {
+            "type": "string",
+            "description": "The volume whose pushout will be used"
+          },
+          "pushOut": {
+            "$ref": "#/definitions/positiveNumber",
+            "description": "Pushout volume, in microliters."
+          }
+        },
+        "required": ["volume", "pushOut"],
+        "additionalProperties": false
+      }
+    },
+    "disposalByVolume": {
+      "type": "array",
+      "description": "Settings for disposal volume keyed by target dispense volume.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "volume": {
+            "type": "string",
+            "description": "The volume whose disposal volume will be used"
+          },
+          "disposal": {
+            "$ref": "#/definitions/positiveNumber",
+            "description": "Disposal volume, in microliters."
+          }
+        },
+        "required": ["volume", "disposal"],
+        "additionalProperties": false
+      }
+    },
+    "conditioningByVolume": {
+      "type": "array",
+      "description": "Settings for conditioning volume keyed by target dispense volume.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "volume": {
+            "type": "string",
+            "description": "The volume whose conditioning volume will be used"
+          },
+          "conditioning": {
+            "$ref": "#/definitions/positiveNumber",
+            "description": "Conditioning volume, in microliters."
+          }
+        },
+        "required": ["volume", "conditioning"],
+        "additionalProperties": false
+      },
+      "additionalProperties": false
     },
     "mix": {
       "type": "object",
@@ -101,27 +193,25 @@
           "type": "boolean",
           "description": "Whether mix is enabled."
         },
-        "repetitions": {
-          "type": "integer",
-          "description": "Number of mixing repetitions.",
-          "minimum": 0
-        },
-        "volume": {
-          "$ref": "#/definitions/positiveNumber",
-          "description": "Volume used for mixing, in microliters."
+        "params": {
+          "type": "object",
+          "properties": {
+            "repetitions": {
+              "type": "integer",
+              "description": "Number of mixing repetitions.",
+              "minimum": 0
+            },
+            "volume": {
+              "$ref": "#/definitions/positiveNumber",
+              "description": "Volume used for mixing, in microliters."
+            }
+          },
+          "required": ["repetitions", "volume"],
+          "additionalProperties": false
         }
       },
-      "if": {
-        "properties": {
-          "enable": { "const": true }
-        }
-      },
-      "then": {
-        "required": ["enable", "repetitions", "volume"]
-      },
-      "else": {
-        "required": ["enable"]
-      }
+      "required": ["enable"],
+      "additionalProperties": false
     },
     "blowout": {
       "type": "object",
@@ -131,27 +221,24 @@
           "type": "boolean",
           "description": "Whether blow-out is enabled."
         },
-        "location": {
-          "type": "string",
-          "enum": ["source", "destination", "trash"],
-          "description": "Location well or trash entity for blow out."
-        },
-        "flowRate": {
-          "$ref": "#/definitions/positiveNumber",
-          "description": "Flow rate for blow out, in microliters per second."
+        "params": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "enum": ["source", "destination", "trash"],
+              "description": "Location well or trash entity for blow out."
+            },
+            "flowRate": {
+              "$ref": "#/definitions/positiveNumber",
+              "description": "Flow rate for blow out, in microliters per second."
+            }
+          },
+          "required": ["location", "flowRate"]
         }
       },
-      "if": {
-        "properties": {
-          "enable": { "const": true }
-        }
-      },
-      "then": {
-        "required": ["enable", "location", "flowRate"]
-      },
-      "else": {
-        "required": ["enable"]
-      }
+      "required": ["enable"],
+      "additionalProperties": false
     },
     "submerge": {
       "type": "object",
@@ -171,7 +258,8 @@
           "$ref": "#/definitions/delay"
         }
       },
-      "required": ["positionReference", "offset", "speed", "delay"]
+      "required": ["positionReference", "offset", "speed", "delay"],
+      "additionalProperties": false
     },
     "retractAspirate": {
       "type": "object",
@@ -187,9 +275,8 @@
           "$ref": "#/definitions/positiveNumber",
           "description": "Speed of retraction, in millimeters per second."
         },
-        "airGap": {
-          "$ref": "#/definitions/positiveNumber",
-          "description": "Air gap volume after retract, in microliters."
+        "airGapByVolume": {
+          "$ref": "#/definitions/airGapByVolume"
         },
         "touchTip": {
           "$ref": "#/definitions/touchTip"
@@ -198,7 +285,13 @@
           "$ref": "#/definitions/delay"
         }
       },
-      "required": ["positionReference", "offset", "speed", "airGap", "delay"],
+      "required": [
+        "positionReference",
+        "offset",
+        "speed",
+        "airGapByVolume",
+        "delay"
+      ],
       "additionalProperties": false
     },
     "retractDispense": {
@@ -215,9 +308,8 @@
           "$ref": "#/definitions/positiveNumber",
           "description": "Speed of retraction, in millimeters per second."
         },
-        "airGap": {
-          "$ref": "#/definitions/positiveNumber",
-          "description": "Air gap volume after retract, in microliters."
+        "airGapByVolume": {
+          "$ref": "#/definitions/airGapByVolume"
         },
         "blowout": {
           "$ref": "#/definitions/blowout"
@@ -233,8 +325,9 @@
         "positionReference",
         "offset",
         "speed",
-        "airGap",
+        "airGapByVolume",
         "blowout",
+        "touchTip",
         "delay"
       ],
       "additionalProperties": false
@@ -255,9 +348,8 @@
         "offset": {
           "$ref": "#/definitions/coordinate"
         },
-        "flowRate": {
-          "$ref": "#/definitions/positiveNumber",
-          "description": "Flow rate for aspirating, in microliters per second."
+        "flowRateByVolume": {
+          "$ref": "#/definitions/flowRateByVolume"
         },
         "preWet": {
           "type": "boolean",
@@ -275,7 +367,7 @@
         "retract",
         "positionReference",
         "offset",
-        "flowRate",
+        "flowRateByVolume",
         "preWet",
         "mix",
         "delay"
@@ -298,16 +390,14 @@
         "offset": {
           "$ref": "#/definitions/coordinate"
         },
-        "flowRate": {
-          "$ref": "#/definitions/positiveNumber",
-          "description": "Flow rate for dispense, in microliters per second."
+        "flowRateByVolume": {
+          "$ref": "#/definitions/flowRateByVolume"
         },
         "mix": {
           "$ref": "#/definitions/mix"
         },
-        "pushOutVolume": {
-          "$ref": "#/definitions/positiveNumber",
-          "description": "Push out volume at dispense, in microliters."
+        "pushOutByVolume": {
+          "$ref": "#/definitions/pushOutByVolume"
         },
         "delay": {
           "$ref": "#/definitions/positiveNumber",
@@ -319,9 +409,9 @@
         "retract",
         "positionReference",
         "offset",
-        "flowRate",
+        "flowRateByVolume",
         "mix",
-        "pushOutVolume",
+        "pushOutByVolume",
         "delay"
       ],
       "additionalProperties": false
@@ -330,10 +420,6 @@
       "type": "object",
       "description": "Parameters specific to the multi-dispense function.",
       "properties": {
-        "enable": {
-          "type": "boolean",
-          "description": "Whether multi-dispense is enabled."
-        },
         "submerge": {
           "$ref": "#/definitions/submerge"
         },
@@ -346,51 +432,36 @@
         "offset": {
           "$ref": "#/definitions/coordinate"
         },
-        "flowRate": {
-          "$ref": "#/definitions/positiveNumber",
-          "description": "Flow rate for dispensing, in microliters per second."
+        "flowRateByVolume": {
+          "$ref": "#/definitions/flowRateByVolume"
         },
         "mix": {
           "$ref": "#/definitions/mix"
         },
-        "conditioningVolume": {
-          "$ref": "#/definitions/positiveNumber",
-          "description": "Volume used for conditioning during dispense, in microliters."
+        "conditioningByVolume": {
+          "$ref": "#/definitions/conditioningByVolume"
         },
-        "disposalVolume": {
-          "$ref": "#/definitions/positiveNumber",
-          "description": "Volume discarded during dispense, in microliters."
+        "disposalByVolume": {
+          "$ref": "#/definitions/disposalByVolume"
         },
         "delay": {
           "$ref": "#/definitions/delay"
         }
       },
-      "if": {
-        "properties": {
-          "enable": { "const": true }
-        }
-      },
-      "then": {
-        "required": [
-          "enable",
-          "submerge",
-          "retract",
-          "positionReference",
-          "offset",
-          "flowRate",
-          "mix",
-          "conditioningVolume",
-          "disposalVolume",
-          "delay"
-        ]
-      },
-      "else": {
-        "required": ["enable"]
-      },
+      "required": [
+        "submerge",
+        "retract",
+        "positionReference",
+        "offset",
+        "flowRateByVolume",
+        "mix",
+        "conditioningByVolume",
+        "disposalByVolume",
+        "delay"
+      ],
       "additionalProperties": false
     }
   },
-  "required": ["liquidName", "schemaVersion", "namespace", "byPipette"],
   "properties": {
     "liquidName": {
       "type": "string",
@@ -435,18 +506,16 @@
                   "$ref": "#/definitions/multiDispenseParams"
                 }
               },
-              "required": [
-                "tipType",
-                "aspirate",
-                "singleDispense",
-                "multiDispense"
-              ]
+              "required": ["tipType", "aspirate", "singleDispense"],
+              "additionalProperties": false
             }
           }
         },
-        "required": ["pipetteModel", "byTipType"]
+        "required": ["pipetteModel", "byTipType"],
+        "additionalProperties": false
       }
     }
   },
+  "required": ["liquidName", "schemaVersion", "namespace", "byPipette"],
   "additionalProperties": false
 }

@@ -1,176 +1,279 @@
 {
-  "liquidName": "glycerol50",
+  "liquidName": "glycerol",
   "schemaVersion": 1,
-  "namespace": "custom",
+  "namespace": "opentrons",
   "byPipette": [
     {
       "pipetteModel": "p300_single",
       "byTipType": [
         {
-          "tipType": "opentrons_300ul_tip",
+          "tipType": "standard",
           "aspirate": {
             "submerge": {
-              "positionReference": "bottom",
+              "positionReference": "meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 1
+                "z": -5
               },
-              "speed": 5,
+              "speed": 100,
               "delay": {
                 "enable": true,
-                "duration": 2
+                "params": {
+                  "duration": 2
+                }
               }
             },
             "retract": {
-              "positionReference": "bottom",
+              "positionReference": "top",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": 5
               },
-              "speed": 10,
-              "airGap": 10,
+              "speed": 150,
+              "airGapByVolume": [
+                {
+                  "volume": "100",
+                  "airGap": 10
+                },
+                {
+                  "volume": "200",
+                  "airGap": 20
+                }
+              ],
               "touchTip": {
                 "enable": true,
-                "zOffset": -1,
-                "mmToEdge": 0.5,
-                "speed": 50
+                "params": {
+                  "zOffset": 1,
+                  "mmToEdge": 2,
+                  "speed": 100
+                }
               },
               "delay": {
-                "enable": true,
-                "duration": 1
+                "enable": false
               }
             },
-            "positionReference": "bottom",
+            "positionReference": "meniscus",
             "offset": {
               "x": 0,
               "y": 0,
-              "z": 1
+              "z": -5
             },
-            "flowRate": 50,
+            "flowRateByVolume": [
+              {
+                "volume": "100",
+                "flowRate": 50
+              },
+              {
+                "volume": "200",
+                "flowRate": 100
+              }
+            ],
             "preWet": true,
             "mix": {
               "enable": true,
-              "repetitions": 3,
-              "volume": 50
+              "params": {
+                "repetitions": 3,
+                "volume": 50
+              }
             },
             "delay": {
-              "enable": true,
-              "duration": 0.5
+              "enable": false
             }
           },
           "singleDispense": {
             "submerge": {
-              "positionReference": "bottom",
+              "positionReference": "meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 1
+                "z": -5
               },
-              "speed": 5,
+              "speed": 100,
               "delay": {
                 "enable": true,
-                "duration": 2
+                "params": {
+                  "duration": 2
+                }
               }
             },
             "retract": {
-              "positionReference": "bottom",
+              "positionReference": "top",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": 5
               },
-              "speed": 10,
-              "airGap": 10,
+              "speed": 150,
+              "airGapByVolume": [
+                {
+                  "volume": "100",
+                  "airGap": 10
+                },
+                {
+                  "volume": "200",
+                  "airGap": 20
+                }
+              ],
               "blowout": {
                 "enable": true,
-                "location": "trash",
-                "flowRate": 30
+                "params": {
+                  "location": "trash",
+                  "flowRate": 100
+                }
               },
               "touchTip": {
                 "enable": true,
-                "zOffset": -1,
-                "mmToEdge": 0.5,
-                "speed": 50
+                "params": {
+                  "zOffset": 1,
+                  "mmToEdge": 2,
+                  "speed": 100
+                }
               },
               "delay": {
                 "enable": true,
-                "duration": 1
+                "params": {
+                  "duration": 1
+                }
               }
             },
-            "positionReference": "bottom",
+            "positionReference": "meniscus",
             "offset": {
               "x": 0,
               "y": 0,
-              "z": 1
+              "z": -5
             },
-            "flowRate": 100,
+            "flowRateByVolume": [
+              {
+                "volume": "100",
+                "flowRate": 50
+              },
+              {
+                "volume": "200",
+                "flowRate": 100
+              }
+            ],
             "mix": {
-              "enable": false,
-              "repetitions": 0,
-              "volume": 0
+              "enable": true,
+              "params": {
+                "repetitions": 2,
+                "volume": 30
+              }
             },
-            "pushOutVolume": 5,
-            "delay": 0.5
+            "pushOutByVolume": [
+              {
+                "volume": "100",
+                "pushOut": 5
+              },
+              {
+                "volume": "200",
+                "pushOut": 10
+              }
+            ],
+            "delay": 2
           },
           "multiDispense": {
-            "enable": true,
             "submerge": {
-              "positionReference": "bottom",
+              "positionReference": "meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 1
+                "z": -5
               },
-              "speed": 5,
+              "speed": 100,
               "delay": {
                 "enable": true,
-                "duration": 2
+                "params": {
+                  "duration": 2
+                }
               }
             },
             "retract": {
-              "positionReference": "bottom",
+              "positionReference": "top",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": 5
               },
-              "speed": 10,
-              "airGap": 10,
+              "speed": 150,
+              "airGapByVolume": [
+                {
+                  "volume": "100",
+                  "airGap": 10
+                },
+                {
+                  "volume": "200",
+                  "airGap": 20
+                }
+              ],
               "blowout": {
                 "enable": true,
-                "location": "trash",
-                "flowRate": 30
+                "params": {
+                  "location": "trash",
+                  "flowRate": 100
+                }
               },
               "touchTip": {
                 "enable": true,
-                "zOffset": -1,
-                "mmToEdge": 0.5,
-                "speed": 50
+                "params": {
+                  "zOffset": 1,
+                  "mmToEdge": 2,
+                  "speed": 100
+                }
               },
               "delay": {
-                "enable": true,
-                "duration": 1
+                "enable": false
               }
             },
-            "positionReference": "bottom",
+            "positionReference": "meniscus",
             "offset": {
               "x": 0,
               "y": 0,
-              "z": 1
+              "z": -5
             },
-            "flowRate": 200,
+            "flowRateByVolume": [
+              {
+                "volume": "100",
+                "flowRate": 50
+              },
+              {
+                "volume": "200",
+                "flowRate": 100
+              }
+            ],
             "mix": {
-              "enable": false,
-              "repetitions": 0,
-              "volume": 0
+              "enable": true,
+              "params": {
+                "repetitions": 2,
+                "volume": 30
+              }
             },
-            "conditioningVolume": 50,
-            "disposalVolume": 10,
+            "conditioningByVolume": [
+              {
+                "volume": "100",
+                "conditioning": 5
+              },
+              {
+                "volume": "200",
+                "conditioning": 10
+              }
+            ],
+            "disposalByVolume": [
+              {
+                "volume": "100",
+                "disposal": 5
+              },
+              {
+                "volume": "200",
+                "disposal": 10
+              }
+            ],
             "delay": {
               "enable": true,
-              "duration": 0.5
+              "params": {
+                "duration": 1
+              }
             }
           }
         }
