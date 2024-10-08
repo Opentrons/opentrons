@@ -24,7 +24,7 @@ CONTAINER_RESULTS: str = "/var/lib/ot/analysis_results"
 HOST_RESULTS: Path = Path(Path(__file__).parent.parent, "analysis_results")
 ANALYSIS_SUFFIX: str = "analysis.json"
 ANALYSIS_TIMEOUT_SECONDS: int = 30
-ANALYSIS_CONTAINER_INSTANCES: int = 7
+ANALYSIS_CONTAINER_INSTANCES: int = 5
 
 console = Console()
 
