@@ -821,11 +821,9 @@ describe('CommandText', () => {
         i18nInstance: i18n,
       }
     )
-    screen.getByText(
-      'Thermocycler starting 2 repetitions of cycle composed of the following steps:'
-    )
-    screen.getByText('temperature: 20°C, seconds: 10')
-    screen.getByText('temperature: 40°C, seconds: 30')
+    screen.getByText('Running thermocycler profile with 2 steps:')
+    screen.getByText('Temperature: 20°C, hold time: 0h 00m 10s')
+    screen.getByText('Temperature: 40°C, hold time: 0h 00m 30s')
   })
   it('renders correct text for thermocycler/runProfile on ODD', () => {
     const mockProfileSteps = [
@@ -853,12 +851,128 @@ describe('CommandText', () => {
         i18nInstance: i18n,
       }
     )
-    screen.getByText(
-      'Thermocycler starting 2 repetitions of cycle composed of the following steps:'
-    )
-    screen.getByText('temperature: 20°C, seconds: 10')
+    screen.getByText('Running thermocycler profile with 2 steps:')
+    screen.getByText('Temperature: 20°C, hold time: 0h 00m 10s')
     expect(
-      screen.queryByText('temperature: 40°C, seconds: 30')
+      screen.queryByText('Temperature: 40°C, hold time: 0h 00m 30s')
+    ).not.toBeInTheDocument()
+  })
+  it('renders correct text for thermocycler/runExtendedProfile on Desktop', () => {
+    const mockProfileSteps = [
+      { holdSeconds: 10, celsius: 20 },
+      {
+        repetitions: 10,
+        steps: [
+          { holdSeconds: 15, celsius: 10 },
+          { holdSeconds: 12, celsius: 11 },
+        ],
+      },
+      { holdSeconds: 30, celsius: 40 },
+      {
+        repetitions: 9,
+        steps: [
+          { holdSeconds: 13000, celsius: 12 },
+          { holdSeconds: 14, celsius: 13 },
+        ],
+      },
+    ]
+    renderWithProviders(
+      <CommandText
+        command={{
+          commandType: 'thermocycler/runExtendedProfile',
+          params: { profileElements: mockProfileSteps, moduleId: 'abc123' },
+          id: 'def456',
+          result: {},
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        commandTextData={mockCommandTextData}
+        robotType={FLEX_ROBOT_TYPE}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )
+    screen.getByText(
+      'Running thermocycler profile with 4 total steps and cycles:'
+    )
+    screen.getByText('Temperature: 20°C, hold time: 0h 00m 10s')
+    screen.getByText('10 repetitions of the following steps:')
+    screen.getByText('Temperature: 10°C, hold time: 0h 00m 15s')
+    screen.getByText('Temperature: 11°C, hold time: 0h 00m 12s')
+    screen.getByText('Temperature: 40°C, hold time: 0h 00m 30s')
+    screen.getByText('9 repetitions of the following steps:')
+    screen.getByText('Temperature: 12°C, hold time: 3h 36m 40s')
+    screen.getByText('Temperature: 13°C, hold time: 0h 00m 14s')
+  })
+  it('renders correct text for thermocycler/runExtendedProfile on ODD', () => {
+    const mockProfileSteps = [
+      { holdSeconds: 10, celsius: 20 },
+      {
+        repetitions: 10,
+        steps: [
+          { holdSeconds: 15, celsius: 10 },
+          { holdSeconds: 12, celsius: 11 },
+        ],
+      },
+      { holdSeconds: 30, celsius: 40 },
+      {
+        repetitions: 9,
+        steps: [
+          { holdSeconds: 13, celsius: 12 },
+          { holdSeconds: 14, celsius: 13 },
+        ],
+      },
+    ]
+    renderWithProviders(
+      <CommandText
+        command={{
+          commandType: 'thermocycler/runExtendedProfile',
+          params: { profileElements: mockProfileSteps, moduleId: 'abc123' },
+          id: 'def456',
+          result: {},
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        commandTextData={mockCommandTextData}
+        robotType={FLEX_ROBOT_TYPE}
+        isOnDevice={true}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )
+    screen.getByText(
+      'Running thermocycler profile with 4 total steps and cycles:'
+    )
+    screen.getByText('Temperature: 20°C, hold time: 0h 00m 10s')
+
+    expect(
+      screen.queryByText('10 repetitions of the following steps:')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Temperature: 10°C, hold time: 0h 00m 15s')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Temperature: 11°C, hold time: 0h 00m 12s')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Temperature: 40°C, hold time: 0h 00m 30s')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('9 repetitions of the following steps:')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Temperature: 12°C, hold time: 0h 00m 13s')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Temperature: 13°C, hold time: 0h 00m 14s')
     ).not.toBeInTheDocument()
   })
   it('renders correct text for heaterShaker/setAndWaitForShakeSpeed', () => {

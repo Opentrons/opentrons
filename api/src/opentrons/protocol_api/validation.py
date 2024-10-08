@@ -18,7 +18,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.robot.types import RobotType
 
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import Mount, DeckSlotName, StagingSlotName, Location
@@ -30,7 +30,6 @@ from opentrons.hardware_control.modules.types import (
     HeaterShakerModuleModel,
     MagneticBlockModel,
     AbsorbanceReaderModel,
-    ThermocyclerStep,
 )
 
 from .disposal_locations import TrashBin, WasteChute
