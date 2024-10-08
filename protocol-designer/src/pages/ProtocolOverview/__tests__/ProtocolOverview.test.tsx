@@ -30,7 +30,7 @@ vi.mock('../../../labware-ingred/selectors')
 vi.mock('../../../organisms')
 vi.mock('../../../labware-ingred/selectors')
 vi.mock('../LiquidDefinitions')
-vi.mock('../Instruments')
+vi.mock('../InstrumentsInfo')
 
 const mockNavigate = vi.fn()
 
