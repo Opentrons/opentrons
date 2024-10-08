@@ -76,8 +76,6 @@ class GripperData(BaseModel):
     """Data from attached gripper."""
 
     jawState: str = Field(..., description="Gripper Jaw state.")
-    # TODO (spp, 2023-01-03): update calibration field as decided after
-    #  spike https://opentrons.atlassian.net/browse/RSS-167
     calibratedOffset: Optional[InstrumentCalibrationData] = Field(
         None, description="Calibrated gripper offset."
     )
@@ -92,9 +90,6 @@ class PipetteData(BaseModel):
     calibratedOffset: Optional[InstrumentCalibrationData] = Field(
         None, description="Calibrated pipette offset."
     )
-
-    # TODO (spp, 2022-12-20): update/ add fields according to client needs.
-    #  add calibration data as decided by https://opentrons.atlassian.net/browse/RSS-167
 
 
 class PipetteState(BaseModel):

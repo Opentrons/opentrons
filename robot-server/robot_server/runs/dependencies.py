@@ -2,6 +2,10 @@
 from typing import Annotated
 
 from fastapi import Depends, status
+from robot_server.error_recovery.settings.store import (
+    ErrorRecoverySettingStore,
+    get_error_recovery_setting_store,
+)
 from robot_server.protocols.dependencies import get_protocol_store
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolStore
@@ -156,12 +160,16 @@ async def get_run_data_manager(
     ],
     run_store: Annotated[RunStore, Depends(get_run_store)],
     runs_publisher: Annotated[RunsPublisher, Depends(get_runs_publisher)],
+    error_recovery_setting_store: Annotated[
+        ErrorRecoverySettingStore, Depends(get_error_recovery_setting_store)
+    ],
 ) -> RunDataManager:
     """Get a run data manager to keep track of current/historical run data."""
     return RunDataManager(
-        task_runner=task_runner,
         run_orchestrator_store=run_orchestrator_store,
         run_store=run_store,
+        error_recovery_setting_store=error_recovery_setting_store,
+        task_runner=task_runner,
         runs_publisher=runs_publisher,
     )
 

@@ -609,8 +609,6 @@ def _run_file_non_pe(
 
     context.home()
     try:
-        # TODO (spp, 2024-03-18): use true run-time param overrides once enabled
-        #  for cli protocol simulation/ execution
         execute_apiv2.run_protocol(
             protocol, context, run_time_parameters_with_overrides=None
         )
@@ -626,6 +624,7 @@ def _run_file_pe(
     """Run a protocol file with Protocol Engine."""
 
     async def run(protocol_source: ProtocolSource) -> None:
+        # TODO (spp, 2024-03-18): use run-time param overrides once enabled for cli protocol execution
         hardware_api_wrapped = hardware_api.wrapped()
         protocol_engine = await create_protocol_engine(
             hardware_api=hardware_api_wrapped,

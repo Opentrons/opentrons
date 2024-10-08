@@ -5,6 +5,10 @@ import type { TFunction } from 'i18next'
 import type { RunTimeCommand, RobotType } from '@opentrons/shared-data'
 import type { CommandTextData } from '../../types'
 import type { GetDirectTranslationCommandText } from './utils/getDirectTranslationCommandText'
+import type {
+  TCProfileStepText,
+  TCProfileCycleText,
+} from './utils/getTCRunExtendedProfileCommandText'
 
 export interface UseCommandTextStringParams {
   command: RunTimeCommand | null
@@ -12,13 +16,32 @@ export interface UseCommandTextStringParams {
   robotType: RobotType
 }
 
+export type CommandTextKind =
+  | 'generic'
+  | 'thermocycler/runProfile'
+  | 'thermocycler/runExtendedProfile'
+
 export type GetCommandText = UseCommandTextStringParams & { t: TFunction }
-export interface GetCommandTextResult {
+export interface GetGenericCommandTextResult {
+  kind: 'generic'
   /* The actual command text. Ex "Homing all gantry, pipette, and plunger axes" */
   commandText: string
-  /* The TC run profile steps.  */
-  stepTexts?: string[]
 }
+export interface GetTCRunProfileCommandTextResult {
+  kind: 'thermocycler/runProfile'
+  commandText: string
+  /* The TC run profile steps.  */
+  stepTexts: string[]
+}
+export interface GetTCRunExtendedProfileCommandTextResult {
+  kind: 'thermocycler/runExtendedProfile'
+  commandText: string
+  profileElementTexts: Array<TCProfileStepText | TCProfileCycleText>
+}
+export type GetCommandTextResult =
+  | GetGenericCommandTextResult
+  | GetTCRunProfileCommandTextResult
+  | GetTCRunExtendedProfileCommandTextResult
 
 // TODO(jh, 07-18-24): Move the testing that covers this from CommandText to a new file, and verify that all commands are
 // properly tested.
@@ -52,6 +75,7 @@ export function useCommandTextString(
     case 'heaterShaker/deactivateShaker':
     case 'heaterShaker/waitForTemperature':
       return {
+        kind: 'generic',
         commandText: utils.getDirectTranslationCommandText(
           fullParams as GetDirectTranslationCommandText
         ),
@@ -67,6 +91,7 @@ export function useCommandTextString(
     case 'dropTipInPlace':
     case 'pickUpTip':
       return {
+        kind: 'generic',
         commandText: utils.getPipettingCommandText(fullParams),
       }
 
@@ -76,12 +101,14 @@ export function useCommandTextString(
     case 'loadModule':
     case 'loadLiquid':
       return {
+        kind: 'generic',
         commandText: utils.getLoadCommandText(fullParams),
       }
 
     case 'liquidProbe':
     case 'tryLiquidProbe':
       return {
+        kind: 'generic',
         commandText: utils.getLiquidProbeCommandText({
           ...fullParams,
           command,
@@ -94,6 +121,7 @@ export function useCommandTextString(
     case 'thermocycler/setTargetLidTemperature':
     case 'heaterShaker/setTargetTemperature':
       return {
+        kind: 'generic',
         commandText: utils.getTemperatureCommandText({
           ...fullParams,
           command,
@@ -103,8 +131,15 @@ export function useCommandTextString(
     case 'thermocycler/runProfile':
       return utils.getTCRunProfileCommandText({ ...fullParams, command })
 
+    case 'thermocycler/runExtendedProfile':
+      return utils.getTCRunExtendedProfileCommandText({
+        ...fullParams,
+        command,
+      })
+
     case 'heaterShaker/setAndWaitForShakeSpeed':
       return {
+        kind: 'generic',
         commandText: utils.getHSShakeSpeedCommandText({
           ...fullParams,
           command,
@@ -113,11 +148,13 @@ export function useCommandTextString(
 
     case 'moveToSlot':
       return {
+        kind: 'generic',
         commandText: utils.getMoveToSlotCommandText({ ...fullParams, command }),
       }
 
     case 'moveRelative':
       return {
+        kind: 'generic',
         commandText: utils.getMoveRelativeCommandText({
           ...fullParams,
           command,
@@ -126,6 +163,7 @@ export function useCommandTextString(
 
     case 'moveToCoordinates':
       return {
+        kind: 'generic',
         commandText: utils.getMoveToCoordinatesCommandText({
           ...fullParams,
           command,
@@ -134,11 +172,13 @@ export function useCommandTextString(
 
     case 'moveToWell':
       return {
+        kind: 'generic',
         commandText: utils.getMoveToWellCommandText({ ...fullParams, command }),
       }
 
     case 'moveLabware':
       return {
+        kind: 'generic',
         commandText: utils.getMoveLabwareCommandText({
           ...fullParams,
           command,
@@ -147,6 +187,7 @@ export function useCommandTextString(
 
     case 'configureForVolume':
       return {
+        kind: 'generic',
         commandText: utils.getConfigureForVolumeCommandText({
           ...fullParams,
           command,
@@ -155,6 +196,7 @@ export function useCommandTextString(
 
     case 'configureNozzleLayout':
       return {
+        kind: 'generic',
         commandText: utils.getConfigureNozzleLayoutCommandText({
           ...fullParams,
           command,
@@ -163,6 +205,7 @@ export function useCommandTextString(
 
     case 'prepareToAspirate':
       return {
+        kind: 'generic',
         commandText: utils.getPrepareToAspirateCommandText({
           ...fullParams,
           command,
@@ -171,6 +214,7 @@ export function useCommandTextString(
 
     case 'moveToAddressableArea':
       return {
+        kind: 'generic',
         commandText: utils.getMoveToAddressableAreaCommandText({
           ...fullParams,
           command,
@@ -179,6 +223,7 @@ export function useCommandTextString(
 
     case 'moveToAddressableAreaForDropTip':
       return {
+        kind: 'generic',
         commandText: utils.getMoveToAddressableAreaForDropTipCommandText({
           ...fullParams,
           command,
@@ -187,6 +232,7 @@ export function useCommandTextString(
 
     case 'waitForDuration':
       return {
+        kind: 'generic',
         commandText: utils.getWaitForDurationCommandText({
           ...fullParams,
           command,
@@ -196,6 +242,7 @@ export function useCommandTextString(
     case 'pause': // legacy pause command
     case 'waitForResume':
       return {
+        kind: 'generic',
         commandText: utils.getWaitForResumeCommandText({
           ...fullParams,
           command,
@@ -204,27 +251,31 @@ export function useCommandTextString(
 
     case 'delay':
       return {
+        kind: 'generic',
         commandText: utils.getDelayCommandText({ ...fullParams, command }),
       }
 
     case 'comment':
       return {
+        kind: 'generic',
         commandText: utils.getCommentCommandText({ ...fullParams, command }),
       }
 
     case 'custom':
       return {
+        kind: 'generic',
         commandText: utils.getCustomCommandText({ ...fullParams, command }),
       }
 
     case 'setRailLights':
       return {
+        kind: 'generic',
         commandText: utils.getRailLightsCommandText({ ...fullParams, command }),
       }
 
     case undefined:
     case null:
-      return { commandText: '' }
+      return { kind: 'generic', commandText: '' }
 
     default:
       console.warn(
@@ -232,6 +283,7 @@ export function useCommandTextString(
         command
       )
       return {
+        kind: 'generic',
         commandText: utils.getUnknownCommandText({ ...fullParams, command }),
       }
   }
