@@ -1,4 +1,5 @@
 .pulled-data/*
+*.csv
 *.tar.gz
 *.zip
 .hardware-testing-description
