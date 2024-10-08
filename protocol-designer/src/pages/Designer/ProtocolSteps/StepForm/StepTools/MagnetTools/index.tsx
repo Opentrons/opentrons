@@ -34,7 +34,8 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
   const defaultEngageHeight = useSelector(getMagnetLabwareEngageHeight)
   const moduleModel = moduleEntities[formData.moduleId].model
 
-  const slotLocation = moduleLabwareOptions[0].name.slice(-1)
+  const slotInfo = moduleLabwareOptions[0].name.split('in')
+  const slotLocation = slotInfo[2].split('slot')
 
   const mmUnits = t('units.millimeter')
   const isGen1 = moduleModel === MAGNETIC_MODULE_V1
@@ -69,11 +70,19 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
           {t('protocol_steps:module')}
         </StyledText>
         <ListItem type="noActive">
-          <Flex padding={SPACING.spacing12} gridGap={SPACING.spacing8}>
-            <DeckInfoLabel deckLabel={slotLocation} />
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {moduleLabwareOptions[0].name}
-            </StyledText>
+          <Flex padding={SPACING.spacing12} gridGap={SPACING.spacing24}>
+            <DeckInfoLabel deckLabel={slotLocation[1]} />
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {slotInfo[0]}
+              </StyledText>
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                color={COLORS.grey60}
+              >
+                {slotInfo[1]}
+              </StyledText>
+            </Flex>
           </Flex>
         </ListItem>
       </Flex>
