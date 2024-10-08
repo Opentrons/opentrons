@@ -3,6 +3,7 @@ from serial.tools.list_ports import comports  # type: ignore[import]
 
 from .radwag import RadwagScaleBase, RadwagScale, SimRadwagScale
 
+
 def list_ports_and_select(device_name: str = "", port_substr: str = None) -> str:
     """List serial ports and display list for user to select from."""
     ports = comports()
@@ -14,28 +15,24 @@ def list_ports_and_select(device_name: str = "", port_substr: str = None) -> str
     idx_str = ""
     for i, p in enumerate(ports):
         print(f"\t{i + 1}) {p.device}")
-        if port_substr:
-            for i, p in enumerate(ports):
-                if port_substr in p.device:
-                    idx = i + 1
-                    break
-        else:
-            idx_str = input(
-                f"\nenter number next to {device_name} port (or ENTER to re-scan): "
-            )
-            if not idx_str:
-                return list_ports_and_select(device_name)
-    if not device_name:
-        device_name = "desired"
+    if port_substr:
+        for i, p in enumerate(ports):
+            if port_substr in p.device:
+                return p.device
+        
+    while True:
+        idx_str = input(
+            f"\nEnter number next to {device_name} port (or ENTER to re-scan): "
+        )
+        if not idx_str:
+            return list_ports_and_select(device_name, port_substr)
 
-    try:
         try:
             idx = int(idx_str.strip())
-        except TypeError:
-            pass
-        return ports[idx - 1].device
-    except (ValueError, IndexError):
-        return list_ports_and_select()
+            return ports[idx - 1].device
+        except (ValueError, IndexError):
+            print("Invalid selection. Please try again.")
+
 
 def find_port(vid: int, pid: int) -> str:
     """Find COM port from provided VIP:PID."""
@@ -43,6 +40,7 @@ def find_port(vid: int, pid: int) -> str:
         if port.pid == pid and port.vid == vid:
             return port.device
     raise RuntimeError(f"Unable to find serial " f"port for VID:PID={vid}:{pid}")
+
 
 __all__ = [
     "list_ports_and_select",
