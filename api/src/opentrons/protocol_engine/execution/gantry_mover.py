@@ -1,4 +1,6 @@
 """Gantry movement wrapper for hardware and simulation based movement."""
+from logging import getLogger
+
 from typing import Optional, List, Dict
 from typing_extensions import Protocol as TypingProtocol
 
@@ -17,6 +19,8 @@ from opentrons.motion_planning import Waypoint
 from ..state.state import StateView
 from ..types import MotorAxis, CurrentWell
 from ..errors import MustHomeError, InvalidAxisForRobotType
+
+log = getLogger(__name__)
 
 
 _MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
@@ -306,20 +310,23 @@ class HardwareGantryMover(GantryMover):
             speed: Optional speed parameter for the move.
         """
         try:
-            abs_pos_hw = self._convert_axis_map_for_hw(axis_map)
+            pos_hw = self._convert_axis_map_for_hw(axis_map)
             mount = self.pick_mount_from_axis_map(axis_map)
             if not critical_point:
                 current_position = await self._hardware_api.current_position(
                     mount, refresh=True
                 )
+                log.info(f"The current position of the robot is: {current_position}.")
                 absolute_pos = target_axis_map_from_relative(
-                    abs_pos_hw, current_position
+                    pos_hw, current_position
                 )
+                log.info(f"The absolute position is: {absolute_pos} and hw pos map is {absolute_pos}.")
             else:
+                log.info(f"Incorrectly in abs move")
                 mount_offset = self._offset_axis_map_for_mount(mount)
                 abs_cp_hw = self._convert_axis_map_for_hw(critical_point)
                 absolute_pos = target_axis_map_from_absolute(
-                    abs_pos_hw, abs_cp_hw, mount_offset
+                    pos_hw, abs_cp_hw, mount_offset
                 )
             await self._hardware_api.move_axes(
                 position=absolute_pos,
