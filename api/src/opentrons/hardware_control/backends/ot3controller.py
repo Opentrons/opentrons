@@ -680,7 +680,7 @@ class OT3Controller(FlexBackend):
         move_group, _ = group
         log.info(f"The move group is {move_group} and the tip motor move group is {tip_motor_move_group}")
         runner = MoveGroupRunner(
-            move_groups=[move_group, tip_motor_move_group],
+            move_groups=[move_group],
             ignore_stalls=True
             if not self._feature_flags.stall_detection_enabled
             else False,
