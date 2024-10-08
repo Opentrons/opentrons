@@ -83,7 +83,7 @@ def get_labware_name(id: str, object_dict: dict, json_data: dict):
                 elif 'labwareId' in location:
                     return get_labware_name(location['labwareId'], json_data['labware'], json_data)
     
-    return "Labware not found"
+    return " Labware not found"
 
 
 def parse_results_volume(json_data_file: str) -> Tuple[

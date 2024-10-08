@@ -539,7 +539,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=location,
             ),
         ):
-            self._protocol_core.comment("MIXING")
+            # self._protocol_core.comment("MIXING")
             self.aspirate(volume, location, rate)
             while repetitions - 1 > 0:
                 self.dispense(volume, rate=rate, **dispense_kwargs)
