@@ -242,7 +242,6 @@ export function EditInstrumentsModal(
               leftInfo != null ? (
                 <PipetteInfoItem
                   mount="left"
-                  pipetteOnDeck={pipettesOnDeck}
                   pipetteName={leftPip.name}
                   tiprackDefURIs={leftPip.tiprackDefURI}
                   editClick={() => {
@@ -277,7 +276,6 @@ export function EditInstrumentsModal(
               rightInfo != null ? (
                 <PipetteInfoItem
                   mount="right"
-                  pipetteOnDeck={pipettesOnDeck}
                   pipetteName={rightPip.name}
                   tiprackDefURIs={rightPip.tiprackDefURI}
                   editClick={() => {
