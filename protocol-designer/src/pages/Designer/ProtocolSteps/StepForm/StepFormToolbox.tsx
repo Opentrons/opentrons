@@ -9,6 +9,7 @@ import {
   COLORS,
   Flex,
   Icon,
+  Modal,
   PrimaryButton,
   SPACING,
   SecondaryButton,
@@ -38,6 +39,7 @@ import { getSaveStepSnackbarText } from './utils'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { FormData, StepType } from '../../../../form-types'
 import type { FieldPropsByName, FocusHandlers, StepFormProps } from './types'
+import { MoreOptionsModal } from '../../../../components/modals/MoreOptionsModal'
 
 type StepFormMap = {
   [K in StepType]?: React.ComponentType<StepFormProps> | null
@@ -97,6 +99,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       ? 1
       : 0
   )
+  const [isRename, setIsRename] = useState<boolean>(false)
   const icon = stepIconsByType[formData.stepType]
 
   const ToolsComponent: typeof STEP_FORM_MAP[keyof typeof STEP_FORM_MAP] = get(
@@ -136,8 +139,12 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       }) as string
     )
   }
+
   return (
     <>
+      {isRename ? 
+      <Modal></Modal>
+      : null}
       <Toolbox
         subHeader={
           isMultiStepToolbox ? (
@@ -149,7 +156,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
         secondaryHeaderButton={
           <Btn
             onClick={() => {
-              console.log('TODO: wire this up')
+              setIsRename(true)
             }}
             css={BUTTON_LINK_STYLE}
             textDecoration={TYPOGRAPHY.textDecorationUnderline}

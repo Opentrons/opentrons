@@ -79,6 +79,7 @@
   "message_uses_standard_namespace": "This labware definition uses the Opentrons standard labware namespace. Change the namespace if it is custom, or use the standard labware in your protocol.",
   "mismatched": "The new labware has a different arrangement of wells than the labware it is replacing. Clicking Overwrite will deselect all wells in any existing steps that use this labware. You will have to edit each of those steps and select new wells.",
   "module": "Module",
+  "name_step": "Name step",
   "next": "next",
   "ninety_six_channel": "96-Channel",
   "no_hints_to_restore": "No hints to restore",
