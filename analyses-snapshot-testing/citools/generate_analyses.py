@@ -24,9 +24,13 @@ CONTAINER_RESULTS: str = "/var/lib/ot/analysis_results"
 HOST_RESULTS: Path = Path(Path(__file__).parent.parent, "analysis_results")
 ANALYSIS_SUFFIX: str = "analysis.json"
 ANALYSIS_TIMEOUT_SECONDS: int = 30
-ANALYSIS_CONTAINER_INSTANCES: int = 6
+ANALYSIS_CONTAINER_INSTANCES: int = 10
 
 console = Console()
+
+
+def is_running_in_github_actions() -> bool:
+    return os.getenv("GITHUB_ACTIONS") == "true"
 
 
 class ProtocolType(Enum):
@@ -229,7 +233,10 @@ def analyze_against_image(tag: str, protocols: List[TargetProtocol], num_contain
         containers = start_containers(image_name, num_containers)
         analyze_many(protocols, containers)
     finally:
-        stop_and_remove_containers(image_name)
+        if is_running_in_github_actions():
+            pass  # We don't need to stop and remove containers in CI
+        else:
+            stop_and_remove_containers(image_name)
     return protocols
 
 
