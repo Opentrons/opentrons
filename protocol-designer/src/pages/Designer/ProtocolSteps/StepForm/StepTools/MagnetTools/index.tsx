@@ -23,6 +23,7 @@ import {
 import {
   getMagnetLabwareEngageHeight,
   getMagneticLabwareOptions,
+  getSingleMagneticModuleId,
 } from '../../../../../../ui/modules/selectors'
 import { ToggleExpandStepFormField } from '../../../../../../molecules'
 import {
@@ -41,6 +42,8 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
   const defaultEngageHeight = useSelector(getMagnetLabwareEngageHeight)
   const deckSetup = useSelector(getInitialDeckSetup)
   const modulesOnDeck = getModulesOnDeckByType(deckSetup, MAGNETIC_MODULE_TYPE)
+
+  console.log(modulesOnDeck)
 
   const moduleModel = moduleEntities[formData.moduleId].model
 
