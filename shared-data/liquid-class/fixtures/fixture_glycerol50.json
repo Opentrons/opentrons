@@ -10,7 +10,7 @@
           "tipType": "p20_tip",
           "aspirate": {
             "submerge": {
-              "positionReference": "meniscus",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -25,7 +25,7 @@
               }
             },
             "retract": {
-              "positionReference": "top",
+              "positionReference": "well-top",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -52,7 +52,7 @@
                 }
               }
             },
-            "positionReference": "bottom",
+            "positionReference": "well-bottom",
             "offset": {
               "x": 0,
               "y": 0,
@@ -80,7 +80,7 @@
           },
           "singleDispense": {
             "submerge": {
-              "positionReference": "meniscus",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -95,7 +95,7 @@
               }
             },
             "retract": {
-              "positionReference": "top",
+              "positionReference": "well-top",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -129,7 +129,7 @@
                 }
               }
             },
-            "positionReference": "bottom",
+            "positionReference": "well-bottom",
             "offset": {
               "x": 0,
               "y": 0,
@@ -156,7 +156,7 @@
           },
           "multiDispense": {
             "submerge": {
-              "positionReference": "meniscus",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -171,7 +171,7 @@
               }
             },
             "retract": {
-              "positionReference": "top",
+              "positionReference": "well-top",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -201,7 +201,7 @@
                 "enable": false
               }
             },
-            "positionReference": "bottom",
+            "positionReference": "well-bottom",
             "offset": {
               "x": 0,
               "y": 0,

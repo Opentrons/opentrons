@@ -10,7 +10,7 @@
       "minimum": 0
     },
     "safeString": {
-      "description": "a string safe to use for namespace. Lowercase-only.",
+      "description": "A string safe to use for namespace. Lowercase-only.",
       "type": "string",
       "pattern": "^[a-z0-9._]+$"
     },
@@ -38,8 +38,8 @@
     },
     "positionReference": {
       "type": "string",
-      "description": "Reference point for positioning (e.g., bottom, top, liquid surface).",
-      "enum": ["bottom", "top", "center", "meniscus"]
+      "description": "Reference point for positioning.",
+      "enum": ["well-bottom", "well-top", "well-center", "liquid-meniscus"]
     },
     "coordinate": {
       "type": "object",
