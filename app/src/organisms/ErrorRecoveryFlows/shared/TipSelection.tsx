@@ -1,6 +1,7 @@
 import { WellSelection } from '../../WellSelection'
 
 import type { WellGroup } from '@opentrons/components'
+import type { NozzleLayoutDetails } from '@opentrons/shared-data'
 import type { RecoveryContentProps } from '../types'
 
 export type TipSelectionProps = RecoveryContentProps & {
@@ -8,14 +9,20 @@ export type TipSelectionProps = RecoveryContentProps & {
 }
 
 export function TipSelection(props: TipSelectionProps): JSX.Element {
-  const { failedLabwareUtils, failedPipetteInfo, allowTipSelection } = props
-
+  //TOME: Refactor down to failedPipetteUtils.
+  const {
+    failedLabwareUtils,
+    failedPipetteInfo,
+    failedPipetteUtils,
+    allowTipSelection,
+  } = props
   const {
     tipSelectorDef,
     selectedTipLocations,
     selectTips,
     deselectTips,
   } = failedLabwareUtils
+  const { relevantActiveNozzleLayout } = failedPipetteUtils
 
   const onSelectTips = (tipGroup: WellGroup): void => {
     if (allowTipSelection) {
@@ -36,6 +43,20 @@ export function TipSelection(props: TipSelectionProps): JSX.Element {
       selectedPrimaryWells={selectedTipLocations as WellGroup}
       selectWells={onSelectTips}
       channels={failedPipetteInfo?.data.channels ?? 1}
+      pipetteNozzleDetails={buildNozzleLayoutDetails(
+        relevantActiveNozzleLayout
+      )}
     />
   )
+}
+
+function buildNozzleLayoutDetails(
+  relevantActiveNozzleLayout: TipSelectionProps['failedPipetteUtils']['relevantActiveNozzleLayout']
+): NozzleLayoutDetails | undefined {
+  return relevantActiveNozzleLayout != null
+    ? {
+        activeNozzleCount: relevantActiveNozzleLayout.activeNozzles.length,
+        nozzleConfig: relevantActiveNozzleLayout.config,
+      }
+    : undefined
 }

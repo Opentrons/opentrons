@@ -14,6 +14,7 @@ import type { WellFill, WellGroup, WellStroke } from '@opentrons/components'
 import type {
   LabwareDefinition2,
   PipetteChannels,
+  NozzleLayoutDetails,
 } from '@opentrons/shared-data'
 import type { GenericRect } from './types'
 
@@ -23,6 +24,8 @@ interface WellSelectionProps {
   selectedPrimaryWells: WellGroup
   selectWells: (wellGroup: WellGroup) => unknown
   channels: PipetteChannels
+  /* Highlight only valid wells given the current pipette nozzle configuration. */
+  pipetteNozzleDetails?: NozzleLayoutDetails
 }
 
 export function WellSelection(props: WellSelectionProps): JSX.Element {
@@ -32,6 +35,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
     selectedPrimaryWells,
     selectWells,
     channels,
+    pipetteNozzleDetails,
   } = props
   const [highlightedWells, setHighlightedWells] = useState<WellGroup>({})
 
@@ -49,6 +53,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
             labwareDef: definition,
             wellName,
             channels,
+            pipetteNozzleDetails,
           })
           if (!wellSet) return acc
           return { ...acc, [wellSet[0]]: null }
@@ -78,6 +83,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
               labwareDef: definition,
               wellName,
               channels,
+              pipetteNozzleDetails,
             }) || []
           const channelWells = arrayToWellGroup(wellSetForMulti)
           return {
@@ -100,7 +106,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
     setHighlightedWells({})
   }
 
-  // For rendering, show all wells not just primary wells
+  // For rendering, show all valid wells, not just primary wells
   const allSelectedWells =
     channels === 8 || channels === 96
       ? reduce<WellGroup, WellGroup>(
@@ -110,6 +116,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
               labwareDef: definition,
               wellName,
               channels,
+              pipetteNozzleDetails,
             })
             if (!wellSet) return acc
             return { ...acc, ...arrayToWellGroup(wellSet) }
