@@ -19,15 +19,11 @@ export function TipSelection(props: TipSelectionProps): JSX.Element {
   const { relevantActiveNozzleLayout, failedPipetteInfo } = failedPipetteUtils
 
   const onSelectTips = (tipGroup: WellGroup): void => {
-    if (allowTipSelection) {
-      selectTips(tipGroup)
-    }
+    selectTips(tipGroup)
   }
 
   const onDeselectTips = (locations: string[]): void => {
-    if (allowTipSelection) {
-      deselectTips(locations)
-    }
+    deselectTips(locations)
   }
 
   return (
@@ -40,6 +36,7 @@ export function TipSelection(props: TipSelectionProps): JSX.Element {
       pipetteNozzleDetails={buildNozzleLayoutDetails(
         relevantActiveNozzleLayout
       )}
+      allowSelect={allowTipSelection}
     />
   )
 }

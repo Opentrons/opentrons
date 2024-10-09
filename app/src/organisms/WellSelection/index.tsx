@@ -26,6 +26,8 @@ interface WellSelectionProps {
   channels: PipetteChannels
   /* Highlight only valid wells given the current pipette nozzle configuration. */
   pipetteNozzleDetails?: NozzleLayoutDetails
+  /* Whether highlighting and selectWells() updates are permitted. */
+  allowSelect?: boolean
 }
 
 export function WellSelection(props: WellSelectionProps): JSX.Element {
@@ -36,6 +38,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
     selectWells,
     channels,
     pipetteNozzleDetails,
+    allowSelect = true,
   } = props
   const [highlightedWells, setHighlightedWells] = useState<WellGroup>({})
 
@@ -73,37 +76,41 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
   }
 
   const handleSelectionMove: (rect: GenericRect) => void = rect => {
-    if (channels === 8 || channels === 96) {
-      const selectedWells = _getWellsFromRect(rect)
-      const allWellsForMulti: WellGroup = reduce(
-        selectedWells,
-        (acc: WellGroup, _, wellName: string): WellGroup => {
-          const wellSetForMulti =
-            getWellSetForMultichannel({
-              labwareDef: definition,
-              wellName,
-              channels,
-              pipetteNozzleDetails,
-            }) || []
-          const channelWells = arrayToWellGroup(wellSetForMulti)
-          return {
-            ...acc,
-            ...channelWells,
-          }
-        },
-        {}
-      )
-      setHighlightedWells(allWellsForMulti)
-    } else {
-      setHighlightedWells(_getWellsFromRect(rect))
+    if (allowSelect) {
+      if (channels === 8 || channels === 96) {
+        const selectedWells = _getWellsFromRect(rect)
+        const allWellsForMulti: WellGroup = reduce(
+          selectedWells,
+          (acc: WellGroup, _, wellName: string): WellGroup => {
+            const wellSetForMulti =
+              getWellSetForMultichannel({
+                labwareDef: definition,
+                wellName,
+                channels,
+                pipetteNozzleDetails,
+              }) || []
+            const channelWells = arrayToWellGroup(wellSetForMulti)
+            return {
+              ...acc,
+              ...channelWells,
+            }
+          },
+          {}
+        )
+        setHighlightedWells(allWellsForMulti)
+      } else {
+        setHighlightedWells(_getWellsFromRect(rect))
+      }
     }
   }
 
   const handleSelectionDone: (rect: GenericRect) => void = rect => {
     const wells = _wellsFromSelected(_getWellsFromRect(rect))
 
-    selectWells(wells)
-    setHighlightedWells({})
+    if (allowSelect) {
+      selectWells(wells)
+      setHighlightedWells({})
+    }
   }
 
   // For rendering, show all valid wells, not just primary wells
