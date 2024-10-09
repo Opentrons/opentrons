@@ -97,7 +97,7 @@
         "pickUp": "pick up tip"
       },
       "magnetAction": {
-        "label": "Magnet action",
+        "label": "Magnet state",
         "options": {
           "disengage": "Disengage",
           "engage": "Engage"
@@ -186,8 +186,9 @@
         "add_cycle_step": "Add a cycle step",
         "add_step": "Add step",
         "add_step_button": "+ Step",
+        "cycle": "cycle",
         "cycle_step": "cycle step",
-        "cycles": "Cycles {{repetitions}}",
+        "cycles": "Cycles {{repetitions}}x",
         "delete": "delete",
         "edit": "Edit Thermocycler profile steps",
         "lid_closed": "Closed",

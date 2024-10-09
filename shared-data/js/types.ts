@@ -162,25 +162,57 @@ export type LabwareWell = LabwareWellProperties & {
 export interface SphericalSegment {
   shape: 'spherical'
   radiusOfCurvature: number
-  depth: number
+  topHeight: number
+  bottomHeight: number
 }
 
-export interface CircularBoundedSection {
-  shape: 'circular'
-  diameter: number
+export interface ConicalFrustum {
+  shape: 'conical'
+  bottomDiameter: number
+  topDiameter: number
   topHeight: number
+  bottomHeight: number
 }
 
-export interface RectangularBoundedSection {
-  shape: 'rectangular'
-  xDimension: number
-  yDimension: number
+export interface CuboidalFrustum {
+  shape: 'cuboidal'
+  bottomXDimension: number
+  bottomYDimension: number
+  topXDimension: number
+  topYDimension: number
   topHeight: number
+  bottomHeight: number
 }
+
+export interface SquaredConeSegment {
+  shape: 'squaredcone'
+  bottomCrossSection: string
+  circleDiameter: number
+  rectangleXDimension: number
+  rectangleYDimension: number
+  topHeight: number
+  bottomHeight: number
+}
+
+export interface RoundedCuboidSegment {
+  shape: 'roundedcuboid'
+  bottomCrossSection: string
+  circleDiameter: number
+  rectangleXDimension: number
+  rectangleYDimension: number
+  topHeight: number
+  bottomHeight: number
+}
+
+export type WellSegment =
+  | CuboidalFrustum
+  | ConicalFrustum
+  | SquaredConeSegment
+  | SphericalSegment
+  | RoundedCuboidSegment
 
 export interface InnerWellGeometry {
-  frusta: CircularBoundedSection[] | RectangularBoundedSection[]
-  bottomShape?: SphericalSegment | null
+  sections: WellSegment[]
 }
 
 // TODO(mc, 2019-03-21): exact object is tough to use with the initial value in
@@ -846,3 +878,10 @@ export interface CutoutConfig {
 }
 
 export type DeckConfiguration = CutoutConfig[]
+
+export type NozzleLayoutConfig =
+  | 'single'
+  | 'column'
+  | 'row'
+  | 'full'
+  | 'subrect'

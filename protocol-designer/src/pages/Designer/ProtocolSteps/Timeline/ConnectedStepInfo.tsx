@@ -18,6 +18,10 @@ import {
   ConfirmDeleteModal,
 } from '../../../../components/modals/ConfirmDeleteModal'
 import { stepIconsByType } from '../../../../form-types'
+import {
+  hoverOnStep,
+  toggleViewSubstep,
+} from '../../../../ui/steps/actions/actions'
 import { getOrderedStepIds } from '../../../../step-forms/selectors'
 import { StepContainer } from './StepContainer'
 
@@ -41,6 +45,7 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const argsAndErrors = useSelector(stepFormSelectors.getArgsAndErrorsByStepId)[
     stepId
   ]
+  const selectedStep = useSelector(getSelectedStepId)
   const errorStepId = useSelector(fileDataSelectors.getErrorStepId)
   const hasError = errorStepId === stepId || argsAndErrors.errors != null
   const hasTimelineWarningsPerStep = useSelector(
@@ -77,17 +82,31 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
     dispatch(stepsActions.hoverOnStep(stepId))
   const unhighlightStep = (): HoverOnStepAction =>
     dispatch(stepsActions.hoverOnStep(null))
+  const handleSelectStep = (): void => {
+    selectStep()
+    if (selectedStep !== stepId) {
+      dispatch(toggleViewSubstep(null))
+      dispatch(hoverOnStep(null))
+    }
+  }
+  const handleSelectDoubleStep = (): void => {
+    selectStepOnDoubleClick()
+    if (selectedStep !== stepId) {
+      dispatch(toggleViewSubstep(null))
+      dispatch(hoverOnStep(null))
+    }
+  }
 
   const {
     confirm: confirmDoubleClick,
     showConfirmation: showConfirmationDoubleClick,
     cancel: cancelDoubleClick,
   } = useConditionalConfirm(
-    selectStepOnDoubleClick,
+    handleSelectDoubleStep,
     currentFormIsPresaved || singleEditFormHasUnsavedChanges
   )
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
-    selectStep,
+    handleSelectStep,
     currentFormIsPresaved || singleEditFormHasUnsavedChanges
   )
 

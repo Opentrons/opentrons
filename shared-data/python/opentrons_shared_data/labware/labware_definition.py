@@ -19,6 +19,15 @@ from pydantic import (
 )
 from typing_extensions import Literal
 
+from .constants import (
+    Conical,
+    Cuboidal,
+    RoundedCuboid,
+    SquaredCone,
+    Spherical,
+    WellShape,
+)
+
 SAFE_STRING_REGEX = "^[a-z0-9._]+$"
 
 
@@ -228,44 +237,226 @@ class WellDefinition(BaseModel):
 
 
 class SphericalSegment(BaseModel):
-    shape: Literal["spherical"] = Field(..., description="Denote shape as spherical")
+    shape: Spherical = Field(..., description="Denote shape as spherical")
     radiusOfCurvature: _NonNegativeNumber = Field(
         ...,
         description="radius of curvature of bottom subsection of wells",
     )
-    depth: _NonNegativeNumber = Field(
+    topHeight: _NonNegativeNumber = Field(
         ..., description="The depth of a spherical bottom of a well"
     )
+    bottomHeight: _NonNegativeNumber = Field(
+        ...,
+        description="Height of the bottom of the segment, must be 0.0",
+    )
 
 
-class CircularBoundedSection(BaseModel):
-    shape: Literal["circular"] = Field(..., description="Denote shape as circular")
-    diameter: _NonNegativeNumber = Field(
-        ..., description="The diameter of a circular cross section of a well"
+class ConicalFrustum(BaseModel):
+    shape: Conical = Field(..., description="Denote shape as conical")
+    bottomDiameter: _NonNegativeNumber = Field(
+        ...,
+        description="The diameter at the bottom cross-section of a circular frustum",
+    )
+    topDiameter: _NonNegativeNumber = Field(
+        ..., description="The diameter at the top cross-section of a circular frustum"
     )
     topHeight: _NonNegativeNumber = Field(
         ...,
         description="The height at the top of a bounded subsection of a well, relative to the bottom"
         "of the well",
     )
+    bottomHeight: _NonNegativeNumber = Field(
+        ...,
+        description="The height at the bottom of a bounded subsection of a well, relative to the bottom of the well",
+    )
 
 
-class RectangularBoundedSection(BaseModel):
-    shape: Literal["rectangular"] = Field(
-        ..., description="Denote shape as rectangular"
-    )
-    xDimension: _NonNegativeNumber = Field(
+class CuboidalFrustum(BaseModel):
+    shape: Cuboidal = Field(..., description="Denote shape as cuboidal")
+    bottomXDimension: _NonNegativeNumber = Field(
         ...,
-        description="x dimension of a subsection of wells",
+        description="x dimension of the bottom cross-section of a rectangular frustum",
     )
-    yDimension: _NonNegativeNumber = Field(
+    bottomYDimension: _NonNegativeNumber = Field(
         ...,
-        description="y dimension of a subsection of wells",
+        description="y dimension of the bottom cross-section of a rectangular frustum",
+    )
+    topXDimension: _NonNegativeNumber = Field(
+        ...,
+        description="x dimension of the top cross-section of a rectangular frustum",
+    )
+    topYDimension: _NonNegativeNumber = Field(
+        ...,
+        description="y dimension of the top cross-section of a rectangular frustum",
     )
     topHeight: _NonNegativeNumber = Field(
         ...,
         description="The height at the top of a bounded subsection of a well, relative to the bottom"
         "of the well",
+    )
+    bottomHeight: _NonNegativeNumber = Field(
+        ...,
+        description="The height at the bottom of a bounded subsection of a well, relative to the bottom of the well",
+    )
+
+
+# A squared cone is the intersection of a cube and a cone that both
+# share a central axis, and is a transitional shape between a cone and pyramid
+"""
+module RectangularPrismToCone(bottom_shape, diameter, x, y, z) {
+    circle_radius = diameter/2;
+    r1 = sqrt(x*x + y*y)/2;
+    r2 = circle_radius/2;
+    top_r = bottom_shape == "square" ? r1 : r2;
+    bottom_r = bottom_shape == "square" ? r2 : r1;
+    intersection() {
+        cylinder(z,top_r,bottom_r,$fn=100);
+        translate([0,0,z/2])cube([x, y, z], center=true);
+    }
+}
+"""
+
+
+class SquaredConeSegment(BaseModel):
+    shape: SquaredCone = Field(
+        ..., description="Denote shape as a squared conical segment"
+    )
+    bottomCrossSection: WellShape = Field(
+        ...,
+        description="Denote if the shape is going from circular to rectangular or vise versa",
+    )
+    circleDiameter: _NonNegativeNumber = Field(
+        ...,
+        description="diameter of the circular face of a truncated circular segment",
+    )
+
+    rectangleXDimension: _NonNegativeNumber = Field(
+        ...,
+        description="x dimension of the rectangular face of a truncated circular segment",
+    )
+    rectangleYDimension: _NonNegativeNumber = Field(
+        ...,
+        description="y dimension of the rectangular face of a truncated circular segment",
+    )
+    topHeight: _NonNegativeNumber = Field(
+        ...,
+        description="The height at the top of a bounded subsection of a well, relative to the bottom"
+        "of the well",
+    )
+    bottomHeight: _NonNegativeNumber = Field(
+        ...,
+        description="The height at the bottom of a bounded subsection of a well, relative to the bottom of the well",
+    )
+
+
+"""
+module filitedCuboidSquare(bottom_shape, diameter, width, length, height, steps) {
+    module _slice(depth, x, y, r) {
+        echo("called with: ", depth, x, y, r);
+        circle_centers = [
+            [(x/2)-r, (y/2)-r, 0],
+            [(-x/2)+r, (y/2)-r, 0],
+            [(x/2)-r, (-y/2)+r, 0],
+            [(-x/2)+r, (-y/2)+r, 0]
+
+        ];
+        translate([0,0,depth/2])cube([x-2*r,y,depth], center=true);
+        translate([0,0,depth/2])cube([x,y-2*r,depth], center=true);
+        for (center = circle_centers) {
+            translate(center) cylinder(depth, r, r, $fn=100);
+        }
+    }
+    for (slice_height = [0:height/steps:height]) {
+        r = (diameter) * (slice_height/height);
+        translate([0,0,slice_height]) {
+             _slice(height/steps , width, length, r/2);
+        }
+    }
+}
+module filitedCuboidForce(bottom_shape, diameter, width, length, height, steps) {
+    module single_cone(r,x,y,z) {
+        r = diameter/2;
+        circle_face = [[ for (i = [0:1: steps]) i ]];
+        theta = 360/steps;
+        circle_points = [for (step = [0:1:steps]) [r*cos(theta*step), r*sin(theta*step), z]];
+        final_points = [[x,y,0]];
+        all_points = concat(circle_points, final_points);
+        triangles = [for (step = [0:1:steps-1]) [step, step+1, steps+1]];
+        faces = concat(circle_face, triangles);
+        polyhedron(all_points, faces);
+    }
+    module square_section(r, x, y, z) {
+        points = [
+            [x,y,0],
+            [-x,y,0],
+            [-x,-y,0],
+            [x,-y,0],
+            [r,0,z],
+            [0,r,z],
+            [-r,0,z],
+            [0,-r,z],
+        ];
+        faces = [
+            [0,1,2,3],
+            [4,5,6,7],
+            [4, 0, 3],
+            [5, 0, 1],
+            [6, 1, 2],
+            [7, 2, 3],
+        ];
+        polyhedron(points, faces);
+    }
+    circle_height = bottom_shape == "square" ? height : -height;
+    translate_height = bottom_shape == "square" ? 0 : height;
+    translate ([0,0, translate_height]) {
+        union() {
+            single_cone(diameter/2, width/2, length/2, circle_height);
+            single_cone(diameter/2, -width/2, length/2, circle_height);
+            single_cone(diameter/2, width/2, -length/2, circle_height);
+            single_cone(diameter/2, -width/2, -length/2, circle_height);
+            square_section(diameter/2, width/2, length/2, circle_height);
+        }
+    }
+}
+
+module filitedCuboid(bottom_shape, diameter, width, length, height) {
+    if (width == length && width == diameter) {
+        filitedCuboidSquare(bottom_shape, diameter, width, length, height, 100);
+    }
+    else {
+        filitedCuboidForce(bottom_shape, diameter, width, length, height, 100);
+    }
+}"""
+
+
+class RoundedCuboidSegment(BaseModel):
+    shape: RoundedCuboid = Field(
+        ..., description="Denote shape as a rounded cuboidal segment"
+    )
+    bottomCrossSection: WellShape = Field(
+        ...,
+        description="Denote if the shape is going from circular to rectangular or vise versa",
+    )
+    circleDiameter: _NonNegativeNumber = Field(
+        ...,
+        description="diameter of the circular face of a rounded rectangular segment",
+    )
+    rectangleXDimension: _NonNegativeNumber = Field(
+        ...,
+        description="x dimension of the rectangular face of a rounded rectangular segment",
+    )
+    rectangleYDimension: _NonNegativeNumber = Field(
+        ...,
+        description="y dimension of the rectangular face of a rounded rectangular segment",
+    )
+    topHeight: _NonNegativeNumber = Field(
+        ...,
+        description="The height at the top of a bounded subsection of a well, relative to the bottom"
+        "of the well",
+    )
+    bottomHeight: _NonNegativeNumber = Field(
+        ...,
+        description="The height at the bottom of a bounded subsection of a well, relative to the bottom of the well",
     )
 
 
@@ -297,16 +488,19 @@ class Group(BaseModel):
     )
 
 
+WellSegment = Union[
+    ConicalFrustum,
+    CuboidalFrustum,
+    SquaredConeSegment,
+    RoundedCuboidSegment,
+    SphericalSegment,
+]
+
+
 class InnerWellGeometry(BaseModel):
-    frusta: Union[
-        List[CircularBoundedSection], List[RectangularBoundedSection]
-    ] = Field(
+    sections: List[WellSegment] = Field(
         ...,
         description="A list of all of the sections of the well that have a contiguous shape",
-    )
-    bottomShape: Optional[SphericalSegment] = Field(
-        None,
-        description="The shape at the bottom of the well: either a spherical segment or a cross-section",
     )
 
 

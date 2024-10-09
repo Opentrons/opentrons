@@ -27,11 +27,7 @@ import {
   ToggleGroup,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  getPipetteSpecsV2,
-  FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import {
   getAdditionalEquipmentEntities,
@@ -57,9 +53,10 @@ import {
 import { DeckThumbnail } from './DeckThumbnail'
 import { OffDeckThumbnail } from './OffdeckThumbnail'
 import { getWarningContent } from './UnusedModalContent'
+import { InstrumentsInfo } from './InstrumentsInfo'
 import { LiquidDefinitions } from './LiquidDefinitions'
 
-import type { CreateCommand, PipetteName } from '@opentrons/shared-data'
+import type { CreateCommand } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../types'
 
@@ -181,8 +178,6 @@ export function ProtocolOverview(): JSX.Element {
   }
 
   const pipettesOnDeck = Object.values(pipettes)
-  const leftPip = pipettesOnDeck.find(pip => pip.mount === 'left')
-  const rightPip = pipettesOnDeck.find(pip => pip.mount === 'right')
   const {
     protocolName,
     description,
@@ -384,72 +379,12 @@ export function ProtocolOverview(): JSX.Element {
                 </ListItem>
               </Flex>
             </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-              <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-                <StyledText desktopStyle="headingSmallBold">
-                  {t('instruments')}
-                </StyledText>
-                <Flex padding={SPACING.spacing4}>
-                  <Btn
-                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                    onClick={() => {
-                      setShowEditInstrumentsModal(true)
-                    }}
-                    css={BUTTON_LINK_STYLE}
-                  >
-                    <StyledText desktopStyle="bodyDefaultRegular">
-                      {t('edit')}
-                    </StyledText>
-                  </Btn>
-                </Flex>
-              </Flex>
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                <ListItem type="noActive" key={`ProtocolOverview_robotType`}>
-                  <ListItemDescriptor
-                    type="default"
-                    description={t('robotType')}
-                    content={
-                      robotType === FLEX_ROBOT_TYPE
-                        ? t('shared:opentrons_flex')
-                        : t('shared:ot2')
-                    }
-                  />
-                </ListItem>
-                <ListItem type="noActive" key={`ProtocolOverview_left`}>
-                  <ListItemDescriptor
-                    type="default"
-                    description={t('left_pip')}
-                    content={
-                      leftPip != null
-                        ? getPipetteSpecsV2(leftPip.name as PipetteName)
-                            ?.displayName ?? t('na')
-                        : t('na')
-                    }
-                  />
-                </ListItem>
-                <ListItem type="noActive" key={`ProtocolOverview_right`}>
-                  <ListItemDescriptor
-                    type="default"
-                    description={t('right_pip')}
-                    content={
-                      rightPip != null
-                        ? getPipetteSpecsV2(rightPip.name as PipetteName)
-                            ?.displayName ?? t('na')
-                        : t('na')
-                    }
-                  />
-                </ListItem>
-                {robotType === FLEX_ROBOT_TYPE ? (
-                  <ListItem type="noActive" key={`ProtocolOverview_gripper`}>
-                    <ListItemDescriptor
-                      type="default"
-                      description={t('extension')}
-                      content={isGripperAttached ? t('gripper') : t('na')}
-                    />
-                  </ListItem>
-                ) : null}
-              </Flex>
-            </Flex>
+            <InstrumentsInfo
+              robotType={robotType}
+              pipettesOnDeck={pipettesOnDeck}
+              additionalEquipment={additionalEquipment}
+              setShowEditInstrumentsModal={setShowEditInstrumentsModal}
+            />
             <LiquidDefinitions
               allIngredientGroupFields={allIngredientGroupFields}
             />

@@ -84,10 +84,10 @@ from opentrons.protocol_engine.state.addressable_areas import (
 )
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
 from opentrons.protocol_engine.state.frustum_helpers import (
-    height_from_volume_circular,
-    height_from_volume_rectangular,
-    volume_from_height_circular,
-    volume_from_height_rectangular,
+    _height_from_volume_circular,
+    _height_from_volume_rectangular,
+    _volume_from_height_circular,
+    _volume_from_height_rectangular,
 )
 from ..pipette_fixtures import get_default_nozzle_map
 from ..mock_circular_frusta import TEST_EXAMPLES as CIRCULAR_TEST_EXAMPLES
@@ -2955,7 +2955,7 @@ def test_rectangular_frustum_math_helpers(
         top_width = frustum["width"][index]
         target_height = frustum["height"][index]
 
-        found_volume = volume_from_height_rectangular(
+        found_volume = _volume_from_height_rectangular(
             target_height=target_height,
             total_frustum_height=total_frustum_height,
             top_length=top_length,
@@ -2964,7 +2964,7 @@ def test_rectangular_frustum_math_helpers(
             bottom_width=bottom_width,
         )
 
-        found_height = height_from_volume_rectangular(
+        found_height = _height_from_volume_rectangular(
             volume=found_volume,
             total_frustum_height=total_frustum_height,
             top_length=top_length,
@@ -2994,14 +2994,14 @@ def test_circular_frustum_math_helpers(
         top_radius = frustum["radius"][index]
         target_height = frustum["height"][index]
 
-        found_volume = volume_from_height_circular(
+        found_volume = _volume_from_height_circular(
             target_height=target_height,
             total_frustum_height=total_frustum_height,
             top_radius=top_radius,
             bottom_radius=bottom_radius,
         )
 
-        found_height = height_from_volume_circular(
+        found_height = _height_from_volume_circular(
             volume=found_volume,
             total_frustum_height=total_frustum_height,
             top_radius=top_radius,

@@ -10,24 +10,25 @@ from robot_server.persistence.fastapi_dependencies import get_sql_engine
 from robot_server.persistence.tables import boolean_setting_table, BooleanSettingKey
 
 
+_ERROR_RECOVERY_ENABLED_DEFAULT = True
+
+
 class ErrorRecoverySettingStore:
     """Persistently stores settings related to error recovery."""
 
     def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
         self._sql_engine = sql_engine
 
-    def get_is_enabled(self) -> bool | None:
-        """Get the value of the "error recovery enabled" setting.
-
-        `None` is the default, i.e. it's never been explicitly set one way or the other.
-        """
+    def get_is_enabled(self) -> bool:
+        """Get the value of the "error recovery enabled" setting."""
         with self._sql_engine.begin() as transaction:
-            return transaction.execute(
+            result: bool | None = transaction.execute(
                 sqlalchemy.select(boolean_setting_table.c.value).where(
                     boolean_setting_table.c.key
                     == BooleanSettingKey.ENABLE_ERROR_RECOVERY
                 )
             ).scalar_one_or_none()
+        return result if result is not None else _ERROR_RECOVERY_ENABLED_DEFAULT
 
     def set_is_enabled(self, is_enabled: bool | None) -> None:
         """Set the value of the "error recovery enabled" setting.

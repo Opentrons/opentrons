@@ -46,7 +46,7 @@ from opentrons.protocol_api.core.engine import (
     InstrumentCore,
     WellCore,
     ProtocolCore,
-    deck_conflict,
+    pipette_movement_conflict,
 )
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
@@ -78,8 +78,10 @@ def patch_mock_pipette_movement_safety_check(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Replace deck_conflict.check() with a mock."""
-    mock = decoy.mock(func=deck_conflict.check_safe_for_pipette_movement)
-    monkeypatch.setattr(deck_conflict, "check_safe_for_pipette_movement", mock)
+    mock = decoy.mock(func=pipette_movement_conflict.check_safe_for_pipette_movement)
+    monkeypatch.setattr(
+        pipette_movement_conflict, "check_safe_for_pipette_movement", mock
+    )
 
 
 @pytest.fixture
@@ -275,12 +277,12 @@ def test_pick_up_tip(
     )
 
     decoy.verify(
-        deck_conflict.check_safe_for_tip_pickup_and_return(
+        pipette_movement_conflict.check_safe_for_tip_pickup_and_return(
             engine_state=mock_engine_client.state,
             pipette_id="abc123",
             labware_id="labware-id",
         ),
-        deck_conflict.check_safe_for_pipette_movement(
+        pipette_movement_conflict.check_safe_for_pipette_movement(
             engine_state=mock_engine_client.state,
             pipette_id="abc123",
             labware_id="labware-id",
@@ -329,7 +331,7 @@ def test_drop_tip_no_location(
     subject.drop_tip(location=None, well_core=well_core, home_after=True)
 
     decoy.verify(
-        deck_conflict.check_safe_for_pipette_movement(
+        pipette_movement_conflict.check_safe_for_pipette_movement(
             engine_state=mock_engine_client.state,
             pipette_id="abc123",
             labware_id="labware-id",
@@ -380,12 +382,12 @@ def test_drop_tip_with_location(
     subject.drop_tip(location=location, well_core=well_core, home_after=True)
 
     decoy.verify(
-        deck_conflict.check_safe_for_tip_pickup_and_return(
+        pipette_movement_conflict.check_safe_for_tip_pickup_and_return(
             engine_state=mock_engine_client.state,
             pipette_id="abc123",
             labware_id="labware-id",
         ),
-        deck_conflict.check_safe_for_pipette_movement(
+        pipette_movement_conflict.check_safe_for_pipette_movement(
             engine_state=mock_engine_client.state,
             pipette_id="abc123",
             labware_id="labware-id",
@@ -512,7 +514,7 @@ def test_aspirate_from_well(
     )
 
     decoy.verify(
-        deck_conflict.check_safe_for_pipette_movement(
+        pipette_movement_conflict.check_safe_for_pipette_movement(
             engine_state=mock_engine_client.state,
             pipette_id="abc123",
             labware_id="123abc",
@@ -630,7 +632,7 @@ def test_blow_out_to_well(
     subject.blow_out(location=location, well_core=well_core, in_place=False)
 
     decoy.verify(
-        deck_conflict.check_safe_for_pipette_movement(
+        pipette_movement_conflict.check_safe_for_pipette_movement(
             engine_state=mock_engine_client.state,
             pipette_id="abc123",
             labware_id="123abc",
@@ -745,7 +747,7 @@ def test_dispense_to_well(
     )
 
     decoy.verify(
-        deck_conflict.check_safe_for_pipette_movement(
+        pipette_movement_conflict.check_safe_for_pipette_movement(
             engine_state=mock_engine_client.state,
             pipette_id="abc123",
             labware_id="123abc",
@@ -1129,7 +1131,7 @@ def test_touch_tip(
     )
 
     decoy.verify(
-        deck_conflict.check_safe_for_pipette_movement(
+        pipette_movement_conflict.check_safe_for_pipette_movement(
             engine_state=mock_engine_client.state,
             pipette_id="abc123",
             labware_id="123abc",

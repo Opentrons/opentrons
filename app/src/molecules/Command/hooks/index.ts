@@ -4,4 +4,6 @@ export type {
   UseCommandTextStringParams,
   GetCommandText,
   GetCommandTextResult,
+  GetTCRunExtendedProfileCommandTextResult,
+  GetTCRunProfileCommandTextResult,
 } from './useCommandTextString'

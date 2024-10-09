@@ -8,10 +8,9 @@ from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.module.types import ModuleModel, ModuleType
 
 from opentrons.legacy_broker import LegacyBroker
-from opentrons.hardware_control.modules import ThermocyclerStep
 from opentrons.legacy_commands import module_commands as cmds
 from opentrons.legacy_commands.publisher import CommandPublisher, publish
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
 from opentrons.protocols.api_support.util import (
     APIVersionError,
     requires_version,
@@ -628,6 +627,13 @@ class ThermocyclerContext(ModuleContext):
             Unlike with :py:meth:`set_block_temperature`, either or both of
             ``hold_time_minutes`` and ``hold_time_seconds`` must be defined
             and for each step.
+
+        .. note:
+
+            Before API Version 2.21, Thermocycler profiles run with this command
+            would be listed in the app as having a number of repetitions equal to
+            their step count. At or above API Version 2.21, the structure of the
+            Thermocycler cycles is preserved.
 
         """
         repetitions = validation.ensure_thermocycler_repetition_count(repetitions)

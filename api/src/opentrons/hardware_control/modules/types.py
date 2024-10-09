@@ -39,6 +39,11 @@ class ThermocyclerStep(ThermocyclerStepBase, total=False):
     hold_time_minutes: float
 
 
+class ThermocyclerCycle(TypedDict):
+    steps: List[ThermocyclerStep]
+    repetitions: int
+
+
 UploadFunction = Callable[[str, str, Dict[str, Any]], Awaitable[Tuple[bool, str]]]
 
 

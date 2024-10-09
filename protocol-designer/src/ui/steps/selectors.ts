@@ -420,3 +420,8 @@ function getMixMultiSelectDisabledFields(forms: FormData[]): DisabledFields {
   }
   return disabledFields
 }
+
+export const getSelectedSubstep: Selector<StepIdType | null> = createSelector(
+  rootSelector,
+  (state: StepsState) => state.selectedSubstep
+)

@@ -1,5 +1,6 @@
 import type { AddressableAreaName } from '../../deck'
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
+import type { DropTipWellLocation, WellLocation } from './support'
 export type PipettingRunTimeCommand =
   | AspirateInPlaceRunTimeCommand
   | AspirateInPlaceRunTimeCommand
@@ -226,17 +227,7 @@ export type BlowoutParams = FlowRateParams &
   PipetteAccessParams &
   WellLocationParam
 export type TouchTipParams = PipetteAccessParams & WellLocationParam
-export type DropTipParams = PipetteAccessParams & {
-  wellLocation?: {
-    origin?: 'default' | 'top' | 'center' | 'bottom'
-    offset?: {
-      // mm values all default to 0
-      x?: number
-      y?: number
-      z?: number
-    }
-  }
-}
+export type DropTipParams = PipetteAccessParams & DropTipWellLocationParam
 export type PickUpTipParams = TouchTipParams
 
 interface AddressableOffsetVector {
@@ -292,17 +283,11 @@ interface VolumeParams {
 }
 
 interface WellLocationParam {
-  wellLocation?: {
-    // default value is 'top'
-    origin?: 'top' | 'center' | 'bottom'
-    offset?: {
-      // mm
-      // all values default to 0
-      x?: number
-      y?: number
-      z?: number
-    }
-  }
+  wellLocation?: WellLocation
+}
+
+interface DropTipWellLocationParam {
+  wellLocation?: DropTipWellLocation
 }
 
 interface VerifyTipPresenceParams extends PipetteIdentityParams {

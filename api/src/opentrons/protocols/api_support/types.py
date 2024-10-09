@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import NamedTuple
+from typing import NamedTuple, TypedDict
 
 
 class APIVersion(NamedTuple):
@@ -17,3 +17,16 @@ class APIVersion(NamedTuple):
 
     def __str__(self) -> str:
         return f"{self.major}.{self.minor}"
+
+
+class ThermocyclerStepBase(TypedDict):
+    """Required elements of a thermocycler step: the temperature."""
+
+    temperature: float
+
+
+class ThermocyclerStep(ThermocyclerStepBase, total=False):
+    """Optional elements of a thermocycler step: the hold time. One of these must be present."""
+
+    hold_time_seconds: float
+    hold_time_minutes: float

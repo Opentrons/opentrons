@@ -37,8 +37,6 @@ if TYPE_CHECKING:
 _GRIPPER_HOMED_POSITION_Z = 166.125  # Height of the center of the gripper critical point from the deck when homed
 
 
-# TODO (spp, 2022-10-20): name this GripperMovementHandler if it doesn't handle
-#  any non-gripper implementations
 class LabwareMovementHandler:
     """Implementation logic for labware movement."""
 

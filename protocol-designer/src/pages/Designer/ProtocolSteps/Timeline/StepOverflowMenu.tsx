@@ -16,7 +16,6 @@ import {
 } from '@opentrons/components'
 import { actions as steplistActions } from '../../../../steplist'
 import { actions as stepsActions } from '../../../../ui/steps'
-import { populateForm } from '../../../../ui/steps/actions/actions'
 import {
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
@@ -24,8 +23,14 @@ import {
   DELETE_STEP_FORM,
 } from '../../../../components/modals/ConfirmDeleteModal'
 import {
+  hoverOnStep,
+  toggleViewSubstep,
+  populateForm,
+} from '../../../../ui/steps/actions/actions'
+import {
   getCurrentFormHasUnsavedChanges,
   getCurrentFormIsPresaved,
+  getSavedStepForms,
   getUnsavedForm,
 } from '../../../../step-forms/selectors'
 import type * as React from 'react'
@@ -49,6 +54,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
     dispatch(steplistActions.deleteStep(stepId))
   }
   const formData = useSelector(getUnsavedForm)
+  const savedStepFormData = useSelector(getSavedStepForms)[stepId]
   const currentFormIsPresaved = useSelector(getCurrentFormIsPresaved)
   const singleEditFormHasUnsavedChanges = useSelector(
     getCurrentFormHasUnsavedChanges
@@ -90,6 +96,10 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
       return CLOSE_STEP_FORM_WITH_CHANGES
     }
   }
+  const isPipetteStep =
+    savedStepFormData.stepType === 'moveLiquid' ||
+    savedStepFormData.stepType === 'mix'
+  const isThermocyclerStep = savedStepFormData.stepType === 'thermocycler'
 
   return (
     <>
@@ -128,14 +138,16 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
         {formData != null ? null : (
           <MenuButton onClick={confirm}>{t('edit_step')}</MenuButton>
         )}
-        <MenuButton
-          disabled={formData != null}
-          onClick={() => {
-            console.log('wire this up')
-          }}
-        >
-          {t('view_commands')}
-        </MenuButton>
+        {isPipetteStep || isThermocyclerStep ? (
+          <MenuButton
+            onClick={() => {
+              dispatch(hoverOnStep(stepId))
+              dispatch(toggleViewSubstep(stepId))
+            }}
+          >
+            {t('view_details')}
+          </MenuButton>
+        ) : null}
         <MenuButton
           onClick={() => {
             duplicateStep(stepId)
