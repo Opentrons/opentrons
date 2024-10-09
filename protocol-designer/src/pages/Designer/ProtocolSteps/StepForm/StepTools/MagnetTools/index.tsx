@@ -23,7 +23,6 @@ import {
 import {
   getMagnetLabwareEngageHeight,
   getMagneticLabwareOptions,
-  getSingleMagneticModuleId,
 } from '../../../../../../ui/modules/selectors'
 import { ToggleExpandStepFormField } from '../../../../../../molecules'
 import {
@@ -83,8 +82,10 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
           {t('protocol_steps:module')}
         </StyledText>
         <ListItem type="noActive">
-          <Flex padding={SPACING.spacing12} gridGap={SPACING.spacing24}>
+          <Flex padding={SPACING.spacing12} gridGap={SPACING.spacing32}>
+            <Flex >
             <DeckInfoLabel deckLabel={slotLocation} />
+            </Flex>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
               <StyledText desktopStyle="bodyDefaultRegular">
                 {slotInfo[0]}
