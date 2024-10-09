@@ -26,7 +26,6 @@ from opentrons_shared_data.protocol.models import (
     Location,
     ProfileStep,
     WellLocation as SD_WellLocation,
-    LiquidHandlingWellLocation as SD_LiquidHandlingWellLocation,
     OffsetVector,
     Metadata as SD_Metadata,
     Module,
