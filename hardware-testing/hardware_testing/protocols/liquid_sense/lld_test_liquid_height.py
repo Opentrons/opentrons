@@ -16,7 +16,7 @@ from abr_testing.automation import google_sheets_tool  # type: ignore[import]
 ###########################################
 # TODO: use runtime-variables instead of constants
 
-NUM_TRIALS = 4
+NUM_TRIALS = 12
 
 ASPIRATE_MM_FROM_BOTTOM = 5
 RESERVOIR = "nest_1_reservoir_195ml"
@@ -107,7 +107,7 @@ def add_parameters(parameters: ParameterContext):
                 "value": "corning_96_wellplate_360ul_flat",
             },
         ],
-        default="opentrons_10_tuberack_nest_4x50ml_6x15ml_conical",
+        default="nest_96_wellplate_2ml_deep",
     )
 
 
@@ -115,7 +115,7 @@ def add_parameters(parameters: ParameterContext):
 #  VARIABLES - END
 ###########################################
 
-metadata = {"protocolName": "lld-test-liquid-height-tube-rack"}
+metadata = {"protocolName": "lld-test-liquid-height"}
 requirements = {"robotType": "Flex", "apiLevel": "2.20"}
 
 _all_96_well_names = [f"{r}{c + 1}" for c in range(12) for r in "ABCDEFGH"]
@@ -170,7 +170,7 @@ def _setup(
     Labware,
     Any,
 ]:
-    global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE_TYPE, VOLUMES, LIQUID_TYPE
+    global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE_TYPE, VOLUMES, LIQUID_TYPE, NUM_TRIALS
     # TODO: use runtime-variables instead of constants
     ctx.load_trash_bin("A3")
     LABWARE_TYPE = ctx.params.labware_type  # type: ignore[attr-defined]
@@ -184,10 +184,7 @@ def _setup(
     else:
         liquid_pip_name = f"flex_1channel_{LIQUID_PIPETTE_SIZE}"
     liquid_pipette = ctx.load_instrument(liquid_pip_name, LIQUID_MOUNT)
-    if LABWARE_TYPE == "nest_12_well_reservoir_15ml":
-        probing_pip_name = f"flex_8channel_{PROBING_PIPETTE_SIZE}"
-    else:
-        probing_pip_name = f"flex_1channel_{PROBING_PIPETTE_SIZE}"
+    probing_pip_name = f"flex_1channel_{PROBING_PIPETTE_SIZE}"
     probing_pipette = ctx.load_instrument(probing_pip_name, PROBING_MOUNT)
 
     reservoir = ctx.load_labware(RESERVOIR, SLOT_RESERVOIR)
@@ -204,9 +201,10 @@ def _setup(
         VOLUMES = [40, 50, 175, 200, 225, 275, 400, 1000]
     elif LABWARE_TYPE == "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical":
         VOLUMES = [250, 250, 500, 1000, 1000, 1000, 1000, 1000]
+        NUM_TRIALS = 4
         # Actual Volumes = 250, 500, 1000, 2000, 3000, 4000, 5000, 6000
     elif LABWARE_TYPE == "nest_12_reservoir_15ml":
-        VOLUMES = []
+        VOLUMES = [100, 150, 200, 250, 500, 700, 1000]
 
     google_sheet = None
     if not ctx.is_simulating() and DIAL_PORT is None:
@@ -361,6 +359,7 @@ def _test_for_finding_liquid_height(
     _write_line_to_csv(ctx, CSV_HEADER)
     all_corrected_heights = []
     corrected_height_list = []
+    data_for_google_sheet = []
     volume_to_record = volume
     if LABWARE_TYPE == "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical":
         prev_vol = 0
@@ -371,7 +370,7 @@ def _test_for_finding_liquid_height(
             if LABWARE_TYPE == "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical" and prev_vol == 0:
                 prev_vol = volume
             elif LABWARE_TYPE == "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical" and prev_vol > 0:
-                volume_to_record = volume + prev_vol
+                volume_to_record += prev_vol
             corrected_height_list.append(str(volume_to_record))
         # pickup probing tip, then measure Z-error
         if probe_yes_or_no == "yes":
@@ -415,17 +414,17 @@ def _test_for_finding_liquid_height(
         trial_data = [trial_counter, volume_to_record, height, tip_z_error, corrected_height]
         corrected_height_list.append(corrected_height)  # type: ignore[arg-type]
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
-
+        
     avg = sum(all_corrected_heights) / len(all_corrected_heights)
     error_mm = (max(all_corrected_heights) - min(all_corrected_heights)) * 0.5
     corrected_height_list.append(avg)  # type: ignore[arg-type]
     corrected_height_list.append(error_mm)  # type: ignore[arg-type]
     error_percent = error_mm / avg if avg else 0.0
-    data_for_google_sheet: List = []
-    data_for_google_sheet = [RUN_ID, volume_to_record, LABWARE_TYPE, LIQUID_TYPE]
+    corrected_height_list.append(error_percent * 100)
+    data_for_google_sheet += [RUN_ID, volume_to_record, LABWARE_TYPE, LIQUID_TYPE]
+
     data_for_google_sheet.extend(corrected_height_list)
-    stats_for_google_sheet = [avg, error_mm, error_percent * 100]
-    data_for_google_sheet.extend(stats_for_google_sheet)
+    
     _write_line_to_csv(ctx, ["average", str(round(avg, 3))])
     _write_line_to_csv(ctx, ["error (mm)", str(round(error_mm, 3))])
     _write_line_to_csv(ctx, ["error (%)", str(round(error_percent * 100, 1))])
