@@ -38,8 +38,8 @@ import {
 import { getSaveStepSnackbarText } from './utils'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { FormData, StepType } from '../../../../form-types'
+import { RenameStepModal } from '../../../../organisms/RenameStepModal'
 import type { FieldPropsByName, FocusHandlers, StepFormProps } from './types'
-import { MoreOptionsModal } from '../../../../components/modals/MoreOptionsModal'
 
 type StepFormMap = {
   [K in StepType]?: React.ComponentType<StepFormProps> | null
@@ -142,9 +142,14 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
 
   return (
     <>
-      {isRename ? 
-      <Modal></Modal>
-      : null}
+      {isRename ? (
+        <RenameStepModal
+          formData={formData}
+          onClose={() => {
+            setIsRename(false)
+          }}
+        />
+      ) : null}
       <Toolbox
         subHeader={
           isMultiStepToolbox ? (
