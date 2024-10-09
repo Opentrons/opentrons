@@ -157,6 +157,10 @@ export function EditInstrumentsModal(
       .trim()
   }
 
+  // Note (kk:2024/10/09)
+  // if a user removes all pipettes, left mount is the first target.
+  const targetPipetteMount = leftPipette == null ? 'left' : 'right'
+
   return createPortal(
     <Modal
       title={
@@ -175,16 +179,18 @@ export function EditInstrumentsModal(
           gridGap={SPACING.spacing8}
           padding={`0 ${SPACING.spacing24} ${SPACING.spacing24}`}
         >
-          {page === 'overview' ? null : (
-            <SecondaryButton
-              onClick={() => {
+          <SecondaryButton
+            onClick={() => {
+              if (page === 'overview') {
+                onClose()
+              } else {
                 setPage('overview')
                 resetFields()
-              }}
-            >
-              {t('shared:cancel')}
-            </SecondaryButton>
-          )}
+              }
+            }}
+          >
+            {page === 'overview' ? t('shared:cancel') : t('shared:back')}
+          </SecondaryButton>
           <PrimaryButton
             disabled={
               page === 'add' &&
@@ -212,7 +218,7 @@ export function EditInstrumentsModal(
               }
             }}
           >
-            {t(page === 'overview' ? 'shared:close' : 'shared:save')}
+            {t('shared:save')}
           </PrimaryButton>
         </Flex>
       }
@@ -227,7 +233,8 @@ export function EditInstrumentsModal(
               <StyledText desktopStyle="bodyLargeSemiBold">
                 {t('your_pipettes')}
               </StyledText>
-              {has96Channel ? null : (
+              {has96Channel ||
+              (leftPipette == null && rightPipette == null) ? null : (
                 <Btn
                   css={BUTTON_LINK_STYLE}
                   onClick={() =>
@@ -275,18 +282,7 @@ export function EditInstrumentsModal(
                     )
                   }}
                 />
-              ) : (
-                <EmptySelectorButton
-                  onClick={() => {
-                    setPage('add')
-                    setMount('left')
-                    resetFields()
-                  }}
-                  text={t('add_pipette')}
-                  textAlignment="left"
-                  iconName="plus"
-                />
-              )}
+              ) : null}
               {rightPipette?.tiprackDefURI != null && rightInfo != null ? (
                 <PipetteInfoItem
                   mount="right"
@@ -307,11 +303,13 @@ export function EditInstrumentsModal(
                     )
                   }}
                 />
-              ) : has96Channel ? null : (
+              ) : null}
+              {has96Channel ||
+              (leftPipette != null && rightPipette != null) ? null : (
                 <EmptySelectorButton
                   onClick={() => {
                     setPage('add')
-                    setMount('right')
+                    setMount(targetPipetteMount)
                   }}
                   text={t('add_pipette')}
                   textAlignment="left"
@@ -355,6 +353,8 @@ export function EditInstrumentsModal(
                       <Btn
                         css={BUTTON_LINK_STYLE}
                         textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                        padding={SPACING.spacing4}
+                        id="hello"
                         onClick={() => {
                           dispatch(toggleIsGripperRequired())
                         }}

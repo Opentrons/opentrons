@@ -3,6 +3,7 @@
   "amount": "Amount:",
   "app_settings": "App settings",
   "ask_for_labware_overwrite": "Duplicate labware name",
+  "back": "Back",
   "cancel": "Cancel",
   "close": "Close",
   "confirm_import": "Are you sure you want to upload this protocol?",
