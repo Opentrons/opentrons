@@ -179,7 +179,6 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
         case 'single':
           return [wellName]
         case 'row':
-          return getActiveRowFromWell(allWellSetsFor8Channel)
         case 'subrect':
         default:
           console.error('Unhandled nozzleConfig case.')
