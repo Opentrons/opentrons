@@ -1374,6 +1374,7 @@ class GeometryView:
                     f"Attempting to dispense {volume}µL of liquid into a well that can currently only hold {remaining_volume}µL (well {well_name} in labware_id: {labware_id})"
                 )
         else:
+            # TODO(pbm, 10-08-24): factor in well (LabwareStore) state volume
             if volume > well_volumetric_capacity:
                 raise errors.InvalidDispenseVolumeError(
                     f"Attempting to dispense {volume}µL of liquid into a well that can only hold {well_volumetric_capacity}µL (well {well_name} in labware_id: {labware_id})"

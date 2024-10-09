@@ -1513,7 +1513,7 @@ def test_get_well_position_with_meniscus_offset(
     mock_addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
-    """It should be able to get the position of a well center in a labware."""
+    """It should be able to get the position of a well meniscus in a labware."""
     labware_data = LoadedLabware(
         id="labware-id",
         loadName="load-name",
@@ -1549,7 +1549,6 @@ def test_get_well_position_with_meniscus_offset(
             origin=WellOrigin.MENISCUS,
             offset=WellOffset(x=2, y=3, z=4),
         ),
-        operation_volume=0.0,
     )
 
     assert result == Point(
@@ -1559,7 +1558,7 @@ def test_get_well_position_with_meniscus_offset(
     )
 
 
-def test_get_well_position_with_meniscus_and_volume_offset(
+def test_get_well_position_with_meniscus_and_literal_volume_offset(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     mock_labware_view: LabwareView,
@@ -1567,7 +1566,7 @@ def test_get_well_position_with_meniscus_and_volume_offset(
     mock_addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
-    """It should be able to get the position of a well center in a labware."""
+    """It should be able to get the position of a well meniscus in a labware with a volume offset."""
     labware_data = LoadedLabware(
         id="labware-id",
         loadName="load-name",
@@ -1618,6 +1617,122 @@ def test_get_well_position_with_meniscus_and_volume_offset(
         y=slot_pos[1] - 2 + well_def.y + 3,
         z=slot_pos[2] + 3 + well_def.z + 4 + 40.0,
     )
+
+
+def test_get_well_position_with_meniscus_and_float_volume_offset(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    mock_labware_view: LabwareView,
+    mock_well_view: WellView,
+    mock_addressable_area_view: AddressableAreaView,
+    subject: GeometryView,
+) -> None:
+    """It should be able to get the position of a well meniscus in a labware with a volume offset."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="offset-id",
+    )
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    slot_pos = Point(4, 5, 6)
+    well_def = well_plate_def.wells["B2"]
+
+    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
+        calibration_offset
+    )
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+    ).then_return(slot_pos)
+    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
+    )
+    decoy.when(
+        mock_well_view.get_last_measured_liquid_height("labware-id", "B2")
+    ).then_return(40.0)
+    labware_def = _load_labware_definition_data()
+    assert labware_def.innerLabwareGeometry is not None
+    inner_well_def = labware_def.innerLabwareGeometry["welldefinition1111"]
+    decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
+        inner_well_def
+    )
+
+    result = subject.get_well_position(
+        labware_id="labware-id",
+        well_name="B2",
+        well_location=LiquidHandlingWellLocation(
+            origin=WellOrigin.MENISCUS,
+            offset=WellOffset(x=2, y=3, z=4),
+            volumeOffset=-323.0,
+        ),
+    )
+
+    assert result == Point(
+        x=slot_pos[0] + 1 + well_def.x + 2,
+        y=slot_pos[1] - 2 + well_def.y + 3,
+        z=slot_pos[2] + 3 + well_def.z + 4 + 35.0,
+    )
+
+
+def test_get_well_position_raises_validation_error(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    mock_labware_view: LabwareView,
+    mock_well_view: WellView,
+    mock_addressable_area_view: AddressableAreaView,
+    subject: GeometryView,
+) -> None:
+    """It should raise a validation error when a volume offset is too large (ie location is below the well bottom)."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="offset-id",
+    )
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    slot_pos = Point(4, 5, 6)
+    well_def = well_plate_def.wells["B2"]
+
+    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
+        calibration_offset
+    )
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+    ).then_return(slot_pos)
+    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
+    )
+    decoy.when(
+        mock_well_view.get_last_measured_liquid_height("labware-id", "B2")
+    ).then_return(45.0)
+    labware_def = _load_labware_definition_data()
+    assert labware_def.innerLabwareGeometry is not None
+    inner_well_def = labware_def.innerLabwareGeometry["welldefinition1111"]
+    decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
+        inner_well_def
+    )
+
+    with pytest.raises(errors.OperationLocationNotInWellError):
+        subject.get_well_position(
+            labware_id="labware-id",
+            well_name="B2",
+            well_location=LiquidHandlingWellLocation(
+                origin=WellOrigin.MENISCUS,
+                offset=WellOffset(x=2, y=3, z=4),
+                volumeOffset="operationVolume",
+            ),
+            operation_volume=-3000.0,
+        )
 
 
 def test_get_relative_well_location(
@@ -2897,3 +3012,62 @@ def test_circular_frustum_math_helpers(
 
     for i in range(len(frustum["height"])):
         _find_volume_from_height_(i)
+
+
+def test_validate_dispense_volume_into_well_bottom(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    mock_labware_view: LabwareView,
+    subject: GeometryView,
+) -> None:
+    """It should raise an InvalidDispenseVolumeError if too much volume is specified."""
+    well_def = well_plate_def.wells["B2"]
+    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
+    )
+
+    with pytest.raises(errors.InvalidDispenseVolumeError):
+        subject.validate_dispense_volume_into_well(
+            labware_id="labware-id",
+            well_name="B2",
+            well_location=LiquidHandlingWellLocation(
+                origin=WellOrigin.BOTTOM,
+                offset=WellOffset(x=2, y=3, z=4),
+            ),
+            volume=400.0,
+        )
+
+
+def test_validate_dispense_volume_into_well_meniscus(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    mock_well_view: WellView,
+    subject: GeometryView,
+) -> None:
+    """It should raise an InvalidDispenseVolumeError if too much volume is specified."""
+    labware_def = _load_labware_definition_data()
+    assert labware_def.wells is not None
+    well_def = labware_def.wells["A1"]
+    assert labware_def.innerLabwareGeometry is not None
+    inner_well_def = labware_def.innerLabwareGeometry["welldefinition1111"]
+
+    decoy.when(mock_labware_view.get_well_definition("labware-id", "A1")).then_return(
+        well_def
+    )
+    decoy.when(mock_labware_view.get_well_geometry("labware-id", "A1")).then_return(
+        inner_well_def
+    )
+    decoy.when(
+        mock_well_view.get_last_measured_liquid_height("labware-id", "A1")
+    ).then_return(45.0)
+
+    with pytest.raises(errors.InvalidDispenseVolumeError):
+        subject.validate_dispense_volume_into_well(
+            labware_id="labware-id",
+            well_name="A1",
+            well_location=LiquidHandlingWellLocation(
+                origin=WellOrigin.MENISCUS,
+                offset=WellOffset(x=2, y=3, z=4),
+            ),
+            volume=2000000.0,
+        )
