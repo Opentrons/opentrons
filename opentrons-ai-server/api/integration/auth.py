@@ -1,13 +1,14 @@
-import logging
 from typing import Any, Optional
 
 import jwt
+import structlog
 from fastapi import HTTPException, Security, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, SecurityScopes
 
 from api.settings import Settings
 
-logger = logging.getLogger(__name__)
+settings: Settings = Settings()
+logger = structlog.stdlib.get_logger(settings.logger_name)
 
 
 class UnauthenticatedException(HTTPException):
@@ -35,10 +36,10 @@ class VerifyToken:
         try:
             signing_key = self.jwks_client.get_signing_key_from_jwt(credentials.credentials).key
         except jwt.PyJWKClientError as error:
-            logger.error(error, extra={"credentials": credentials})
+            logger.error("Client Error", extra={"credentials": credentials}, exc_info=True)
             raise UnauthenticatedException() from error
         except jwt.exceptions.DecodeError as error:
-            logger.error(error, extra={"credentials": credentials})
+            logger.error("Decode Error", extra={"credentials": credentials}, exc_info=True)
             raise UnauthenticatedException() from error
 
         try:
@@ -51,10 +52,10 @@ class VerifyToken:
             )
             logger.info("Decoded token", extra={"token": payload})
             return payload
-        except jwt.ExpiredSignatureError as error:
-            logger.error(error, extra={"credentials": credentials})
+        except jwt.ExpiredSignatureError:
+            logger.error("Expired Signature", extra={"credentials": credentials}, exc_info=True)
             # Handle token expiration, e.g., refresh token, re-authenticate, etc.
-        except jwt.PyJWTError as error:
-            logger.error(error, extra={"credentials": credentials})
+        except jwt.PyJWTError:
+            logger.error("General JWT Error", extra={"credentials": credentials}, exc_info=True)
             # Handle other JWT errors
         raise UnauthenticatedException()

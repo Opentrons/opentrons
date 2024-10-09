@@ -4,7 +4,7 @@ import pytest
 
 from opentrons import simulate
 from opentrons.protocol_api import COLUMN, ALL, SINGLE, ROW
-from opentrons.protocol_api.core.engine.deck_conflict import (
+from opentrons.protocol_api.core.engine.pipette_movement_conflict import (
     PartialTipMovementNotAllowedError,
 )
 

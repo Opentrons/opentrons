@@ -97,7 +97,7 @@
         "pickUp": "pick up tip"
       },
       "magnetAction": {
-        "label": "Magnet action",
+        "label": "Magnet state",
         "options": {
           "disengage": "Disengage",
           "engage": "Engage"
