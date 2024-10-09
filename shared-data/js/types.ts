@@ -878,3 +878,10 @@ export interface CutoutConfig {
 }
 
 export type DeckConfiguration = CutoutConfig[]
+
+export type NozzleLayoutConfig =
+  | 'single'
+  | 'column'
+  | 'row'
+  | 'full'
+  | 'subrect'
