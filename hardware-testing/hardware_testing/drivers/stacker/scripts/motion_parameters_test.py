@@ -13,9 +13,9 @@ import argparse
 TEST_PARAMETERS: Dict[str, Dict[str, Dict[str, Dict[str, float]]]] = {
     "Plate_stacker": {
         "X": {
-            "SPEED": {"MIN": 20, "MAX": 200, "INC": 20},
+            "SPEED": {"MIN": 100, "MAX": 300, "INC": 20},
             "ACCEL": {"MIN": 100, "MAX": 2000, "INC": 100},
-            "CURRENT": {"MIN": 0.5, "MAX": 1.5, "INC": 0.05}
+            "CURRENT": {"MIN": 0.8, "MAX": 1.5, "INC": 0.05}
         },
         "Z": {
             "SPEED": {"MIN": 5, "MAX": 450, "INC": 5},
