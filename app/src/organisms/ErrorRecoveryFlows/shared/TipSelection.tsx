@@ -9,20 +9,14 @@ export type TipSelectionProps = RecoveryContentProps & {
 }
 
 export function TipSelection(props: TipSelectionProps): JSX.Element {
-  //TOME: Refactor down to failedPipetteUtils.
-  const {
-    failedLabwareUtils,
-    failedPipetteInfo,
-    failedPipetteUtils,
-    allowTipSelection,
-  } = props
+  const { failedLabwareUtils, failedPipetteUtils, allowTipSelection } = props
   const {
     tipSelectorDef,
     selectedTipLocations,
     selectTips,
     deselectTips,
   } = failedLabwareUtils
-  const { relevantActiveNozzleLayout } = failedPipetteUtils
+  const { relevantActiveNozzleLayout, failedPipetteInfo } = failedPipetteUtils
 
   const onSelectTips = (tipGroup: WellGroup): void => {
     if (allowTipSelection) {
