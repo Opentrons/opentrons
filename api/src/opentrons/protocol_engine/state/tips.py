@@ -44,8 +44,8 @@ class TipState:
 
     tips_by_labware_id: Dict[str, TipRackStateByWellName]
     column_by_labware_id: Dict[str, List[List[str]]]
+
     channels_by_pipette_id: Dict[str, int]
-    length_by_pipette_id: Dict[str, float]
     active_channels_by_pipette_id: Dict[str, int]
     nozzle_map_by_pipette_id: Dict[str, NozzleMap]
 
@@ -61,7 +61,6 @@ class TipStore(HasState[TipState], HandlesActions):
             tips_by_labware_id={},
             column_by_labware_id={},
             channels_by_pipette_id={},
-            length_by_pipette_id={},
             active_channels_by_pipette_id={},
             nozzle_map_by_pipette_id={},
         )
@@ -121,18 +120,15 @@ class TipStore(HasState[TipState], HandlesActions):
             labware_id = command.params.labwareId
             well_name = command.params.wellName
             pipette_id = command.params.pipetteId
-            length = command.result.tipLength
             self._set_used_tips(
                 pipette_id=pipette_id, well_name=well_name, labware_id=labware_id
             )
-            self._state.length_by_pipette_id[pipette_id] = length
 
         elif isinstance(
             command.result,
             (DropTipResult, DropTipInPlaceResult, unsafe.UnsafeDropTipInPlaceResult),
         ):
             pipette_id = command.params.pipetteId
-            self._state.length_by_pipette_id.pop(pipette_id, None)
 
     def _handle_failed_command(
         self,
@@ -505,10 +501,6 @@ class TipView(HasState[TipState]):
         well_state = tip_rack.get(well_name) if tip_rack else None
 
         return well_state == TipRackWellState.CLEAN
-
-    def get_tip_length(self, pipette_id: str) -> float:
-        """Return the given pipette's tip length."""
-        return self._state.length_by_pipette_id.get(pipette_id, 0)
 
 
 def _drop_wells_before_starting_tip(
