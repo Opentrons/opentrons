@@ -8,7 +8,9 @@ The Opentrons AI application helps you to create a protocol with natural languag
 
 ## Developing
 
-To get started: clone the `Opentrons/opentrons` repository, set up your computer for development as specified in the [contributing guide][contributing-guide-setup], and then:
+1. To get started: clone the `Opentrons/opentrons` repository
+1. Read [contributing guide][contributing-guide-setup]
+1. Follow [DEV_SETUP.md](./DEV_SETUP.md) for our recommended development setup guides for macOS, Windows, and Linux.
 
 ```shell
 # change into the cloned directory
@@ -55,14 +57,16 @@ Test tasks can also be run with the following arguments:
 | watch    | `false`  | Run tests in watch mode | `make test-unit watch=true`       |
 | cover    | `!watch` | Calculate code coverage | `make test watch=true cover=true` |
 
-## Building
+## Local development notes
 
-TBD
+1. [constants.ts](./src/resources/constants.ts) defines the AI API location and the Auth0 configuration.
+1. [main.tsx](./src/main.tsx) has the logic to use the appropriate constants based on the environment.
+
+## Links
 
 [style-guide]: https://standardjs.com
 [style-guide-badge]: https://img.shields.io/badge/code_style-standard-brightgreen.svg?style=flat-square&maxAge=3600
 [contributing-guide-setup]: ../CONTRIBUTING.md#development-setup
-[contributing-guide-running-the-api]: ../CONTRIBUTING.md#opentrons-api
 [react]: https://react.dev/
 [babel]: https://babeljs.io/
 [vite]: https://vitejs.dev/
