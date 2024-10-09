@@ -79,14 +79,14 @@
     },
     "lidOffsets": {
       "pickUpOffset": {
-        "x": 1.0,
+        "x": 0.5,
         "y": 0,
         "z": -5
       },
       "dropOffset": {
-        "x": 1.0,
+        "x": 0.5,
         "y": 0,
-        "z": 0
+        "z": -1
       }
     }
   }
