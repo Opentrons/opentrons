@@ -16,6 +16,7 @@ import {
   MODULE_MODELS_OT2_ONLY,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  ABSORBANCE_READER_TYPE,
 } from '@opentrons/shared-data'
 import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 import { useIsLegacySessionInProgress } from '/app/resources/legacy_sessions'
@@ -119,6 +120,7 @@ export const ModuleOverflowMenu = (
     <Flex position={POSITION_RELATIVE}>
       <MenuList>
         {isFlex &&
+        module.moduleType !== ABSORBANCE_READER_TYPE &&
         !MODULE_MODELS_OT2_ONLY.some(
           modModel => modModel === module.moduleModel
         ) ? (
@@ -146,13 +148,15 @@ export const ModuleOverflowMenu = (
           (item: any, index: number) => {
             return (
               <Fragment key={`${index}_${String(module.moduleType)}`}>
-                <MenuItem
-                  onClick={() => item.onClick(item.isSecondary)}
-                  disabled={item.disabledReason || isDisabled}
-                  whiteSpace={NO_WRAP}
-                >
-                  {item.setSetting}
-                </MenuItem>
+                {item.setSetting ? (
+                  <MenuItem
+                    onClick={() => item.onClick(item.isSecondary)}
+                    disabled={item.disabledReason || isDisabled}
+                    whiteSpace="nowrap"
+                  >
+                    {item.setSetting}
+                  </MenuItem>
+                ) : null}
                 {item.menuButtons}
               </Fragment>
             )

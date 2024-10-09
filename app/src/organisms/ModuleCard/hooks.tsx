@@ -79,10 +79,10 @@ export function useLatchControls(module: AttachedModule): LatchControls {
 }
 export type MenuItemsByModuleType = {
   [moduleType in AttachedModule['moduleType']]: Array<{
-    setSetting: string
-    isSecondary: boolean
+    setSetting?: string
+    isSecondary?: boolean
     menuButtons: JSX.Element[] | null
-    onClick: (isSecondary: boolean) => void
+    onClick?: (isSecondary: boolean) => void
   }>
 }
 interface ModuleOverflowMenu {
@@ -354,7 +354,11 @@ export function useModuleOverflowMenu(
               },
       },
     ],
-    absorbanceReaderType: [],
+    absorbanceReaderType: [
+      {
+        menuButtons: [aboutModuleBtn],
+      },
+    ],
   }
 
   return {

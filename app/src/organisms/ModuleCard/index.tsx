@@ -131,7 +131,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const requireModuleCalibration =
     isFlex &&
     !MODULE_MODELS_OT2_ONLY.some(modModel => modModel === module.moduleModel) &&
-    module.moduleOffset?.last_modified == null
+    module.moduleOffset?.last_modified == null &&
+    !(module.moduleType === 'absorbanceReaderType')
+
   const isPipetteReady =
     !Boolean(attachPipetteRequired) &&
     !Boolean(calibratePipetteRequired) &&
